@@ -44,6 +44,7 @@ namespace Corasau.Client.Pages
             : base(api, string.Empty)
         {
             InitPage();
+            var string = "str";
         }
        
         public Gl_Accounts(BaseAPI api, string lookupKey)
