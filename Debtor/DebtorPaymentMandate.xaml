@@ -1,0 +1,63 @@
+<Pages:GridBasePage  xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=Uniconta.WPFClient"
+x:Class="UnicontaClient.Pages.CustomPage.DebtorPaymentMandate"
+        xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools" 
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"       
+        xmlns:dxn="clr-namespace:DevExpress.Xpf.NavBar;assembly=DevExpress.Xpf.NavBar.v18.2"                                         
+        xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+        xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+        xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
+        xmlns:editor="clr-namespace:DevExpress.Xpf.Editors.Settings;assembly=DevExpress.Xpf.Core.v18.2">
+    <UserControl.Resources>
+        <Util:RowIndexConverter x:Key="RowIndexConverter" />
+    </UserControl.Resources>
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="2" x:Name="rowgridSplitter"/>
+            <RowDefinition Height="Auto" x:Name="rowStatusInfoSection"/>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Debtor/DebtorPaymentMandateGridRibbon.xml" x:Name="localMenu"/>
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <local:DebtorPaymentMandateGrid x:Name="dgDebtorPaymentMandate" AutoGenerateColumns="None" HorizontalAlignment="Stretch">
+                <local:DebtorPaymentMandateGrid.Columns>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DCAccount" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="AccountName" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="MandateId" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="OldMandateId" Visible="False" AllowEditing="True"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PaymentFormat" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="AgreementId" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ActivationDate" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="CancellationDate" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="MandateStatus" AllowEditing="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="StatusInfo" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ErrorInfo" />
+                </local:DebtorPaymentMandateGrid.Columns>
+            </local:DebtorPaymentMandateGrid>
+        </CorasauControls:BusyIndicator>
+
+        <GridSplitter Grid.Row="2" x:Name="gridSplitter" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Visibility="{Binding ElementName=Comment,Path=Visibility}" />
+
+        <dxn:NavBarControl  Grid.Row="3" x:Name="InputWindowOrder1"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <dxn:NavBarControl.Groups>
+                <dxn:NavBarGroup IsExpanded="True">
+                    <Grid DataContext="{Binding Path=SelectedItem,ElementName=dgDebtorPaymentMandate}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock  Grid.Row="0" Grid.Column="0" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=StatusInfo}" FontWeight="Bold" />
+                        <TextBlock Grid.Row="1" TextWrapping="Wrap" Grid.Column="0" x:Name="CommentTxt" Text="{Binding Path=StatusInfo}" />
+                    </Grid>
+                </dxn:NavBarGroup>
+            </dxn:NavBarControl.Groups>
+        </dxn:NavBarControl>
+    </Grid>
+</Pages:GridBasePage>

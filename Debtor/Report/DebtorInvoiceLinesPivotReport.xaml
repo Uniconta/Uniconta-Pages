@@ -1,0 +1,69 @@
+<Pages:PivotBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools" 
+        xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=Uniconta.WPFClient"
+x:Class="UnicontaClient.Pages.CustomPage.DebtorInvoiceLinesPivotReport"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:dxc="clr-namespace:DevExpress.Xpf.Charts;assembly=DevExpress.Xpf.Charts.v18.2"
+        xmlns:collections="clr-namespace:System.Collections;assembly=mscorlib"
+        xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
+        xmlns:UnicontaControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <UnicontaControls:CorasauRibbonControl x:Name="localMenu" XMLSourcePath=";component/Pages/Inventory/InvTransPivotPageRibbon.xml" Grid.Row="0"/>
+        <UnicontaControls:BusyIndicator x:Name="busyIndicator"  Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <UnicontaControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Vertical" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="5" x:Name="rowgridSplitter"/>
+                        <RowDefinition Height="Auto" x:Name="rowChartControl"/>
+                    </Grid.RowDefinitions>
+                    <UnicontaControls:UnicontaPivotDataGrid x:Name="pivotDgDebtorInvLines" 
+             RowTotalsLocation="Far" RowTreeWidth="305"  ShowBorder="False" Loaded="pivotDgDebtorInvLines_Loaded"
+             VerticalAlignment="Stretch" ChartProvideDataByColumns="False" ChartSelectionOnly="True" ChartProvideColumnGrandTotals="False"
+             ChartProvideRowGrandTotals="False"  ChartDataProvideMode="UseCustomSettings" >
+                        <UnicontaControls:UnicontaPivotDataGrid.Fields>
+                            <UnicontaControls:UnicontaPivotGridField  x:Name="fieldItem"  FieldName="Item"  AllowFilter="True"  AreaIndex="0" Width="100" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Item}"/>
+                            <UnicontaControls:UnicontaPivotGridField  x:Name="fieldItemName"  FieldName="ItemName"  AllowFilter="True"  AreaIndex="1" Width="100" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ItemName}"/>
+                            <UnicontaControls:UnicontaPivotGridField  x:Name="fieldDCAccount"  FieldName="DCAccount"  AllowFilter="True" AreaIndex="2" Width="100" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Account}"/>
+                            <UnicontaControls:UnicontaPivotGridField  x:Name="fieldAccountName"  FieldName="AccountName"  AllowFilter="True" AreaIndex="3" Width="100" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=AccountName}"/>
+                            <UnicontaControls:UnicontaPivotGridField  x:Name="fieldGroup"   FieldName="Group"  AllowFilter="True" AreaIndex="4" Width="100" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Group}" />
+                            <UnicontaControls:UnicontaPivotGridField  x:Name="fieldDebtorGroup"  FieldName="DebtorGroup"  AllowFilter="True" AreaIndex="5" Width="100" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DebtorGroup}" />
+                            <UnicontaControls:UnicontaPivotGridField  x:Name="fieldWarehouse"  FieldName="Warehouse"  AllowFilter="True" AreaIndex="6" Width="100" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Warehouse}"/>
+                            <UnicontaControls:UnicontaPivotGridField  x:Name="fieldLocation"  FieldName="Location"  AllowFilter="True" AreaIndex="7" Width="100" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Location}"/>
+                            <UnicontaControls:UnicontaPivotGridField  x:Name="fieldEmployee"  FieldName="Employee"  AllowFilter="True" AreaIndex="8" Width="100" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Employee}"/>
+                            <UnicontaControls:UnicontaPivotGridField  x:Name="fieldVat"  FieldName="Vat"  AllowFilter="True" AreaIndex="9" Width="100" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Vat}"/>
+
+                            <UnicontaControls:UnicontaPivotGridField x:Name="fieldDate" FieldName="Date" GroupInterval="DateMonth"  AreaIndex="10" Width="60" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Month}" />
+                            <UnicontaControls:UnicontaPivotGridField x:Name="fieldYear" FieldName="Date"  GroupInterval="DateYear" AreaIndex="11"  Width="60" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Year}" />
+                            <UnicontaControls:UnicontaPivotGridField x:Name="fieldQuarter" ValueFormat="Quarter {0}" FieldName="Date" AreaIndex="12" GroupInterval="DateQuarter" Width="60" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Quarter}" />
+
+                            <UnicontaControls:UnicontaPivotGridField x:Name="fieldInvQty" FieldName="InvoiceQty" SummaryType="Sum" ShowSummaryTypeName="True"  Area="DataArea" Width="120" AllowFilter="False"
+                                AreaIndex="0"/>
+                            <UnicontaControls:UnicontaPivotGridField x:Name="fieldNetAmt" FieldName="InvoiceNetAmount" SummaryType="Sum" ShowSummaryTypeName="True" Area="DataArea"  Width="120" AllowFilter="False"
+                                AreaIndex="1" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=NetAmount}"  />
+                            <UnicontaControls:UnicontaPivotGridField x:Name="fieldMargin" FieldName="Margin" SummaryType="Sum" ShowSummaryTypeName="True" Area="DataArea" Width="120" AllowFilter="False"
+                                AreaIndex="2" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Margin}" />
+                            <UnicontaControls:UnicontaPivotGridField x:Name="fieldCostValue" FieldName="CostValue" SummaryType="Sum" ShowSummaryTypeName="True" Area="DataArea" Width="120" AllowFilter="False"
+                                AreaIndex="3" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CostValue}" />
+                        </UnicontaControls:UnicontaPivotDataGrid.Fields>
+                    </UnicontaControls:UnicontaPivotDataGrid>
+                    <GridSplitter  x:Name="gridSplitter" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Visibility="{Binding ElementName=chartControl,Path=Visibility}" />
+                    <UnicontaControls:UnicontaChart x:Name="chartControl" Grid.Row="2" VerticalAlignment="Stretch"  Visibility="Collapsed" DataSource="{Binding ElementName=pivotDgDebtorInvLines, Path=ChartDataSource}" >
+                        <dxc:ChartControl.CrosshairOptions>
+                            <dxc:CrosshairOptions ShowArgumentLine="False"/>
+                        </dxc:ChartControl.CrosshairOptions>
+                        <dxc:ChartControl.Legend>
+                            <dxc:Legend ReverseItems="True"  />
+                        </dxc:ChartControl.Legend>
+                    </UnicontaControls:UnicontaChart>
+                </Grid>
+            </UnicontaControls:CorasauLayoutControl>
+        </UnicontaControls:BusyIndicator>
+    </Grid>
+</Pages:PivotBasePage>

@@ -1,0 +1,15 @@
+<Pages:BasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"   
+   xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=Uniconta.WPFClient"
+x:Class="UnicontaClient.Pages.CustomPage.DebtorOrderInvoice"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+    mc:Ignorable="d"
+    d:DesignHeight="300" d:DesignWidth="400">
+    
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <!--<CorasauControls:OrderInvoice x:Name="odrInv"></CorasauControls:OrderInvoice>-->
+    </Grid>
+</Pages:BasePage>

@@ -1,0 +1,61 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"  
+   xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=Uniconta.WPFClient"
+x:Class="UnicontaClient.Pages.CustomPage.DebtorLayoutGroupPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage"
+      xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"              
+      mc:Ignorable="d" 
+      d:DesignHeight="300" d:DesignWidth="300">
+
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Debtor/DebtorLayoutGroupGridRibbon.xml" x:Name="localMenu"/>
+
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <localPage:DebtorLayoutGroupGrid  x:Name="dgDebtorLayoutGroupGrid" AutoGenerateColumns="None">
+                <localPage:DebtorLayoutGroupGrid.Columns>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="IsDefault" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Invoice" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Creditnote"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Packnote"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="OrderConfirmation"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Offer" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceRep"  />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CreditnoteRep" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PacknoteRep" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="OrderConfirmationRep" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="OfferRep" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="StatementRep"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="StatementCurRep" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CollectionRep" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CollectionCurRep" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="InterestNoteRep" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="InterestNoteCurRep" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PickingListRep" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="IBAN" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="NationalBank" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="SWIFT" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="FIK" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceEmail" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CreditnoteEmail" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PacknoteEmail" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="OrderConfirmationEmail" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="OfferEmail" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="StatementEmail" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="StatementCurEmail" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CollectionEmail" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="InterestNoteEmail" Visible="False"/>
+                </localPage:DebtorLayoutGroupGrid.Columns>
+            </localPage:DebtorLayoutGroupGrid>
+        </CorasauControls:BusyIndicator>
+
+
+    </Grid>
+</Pages:GridBasePage>

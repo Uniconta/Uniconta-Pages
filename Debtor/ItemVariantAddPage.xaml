@@ -1,0 +1,40 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools" 
+        xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=Uniconta.WPFClient"
+x:Class="UnicontaClient.Pages.CustomPage.ItemVariantAddPage"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
+        xmlns:converter="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
+       xmlns:UnicontaControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools" >
+    <Pages:GridBasePage.Resources>
+        <converter:MaskConverter x:Key="MaskConverter" />
+    </Pages:GridBasePage.Resources>
+    <Grid x:Name="LayoutRoot" Margin="2" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <UnicontaControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Debtor/ItemVariantAddPageRibbon.xml" x:Name="localMenu"/>
+        <UnicontaControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1"  BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <local:ItemVariantAddPageGrid x:Name="dgItemVariant" AutoGenerateColumns="None">
+                <local:ItemVariantAddPageGrid.Columns>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Quantity" >
+                        <local:CorasauDataGridTemplateColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <UnicontaControls:TextEditor  x:Name="PART_Editor" HorizontalContentAlignment="Right" Mask="{Binding Path=DataContext.RowData.Row.Decimals,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource MaskConverter},ConverterParameter=Decimals}" 
+                                 MaskUseAsDisplayFormat="True" MaskType="Numeric" EditValue="{Binding Path=DataContext.RowData.Row.Quantity,RelativeSource={RelativeSource TemplatedParent}}"/>
+                            </DataTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.CellTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient FieldName="Variant1" x:Name="colVariant1" AllowEditing="False"/>
+                    <local:CorasauDataGridTemplateColumnClient FieldName="Variant2" x:Name="colVariant2" AllowEditing="False"/>
+                    <local:CorasauDataGridTemplateColumnClient FieldName="Variant3" x:Name="colVariant3" AllowEditing="False"/>
+                    <local:CorasauDataGridTemplateColumnClient FieldName="Variant4" x:Name="colVariant4" AllowEditing="False"/>
+                    <local:CorasauDataGridTemplateColumnClient FieldName="Variant5" x:Name="colVariant5" AllowEditing="False"/>
+                </local:ItemVariantAddPageGrid.Columns>
+            </local:ItemVariantAddPageGrid>
+        </UnicontaControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

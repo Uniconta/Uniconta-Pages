@@ -1,0 +1,34 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"  
+        xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=Uniconta.WPFClient"
+x:Class="UnicontaClient.Pages.CustomPage.IOBSClaimBatchPage"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
+        xmlns:UnicontaControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+        xmlns:dxg="clr-namespace:DevExpress.Xpf.Grid;assembly=DevExpress.Xpf.Grid.v18.2">
+    <UserControl.Resources>
+        <Style x:Key="StyleRow" TargetType="dxg:RowControl">
+            <Setter Property="Height" Value="Auto"/>
+        </Style>
+    </UserControl.Resources>
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <UnicontaControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Debtor/Report/IOBSClaimBatchPageGridRibbon.xml" x:Name="localMenu"/>
+        <UnicontaControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <local:IOBSClaimBatchPageGrid  x:Name="dgIOBSClaimBatchPageGrid" AutoGenerateColumns="None">
+                <local:IOBSClaimBatchPageGrid.Columns>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DueDate" Width="200"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="FinalDueDate" Width="200" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="BatchNumber" Width="150" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Description" Width="300"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DateAndTimeSentToBank" Width="200" />
+                </local:IOBSClaimBatchPageGrid.Columns>
+            </local:IOBSClaimBatchPageGrid>
+        </UnicontaControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

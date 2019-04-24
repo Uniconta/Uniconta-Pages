@@ -1,0 +1,80 @@
+using UnicontaClient.Utilities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+using Uniconta.ClientTools;
+
+using UnicontaClient.Pages;
+namespace UnicontaClient.Pages.CustomPage
+{
+    /// <summary>
+    /// Interaction logic for CWCollectionLetter.xaml
+    /// </summary>
+    public partial class CWCollectionLetter : ChildWindow
+    {
+        public string Result { get; set; }
+        public CWCollectionLetter()
+        {
+            InitializeComponent();
+            this.DataContext = this;
+            this.Title = string.Format("{0} {1}", Uniconta.ClientTools.Localization.lookup("Select"), Uniconta.ClientTools.Localization.lookup("Options"));
+            Loaded += CWCollectionLetter_Loaded;
+#if SILVERLIGHT
+            Utility.SetThemeBehaviorOnChildWindow(this);
+#endif
+
+            cmbCollectionLtr.ItemsSource = Utility.GetDebtorCollectionLetters();
+            cmbCollectionLtr.SelectedIndex = 0;
+        }
+
+       
+
+        private void CancelButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.DialogResult = false;
+        }
+
+        private void OKButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (cmbCollectionLtr.SelectedItem == null)
+                this.DialogResult = false;
+            else
+            {
+                Result = cmbCollectionLtr.SelectedItem.ToString();
+                this.DialogResult = true;
+            }
+        }
+
+        void CWCollectionLetter_Loaded(object sender, RoutedEventArgs e)
+        {
+            Dispatcher.BeginInvoke(new Action(() => { cmbCollectionLtr.Focus(); }));
+        }
+
+        private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Escape)
+            {
+                this.DialogResult = false;
+            }
+            else
+               if (e.Key == Key.Enter)
+            {
+                if (OKButton.IsFocused)
+                    OKButton_Click(null, null);
+                else if (CancelButton.IsFocused)
+                    this.DialogResult = false;
+            }
+        }
+    }
+}

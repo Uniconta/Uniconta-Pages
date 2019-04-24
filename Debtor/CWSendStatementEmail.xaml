@@ -1,0 +1,39 @@
+<cw:ChildWindow xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=Uniconta.WPFClient"
+x:Class="UnicontaClient.Pages.CustomPage.CWSendStatementEmail"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
+        xmlns:cw="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"    
+        xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+        xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+        Width="220" Height="{StaticResource Height19}"  KeyDown="ChildWindow_KeyDown">
+    <Grid Margin="4" x:Name="LayoutRoot" >
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid VerticalAlignment="Center">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=All}" Grid.Column="0" Grid.Row="0" Margin="5,0,0,0" VerticalAlignment="Center"/>
+            <CorasauControls:CheckEditor Checked="cbxAll_Checked" IsChecked="{Binding SendAll, Mode=TwoWay}" Unchecked="cbxAll_Checked" x:Name="cbxAll" Grid.Column="2" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=SelectedRows}"  Grid.Column="0" Grid.Row="1" Margin="5,0,0,0" VerticalAlignment="Center"/>
+            <CorasauControls:CheckEditor x:Name="cbxMarked" IsChecked="{Binding SendOnlyMarked, Mode=TwoWay}" Grid.Column="2" Grid.Row="1" HorizontalAlignment="Center"  VerticalAlignment="Center"/>
+        </Grid>
+        <StackPanel x:Name="actionButton" HorizontalAlignment="Right" Grid.Row="1" Orientation="Horizontal" Margin="0 10 0 0">
+            <Button x:Name="OKButton" IsDefault="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OK}" Click="OKButton_Click" MinWidth="75" Height="23" 
+                    HorizontalAlignment="Right" Margin="0 0 3 0" />
+            <Button x:Name="CancelButton" IsCancel="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Cancel}" Click="CancelButton_Click" MinWidth="75" 
+                    Height="23" HorizontalAlignment="Right"  />
+        </StackPanel>
+    </Grid>
+</cw:ChildWindow>

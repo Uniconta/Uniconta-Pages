@@ -1,0 +1,129 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools" xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=Uniconta.WPFClient"
+x:Class="UnicontaClient.Pages.CustomPage.DebtorTotals"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:dxc="clr-namespace:DevExpress.Xpf.Charts;assembly=DevExpress.Xpf.Charts.v18.2"
+             xmlns:UnicontaControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"      
+             xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage" xmlns:WPFPages="clr-namespace:UnicontaClient.Pages.CustomPage"
+             xmlns:editor="clr-namespace:DevExpress.Xpf.Editors;assembly=DevExpress.Xpf.Core.v18.2">
+
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="10" />
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="2" x:Name="rowgridSplitter"/>
+            <RowDefinition Height="Auto" x:Name="rowChartControl"/>
+        </Grid.RowDefinitions>
+        <UnicontaControls:CorasauRibbonControl x:Name="localMenu" XMLSourcePath=";component/Pages/Debtor/Report/DebtorTotalsRibbon.xml"/>
+        <Grid Grid.Row="1" Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="10" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="3" />
+                <ColumnDefinition Width="170" />
+                <ColumnDefinition Width="3" />
+                <ColumnDefinition Width="170" />
+                <ColumnDefinition Width="10" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="3" />
+                <ColumnDefinition Width="60" />
+                <ColumnDefinition Width="10" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="3" />
+                <ColumnDefinition Width="60" />
+                <ColumnDefinition Width="10" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="3" />
+                <ColumnDefinition Width="100" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=GroupingBy}" VerticalAlignment="Center" Grid.Row="0" Grid.Column="0" />
+            <ComboBox x:Name="cmbReportType" SelectionChanged="cmbReportType_SelectionChanged" Grid.Row="0" Grid.Column="2">
+                <ComboBoxItem Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CurBalance}" />
+                <ComboBoxItem Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BalanceDue}" />
+            </ComboBox>
+            <UnicontaControls:DateEditor x:Name="BalanceDate" Grid.Row="0" Grid.Column="4" ShowToday="True"/>
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=AgeInterval}" Grid.Row="0" Grid.Column="6" VerticalAlignment="Center" />
+            <UnicontaControls:NumericUpDownEditor x:Name="intervalEdit"  MaxValue="1000" Grid.Row="0" Grid.Column="8" />
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=NumberOfColumns}" Grid.Row="0" Grid.Column="10" VerticalAlignment="Center" />
+            <UnicontaControls:NumericUpDownEditor x:Name="countEdit" MaxValue="10" MinValue="1" Text="10" Grid.Row="0" Grid.Column="12"/>
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Currency}"  Grid.Row="0" Grid.Column="14" VerticalAlignment="Center" />
+            <UnicontaControls:ComboBoxEditor x:Name="cmbCurrency"  Grid.Row="0" Grid.Column="16"/>
+            <StackPanel Orientation="Horizontal"  Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="5">
+                <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=SkipOnHold}" VerticalAlignment="Center"/>
+                <UnicontaControls:CheckEditor x:Name="chkSkipOnHold" Margin="3 0 0 0" IsChecked="False"/>
+            </StackPanel>
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=IncludeJournal}" VerticalAlignment="Center"  Grid.Row="2" Grid.Column="6" TextWrapping="Wrap"/>
+            <UnicontaControls:ComboBoxEditor x:Name="cmbJournal" Grid.Column="8" Grid.Row="2" Grid.ColumnSpan="3">
+                <UnicontaControls:ComboBoxEditor.StyleSettings>
+                    <editor:CheckedComboBoxStyleSettings />
+                </UnicontaControls:ComboBoxEditor.StyleSettings>
+            </UnicontaControls:ComboBoxEditor>
+        </Grid>
+        <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{StaticResource WindowHeaderGradient}" />
+        <UnicontaControls:BusyIndicator x:Name="busyIndicator" Grid.Row="3" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BusyMessage}">
+            <WPFPages:DebtorTotalsGrid  x:Name="dgDebtorTotalsGrid" AutoGenerateColumns="None" HorizontalAlignment="Stretch">
+                <WPFPages:DebtorTotalsGrid.Columns>
+                    <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Account" Width="100"/>
+                    <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Name" Width="150"/>
+                    <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Group" Width="80" />
+                    <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Amount0"/>
+                    <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Amount1"/>
+                    <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Amount2"/>
+                    <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Amount3"/>
+                    <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Amount4"/>
+                    <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Amount5"/>
+                    <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Amount6"/>
+                    <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Amount7"/>
+                    <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Amount8"/>
+                    <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Amount9"/>
+                    <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Total"/>
+                </WPFPages:DebtorTotalsGrid.Columns>
+                <WPFPages:DebtorTotalsGrid.TotalSummary>
+                    <localPage:SumColumn FieldName="Amount0" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="Amount1" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="Amount2" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="Amount3" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="Amount4" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="Amount5" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="Amount6" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="Amount7" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="Amount8" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="Amount9" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="Total" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                </WPFPages:DebtorTotalsGrid.TotalSummary>
+            </WPFPages:DebtorTotalsGrid>
+        </UnicontaControls:BusyIndicator>
+        <GridSplitter Grid.Row="4" x:Name="gridSplitter" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Visibility="{Binding ElementName=totalAmountByDateChart,Path=Visibility}" />
+        <UnicontaControls:UnicontaChart x:Name="totalAmountByDateChart" Grid.Row="5"  Visibility="Collapsed" >
+            <UnicontaControls:UnicontaChart.Legend>
+                <dxc:Legend/>
+            </UnicontaControls:UnicontaChart.Legend>
+            <dxc:XYDiagram2D>
+                <dxc:XYDiagram2D.AxisY>
+                    <dxc:AxisY2D>
+                        <dxc:AxisY2D.Label>
+                            <dxc:AxisLabel TextPattern="{}{V:N2}" />
+                        </dxc:AxisY2D.Label>
+                    </dxc:AxisY2D>
+                </dxc:XYDiagram2D.AxisY>
+
+                <dxc:XYDiagram2D.Series>
+                    <dxc:BarSideBySideSeries2D 
+                        ArgumentDataMember="Date" ValueDataMember="Amount"  ColorEach="True" CrosshairLabelPattern="{}{V:N2}" >
+                        <dxc:BarSideBySideSeries2D.LegendPointOptions>
+                            <dxc:PointOptions Pattern="{}{V:N2}" />
+                        </dxc:BarSideBySideSeries2D.LegendPointOptions>
+                    </dxc:BarSideBySideSeries2D>
+                </dxc:XYDiagram2D.Series>
+            </dxc:XYDiagram2D>
+        </UnicontaControls:UnicontaChart>
+
+    </Grid>
+
+</Pages:GridBasePage>

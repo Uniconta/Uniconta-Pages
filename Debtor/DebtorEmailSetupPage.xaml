@@ -1,0 +1,34 @@
+<Pages:GridBasePage xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=Uniconta.WPFClient"
+x:Class="UnicontaClient.Pages.CustomPage.DebtorEmailSetupPage"
+                    xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
+                    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+                    xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage">
+    <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+        <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Debtor/DebtorEmailSetupGridRibbon.xml" x:Name="localMenu"/>
+            <localPage:DebtorEmailSetupGrid x:Name="dgEmailSetupGrid" AutoGenerateColumns="None" Grid.Row="1">
+                <localPage:DebtorEmailSetupGrid.Columns>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="EmailSendFrom" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="NameInEmail" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="EmailSubject" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Language" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="EmailType" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Default" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Html" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Bcc" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Host" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Port" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="SmtpUser" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ReplyTo" Visible="False" />
+                </localPage:DebtorEmailSetupGrid.Columns>
+            </localPage:DebtorEmailSetupGrid>
+        </Grid>
+    </CorasauControls:BusyIndicator>
+</Pages:GridBasePage>

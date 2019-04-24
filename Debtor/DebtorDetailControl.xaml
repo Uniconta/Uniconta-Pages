@@ -1,0 +1,234 @@
+<UserControl xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=Uniconta.WPFClient"
+x:Class="UnicontaClient.Pages.CustomPage.DebtorDetailControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    mc:Ignorable="d"   xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
+    xmlns:editor="clr-namespace:DevExpress.Xpf.Editors;assembly=DevExpress.Xpf.Core.v18.2"   
+    xmlns:editorSettings="clr-namespace:DevExpress.Xpf.Editors.Settings;assembly=DevExpress.Xpf.Core.v18.2"
+    d:DesignHeight="300" d:DesignWidth="400">
+    <UserControl.Resources>
+        <Util:LocalizationValueConverter x:Key="LocalizationValueConverter"></Util:LocalizationValueConverter>
+        <Util:RowIndexConverter x:Key="RowIndexConverter" />
+    </UserControl.Resources>
+    <Grid x:Name="LayoutRoot">
+        <CorasauControls:CorasauLayoutControl x:FieldModifier="public" x:Name="layoutItems" Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
+
+            <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="grpFirst">
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpDescription" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Description}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="400">
+                    <CorasauControls:CorasauLayoutItem FieldName="Account" x:Name="liAccount">
+                        <CorasauControls:TextEditor Text="{Binding Account}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="CompanyRegNo" x:Name="liCompanyRegNo">
+                        <CorasauControls:TextEditor Text="{Binding CompanyRegNo}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Name" x:Name="liName">
+                        <CorasauControls:TextEditor Text="{Binding Name}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Address1" x:Name="liAddress1">
+                        <CorasauControls:TextEditor Text="{Binding Address1}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Address2" x:Name="liAddress2">
+                        <CorasauControls:TextEditor Text="{Binding Address2}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Address3" x:Name="liAddress3">
+                        <CorasauControls:TextEditor Text="{Binding Address3}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="ZipCode" x:Name="liZipCode" Style="{StaticResource LayoutItemsstyle}" ButtonClicked="liZipCode_ButtonClicked" ButtonContent="&#x26EF;" Padding="0">
+                        <CorasauControls:TextEditor x:Name="txtZipCode" Text="{Binding ZipCode}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="City" x:Name="liCity">
+                        <CorasauControls:TextEditor Text="{Binding City}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Country" x:Name="liCountry">
+                        <CorasauControls:TextEditor x:Name="cbCountry" Text="{Binding Country}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="UserLanguage" x:Name="liUserLanguage">
+                        <CorasauControls:TextEditor Text="{Binding UserLanguage}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Phone" x:Name="liPhone">
+                        <CorasauControls:TextEditor Text="{Binding Phone}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="ContactPerson" x:Name="liContactPerson">
+                        <CorasauControls:TextEditor Text="{Binding ContactPerson}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="ContactEmail" x:Name="liContactEmail" Style="{StaticResource LayoutItemsstyle}" ButtonClicked="Email_ButtonClicked" ButtonContent="&#x2709;" Padding="0">
+                        <CorasauControls:TextEditor Text="{Binding ContactEmail}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="liWww" FieldName="Www" Style="{StaticResource LayoutItemsstyle}" ButtonClicked="liWww_ButtonClicked"  ButtonContent="&#x1f310;" Padding="0">
+                        <CorasauControls:TextEditor Text="{Binding Www,Mode=TwoWay}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="MobilPhone" x:Name="liMobilPhone">
+                        <CorasauControls:TextEditor Text="{Binding MobilPhone}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Blocked" x:Name="liBlocked">
+                        <CorasauControls:CheckEditor x:Name="Blocked" IsChecked="{Binding Blocked}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
+
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpGroup" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Group}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left"  Width="400">
+                    <CorasauControls:CorasauLayoutItem FieldName="Group" x:Name="liGroup">
+                        <CorasauControls:TextEditor  x:Name="grouplookupeditor" Text="{Binding Group}" IsReadOnly="True" />
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Payment" x:Name="liPayment">
+                        <CorasauControls:TextEditor x:Name="Paymentlookupeditior" Text="{Binding Payment}" IsReadOnly="True" />
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="EndDiscountPct" x:Name="liEndDiscountPct">
+                        <CorasauControls:DoubleEditor FieldName="EndDiscountPct" IsReadOnly="True" />
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="CreditMax" x:Name="liCreditMax">
+                        <CorasauControls:DoubleEditor FieldName="CreditMax" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Employee" x:Name="liEmployee">
+                        <CorasauControls:TextEditor x:Name="Employeelookupeditor" Text="{Binding Employee}" IsReadOnly="True" />
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="VatZone" x:Name="liVatZone">
+                        <CorasauControls:TextEditor Text="{Binding VatZone}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Vat" x:Name="liVat">
+                        <CorasauControls:TextEditor x:Name="Vatlookupeditior" Text="{Binding Vat}" IsReadOnly="True" />
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="VatOperation" x:Name="itmVatOpr">
+                        <CorasauControls:TextEditor x:Name="VatOprlookupeditior" Text="{Binding VatOperation}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Currency" x:Name="liCurrency">
+                        <CorasauControls:TextEditor Text="{Binding Currency}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="BankAccountType" x:Name="itmBankAccType">
+                        <CorasauControls:TextEditor x:Name="BankAccountTypeEditior" Text="{Binding BankAccountType}" IsReadOnly="True" />
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="BankAccount" x:Name="liBankAccount">
+                        <CorasauControls:TextEditor Text="{Binding BankAccount}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="RefInPayment" x:Name="liRefInPayment">
+                        <CorasauControls:TextEditor Text="{Binding RefInPayment}" IsReadOnly="True" />
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="VatNumber" x:Name="liVatNumber">
+                        <CorasauControls:TextEditor Text="{Binding VatNumber}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
+
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="crmGroup" Visibility="Collapsed"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CRM}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="400">
+
+                    <CorasauControls:CorasauLayoutItem FieldName="CrmGroup" x:Name="liCrmHroup">
+                        <CorasauControls:TextEditor x:Name="leCrmGroup" Text="{Binding CrmGroup}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+
+                    <CorasauControls:CorasauLayoutItem FieldName="Interests" x:Name="liInterests">
+                        <CorasauControls:TextEditor x:Name="cmbInterests" Text="{Binding Interests}" IsReadOnly="True">
+
+                        </CorasauControls:TextEditor>
+                    </CorasauControls:CorasauLayoutItem>
+
+                    <CorasauControls:CorasauLayoutItem FieldName="Products" x:Name="liProducts">
+                        <CorasauControls:TextEditor x:Name="cmbProducts" Text="{Binding Products}" IsReadOnly="True">
+                        </CorasauControls:TextEditor>
+                    </CorasauControls:CorasauLayoutItem>
+                    
+                </CorasauControls:CorasauLayoutGroup>
+
+            </CorasauControls:CorasauLayoutGroup>
+            <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="lastGroup">
+
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="invoiceGrp" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Invoice}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="400">
+                    <CorasauControls:CorasauLayoutItem FieldName="InvoiceEmail" x:Name="liInvoiceEmail" Style="{StaticResource LayoutItemsstyle}" ButtonClicked="Email_ButtonClicked" ButtonContent="&#x2709;" Padding="0">
+                        <CorasauControls:TextEditor Text="{Binding InvoiceEmail}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="InvoiceInXML" x:Name="liInvoiceInXML">
+                        <CorasauControls:CheckEditor IsChecked="{Binding InvoiceInXML}" IsReadOnly="True" />
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="EAN" x:Name="liEAN">
+                        <CorasauControls:TextEditor Text="{Binding EAN}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="PostingAccount" x:Name="liPostingAccount">
+                        <CorasauControls:TextEditor x:Name="lePostingAccount" Text="{Binding PostingAccount}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="InvoiceAccount" x:Name="liInvoiceAccount">
+                        <CorasauControls:TextEditor x:Name="leInvoiceAccount" Text="{Binding InvoiceAccount}" IsReadOnly="True" />
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="PriceGroup" x:Name="liPriceGroup">
+                        <CorasauControls:TextEditor Text="{Binding PriceGroup}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="PriceList" x:Name="priceListLayoutItem">
+                        <CorasauControls:TextEditor x:Name="PriceListlookupeditior" Text="{Binding PriceList}" IsReadOnly="True" />
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="shipmentItem" FieldName="Shipment">
+                        <CorasauControls:TextEditor x:Name="leShipment" Text="{Binding Shipment}" IsReadOnly="True" />
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="DeliveryTerm" x:Name="liDeliveryTerm" Visibility="{Binding ElementName=shipmentItem, Path=Visibility}">
+                        <CorasauControls:LookupEditor x:Name="leDeliveryTerm" Text="{Binding DeliveryTerm}" IsReadOnly="True">
+                        </CorasauControls:LookupEditor>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="LayoutGroup">
+                        <CorasauControls:TextEditor x:Name="LayoutGrouplookupeditior" Text="{Binding LayoutGroup}" IsReadOnly="True" />
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="ItemNameGroup" x:Name="itemNameGrpLayoutItem">
+                        <CorasauControls:TextEditor x:Name="ItemNameGrouplookupeditior" Text="{Binding ItemNameGroup}" IsReadOnly="True" />
+                    </CorasauControls:CorasauLayoutItem>
+                   
+                    <CorasauControls:CorasauLayoutItem FieldName="PricesInclVat" x:Name="liPricesInclVat" >
+                        <CorasauControls:CheckEditor IsChecked="{Binding PricesInclVat}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="OurAccount" x:Name="liOurAccount">
+                        <CorasauControls:TextEditor Text="{Binding OurAccount}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="LastInvoice" x:Name="liLastInvoice">
+                        <CorasauControls:DateEditor EditValue="{Binding LastInvoice}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
+
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="dAddress" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="400">
+                    <CorasauControls:CorasauLayoutItem FieldName="DeliveryName" x:Name="liDeliveryName">
+                        <CorasauControls:TextEditor Text="{Binding DeliveryName}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="DeliveryAddress1" x:Name="liDeliveryAddress1">
+                        <CorasauControls:TextEditor Text="{Binding DeliveryAddress1}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="DeliveryAddress2" x:Name="liDeliveryAddress2">
+                        <CorasauControls:TextEditor  Text="{Binding DeliveryAddress2}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="DeliveryAddress3" x:Name="liDeliveryAddress3">
+                        <CorasauControls:TextEditor  Text="{Binding DeliveryAddress3}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="DeliveryZipCode" x:Name="liDeliveryZipCode"  Style="{StaticResource LayoutItemsstyle}" ButtonClicked="LiDeliveryZipCode_OnButtonClicked"  ButtonContent="&#x26EF;" Padding="0" >
+                        <CorasauControls:TextEditor Text="{Binding DeliveryZipCode}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="DeliveryCity" x:Name="liDeliveryCity">
+                        <CorasauControls:TextEditor Text="{Binding DeliveryCity}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="DeliveryCountry" x:Name="liDeliveryCountry">
+                        <CorasauControls:TextEditor x:Name="cbDeliveryCountry" Text="{Binding DeliveryCountry}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+
+                </CorasauControls:CorasauLayoutGroup>
+
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="usedim" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Dimension}" Orientation="Vertical" Width="400" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                    <CorasauControls:CorasauLayoutItem x:Name="lbldim1">
+                        <CorasauControls:TextEditor x:Name="dim1lookupeditior" Text="{Binding Dimension1}" IsReadOnly="True">
+                        </CorasauControls:TextEditor>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="lbldim2">
+                        <CorasauControls:TextEditor x:Name="dim2lookupeditior" Text="{Binding Dimension2}" IsReadOnly="True">
+                        </CorasauControls:TextEditor>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="lbldim3">
+                        <CorasauControls:TextEditor x:Name="dim3lookupeditior" Text="{Binding Dimension3}" IsReadOnly="True">
+                        </CorasauControls:TextEditor>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="lbldim4">
+                        <CorasauControls:TextEditor x:Name="dim4lookupeditior" Text="{Binding Dimension4}" IsReadOnly="True">
+                        </CorasauControls:TextEditor>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="lbldim5">
+                        <CorasauControls:TextEditor x:Name="dim5lookupeditior" Text="{Binding Dimension5}" IsReadOnly="True">
+                        </CorasauControls:TextEditor>
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
+
+            </CorasauControls:CorasauLayoutGroup>
+        </CorasauControls:CorasauLayoutControl>
+
+    </Grid>
+</UserControl>

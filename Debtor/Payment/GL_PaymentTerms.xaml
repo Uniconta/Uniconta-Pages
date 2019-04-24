@@ -1,0 +1,47 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
+   xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=Uniconta.WPFClient"
+x:Class="UnicontaClient.Pages.CustomPage.GL_PaymentTerms"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"  
+    xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+    xmlns:toolkit="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Toolkit"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d" xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage"
+    xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
+    d:DesignHeight="300" d:DesignWidth="400">
+    <UserControl.Resources>
+        <Util:RowIndexConverter x:Key="RowIndexConverter" />
+    </UserControl.Resources>
+    <Grid x:Name="LayoutRoot" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Debtor/Payment/GL_PaymentTermGridRibbon.xml" x:Name="localMenu"/>
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <localPage:PaymentGrid  x:Name="dgPayment" AutoGenerateColumns="None">
+                <localPage:PaymentGrid.Columns>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Payment" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="IsDefault" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PaymentMethod" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Days" AllowThousandMask="false"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PartialPayment" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="FirstPartPct"  Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="RemainingPartPct"  Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DaysInterval" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Account" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DebtorAccount" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Pct1"  Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Pct2"  Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CashDiscountPct"  Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CashDiscountDays"  Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CashdiscountMethod"  Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ReverseVatOnCachdiscount"  Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="UseForCollection" />
+                </localPage:PaymentGrid.Columns>
+            </localPage:PaymentGrid>
+        </CorasauControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

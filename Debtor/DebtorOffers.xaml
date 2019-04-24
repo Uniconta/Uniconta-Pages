@@ -1,0 +1,88 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
+   xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=Uniconta.WPFClient"
+x:Class="UnicontaClient.Pages.CustomPage.DebtorOffers"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage"
+    xmlns:editor="clr-namespace:DevExpress.Xpf.Editors.Settings;assembly=DevExpress.Xpf.Core.v18.2"
+    xmlns:toolkit="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Toolkit"
+    xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
+    mc:Ignorable="d"   xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+    d:DesignHeight="300" d:DesignWidth="400">
+    <UserControl.Resources>
+        <Util:RowIndexConverter x:Key="RowIndexConverter" />
+    </UserControl.Resources>
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Debtor/DebtorOffersGridRibbon.xml" x:Name="localMenu"/>
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <localPage:DebtorOffersGrid  x:Name="dgDebtorOffers" AutoGenerateColumns="None">
+                <localPage:DebtorOffersGrid.Columns>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Account"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Name"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Group"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="OfferNumber" Width="70"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryDate" Width="90" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="OrderTotal" Width="90"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="NoLines" Width="50" ReadOnly="True" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Currency" Width="50">
+                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="Currencies" />
+                            </DataTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                    </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Margin" Width="90"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="MarginRatio" Width="60" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CostValue" Width="80" Visible="False" ReadOnly="True" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="SalesValue" Width="80" Visible="False" ReadOnly="True" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="TotalQty" Width="80" Visible="False" ReadOnly="True" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CurBalance" Width="80" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Overdue" Width="80" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CreditMax" Width="80" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="YourRef"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="OurRef"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Remark"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Requisition" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="EndDiscountPct" Width="50"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Payment" Width="70"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ContactName" ReadOnly="True" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Employee" Width="70"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Project" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PricesInclVat" Width="60"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceEmail" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryName" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryAddress1" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryAddress2" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryAddress3" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryZipCode" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryCity" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryCountry" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Installation" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Country" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="UpdatedAt" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="RelatedOrder" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Created"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceAccount"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PriceList" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Shipment" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryTerm" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Discount" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="TotalBeforeVAT" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="LayoutGroup" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim1" Width="70" FieldName="Dimension1" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim2" Width="70" FieldName="Dimension2" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim3" Width="70" FieldName="Dimension3" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim4" Width="70" FieldName="Dimension4" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim5" Width="70" FieldName="Dimension5" />
+                </localPage:DebtorOffersGrid.Columns>
+            </localPage:DebtorOffersGrid>
+        </CorasauControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>
