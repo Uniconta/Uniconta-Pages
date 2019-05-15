@@ -1,4 +1,4 @@
-<cw:ChildWindow xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=Uniconta.WPFClient"
+<cw:ChildWindow xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
 x:Class="UnicontaClient.Pages.CustomPage.CWSetFeeAmount"
         xmlns:cw="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"

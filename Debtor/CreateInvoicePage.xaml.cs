@@ -568,6 +568,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         async Task CreateOrderFromInvoice(DebtorOrderClient order, DebtorInvoiceLocal invoice, bool checkIfCreditNote)
         {
+            order.OrderNumber = invoice._OrderNumber;
             order.Account = invoice._DCAccount;
             order.LayoutGroup = invoice._LayoutGroup;
             order.DeliveryName = invoice._DeliveryName;

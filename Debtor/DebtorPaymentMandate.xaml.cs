@@ -458,10 +458,12 @@ namespace UnicontaClient.Pages.CustomPage
 
                         var lines = File.ReadAllLines(sfd.FileName).Select(a => a.Split(';'));
 
-                        var mandatesUpdated = new List<DebtorMandateDirectDebit>();
+                        var updateRecords = new List<UnicontaBaseEntity>();
+                        
                         var cnt = 0;
                         foreach (var rec in lines)
                         {
+                            
                             if (debtorPaymentFormat._ExportFormat == (byte)DebtorPaymFormatType.NetsBS)
                             {
                                 if (rec.Count() < 3)
@@ -473,15 +475,21 @@ namespace UnicontaClient.Pages.CustomPage
 
                                 var mandate = mandateLst.Where(s => s.DCAccount == debtorAccValue).FirstOrDefault();
 
+
+
                                 if (mandate != null)
                                 {
+                                    var debtor = mandate.Debtor;
+                                    debtor._PaymentFormat = debtorPaymentFormat.Format;
+                                    updateRecords.Add(debtor);
+
                                     var statusInfoText = string.Format("({0}) Mandate agreement id set to {1}\n{2}", Uniconta.DirectDebitPayment.Common.GetTimeStamp(), agreementId, mandate.StatusInfo);
 
                                     mandate.OldMandateId = oldMandateValue;
                                     mandate._AgreementId = agreementId;
                                     mandate._StatusInfo = Uniconta.DirectDebitPayment.Common.StatusInfoTruncate(statusInfoText);
 
-                                    mandatesUpdated.Add(mandate);
+                                    updateRecords.Add(mandate);
                                     cnt++;
                                 }
                             }
@@ -497,6 +505,10 @@ namespace UnicontaClient.Pages.CustomPage
 
                                 if (mandate != null)
                                 {
+                                    var debtor = mandate.Debtor;
+                                    debtor._PaymentFormat = debtorPaymentFormat.Format;
+                                    updateRecords.Add(debtor);
+
                                     mandate.OldMandateId = oldMandateValue;
                                     cnt++;
                                 }
@@ -516,8 +528,8 @@ namespace UnicontaClient.Pages.CustomPage
                         }
                         else
                         {
-                            if (debtorPaymentFormat._ExportFormat == (byte)DebtorPaymFormatType.NetsBS)
-                                api.Update(mandatesUpdated);
+                            if (updateRecords != null && updateRecords.Count != 0)
+                                api.Update(updateRecords);
                         }
                     }
                     catch (Exception e)

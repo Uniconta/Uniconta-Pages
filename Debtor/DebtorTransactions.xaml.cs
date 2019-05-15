@@ -386,7 +386,7 @@ namespace UnicontaClient.Pages.CustomPage
             if(isInitializedSuccess)
             {
                 var standardCreditorInvoice = new CreditorStandardReportClient(creditorInvoicePrint.Company, creditorInvoicePrint.Creditor, creditorInvoicePrint.CreditorInvoice, creditorInvoicePrint.InvTransInvoiceLines, null,
-                    creditorInvoicePrint.CompanyLogo, creditorInvoicePrint.ReportName, (int)Uniconta.ClientTools.Controls.Reporting.StandardReports.PurchaseInvoice);
+                    creditorInvoicePrint.CompanyLogo, creditorInvoicePrint.ReportName, (int)Uniconta.ClientTools.Controls.Reporting.StandardReports.PurchaseInvoice,creditorInvoicePrint.IsCreditNote);
 
                 var standardReports = new ICreditorStandardReport[1] { standardCreditorInvoice };
 

@@ -84,10 +84,18 @@ namespace UnicontaClient.Pages.CustomPage
         }
         void SetHeader()
         {
-            var masterClient = dgInvoicesGrid.masterRecord as Debtor;
-            if (masterClient == null)
-                return;
-            string header = string.Format("{0}/{1}", Uniconta.ClientTools.Localization.lookup("DebtorInvoice"), masterClient._Account);
+            string header;
+            var masterClient1 = dgInvoicesGrid.masterRecord as Debtor;
+            if (masterClient1 != null)
+                header = string.Format("{0}/{1}", Uniconta.ClientTools.Localization.lookup("DebtorInvoice"), masterClient1._Account);
+            else
+            {
+                var masterClient2 = dgInvoicesGrid.masterRecord as Uniconta.DataModel.Project;
+                if (masterClient2 != null)
+                    header = string.Format("{0}/{1}", Uniconta.ClientTools.Localization.lookup("ProjectInvoice"), masterClient2._DCAccount);
+                else
+                    return;
+            }
             SetHeader(header);
         }
         public Invoices(UnicontaBaseEntity master)
@@ -124,19 +132,23 @@ namespace UnicontaClient.Pages.CustomPage
         private void dgInvoicesGrid_CustomSummary(object sender, DevExpress.Data.CustomSummaryEventArgs e)
         {
             var fieldName = ((GridSummaryItem)e.Item).FieldName;
-            if (e.SummaryProcess == CustomSummaryProcess.Start)
+            switch (e.SummaryProcess)
             {
-                sumMargin = sumSales = 0d;
-            }
-            if (e.SummaryProcess == CustomSummaryProcess.Calculate)
-            {
-                var row = e.Row as DebtorInvoiceClient;
-                sumSales += row.SalesValue;
-                sumMargin += row.Margin;
-                switch (fieldName)
-                {
-                    case "MarginRatio": sumMarginRatio = 100 * sumMargin / sumSales; e.TotalValue = sumMarginRatio; break;
-                }
+                case CustomSummaryProcess.Start:
+                    sumMargin = sumSales = 0d;
+                    break;
+                case CustomSummaryProcess.Calculate:
+                    var row = e.Row as DebtorInvoiceClient;
+                    sumSales += row.SalesValue;
+                    sumMargin += row.Margin;
+                    break;
+                case CustomSummaryProcess.Finalize:
+                    if (fieldName == "MarginRatio" && sumSales > 0)
+                    {
+                        sumMarginRatio = 100 * sumMargin / sumSales;
+                        e.TotalValue = sumMarginRatio;
+                    }
+                    break;
             }
         }
         public override bool CheckIfBindWithUserfield(out bool isReadOnly, out bool useBinding)
@@ -464,7 +476,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                 if (iprintReport?.Report == null)
                 {
-                    iprintReport = new LayoutPrintReport(api, debtorInvoice);
+                    iprintReport = new LayoutPrintReport(api, debtorInvoice, debtorInvoicePrint.IsCreditNote ? CompanyLayoutType.Creditnote : CompanyLayoutType.Invoice);
                     await iprintReport.InitializePrint();
                 }
             }
@@ -612,7 +624,7 @@ namespace UnicontaClient.Pages.CustomPage
                         {
                             folderBrowserDialog = UtilDisplay.LoadFolderBrowserDialog;
                             var dialogResult = folderBrowserDialog.ShowDialog();
-                            if (dialogResult !=  System.Windows.Forms.DialogResult.OK)
+                            if (dialogResult != System.Windows.Forms.DialogResult.OK)
                                 break;
                         }
 

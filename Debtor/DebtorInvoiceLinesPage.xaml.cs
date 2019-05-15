@@ -111,19 +111,23 @@ namespace UnicontaClient.Pages.CustomPage
         private void DgInvLines_CustomSummary(object sender, DevExpress.Data.CustomSummaryEventArgs e)
         {
             var fieldName = ((GridSummaryItem)e.Item).FieldName;
-            if (e.SummaryProcess == CustomSummaryProcess.Start)
+            switch (e.SummaryProcess)
             {
-                sumMargin = sumSales = 0d;
-            }
-            if (e.SummaryProcess == CustomSummaryProcess.Calculate)
-            {
-                var row = e.Row as DebtorInvoiceLines;
-                sumSales += row.SalesPrice;
-                sumMargin += row.Margin;
-                switch (fieldName)
-                {
-                    case "MarginRatio": sumMarginRatio = 100 * sumMargin / sumSales; e.TotalValue = sumMarginRatio; break;
-                }
+                case CustomSummaryProcess.Start:
+                    sumMargin = sumSales = 0d;
+                    break;
+                case CustomSummaryProcess.Calculate:
+                    var row = e.Row as DebtorInvoiceLines;
+                    sumSales += row.SalesPrice;
+                    sumMargin += row.Margin;
+                    break;
+                case CustomSummaryProcess.Finalize:
+                    if (fieldName == "MarginRatio" && sumSales > 0)
+                    {
+                        sumMarginRatio = 100 * sumMargin / sumSales;
+                        e.TotalValue = sumMarginRatio;
+                    }
+                    break;
             }
         }
 

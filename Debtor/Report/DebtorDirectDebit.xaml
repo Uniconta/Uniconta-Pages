@@ -1,4 +1,4 @@
-<Pages:GridBasePage xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=Uniconta.WPFClient"
+<Pages:GridBasePage xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
 x:Class="UnicontaClient.Pages.CustomPage.DebtorDirectDebit"
         xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools" 
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -7,9 +7,8 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorDirectDebit"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:UnicontaControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"       
         xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
-        xmlns:dxn="clr-namespace:DevExpress.Xpf.NavBar;assembly=DevExpress.Xpf.NavBar.v18.2"                    
+        xmlns:dxn="http://schemas.devexpress.com/winfx/2008/xaml/navbar"                    
         mc:Ignorable="d"   xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
-        xmlns:editor="clr-namespace:DevExpress.Xpf.Editors;assembly=DevExpress.Xpf.Core.v18.2"
         xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
         d:DesignHeight="300" d:DesignWidth="400">
     

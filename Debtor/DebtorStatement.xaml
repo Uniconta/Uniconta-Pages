@@ -1,15 +1,12 @@
-<Pages:GridBasePage xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=Uniconta.WPFClient"
+<Pages:GridBasePage xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
 x:Class="UnicontaClient.Pages.CustomPage.DebtorStatement"
              xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"  
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
             xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
-            xmlns:dxn="clr-namespace:DevExpress.Xpf.NavBar;assembly=DevExpress.Xpf.NavBar.v18.2"
             xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage"     
             xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
-            xmlns:editor="clr-namespace:DevExpress.Xpf.Editors;assembly=DevExpress.Xpf.Core.v18.2"   
-            xmlns:editorSettings="clr-namespace:DevExpress.Xpf.Editors.Settings;assembly=DevExpress.Xpf.Core.v18.2"
-            xmlns:dxg="clr-namespace:DevExpress.Xpf.Grid;assembly=DevExpress.Xpf.Grid.v18.2">
+            xmlns:editorSettings="http://schemas.devexpress.com/winfx/2008/xaml/editors">
     <UserControl.Resources>
         <DataTemplate x:Key="RegularCellTemplate">
             <Grid>

@@ -32,11 +32,31 @@ namespace UnicontaClient.Pages.CustomPage
     public partial class ItemVariantAddPage : GridBasePage
     {
         DCOrder master;
+        InvJournal journalMaster;
         InvItem invItem;
         InvStandardVariant stdVariant;
         DCOrderLineClient line;
+        InvJournalLineClient journalLine;
 
         public ItemVariantAddPage(DCOrderLineClient line, DCOrder master) : base(null)
+        {
+            this.master = master;
+            this.line = line;
+            this.invItem = line.InvItem;
+            InitPage();
+        }
+
+        bool IsInvJrnLine = false;
+        public ItemVariantAddPage(InvJournalLineClient line, InvJournal master) : base(null)
+        {
+            this.journalMaster = master;
+            this.journalLine = line;
+            this.invItem = journalLine.InvItem;
+            IsInvJrnLine = true;
+            InitPage();
+        }
+
+        void InitPage()
         {
             DataContext = this;
             InitializeComponent();
@@ -44,11 +64,6 @@ namespace UnicontaClient.Pages.CustomPage
             dgItemVariant.api = api;
             SetRibbonControl(localMenu, dgItemVariant);
             dgItemVariant.BusyIndicator = busyIndicator;
-
-            this.master = master;
-            this.line = line;
-            this.invItem = line.InvItem;
-
             var standardVariants = api.GetCache(typeof(Uniconta.DataModel.InvStandardVariant));
             stdVariant = (InvStandardVariant)standardVariants?.Get(invItem._StandardVariant);
             if (stdVariant != null)
@@ -102,13 +117,13 @@ namespace UnicontaClient.Pages.CustomPage
 
         void Generate()
         {
-            Type recordType = line.GetType();
+            Type recordType = !IsInvJrnLine ? line.GetType() : journalLine.GetType();
             var itemStr = invItem.KeyStr;
             var InvItems = new List<UnicontaBaseEntity>();
-            bool first = (line._Variant1 == null && line._Variant2 == null);  // the line we pasted has no variant, so we insert the first variant in that.
+            bool first = !IsInvJrnLine ? (line._Variant1 == null && line._Variant2 == null) : (journalLine._Variant1 == null && journalLine._Variant2 == null);  // the line we pasted has no variant, so we insert the first variant in that.
             foreach (var rec in (IEnumerable<ItemVariantLocal>)dgItemVariant.ItemsSource)
             {
-                if (rec._Quantity != 0d)
+                if (rec._Quantity != 0d && !IsInvJrnLine)
                 {
                     DCOrderLineClient lin;
                     if (!first)
@@ -128,8 +143,28 @@ namespace UnicontaClient.Pages.CustomPage
                     else
                         first = false;
                 }
+                else if(rec._Quantity != 0d && IsInvJrnLine)
+                {
+                    InvJournalLineClient lin;
+                    if (!first)
+                        lin = Activator.CreateInstance(recordType) as InvJournalLineClient;
+                    else
+                        lin = this.journalLine; // we want to edit the first.
+                    lin.SetMaster((UnicontaBaseEntity)journalMaster);
+                    lin._Item = itemStr;
+                    lin.Qty = rec._Quantity;
+                    lin.Variant1 = rec._Variant1;
+                    lin.Variant2 = rec._Variant2;
+                    lin.Variant3 = rec._Variant3;
+                    lin.Variant4 = rec._Variant4;
+                    lin.Variant5 = rec._Variant5;
+                    if (!first)
+                        InvItems.Add((UnicontaBaseEntity)lin);
+                    else
+                        first = false;
+                }
             }
-            var param = new object[2] { InvItems, master._OrderNumber};
+            var param = !IsInvJrnLine ? new object[2] { InvItems, master._OrderNumber } : new object[2] { InvItems, journalMaster._Journal };
             globalEvents.OnRefresh(TabControls.ItemVariantAddPage, param);
             dockCtrl.CloseDockItem();
         }

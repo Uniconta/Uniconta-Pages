@@ -1,5 +1,5 @@
 <Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"   
-   xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=Uniconta.WPFClient"
+   xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
 x:Class="UnicontaClient.Pages.CustomPage.DebtorOrderLines"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -8,11 +8,10 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrderLines"
     xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
     xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage" 
     xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
-    xmlns:editor="clr-namespace:DevExpress.Xpf.Editors.Settings;assembly=DevExpress.Xpf.Core.v18.2"
-    xmlns:dxg="clr-namespace:DevExpress.Xpf.Grid;assembly=DevExpress.Xpf.Grid.v18.2"
-    xmlns:dxn="clr-namespace:DevExpress.Xpf.NavBar;assembly=DevExpress.Xpf.NavBar.v18.2"
+    xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
     xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
-    xmlns:docking="clr-namespace:DevExpress.Xpf.Docking;assembly=DevExpress.Xpf.Docking.v18.2">
+    xmlns:docking="http://schemas.devexpress.com/winfx/2008/xaml/docking">
     <UserControl.Resources>
         <Style x:Key="StyleRow" TargetType="dxg:RowControl">
             <Setter Property="Height" Value="Auto"/>
@@ -197,12 +196,12 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrderLines"
                                     <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OnHand}"/>
                                     <Button x:Name="btnPurchase" Click="btnPurchase_Click" ToolTip="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=PurchaseLines}"  Margin="10,0,0,0">
                                         <StackPanel>
-                                            <Image Source="/Assets/img/Plus_8x8.png"/>
+                                            <Image Source="/UnicontaPages;component/Assets/img/Plus_8x8.png"/>
                                         </StackPanel>
                                     </Button>
                                     <Button x:Name="btnSales" Click="btnSales_Click" ToolTip="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OrdersLine}"  Margin="5,0,0,0">
                                         <StackPanel>
-                                            <Image Source="/Assets/img/Minus_8x8.png"/>
+                                            <Image Source="/UnicontaPages;component/Assets/img/Minus_8x8.png"/>
                                         </StackPanel>
                                     </Button>
                                 </StackPanel>

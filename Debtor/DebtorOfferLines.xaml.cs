@@ -587,6 +587,16 @@ namespace UnicontaClient.Pages.CustomPage
                 case "EditOrder":
                     AddDockItem(TabControls.DebtorOfferPage2, Order, string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("Offers"), Order._OrderNumber));
                     break;
+                case "AddVariants":
+                    var itm = selectedItem?.InvItem;
+                    if (itm?._StandardVariant != null)
+                    {
+                        var paramItem = new object[] { selectedItem, Order };
+                        dgDebtorOfferLineGrid.SetLoadedRow(selectedItem);
+                        AddDockItem(TabControls.ItemVariantAddPage, paramItem, true,
+                        string.Format(Uniconta.ClientTools.Localization.lookup("AddOBJ"), Uniconta.ClientTools.Localization.lookup("Variants")), null, floatingLoc: Utility.GetDefaultLocation());
+                    }
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -606,6 +616,16 @@ namespace UnicontaClient.Pages.CustomPage
                         dgDebtorOfferLineGrid.DeleteRow();
                         dgDebtorOfferLineGrid.isDefaultFirstRow = false;
                     }
+                    var invItems = param[0] as List<UnicontaBaseEntity>;
+                    dgDebtorOfferLineGrid.PasteRows(invItems);
+                }
+            }
+            if (screenName == TabControls.ItemVariantAddPage)
+            {
+                var param = argument as object[];
+                var orderNumber = (int)param[1];
+                if (param != null && orderNumber == Order._OrderNumber)
+                {
                     var invItems = param[0] as List<UnicontaBaseEntity>;
                     dgDebtorOfferLineGrid.PasteRows(invItems);
                 }

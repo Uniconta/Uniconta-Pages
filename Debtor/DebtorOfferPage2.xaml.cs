@@ -80,6 +80,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 frmRibbon.DisableButtons("Delete");
                 editrow = CreateNew() as DebtorOfferClient;
+                editrow._Created = DateTime.MinValue;
                 liCreatedTime.Visibility = Visibility.Collapsed;
                 if (master != null)
                 {

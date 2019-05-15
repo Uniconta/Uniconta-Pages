@@ -1,4 +1,4 @@
-<Pages:FormBasePage xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=Uniconta.WPFClient"
+<Pages:FormBasePage xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
 x:Class="UnicontaClient.Pages.CustomPage.DebtorMessagesPage2"
         xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"  
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"

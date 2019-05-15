@@ -1,4 +1,4 @@
-<Pages:GridBasePage xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=Uniconta.WPFClient"
+<Pages:GridBasePage xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
 x:Class="UnicontaClient.Pages.CustomPage.DebtorMultiOrderLinesPage"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -6,7 +6,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorMultiOrderLinesPage"
              xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
              xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
              xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
-             xmlns:editor="clr-namespace:DevExpress.Xpf.Editors.Settings;assembly=DevExpress.Xpf.Core.v18.2"
+             xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors"
              xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage">
     <UserControl.Resources>
         <Util:RowIndexConverter x:Key="RowIndexConverter" />

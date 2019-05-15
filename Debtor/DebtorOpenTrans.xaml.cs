@@ -33,8 +33,9 @@ namespace UnicontaClient.Pages.CustomPage
     }
     public partial class DebtorOpenTrans : GridBasePage
     {
-        DebtorTransOpenClient master;
+        DebtorTransOpenClient tranOpenMaster;
         List<DebtorTransOpenClient> settles;
+        UnicontaBaseEntity pageMaster;
         public override string NameOfControl
         {
             get { return TabControls.DebtorOpenTransactions.ToString(); }
@@ -70,7 +71,7 @@ namespace UnicontaClient.Pages.CustomPage
             dgDebtorTransOpen.api = api;
             dgDebtorTransOpen.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
-            dgDebtorTransOpen.UpdateMaster(master);
+            dgDebtorTransOpen.UpdateMaster(pageMaster = master);
             dgDebtorTransOpen.tableView.ShowTotalSummary = true;
 
 #if SILVERLIGHT
@@ -105,11 +106,11 @@ namespace UnicontaClient.Pages.CustomPage
 
         async void Settle()
         {
-            if (master != null && settles != null)
+            if (tranOpenMaster != null && settles != null)
             {
                 TransactionAPI transApi = new TransactionAPI(api);
-                var err = await transApi.Settle(master, settles);
-                master = null;
+                var err = await transApi.Settle(tranOpenMaster, settles);
+                tranOpenMaster = null;
                 settles = null;
                 UtilDisplay.ShowErrorCode(err);
                 InitQuery();
@@ -216,9 +217,9 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (!rec.IsSettled)
             {
-                if (master == rec)
+                if (tranOpenMaster == rec)
                 {
-                    master = null;
+                    tranOpenMaster = null;
                     settles = null;
                     var openTrans = dgDebtorTransOpen.ItemsSource as List<DebtorTransOpenClient>;
                     foreach (DebtorTransOpenClient openTran in openTrans)
@@ -231,8 +232,8 @@ namespace UnicontaClient.Pages.CustomPage
             }
             else
             {
-                if (master == null)
-                    master = rec;
+                if (tranOpenMaster == null)
+                    tranOpenMaster = rec;
                 else
                 {
                     if (settles == null)
@@ -249,10 +250,10 @@ namespace UnicontaClient.Pages.CustomPage
             var groups = UtilDisplay.GetMenuCommandsByStatus(rb, true);
             double payment = 0d, invoice = 0d;
             double? paymentCur =0d, invoiceCur=0d;
-            if (master != null)
+            if (tranOpenMaster != null)
             {
-                payment = master.AmountOpen;
-                paymentCur = master.AmountOpenCur.HasValue ? master.AmountOpenCur.Value: 0d;
+                payment = tranOpenMaster.AmountOpen;
+                paymentCur = tranOpenMaster.AmountOpenCur.HasValue ? tranOpenMaster.AmountOpenCur.Value: 0d;
                 if ((settles != null && settles.Count != 0))
                 {
                     invoice = settles.Sum(s => s.AmountOpen);
@@ -262,7 +263,7 @@ namespace UnicontaClient.Pages.CustomPage
             
             foreach (var grp in groups)
             {
-                if (master == null)
+                if (tranOpenMaster == null)
                     grp.StatusValue = string.Empty;
                 else
                 {
@@ -295,11 +296,11 @@ namespace UnicontaClient.Pages.CustomPage
 
         void CheckSettle(bool value)
         {
-            if (master == null)
+            if (pageMaster == null)
                 return;
             foreach (var row in dgDebtorTransOpen.ItemsSource as IEnumerable<DebtorTransOpenClient>)
             {
-                if (row != master && row.IsSettled != value)
+                if (row != pageMaster && row.IsSettled != value)
                 {
                     row.IsSettled = value;
                     CheckBoxClick(row);

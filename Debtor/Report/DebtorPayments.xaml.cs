@@ -638,7 +638,9 @@ namespace UnicontaClient.Pages.CustomPage
                         {
                             var desm = api.CompanyEntity.HasDecimals ? 2 : 0;
                             foreach (var rec in debtorPayments)
-                                rec.FeeAmount = !rec._OnHold ? Math.Round((rec._AmountOpen * cwwin.value) / 100d, desm) : 0d;
+                            {
+                                rec.FeeAmount = !rec._OnHold ? Math.Round(((rec._AmountOpenCur != 0 ? rec._AmountOpenCur : rec._AmountOpen) * cwwin.value) / 100d, desm) : 0d;
+                            }
                         }
                         collectionType = Uniconta.ClientTools.Localization.lookup("InterestNote");
                     }

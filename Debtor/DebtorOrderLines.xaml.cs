@@ -204,19 +204,23 @@ namespace UnicontaClient.Pages.CustomPage
         private void dgDebtorOrderLineGrid_CustomSummary(object sender, DevExpress.Data.CustomSummaryEventArgs e)
         {
             var fieldName = ((GridSummaryItem)e.Item).FieldName;
-            if (e.SummaryProcess == DevExpress.Data.CustomSummaryProcess.Start)
+            switch (e.SummaryProcess)
             {
-                sumMargin = sumSales = 0d;
-            }
-            if (e.SummaryProcess == DevExpress.Data.CustomSummaryProcess.Calculate)
-            {
-                var row = e.Row as DebtorOrderLineClient;
-                sumSales += row.SalesValue;
-                sumMargin += row.Margin;
-                switch (fieldName)
-                {
-                    case "MarginRatio": sumMarginRatio = 100 * sumMargin / sumSales; e.TotalValue = sumMarginRatio; break;
-                }
+                case DevExpress.Data.CustomSummaryProcess.Start:
+                    sumMargin = sumSales = 0d;
+                    break;
+                case DevExpress.Data.CustomSummaryProcess.Calculate:
+                    var row = e.Row as DebtorOrderLineClient;
+                    sumSales += row.SalesValue;
+                    sumMargin += row.Margin;
+                    break;
+                case DevExpress.Data.CustomSummaryProcess.Finalize:
+                    if (fieldName == "MarginRatio" && sumSales > 0)
+                    {
+                        sumMarginRatio = 100 * sumMargin / sumSales;
+                        e.TotalValue = sumMarginRatio;
+                    }
+                    break;
             }
         }
 

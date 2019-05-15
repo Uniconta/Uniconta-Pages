@@ -1,5 +1,5 @@
 <Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"  
-   xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=Uniconta.WPFClient"
+   xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
 x:Class="UnicontaClient.Pages.CustomPage.CreateInvoicePage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -10,9 +10,9 @@ x:Class="UnicontaClient.Pages.CustomPage.CreateInvoicePage"
     xmlns:controlsToolkit="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Layout.Toolkit"
     xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
     xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
-    xmlns:dxg="clr-namespace:DevExpress.Xpf.Grid;assembly=DevExpress.Xpf.Grid.v18.2"
-    xmlns:dxn="clr-namespace:DevExpress.Xpf.NavBar;assembly=DevExpress.Xpf.NavBar.v18.2"
-    xmlns:editor="clr-namespace:DevExpress.Xpf.Editors.Settings;assembly=DevExpress.Xpf.Core.v18.2"
+    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+    xmlns:dxn="http://schemas.devexpress.com/winfx/2008/xaml/navbar"
+    xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors"
     xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
     d:DesignHeight="300" d:DesignWidth="400">
     <UserControl.Resources>
@@ -197,7 +197,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreateInvoicePage"
                                 <ColumnDefinition />
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OrderNumber}" Grid.Column="0" Grid.Row="0" />
-                            <CorasauControls:IntegerEditor MaxWidth="170"  Text="{Binding OrderNumber,Mode=OneWay}" Grid.Column="1" Grid.Row="0" Margin="5,0,0,0" SetMask="False" />
+                            <CorasauControls:IntegerEditor MaxWidth="170"  Text="{Binding OrderNumber,Mode=TwoWay}" Grid.Column="1" Grid.Row="0" Margin="5,0,0,0" SetMask="False" />
 
                             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=EndDiscountPct}" Grid.Column="0" Grid.Row="2" />
                             <CorasauControls:DoubleEditor MaxWidth="170"  FieldName="EndDiscountPct"  Grid.Column="1" Grid.Row="2" Margin="5,0,0,0"  />

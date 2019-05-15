@@ -252,13 +252,21 @@ namespace UnicontaClient.Pages.CustomPage
                 var allIsLetter = cvr?.All(x => char.IsLetter(x));
                 if (allIsLetter.HasValue && allIsLetter.Value == true)
                     return;
+                CompanyInfo ci = null;
+                try
+                {
 #if !SILVERLIGHT
-                var ci = await CVR.CheckCountry(cvr, editrow._Country);
+                    ci = await CVR.CheckCountry(cvr, editrow._Country);
 #else
-                var lookupApi = new Uniconta.API.System.UtilityAPI(api);
-                var ci = await lookupApi.LookupCVR(cvr, editrow._Country);
+                    var lookupApi = new Uniconta.API.System.UtilityAPI(api);
+                    ci = await lookupApi.LookupCVR(cvr, editrow._Country);
 #endif
-
+                }
+                catch (Exception ex)
+                {
+                    UnicontaMessageBox.Show(ex.Message, Uniconta.ClientTools.Localization.lookup("Exception"), MessageBoxButton.OK);
+                    return;
+                }
                 if (!onlyRunOnce)
                 {
                     if (ci == null)

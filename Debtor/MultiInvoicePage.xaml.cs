@@ -304,23 +304,33 @@ namespace UnicontaClient.Pages.CustomPage
                     updatedMsg = updatedMsg + "\n" + string.Format(Uniconta.ClientTools.Localization.lookup("MulitDocPrintConfirmationMsg"), previewInvoiceCount, Uniconta.ClientTools.Localization.lookup("Invoices"));
 
                     if (errorList.Count == 0)
-                    {
-                        if ((GenrateInvoiceDialog.ShowInvoice || GenrateInvoiceDialog.InvoiceQuickPrint) && previewInvoiceCount > 0)
-                            InitMultiplePreviewDocument(updatedMsg, CompanyLayoutType.Invoice, GenrateInvoiceDialog.InvoiceQuickPrint);
-                    }
+                        PreInitMulitplePreviewDocument(updatedMsg, CompanyLayoutType.Invoice, GenrateInvoiceDialog.ShowInvoice, GenrateInvoiceDialog.InvoiceQuickPrint, previewInvoiceCount, GenrateInvoiceDialog.SendByEmail,
+                            GenrateInvoiceDialog.sendOnlyToThisEmail);
                     else
                     {
                         CWErrorBox errorDialog = new CWErrorBox(errorList.ToArray(), true);
                         errorDialog.Closed += delegate
                         {
-                            if ((GenrateInvoiceDialog.ShowInvoice || GenrateInvoiceDialog.InvoiceQuickPrint) && previewInvoiceCount > 0)
-                                InitMultiplePreviewDocument(updatedMsg, CompanyLayoutType.Invoice, GenrateInvoiceDialog.InvoiceQuickPrint);
+                            PreInitMulitplePreviewDocument(updatedMsg, CompanyLayoutType.Invoice, GenrateInvoiceDialog.ShowInvoice, GenrateInvoiceDialog.InvoiceQuickPrint, previewInvoiceCount, GenrateInvoiceDialog.SendByEmail,
+                                GenrateInvoiceDialog.sendOnlyToThisEmail);
                         };
                         errorDialog.Show();
                     }
                 }
             };
             GenrateInvoiceDialog.Show();
+        }
+
+        private void PreInitMulitplePreviewDocument(string message, CompanyLayoutType documentType, bool showInvoice, bool quickPrintInvoice, int docCount, bool sendBymail, bool sendOnlyToMail)
+        {
+            if (docCount > 0)
+            {
+                if (showInvoice || quickPrintInvoice)
+                    InitMultiplePreviewDocument(message, documentType, quickPrintInvoice);
+                else if (sendBymail || sendOnlyToMail)
+                    UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("SendEmailMsgOBJ"), string.Format("{0} {1}", docCount, Uniconta.ClientTools.Localization.lookup(documentType.ToString()))),
+                        Uniconta.ClientTools.Localization.lookup("Message"));
+            }
         }
 
         private void InitMultiplePreviewDocument(string updatedMsg, CompanyLayoutType docType, bool isQuickPrint)
@@ -420,17 +430,15 @@ namespace UnicontaClient.Pages.CustomPage
                         string.Format("{0} {1}", Uniconta.ClientTools.Localization.lookup(docType.ToString()), Uniconta.ClientTools.Localization.lookup("Documents")));
 
                     if (errorList.Count == 0)
-                    {
-                        if ((GenrateInvoiceDialog.ShowInvoice || GenrateInvoiceDialog.InvoiceQuickPrint) && confirmOrder.Count > 0)
-                            InitMultiplePreviewDocument(updatedMsg, docType, GenrateInvoiceDialog.InvoiceQuickPrint);
-                    }
+                        PreInitMulitplePreviewDocument(updatedMsg, docType, GenrateInvoiceDialog.ShowInvoice, GenrateInvoiceDialog.InvoiceQuickPrint, documentsPreviewPrint, GenrateInvoiceDialog.SendByEmail,
+                            GenrateInvoiceDialog.sendOnlyToThisEmail);
                     else
                     {
                         CWErrorBox errorDialog = new CWErrorBox(errorList.ToArray(), true);
                         errorDialog.Closed += delegate
                         {
-                            if ((GenrateInvoiceDialog.ShowInvoice || GenrateInvoiceDialog.InvoiceQuickPrint) && confirmOrder.Count > 0)
-                                InitMultiplePreviewDocument(updatedMsg, docType, GenrateInvoiceDialog.InvoiceQuickPrint);
+                            PreInitMulitplePreviewDocument(updatedMsg, docType, GenrateInvoiceDialog.ShowInvoice, GenrateInvoiceDialog.InvoiceQuickPrint, documentsPreviewPrint, GenrateInvoiceDialog.SendByEmail,
+                                GenrateInvoiceDialog.sendOnlyToThisEmail);
                         };
                         errorDialog.Show();
                     }

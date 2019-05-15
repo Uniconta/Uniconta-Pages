@@ -105,6 +105,7 @@ namespace UnicontaClient.Pages.CustomPage
                 frmRibbon.DisableButtons("Delete");
                 liCreatedTime.Visibility = Visibility.Collapsed;
                 editrow = CreateNew() as DebtorOrderClient;
+                editrow._Created = DateTime.MinValue;
                 if (Debtor != null)
                 {
                     editrow.SetMaster(Debtor);
