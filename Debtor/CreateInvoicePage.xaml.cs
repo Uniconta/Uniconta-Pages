@@ -67,7 +67,7 @@ namespace UnicontaClient.Pages.CustomPage
         SQLCache items, warehouse, debtors, standardVariants, variants1, variants2;
         DebtorOrderClient initialOrder;
         double exchangeRate;
-
+        bool linesFromProjectInvoice = false;
         private void InitPage(UnicontaBaseEntity master, DebtorOrderLineClient[] orderLines = null)
         {
             InitializeComponent();
@@ -128,7 +128,10 @@ namespace UnicontaClient.Pages.CustomPage
             this.variants2 = Comp.GetCache(typeof(InvVariant2));
             this.standardVariants = Comp.GetCache(typeof(InvStandardVariant));
             if (orderLines != null)
+            {
+                linesFromProjectInvoice = true;
                 dgDebtorOrderLineGrid.SetSource(orderLines);
+            }
 
             dgDebtorOrderLineGrid.allowSave = false;
 #if SILVERLIGHT
@@ -773,7 +776,8 @@ namespace UnicontaClient.Pages.CustomPage
                     leDeliveryAddress.InvalidCache();
                 }
                 IEnumerable<DCOrderLineClient> lines = (IEnumerable<DCOrderLineClient>)dgDebtorOrderLineGrid.ItemsSource;
-                lines?.FirstOrDefault()?.SetMaster(Order);
+                if (!linesFromProjectInvoice)
+                    lines?.FirstOrDefault()?.SetMaster(Order);
                 Dispatcher.BeginInvoke(new Action(async () =>
                 {
                     await api.Read(Debtor);

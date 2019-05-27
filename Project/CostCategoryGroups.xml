@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<root>
+  <RibbonItem TabId="0" LocalizedNameKey="Home">
+    <!---When we create a new group and a new TabPage -->
+    <RibbonItem Action="AddRow" LocalizedNameKey="AddOBJ" Parameter="CostCategoryGroup" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png"/>
+    <RibbonItem Action="EditRow" ShortcutKey="Ctrl+E" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>
+  </RibbonItem>
+</root>

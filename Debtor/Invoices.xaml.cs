@@ -749,7 +749,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                      foreach (var inv in invoiceEmails)
                      {
-                         var errorCode = await Invapi.SendInvoice(inv, cwSendInvoice.Emails, cwSendInvoice.sendOnlyToThisEmail);
+                         var errorCode = await Invapi.SendInvoice(inv, cwSendInvoice.Emails, cwSendInvoice.sendOnlyToThisEmail, CWSendInvoice.sendInBackgroundOnly);
                          if (errorCode != ErrorCodes.Succes)
                          {
                              var standardError = await api.session.GetErrors();

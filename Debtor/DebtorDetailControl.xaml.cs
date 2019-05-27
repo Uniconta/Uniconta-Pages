@@ -78,7 +78,7 @@ namespace UnicontaClient.Pages.CustomPage
             row.SetMaster(api.CompanyEntity);
             var UserFieldDef = row.UserFieldDef();
             if (UserFieldDef != null)
-                UserFieldControl.CreateUserFieldOnPage2(layoutItems, UserFieldDef, (RowIndexConverter)this.Resources["RowIndexConverter"], this.api, true, lastGroup);
+                UserFieldControl.CreateUserFieldOnPage2(layoutItems, UserFieldDef, (RowIndexConverter)this.Resources["RowIndexConverter"], this.api, this, true, lastGroup);
             var Comp = api.CompanyEntity;
             if (Comp.CRM)
             {

@@ -1,0 +1,215 @@
+<Pages:BasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools" 
+               xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.AltinnMvaReport"
+                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                mc:Ignorable="d"
+                xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core" 
+                xmlns:dxdb="http://schemas.devexpress.com/winfx/2008/xaml/demobase" 
+                xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars" 
+                xmlns:dxp="http://schemas.devexpress.com/winfx/2008/xaml/printing" 
+                xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+                xmlns:dg="http://schemas.devexpress.com/winfx/2008/xaml/grid" 
+                xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
+                xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+                xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools" 
+                xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
+                d:DesignHeight="300" d:DesignWidth="400">
+
+    <UserControl.Resources>
+        <DataTemplate x:Key="detailTemplate">
+            <Grid Width="{Binding Path=UsablePageWidth, Mode=OneWay}"  HorizontalAlignment="Stretch" dxp:ExportSettings.TargetType="Panel">
+                <Grid.Resources>
+                    <Util:DoubleValueFormatConvert x:Key="FormatConverter"/>
+                </Grid.Resources>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="25"/>
+                    <RowDefinition Height="17"/>
+                    <RowDefinition Height="17"/>
+                    <RowDefinition Height="17"/>
+                    <RowDefinition Height="17"/>
+                    <RowDefinition Height="17"/>
+                    <RowDefinition Height="17"/>
+                    <RowDefinition Height="17"/>
+                    <RowDefinition Height="17"/>
+                    <RowDefinition Height="17"/>
+
+                    <RowDefinition Height="17"/>
+                    <RowDefinition Height="17"/>
+                    <RowDefinition Height="17"/>
+                    <RowDefinition Height="17"/>
+                    <RowDefinition Height="17"/>
+                    <RowDefinition Height="17"/>
+                    <RowDefinition Height="17"/>
+                    <RowDefinition Height="17"/>
+                    <RowDefinition Height="17"/>
+                    <RowDefinition Height="17"/>
+
+                    <RowDefinition Height="17"/>
+                    <RowDefinition Height="17"/>
+                    <RowDefinition Height="17"/>
+                    <RowDefinition Height="17"/>
+                    <RowDefinition Height="17"/>
+                    <RowDefinition Height="17"/>
+                    <RowDefinition Height="17"/>
+                    <RowDefinition Height="17"/>
+                    <RowDefinition Height="17"/>
+                    <RowDefinition Height="17"/>
+
+                    <RowDefinition Height="17"/>
+                    <RowDefinition Height="17"/>
+                    <RowDefinition Height="17"/>
+                    <RowDefinition Height="17"/>
+                    <RowDefinition Height="17"/>
+                    <RowDefinition Height="17"/>
+                    <RowDefinition Height="17"/>
+                    <RowDefinition Height="17"/>
+                    <RowDefinition Height="17"/>
+                    <RowDefinition Height="17"/>
+
+                    <RowDefinition Height="17"/>
+                    <RowDefinition Height="17"/>
+                    <RowDefinition Height="17"/>
+                    <RowDefinition Height="17"/>
+                    <RowDefinition Height="17"/>
+                    <RowDefinition Height="17"/>                    
+
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="400"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>                    
+                </Grid.ColumnDefinitions>
+
+                <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0"  Grid.ColumnSpan="2" Grid.Row="0" Text="RF-0002 Skattemelding for merverdiavgift - alminnelig næring" VerticalAlignment="Center"  FontSize="14" FontWeight="Bold"/>
+                <dxe:TextEdit Grid.Row="0" Grid.Column="3" HorizontalAlignment="Right" Text="{Binding Content.PrintDateTime}" FontSize="10"/>
+
+                <dxe:TextEdit Grid.Row="1" Grid.Column="0" Text="Opplysninger om skattepliktig" FontSize="12" FontWeight="Bold"></dxe:TextEdit>
+
+                <dxe:TextEdit Grid.Row="2" Grid.Column="0"  Text="Navn" FontSize="10"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding Content.CompanyInfo}" FontSize="10"/>
+
+                <dxe:TextEdit Grid.Row="3" Grid.Column="0" Text="Org.nr." FontSize="10"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding Content.CompanyRegNr}" FontSize="10"/>
+                <dxe:TextEdit Grid.Row="4" Grid.Column="0" Text="Kontonr. for tilbakebetaling" FontSize="10"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding Content.CompanyBBAN}" FontSize="10"/>
+                <dxe:TextEdit Grid.Row="5" Grid.Column="0" Text="IBAN for tilbakebetaling" FontSize="10"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding Content.CompanyIBAN}" FontSize="10"/>
+                <dxe:TextEdit Grid.Row="6" Grid.Column="0" Text="BIC/SWIFT for tilbakebetaling" FontSize="10"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding Content.CompanyBIC}" FontSize="10"/>                
+                
+                <dxe:TextEdit Grid.Row="7" Grid.Column="0" Text="" FontSize="10"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="8" Grid.Column="0" Text="Meldingsopplysninger" FontSize="13" FontWeight="Bold"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="9" Grid.Column="0" Text="Meldingstype" FontSize="10"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="9" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding Content.MessageType}" FontSize="10"/>
+                <dxe:TextEdit Grid.Row="10" Grid.Column="0" Text="Termintype" FontSize="10"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="10" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding Content.TerminType}" FontSize="10"/>
+                <dxe:TextEdit Grid.Row="11" Grid.Column="0" Text="Termin" FontSize="10"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="11" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding Content.Termin}" FontSize="10"/>
+                <dxe:TextEdit Grid.Row="12" Grid.Column="0" Text="År" FontSize="10"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="12" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding Content.Year}" FontSize="10"/>
+
+                <dxe:TextEdit Grid.Row="13" Grid.Column="0" Text="" FontSize="10"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="14" Grid.Column="0" Grid.ColumnSpan="3" Text="The main-part of the report is all number fields" FontSize="12" FontWeight="Bold"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="15" Grid.Column="0" Text="Avgiftsposter og tilleggsopplysninger" FontSize="12" FontWeight="Bold"></dxe:TextEdit>
+
+                <dxe:TextEdit Grid.Row="16" Grid.Column="0" Text="A. Samlet omsetning, uttak og innførsel" FontSize="10" FontWeight="Bold"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="16" Grid.Column="1" Text="Grunnlag" FontSize="10" FontWeight="Bold" HorizontalAlignment="Right"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="16" Grid.Column="2" Text="Avgift" FontSize="10" FontWeight="Bold" HorizontalAlignment="Right"></dxe:TextEdit>
+
+                <dxe:TextEdit Grid.Row="17" Grid.Column="0" Text="{Binding Content.Text[0],Converter={StaticResource FormatConverter}, Mode=OneWay}" FontSize="10"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="17" Grid.Column="1" Text="{Binding Content.AmountBase[0],Converter={StaticResource FormatConverter},ConverterParameter=N0, Mode=OneWay}" FontSize="10" HorizontalAlignment="Right"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="17" Grid.Column="2" Text="{Binding Content.Amount[0],Converter={StaticResource FormatConverter},ConverterParameter=N0, Mode=OneWay}" FontSize="10" HorizontalAlignment="Right"></dxe:TextEdit>
+
+                <dxe:TextEdit Grid.Row="18" Grid.Column="0" Text="{Binding Content.Text[1],Converter={StaticResource FormatConverter}, Mode=OneWay}" FontSize="10"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="18" Grid.Column="1" Text="{Binding Content.AmountBase[1],Converter={StaticResource FormatConverter},ConverterParameter=N0, Mode=OneWay}" FontSize="10" HorizontalAlignment="Right"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="18" Grid.Column="2" Text="{Binding Content.Amount[1],Converter={StaticResource FormatConverter},ConverterParameter=N0, Mode=OneWay}" FontSize="10" HorizontalAlignment="Right"></dxe:TextEdit>
+
+                <dxe:TextEdit Grid.Row="19" Grid.Column="0" Text="B. Innenlands omsetning og uttak" FontSize="10" FontWeight="Bold"></dxe:TextEdit>                
+                <dxe:TextEdit Grid.Row="20" Grid.Column="0" Text="{Binding Content.Text[2],Converter={StaticResource FormatConverter}, Mode=OneWay}" FontSize="10"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="20" Grid.Column="1" Text="{Binding Content.AmountBase[2],Converter={StaticResource FormatConverter},ConverterParameter=N0, Mode=OneWay}" FontSize="10" HorizontalAlignment="Right"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="20" Grid.Column="2" Text="{Binding Content.Amount[2],Converter={StaticResource FormatConverter},ConverterParameter=N0, Mode=OneWay}" FontSize="10" HorizontalAlignment="Right"></dxe:TextEdit>
+
+                <dxe:TextEdit Grid.Row="21" Grid.Column="0" Text="{Binding Content.Text[3],Converter={StaticResource FormatConverter}, Mode=OneWay}" FontSize="10"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="21" Grid.Column="1" Text="{Binding Content.AmountBase[3],Converter={StaticResource FormatConverter},ConverterParameter=N0, Mode=OneWay}" FontSize="10" HorizontalAlignment="Right"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="21" Grid.Column="2" Text="{Binding Content.Amount[3],Converter={StaticResource FormatConverter},ConverterParameter=N0, Mode=OneWay}" FontSize="10" HorizontalAlignment="Right"></dxe:TextEdit>
+
+                <dxe:TextEdit Grid.Row="22" Grid.Column="0" Text="{Binding Content.Text[4],Converter={StaticResource FormatConverter}, Mode=OneWay}" FontSize="10"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="22" Grid.Column="1" Text="{Binding Content.AmountBase[4],Converter={StaticResource FormatConverter},ConverterParameter=N0, Mode=OneWay}" FontSize="10" HorizontalAlignment="Right"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="22" Grid.Column="2" Text="{Binding Content.Amount[4],Converter={StaticResource FormatConverter},ConverterParameter=N0, Mode=OneWay}" FontSize="10" HorizontalAlignment="Right"></dxe:TextEdit>
+
+                <dxe:TextEdit Grid.Row="23" Grid.Column="0" Text="{Binding Content.Text[5],Converter={StaticResource FormatConverter}, Mode=OneWay}" FontSize="10"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="23" Grid.Column="1" Text="{Binding Content.AmountBase[5],Converter={StaticResource FormatConverter},ConverterParameter=N0, Mode=OneWay}" FontSize="10" HorizontalAlignment="Right"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="23" Grid.Column="2" Text="{Binding Content.Amount[5],Converter={StaticResource FormatConverter},ConverterParameter=N0, Mode=OneWay}" FontSize="10" HorizontalAlignment="Right"></dxe:TextEdit>
+
+                <dxe:TextEdit Grid.Row="24" Grid.Column="0" Text="{Binding Content.Text[6],Converter={StaticResource FormatConverter}, Mode=OneWay}" FontSize="10"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="24" Grid.Column="1" Text="{Binding Content.AmountBase[6],Converter={StaticResource FormatConverter},ConverterParameter=N0, Mode=OneWay}" FontSize="10" HorizontalAlignment="Right"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="24" Grid.Column="2" Text="{Binding Content.Amount[6],Converter={StaticResource FormatConverter},ConverterParameter=N0, Mode=OneWay}" FontSize="10" HorizontalAlignment="Right"></dxe:TextEdit>
+
+                <dxe:TextEdit Grid.Row="25" Grid.Column="0" Text="C. Utførsel" FontSize="10" FontWeight="Bold"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="26" Grid.Column="0" Text="{Binding Content.Text[7],Converter={StaticResource FormatConverter}, Mode=OneWay}" FontSize="10"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="26" Grid.Column="1" Text="{Binding Content.AmountBase[7],Converter={StaticResource FormatConverter},ConverterParameter=N0, Mode=OneWay}" FontSize="10" HorizontalAlignment="Right"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="26" Grid.Column="2" Text="{Binding Content.Amount[7],Converter={StaticResource FormatConverter},ConverterParameter=N0, Mode=OneWay}" FontSize="10" HorizontalAlignment="Right"></dxe:TextEdit>
+
+                <dxe:TextEdit Grid.Row="27" Grid.Column="0" Text="D. Innførsel av varer" FontSize="10" FontWeight="Bold"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="28" Grid.Column="0" Text="{Binding Content.Text[8],Converter={StaticResource FormatConverter}, Mode=OneWay}" FontSize="10"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="28" Grid.Column="1" Text="{Binding Content.AmountBase[8],Converter={StaticResource FormatConverter},ConverterParameter=N0, Mode=OneWay}" FontSize="10" HorizontalAlignment="Right"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="28" Grid.Column="2" Text="{Binding Content.Amount[8],Converter={StaticResource FormatConverter},ConverterParameter=N0, Mode=OneWay}" FontSize="10" HorizontalAlignment="Right"></dxe:TextEdit>
+
+                <dxe:TextEdit Grid.Row="29" Grid.Column="0" Text="{Binding Content.Text[9],Converter={StaticResource FormatConverter}, Mode=OneWay}" FontSize="10"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="29" Grid.Column="1" Text="{Binding Content.AmountBase[9],Converter={StaticResource FormatConverter},ConverterParameter=N0, Mode=OneWay}" FontSize="10" HorizontalAlignment="Right"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="29" Grid.Column="2" Text="{Binding Content.Amount[9],Converter={StaticResource FormatConverter},ConverterParameter=N0, Mode=OneWay}" FontSize="10" HorizontalAlignment="Right"></dxe:TextEdit>
+
+                <dxe:TextEdit Grid.Row="30" Grid.Column="0" Text="{Binding Content.Text[10],Converter={StaticResource FormatConverter}, Mode=OneWay}" FontSize="10"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="30" Grid.Column="1" Text="{Binding Content.AmountBase[10],Converter={StaticResource FormatConverter},ConverterParameter=N0, Mode=OneWay}" FontSize="10" HorizontalAlignment="Right"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="30" Grid.Column="2" Text="{Binding Content.Amount[10],Converter={StaticResource FormatConverter},ConverterParameter=N0, Mode=OneWay}" FontSize="10" HorizontalAlignment="Right"></dxe:TextEdit>
+
+                <dxe:TextEdit Grid.Row="31" Grid.Column="0" Text="E. Kjøp med omvendt avgiftsplikt" FontSize="10" FontWeight="Bold"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="32" Grid.Column="0" Text="{Binding Content.Text[11],Converter={StaticResource FormatConverter}, Mode=OneWay}" FontSize="10"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="32" Grid.Column="1" Text="{Binding Content.AmountBase[11],Converter={StaticResource FormatConverter},ConverterParameter=N0, Mode=OneWay}" FontSize="10" HorizontalAlignment="Right"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="32" Grid.Column="2" Text="{Binding Content.Amount[11],Converter={StaticResource FormatConverter},ConverterParameter=N0, Mode=OneWay}" FontSize="10" HorizontalAlignment="Right"></dxe:TextEdit>
+
+                <dxe:TextEdit Grid.Row="33" Grid.Column="0" Text="{Binding Content.Text[12],Converter={StaticResource FormatConverter}, Mode=OneWay}" FontSize="10"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="33" Grid.Column="1" Text="{Binding Content.AmountBase[12],Converter={StaticResource FormatConverter},ConverterParameter=N0, Mode=OneWay}" FontSize="10" HorizontalAlignment="Right"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="33" Grid.Column="2" Text="{Binding Content.Amount[12],Converter={StaticResource FormatConverter},ConverterParameter=N0, Mode=OneWay}" FontSize="10" HorizontalAlignment="Right"></dxe:TextEdit>
+
+                <dxe:TextEdit Grid.Row="34" Grid.Column="0" Text="F. Fradragsberettiget innenlands inngående avgift" FontSize="10" FontWeight="Bold"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="35" Grid.Column="0" Text="{Binding Content.Text[13],Converter={StaticResource FormatConverter}, Mode=OneWay}" FontSize="10"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="35" Grid.Column="1" Text="{Binding Content.AmountBase[13],Converter={StaticResource FormatConverter},ConverterParameter=N0, Mode=OneWay}" FontSize="10" HorizontalAlignment="Right"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="35" Grid.Column="2" Text="{Binding Content.Amount[13],Converter={StaticResource FormatConverter},ConverterParameter=N0, Mode=OneWay}" FontSize="10" HorizontalAlignment="Right"></dxe:TextEdit>
+
+                <dxe:TextEdit Grid.Row="36" Grid.Column="0" Text="{Binding Content.Text[14],Converter={StaticResource FormatConverter}, Mode=OneWay}" FontSize="10"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="36" Grid.Column="1" Text="{Binding Content.AmountBase[14],Converter={StaticResource FormatConverter},ConverterParameter=N0, Mode=OneWay}" FontSize="10" HorizontalAlignment="Right"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="36" Grid.Column="2" Text="{Binding Content.Amount[14],Converter={StaticResource FormatConverter},ConverterParameter=N0, Mode=OneWay}" FontSize="10" HorizontalAlignment="Right"></dxe:TextEdit>
+
+                <dxe:TextEdit Grid.Row="37" Grid.Column="0" Text="{Binding Content.Text[15],Converter={StaticResource FormatConverter}, Mode=OneWay}" FontSize="10"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="37" Grid.Column="1" Text="{Binding Content.AmountBase[15],Converter={StaticResource FormatConverter},ConverterParameter=N0, Mode=OneWay}" FontSize="10" HorizontalAlignment="Right"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="37" Grid.Column="2" Text="{Binding Content.Amount[15],Converter={StaticResource FormatConverter},ConverterParameter=N0, Mode=OneWay}" FontSize="10" HorizontalAlignment="Right"></dxe:TextEdit>
+
+                <dxe:TextEdit Grid.Row="38" Grid.Column="0" Text="G. Fradragsberettiget innførselsmerverdiavgift" FontSize="11" FontWeight="Bold"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="39" Grid.Column="0" Text="{Binding Content.Text[16],Converter={StaticResource FormatConverter}, Mode=OneWay}" FontSize="10"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="39" Grid.Column="1" Text="{Binding Content.AmountBase[16],Converter={StaticResource FormatConverter},ConverterParameter=N0, Mode=OneWay}" FontSize="10" HorizontalAlignment="Right"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="39" Grid.Column="2" Text="{Binding Content.Amount[16],Converter={StaticResource FormatConverter},ConverterParameter=N0, Mode=OneWay}" FontSize="10" HorizontalAlignment="Right"></dxe:TextEdit>
+
+                <dxe:TextEdit Grid.Row="40" Grid.Column="0" Text="{Binding Content.Text[17],Converter={StaticResource FormatConverter}, Mode=OneWay}" FontSize="10"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="40" Grid.Column="1" Text="{Binding Content.AmountBase[17],Converter={StaticResource FormatConverter},ConverterParameter=N0, Mode=OneWay}" FontSize="10" HorizontalAlignment="Right"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="40" Grid.Column="2" Text="{Binding Content.Amount[17],Converter={StaticResource FormatConverter},ConverterParameter=N0, Mode=OneWay}" FontSize="10" HorizontalAlignment="Right"></dxe:TextEdit>
+
+                <dxe:TextEdit Grid.Row="41" Grid.Column="0" Text="H. Sum" FontSize="10" FontWeight="Bold"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="42" Grid.Column="0" Text="{Binding Content.Text[18],Converter={StaticResource FormatConverter}, Mode=OneWay}" FontSize="10"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="42" Grid.Column="1" Text="{Binding Content.AmountBase[18],Converter={StaticResource FormatConverter},ConverterParameter=N0, Mode=OneWay}" FontSize="10" HorizontalAlignment="Right"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="42" Grid.Column="2" Text="{Binding Content.Amount[18],Converter={StaticResource FormatConverter},ConverterParameter=N0, Mode=OneWay}" FontSize="10" HorizontalAlignment="Right"></dxe:TextEdit>
+
+                <dxe:TextEdit Grid.Row="43" Grid.Column="0" Grid.ColumnSpan="3" Text="Legg inn tilleggsopplysninger og forklaring til eventuelle avvik her" FontSize="10" FontWeight="Bold"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="44" Grid.Column="0" Grid.ColumnSpan="3" Text="{Binding Content.AltinnInfoText}" FontSize="10"/>
+            </Grid>
+        </DataTemplate>
+        
+    </UserControl.Resources>
+
+    <Grid x:Name="LayoutRoot" Background="White">
+        <CorasauControls:CustomPrint x:Name="custPrint"/>
+    </Grid>
+</Pages:BasePage>

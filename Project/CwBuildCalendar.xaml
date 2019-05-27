@@ -1,0 +1,77 @@
+<cw:ChildWindow xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.CwBuildCalendar"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:cw="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+        xmlns:ClientToolsControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+        xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
+        Height="230" Width="650">
+    <Grid x:Name="LayoutRoot" Margin="2">
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="25" />
+                <RowDefinition Height="25"/>
+                <RowDefinition Height="25"/>
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <TextBlock Height="23" TextDecorations="UnderLine" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Period}" />
+            <StackPanel Orientation="Horizontal" Grid.Row="1">
+                <TextBlock Height="23" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=From}"/>
+                <ClientToolsControls:DateEditor  Width="130" Height="23" x:Name="fromDate" Grid.Row="1"   Margin="5,0,0,0"/>
+                <TextBlock Height="23" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=To}" Margin="5,0,0,0"/>
+                <ClientToolsControls:DateEditor  Width="130" Height="23" x:Name="toDate" Grid.Row="1"  Margin="5,0,0,0"/>
+            </StackPanel>
+            <TextBlock Height="23" TextDecorations="UnderLine" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Hours}" Grid.Row="2" />
+            <Grid  Grid.Row="3">
+                <StackPanel Orientation="Horizontal">
+                    <StackPanel Margin="7,0,0,0">
+                        <Label Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Monday}" />
+                        <ClientToolsControls:NumericUpDownEditor ApplyDefaultMask="False"  IsFloatValue="True"  MaxValue="24"  x:Name="txtMonHrs"  Width="80" Mask="N2" MaskType="Numeric"  />
+                    </StackPanel>
+
+                    <StackPanel Margin="7,0,0,0">
+                        <Label Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Tuesday}"  />
+                        <ClientToolsControls:NumericUpDownEditor ApplyDefaultMask="False"  IsFloatValue="True"   MaxValue="24"  x:Name="txtTueHrs" Width="80" Mask="N2" MaskType="Numeric" />
+                    </StackPanel>
+
+                    <StackPanel Margin="7,0,0,0">
+                        <Label Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Wednesday}"  />
+                        <ClientToolsControls:NumericUpDownEditor ApplyDefaultMask="False" IsFloatValue="True"  MaxValue="24"  x:Name="txtWedHrs" Width="80"  Mask="N2" MaskType="Numeric" />
+                    </StackPanel>
+
+                    <StackPanel Margin="7,0,0,0">
+                        <Label Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Thursday}" />
+                        <ClientToolsControls:NumericUpDownEditor ApplyDefaultMask="False" IsFloatValue="True"  MaxValue="24"  x:Name="txtThuHrs"  Width="80"   Mask="N2" MaskType="Numeric" />
+                    </StackPanel>
+
+                    <StackPanel Margin="7,0,0,0">
+                        <Label Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Friday}"  />
+                        <ClientToolsControls:NumericUpDownEditor ApplyDefaultMask="False" IsFloatValue="True"  MaxValue="24"  x:Name="txtFriHrs"  Width="80"   Mask="N2" MaskType="Numeric" />
+                    </StackPanel>
+
+                    <StackPanel Margin="7,0,0,0">
+                    <Label Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Saturday}"  />
+                        <ClientToolsControls:NumericUpDownEditor ApplyDefaultMask="False" IsFloatValue="True"    x:Name="txtSatHrs"  Width="80"  Mask="N2" MaskType="Numeric" />
+                    </StackPanel>
+
+                    <StackPanel Margin="7,0,0,0">
+                        <Label Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Sunday}" />
+                        <ClientToolsControls:NumericUpDownEditor ApplyDefaultMask="False"  MaxValue="24"  x:Name="txtSunHrs"  Width="80"  Mask="N2" MaskType="Numeric" />
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+        </Grid>
+        <StackPanel x:Name="actionButton" HorizontalAlignment="Right" Grid.Row="1" Orientation="Horizontal" Margin="0 10 0 0">
+            <Button x:Name="btnBuild" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Create}" Click="btnBuild_Click"  MinWidth="75" Height="23"
+                    HorizontalAlignment="Right" Margin="0 0 3 0" />
+            <Button x:Name="CancelButton" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Cancel}" IsCancel="True" Click="CancelButton_Click"  MinWidth="75" 
+                    Height="23" HorizontalAlignment="Right"  />
+        </StackPanel>
+    </Grid>
+</cw:ChildWindow>

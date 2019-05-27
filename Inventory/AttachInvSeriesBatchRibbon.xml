@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<root>
+  <RibbonItem TabId="0" LocalizedNameKey="Home">
+      <RibbonItem Action="AttachSerieBatch" LocalizedNameKey="Attach" Glyph="Attachments_32x32.png" LargeGlyph="Attachments_32x32.png"/>
+  </RibbonItem>
+</root>

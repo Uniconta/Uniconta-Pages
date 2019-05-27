@@ -1,0 +1,51 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
+        xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.EUInvStatPage"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:UnicontaControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"      
+        xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage" xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage">
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="50"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <UnicontaControls:CorasauRibbonControl x:Name="localMenu" XMLSourcePath=";component/Pages/Inventory/InventoryTotalsRibbon.xml"/>
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Row="1" Margin="0,12,0,10">
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FromDate}"  Margin="10 0 0 0"/>
+            <UnicontaControls:DateEditor x:Name="FromDate"  Margin="10 0 0 0" ShowToday="True"/>
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ToDate}"  Margin="10 0 0 0"/>
+            <UnicontaControls:DateEditor x:Name="ToDate"  Margin="10 0 0 0" ShowToday="True"/>
+        </StackPanel>
+        <UnicontaControls:BusyIndicator x:Name="busyIndicator" Grid.Row="2" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BusyMessage}">
+            <local:EUInvStatPageGrid   x:Name="dgEUInvStatGrid" AutoGenerateColumns="None" HorizontalAlignment="Stretch">
+                <local:EUInvStatPageGrid.Columns>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Account" Width="100" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="AccountName" Width="200"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Group" Width="60" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CompanyRegNo"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Country" Width="100"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ItemType" Width="60" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="VatZone" Width="100"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Vat" Width="70"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="VatOperation" Width="40"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="VatOperationName" Width="100" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="SalesValue"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Qty" Width="90"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CostValue" Visible="False" Width="100"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Margin" Visible="False" Width="100"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="MarginRatio" Width="60" Visible="False" />
+                </local:EUInvStatPageGrid.Columns>
+                <local:EUInvStatPageGrid.TotalSummary>
+                    <localPage:SumColumn FieldName="Qty" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="CostValue" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="SalesValue" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="Margin" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                </local:EUInvStatPageGrid.TotalSummary>
+            </local:EUInvStatPageGrid>
+        </UnicontaControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

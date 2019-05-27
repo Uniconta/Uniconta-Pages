@@ -1,0 +1,27 @@
+<Pages:GridBasePage  xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
+                        xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.VatReportUnitedKingdom"
+                         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                         xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage"
+                         xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1"  BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <localPage:VatReportUnitedKingdomGrid x:Name="dgVatReportUnitedKingdom" AutoGenerateColumns="None">
+                <localPage:VatReportUnitedKingdomGrid.Columns>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Line" Width="50"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="UnicontaOperation" Width="50" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Text" Width="500"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="AmountBase"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Amount" />
+                </localPage:VatReportUnitedKingdomGrid.Columns>
+            </localPage:VatReportUnitedKingdomGrid>
+        </CorasauControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

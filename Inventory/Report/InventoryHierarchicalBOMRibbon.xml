@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<root>
+   <RibbonItem TabId="0" LocalizedNameKey="Home">
+    <RibbonItem Action="ExpandAndCollapse" LocalizedNameKey="ExpandAll" ShortcutKey="Ctrl+O"  LargeGlyph="Expand_32x32.png" />
+     <RibbonItem Action="ExpandRow" LocalizedNameKey="Expand" LargeGlyph="Dimension_Setup_32x32.png" />
+  </RibbonItem>
+   <RibbonItem>
+    <RibbonItem Action="ApplyFilter" LocalizedNameKey="Filter" Glyph="Filter_16x16.png" LargeGlyph="Filter_32x32.png"/>
+    <RibbonItem Action="ClearFilter" ShortcutKey="Ctrl+K" LocalizedNameKey="ClearFilter" Glyph="Filter_Clear_32x32.png" LargeGlyph="Filter_Clear_32x32.png"/>
+  </RibbonItem>
+  <RibbonItem>
+    <!---When we create a new group and a new TabPage -->
+    <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh.png" LargeGlyph="refresh.png"/>
+  </RibbonItem>
+</root>

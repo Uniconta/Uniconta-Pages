@@ -1,0 +1,88 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"    
+   xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.CreditorInvoiceLine"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+     xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage"
+           xmlns:toolkit="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Toolkit"
+           xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+           xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools">
+    <UserControl.Resources>
+        <Util:RowIndexConverter x:Key="RowIndexConverter" />
+    </UserControl.Resources>
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl x:Name="localMenu" XMLSourcePath=";component/Pages/Creditor/CreditorInvoiceLinesRibbon.xml"/>
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <localPage:CreditorInvTransClientGrid x:Name="dgCrdInvLines" AutoGenerateColumns="None">
+                <localPage:CreditorInvTransClientGrid.Columns>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colAccount" FieldName="DCAccount" Width="100"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="AccountName" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Item"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ItemName" Visible="False"/>
+                    <localPage:CorasauDataGridForeignKeyColumnClient x:Name="colVariant1" FieldName="Variant1" Width="80" />
+                    <localPage:CorasauDataGridForeignKeyColumnClient x:Name="colVariant2" FieldName="Variant2" Width="80" />
+                    <localPage:CorasauDataGridForeignKeyColumnClient x:Name="colVariant3" FieldName="Variant3" Width="80" />
+                    <localPage:CorasauDataGridForeignKeyColumnClient x:Name="colVariant4" FieldName="Variant4" Width="80" />
+                    <localPage:CorasauDataGridForeignKeyColumnClient x:Name="colVariant5" FieldName="Variant5" Width="80" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Variant1Name" Width="100" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Variant2Name" Width="100" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Variant3Name" Width="100" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Variant4Name" Width="100" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Variant5Name" Width="100" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Text" Width="250"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceQty"  Width="100" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Unit" Width="50" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="SalesPrice" Width="90"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Discount" Width="90"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DiscountPct" Width="50"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceTotal" Width="100"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CostPrice" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CostValue" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Warehouse" Width="90" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Location" Width="90" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Currency" Width="50" Visible="false"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Vat" Width="50" Visible="false"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="UnitStr" Width="50" Visible="false"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Week" Width="50" Visible="false"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DateOnOrder" Width="90" Visible="false"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Date" Width="90" Visible="false"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Subtotal" Width="50" Visible="false"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="StockUpdate" Width="60" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CostRestated" Width="60" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PartOfBOM" Width="50" Visible="false"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="HasSeriaBatch" Width="50" Visible="false"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="OrderNumber" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="NetAmount" Width="90" Visible="false"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Employee" Width="50" Visible="false"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="EndDiscountPct" Width="35" Visible="false"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="MovementType" Visible="false"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="SalesPriceCur" Visible="false"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="LineNumber" Visible="false"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ReferenceNumber" Width="70" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceNumber" Visible="false"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Margin" Width="100" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="MarginRatio" Width="60" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim1" Width="70" FieldName="Dimension1" Visible="false" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim2" Width="70" FieldName="Dimension2" Visible="false" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim3" Width="70" FieldName="Dimension3" Visible="false"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim4" Width="70" FieldName="Dimension4" Visible="false"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim5" Width="70" FieldName="Dimension5" Visible="false" />
+                </localPage:CreditorInvTransClientGrid.Columns>
+                <localPage:CreditorInvTransClientGrid.TotalSummary>
+                    <localPage:SumColumn FieldName="InvoiceQty" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="InvoiceTotal" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="NetAmount" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="Margin" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="CostValue" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="MarginRatio" SummaryType="Custom" DisplayFormat="{}{0:N2}" />
+                </localPage:CreditorInvTransClientGrid.TotalSummary>
+            </localPage:CreditorInvTransClientGrid>
+        </CorasauControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

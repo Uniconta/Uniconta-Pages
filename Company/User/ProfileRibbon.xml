@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<root>
+  <RibbonItem TabId="0" LocalizedNameKey="Home">
+    <RibbonItem Action="Save" ShortcutKey="Ctrl+S" LocalizedNameKey="Save" Glyph="save-16x16.png" LargeGlyph="save-32x32.png"/>
+    <RibbonItem Action="Cancel" LocalizedNameKey="Cancel" Glyph="close-16x16.png" LargeGlyph="close-32x32.png"/>
+  </RibbonItem>
+  <RibbonItem> 
+    <RibbonItem Action="CopyLayout" LocalizedNameKey="CopyUserLayout" LargeGlyph="Copy_32x32.png"/>    
+  </RibbonItem>
+  <RibbonItem> 
+    <RibbonItem Action="LatestXap" LocalizedNameKey="Download" LargeGlyph="save-32x32.png"/>    
+   </RibbonItem>
+    <RibbonItem> 
+    <RibbonItem Action="Subscription" LocalizedNameKey="Subscription" LargeGlyph="Subscribe_32x32.png"/>        
+  </RibbonItem>
+    <RibbonItem>
+    <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32.png">     
+      <RibbonItem Action="StartEdit" LocalizedNameKey="StartEdit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>
+      <RibbonItem Action="EndEdit" LocalizedNameKey="SaveOBJ" Parameter="Layout" Glyph="save-16x16.png" LargeGlyph="save-32x32.png"/>
+      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="SwitchToDefault" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png"/>
+      <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportOBJ"  Parameter="Layout" EnableSeperator="True" Glyph="ExportLayout_16x16.png" LargeGlyph="ExportLayout_16x16.png"/>
+     <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportOBJ" Parameter="Layout" Glyph="Import_16x16.png" LargeGlyph="Import_16x16.png"/>
+      <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16.png" />
+    </RibbonItem>
+  </RibbonItem>
+  <RibbonItem> 
+    <RibbonItem Action="UserOperations" LocalizedNameKey="UserOperations" LargeGlyph="User_Operations_32x32.png"/>
+    <RibbonItem Action="ActiveSessions" LocalizedNameKey="ActiveSessions" LargeGlyph="Convert_To_User_32x32.png"/>
+   <RibbonItem Action="UserLoginHistory" LocalizedNameKey="UserLoginHistory" LargeGlyph="History_32x32.png"/>
+  </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="UserLayout" LocalizedNameKey="UserLayout" LargeGlyph="UserFieldData_32x32.png"/>
+  </RibbonItem>
+
+</root>

@@ -35,6 +35,8 @@
     <RibbonItem Action="UpdatePrices" LocalizedNameKey="RecalculatePrices" LargeGlyph="Calculator_32x32.png"/>
   </RibbonItem>
 <RibbonItem>
+    <RibbonItem LocalizedNameKey="Adjustment" StatusValue=""></RibbonItem>
     <RibbonItem LocalizedNameKey="Total" StatusValue=""></RibbonItem>
+  <RibbonItem LocalizedNameKey="Diff" StatusValue=""></RibbonItem>
   </RibbonItem>
 </root>

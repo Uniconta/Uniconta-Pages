@@ -1,0 +1,46 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
+        xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.IOBSClaimPaymentEntriesPage"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
+        xmlns:UnicontaControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <UnicontaControls:CorasauRibbonControl XMLSourcePath=";component/Pages/GL/Reports/IOBSClaimPaymentEntriesPageGridRibbon.xml" x:Name="localMenu"/>
+        <UnicontaControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <local:IOBSClaimPaymentEntriesPageGrid  x:Name="dgIOBSClaimPaymentEntriesPageGrid" AutoGenerateColumns="None">
+                <local:IOBSClaimPaymentEntriesPageGrid.Columns>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ClaimKey"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Amount"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="FinalDueDate"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Identifier"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Reference"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="CategoryCode"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="RedeemingBank"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="TransactionDate"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="BookingDate"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ValueDate"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PaymentType"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="AmountDeposited"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="TotalAmount"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="CapitalGainsTax"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="BillNumber"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="CustmerNumber" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="NoticeChargeAmount" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DefaultChargeAmount" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="OtherDefaultCostAmount" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DefautInterestAmount" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DiscountAmount" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Currency"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="BatchNumber"/>
+                </local:IOBSClaimPaymentEntriesPageGrid.Columns>
+            </local:IOBSClaimPaymentEntriesPageGrid>
+        </UnicontaControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

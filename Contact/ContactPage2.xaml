@@ -1,0 +1,103 @@
+<Pages:FormBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools" 
+   xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.ContactPage2"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+    xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools" 
+    xmlns:toolkit="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Toolkit"
+    xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
+    xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors"   >
+
+    <UserControl.Resources>
+            
+        <Util:RowIndexConverter x:Key="RowIndexConverter" />
+
+    </UserControl.Resources>
+    <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="0" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BusyMessage}">
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl x:Name="frmRibbon" XMLSourcePath=";component/Assets/FormRibbon.xml" Grid.Row="0"/>
+        <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Vertical" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpDescription" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Description}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="350">
+                <CorasauControls:CorasauLayoutItem FieldName="Name" x:Name="liName">
+                    <CorasauControls:TextEditor Text="{Binding Name,Mode=TwoWay}" x:Name="txtName"/>
+                </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Email" x:Name="liEmail" Style="{StaticResource LayoutItemsstyle}" ButtonClicked="Email_ButtonClicked" ButtonContent="&#x2709;" Padding="0">
+                        <CorasauControls:TextEditor x:Name="txtEmail" Text="{Binding Email,Mode=TwoWay}" MaskType="RegEx" Mask="{StaticResource EmailValidationRegx}"/>
+                </CorasauControls:CorasauLayoutItem>
+                <CorasauControls:CorasauLayoutItem FieldName="Mobil" x:Name="liMobile">
+                        <CorasauControls:TextEditor Text="{Binding Mobil,Mode=TwoWay}"/>
+                </CorasauControls:CorasauLayoutItem>
+                <CorasauControls:CorasauLayoutItem FieldName="Title" x:Name="liTitle">
+                    <CorasauControls:ComboBoxEditor x:Name="cbTitle" SelectedItem="{Binding Title,Mode=TwoWay}"/>
+                </CorasauControls:CorasauLayoutItem>
+
+                <CorasauControls:CorasauLayoutItem FieldName="DCType" x:Name="itmDCType" Visibility="Collapsed">
+                    <CorasauControls:ComboBoxEditor  SelectedItem="{Binding DCType,Mode=TwoWay}"/>       
+                </CorasauControls:CorasauLayoutItem>
+                <CorasauControls:CorasauLayoutItem FieldName="DCAccount" x:Name="itemDCAccount" Visibility="Collapsed">
+                    <CorasauControls:LookupEditor x:Name="lookupDCAccount" GotFocus="lookupDCAccount_GotFocus" Text="{Binding DCAccount,Mode=TwoWay}" HasCustomLookUp="True"  ItemsSource="{Binding AccountSource,Mode=OneWay}" />
+                </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="EAN" x:Name="liEAN">
+                        <CorasauControls:TextEditor Text="{Binding EAN,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="ReferenceId" x:Name="liReferenceId">
+                        <CorasauControls:TextEditor Text="{Binding ReferenceId,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
+                
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="crmGroup" Visibility="Collapsed"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CRM}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="350">
+                    <CorasauControls:CorasauLayoutItem FieldName="Interests" x:Name="liInterests">
+                        <CorasauControls:ComboBoxEditor x:Name="cmbInterests" Text="{Binding Interests, Mode=TwoWay}" >
+                            <CorasauControls:ComboBoxEditor.StyleSettings>
+                                <editor:CheckedComboBoxStyleSettings />
+                            </CorasauControls:ComboBoxEditor.StyleSettings>
+                        </CorasauControls:ComboBoxEditor>
+                    </CorasauControls:CorasauLayoutItem>
+
+                    <CorasauControls:CorasauLayoutItem FieldName="Products" x:Name="liProducts">
+                        <CorasauControls:ComboBoxEditor x:Name="cmbProducts" Text="{Binding Products, Mode=TwoWay}">
+                            <CorasauControls:ComboBoxEditor.StyleSettings>
+                                <editor:CheckedComboBoxStyleSettings />
+                            </CorasauControls:ComboBoxEditor.StyleSettings>
+                        </CorasauControls:ComboBoxEditor>
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
+
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpEmailRecipient" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=EmailRecipient}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                <CorasauControls:CorasauLayoutItem FieldName="Invoice" x:Name="liInvoice">
+                    <CorasauControls:CheckEditor IsChecked="{Binding Invoice,Mode=TwoWay}"/>
+                </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="AccountStatement" x:Name="liAccountStatement">
+                        <CorasauControls:CheckEditor IsChecked="{Binding AccountStatement,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="InterestNote" x:Name="liInterestNote">
+                        <CorasauControls:CheckEditor IsChecked="{Binding InterestNote,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="CollectionLetter" x:Name="liCollectionLetter">
+                        <CorasauControls:CheckEditor IsChecked="{Binding CollectionLetter,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Packnote" x:Name="liPackNote">
+                        <CorasauControls:CheckEditor IsChecked="{Binding Packnote,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Confirmation" x:Name="liConfirmation">
+                        <CorasauControls:CheckEditor IsChecked="{Binding Confirmation,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Offer" x:Name="liOffer">
+                        <CorasauControls:CheckEditor IsChecked="{Binding Offer,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="GetEmailIfContact" x:Name="liOGetEmailIfContact">
+                        <CorasauControls:CheckEditor IsChecked="{Binding GetEmailIfContact,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
+
+        </CorasauControls:CorasauLayoutControl>
+    </Grid>
+    </CorasauControls:BusyIndicator>
+</Pages:FormBasePage>

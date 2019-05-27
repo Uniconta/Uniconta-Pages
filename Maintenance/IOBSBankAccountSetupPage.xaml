@@ -1,0 +1,68 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
+        xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.IOBSBankAccountSetupPage"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
+        xmlns:UnicontaControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <UnicontaControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Maintenance/IOBSBankAccountSetupPageGridRibbon.xml" x:Name="localMenu"/>
+        <UnicontaControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <local:IOBSBankAccountSetupPageGrid  x:Name="dgIOBSBankAccountSetupPageGrid" AutoGenerateColumns="None">
+                <local:IOBSBankAccountSetupPageGrid.Columns>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Name" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="BankAccountLedger"  />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="BankAccountBankNumber"  />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="BankAccountNumber" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ClaimsURL"  />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="UserName"  />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Password"  />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="FinalDueDateTermsOfPayment"  />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Indentifier"  />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="MinClaimAmount"  />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PermitOutOfSequencePayment"  />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="IsPartialPaymentAllowed"  />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DefaultClaimBankAccount"  />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Bankprintsclaim"  />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="BankAccountGLAccount"  />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="NoticeAndPaymentFeePrinting"  />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="NoticeAndPaymentFeePaperless"  />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ReferenceDate"  />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DefaultChargeFirstDays" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DefaultChargeFirstAmount"  />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DefaultChargeSecondDays"  />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DefaultChargeSecondAmount"  />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="OtherCost"  />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="OtherDefaultCosts"  />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DefaultInterestRule"  />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DefaultInterestPercentage4"  />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DefaultInterestSpecialCode"  />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="CurrencyInfoReferenceRate"  />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="CurrencyInfoCurrency"  />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="CurrencyInfoPaymentRate"  />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DiscountReferenceDate"  />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DiscountFirstDays"  />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DiscountFirstAmount"  />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DiscountSecondDays"  />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DiscountSecondAmount"  />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="BillPresentmentSystemType"  />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="BillPresentmentSystemParameters"  />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DiscountIsPostRefDate"  />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DefaultChargeAccount"  />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="NoticeChargeAccount"  />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DefaultInterestAccount"  />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="OtherCostAccount"  />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="CapitalGainsTaxAccount"  />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PrintingCharge"  />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PaperlessCharge"  />
+                </local:IOBSBankAccountSetupPageGrid.Columns>
+            </local:IOBSBankAccountSetupPageGrid>
+        </UnicontaControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

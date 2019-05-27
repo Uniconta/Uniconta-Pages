@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<root>
+  <RibbonItem TabId="0" LocalizedNameKey="Home">
+    <RibbonItem Action="SaveFolder" LocalizedNameKey="SaveOBJ" Parameter="Folder" LargeGlyph="save-32x32.png"/>
+    <RibbonItem Action="Cancel" LocalizedNameKey="Cancel" Glyph="close-16x16.png" LargeGlyph="close-32x32.png"/>
+  </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="AddVoucher"  LocalizedNameKey="AddOBJ" Parameter="Voucher" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png"/>
+    <RibbonItem Action="RemoveVoucher"  LocalizedNameKey="RemoveOBJ" Parameter="Voucher" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png"/>
+  </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="ViewFolderVoucher"  LocalizedNameKey="ViewOBJ" Parameter="Voucher" Glyph="View_16x16.png" LargeGlyph="View_32x32.png"/>
+    <RibbonItem Action="ViewPhysicalVoucher"  LocalizedNameKey="ViewOBJ" Parameter="Voucher" Glyph="View_16x16.png" LargeGlyph="View_32x32.png"/> 
+  </RibbonItem>
+</root>

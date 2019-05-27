@@ -1,0 +1,35 @@
+<ClientTools:ChildWindow xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.CWPartnerInvoice"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools" 
+             xmlns:UnicontaCtrls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+             Width="320">
+    <Grid x:Name="LayoutRoot" Margin="2">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid x:Name="LayoutGrid" Margin="10" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition x:Name="rowHidden" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="10" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="{Binding  Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=SendAll}" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" />
+            <CheckBox IsChecked="{Binding IsChecked}" Grid.Row="0" Grid.Column="2" VerticalAlignment="Center" />
+            <TextBlock Text="{Binding  Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=Journal}" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center"/>
+            <UnicontaCtrls:LookupEditor x:Name="lookupJournal" Text="{Binding Journal}" Height="25" Grid.Column="2"  Grid.Row="1" VerticalAlignment="Center"/>
+        </Grid>
+        <StackPanel x:Name="actionButton" HorizontalAlignment="Right" Grid.Row="1" Orientation="Horizontal" Margin="0 10 0 0">
+            <Button x:Name="OKButton" IsDefault="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=OK}" Click="OKButton_Click"  MinWidth="75" Height="23" 
+                    HorizontalAlignment="Right" Margin="0 0 3 0" />
+            <Button x:Name="CancelButton" IsCancel="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=Cancel}" Click="CancelButton_Click"  MinWidth="75" 
+                    Height="23" HorizontalAlignment="Right" />
+        </StackPanel>
+    </Grid>
+</ClientTools:ChildWindow>

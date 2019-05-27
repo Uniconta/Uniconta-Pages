@@ -1,0 +1,41 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
+   xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.BalanceReport"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+    xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage" 
+    xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+    d:DesignHeight="300" d:DesignWidth="400">
+    <UserControl.Resources>
+    
+    </UserControl.Resources>
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>     
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>   
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1">
+            <localPage:BalanceReportManagerGrid x:Name="dgBalanceReport" AutoGenerateColumns="None">
+                <localPage:BalanceReportManagerGrid.Bands>
+                    <localPage:BalanceReportManagerGridColumnGridControlBand>
+                        <localPage:BalanceReportManagerTextGridColumn  FieldName="AccountNo" IsSmart="True" x:Name="AccountNo"/>
+                        <localPage:BalanceReportManagerTextGridColumn  FieldName="AccountName" MinWidth="200" IsSmart="True" x:Name="AccountName"/>
+                        <localPage:BalanceReportManagerTextGridColumn  FieldName="Text" MinWidth="200" IsSmart="True" x:Name="Text"  />
+                        <localPage:BalanceReportManagerTextGridColumn x:Name="coldim1" FieldName="Dim1" />
+                        <localPage:BalanceReportManagerTextGridColumn x:Name="coldim2" FieldName="Dim2"  />
+                        <localPage:BalanceReportManagerTextGridColumn x:Name="coldim3" FieldName="Dim3" />
+                        <localPage:BalanceReportManagerTextGridColumn x:Name="coldim4" FieldName="Dim4" />
+                        <localPage:BalanceReportManagerTextGridColumn x:Name="coldim5" FieldName="Dim5" />
+                    </localPage:BalanceReportManagerGridColumnGridControlBand>
+
+                </localPage:BalanceReportManagerGrid.Bands>
+                <localPage:BalanceReportManagerGrid.Columns>
+                </localPage:BalanceReportManagerGrid.Columns>
+            </localPage:BalanceReportManagerGrid>
+        </CorasauControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

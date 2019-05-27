@@ -1,0 +1,89 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
+   xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.PartInvItemsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage"
+    xmlns:toolkit="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Toolkit" 
+    xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+    xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"   
+    xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
+    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid">
+    <UserControl.Resources>
+        <Style x:Key="StyleRow" TargetType="dxg:RowControl">
+            <Setter Property="Height" Value="Auto"/>
+        </Style>
+        <Util:RowIndexConverter x:Key="RowIndexConverter" />
+        <Util:MaskConverter x:Key="MaskConverter" />
+    </UserControl.Resources>
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>        
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Inventory/PartInvItemsPageLineRibbon.xml" x:Name="localMenu"/>
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <localPage:PartInvItemsGrid x:Name="dgPartInvItemsGrid"  AutoGenerateColumns="None">
+                <localPage:PartInvItemsGrid.Columns>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="LineNumber" Width="50" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ItemPart" Width="100"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" Width="150" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ItemType" Width="80" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant" FieldName="Variant">
+                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <localPage:VariantEditorClient x:Name="PART_Editor" EditValue="{Binding DataContext.RowData.Row.Variant,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" DataContext="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"></localPage:VariantEditorClient>
+                            </DataTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                    </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant1" Width="70" IsEditSettingSet="True" FieldName="Variant1" Visible="False" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant2" Width="70" IsEditSettingSet="True" FieldName="Variant2" Visible="False" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant3" Width="70" IsEditSettingSet="True" FieldName="Variant3" Visible="False" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant4" Width="70" IsEditSettingSet="True" FieldName="Variant4" Visible="False" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant5" Width="70" IsEditSettingSet="True" FieldName="Variant5" Visible="False" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Variant1Name" Width="100" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Variant2Name" Width="100" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Variant3Name" Width="100" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Variant4Name" Width="100" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Variant5Name" Width="100" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Qty" Width="90" >
+                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <CorasauControls:TextEditor  x:Name="PART_Editor" HorizontalContentAlignment="Right" Mask="{Binding Path=DataContext.RowData.Row.Decimals,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource MaskConverter},ConverterParameter=Decimals}" MaskUseAsDisplayFormat="True" MaskType="Numeric" EditValue="{Binding Path=DataContext.RowData.Row.Qty,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"/>
+                            </DataTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                    </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="UnitSize" Width="80" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CostPriceFactor" Width="80" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="QtyType" Width="100">
+                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="BOMQtyType"/>
+                            </DataTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                    </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="MoveType" Width="100">
+                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="BOMMoveType"/>
+                            </DataTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                    </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CostValue" Width="80"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="SalesValue" Width="80"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ShowOnInvoice" Width="60"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ShowOnPacknote" Width="60"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="InclValueOnInvoice" Width="60"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="UnfoldBOM" Visible="False"  Width="100"/>
+                </localPage:PartInvItemsGrid.Columns>
+                <localPage:PartInvItemsGrid.TotalSummary >
+                    <localPage:SumColumn FieldName="Qty" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="CostValue" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="SalesValue" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                </localPage:PartInvItemsGrid.TotalSummary>  
+            </localPage:PartInvItemsGrid>
+        </CorasauControls:BusyIndicator>       
+    </Grid>
+</Pages:GridBasePage>

@@ -1,0 +1,42 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
+        xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.InvPurchaseAccountPage"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
+        xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+        xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
+        xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools">
+    <UserControl.Resources>
+        <Util:RowIndexConverter x:Key="RowIndexConverter" />
+    </UserControl.Resources>
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Assets/EditableGridRibbon.xml" x:Name="localMenu"/>
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <local:InvPurchaseAccountGrid  x:Name="dgInvPurchaseAccount" AutoGenerateColumns="None" HorizontalAlignment="Stretch">
+                <local:InvPurchaseAccountGrid.Columns>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Item" Width="100" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ItemName" Width="200"  Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PurchaseAccount" Width="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Name" Width="200"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="EAN" Width="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PurchaseQty" Width="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PurchasePrice" Width="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PurchaseCurrency" Width="60">
+                        <local:CorasauDataGridTemplateColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor"  AppEnumName="Currencies" IsEnabled="{Binding DataContext.RowData.Row.IsEnabled,RelativeSource={RelativeSource TemplatedParent}}"/>
+                            </DataTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.CellTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
+                </local:InvPurchaseAccountGrid.Columns>
+            </local:InvPurchaseAccountGrid>
+        </CorasauControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

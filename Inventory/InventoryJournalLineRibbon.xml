@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<root>
+  <RibbonItem TabId="0" LocalizedNameKey="Home">
+    <!---When we create a new group and a new TabPage -->
+    <RibbonItem Action="AddRow" LocalizedNameKey="AddNewRow" ShortcutKey="CTRL+N" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png"/>
+    <RibbonItem Action="AddVariants" LocalizedNameKey="AddOBJ" Parameter="Variants" Module="ItemVariants" LargeGlyph="GanttChart_32x32.png"/>
+    <RibbonItem Action="CopyRow" LocalizedNameKey="CopyRow" ShortcutKey="Shift+F2" LargeGlyph="Copy_32x32.png"/>
+    <RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="DeleteRow" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png"/>
+    <RibbonItem Action="SaveGrid" ShortcutKey="CTRL+S" LocalizedNameKey="Save" Glyph="save-16x16.png" LargeGlyph="save-32x32.png"/>
+  </RibbonItem>
+  <RibbonItem>
+    <!---next group-->
+    <RibbonItem Action="Templates" LocalizedNameKey="Templates" LargeGlyph="Layout_32x32.png">
+      <!---If we want Inner menu-->
+      <RibbonItem Action="LoadTemplate" LocalizedNameKey="Load" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>
+      <RibbonItem Action="SaveTemplate" LocalizedNameKey="SaveAs" Glyph="save-16x16.png" LargeGlyph="save-32x32.png"/>
+      <RibbonItem Action="DeleteTemplate" LocalizedNameKey="Delete" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png"/>
+    </RibbonItem>
+  </RibbonItem>
+  <RibbonItem>
+    <!---If we want to create a new group in same PageTab-->
+    <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32.png">
+      <!---If we want Inner menu-->
+      <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
+      <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16.png" ShortcutKey="" />
+      <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveOBJ" Parameter="Layout" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
+      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="SwitchToDefault" Glyph="Delete_16x16.png" ShortcutKey=""/>
+      <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16.png" ShortcutKey="CTRL+U"/>
+      <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportOBJ"  Parameter="Layout" EnableSeperator="True" Glyph="ExportLayout_16x16.png" LargeGlyph="ExportLayout_16x16.png" ShortcutKey=""/>
+      <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportOBJ" Parameter="Layout" Glyph="Import_16x16.png" LargeGlyph="Import_16x16.png" ShortcutKey=""/>
+      <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16.png" ShortcutKey=""/>
+      <RibbonItem Action="FieldSetting" LocalizedNameKey="FieldSetting" Glyph="Setup_16x16.png" ShortcutKey=""/>
+    </RibbonItem>
+  </RibbonItem>
+  <RibbonItem>    
+    <RibbonItem Action="PostJournal" LocalizedNameKey="PostJournal" LargeGlyph="Posted_Journal_32x32.png"/>
+    <RibbonItem Action="Storage" LocalizedNameKey="OnHand" Module="Storage" LargeGlyph="Inventory_Trans_32x32.png"/>
+  </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="UnfoldBOM" LocalizedNameKey="UnfoldBOM" LargeGlyph="CopyUserTable_32x32.png"/>
+  </RibbonItem>
+</root>

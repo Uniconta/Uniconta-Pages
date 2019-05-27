@@ -1,0 +1,111 @@
+<Pages:BasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools" 
+               xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.VatReportSingapore"
+                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core" 
+                xmlns:dxdb="http://schemas.devexpress.com/winfx/2008/xaml/demobase" 
+                xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars" 
+                xmlns:dxp="http://schemas.devexpress.com/winfx/2008/xaml/printing" 
+                xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+                xmlns:dg="http://schemas.devexpress.com/winfx/2008/xaml/grid" 
+                xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
+                xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+                xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools" 
+                xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage">
+    <UserControl.Resources>
+        <DataTemplate x:Key="detailTemplate">
+            <Grid Width="{Binding Path=UsablePageWidth, Mode=OneWay}"  HorizontalAlignment="Stretch" dxp:ExportSettings.TargetType="Panel">
+                <Grid.Resources>
+                    <Util:DoubleValueFormatConvert x:Key="FormatConverter"/>
+                </Grid.Resources>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="10"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="10"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="10"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="10"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="10"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="10"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="10"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="10"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="10"/>
+                    <RowDefinition Height="30"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <dxe:TextEdit HorizontalAlignment="Center" Grid.Column="0"  Grid.ColumnSpan="3" Grid.Row="0" Text="Tax Statement" VerticalAlignment="Center"  FontSize="20" Foreground="DeepSkyBlue" FontWeight="Bold"/>
+
+                <dxe:TextEdit Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Text="SG Gov GST description:" FontWeight="Bold" FontSize="13"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="2" Grid.Column="2" Text="Amount" FontWeight="Bold" FontSize="13"  HorizontalAlignment="Right"></dxe:TextEdit>
+
+                <dxe:TextEdit Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Text="SALES" FontWeight="Bold" FontSize="13"></dxe:TextEdit>
+
+                <dxe:TextEdit Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2"  Text="Value of standard-rated supplies (excluding GST)" FontSize="13"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="4" Grid.Column="2" Text="{ Binding Content.VatArray[1],Converter={StaticResource FormatConverter},ConverterParameter=N2, Mode=OneWay}" FontSize="13" HorizontalAlignment="Right"></dxe:TextEdit>
+
+                <dxe:TextEdit Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Text="Value of zero-rated supplies" FontSize="13"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="5" Grid.Column="2" Text="{Binding Content.VatArray[2],Converter={StaticResource FormatConverter},ConverterParameter=N2, Mode=OneWay}" FontSize="13" HorizontalAlignment="Right"></dxe:TextEdit>
+
+                <dxe:TextEdit Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" Text="Value of exempted supplies" FontSize="13"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="6" Grid.Column="2" Text="{Binding Content.VatArray[3],Converter={StaticResource FormatConverter},ConverterParameter=N2, Mode=OneWay}" FontSize="13" HorizontalAlignment="Right"></dxe:TextEdit>
+
+                <dxe:TextEdit Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" Text="Total supplies" FontSize="13"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="8" Grid.Column="2" Text="{Binding Content.VatArray[4],Converter={StaticResource FormatConverter},ConverterParameter=N2, Mode=OneWay}" FontSize="13" HorizontalAlignment="Right"></dxe:TextEdit>
+
+                <dxe:TextEdit Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="2" Text="PURCHASE" FontWeight="Bold" FontSize="13"></dxe:TextEdit>
+
+                <dxe:TextEdit Grid.Row="11" Grid.Column="0" Grid.ColumnSpan="2" Text="Total Value of Taxable Purchases (Excluding GST)  " FontSize="13"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="11" Grid.Column="2" Text="{Binding Content.VatArray[5],Converter={StaticResource FormatConverter},ConverterParameter=N2, Mode=OneWay}" FontSize="13" HorizontalAlignment="Right"></dxe:TextEdit>
+
+                <dxe:TextEdit Grid.Row="13" Grid.Column="0" Grid.ColumnSpan="2" Text="GST INPUT/OUTPUT" FontWeight="Bold" FontSize="13"></dxe:TextEdit>
+
+                <dxe:TextEdit Grid.Row="14" Grid.Column="0" Grid.ColumnSpan="2" Text="Output Tax Due" FontSize="13"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="14" Grid.Column="2" Text="{Binding Content.VatArray[6],Converter={StaticResource FormatConverter},ConverterParameter=N2, Mode=OneWay}" FontSize="13" HorizontalAlignment="Right"></dxe:TextEdit>
+
+                <dxe:TextEdit Grid.Row="15" Grid.Column="0" Grid.ColumnSpan="2" Text="Input Tax and Refunds Claim" FontSize="13"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="15" Grid.Column="2" Text="{Binding Content.VatArray[7],Converter={StaticResource FormatConverter},ConverterParameter=N2, Mode=OneWay}" FontSize="13" HorizontalAlignment="Right"></dxe:TextEdit>
+
+                <dxe:TextEdit Grid.Row="16" Grid.Column="0" Grid.ColumnSpan="2" Text="NET GST to be paid/claimed from IRAS" FontSize="13"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="16" Grid.Column="2" Text="{Binding Content.VatArray[8],Converter={StaticResource FormatConverter},ConverterParameter=N2, Mode=OneWay}" FontSize="13" HorizontalAlignment="Right"></dxe:TextEdit>
+
+                <dxe:TextEdit Grid.Row="18" Grid.Column="0" Grid.ColumnSpan="2" Text="Total value of Goods imported under MES/3PL " FontSize="13"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="18" Grid.Column="2" Text="{Binding Content.VatArray[9],Converter={StaticResource FormatConverter},ConverterParameter=N2, Mode=OneWay}" FontSize="13" HorizontalAlignment="Right"></dxe:TextEdit>
+
+                <dxe:TextEdit Grid.Row="20" Grid.Column="0" Grid.ColumnSpan="2" Text="Did you claim for GST you had to refunded to Tourists? (   )" FontSize="13"></dxe:TextEdit>
+
+                <dxe:TextEdit Grid.Row="22" Grid.Column="0" Grid.ColumnSpan="2" Text="Did you make any bad debt relief claims? (   )" FontSize="13"></dxe:TextEdit>
+
+                <dxe:TextEdit Grid.Row="24" Grid.Column="0" Grid.ColumnSpan="2" Text="Did you make any pre-registration claims? (   )" FontSize="13"></dxe:TextEdit>
+
+                <dxe:TextEdit Grid.Row="26" Grid.Column="0" Grid.ColumnSpan="2" Text="Revenue" FontSize="13"></dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="26" Grid.Column="2" Text="{Binding Content.VatArray[10],Converter={StaticResource FormatConverter},ConverterParameter=N2, Mode=OneWay}" FontSize="13" HorizontalAlignment="Right"></dxe:TextEdit>
+
+            </Grid>
+        </DataTemplate>
+    </UserControl.Resources>
+    <Grid x:Name="LayoutRoot" Background="White">
+        <CorasauControls:CustomPrint x:Name="custPrint"/>
+    </Grid>
+</Pages:BasePage>

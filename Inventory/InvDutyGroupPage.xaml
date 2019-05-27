@@ -1,0 +1,56 @@
+<Pages:GridBasePage xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.InvDutyGroupPage"
+             xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
+             xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+             xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
+             xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
+    <UserControl.Resources>
+        <Style  x:Key="StyleRow" TargetType="dxg:GridRowContent">
+            <Setter Property="Height" Value="Auto"/>
+        </Style>
+            <Util:VisibilityBoolConverter x:Key="VisibilityBoolConverter" />
+            <Util:ImageNameToImagesourceConverter x:Key="ImageNameToImagesourceConverter"/>
+    </UserControl.Resources>
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Inventory/CustomerPriceListsPageGridRibbon.xml" x:Name="localMenu"/>
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <local:InvDutyGroupPageGrid x:Name="dgInvDutyGroupGrid" AutoGenerateColumns="None">
+                <local:InvDutyGroupPageGrid.Columns>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="HasNotes" Width="30" ReadOnly="True">
+                        <local:CorasauDataGridTemplateColumnClient.HeaderTemplate>
+                            <DataTemplate>
+                                <Image Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=;component/Assets/img/Note_16x16.png}" Width="16" Height="16" VerticalAlignment="Center"/>
+                            </DataTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.HeaderTemplate>
+                        <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <Image Margin="5" Tag="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=;component/Assets/img/Note_16x16.png}" MouseLeftButtonDown="HasNoteImage_MouseLeftButtonDown" Visibility="{Binding DataContext.RowData.Row.HasNotes,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource VisibilityBoolConverter}}" Stretch="Fill" Width="16" Height="16" RenderOptions.BitmapScalingMode="NearestNeighbor" RenderOptions.EdgeMode="Aliased" />
+                            </ControlTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="HasDocs" ReadOnly="True"  Width="30" >
+                        <local:CorasauDataGridTemplateColumnClient.HeaderTemplate>
+                            <DataTemplate>
+                                <Image Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=;component/Assets/img/Document_Attachment_16x16.png}" Width="16" Height="16" VerticalAlignment="Center"/>
+                            </DataTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.HeaderTemplate>
+                        <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <Image Margin="5" Tag="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=;component/Assets/img/Document_Attachment_16x16.png}" MouseLeftButtonDown="HasDocImage_MouseLeftButtonDown" Visibility="{Binding DataContext.RowData.Row.HasDocs,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource VisibilityBoolConverter}}" Stretch="Fill" Width="16" Height="16" RenderOptions.BitmapScalingMode="NearestNeighbor" RenderOptions.EdgeMode="Aliased" />
+                            </ControlTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DutyGroup" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Name" Width="200" />
+                </local:InvDutyGroupPageGrid.Columns>
+            </local:InvDutyGroupPageGrid>
+        </CorasauControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

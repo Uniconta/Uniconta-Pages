@@ -1,0 +1,41 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools" 
+   xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.WarehousePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"    
+    mc:Ignorable="d"
+    xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
+    xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+    xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage" 
+    xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+    d:DesignHeight="300" d:DesignWidth="400">
+    <Pages:GridBasePage.Resources>
+        <Util:RowIndexConverter x:Key="RowIndexConverter" />
+    </Pages:GridBasePage.Resources>
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Inventory/WarehousePage.xml" x:Name="localMenu"/>
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg,Mode=OneWay}">
+            <localPage:WarehouseClientGrid  x:Name="dgWarehouseClientGrid" AutoGenerateColumns="None">
+                <localPage:WarehouseClientGrid.Columns>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Warehouse" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Name"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Sorting"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="UseFor">
+                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="WarehouseType" />
+                            </DataTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                    </localPage:CorasauDataGridTemplateColumnClient>
+                </localPage:WarehouseClientGrid.Columns>
+            </localPage:WarehouseClientGrid>
+        </CorasauControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>
+

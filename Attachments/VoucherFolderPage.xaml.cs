@@ -1,0 +1,286 @@
+using UnicontaClient.Controls.Dialogs;
+using UnicontaClient.Models;
+using UnicontaClient.Pages.Attachments;
+using UnicontaClient.Utilities;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Net;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Animation;
+using System.Windows.Shapes;
+using Uniconta.API.GeneralLedger;
+using Uniconta.ClientTools.Controls;
+using Uniconta.ClientTools.DataModel;
+using Uniconta.ClientTools.Page;
+using Uniconta.ClientTools.Util;
+using Uniconta.Common;
+using Uniconta.DataModel;
+
+using UnicontaClient.Pages;
+namespace UnicontaClient.Pages.CustomPage
+{
+    public class VouchersFolderGrid : CorasauDataGridClient
+    {
+        public override Type TableType { get { return typeof(VouchersClient); } }
+
+    }
+
+    public class ExtendedVouchersGrid : CorasauDataGridClient
+    {
+        public override Type TableType { get { return typeof(VoucherExtendedClient); } }
+    }
+    public partial class VoucherFolderPage : ControlBasePage
+    {
+        VouchersClient voucherClient;
+        string action;
+        List<int> removedRowIds = null;
+        public VoucherFolderPage(UnicontaBaseEntity sourceData, string folderAction) :
+            base(sourceData)
+        {
+            InitializeComponent();
+            InitPage(folderAction);
+        }
+
+        string folderAction;
+        private void InitPage(string _folderAction)
+        {
+            MainControl = dgVoucherFolderGrid;
+            folderAction = _folderAction;
+            action = folderAction;
+            ribbonControl = localMenu;
+            dgVouchersGrid.api = dgVoucherFolderGrid.api = api;
+            dgVoucherFolderGrid.Readonly = false;
+            localMenu.OnItemClicked += LocalMenu_OnItemClicked;
+            if (LoadedRow == null)
+                voucherClient = new VouchersClient();
+            else
+                voucherClient = LoadedRow as VouchersClient;
+            SetRibbon(folderAction);
+        }
+
+        private void SetRibbon(string folderAction)
+        {
+            switch (folderAction)
+            {
+                case "Remove":
+                    ribbonControl.DisableButtons(new string[] { "AddVoucher", "AddPhysicalVoucher", "ViewPhysicalVoucher" });
+                    break;
+            }
+        }
+
+        public async override Task InitQuery()
+        {
+            await dgVouchersGrid.Filter(null);
+            var defaultFilterString = "Contains([Folder],'false')";
+            dgVouchersGrid.FilterString = defaultFilterString;
+            dgVoucherFolderGrid.Visibility = Visibility.Visible;
+            removedRowIds = new List<int>();
+
+            switch (folderAction)
+            {
+                case "Create":
+                    dgVouchersGrid.Visibility = Visibility.Visible;
+                    break;
+                case "Edit":
+                    var dapi = new DocumentAPI(api);
+                    var items = (VouchersClient[])await dapi.GetFolderContent(voucherClient, false);
+                    dgVoucherFolderGrid.ItemsSource = items.ToList(); // we need to do a toList, so we can update the list
+                    var folderrowIds = items.Select(p => p.RowId).ToList();
+                    if (folderrowIds.Count > 0)
+                        dgVouchersGrid.FilterString = GetFilterString(defaultFilterString, folderrowIds);
+                    dgVouchersGrid.Visibility = Visibility.Visible;
+                    break;
+            }
+        }
+
+        private string GetFilterString(string defaultFilter, List<int> newRowIds, List<int> existingRowIds = null)
+        {
+            var filterString = string.Empty;
+            StringBuilder strBuilder = new StringBuilder();
+            strBuilder.Append(" And Not [RowId] In (");
+            var totalRowIds = new List<int>();
+            if (newRowIds != null)
+                totalRowIds.AddRange(newRowIds);
+            if (existingRowIds != null)
+                totalRowIds.AddRange(existingRowIds);
+
+            foreach (var rowId in totalRowIds)
+                strBuilder.Append('\'').Append(rowId).Append('\'').Append(',');
+
+            strBuilder.Remove(strBuilder.Length - 1, 1);
+            strBuilder.Append(')');
+            filterString = string.Concat(defaultFilter, strBuilder);
+
+            return filterString;
+        }
+        private void LocalMenu_OnItemClicked(string ActionType)
+        {
+            var selectedVoucher = dgVouchersGrid.SelectedItem as VoucherExtendedClient;
+            var selectedVoucherFolder = dgVoucherFolderGrid.SelectedItem as VouchersClient;
+            switch (ActionType)
+            {
+                case "SaveFolder":
+                    SaveFolder();
+                    break;
+                case "AddVoucher":
+                    var itemsOld = dgVoucherFolderGrid.ItemsSource == null ? null : ((IEnumerable<VouchersClient>)dgVoucherFolderGrid.ItemsSource).Select(p => p.RowId).ToList();
+                    var VouchersAdd = ((IEnumerable<VoucherExtendedClient>)dgVouchersGrid.ItemsSource).Where(p => p.IsAdded == true).ToList();
+                    if (VouchersAdd.Count > 0)
+                        AddVouchers(VouchersAdd);
+                    else if (selectedVoucher != null)
+                    {
+                        var selectedList = new List<VoucherExtendedClient>() { selectedVoucher };
+                        AddVouchers(selectedList);
+                    }
+                    var itemsNew = VouchersAdd.Select(p => p.RowId).ToList();
+                    dgVouchersGrid.FilterString = GetFilterString("Contains([Folder],'false')", itemsNew, itemsOld);
+                    dgVoucherFolderGrid.Visibility = Visibility.Visible;
+                    break;
+                case "RemoveVoucher":
+                    if (selectedVoucherFolder == null)
+                        return;
+                    var rowId = selectedVoucherFolder.RowId;
+                    dgVoucherFolderGrid.DeleteRow();
+                    removedRowIds.Add(rowId);
+                   
+                    var voucherRow = ((IEnumerable<VoucherExtendedClient>)dgVouchersGrid.ItemsSource).Where(p => p.RowId == rowId).SingleOrDefault();
+                    voucherRow.IsAdded = false;
+                    var itemExisting = ((IEnumerable<VouchersClient>)dgVoucherFolderGrid.ItemsSource).Select(p => p.RowId).ToList();
+                    dgVouchersGrid.FilterString = GetFilterString("Contains([Folder],'false')", null, itemExisting);
+                    break;
+                case "ViewPhysicalVoucher":
+                case "ViewVoucher":
+                    if (selectedVoucher == null)
+                        return;
+                    ViewVoucher(TabControls.VouchersPage3, dgVouchersGrid.syncEntity);
+                    break;
+                case "ViewFolderVoucher":
+                    if (selectedVoucherFolder == null)
+                        return;
+                    ViewVoucher(TabControls.VouchersPage3, dgVoucherFolderGrid.syncEntity);
+                    break;
+                default:
+                    controlRibbon_BaseActions(ActionType);
+                    break;
+            }
+        }
+
+        private void AddVouchers(List<VoucherExtendedClient> vouchersAdd)
+        {
+            foreach (var voucher in vouchersAdd)
+            {
+                if (dgVoucherFolderGrid.ItemsSource == null)
+                    dgVoucherFolderGrid.AddRow(voucher);
+                else
+                {
+                    var list = (IEnumerable<VouchersClient>)dgVoucherFolderGrid.ItemsSource;
+                    if (!list.Contains(voucher))
+                        dgVoucherFolderGrid.AddRow(voucher);
+                }
+            }
+        }
+
+        async private void SaveFolder()
+        {
+            var result = false;
+            var documentApi = new DocumentAPI(api);
+            try
+            {
+                switch (action)
+                {
+                    case "Create":
+                        var newlist = (IEnumerable<VouchersClient>)dgVoucherFolderGrid.ItemsSource;
+                        if (newlist != null)
+                        {
+                            CWCreateFolder createFolderDialog = new CWCreateFolder();
+                            createFolderDialog.Closing += async delegate
+                               {
+                                   if (createFolderDialog.DialogResult == true)
+                                   {
+                                       voucherClient.Text = createFolderDialog.FolderName;
+                                       voucherClient.Content = createFolderDialog.ContentType;
+                                       var createResult = await documentApi.CreateFolder(voucherClient, newlist);
+                                       // Folder now contains a full record with the content.
+                                       if (createResult == ErrorCodes.Succes)
+                                       {
+                                           globalEvents.OnRefresh(TabControls.VoucherFolderPage);
+                                           dockCtrl.CloseDockItem();
+                                       }
+                                       else
+                                           UtilDisplay.ShowErrorCode(ErrorCodes.CouldNotSave);
+
+                                   }
+                               };
+                            result = true;
+                            createFolderDialog.Show();
+                        }
+                        break;
+                    case "Edit":
+
+                        //Removing the Items
+                        if (removedRowIds.Count > 0)
+                        {
+                            var allVouchers = (IEnumerable<VoucherExtendedClient>)dgVouchersGrid.ItemsSource;
+                            var listRemove = new List<VouchersClient>();
+                            foreach (var id in removedRowIds)
+                            {
+                                var tempVoucher = allVouchers.Where(r => r.RowId == id).SingleOrDefault();
+                                if (tempVoucher != null)
+                                    listRemove.Add(tempVoucher);
+                            }
+
+                            var removeResult = await documentApi.RemoveFromFolder(voucherClient, listRemove);
+                            result = (removeResult == ErrorCodes.Succes);
+                        }
+
+                        //Adding the Items
+
+                        var appendList = (IEnumerable<VouchersClient>)dgVoucherFolderGrid.ItemsSource;
+                        if (appendList != null)
+                        {
+                            var appendResult = await documentApi.AppendToFolder(voucherClient, appendList);
+                            result = (appendResult == ErrorCodes.Succes);
+                        }
+                        
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                documentApi.ReportException(ex, string.Format("Folders, Action={0}", action));
+                result = false;
+            }
+            if (action != "Create")
+            {
+                if (result)
+                    dockCtrl.CloseDockItem();
+                else
+                    UtilDisplay.ShowErrorCode(ErrorCodes.CouldNotSave);
+            }
+        }
+
+        async private void BindGrid()
+        {
+            var vouchers = await api.Query<VouchersClient>();
+            dgVoucherFolderGrid.ItemsSource = vouchers;
+            dgVoucherFolderGrid.Visibility = Visibility.Visible;
+        }
+
+        public override string NameOfControl { get { return TabControls.VoucherFolderPage; } }
+    }
+
+    public class VoucherExtendedClient : VouchersClient
+    {
+        bool _isAdded;
+        public bool IsAdded { get { return _isAdded; } set { _isAdded = value; NotifyPropertyChanged("IsAdded"); } }
+    }
+}

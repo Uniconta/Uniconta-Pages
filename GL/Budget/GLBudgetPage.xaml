@@ -1,0 +1,35 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
+                    xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.GLBudgetPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+          xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    xmlns:UnicontaControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+    xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"                
+    xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+    d:DesignHeight="300" d:DesignWidth="400">
+    <UserControl.Resources>
+
+    </UserControl.Resources>
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <UnicontaControls:CorasauRibbonControl x:Name="localMenu" XMLSourcePath=";component/Pages/GL/Budget/GlBudgetGridRibbon.xml"/>
+        <UnicontaControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <local:GLBudgetGrid x:Name="dgGlBudget" AutoGenerateColumns="None">
+                <local:GLBudgetGrid.Columns>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PrimaryKeyId" Width="70" Visible="False" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Name" Width="200"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="FromDate"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ToDate"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Comment"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="BaseBudget"/>
+                </local:GLBudgetGrid.Columns>
+            </local:GLBudgetGrid>
+        </UnicontaControls:BusyIndicator>
+    </Grid>
+    </Pages:GridBasePage>

@@ -1,0 +1,57 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"  
+   xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.SubscriptionInvoicePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage"    
+    mc:Ignorable="d"   xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+    d:DesignHeight="300" d:DesignWidth="400">
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Company/SubscriptionInv/SubscriptionInvoicePageGridRibbon.xml" x:Name="localMenu"/>
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <localPage:SubscriptionInvoiceGrid x:Name="dgSubInvoicesGrid" AutoGenerateColumns="None">
+                <localPage:SubscriptionInvoiceGrid.Columns>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Subscriptionid" Width="50"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Reseller" Width="50"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ResellerName" Width="100"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="UserName" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CompanyName" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Date" Width="90" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Invoice" Width="80" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="LineAmount" Width="80" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DiscountPct" Width="50"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="VatAmount" Width="80" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Total" Width="80" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="AdminCharge" Width="70" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DistributorCharge" Width="70" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ResellerCharge" Width="70" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Users" Width="50"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Companies" Width="50"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="TransCount" Width="50"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Package" Width="50"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ModuleLogistic"  Width="50"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ModuleOrder" Width="50" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ModuleCrm" Width="50" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ModuleProject" Width="50" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ModuleProduction" Width="50" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Send" Width="90" />
+                </localPage:SubscriptionInvoiceGrid.Columns>
+                <localPage:SubscriptionInvoiceGrid.TotalSummary>
+                    <localPage:SumColumn FieldName="Invoice" SummaryType="Count" DisplayFormat="{}{0:N0}"/>
+                    <localPage:SumColumn FieldName="LineAmount" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="VatAmount" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="Total" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="AdminCharge" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="DistributorCharge" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="ResellerCharge" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                </localPage:SubscriptionInvoiceGrid.TotalSummary>
+            </localPage:SubscriptionInvoiceGrid>
+        </CorasauControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

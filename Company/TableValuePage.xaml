@@ -1,0 +1,58 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"  
+        xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.TableValuePage"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+        xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+        xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+        xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+        xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage">
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Assets/EditableGridRibbon.xml" x:Name="localMenu"/>
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <local:TableValuePageGrid  x:Name="dgTableValueGrid" AutoGenerateColumns="None" HorizontalAlignment="Stretch">
+                <local:TableValuePageGrid.Columns>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="TableNo" Width="100" ReadOnly="True" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Property" Width="200" IsSmart="True">
+                        <local:CorasauDataGridTemplateColumnClient.EditSettings>
+                            <editor:ComboBoxEditSettings x:Name="cmbTableProperties" DisplayMember="Value" ValueMember="Key"  IsTextEditable="False"  />
+                        </local:CorasauDataGridTemplateColumnClient.EditSettings>
+                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Value" Width="150" IsSmart="True">
+                        <dxg:GridColumn.CellTemplateSelector>
+                            <local:UserInputDataTemplateSelector>
+                                <local:UserInputDataTemplateSelector.DateTypeTemplate>
+                                    <DataTemplate>
+                                        <CorasauControls:GridDateEditor x:Name="PART_Editor"/>
+                                    </DataTemplate>
+                                </local:UserInputDataTemplateSelector.DateTypeTemplate>
+                                <local:UserInputDataTemplateSelector.GenericTypeTemplate>
+                                    <DataTemplate>
+                                        <CorasauControls:TextEditor x:Name="PART_Editor" />
+                                    </DataTemplate>
+                                </local:UserInputDataTemplateSelector.GenericTypeTemplate>
+                                <local:UserInputDataTemplateSelector.BooleanTypeTemplate>
+                                    <DataTemplate>
+                                        <dxe:CheckEdit x:Name="PART_Editor" />
+                                    </DataTemplate>
+                                </local:UserInputDataTemplateSelector.BooleanTypeTemplate>
+                            </local:UserInputDataTemplateSelector>
+                        </dxg:GridColumn.CellTemplateSelector>
+                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Mandatory" Width="50"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ShowInDropdown" Width="200"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="RemoveCheckmarkInHeader" Width="200"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="BlockedOnEdit" Width="50"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Hide" Width="50" Visible="False" />
+                </local:TableValuePageGrid.Columns>
+            </local:TableValuePageGrid>
+        </CorasauControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

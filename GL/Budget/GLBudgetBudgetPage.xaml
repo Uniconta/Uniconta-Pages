@@ -1,0 +1,43 @@
+<Pages:GridBasePage xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.GLBudgetBudgetPage"
+      xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+     xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+     xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+     xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage">
+    <CorasauControls:BusyIndicator x:Name="busyIndicator" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BusyMessage}">
+        <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+            </Grid.RowDefinitions>
+            <CorasauControls:CorasauRibbonControl x:Name="localMenu" XMLSourcePath=";component/Pages/GL/Budget/GlBudgetBudgetGridRibbon.xml"/>
+            <local:GLBudgetBudgetGrid x:Name="dgGLBudgetBudget" AutoGenerateColumns="None" Grid.Row="1">
+                <local:GLBudgetBudgetGrid.Columns>
+                    <local:CorasauDataGridForeignKeyColumnClient x:Name="SubBudget" Width="200">
+                                          <local:CorasauDataGridForeignKeyColumnClient.CellTemplateSelector>
+                            <local:SubBudgetTemplateSelector>
+                                <local:SubBudgetTemplateSelector.TextTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Margin="2" x:Name="PART_Editor" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.SubBudget,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}"></TextBlock>
+                                    </DataTemplate>
+                                </local:SubBudgetTemplateSelector.TextTemplate>
+                                <local:SubBudgetTemplateSelector.LookupTemplate>
+                                    <DataTemplate>
+                                        <local:CorasauGridLookupEditorClient x:Name="PART_Editor" IsEnabled="{Binding DataContext.RowData.Row.IsEditable,RelativeSource={RelativeSource TemplatedParent}}"/>
+                                    </DataTemplate>
+                                </local:SubBudgetTemplateSelector.LookupTemplate>
+                            </local:SubBudgetTemplateSelector>
+                        </local:CorasauDataGridForeignKeyColumnClient.CellTemplateSelector>
+                        <local:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <TextBlock Margin="2" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.SubBudget,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"></TextBlock>
+                            </ControlTemplate>
+                        </local:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
+                    </local:CorasauDataGridForeignKeyColumnClient>
+                </local:GLBudgetBudgetGrid.Columns>
+            </local:GLBudgetBudgetGrid>
+        </Grid>
+    </CorasauControls:BusyIndicator>
+</Pages:GridBasePage>

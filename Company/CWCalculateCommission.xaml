@@ -1,0 +1,35 @@
+<cw:ChildWindow xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.CWCalculateCommission"
+           xmlns:cw="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+           xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+           Width="{StaticResource Width15}" Height="{StaticResource Height15}" KeyDown="CWCalculateCommission_OnKeyDown" SizeToContent="Height">
+    <Grid x:Name="LayoutRoot" Margin="2" >
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid VerticalAlignment="Center" Grid.Row="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="{Binding Converter={StaticResource  GlobalLocalizationValueConverter},ConverterParameter=FromDate, Mode=OneWay}" Margin="5,0,0,0" Grid.Row="0" Grid.Column="0"></TextBlock>
+            <CorasauControls:DateEditor Grid.Row="1" x:Name="fromDatePicker" Grid.Column="0" Text="{Binding FromDateTime,Mode=TwoWay}" Margin="5,0,0,0"></CorasauControls:DateEditor>
+
+            <TextBlock Text="{Binding Converter={StaticResource  GlobalLocalizationValueConverter},ConverterParameter=ToDate,Mode=OneWay}" Margin="5,0,0,0" Grid.Row="0" Grid.Column="1"></TextBlock>
+            <CorasauControls:DateEditor Grid.Row="1" x:Name="toDatePicker" Grid.Column="1" Text="{Binding ToDateTime,Mode=TwoWay}" Margin="5,0,0,0"></CorasauControls:DateEditor>
+        </Grid>
+        <StackPanel x:Name="actionButton" HorizontalAlignment="Right" Grid.Row="1" Orientation="Horizontal" Margin="0 10 0 0">
+            <Button x:Name="OKButton" Click="OKButton_OnClick" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Calculate,Mode=OneWay}" MinWidth="75" Height="23" 
+                    HorizontalAlignment="Right" Margin="0 0 3 0"/>
+            <Button x:Name="CancelButton" IsCancel="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Cancel,Mode=OneWay}" Click="CancelButton_OnClick" MinWidth="75" 
+                    Height="23" HorizontalAlignment="Right"/>
+        </StackPanel>
+    </Grid>
+</cw:ChildWindow>

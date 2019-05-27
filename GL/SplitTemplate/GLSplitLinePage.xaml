@@ -1,0 +1,40 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
+   xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.GLSplitLinePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage"
+    xmlns:toolkit="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Toolkit"
+    mc:Ignorable="d"   xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+    d:DesignHeight="300" d:DesignWidth="400">
+
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/GL/SplitTemplate/GLSplitLinePageGridRibbon.xml" x:Name="localMenu"/>
+        <CorasauControls:BusyIndicator x:Name="busyIndicatorFinanceYearGrid" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <localPage:GLSplitLineGrid  x:Name="dgGLSplitLineGrid" AutoGenerateColumns="None">
+                <localPage:GLSplitLineGrid.Columns>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="AllocAccount" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Pct" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Amount" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="TransType" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Model" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Periods" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="EneryNthMonth" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="FirstDayInMonth" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim1" FieldName="AllocDimension1" ShowInColumnChooser="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim2" FieldName="AllocDimension2" ShowInColumnChooser="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim3" FieldName="AllocDimension3" ShowInColumnChooser="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim4" FieldName="AllocDimension4" ShowInColumnChooser="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim5" FieldName="AllocDimension5" ShowInColumnChooser="False"/>
+                </localPage:GLSplitLineGrid.Columns>
+            </localPage:GLSplitLineGrid>
+        </CorasauControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

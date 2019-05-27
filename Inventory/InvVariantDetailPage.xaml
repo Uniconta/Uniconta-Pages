@@ -1,0 +1,51 @@
+ <Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"   
+    xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.InvVariantDetailPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
+      mc:Ignorable="d" 
+      d:DesignHeight="300" d:DesignWidth="300"
+    xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"  
+    xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+    xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools">
+    <UserControl.Resources>
+        <Util:RowIndexConverter x:Key="RowIndexConverter" />
+    </UserControl.Resources>
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Inventory/InvVariantDetailGridRibbon.xml" x:Name="localMenu"/>
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+        <local:InvVariantDetailGrid x:Name="dgInvVariantDetailGrid" AutoGenerateColumns="None">
+            <local:InvVariantDetailGrid.Columns>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Item" Width="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="colVariant" FieldName="Variant">
+                        <local:CorasauDataGridTemplateColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <local:VariantEditorClient x:Name="PART_Editor" EditValue="{Binding DataContext.RowData.Row.Variant,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" DataContext="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"></local:VariantEditorClient>
+                            </DataTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.CellTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="colVariant1" IsEditSettingSet="True" FieldName="Variant1" Visible="False" ReadOnly="True"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="colVariant2" IsEditSettingSet="True" FieldName="Variant2" Visible="False" ReadOnly="True"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="colVariant3" IsEditSettingSet="True" FieldName="Variant3" Visible="False" ReadOnly="True"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="colVariant4" IsEditSettingSet="True" FieldName="Variant4" Visible="False" ReadOnly="True"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="colVariant5" IsEditSettingSet="True" FieldName="Variant5" Visible="False" ReadOnly="True"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Variant1Name" Width="100" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Variant2Name" Width="100" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Variant3Name" Width="100" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Variant4Name" Width="100" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Variant5Name" Width="100" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient FieldName="CostPrice"  x:Name="CostPrice"/>
+                    <local:CorasauDataGridTemplateColumnClient FieldName="EAN"  x:Name="Ean"/>
+                </local:InvVariantDetailGrid.Columns>
+            
+        </local:InvVariantDetailGrid>
+        </CorasauControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

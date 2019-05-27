@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<root>
+  <RibbonItem TabId="0" LocalizedNameKey="Home" >
+    <RibbonItem Action="AddItem" LocalizedNameKey="AddOBJ" Parameter="Item" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png" ShortcutKey="CTRL+N"/>
+    <RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="DiscardTransaction" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png" />
+  </RibbonItem>
+  <RibbonItem >
+    <RibbonItem Action="Filter" ShortcutKey="Ctrl+I" LocalizedNameKey="Filter" Glyph="Filter_16x16.png" LargeGlyph="Filter_32x32.png"/>
+    <RibbonItem Action="ClearFilter" ShortcutKey="Ctrl+K" LocalizedNameKey="ClearFilter" Glyph="Filter_Clear_32x32.png" LargeGlyph="Filter_Clear_32x32.png"/>
+    <RibbonItem Action="PerWarehouse" LocalizedNameKey="PerOBJ" Parameter="Warehouse" IsCheckBox="True" />
+    <RibbonItem Action="PerLocation" LocalizedNameKey="PerOBJ" Parameter="Location" IsCheckBox="True" />
+  </RibbonItem>
+  <RibbonItem>
+    <!---next group in same Tab-->
+    <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32.png">
+      <!---If we want Inner menu-->
+      <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
+      <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16.png" ShortcutKey="" />
+      <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveOBJ" Parameter="Layout" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
+      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="SwitchToDefault" Glyph="Delete_16x16.png" ShortcutKey=""/>
+      <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16.png" ShortcutKey="CTRL+U"/>
+      <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportOBJ"  Parameter="Layout" EnableSeperator="True" Glyph="ExportLayout_16x16.png" LargeGlyph="ExportLayout_16x16.png" ShortcutKey=""/>
+      <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportOBJ" Parameter="Layout" Glyph="Import_16x16.png" LargeGlyph="Import_16x16.png" ShortcutKey=""/>
+      <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16.png" ShortcutKey=""/>
+    </RibbonItem>
+  </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="InvTrans" LocalizedNameKey="Transactions" LargeGlyph="Transactions_32x32.png"/>
+    <RibbonItem Action="OrderLines" LocalizedNameKey="OrdersLine" Glyph="Order_Lines_Highlighted_32x32.png" LargeGlyph="Order_Lines_Highlighted_32x32.png" ShortcutKey="ALT+L"/>
+    <RibbonItem Action="PurchaseLines" LocalizedNameKey="PurchaseLines" Glyph="Purchase_Lines_32x32.png" LargeGlyph="Purchase_Lines_32x32.png"/>
+    <RibbonItem Action="ProductionLines" LocalizedNameKey="ProductionLines" Glyph="Production_Lines_32x32.png" LargeGlyph="Production_Lines_32x32.png"/>
+    <RibbonItem Action="ProductionOrders" LocalizedNameKey="ProductionOrders" Glyph="Production_32x32.png" LargeGlyph="Production_32x32.png"/>
+  </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="UnfoldBOM" LocalizedNameKey="UnfoldBOM"  Glyph="CopyUserTable_16x16.png" LargeGlyph="CopyUserTable_16x16.png"/>
+    <RibbonItem Action="CreateOrder" LocalizedNameKey="CreateOBJ" Parameter="CreditorOrders" LargeGlyph="Orders_32x32.png" />
+    <RibbonItem Action="CreateProductionOrder" LocalizedNameKey="CreateOBJ" Parameter="ProductionOrder" LargeGlyph="Pack_Note_32x32.png" />
+    <RibbonItem Action="ReportAsFinished" LocalizedNameKey="ReportAsFinished" LargeGlyph="Order_Lines_Highlighted_32x32.png" />
+    <RibbonItem Action="MoveFromWarehouse" LocalizedNameKey="MoveFromWarehouse" LargeGlyph="Journal_Lines_Highlighted_32x32.png" />
+  </RibbonItem>
+</root>

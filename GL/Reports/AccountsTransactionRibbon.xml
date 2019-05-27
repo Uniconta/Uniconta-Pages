@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<root>
+  <RibbonItem TabId="0" LocalizedNameKey="Home">
+    <RibbonItem Action="Filter" ShortcutKey="CTRL+I" LocalizedNameKey="Filter" Glyph="Filter_16x16.png" LargeGlyph="Filter_32x32.png"/>
+    <RibbonItem Action="ClearFilter" ShortcutKey="CTRL+K" LocalizedNameKey="ClearFilter" Glyph="Filter_Clear_32x32.png" LargeGlyph="Filter_Clear_32x32.png"/>
+  </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="ViewDownloadRow" ShortcutKey="F7" LocalizedNameKey="PhysicalVoucher" Glyph="View_Voucher_32x32.png" LargeGlyph="View_Voucher_32x32.png" />
+    <RibbonItem Action="VoucherTransactions" ShortcutKey="Alt+T" LocalizedNameKey="VoucherTransactions" Glyph="Voucher_Transactions_32x32.png" LargeGlyph="Voucher_Transactions_32x32.png" />
+    <RibbonItem Action="AccountsTransaction" LocalizedNameKey="AccountsTransaction" Glyph="Account-statement_32x32.png" LargeGlyph="Account-statement_32x32.png" />
+    <RibbonItem Action="PostedTransaction" LocalizedNameKey="PostedTransactions" Glyph="Posted_Transaction_32x32.png" LargeGlyph="Posted_Transaction_32x32.png" ShortcutKey="Ctrl+T"/>
+    <RibbonItem Action="PostedBy" LocalizedNameKey="PostedBy" Glyph="Debtor_Group_Posting_32x32.png" LargeGlyph="Debtor_Group_Posting_32x32.png"/>
+  </RibbonItem>
+  <RibbonItem>
+    <!---If we want to create a new group in same PageTab-->
+    <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32.png">
+      <!---If we want Inner menu-->
+      <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
+      <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16.png" ShortcutKey="" />
+      <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveOBJ" Parameter="Layout" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
+      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="SwitchToDefault" Glyph="Delete_16x16.png" ShortcutKey=""/>
+      <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16.png" ShortcutKey="Ctrl+U"/>
+      <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportOBJ"  Parameter="Layout" EnableSeperator="True" Glyph="ExportLayout_16x16.png" LargeGlyph="ExportLayout_16x16.png" ShortcutKey=""/>
+      <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportOBJ" Parameter="Layout" Glyph="Import_16x16.png" LargeGlyph="Import_16x16.png" ShortcutKey=""/>
+      <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16.png" ShortcutKey=""/>
+    </RibbonItem>
+  </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="CancelVoucher" LocalizedNameKey="CancelVoucher" Glyph="Cancel_Voucher_32x32.png" LargeGlyph="Cancel_Voucher_32x32.png" />
+    <RibbonItem Action="DeleteVoucher" LocalizedNameKey="Delete" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png"/>
+    <RibbonItem Action="InvertSign" LocalizedNameKey="InvertSign" Glyph="Invert_Sign_32x32.png" LargeGlyph="Invert_Sign_32x32.png" />
+    <RibbonItem Action="PhyslVoucher" LocalizedNameKey="PhysicalVoucher" Glyph="Cover_16x16.png" LargeGlyph="View_Voucher_32x32.png" >
+      <RibbonItem Action="RefVoucher" LocalizedNameKey="Attach" Glyph="Attachments_16x16.png" LargeGlyph="Attachments_32x32.png" />
+      <RibbonItem Action="ImportVoucher" LocalizedNameKey="ImportFile" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png" />
+      <RibbonItem Action="RemoveVoucher" LocalizedNameKey="Remove" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png" />
+    </RibbonItem>
+    <RibbonItem Action="ChangeDimension" LocalizedNameKey="ChangeDimension" LargeGlyph="Default_Values_32x32.png" />
+    <RibbonItem Action="ChangeText" LocalizedNameKey="ChangeText" LargeGlyph="Transfer_32x32.png" />
+    <RibbonItem Action="ChangeQuantity" LocalizedNameKey="ChangeOBJ" Parameter="Qty" LargeGlyph="ImportExport_32x32.png" />
+    <RibbonItem Action="ChangeDate" LocalizedNameKey="ChangeOBJ" Parameter="Date" LargeGlyph="Month_View_32x32.png" />
+  </RibbonItem>    
+  <RibbonItem>
+    <RibbonItem Action="AddEditNote" LocalizedNameKey="AddEditOBJ" Parameter="Note" LargeGlyph="AddUpdate_32x32.png"/>
+  </RibbonItem>
+</root>

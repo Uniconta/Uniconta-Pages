@@ -1,0 +1,89 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"  
+   xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.CreditorOpenTrans"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage"
+    mc:Ignorable="d"   xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+    d:DesignHeight="300" d:DesignWidth="400">
+
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Creditor/Creditor-DebtorOpenTransRibbon.xml" x:Name="localMenu"/>
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <localPage:CreditorTransOpenGrid  x:Name="dgCreditorTranOpenGrid" AutoGenerateColumns="None">
+                <localPage:CreditorTransOpenGrid.Columns>
+                    <localPage:CorasauDataGridTemplateColumnClient IsSmart="True" ShowInColumnChooser="False" Width="60" AllowSorting="False" AllowColumnFiltering="False">
+                        <localPage:CorasauDataGridTemplateColumnClient.HeaderTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Settle}" VerticalAlignment="Center"/>
+                                    <CorasauControls:CheckEditor Margin="3 0 0 0" Checked="SettleHeaderCheckEditor_Checked" Unchecked="SettleHeaderCheckEditor_UnChecked"  IsEnabled="True"></CorasauControls:CheckEditor>
+                                </StackPanel>
+                            </DataTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.HeaderTemplate>
+                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox  HorizontalAlignment="Center" Click="CheckBox_Click" Tag="{Binding DataContext.RowData.Row,RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" IsChecked="{Binding DataContext.RowData.Row.IsSettled,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"></CheckBox>
+                            </DataTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                    </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Date" Width="90"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DueDate" Width="90"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Text" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Invoice" Width="60"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Amount" Width="90"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="AmountOpen" Width="90"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Overdue" Width="90"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PostType"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Comment" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="OnHold" Width="50"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Paid" Width="50"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="HasVoucher" Width="50" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Currency" Width="40"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="AmountCur" Width="90"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="AmountOpenCur" Width="90"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="OverdueCur" Width="90"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="SendToCollection" Visible="False" Width="50"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="TransType" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="NumberSerie" Visible="False" Width="60"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="VoucherX" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Voucher" Width="60"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PaymentMethod" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PaymentId" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Payment" Width="60"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CashDiscount" Width="90"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CashDiscountDate" Width="90"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="LastInterest" Visible="False" Width="50"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="LastCollectionLetter" Visible="False" Width="50"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CollectionsLetters" Visible="False" Width="50"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Debit" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Credit" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DebitCur" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CreditCur" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="JournalPostedId" Width="50" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Account" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryAccount" Visible="False"/>
+                </localPage:CreditorTransOpenGrid.Columns>
+                <localPage:CreditorTransOpenGrid.TotalSummary>
+                    <localPage:SumColumn FieldName="Amount" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="AmountOpen" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="Overdue" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="Debit" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="Credit" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="AmountCur" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="AmountOpenCur" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="OverdueCur" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="DebitCur" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="CreditCur" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                </localPage:CreditorTransOpenGrid.TotalSummary>
+            </localPage:CreditorTransOpenGrid>
+        </CorasauControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

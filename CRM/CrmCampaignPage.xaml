@@ -1,0 +1,48 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools" 
+        xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.CrmCampaignPage"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+        xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
+        xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+        xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools" 
+        xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors"       
+        xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools">
+    <UserControl.Resources>
+        <Util:RowIndexConverter x:Key="RowIndexConverter" />
+        <Style x:Key="StyleRow" TargetType="dxg:RowControl">
+            <Setter Property="Height" Value="Auto"/>
+        </Style>
+    </UserControl.Resources>
+    <CorasauControls:BusyIndicator x:Name="busyIndicator" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BusyMessage}">
+        <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+            </Grid.RowDefinitions>
+            <CorasauControls:CorasauRibbonControl x:Name="localMenu" XMLSourcePath=";component/Pages/CRM/CrmCampaignPageRibbon.xml"/>
+
+            <local:CrmCampaignPageGrid x:Name="dgCrmCampaignGrid" AutoGenerateColumns="None" Grid.Row="1">
+                <local:CrmCampaignPageGrid.Columns>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PrimaryKeyId" Width="70" Visible="False" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Created" MinWidth="120" ShowTime="True" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Name" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Group" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Employee" Width="80" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Text" Width="300">
+                        <local:CorasauDataGridTemplateColumnClient.EditSettings>
+                            <editor:TextEditSettings TextWrapping="Wrap"/>
+                        </local:CorasauDataGridTemplateColumnClient.EditSettings>
+                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="StartDate" Width="120" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Status" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="CampaignType" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Ended" MinWidth="80" />
+                </local:CrmCampaignPageGrid.Columns>
+            </local:CrmCampaignPageGrid>
+        </Grid>
+    </CorasauControls:BusyIndicator>
+</Pages:GridBasePage>

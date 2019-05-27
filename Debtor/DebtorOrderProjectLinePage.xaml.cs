@@ -114,7 +114,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         SQLCache ItemsCache, ProjectCache, DebtorCache, CategoryCache, EmployeeCache, PrStandardCache;
         Dictionary<string, Uniconta.API.DebtorCreditor.FindPrices> dictPriceLookup;
-
+        DebtorOrder debtorOrder;
         public DebtorOrderProjectLinePage(UnicontaBaseEntity master) : base(master)
         {
             InitializeComponent();
@@ -126,7 +126,7 @@ namespace UnicontaClient.Pages.CustomPage
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgDebtorOrderProjectLineGrid.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;
             dictPriceLookup = new Dictionary<string, Uniconta.API.DebtorCreditor.FindPrices>();
-            RecalculateAmount();
+            debtorOrder = master as DebtorOrder;
         }
 
         protected override void OnLayoutLoaded()
@@ -134,6 +134,12 @@ namespace UnicontaClient.Pages.CustomPage
             base.OnLayoutLoaded();
             var Comp = api.CompanyEntity;
             UnicontaClient.Utilities.Utility.SetDimensionsGrid(api, coldim1, coldim2, coldim3, coldim4, coldim5);
+        }
+
+        public async override Task InitQuery()
+        {
+            await dgDebtorOrderProjectLineGrid.Filter(null);
+            RecalculateAmount();
         }
 
         private void localMenu_OnItemClicked(string ActionType)
@@ -209,6 +215,7 @@ namespace UnicontaClient.Pages.CustomPage
                     UpdatePrice(rec);
                     break;
             }
+            RecalculateAmount();
         }
 
         void SetItem(DebtorOrderProjectLineLocal rec)
@@ -338,14 +345,22 @@ namespace UnicontaClient.Pages.CustomPage
             var lst = dgDebtorOrderProjectLineGrid.ItemsSource as List<DebtorOrderProjectLineLocal>;
             if (lst == null)
                 return;
+            double adjustment = debtorOrder._OrderTotal - debtorOrder._ProjectTotal;
             double Amountsum = lst.Sum(x=>x._SalesAmount);
+            double difference = adjustment - Amountsum;
             RibbonBase rb = (RibbonBase)localMenu.DataContext;
             var groups = UtilDisplay.GetMenuCommandsByStatus(rb, true);
+            var adjust = Uniconta.ClientTools.Localization.lookup("Adjustment");
             var strTotal = Uniconta.ClientTools.Localization.lookup("Total");
+            var diff = Uniconta.ClientTools.Localization.lookup("Diff");
             foreach (var grp in groups)
             {
+                if (grp.Caption == adjust)
+                    grp.StatusValue = adjustment.ToString("N2");
                 if (grp.Caption == strTotal)
                     grp.StatusValue = Amountsum.ToString("N2");
+                if (grp.Caption == diff)
+                    grp.StatusValue = difference.ToString("N2");
             }
         }
     }

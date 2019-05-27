@@ -1,0 +1,55 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
+             xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.GLBudgetLinePage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:UnicontaControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+             xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage" 
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+        </Grid.RowDefinitions>
+        <UnicontaControls:CorasauRibbonControl XMLSourcePath=";component/Pages/GL/Budget/GlBudgetLineGridRibbon.xml" x:Name="localMenu"/>
+        <UnicontaControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <local:GLBudgetLineGrid x:Name="dgGLBudgetLine" AutoGenerateColumns="None">
+                <local:GLBudgetLineGrid.Columns>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="BudgetId" Width="100" />
+                    <local:CorasauDataGridTemplateColumnClient FieldName="Date" x:Name="colDate" Width="90" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Account" Width="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="AccountName" Width="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="AccountType" Width="100"/>
+                    <local:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension1" x:Name="coldim1"/>
+                    <local:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension2" x:Name="coldim2"/>
+                    <local:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension3" x:Name="coldim3"/>
+                    <local:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension4" x:Name="coldim4"/>
+                    <local:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension5" x:Name="coldim5"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Comment" Width="150" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Amount"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Debit" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Credit" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Recurring" Width="90">
+                        <local:CorasauDataGridTemplateColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <UnicontaControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="RecurringMethod" />
+                            </DataTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.CellTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Regulate" Width="60"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ToDate" Width="90" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Disable" Width="50"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Dimension1Name" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Dimension2Name" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Dimension3Name" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Dimension4Name" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Dimension5Name" Visible="False"/>
+                </local:GLBudgetLineGrid.Columns>
+            </local:GLBudgetLineGrid>
+        </UnicontaControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

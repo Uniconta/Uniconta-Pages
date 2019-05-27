@@ -1,0 +1,30 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
+            xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.ProjectStandardCategory"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+             xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage" 
+             xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools">
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Project/ProjectStandardCategoryPageRibbon.xml" x:Name="localMenu"/>
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <localPage:PrStandardCategoryGridClient  x:Name="dgStandardCategoryClient" AutoGenerateColumns="None" >
+                <localPage:PrStandardCategoryGridClient.Columns>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PrStandard" ReadOnly="True" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PrCategory"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CategoryName" Width="300" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CatType" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CostPctCharge" Width="50" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CostAmountCharge" Width="70" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="SalesPctCharge" Width="50" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="SalesAmountCharge" Width="70" />
+                </localPage:PrStandardCategoryGridClient.Columns>
+            </localPage:PrStandardCategoryGridClient>
+        </CorasauControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

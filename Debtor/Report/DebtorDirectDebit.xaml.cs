@@ -88,7 +88,7 @@ namespace UnicontaClient.Pages.CustomPage
             InitPage();
         }
 
-        SQLCache DebtorCache, JournalCache, BankAccountCache, PaymentFormatCache, MandateCache, InvoiceItemNameGroupCache, InvoiceItemNameGroupItemsCache;
+        SQLCache DebtorCache, JournalCache, BankAccountCache, PaymentFormatCache, MandateCache, InvoiceItemNameGroupCache;
 
         private void InitPage()
         {
@@ -123,7 +123,6 @@ namespace UnicontaClient.Pages.CustomPage
             PaymentFormatCache = Comp.GetCache(typeof(Uniconta.DataModel.DebtorPaymentFormat));
             MandateCache = Comp.GetCache(typeof(Uniconta.DataModel.DebtorPaymentMandate));
             InvoiceItemNameGroupCache = Comp.GetCache(typeof(Uniconta.DataModel.InvItemNameGroup));
-            InvoiceItemNameGroupItemsCache = Comp.GetCache(typeof(Uniconta.DataModel.InvItemText));
 
             StartLoadCache();
             dgDebtorTranOpenGrid.ShowTotalSummary();
@@ -137,9 +136,9 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (e.Column.FieldName == "PaymentDate" || e.Column.FieldName == "PartialPaymentAmount")
             {
-                var row = e.Row as DebtorTransDirectDebit;
+                var row = e.Row as DCTransOpen;
 
-                if (row._PaymentStatus == PaymentStatusLevel.FileSent || row._PaymentStatus == PaymentStatusLevel.Processed || row._PaymentStatus == PaymentStatusLevel.PaymentReceived || row._PaymentStatus == PaymentStatusLevel.PaymentReceivedDiff)
+                if (row == null || row._PaymentStatus == PaymentStatusLevel.FileSent || row._PaymentStatus == PaymentStatusLevel.Processed || row._PaymentStatus == PaymentStatusLevel.PaymentReceived || row._PaymentStatus == PaymentStatusLevel.PaymentReceivedDiff)
                     e.Cancel = true;
                 else
                     e.Cancel = false;
@@ -147,19 +146,21 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-
         protected override async void LoadCacheInBackGround()
         {
             var api = this.api;
-            var Comp = api.CompanyEntity;
-           
-            DebtorCache = Comp.GetCache(typeof(Uniconta.DataModel.Debtor)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.Debtor), api);
-            JournalCache = Comp.GetCache(typeof(Uniconta.DataModel.GLDailyJournal)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.GLDailyJournal), api);
-            BankAccountCache = Comp.GetCache(typeof(Uniconta.DataModel.BankStatement)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.BankStatement), api);
-            PaymentFormatCache = Comp.GetCache(typeof(Uniconta.DataModel.DebtorPaymentFormat)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.DebtorPaymentFormat), api);
-            MandateCache = Comp.GetCache(typeof(Uniconta.DataModel.DebtorPaymentMandate)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.DebtorPaymentMandate), api);
-            InvoiceItemNameGroupCache = Comp.GetCache(typeof(Uniconta.DataModel.InvItemNameGroup)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.InvItemNameGroup), api);
-            InvoiceItemNameGroupItemsCache = Comp.GetCache(typeof(Uniconta.DataModel.InvItemText)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.InvItemText), api);
+            if (DebtorCache == null)
+                DebtorCache = await api.LoadCache(typeof(Uniconta.DataModel.Debtor)).ConfigureAwait(false);
+            if (JournalCache == null)
+                JournalCache = await api.LoadCache(typeof(Uniconta.DataModel.GLDailyJournal)).ConfigureAwait(false);
+            if (BankAccountCache == null)
+                BankAccountCache = await api.LoadCache(typeof(Uniconta.DataModel.BankStatement)).ConfigureAwait(false);
+            if (PaymentFormatCache == null)
+                PaymentFormatCache = await api.LoadCache(typeof(Uniconta.DataModel.DebtorPaymentFormat)).ConfigureAwait(false);
+            if (MandateCache == null)
+                MandateCache = await api.LoadCache(typeof(Uniconta.DataModel.DebtorPaymentMandate)).ConfigureAwait(false);
+            if (InvoiceItemNameGroupCache == null)
+                InvoiceItemNameGroupCache = await api.LoadCache(typeof(Uniconta.DataModel.InvItemNameGroup)).ConfigureAwait(false);
         }
 
         static DateTime fromDate;

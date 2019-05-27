@@ -1,0 +1,43 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
+             xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.CreditorLayoutGroupPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
+             xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools" 
+             >
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Creditor/CreditorLayoutGroupGridRibbon.xml"  x:Name="localMenu" />
+
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <local:CreditorLayoutGroupGridClient x:Name="dgCreditorLayoutGroupGridClient" AutoGenerateColumns="None">
+                <local:CreditorLayoutGroupGridClient.Columns>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Name" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="IsDefault" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PurchaseOrderRep" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PurchasePackNoteRep"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PurchaseRequisitionRep"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PurchaseInvoiceRep"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PurchaseCreditnoteRep" />
+                    <!--<local:CorasauDataGridTemplateColumnClient x:Name="PurchaseRequestRep"/>-->
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PurchaseOrderEmail" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PurchasePacknoteEmail"  />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PurchaseRequisitionEmail"  />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PurchaseInvoiceEmail"  />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PurchaseCreditnoteEmail"  />
+                    <!--<local:CorasauDataGridTemplateColumnClient x:Name="PurchaseRequestEmail"  />-->
+                    <local:CorasauDataGridTemplateColumnClient x:Name="IBAN" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="NationalBank" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="SWIFT" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="FIK" />
+                </local:CreditorLayoutGroupGridClient.Columns>
+            </local:CreditorLayoutGroupGridClient>
+        </CorasauControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

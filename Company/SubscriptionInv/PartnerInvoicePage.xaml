@@ -1,0 +1,38 @@
+<Pages:GridBasePage xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.PartnerInvoicePage"
+             xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools" 
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
+             xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Company/SubscriptionInv/PartnerInvoicePageGridRibbon.xml" x:Name="localMenu"/>
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <local:PartnerInvoiceGrid x:Name="dgPartnerInvoice" AutoGenerateColumns="None">
+                <local:PartnerInvoiceGrid.Columns>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Reseller" Width="70"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ResellerName" Width="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Date" Width="90"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Country" Width="90" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Invoice" Width="90"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Clients" Width="50"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="LineAmount" Width="90"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DiscountPct" Width="50"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="VatAmount" Width="90"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Total" Width="90"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Send" Width="90" />
+                </local:PartnerInvoiceGrid.Columns>
+                
+                <local:PartnerInvoiceGrid.TotalSummary>
+                    <local:SumColumn FieldName="LineAmount" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <local:SumColumn FieldName="VatAmount" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <local:SumColumn FieldName="Total" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                </local:PartnerInvoiceGrid.TotalSummary>
+            </local:PartnerInvoiceGrid>
+        </CorasauControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

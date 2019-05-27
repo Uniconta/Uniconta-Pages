@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<root>
+  <RibbonItem TabId="0" LocalizedNameKey="Home">
+    <RibbonItem Action="Filter" ShortcutKey="Ctrl+I" LocalizedNameKey="Filter" Glyph="Filter_16x16.png" LargeGlyph="Filter_32x32.png"/>
+    <RibbonItem Action="ClearFilter" ShortcutKey="Ctrl+K" LocalizedNameKey="ClearFilter" Glyph="Filter_Clear_32x32.png" LargeGlyph="Filter_Clear_32x32.png"/>
+    <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh.png" LargeGlyph="refresh.png"/>
+   </RibbonItem>
+  <!---If we want to create a new group in same PageTab-->
+  <RibbonItem>
+    <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32.png">
+      <!---If we want Inner menu-->
+      <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
+      <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16.png" ShortcutKey="" />
+      <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveOBJ" Parameter="Layout" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
+      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="SwitchToDefault" Glyph="Delete_16x16.png" ShortcutKey=""/>
+      <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16.png" ShortcutKey="Ctrl+U"/>
+      <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportOBJ"  Parameter="Layout" EnableSeperator="True" Glyph="ExportLayout_16x16.png" LargeGlyph="ExportLayout_16x16.png" ShortcutKey=""/>
+      <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportOBJ" Parameter="Layout" Glyph="Import_16x16.png" LargeGlyph="Import_16x16.png" ShortcutKey=""/>
+      <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16.png" ShortcutKey=""/>
+    </RibbonItem>
+  </RibbonItem>
+    <RibbonItem>
+   <RibbonItem Action="SubscriptionInvoice" LocalizedNameKey="SubscriptionInvoices" LargeGlyph="Invoice_32x32.png"/>
+   <RibbonItem Action="ShowInvoice" LocalizedNameKey="ShowInvoice" LargeGlyph="Show_Invoice_32x32.png" />   
+   <RibbonItem Action="SendAsEmail" LocalizedNameKey="Sendinvoicebyemail" LargeGlyph="SendInvoiceMail_32x32.png" />
+    <RibbonItem Action="PostInvoice" LocalizedNameKey="PostInvoice" LargeGlyph="Posted_Journal_32x32.png" />
+  </RibbonItem>
+ </root>

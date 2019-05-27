@@ -1,0 +1,35 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"  
+   xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.SubscriptionInvoiceLinePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage"        
+    mc:Ignorable="d"   xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+    d:DesignHeight="300" d:DesignWidth="400">
+
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Company/SubscriptionInv/SubscriptionInvoiceLineRibbon.xml" x:Name="localMenu"/>
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <localPage:SubscriptionInvoiceLineGrid x:Name="dgSubInvoiceslineGrid" AutoGenerateColumns="None">
+                <localPage:SubscriptionInvoiceLineGrid.Columns>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Date" Width="80" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Subscription" Width="50" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Company" Width="50"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CompanyName" Width="200"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Uid" Width="50"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="User" Width="150"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Package" Width="80" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Product" Width="80" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Text" Width="200" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Amount" Width="80" />                    
+                </localPage:SubscriptionInvoiceLineGrid.Columns>
+            </localPage:SubscriptionInvoiceLineGrid>
+        </CorasauControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

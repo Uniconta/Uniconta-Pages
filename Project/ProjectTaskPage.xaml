@@ -1,0 +1,117 @@
+<Pages:ControlBasePage xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.ProjectTaskPage"
+        xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
+        xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+        xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+        xmlns:GantChart="clr-namespace:UnicontaClient.Controls.GantChart"
+        xmlns:themes="http://schemas.devexpress.com/winfx/2008/xaml/editors/themekeys"
+        xmlns:UnicontaControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+        DataContext="{dxmvvm:ViewModelSource Type={x:Type GantChart:ProjectTaskVM}}"
+        xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm" >
+    <UserControl.Resources>
+        <DataTemplate x:Key="TimeTemplate">
+            <dxe:DateEdit x:Name="PART_Editor" Mask="dd.MM.yy" MaskUseAsDisplayFormat="True" GotFocus="PART_Editor_GotFocus"/>
+        </DataTemplate>
+        <DataTemplate x:Key="GantTemplate">
+            <GantChart:GantCanvas EditRange="{Binding SelectionRange, ElementName=GanttRange}"
+                                 RowStartDate="{Binding DataContext.Data.Start, RelativeSource={RelativeSource TemplatedParent}}"
+                                 RowEndDate="{Binding DataContext.Data.End, RelativeSource={RelativeSource TemplatedParent}}"
+                                 DataContext="{Binding Value}" x:Name="LayoutRoot">
+
+                <Border Canvas.Top="2" CornerRadius="3"
+        			    Canvas.Left="{Binding Left, Mode=OneWay}"
+        			    Height="16" Opacity="1"
+        			    Width="{Binding Width, Mode=OneWay}"
+        			    BorderThickness="1" BorderBrush="DimGray" Background="{Binding DataContext.Data.BarColor, RelativeSource={RelativeSource TemplatedParent}}">
+                </Border>
+
+                <ItemsControl ItemsSource="{Binding Days, Mode=OneWay}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Rectangle Width="{Binding DataContext.DayWidth, ElementName=LayoutRoot, Mode=OneWay}"
+        						       Height="20" Stroke="Gray" StrokeThickness="0.1"/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </GantChart:GantCanvas>
+        </DataTemplate>
+        
+    </UserControl.Resources>
+    
+        <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <CorasauControls:CorasauRibbonControl x:Name="localMenu" XMLSourcePath=";component/Pages/Project/ProjectTaskPageRibbon.xml" Grid.Row="0"/>
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}" Grid.Row="1">
+            <DockPanel>
+                <UnicontaControls:UnicontaRangeControl x:Name="GanttRange" DockPanel.Dock="Top" 
+			              HorizontalAlignment="Right"
+			              Width="{Binding CanvasWidth, Mode=OneWay}"
+			              RangeStart="{Binding Beg}"
+			              RangeEnd="{Binding End}"
+			              VisibleRangeStart="{Binding VisBeg}"
+			              VisibleRangeEnd="{Binding VisEnd}"
+			              SelectionRangeStart="{Binding SelBeg}"
+			              SelectionRangeEnd="{Binding SelEnd}"
+			              ShowNavigationButtons="False" 
+			              ShowLabels="True" ShowRangeBar="False"
+			              AllowScroll="False" AllowZoom="True" UpdateDelay="500"
+			              Margin="0,10,18,0" Height="25">
+                    <dxe:CalendarClient FontSize="12" FontWeight="Medium"  AllowGrouping="True" >
+                        <dxe:CalendarClient.IntervalFactories>
+                            <dxe:MonthIntervalFactory/>
+                            <dxe:DayIntervalFactory/>
+                        </dxe:CalendarClient.IntervalFactories>
+                    </dxe:CalendarClient>
+                </UnicontaControls:UnicontaRangeControl>
+                <UnicontaControls:UnicontaGantChartGrid ItemsSource="{Binding TaskList}" x:Name="dgTaskList" 
+			            DesignTimeDataObjectType="{x:Type GantChart:GantData}"
+                         CurrentItem="{Binding CurrentRow}">
+                    <UnicontaControls:UnicontaGantChartGrid.Columns>
+                        <UnicontaControls:UnicontaGridColumn AllowColumnFiltering="false"  FieldName="Task" IsSmart="True" FixedWidth="True" Width="100" FilterPopupMode="CheckedList"   />
+                        <UnicontaControls:UnicontaGridColumn AllowColumnFiltering="false"  FieldName="Name" IsSmart="True" FixedWidth="True" Width="100" />
+                        <UnicontaControls:UnicontaGridColumn AllowColumnFiltering="false" FieldName="Start" IsSmart="True" CellTemplate="{StaticResource TimeTemplate}"   FixedWidth="True" Width="90"/>
+                        <UnicontaControls:UnicontaGridColumn AllowColumnFiltering="false" FieldName="End" IsSmart="True"  CellTemplate="{StaticResource TimeTemplate}"  FixedWidth="True" Width="90"/>
+                        <UnicontaControls:UnicontaGridColumn Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=AddDelete}" IsSmart="True" FixedWidth="True">
+                            <UnicontaControls:UnicontaGridColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" >
+                                        <Button ContentTemplate="{StaticResource AddButtonTemplate}" Visibility="{Binding DataContext.RowData.Row.AddVisible,RelativeSource={RelativeSource TemplatedParent}}" Margin="3,4,3,4" Command="{Binding View.DataContext.AddRowCommand}"/>
+                                        <Button ContentTemplate="{StaticResource DeleteButtonTemplate}" Margin="3,4,3,4"  Visibility="{Binding DataContext.RowData.Row.DeleteVisible,RelativeSource={RelativeSource TemplatedParent}}" Click="Button_Click" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </UnicontaControls:UnicontaGridColumn.CellTemplate>
+                        </UnicontaControls:UnicontaGridColumn>
+                        <UnicontaControls:UnicontaGridColumn Binding="{Binding}" CellTemplate="{StaticResource GantTemplate}" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Chart}" />
+                    </UnicontaControls:UnicontaGantChartGrid.Columns>
+                    <UnicontaControls:UnicontaGantChartGrid.View>
+                        <UnicontaControls:UnicontaTreeListView AllowPerPixelScrolling="True" x:Name="treeListView" UseLightweightTemplates="None"
+                                  AutoExpandAllNodes="True"
+					              ShowTotalSummary="False"
+					              AutoWidth="True"
+					              AllowEditing="True"
+					              ParentFieldName="Follows"
+					              KeyFieldName="Id"
+					              TreeDerivationMode="Selfreference" ShowingEditor="treeListView_ShowingEditor" AllowSorting="False" CellValueChanging="treeListView_CellValueChanging">
+                            <dxmvvm:Interaction.Behaviors>
+                                <dxmvvm:EventToCommand EventName="CellValueChanged" PassEventArgsToCommand="True" Command="{Binding CellEditedCommand}"/>
+                            </dxmvvm:Interaction.Behaviors>
+                        </UnicontaControls:UnicontaTreeListView>
+                    </UnicontaControls:UnicontaGantChartGrid.View>
+                </UnicontaControls:UnicontaGantChartGrid>
+            </DockPanel>
+        </CorasauControls:BusyIndicator>
+    </Grid> 
+</Pages:ControlBasePage>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<root>
+  <RibbonItem TabId="0" LocalizedNameKey="Home">
+    <!---When we create a new group and a new TabPage -->
+    <RibbonItem Action="AddRow" LocalizedNameKey="Add" Glyph=";component/Assets/img/Add_16x16.png" LargeGlyph=";component/Assets/img/Add_32x32.png"/>
+    <RibbonItem Action="Delete" LocalizedNameKey="Delete" Glyph=";component/Assets/img/Delete_16x16.png" LargeGlyph=";component/Assets/img/Delete_32x32.png"/>    
+  </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="RefreshGrid" LocalizedNameKey="Refresh" Glyph=";component/Assets/img/refresh.png" LargeGlyph=";component/Assets/img/refresh.png"/>
+  </RibbonItem>
+</root>

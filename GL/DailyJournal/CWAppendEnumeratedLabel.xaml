@@ -1,0 +1,55 @@
+<cw:ChildWindow xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.CWAppendEnumeratedLabel"
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+           xmlns:cw="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+           xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+           xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+           Width="400" Height="255" SizeToContent="Height">
+    <Grid x:Name="LayoutRoot" Margin="2" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition  Height="Auto"/>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition  Height="Auto"/>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition  Height="Auto"/>
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TransType}" VerticalAlignment="Center" Grid.Column="0" Grid.Row="0" />
+                <CorasauControls:TextEditor x:Name="txtTransType" HandleKeyDown="False" Grid.Column="1" Grid.Row="0" Margin="5,5,0,0" Height="25" TabIndex="0"/>
+
+                <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LookupId}" VerticalAlignment="Center" Grid.Column="0" Grid.Row="1" />
+                <CorasauControls:TextEditor x:Name="txtCode" HandleKeyDown="False" Grid.Column="1" Grid.Row="1" Margin="5,5,0,0" Height="25" MaxLength="10"/>
+
+                <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=AccountType}" VerticalAlignment="Center" Grid.Column="0" Grid.Row="2" />
+                <CorasauControls:ComboBoxEditor x:Name="cmbAccType" Grid.Column="1" Grid.Row="2" Margin="5,5,0,0" Height="25" MaxLength="10" SelectedIndexChanged="cmbAccType_SelectedIndexChanged"/>
+
+                <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Account}" VerticalAlignment="Center" Grid.Column="0" Grid.Row="3" />
+                <CorasauControls:LookupEditor x:Name="leAccount" Grid.Column="1" Grid.Row="3" Margin="5,5,0,0" Height="25" MaxLength="10"/>
+
+                <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=PostOffsetAccountType}" VerticalAlignment="Center" Grid.Column="0" Grid.Row="4" />
+                <CorasauControls:ComboBoxEditor x:Name="cmbOffSetAccType" Grid.Column="1" Grid.Row="4" Margin="5,5,0,0" Height="25" MaxLength="10" SelectedIndexChanged="cmbOffSetAccType_SelectedIndexChanged"/>
+
+                <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OffsetAccount}" VerticalAlignment="Center" Grid.Column="0" Grid.Row="5" />
+                <CorasauControls:LookupEditor x:Name="leOffsetAccount" Grid.Column="1" Grid.Row="5" Margin="5,5,0,0" Height="25" MaxLength="10"/>
+
+            </Grid>
+        </CorasauControls:BusyIndicator>
+        <StackPanel x:Name="actionButton" HorizontalAlignment="Right" Grid.Row="1" Orientation="Horizontal" Margin="0 10 0 0">
+            <Button x:Name="SaveButton" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Save}" Click="SaveButton_Click" MinWidth="75" Height="23"
+                    HorizontalAlignment="Right" Margin="0 0 3 0"  />
+            <Button x:Name="CancelButton" IsCancel="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Cancel}" Click="CancelButton_Click" MinWidth="75" 
+                    Height="23" HorizontalAlignment="Right"  />
+        </StackPanel>
+    </Grid>
+</cw:ChildWindow>

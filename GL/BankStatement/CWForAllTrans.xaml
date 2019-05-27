@@ -1,0 +1,37 @@
+<cw:ChildWindow xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.CWForAllTrans"
+           xmlns:cw="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+           xmlns:controls="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls"
+           xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+           xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+           Width="400" SizeToContent="Height" KeyDown="ChildWindow_KeyDown">   
+    <Grid x:Name="LayoutRoot" Margin="2">
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="5"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <TextBlock Text="{Binding Converter={StaticResource  GlobalLocalizationValueConverter},ConverterParameter=ForAllTransactionsOnVoucher}" Grid.Column="0" Grid.Row="0" VerticalAlignment="Center"/>
+        <CorasauControls:CheckEditor x:Name="chkForAllTransactions" IsChecked="{Binding ForAllTransactions,Mode=TwoWay}"  Height="25" Grid.Column="2"  Grid.Row="0"/>
+        <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=PhysicalVoucher}" Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" />
+        <ComboBox Grid.Column="2" Grid.Row="1" VerticalAlignment="Center" x:Name="cmbPhysicalvoucher"  HorizontalAlignment="Stretch" Height="25">
+            <ComboBox.Items>
+                <ComboBoxItem Content="{Binding Converter={StaticResource  GlobalLocalizationValueConverter},ConverterParameter=Replace}" />
+                <ComboBoxItem Content="{Binding Converter={StaticResource  GlobalLocalizationValueConverter},ConverterParameter=Append}" />
+            </ComboBox.Items>
+        </ComboBox>
+        <StackPanel x:Name="actionButton" HorizontalAlignment="Right" Grid.Row="2"  Grid.ColumnSpan="3" Orientation="Horizontal" Margin="0 10 0 0">
+            <Button x:Name="OKButton" IsDefault="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OK}" Click="OKButton_Click" MinWidth="75" Height="23" 
+                    HorizontalAlignment="Right" Margin="0 0 3 0" />
+            <Button x:Name="CancelButton" IsCancel="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Cancel}" Click="CancelButton_Click" MinWidth="75" 
+                     Height="23" HorizontalAlignment="Right" />
+        </StackPanel>
+    </Grid>
+</cw:ChildWindow>

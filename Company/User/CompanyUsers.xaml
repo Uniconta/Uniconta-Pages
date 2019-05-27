@@ -1,0 +1,30 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools" 
+   xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.CompanyUsers"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage"
+    mc:Ignorable="d"   xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+    d:DesignHeight="300" d:DesignWidth="400">
+
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Company/User/CompanyUsersGridRibbon.xml" x:Name="localMenu"/>
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <localPage:CompanyUsersGrid  x:Name="dgCompanyUsersGrid" AutoGenerateColumns="None">
+                <localPage:CompanyUsersGrid.Columns>
+
+                    <localPage:CorasauDataGridTemplateColumnClient FieldName="Userid" Width="50" FixedWidth="True" IsSmart="True" AllowEditing="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient FieldName="UserName" Width="100" FixedWidth="True" IsSmart="True" AllowEditing="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient FieldName="UserLoginId" Width="100" FixedWidth="True" IsSmart="True" AllowEditing="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient FieldName="UserTasks" IsSmart="True"/>
+                </localPage:CompanyUsersGrid.Columns>
+            </localPage:CompanyUsersGrid>
+        </CorasauControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

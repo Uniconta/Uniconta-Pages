@@ -1,0 +1,436 @@
+<Pages:BasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools" 
+   xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.BalanceReportTemplatePrint"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core" 
+    xmlns:dxp="http://schemas.devexpress.com/winfx/2008/xaml/printing" 
+    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+    xmlns:dg="http://schemas.devexpress.com/winfx/2008/xaml/grid" 
+    xmlns:ClientTools="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
+    xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools" 
+    xmlns:sd="http://schemas.devexpress.com/winfx/2008/xaml/printing"
+    xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
+    >
+
+    <UserControl.Resources>
+        <DataTemplate x:Key="pageHeaderTemplate">
+            <Grid Width="{Binding Path=UsablePageWidth, Mode=OneWay}"  HorizontalAlignment="Stretch" dxp:ExportSettings.TargetType="Panel">
+                <Grid.Resources>
+                    <dx:ImageDataConverter x:Key="imageDataConverter" />
+                    <ClientTools:LocalizationValueConverter x:Key="LocalizationValueConverterINV"/>
+                </Grid.Resources>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="2"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="2"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="2"/>
+                </Grid.RowDefinitions>
+                <dxe:TextEdit IsPrintingMode="True" HorizontalContentAlignment="Left" Grid.Row="0" Text="{Binding Content.BalanceName,Mode=OneWay}" VerticalAlignment="Top"  FontSize="18" FontWeight="Bold"/>
+                <dxe:ImageEdit Grid.Row="1" Width="{Binding Path=UsablePageWidth, Mode=OneWay}"  Height="2" dxp:ExportSettings.TargetType="Image" Source="{Binding Path=Content.Lines.Line,Mode=OneWay,Converter={StaticResource imageDataConverter}}"  />
+                <StackPanel Orientation="Horizontal" Grid.Row="2" VerticalAlignment="Center" Width="{Binding Path=UsablePageWidth, Mode=OneWay}" HorizontalAlignment="Stretch" dxp:ExportSettings.TargetType="Panel">
+                    <StackPanel Orientation="Horizontal"  HorizontalAlignment="Left" >
+                        <dxe:TextEdit HorizontalContentAlignment="Left" Text="{Binding Content.Company.CompanyName, Mode=OneWay}"  FontSize="14" FontWeight="Bold"/>
+                        <dxe:TextEdit Margin="10,0,0,0" Text="{Binding Content.Company.Id, Mode=OneWay}"  FontSize="14"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal"  HorizontalAlignment="Right" Margin="590,0,0,0">
+                        <dxe:TextEdit Text="{Binding Content.CurDateTime,Mode=OneWay}"  HorizontalAlignment="Right"/>
+                        <dxe:TextEdit HorizontalAlignment="Right"             
+                             sd:ExportSettings.TargetType="PageNumber"
+                             sd:PageNumberExportSettings.Kind="NumberOfTotal"  Width="100" Margin="5,0,10,0"
+                             sd:PageNumberExportSettings.Format="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=PageXofY, Mode=OneWay}"/>
+                    </StackPanel>
+                </StackPanel>
+                <dxe:ImageEdit Grid.Row="3" Width="{Binding Path=UsablePageWidth, Mode=OneWay}"  Height="2" dxp:ExportSettings.TargetType="Image" Source="{Binding Path=Content.Lines.Line,Mode=OneWay,Converter={StaticResource imageDataConverter}}"  />
+                <Grid Grid.Row="4"  Width="{Binding Path=UsablePageWidth, Mode=OneWay}"  HorizontalAlignment="Stretch" dxp:ExportSettings.TargetType="Panel">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <dxe:TextEdit IsPrintingMode="True" Width="{Binding Path=Content.TextSize,Mode=OneWay}"  Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Text, Mode=OneWay}" FontSize="12" FontWeight="Bold" Grid.Column="0" VerticalAlignment="Bottom" Margin="{Binding Content.LeftMargin, Mode=OneWay}"/>
+                    <dxe:TextEdit IsPrintingMode="True" Text="{Binding Content.Dim1, Mode=OneWay}" FontSize="12" FontWeight="Bold" Grid.Column="1" Width="{Binding Content.Dim1Width, Mode=OneWay}" VerticalAlignment="Bottom"/>
+                    <dxe:TextEdit IsPrintingMode="True" Text="{Binding Content.Dim2, Mode=OneWay}" FontSize="12" FontWeight="Bold" Grid.Column="2" Width="{Binding Content.Dim2Width, Mode=OneWay}" VerticalAlignment="Bottom"/>
+                    <dxe:TextEdit IsPrintingMode="True" Text="{Binding Content.Dim3, Mode=OneWay}" FontSize="12" FontWeight="Bold" Grid.Column="3" Width="{Binding Content.Dim3Width, Mode=OneWay}" VerticalAlignment="Bottom"/>
+                    <dxe:TextEdit IsPrintingMode="True" Text="{Binding Content.Dim4, Mode=OneWay}" FontSize="12" FontWeight="Bold" Grid.Column="4" Width="{Binding Content.Dim4Width, Mode=OneWay}" VerticalAlignment="Bottom"/>
+                    <dxe:TextEdit IsPrintingMode="True" Text="{Binding Content.Dim5, Mode=OneWay}" FontSize="12" FontWeight="Bold" Grid.Column="5" Width="{Binding Content.Dim5Width, Mode=OneWay}" VerticalAlignment="Bottom"/>
+                    <Grid Grid.Column="6"  Visibility="{Binding Content.Col1Width, Mode=OneWay}"  VerticalAlignment="Top">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <dxe:TextEdit Text="{Binding Content.ColName1, Mode=OneWay}" FontSize="12" FontWeight="Bold" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Right"/>
+                        <dxe:TextEdit HorizontalContentAlignment="Right"  Visibility="{Binding Content.ShowAmountCol1, Mode=OneWay}" Width="{Binding Path=Content.AmountSize,Mode=OneWay}"  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding Content.Col1AmountHeader, Mode=OneWay}"  FontSize="12" FontWeight="Bold" VerticalAlignment="Bottom"/>
+                        <dxe:TextEdit HorizontalContentAlignment="Right" Visibility="{Binding Content.ShowDCCol1,Mode=OneWay}" Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Grid.Row="1" Grid.Column="0" Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Debit, Mode=OneWay}"  FontSize="12" FontWeight="Bold" VerticalAlignment="Bottom"/>
+                        <dxe:TextEdit HorizontalContentAlignment="Right" Visibility="{Binding Content.ShowDCCol1,Mode=OneWay}" Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Grid.Row="1"  Grid.Column="1" Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Credit, Mode=OneWay}"  FontSize="12"  FontWeight="Bold" VerticalAlignment="Bottom"/>
+                    </Grid>
+                    <Grid Grid.Column="7"  Visibility="{Binding Content.Col2Width, Mode=OneWay}"  VerticalAlignment="Top">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <dxe:TextEdit Text="{Binding Content.ColName2, Mode=OneWay}" FontSize="12" FontWeight="Bold" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
+                        <dxe:TextEdit HorizontalContentAlignment="Right"  Visibility="{Binding Content.ShowAmountCol2, Mode=OneWay}" Width="{Binding Path=Content.AmountSize,Mode=OneWay}"  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding Content.Col2AmountHeader, Mode=OneWay}"  FontSize="12" FontWeight="Bold" VerticalAlignment="Bottom"/>
+                        <dxe:TextEdit HorizontalContentAlignment="Right" Visibility="{Binding Content.ShowDCCol2,Mode=OneWay}" Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Grid.Row="1" Grid.Column="0" Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Debit, Mode=OneWay}"  FontSize="12" FontWeight="Bold" VerticalAlignment="Bottom"/>
+                        <dxe:TextEdit HorizontalContentAlignment="Right" Visibility="{Binding Content.ShowDCCol2,Mode=OneWay}" Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Grid.Row="1"  Grid.Column="1" Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Credit, Mode=OneWay}"  FontSize="12"  FontWeight="Bold" VerticalAlignment="Bottom"/>
+                    </Grid>
+                    <Grid Grid.Column="8"  Visibility="{Binding Content.Col3Width, Mode=OneWay}"  VerticalAlignment="Top">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <dxe:TextEdit Text="{Binding Content.ColName3, Mode=OneWay}" FontSize="12" FontWeight="Bold" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Right"/>
+                        <dxe:TextEdit HorizontalContentAlignment="Right"  Visibility="{Binding Content.ShowAmountCol3, Mode=OneWay}" Width="{Binding Path=Content.AmountSize,Mode=OneWay}"  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding Content.Col3AmountHeader, Mode=OneWay}"  FontSize="12" FontWeight="Bold" VerticalAlignment="Bottom"/>
+                        <dxe:TextEdit HorizontalContentAlignment="Right" Visibility="{Binding Content.ShowDCCol3,Mode=OneWay}" Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Grid.Row="1" Grid.Column="0" Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Debit, Mode=OneWay}"  FontSize="12" FontWeight="Bold" VerticalAlignment="Bottom"/>
+                        <dxe:TextEdit HorizontalContentAlignment="Right" Visibility="{Binding Content.ShowDCCol3,Mode=OneWay}" Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Grid.Row="1"  Grid.Column="1" Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Credit, Mode=OneWay}"  FontSize="12"  FontWeight="Bold" VerticalAlignment="Bottom"/>
+                    </Grid>
+                    <Grid Grid.Column="9"  Visibility="{Binding Content.Col4Width, Mode=OneWay}"  VerticalAlignment="Top">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <dxe:TextEdit Text="{Binding Content.ColName4, Mode=OneWay}" FontSize="12" FontWeight="Bold" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Right"/>
+                        <dxe:TextEdit HorizontalContentAlignment="Right"  Visibility="{Binding Content.ShowAmountCol4, Mode=OneWay}" Width="{Binding Path=Content.AmountSize,Mode=OneWay}"  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding Content.Col4AmountHeader, Mode=OneWay}"  FontSize="12" FontWeight="Bold" VerticalAlignment="Bottom"/>
+                        <dxe:TextEdit HorizontalContentAlignment="Right" Visibility="{Binding Content.ShowDCCol4,Mode=OneWay}" Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Grid.Row="1" Grid.Column="0" Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Debit, Mode=OneWay}"  FontSize="12" FontWeight="Bold" VerticalAlignment="Bottom"/>
+                        <dxe:TextEdit HorizontalContentAlignment="Right" Visibility="{Binding Content.ShowDCCol4,Mode=OneWay}" Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Grid.Row="1"  Grid.Column="1" Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Credit, Mode=OneWay}"  FontSize="12"  FontWeight="Bold" VerticalAlignment="Bottom"/>
+                    </Grid>
+
+                    <Grid Grid.Column="10"  Visibility="{Binding Content.Col5Width, Mode=OneWay}"  VerticalAlignment="Top">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <dxe:TextEdit Text="{Binding Content.ColName5, Mode=OneWay}" FontSize="12" FontWeight="Bold" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Right"/>
+                        <dxe:TextEdit HorizontalContentAlignment="Right"  Visibility="{Binding Content.ShowAmountCol5, Mode=OneWay}" Width="{Binding Path=Content.AmountSize,Mode=OneWay}"  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding Content.Col5AmountHeader, Mode=OneWay}"  FontSize="12" FontWeight="Bold" VerticalAlignment="Bottom"/>
+                        <dxe:TextEdit HorizontalContentAlignment="Right" Visibility="{Binding Content.ShowDCCol5,Mode=OneWay}" Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Grid.Row="1" Grid.Column="0" Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Debit, Mode=OneWay}"  FontSize="12" FontWeight="Bold" VerticalAlignment="Bottom"/>
+                        <dxe:TextEdit HorizontalContentAlignment="Right" Visibility="{Binding Content.ShowDCCol5,Mode=OneWay}" Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Grid.Row="1"  Grid.Column="1" Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Credit, Mode=OneWay}"  FontSize="12"  FontWeight="Bold" VerticalAlignment="Bottom"/>
+                    </Grid>
+                    <Grid Grid.Column="11"  Visibility="{Binding Content.Col6Width, Mode=OneWay}"  VerticalAlignment="Top">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <dxe:TextEdit Text="{Binding Content.ColName6, Mode=OneWay}" FontSize="12" FontWeight="Bold" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Right"/>
+                        <dxe:TextEdit HorizontalContentAlignment="Right"  Visibility="{Binding Content.ShowAmountCol6, Mode=OneWay}" Width="{Binding Path=Content.AmountSize,Mode=OneWay}"  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding Content.Col6AmountHeader, Mode=OneWay}"  FontSize="12" FontWeight="Bold" VerticalAlignment="Bottom"/>
+                        <dxe:TextEdit HorizontalContentAlignment="Right" Visibility="{Binding Content.ShowDCCol6,Mode=OneWay}" Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Grid.Row="1" Grid.Column="0" Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Debit, Mode=OneWay}"  FontSize="12" FontWeight="Bold" VerticalAlignment="Bottom"/>
+                        <dxe:TextEdit HorizontalContentAlignment="Right" Visibility="{Binding Content.ShowDCCol6,Mode=OneWay}" Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Grid.Row="1"  Grid.Column="1" Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Credit, Mode=OneWay}"  FontSize="12"  FontWeight="Bold" VerticalAlignment="Bottom"/>
+                    </Grid>
+                    <Grid Grid.Column="12"  Visibility="{Binding Content.Col7Width, Mode=OneWay}"  VerticalAlignment="Top">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <dxe:TextEdit Text="{Binding Content.ColName7, Mode=OneWay}" FontSize="12" FontWeight="Bold" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Right"/>
+                        <dxe:TextEdit HorizontalContentAlignment="Right"  Visibility="{Binding Content.ShowAmountCol7, Mode=OneWay}" Width="{Binding Path=Content.AmountSize,Mode=OneWay}"  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding Content.Col7AmountHeader, Mode=OneWay}"  FontSize="12" FontWeight="Bold" VerticalAlignment="Bottom"/>
+                        <dxe:TextEdit HorizontalContentAlignment="Right" Visibility="{Binding Content.ShowDCCol7,Mode=OneWay}" Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Grid.Row="1" Grid.Column="0" Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Debit, Mode=OneWay}"  FontSize="12" FontWeight="Bold" VerticalAlignment="Bottom"/>
+                        <dxe:TextEdit HorizontalContentAlignment="Right" Visibility="{Binding Content.ShowDCCol7,Mode=OneWay}" Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Grid.Row="1"  Grid.Column="1" Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Credit, Mode=OneWay}"  FontSize="12"  FontWeight="Bold" VerticalAlignment="Bottom"/>
+                    </Grid>
+                    <Grid Grid.Column="13"  Visibility="{Binding Content.Col8Width, Mode=OneWay}"  VerticalAlignment="Top">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <dxe:TextEdit Text="{Binding Content.ColName8, Mode=OneWay}" FontSize="12" FontWeight="Bold" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Right"/>
+                        <dxe:TextEdit HorizontalContentAlignment="Right"  Visibility="{Binding Content.ShowAmountCol8, Mode=OneWay}" Width="{Binding Path=Content.AmountSize,Mode=OneWay}"  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding Content.Col8AmountHeader, Mode=OneWay}"  FontSize="12" FontWeight="Bold" VerticalAlignment="Bottom"/>
+                        <dxe:TextEdit HorizontalContentAlignment="Right" Visibility="{Binding Content.ShowDCCol8,Mode=OneWay}" Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Grid.Row="1" Grid.Column="0" Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Debit, Mode=OneWay}"  FontSize="12" FontWeight="Bold" VerticalAlignment="Bottom"/>
+                        <dxe:TextEdit HorizontalContentAlignment="Right" Visibility="{Binding Content.ShowDCCol8,Mode=OneWay}" Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Grid.Row="1"  Grid.Column="1" Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Credit, Mode=OneWay}"  FontSize="12"  FontWeight="Bold" VerticalAlignment="Bottom"/>
+                    </Grid>
+                    <Grid Grid.Column="14"  Visibility="{Binding Content.Col9Width, Mode=OneWay}"  VerticalAlignment="Top">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <dxe:TextEdit Text="{Binding Content.ColName9, Mode=OneWay}" FontSize="12" FontWeight="Bold" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Right"/>
+                        <dxe:TextEdit HorizontalContentAlignment="Right"  Visibility="{Binding Content.ShowAmountCol9, Mode=OneWay}" Width="{Binding Path=Content.AmountSize,Mode=OneWay}"  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding Content.Col9AmountHeader, Mode=OneWay}"  FontSize="12" FontWeight="Bold" VerticalAlignment="Bottom"/>
+                        <dxe:TextEdit HorizontalContentAlignment="Right" Visibility="{Binding Content.ShowDCCol9,Mode=OneWay}" Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Grid.Row="1" Grid.Column="0" Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Debit, Mode=OneWay}"  FontSize="12" FontWeight="Bold" VerticalAlignment="Bottom"/>
+                        <dxe:TextEdit HorizontalContentAlignment="Right" Visibility="{Binding Content.ShowDCCol9,Mode=OneWay}" Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Grid.Row="1"  Grid.Column="1" Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Credit, Mode=OneWay}"  FontSize="12"  FontWeight="Bold" VerticalAlignment="Bottom"/>
+                    </Grid>
+                    <Grid Grid.Column="15"  Visibility="{Binding Content.Col10Width, Mode=OneWay}"  VerticalAlignment="Top">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <dxe:TextEdit Text="{Binding Content.ColName10, Mode=OneWay}" FontSize="12" FontWeight="Bold" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Right"/>
+                        <dxe:TextEdit HorizontalContentAlignment="Right"  Visibility="{Binding Content.ShowAmountCol10, Mode=OneWay}" Width="{Binding Path=Content.AmountSize,Mode=OneWay}"  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding Content.Col10AmountHeader, Mode=OneWay}"  FontSize="12" FontWeight="Bold" VerticalAlignment="Bottom"/>
+                        <dxe:TextEdit HorizontalContentAlignment="Right" Visibility="{Binding Content.ShowDCCol10,Mode=OneWay}" Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Grid.Row="1" Grid.Column="0" Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Debit, Mode=OneWay}"  FontSize="12" FontWeight="Bold" VerticalAlignment="Bottom"/>
+                        <dxe:TextEdit HorizontalContentAlignment="Right" Visibility="{Binding Content.ShowDCCol10,Mode=OneWay}" Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Grid.Row="1"  Grid.Column="1" Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Credit, Mode=OneWay}"  FontSize="12"  FontWeight="Bold" VerticalAlignment="Bottom"/>
+                    </Grid>
+                    <Grid Grid.Column="16"  Visibility="{Binding Content.Col11Width, Mode=OneWay}"  VerticalAlignment="Top">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <dxe:TextEdit Text="{Binding Content.ColName11, Mode=OneWay}" FontSize="12" FontWeight="Bold" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Right"/>
+                        <dxe:TextEdit HorizontalContentAlignment="Right"  Visibility="{Binding Content.ShowAmountCol12, Mode=OneWay}" Width="{Binding Path=Content.AmountSize,Mode=OneWay}"  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding Content.Col11AmountHeader, Mode=OneWay}"  FontSize="12" FontWeight="Bold" VerticalAlignment="Bottom"/>
+                        <dxe:TextEdit HorizontalContentAlignment="Right" Visibility="{Binding Content.ShowDCCol11,Mode=OneWay}" Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Grid.Row="1" Grid.Column="0" Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Debit, Mode=OneWay}"  FontSize="12" FontWeight="Bold" VerticalAlignment="Bottom"/>
+                        <dxe:TextEdit HorizontalContentAlignment="Right" Visibility="{Binding Content.ShowDCCol11,Mode=OneWay}" Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Grid.Row="1"  Grid.Column="1" Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Credit, Mode=OneWay}"  FontSize="12"  FontWeight="Bold" VerticalAlignment="Bottom"/>
+                    </Grid>
+                    <Grid Grid.Column="17"  Visibility="{Binding Content.Col12Width, Mode=OneWay}"  VerticalAlignment="Top">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <dxe:TextEdit Text="{Binding Content.ColName12, Mode=OneWay}" FontSize="12" FontWeight="Bold" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Right"/>
+                        <dxe:TextEdit HorizontalContentAlignment="Right"  Visibility="{Binding Content.ShowAmountCol1, Mode=OneWay}" Width="{Binding Path=Content.AmountSize,Mode=OneWay}"  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding Content.Col12AmountHeader, Mode=OneWay}"  FontSize="12" FontWeight="Bold" VerticalAlignment="Bottom"/>
+                        <dxe:TextEdit HorizontalContentAlignment="Right" Visibility="{Binding Content.ShowDCCol12,Mode=OneWay}" Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Grid.Row="1" Grid.Column="0" Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Debit, Mode=OneWay}"  FontSize="12" FontWeight="Bold" VerticalAlignment="Bottom"/>
+                        <dxe:TextEdit HorizontalContentAlignment="Right" Visibility="{Binding Content.ShowDCCol12,Mode=OneWay}" Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Grid.Row="1"  Grid.Column="1" Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Credit, Mode=OneWay}"  FontSize="12"  FontWeight="Bold" VerticalAlignment="Bottom"/>
+                    </Grid>
+                    <Grid Grid.Column="18"  Visibility="{Binding Content.Col13Width, Mode=OneWay}"  VerticalAlignment="Top">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <dxe:TextEdit Text="{Binding Content.ColName13, Mode=OneWay}" FontSize="12" FontWeight="Bold" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Right"/>
+                        <dxe:TextEdit HorizontalContentAlignment="Right"  Visibility="{Binding Content.ShowAmountCol1, Mode=OneWay}" Width="{Binding Path=Content.AmountSize,Mode=OneWay}"  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding Content.Col13AmountHeader, Mode=OneWay}"  FontSize="12" FontWeight="Bold" VerticalAlignment="Bottom"/>
+                        <dxe:TextEdit HorizontalContentAlignment="Right" Visibility="{Binding Content.ShowDCCol13,Mode=OneWay}" Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Grid.Row="1" Grid.Column="0" Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Debit, Mode=OneWay}"  FontSize="12" FontWeight="Bold" VerticalAlignment="Bottom"/>
+                        <dxe:TextEdit HorizontalContentAlignment="Right" Visibility="{Binding Content.ShowDCCol13,Mode=OneWay}" Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Grid.Row="1"  Grid.Column="1" Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Credit, Mode=OneWay}"  FontSize="12"  FontWeight="Bold" VerticalAlignment="Bottom"/>
+                    </Grid>
+                </Grid>
+                <dxe:ImageEdit Grid.Row="5" Width="{Binding Path=UsablePageWidth, Mode=OneWay}"  Height="2" dxp:ExportSettings.TargetType="Image" Source="{Binding Path=Content.Lines.Line,Mode=OneWay,Converter={StaticResource imageDataConverter}}"  />
+            </Grid>
+        </DataTemplate>
+        <!---Details -->
+        <DataTemplate x:Key="detailTemplate">
+            <StackPanel Orientation="Vertical" Margin="{Binding Path= Content.LineSpace, Mode=OneWay}" Width="{Binding Path=UsablePageWidth, Mode=OneWay}" Height="Auto"  HorizontalAlignment="Stretch" dxp:ExportSettings.TargetType="Panel">
+                <Grid   Width="{Binding Path=UsablePageWidth, Mode=OneWay}"  HorizontalAlignment="Stretch" Height="Auto" dxp:ExportSettings.TargetType="Panel">
+                    <Grid.Resources>
+                        <dx:ImageDataConverter x:Key="imageDataConverter" />
+                        <ClientTools:LocalizationValueConverter x:Key="LocalizationValueConverterINV"/>
+                    </Grid.Resources>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Vertical" Grid.Column="0">
+                        <dxe:TextEdit Padding="{Binding Content.Indent, Mode=OneWay}" VerticalAlignment="Top" IsPrintingMode="True"  Text="{Binding Content.Text, Mode=OneWay}" FontSize="{Binding Content.FontSize, Mode=OneWay}" Visibility="{Binding Content.Hide, Mode=OneWay}" Width="{Binding Path=Content.TextSize, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic}" />
+                        <dxe:ImageEdit HorizontalAlignment="Left" Background="{Binding Content.LineBackground,Mode=OneWay}" dxp:ExportSettings.TargetType="Image" Height="2" Width="{Binding Path=Content.TextSize, Mode=OneWay}"
+                      Source="{Binding Path=Content.Line,Mode=OneWay,Converter={StaticResource imageDataConverter}}"  />
+                    </StackPanel>
+                    <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Text="{Binding Content.Dim1, Mode=OneWay}" FontSize="{Binding Content.FontSize, Mode=OneWay}" Visibility="{Binding Content.Hide, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}" Grid.Column="1" Width="{Binding Content.Dim1Width, Mode=OneWay}" Padding="2 0 0 0"/>
+                    <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Text="{Binding Content.Dim2, Mode=OneWay}" FontSize="{Binding Content.FontSize, Mode=OneWay}" Visibility="{Binding Content.Hide, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}" Grid.Column="2" Width="{Binding Content.Dim2Width, Mode=OneWay}" Padding="2 0 0 0"/>
+                    <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Text="{Binding Content.Dim3, Mode=OneWay}" FontSize="{Binding Content.FontSize, Mode=OneWay}" Visibility="{Binding Content.Hide, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}" Grid.Column="3" Width="{Binding Content.Dim3Width, Mode=OneWay}" Padding="2 0 0 0"/>
+                    <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Text="{Binding Content.Dim4, Mode=OneWay}" FontSize="{Binding Content.FontSize, Mode=OneWay}" Visibility="{Binding Content.Hide, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}" Grid.Column="4" Width="{Binding Content.Dim4Width, Mode=OneWay}" Padding="2 0 0 0"/>
+                    <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Text="{Binding Content.Dim5, Mode=OneWay}" FontSize="{Binding Content.FontSize, Mode=OneWay}" Visibility="{Binding Content.Hide, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}" Grid.Column="5" Width="{Binding Content.Dim5Width, Mode=OneWay}" Padding="2 0 0 0"/>
+                    <Grid Grid.Column="6"  Visibility="{Binding Content.Col1Width, Mode=OneWay}" >
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col1.Amount, Mode=OneWay}" Visibility="{Binding Content.Col1.ShowAmount, Mode=OneWay}" HorizontalContentAlignment="Right" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"  Mask="{Binding Content.HeaderData.Col1Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize}"  FontWeight="{Binding Content.IsBold}" FontStyle="{Binding Content.IsItalic}"/>
+                        <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col1.Debit, Mode=OneWay}" Visibility="{Binding Content.Col1.ShowDebitCredit,Mode=OneWay}" HorizontalContentAlignment="Right"  Grid.Row="1" Grid.Column="0"  Mask="{Binding Content.HeaderData.Col1Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}"/>
+                        <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col1.Credit, Mode=OneWay}" Visibility="{Binding Content.Col1.ShowDebitCredit,Mode=OneWay}" HorizontalContentAlignment="Right" Grid.Row="1"  Grid.Column="1"  Mask="{Binding Content.HeaderData.Col1Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}"/>
+                    </Grid>
+                    <Grid Grid.Column="7"  Visibility="{Binding Content.Col2Width, Mode=OneWay}" >
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col2.Amount, Mode=OneWay}" Visibility="{Binding Content.Col2.ShowAmount, Mode=OneWay}" HorizontalContentAlignment="Right" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"  Mask="{Binding Content.HeaderData.Col2Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize}"  FontWeight="{Binding Content.IsBold}" FontStyle="{Binding Content.IsItalic}"/>
+                        <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col2.Debit, Mode=OneWay}" Visibility="{Binding Content.Col2.ShowDebitCredit,Mode=OneWay}" HorizontalContentAlignment="Right"  Grid.Row="1" Grid.Column="0"  Mask="{Binding Content.HeaderData.Col2Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}"/>
+                        <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col2.Credit, Mode=OneWay}" Visibility="{Binding Content.Col2.ShowDebitCredit,Mode=OneWay}" HorizontalContentAlignment="Right" Grid.Row="1"  Grid.Column="1"  Mask="{Binding Content.HeaderData.Col2Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}"/>
+                    </Grid>
+                    <Grid Grid.Column="8"  Visibility="{Binding Content.Col3Width, Mode=OneWay}" >
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col3.Amount, Mode=OneWay}" Visibility="{Binding Content.Col3.ShowAmount, Mode=OneWay}" HorizontalContentAlignment="Right" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"  Mask="{Binding Content.HeaderData.Col3Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize}"  FontWeight="{Binding Content.IsBold}" FontStyle="{Binding Content.IsItalic}"/>
+                        <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col3.Debit, Mode=OneWay}" Visibility="{Binding Content.Col3.ShowDebitCredit,Mode=OneWay}" HorizontalContentAlignment="Right"  Grid.Row="1" Grid.Column="0"  Mask="{Binding Content.HeaderData.Col3Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}"/>
+                        <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col3.Credit, Mode=OneWay}" Visibility="{Binding Content.Col3.ShowDebitCredit,Mode=OneWay}" HorizontalContentAlignment="Right" Grid.Row="1"  Grid.Column="1"  Mask="{Binding Content.HeaderData.Col3Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}"/>
+                    </Grid>
+                    <Grid Grid.Column="9"  Visibility="{Binding Content.Col4Width, Mode=OneWay}" >
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col4.Amount, Mode=OneWay}" Visibility="{Binding Content.Col4.ShowAmount, Mode=OneWay}" HorizontalContentAlignment="Right" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"  Mask="{Binding Content.HeaderData.Col4Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize}"  FontWeight="{Binding Content.IsBold}" FontStyle="{Binding Content.IsItalic}"/>
+                        <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col4.Debit, Mode=OneWay}" Visibility="{Binding Content.Col4.ShowDebitCredit,Mode=OneWay}" HorizontalContentAlignment="Right"  Grid.Row="1" Grid.Column="0"  Mask="{Binding Content.HeaderData.Col4Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}"/>
+                        <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col4.Credit, Mode=OneWay}" Visibility="{Binding Content.Col4.ShowDebitCredit,Mode=OneWay}" HorizontalContentAlignment="Right" Grid.Row="1"  Grid.Column="1"  Mask="{Binding Content.HeaderData.Col4Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}"/>
+                    </Grid>
+
+                    <Grid Grid.Column="10"  Visibility="{Binding Content.Col5Width, Mode=OneWay}" >
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col5.Amount, Mode=OneWay}" Visibility="{Binding Content.Col5.ShowAmount, Mode=OneWay}" HorizontalContentAlignment="Right" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"  Mask="{Binding Content.HeaderData.Col5Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize}"  FontWeight="{Binding Content.IsBold}" FontStyle="{Binding Content.IsItalic}"/>
+                        <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col5.Debit, Mode=OneWay}" Visibility="{Binding Content.Col5.ShowDebitCredit,Mode=OneWay}" HorizontalContentAlignment="Right"  Grid.Row="1" Grid.Column="0"  Mask="{Binding Content.HeaderData.Col5Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}"/>
+                        <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col5.Credit, Mode=OneWay}" Visibility="{Binding Content.Col5.ShowDebitCredit,Mode=OneWay}" HorizontalContentAlignment="Right" Grid.Row="1"  Grid.Column="1"  Mask="{Binding Content.HeaderData.Col5Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}"/>
+                    </Grid>
+                    <Grid Grid.Column="11"  Visibility="{Binding Content.Col6Width, Mode=OneWay}" >
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col6.Amount, Mode=OneWay}" Visibility="{Binding Content.Col6.ShowAmount, Mode=OneWay}" HorizontalContentAlignment="Right" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"  Mask="{Binding Content.HeaderData.Col6Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize}"  FontWeight="{Binding Content.IsBold}" FontStyle="{Binding Content.IsItalic}"/>
+                        <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col6.Debit, Mode=OneWay}" Visibility="{Binding Content.Col6.ShowDebitCredit,Mode=OneWay}" HorizontalContentAlignment="Right"  Grid.Row="1" Grid.Column="0"  Mask="{Binding Content.HeaderData.Col6Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}"/>
+                        <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col6.Credit, Mode=OneWay}" Visibility="{Binding Content.Col6.ShowDebitCredit,Mode=OneWay}" HorizontalContentAlignment="Right" Grid.Row="1"  Grid.Column="1"  Mask="{Binding Content.HeaderData.Col6Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}"/>
+                    </Grid>
+                    <Grid Grid.Column="12"  Visibility="{Binding Content.Col7Width, Mode=OneWay}" >
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col7.Amount, Mode=OneWay}" Visibility="{Binding Content.Col7.ShowAmount, Mode=OneWay}" HorizontalContentAlignment="Right" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"  Mask="{Binding Content.HeaderData.Col7Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize}"  FontWeight="{Binding Content.IsBold}" FontStyle="{Binding Content.IsItalic}"/>
+                        <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col7.Debit, Mode=OneWay}" Visibility="{Binding Content.Col7.ShowDebitCredit,Mode=OneWay}" HorizontalContentAlignment="Right"  Grid.Row="1" Grid.Column="0"  Mask="{Binding Content.HeaderData.Col7Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}"/>
+                        <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col7.Credit, Mode=OneWay}" Visibility="{Binding Content.Col7.ShowDebitCredit,Mode=OneWay}" HorizontalContentAlignment="Right" Grid.Row="1"  Grid.Column="1"  Mask="{Binding Content.HeaderData.Col7Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}"/>
+                    </Grid>
+                    <Grid Grid.Column="13"  Visibility="{Binding Content.Col8Width, Mode=OneWay}" >
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col8.Amount, Mode=OneWay}" Visibility="{Binding Content.Col8.ShowAmount, Mode=OneWay}" HorizontalContentAlignment="Right" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"  Mask="{Binding Content.HeaderData.Col8Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize}"  FontWeight="{Binding Content.IsBold}" FontStyle="{Binding Content.IsItalic}"/>
+                        <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col8.Debit, Mode=OneWay}" Visibility="{Binding Content.Col8.ShowDebitCredit,Mode=OneWay}" HorizontalContentAlignment="Right"  Grid.Row="1" Grid.Column="0"  Mask="{Binding Content.HeaderData.Col8Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}"/>
+                        <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col8.Credit, Mode=OneWay}" Visibility="{Binding Content.Col8.ShowDebitCredit,Mode=OneWay}" HorizontalContentAlignment="Right" Grid.Row="1"  Grid.Column="1"  Mask="{Binding Content.HeaderData.Col8Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}"/>
+                    </Grid>
+                    <Grid Grid.Column="14"  Visibility="{Binding Content.Col9Width, Mode=OneWay}" >
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col9.Amount, Mode=OneWay}" Visibility="{Binding Content.Col9.ShowAmount, Mode=OneWay}" HorizontalContentAlignment="Right" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"  Mask="{Binding Content.HeaderData.Col9Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize}"  FontWeight="{Binding Content.IsBold}" FontStyle="{Binding Content.IsItalic}"/>
+                        <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col9.Debit, Mode=OneWay}" Visibility="{Binding Content.Col9.ShowDebitCredit,Mode=OneWay}" HorizontalContentAlignment="Right"  Grid.Row="1" Grid.Column="0"  Mask="{Binding Content.HeaderData.Col9Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}"/>
+                        <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col9.Credit, Mode=OneWay}" Visibility="{Binding Content.Col9.ShowDebitCredit,Mode=OneWay}" HorizontalContentAlignment="Right" Grid.Row="1"  Grid.Column="1"  Mask="{Binding Content.HeaderData.Col9Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}"/>
+                    </Grid>
+                    <Grid Grid.Column="15"  Visibility="{Binding Content.Col10Width, Mode=OneWay}" >
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col10.Amount, Mode=OneWay}" Visibility="{Binding Content.Col10.ShowAmount, Mode=OneWay}" HorizontalContentAlignment="Right" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"  Mask="{Binding Content.HeaderData.Col10Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize}"  FontWeight="{Binding Content.IsBold}" FontStyle="{Binding Content.IsItalic}"/>
+                        <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col10.Debit, Mode=OneWay}" Visibility="{Binding Content.Col10.ShowDebitCredit,Mode=OneWay}" HorizontalContentAlignment="Right"  Grid.Row="1" Grid.Column="0"  Mask="{Binding Content.HeaderData.Col10Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}"/>
+                        <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col10.Credit, Mode=OneWay}" Visibility="{Binding Content.Col10.ShowDebitCredit,Mode=OneWay}" HorizontalContentAlignment="Right" Grid.Row="1"  Grid.Column="1"  Mask="{Binding Content.HeaderData.Col10Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}"/>
+                    </Grid>
+                    <Grid Grid.Column="16"  Visibility="{Binding Content.Col11Width, Mode=OneWay}" >
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col11.Amount, Mode=OneWay}" Visibility="{Binding Content.Col11.ShowAmount, Mode=OneWay}" HorizontalContentAlignment="Right" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"  Mask="{Binding Content.HeaderData.Col11Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize}"  FontWeight="{Binding Content.IsBold}" FontStyle="{Binding Content.IsItalic}"/>
+                        <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col11.Debit, Mode=OneWay}" Visibility="{Binding Content.Col11.ShowDebitCredit,Mode=OneWay}" HorizontalContentAlignment="Right"  Grid.Row="1" Grid.Column="0"  Mask="{Binding Content.HeaderData.Col11Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}"/>
+                        <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col11.Credit, Mode=OneWay}" Visibility="{Binding Content.Col11.ShowDebitCredit,Mode=OneWay}" HorizontalContentAlignment="Right" Grid.Row="1"  Grid.Column="1"  Mask="{Binding Content.HeaderData.Col11Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}"/>
+                    </Grid>
+                    <Grid Grid.Column="17"  Visibility="{Binding Content.Col12Width, Mode=OneWay}" >
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col12.Amount, Mode=OneWay}" Visibility="{Binding Content.Col12.ShowAmount, Mode=OneWay}" HorizontalContentAlignment="Right" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"  Mask="{Binding Content.HeaderData.Col12Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize}"  FontWeight="{Binding Content.IsBold}" FontStyle="{Binding Content.IsItalic}"/>
+                        <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col12.Debit, Mode=OneWay}" Visibility="{Binding Content.Col12.ShowDebitCredit,Mode=OneWay}" HorizontalContentAlignment="Right"  Grid.Row="1" Grid.Column="0"  Mask="{Binding Content.HeaderData.Col12Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}"/>
+                        <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col12.Credit, Mode=OneWay}" Visibility="{Binding Content.Col12.ShowDebitCredit,Mode=OneWay}" HorizontalContentAlignment="Right" Grid.Row="1"  Grid.Column="1"  Mask="{Binding Content.HeaderData.Col12Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}"/>
+                    </Grid>
+                    <Grid Grid.Column="18"  Visibility="{Binding Content.Col13Width, Mode=OneWay}" >
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col13.Amount, Mode=OneWay}" Visibility="{Binding Content.Col13.ShowAmount, Mode=OneWay}" HorizontalContentAlignment="Right" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"  Mask="{Binding Content.HeaderData.Col13Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize}"  FontWeight="{Binding Content.IsBold}" FontStyle="{Binding Content.IsItalic}"/>
+                        <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col13.Debit, Mode=OneWay}" Visibility="{Binding Content.Col13.ShowDebitCredit,Mode=OneWay}" HorizontalContentAlignment="Right"  Grid.Row="1" Grid.Column="0"  Mask="{Binding Content.HeaderData.Col13Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}"/>
+                        <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col13.Credit, Mode=OneWay}" Visibility="{Binding Content.Col13.ShowDebitCredit,Mode=OneWay}" HorizontalContentAlignment="Right" Grid.Row="1"  Grid.Column="1"  Mask="{Binding Content.HeaderData.Col13Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}"/>
+                    </Grid>
+                </Grid>
+                <Grid  Width="{Binding Path=UsablePageWidth, Mode=OneWay}" Height="{Binding  Content.GridHeight, Mode=OneWay}" HorizontalAlignment="Stretch" dxp:ExportSettings.TargetType="Panel" Visibility="{Binding Content.IsNewline, Mode=OneWay}">
+                    <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  HorizontalContentAlignment="Center"  Text=""  FontSize="12" />
+                </Grid>
+                <!--<Grid  HorizontalAlignment="Stretch" dxp:ExportSettings.TargetType="Panel" Height="{Binding Content.GridHeight, Mode=OneWay}" Width="{Binding Path=UsablePageWidth, Mode=OneWay}"  Visibility="{Binding Content.IsNewPage, Mode=OneWay}">
+                    <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  HorizontalContentAlignment="Center"  Text=""  FontSize="12" />
+                </Grid>-->
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate x:Key="frontPageHeaderTemplate">
+            <CorasauControls:TextEditor FontWeight="Bold" FontSize="{Binding Content.FontSize, Mode=OneWay}" Text="{Binding Content.Text,Mode=OneWay}" />
+        </DataTemplate>
+    </UserControl.Resources>
+    <Grid Background="{StaticResource LayoutGridColor}">
+        <CorasauControls:UnicontaPreviewControl x:Name="custPrint"  />
+    </Grid>
+</Pages:BasePage>

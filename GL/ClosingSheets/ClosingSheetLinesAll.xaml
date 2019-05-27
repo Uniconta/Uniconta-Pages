@@ -1,0 +1,111 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
+        xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.ClosingSheetLinesAll"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
+        xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"    
+        xmlns:converter="clr-namespace:UnicontaClient.Utilities"
+        xmlns:controls="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls"
+        xmlns:dxn="http://schemas.devexpress.com/winfx/2008/xaml/navbar">
+    <Grid x:Name="LayoutRoot" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/GL/ClosingSheets/ClosingSheetLinesAllGridRibbon.xml" x:Name="localMenu"/>
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <local:GLClosingSheetLineAllGrid x:Name="dgClosingSheetLineAll" AutoGenerateColumns="None" Grid.Row="1">
+                <local:GLClosingSheetLineAllGrid.Columns>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Note" Width="50" >
+                        <local:CorasauDataGridTemplateColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <CorasauControls:MemoEditor Name="PART_Editor" ShowIcon="{Binding DataContext.RowData.Row.HasNote, RelativeSource={RelativeSource TemplatedParent}}" MaxLength="1000"/>
+                            </DataTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.CellTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridForeignKeyColumnClient x:Name="Account" Width="100">
+                        <local:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <TextBlock Margin="2" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.Account,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"></TextBlock>
+                            </ControlTemplate>
+                        </local:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
+                        <local:CorasauDataGridForeignKeyColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <local:CorasauGridLookupEditorClient  x:Name="PART_Editor" ItemsSource="{Binding DataContext.RowData.Row.AccountSource,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" />
+                            </DataTemplate>
+                        </local:CorasauDataGridForeignKeyColumnClient.CellTemplate>
+                    </local:CorasauDataGridForeignKeyColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="TransType"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Text" Width="200"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Code" Width="50"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Amount" Width="100"/>
+                    <local:CorasauDataGridForeignKeyColumnClient x:Name="OffsetAccount" Width="100">
+                        <local:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <TextBlock Margin="2" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.OffsetAccount,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"></TextBlock>
+                            </ControlTemplate>
+                        </local:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
+                        <local:CorasauDataGridForeignKeyColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <local:CorasauGridLookupEditorClient  x:Name="PART_Editor" ItemsSource="{Binding DataContext.RowData.Row.AccountSource,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" />
+                            </DataTemplate>
+                        </local:CorasauDataGridForeignKeyColumnClient.CellTemplate>
+                    </local:CorasauDataGridForeignKeyColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Date" Width="80" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Voucher" Width="80" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Debit" Width="100" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Credit" Width="100" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Total" Width="100" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="AccountName" ReadOnly="True" Visible="False" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="OffsetAcccountName" ReadOnly="True" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Correction" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Vat" Width="60" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="OffsetVat" Width="60" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Split"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="SplitFromDate" Width="90" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="SplitToDate" Width="90" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="OffsetText"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="OffsetTransType" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension1" x:Name="coldim1"/>
+                    <local:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension2" x:Name="coldim2"/>
+                    <local:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension3" x:Name="coldim3"/>
+                    <local:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension4" x:Name="coldim4"/>
+                    <local:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension5" x:Name="coldim5"/>
+                    <local:CorasauDataGridTemplateColumnClient FieldName="OffsetDimension1" x:Name="colOffsetdim1"/>
+                    <local:CorasauDataGridTemplateColumnClient FieldName="OffsetDimension2" x:Name="colOffsetdim2"/>
+                    <local:CorasauDataGridTemplateColumnClient FieldName="OffsetDimension3" x:Name="colOffsetdim3"/>
+                    <local:CorasauDataGridTemplateColumnClient FieldName="OffsetDimension4" x:Name="colOffsetdim4"/>
+                    <local:CorasauDataGridTemplateColumnClient FieldName="OffsetDimension5" x:Name="colOffsetdim5"/>
+                </local:GLClosingSheetLineAllGrid.Columns>
+            </local:GLClosingSheetLineAllGrid>
+        </CorasauControls:BusyIndicator>
+        <dxn:NavBarControl  Grid.Row="2" x:Name="InputWindowOrder1"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <dxn:NavBarControl.View>
+                <dxn:ExplorerBarView  />
+            </dxn:NavBarControl.View>
+            <dxn:NavBarControl.Groups>
+                <dxn:NavBarGroup IsExpanded="True">
+                    <Grid DataContext="{Binding Path=SelectedItem,ElementName=dgClosingSheetLineAll}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="5"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock  Grid.Row="0" Grid.Column="0" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=AccountName}" FontWeight="Bold" />
+                        <TextBlock Grid.Row="1" Grid.Column="0" x:Name="ValActName" Text="{Binding Path=AccountName}" />
+                        <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OffsetAccount}" FontWeight="Bold"/>
+                        <TextBlock Grid.Row="1" Grid.Column="2" x:Name="ValOffsetAct" Text="{Binding OffsetAccountName}" />
+                    </Grid>
+                </dxn:NavBarGroup>
+            </dxn:NavBarControl.Groups>
+        </dxn:NavBarControl>
+    </Grid>
+</Pages:GridBasePage>

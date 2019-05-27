@@ -1,0 +1,48 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"   
+   xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.UserTablePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:toolkit="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Toolkit"
+    xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+    xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage" 
+    xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+    mc:Ignorable="d"
+    d:DesignHeight="300" d:DesignWidth="400">
+
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Company/UserTableRibbon.xml" x:Name="localMenu"/>
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <localPage:UserTableGrid  x:Name="dgUserTable" AutoGenerateColumns="None" HorizontalAlignment="Stretch">
+                <localPage:UserTableGrid.Columns>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" Width="150" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Prompt" Width="150" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="AccessGroup" Width="50"  />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="MenuPosition" Width="80"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="MasterTable" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="MandatoryMaster" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="HasPrimaryKey" Width="60" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PKprompt" Width="150" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ReadOnly" Width="60"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Hide" Width="60"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="EditLines" Width="60"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Delete" Width="60" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Detail" Width="60" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Attachment" Width="60" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="TableId" Width="60" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="UserDefinedId" Width="60" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="AutoNumber" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="SQLIdent" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="SharedFromCompanyId" />
+                </localPage:UserTableGrid.Columns>
+            </localPage:UserTableGrid>
+        </CorasauControls:BusyIndicator>
+    </Grid>
+
+</Pages:GridBasePage>

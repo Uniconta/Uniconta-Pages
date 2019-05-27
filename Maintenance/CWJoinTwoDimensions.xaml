@@ -1,0 +1,36 @@
+<cw:ChildWindow xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.CWJoinTwoDimensions"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cw="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+             xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
+             xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+             xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+             Width="{StaticResource Width8}" Height="{StaticResource Height8}" KeyDown="ChildWindow_KeyDown" SizeToContent="WidthAndHeight">
+    <Grid x:Name="LayoutRoot" Margin="2" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="40"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="5"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CopyFrom}" Grid.Column="0" Grid.Row="0" Margin="3,3,3,3"/>
+        <CorasauControls:LookupEditor x:Name="cmbFromDimension" Grid.Column="2" Grid.Row="0" Margin="0,3,3,3" HasCustomLookUp="True" />
+        <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=WillBeDeleted}" TextWrapping="Wrap" Grid.Column="3" Grid.Row="0" Margin="3,3,3,3"/>
+        <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CopyTo}" Grid.Column="0" Grid.Row="1" Margin="3,3,3,3"/>
+        <CorasauControls:LookupEditor x:Name="cmbToDimension" Grid.Column="2" Grid.Row="1" Margin="0,3,3,3" HasCustomLookUp="True" />
+        <StackPanel x:Name="actionButton" HorizontalAlignment="Right" Grid.ColumnSpan="2" Grid.Row="2" Grid.Column="2" Orientation="Horizontal" Margin="0 10 0 0">
+            <Button x:Name="OKButton" IsDefault="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OK}" Click="OKButton_Click" 
+                Width="75" Height="23" HorizontalAlignment="Right" Margin="0 0 3 0"  />
+            <Button x:Name="CancelButton" IsCancel="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Cancel}" Click="CancelButton_Click" 
+                Width="75" Height="23" HorizontalAlignment="Right" />
+        </StackPanel>
+        
+       
+    </Grid>
+</cw:ChildWindow>

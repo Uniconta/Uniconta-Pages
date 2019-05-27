@@ -1,0 +1,164 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools" 
+                     xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.CrmDebtorProspectReport"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
+        xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+        xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
+        xmlns:Utility="clr-namespace:UnicontaClient.Utilities"
+        xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
+    <UserControl.Resources>
+        <Util:RowIndexConverter x:Key="RowIndexConverter" />
+        <Utility:DebtorPropsectImageConverter x:Key="DebtorPropsectImageConverter"/>
+        <Util:VisibilityBoolConverter x:Key="VisibilityBoolConverter" />
+        <Style x:Key="StyleRow" TargetType="dxg:RowControl">
+            <Setter Property="Height" Value="Auto"/>
+        </Style>
+    </UserControl.Resources>
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/CRM/CrmDebtorProspectGridRibbon.xml" x:Name="localMenu"/>
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <local:CrmDebtorProspectReportGrid  x:Name="dgCrmDebtorProspect" AutoGenerateColumns="None">
+                <local:CrmDebtorProspectReportGrid.Columns>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="HasNotes" Width="30" ReadOnly="True">
+                        <local:CorasauDataGridTemplateColumnClient.HeaderTemplate>
+                            <DataTemplate>
+                                <Image Source="/UnicontaPages;component/Assets/img/Note_16x16.png" Width="16" Height="16" VerticalAlignment="Center"/>
+                            </DataTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.HeaderTemplate>
+                        <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <Image Margin="5" Tag="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" 
+                                       Source="/UnicontaPages;component/Assets/img/Note_16x16.png" MouseLeftButtonDown="HasNoteImage_MouseLeftButtonDown" Visibility="{Binding DataContext.RowData.Row.HasNotes,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource VisibilityBoolConverter}}" 
+                                       Stretch="Fill" Width="16" Height="16" RenderOptions.BitmapScalingMode="NearestNeighbor" RenderOptions.EdgeMode="Aliased" />
+                            </ControlTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="HasDocs" ReadOnly="True"  Width="30" >
+                        <local:CorasauDataGridTemplateColumnClient.HeaderTemplate>
+                            <DataTemplate>
+                                <Image Source="/UnicontaPages;component/Assets/img/Document_Attachment_16x16.png" Width="16" Height="16" VerticalAlignment="Center"/>
+                            </DataTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.HeaderTemplate>
+                        <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <Image Margin="5" Tag="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" Source="/UnicontaPages;component/Assets/img/Document_Attachment_16x16.png" MouseLeftButtonDown="HasDocImage_MouseLeftButtonDown" Visibility="{Binding DataContext.RowData.Row.HasDocs,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource VisibilityBoolConverter}}" Stretch="Fill" Width="16" Height="16" RenderOptions.BitmapScalingMode="NearestNeighbor" RenderOptions.EdgeMode="Aliased" />
+                            </ControlTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="IsDebtor"  Width="30" >
+                        <local:CorasauDataGridTemplateColumnClient.HeaderTemplate>
+                            <DataTemplate>
+                                <Image Source="/UnicontaPages;component/Assets/img/Column_Head_16x16.png" Width="16" Height="16" VerticalAlignment="Center"/>
+                            </DataTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.HeaderTemplate>
+                        <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <Image Margin="5" Tag="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"
+                                       VerticalAlignment="Center" Source="{Binding DataContext.RowData.Row.IsDebtor,
+                                        RelativeSource ={RelativeSource TemplatedParent},Converter={StaticResource DebtorPropsectImageConverter}}" 
+                                       Stretch="Fill" Width="16" Height="16" RenderOptions.BitmapScalingMode="NearestNeighbor" RenderOptions.EdgeMode="Aliased" />
+                            </ControlTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="AccountNumber" Width="120" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="CrmGroup" Width="120"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DebGroup" Width="120"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="GroupName" Width="120"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Name" Width="120"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Address1" Width="150"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Address2" Width="150"  />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Address3" Width="150"  />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ZipCode" Width="70"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="City" Width="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Country" Width="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="CompanyRegNo" Width="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Currency" Width="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Phone" Width="150"  />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="VatZone" Width="150"  />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PriceGroup" Width="70"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PriceList" Width="150"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ItemNameGroup" Width="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="LayoutGroup" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Blocked" Width="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="UserLanguage" Width="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ContactEmail" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="MobilPhone" Width="120"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="InvoiceEmail" Width="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ContactPerson" Width="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Employee" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="EAN" Width="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Interests" Width="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Products" Width="100"/>
+                    <local:CorasauDataGridForeignKeyColumnClient x:Name="cldim1" Width="70" FieldName="Dimension1" >
+                        <local:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <TextBlock Margin="2" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.Dimension1,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"/>
+                            </ControlTemplate>
+                        </local:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
+                        <local:CorasauDataGridForeignKeyColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <local:CorasauGridLookupEditorClient x:Name="PART_Editor"/>
+                            </DataTemplate>
+                        </local:CorasauDataGridForeignKeyColumnClient.CellTemplate>
+                    </local:CorasauDataGridForeignKeyColumnClient>
+                    <local:CorasauDataGridForeignKeyColumnClient  x:Name="cldim2" Width="70" FieldName="Dimension2" >
+                        <local:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <TextBlock Margin="2" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.Dimension2,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"/>
+                            </ControlTemplate>
+                        </local:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
+                        <local:CorasauDataGridForeignKeyColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <local:CorasauGridLookupEditorClient x:Name="PART_Editor"/>
+                            </DataTemplate>
+                        </local:CorasauDataGridForeignKeyColumnClient.CellTemplate>
+                    </local:CorasauDataGridForeignKeyColumnClient>
+                    <local:CorasauDataGridForeignKeyColumnClient x:Name="cldim3" Width="70" FieldName="Dimension3" >
+                        <local:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <TextBlock Margin="2" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.Dimension3,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"/>
+                            </ControlTemplate>
+                        </local:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
+                        <local:CorasauDataGridForeignKeyColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <local:CorasauGridLookupEditorClient x:Name="PART_Editor"/>
+                            </DataTemplate>
+                        </local:CorasauDataGridForeignKeyColumnClient.CellTemplate>
+                    </local:CorasauDataGridForeignKeyColumnClient>
+                    <local:CorasauDataGridForeignKeyColumnClient x:Name="cldim4" Width="70" FieldName="Dimension4" >
+                        <local:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <TextBlock Margin="2" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.Dimension4,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"/>
+                            </ControlTemplate>
+                        </local:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
+                        <local:CorasauDataGridForeignKeyColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <local:CorasauGridLookupEditorClient x:Name="PART_Editor"/>
+                            </DataTemplate>
+                        </local:CorasauDataGridForeignKeyColumnClient.CellTemplate>
+                    </local:CorasauDataGridForeignKeyColumnClient>
+                    <local:CorasauDataGridForeignKeyColumnClient x:Name="cldim5" Width="70" FieldName="Dimension5" >
+                        <local:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <TextBlock Margin="2" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.Dimension5,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"/>
+                            </ControlTemplate>
+                        </local:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
+                        <local:CorasauDataGridForeignKeyColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <local:CorasauGridLookupEditorClient x:Name="PART_Editor"/>
+                            </DataTemplate>
+                        </local:CorasauDataGridForeignKeyColumnClient.CellTemplate>
+                    </local:CorasauDataGridForeignKeyColumnClient>
+                </local:CrmDebtorProspectReportGrid.Columns>
+            </local:CrmDebtorProspectReportGrid>
+        </CorasauControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

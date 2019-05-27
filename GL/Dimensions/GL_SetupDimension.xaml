@@ -1,0 +1,51 @@
+ <Pages:FormBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
+   xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.GL_SetupDimension"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"        
+    xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+    xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"  
+                     xmlns:toolkit="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Toolkit"
+    xmlns:toolkitControls="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Input.Toolkit"
+    mc:Ignorable="d"
+    d:DesignHeight="300" d:DesignWidth="400">
+    <UserControl.Resources>
+    
+    </UserControl.Resources>
+    <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="0" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BusyMessage}">
+        <Grid x:Name="LayoutRoot"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <CorasauControls:CorasauRibbonControl x:Name="frmRibbon"  XMLSourcePath=";component/Pages/GL/Dimensions/GL_SetupDimensionRibbon.xml" Grid.Row="0"/>
+            <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Vertical" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grp" MinWidth="250" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                    <CorasauControls:CorasauLayoutItem x:Name="liNumberOfDims" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=NumberOfDimensions}">
+                        <CorasauControls:NumericUpDownEditor Value="{Binding NumberOfDimensions,Mode=TwoWay}" MaxValue="5" EditValueChanged="NumericUpDownEditor_EditValueChanged" />
+                        <!--<toolkitControls:NumericUpDown Value="{Binding NumberOfDimensions,Mode=TwoWay}" Minimum="0" Maximum="5"  ValueChanged="NumericUpDown_ValueChanged"/>-->
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
+                <CorasauControls:CorasauLayoutGroup x:Name="grpDims" View="GroupBox" Orientation="Vertical" MinWidth="250" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                    <CorasauControls:CorasauLayoutItem x:Name="lbldim1" CustomLabel="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Dimension,StringFormat=\{0\}1}" >
+                        <CorasauControls:TextEditor x:Name="txtDim1" Text="{Binding Dim1,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="lbldim2" CustomLabel="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Dimension,StringFormat=\{0\}2}">
+                        <CorasauControls:TextEditor x:Name="txtDim2" Text="{Binding Dim2,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem  x:Name="lbldim3" CustomLabel="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Dimension,StringFormat=\{0\}3}">
+                        <CorasauControls:TextEditor x:Name="txtDim3" Text="{Binding Dim3,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="lbldim4" CustomLabel="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Dimension,StringFormat=\{0\}4}">
+                        <CorasauControls:TextEditor x:Name="txtDim4" Text="{Binding Dim4,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="lbldim5" CustomLabel="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Dimension,StringFormat=\{0\}5}">
+                        <CorasauControls:TextEditor x:Name="txtDim5" Text="{Binding Dim5,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
+            </CorasauControls:CorasauLayoutControl>
+        </Grid>
+    </CorasauControls:BusyIndicator>
+</Pages:FormBasePage>

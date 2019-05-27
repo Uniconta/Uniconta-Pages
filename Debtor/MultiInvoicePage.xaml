@@ -14,7 +14,7 @@ x:Class="UnicontaClient.Pages.CustomPage.MultiInvoicePage"
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <UnicontaControls:CorasauRibbonControl XMLSourcePath="/;component/Pages/Debtor/MultiInvoicePageRibbon.xml" x:Name="localMenu" />
+        <UnicontaControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Debtor/MultiInvoicePageRibbon.xml" x:Name="localMenu" />
         <UnicontaControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BusyMessage}">
 
             <local:MultiInvoiceGrid x:Name="dgMultiInvGrid" AutoGenerateColumns="None">

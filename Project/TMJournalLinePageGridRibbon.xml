@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<root>
+  <RibbonItem TabId="0" LocalizedNameKey="Home">
+    <!---When we create a new TabPage -->
+    <RibbonItem Action="AddRow" LocalizedNameKey="AddNewRow" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png"/>
+    <RibbonItem Action="CopyRow" LocalizedNameKey="CopyRow" ShortcutKey="Shift+F2" LargeGlyph="Copy_32x32.png"/>
+    <RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="DeleteRow" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png"/>   
+    <RibbonItem Action="SaveGrid" ShortcutKey="CTRL+S" LocalizedNameKey="Save" Glyph="save-16x16.png" LargeGlyph="save-32x32.png"/>
+  </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh.png" LargeGlyph="refresh.png"/>
+  </RibbonItem>
+  <RibbonItem>
+    <!---next group in same Tab-->
+    <RibbonItem Action="Layout" LocalizedNameKey="Layout" Glyph="Cover_16x16.png" LargeGlyph="Layout_32x32.png">
+      <!---If we want Inner menu-->
+      <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
+      <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16.png" ShortcutKey="" />
+      <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveOBJ" Parameter="Layout" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
+      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="SwitchToDefault" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png" ShortcutKey=""/>
+      <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16.png" LargeGlyph="Delete_32x32.png" ShortcutKey="Ctrl+U"/>
+      <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportOBJ"  Parameter="Layout" EnableSeperator="True" Glyph="ExportLayout_16x16.png" LargeGlyph="ExportLayout_16x16.png" ShortcutKey=""/>
+      <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportOBJ" Parameter="Layout" Glyph="Import_16x16.png" LargeGlyph="Import_16x16.png" ShortcutKey=""/>
+      <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16.png" ShortcutKey=""/>
+    </RibbonItem>
+  </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="ShowMileage" LocalizedNameKey="ShowOBJ" Parameter="Mileage" LargeGlyph="Delivery_32x32.png"/>
+    <RibbonItem Action="AddMileage" LocalizedNameKey="AddOBJ" Parameter="Mileage" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png"/>
+    <RibbonItem Action="EditMileage" LocalizedNameKey="EditOBJ" Parameter="Mileage" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" />
+  </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="Today" LocalizedNameKey="Today" Glyph="Day_View_32x32.png" LargeGlyph="Day_View_32x32.png"/>
+    <RibbonItem Action="BackWard" LocalizedNameKey="Back" Glyph="Back_32x32.png" LargeGlyph="Back_32x32.png"/>
+    <RibbonItem Action="Forward" LocalizedNameKey="Forward" Glyph="Forward_32x32.png" LargeGlyph="Forward_32x32.png"/>
+  </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="ValidateJournal" LocalizedNameKey="Validate" Glyph="Check_Journal_32x32.png" LargeGlyph="Check_Journal_32x32.png"/>
+  </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="Close" LocalizedNameKey="ReportAsReady"  Glyph="close-32x32.png" LargeGlyph="Order_Confirmation_32x32.png"/>
+    <RibbonItem Action="Open" LocalizedNameKey="ReOpen"  Glyph="Journal_Lines_32x32.png" LargeGlyph="Transactions_32x32.png"/>
+  </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="Approve" LocalizedNameKey="Approve"  Glyph="Journal_Lines_32x32.png" LargeGlyph="Order_Confirmation_32x32.png"/>
+  </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="VacationBal" LocalizedNameKey="Vacation" StatusValue=""/>
+    <RibbonItem Action="OtherVacationBal" LocalizedNameKey="OtherVacation" StatusValue=""/>
+    <RibbonItem Action="OvertimeBal" LocalizedNameKey="Overtime" StatusValue="" />
+    <RibbonItem Action="FlexTimeBal" LocalizedNameKey="Flextime" StatusValue="" />
+    <RibbonItem Action="MileageHighRateBal" LocalizedNameKey="MileageHighRate" StatusValue="" />
+  </RibbonItem>
+</root>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<root>
+  <RibbonItem TabId="0" LocalizedNameKey="Home">
+    <RibbonItem Action="Search" LocalizedNameKey="Search" LargeGlyph="Validate_32x32.png" ShortcutKey="Ctrl+H" />
+  </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="CreditorFilter" LocalizedNameKey="FilterOBJ" Parameter="Creditor" Glyph="Filter_16x16.png" LargeGlyph="Filter_32x32.png"/>
+    <RibbonItem Action="ClearCreditorFilter" LocalizedNameKey="ClearFilter" Glyph="Filter_Clear_32x32.png" LargeGlyph="Filter_Clear_32x32.png"/>
+  </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="EnableChart" LocalizedNameKey="HideOBJ" Parameter="Graph" Glyph="Chart_Settings_32x32.png" LargeGlyph="Chart_Settings_32x32.png" />
+  </RibbonItem>
+  <RibbonItem>
+    <!---If we want to create a new group in same PageTab-->
+    <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32.png">
+      <!---If we want Inner menu-->
+      <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
+      <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16.png" ShortcutKey="" />
+      <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16.png" ShortcutKey=""/>
+    </RibbonItem>
+  </RibbonItem>
+</root>

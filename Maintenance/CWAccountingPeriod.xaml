@@ -1,0 +1,40 @@
+<cw:ChildWindow xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.CWAccountingPeriod"
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+           xmlns:cw="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+            xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"        
+           xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"           
+            xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+                      xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
+                      xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+           Width="500" Height="450" KeyDown="ChildWindow_KeyDown" >
+      <Grid x:Name="LayoutRoot" Margin="2" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <dxg:GridControl x:Name="dgAccountPeriod" Grid.Row="0" AutoGenerateColumns="None">
+            <dxg:GridControl.View>
+                <dxg:TableView AllowEditing="True" ShowGroupPanel="False"></dxg:TableView>
+            </dxg:GridControl.View>
+            <dxg:GridControl.Columns>
+                <dxg:GridColumn  FieldName="FromDate" IsSmart="True" AllowEditing="False" MinWidth="100"/>
+                <dxg:GridColumn  FieldName="ToDate" IsSmart="True" AllowEditing="False" MinWidth="100"/>
+                <dxg:GridColumn  FieldName="PeriodState" IsSmart="True" MinWidth="150">        
+                    <dxg:GridColumn.CellTemplate>
+                        <DataTemplate>
+                            <CorasauControls:ComboBoxEditor x:Name="PART_Editor" EditValueChanged="PART_Editor_EditValueChanged" SelectedItem="{Binding DataContext.RowData.Row.PeriodState,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"/>
+                        </DataTemplate>
+                    </dxg:GridColumn.CellTemplate>
+                </dxg:GridColumn>
+            </dxg:GridControl.Columns>
+        </dxg:GridControl>
+        <StackPanel x:Name="actionButton" HorizontalAlignment="Right" Grid.Row="1" Orientation="Horizontal" Margin="0 10 0 0">
+            <Button x:Name="btnSave" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=Save}" Click="btnSave_Click" MinWidth="75" Height="23" 
+                    HorizontalAlignment="Right" Margin="0 0 3 0"/>
+            <Button x:Name="btnCancel" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=Cancel}" Click="btnCancel_Click" MinWidth="75" 
+                    Height="23" HorizontalAlignment="Right" />
+        </StackPanel>
+    </Grid>
+</cw:ChildWindow>

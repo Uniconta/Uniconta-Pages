@@ -1,0 +1,67 @@
+<cw:ChildWindow xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.AccountantAccess"
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+           xmlns:cw="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+           xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+        xmlns:UnicontaControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+           xmlns:gd="clr-namespace:UnicontaClient.Controls.Dialogs" Width="700" Height="650" KeyDown="ChildWindow_KeyDown">
+
+    <Grid x:Name="LayoutRoot" Margin="2" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="25"/>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Foreground="{StaticResource BodyTextColorBrush}" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Accountant}" VerticalAlignment="Center"></TextBlock>
+                <TextBlock Foreground="{StaticResource BodyTextColorBrush}" x:Name="txtCurrentAccountant" VerticalAlignment="Center" Margin="5 0 0 0"></TextBlock>
+            </StackPanel>
+
+            <UnicontaControls:LookupEditor x:Name="cbAccountant" AutoComplete="True"  Grid.Row="1"  DisplayMember="Name" Width="200" HorizontalAlignment="Left" SelectedIndexChanged="cbAccountant_SelectedIndexChanged">
+            </UnicontaControls:LookupEditor>
+            <Grid Grid.Column="1" Grid.RowSpan="3" HorizontalAlignment="Right" x:Name="grdAcctantDetail" Margin="0 0 10 0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition MinWidth="200"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=PhoneNo}" />
+                <TextBlock Grid.Column="2" Text="{Binding Phone}"></TextBlock>
+                <TextBlock Grid.Row="1" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Email}" />
+                <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding ContactEmail}"></TextBlock>
+                <TextBlock Grid.Row="2" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Contact}" />
+                <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding ContactPerson}"></TextBlock>
+            </Grid>
+        </Grid>
+        <gd:TaskGrid x:Name="dgUserRights" Grid.Row="1" AutoGenerateColumns="None">
+            <gd:TaskGrid.Columns>
+                <UnicontaControls:CorasauDataGridTemplateColumn  FieldName="Task" IsSmart="True" AllowEditing="False" MinWidth="200"/>
+                <UnicontaControls:CorasauDataGridTemplateColumn  FieldName="Permission" IsSmart="True" MinWidth="200">
+                    <UnicontaControls:CorasauDataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <UnicontaControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="CompanyPermissions"/>
+                        </DataTemplate>
+                    </UnicontaControls:CorasauDataGridTemplateColumn.CellTemplate>
+                </UnicontaControls:CorasauDataGridTemplateColumn>
+            </gd:TaskGrid.Columns>
+        </gd:TaskGrid>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0 10 0 10">
+            <Button x:Name="OKButton" IsDefault="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Assign}" Click="OKButton_Click"  Height="23" HorizontalAlignment="Right" />
+            <Button x:Name="ClearAccessButton" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Clear}" Click="ClearButton_Click"  Height="23"  Margin="10,0,0,0" />
+            <Button x:Name="CancelButton" IsCancel="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Cancel}" Click="CancelButton_Click"  Height="23"  Margin="10,0,0,0" />
+
+        </StackPanel>
+    </Grid>
+</cw:ChildWindow>

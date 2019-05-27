@@ -1,0 +1,77 @@
+<cw:ChildWindow xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.CWBudgetLineDialog"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+           xmlns:cw="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"                            
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+      xmlns:UnicontaControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"   
+      mc:Ignorable="d" Width="320" Height="570" 
+      d:DesignHeight="100" d:DesignWidth="380">
+     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="40"/>
+        </Grid.RowDefinitions>      
+        <UnicontaControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Vertical" Grid.Row="0" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
+            <UnicontaControls:CorasauLayoutGroup x:Name="layoutGroupBudget" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Description}" Orientation="Vertical" UnicontaControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                <UnicontaControls:CorasauLayoutItem FieldName="Date">
+                    <UnicontaControls:DateEditor Text="{Binding Date,Mode=TwoWay}" x:Name="deDate"/>
+                </UnicontaControls:CorasauLayoutItem>
+                <UnicontaControls:CorasauLayoutItem FieldName="Comment">
+                    <UnicontaControls:TextEditor Text="{Binding Comment,Mode=TwoWay}" />
+                </UnicontaControls:CorasauLayoutItem>
+                <UnicontaControls:CorasauLayoutItem FieldName="Amount">
+                    <UnicontaControls:DoubleEditor FieldName="Amount"/>
+                </UnicontaControls:CorasauLayoutItem>
+                <UnicontaControls:CorasauLayoutItem FieldName="Recurring">                 
+                    <UnicontaControls:ComboBoxEditor x:Name="cbRecurring" SelectedItem="{Binding Recurring,Mode=TwoWay}"/>
+                </UnicontaControls:CorasauLayoutItem>
+                <UnicontaControls:CorasauLayoutItem FieldName="ToDate">
+                    <UnicontaControls:DateEditor Text="{Binding ToDate,Mode=TwoWay}"/>
+                </UnicontaControls:CorasauLayoutItem>
+                <UnicontaControls:CorasauLayoutItem FieldName="Regulate">
+                    <UnicontaControls:DoubleEditor FieldName="Regulate" />
+                </UnicontaControls:CorasauLayoutItem>
+                <UnicontaControls:CorasauLayoutItem FieldName="Disable">
+                    <UnicontaControls:CheckEditor IsChecked="{Binding Disable,Mode=TwoWay}"/>
+                </UnicontaControls:CorasauLayoutItem>
+
+                
+            </UnicontaControls:CorasauLayoutGroup>
+            <UnicontaControls:CorasauLayoutGroup x:Name="layoutGroupDimensions" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Dimension}" Orientation="Vertical" UnicontaControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                <UnicontaControls:CorasauLayoutItem  x:Name="lbldim1">
+                    <UnicontaControls:LookupEditor x:Name="dim1lookupeditior" Text="{Binding Dimension1,Mode=TwoWay}"/>
+                </UnicontaControls:CorasauLayoutItem>
+                <UnicontaControls:CorasauLayoutItem x:Name="lbldim2">
+                    <UnicontaControls:LookupEditor x:Name="dim2lookupeditior" Text="{Binding Dimension2,Mode=TwoWay}"/>
+                </UnicontaControls:CorasauLayoutItem>
+                <UnicontaControls:CorasauLayoutItem x:Name="lbldim3">
+                    <UnicontaControls:LookupEditor x:Name="dim3lookupeditior" Text="{Binding Dimension3,Mode=TwoWay}"/>
+                </UnicontaControls:CorasauLayoutItem>
+                <UnicontaControls:CorasauLayoutItem x:Name="lbldim4">
+                    <UnicontaControls:LookupEditor x:Name="dim4lookupeditior" Text="{Binding Dimension4,Mode=TwoWay}"/>
+                </UnicontaControls:CorasauLayoutItem>
+                <UnicontaControls:CorasauLayoutItem x:Name="lbldim5">
+                    <UnicontaControls:LookupEditor x:Name="dim5lookupeditior" Text="{Binding Dimension5,Mode=TwoWay}"/>
+                </UnicontaControls:CorasauLayoutItem>
+            </UnicontaControls:CorasauLayoutGroup>
+            <UnicontaControls:CorasauLayoutGroup x:Name="layoutGroupAccountRange" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Range}" Orientation="Vertical" UnicontaControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                <UnicontaControls:CorasauLayoutItem FieldName="FromAccount" x:Name="lblFromAccount">
+                    <UnicontaControls:LookupEditor x:Name="fromAccountlookupeditior" Text="{Binding FromAccount,Mode=TwoWay}"/>
+                </UnicontaControls:CorasauLayoutItem>
+                <UnicontaControls:CorasauLayoutItem FieldName="ToAccount" x:Name="lblToAccount">
+                    <UnicontaControls:LookupEditor x:Name="toAccountlookupeditior" Text="{Binding ToAccount,Mode=TwoWay}"/>
+                </UnicontaControls:CorasauLayoutItem>
+            </UnicontaControls:CorasauLayoutGroup>
+
+        </UnicontaControls:CorasauLayoutControl>
+        <StackPanel x:Name="actionButton" HorizontalAlignment="Right" Grid.Row="1" Orientation="Horizontal" Margin="0 10 0 0">
+            <Button x:Name="OKButton" IsDefault="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OK}" MinWidth="75" Height="23" 
+                    HorizontalAlignment="Right" Margin="0 0 3 0" Click="OKButton_Click" />
+            <Button x:Name="CancelButton" IsCancel="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Cancel}"  MinWidth="75" Height="23" 
+                    HorizontalAlignment="Right"   Click="CancelButton_Click" />
+        </StackPanel>
+    </Grid>
+</cw:ChildWindow>

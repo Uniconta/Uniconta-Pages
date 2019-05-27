@@ -1,0 +1,66 @@
+<wizard:UnicontaWizardControl xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.VoucherGridFolderWizard"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
+             xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools" 
+             xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+             xmlns:wizard="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
+    <Grid x:Name="LayoutRoot" Margin="2" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="5" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <TextBlock Text="{Binding Header}" Grid.Row="0" HorizontalAlignment="Left" />
+        <CorasauControls:BusyIndicator Grid.Row="2" x:Name="busyIndicator" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <Grid x:Name="containerLayout">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <local:ExtendedVouchersGrid  x:Name="dgVouchersGrid" AutoGenerateColumns="None">
+                    <local:ExtendedVouchersGrid.Columns>
+                        <local:CorasauDataGridTemplateColumnClient x:Name="IsAdded" Width="40"  Header=" "  AllowEditing="True" >
+                            <local:CorasauDataGridTemplateColumnClient.CellTemplate>
+                                <DataTemplate>
+                                    <CorasauControls:CheckEditor Margin="6,0,6,0" EditValue="{Binding DataContext.RowData.Row.IsAdded,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent},UpdateSourceTrigger=PropertyChanged}" IsEnabled="True"/>
+                                </DataTemplate>
+                            </local:CorasauDataGridTemplateColumnClient.CellTemplate>
+                        </local:CorasauDataGridTemplateColumnClient>
+                        <local:CorasauDataGridTemplateColumnClient x:Name="RowId" Width="70" AllowEditing="False" />
+                        <local:CorasauDataGridTemplateColumnClient x:Name="Created" ShowTime="True" AllowEditing="False" Width="120" SortOrder="Descending" AllowSorting="True">
+                            <local:CorasauDataGridTemplateColumnClient.EditSettings>
+                                <editor:TextEditSettings DisplayFormat="g" MaskType="DateTime" />
+                            </local:CorasauDataGridTemplateColumnClient.EditSettings>
+                        </local:CorasauDataGridTemplateColumnClient>
+                        <local:CorasauDataGridTemplateColumnClient x:Name="UserName" AllowEditing="False" Width="100" />
+                        <local:CorasauDataGridTemplateColumnClient x:Name="Fileextension"  Width="55" AllowEditing="False" />
+                        <local:CorasauDataGridTemplateColumnClient x:Name="Content" AllowEditing="False" />
+                        <local:CorasauDataGridTemplateColumnClient x:Name="Text"  Width="500" AllowEditing="False"/>
+                        <local:CorasauDataGridTemplateColumnClient x:Name="Invoice" AllowEditing="False" Width="60" AllowThousandMask="false" />
+                        <local:CorasauDataGridTemplateColumnClient x:Name="Amount" AllowEditing="False" Width="85" />
+                        <local:CorasauDataGridTemplateColumnClient x:Name="Currency" Width="35" AllowEditing="False" />
+                        <local:CorasauDataGridTemplateColumnClient x:Name="CreditorAccount" Width="60" AllowEditing="False" />
+                        <local:CorasauDataGridTemplateColumnClient x:Name="PostingDate" AllowEditing="False" Width="85" Visible="False" />
+                        <local:CorasauDataGridTemplateColumnClient x:Name="DocumentDate" AllowEditing="False" Width="85" Visible="False" />
+
+                        <local:CorasauDataGridTemplateColumnClient x:Name="Approver1" Width="100" AllowEditing="False" Visible="False" />
+                        <local:CorasauDataGridTemplateColumnClient x:Name="Approver2" Width="100" AllowEditing="False" Visible="False"/>
+                        <local:CorasauDataGridTemplateColumnClient x:Name="PaymentMethod" Width="50" AllowEditing="False" Visible="False" />
+                        <local:CorasauDataGridTemplateColumnClient x:Name="PaymentId" Width="50" AllowEditing="False"  Visible="False"/>
+
+                        <local:CorasauDataGridTemplateColumnClient x:Name="Approved" Width="70" AllowEditing="False" Visible="False"/>
+                        <local:CorasauDataGridTemplateColumnClient x:Name="UserLogidId" Width="100" AllowEditing="False" Visible="False"/>
+                        <local:CorasauDataGridTemplateColumnClient x:Name="Folder" AllowEditing="False" Visible="False" Width="55" />
+                    </local:ExtendedVouchersGrid.Columns>
+                </local:ExtendedVouchersGrid>
+                <Border BorderBrush="{StaticResource BorderColor}" Grid.Column="1" BorderThickness="1">
+                    <Grid x:Name="documentViewer">
+
+                    </Grid>
+                </Border>
+            </Grid>
+        </CorasauControls:BusyIndicator>
+    </Grid>
+</wizard:UnicontaWizardControl>

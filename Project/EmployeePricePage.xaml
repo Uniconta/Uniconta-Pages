@@ -1,0 +1,46 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools" 
+        xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.EmpPayrolCategoryPage"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage"
+        xmlns:UnicontaControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+        mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="400">
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <UnicontaControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Project/EmployeePricePageRibbon.xml" x:Name="localMenu"/>
+        <UnicontaControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <localPage:EmpPayrolCategoryPageGrid  x:Name="dgEmpPayCatGrid" AutoGenerateColumns="None">
+                <localPage:EmpPayrolCategoryPageGrid.Columns >
+                    <localPage:CorasauDataGridTemplateColumnClient FieldName="PayrollCategory" x:Name="colPayrolCat" Width="100"/>
+                    <localPage:CorasauDataGridTemplateColumnClient FieldName="PayrollCategoryName"  x:Name="colPayrolCatName" ReadOnly="True" Width="150"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ValidFrom" ShowTime="False" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ValidTo" ShowTime="False" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient FieldName="Employee" Width="100" x:Name="colEmployee" />
+                    <localPage:CorasauDataGridTemplateColumnClient FieldName="EmployeeName" x:Name="colEmployeeName" ReadOnly="True" Width="150"/>
+                    <localPage:CorasauDataGridTemplateColumnClient FieldName="Account" Width="100" x:Name="colAccount" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient FieldName="AccountName" x:Name="colAccountName" ReadOnly="True" Width="150" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient FieldName="Project" Width="100" x:Name="colProject" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient FieldName="ProjectName" x:Name="colProjectName" ReadOnly="True" Width="150" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient FieldName="PrCategory" Width="100" x:Name="colPrCategory" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient FieldName="CategoryName" x:Name="colCategoryName" ReadOnly="True" Width="150" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient FieldName="Item" x:Name="colItem" Width="100"/>
+                    <localPage:CorasauDataGridTemplateColumnClient FieldName="ItemName" x:Name="colItemName" ReadOnly="True" Width="150"/>
+                    <localPage:CorasauDataGridTemplateColumnClient FieldName="CostPrice" Width="90"/>
+                    <localPage:CorasauDataGridTemplateColumnClient FieldName="SalesPrice" Width="90"/>
+                    <localPage:CorasauDataGridTemplateColumnClient FieldName="Rate" Width="90"/>
+                    <localPage:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension1" x:Name="cldim1" />
+                    <localPage:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension2"  x:Name="cldim2"/>
+                    <localPage:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension3" x:Name="cldim3" />
+                    <localPage:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension4" x:Name="cldim4" />
+                    <localPage:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension5" x:Name="cldim5" />
+                </localPage:EmpPayrolCategoryPageGrid.Columns>
+            </localPage:EmpPayrolCategoryPageGrid>
+        </UnicontaControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

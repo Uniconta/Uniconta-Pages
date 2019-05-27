@@ -1,0 +1,164 @@
+using UnicontaClient.Models;
+using Uniconta.ClientTools.DataModel;
+using Uniconta.ClientTools.Page;
+using Uniconta.Common;
+using DevExpress.Xpf.Grid;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Animation;
+using System.Windows.Shapes;
+using Uniconta.ClientTools.Controls;
+using Uniconta.API.GeneralLedger;
+using Uniconta.DataModel;
+using System.Threading.Tasks;
+
+using UnicontaClient.Pages;
+namespace UnicontaClient.Pages.CustomPage
+{
+    public class CorasauDataGridSimulatedTran : CorasauDataGridClient
+    {
+        public override Type TableType { get { return typeof(GLTransClientTotal); } }
+        public override DataTemplate PrintGridFooter(ref object FooterData)
+        {
+            FooterData = this.FooterData;
+            if (FooterData != null)
+            {
+                var footerTemplate = Page.Resources["ReportFooterTemplate"] as DataTemplate;
+                return footerTemplate;
+            }
+            return null;
+        }
+
+        public object FooterData { get; set; }
+    }
+
+    public partial class SimulatedTransactions : GridBasePage
+    {
+        public override string NameOfControl { get { return TabControls.SimulatedTransactions; } }
+        public SimulatedTransactions(UnicontaBaseEntity[] simulatedTransactions)
+            : base(simulatedTransactions, 0, 0)
+        {
+            Initialize(null, simulatedTransactions);
+		}
+        bool ShowTotal;
+
+        AccountPostingBalance[] balance;
+        public SimulatedTransactions(AccountPostingBalance[] balance, UnicontaBaseEntity[] simulatedTransactions)
+            : base(simulatedTransactions, 0, 0)
+        {
+            this.balance = balance;
+            Initialize(null, simulatedTransactions);
+        }
+        private void Initialize(UnicontaBaseEntity master, UnicontaBaseEntity[] simulatedTransactions)
+        {
+            InitializeComponent();
+            dgSimulatedTran.api = api;
+            if (simulatedTransactions != null && simulatedTransactions.Length > 0)
+            {
+                var lst = new GLTransClientTotal[simulatedTransactions.Length];
+                long total = 0;
+                int i = 0;
+                foreach (var t in (IEnumerable<GLTransClientTotal>)simulatedTransactions)
+                {
+                    total += t._AmountCent;
+                    t._Total = total;
+                    lst[i++] = t;
+                }
+                ShowTotal = (total != 0);
+                dgSimulatedTran.ClearSorting();
+                dgSimulatedTran.SetSource(lst);
+            }
+            SetRibbonControl(localMenu, dgSimulatedTran);
+            dgSimulatedTran.BusyIndicator = busyIndicator;
+
+            localMenu.OnItemClicked += gridRibbon_BaseActions;
+            dgSimulatedTran.ShowTotalSummary();
+            LedgerCache = this.api.GetCache(typeof(GLAccount));
+        }
+
+        public override Task InitQuery() { return null; }
+
+        protected override void OnLayoutLoaded()
+        {
+            base.OnLayoutLoaded();
+            Total.Visible = ShowTotal;
+            UnicontaClient.Utilities.Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
+            var Comp = api.CompanyEntity;
+            if (!Comp._UseVatOperation)
+                VatOperation.Visible = false;
+            if (!Comp.Project)
+            {
+                ProjectName.Visible = false;
+                Project.Visible = false;
+                CategoryName.Visible = false;
+                PrCategory.Visible = false;
+            }
+            if (!Comp.HasDecimals)
+                Debit.HasDecimals = Credit.HasDecimals = Amount.HasDecimals = AmountBase.HasDecimals = AmountVat.HasDecimals = Total.HasDecimals = false;
+        }
+
+        SQLCache LedgerCache;
+        
+        public override object GetPrintParameter()
+        {
+            if (balance != null && balance.Length > 0)
+            {
+                var fd = new PrintReportFooter();
+                dgSimulatedTran.FooterData = fd;
+
+                int n = 0;
+                foreach (var bal in balance)
+                {
+                    var ac = (GLAccount)LedgerCache.Get(bal.AccountRowId);
+                    var name = string.Format("{0}, {1}", ac._Account, ac._Name);
+                    var InitialSum = bal.BalanceBefore;
+                    var TraceSum = InitialSum + bal.PostingAmount;
+
+                    n++;
+                    switch (n)
+                    {
+                        case 1:
+                            fd.TraceSum1Name = name;
+                            fd.TraceSum1 = TraceSum;
+                            fd.InitialSum1 = InitialSum;
+                            break;
+                        case 2:
+                            fd.TraceSum2Name = name;
+                            fd.TraceSum2 = TraceSum;
+                            fd.InitialSum2 = InitialSum;
+                            break;
+                        case 3:
+                            fd.TraceSum3Name = name;
+                            fd.TraceSum3 = TraceSum;
+                            fd.InitialSum3 = InitialSum;
+                            break;
+                        case 4:
+                            fd.TraceSum4Name = name;
+                            fd.TraceSum4 = TraceSum;
+                            fd.InitialSum4 = InitialSum;
+                            break;
+                        case 5:
+                            fd.TraceSum5Name = name;
+                            fd.TraceSum5 = TraceSum;
+                            fd.InitialSum5 = InitialSum;
+                            break;
+                        case 6:
+                            fd.TraceSum6Name = name;
+                            fd.TraceSum6 = TraceSum;
+                            fd.InitialSum6 = InitialSum;
+                            break;
+                    }
+                }
+            }
+            return base.GetPrintParameter();
+        }
+    }
+}

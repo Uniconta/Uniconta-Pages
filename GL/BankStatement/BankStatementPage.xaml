@@ -1,0 +1,41 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"  
+   xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.BankStatementPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    xmlns:toolkit="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Toolkit"
+    xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+    xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage" 
+    xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+    d:DesignHeight="300" d:DesignWidth="400">
+
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/GL/BankStatement/BankStatementPageRibbon.xml" x:Name="localMenu"/>
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <local:BankStatementGrid  x:Name="dgBankStatement" AutoGenerateColumns="None" HorizontalAlignment="Stretch">
+                <local:BankStatementGrid.Columns>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Name"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Account" ReadOnly="True" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Currency" Width="50" ReadOnly="True" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Journal" Width="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Balance" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="StartBalance"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DaysSlip" Width="60"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="LastTransaction" Width="90" />
+                    <local:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension1" x:Name="coldim1"/>
+                    <local:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension2" x:Name="coldim2"/>
+                    <local:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension3" x:Name="coldim3"/>
+                    <local:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension4" x:Name="coldim4"/>
+                    <local:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension5" x:Name="coldim5"/>
+                </local:BankStatementGrid.Columns>
+            </local:BankStatementGrid>
+        </CorasauControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

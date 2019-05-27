@@ -1,0 +1,48 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools" xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.GLVatPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage"
+    mc:Ignorable="d"   xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+                     xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
+    d:DesignHeight="300" d:DesignWidth="400">
+    <UserControl.Resources>
+        <Util:RowIndexConverter x:Key="RowIndexConverter" />
+    </UserControl.Resources>
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition></RowDefinition>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/GL/Vat/GLVatGridRibbon.xml" x:Name="localMenu"/>
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <localPage:GLVatGrid  x:Name="dgVat" AutoGenerateColumns="None">
+                <localPage:GLVatGrid.Columns>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Vat" Width="70"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" Width="150"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="VatType" Width="100"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="TypeSales" Width="50" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="TypeBuy" Width="50"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Method" Width="80" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Rate" Width="50"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Rate2" Width="50"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Rate2PartOfBrutto" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Account" Width="90"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="FollowAccount" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="OffsetAccount" Width="90" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="AccountRate2" Width="90" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="FollowAccount2" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="OffsetAccountRate2" Visible="False" Width="90"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="UnrealizedAccount" Visible="False" Width="90"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Date" Width="90"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="RateAfterDate" Width="50"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Rate2AfterDate" Width="50"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ModelBoxId" Width="50" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ShowZeroOnInvoice" Width="50" Visible="False"/>
+                </localPage:GLVatGrid.Columns>
+            </localPage:GLVatGrid>
+        </CorasauControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>
+

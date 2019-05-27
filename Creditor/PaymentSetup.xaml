@@ -1,0 +1,33 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"  
+        xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.PaymentSetup"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
+        xmlns:UnicontaControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+        mc:Ignorable="d" >
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <UnicontaControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Creditor/PaymentSetupRibbon.xml" x:Name="localMenu"/>
+        <UnicontaControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <local:PaymentSetupGrid  x:Name="dgPaymentSetupGrid" AutoGenerateColumns="None">
+                <local:PaymentSetupGrid.Columns >
+                     <local:CorasauDataGridTemplateColumnClient x:Name="Name" MinWidth="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DataAvsender" MinWidth="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="AvtaleId" MinWidth="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="OppdragsNummer" MinWidth="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="OppdragsKonto" MinWidth="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="KreditKonto" MinWidth="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Kid" MinWidth="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ForsendelsesNummer" MinWidth="100"/>
+                </local:PaymentSetupGrid.Columns>  
+           </local:PaymentSetupGrid>
+
+        </UnicontaControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

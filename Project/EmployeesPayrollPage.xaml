@@ -1,0 +1,70 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools" 
+   xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.EmployeesPayrollPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    xmlns:toolkit="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Toolkit"
+    xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+    xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage" 
+    xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+    d:DesignHeight="300" d:DesignWidth="400">
+
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Project/EmployeesPayrollPageGridRibbon.xml" x:Name="localMenu"/>
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <localPage:EmployeePayrollGrid  x:Name="dgEmployeePayrollGrid" AutoGenerateColumns="None" HorizontalAlignment="Stretch">
+                <localPage:EmployeePayrollGrid.Columns>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PrimaryKeyId" Width="70" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Number" Width="80"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" Width="200"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PayrollType" Width="80">
+                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="PayrollType" />
+                            </DataTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                    </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Unit" Width="50">
+                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="ItemUnit" />
+                            </DataTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                    </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceText" Width="150"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CategoryName" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Item" Visible="True" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ItemName" Visible="True" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Rate" Width="70"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="SalesPrice" Width="70" Visible="True" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Invoiceable" Width="60" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ExternCode"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="InternalType" Visible="False" Width="80">
+                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="InternalType" />
+                            </DataTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                    </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Factor" Width="70" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="InternalProject" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="InternalProjectName" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ATP" Width="35" />
+                    <localPage:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension1" x:Name="coldim1"/>
+                    <localPage:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension2" x:Name="coldim2"/>
+                    <localPage:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension3" x:Name="coldim3"/>
+                    <localPage:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension4" x:Name="coldim4"/>
+                    <localPage:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension5" x:Name="coldim5"/>
+                </localPage:EmployeePayrollGrid.Columns>
+            </localPage:EmployeePayrollGrid>
+        </CorasauControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

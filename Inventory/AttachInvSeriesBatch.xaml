@@ -1,0 +1,36 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"   
+        xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.AttachInvSeriesBatch"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
+        xmlns:UnicontaControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+        mc:Ignorable="d">
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="30"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <UnicontaControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Inventory/AttachInvSeriesBatchRibbon.xml" x:Name="localMenu"/>
+        <StackPanel Orientation="Horizontal" Grid.Row="1">
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Qty}"></TextBlock>
+            <UnicontaControls:DoubleEditor x:Name="txtQty" Height="23" Width="200" Margin="10 0 0 0" BindningIsSet="True"></UnicontaControls:DoubleEditor>
+        </StackPanel>
+        <UnicontaControls:BusyIndicator x:Name="busyIndicator" Grid.Row="2" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <local:AttachInvSeriesBatchGrid   x:Name="dgInvSeriesBatchGrid" AutoGenerateColumns="None">
+                <local:AttachInvSeriesBatchGrid.Columns>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ItemName" Width="200"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Date" MinWidth="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Expire" MinWidth="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Number" MinWidth="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Comment" MinWidth="200"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Qty" MinWidth="100" ReadOnly="True" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="QtyOpen" MinWidth="100"/>
+               </local:AttachInvSeriesBatchGrid.Columns>
+            </local:AttachInvSeriesBatchGrid>
+        </UnicontaControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

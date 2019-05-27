@@ -1,0 +1,70 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
+                    xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.SalesRepCustomerStatPage"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:UnicontaControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+        xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage" xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage">
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <UnicontaControls:CorasauRibbonControl x:Name="localMenu" XMLSourcePath=";component/Pages/Inventory/InventoryTotalsRibbon.xml"/>
+        <StackPanel Orientation="Horizontal"  Grid.Row="1" Margin="0,12,0,5">
+            <TextBlock x:Name="txtItem" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Item}" Margin="10,0,0,0"/>
+            <CheckBox x:Name="cbxItem" IsEnabled="False" Margin="10,0,0,0"/>
+            <TextBlock x:Name="txtItemGrp" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=InventoryGroup}" Margin="10,0,0,0"/>
+            <CheckBox x:Name="cbxInvGrp" IsEnabled="False" Margin="10,0,0,0"/>
+            <TextBlock x:Name="txtAccount" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Account}" Margin="10,0,0,0"/>
+            <CheckBox x:Name="cbxAccount" IsEnabled="False" Margin="10,0,0,0"/>
+            <TextBlock x:Name="txtAccGrp" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=AccountGroup}"  Margin="10,0,0,0"/>
+            <CheckBox x:Name="cbxAccountGrp" IsEnabled="False"  Margin="10,0,0,0"/>
+            <TextBlock x:Name="txtEmpGrp" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Employee}"  Margin="10,0,0,0"/>
+            <CheckBox x:Name="cbxEmpGrp" IsEnabled="False"  Margin="10,0,0,0"/>
+        </StackPanel>
+        <UnicontaControls:BusyIndicator x:Name="busyIndicator" Grid.Row="2" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BusyMessage}">
+            <local:SalesRepCustomerStatPageGrid x:Name="dgSalesRepCustomerStat" AutoGenerateColumns="None">
+                <local:SalesRepCustomerStatPageGrid.Columns>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Employee" Width="100"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Item" Width="100"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ItemName"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ItemType" Visible="False" Width="60"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ItemGroup" Width="100"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant1" IsEditSettingSet="True" FieldName="Variant1" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant2" IsEditSettingSet="True" FieldName="Variant2" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant3" IsEditSettingSet="True" FieldName="Variant3" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant4" IsEditSettingSet="True" FieldName="Variant4" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant5" IsEditSettingSet="True" FieldName="Variant5" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Variant1Name" Width="100" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Variant2Name" Width="100" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Variant3Name" Width="100" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Variant4Name" Width="100" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Variant5Name" Width="100" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Account" Width="100"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="AccountName"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Group" Width="60"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CompanyRegNo" Visible="False" Width="60"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Country" Visible="False" Width="60"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="VatZone" Visible="False" Width="60"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Vat" Visible="False" Width="60"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Unit" Visible="False" Width="70"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Qty" Width="100"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CostValue" Width="100"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="SalesValue" Width="100"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Margin" Width="100"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="MarginRatio" Width="70"/>
+                </local:SalesRepCustomerStatPageGrid.Columns>
+                <local:SalesRepCustomerStatPageGrid.TotalSummary>
+                    <localPage:SumColumn FieldName="Qty" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="CostValue" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="SalesValue" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="Margin" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                </local:SalesRepCustomerStatPageGrid.TotalSummary>
+            </local:SalesRepCustomerStatPageGrid>
+        </UnicontaControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

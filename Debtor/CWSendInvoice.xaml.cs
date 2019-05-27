@@ -27,6 +27,8 @@ namespace UnicontaClient.Pages.CustomPage
         [InputFieldData]
         [Display(Name = "SendOnlyToThisEmail", ResourceType = typeof(InputFieldDataText))]
         public bool sendOnlyToThisEmail { get; set; }
+
+        public static bool sendInBackgroundOnly = true;
 #if !SILVERLIGHT
         protected override int DialogId { get { return DialogTableId; } }
         public int DialogTableId { get; set; }
@@ -36,6 +38,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             this.DataContext = this;
             InitializeComponent();
+            chkSendOnlyInBackGround.IsChecked = sendInBackgroundOnly;
 #if !SILVERLIGHT
             this.Title = Uniconta.ClientTools.Localization.lookup("Sendinvoicebyemail");
 #else
@@ -76,6 +79,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             Emails = (string.IsNullOrEmpty(txtEmail.Text) || string.IsNullOrWhiteSpace(txtEmail.Text)) ? null : txtEmail.Text;
             sendOnlyToThisEmail = chkSendOnlyEmail.IsChecked.Value;
+            sendInBackgroundOnly = chkSendOnlyInBackGround.IsChecked.Value;
             this.DialogResult = true;
         }
 

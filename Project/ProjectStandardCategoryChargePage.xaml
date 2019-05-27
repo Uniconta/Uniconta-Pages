@@ -1,0 +1,33 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
+                   xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.ProjectStandardCategoryChargePage"
+                    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+                    xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage" 
+                    xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools">
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Project/ProjectStandardCategoryChargePageRibbon.xml" x:Name="localMenu"/>
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <localPage:PrStandardCategoryChargeGridClient x:Name="dgStandardCategoryChargeGrid" AutoGenerateColumns="None">
+                <localPage:PrStandardCategoryChargeGridClient.Columns>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PrStandard" Visible="False" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Visible="False" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" Width="300"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ChargeType" Width="300">
+                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="PctChargeType" />
+                            </DataTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                    </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Value" Width="80" />
+                </localPage:PrStandardCategoryChargeGridClient.Columns>
+            </localPage:PrStandardCategoryChargeGridClient>
+        </CorasauControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

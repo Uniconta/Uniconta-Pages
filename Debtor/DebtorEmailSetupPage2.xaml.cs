@@ -43,7 +43,6 @@ namespace UnicontaClient.Pages.CustomPage
 
         public override Type TableType { get { return typeof(DebtorEmailSetupClient); } }
         public override UnicontaBaseEntity ModifiedRow { get { return editrow; } set { editrow = (DebtorEmailSetupClient)value; } }
-
         //For Edit
         public DebtorEmailSetupPage2(UnicontaBaseEntity sourceData, bool isEdit) : base(sourceData, isEdit)
         {
@@ -71,6 +70,7 @@ namespace UnicontaClient.Pages.CustomPage
 #if !SILVERLIGHT
             liTextinHtml.Label = Uniconta.ClientTools.Localization.lookup("TextInHtml");
 #endif
+            txtSmptPwd.Text = editrow._smtpPassword;
         }
 
         public DebtorEmailSetupPage2(CrudAPI crudApi, string dummy) : base(crudApi, dummy)
@@ -96,6 +96,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void FrmRibbon_OnItemClicked(string ActionType)
         {
+            editrow._smtpPassword = txtSmptPwd.Text;
             switch (ActionType)
             {
                 case "TestMail":
@@ -155,7 +156,7 @@ namespace UnicontaClient.Pages.CustomPage
                            {
                                editrow.Host = emailSetup.Host;
                                editrow.SmtpUser = emailSetup.User;
-                               editrow.SmtpPassword = emailSetup.Password;
+                               editrow._smtpPassword = txtSmptPwd.Text =  emailSetup.Password;
                                editrow.Port = emailSetup.Port;
                                editrow.UseSSL = emailSetup.SSL;
                            }
@@ -187,7 +188,6 @@ namespace UnicontaClient.Pages.CustomPage
         bool? isSMTPValidated;
         bool ValidateSMTP()
         {
-
             object element;
 #if !SILVERLIGHT
             element = FocusManager.GetFocusedElement(Application.Current.Windows[0]);
@@ -212,12 +212,14 @@ namespace UnicontaClient.Pages.CustomPage
                 editrow.Host = null;
             if (editrow.SmtpUser == string.Empty)
                 editrow.SmtpUser = null;
-            if (editrow.SmtpPassword == string.Empty)
-                editrow.SmtpPassword = null;
+            if (string.IsNullOrEmpty(editrow._smtpPassword))
+            {
+                editrow._smtpPassword = null;
+            }
             var loadedRow = this.LoadedRow as DebtorEmailSetupClient;
             if (loadedRow == null && !string.IsNullOrEmpty(editrow.Host))
                 isSMTPValidated = false;
-            else if (loadedRow != null && ((editrow.Host != null && editrow.Host != loadedRow.Host) || (editrow.Port != 0 && editrow.Port != loadedRow.Port) || (editrow.SmtpUser != null && editrow.SmtpUser != loadedRow.SmtpUser) || (editrow.SmtpPassword != null && editrow.SmtpPassword != loadedRow.SmtpPassword)
+            else if (loadedRow != null && ((editrow.Host != null && editrow.Host != loadedRow.Host) || (editrow.Port != 0 && editrow.Port != loadedRow.Port) || (editrow.SmtpUser != null && editrow.SmtpUser != loadedRow.SmtpUser) || (editrow._smtpPassword != null && editrow._smtpPassword != loadedRow._smtpPassword)
                 || (editrow.AllowDifferentSender == true && editrow.AllowDifferentSender != loadedRow.AllowDifferentSender)
                 || (editrow.AllowDifferentSender == true && editrow.EmailSendFrom != loadedRow.EmailSendFrom)))
                 isSMTPValidated = false;

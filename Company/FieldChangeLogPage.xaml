@@ -1,0 +1,36 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools" 
+        xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.FieldChangeLogPage"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+        xmlns:UnicontaControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+        xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage">
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <UnicontaControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Company/FieldChangeLogPageGridRibbon.xml" x:Name="localMenu"/>
+        <UnicontaControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <local:FieldChangeLogPageGrid  x:Name="dgFieldChangeLog" AutoGenerateColumns="None" HorizontalAlignment="Stretch">
+                <local:FieldChangeLogPageGrid.Columns>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="TableId" Width="50" Visible="False" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="TableRowId" Width="80" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="KeyStr" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="KeyName" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Time" Width="150" ShowSec="True"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Uid"  Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="UserName" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PropName" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="OldValue" Visible="False" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="NewValue" Visible="False" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="OldClientValue" Width="300"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="NewClientValue" Width="300"/>
+                </local:FieldChangeLogPageGrid.Columns>
+            </local:FieldChangeLogPageGrid>
+        </UnicontaControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<root>
+  <RibbonItem TabId="0" LocalizedNameKey="Home">
+      <RibbonItem Action="GLAccountFilter" LocalizedNameKey="FilterOBJ" Parameter="Account" Glyph="Filter_16x16.png" LargeGlyph="Filter_32x32.png"/>
+      <RibbonItem Action="ClearGLAccountFilter" LocalizedNameKey="ClearFilter" Glyph="Filter_Clear_32x32.png" LargeGlyph="Filter_Clear_32x32.png"/>
+    </RibbonItem>
+    <RibbonItem>
+      <RibbonItem Action="UserNotesFilter" LocalizedNameKey="FilterOBJ" Parameter="UserNotesInfo" Glyph="Filter_16x16.png" LargeGlyph="Filter_32x32.png"/>
+      <RibbonItem Action="ClearUserNotesFilter" LocalizedNameKey="ClearFilter" Glyph="Filter_Clear_32x32.png" LargeGlyph="Filter_Clear_32x32.png"/>
+  </RibbonItem>
+  <RibbonItem>
+    <!---If we want to create a new group in same PageTab-->
+    <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32.png">
+      <!---If we want Inner menu-->
+      <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
+      <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16.png" ShortcutKey="" />
+      <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveOBJ" Parameter="Layout" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
+      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="SwitchToDefault" Glyph="Delete_16x16.png" ShortcutKey=""/>
+      <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16.png" ShortcutKey="Ctrl+U"/>
+      <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportOBJ"  Parameter="Layout" EnableSeperator="True" Glyph="ExportLayout_16x16.png" LargeGlyph="ExportLayout_16x16.png" ShortcutKey=""/>
+      <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportOBJ" Parameter="Layout" Glyph="Import_16x16.png" LargeGlyph="Import_16x16.png" ShortcutKey=""/>
+      <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16.png" ShortcutKey=""/>
+    </RibbonItem>
+  </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="ExpandAndCollapse" LocalizedNameKey="ExpandAll" ShortcutKey="Ctrl+O" Glyph="Cover_16x16.png" LargeGlyph="Expand_32x32.png" />
+  </RibbonItem>
+  <RibbonItem>
+  <RibbonItem Action="Search" LocalizedNameKey="Search" LargeGlyph="Validate_32x32.png" ShortcutKey="Ctrl+H" />
+  </RibbonItem>
+</root>

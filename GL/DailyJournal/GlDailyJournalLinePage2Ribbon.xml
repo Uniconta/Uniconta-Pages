@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<root>
+  <RibbonItem TabId="0" LocalizedNameKey="Home">
+    <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32.png">     
+      <RibbonItem Action="StartEdit" LocalizedNameKey="StartEdit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>
+      <RibbonItem Action="EndEdit" LocalizedNameKey="SaveOBJ" Parameter="Layout" Glyph="save-16x16.png" LargeGlyph="save-32x32.png"/>
+      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="SwitchToDefault" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png"/>
+     <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportOBJ"  Parameter="Layout" EnableSeperator="True" Glyph="ExportLayout_16x16.png" LargeGlyph="ExportLayout_16x16.png"/>
+     <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportOBJ" Parameter="Layout" Glyph="Import_16x16.png" LargeGlyph="Import_16x16.png"/>
+    <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16.png" />
+</RibbonItem>
+  </RibbonItem>
+</root>

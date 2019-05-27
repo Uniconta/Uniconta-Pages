@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<root>
+  <RibbonItem TabId="0" LocalizedNameKey="Home" >
+    <RibbonItem Action="DeleteRow" LocalizedNameKey="DiscardTransaction" Glyph=";component/Assets/img/Delete_16x16.png" LargeGlyph=";component/Assets/img/Delete_32x32.png" />
+  </RibbonItem>
+  <RibbonItem >
+    <RibbonItem Action="Filter" LocalizedNameKey="Filter" Glyph=";component/Assets/img/Filter_16x16.png" LargeGlyph=";component/Assets/img/Filter_32x32.png"/>
+    <RibbonItem Action="ClearFilter" LocalizedNameKey="ClearFilter" Glyph=";component/Assets/img/Filter_Clear_32x32.png" LargeGlyph=";component/Assets/img/Filter_Clear_32x32.png"/>
+  </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="PostJournal" LocalizedNameKey="PostJournal" Glyph=";component/Assets/img/Delete_16x16.png" LargeGlyph=";component/Assets/img/Orders_32x32.png" />
+  </RibbonItem>
+</root>

@@ -1,0 +1,45 @@
+<wizard:UnicontaWizardControl xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.VoucherSaveFolderWizardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
+             xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools" 
+             xmlns:wizard="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
+    <Grid x:Name="LayoutRoot" Margin="2" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="5" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="5" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="5" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <!-- Row 1-->
+        <TextBlock Text="{Binding Header}" Grid.Row="0" HorizontalAlignment="Left" Grid.ColumnSpan="2" />
+
+        <!-- Row 2-->
+        <local:VouchersFolderGrid x:Name="dgVoucherFolderGrid" AutoGenerateColumns="None" Grid.Row="2" Grid.ColumnSpan="2">
+            <local:VouchersFolderGrid.Columns>
+                <local:CorasauDataGridTemplateColumnClient FieldName="RowId" Header="Row Id"  AllowEditing="False" />
+                <local:CorasauDataGridTemplateColumnClient FieldName="Text"  Header="Text" AllowEditing="False"/>
+                <local:CorasauDataGridTemplateColumnClient FieldName="Fileextension" Header="Extension" AllowEditing="False"/>
+                <local:CorasauDataGridTemplateColumnClient FieldName="Content" AllowEditing="False"/>
+            </local:VouchersFolderGrid.Columns>
+        </local:VouchersFolderGrid>
+        
+        <!--Row 3-->
+        <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Name}" Grid.Row="4" HorizontalAlignment="Left"></TextBlock>
+        <CorasauControls:TextEditor x:Name="txtFolder" Grid.Row="4" HorizontalAlignment="Left" Grid.Column="1" Margin="5,0,0,0" Width="200" />
+
+        <!--Row 4-->
+        <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Content}" Grid.Column="0" Grid.Row="6" />
+        <CorasauControls:ComboBoxEditor x:Name="cmbContentTypes" Grid.Column="1" HorizontalAlignment="Left"  Grid.Row="6" Margin="5,0,0,0" Width="200" />
+    </Grid>
+</wizard:UnicontaWizardControl>

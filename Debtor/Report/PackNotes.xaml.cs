@@ -342,7 +342,7 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     busyIndicator.IsBusy = true;
                     InvoiceAPI Invapi = new InvoiceAPI(api);
-                    ErrorCodes res = await Invapi.SendInvoice(invClient, cwSendInvoice.Emails, cwSendInvoice.sendOnlyToThisEmail);
+                    ErrorCodes res = await Invapi.SendInvoice(invClient, cwSendInvoice.Emails, cwSendInvoice.sendOnlyToThisEmail, CWSendInvoice.sendInBackgroundOnly);
 
                     busyIndicator.IsBusy = false;
                     if (res == ErrorCodes.Succes)

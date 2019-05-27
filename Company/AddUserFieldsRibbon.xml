@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<root>
+  <RibbonItem TabId="0" LocalizedNameKey="Home">
+    <!---When we create a new group and a new TabPage -->
+    <RibbonItem Action="AddRow" LocalizedNameKey="AddOBJ" Parameter="Field" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png"/>
+    <RibbonItem Action="EditRow" ShortcutKey="Ctrl+E" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>
+    <RibbonItem Action="CopyUserfields" LocalizedNameKey="CopyUserFields" LargeGlyph="Copy_32x32.png"/>
+  </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh.png" LargeGlyph="refresh.png"/>
+  </RibbonItem>
+  <RibbonItem>
+    <RibbonItem LocalizedNameKey="GenerateClass" LargeGlyph="Generate_32x32.png" ShortcutKey="Ctrl+G">
+      <RibbonItem Action="BaseClass" LocalizedNameKey="BaseClass" Glyph="Master_16x16.png" LargeGlyph=""/>
+      <RibbonItem Action="ClientClass" LocalizedNameKey="ClientClass" Glyph="Client_16x16.png" LargeGlyph=""/>
+    </RibbonItem>
+  </RibbonItem>
+</root>

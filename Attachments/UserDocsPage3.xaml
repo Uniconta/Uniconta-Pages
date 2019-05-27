@@ -1,0 +1,44 @@
+<Pages:FormBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
+          xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.UserDocsPage3" 
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+           xmlns:toolkit="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Toolkit"
+           xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+           xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
+    <Pages:FormBasePage.Resources>
+    
+    </Pages:FormBasePage.Resources>
+    <CorasauControls:BusyIndicator x:Name="busyIndicator"  BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BusyMessage}">
+        <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <!--Dynamically Place the Document Viewer Control  -->
+            <Grid x:Name="documentViewer">
+
+            </Grid>
+            <Border Grid.Row="1" Name="border1" Height="2" VerticalAlignment="Top" BorderBrush="{StaticResource BodyTextColorBrush}" BorderThickness="2" Margin="0,5" />
+            <Border Grid.Row="2" Background="{StaticResource LayoutGridColor}">
+                <Grid  Margin="0,5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <CorasauControls:DocumentMetaInfoControl x:Name="metaInfoCtrl" HorizontalAlignment="Stretch"/>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button x:Name="ViewProgram" Height="23" Margin="10,0,0,0" Width="120"  HorizontalAlignment="Right" VerticalAlignment="Bottom"  
+                        Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ViewInProgram}" Click="ViewProgram_Click" />
+                        <Button x:Name="saveImage" Height="23" Margin="5,0,5,0" Width="90"  HorizontalAlignment="Right" VerticalAlignment="Bottom"  
+                        Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=SaveAs}" Click="saveImage_Click" />
+                        <Button x:Name="cancelWindow" Height="23" Margin="5,0,5,0" Width="90" HorizontalAlignment="Right" VerticalAlignment="Bottom" 
+                        Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Cancel}" Click="cancelWindow_Click" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+    </CorasauControls:BusyIndicator>
+</Pages:FormBasePage>

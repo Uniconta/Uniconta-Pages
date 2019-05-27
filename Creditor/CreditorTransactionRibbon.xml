@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<root>
+  <RibbonItem TabId="0" LocalizedNameKey="Home">
+    <RibbonItem Action="SaveGrid" ShortcutKey="CTRL+S" LocalizedNameKey="Save" Glyph="save-16x16.png" LargeGlyph="save-32x32.png"/>
+    <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh.png" LargeGlyph="refresh.png"/>
+    <RibbonItem Action="Settlements" LocalizedNameKey="Settlements" Glyph="Settled_Transaction_32x32.png" LargeGlyph="Settled_Transaction_32x32.png"/>
+  </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="ViewDownloadRow" ShortcutKey="Alt+P" LocalizedNameKey="PhysicalVoucher" Glyph="View_Voucher_32x32.png" LargeGlyph="View_Voucher_32x32.png" />
+  </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="Filter" ShortcutKey="Ctrl+I" LocalizedNameKey="Filter" LargeGlyph="Filter_32x32.png"/>
+    <RibbonItem Action="ClearFilter" ShortcutKey="Ctrl+K" LocalizedNameKey="ClearFilter" LargeGlyph="Filter_Clear_32x32.png"/>
+  </RibbonItem>
+  <RibbonItem>
+    <!---If we want to create a new group in same PageTab-->
+    <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32.png">
+      <!---If we want Inner menu-->
+      <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
+      <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16.png" ShortcutKey="" />
+      <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveOBJ" Parameter="Layout" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
+      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="SwitchToDefault" Glyph="Delete_16x16.png" ShortcutKey=""/>
+      <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16.png" ShortcutKey="Ctrl+U"/>
+      <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportOBJ"  Parameter="Layout" EnableSeperator="True" Glyph="ExportLayout_16x16.png" LargeGlyph="ExportLayout_16x16.png" ShortcutKey=""/>
+      <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportOBJ" Parameter="Layout" Glyph="Import_16x16.png" LargeGlyph="Import_16x16.png" ShortcutKey=""/>
+      <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16.png" ShortcutKey=""/>
+    </RibbonItem>
+  </RibbonItem>
+	<RibbonItem>
+		<RibbonItem Action="VoucherTransactions" ShortcutKey="Alt+T" LocalizedNameKey="VoucherTransactions" Glyph="Voucher_Transactions_32x32.png" LargeGlyph="Voucher_Transactions_32x32.png" />
+      <RibbonItem Action="PostedBy" LocalizedNameKey="PostedBy" Glyph="Debtor_Group_Posting_32x32.png" LargeGlyph="Debtor_Group_Posting_32x32.png"/>
+	</RibbonItem>
+</root>

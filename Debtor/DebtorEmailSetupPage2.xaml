@@ -43,8 +43,8 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorEmailSetupPage2"
                     <CorasauControls:CorasauLayoutItem x:Name="itemSmtpUser" FieldName="SmtpUser">
                         <CorasauControls:TextEditor  Text="{Binding SmtpUser,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="itemSmtpPassword" FieldName="SmtpPassword">
-                        <CorasauControls:PasswordBoxEditor  Text="{Binding SmtpPassword,Mode=TwoWay}"/>
+                    <CorasauControls:CorasauLayoutItem x:Name="itemSmtpPassword" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=SmtpPassword}">
+                        <CorasauControls:PasswordBoxEditor x:Name="txtSmptPwd" />
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem x:Name="itemUseSSL" FieldName="UseSSL">
                         <CorasauControls:CheckEditor  EditValue="{Binding UseSSL,Mode=TwoWay}"/>

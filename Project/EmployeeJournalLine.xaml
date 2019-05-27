@@ -1,0 +1,38 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"  
+   xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.EmployeeJournalLine"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"    
+    xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+    xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage" 
+    xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+    d:DesignHeight="300" d:DesignWidth="400">
+
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Project/EmployeeJournalLineGridRibbon.xml" x:Name="localMenu"/>
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <localPage:EmployeeJournalLineGrid  x:Name="dgEmployeeJournalLineGrid" AutoGenerateColumns="None" HorizontalAlignment="Stretch">
+                <localPage:EmployeeJournalLineGrid.Columns>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PrimaryKeyId" Width="70" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Employee" Width="100"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Text" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CostCategory" Width="100"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Project" Width="80" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="FromTime" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ToTime" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Qty" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CostPrice" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="SalesPrice" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DiscountPct" />
+                </localPage:EmployeeJournalLineGrid.Columns>
+            </localPage:EmployeeJournalLineGrid>
+        </CorasauControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

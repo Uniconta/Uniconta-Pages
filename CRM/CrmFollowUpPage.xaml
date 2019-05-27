@@ -1,0 +1,118 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools" 
+                    xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.CrmFollowUpPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+      xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
+      xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+      xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools" 
+      xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors"       
+      xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools">
+    <UserControl.Resources>
+        <Util:RowIndexConverter x:Key="RowIndexConverter" />
+        <Util:VisibilityTextConverter x:Key="VisibilityTextConverter" />
+        <Util:VisibilityBoolConverter x:Key="VisibilityBoolConverter" />
+        <Style x:Key="StyleRow" TargetType="dxg:RowControl">
+            <Setter Property="Height" Value="Auto"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl x:Name="localMenu" XMLSourcePath=";component/Pages/CRM/CrmFollowUpPageRibbon.xml"/>
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BusyMessage}">
+            <local:CrmFollowUpPageGrid x:Name="dgCrmFollowUpGrid" AutoGenerateColumns="None" >
+                <local:CrmFollowUpPageGrid.Columns>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="HasContactEmail" Visible="False"  Width="30" >
+                        <local:CorasauDataGridTemplateColumnClient.HeaderTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="&#x2709;"  Width="16" Height="16" VerticalAlignment="Center"/>
+                            </DataTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.HeaderTemplate>
+                        <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <TextBlock Text="&#x2709;"  Tag="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center"  MouseLeftButtonDown="HasEmailImage_MouseLeftButtonDown" Visibility="{Binding DataContext.RowData.Row.ContactEmail,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource VisibilityTextConverter}}"  Width="16" Height="16" RenderOptions.BitmapScalingMode="NearestNeighbor" RenderOptions.EdgeMode="Aliased" />
+                            </ControlTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="HasWebsite" Visible="False"  Width="35" >
+                        <local:CorasauDataGridTemplateColumnClient.HeaderTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="&#x1f310;" Width="16" Height="16" VerticalAlignment="Center"/>
+                            </DataTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.HeaderTemplate>
+                        <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <TextBlock Text="&#x1f310;" Margin="5" Tag="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" MouseLeftButtonDown="HasWebsite_MouseLeftButtonDown" Visibility="{Binding DataContext.RowData.Row.Www,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource VisibilityTextConverter}}" Width="16" Height="16" RenderOptions.BitmapScalingMode="NearestNeighbor" RenderOptions.EdgeMode="Aliased"/>
+                            </ControlTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PrimaryKeyId" Width="70" Visible="False" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Created" MinWidth="150" ShowTime="True" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="UpdatedAt" MinWidth="150" ShowTime="True" AllowEditing="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="UserName" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Group" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Employee" Width="80" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Text" Width="300">
+                        <local:CorasauDataGridTemplateColumnClient.EditSettings>
+                            <editor:TextEditSettings TextWrapping="Wrap"/>
+                        </local:CorasauDataGridTemplateColumnClient.EditSettings>
+                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="OfferNumber" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="FollowUp" Width="150" ShowTime="True"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="FollowUpAction" Width="80">
+                        <local:CorasauDataGridTemplateColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="FollowUpAction" />
+                            </DataTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.CellTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Probability" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Amount" Width="150" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Ended" MinWidth="80" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DCType" Width="80">
+                        <local:CorasauDataGridTemplateColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="DebtorCreditorProspectContact" />
+                            </DataTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.CellTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridForeignKeyColumnClient x:Name="DCAccount" Width="100">
+                        <local:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <TextBlock Margin="2" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.DCAccount,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"></TextBlock>
+                            </ControlTemplate>
+                        </local:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
+                        <local:CorasauDataGridForeignKeyColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <local:CorasauGridLookupEditorClient HasCustomLookUp="true" GotFocus="DCAccount_GotFocus"  x:Name="PART_Editor" ItemsSource="{Binding DataContext.RowData.Row.AccountSource,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" />
+                            </DataTemplate>
+                        </local:CorasauDataGridForeignKeyColumnClient.CellTemplate>
+                    </local:CorasauDataGridForeignKeyColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Name" Width="150"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Address1"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Address2"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Address3" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ZipCode" Width="50"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="City" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Country"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Phone"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ContactPerson"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ContactEmail"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Www" />
+                </local:CrmFollowUpPageGrid.Columns>
+                <local:CrmFollowUpPageGrid.TotalSummary>
+                    <local:SumColumn FieldName="Created" SummaryType="Count" />
+                    <local:SumColumn FieldName="Amount" SummaryType="Sum" DisplayFormat="{}{0:N2}" />
+                </local:CrmFollowUpPageGrid.TotalSummary>
+            </local:CrmFollowUpPageGrid>
+        </CorasauControls:BusyIndicator>
+        <local:CrmFollowUpDetailControl Visible="Collapsed" Grid.Row="1" x:Name="crmDetailControl"></local:CrmFollowUpDetailControl>
+    </Grid>
+</Pages:GridBasePage>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<root>
+  <RibbonItem TabId="0" LocalizedNameKey="Home">
+    <RibbonItem Action="ItemFilter" LocalizedNameKey="Filter" Glyph="Filter_16x16.png" LargeGlyph="Filter_32x32.png" ShortcutKey="CTRL+I"/>
+    <RibbonItem Action="ClearItemFilter" LocalizedNameKey="ClearFilter" Glyph="Filter_Clear_32x32.png" LargeGlyph="Filter_Clear_32x32.png" ShortcutKey="CTRL+K"/>
+  </RibbonItem>
+  <RibbonItem>
+    <!---If we want to create a new group in same PageTab-->
+    <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32.png">
+      <!---If we want Inner menu-->
+      <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>
+      <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveOBJ" Parameter="Layout" Glyph="save-16x16.png" LargeGlyph="save-16x16.png"/>
+      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteOBJ" Parameter="Layout" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png"/>
+      <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16.png" LargeGlyph="LoadLayout_16x16.png"/>
+     <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportOBJ"  Parameter="Layout" EnableSeperator="True" Glyph="ExportLayout_16x16.png" LargeGlyph="ExportLayout_16x16.png"/>
+     <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportOBJ" Parameter="Layout" Glyph="Import_16x16.png" LargeGlyph="Import_16x16.png"/>
+    <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16.png" />
+</RibbonItem>
+  </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="Search" LocalizedNameKey="Search" LargeGlyph="Validate_32x32.png" ShortcutKey="Ctrl+H" />
+  </RibbonItem>
+</root>

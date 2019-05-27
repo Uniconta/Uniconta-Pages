@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<root>
+  <RibbonItem TabId="0" LocalizedNameKey="Home">
+    <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh.png" LargeGlyph="refresh.png"/>
+    <RibbonItem Action="LocalFilter" LocalizedNameKey="Filter" Glyph="Filter_16x16.png" LargeGlyph="Filter_32x32.png" ShortcutKey="CTRL+I"/>
+    <RibbonItem Action="ClearLocalFilter" LocalizedNameKey="ClearFilter" Glyph="Filter_Clear_32x32.png" LargeGlyph="Filter_Clear_32x32.png" ShortcutKey="CTRL+K"/>
+  </RibbonItem>
+  <RibbonItem>
+    <!---If we want to create a new group in same PageTab-->
+    <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32.png">
+      <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16.png" ShortcutKey="" />
+      <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveOBJ" EnableSeperator="True" Parameter="Layout" Glyph="save-16x16.png" LargeGlyph="save-32x32.png"/>
+      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="SwitchToDefault" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png"/>
+      <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16.png" ShortcutKey="Ctrl+U"/>
+      <RibbonItem Action="ExportPivotTableLayout" LocalizedNameKey="ExportOBJ" EnableSeperator="True" Parameter="Layout" Glyph="ExportLayout_16x16.png" LargeGlyph="ExportLayout_16x16.png"/>
+      <RibbonItem Action="ImportPivotTableLayout" LocalizedNameKey="ImportOBJ" Parameter="Layout" Glyph="Import_16x16.png" LargeGlyph="Import_16x16.png"/>
+    </RibbonItem>
+  </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="ChartSettings" LocalizedNameKey="ChartSettings"  Glyph="Chart_Settings_32x32.png" LargeGlyph="Chart_Settings_32x32.png"/>
+  </RibbonItem>
+</root>

@@ -1,0 +1,62 @@
+<Pages:GridBasePage xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.UserCompaniesGridPage"
+      xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools" 
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
+      xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
+
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Company/User/UserCompaniesGridRibbon.xml" x:Name="localMenu"/>
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <local:UserCompaniesGridClient x:Name="dgUserCompaniesGridClient" AutoGenerateColumns="None">
+                <local:UserCompaniesGridClient.Columns>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="CompanyName" Width="250" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Id" Width="100" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PrimaryKeyId" Width="70" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="OwnerUid" Width="50" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ClientId" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Country" Visible="False" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Currency" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="EORI" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ScanEmail" Width="250" Visible="False" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Created" Width="90" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ConvertedFrom" Width="80" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="BackupFrom" Width="50" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Deleted" Width="70" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Delete" Width="35" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Deactivated" Width="70" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Deactive" Width="35" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ResellerAccess" Width="35" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="CompanyType" Width="80" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="AllowMinusDebetCredit" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="AutoSettlement" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="RestateCostPerLocation" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Checkean" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="OrderLineStorage" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="OrderLineOne" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="OrderLineEditDelivered" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PurchaseLineStorage" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PurchaseLineOne" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PurchaseLineEditDelivered" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="InvoiceAccountOnInvTrans" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="OnHandScreenInOrder" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="UpdateCostOnPurchase" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="AllowNegativStocks" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="BlockSendEmail" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="InvoiceUseQtyNow" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="InvoiceShowEmptyLines" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="UseActualCostPrice" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="UseQtyInLedger" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="UseVatOperation" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="TransCount" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="UseUnrealizedVat" Visible="False"/>
+                </local:UserCompaniesGridClient.Columns>
+            </local:UserCompaniesGridClient>
+        </CorasauControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>
