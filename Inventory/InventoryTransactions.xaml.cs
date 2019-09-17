@@ -418,6 +418,33 @@ namespace UnicontaClient.Pages.CustomPage
                 UtilDisplay.ShowErrorCode(res);
         }
 
+        protected override void LoadCacheInBackGround()
+        {
+            var Comp = api.CompanyEntity;
+
+            var lst = new List<Type>(12) { typeof(Uniconta.DataModel.InvItem), typeof(Uniconta.DataModel.GLVat), typeof(Uniconta.DataModel.Employee) };
+            if (Comp.ItemVariants)
+            {
+                lst.Add(typeof(Uniconta.DataModel.InvVariant1));
+                lst.Add(typeof(Uniconta.DataModel.InvVariant2));
+                var n = Comp.NumberOfVariants;
+                if (n >= 3)
+                    lst.Add(typeof(Uniconta.DataModel.InvVariant3));
+                if (n >= 4)
+                    lst.Add(typeof(Uniconta.DataModel.InvVariant4));
+                if (n >= 5)
+                    lst.Add(typeof(Uniconta.DataModel.InvVariant5));
+            }
+            if (Comp.Warehouse)
+                lst.Add(typeof(Uniconta.DataModel.InvWarehouse));
+            if (Comp.Shipments)
+            {
+                lst.Add(typeof(Uniconta.DataModel.ShipmentType));
+                lst.Add(typeof(Uniconta.DataModel.DeliveryTerm));
+            }
+
+            LoadType(lst);
+        }
 
         protected override LookUpTable HandleLookupOnLocalPage(LookUpTable lookup, CorasauDataGrid dg)
         {

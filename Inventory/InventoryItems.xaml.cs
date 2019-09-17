@@ -22,6 +22,7 @@ using Uniconta.ClientTools.Controls;
 using System.Collections;
 using Uniconta.API.Service;
 using Uniconta.DataModel;
+using DevExpress.Xpf.Grid;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -67,9 +68,21 @@ namespace UnicontaClient.Pages.CustomPage
             this.PreviewKeyDown += RootVisual_KeyDown;
 #endif
             this.BeforeClose += DebtorAccount_BeforeClose;
+            LoadNow(typeof(InvGroup));
+            dgInventoryItemsGrid.tableView.ShownEditor += TableView_ShownEditor;
         }
 
-        private void RootVisual_KeyDown(object sender, KeyEventArgs e)
+        private void TableView_ShownEditor(object sender, DevExpress.Xpf.Grid.EditorEventArgs e)
+        {
+            var view = (TableView)sender;
+            if (e.Column.Name == "Warehouse")
+            {
+                var editor = (LookupEditor)view.ActiveEditor;
+                editor.GetGridControl().FilterString = "[Name]='123'";
+            }
+        }
+
+            private void RootVisual_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.F8 && Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
                 localMenu_OnItemClicked("InvTrans");
@@ -258,7 +271,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "InvTrans":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.InventoryTransactions, dgInventoryItemsGrid.syncEntity);
+                        AddDockItem(TabControls.InventoryTransactions, dgInventoryItemsGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("InvTransactions"), selectedItem._Name));
                     break;
                 case "Statistics":
                     if (selectedItem != null)
@@ -266,7 +279,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "InvBOMPartOfContains":
                     if (selectedItem != null && selectedItem._ItemType >= (byte)Uniconta.DataModel.ItemType.BOM)
-                        AddDockItem(TabControls.PartInvItemsPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("BOM"), selectedItem._Item));
+                        AddDockItem(TabControls.PartInvItemsPage, dgInventoryItemsGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("BOM"), selectedItem._Item));
                     break;
                 case "InvBOMPartOfWhereUsed":
                     if (selectedItem != null)

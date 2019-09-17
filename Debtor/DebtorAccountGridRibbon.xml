@@ -2,25 +2,25 @@
 <root>
   <RibbonItem TabId="0" LocalizedNameKey="Home">
     <!---When we create a new group and a new TabPage -->
-   <RibbonItem Action="AddRow" LocalizedNameKey="Add"  Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png">
-      <RibbonItem Action="AddRow" LocalizedNameKey="Add"  Glyph="Add_16x16.png" LargeShortcutKey="CTRL+N"/>
+   <RibbonItem Action="AddRow" LocalizedNameKey="Add"  Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png" ControlName="DebtorAccountPage2">
+      <RibbonItem Action="AddRow" LocalizedNameKey="Add"  Glyph="Add_16x16.png" LargeShortcutKey="CTRL+N" ControlName="DebtorAccountPage2"/>
       <RibbonItem Action="CopyRecord" LocalizedNameKey="Copy"   Glyph="Copy_16x16.png" LargeShortcutKey="Shift+F2"/>
     </RibbonItem>
     <RibbonItem Action="EditRow" ShortcutKey="Ctrl+E" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>
     <RibbonItem Action="DetailView" LocalizedNameKey="DetailView" Glyph="Detailed_View_32x32.png" LargeGlyph="Detailed_View_32x32.png"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh.png" LargeGlyph="refresh.png"/>
+    <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+ALT+R" LocalizedNameKey="Refresh" Glyph="refresh.png" LargeGlyph="refresh.png"/>
     <RibbonItem Action="Filter" ShortcutKey="Ctrl+I" LocalizedNameKey="Filter" LargeGlyph="Filter_32x32.png"/>
   </RibbonItem>
   <RibbonItem>
     <!---If we want to create a new group in same PageTab-->
      <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32.png">
       <!---If we want Inner menu-->
-      <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
+      <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey="" ControlName="DebtorAccountPage2"/>
       <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16.png" ShortcutKey="" />
       <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveOBJ" Parameter="Layout" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
-      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="SwitchToDefault" Glyph="Delete_16x16.png" ShortcutKey=""/>
+      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16.png" ShortcutKey=""/>
       <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16.png" ShortcutKey="Ctrl+U"/>
       <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportOBJ"  Parameter="Layout" EnableSeperator="True" Glyph="ExportLayout_16x16.png" LargeGlyph="ExportLayout_16x16.png" ShortcutKey=""/>
       <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportOBJ" Parameter="Layout" Glyph="Import_16x16.png" LargeGlyph="Import_16x16.png" ShortcutKey=""/>
@@ -55,6 +55,7 @@
     </RibbonItem>
     <RibbonItem Action="Offers" LocalizedNameKey="Offers" LargeGlyph="Offer_32x32.png">
     </RibbonItem>
+    <RibbonItem Action="Project" LocalizedNameKey="Project" Module="Project" LargeGlyph="Folder_32x32.png"/>
     <RibbonItem Action="Invoice" LocalizedNameKey="Invoices" LargeGlyph="Invoice_32x32.png">
          <RibbonItem Action="Invoices" LocalizedNameKey="Invoices" Glyph="AccountInvoice_16x16.png" />
          <RibbonItem Action="QuickInvoice" LocalizedNameKey="CreateOBJ" Parameter="Invoice" Glyph="Invoice_16x16.png" />
@@ -67,7 +68,7 @@
     </RibbonItem>
   </RibbonItem>
   <RibbonItem TabId="1" LocalizedNameKey="EditAll">
-    <RibbonItem Action="EditAll"  LocalizedNameKey="EditAll" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>
+    <RibbonItem Action="EditAll"  LocalizedNameKey="EditAll" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ControlName="DebtorAccountPage2"/>
     <RibbonItem Action="AddLine"  LocalizedNameKey="AddOBJ" Parameter="Debtor" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png"/>
     <RibbonItem Action="CopyRow" LocalizedNameKey="CopyOBJ" Parameter="Debtor" LargeGlyph="Copy_32x32.png"/>
     <RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="DeleteOBJ" Parameter="Debtor" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png"/>

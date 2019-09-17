@@ -2,7 +2,7 @@
 <root>
   <RibbonItem TabId="0" LocalizedNameKey="Home">
     <!---When we create a new group and a new TabPage -->
-    <RibbonItem Action="AddRow" LocalizedNameKey="AddOBJ"  Parameter="BudgetModel" ShortcutKey="CTRL+N" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png"/>
+    <RibbonItem Action="AddRow" LocalizedNameKey="AddOBJ"  Parameter="BudgetModel" ControlName="GLBudgetPage2" ShortcutKey="CTRL+N" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png"/>
     <RibbonItem Action="EditRow" ShortcutKey="CTRL+E" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>
     <RibbonItem Action="CopyRow" LocalizedNameKey="CopyBudgetWithLines" LargeGlyph="Copy_32x32.png"/>
     <RibbonItem Action="SaveGrid" ShortcutKey="CTRL+S" LocalizedNameKey="Save" Glyph="save-16x16.png" LargeGlyph="save-32x32.png"/>
@@ -14,7 +14,7 @@
       <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
       <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16.png" ShortcutKey="" />
       <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveOBJ" Parameter="Layout" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
-      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="SwitchToDefault" Glyph="Delete_16x16.png" ShortcutKey=""/>
+      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16.png" ShortcutKey=""/>
       <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16.png" ShortcutKey="CTRL+U"/>
       <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportOBJ"  Parameter="Layout" EnableSeperator="True" Glyph="ExportLayout_16x16.png" LargeGlyph="ExportLayout_16x16.png" ShortcutKey=""/>
       <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportOBJ" Parameter="Layout" Glyph="Import_16x16.png" LargeGlyph="Import_16x16.png" ShortcutKey=""/>
@@ -24,7 +24,7 @@
   <RibbonItem>
     <RibbonItem Action="BudgetLines" LocalizedNameKey="BudgetLines" Glyph="Cover_16x16.png" LargeGlyph="Journal_Lines_Highlighted_32x32.png" ShortcutKey="ALT+L">
     </RibbonItem>
-      <RibbonItem Action="IncludeSubModels" LocalizedNameKey="IncludeSubModels" Glyph="Cover_16x16.png" LargeGlyph="Journal_Lines_Highlighted_32x32.png">
+      <RibbonItem Action="IncludeSubModels" LocalizedNameKey="IncludeSubModels" ControlName="GLBudgetBudgetPage" Glyph="Cover_16x16.png" LargeGlyph="Journal_Lines_Highlighted_32x32.png">
     </RibbonItem>
   </RibbonItem>
   

@@ -32,7 +32,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override IList ToList(UnicontaBaseEntity[] Arr)
         {
-            var lstInvStandardVariantCombiClient = ((GLBudgetBudgetClient[])Arr).ToList();
+            var lstInvStandardVariantCombiClient = new List<GLBudgetBudgetClient>((GLBudgetBudgetClient[])Arr);
             foreach (GLBudgetBudgetClient objBudgetClient in lstInvStandardVariantCombiClient)
             {
                 objBudgetClient.IsEditable = false;

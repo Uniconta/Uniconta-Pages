@@ -33,6 +33,8 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectTaskGridPage"
                             </DataTemplate>
                         </local:CorasauDataGridForeignKeyColumnClient.CellTemplate>
                     </local:CorasauDataGridForeignKeyColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Employee" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="EmployeeName" Visible="False"/>
                 </local:ProjectTaskGridClient.Columns>
             </local:ProjectTaskGridClient>
         </CorasauControls:BusyIndicator>

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.Common;
 using Uniconta.DataModel;
+using UnicontaClient.Pages.Creditor.Payments;
 
 namespace UnicontaISO20022CreditTransfer
 {
@@ -71,6 +72,14 @@ namespace UnicontaISO20022CreditTransfer
             return BaseDocument.CCYDKK;
         }
 
+        /// <summary>
+        /// Allowed characters
+        /// </summary>
+        public override string AllowedCharactersRegEx()
+        {
+            allowedCharactersRegEx = "[^a-zA-Z0-9æøåÆØÅ &-?:().,'+/]";
+            return allowedCharactersRegEx;
+        }
 
         /// <summary>
         /// Identifies whether a single entry per individual transaction or a batch entry for the sum of the amounts of all transactions 
@@ -378,71 +387,15 @@ namespace UnicontaISO20022CreditTransfer
                     }
             }
         }
-
-
-        //TODO:Indsættes ifm. BankConnect
-        ///// <summary>
-        ///// Nordea: Reference quoted on statement. This reference will be presented on Creditor’s account statement. It may only be used for domestic payments. Only used by Norway, Denmark and Sweden.
-        ///// Max 20 characters
-        ///// </summary>
-        //public override string RemittanceInfo(string externalAdvText, ISO20022PaymentTypes ISOPaymType, PaymentTypes paymentMethod)
-        //{
-        //    string remittanceInfo = externalAdvText;
-
-        //    if (remittanceInfo != string.Empty && ISOPaymType == ISO20022PaymentTypes.DOMESTIC)
-        //    {
-        //        switch (paymentMethod)
-        //        {
-        //            case PaymentTypes.VendorBankAccount:
-        //                if (companyBankEnum == CompanyBankENUM.BankConnect)
-        //                {
-        //                    if (remittanceInfo.Length > 35)
-        //                        remittanceInfo = remittanceInfo.Substring(0, 35);
-        //                }
-        //                else
-        //                {
-        //                    if (remittanceInfo.Length > 20)
-        //                        remittanceInfo = remittanceInfo.Substring(0, 20);
-        //                }
-        //                break;
-
-        //            case PaymentTypes.IBAN:
-        //                remittanceInfo = string.Empty;
-        //                break;
-
-        //            case PaymentTypes.PaymentMethod3: //FIK71
-        //                remittanceInfo = string.Empty;
-        //                break;
-
-        //            case PaymentTypes.PaymentMethod5: //FIK75
-        //                remittanceInfo = string.Empty;
-        //                break;
-
-        //            case PaymentTypes.PaymentMethod4: //FIK73
-        //                remittanceInfo = string.Empty;
-        //                break;
-
-        //            case PaymentTypes.PaymentMethod6: //FIK04
-        //                remittanceInfo = string.Empty;
-        //                break;
-        //        }
-        //    }
-        //    else
-        //    {
-        //        remittanceInfo = string.Empty;
-        //    }
-
-        //    return remittanceInfo;
-        //}
-
+        
 
         /// <summary>
         /// Unstructured Remittance Information
         /// </summary>
         public override List<string> Ustrd(string externalAdvText, ISO20022PaymentTypes ISOPaymType, PaymentTypes paymentMethod)
          {
-            var ustrdText = externalAdvText;
-
+            var ustrdText = StandardPaymentFunctions.RegularExpressionReplace(externalAdvText, allowedCharactersRegEx, replaceCharactersRegEx);
+            
             int maxLines = 0;
             int maxStrLen = 0;
             List<string> resultList = new List<string>();

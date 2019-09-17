@@ -14,6 +14,7 @@ namespace UnicontaISO20022CreditTransfer
         private readonly DateTime requestedExecutionDate;
         private readonly bool pmtInfCtrlSumActive;
         private readonly bool pmtInfNumberOfTransActive;
+        private readonly string chargeBearer;
 
         private readonly Dbtr dbtr;
         private readonly DbtrAcct dbtrAcct;
@@ -28,6 +29,8 @@ namespace UnicontaISO20022CreditTransfer
         private const string BTCHBOOKG = "BtchBookg";
         private const string CTRLSUM = "CtrlSum";
         private const string NBOFTXS = "NbOfTxs";
+        private const string CHRGBR = "ChrgBr";
+
 
         #region Properties
         /// <summary>
@@ -129,7 +132,7 @@ namespace UnicontaISO20022CreditTransfer
         /// <param name="dbtrAcct">Debtor Account</param>
         /// <param name="dbtrAgt">Debtor Agent</param>
 
-        public PmtInf(CreditTransferDocument doc, PmtTpInf pmtTpInf, Dbtr dbtr, DbtrAcct dbtrAcct, DbtrAgt dbtrAgt)
+        public PmtInf(CreditTransferDocument doc, PmtTpInf pmtTpInf, Dbtr dbtr, DbtrAcct dbtrAcct, DbtrAgt dbtrAgt, string chargeBearer)
         {
             paymentInfoId = doc.PaymentInfoId;
             paymentMethod = doc.PaymentMethod;
@@ -141,6 +144,7 @@ namespace UnicontaISO20022CreditTransfer
             this.dbtr = dbtr;
             this.dbtrAcct = dbtrAcct;
             this.dbtrAgt = dbtrAgt;
+            this.chargeBearer = chargeBearer;
         }
 
 
@@ -172,7 +176,10 @@ namespace UnicontaISO20022CreditTransfer
             dbtr.Append(baseDoc, doc, pmtInf);
             dbtrAcct.Append(baseDoc, doc, pmtInf);
             dbtrAgt.Append(baseDoc, doc, pmtInf);
-            
+
+            if (chargeBearer != string.Empty)
+                baseDoc.AppendElement(doc, pmtInf, CHRGBR, chargeBearer);
+
             foreach (CdtTrfTxInf cdtTrfTxInf in cdtTrfTxInfList.Where(s => s.PaymentInfoIdReference == PaymentInfoId))
             {
                 cdtTrfTxInf.Append(baseDoc, doc, pmtInf);

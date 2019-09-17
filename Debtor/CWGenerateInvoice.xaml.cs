@@ -90,7 +90,7 @@ namespace UnicontaClient.Pages.CustomPage
                 this.IsSimulation = false;
                 RowChk.Height = new GridLength(0);
                 if (!string.IsNullOrEmpty(title))
-                    this.Title = title;
+                    this.Title = Uniconta.ClientTools.Localization.lookup(title);
             }
             if (!showInputforInvNumber)
             {
@@ -131,6 +131,12 @@ namespace UnicontaClient.Pages.CustomPage
                 txtInvNumber.Text = string.Empty;
             }
 
+            //Code added to set the correct label for purchase invoice or Purchase pack note
+            CompanyLayoutType layoutType;
+            if (Enum.TryParse(title, out layoutType) && layoutType == CompanyLayoutType.PurchasePacknote)
+                txtInvNumberLabel.Text = Uniconta.ClientTools.Localization.lookup("PackNoteNumber");
+            else
+                txtInvNumberLabel.Text = Uniconta.ClientTools.Localization.lookup("InvoiceNumber");
             txtInvNumber.MaxLength = 17;
             chkShowInvoice.IsChecked = showInvoice;
 #if SILVERLIGHT

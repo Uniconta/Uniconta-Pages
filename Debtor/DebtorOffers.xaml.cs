@@ -131,7 +131,9 @@ namespace UnicontaClient.Pages.CustomPage
         protected override void LoadCacheInBackGround()
         {
             var Comp = api.CompanyEntity;
-            var lst = new List<Type>() { typeof(Uniconta.DataModel.InvItem), typeof(Uniconta.DataModel.Employee) };
+            var lst = new List<Type>(12) { typeof(Uniconta.DataModel.InvItem), typeof(Uniconta.DataModel.Employee) };
+            if (Comp.Contacts)
+                lst.Add(typeof(Uniconta.DataModel.Contact));
             if (Comp.InvPrice)
                 lst.Add(typeof(Uniconta.DataModel.DebtorPriceList));
             if (Comp.ItemVariants)
@@ -362,7 +364,7 @@ namespace UnicontaClient.Pages.CustomPage
                 showSendByMail = true;
             }
 
-            CWGenerateInvoice GenrateOfferDialog = new CWGenerateInvoice(false, Uniconta.ClientTools.Localization.lookup("Offer"), askForEmail: true, showNoEmailMsg: !showSendByMail, debtorName: debtorName, isDebtorOrder: true);
+            CWGenerateInvoice GenrateOfferDialog = new CWGenerateInvoice(false, CompanyLayoutType.Offer.ToString(), askForEmail: true, showNoEmailMsg: !showSendByMail, debtorName: debtorName, isDebtorOrder: true);
 #if !SILVERLIGHT
             GenrateOfferDialog.DialogTableId = 2000000006;
 #endif

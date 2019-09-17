@@ -58,6 +58,7 @@ namespace UnicontaClient.Pages.CustomPage
         public SettleOpenTransactionPage(UnicontaBaseEntity baseEntity, byte openTransType, UnicontaBaseEntity selectedjournalLine, bool offSet, IEnumerable<string> markedList) : base(null)
         {
             InitializeComponent();
+            this.DataContext = this;
             this.OffSet = offSet;
             this.OpenTransactionType = openTransType;
             InitializePage(baseEntity, openTransType);

@@ -5,11 +5,16 @@ x:Class="UnicontaClient.Pages.CustomPage.TMJournalLinePage"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-         xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage" 
+        xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+        xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage" 
         xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid" 
+        xmlns:dxcn="http://schemas.devexpress.com/winfx/2008/xaml/core/internal"
         xmlns:docking="http://schemas.devexpress.com/winfx/2008/xaml/docking"
         xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
         xmlns:globalization="clr-namespace:System.Globalization;assembly=mscorlib"
+        xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+        xmlns:utilityfunction="clr-namespace:UnicontaClient.Utilities"
+        xmlns:dxednc="http://schemas.devexpress.com/winfx/2008/xaml/editors/internal"
         xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
     <UserControl.Resources>
         <Util:IntToVisibilityConverter x:Key="IntToVisibilityConverter" />
@@ -27,6 +32,49 @@ x:Class="UnicontaClient.Pages.CustomPage.TMJournalLinePage"
                     <Setter Property="Background" Value="LightBlue" />
                 </DataTrigger>
             </Style.Triggers>
+        </Style>
+        <Style TargetType="{x:Type dxe:DateEdit}"
+               x:Key="CustomColorDateEdit">
+            <Style.Resources>
+                <utilityfunction:DateEditColorConverter x:Key="DateEditColorConverter" />
+                <Style TargetType="{x:Type dxednc:DateNavigatorCalendarCellButton}">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="{x:Type Button}">
+                                <Grid x:Name="GridContent" Background="Transparent">
+                                    <VisualStateManager.VisualStateGroups>
+                                        <VisualStateGroup x:Name="CellStatesToday">
+                                            <VisualState x:Name="CellStateToday">
+                                                <Storyboard>
+                                                    <ObjectAnimationUsingKeyFrames dxcn:ValueSetter.Visibility="Visible" Storyboard.TargetName="BorderToday" Storyboard.TargetProperty="Visibility" />
+                                                    <ColorAnimation Duration="0" Storyboard.TargetName="Content" Storyboard.TargetProperty="ForegroundSolidColor4" To="#FFFFFFFF" />
+                                                </Storyboard>
+                                            </VisualState>
+                                            <VisualState x:Name="CellStateNotToday" />
+                                        </VisualStateGroup>
+                                    </VisualStateManager.VisualStateGroups>
+                                    <Border x:Name="MyBorderSpecial" CornerRadius="2">
+                                        <Border.Background>
+                                            <MultiBinding Converter="{StaticResource DateEditColorConverter}">
+                                                <Binding RelativeSource="{RelativeSource AncestorType=dxednc:DateNavigatorCalendarCellButton}" Path="(dxednc:DateNavigatorCalendar.DateTime)"/>
+                                                <Binding RelativeSource="{RelativeSource Self}" Path="(dxe:BaseEdit.OwnerEdit).MySpecialDates"/>
+                                            </MultiBinding>
+                                        </Border.Background>
+                                    </Border>
+                                    <Border x:Name="BorderToday" CornerRadius="2" Background="#FFFAD900" Visibility="Collapsed" />
+                                    <dx:ContentContainer x:Name="Content" Content="{TemplateBinding Content}" Foreground="#FF444444" HorizontalAlignment="Center" Margin="1,0,1,1" VerticalAlignment="Center" />
+                                </Grid>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="dx:ThemeManager.IsTouchEnabled" Value="True">
+                                        <Setter Property="MinWidth" TargetName="GridContent" Value="44" />
+                                        <Setter Property="MinHeight" TargetName="GridContent" Value="44" />
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </Style.Resources>
         </Style>
     </UserControl.Resources>
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
@@ -48,7 +96,7 @@ x:Class="UnicontaClient.Pages.CustomPage.TMJournalLinePage"
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=StartDate}" Grid.Column="0"  Margin="3,3,3,3"/>
-            <CorasauControls:DateEditor  PopupClosed="txtDateTo_PopupClosed" x:Name="txtDateTo" Grid.Column="2"  Margin="0,3,3,3"/>
+            <CorasauControls:DateEditorEx Style="{StaticResource CustomColorDateEdit}" PopupClosed="txtDateTo_PopupClosed" x:Name="txtDateTo" Grid.Column="2"  Margin="0,3,3,3"/>
             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=RegistrationType}" Visibility="Collapsed"  Grid.Column="4"  Margin="3,3,3,3"/>
             <CorasauControls:ComboBoxEditor x:Name="cmbRegistration" Visibility="Collapsed" IsReadOnly="True" IsEnabled="False"  Grid.Column="6"  Margin="0,3,3,3" />
         </Grid>
@@ -59,7 +107,7 @@ x:Class="UnicontaClient.Pages.CustomPage.TMJournalLinePage"
                     <docking:LayoutPanel x:Name="layOutDebtorOrderLine" FloatOnDoubleClick="False" AllowDrag="False" AllowDock="False" AllowClose="False" AllowContextMenu="False" AllowMaximize="False" AllowDockToDocumentGroup="False" ShowCloseButton="False"  ShowPinButton="False">
                         <localPage:TMJournalLinePageGrid  x:Name="dgTMJournalLineGrid" AutoGenerateColumns="None" HorizontalAlignment="Stretch">
                             <localPage:TMJournalLinePageGrid.Columns>
-                                <localPage:CorasauDataGridForeignKeyColumnClient x:Name="Project">
+                                <localPage:CorasauDataGridForeignKeyColumnClient x:Name="Project" Width="90">
                                     <localPage:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
                                         <ControlTemplate>
                                             <TextBlock Margin="2" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.Project,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"></TextBlock>
@@ -72,7 +120,7 @@ x:Class="UnicontaClient.Pages.CustomPage.TMJournalLinePage"
                                     </localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridForeignKeyColumnClient>
                                 <localPage:CorasauDataGridTemplateColumnClient FieldName="ProjectName" x:Name="colProjectName" ReadOnly="True" Width="150" />
-                                <localPage:CorasauDataGridForeignKeyColumnClient x:Name="PayrollCategory">
+                                <localPage:CorasauDataGridForeignKeyColumnClient x:Name="PayrollCategory" Width="90">
                                     <localPage:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
                                         <ControlTemplate>
                                             <TextBlock Margin="2" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.PayrollCategory,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"></TextBlock>
@@ -85,7 +133,7 @@ x:Class="UnicontaClient.Pages.CustomPage.TMJournalLinePage"
                                     </localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridForeignKeyColumnClient>
                                 <localPage:CorasauDataGridTemplateColumnClient FieldName="PayrollCategoryName"  x:Name="colPayrolCatName" ReadOnly="True" Width="150"/>
-                                <localPage:CorasauDataGridForeignKeyColumnClient x:Name="Task" Visible="False">
+                                <localPage:CorasauDataGridForeignKeyColumnClient x:Name="Task" Width="90" Visible="False">
                                     <localPage:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
                                         <ControlTemplate>
                                             <TextBlock Margin="2" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.Task,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"></TextBlock>
@@ -240,10 +288,10 @@ x:Class="UnicontaClient.Pages.CustomPage.TMJournalLinePage"
                                         </DataTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridTemplateColumnClient>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="CopyLine" Visible="True" AllowEditing="True"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="ErrorInfo" Visible="False" AllowEditing="False"/>
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="InternalType" SortOrder="Ascending" Visible="False" AllowEditing="False"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="InternalType" Visible="False" AllowEditing="False"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="JournalPostedId" Visible="False" AllowEditing="False"/>
-
                             </localPage:TMJournalLinePageGrid.Columns>
                             <localPage:TMJournalLinePageGrid.TotalSummary >
                                 <localPage:SumColumn SerializableTag="Sum"  FieldName="Project" SummaryType="Custom" />

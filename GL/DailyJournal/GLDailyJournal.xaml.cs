@@ -91,7 +91,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override void LoadCacheInBackGround()
         {
-            var lst = new List<Type>() { typeof(Uniconta.DataModel.GLAccount), typeof(Uniconta.DataModel.GLVat), typeof(Uniconta.DataModel.Debtor), typeof(Uniconta.DataModel.Creditor) };
+            var lst = new List<Type>(12) { typeof(Uniconta.DataModel.GLAccount), typeof(Uniconta.DataModel.GLVat), typeof(Uniconta.DataModel.Debtor), typeof(Uniconta.DataModel.Creditor), typeof(Uniconta.DataModel.PaymentTerm), typeof(Uniconta.DataModel.GLTransType), typeof(Uniconta.DataModel.NumberSerie) };
             var noofDimensions = api.CompanyEntity.NumberOfDimensions;
             if (noofDimensions >= 1)
                 lst.Add(typeof(Uniconta.DataModel.GLDimType1));
@@ -103,8 +103,7 @@ namespace UnicontaClient.Pages.CustomPage
                 lst.Add(typeof(Uniconta.DataModel.GLDimType4));
             if (noofDimensions >= 5)
                 lst.Add(typeof(Uniconta.DataModel.GLDimType5));
-
-            LoadType(lst.ToArray());
+            LoadType(lst);
         }
         public override void Utility_Refresh(string screenName, object argument = null)
         {

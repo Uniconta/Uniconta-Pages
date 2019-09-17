@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.Common;
 using Uniconta.DataModel;
+using System.Text.RegularExpressions;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
@@ -92,19 +93,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
                 return false;
             }
         }
-
-
-        public static string MessageFormat(string messageFormat, CreditorTransPayment rec, Company company, Uniconta.DataModel.Creditor creditor)
-        {
-            if (messageFormat == null || rec._Message != null)
-                return rec._Message;
-
-            var format = messageFormat.Replace("%1", "{0}").Replace("%2", "{1}").Replace("%3", "{2}").Replace("%4", "{3}");
-            var text = string.Format(format, rec.Invoice == 0 ? string.Empty : rec.Invoice.ToString(), company.Name, rec.CashDiscount, creditor._OurAccount);
-
-            return text;
-        }
-
+            
         private static Tuple<string, string, string> MessageLabel(CountryCode country)
         {
             string label_Acc, label_Inv, label_Ref;
@@ -165,7 +154,8 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
             return advText;
         }
 
-        public static string ExternalMessage(string messageFormat, CreditorTransPayment rec, Company company, Uniconta.DataModel.Creditor creditor)
+      
+        public static string ExternalMessage(string messageFormat, CreditorTransPayment rec, Company company, Uniconta.DataModel.Creditor creditor, bool UIMessage = false)
         {
             StringBuilder sbAdvText = new StringBuilder();
 
@@ -173,24 +163,52 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
             var country = company._CountryId;
             var tuple = MessageLabel(country);
 
-            if (rec.invoiceNumbers != null) //Merged payments
+            if (UIMessage == false && rec.invoiceNumbers != null) //Merged payments
             {
+                var invNumbers = rec.invoiceNumbers.ToString();
+                var invNumbersCheck = Regex.Replace(invNumbers, "[^1-9]", "");
+
                 sbAdvText = BuildBankAdviceText(sbAdvText, creditor?._OurAccount, tuple.Item1);
-                sbAdvText = BuildBankAdviceText(sbAdvText, rec.invoiceNumbers.ToString(), tuple.Item2);
+                sbAdvText = BuildBankAdviceText(sbAdvText, invNumbersCheck == string.Empty ? invNumbersCheck : invNumbers, tuple.Item2);
+                if (sbAdvText.Length == 0)
+                    sbAdvText.Append(company.Name);
                 advText = sbAdvText.ToString();
             }
             else
             {
-                if (rec._Message != null && rec._Message != string.Empty)
+                if (!string.IsNullOrEmpty(rec._Message))
+                    return rec._Message;
+            
+                if (messageFormat != null)
                 {
-                    advText = rec._Message;
+                    var parmCode = "%1";
+                    if (messageFormat.IndexOf(parmCode) != -1 && rec.Invoice == 0)
+                        messageFormat = MessageFormatRemove(messageFormat, parmCode);
+
+                    parmCode = "%2";
+                    if (messageFormat.IndexOf(parmCode) != -1 && company.Name == null)
+                        messageFormat = MessageFormatRemove(messageFormat, parmCode);
+
+                    parmCode = "%3";
+                    if (messageFormat.IndexOf(parmCode) != -1 && rec.CashDiscount == 0)
+                        messageFormat = MessageFormatRemove(messageFormat, parmCode);
+
+                    parmCode = "%4";
+                    if (messageFormat.IndexOf(parmCode) != -1 && creditor._OurAccount == null)
+                        messageFormat = MessageFormatRemove(messageFormat, parmCode);
+
+                    parmCode = "%5";
+                    if (messageFormat.IndexOf(parmCode) != -1 && rec.TransType == null)
+                        messageFormat = MessageFormatRemove(messageFormat, parmCode);
+
+                    advText = string.Format(messageFormat.Replace("%1", "{0}").Replace("%2", "{1}").Replace("%3", "{2}").Replace("%4", "{3}").Replace("%5", "{4}"),
+                                             rec.Invoice.ToString(),
+                                             company.Name,
+                                             rec.CashDiscount,
+                                             creditor._OurAccount,
+                                             rec.TransType);
                 }
-                else if (messageFormat != null)
-                { 
-                    var format = messageFormat.Replace("%1", "{0}").Replace("%2", "{1}").Replace("%3", "{2}").Replace("%4", "{3}");
-                    advText = string.Format(format, rec.Invoice == 0 ? string.Empty : rec.Invoice.ToString(), company.Name, rec.CashDiscount, creditor?._OurAccount);
-                }
-                else //Default message
+                else if (UIMessage == false) //Default message
                 {
                     sbAdvText = BuildBankAdviceText(sbAdvText, creditor?._OurAccount, tuple.Item1);
                     sbAdvText = BuildBankAdviceText(sbAdvText, rec.Invoice == 0 ? string.Empty : rec.Invoice.ToString(), tuple.Item2);
@@ -200,6 +218,32 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
             }
 
             return advText;
+        }
+
+        private static string MessageFormatRemove(string msgFormat, string parmValue)
+        {
+            int msgFormatLen = msgFormat.Length;
+            int parmValLen = parmValue.Length;
+            int fromPos = msgFormat.IndexOf(parmValue);
+
+            int pos = 0;
+            for (int i = fromPos - 1; i >= 0; i--)
+            {
+                if (msgFormat[i] == '%')
+                {
+                    int cnt = 0;
+                    while (msgFormatLen > i + cnt)
+                    {
+                        cnt++;
+                        if (!char.IsDigit(msgFormat[i + cnt]))
+                            break;
+                    }
+                    pos = i + cnt;
+                    break;
+                }
+            }
+
+            return msgFormat.Remove(pos, fromPos + parmValLen - pos).Trim();
         }
 
         private static StringBuilder BuildBankAdviceText(StringBuilder advText, string inputValue, string prefix = null)
@@ -215,6 +259,24 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
             }
 
             return advText;
+        }
+
+        public static string RegularExpressionReplace(string text, string pattern, Dictionary<string, string> replaceDict = null)
+        {
+            if (text == null)
+                return null;
+
+            var result = text;
+            if (replaceDict != null)
+            {
+                var patternDict = $"(?<placeholder>{string.Join("|", replaceDict.Keys)})";
+                result = Regex.Replace(result, patternDict, m => replaceDict[m.Groups["placeholder"].Value], RegexOptions.ExplicitCapture);
+            }
+
+            var regex = new Regex(pattern);
+            result = regex.Replace(result, "");
+
+            return result;
         }
     }
 }

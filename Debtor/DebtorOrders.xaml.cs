@@ -32,6 +32,7 @@ using DevExpress.Data;
 using UnicontaClient.Pages;
 using FromXSDFile.OIOUBL.ExportImport;
 using ubl_norway_uniconta;
+using UBL.Iceland;
 using Microsoft.Win32;
 #endif
 using UnicontaClient.Pages;
@@ -462,7 +463,7 @@ namespace UnicontaClient.Pages.CustomPage
                 showSendByMail = !string.IsNullOrEmpty(debtor.InvoiceEmail);
             string debtorName = debtor?._Name ?? dbOrder._DCAccount;
             bool showUpdateInv = api.CompanyEntity.Storage || (doctype == CompanyLayoutType.Packnote && api.CompanyEntity.Packnote);
-            CWGenerateInvoice GenrateOfferDialog = new CWGenerateInvoice(false, Uniconta.ClientTools.Localization.lookup(doctype.ToString()), isShowInvoiceVisible: true, askForEmail: true, showNoEmailMsg: !showSendByMail, debtorName: debtorName, isShowUpdateInv: showUpdateInv, isDebtorOrder: true);
+            CWGenerateInvoice GenrateOfferDialog = new CWGenerateInvoice(false, doctype.ToString(), isShowInvoiceVisible: true, askForEmail: true, showNoEmailMsg: !showSendByMail, debtorName: debtorName, isShowUpdateInv: showUpdateInv, isDebtorOrder: true);
 #if !SILVERLIGHT
             if (doctype == CompanyLayoutType.OrderConfirmation)
                 GenrateOfferDialog.DialogTableId = 2000000009;
@@ -531,13 +532,12 @@ namespace UnicontaClient.Pages.CustomPage
 
         static public void SetGLNnumber(DCInvoice InvClient, DCAccount client, QueryAPI api)
         {
-            var Comp = api.CompanyEntity;
-            var installation = (WorkInstallation)Comp.GetCache(typeof(WorkInstallation), api)?.Get(InvClient._Installation);
-            var deliveryAccount = (DCAccount)Comp.GetCache(typeof(Debtor), api)?.Get(InvClient._DeliveryAccount);
-            var debtor = client ?? (DCAccount)Comp.GetCache(typeof(Debtor), api)?.Get(InvClient._DCAccount);
-            var contact = (Contact)Comp.GetCache(typeof(Contact), api)?.Get(InvClient._ContactRef);
+            var installation = (WorkInstallation)api.GetCache(typeof(WorkInstallation))?.Get(InvClient._Installation);
+            var deliveryAccount = (DCAccount)api.GetCache(typeof(Debtor))?.Get(InvClient._DeliveryAccount);
+            var debtor = client ?? (DCAccount)api.GetCache(typeof(Debtor))?.Get(InvClient._DCAccount);
+            var contact = (Contact)api.GetCache(typeof(Contact))?.Get(InvClient._ContactRef);
 
-            InvClient._EAN = installation?._GLN ?? deliveryAccount?._EAN ?? contact?._EAN ?? debtor?._EAN;
+            InvClient._EAN = installation?._GLN ?? contact?._EAN ?? debtor?._EAN ?? deliveryAccount?._EAN;
         }
 
         static public void SetDeliveryAdress(DCInvoice InvClient, DCAccount client, QueryAPI api)
@@ -547,10 +547,9 @@ namespace UnicontaClient.Pages.CustomPage
             if (InvClient._DeliveryAddress1 != null)
                 return;
 
-            var Comp = api.CompanyEntity;
             if (InvClient._Installation != null)
             {
-                var installation = (WorkInstallation)Comp.GetCache(typeof(WorkInstallation), api)?.Get(InvClient._Installation);
+                var installation = (WorkInstallation)api.GetCache(typeof(WorkInstallation))?.Get(InvClient._Installation);
                 if (installation != null)
                 {
                     InvClient._DeliveryName = installation._Name;
@@ -559,7 +558,7 @@ namespace UnicontaClient.Pages.CustomPage
                     InvClient._DeliveryAddress3 = installation._Address3;
                     InvClient._DeliveryZipCode = installation._ZipCode;
                     InvClient._DeliveryCity = installation._City;
-                    if (Comp._Country != (byte)installation._Country)
+                    if (api.CompanyEntity._Country != (byte)installation._Country)
                         InvClient._DeliveryCountry = installation._Country;
                 }
             }
@@ -569,12 +568,12 @@ namespace UnicontaClient.Pages.CustomPage
                 bool UseDebAddress;
                 if (InvClient._DeliveryAccount != null)
                 {
-                    deb = (DCAccount)Comp.GetCache(typeof(Debtor), api)?.Get(InvClient._DeliveryAccount);
+                    deb = (DCAccount)api.GetCache(typeof(Debtor))?.Get(InvClient._DeliveryAccount);
                     UseDebAddress = true;
                 }
                 else
                 {
-                    deb = client ?? (DCAccount)Comp.GetCache(typeof(Debtor), api)?.Get(InvClient._DCAccount);
+                    deb = client ?? (DCAccount)api.GetCache(typeof(Debtor))?.Get(InvClient._DCAccount);
                     UseDebAddress = false;
                 }
                 if (deb != null)
@@ -597,7 +596,7 @@ namespace UnicontaClient.Pages.CustomPage
                         InvClient._DeliveryAddress3 = deb._Address3;
                         InvClient._DeliveryZipCode = deb._ZipCode;
                         InvClient._DeliveryCity = deb._City;
-                        if (Comp._Country != (byte)deb._Country)
+                        if (api.CompanyEntity._Country != (byte)deb._Country)
                             InvClient._DeliveryCountry = deb._Country;
                     }
                 }
@@ -629,7 +628,9 @@ namespace UnicontaClient.Pages.CustomPage
         protected override void LoadCacheInBackGround()
         {
             var Comp = api.CompanyEntity;
-            var lst = new List<Type>() { typeof(Uniconta.DataModel.InvItem), typeof(Uniconta.DataModel.DebtorOrderGroup), typeof(Uniconta.DataModel.Employee) };
+            var lst = new List<Type>(14) { typeof(Uniconta.DataModel.InvItem), typeof(Uniconta.DataModel.DebtorOrderGroup), typeof(Uniconta.DataModel.Employee), typeof(Uniconta.DataModel.GLVat) };
+            if (Comp.Contacts)
+                lst.Add(typeof(Uniconta.DataModel.Contact));
             if (Comp.DeliveryAddress)
                 lst.Add(typeof(Uniconta.DataModel.WorkInstallation));
             if (Comp.InvPrice)
@@ -687,7 +688,7 @@ namespace UnicontaClient.Pages.CustomPage
                 }
             }
             else
-                api.CompanyEntity.LoadCache(typeof(Debtor), api, true);
+                api.LoadCache(typeof(Debtor), true);
 
             string debtorName = debtor?._Name ?? dbOrder._DCAccount;
             bool invoiceInXML = debtor?._InvoiceInXML ?? false;
@@ -783,6 +784,11 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (Comp._CountryId == CountryCode.Norway || Comp._CountryId == CountryCode.Netherlands)
                 result = EHF.GenerateEHFXML(Comp, debtor, deliveryAccount, invClient, invoiceLines, InvCache, VatCache, null, contactPerson);
+            else if (Comp._CountryId == CountryCode.Iceland)
+            {
+                var paymFormatCache = Comp.GetCache(typeof(DebtorPaymentFormatClientIceland)) ?? await Comp.LoadCache(typeof(DebtorPaymentFormatClientIceland), api);
+                result = TS136137.GenerateTS136137XML(Comp, debtor, deliveryAccount, invClient, invoiceLines, InvCache, VatCache, null, contactPerson, paymFormatCache);
+            }
             else
                 result = Uniconta.API.DebtorCreditor.OIOUBL.GenerateOioXML(Comp, debtor, deliveryAccount, invClient, invoiceLines, InvCache, VatCache, null, contactPerson);
 

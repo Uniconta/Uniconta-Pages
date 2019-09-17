@@ -71,7 +71,7 @@ namespace UnicontaClient.Pages.CustomPage
             Curlanguage = editrow._Language;
 
 #if !SILVERLIGHT
-            cbDefaultPrinter.ItemsSource = System.Drawing.Printing.PrinterSettings.InstalledPrinters;
+            cbDefaultPrinter.ItemsSource = UtilDisplay.GetInstalledPrinters();
             RemoveMenu();
 #elif SILVERLIGHT
             if (LoginPage.PCtype != LoginType.MAC_OOB)
@@ -136,6 +136,7 @@ namespace UnicontaClient.Pages.CustomPage
                     user._ColumnFilter = editrow._ColumnFilter;
                     user._AppDocPath = editrow._AppDocPath;
                     user._ShowGridLines = editrow._ShowGridLines;
+                    user._ConfirmDelete = editrow._ConfirmDelete;
                     string msg;
                     if (Curlanguage != editrow._Language)
                         msg = string.Format(Uniconta.ClientTools.Localization.lookup("LanguageApplyMsg"), editrow.UserLanguage);
@@ -209,7 +210,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 }
                             }));
                             File.WriteAllBytes(string.Format("{0}application.xap", path), buffer);
-                            Dispatcher.BeginInvoke(new Action(() => { UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("SlUpdate"), Uniconta.ClientTools.Localization.lookup("Error")); }));
+                            Dispatcher.BeginInvoke(new Action(() => { UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("SlUpdate"), Uniconta.ClientTools.Localization.lookup("Message")); }));
                         }
                         catch (Exception ex)
                         {

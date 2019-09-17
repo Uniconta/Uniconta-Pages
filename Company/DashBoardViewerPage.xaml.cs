@@ -82,12 +82,7 @@ namespace UnicontaClient.Pages.CustomPage
             Initialise();
             isDashBoardLaoded = true;
         }
-
-        private void Timer_Tick(object sender, EventArgs e)
-        {
-            dashboardViewerUniconta.ReloadData();
-        }
-
+      
         private async Task<bool> Initialise()
         {
             busyIndicator.IsBusy = true;
@@ -151,24 +146,6 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                 }
                 cs.Release();
-
-                XDocument xdoc = XDocument.Load(st);
-                var exist = xdoc.Root.Attributes().Where(x => x.Name == "RefreshTimer").FirstOrDefault();
-                if (exist != null)
-                {
-                    var element = xdoc.Root.Attribute("RefreshTimer") as XAttribute;
-                    if (element != null || element.Name == "RefreshTimer")
-                    {
-                        refreshTimer = Convert.ToInt16(element.Value);
-                        if (refreshTimer > 0)
-                        {
-                            System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer();
-                            timer.Interval = refreshTimer * 1000;
-                            timer.Tick += Timer_Tick;
-                            timer.Start();
-                        }
-                    }
-                }
                 st.Seek(0, System.IO.SeekOrigin.Begin);
                 dashboardViewerUniconta.LoadDashboard(st);
                 st.Release();

@@ -79,6 +79,7 @@ namespace UnicontaISO20022CreditTransfer
         protected DateTime requestedExecutionDate;
         protected string extServiceCode;
         protected string externalLocalInstrument;
+        protected string companyName;
         protected string companyBBAN;
         protected string companyIBAN;
         protected string companyCcy;
@@ -115,6 +116,9 @@ namespace UnicontaISO20022CreditTransfer
         protected bool authstnCodeTest;
         protected string creDtTm;
         protected Encoding encodingFormat;
+        protected string allowedCharactersRegEx;
+        protected Dictionary<string, string> replaceCharactersRegExDict;
+        protected string chargeBearer;
 
         protected InitgPty initgPty;
         protected PmtInf pmtInf;
@@ -588,6 +592,23 @@ namespace UnicontaISO20022CreditTransfer
             }
         }
 
+        /// <summary>
+        /// Company name
+        /// </summary>
+        public string CompanyName
+        {
+            get
+            {
+                return companyName;
+            }
+
+            set
+            {
+                companyName = value;
+            }
+        }
+
+
 
         /// <summary>
         /// Unambiguous identification of the BBAN account of the debtor to which a debit entry will be made as a result of the transaction.
@@ -759,7 +780,7 @@ namespace UnicontaISO20022CreditTransfer
         }
 
         /// <summary>
-        /// Exclude section CdtrAgt
+        /// 
         /// </summary>
         public Encoding EncodingFormat
         {
@@ -773,6 +794,56 @@ namespace UnicontaISO20022CreditTransfer
                 encodingFormat = value;
             }
         }
+
+        /// <summary>
+        /// Allowed characters - Regular expression
+        /// </summary>
+        public string AllowedCharactersRegEx
+        {
+            get
+            {
+                return allowedCharactersRegEx;
+            }
+
+            set
+            {
+                allowedCharactersRegEx = value;
+            }
+        }
+
+        /// <summary>
+        /// Allowed characters - Regular expression
+        /// </summary>
+        public Dictionary<string, string> ReplaceCharactersRegExDict
+        {
+            get
+            {
+                return replaceCharactersRegExDict;
+            }
+
+            set
+            {
+                replaceCharactersRegExDict = value;
+            }
+        }
+
+        /// <summary>
+        /// Charge Bearer
+        /// </summary>
+        public string ChargeBearer
+        {
+            get
+            {
+                return chargeBearer;
+            }
+
+            set
+            {
+                chargeBearer = value;
+            }
+        }
+
+
         #endregion
 
         #region Methods

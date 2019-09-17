@@ -10,10 +10,20 @@ x:Class="UnicontaClient.Pages.CustomPage.BalanceReport"
     xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage" 
     xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
     xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
     d:DesignHeight="300" d:DesignWidth="400">
     <UserControl.Resources>
-    
-    </UserControl.Resources>
+        <localPage:AccountTextDecorationTypeConverter x:Key="AccountTextDecorationTypeConverter"></localPage:AccountTextDecorationTypeConverter>
+        <localPage:AccountFontTypeConverter x:Key="AccountFontTypeConverter"></localPage:AccountFontTypeConverter>
+        <Style x:Key="UnderlineTextPrintStyle" TargetType="dxe:TextEdit">
+            <Style.Setters>
+                <Setter Property="TextDecorations" Value="{Binding RowData.Row, Converter={StaticResource AccountTextDecorationTypeConverter}}" />
+                <Setter Property="FontWeight" Value="{Binding RowData.Row, Converter={StaticResource AccountFontTypeConverter}}" />
+                <Setter Property="ShowBorder" Value="True"/>
+                <Setter Property="BorderThickness" Value="1"/>
+            </Style.Setters>
+        </Style>
+       </UserControl.Resources>
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>     
             <RowDefinition Height="*"></RowDefinition>
@@ -23,7 +33,7 @@ x:Class="UnicontaClient.Pages.CustomPage.BalanceReport"
                 <localPage:BalanceReportManagerGrid.Bands>
                     <localPage:BalanceReportManagerGridColumnGridControlBand>
                         <localPage:BalanceReportManagerTextGridColumn  FieldName="AccountNo" IsSmart="True" x:Name="AccountNo"/>
-                        <localPage:BalanceReportManagerTextGridColumn  FieldName="AccountName" MinWidth="200" IsSmart="True" x:Name="AccountName"/>
+                        <localPage:BalanceReportManagerTextGridColumn  FieldName="AccountName" MinWidth="200" IsSmart="True" x:Name="AccountName" PrintCellStyle="{StaticResource UnderlineTextPrintStyle}"/>
                         <localPage:BalanceReportManagerTextGridColumn  FieldName="Text" MinWidth="200" IsSmart="True" x:Name="Text"  />
                         <localPage:BalanceReportManagerTextGridColumn x:Name="coldim1" FieldName="Dim1" />
                         <localPage:BalanceReportManagerTextGridColumn x:Name="coldim2" FieldName="Dim2"  />

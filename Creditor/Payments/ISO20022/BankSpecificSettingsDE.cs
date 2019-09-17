@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.Common;
 using Uniconta.DataModel;
+using UnicontaClient.Pages.Creditor.Payments;
 
 namespace UnicontaISO20022CreditTransfer
 {
@@ -36,6 +37,9 @@ namespace UnicontaISO20022CreditTransfer
                 case deBank.Deutsche_Kreditwirtschaft:
                     companyBankEnum = CompanyBankENUM.Deutsche_Kreditwirtschaft;
                     return companyBankEnum;
+                case deBank.Volks_Raiffeisenbanken:
+                    companyBankEnum = CompanyBankENUM.Volks_Raiffeisenbanken;
+                    return companyBankEnum;
                 default:
                     return CompanyBankENUM.None;
             }
@@ -51,6 +55,7 @@ namespace UnicontaISO20022CreditTransfer
                 case CompanyBankENUM.StarMoney_SFirm:
                     return "StarMoney/SFirm";
                 case CompanyBankENUM.Deutsche_Kreditwirtschaft:
+                case CompanyBankENUM.Volks_Raiffeisenbanken:
                     return String.Empty;
                 default:
                     return string.Empty;
@@ -70,8 +75,41 @@ namespace UnicontaISO20022CreditTransfer
         /// </summary>
         public override Encoding EncodingFormat()
         {
-            var encoding = Encoding.GetEncoding("ISO-8859-1");
-            return encoding;
+            switch (companyBankEnum)
+            {
+                case CompanyBankENUM.Volks_Raiffeisenbanken:
+                    return Encoding.UTF8;
+                default:
+                    return Encoding.GetEncoding("ISO-8859-1"); ;
+            }
+          
+        }
+
+        /// <summary>
+        /// Allowed characters
+        /// </summary>
+        public override string AllowedCharactersRegEx()
+        {
+            allowedCharactersRegEx = "[^a-zA-Z0-9äöüÄÖÜß -?:().,'+/]";
+            return allowedCharactersRegEx;
+        }
+
+        /// <summary>
+        /// Replacement characters
+        /// </summary>
+        public override Dictionary<string, string> ReplaceCharactersRegEx()
+        {
+            replaceCharactersRegEx = new Dictionary<string, string>
+            {
+                ["Æ"] = "AE",
+                ["Ø"] = "OE",
+                ["Å"] = "AA",
+                ["æ"] = "ae",
+                ["ø"] = "oe",
+                ["å"] = "aa"
+            };
+
+            return replaceCharactersRegEx;
         }
 
         /// <summary>
@@ -86,7 +124,7 @@ namespace UnicontaISO20022CreditTransfer
             switch (companyBankEnum)
             {
                 case CompanyBankENUM.Deutsche_Kreditwirtschaft:
-                    return identificationId; 
+                   return identificationId; 
                 default:
                     return string.Empty;
             }
@@ -100,6 +138,7 @@ namespace UnicontaISO20022CreditTransfer
             switch (companyBankEnum)
             {
                 case CompanyBankENUM.Deutsche_Kreditwirtschaft:
+                case CompanyBankENUM.Volks_Raiffeisenbanken:
                     return amount;
                 default:
                     return 0;
@@ -114,6 +153,7 @@ namespace UnicontaISO20022CreditTransfer
             switch (companyBankEnum)
             {
                 case CompanyBankENUM.Deutsche_Kreditwirtschaft:
+                case CompanyBankENUM.Volks_Raiffeisenbanken:
                     return true;
                 default:
                     return false;
@@ -128,107 +168,102 @@ namespace UnicontaISO20022CreditTransfer
             switch (companyBankEnum)
             {
                 case CompanyBankENUM.Deutsche_Kreditwirtschaft:
+                case CompanyBankENUM.Volks_Raiffeisenbanken:
                     return true;
                 default:
                     return false;
             }
         }
 
+        
 
         /// <summary>
-        /// Merged payments
-        /// Bank: Deutsche_Kreditwirtschaft, underscore '_' is not allowed
+        /// Valid codes:
+        /// CRED (Creditor)
+        /// DEBT (Debtor)
+        /// SHAR (Shared)
+        /// SLEV (Service Level)
         /// </summary>
-        public override string PaymentInfoId(int fileSeqNumber, int recordSeqNumber)
+        public override string ChargeBearer(string ISOPaymType)
         {
-            var paymInfoId = string.Format("{0}_{1}_MERGED", fileSeqNumber.ToString().PadLeft(6, '0'), recordSeqNumber.ToString().PadLeft(6, '0'));
+            ISOPaymType = ISOPaymType ?? string.Empty;
 
             switch (companyBankEnum)
             {
-                case CompanyBankENUM.Deutsche_Kreditwirtschaft:
-                    return paymInfoId.Replace(@"_", string.Empty);
+                case CompanyBankENUM.Volks_Raiffeisenbanken:
+                    return string.Empty;
                 default:
-                    return paymInfoId;
-            }
-
-        }
-
-        /// <summary>
-        /// Bank: Deutsche_Kreditwirtschaft, underscore '_' is not allowed
-        /// </summary>
-        public override string PaymentInfoId(int fileSeqNumber, DateTime requestedExecutionDate, string paymentCurrency, string isoPaymentType, string companyPaymentMethod, PaymentTypes paymentMethod)
-        {
-            var paymentMethodDescription = "TYPE";
-
-            switch (paymentMethod)
-            {
-                case PaymentTypes.VendorBankAccount:
-                    paymentMethodDescription = "BBAN";
-                    break;
-
-                case PaymentTypes.IBAN:
-                    paymentMethodDescription = "IBAN";
-                    break;
-
-                case PaymentTypes.PaymentMethod3:
-                    paymentMethodDescription = "FIK71";
-                    break;
-
-                case PaymentTypes.PaymentMethod5:
-                    paymentMethodDescription = "FIK75";
-                    break;
-
-                case PaymentTypes.PaymentMethod4:
-                    paymentMethodDescription = "FIK73";
-                    break;
-
-                case PaymentTypes.PaymentMethod6:
-                    paymentMethodDescription = "FIK04";
-                    break;
-            }
-
-            var paymentInfoIdStr = string.Format("{0}_{1}_{2}_{3}_{4}_{5}", fileSeqNumber, requestedExecutionDate.ToString("yyMMdd"), paymentCurrency, isoPaymentType, companyPaymentMethod, paymentMethodDescription);
-
-            if (paymentInfoIdStr.Length > 35)
-                paymentInfoIdStr = paymentInfoIdStr.Substring(0, 35);
-
-
-            switch (companyBankEnum)
-            {
-                case CompanyBankENUM.Deutsche_Kreditwirtschaft:
-                    return paymentInfoIdStr.Replace(@"_", string.Empty);
-                default:
-                    return paymentInfoIdStr;
+                    switch (ISOPaymType)
+                    {
+                        case "DOMESTIC":
+                            return BaseDocument.CHRGBR_SHAR;
+                        case "CROSSBORDER":
+                            return BaseDocument.CHRGBR_DEBT;
+                        case "SEPA":
+                            return BaseDocument.CHRGBR_SLEV;
+                        default:
+                            return BaseDocument.CHRGBR_SHAR;
+                    }
             }
         }
 
-        public override PostalAddress CreditorAddress(PostalAddress address)
+
+        /// <summary>
+        /// Valid codes:
+        /// CRED (Creditor)
+        /// DEBT (Debtor)
+        /// SHAR (Shared)
+        /// SLEV (Service Level)
+        /// 
+        /// This Charge bearer is per Debtor (only once)
+        /// </summary>
+        public override string ChargeBearerDebtor()
+        {
+            switch (companyBankEnum)
+            {
+                case CompanyBankENUM.Volks_Raiffeisenbanken:
+                    return BaseDocument.CHRGBR_SLEV;
+                default:
+                    return string.Empty;
+            }
+        }
+      
+
+        public override PostalAddress CreditorAddress(Uniconta.DataModel.Creditor creditor, PostalAddress creditorAddress)
         {
             switch (companyBankEnum)
             {
                 case CompanyBankENUM.Deutsche_Kreditwirtschaft:
+                case CompanyBankENUM.Volks_Raiffeisenbanken:
                     return null;
                 default:
-                    return address;
+                    return base.CreditorAddress(creditor, creditorAddress); //TODO:TEST DENNE
             }
         }
 
         /// <summary>
-        /// Bank Deutsche_Kreditwirtschaft: Only two Addresslines are accepted
+        /// Bank Deutsche_Kreditwirtschaft and Volks_Raiffeisenbanken: Only two Addresslines are accepted
         /// </summary>
         public override PostalAddress DebtorAddress(Company company, PostalAddress debtorAddress)
         {
-            debtorAddress.AddressLine1 = company._Address1;
-            debtorAddress.AddressLine2 = company._Address2;
-            debtorAddress.AddressLine3 = company._Address3;
+            var adr1 = StandardPaymentFunctions.RegularExpressionReplace(company._Address1, allowedCharactersRegEx, replaceCharactersRegEx);
+            var adr2 = StandardPaymentFunctions.RegularExpressionReplace(company._Address2, allowedCharactersRegEx, replaceCharactersRegEx);
+            var adr3 = StandardPaymentFunctions.RegularExpressionReplace(company._Address3, allowedCharactersRegEx, replaceCharactersRegEx);
+
+            debtorAddress.AddressLine1 = adr1;
+            debtorAddress.AddressLine2 = adr2;
+            debtorAddress.AddressLine3 = adr3;
             debtorAddress.CountryId = ((CountryISOCode)company._CountryId).ToString();
 
             debtorAddress.Unstructured = true;
 
             switch (companyBankEnum)
             {
+                case CompanyBankENUM.Volks_Raiffeisenbanken:
+                    debtorAddress = null;
+                    break;
                 case CompanyBankENUM.Deutsche_Kreditwirtschaft:
-                    debtorAddress.AddressLine2 = company._Address3 != null ? string.Format("{0} {1}", company._Address2, company._Address3) : company._Address2;
+                    debtorAddress.AddressLine2 = adr3 != null ? string.Format("{0} {1}", adr2, adr3) : adr2;
                     debtorAddress.AddressLine3 = null;
                     break;
             }
@@ -245,6 +280,7 @@ namespace UnicontaISO20022CreditTransfer
             switch (companyBankEnum)
             {
                 case CompanyBankENUM.Deutsche_Kreditwirtschaft:
+                case CompanyBankENUM.Volks_Raiffeisenbanken:
                     return string.Empty;
                 default:
                     return countryId;
@@ -257,7 +293,7 @@ namespace UnicontaISO20022CreditTransfer
         /// ONCL (Standard Transfer)
         /// SDCL (Same-day Transfer)
         /// 
-        /// Deutsche_Kreditwirtschaft: Not used
+        /// Deutsche_Kreditwirtschaft and Volks_Raiffeisenbanken: Not used
         /// Other german banks: For now they have an empty value
         /// </summary>
         public override string ExternalLocalInstrument(string currencyCode, DateTime executionDate)
@@ -265,6 +301,7 @@ namespace UnicontaISO20022CreditTransfer
             switch (companyBankEnum)
             {
                 case CompanyBankENUM.Deutsche_Kreditwirtschaft:
+                case CompanyBankENUM.Volks_Raiffeisenbanken:
                     return string.Empty;
                 default:
                     return string.Empty;

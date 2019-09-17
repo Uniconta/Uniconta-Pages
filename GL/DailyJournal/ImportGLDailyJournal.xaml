@@ -62,6 +62,18 @@ x:Class="UnicontaClient.Pages.CustomPage.ImportGLDailyJournal"
                         </Grid>
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
+                <CorasauControls:CorasauLayoutGroup x:Name="grpUserLogin" Visibility="Collapsed" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Login}" Orientation="Vertical" MinWidth="350" 
+                                                CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                    <CorasauControls:CorasauLayoutItem FieldName="LoginId"  x:Name="liLoginId">
+                        <CorasauControls:TextEditor Text="{Binding LoginId,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Passowrd"  x:Name="liPassword">
+                        <CorasauControls:PasswordBoxEditor x:Name="txtPassowrd" Text="{Binding Password,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BankAccount}"  x:Name="liBankAcc">
+                        <CorasauControls:TextEditor x:Name="txtBankAccount" />
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
             </CorasauControls:CorasauLayoutControl>
         </CorasauControls:BusyIndicator>
     </Grid>

@@ -219,6 +219,9 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrdersPage2"
                         <CorasauControls:CorasauLayoutItem FieldName="InvoiceDate" x:Name="liInvoiceDate">
                             <CorasauControls:DateEditor EditValue="{Binding InvoiceDate,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="Split" x:Name="liSplit">
+                            <CorasauControls:LookupEditor x:Name="leSplit" EditValue="{Binding Split,Mode=TwoWay}"  />
+                        </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
                     <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpProject"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Project}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="450" >
                         <CorasauControls:CorasauLayoutItem x:Name="projectItem" FieldName="Project">

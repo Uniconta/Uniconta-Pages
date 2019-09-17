@@ -31,10 +31,12 @@ using Uniconta.Client.Pages;
 using DevExpress.Xpf.Grid;
 using DevExpress.Data;
 
+
 #if !SILVERLIGHT
 using ubl_norway_uniconta;
 using FromXSDFile.OIOUBL.ExportImport;
 using Microsoft.Win32;
+using UBL.Iceland;
 using UnicontaClient.Pages;
 #endif
 
@@ -65,6 +67,18 @@ namespace UnicontaClient.Pages.CustomPage
     {
         SQLCache Debcache;
         public override string NameOfControl { get { return TabControls.Invoices.ToString(); } }
+
+        DateTime filterDate;
+        protected override Filter[] DefaultFilters()
+        {
+            if (filterDate != DateTime.MinValue)
+            {
+                Filter dateFilter = new Filter() { name = "Date", value = String.Format("{0:d}..", filterDate) };
+                return new Filter[] { dateFilter };
+            }
+            return base.DefaultFilters();
+        }
+
         public Invoices(BaseAPI API) : base(API, string.Empty)
         {
             InitPage();
@@ -109,13 +123,13 @@ namespace UnicontaClient.Pages.CustomPage
             InitializeComponent();
             dgInvoicesGrid.UpdateMaster(master);
             SetRibbonControl(localMenu, dgInvoicesGrid);
-            dgInvoicesGrid.api = api;
             dgInvoicesGrid.BusyIndicator = busyIndicator;
             dgInvoicesGrid.api = api;
+            var Comp = api.CompanyEntity;
+            filterDate = BasePage.GetFilterDate(Comp, master != null);
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             initialLoad();
             dgInvoicesGrid.ShowTotalSummary();
-            var Comp = api.CompanyEntity;
             if (Comp.RoundTo100)
                 CostValue.HasDecimals = NetAmount.HasDecimals = TotalAmount.HasDecimals = Margin.HasDecimals = SalesValue.HasDecimals = false;
 
@@ -179,17 +193,14 @@ namespace UnicontaClient.Pages.CustomPage
 
         async void initialLoad()
         {
-            var Comp = api.CompanyEntity;
-            Debcache = Comp.GetCache(typeof(Debtor)) ?? await Comp.LoadCache(typeof(Debtor), api);
-
-
+            Debcache = api.GetCache(typeof(Debtor)) ?? await api.LoadCache(typeof(Debtor));
         }
 
         protected override void LoadCacheInBackGround()
         {
             var Comp = api.CompanyEntity;
 
-            var lst = new List<Type>() { typeof(Uniconta.DataModel.InvItem), typeof(Uniconta.DataModel.PaymentTerm) };
+            var lst = new List<Type>(12) { typeof(Uniconta.DataModel.InvItem), typeof(Uniconta.DataModel.PaymentTerm), typeof(Uniconta.DataModel.GLVat), typeof(Uniconta.DataModel.Employee) };
             if (Comp.ItemVariants)
             {
                 lst.Add(typeof(Uniconta.DataModel.InvVariant1));
@@ -521,7 +532,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             var InvCache = Comp.GetCache(typeof(Uniconta.DataModel.InvItem)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.InvItem), api);
             var VatCache = Comp.GetCache(typeof(Uniconta.DataModel.GLVat)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.GLVat), api);
-
+         
             SystemInfo.Visible = true;
 
             var applFilePath = string.Empty;
@@ -573,6 +584,11 @@ namespace UnicontaClient.Pages.CustomPage
 
                 if (Comp._CountryId == CountryCode.Norway || Comp._CountryId == CountryCode.Netherlands)
                     result = EHF.GenerateEHFXML(Comp, debtor, deliveryAccount, invClient, invoiceLines, InvCache, VatCache, invItemText, contactPerson);
+                else if (Comp._CountryId == CountryCode.Iceland)
+                {
+                    var paymFormatCache = Comp.GetCache(typeof(DebtorPaymentFormatClientIceland)) ?? await Comp.LoadCache(typeof(DebtorPaymentFormatClientIceland), api);
+                    result = TS136137.GenerateTS136137XML(Comp, debtor, deliveryAccount, invClient, invoiceLines, InvCache, VatCache, invItemText, contactPerson, paymFormatCache);
+                }
                 else
                     result = Uniconta.API.DebtorCreditor.OIOUBL.GenerateOioXML(Comp, debtor, deliveryAccount, invClient, invoiceLines, InvCache, VatCache, invItemText, contactPerson);
 
@@ -776,7 +792,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         public async override Task InitQuery()
         {
-            await dgInvoicesGrid.Filter(null);
+            await Filter();
             var api = this.api;
             if (api.CompanyEntity.DeliveryAddress)
             {

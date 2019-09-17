@@ -72,6 +72,12 @@ namespace UnicontaClient.Pages.CustomPage
             Layout._SubId = api.CompanyId;
             Initialize(master, null);
         }
+        public UserTableData(string lookupKey, TableHeader master) : base(master)
+        {
+            this.thMaster = master;
+            Layout._SubId = api.CompanyId;
+            Initialize(master, null, lookupKey);
+        }
         public UserTableData(TableHeader thMaster, string layoutname, SynchronizeEntity syncEntity)
          : base(syncEntity, true)
         {
@@ -107,9 +113,11 @@ namespace UnicontaClient.Pages.CustomPage
             if (header != null)
                 SetHeader(header);
         }
-        private void Initialize(TableHeader thMaster, UnicontaBaseEntity masterRecord)
+        private void Initialize(TableHeader thMaster, UnicontaBaseEntity masterRecord, string lookupkey=null)
         {
             InitializeComponent();
+            if (lookupkey != null)
+                this.LookupKey = lookupkey;
             master = masterRecord;
             dgTabledataGrid.UserTableType = thMaster.UserType;
             dgTabledataGrid.IsEditable = thMaster._EditLines;

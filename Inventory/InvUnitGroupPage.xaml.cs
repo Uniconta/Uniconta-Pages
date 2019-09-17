@@ -76,7 +76,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "DeleteRow":
                     if (selectedItem == null) return;
                     if (UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("DeleteConfirmation"), Uniconta.ClientTools.Localization.lookup("Confirmation"), MessageBoxButton.OKCancel) == MessageBoxResult.OK)
-                        dgInvUnitGroupGrid.DeleteRow();
+                        dgInvUnitGroupGrid.DeleteRow(false);
                     break;
                 case "Lines":
                     if (selectedItem != null)

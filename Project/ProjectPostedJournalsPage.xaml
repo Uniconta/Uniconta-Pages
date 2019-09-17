@@ -23,6 +23,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectPostedJournalsPage"
                 <localPage:ProjectPostedJournalGrid.Columns>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="SeqNumber" Width="60" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Journal" Width="150" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Employee" Width="150" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Posted" ShowTime="True" MinWidth="120">
                         <localPage:CorasauDataGridTemplateColumnClient.EditSettings>
                             <editor:TextEditSettings DisplayFormat="g"  MaskType="DateTime" />
@@ -34,8 +35,8 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectPostedJournalsPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Voucher" Width="60" AllowThousandMask="False"/>                    
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Lines" Width="30" AllowThousandMask="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Comment"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="FromDate" Width="90" Visible="False" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ToDate" Width="90" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DateMin" Width="90" Visible="True" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DateMax" Width="90" Visible="True" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Deleted" ShowTime="True" MinWidth="120">
                         <localPage:CorasauDataGridTemplateColumnClient.EditSettings>
                             <editor:TextEditSettings DisplayFormat="g"  MaskType="DateTime" />

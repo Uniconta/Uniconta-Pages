@@ -105,6 +105,39 @@ namespace UnicontaClient.Pages.CustomPage
             }
             if (load.Count != 0)
                 LoadType(load.ToArray());
+           
+            dgContactGrid.SelectedItemChanged += DgContactGrid_SelectedItemChanged;
+        }
+
+        private void DgContactGrid_SelectedItemChanged(object sender, DevExpress.Xpf.Grid.SelectedItemChangedEventArgs e)
+        {
+            var selectedItem = dgContactGrid.SelectedItem as ContactClient;
+            if (selectedItem == null)
+                return;
+            if (selectedItem._DCType == 2)
+            {
+                ribbonControl.EnableButtons("CreditorOrders");
+                ribbonControl.DisableButtons("DebtorOrders");
+                ribbonControl.DisableButtons("Offers");
+            }
+            else if (selectedItem._DCType == 1)
+            {
+                ribbonControl.DisableButtons("CreditorOrders");
+                ribbonControl.EnableButtons("DebtorOrders");
+                ribbonControl.DisableButtons("Offers");
+            }
+            else if (selectedItem._DCType == 3)
+            {
+                ribbonControl.DisableButtons("CreditorOrders");
+                ribbonControl.DisableButtons("DebtorOrders");
+                ribbonControl.EnableButtons("Offers");
+            }
+            else
+            {
+                ribbonControl.DisableButtons("CreditorOrders");
+                ribbonControl.DisableButtons("DebtorOrders");
+                ribbonControl.DisableButtons("Offers");
+            }
         }
 
         protected override void OnLayoutLoaded()
@@ -164,6 +197,18 @@ namespace UnicontaClient.Pages.CustomPage
                 case "AddDoc":
                     if (selectedItem != null)
                         AddDockItem(TabControls.UserDocsPage, dgContactGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Documents"), selectedItem._Name));
+                    break;
+                case "DebtorOrders":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.DebtorOrders, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("DebtorOrders"), selectedItem._Name));
+                    break;
+                case "Offers":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.DebtorOffers, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Offers"), selectedItem._Name));
+                    break;
+                case "CreditorOrders":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.CreditorOrders, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("CreditorOrders"), selectedItem._Name));
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);

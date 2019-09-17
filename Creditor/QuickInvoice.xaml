@@ -195,7 +195,7 @@ x:Class="UnicontaClient.Pages.CustomPage.QuickInvoice"
                             <CorasauControls:IntegerEditor MaxWidth="170"  Text="{Binding OrderNumber,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" Grid.Row="0" Margin="5,0,0,0" SetMask="False" />
                             
                             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=EndDiscountPct}" Grid.Column="0" Grid.Row="2" />
-                            <CorasauControls:DoubleEditor MaxWidth="170"  FieldName="EndDiscountPct"  Grid.Column="1" Grid.Row="2" Margin="5,0,0,0"  />
+                            <CorasauControls:DoubleEditor MaxWidth="170"  EditValue="{Binding EndDiscountPct,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"   Grid.Column="1" Grid.Row="2" Margin="5,0,0,0"  />
                             
                             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Payment}" Grid.Column="0" Grid.Row="4" />
                             <CorasauControls:LookupEditor MaxWidth="170" x:Name="lePayment"   EditValue="{Binding Payment,Mode=TwoWay}"  Grid.Column="1" Grid.Row="4" Margin="5,0,0,0"  />

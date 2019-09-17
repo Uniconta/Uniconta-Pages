@@ -46,8 +46,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (last != null)
             {
                 var newRow = (DCOrderLine)dataEntity;
-                newRow._Date = last._Date;
-                newRow._OrderNumber = last._OrderNumber;
+                newRow.SetMaster(last);
             }
         }
     }

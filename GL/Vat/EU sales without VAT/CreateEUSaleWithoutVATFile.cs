@@ -35,9 +35,9 @@ namespace UnicontaClient.Pages.CustomPage
         static double sumOfAllAmounts;
 
 #if !SILVERLIGHT
-        public static List<EUSaleWithoutVATClient> CreateEUSaleWithoutVATfile(List<EUSaleWithoutVATClient> listOfEUSaleWithoutVAT, CrudAPI api, double sumOfAmount)
+        public static List<EUSaleWithoutVATClient> CreateEUSaleWithoutVATfile(List<EUSaleWithoutVATClient> listOfEUSaleWithoutVAT, CrudAPI api)
 #else
-        public static List<EUSaleWithoutVATClient> CreateEUSaleWithoutVATfile(List<EUSaleWithoutVATClient> listOfEUSaleWithoutVAT, CrudAPI api, System.Windows.Controls.SaveFileDialog sfd, double sumOfAmount)
+        public static List<EUSaleWithoutVATClient> CreateEUSaleWithoutVATfile(List<EUSaleWithoutVATClient> listOfEUSaleWithoutVAT, CrudAPI api, System.Windows.Controls.SaveFileDialog sfd)
 #endif
         {
             var cmp = new CompressCompare();
@@ -118,7 +118,7 @@ namespace UnicontaClient.Pages.CustomPage
 #endif
                     {
                         CreateAndStreamFirstAndLast(result, sw, true, api, 0);
-                        StreamToFile(result, sw);
+                        var sumOfAmount = StreamToFile(result, sw);
                         CreateAndStreamFirstAndLast(result, sw, false, api, sumOfAmount);
                     }
                     stream.Close();
@@ -134,8 +134,9 @@ namespace UnicontaClient.Pages.CustomPage
             return listOfResults.Values.ToList();
         }
 
-        public static void StreamToFile(List<EUSaleWithoutVATClient> listOfImportExport, StreamWriter sw)
+        public static long StreamToFile(List<EUSaleWithoutVATClient> listOfImportExport, StreamWriter sw)
         {
+            long sumOfAmount = 0;
             var type = new EUSaleWithoutVATClient();
             var seperator = ';';
 
@@ -188,6 +189,7 @@ namespace UnicontaClient.Pages.CustomPage
                     else if (val is double)
                     {
                         var doubleNumber = NumberConvert.ToLong((double)val);
+                        sumOfAmount += doubleNumber;
                         value = doubleNumber.ToString();
                     }
                     else
@@ -199,9 +201,11 @@ namespace UnicontaClient.Pages.CustomPage
                 }
                 sw.WriteLine();
             }
+
+            return sumOfAmount;
         }
 
-        public static void CreateAndStreamFirstAndLast(List<EUSaleWithoutVATClient> listOfEUSale, StreamWriter sw, bool firstOrLast, CrudAPI api, double sumOfAmount)
+        public static void CreateAndStreamFirstAndLast(List<EUSaleWithoutVATClient> listOfEUSale, StreamWriter sw, bool firstOrLast, CrudAPI api, long sumOfAmount)
         {
             var EUSaleWithoutVAT = new EUSaleWithoutVATClient();
             var streamFileList = new List<EUSaleWithoutVATClient>();

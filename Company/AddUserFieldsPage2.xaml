@@ -41,6 +41,9 @@ x:Class="UnicontaClient.Pages.CustomPage.AddUserFieldsPage2"
                     <CorasauControls:CorasauLayoutItem FieldName="RefTable" x:Name="layoutRefTable">
                         <CorasauControls:ComboBoxEditor x:Name="cbRefTable" SelectedItem="{Binding RefTable,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Math" x:Name="liMath">
+                        <CorasauControls:CheckEditor IsChecked="{Binding Math,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="ReadOnly" x:Name="liReadOnly">
                         <CorasauControls:CheckEditor IsChecked="{Binding ReadOnly,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>

@@ -9,6 +9,7 @@ using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.Common;
 using Uniconta.DataModel;
+using UnicontaClient.Pages.Creditor.Payments;
 
 namespace UnicontaISO20022CreditTransfer
 {
@@ -25,6 +26,8 @@ namespace UnicontaISO20022CreditTransfer
         #region Member variables
         protected CompanyBankENUM companyBankEnum;
         protected string companyCountryId;
+        protected string allowedCharactersRegEx;
+        protected Dictionary<string, string> replaceCharactersRegEx;
         #endregion
 
         #region Properties
@@ -88,6 +91,25 @@ namespace UnicontaISO20022CreditTransfer
         public virtual Encoding EncodingFormat()
         {
             return Encoding.UTF8;
+        }
+
+
+        /// <summary>
+        /// Allowed characters
+        /// </summary>
+        public virtual string AllowedCharactersRegEx()
+        {
+            allowedCharactersRegEx = "[^a-zA-Z0-9 -?:().,'+/]";
+            return allowedCharactersRegEx;
+        }
+
+        /// <summary>
+        /// Replacement characters
+        /// </summary>
+        public virtual Dictionary<string, string> ReplaceCharactersRegEx()
+        {
+            replaceCharactersRegEx = null;
+            return replaceCharactersRegEx;
         }
 
         /// <summary>
@@ -253,8 +275,10 @@ namespace UnicontaISO20022CreditTransfer
         /// </summary>
         public virtual string PaymentInfoId(int fileSeqNumber, int recordSeqNumber)
         {
-            return string.Format("{0}_{1}_MERGED", fileSeqNumber.ToString().PadLeft(6, '0'), recordSeqNumber.ToString().PadLeft(6, '0'));
+            var result = string.Format("{0}-{1}-MERGED", fileSeqNumber.ToString().PadLeft(6, '0'), recordSeqNumber.ToString().PadLeft(6, '0'));
+            return StandardPaymentFunctions.RegularExpressionReplace(result, allowedCharactersRegEx, replaceCharactersRegEx);
         }
+
 
         /// <summary>
         /// 
@@ -290,7 +314,8 @@ namespace UnicontaISO20022CreditTransfer
                     break;
             }
 
-            var paymentInfoIdStr = string.Format("{0}_{1}_{2}_{3}_{4}_{5}", fileSeqNumber, requestedExecutionDate.ToString("yyMMdd"), paymentCurrency, isoPaymentType, companyPaymentMethod, paymentMethodDescription);
+            var paymentInfoIdStr = string.Format("{0}-{1}-{2}-{3}-{4}-{5}", fileSeqNumber, requestedExecutionDate.ToString("yyMMdd"), paymentCurrency, isoPaymentType, companyPaymentMethod, paymentMethodDescription);
+            paymentInfoIdStr = StandardPaymentFunctions.RegularExpressionReplace(paymentInfoIdStr, allowedCharactersRegEx, replaceCharactersRegEx);
 
             if (paymentInfoIdStr.Length > 35)
                 paymentInfoIdStr = paymentInfoIdStr.Substring(0, 35);
@@ -442,6 +467,15 @@ namespace UnicontaISO20022CreditTransfer
             return bic;
         }
 
+    
+        /// <summary>
+        /// Company Name
+        /// </summary>
+        public virtual string CompanyName(string companyName)
+        {
+            return StandardPaymentFunctions.RegularExpressionReplace(companyName, allowedCharactersRegEx, replaceCharactersRegEx);
+        }
+
         /// <summary>
         /// Unambiguous identification of the BBAN account of the debtor to which a debit entry will be made as a result of the transaction.
         /// In Denmark it will be: Reg. no. + Account no. 14 char (4+10)
@@ -577,9 +611,9 @@ namespace UnicontaISO20022CreditTransfer
         /// </summary>
         public virtual PostalAddress DebtorAddress(Company company, PostalAddress debtorAddress)
         {
-            debtorAddress.AddressLine1 = company._Address1;
-            debtorAddress.AddressLine2 = company._Address2;
-            debtorAddress.AddressLine3 = company._Address3;
+            debtorAddress.AddressLine1 = StandardPaymentFunctions.RegularExpressionReplace(company._Address1, allowedCharactersRegEx, replaceCharactersRegEx);
+            debtorAddress.AddressLine2 = StandardPaymentFunctions.RegularExpressionReplace(company._Address2, allowedCharactersRegEx, replaceCharactersRegEx);
+            debtorAddress.AddressLine3 = StandardPaymentFunctions.RegularExpressionReplace(company._Address3, allowedCharactersRegEx, replaceCharactersRegEx);
             debtorAddress.CountryId = ((CountryISOCode)company._CountryId).ToString();
 
             debtorAddress.Unstructured = true;
@@ -588,13 +622,55 @@ namespace UnicontaISO20022CreditTransfer
         }
 
         /// <summary>
+        /// Creditor Name
+        /// </summary>
+        public virtual string CreditorName(string credName)
+        {
+            var result = string.IsNullOrEmpty(credName) ? BaseDocument.VALUE_NOT_AVAILABLE : credName;
+            result = StandardPaymentFunctions.RegularExpressionReplace(result, allowedCharactersRegEx, replaceCharactersRegEx);
+            return result;
+        }
+
+        /// <summary>
+        /// Creditor Address
+        /// </summary>
+        public virtual PostalAddress CreditorAddress(Uniconta.DataModel.Creditor creditor, PostalAddress creditorAddress)
+        {
+            var adr1 = creditor._Address1;
+            var adr2 = creditor._Address2;
+            var adr3 = creditor._Address3;
+            var zipCode = creditor._ZipCode;
+            var city = creditor._City;
+
+            if (creditor._ZipCode != null)
+            {
+                creditorAddress.ZipCode = StandardPaymentFunctions.RegularExpressionReplace(zipCode, allowedCharactersRegEx, replaceCharactersRegEx);
+                creditorAddress.CityName = StandardPaymentFunctions.RegularExpressionReplace(city, allowedCharactersRegEx, replaceCharactersRegEx);
+                creditorAddress.StreetName = StandardPaymentFunctions.RegularExpressionReplace(adr1, allowedCharactersRegEx, replaceCharactersRegEx);
+            }
+            else
+            {
+                creditorAddress.AddressLine1 = adr1;
+                creditorAddress.AddressLine2 = adr2;
+                creditorAddress.AddressLine3 = adr3;
+                creditorAddress.Unstructured = true;
+            }
+
+            creditorAddress.CountryId = ((CountryISOCode)creditor._Country).ToString();
+
+            return creditorAddress;
+        }
+
+
+
+        /// <summary>
         /// Instruction Id – Customer reference number - must be unique. It will be returned in the status reports and bank account statement. It will not be send to the beneficiary. 
         /// Nordea specific: If Instruction Id is missing, EndToEndId will be used as customer reference. This will be used for duplicate control on transaction level.
         /// </summary>
         public virtual string InstructionId(string internalMessage)
         {
-            string instructionId = internalMessage;
-
+            string instructionId = StandardPaymentFunctions.RegularExpressionReplace(internalMessage, allowedCharactersRegEx, replaceCharactersRegEx);
+        
             if (instructionId.Length > 35)
                 instructionId = instructionId.Substring(0, 35);
 
@@ -620,6 +696,8 @@ namespace UnicontaISO20022CreditTransfer
         /// Domestic payments: SHAR 
         /// SEPA payments: SLEV
         /// Cross-border payments: DEBT
+        /// 
+        /// /// This Charge bearer is per payment
         /// </summary>
         public virtual string ChargeBearer(string ISOPaymType) //ISO20022PaymentTypes ISOPaymType) //TODO: This has to be changed - it has to use enum
         {
@@ -638,13 +716,29 @@ namespace UnicontaISO20022CreditTransfer
             }
          }
 
+
+        /// <summary>
+        /// Valid codes:
+        /// CRED (Creditor)
+        /// DEBT (Debtor)
+        /// SHAR (Shared)
+        /// SLEV (Service Level)
+        /// 
+        /// This Charge bearer is per Debtor (only once)
+        /// </summary>
+        public virtual string ChargeBearerDebtor()
+        {
+            return string.Empty;
+        }
+
+
         /// <summary>
         /// Nordea: Reference quoted on statement. This reference will be presented on Creditor’s account statement. It may only be used for domestic payments. Only used by Norway, Denmark and Sweden.
         /// Max 20 characters
         /// </summary>
         public virtual string RemittanceInfo(string externalAdvText, ISO20022PaymentTypes ISOPaymType, PaymentTypes paymentMethod)
         {
-            string remittanceInfo = externalAdvText;
+            string remittanceInfo = StandardPaymentFunctions.RegularExpressionReplace(externalAdvText, allowedCharactersRegEx, replaceCharactersRegEx);
 
             if (remittanceInfo != string.Empty && ISOPaymType == ISO20022PaymentTypes.DOMESTIC)
             {
@@ -689,7 +783,7 @@ namespace UnicontaISO20022CreditTransfer
         /// </summary>
         public virtual List<string> Ustrd(string externalAdvText, ISO20022PaymentTypes ISOPaymType, PaymentTypes paymentMethod)
         {
-            var ustrdText = externalAdvText;
+            var ustrdText = StandardPaymentFunctions.RegularExpressionReplace(externalAdvText, allowedCharactersRegEx, replaceCharactersRegEx); 
 
             int maxLines = 1;
             int maxStrLen = 140;
@@ -706,11 +800,6 @@ namespace UnicontaISO20022CreditTransfer
             }
 
             return resultList;
-        }
-
-        public virtual PostalAddress CreditorAddress(PostalAddress address)
-        {
-            return address;
         }
 
     }

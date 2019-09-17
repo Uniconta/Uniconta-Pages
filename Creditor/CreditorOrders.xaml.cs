@@ -276,7 +276,7 @@ namespace UnicontaClient.Pages.CustomPage
                         if (addVouvhersDialog.DialogResult == true)
                         {
                             var propertyInfo = selectedItem.GetType().GetProperty("DocumentRef");
-                            if (addVouvhersDialog.VoucherRowIds.Count() > 0 && propertyInfo != null)
+                            if (addVouvhersDialog.VoucherRowIds.Length > 0 && propertyInfo != null)
                             {
                                 propertyInfo.SetValue(selectedItem, addVouvhersDialog.VoucherRowIds[0], null);
                                 UpdateVoucher(selectedItem);
@@ -676,8 +676,10 @@ namespace UnicontaClient.Pages.CustomPage
             if (creditor != null)
                 showSendByMail = !string.IsNullOrEmpty(creditor._InvoiceEmail);
             string creditorName = creditor?._Name ?? dbOrder._DCAccount;
-            bool showUpdateInv = api.CompanyEntity.Storage;
-            CWGenerateInvoice GenrateOfferDialog = new CWGenerateInvoice(false, Uniconta.ClientTools.Localization.lookup(doctype.ToString()), isShowInvoiceVisible: true, askForEmail: true, showNoEmailMsg: !showSendByMail, debtorName: creditorName, isShowUpdateInv: showUpdateInv);
+            var comp = api.CompanyEntity;
+            bool showUpdateInv = comp.Storage || (doctype == CompanyLayoutType.PurchasePacknote && comp.CreditorPacknote);
+            CWGenerateInvoice GenrateOfferDialog = new CWGenerateInvoice(false, doctype.ToString(), showInputforInvNumber: doctype == CompanyLayoutType.PurchasePacknote ? true : false,
+                isShowInvoiceVisible: true, askForEmail: true, showNoEmailMsg: !showSendByMail, debtorName: creditorName, isShowUpdateInv: showUpdateInv);
 #if !SILVERLIGHT
             switch (doctype)
             {
@@ -698,8 +700,13 @@ namespace UnicontaClient.Pages.CustomPage
                 if (GenrateOfferDialog.DialogResult == true)
                 {
                     showInvPrintPreview = GenrateOfferDialog.ShowInvoice || GenrateOfferDialog.InvoiceQuickPrint;
-
-                    var invoicePostingResult = new InvoicePostingPrintGenerator(api, this, dbOrder, null, GenrateOfferDialog.GenrateDate, 0, !GenrateOfferDialog.UpdateInventory, doctype,
+                    long documentNumber = 0;
+                    if (doctype == CompanyLayoutType.PurchasePacknote)
+                    {
+                        documentNumber = GenrateOfferDialog.InvoiceNumber;
+                        dbOrder._InvoiceNumber = documentNumber;
+                    }
+                    var invoicePostingResult = new InvoicePostingPrintGenerator(api, this, dbOrder, null, GenrateOfferDialog.GenrateDate, documentNumber, !GenrateOfferDialog.UpdateInventory, doctype,
                         showInvPrintPreview, GenrateOfferDialog.InvoiceQuickPrint, GenrateOfferDialog.NumberOfPages, GenrateOfferDialog.SendByEmail, GenrateOfferDialog.Emails, GenrateOfferDialog.sendOnlyToThisEmail);
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
                     busyIndicator.IsBusy = true;
@@ -756,7 +763,9 @@ namespace UnicontaClient.Pages.CustomPage
         protected override void LoadCacheInBackGround()
         {
             var Comp = api.CompanyEntity;
-            var lst = new List<Type>() { typeof(Uniconta.DataModel.InvItem), typeof(Uniconta.DataModel.CreditorGroup) };
+            var lst = new List<Type>(12) { typeof(Uniconta.DataModel.InvItem), typeof(Uniconta.DataModel.CreditorGroup) };
+            if (Comp.Contacts)
+                lst.Add(typeof(Uniconta.DataModel.Contact));
             if (Comp.CreditorPrice)
                 lst.Add(typeof(Uniconta.DataModel.CreditorPriceList));
             if (Comp.ItemVariants)
@@ -781,6 +790,5 @@ namespace UnicontaClient.Pages.CustomPage
         {
             UnicontaClient.Utilities.Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
         }
-
     }
 }

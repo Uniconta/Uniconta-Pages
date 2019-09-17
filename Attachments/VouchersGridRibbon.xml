@@ -15,8 +15,8 @@
     <RibbonItem Action="ViewJournalLines" LocalizedNameKey="Journallines" LargeGlyph="Journal_Lines_32x32.png" />
   </RibbonItem>
   <RibbonItem LocalizedNameKey="Bilagscan">
-    <RibbonItem Action="BilagscanSendVouchers" LocalizedNameKey="BilagscanSend" Glyph="" LargeGlyph=";component/Assets/img/Export_32x32.png" />
-    <RibbonItem Action="BilagscanReadVouchers" LocalizedNameKey="BilagscanRead" Glyph="" LargeGlyph=";component/Assets/img/Import_32x32.png" />
+    <RibbonItem Action="BilagscanSendVouchers" LocalizedNameKey="BilagscanSend" Module="Bilagscan" LargeGlyph=";component/Assets/img/Export_32x32.png" />
+    <RibbonItem Action="BilagscanReadVouchers" LocalizedNameKey="BilagscanRead" Module="Bilagscan" LargeGlyph=";component/Assets/img/Import_32x32.png" />
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="SplitPDF" LocalizedNameKey="SplitPDF" LargeGlyph="Match_Remove_32x32.png" />
@@ -29,7 +29,7 @@
       <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
       <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16.png" ShortcutKey="" />
       <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveOBJ" Parameter="Layout" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
-      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="SwitchToDefault" Glyph="Delete_16x16.png" ShortcutKey=""/>
+      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16.png" ShortcutKey=""/>
       <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16.png" ShortcutKey="Ctrl+U"/>
       <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportOBJ"  Parameter="Layout" EnableSeperator="True" Glyph="ExportLayout_16x16.png" LargeGlyph="ExportLayout_16x16.png" ShortcutKey=""/>
       <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportOBJ" Parameter="Layout" Glyph="Import_16x16.png" LargeGlyph="Import_16x16.png" ShortcutKey=""/>

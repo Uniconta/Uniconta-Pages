@@ -70,7 +70,10 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override void SyncEntityMasterRowChanged(UnicontaBaseEntity args)
         {
-            dgInvSeriesBatchGrid.UpdateMaster(args);
+            if (openMaster == null)
+                SetMaster(args, null);
+            else
+                SetMaster(args, openMaster);
             SetHeader();
             InitQuery();
         }
@@ -208,6 +211,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         InvSerieBatchOpen openMaster;
+        ItemBase ibase;
         private void LocalMenu_OnItemClicked(string ActionType)
         {
             InvSerieBatchClient selectedItem = dgInvSeriesBatchGrid.SelectedItem as InvSerieBatchClientLocal;
@@ -227,7 +231,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "OpenOrAll":
                     RibbonBase rb = (RibbonBase)localMenu.DataContext;
-                    var ibase = UtilDisplay.GetMenuCommandByName(rb, "OpenOrAll");
+                    ibase = UtilDisplay.GetMenuCommandByName(rb, "OpenOrAll");
                     if (openMaster == null)
                     {
                         openMaster = new InvSerieBatchOpen();

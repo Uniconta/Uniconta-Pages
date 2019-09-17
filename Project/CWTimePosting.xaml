@@ -1,0 +1,41 @@
+<ClientTools:ChildWindow xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.CWTimePosting "
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+           xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+           xmlns:ClientToolsControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+           Width="400" Height="200" KeyDown="ChildWindow_KeyDown">
+    <Grid x:Name="LayoutRoot" Margin="2" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="160"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CompanyName}" VerticalAlignment="Center"></TextBlock>
+            <TextBlock x:Name="txtCompName" Grid.Column="2" VerticalAlignment="Center"></TextBlock>
+            <TextBlock Grid.Row="1" Grid.Column="0" x:Name="tbPostingDate" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ApprovePeriodPer}" VerticalAlignment="Center"  />
+            <ClientToolsControls:DateEditor Width="200" Height="25" x:Name="dpApprovePrdPer" EditValue="{Binding PostedDate, Mode=TwoWay}"  Grid.Row="1" Grid.Column="2" HorizontalAlignment="Left" />
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Simulation}" VerticalAlignment="Center"/>
+            <CheckBox x:Name="chkSimulation" Grid.Row="2" VerticalAlignment="Center" Grid.Column="2" IsChecked="{Binding IsSimulation, Mode=TwoWay}"/>
+            <TextBlock Grid.Row="3" Grid.Column="0" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Comment}" VerticalAlignment="Center"/>
+            <ClientToolsControls:TextEditor Width="200" MaxLength="40" Text="{Binding comments, Mode=TwoWay}" Grid.Row="3" x:Name="txtComments" Grid.Column="2" Height="25" HorizontalAlignment="Left"/>
+             </Grid>
+        <StackPanel x:Name="actionButton" HorizontalAlignment="Right" Grid.Row="1" Orientation="Horizontal" Margin="0 10 0 0">
+            <Button x:Name="OKButton" IsDefault="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=PostJournal}" Click="OKButton_Click" MinWidth="75" 
+                    Height="23" HorizontalAlignment="Right" Margin="0 0 3 0" />
+            <Button x:Name="CancelButton" IsCancel="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Cancel}" Click="CancelButton_Click" MinWidth="75" 
+                    Height="23" HorizontalAlignment="Right"  Margin="0 0 3 0" />
+        </StackPanel>
+    </Grid>
+</ClientTools:ChildWindow>

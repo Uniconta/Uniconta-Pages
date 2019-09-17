@@ -27,6 +27,7 @@ using System.Windows.Shapes;
 using Uniconta.ClientTools.Util;
 using Uniconta.API.Service;
 using System.Windows.Data;
+using System.Globalization;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -164,6 +165,16 @@ namespace UnicontaClient.Pages.CustomPage
         {
             for (int i = NumberOfCol; (--i >= 0);)
                 sumAmount[i] += amount[i];
+        }
+
+        public void RemoveColumn(int column)
+        {
+            NumberOfCol--;
+            while (column < NumberOfCol)
+            {
+                amount[column] = amount[column + 1];
+                column++;
+            }
         }
 
         public bool AmountsAreZero()
@@ -412,26 +423,47 @@ namespace UnicontaClient.Pages.CustomPage
             dimParamFive.DimDetails = dim5details;
             dimParamFive.InValues = ValidateDimValues(dimval5);
 
-            var dimParams = new List<ReportAPI.DimensionParameter>() { dimParamOne, dimParamTwo, dimParamThree, dimParamFour, dimParamFive };
+            var dimParams = new List<ReportAPI.DimensionParameter>(5) { dimParamOne, dimParamTwo, dimParamThree, dimParamFour, dimParamFive };
             return dimParams;
         }
 
         async void GenerateBalance()
         {
             busyIndicator.IsBusy = true;
-            var Comp = api.CompanyEntity;
-            var Cache = Comp.GetCache(typeof(GLAccount)) ?? await Comp.LoadCache(typeof(GLAccount), qapi);
+            var Cache = api.GetCache(typeof(GLAccount)) ?? await api.LoadCache(typeof(GLAccount));
+
+            var CriteriaLst = this.CriteriaLst;
+            int k;
+
+            bool CalcFound = false;
+            for (k = CriteriaLst.Count; (--k >= 0); )
+            {
+                var method = CriteriaLst[k].balcolMethod;
+                if (method > BalanceColumnMethod.FromBudget && method < BalanceColumnMethod.OnlyJournals)
+                {
+                    CalcFound = true;
+                    break;
+                }
+            }
 
             int Cols = 0;
             bool first = true;
-            bool CalcFound = false;
-            CriteriaLst = CriteriaLst?.Where(x => x._Hide == false).ToList();
-            foreach (var Crit in CriteriaLst)
+            bool hiddenFound = false;
+            for (k = 0; (k < CriteriaLst.Count); k++)
             {
+                var Crit = CriteriaLst[k];
+                if (Crit._Hide)
+                {
+                    hiddenFound = true;
+                    if (! CalcFound) // if we do not have calculated columns, we do not need to calculate the hidden column
+                    {
+                        Cols++;
+                        continue;
+                    }
+                }
+
                 var method = Crit.balcolMethod;
-                if (method > BalanceColumnMethod.FromBudget && method < BalanceColumnMethod.OnlyJournals)
-                    CalcFound = true;
-                else
+                if (method <= BalanceColumnMethod.FromBudget || method >= BalanceColumnMethod.OnlyJournals)
                 {
                     Task<FinancialBalance[]> tsk;
                     bool inTrans;
@@ -439,12 +471,17 @@ namespace UnicontaClient.Pages.CustomPage
                     if (method == BalanceColumnMethod.FromTrans || method == BalanceColumnMethod.OnlyJournals)
                     {
                         inTrans = true;
-                        tsk = tranApi.GenerateTotal(null, Crit.frmdateval, Crit.todateval, Crit.journal, dimParams, Crit.forCompany != null ? Crit.forCompany.CompanyId : 0, false, Crit.balcolMethod == BalanceColumnMethod.OnlyJournals);
+                        tsk = tranApi.GenerateTotal(null, Crit.frmdateval, Crit.todateval, Crit.journal, dimParams, Crit.forCompany != null ? Crit.forCompany.CompanyId : 0, false, method == BalanceColumnMethod.OnlyJournals);
+                    }
+                    else if (method == BalanceColumnMethod.TransQty)
+                    {
+                        inTrans = true;
+                        tsk = tranApi.GenerateTotalQty(null, Crit.frmdateval, Crit.todateval, Crit.journal, dimParams, Crit.forCompany != null ? Crit.forCompany.CompanyId : 0, false);
                     }
                     else
                     {
                         inTrans = false;
-                        tsk = tranApi.GenerateBudgetTotals(Crit.budgetModel, Crit.frmdateval, Crit.todateval, dimParams);
+                        tsk = tranApi.GenerateBudgetTotals(Crit.budgetModel, Crit.frmdateval, Crit.todateval, dimParams, method == BalanceColumnMethod.BudgetQty);
                     }
                     var bal = await tsk;
                     if (bal != null)
@@ -474,12 +511,11 @@ namespace UnicontaClient.Pages.CustomPage
                 BalanceList = balanceClient;
             }
 
-            int i;
             if (CalcFound)
             {
-                i = 0;
-                foreach (var Crit in CriteriaLst)
+                for (k = 0; (k < CriteriaLst.Count); k++)
                 {
+                    var Crit = CriteriaLst[k];
                     var ColA = Crit.ColA - 1;
                     var ColB = Crit.ColB - 1;
                     var Method = Crit.balcolMethod;
@@ -488,12 +524,12 @@ namespace UnicontaClient.Pages.CustomPage
                         if (ColA < 0)
                             ColA = 0;
                         if (ColB < 0)
-                            ColB = i - 1;
+                            ColB = k - 1;
                     }
                     if (Method == BalanceColumnMethod.Account100)
                     {
                         if (ColA < 0)
-                            ColA = i > 0 ? i - 1 : i + 1;
+                            ColA = k > 0 ? k - 1 : k + 1;
                         var Acc100 = Crit.Account100;
                         if (!string.IsNullOrEmpty(Acc100))
                         {
@@ -501,11 +537,11 @@ namespace UnicontaClient.Pages.CustomPage
                             if (Sum100 != 0)
                             {
                                 foreach (var col in BalanceList)
-                                    col.amount[i] = Math.Abs(10000 * col.amount[ColA] / Sum100);
+                                    col.amount[k] = Math.Abs(10000 * col.amount[ColA] / Sum100);
                             }
                         }
                     }
-                    else if (Method > BalanceColumnMethod.FromBudget && ColA >= 0 && ColA < CriteriaLst.Count && ColB >= 0 && ColB < CriteriaLst.Count)
+                    else if ((Method > BalanceColumnMethod.FromBudget && Method < BalanceColumnMethod.OnlyJournals) && ColA >= 0 && ColA < Cols && ColB >= 0 && ColB < Cols)
                     {
                         foreach (var col in BalanceList)
                         {
@@ -537,20 +573,32 @@ namespace UnicontaClient.Pages.CustomPage
                                     d = 0;
                                     break;
                             }
-                            col.amount[i] = d;
+                            col.amount[k] = d;
                         }
                     }
-                    i++;
                 }
             }
 
-            i = 0;
-            foreach (var Crit in CriteriaLst)
+            if (hiddenFound)
             {
+                for (k = CriteriaLst.Count; (--k >= 0);)
+                {
+                    if (CriteriaLst[k]._Hide)
+                    {
+                        CriteriaLst.RemoveAt(k);
+                        foreach (var col in BalanceList)
+                            col.RemoveColumn(k);
+                    }
+                }
+            }
+
+            for (k = 0; (k < CriteriaLst.Count); k++)
+            {
+                var Crit = CriteriaLst[k];
                 if (Crit.balanceColumnFormat == BalanceColumnFormat.Thousand)
                 {
                     foreach (var col in BalanceList)
-                        col.amount[i] /= 1000;
+                        col.amount[k] /= 1000;
                 }
                 if (AppliedTemplate == null && Crit._InvertSign)
                 {
@@ -566,10 +614,9 @@ namespace UnicontaClient.Pages.CustomPage
                             plFound = true;
 
                         if (plFound)
-                            col.amount[i] *= -1;
+                            col.amount[k] *= -1;
                     }
                 }
-                i++;
             }
 
             if (AppliedTemplate == null)
@@ -578,6 +625,8 @@ namespace UnicontaClient.Pages.CustomPage
                 var Skip0Account = this.Skip0Account;
                 var SkipSumAccount = this.SkipSumAccount;
                 int ShowAccType = this.ShowType;
+                if (ShowAccType > 2)
+                    ShowAccType = 0;
                 bool lastSkipped = false;
 
                 if (FromAccount != null || ToAccount != null || Skip0Account || SkipSumAccount || OnlySumAccounts || ShowAccType != 0)
@@ -729,9 +778,9 @@ namespace UnicontaClient.Pages.CustomPage
         private void ShowColumns()
         {
             var AmountHeader = Uniconta.ClientTools.Localization.lookup("Amount");
-            int i = 0;
-            foreach (var Crit in CriteriaLst)
+            for (int i = 0; (i < CriteriaLst.Count); i++)
             {
+                var Crit = CriteriaLst[i];
                 string str = setDateFormat(Crit);
                 bool ShowDebitCredit = Crit.ShowDebitCredit;
                 bool ShowAmount = !ShowDebitCredit;
@@ -831,7 +880,6 @@ namespace UnicontaClient.Pages.CustomPage
                         hdrData.ShowDCCol13 = ShowDebitCredit == true ? Visibility.Visible : Visibility.Collapsed;
                         break;
                 }
-                i++;
             }
             busyIndicator.IsBusy = false;
         }
@@ -1027,5 +1075,40 @@ namespace UnicontaClient.Pages.CustomPage
             return balanceFrontPageReport;
         }
 #endif
+    }
+
+    public class AccountTextDecorationTypeConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            string textDecoration = null;
+            var bal = value as BalanceClient;
+            if (bal?.AccountTypeEnum == GLAccountTypes.Header || bal?.AccountTypeEnum == GLAccountTypes.Sum)
+                textDecoration = "Underline";
+            return textDecoration;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return null;
+        }
+    }
+
+    public class AccountFontTypeConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            var fontweight = FontWeights.Normal;
+            var bal = value as BalanceClient;
+            if (bal?.AccountTypeEnum == GLAccountTypes.Header || bal?.AccountTypeEnum == GLAccountTypes.Sum)
+                fontweight = FontWeights.Bold;
+            return fontweight;
+
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return null;
+        }
     }
 }

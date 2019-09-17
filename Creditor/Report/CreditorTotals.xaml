@@ -73,16 +73,16 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorTotals"
                     <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Account" Width="100"/>
                     <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Name" Width="150"/>
                     <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Group" Width="80" />
-                    <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Amount0"/>
-                    <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Amount1"/>
-                    <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Amount2"/>
-                    <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Amount3"/>
-                    <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Amount4"/>
-                    <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Amount5"/>
-                    <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Amount6"/>
-                    <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Amount7"/>
-                    <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Amount8"/>
-                    <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Amount9"/>
+                    <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Amount0" Visible="False"/>
+                    <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Amount1" Visible="False"/>
+                    <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Amount2" Visible="False"/>
+                    <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Amount3" Visible="False"/>
+                    <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Amount4" Visible="False"/>
+                    <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Amount5" Visible="False"/>
+                    <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Amount6" Visible="False"/>
+                    <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Amount7" Visible="False"/>
+                    <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Amount8" Visible="False"/>
+                    <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Amount9" Visible="False"/>
                     <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Total"/>
                 </WPFPages:CreditorTotalsGrid.Columns>
                 <WPFPages:CreditorTotalsGrid.TotalSummary>

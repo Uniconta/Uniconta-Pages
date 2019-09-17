@@ -87,6 +87,8 @@ namespace UnicontaClient.Pages.CustomPage
                 usedim.Visibility = Visibility.Collapsed;
                 useNewdim.Visibility = Visibility.Collapsed;
             }
+            if (Comp._CountryId != CountryCode.Germany)
+                liDATEVAuto.Visibility = Visibility.Collapsed;
 
             SetAccountTotals();
             SetOffsetAccountSource();

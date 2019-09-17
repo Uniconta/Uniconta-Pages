@@ -30,6 +30,10 @@ using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
 using Uniconta.Common;
 using Uniconta.DataModel;
+using System.Windows.Data;
+using DevExpress.Data.Filtering;
+using DevExpress.Xpf.Editors;
+using DevExpress.Mvvm.UI.Interactivity;
 #if !SILVERLIGHT
 using UnicontaClient.Pages;
 #endif
@@ -246,6 +250,47 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
+        void MasterRowExpanded(object sender, RowEventArgs e)
+        {
+            var detailView = GetDetailView(e.RowHandle);
+            if (detailView == null)
+                return;
+            detailView.ShowSearchPanelMode = ShowSearchPanelMode.Never;
+            detailView.SearchPanelHighlightResults = true;
+            BindingOperations.SetBinding(detailView, DataViewBase.SearchStringProperty, new Binding("SearchText") { Source = ribbonControl.SearchControl });
+        }
+
+        TableView GetDetailView(int rowHandle)
+        {
+            var detail = dgGLTrans.GetDetail(rowHandle) as GridControl;
+            return detail == null ? null : detail.View as TableView;
+        }
+
+#if !SILVERLIGHT
+
+        void SubstituteFilter(object sender, DevExpress.Data.SubstituteFilterEventArgs e)
+        {
+            if (string.IsNullOrEmpty(ribbonControl.SearchControl.SearchText))
+                return;
+            e.Filter = new GroupOperator(GroupOperatorType.Or, e.Filter, GetDetailFilter(ribbonControl.SearchControl.SearchText));
+        }
+
+        List<OperandProperty> operands;
+        AggregateOperand GetDetailFilter(string searchString)
+        {
+            if(operands== null)
+            {
+                var visibleColumns = childDgGLTrans.Columns.Where(c => c.Visible).Select(c => string.IsNullOrEmpty(c.FieldName) ? c.Name : c.FieldName);
+                operands = new List<OperandProperty>();
+                foreach (var col in visibleColumns)
+                    operands.Add(new OperandProperty(col));
+            }
+            GroupOperator detailOperator = new GroupOperator(GroupOperatorType.Or);
+            foreach (var op in operands)
+                detailOperator.Operands.Add(new FunctionOperator(FunctionOperatorType.Contains, op, new OperandValue(searchString)));
+            return new AggregateOperand("ChildRecords", Aggregate.Exists , detailOperator);
+        }
+#endif
         public override Task InitQuery()
         {
             return null;
@@ -271,7 +316,7 @@ namespace UnicontaClient.Pages.CustomPage
             var Comp = api.CompanyEntity;
             if (accountCache == null)
                 accountCache = await Comp.LoadCache(typeof(Uniconta.DataModel.GLAccount), api).ConfigureAwait(false);
-            LoadType(new Type[] { typeof(Uniconta.DataModel.Debtor), typeof(Uniconta.DataModel.Creditor) });
+            LoadType(new Type[] { typeof(Uniconta.DataModel.Debtor), typeof(Uniconta.DataModel.Creditor), typeof(Uniconta.DataModel.GLDailyJournal), typeof(Uniconta.DataModel.GLVat), typeof(Uniconta.DataModel.GLTransType), typeof(Uniconta.DataModel.NumberSerie) });
         }
 
         void LocalMenu_OnItemClicked(string ActionType)
@@ -300,6 +345,9 @@ namespace UnicontaClient.Pages.CustomPage
                 case "ExpandAndCollapse":
                     if (dgGLTrans.ItemsSource != null)
                         SetExpandAndCollapse(dgGLTrans.IsMasterRowExpanded(0));
+                    break;
+                case "Search":
+                    LoadGLTrans();
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);
@@ -337,11 +385,6 @@ namespace UnicontaClient.Pages.CustomPage
                     ibase.LargeGlyph = Utilities.Utility.GetGlyph(";component/Assets/img/Expand_32x32.png");
                 }
             }
-        }
-
-        private void btnSearch_Click(object sender, RoutedEventArgs e)
-        {
-            LoadGLTrans();
         }
 
         void GetMenuItem()
@@ -478,8 +521,7 @@ namespace UnicontaClient.Pages.CustomPage
                 Uniconta.ClientTools.Util.UtilDisplay.ShowErrorCode(transApi.LastError);
             }
             busyIndicator.IsBusy = false;
-            if (_master != null)
-                SetExpandAndCollapse(false);
+            SetExpandAndCollapse(false);
         }
 
 
@@ -609,4 +651,5 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
     }
+
 }

@@ -103,6 +103,8 @@ namespace UnicontaClient.Pages.CustomPage
                 UtilDisplay.RemoveMenuCommand(rb, "VatReportEstonia");
             if (country != CountryCode.Netherlands)
                 UtilDisplay.RemoveMenuCommand(rb, "VatReportHolland");
+            if (country != CountryCode.Iceland)
+                UtilDisplay.RemoveMenuCommand(rb, "VatReportIceland");
             else
                 vatReportSumSize = 23; // we need 23 columns for Holland
         }
@@ -177,9 +179,17 @@ namespace UnicontaClient.Pages.CustomPage
                             PropValuePair.GenereteWhereElements("Account", lin.AccountNumber, CompareOperator.Equal),
                             PropValuePair.GenereteWhereElements("Vat", lin.Vat != null ? lin.Vat._Vat : "null", CompareOperator.Equal)
                         };
-                        AddDockItem(TabControls.AccountsTransaction, new object[] {api, filter}, Uniconta.ClientTools.Localization.lookup("Transactions"));
+                        AddDockItem(TabControls.AccountsTransaction, new object[] {api, filter}, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Transactions"), lin.AccountNumber));
                     }
                     break;
+                case "VatReportIceland":
+                    {
+                        if (vatReportSum == null)
+                            return;
+                        param = new object[] { vatReportSum, fromDate, toDate };
+                        AddDockItem(TabControls.VatReportIceland, param, "VAT statement", closeIfOpened: true);
+                        break;
+                    }
                 default:
                     break;
             }
@@ -196,11 +206,17 @@ namespace UnicontaClient.Pages.CustomPage
             LoadVatReport();
         }
 
-        static void UpdateSum(VatSumOperationReport[] vatReportSum, VatReportLine vDif, int pos, int pos2, int pos3)
+        static VatSumOperationReport CreateSum(VatSumOperationReport[] vatReportSum, int pos, double rate = 0d)
         {
             var sumLine = vatReportSum[pos];
-            if (sumLine == null)
-                vatReportSum[pos] = sumLine = new VatSumOperationReport() { _Line = pos, _Pct = vDif._Rate };
+            if (sumLine != null)
+                return sumLine;
+            return (vatReportSum[pos] = new VatSumOperationReport() { _Line = pos, _Pct = rate });
+        }
+
+        static void UpdateSum(VatSumOperationReport[] vatReportSum, VatReportLine vDif, int pos, int pos2, int pos3)
+        {
+            var sumLine = CreateSum(vatReportSum, pos, vDif._Rate);
 
             if (pos2 == 1)
                 sumLine._AmountBase += vDif.AmountWithVat;
@@ -452,6 +468,8 @@ namespace UnicontaClient.Pages.CustomPage
             double[] VatValues = new double[256];
             double[] VatBases = new double[256];
 
+            VatSumOperationReport[] vatReportSum = new VatSumOperationReport[127];
+
             for (int i = 0; (i < l); i++)
             {
                 var v = arr[i];
@@ -459,10 +477,39 @@ namespace UnicontaClient.Pages.CustomPage
                 if (v.Order == 1) // total
                 {
                     v.AmountWithVat = Math.Round(d1, decm);
-                    v.AmountWithout = Math.Round(d2, decm);
+                    var AmountWithout = Math.Round(d2, decm);
+                    v.AmountWithout = AmountWithout;
                     v._CalculatedVAT = Math.Round(d3, decm);
                     v._PostedVAT = Math.Round(d4, decm);
                     d1 = d2 = d3 = d4 = 0d;
+
+                    if (country == CountryCode.Denmark && AmountWithout != 0 && v.AccountIsVat == 1)
+                    {
+                        if (v.IsOffsetAccount == 0)
+                        {
+                            // here we sum up the amount without vatcodes
+                            if (v.VatType == 0)
+                            {
+                                var sumLine = CreateSum(vatReportSum, 33);
+                                sumLine._Amount -= AmountWithout;
+                            }
+                            else
+                            {
+                                var sumLine = CreateSum(vatReportSum, 23);
+                                sumLine._Amount += AmountWithout;
+                                sumLine = CreateSum(vatReportSum, 31);
+                                sumLine._Amount += AmountWithout;
+                            }
+                        }
+                        else
+                        {
+                            if (v.VatType == 1)
+                            {
+                                var sumLine = CreateSum(vatReportSum, 34);
+                                sumLine._Amount -= AmountWithout;
+                            }
+                        }
+                    }
                 }
                 else
                 {
@@ -494,8 +541,6 @@ namespace UnicontaClient.Pages.CustomPage
             vDif = new VatReportLine();
             vDif.Text = string.Format("{0}: {1}, {2}", Uniconta.ClientTools.Localization.lookup("FinalVatStatus"), Uniconta.ClientTools.Localization.lookup("AmountBase"), Uniconta.ClientTools.Localization.lookup("VATamount"));
             lst.Add(vDif);
-
-            VatSumOperationReport[] vatReportSum = new VatSumOperationReport[127];
 
             foreach (var c in (GLVatType[])vattypes.GetNotNullArray)
             {
@@ -565,7 +610,6 @@ namespace UnicontaClient.Pages.CustomPage
             if (lst.Count > 0)
                 SetMenuItem();
 
-#if !SILVERLIGHT
             if (country == CountryCode.Denmark)
             {
                 AccLst.Clear();
@@ -598,7 +642,6 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                 }
             }
-#endif
 
             for (int i = vatReportSumSize + 1; (--i >= 1);)
                 if (vatReportSum[i] == null)

@@ -2,7 +2,7 @@
 <root>
   <RibbonItem TabId="0" LocalizedNameKey="Home">
     <!---When we create a new TabPage -->
-    <RibbonItem Action="AddRow" LocalizedNameKey="CreateOBJ" Parameter="Campaign" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png"/>
+    <RibbonItem Action="AddRow" LocalizedNameKey="CreateOBJ" Parameter="Campaign" ControlName="CrmCampaignPage2" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png"/>
     <RibbonItem Action="EditRow" ShortcutKey="Ctrl+E" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>
   </RibbonItem>
   <RibbonItem>
@@ -14,8 +14,8 @@
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Module="Attachments" LocalizedNameKey="Attachments" LargeGlyph="Attachments_32x32.png">
-      <RibbonItem Action="AddNote" ShortcutKey="Alt+N" LocalizedNameKey="Note" Glyph="Add_Notes_16x16.png" />
-      <RibbonItem Action="AddDoc" LocalizedNameKey="Document" Glyph="Accounts_Statement_Report_16x16.png" />
+      <RibbonItem Action="AddNote" ShortcutKey="Alt+N" LocalizedNameKey="Note" ControlName="UserNotesPage" Glyph="Add_Notes_16x16.png" />
+      <RibbonItem Action="AddDoc" LocalizedNameKey="Document" ControlName="UserDocsPage" Glyph="Accounts_Statement_Report_16x16.png" />
     </RibbonItem>
   </RibbonItem>
   <RibbonItem>
@@ -25,7 +25,7 @@
       <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
       <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16.png" ShortcutKey="" />
       <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveOBJ" Parameter="Layout" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
-      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="SwitchToDefault" Glyph="Delete_16x16.png" ShortcutKey=""/>
+      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16.png" ShortcutKey=""/>
       <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16.png" ShortcutKey="Ctrl+U"/>
       <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportOBJ"  Parameter="Layout" EnableSeperator="True" Glyph="ExportLayout_16x16.png" LargeGlyph="ExportLayout_16x16.png" ShortcutKey=""/>
       <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportOBJ" Parameter="Layout" Glyph="Import_16x16.png" LargeGlyph="Import_16x16.png" ShortcutKey=""/>
@@ -33,12 +33,12 @@
     </RibbonItem>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="CreateEmailList" LocalizedNameKey="CreateOBJ" Parameter="EmailList" LargeGlyph="Email_Add_32x32.png"/>
-    <RibbonItem Action="ShowEmailList" LocalizedNameKey="ShowOBJ" Parameter="EmailList" LargeGlyph="Email_Search_32x32.png"/>
+    <RibbonItem Action="CreateEmailList" LocalizedNameKey="CreateOBJ" Parameter="EmailList" ControlName="CreateEmailListPage" LargeGlyph="Email_Add_32x32.png"/>
+    <RibbonItem Action="ShowEmailList" LocalizedNameKey="ShowOBJ" Parameter="EmailList" ControlName="EmailListPage" LargeGlyph="Email_Search_32x32.png"/>
     <RibbonItem Action="DeleteEmailList" LocalizedNameKey="DeleteOBJ" Parameter="EmailList" LargeGlyph="Email_Delete_32x32.png"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="FollowUp" LocalizedNameKey="FollowUp" LargeGlyph="CrmFollowUp.png"/>
-    <RibbonItem Action="AddFollowUp" LocalizedNameKey="GenerateOBJ" Parameter="FollowUps" LargeGlyph="FollowUp_Add_32x32.png"/>
+    <RibbonItem Action="FollowUp" LocalizedNameKey="FollowUp" ControlName="CrmFollowUpPage" LargeGlyph="CrmFollowUp.png"/>
+    <RibbonItem Action="AddFollowUp" LocalizedNameKey="GenerateOBJ" Parameter="FollowUps" ControlName="CrmCampaignFollowUp" LargeGlyph="FollowUp_Add_32x32.png"/>
   </RibbonItem>
 </root>

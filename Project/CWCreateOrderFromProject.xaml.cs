@@ -52,6 +52,8 @@ namespace UnicontaClient.Pages.CustomPage
         [ForeignKeyAttribute(ForeignKeyTable = typeof(Uniconta.DataModel.PrCategory))]
         public string PrCategory { get; set; }
 
+        static string LastInvoiceCategory;
+        static DateTime LastToDate, LastFromDate, LastGenerateDate;
         CrudAPI api;
 #if !SILVERLIGHT
         public int DialogTableId;
@@ -59,13 +61,17 @@ namespace UnicontaClient.Pages.CustomPage
         protected override bool ShowTableValueButton { get { return true; } }
 #endif
 
-        public CWCreateOrderFromProject(CrudAPI crudApi, DateTime documentGenrateteDate)
+        public CWCreateOrderFromProject(CrudAPI crudApi)
         {
-            GenrateDate = documentGenrateteDate;
+            this.GenrateDate = LastGenerateDate != DateTime.MinValue ? LastGenerateDate : Uniconta.ClientTools.Page.BasePage.GetSystemDefaultDate();
+            this.ToDate = LastToDate;
+            this.FromDate = LastFromDate;
+            this.PrCategory = LastInvoiceCategory;
+            this.InvoiceCategory = LastInvoiceCategory;
             this.DataContext = this;
             InitializeComponent();
             this.Title = string.Format(Uniconta.ClientTools.Localization.lookup("CreateOBJ"), Uniconta.ClientTools.Localization.lookup("Order"));
-            dpDate.DateTime = documentGenrateteDate;
+            dpDate.DateTime = this.GenrateDate;
             api = crudApi;
             cmbCategory.api = crudApi;
             Loaded += CWCreateOrderFromProject_Loaded;
@@ -82,7 +88,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         async void SetItemSource(QueryAPI api)
         {
-            var prCache = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.PrCategory)) ?? await api.CompanyEntity.LoadCache(typeof(Uniconta.DataModel.PrCategory), api);
+            var prCache = api.GetCache(typeof(Uniconta.DataModel.PrCategory)) ?? await api.LoadCache(typeof(Uniconta.DataModel.PrCategory));
             cmbCategory.ItemsSource = new PrCategoryRevenueFilter(prCache);
         }
 
@@ -106,10 +112,10 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
-            InvoiceCategory = PrCategory;
-            GenrateDate = dpDate.DateTime;
-            FromDate = fromDate.DateTime;
-            ToDate = toDate.DateTime;
+            this.InvoiceCategory = LastInvoiceCategory = PrCategory;
+            this.GenrateDate = LastGenerateDate = dpDate.DateTime;
+            this.FromDate = LastFromDate = fromDate.DateTime;
+            this.ToDate = LastToDate = toDate.DateTime;
             this.DialogResult = true;
         }
 

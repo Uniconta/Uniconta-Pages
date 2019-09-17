@@ -20,6 +20,7 @@ using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
 using Uniconta.Common;
 using Uniconta.DataModel;
+using Uniconta.ClientTools.Controls;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -27,7 +28,6 @@ namespace UnicontaClient.Pages.CustomPage
     public class ProductionOrderLineReportGrid : CorasauDataGridClient
     {
         public override Type TableType { get { return typeof(ProductionOrderLineClient); } }
-        public override bool Readonly { get { return false; } }
     }
 
     public partial class ProductionOrderLineReport : GridBasePage
@@ -61,6 +61,7 @@ namespace UnicontaClient.Pages.CustomPage
             dgProductionOrderLineGrid.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgProductionOrderLineGrid.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;
+            ribbonControl.DisableButtons(new string[] { "DeleteRow", "SaveGrid" });
         }
 
         protected override void OnLayoutLoaded()
@@ -88,6 +89,10 @@ namespace UnicontaClient.Pages.CustomPage
             var selectedItem = dgProductionOrderLineGrid.SelectedItem as ProductionOrderLineClient;
             switch (ActionType)
             {
+                case "EditAll":
+                    if (dgProductionOrderLineGrid.Visibility == Visibility.Visible)
+                        EditAll();
+                    break;
                 case "SaveGrid":
                     dgProductionOrderLineGrid.SaveData();
                     break;
@@ -98,6 +103,71 @@ namespace UnicontaClient.Pages.CustomPage
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
+            }
+        }
+
+        bool editAllChecked;
+        private void EditAll()
+        {
+            RibbonBase rb = (RibbonBase)localMenu.DataContext;
+            var ibase = UtilDisplay.GetMenuCommandByName(rb, "EditAll");
+            if (ibase == null)
+                return;
+            if (dgProductionOrderLineGrid.Readonly)
+            {
+                api.AllowBackgroundCrud = false;
+                dgProductionOrderLineGrid.MakeEditable();
+                UserFieldControl.MakeEditable(dgProductionOrderLineGrid);
+                ibase.Caption = Uniconta.ClientTools.Localization.lookup("LeaveEditAll");
+                ribbonControl.EnableButtons(new string[] { "DeleteRow", "SaveGrid" });
+                editAllChecked = false;
+            }
+            else
+            {
+                if (IsDataChaged)
+                {
+                    string message = Uniconta.ClientTools.Localization.lookup("SaveChangesPrompt");
+                    CWConfirmationBox confirmationDialog = new CWConfirmationBox(message);
+                    confirmationDialog.Closing += async delegate
+                    {
+                        if (confirmationDialog.DialogResult == null)
+                            return;
+
+                        switch (confirmationDialog.ConfirmationResult)
+                        {
+                            case CWConfirmationBox.ConfirmationResultEnum.Yes:
+                                var err = await dgProductionOrderLineGrid.SaveData();
+                                if (err != 0)
+                                {
+                                    api.AllowBackgroundCrud = true;
+                                    return;
+                                }
+                                break;
+                            case CWConfirmationBox.ConfirmationResultEnum.No:
+                                break;
+                        }
+                        editAllChecked = true;
+                        dgProductionOrderLineGrid.Readonly = true;
+                        dgProductionOrderLineGrid.tableView.CloseEditor();
+                        ibase.Caption = Uniconta.ClientTools.Localization.lookup("EditAll");
+                        ribbonControl.DisableButtons(new string[] { "DeleteRow", "SaveGrid" });
+                    };
+                    confirmationDialog.Show();
+                }
+                else
+                {
+                    dgProductionOrderLineGrid.Readonly = true;
+                    dgProductionOrderLineGrid.tableView.CloseEditor();
+                    ibase.Caption = Uniconta.ClientTools.Localization.lookup("EditAll");
+                    ribbonControl.DisableButtons(new string[] { "DeleteRow", "SaveGrid" });
+                }
+            }
+        }
+        public override bool IsDataChaged
+        {
+            get
+            {
+                return editAllChecked ? false : dgProductionOrderLineGrid.HasUnsavedData;
             }
         }
 

@@ -22,6 +22,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectGroups"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Group" Width="100"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Name"  Width="200"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="IsDefault" Width="50"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Invoiceable" Width="50"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="AutoNumber" Width="100"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="UseCostInWIP" Width="80"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="WorkInProgress" Width="100"/>
@@ -32,6 +33,8 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectGroups"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="MaterialsOffset" Width="100" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Adjustment" Width="100" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="AdjustmentOffset" Width="100" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceAdjustment" Width="80" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceAdjustmentOffset" Width="80" Visible="False"/>
                 </localPage:ProjectGroupGrid.Columns>
             </localPage:ProjectGroupGrid>
         </CorasauControls:BusyIndicator>

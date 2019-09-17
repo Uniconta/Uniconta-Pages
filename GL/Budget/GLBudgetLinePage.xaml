@@ -33,6 +33,7 @@ x:Class="UnicontaClient.Pages.CustomPage.GLBudgetLinePage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="Amount"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Debit" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Credit" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Qty" Width="60"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Recurring" Width="90">
                         <local:CorasauDataGridTemplateColumnClient.CellTemplate>
                             <DataTemplate>

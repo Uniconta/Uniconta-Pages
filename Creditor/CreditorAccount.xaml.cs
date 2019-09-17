@@ -62,6 +62,7 @@ namespace UnicontaClient.Pages.CustomPage
             this.PreviewKeyDown += RootVisual_KeyDown;
 #endif
             this.BeforeClose += CreditorAccount_BeforeClose;
+            LoadNow(typeof(Uniconta.DataModel.CreditorGroup));
         }
 
         private void CreditorAccount_BeforeClose()
@@ -122,7 +123,6 @@ namespace UnicontaClient.Pages.CustomPage
         {
             InitPage();
         }
-
 
         private void localMenu_OnItemClicked(string ActionType)
         {

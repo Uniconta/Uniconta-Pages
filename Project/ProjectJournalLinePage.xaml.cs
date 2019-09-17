@@ -262,11 +262,19 @@ namespace UnicontaClient.Pages.CustomPage
                 case "TimeTo":
                     if (rec._TimeTo >= rec._TimeFrom)
                         rec.Qty = (rec._TimeTo - rec._TimeFrom) / 60d;
+                    else
+                        rec.Qty = ((rec._TimeTo + 24*60) - rec._TimeFrom) / 60d;
                     break;
 
                 case "Qty":
                     UpdatePrice(rec);
-                    if (rec._Qty != (rec._TimeTo - rec._TimeFrom) / 60d)
+                    double tim;
+                    if (rec._TimeTo >= rec._TimeFrom)
+                        tim = (rec._TimeTo - rec._TimeFrom) / 60d;
+                    else
+                        tim = ((rec._TimeTo + 24 * 60) - rec._TimeFrom) / 60d;
+
+                    if (rec._Qty != tim)
                     {
                         rec._TimeFrom = 0;
                         rec._TimeTo = 0;
@@ -556,17 +564,22 @@ namespace UnicontaClient.Pages.CustomPage
                     invJournalLine._Item = bom._ItemPart;
                     item = (InvItem)items.Get(bom._ItemPart);
                     invJournalLine.SetItemValues(item);
+                    invJournalLine._Project = selectedItem._Project;
                     invJournalLine._Date = selectedItem._Date;
                     invJournalLine._Dim1 = selectedItem._Dim1;
                     invJournalLine._Dim2 = selectedItem._Dim2;
                     invJournalLine._Dim3 = selectedItem._Dim3;
                     invJournalLine._Dim4 = selectedItem._Dim4;
                     invJournalLine._Dim5 = selectedItem._Dim5;
+                    invJournalLine._Employee = selectedItem._Employee;
+                    invJournalLine._Task = selectedItem._Task;
                     invJournalLine._Variant1 = bom._Variant1;
                     invJournalLine._Variant2 = bom._Variant2;
                     invJournalLine._Variant3 = bom._Variant3;
                     invJournalLine._Variant4 = bom._Variant4;
                     invJournalLine._Variant5 = bom._Variant5;
+                    invJournalLine._PrCategory = item._PrCategory ?? selectedItem._PrCategory;
+                    invJournalLine._PayrollCategory = item._PayrollCategory ?? selectedItem._PayrollCategory;
                     invJournalLine._Warehouse = item._Warehouse;
                     invJournalLine._Location = item._Location;
                     invJournalLine._CostPrice = item._CostPrice;

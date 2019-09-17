@@ -8,7 +8,7 @@ using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.Common;
 using Uniconta.DataModel;
-
+using UnicontaClient.Pages.Creditor.Payments;
 
 namespace UnicontaISO20022CreditTransfer
 {
@@ -105,13 +105,17 @@ namespace UnicontaISO20022CreditTransfer
         /// </summary>
         public override PostalAddress DebtorAddress(Company company, PostalAddress debtorAddress)
         {
-            debtorAddress.AddressLine1 = company._Address1;
-            debtorAddress.AddressLine2 = company._Address2;
-            debtorAddress.AddressLine3 = company._Address3;
+            var adr1 = StandardPaymentFunctions.RegularExpressionReplace(company._Address1, allowedCharactersRegEx, replaceCharactersRegEx);
+            var adr2 = StandardPaymentFunctions.RegularExpressionReplace(company._Address2, allowedCharactersRegEx, replaceCharactersRegEx);
+            var adr3 = StandardPaymentFunctions.RegularExpressionReplace(company._Address3, allowedCharactersRegEx, replaceCharactersRegEx);
+
+            debtorAddress.AddressLine1 = adr1;
+            debtorAddress.AddressLine2 = adr2;
+            debtorAddress.AddressLine3 = adr3;
             debtorAddress.CountryId = ((CountryISOCode)company._CountryId).ToString();
 
             debtorAddress.Unstructured = true;
-            debtorAddress.AddressLine2 = company._Address3 != null ? string.Format("{0} {1}", company._Address2, company._Address3) : company._Address2;
+            debtorAddress.AddressLine2 = adr3 != null ? string.Format("{0} {1}", adr2, adr3) : adr2;
             debtorAddress.AddressLine3 = null;
        
             return debtorAddress;

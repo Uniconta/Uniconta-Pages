@@ -32,6 +32,8 @@ using Uniconta.ClientTools.Util;
 using Uniconta.Common;
 using Uniconta.DataModel;
 using UnicontaClient.Pages;
+using System.Windows.Data;
+using DevExpress.Data.Filtering;
 #if !SILVERLIGHT
 using UnicontaClient.Pages;
 #endif
@@ -224,6 +226,47 @@ namespace UnicontaClient.Pages.CustomPage
 #endif
         }
 
+        void MasterRowExpanded(object sender, RowEventArgs e)
+        {
+            var detailView = GetDetailView(e.RowHandle);
+            if (detailView == null)
+                return;
+            detailView.ShowSearchPanelMode = ShowSearchPanelMode.Never;
+            detailView.SearchPanelHighlightResults = true;
+            BindingOperations.SetBinding(detailView, DataViewBase.SearchStringProperty, new Binding("SearchText") { Source = ribbonControl.SearchControl });
+        }
+
+        TableView GetDetailView(int rowHandle)
+        {
+            var detail = dgDebtorTrans.GetDetail(rowHandle) as GridControl;
+            return detail == null ? null : detail.View as TableView;
+        }
+
+#if !SILVERLIGHT
+
+        void SubstituteFilter(object sender, DevExpress.Data.SubstituteFilterEventArgs e)
+        {
+            if (string.IsNullOrEmpty(ribbonControl.SearchControl.SearchText))
+                return;
+            e.Filter = new GroupOperator(GroupOperatorType.Or, e.Filter, GetDetailFilter(ribbonControl.SearchControl.SearchText));
+        }
+
+        List<OperandProperty> operands;
+        AggregateOperand GetDetailFilter(string searchString)
+        {
+            if (operands == null)
+            {
+                var visibleColumns = childDgDebtorTrans.Columns.Where(c => c.Visible).Select(c => string.IsNullOrEmpty(c.FieldName) ? c.Name : c.FieldName);
+                operands = new List<OperandProperty>();
+                foreach (var col in visibleColumns)
+                    operands.Add(new OperandProperty(col));
+            }
+            GroupOperator detailOperator = new GroupOperator(GroupOperatorType.Or);
+            foreach (var op in operands)
+                detailOperator.Operands.Add(new FunctionOperator(FunctionOperatorType.Contains, op, new OperandValue(searchString)));
+            return new AggregateOperand("ChildRecords", Aggregate.Exists, detailOperator);
+        }
+#endif
         public override Task InitQuery()
         {
             if (_master != null)
@@ -547,6 +590,22 @@ namespace UnicontaClient.Pages.CustomPage
             DebtorStatement.SetDateTime(txtDateFrm, txtDateTo);
             DateTime fromDate = DebtorStatement.DefaultFromDate, toDate = DebtorStatement.DefaultToDate;
             bool OnlyOpen = cbxOnlyOpen.IsChecked.Value;
+
+            var lstDebtorTransLst = ((IEnumerable<DebtorStatementList>)dgDebtorTrans.ItemsSource);
+            if (! SendAll)
+            {
+                // lets check if we will send all anyway.
+                SendAll = true;
+                foreach (var t in lstDebtorTransLst)
+                {
+                    if (!t._Mark)
+                    {
+                        SendAll = false;
+                        break;
+                    }
+                }
+            }
+
             if (SendAll)
             {
                 busyIndicator.IsBusy = true;
@@ -565,7 +624,6 @@ namespace UnicontaClient.Pages.CustomPage
                 busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
                 busyIndicator.IsBusy = true;
                 bool RunInBack = false;
-                var lstDebtorTransLst = ((IEnumerable<DebtorStatementList>)dgDebtorTrans.ItemsSource);
                 foreach (var t in lstDebtorTransLst)
                 {
                     if (!t._Mark)

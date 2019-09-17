@@ -47,7 +47,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CWGenerateInvoice"
             <!--<TextBlock Grid.Row="3" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CompanyDocumentUse,Mode=OneWay}" VerticalAlignment="Center"></TextBlock>
             <ClientToolsControls:ComboBoxEditor  Width="200" Height="25" x:Name="cmbDocType" Grid.Row="3" Grid.Column="2" HorizontalAlignment="Left"/>-->
 
-            <TextBlock Grid.Row="4" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=InvoiceNumber,Mode=OneWay}" VerticalAlignment="Center" Margin="0 0 0 10"></TextBlock>
+            <TextBlock Grid.Row="4" x:Name="txtInvNumberLabel"  VerticalAlignment="Center" Margin="0 0 0 10"></TextBlock>
             <ClientToolsControls:IntegerEditor Text="{Binding InvoiceNumber,Mode=TwoWay}" SetMask="false"  Width="200" Height="25" x:Name="txtInvNumber" Grid.Row="4" Grid.Column="2" HorizontalAlignment="Left" Margin="0 0 0 10"/>
 
             <TextBlock Grid.Row="5" x:Name="tbShowInv" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Print,Mode=OneWay}" VerticalAlignment="Center" Margin="0 0 0 10"></TextBlock>

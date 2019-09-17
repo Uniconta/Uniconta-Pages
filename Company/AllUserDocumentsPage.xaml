@@ -25,9 +25,12 @@ x:Class="UnicontaClient.Pages.CustomPage.AllUserDocumentsPage"
                     </local:CorasauDataGridTemplateColumnClient>
                     <local:CorasauDataGridTemplateColumnClient x:Name="UserName" Width="100" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="DocumentType" Width="55"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Url" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Text" Width="500" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Url" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="UserId" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Text" Width="400" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Group" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="KeyStr" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="KeyName" Width="120"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="GroupName" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Invoice" Width="80"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Offer" Width="80"/>

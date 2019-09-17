@@ -526,7 +526,7 @@ namespace ISO20022CreditTransfer
 
             if (paymID == string.Empty)
             { 
-                checkErrors.Add(new CheckError(String.Format("Payment Id part of the FIK71 OCR-reference could not be found due to an unvalid format.")));
+                checkErrors.Add(new CheckError(String.Format("Payment Id part of the FIK71 OCR-reference could not be found due to an invalid format.")));
                 return false;
             }
 
@@ -538,7 +538,7 @@ namespace ISO20022CreditTransfer
 
             if (creditorAccount == string.Empty)
             {
-                checkErrors.Add(new CheckError(String.Format("Creditor account part of the FIK71 OCR-reference could not be found due to an unvalid format.")));
+                checkErrors.Add(new CheckError(String.Format("Creditor account part of the FIK71 OCR-reference could not be found due to an invalid format.")));
                 return false;
             }
 
@@ -550,7 +550,7 @@ namespace ISO20022CreditTransfer
 
             if (creditorAccount.Substring(0,1) != "8")
             {
-                checkErrors.Add(new CheckError(String.Format("Creditor account part of the FIK71 OCR-reference must start with the character 8 or it will be unvalid.")));
+                checkErrors.Add(new CheckError(String.Format("Creditor account part of the FIK71 OCR-reference must start with the character 8 or it will be invalid.")));
                 return false;
             }
 
@@ -598,7 +598,7 @@ namespace ISO20022CreditTransfer
 
             if (creditorAccount == string.Empty)
             {
-                checkErrors.Add(new CheckError(String.Format("Creditor account could not be found due to an unvalid format.")));
+                checkErrors.Add(new CheckError(String.Format("Creditor account could not be found due to an invalid format.")));
                 return false;
             }
 
@@ -610,7 +610,7 @@ namespace ISO20022CreditTransfer
 
             if (creditorAccount.Substring(0, 1) != "8")
             {
-                checkErrors.Add(new CheckError(String.Format("Creditor account must start with the character 8 or it will be unvalid.")));
+                checkErrors.Add(new CheckError(String.Format("Creditor account must start with the character 8 or it will be invalid.")));
                 return false;
             }
 
@@ -664,7 +664,7 @@ namespace ISO20022CreditTransfer
 
             if (paymID == string.Empty)
             {
-                checkErrors.Add(new CheckError(String.Format("Payment Id part of the FIK75 OCR-reference could not be found due to an unvalid format.")));
+                checkErrors.Add(new CheckError(String.Format("Payment Id part of the FIK75 OCR-reference could not be found due to an invalid format.")));
                 return false;
             }
 
@@ -676,7 +676,7 @@ namespace ISO20022CreditTransfer
 
             if (creditorAccount == string.Empty)
             {
-                checkErrors.Add(new CheckError(String.Format("Creditor account part of the FIK75 OCR-reference could not be found due to an unvalid format.")));
+                checkErrors.Add(new CheckError(String.Format("Creditor account part of the FIK75 OCR-reference could not be found due to an invalid format.")));
                 return false;
             }
 
@@ -688,7 +688,7 @@ namespace ISO20022CreditTransfer
 
             if (creditorAccount.Substring(0, 1) != "8")
             {
-                checkErrors.Add(new CheckError(String.Format("Creditor account part of the FIK75 OCR-reference must start with the character 8 or it will be unvalid.")));
+                checkErrors.Add(new CheckError(String.Format("Creditor account part of the FIK75 OCR-reference must start with the character 8 or it will be invalid.")));
                 return false;
             }
 
@@ -748,7 +748,7 @@ namespace ISO20022CreditTransfer
 
             if (paymID == string.Empty)
             {
-                checkErrors.Add(new CheckError(String.Format("Payment Id part of the FIK04 OCR-reference could not be found due to an unvalid format.")));
+                checkErrors.Add(new CheckError(String.Format("Payment Id part of the FIK04 OCR-reference could not be found due to an invalid format.")));
                 return false;
             }
 
@@ -761,7 +761,7 @@ namespace ISO20022CreditTransfer
 
             if (giroAccount == string.Empty)
             {
-                checkErrors.Add(new CheckError(String.Format("Giro account part of the FIK04 OCR-reference could not be found due to an unvalid format.")));
+                checkErrors.Add(new CheckError(String.Format("Giro account part of the FIK04 OCR-reference could not be found due to an invalid format.")));
                 return false;
             }
 

@@ -251,6 +251,14 @@ namespace UnicontaClient.Pages.CustomPage
         {
             await dgDocsGrid.Filter(null);
             SetColumn();
+
+          
+            var filter = new List<PropValuePair> { PropValuePair.GenereteWhereElements(nameof(DebtorOfferClient.Account), "-1", CompareOperator.Equal) };
+
+            var query = (await api.Query<DebtorOfferClient>(filter)).FirstOrDefault();
+
+            var lines = await api.Query<DebtorOfferLineClient>(query);
+
         }
 
         protected override void LoadCacheInBackGround() { LoadType(typeof(Uniconta.DataModel.AttachmentGroup)); }

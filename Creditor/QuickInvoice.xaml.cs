@@ -85,7 +85,6 @@ namespace UnicontaClient.Pages.CustomPage
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgCreditorOrderLineGrid.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;
 #if !SILVERLIGHT
-            txtDelZipCode.EditValueChanged += TxtDelZipCode_EditValueChanged;
             btnAccount.ToolTip = string.Format(Uniconta.ClientTools.Localization.lookup("CreateOBJ"), Uniconta.ClientTools.Localization.lookup("Creditor"));
 #endif
             txtName.IsEnabled = false;
@@ -144,15 +143,28 @@ namespace UnicontaClient.Pages.CustomPage
 
         public override Task InitQuery() { return null; }
 
-        private async void TxtDelZipCode_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
+        string zip;
+        private async void Editrow_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            var s = sender as TextEditor;
-            if (s != null && s.IsLoaded)
+            if (e.PropertyName == "DeliveryZipCode")
             {
-                var deliveryCountry = Order.DeliveryCountry ?? api.CompanyEntity._CountryId;
-                var city = await UtilDisplay.GetCityName(s.Text, deliveryCountry);
-                if (city != null)
-                    Order.DeliveryCity = city;
+                if (zip == null)
+                {
+                    var deliveryCountry = Order.DeliveryCountry ?? api.CompanyEntity._CountryId;
+                    var city = await UtilDisplay.GetCityAndAddress(txtDelZipCode.Text, deliveryCountry);
+                    if (city != null)
+                    {
+                        Order.DeliveryCity = city[0];
+                        var add1 = city[1];
+                        if (!string.IsNullOrEmpty(add1))
+                            Order.DeliveryAddress1 = add1;
+                        zip = city[2];
+                        if (!string.IsNullOrEmpty(zip))
+                            Order.DeliveryZipCode = zip;
+                    }
+                }
+                else
+                    zip = null;
             }
         }
 
@@ -590,6 +602,7 @@ namespace UnicontaClient.Pages.CustomPage
         void ClearFields(CreditorOrderClient initialOrder)
         {
             Order = StreamingManager.Clone(initialOrder) as CreditorOrderClient;
+            Order.PropertyChanged += Editrow_PropertyChanged;
             this.DataContext = Order;
             dgCreditorOrderLineGrid.UpdateMaster(Order);
             dgCreditorOrderLineGrid.ItemsSource = null;
@@ -615,6 +628,12 @@ namespace UnicontaClient.Pages.CustomPage
                 Uniconta.ClientTools.Localization.lookup("ProceedConfirmation")), Uniconta.ClientTools.Localization.lookup("Confirmation"), MessageBoxButton.OKCancel);
                 if (confirmationMsgBox != MessageBoxResult.OK)
                     return;
+            }
+
+            if (api.CompanyEntity._InvoiceUseQtyNowCre)
+            {
+                foreach (var rec in lines)
+                    rec._QtyNow = rec._Qty;
             }
 
             CWGenerateInvoice GenrateInvoiceDialog = new CWGenerateInvoice(true, string.Empty, true);

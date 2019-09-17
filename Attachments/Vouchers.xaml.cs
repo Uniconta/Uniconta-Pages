@@ -26,6 +26,7 @@ using System.Collections;
 using Uniconta.API.Service;
 using UnicontaClient.Controls.Dialogs;
 using Uniconta.Common.Utility;
+using System.Text.RegularExpressions;
 #if !SILVERLIGHT
 using Bilagscan;
 using System.Net.Http;
@@ -42,6 +43,7 @@ namespace UnicontaClient.Pages.CustomPage
     {
         public override Type TableType { get { return typeof(VouchersClient); } }
         public override bool Readonly { get { return false; } }
+        public override bool SingleBufferUpdate { get { return false; } }
         public override bool CanInsert { get { return false; } }
         public override IComparer GridSorting { get { return new SortDocAttached(); } }
 
@@ -78,7 +80,7 @@ namespace UnicontaClient.Pages.CustomPage
                     Utility.UpdateBuffers(api, buffers, vouchersClient);
 
                 await Filter(null);
-                
+
                 return result;
             }
             else
@@ -112,10 +114,9 @@ namespace UnicontaClient.Pages.CustomPage
             localMenu.dataGrid = dgVoucherGrid;
 
             var api = this.api;
-            var Comp = api.CompanyEntity;
-            this.LedgerCache = Comp.GetCache(typeof(Uniconta.DataModel.GLAccount));
-            this.CreditorCache = Comp.GetCache(typeof(Uniconta.DataModel.Creditor));
-            this.PaymentCache = Comp.GetCache(typeof(PaymentTerm));
+            this.LedgerCache = api.GetCache(typeof(Uniconta.DataModel.GLAccount));
+            this.CreditorCache = api.GetCache(typeof(Uniconta.DataModel.Creditor));
+            this.PaymentCache = api.GetCache(typeof(Uniconta.DataModel.PaymentTerm));
 
             dgVoucherGrid.api = api;
             dgVoucherGrid.BusyIndicator = busyIndicator;
@@ -167,7 +168,6 @@ namespace UnicontaClient.Pages.CustomPage
                     return;
 
                 errors = Utility.DropFilesToGrid(dgVoucherGrid, files, true).ToArray();
-
             }
             else if (e.Data.GetDataPresent("FileGroupDescriptor"))
                 errors = Utility.DropOutlookMailsToGrid(dgVoucherGrid, e.Data, true);
@@ -179,32 +179,23 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 #endif
-        SQLCache LedgerCache, CreditorCache, PaymentCache, ProjectCache;
+        SQLCache LedgerCache, CreditorCache, PaymentCache, ProjectCache, TextTypes;
         protected override async void LoadCacheInBackGround()
         {
             var api = this.api;
-            var Comp = api.CompanyEntity;
             if (this.LedgerCache == null)
-                this.LedgerCache = Comp.GetCache(typeof(Uniconta.DataModel.GLAccount)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.GLAccount), api).ConfigureAwait(false);
+                this.LedgerCache = api.GetCache(typeof(Uniconta.DataModel.GLAccount)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLAccount)).ConfigureAwait(false);
             if (this.PaymentCache == null)
-                this.CreditorCache = Comp.GetCache(typeof(Uniconta.DataModel.Creditor)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.Creditor), api).ConfigureAwait(false);
+                this.CreditorCache = api.GetCache(typeof(Uniconta.DataModel.Creditor)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Creditor)).ConfigureAwait(false);
             if (this.PaymentCache == null)
-                this.PaymentCache = Comp.GetCache(typeof(PaymentTerm)) ?? await Comp.LoadCache(typeof(PaymentTerm), api).ConfigureAwait(false);
-            LoadType(typeof(Uniconta.DataModel.Employee));
+                this.PaymentCache = api.GetCache(typeof(Uniconta.DataModel.PaymentTerm)) ?? await api.LoadCache(typeof(Uniconta.DataModel.PaymentTerm)).ConfigureAwait(false);
+            LoadType( new Type[] { typeof(Uniconta.DataModel.Employee), typeof(Uniconta.DataModel.GLVat) });
         }
 
         void RemoveMenuItem()
         {
-            RibbonBase rb = (RibbonBase)localMenu.DataContext;
-            var Comp = api.CompanyEntity;
-
-            if (Comp._CountryId != CountryCode.Denmark && Comp._CountryId != CountryCode.Iceland && Comp._CountryId != CountryCode.Netherlands && Comp._CountryId != CountryCode.Austria)
-            {
-                UtilDisplay.RemoveMenuCommand(rb, "BilagscanSendVouchers");
-                UtilDisplay.RemoveMenuCommand(rb, "BilagscanReadVouchers");
-            }
-
 #if SILVERLIGHT
+            RibbonBase rb = (RibbonBase)localMenu.DataContext;
             UtilDisplay.RemoveMenuCommand(rb,"SplitPDF");
             UtilDisplay.RemoveMenuCommand(rb,"JoinPDF");
 #endif
@@ -292,21 +283,39 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                     break;
                 case "Invoice":
-                    rec.UpdateDefaultText();
+                    if (rec != null)
+                        rec.UpdateDefaultText();
                     break;
                 case "Project":
-                    lookupProjectDim(rec);
+                    if (rec?._Project != null)
+                        lookupProjectDim(rec);
                     break;
+                case "TransType":
+                    if (rec?._TransType != null)
+                        SetTransText(rec);
+                    break;
+            }
+        }
+
+        async void SetTransText(VouchersClient rec)
+        {
+            if (TextTypes == null)
+                TextTypes = api.GetCache(typeof(Uniconta.DataModel.GLTransType)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLTransType));
+            var t = (Uniconta.DataModel.GLTransType)TextTypes?.Get(rec._TransType);
+            if (t != null)
+            {
+                rec.Text = t._TransType;
+                if (t._AccountType == 0 && t._Account != null)
+                    rec.CostAccount = t._Account;
+                if (t._OffsetAccountType == 0 && t._OffsetAccount != null)
+                    rec.PayAccount = t._OffsetAccount;
             }
         }
 
         async void lookupProjectDim(VouchersClient rec)
         {
             if (ProjectCache == null)
-            {
-                var api = this.api;
-                ProjectCache = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.Project)) ?? await api.CompanyEntity.LoadCache(typeof(Uniconta.DataModel.Project), api);
-            }
+                ProjectCache = api.GetCache(typeof(Uniconta.DataModel.Project)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Project));
             var proj = (Uniconta.DataModel.Project)ProjectCache?.Get(rec._Project);
             if (proj != null)
             {
@@ -565,7 +574,7 @@ namespace UnicontaClient.Pages.CustomPage
             };
             confirmationDialog.Show();
         }
-       
+
         private void CopyOrMoveAttachement(VouchersClient selectedItem)
         {
             var cwAttachedVouchers = new CWAttachedVouchers(api);
@@ -620,6 +629,9 @@ namespace UnicontaClient.Pages.CustomPage
                     voucher1 = await ValidateVoucher(vouchers[0]);
             }
 
+            //To save any information on the editable grid
+            saveGrid();
+
             if (voucher1 != null && voucher2 != null)
                 cwJoinPdfDoc = new CWJoinPDFDocument(voucher1.Buffer, voucher2.Buffer);
             else if (voucher1 != null)
@@ -643,7 +655,7 @@ namespace UnicontaClient.Pages.CustomPage
                          deleteMsg = string.Format(Uniconta.ClientTools.Localization.lookup("ConfirmDeleteOBJ"), string.Format("{0} {1}",
                             Uniconta.ClientTools.Localization.lookup("Right"), Uniconta.ClientTools.Localization.lookup("Voucher")));
 
-                     var deleteVoucher = !string.IsNullOrEmpty(deleteMsg) && UnicontaMessageBox.Show(deleteMsg, Uniconta.ClientTools.Localization.lookup("Warning"), MessageBoxButton.YesNo)
+                     var deleteVoucher = !string.IsNullOrEmpty(deleteMsg) && voucher1.RowId > 0 && UnicontaMessageBox.Show(deleteMsg, Uniconta.ClientTools.Localization.lookup("Warning"), MessageBoxButton.YesNo)
                             == MessageBoxResult.Yes ? true : false;
 
                      if (cwJoinPdfDoc.IsLeftJoin)
@@ -659,10 +671,16 @@ namespace UnicontaClient.Pages.CustomPage
         async private Task UpdateJoinedPDFContents(VouchersClient saveVoucher, VouchersClient copiedVoucher, byte[] mergedContents, bool isDeleteVoucher)
         {
             saveVoucher._Data = mergedContents;
-            VoucherCache.SetGlobalVoucherCache(saveVoucher);
-            api.UpdateNoResponse(saveVoucher);
-
             busyIndicator.IsBusy = true;
+
+            if (saveVoucher.RowId > 0)
+            {
+                VoucherCache.SetGlobalVoucherCache(saveVoucher);
+                api.UpdateNoResponse(saveVoucher);
+            }
+            else
+                await api.Insert(saveVoucher);
+
             if (isDeleteVoucher && copiedVoucher != null)
                 await api.Delete(copiedVoucher);
 
@@ -675,7 +693,13 @@ namespace UnicontaClient.Pages.CustomPage
             if (voucher != null)
             {
                 if (voucher._Data == null)
-                    await api.Read(voucher);
+                {
+                    var voucherClient = VoucherCache.GetGlobalVoucherCache(voucher);
+                    if (voucherClient != null)
+                        voucher._Data = voucherClient._Data;
+                    else
+                        await api.Read(voucher);
+                }
             }
             return voucher;
         }
@@ -696,8 +720,13 @@ namespace UnicontaClient.Pages.CustomPage
 
                 busyIndicator.IsBusy = true;
                 if (selectedItem._Data == null)
-                    await api.Read(selectedItem);
-
+                {
+                    var voucherClient = VoucherCache.GetGlobalVoucherCache(selectedItem);
+                    if (voucherClient != null)
+                        selectedItem._Data = voucherClient._Data;
+                    else
+                        await api.Read(selectedItem);
+                }
                 if (selectedItem.Buffer == null)
                 {
                     UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("EmptyTable"), Uniconta.ClientTools.Localization.lookup("Error"), MessageBoxButton.OK);
@@ -748,7 +777,6 @@ namespace UnicontaClient.Pages.CustomPage
                         voucher._Text = string.IsNullOrEmpty(selectedItem.Text) ? fileInfo.FileName : selectedItem.Text;
                         voucherClients[iVoucher++] = voucher;
                     }
-
 
                     busyIndicator.IsBusy = true;
                     var result = await api.Insert(voucherClients);
@@ -862,11 +890,6 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        public override string NameOfControl
-        {
-            get { return TabControls.Vouchers.ToString(); }
-        }
-
         void SetFooterDetailText()
         {
             txtCreditorName.Text = VouchersClientText.CreditorName;
@@ -928,13 +951,13 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (vouchers.Count > 0)
             {
-                var filter = new List<PropValuePair>
+                var filter = new PropValuePair[]
                 {
-                    PropValuePair.GenereteWhereElements("CompanyId", typeof(int), api.CompanyEntity.CompanyId.ToString())
+                    PropValuePair.GenereteWhereElements("CompanyId", typeof(int),NumberConvert.ToString( api.CompanyId))
                 };
                 var companySettings = await api.Query<CompanySettingsClient>(filter);
 
-                orgNo = companySettings.FirstOrDefault()._OrgNumber.ToString();
+                orgNo = NumberConvert.ToString(companySettings.FirstOrDefault()._OrgNumber);
 
                 //if (humanValidation)
                 //    await Account.Enable100Percent(orgNo, accessToken);
@@ -948,8 +971,15 @@ namespace UnicontaClient.Pages.CustomPage
             foreach (var v in vouchers)
             {
                 var voucher = v as VouchersClient;
+                if (voucher._Data == null)
+                {
+                    var voucherClient = VoucherCache.GetGlobalVoucherCache(voucher);
+                    if (voucherClient != null)
+                        voucher._Data = voucherClient._Data;
+                    else
+                        await api.Read(voucher);
+                }
 
-                await api.Read(voucher);
                 if (await Bilagscan.Voucher.Upload(voucher, orgNo, accessToken))
                 {
                     voucherUpdates.Add(voucher);
@@ -957,7 +987,7 @@ namespace UnicontaClient.Pages.CustomPage
                 else
                 {
                     voucherErrors.Add(voucher);
-                    errorText.AppendLine(voucher.Text);
+                    errorText.AppendLine(voucher._Text);
                 }
                 voucher.SentToBilagscan = true;
                 voucher._Data = null;
@@ -974,11 +1004,11 @@ namespace UnicontaClient.Pages.CustomPage
                 await api.Update(voucherErrors);
             }
 
-            UnicontaMessageBox.Show(messageText, Uniconta.ClientTools.Localization.lookup("Bilagscan"));
+            UnicontaMessageBox.Show(messageText, Uniconta.ClientTools.Localization.lookup("Bilagscan"), MessageBoxButton.OK, MessageBoxImage.Information);
 #endif
         }
 
-        private bool readingFromBilagscan = false;
+        private bool readingFromBilagscan;
         private async void RecieveFromBilagscan()
         {
 #if !SILVERLIGHT
@@ -999,202 +1029,250 @@ namespace UnicontaClient.Pages.CustomPage
                     var content = await response.Content.ReadAsStringAsync();
                     var vouchers = JsonConvert.DeserializeObject<BilagscanVoucher.Processed>(content);
 
-                    var credCache = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.Creditor)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Creditor));
-                    var offsetCache = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.GLAccount)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLAccount));
+                    var credCache = api.GetCache(typeof(Uniconta.DataModel.Creditor)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Creditor));
+                    var offsetCache = api.GetCache(typeof(Uniconta.DataModel.GLAccount)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLAccount));
                     var vouchersSeen = new CommaDelimitedStringCollection();
 
                     var updateLines = new List<UnicontaBaseEntity>();
 
-                    if (vouchers != null && vouchers.data != null)
+                    if (vouchers?.data != null)
                     {
+                        var creditors = credCache.GetKeyStrRecords as Uniconta.DataModel.Creditor[];
+
+                        var search = new DocumentNoRef();
                         foreach (var voucher in vouchers.data)
                         {
-                            vouchersSeen.Add(voucher.id.ToString());
+                            vouchersSeen.Add(NumberConvert.ToString(voucher.id));
                             var hint = JsonConvert.DeserializeObject<BilagscanWrite.Hint>(voucher.note);
                             if (hint != null)
                             {
-                                var originalVoucher = new Uniconta.ClientTools.DataModel.VouchersClient()
+                                search._DocumentRef = hint.RowId;
+                                var loadedVoucher = await api.Query<VouchersClient>(search);
+                                if (loadedVoucher == null || loadedVoucher.Length == 0)
+                                    continue;
+                                var originalVoucher = loadedVoucher[0];
+
+                                var bilagscanRefID = voucher.id;
+                                originalVoucher._Reference = bilagscanRefID != 0 ? bilagscanRefID.ToString() : null;
+
+                                var bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "voucher_number", true) == 0).FirstOrDefault();
+                                if (bsItem != null)
                                 {
-                                    PrimaryKeyId = hint.RowId
-                                };
-                                await api.Read(originalVoucher);
-
-                                var voucherNumber = voucher.header_fields.Where(hf => string.Compare(hf.code, "voucher_number", true) == 0).FirstOrDefault().value;
-                                originalVoucher.Invoice = NumberConvert.ToInt(voucherNumber);
-
-                                var creditorNumber = voucher.header_fields.Where(hf => string.Compare(hf.code, "company_vat_reg_no", true) == 0).FirstOrDefault().value;
-                                originalVoucher._CreditorAccount = creditorNumber;
-
-                                var paymentCodeId = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_code_id", true) == 0).FirstOrDefault().value;
-
-                                var totalAmountInclVat = NumberConvert.ToDoubleNoThousandSeperator(voucher.header_fields.Where(hf => string.Compare(hf.code, "total_amount_incl_vat", true) == 0).FirstOrDefault().value);
-                                originalVoucher._Amount = totalAmountInclVat;
-
-                                //var dd = voucher.header_fields.Where(hf => hf.code, "payment_date").FirstOrDefault().value;
-                                //var paymentDate = dd == "" ? DateTime.Today : StringSplit.DateParse(dd, DateFormat.ymd);
-                                //originalVoucher._PayDate = paymentDate;
-
-                                var paymentId = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_id", true) == 0).FirstOrDefault().value;
-
-                                var country = voucher.header_fields.Where(hf => string.Compare(hf.code, "country", true) == 0).FirstOrDefault().value;
-                                var countryCode = CountryCode.Denmark;
-                                switch (country)
-                                {
-                                    case "DK":
-                                    default:
-                                        countryCode = CountryCode.Denmark;
-                                        break;
+                                    var invoiceNumber = bsItem.value;
+                                    invoiceNumber = Regex.Replace(invoiceNumber, "[^0-9]", string.Empty);
+                                    long tmpNumber = long.TryParse(invoiceNumber, out tmpNumber) ? tmpNumber : 0;
+                                    originalVoucher._Invoice = tmpNumber;
                                 }
 
-                                var dt = voucher.header_fields.Where(hf => string.Compare(hf.code, "invoice_date", true) == 0).FirstOrDefault().value;
-                                var invoiceDate = dt == "" ? DateTime.Today : StringSplit.DateParse(dt, DateFormat.ymd);
-                                originalVoucher._PostingDate = invoiceDate;
-
-                                var ibanNo = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_iban", true) == 0).FirstOrDefault().value;
-
-                                var currency = voucher.header_fields.Where(hf => string.Compare(hf.code, "currency", true) == 0).FirstOrDefault().value;
-                                originalVoucher.Currency = currency;
-
-                                var paymentMethod = PaymentMethods.FIK;
-                                if (countryCode == CountryCode.Denmark && !string.IsNullOrEmpty(paymentCodeId))
-                                    paymentMethod = PaymentMethods.FIK;
-                                else
-                                    paymentMethod = PaymentMethods.IBAN;
-
-                                if (paymentMethod == PaymentMethods.FIK)
+                                bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "voucher_type", true) == 0).FirstOrDefault();
+                                if (bsItem != null)
                                 {
-                                    switch (paymentCodeId)
+                                    switch (bsItem.value)
                                     {
-                                        case "71":
-                                            originalVoucher._PaymentMethod = PaymentTypes.PaymentMethod3;
-                                            break;
-                                        case "73":
-                                            originalVoucher._PaymentMethod = PaymentTypes.PaymentMethod4;
-                                            break;
-                                        case "75":
-                                            originalVoucher._PaymentMethod = PaymentTypes.PaymentMethod5;
-                                            break;
-                                        case "04":
-                                            originalVoucher._PaymentMethod = PaymentTypes.PaymentMethod6;
-                                            break;
-                                        default:
-                                            originalVoucher._PaymentMethod = PaymentTypes.VendorBankAccount;
-                                            break;
-                                    }
-
-                                    if (!string.IsNullOrEmpty(paymentId))
-                                    {
-                                        var paymentId1 = paymentId.Substring(0, paymentId.Length - 8);
-                                        var paymentId2 = paymentId.Substring(paymentId.Length - 8);
-
-                                        originalVoucher._PaymentId = string.Format("{0}+{1}", paymentId1, paymentId2);
+                                        case "invoice": originalVoucher._Content = ContentTypes.Invoice; break;
+                                        case "creditnote": originalVoucher._Content = ContentTypes.CreditNote; break;
+                                        case "receipt": originalVoucher._Content = ContentTypes.Receipt; break;
                                     }
                                 }
-                                else
+
+                                var creditorCVR = string.Empty;
+                                bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "company_vat_reg_no", true) == 0).FirstOrDefault();
+                                if (bsItem != null)
+                                    creditorCVR = bsItem.value;
+
+                                bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "total_amount_incl_vat", true) == 0).FirstOrDefault();
+                                if (bsItem != null)
+                                    originalVoucher._Amount = NumberConvert.ToDoubleNoThousandSeperator(bsItem.value);
+
+                                CountryCode countryCode = CountryCode.Denmark;
+                                bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "country", true) == 0).FirstOrDefault();
+                                if (bsItem != null)
+                                {
+                                    CountryISOCode countryISO;
+                                    countryCode = CountryCode.Denmark; //default
+                                    if (Enum.TryParse(bsItem.value, true, out countryISO))
+                                        countryCode = (CountryCode)countryISO;
+                                }
+
+                                bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "invoice_date", true) == 0).FirstOrDefault();
+                                if (bsItem != null)
+                                {
+                                    var invoiceDate = bsItem.value == string.Empty ? DateTime.Today : StringSplit.DateParse(bsItem.value, DateFormat.ymd);
+                                    originalVoucher._PostingDate = invoiceDate;
+                                }
+
+                                bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_date", true) == 0).FirstOrDefault();
+                                if (bsItem != null)
+                                {
+                                    var paymentDate = bsItem.value == string.Empty ? DateTime.MinValue : StringSplit.DateParse(bsItem.value, DateFormat.ymd);
+                                    originalVoucher._PayDate = paymentDate;
+                                }
+
+                                bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "purchase_order_number", true) == 0).FirstOrDefault();
+                                if (bsItem != null)
+                                {
+                                    var purchaseNumber = bsItem.value;
+                                    purchaseNumber = Regex.Replace(purchaseNumber, "[^0-9]", string.Empty);
+                                    int tmpNumber = int.TryParse(purchaseNumber, out tmpNumber) ? tmpNumber : 0;
+                                    originalVoucher._PurchaseNumber = tmpNumber;
+                                }
+
+                                bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "currency", true) == 0).FirstOrDefault();
+                                if (bsItem != null)
+                                {
+                                    Currencies currencyISO;
+                                    if (!Enum.TryParse(bsItem.value, true, out currencyISO))
+                                        currencyISO = Currencies.DKK; //default
+
+                                    originalVoucher._Currency = (byte)currencyISO;
+                                }
+
+                                string bbanAcc = null;
+                                bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_account_number", true) == 0).FirstOrDefault();
+                                if (bsItem != null)
+                                    bbanAcc = bsItem.value;
+
+                                string bbanRegNum = null;
+                                bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_reg_number", true) == 0).FirstOrDefault();
+                                if (bsItem != null)
+                                    bbanRegNum = bsItem.value;
+
+                                string ibanNo = null;
+                                bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_iban", true) == 0).FirstOrDefault();
+                                if (bsItem != null)
+                                    ibanNo = bsItem.value;
+
+                                string swiftNo = null;
+                                bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_swift_bic", true) == 0).FirstOrDefault();
+                                if (bsItem != null)
+                                    swiftNo = bsItem.value;
+
+                                string paymentCodeId = null;
+                                bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_code_id", true) == 0).FirstOrDefault();
+                                if (bsItem != null)
+                                    paymentCodeId = bsItem.value;
+
+                                string paymentId = null;
+                                bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_id", true) == 0).FirstOrDefault();
+                                if (bsItem != null)
+                                    paymentId = bsItem.value;
+
+                                string jointPaymentId = null;
+                                bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "joint_payment_id", true) == 0).FirstOrDefault();
+                                if (bsItem != null)
+                                    jointPaymentId = bsItem.value;
+                               
+                                var paymentMethod = PaymentTypes.VendorBankAccount;
+                                switch (paymentCodeId)
+                                {
+                                    case "71": paymentMethod = PaymentTypes.PaymentMethod3; break;
+                                    case "73": paymentMethod = PaymentTypes.PaymentMethod4; break;
+                                    case "75": paymentMethod = PaymentTypes.PaymentMethod5; break;
+                                    case "04":
+                                    case "4": paymentMethod = PaymentTypes.PaymentMethod6; break;
+                                }
+
+                                if (paymentMethod != PaymentTypes.VendorBankAccount && (paymentId != null || jointPaymentId != null))
+                                {
+                                    originalVoucher._PaymentMethod = paymentMethod;
+                                    originalVoucher._PaymentId = string.Format("{0} +{1}", paymentId, jointPaymentId);
+                                }
+                                else if (bbanRegNum != null && bbanAcc != null)
+                                {
+                                    originalVoucher._PaymentMethod = PaymentTypes.VendorBankAccount;
+                                    originalVoucher._PaymentId = string.Format("{0}-{1}", bbanRegNum, bbanAcc);
+                                }
+                                else if (swiftNo != null && ibanNo != null) 
                                 {
                                     originalVoucher._PaymentMethod = PaymentTypes.IBAN;
                                     originalVoucher._PaymentId = ibanNo;
                                 }
 
+                                Uniconta.DataModel.Creditor creditor = null;
+                               
                                 if (hint.CreditorAccount != null)
-                                    originalVoucher._CreditorAccount = hint.CreditorAccount;
+                                    creditor = (Uniconta.DataModel.Creditor)credCache.Get(hint.CreditorAccount);
                                 if (hint.Amount != 0)
                                     originalVoucher._Amount = hint.Amount;
-                                if (hint.Currency != null)
+                                if (hint.Currency != null && hint.Currency != "-")
                                     originalVoucher.Currency = hint.Currency;
                                 if (hint.PaymentId != null)
                                 {
                                     originalVoucher._PaymentId = hint.PaymentId;
                                     originalVoucher.PaymentMethod = hint.PaymentMethod;
                                 }
+                               
+                                var creditorCVRNum = Regex.Replace(creditorCVR, "[^0-9]", string.Empty);
 
-                                var creditors = credCache.GetRecords as Uniconta.DataModel.Creditor[];
-                                Uniconta.DataModel.Creditor creditor = null;
-
-                                foreach (var c in creditors)
-                                {
-                                    if (c != null)
-                                    {
-                                        if (c._LegalIdent == creditorNumber)
-                                        {
-                                            creditor = c;
-                                            break;
-                                        }
-                                    }
-                                }
-
-                                if (creditor == null && !string.IsNullOrEmpty(creditorNumber))
-                                {
-                                    foreach (var c in creditors)
-                                    {
-                                        if (c != null)
-                                        {
-                                            if (c._LegalIdent == creditorNumber.Remove(0, 2))
-                                            {
-                                                creditor = c;
-                                                creditorNumber = creditorNumber.Remove(0, 2);
-                                                originalVoucher._CreditorAccount = creditorNumber;
-                                            }
-                                        }
-                                    }
-                                }
-
+                                if (creditor == null)
+                                    creditor = creditors.Where(s => (s._LegalIdent == creditorCVR || s._LegalIdent == creditorCVRNum)).FirstOrDefault();
+                             
                                 if (creditor == null)
                                 {
                                     var newCreditor = new CreditorClient()
                                     {
-                                        Account = creditorNumber,
-                                        CompanyRegNo = creditorNumber,
-                                        _PaymentMethod = originalVoucher._PaymentMethod
+                                        _Account = creditorCVR, 
+                                        _LegalIdent = creditorCVR,
+                                        _PaymentMethod = originalVoucher._PaymentMethod,
+                                        _PaymentId = originalVoucher._PaymentId,
+                                        _SWIFT = swiftNo
                                     };
+
                                     CompanyInfo companyInformation = null;
                                     try
                                     {
-                                        companyInformation = await CVR.CheckCountry(creditorNumber, countryCode);
+                                        companyInformation = await CVR.CheckCountry(creditorCVR, countryCode);
                                     }
                                     catch (Exception ex)
                                     {
                                         UnicontaMessageBox.Show(ex.Message, Uniconta.ClientTools.Localization.lookup("Exception"), MessageBoxButton.OK);
                                         return;
                                     }
+
                                     if (companyInformation != null)
                                     {
                                         if (companyInformation.life != null)
-                                            newCreditor.Name = companyInformation.life.name;
+                                            newCreditor._Name = companyInformation.life.name;
 
                                         if (companyInformation.address != null)
                                         {
-                                            newCreditor.Address1 = companyInformation.address.CompleteStreet;
-                                            newCreditor.ZipCode = companyInformation.address.zipcode;
-                                            newCreditor.City = companyInformation.address.cityname;
-                                            newCreditor.Country = companyInformation.address.Country;
+                                            newCreditor._Address1 = companyInformation.address.CompleteStreet;
+                                            newCreditor._ZipCode = companyInformation.address.zipcode;
+                                            newCreditor._City = companyInformation.address.cityname;
+                                            newCreditor._Country = companyInformation.address.Country;
                                         }
 
                                         if (companyInformation.contact != null)
                                         {
-                                            newCreditor.Phone = companyInformation.contact.phone;
-                                            newCreditor.ContactEmail = companyInformation.contact.email;
+                                            newCreditor._Phone = companyInformation.contact.phone;
+                                            newCreditor._ContactEmail = companyInformation.contact.email;
                                         }
 
-                                        if (totalAmountInclVat > 0)
-                                            originalVoucher.Text = Uniconta.ClientTools.Localization.lookup("Invoice") + ": " + newCreditor.Name;
-                                        else
-                                            originalVoucher.Text = Uniconta.ClientTools.Localization.lookup("Creditnote") + ": " + newCreditor.Name;
+                                        originalVoucher._Text = newCreditor.Name;
+                                    }
+                                    else
+                                    {
+                                        newCreditor.Name = Uniconta.ClientTools.Localization.lookup("BilagscanNotValidVatNo");
                                     }
 
                                     await api.Insert(newCreditor);
-                                    originalVoucher._CreditorAccount = creditorNumber;
+                                    originalVoucher._CreditorAccount = creditorCVR;
                                 }
                                 else
                                 {
                                     if (!string.IsNullOrEmpty(creditor._PostingAccount))
                                         originalVoucher._CostAccount = creditor._PostingAccount;
 
-                                    if (totalAmountInclVat > 0)
-                                        originalVoucher.Text = Uniconta.ClientTools.Localization.lookup("Invoice") + ": " + creditor._Name;
-                                    else
-                                        originalVoucher.Text = Uniconta.ClientTools.Localization.lookup("Creditnote") + ": " + creditor._Name;
+                                    originalVoucher.CreditorAccount = creditor._Account;
+                                    originalVoucher._Text = creditor._Name;
+
+                                    if (creditor._SWIFT == null && swiftNo != null)
+                                    {
+                                        creditor._SWIFT = swiftNo;
+                                        updateLines.Add(creditor);
+                                    }
                                 }
+
                                 updateLines.Add(originalVoucher);
                                 noOfVouchers += 1;
                             }

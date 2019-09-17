@@ -24,7 +24,7 @@ namespace UnicontaClient.Pages.CustomPage
         public override Type TableType { get { return typeof(InvStandardVariantCombiClient); } }
         protected override IList ToList(UnicontaBaseEntity[] Arr)
         {
-            var lstInvStandardVariantCombiClient = ((InvStandardVariantCombiClient[])Arr).ToList();
+            var lstInvStandardVariantCombiClient = new List<InvStandardVariantCombiClient>((InvStandardVariantCombiClient[])Arr);
 
             foreach (InvStandardVariantCombiClient objCombiClient in lstInvStandardVariantCombiClient)
             {

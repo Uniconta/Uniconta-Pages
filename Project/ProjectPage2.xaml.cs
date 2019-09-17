@@ -34,6 +34,7 @@ namespace UnicontaClient.Pages.CustomPage
         public override Type TableType { get { return typeof(ProjectClient); } }
         public override UnicontaBaseEntity ModifiedRow { get { return editrow; } set { editrow = (ProjectClient)value; } }
         bool isCopiedRow = false;
+        Uniconta.DataModel.Debtor Debtor;
         public ProjectPage2(UnicontaBaseEntity sourcedata, bool IsEdit)
             : base(sourcedata, IsEdit)
         {
@@ -51,6 +52,25 @@ namespace UnicontaClient.Pages.CustomPage
 #endif
         }
 
+        public ProjectPage2(UnicontaBaseEntity sourcedata, UnicontaBaseEntity master)
+            : base(sourcedata, true)
+        {
+            InitializeComponent();
+            Debtor = master as Uniconta.DataModel.Debtor;
+            InitPage(api);
+        }
+
+        public ProjectPage2(CrudAPI crudApi, UnicontaBaseEntity master)
+         : base(crudApi, "")
+        {
+            InitializeComponent();
+            Debtor = master as Uniconta.DataModel.Debtor;
+            InitPage(crudApi);
+#if !SILVERLIGHT
+            FocusManager.SetFocusedElement(txtNumber, txtNumber);
+#endif
+        }
+
         void InitPage(CrudAPI crudapi)
         {
             BusyIndicator = busyIndicator;            
@@ -61,16 +81,22 @@ namespace UnicontaClient.Pages.CustomPage
             Utility.SetDimensions(crudapi, lbldim1, lbldim2, lbldim3, lbldim4, lbldim5, cmbDim1, cmbDim2, cmbDim3, cmbDim4, cmbDim5, usedim);
             if (LoadedRow == null)
             {
-                frmRibbon.DisableButtons( "Delete" );
+                frmRibbon.DisableButtons("Delete");
                 if (!isCopiedRow)
                 {
                     editrow = CreateNew() as ProjectClient;
-                    editrow.SetMaster(crudapi.CompanyEntity);
+                    if (Debtor != null)
+                    {
+                        editrow.SetMaster(Debtor);
+                        leAccount.IsEnabled = false;
+                    }
+                    else
+                        editrow.SetMaster(crudapi.CompanyEntity);
                 }
             }
             layoutItems.DataContext = editrow;
             frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
-            txtZipCode.EditValueChanged += TextEditor_EditValueChanged;
+            editrow.PropertyChanged += Editrow_PropertyChanged;
             StartLoadCache();
         }
 
@@ -78,17 +104,30 @@ namespace UnicontaClient.Pages.CustomPage
         {
             frmRibbon_BaseActions(ActionType);
         }
-       
-        private async void TextEditor_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
+        string zip;
+        private async void Editrow_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            var s = sender as TextEditor;
-            if (s != null && s.IsLoaded)
+            if (e.PropertyName == "ZipCode")
             {
-                var city = await UtilDisplay.GetCityName(s.Text, editrow._WorkCountry != 0 ? editrow._WorkCountry : api.CompanyEntity._CountryId);
-                if (city != null)
-                    editrow.City = city;
+                if (zip == null)
+                {
+                    var city = await UtilDisplay.GetCityAndAddress(txtZipCode.Text, editrow._WorkCountry != 0 ? editrow._WorkCountry : api.CompanyEntity._CountryId);
+                    if (city != null)
+                    {
+                        editrow.City = city[0];
+                        var add1 = city[1];
+                        if (!string.IsNullOrEmpty(add1))
+                            editrow.WorkAddress1 = add1;
+                        zip = city[2];
+                        if (!string.IsNullOrEmpty(zip))
+                            editrow.ZipCode = zip;
+                    }
+                }
+                else
+                    zip = null;
             }
         }
+        
 #if !SILVERLIGHT
         private void Email_ButtonClicked(object sender)
         {

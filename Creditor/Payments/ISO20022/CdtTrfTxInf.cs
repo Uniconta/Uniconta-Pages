@@ -160,7 +160,8 @@ namespace UnicontaISO20022CreditTransfer
             XmlElement amt = baseDoc.AppendElement(doc, cdtTrfTxInf, HAMT);
             baseDoc.AppendElement(doc, amt, INSTDAMT, amount).SetAttribute(BaseDocument.CURRENCY_ID, currencyCode);
 
-            baseDoc.AppendElement(doc, cdtTrfTxInf, CHRGBR, chargeBearer);
+            if (chargeBearer != string.Empty)
+                baseDoc.AppendElement(doc, cdtTrfTxInf, CHRGBR, chargeBearer);
 
             cdtrAgt.Append(baseDoc, doc, cdtTrfTxInf);
             cdtr.Append(baseDoc, doc, cdtTrfTxInf);

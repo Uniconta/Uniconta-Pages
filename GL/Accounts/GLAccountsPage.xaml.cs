@@ -71,7 +71,10 @@ namespace UnicontaClient.Pages.CustomPage
                 PrevYear.HasDecimals = PrevYearDebit.HasDecimals = PrevYearCredit.HasDecimals = 
                 ThisYear.HasDecimals = ThisYearDebit.HasDecimals = ThisYearCredit.HasDecimals = false;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
-            
+
+            if (Comp._CountryId != CountryCode.Germany)
+                DATEVAuto.ShowInColumnChooser = false;
+
             dgGLTable.BusyIndicator = busyIndicator;
             ribbonControl.DisableButtons(new string[] { "AddRow", "CopyRow", "DeleteRow", "SaveGrid" });
             ((TableView)dgGLTable.View).RowStyle = Application.Current.Resources["RowStyle"] as Style;
@@ -138,7 +141,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "Trans":
                     if (selectedItem == null)
                         return;
-                    AddDockItem(TabControls.AccountsTransaction, dgGLTable.syncEntity, string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("VoucherTransactions"), selectedItem._Name));
+                    AddDockItem(TabControls.AccountsTransaction, dgGLTable.syncEntity, string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("AccountsTransaction"), selectedItem._Name));
                     break;
                 case "Budget":
                     if (selectedItem == null)

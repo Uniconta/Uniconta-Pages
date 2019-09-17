@@ -31,7 +31,6 @@ namespace UnicontaClient.Pages.CustomPage
     public class EUSalesWithoutVATGrid : CorasauDataGridClient
     {
         public override Type TableType { get { return typeof(EUSaleWithoutVATClient); } }
-        protected override IList ToList(UnicontaBaseEntity[] Arr) { return ((EUSaleWithoutVATClient[])Arr).ToList(); }
         public override bool Readonly { get { return false; } }
     }
     public partial class EUSalesWithoutVATPage : GridBasePage
@@ -134,9 +133,9 @@ namespace UnicontaClient.Pages.CustomPage
                                 else
                                 {
 #if SILVERLIGHT
-                                    listOfFiles = CreateEUSaleWithoutVATFile.CreateEUSaleWithoutVATfile(result, api, sfd, sumOfAmount);
+                                    listOfFiles = CreateEUSaleWithoutVATFile.CreateEUSaleWithoutVATfile(result, api, sfd);
 #else
-                                    listOfFiles = CreateEUSaleWithoutVATFile.CreateEUSaleWithoutVATfile(result, api, sumOfAmount);
+                                    listOfFiles = CreateEUSaleWithoutVATFile.CreateEUSaleWithoutVATfile(result, api);
 #endif
                                 }
                             else

@@ -42,8 +42,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (last != null)
             {
                 var newRow = (DCOrderLine)dataEntity;
-                newRow._Date = last._Date;
-                newRow._OrderNumber = last._OrderNumber;
+                newRow.SetMaster(last);
             }
         }
     }
@@ -244,6 +243,8 @@ namespace UnicontaClient.Pages.CustomPage
                             rec.Qty = selectedItem._SalesQty;
                         else if (api.CompanyEntity._PurchaseLineOne)
                             rec.Qty = 1d;
+                        if (api.CompanyEntity._InvoiceUseQtyNowCre)
+                            rec.QtyNow = rec._Qty;
                         rec.SetItemValues(selectedItem, api.CompanyEntity._PurchaseLineStorage);
                         var lookup = SetPriceLookup(rec);
                         if (lookup != null)
@@ -267,6 +268,8 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "Qty":
                     UpdatePrice(rec);
+                    if (api.CompanyEntity._InvoiceUseQtyNowCre)
+                        rec.QtyNow = rec._Qty;
                     break;
                 case "Warehouse":
                     if (warehouse != null)

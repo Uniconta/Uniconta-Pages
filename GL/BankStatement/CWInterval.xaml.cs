@@ -19,9 +19,9 @@ namespace UnicontaClient.Pages.CustomPage
     {
         public DateTime FromDate { get; set; }
         public DateTime ToDate { get; set; }
-        public int VarianceDays { get; set; } 
+        public int VarianceDays { get; set; }
 
-        public CWInterval(DateTime fromdate,DateTime todate, int variantdays = 0, bool isShowVarDays = false)
+        public CWInterval(DateTime fromdate, DateTime todate, int variantdays = 0, bool isShowVarDays = false)
         {
             FromDate = fromdate;
             ToDate = todate;
@@ -39,6 +39,7 @@ namespace UnicontaClient.Pages.CustomPage
                 RowVarDays.Height = new GridLength(0);
                 double h = this.Height - 30;
                 this.Height = h;
+                txtVarDays.Visibility = intVarDays.Visibility = Visibility.Collapsed;
             }
 
             this.Loaded += CW_Loaded;

@@ -7,7 +7,7 @@ using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.Common;
 using Uniconta.DataModel;
-
+using UnicontaClient.Pages.Creditor.Payments;
 
 namespace UnicontaISO20022CreditTransfer
 {
@@ -132,61 +132,8 @@ namespace UnicontaISO20022CreditTransfer
         {
             return true;
         }
-
-
-        /// <summary>
-        /// Merged payments - underscore '_' is not allowed
-        /// </summary>
-        public override string PaymentInfoId(int fileSeqNumber, int recordSeqNumber)
-        {
-            var paymInfoId = string.Format("{0}_{1}_MERGED", fileSeqNumber.ToString().PadLeft(6, '0'), recordSeqNumber.ToString().PadLeft(6, '0'));
-
-            return paymInfoId.Replace(@"_", string.Empty);
-        }
-
-        /// <summary>
-        ///  Underscore '_' is not allowed
-        /// </summary>
-        public override string PaymentInfoId(int fileSeqNumber, DateTime requestedExecutionDate, string paymentCurrency, string isoPaymentType, string companyPaymentMethod, PaymentTypes paymentMethod)
-        {
-            var paymentMethodDescription = "TYPE";
-
-            switch (paymentMethod)
-            {
-                case PaymentTypes.VendorBankAccount:
-                    paymentMethodDescription = "BBAN";
-                    break;
-
-                case PaymentTypes.IBAN:
-                    paymentMethodDescription = "IBAN";
-                    break;
-
-                case PaymentTypes.PaymentMethod3:
-                    paymentMethodDescription = "FIK71";
-                    break;
-
-                case PaymentTypes.PaymentMethod5:
-                    paymentMethodDescription = "FIK75";
-                    break;
-
-                case PaymentTypes.PaymentMethod4:
-                    paymentMethodDescription = "FIK73";
-                    break;
-
-                case PaymentTypes.PaymentMethod6:
-                    paymentMethodDescription = "FIK04";
-                    break;
-            }
-
-            var paymentInfoIdStr = string.Format("{0}_{1}_{2}_{3}_{4}_{5}", fileSeqNumber, requestedExecutionDate.ToString("yyMMdd"), paymentCurrency, isoPaymentType, companyPaymentMethod, paymentMethodDescription);
-
-            if (paymentInfoIdStr.Length > 35)
-                paymentInfoIdStr = paymentInfoIdStr.Substring(0, 35);
-
-            return paymentInfoIdStr.Replace(@"_", string.Empty);
-        }
-
-
+      
+        
         /// <summary>
         /// DOMESTIC Payment:
         /// Transfers within the same country where either sender or receiver uses BBAN. If both parts uses IBAN/SWIFT it will be a SEPA. This is country specific for Netherland
@@ -269,19 +216,22 @@ namespace UnicontaISO20022CreditTransfer
         /// </summary>
         public override PostalAddress DebtorAddress(Company company, PostalAddress debtorAddress)
         {
+            var adr1 = StandardPaymentFunctions.RegularExpressionReplace(company._Address1, allowedCharactersRegEx, replaceCharactersRegEx);
+            var adr2 = StandardPaymentFunctions.RegularExpressionReplace(company._Address2, allowedCharactersRegEx, replaceCharactersRegEx);
+            var adr3 = StandardPaymentFunctions.RegularExpressionReplace(company._Address3, allowedCharactersRegEx, replaceCharactersRegEx);
 
             switch (companyBankEnum)
             {
                 case CompanyBankENUM.Rabobank: //Rabobank: AdrLine can occur a maximum of 2 time(s)
-                    debtorAddress.AddressLine1 = company._Address1;
-                    debtorAddress.AddressLine2 = string.Format("{0} {1}", company._Address2, company._Address3);
+                    debtorAddress.AddressLine1 = adr1;
+                    debtorAddress.AddressLine2 = string.Format("{0} {1}", adr2, adr3);
                     debtorAddress.CountryId = ((CountryISOCode)company._CountryId).ToString();
                     break;
 
                 default:
-                    debtorAddress.AddressLine1 = company._Address1;
-                    debtorAddress.AddressLine2 = company._Address2;
-                    debtorAddress.AddressLine3 = company._Address3;
+                    debtorAddress.AddressLine1 = adr1;
+                    debtorAddress.AddressLine2 = adr2;
+                    debtorAddress.AddressLine3 = adr3;
                     debtorAddress.CountryId = ((CountryISOCode)company._CountryId).ToString();
                     break;
             }
@@ -320,13 +270,34 @@ namespace UnicontaISO20022CreditTransfer
             }
         }
 
+
+        /// <summary>
+        /// Specifies the local instrument, as published in an external local instrument code list.
+        /// Allowed Codes: 
+        /// ONCL (Standard Transfer)
+        /// SDCL (Same-day Transfer)
+        /// 
+        /// ING_Bank: Not used
+        /// </summary>
+        public override string ExternalLocalInstrument(string currencyCode, DateTime executionDate)
+        {
+            switch (companyBankEnum)
+            {
+                case CompanyBankENUM.ING_Bank:
+                    return string.Empty;
+                default:
+                    return "ONCL";
+            }
+        }
+
+
         /// <summary>
         /// Unstructured Remittance Information
         /// </summary>
         public override List<string> Ustrd(string externalAdvText, ISO20022PaymentTypes ISOPaymType, PaymentTypes paymentMethod)
         {
-            var ustrdText = externalAdvText;
-
+            var ustrdText = StandardPaymentFunctions.RegularExpressionReplace(externalAdvText, allowedCharactersRegEx, replaceCharactersRegEx);
+            
             int maxLines = 0;
             int maxStrLen = 0;
             List<string> resultList = new List<string>();

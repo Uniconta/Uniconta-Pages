@@ -3,7 +3,7 @@
   <RibbonItem TabId="0" LocalizedNameKey="Home">
     <!---When we create a new TabPage -->
     <RibbonItem Action="AddRow" LocalizedNameKey="AddOBJ" Parameter="Item" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png">
-      <RibbonItem Action="AddRow" LocalizedNameKey="AddOBJ" Parameter="Item" Glyph="Add_16x16.png" LargeShortcutKey="CTRL+N"/>
+      <RibbonItem Action="AddRow" LocalizedNameKey="AddOBJ" Parameter="Item" ControlName="InventoryItemPage2" Glyph="Add_16x16.png" LargeShortcutKey="CTRL+N"/>
       <RibbonItem Action="CopyRecord" LocalizedNameKey="CopyOBJ" Parameter="Item" Glyph="Copy_16x16.png" LargeShortcutKey="Shift+F2"/>
     </RibbonItem>
     <RibbonItem Action="EditRow" ShortcutKey="Ctrl+E" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>
@@ -20,7 +20,7 @@
       <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
       <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16.png" ShortcutKey="" />
       <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveOBJ" Parameter="Layout" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
-      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="SwitchToDefault" Glyph="Delete_16x16.png" ShortcutKey=""/>
+      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16.png" ShortcutKey=""/>
       <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16.png" ShortcutKey="Ctrl+U"/>
       <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportOBJ"  Parameter="Layout" EnableSeperator="True" Glyph="ExportLayout_16x16.png" LargeGlyph="ExportLayout_16x16.png" ShortcutKey=""/>
       <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportOBJ" Parameter="Layout" Glyph="Import_16x16.png" LargeGlyph="Import_16x16.png" ShortcutKey=""/>
@@ -29,36 +29,36 @@
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Module="Attachments" LocalizedNameKey="Attachments" LargeGlyph="Attachments_32x32.png">
-      <RibbonItem Action="AddNote" ShortcutKey="Alt+N" LocalizedNameKey="Note" Glyph="Note_16x16.png" />
-      <RibbonItem Action="AddDoc" LocalizedNameKey="Document" Glyph="Document_Attachment_16x16.png" />
+      <RibbonItem Action="AddNote" ShortcutKey="Alt+N" LocalizedNameKey="Note" ControlName="UserNotesPage" Glyph="Note_16x16.png" />
+      <RibbonItem Action="AddDoc" LocalizedNameKey="Document" ControlName="UserDocsPage" Glyph="Document_Attachment_16x16.png" />
     </RibbonItem>
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="PartInvItems" LocalizedNameKey="BOM" Module="InvBOM" LargeGlyph="Order_Lines_Highlighted_32x32.png" >
-      <RibbonItem Action="InvBOMPartOfContains" LocalizedNameKey="Contains" LargeGlyph="Multiple_16x16.png"/>
-      <RibbonItem Action="InvBOMPartOfWhereUsed" LocalizedNameKey="WhereUsed" LargeGlyph="Single_16x16.png"/>
-      <RibbonItem Action="InvBOMProductionPosted" LocalizedNameKey="ProductionPosted" LargeGlyph="Offset_Account_16x16.png"/>
-      <RibbonItem Action="InvHierarichalBOM" LocalizedNameKey="HierarchicalBOM" LargeGlyph="Nested_16x16.png"/>
+      <RibbonItem Action="InvBOMPartOfContains" LocalizedNameKey="Contains" ControlName="PartInvItemsPage" LargeGlyph="Multiple_16x16.png"/>
+      <RibbonItem Action="InvBOMPartOfWhereUsed" LocalizedNameKey="WhereUsed" ControlName="InvBOMPartOfPage" LargeGlyph="Single_16x16.png"/>
+      <RibbonItem Action="InvBOMProductionPosted" LocalizedNameKey="ProductionPosted" ControlName="ProductionPostedGridPage" LargeGlyph="Offset_Account_16x16.png"/>
+      <RibbonItem Action="InvHierarichalBOM" LocalizedNameKey="HierarchicalBOM" ControlName="InventoryHierarchicalBOMStatement" LargeGlyph="Nested_16x16.png"/>
     </RibbonItem>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="InvTrans" LocalizedNameKey="Transactions" LargeGlyph="Transactions_32x32.png" ShortcutKey="CTRL+T"/>
-    <RibbonItem Action="Statistics" LocalizedNameKey="Statistics" LargeGlyph="Statistics_32x32.png"/>
-    <RibbonItem Action="Storage" LocalizedNameKey="OnHand" Module="Storage" LargeGlyph="Inventory_Trans_32x32.png"/>
-    <RibbonItem Action="InvReservation" LocalizedNameKey="Reservations" Module="Storage" LargeGlyph="Item_Number_32x32.png"/>
+    <RibbonItem Action="InvTrans" LocalizedNameKey="Transactions" ControlName="InventoryTransactions" LargeGlyph="Transactions_32x32.png" ShortcutKey="CTRL+T"/>
+    <RibbonItem Action="Statistics" LocalizedNameKey="Statistics" ControlName="InventoryTotals" LargeGlyph="Statistics_32x32.png"/>
+    <RibbonItem Action="Storage" LocalizedNameKey="OnHand" Module="Storage" ControlName="InvItemStoragePage" LargeGlyph="Inventory_Trans_32x32.png"/>
+    <RibbonItem Action="InvReservation" LocalizedNameKey="Reservations" ControlName="InventoryReservationReport" Module="Storage" LargeGlyph="Item_Number_32x32.png"/>
     <RibbonItem Action="VariantCombi" LocalizedNameKey="ItemVariants" Module="ItemVariants" LargeGlyph="Variants_Combination_32x32.png"/>
     <RibbonItem Action="VariantDetails" LocalizedNameKey="InvVariantDetail" Module="ItemVariants" LargeGlyph="Preview_32x32.png"/>
-    <RibbonItem Action="InvTransPivot" LocalizedNameKey="PivotTable" LargeGlyph="Category_Charge_32x32.png" />
+    <RibbonItem Action="InvTransPivot" LocalizedNameKey="PivotTable" ControlName="InvTransPivotPage" LargeGlyph="Category_Charge_32x32.png" />
   </RibbonItem>
   <RibbonItem >
-    <RibbonItem Action="LanguageItemText" LocalizedNameKey="LanguageItemText" Module="InvClientName" Glyph="Translation_32x32.png" LargeGlyph="Translation_32x32.png"/>
-    <RibbonItem Action="Prices" LocalizedNameKey="SalesPricesAndDiscounts" Module="InvPrice" LargeGlyph="PriceTag_32x32.png"/>
+    <RibbonItem Action="LanguageItemText" LocalizedNameKey="LanguageItemText" ControlName="LanguageItemTextPage" Module="InvClientName" Glyph="Translation_32x32.png" LargeGlyph="Translation_32x32.png"/>
+    <RibbonItem Action="Prices" LocalizedNameKey="SalesPricesAndDiscounts" ControlName="CustomerPriceListLinePage" Module="InvPrice" LargeGlyph="PriceTag_32x32.png"/>
   </RibbonItem>
   <RibbonItem >
-    <RibbonItem Action="InventorySeriesBatch" LocalizedNameKey="SerialBatchNumbers" Module="SerialBatchNumbers" Glyph="Account-statement_32x32.png" LargeGlyph="Account-statement_32x32.png"/>
+    <RibbonItem Action="InventorySeriesBatch" LocalizedNameKey="SerialBatchNumbers" ControlName="InvSeriesBatch" Module="SerialBatchNumbers" Glyph="Account-statement_32x32.png" LargeGlyph="Account-statement_32x32.png"/>
   </RibbonItem>
   <RibbonItem >
-    <RibbonItem Action="InvPurchaseAccounts" LocalizedNameKey="PurchaseAccounts" Module="PurchaseAccounts" LargeGlyph="Vendor_32x32.png"/>
+    <RibbonItem Action="InvPurchaseAccounts" LocalizedNameKey="PurchaseAccounts" ControlName="InvPurchaseAccountPage" Module="PurchaseAccounts" LargeGlyph="Vendor_32x32.png"/>
   </RibbonItem>
   <RibbonItem TabId="1" LocalizedNameKey="EditAll">
     <RibbonItem Action="EditAll"  LocalizedNameKey="EditAll" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>

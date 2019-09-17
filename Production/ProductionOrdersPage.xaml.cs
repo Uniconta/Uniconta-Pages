@@ -25,7 +25,6 @@ namespace UnicontaClient.Pages.CustomPage
     public class ProductionOrdersPageGrid : CorasauDataGridClient
     {
         public override Type TableType { get { return typeof(ProductionOrderClient); } }
-        protected override IList ToList(UnicontaBaseEntity[] Arr) { return ((ProductionOrderClient[])Arr).ToList(); }
         public override IComparer GridSorting { get { return new DCOrderSort(); } }
     }
 

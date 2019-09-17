@@ -18,6 +18,7 @@ using System.Windows.Shapes;
 using Uniconta.ClientTools;
 using Uniconta.DataModel;
 using Uniconta.ClientTools.Controls;
+using System.Threading.Tasks;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -25,10 +26,12 @@ namespace UnicontaClient.Pages.CustomPage
     public partial class UserTablePage2 : FormBasePage
     {
         TableHeaderClient editrow;
-        async public override void OnClosePage(object[] RefreshParams)
+        public override void OnClosePage(object[] refreshParams)
+        {
+        }
+        public async override Task OnClosePageAsync(object[] refreshParams)
         {
             var comp = api.CompanyEntity;
-
             if (comp != null)
             {
                 Utilities.Utility.SetDefaultCompany(null);
@@ -39,10 +42,9 @@ namespace UnicontaClient.Pages.CustomPage
                 else
                     Utilities.Utility.SetDefaultCompany(comp);
             }
-
-            globalEvents.OnRefresh(NameOfControl, RefreshParams);
+            globalEvents.OnRefresh(NameOfControl, refreshParams);
         }
-
+        
         public override Type TableType { get { return typeof(TableHeaderClient); } }
         public override string NameOfControl { get { return TabControls.UserTablePage2.ToString(); } }
         public override UnicontaBaseEntity ModifiedRow { get { return editrow; } set { editrow = (TableHeaderClient)value; } }

@@ -52,7 +52,9 @@ namespace UnicontaClient.Pages.CustomPage
         void InitPage(CrudAPI crudapi)
         {
             layoutControl = layoutItems;
-            leWorkInProgress.api = leWorkInProgressOffset.api = leOutlay.api = leOutlayOffset.api = leMaterials.api = leMaterialsOffset.api = leAutoNumber.api= leAdjustment.api= leAdjustmentOffset.api = crudapi;
+            leWorkInProgress.api = leWorkInProgressOffset.api = leOutlay.api = leOutlayOffset.api = 
+            leMaterials.api = leMaterialsOffset.api = leAutoNumber.api= leAdjustment.api=
+            leAdjustmentOffset.api = leInvoiceAdjustment.api = leInvoiceAdjustmentOffset.api = crudapi;
             cbUseCostInWIP.ItemsSource = AppEnums.WIPValue.Values;
 
             if (LoadedRow == null)

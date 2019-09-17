@@ -435,7 +435,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (master != null)
                         LoadGrid();
                     else
-                        BindGrid(true);
+                        BindGrid();
                     break;
                 case "ProjectTransFilter":
                     if (proTransFilterDialog == null)
@@ -488,9 +488,12 @@ namespace UnicontaClient.Pages.CustomPage
         {
             return dgProjectTransCategorySum.Filter(propValuePair);
         }
-        private void BindGrid(bool refresh = false)
+        private void BindGrid()
         {
-            var t = Filter(refresh == true ? null : proTransFilterValues);
+            if (proTransFilterValues == null)
+                LoadGrid();
+            else
+                Filter(proTransFilterValues);
         }
 
         void ShowBudget()
@@ -522,10 +525,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         Task ShowInculdeSubProject()
         {
-            if (includeSubProject)
-                iIncludeSubProBase.IsChecked = true;
-            else
-                iIncludeSubProBase.IsChecked = false;
+            iIncludeSubProBase.IsChecked = includeSubProject;
             return LoadGrid();
         }
 

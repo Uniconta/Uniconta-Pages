@@ -9,6 +9,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectTransactionPage"
     <UserControl.Resources>
         <Util:MaskConverter x:Key="MaskConverter" />
         <Util:RowIndexConverter x:Key="RowIndexConverter"/>
+        <Util:IntToTimeConverter x:Key="IntToTimeConverter" />
     </UserControl.Resources>
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
@@ -26,6 +27,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectTransactionPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CategoryName" AllowEditing="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CatType" Width="70" AllowEditing="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Item" Width="80" />
+                    
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Text" Width="200" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ItemName" Visible="False" AllowEditing="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ProjectName" Visible="False" AllowEditing="False"/>
@@ -35,8 +37,22 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectTransactionPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Employee" Width="80"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CreditorAccount" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PayrollCategory" Width="70"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="TimeFrom" Width="80" ShowTimeElapsed="True" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="TimeTo" Width="80" ShowTimeElapsed="True"/>
+
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="TimeFrom" Width="80">
+                        <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <TextBlock Margin="2" VerticalAlignment="Center" Text="{Binding Path=DataContext.RowData.Row.TimeFrom,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToTimeConverter}}"  Width="80"/>
+                            </ControlTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="TimeTo" Width="80"  >
+                        <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <TextBlock Margin="2" VerticalAlignment="Center" Text="{Binding Path=DataContext.RowData.Row.TimeTo,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToTimeConverter}}"  Width="80"/>
+                            </ControlTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    </localPage:CorasauDataGridTemplateColumnClient>
+                   
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Qty" Width="80">
                         <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                             <DataTemplate>

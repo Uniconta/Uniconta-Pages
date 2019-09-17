@@ -2,9 +2,9 @@
 <root>
   <RibbonItem TabId="0" LocalizedNameKey="Home">
     <!---When we create new TabPage -->
-    <RibbonItem Action="AddRow" LocalizedNameKey="AddOBJ" Parameter="BankAccount" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png"/>
-    <RibbonItem Action="EditRow" ShortcutKey="Ctrl+E" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>
-    <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh.png" LargeGlyph="refresh.png"/>
+    <RibbonItem Action="AddRow" LocalizedNameKey="AddOBJ" Parameter="BankAccount" ControlName="BankStatementPage2"  LargeGlyph="Add_32x32.png"/>
+    <RibbonItem Action="EditRow" ShortcutKey="Ctrl+E" LocalizedNameKey="Edit"  LargeGlyph="Edit_32x32.png"/>
+    <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh"  LargeGlyph="refresh.png"/>
   </RibbonItem>
 
   <RibbonItem>
@@ -14,7 +14,7 @@
       <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
       <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16.png" ShortcutKey="" />
       <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveOBJ" Parameter="Layout" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
-      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="SwitchToDefault" Glyph="Delete_16x16.png" ShortcutKey=""/>
+      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16.png" ShortcutKey=""/>
       <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16.png" ShortcutKey="Ctrl+U"/>
       <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportOBJ"  Parameter="Layout" EnableSeperator="True" Glyph="ExportLayout_16x16.png" LargeGlyph="ExportLayout_16x16.png" ShortcutKey=""/>
       <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportOBJ" Parameter="Layout" Glyph="Import_16x16.png" LargeGlyph="Import_16x16.png" ShortcutKey=""/>
@@ -23,18 +23,18 @@
   </RibbonItem>
   <RibbonItem>
     <!---When we create new TabPage -->
-    <RibbonItem Action="MatchLines" LocalizedNameKey="MatchLines" Glyph="Match_Lines_32x32.png" LargeGlyph="Match_Lines_32x32.png"/>
+    <RibbonItem Action="MatchLines" LocalizedNameKey="MatchLines" ControlName="BankStatementLinePage" Glyph="Match_Lines_32x32.png" LargeGlyph="Match_Lines_32x32.png"/>
     <RibbonItem Action="RemoveSettlements" LocalizedNameKey="RemoveOBJ" Parameter="Settlements" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png" />
     <!--RibbonItem Action="LedgerPosting" LocalizedNameKey="LedgerPostng" LargeGlyph="Posted_Journal_32x32.png"/-->
   </RibbonItem>
   <RibbonItem>
     <!---When we create new TabPage -->
-    <RibbonItem Action="StLines" LocalizedNameKey="BankStatement" Glyph="Bank_Statement_32x32.png" LargeGlyph="Bank_Statement_32x32.png"/>
-    <RibbonItem Action="GLTrans" LocalizedNameKey="LedgerTransactions" Glyph="Transactions_32x32.png" LargeGlyph="Transactions_32x32.png"/>
+    <RibbonItem Action="StLines" LocalizedNameKey="BankStatement" ControName="StatementLine" Glyph="Bank_Statement_32x32.png" LargeGlyph="Bank_Statement_32x32.png"/>
+    <RibbonItem Action="GLTrans" LocalizedNameKey="LedgerTransactions" ControlName="StatementLineTransPage" Glyph="Transactions_32x32.png" LargeGlyph="Transactions_32x32.png"/>
   </RibbonItem>
   <RibbonItem>
     <!---When we create new TabPage -->
-    <RibbonItem Action="ImportBankStatement" LocalizedNameKey="ImportOBJ" Parameter="BankStatement" LargeGlyph="Import_32x32.png"/>
+    <RibbonItem Action="ImportBankStatement" LocalizedNameKey="ImportOBJ" ControlName="ImportGLDailyJournal" Parameter="BankStatement" LargeGlyph="Import_32x32.png"/>
     <RibbonItem Action="DeleteStatement" LocalizedNameKey="DeleteOBJ" Parameter="BankStatement" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png" />
   </RibbonItem>
 </root>

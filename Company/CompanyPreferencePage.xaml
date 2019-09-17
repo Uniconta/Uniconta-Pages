@@ -52,6 +52,9 @@ x:Class="UnicontaClient.Pages.CustomPage.CompanyPreferencePage"
                     <CorasauControls:CorasauLayoutItem FieldName="PurchaseLineEditDelivered">
                         <CorasauControls:CheckEditor IsChecked="{Binding PurchaseLineEditDelivered,Mode=TwoWay}" />
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="InvoiceUseQtyNowCre">
+                        <CorasauControls:CheckEditor IsChecked="{Binding InvoiceUseQtyNowCre,Mode=TwoWay}" />
+                    </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
                 <CorasauControls:CorasauLayoutGroup View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Inventory}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" MinWidth="420">
                     <CorasauControls:CorasauLayoutItem FieldName="InvoiceAccountOnInvTrans">

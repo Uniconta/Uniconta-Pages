@@ -62,7 +62,7 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryStatement"
         </Grid>
         <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{StaticResource WindowHeaderGradient}" />
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="3" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
-            <localPage:AccountsStatementGrid x:Name="dgInvTran" AutoGenerateColumns="None" SelectionMode="None">
+            <localPage:AccountsStatementGrid x:Name="dgInvTran" AutoGenerateColumns="None" SelectionMode="None" MasterRowExpanded="MasterRowExpanded" SubstituteFilter="SubstituteFilter">
                 <localPage:AccountsStatementGrid.Columns>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ItemNumber" CellTemplate="{StaticResource RegularCellTemplate}"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Name"  />

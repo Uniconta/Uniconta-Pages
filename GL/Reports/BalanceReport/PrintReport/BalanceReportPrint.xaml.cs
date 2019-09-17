@@ -31,6 +31,28 @@ namespace UnicontaClient.Pages.CustomPage
 
     public partial class BalanceReportPrint : BasePage
     {
+        public string PrintBalanceReportPageFormat;
+        public override object GetPrintParameter()
+        {
+#if !SILVERLIGHT
+            switch (PrintBalanceReportPageFormat)
+            {
+                case "Excel":
+                    custPrint.Export(ExportFormat.Xlsx);
+                    break;
+                case "Docs":
+                    custPrint.Export(ExportFormat.Docx);
+                    break;
+                case "CSV":
+                    custPrint.Export(ExportFormat.Csv);
+                    break;
+                default:
+                    custPrint.Print();
+                    break;
+            }
+#endif
+            return base.GetPrintParameter();
+        }
         public override string NameOfControl
         {
             get { return TabControls.BalanceReportPrint.ToString(); }
@@ -131,6 +153,8 @@ namespace UnicontaClient.Pages.CustomPage
             link.PaperKind = System.Drawing.Printing.PaperKind.A4;
             link.PrintingSystem.ExportOptions.Html.EmbedImagesInHTML = true;
             ExportOptions options = link.PrintingSystem.ExportOptions;
+            options.Xls.ExportMode = XlsExportMode.SingleFile;
+            options.Xlsx.ExportMode = XlsxExportMode.SingleFile;
             ExportOptionKind[] OptionsKinds = new ExportOptionKind[]{
                 ExportOptionKind.PdfConvertImagesToJpeg,
                 ExportOptionKind.PdfACompatibility,

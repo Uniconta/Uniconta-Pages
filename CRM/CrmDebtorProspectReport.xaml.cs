@@ -352,7 +352,7 @@ namespace UnicontaClient.Pages.CustomPage
         [Display(Name = "City", ResourceType = typeof(DCAccountText))]
         string City { get; set; }
 
-        [StringLength(8)]
+        [StringLength(10)]
         [Display(Name = "ZipCode", ResourceType = typeof(DCAccountText))]
         string ZipCode { get; set; }
 

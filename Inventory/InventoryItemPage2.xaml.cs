@@ -141,7 +141,7 @@ namespace UnicontaClient.Pages.CustomPage
                 UnicontaMessageBox.Show(string.Format("{0} {1}", Uniconta.ClientTools.Localization.lookup("EANinvalid"), ean), Uniconta.ClientTools.Localization.lookup("Warning"));
             return false;
         }
-
+        bool isLayoutCtrlLoaded;
         protected override void OnLayoutCtrlLoaded()
         {
             if (editrow._Warehouse != null && api.CompanyEntity.Location && this.warehouse != null)
@@ -149,6 +149,7 @@ namespace UnicontaClient.Pages.CustomPage
                 var wareHouse = this.warehouse.Get(editrow._Warehouse) as InvWarehouseClient;
                 setLocation(wareHouse);
             }
+            isLayoutCtrlLoaded = true;
         }
         public override bool BeforeSetUserField(ref CorasauLayoutGroup parentGroup)
         {
@@ -200,7 +201,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void txtItem_LostFocus(object sender, RoutedEventArgs e)
         {
             var s = sender as TextEditor;
-            if (s != null && s.IsLoaded && itemCache != null)
+            if (s != null && isLayoutCtrlLoaded && s.IsLoaded && itemCache != null)
             {
                 var item = itemCache.Get(s.Text);
                 if (item != null && item.RowId != editrow.RowId)

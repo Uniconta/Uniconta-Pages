@@ -2,12 +2,12 @@
 <root>
   <RibbonItem TabId="0" LocalizedNameKey="Home">
     <!---When we create a new group and a new TabPage -->
-    <RibbonItem Action="AddBankFormat" LocalizedNameKey="AddOBJ" Parameter="BankFormatName" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png"/>
+    <RibbonItem Action="AddBankFormat" LocalizedNameKey="AddOBJ" Parameter="BankFormatName" ControlName="ImportGLDailyJournalPage2" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png"/>
     <RibbonItem Action="CopyRow" LocalizedNameKey="CopyOBJ" Parameter="BankFormatName" LargeGlyph="Copy_32x32.png"/>
     <RibbonItem Action="EditBankFormat" LocalizedNameKey="EditOBJ" Parameter="BankFormatName" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="LookupAccounts" LocalizedNameKey="AutomaticAccountSelection" LargeGlyph="Match_32x32.png"/>
+    <RibbonItem Action="LookupAccounts" LocalizedNameKey="AutomaticAccountSelection" ControlName="BankImportMapping" LargeGlyph="Match_32x32.png"/>
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="Import" LocalizedNameKey="Import" LargeGlyph="Import_32x32.png"/>

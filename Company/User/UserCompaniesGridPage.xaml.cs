@@ -55,6 +55,16 @@ namespace UnicontaClient.Pages.CustomPage
         bool queryLocal;
         public UserCompaniesGridPage(UnicontaBaseEntity baseEntity) : base(null)
         {
+            InitPage(baseEntity);
+        }
+
+        public UserCompaniesGridPage(CrudAPI api) : base(api, string.Empty)
+        {
+            InitPage(null);
+        }
+
+        void InitPage(UnicontaBaseEntity baseEntity)
+        {
             this.DataContext = this;
             InitializeComponent();
             queryLocal = true;
@@ -71,7 +81,6 @@ namespace UnicontaClient.Pages.CustomPage
             UtilDisplay.RemoveMenuCommand(rb, "OpenNewWindow");
 #endif
         }
-
 #if SILVERLIGHT
         public override bool CheckIfBindWithUserfield(out bool isReadOnly, out bool useBinding)
         {
@@ -171,7 +180,10 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                     {
                         if (!selectedItem._Delete)
+                        {
                             globalEvents?.NotifyCompanyChange(this, new Uniconta.ClientTools.Util.CompanyEventArgs(selectedItem));
+                            dockCtrl.CloseDockItem();
+                        }
                         else
                             UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("CompanyDeleted"), Uniconta.ClientTools.Localization.lookup("Warning"), MessageBoxButton.OK);
                     }

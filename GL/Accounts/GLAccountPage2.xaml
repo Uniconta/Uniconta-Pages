@@ -123,6 +123,9 @@ x:Class="UnicontaClient.Pages.CustomPage.GLAccountPage2"
                         <CorasauControls:CorasauLayoutItem FieldName="HideInBalance" x:Name="liHideInBalance">
                             <CorasauControls:CheckEditor x:Name="HideInBalance" IsChecked="{Binding HideInBalance,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="DATEVAuto" x:Name="liDATEVAuto">
+                            <CorasauControls:CheckEditor x:Name="DATEVAuto" IsChecked="{Binding DATEVAuto,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="ConsolidationAccount" x:Name="liConsolidationAccount" >
                             <CorasauControls:TextEditor Text="{Binding ConsolidationAccount,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>

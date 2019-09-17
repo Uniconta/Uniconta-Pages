@@ -20,12 +20,12 @@ x:Class="UnicontaClient.Pages.CustomPage.CompanyIPRestrictionPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="IpAddress" Width="120" >
                         <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                             <ControlTemplate>
-                                <TextBlock  HorizontalAlignment="Center" Text="{Binding Path=DataContext.RowData.Row.IpAddress,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" />
+                                <TextBlock VerticalAlignment="Center"  HorizontalAlignment="Center" Text="{Binding Path=DataContext.RowData.Row.IpAddress,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" />
                             </ControlTemplate>
                         </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                         <local:CorasauDataGridTemplateColumnClient.CellTemplate>
                             <DataTemplate>
-                                <CorasauControls:TextEditor HorizontalAlignment="Center"  x:Name="PART_Editor" IsReadOnly="{Binding DataContext.RowData.Row.IsSaveRow,RelativeSource={RelativeSource TemplatedParent}}" Mask="([1-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])){3}" MaskUseAsDisplayFormat="True" MaskType="RegEx"  EditValue="{Binding Path=DataContext.RowData.Row.IpAddress,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"/>
+                                <CorasauControls:TextEditor VerticalAlignment="Center" HorizontalAlignment="Center"  x:Name="PART_Editor" IsReadOnly="{Binding DataContext.RowData.Row.IsSaveRow,RelativeSource={RelativeSource TemplatedParent}}" Mask="([1-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])){3}" MaskUseAsDisplayFormat="True" MaskType="RegEx"  EditValue="{Binding Path=DataContext.RowData.Row.IpAddress,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"/>
                             </DataTemplate>
                         </local:CorasauDataGridTemplateColumnClient.CellTemplate>
                     </local:CorasauDataGridTemplateColumnClient>

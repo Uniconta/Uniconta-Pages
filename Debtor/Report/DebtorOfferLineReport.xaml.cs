@@ -21,6 +21,7 @@ using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
 using Uniconta.Common;
 using Uniconta.DataModel;
+using Uniconta.ClientTools.Controls;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -28,7 +29,6 @@ namespace UnicontaClient.Pages.CustomPage
     public class DebtorOfferLineReportGrid : CorasauDataGridClient
     {
         public override Type TableType { get { return typeof(DebtorOfferLineClient); } }
-        public override bool Readonly { get { return false; } }
     }
     /// <summary>
     /// Interaction logic for DebtorOfferLineReport.xaml
@@ -62,6 +62,7 @@ namespace UnicontaClient.Pages.CustomPage
             dgDebtorOfferLineGrid.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;
             InitialLoad();
             SetColumns();
+            ribbonControl.DisableButtons(new string[] { "DeleteRow", "SaveGrid" });
         }
 
         private void InitialLoad()
@@ -135,6 +136,10 @@ namespace UnicontaClient.Pages.CustomPage
             var selectedItem = dgDebtorOfferLineGrid.SelectedItem as DebtorOfferLineClient;
             switch (ActionType)
             {
+                case "EditAll":
+                    if (dgDebtorOfferLineGrid.Visibility == Visibility.Visible)
+                        EditAll();
+                    break;
                 case "SaveGrid":
                     dgDebtorOfferLineGrid.SaveData();
                     break;
@@ -145,6 +150,71 @@ namespace UnicontaClient.Pages.CustomPage
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
+            }
+        }
+
+        bool editAllChecked;
+        private void EditAll()
+        {
+            RibbonBase rb = (RibbonBase)localMenu.DataContext;
+            var ibase = UtilDisplay.GetMenuCommandByName(rb, "EditAll");
+            if (ibase == null)
+                return;
+            if (dgDebtorOfferLineGrid.Readonly)
+            {
+                api.AllowBackgroundCrud = false;
+                dgDebtorOfferLineGrid.MakeEditable();
+                UserFieldControl.MakeEditable(dgDebtorOfferLineGrid);
+                ibase.Caption = Uniconta.ClientTools.Localization.lookup("LeaveEditAll");
+                ribbonControl.EnableButtons(new string[] { "DeleteRow", "SaveGrid" });
+                editAllChecked = false;
+            }
+            else
+            {
+                if (IsDataChaged)
+                {
+                    string message = Uniconta.ClientTools.Localization.lookup("SaveChangesPrompt");
+                    CWConfirmationBox confirmationDialog = new CWConfirmationBox(message);
+                    confirmationDialog.Closing += async delegate
+                    {
+                        if (confirmationDialog.DialogResult == null)
+                            return;
+
+                        switch (confirmationDialog.ConfirmationResult)
+                        {
+                            case CWConfirmationBox.ConfirmationResultEnum.Yes:
+                                var err = await dgDebtorOfferLineGrid.SaveData();
+                                if (err != 0)
+                                {
+                                    api.AllowBackgroundCrud = true;
+                                    return;
+                                }
+                                break;
+                            case CWConfirmationBox.ConfirmationResultEnum.No:
+                                break;
+                        }
+                        editAllChecked = true;
+                        dgDebtorOfferLineGrid.Readonly = true;
+                        dgDebtorOfferLineGrid.tableView.CloseEditor();
+                        ibase.Caption = Uniconta.ClientTools.Localization.lookup("EditAll");
+                        ribbonControl.DisableButtons(new string[] { "DeleteRow", "SaveGrid" });
+                    };
+                    confirmationDialog.Show();
+                }
+                else
+                {
+                    dgDebtorOfferLineGrid.Readonly = true;
+                    dgDebtorOfferLineGrid.tableView.CloseEditor();
+                    ibase.Caption = Uniconta.ClientTools.Localization.lookup("EditAll");
+                    ribbonControl.DisableButtons(new string[] { "DeleteRow", "SaveGrid" });
+                }
+            }
+        }
+        public override bool IsDataChaged
+        {
+            get
+            {
+                return editAllChecked ? false : dgDebtorOfferLineGrid.HasUnsavedData;
             }
         }
 

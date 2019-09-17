@@ -2,7 +2,7 @@
 <root>
   <RibbonItem TabId="0" LocalizedNameKey="Home">
     <!---When we create a new TabPage -->
-    <RibbonItem Action="AddRow" LocalizedNameKey="AddNewRow" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png"/>    
+    <RibbonItem Action="AddRow" LocalizedNameKey="AddNewRow" ControlName="ContactPage2" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png"/>    
     <RibbonItem Action="EditRow" ShortcutKey="Ctrl+E" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>    
   </RibbonItem>
   <RibbonItem>
@@ -13,11 +13,16 @@
 	<RibbonItem Action="ClearFilter" ShortcutKey="Ctrl+K" LocalizedNameKey="ClearFilter" LargeGlyph="Filter_Clear_32x32.png"/>
   </RibbonItem>
 	<RibbonItem>
-    <RibbonItem Action="FollowUp" LocalizedNameKey="FollowUp" LargeGlyph="CrmFollowUp.png"/>
+    <RibbonItem Action="FollowUp" LocalizedNameKey="FollowUp" ControlName="CrmFollowUpPage" LargeGlyph="CrmFollowUp.png"/>
 		<RibbonItem Module="Attachments" LocalizedNameKey="Attachments" LargeGlyph="Attachments_32x32.png">
-			<RibbonItem Action="AddNote" ShortcutKey="Alt+N" LocalizedNameKey="Note" Glyph="Add_Notes_16x16.png" />
-			<RibbonItem Action="AddDoc" LocalizedNameKey="Document" Glyph="Accounts_Statement_Report_16x16.png" />
+			<RibbonItem Action="AddNote" ShortcutKey="Alt+N" LocalizedNameKey="Note" ControlName="UserNotesPage" Glyph="Add_Notes_16x16.png" />
+			<RibbonItem Action="AddDoc" LocalizedNameKey="Document" ControlName="UserDocsPage" Glyph="Accounts_Statement_Report_16x16.png" />
 		</RibbonItem>
+    <RibbonItem Action="Orders" LocalizedNameKey="Orders" LargeGlyph="Orders_32x32.png">
+      <RibbonItem Action="DebtorOrders" ControlName="DebtorOrders" LocalizedNameKey="Orders" Glyph="Offset_Account_16x16.png" />
+      <RibbonItem Action="Offers" ControlName="DebtorOffers" LocalizedNameKey="Offers" Glyph="Offer_16x16.png" />
+      <RibbonItem Action="CreditorOrders" ControlName="CreditorOrders" LocalizedNameKey="CreditorOrders" Glyph="Vendor_16x16.png" />
+    </RibbonItem>
 	</RibbonItem>
 	<RibbonItem> <!---next group in same Tab-->
     <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32.png">
@@ -25,7 +30,7 @@
       <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
       <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16.png" ShortcutKey="" />
       <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveOBJ" Parameter="Layout" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
-      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="SwitchToDefault" Glyph="Delete_16x16.png" ShortcutKey=""/>
+      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16.png" ShortcutKey=""/>
       <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16.png" ShortcutKey="Ctrl+U"/>
       <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportOBJ"  Parameter="Layout" EnableSeperator="True" Glyph="ExportLayout_16x16.png" LargeGlyph="ExportLayout_16x16.png" ShortcutKey=""/>
       <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportOBJ" Parameter="Layout" Glyph="Import_16x16.png" LargeGlyph="Import_16x16.png" ShortcutKey=""/>

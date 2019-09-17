@@ -39,13 +39,19 @@ namespace UnicontaClient.Pages.CustomPage
         public override string NameOfControl { get { return TabControls.CreditorOrdersPage2.ToString(); } }
         public override UnicontaBaseEntity ModifiedRow { get { return editrow; } set { editrow = (CreditorOrderClient)value; } }
         CreditorClient Creditor;
+        ContactClient Contact;
         public CreditorOrdersPage2(UnicontaBaseEntity sourcedata, UnicontaBaseEntity master) /* called for edit from particular account */
             : base(sourcedata, true)
         {
             InitializeComponent();
-            if (master != null && master is CreditorClient)
+            if (master != null)
             {
                 Creditor = master as CreditorClient;
+                if (Creditor == null)
+                {
+                    Contact = master as ContactClient;
+                    Creditor = Contact?.Creditor;
+                }
             }
             InitPage(api);
         }
@@ -53,9 +59,14 @@ namespace UnicontaClient.Pages.CustomPage
             : base(crudApi, "")
         {
             InitializeComponent();
-            if (master != null && master is CreditorClient)
+            if (master != null)
             {
                 Creditor = master as CreditorClient;
+                if (Creditor == null)
+                {
+                    Contact = master as ContactClient;
+                    Creditor = Contact?.Creditor;
+                }
             }
             InitPage(api);
         }
@@ -93,10 +104,15 @@ namespace UnicontaClient.Pages.CustomPage
                 liCreatedTime.Visibility = Visibility.Collapsed;
                 if (Creditor != null)
                 {
-                    editrow.SetMaster(Creditor);
+                    editrow.SetMaster(this.Creditor);
                     if (editrow.RowId == 0)
-                        SetValuesFromMaster(Creditor);
+                        SetValuesFromMaster(this.Creditor);
                     leAccount.IsEnabled = txtName.IsEnabled = false;
+                }
+                if (Contact != null)
+                {
+                    editrow.SetMaster(Contact);
+                    leAccount.IsEnabled = txtName.IsEnabled = cmbContactName.IsEnabled= false;
                 }
             }
             else
@@ -108,10 +124,10 @@ namespace UnicontaClient.Pages.CustomPage
 
             AcItem.ButtonClicked += AcItem_ButtonClicked;
 #if !SILVERLIGHT
-            txtDelZipCode.EditValueChanged += TxtDelZipCode_EditValueChanged;
+            editrow.PropertyChanged += Editrow_PropertyChanged;
 #endif
-            if (crudapi.CompanyEntity.GetCache(typeof(Uniconta.DataModel.Creditor)) == null)
-                crudapi.CompanyEntity.LoadCache(typeof(Uniconta.DataModel.Creditor), crudapi);
+            if (crudapi.GetCache(typeof(Uniconta.DataModel.Creditor)) == null)
+                crudapi.LoadCache(typeof(Uniconta.DataModel.Creditor));
         }
 
         int contactRefId;
@@ -120,8 +136,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (creditor == null) return;
 
             contactRefId = editrow._ContactRef;
-            var comp = api.CompanyEntity;
-            var cache = comp.GetCache(typeof(Contact)) ?? await comp.LoadCache(typeof(Contact), api);
+            var cache = api.GetCache(typeof(Contact)) ?? await api.LoadCache(typeof(Contact));
             var items = ((IEnumerable<Contact>)cache?.GetNotNullArray)?.Where(x => x._DCType == 2 && x._DCAccount == creditor._Account);
             cmbContactName.ItemsSource = items;
             cmbContactName.DisplayMember = "KeyName";
@@ -138,15 +153,28 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        private async void TxtDelZipCode_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
+        string zip;
+        private async void Editrow_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            var s = sender as TextEditor;
-            if (s != null && s.IsLoaded)
+            if (e.PropertyName == "DeliveryZipCode")
             {
-                var deliveryCountry = editrow.DeliveryCountry ?? editrow.Country;
-                var city = await UtilDisplay.GetCityName(s.Text, deliveryCountry);
-                if (city != null)
-                    editrow.DeliveryCity = city;
+                if (zip == null)
+                {
+                    var deliveryCountry = editrow.DeliveryCountry ?? editrow.Country;
+                    var city = await UtilDisplay.GetCityAndAddress(txtDelZipCode.Text, deliveryCountry);
+                    if (city != null)
+                    {
+                        editrow.DeliveryCity = city[0];
+                        var add1 = city[1];
+                        if (!string.IsNullOrEmpty(add1))
+                            editrow.DeliveryAddress1 = add1;
+                        zip = city[2];
+                        if (!string.IsNullOrEmpty(zip))
+                            editrow.DeliveryZipCode = zip;
+                    }
+                }
+                else
+                    zip = null;
             }
         }
         protected override void OnLayoutCtrlLoaded()
@@ -178,8 +206,11 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         public override void RowsPastedDone()
-        {
-            editrow.SetMaster(Creditor);
+        { 
+            if (Creditor != null)
+                editrow.SetMaster(Creditor);
+            if (Contact != null)
+                editrow.SetMaster(Contact);
             SetValuesFromMaster(Creditor);
         }
 
@@ -203,7 +234,6 @@ namespace UnicontaClient.Pages.CustomPage
             if (screenName == TabControls.AttachVoucherGridPage && argument != null)
             {
                 var voucherObj = argument as object[];
-
                 if (voucherObj[0] is VouchersClient)
                 {
                     attachedVoucher = voucherObj[0] as VouchersClient;
@@ -288,7 +318,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void leAccount_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
         {
             string id = Convert.ToString(e.NewValue);
-            var creditors = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.Creditor));
+            var creditors = api.GetCache(typeof(Uniconta.DataModel.Creditor));
             SetValuesFromMaster((Uniconta.DataModel.Creditor)creditors?.Get(id));
         }
         void SetValuesFromMaster(Uniconta.DataModel.Creditor creditor)

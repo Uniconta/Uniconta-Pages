@@ -28,6 +28,9 @@ namespace UnicontaClient.Pages.CustomPage
     {
         DebtorOfferClient editrow;
         SQLCache ProjectCache;
+        DebtorClient Debtor;
+        ContactClient Contact;
+        CrmProspectClient Prospect;
         public override void OnClosePage(object[] RefreshParams)
         {
             globalEvents.OnRefresh(NameOfControl, RefreshParams);
@@ -40,14 +43,36 @@ namespace UnicontaClient.Pages.CustomPage
             : base(sourcedata, true)
         {
             InitializeComponent();
+            if (master != null)
+            {
+                Debtor = master as DebtorClient;
+                if (Debtor == null)
+                {
+                    Prospect = master as CrmProspectClient;
+                    if (Prospect == null)
+                        Contact = master as ContactClient;
+                }
+            }
             InitPage(api, master);
         }
+
         public DebtorOfferPage2(CrudAPI crudApi, UnicontaBaseEntity master) /* called for add from particular account */
             : base(crudApi, "")
         {
             InitializeComponent();
+            if (master != null)
+            {
+                Debtor = master as DebtorClient;
+                if (Debtor == null)
+                {
+                    Prospect = master as CrmProspectClient;
+                    if (Prospect == null)
+                        Contact = master as ContactClient;
+                }
+            }
             InitPage(crudApi, master);
         }
+
         public DebtorOfferPage2(UnicontaBaseEntity sourcedata)
             : base(sourcedata, true)
         {
@@ -82,18 +107,31 @@ namespace UnicontaClient.Pages.CustomPage
                 editrow = CreateNew() as DebtorOfferClient;
                 editrow._Created = DateTime.MinValue;
                 liCreatedTime.Visibility = Visibility.Collapsed;
-                if (master != null)
+                if (Debtor != null)
                 {
-                    editrow.SetMaster(master);
+                    editrow.SetMaster(Debtor);
                     if (editrow.RowId == 0)
-                        SetValuesFromMaster(master as Debtor);
+                        SetValuesFromMaster(Debtor);
                     leAccount.IsEnabled = txtName.IsEnabled = false;
                 }
+                if (Contact != null)
+                {
+                    editrow.SetMaster(Contact);
+                    editrow.ContactName = Contact.Name;
+                    cmbContactName.IsEnabled = false;
+                }
+                if (Prospect != null)
+                    editrow.SetMaster(Prospect);
             }
             else
             {
                 BindContact(editrow.Debtor);
             }
+
+            if (Prospect != null)
+                BindContact(Prospect);
+            if (Contact != null)
+                BindContact(Contact.Prospect);
 
             layoutItems.DataContext = editrow;
             frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
@@ -101,11 +139,10 @@ namespace UnicontaClient.Pages.CustomPage
             AcItem.ButtonClicked += AcItem_ButtonClicked;
 
 #if !SILVERLIGHT
-            txtDelZipCode.EditValueChanged += TxtDelZipCode_EditValueChanged;
+            editrow.PropertyChanged += Editrow_PropertyChanged;
 #endif
-
             this.master = master;
-            if (master is CrmProspectClient)
+            if (Prospect != null || Contact != null)
             {
                 leAccount.IsEnabled = false;
                 AcItem.IsEnabled = false;
@@ -156,22 +193,35 @@ namespace UnicontaClient.Pages.CustomPage
             return true;
         }
 
-        private async void TxtDelZipCode_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
+        string zip;
+        private async void Editrow_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            var s = sender as TextEditor;
-            if (s != null && s.IsLoaded)
+            if (e.PropertyName == "DeliveryZipCode")
             {
-                var deliveryCountry = editrow.DeliveryCountry ?? editrow.Country;
-                var city = await UtilDisplay.GetCityName(s.Text, deliveryCountry);
-                if (city != null)
-                    editrow.DeliveryCity = city;
+                if (zip == null)
+                {
+                    var deliveryCountry = editrow.DeliveryCountry ?? editrow.Country;
+                    var city = await UtilDisplay.GetCityAndAddress(txtDelZipCode.Text, deliveryCountry);
+                    if (city != null)
+                    {
+                        editrow.DeliveryCity = city[0];
+                        var add1 = city[1];
+                        if (!string.IsNullOrEmpty(add1))
+                            editrow.DeliveryAddress1 = add1;
+                        zip = city[2];
+                        if (!string.IsNullOrEmpty(zip))
+                            editrow.DeliveryZipCode = zip;
+                    }
+                }
+                else
+                    zip = null;
             }
         }
 
         public override void RowsPastedDone()
         {
             editrow.SetMaster(master);
-            SetValuesFromMaster(master as Debtor);
+            SetValuesFromMaster(Debtor);
         }
 
         void AcItem_ButtonClicked(object sender)
@@ -230,7 +280,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             string id = Convert.ToString(e.NewValue);
             var debtors = api.CompanyEntity.GetCache(typeof(Debtor));
-            if (debtors != null)
+            if (debtors != null && Contact == null)
                 SetValuesFromMaster((Debtor)debtors.Get(id));
         }
 
@@ -251,6 +301,7 @@ namespace UnicontaClient.Pages.CustomPage
             editrow.Shipment = debtor._Shipment;
             editrow.Employee = debtor._Employee;
             editrow.DeliveryTerm = debtor._DeliveryTerm;
+            editrow.PriceList = debtor._PriceList;
             if (!RecordLoadedFromTemplate || debtor._DeliveryAddress1 != null)
             {
                 editrow.DeliveryName = debtor._DeliveryName;
@@ -305,6 +356,37 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
+        async void BindContact(CrmProspect prospect)
+        {
+            if (prospect == null)
+            {
+                var list = new List<ContactClient>();
+                list.Add(Contact);
+                cmbContactName.ItemsSource = list;
+                cmbContactName.DisplayMember = "KeyName";
+                cmbContactName.SelectedItem = list.FirstOrDefault();
+            }
+            else
+            {
+                contactRefId = editrow._ContactRef;
+                var cache = api.GetCache(typeof(Uniconta.DataModel.Contact)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Contact));
+                var items = (cache != null) ? ((IEnumerable<Uniconta.DataModel.Contact>)cache.GetNotNullArray).Where(x => x._DCType == 3 && x._DCAccount == prospect.KeyStr) : null;
+                cmbContactName.ItemsSource = items;
+                cmbContactName.DisplayMember = "KeyName";
+
+                if (contactRefId != 0 && items != null)
+                {
+                    var contact = items.Where(x => x.RowId == contactRefId).FirstOrDefault();
+                    cmbContactName.SelectedItem = contact;
+                    if (contact == null)
+                    {
+                        editrow._ContactRef = 0;
+                        editrow.ContactName = null;
+                    }
+                }
+            }
+        }
+
         private void cmbContactName_EditValueChanged(object sender, EditValueChangedEventArgs e)
         {
             var selectedItem = cmbContactName.SelectedItem as Contact;
@@ -335,17 +417,17 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (Comp.Project)
             {
-                ProjectCache = Comp.GetCache(typeof(Uniconta.DataModel.Project)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.Project), api).ConfigureAwait(false);
+                ProjectCache = api.GetCache(typeof(Uniconta.DataModel.Project)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Project)).ConfigureAwait(false);
                 if (editrow._DCAccount != null)
                     Projectlookupeditor.cacheFilter = new DebtorProjectFilter(ProjectCache, editrow._DCAccount);
 
-                var prCache = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.PrCategory)) ?? await api.CompanyEntity.LoadCache(typeof(Uniconta.DataModel.PrCategory), api).ConfigureAwait(false);
+                var prCache = api.GetCache(typeof(Uniconta.DataModel.PrCategory)) ?? await api.LoadCache(typeof(Uniconta.DataModel.PrCategory)).ConfigureAwait(false);
                 PrCategorylookupeditor.cacheFilter = new PrCategoryRevenueFilter(prCache);
             }
 
             if (Comp.DeliveryAddress)
             {
-                installationCache = Comp.GetCache(typeof(Uniconta.DataModel.WorkInstallation)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.WorkInstallation), api).ConfigureAwait(false);
+                installationCache = api.GetCache(typeof(Uniconta.DataModel.WorkInstallation)) ?? await api.LoadCache(typeof(Uniconta.DataModel.WorkInstallation)).ConfigureAwait(false);
                 if (editrow._DCAccount != null)
                     leDeliveryAddress.cacheFilter = new AccountCacheFilter(installationCache, 1, editrow._DCAccount);
             }

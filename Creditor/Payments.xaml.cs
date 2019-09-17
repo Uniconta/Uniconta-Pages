@@ -67,7 +67,7 @@ namespace UnicontaClient.Pages.CustomPage
         public double RemainingAmount { get { return _RemainingAmount; } }
         public double _RemainingAmount;
 
-        [Display(Name = "System Info")]
+        [Display(Name = "SystemInfo", ResourceType = typeof(DCTransText))]
         public string ErrorInfo { get { return _ErrorInfo; } }
         public string _ErrorInfo;
 
@@ -100,7 +100,6 @@ namespace UnicontaClient.Pages.CustomPage
     {
         public override Type TableType { get { return typeof(CreditorTransPayment); } }
         public override bool Readonly { get { return false; } }
-        protected override IList ToList(UnicontaBaseEntity[] Arr) { return ((CreditorTransPayment[])Arr).ToList(); }
         protected override void OnPreviewKeyDown(KeyEventArgs e)
         {
             if (e.Key == Key.Delete && Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
@@ -1438,7 +1437,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (paymFormatClient != null)
                     paymMessage = paymFormatClient._Message ?? string.Empty;
 
-                rec._Message = StandardPaymentFunctions.MessageFormat(paymMessage, rec, company, cred);
+                rec._Message = StandardPaymentFunctions.ExternalMessage(paymMessage, rec, company, cred, true);
 
                 if (rec._PaymentDate < today)
                 {

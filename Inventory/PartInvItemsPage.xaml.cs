@@ -55,8 +55,42 @@ namespace UnicontaClient.Pages.CustomPage
             base.PageClosing();
         }
 
+        public PartInvItemsPage(SynchronizeEntity syncEntity)
+            : base(syncEntity, true)
+        {
+            this.syncEntity = syncEntity;
+            if (syncEntity != null)
+                InitPage(syncEntity.Row);
+            SetHeader();
+        }
+
         public PartInvItemsPage(UnicontaBaseEntity _master)
             : base(_master)
+        {
+            InitPage(_master);
+        }
+
+        protected override void SyncEntityMasterRowChanged(UnicontaBaseEntity args)
+        {
+            var item = args as Uniconta.DataModel.InvItem;
+            if (item._ItemType < (byte)Uniconta.DataModel.ItemType.BOM)
+                return;
+            dgPartInvItemsGrid.UpdateMaster(args);
+            SetHeader();
+            InitQuery();
+        }
+
+        void SetHeader()
+        {
+            var syncMaster = dgPartInvItemsGrid.masterRecord as Uniconta.DataModel.InvItem;
+            string header = null;
+            if (syncMaster != null)
+                header = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("BOM"), syncMaster._Item);
+            if (header != null)
+                SetHeader(header);
+        }
+
+        void InitPage(UnicontaBaseEntity _master)
         {
             master = _master;
             Invitem = master as InvItemClient;

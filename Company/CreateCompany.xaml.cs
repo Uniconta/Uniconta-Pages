@@ -76,45 +76,50 @@ namespace UnicontaClient.Pages.CustomPage
             layoutEndDate.Label = Uniconta.ClientTools.Localization.lookup("ToDate");
             layoutControl = layoutItems;
             editrow = CreateNew() as CompanyClient;
-            editrow.Country = api.session.DefaultCompany._CountryId;
-            layoutItems.DataContext = editrow;
-            int year = BasePage.GetSystemDefaultDate().Year;
-            dateFrm.DateTime = new DateTime(year, 1, 1);
-            dateTo.DateTime = new DateTime(year, 12, 31);
-            frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
-            SetOwnCompany();
-            CompanySetupPage.SetCountry(cmbCountry, cmbStandardCompany, editrow, true);
-            browseTopLogo.FileSelected += BrowseTopLogo_FileSelected;
+            var defaultCompany = api.session.DefaultCompany;
+            if (defaultCompany != null)
+            {
+                editrow.Country = defaultCompany._CountryId;
+                layoutItems.DataContext = editrow;
+                int year = BasePage.GetSystemDefaultDate().Year;
+                dateFrm.DateTime = new DateTime(year, 1, 1);
+                dateTo.DateTime = new DateTime(year, 12, 31);
+                frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
+                SetOwnCompany();
+                CompanySetupPage.SetCountry(cmbCountry, cmbStandardCompany, editrow, true);
+                browseTopLogo.FileSelected += BrowseTopLogo_FileSelected;
 #if !SILVERLIGHT
-            lblImportInvoice.Label = string.Format(Uniconta.ClientTools.Localization.lookup("ImportOBJ"), Uniconta.ClientTools.Localization.lookup("Invoice"));
-            BindSetupType();
-            grpImportSetup.Header = string.Format(Uniconta.ClientTools.Localization.lookup("ImportOBJ"), Uniconta.ClientTools.Localization.lookup("Company"));
-            cmbImportFrom.ItemsSource = Enum.GetNames(typeof(ImportFrom));
-            cmbImportFrom.SelectedIndexChanged += cmbImportFrom_SelectionChanged;
-            cmbImportDimension.ItemsSource = new List<string>() { "Ingen", "Kun Afdeling", "Afdeling, Bærer", "Afdeling, Bærer, Formål" };
-            cmbImportDimension.SelectedIndex = 3;
+                lblImportInvoice.Label = string.Format(Uniconta.ClientTools.Localization.lookup("ImportOBJ"), Uniconta.ClientTools.Localization.lookup("Invoice"));
+                BindSetupType();
+                grpImportSetup.Header = string.Format(Uniconta.ClientTools.Localization.lookup("ImportOBJ"), Uniconta.ClientTools.Localization.lookup("Company"));
+                cmbImportFrom.ItemsSource = Enum.GetNames(typeof(ImportFrom));
+                cmbImportFrom.SelectedIndexChanged += cmbImportFrom_SelectionChanged;
+                cmbImportDimension.ItemsSource = new List<string>() { "Ingen", "Kun Afdeling", "Afdeling, Bærer", "Afdeling, Bærer, Formål" };
+                cmbImportDimension.SelectedIndex = 3;
 
-            lblDim1.Label = string.Concat(string.Format(Uniconta.ClientTools.Localization.lookup("ImportOBJ"), Uniconta.ClientTools.Localization.lookup("Dimension")), " 1");
-            lblDim2.Label = string.Concat(string.Format(Uniconta.ClientTools.Localization.lookup("ImportOBJ"), Uniconta.ClientTools.Localization.lookup("Dimension")), " 2");
-            lblDim3.Label = string.Concat(string.Format(Uniconta.ClientTools.Localization.lookup("ImportOBJ"), Uniconta.ClientTools.Localization.lookup("Dimension")), " 3");
-            lblDim4.Label = string.Concat(string.Format(Uniconta.ClientTools.Localization.lookup("ImportOBJ"), Uniconta.ClientTools.Localization.lookup("Dimension")), " 4");
-            lblDim5.Label = string.Concat(string.Format(Uniconta.ClientTools.Localization.lookup("ImportOBJ"), Uniconta.ClientTools.Localization.lookup("Dimension")), " 5");
-            txtNavDim1.Text = Uniconta.ClientTools.Localization.lookup("Optional");
-            txtNavDim2.Text = Uniconta.ClientTools.Localization.lookup("Optional");
-            txtNavDim3.Text = Uniconta.ClientTools.Localization.lookup("Optional");
-            txtNavDim4.Text = Uniconta.ClientTools.Localization.lookup("Optional");
-            txtNavDim5.Text = Uniconta.ClientTools.Localization.lookup("Optional");
-            txtNavErrorAccount.Text = Uniconta.ClientTools.Localization.lookup("Required");
-            txtAccountForPrimo.Text = Uniconta.ClientTools.Localization.lookup("Required");
+                lblDim1.Label = string.Concat(string.Format(Uniconta.ClientTools.Localization.lookup("ImportOBJ"), Uniconta.ClientTools.Localization.lookup("Dimension")), " 1");
+                lblDim2.Label = string.Concat(string.Format(Uniconta.ClientTools.Localization.lookup("ImportOBJ"), Uniconta.ClientTools.Localization.lookup("Dimension")), " 2");
+                lblDim3.Label = string.Concat(string.Format(Uniconta.ClientTools.Localization.lookup("ImportOBJ"), Uniconta.ClientTools.Localization.lookup("Dimension")), " 3");
+                lblDim4.Label = string.Concat(string.Format(Uniconta.ClientTools.Localization.lookup("ImportOBJ"), Uniconta.ClientTools.Localization.lookup("Dimension")), " 4");
+                lblDim5.Label = string.Concat(string.Format(Uniconta.ClientTools.Localization.lookup("ImportOBJ"), Uniconta.ClientTools.Localization.lookup("Dimension")), " 5");
+                txtNavDim1.Text = Uniconta.ClientTools.Localization.lookup("Optional");
+                txtNavDim2.Text = Uniconta.ClientTools.Localization.lookup("Optional");
+                txtNavDim3.Text = Uniconta.ClientTools.Localization.lookup("Optional");
+                txtNavDim4.Text = Uniconta.ClientTools.Localization.lookup("Optional");
+                txtNavDim5.Text = Uniconta.ClientTools.Localization.lookup("Optional");
+                txtNavErrorAccount.Text = Uniconta.ClientTools.Localization.lookup("Required");
+                txtAccountForPrimo.Text = Uniconta.ClientTools.Localization.lookup("Required");
 
-            var navEmailType = new List<string>()
+                var navEmailType = new List<string>()
             {
                 Uniconta.ClientTools.Localization.lookup("InvoiceEmail"),
                 Uniconta.ClientTools.Localization.lookup("ContactEmail")
             };
-            cmbInvoiceOrContactMail.ItemsSource = navEmailType;
+                cmbInvoiceOrContactMail.ItemsSource = navEmailType;
 #endif
-
+            }
+            else
+                UtilDisplay.ShowErrorCode(ErrorCodes.NoRights);
         }
 #if !SILVERLIGHT
         void BindSetupType()
@@ -244,8 +249,8 @@ namespace UnicontaClient.Pages.CustomPage
                 lblAccountForPrimo.Visibility = Visibility.Visible;
                 txtAccountForPrimo.Visibility = Visibility.Visible;
 
-                lblImportInvoice.Visibility = Visibility.Collapsed;
-                chkImportInvoice.IsChecked = false;
+                lblImportInvoice.Visibility = Visibility.Visible;
+                chkImportInvoice.IsChecked = true;
             }
             else if (cmbImportFrom.SelectedIndex == (int)ImportFrom.dk_Iceland) //DK Iceland
             {
@@ -504,7 +509,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 if (importFrom == -1)
                 {
-                    UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("CannotBeBlank"), Uniconta.ClientTools.Localization.lookup("ImportFrom")), 
+                    UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("CannotBeBlank"), Uniconta.ClientTools.Localization.lookup("ImportFrom")),
                         Uniconta.ClientTools.Localization.lookup("Warning"));
                     return;
                 }
@@ -560,9 +565,7 @@ namespace UnicontaClient.Pages.CustomPage
                             await CopyBaseData();
                     }
                     await SaveCompanyLogos();
-                    if (setupType == 1)
-                        dockCtrl.CloseDockItem();
-                    else
+                    if (setupType != 1)
                     {
 #if !SILVERLIGHT
                         var listOfNavDim = new List<string>();
@@ -610,7 +613,10 @@ namespace UnicontaClient.Pages.CustomPage
                     }
 
                     if (setupType == 1)
+                    {
                         globalEvents.OnRefresh(TabControls.CreateCompany, editrow.RowId);
+                        dockCtrl.CloseDockItem();
+                    }
                 }
                 else
                 {
@@ -621,7 +627,7 @@ namespace UnicontaClient.Pages.CustomPage
             catch (Exception ex)
             {
                 BasePage.session.ReportException(ex, "Create Company. Setup Page", 0);
-                UnicontaMessageBox.Show(ex.Message,Uniconta.ClientTools.Localization.lookup("Exception"));
+                UnicontaMessageBox.Show(ex.Message, Uniconta.ClientTools.Localization.lookup("Exception"));
             }
             if (setupType == 1)
                 busyIndicator.IsBusy = false;
@@ -666,7 +672,7 @@ namespace UnicontaClient.Pages.CustomPage
         async Task CopyBaseData()
         {
             CompanyAPI comApi = new CompanyAPI(api);
-            ErrorCodes res = await comApi.CopyBaseData(fromCompany, editrow, (bool)chkDimensions.IsChecked, (bool)chkTransType.IsChecked, (bool)chkNumberSerei.IsChecked, (bool)chkPayments.IsChecked, (bool)chkJournal.IsChecked, (bool)chkGroups.IsChecked, (bool)chkGlAccount.IsChecked, (bool)chkVat.IsChecked);
+            ErrorCodes res = await comApi.CopyBaseData(fromCompany, editrow, (bool)chkDimensions.IsChecked, (bool)chkTransType.IsChecked, (bool)chkNumberSerei.IsChecked, (bool)chkPayments.IsChecked, (bool)chkJournal.IsChecked, (bool)chkGroups.IsChecked, (bool)chkGlAccount.IsChecked, (bool)chkVat.IsChecked, CopyProject: (bool)chkProject.IsChecked);
             Thread.Sleep(2 * 1000);
             editrow.ClearCache(typeof(GLVat));
             editrow.ClearCache(typeof(GLAccount));

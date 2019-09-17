@@ -278,7 +278,7 @@ namespace UnicontaClient.Pages.CustomPage
                             var dc = dbOrder.Debtor;
                             if (dc == null)
                             {
-                                await api.CompanyEntity.LoadCache(typeof(Debtor), api, true);
+                                await api.LoadCache(typeof(Debtor), true);
                                 dc = dbOrder.Debtor;
                             }
 
@@ -368,8 +368,8 @@ namespace UnicontaClient.Pages.CustomPage
 #else
             confirmOrder = new Dictionary<InvoicePostingResult, DebtorOrderClient>();
 #endif
-            UnicontaClient.Pages.CWGenerateInvoice GenrateInvoiceDialog = new UnicontaClient.Pages.CWGenerateInvoice(false, Uniconta.ClientTools.Localization.lookup(docType.ToString()),
-                isShowInvoiceVisible: true, askForEmail: true, showInputforInvNumber: false, showInvoice: true, isShowUpdateInv: true, isQuickPrintVisible: true, isDebtorOrder: true, isPageCountVisible: false);
+            UnicontaClient.Pages.CWGenerateInvoice GenrateInvoiceDialog = new UnicontaClient.Pages.CWGenerateInvoice(false, docType.ToString(),isShowInvoiceVisible: true, askForEmail: true, showInputforInvNumber: false, 
+                showInvoice: true, isShowUpdateInv: true, isQuickPrintVisible: true, isDebtorOrder: true, isPageCountVisible: false);
 #if !SILVERLIGHT
             GenrateInvoiceDialog.DialogTableId = 2000000012;
 #endif
@@ -401,7 +401,7 @@ namespace UnicontaClient.Pages.CustomPage
                             var dc = dbOrder.Debtor;
                             if (dc == null)
                             {
-                                await api.CompanyEntity.LoadCache(typeof(Debtor), api, true);
+                                await api.LoadCache(typeof(Debtor), true);
                                 dc = dbOrder.Debtor;
                             }
                             DebtorOrders.SetDeliveryAdress(result.Header, dc, api);
@@ -640,7 +640,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (debtor != null)
                 showSendByMail = !string.IsNullOrEmpty(debtor.InvoiceEmail);
             else
-                api.CompanyEntity.LoadCache(typeof(Debtor), api, true);
+                api.LoadCache(typeof(Debtor), true);
 
             string debtorName = debtor?.Name ?? dbOrder._DCAccount;
             bool invoiceInXML = debtor?._InvoiceInXML ?? false;
@@ -713,8 +713,10 @@ namespace UnicontaClient.Pages.CustomPage
 #if !SILVERLIGHT
         private async void GenerateOIOXmlForAll(List<string> errorlist, bool sendMail)
         {
-            var invoicePostedCount = invoicePosted.Count;
+            var api = this.api;
+            var Comp = api.CompanyEntity;
             InvoiceAPI Invapi = new InvoiceAPI(api);
+            var invoicePostedCount = invoicePosted.Count;
             Microsoft.Win32.SaveFileDialog saveDialog = null;
             System.Windows.Forms.FolderBrowserDialog folderBrowserDialog = null;
             var listOfXmlPath = new List<string>();
@@ -724,14 +726,13 @@ namespace UnicontaClient.Pages.CustomPage
 
             foreach (var item in invoicePosted)
             {
-                var Comp = api.CompanyEntity;
                 var invClient = (DebtorInvoiceClient)item.Key.Header;
                 var invoiceLines = (InvTransClient[])item.Key.Lines;
 
-                var InvCache = Comp?.GetCache(typeof(Uniconta.DataModel.InvItem)) ?? await Comp?.LoadCache(typeof(Uniconta.DataModel.InvItem), api);
-                var VatCache = Comp?.GetCache(typeof(Uniconta.DataModel.GLVat)) ?? await Comp?.LoadCache(typeof(Uniconta.DataModel.GLVat), api);
-                var Debcache = Comp.GetCache(typeof(Debtor)) ?? await Comp.LoadCache(typeof(Debtor), api);
-                var debtor = (Debtor)Debcache.Get(item.Value.Account);
+                var InvCache = api.GetCache(typeof(Uniconta.DataModel.InvItem)) ?? await api.LoadCache(typeof(Uniconta.DataModel.InvItem));
+                var VatCache = api.GetCache(typeof(Uniconta.DataModel.GLVat)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLVat));
+                var Debcache = api.GetCache(typeof(Debtor)) ?? await api.LoadCache(typeof(Debtor));
+                var debtor = (Debtor)Debcache.Get(invClient._DCAccount);
 
                 if (!debtor._InvoiceInXML || invClient.SendTime != DateTime.MinValue)
                     continue;
@@ -751,6 +752,8 @@ namespace UnicontaClient.Pages.CustomPage
                 InvItemText[] invItemText = null;
                 if (debtor._ItemNameGroup != null)
                     invItemText = await api.Query<InvItemText>(new UnicontaBaseEntity[] { debtor }, null);
+
+                DebtorOrders.SetDeliveryAdress(invClient, debtor, api);
 
                 Debtor deliveryAccount;
                 if (invClient._DeliveryAccount != null)
@@ -909,15 +912,11 @@ namespace UnicontaClient.Pages.CustomPage
         protected override async void LoadCacheInBackGround()
         {
             var api = this.api;
-            var Comp = api.CompanyEntity;
-
             if (this.debtors == null)
-                this.debtors = await Comp.LoadCache(typeof(Uniconta.DataModel.Debtor), api).ConfigureAwait(false);
-
+                this.debtors = await api.LoadCache(typeof(Uniconta.DataModel.Debtor)).ConfigureAwait(false);
             if (this.items == null)
-                this.items = await Comp.LoadCache(typeof(Uniconta.DataModel.InvItem), api).ConfigureAwait(false);
-            if (Comp.DeliveryAddress)
-                LoadType(typeof(Uniconta.DataModel.WorkInstallation));
+                this.items = await api.LoadCache(typeof(Uniconta.DataModel.InvItem)).ConfigureAwait(false);
+            LoadType(new Type[] { typeof(Uniconta.DataModel.GLVat), typeof(Uniconta.DataModel.WorkInstallation), typeof(Uniconta.DataModel.InvItem) });
         }
 
         public override bool CheckIfBindWithUserfield(out bool isReadOnly, out bool useBinding)

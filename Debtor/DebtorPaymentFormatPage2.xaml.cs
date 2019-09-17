@@ -121,6 +121,16 @@ namespace UnicontaClient.Pages.CustomPage
                     };
                     dialogNets.Show();
                     break;
+
+                case DebtorPaymFormatType.SEPA:
+                    CWDebtorPaymentSetupSEPA dialogSEPA = new CWDebtorPaymentSetupSEPA(this.api, editrow);
+                    dialogSEPA.Closing += delegate
+                    {
+                        if (dialogSEPA.DialogResult == true)
+                            StreamingManager.Copy(dialogSEPA.paymentFormatSEPA, editrow);
+                    };
+                    dialogSEPA.Show();
+                    break;
 #endif
                 default:
                     UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("NoOptions"), Uniconta.ClientTools.Localization.lookup("Warning"));

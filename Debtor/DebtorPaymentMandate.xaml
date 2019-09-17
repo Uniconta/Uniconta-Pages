@@ -33,6 +33,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorPaymentMandate"
                     <local:CorasauDataGridTemplateColumnClient x:Name="ActivationDate" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="CancellationDate" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="MandateStatus" AllowEditing="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DirectDebitScheme" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="StatusInfo" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="ErrorInfo" />
                 </local:DebtorPaymentMandateGrid.Columns>

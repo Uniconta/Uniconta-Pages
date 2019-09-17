@@ -8,7 +8,6 @@ x:Class="UnicontaClient.Pages.CustomPage.CompanyUsers"
     xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage"
     mc:Ignorable="d"   xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
     d:DesignHeight="300" d:DesignWidth="400">
-
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -18,10 +17,9 @@ x:Class="UnicontaClient.Pages.CustomPage.CompanyUsers"
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <localPage:CompanyUsersGrid  x:Name="dgCompanyUsersGrid" AutoGenerateColumns="None">
                 <localPage:CompanyUsersGrid.Columns>
-
-                    <localPage:CorasauDataGridTemplateColumnClient FieldName="Userid" Width="50" FixedWidth="True" IsSmart="True" AllowEditing="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient FieldName="UserName" Width="100" FixedWidth="True" IsSmart="True" AllowEditing="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient FieldName="UserLoginId" Width="100" FixedWidth="True" IsSmart="True" AllowEditing="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient FieldName="Userid" Width="50" FixedWidth="True" IsSmart="True" />
+                    <localPage:CorasauDataGridTemplateColumnClient FieldName="UserName" Width="100" FixedWidth="True" IsSmart="True" ReadOnly="True" />
+                    <localPage:CorasauDataGridTemplateColumnClient FieldName="UserLoginId" Width="100" FixedWidth="True" IsSmart="True" ReadOnly="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient FieldName="UserTasks" IsSmart="True"/>
                 </localPage:CompanyUsersGrid.Columns>
             </localPage:CompanyUsersGrid>

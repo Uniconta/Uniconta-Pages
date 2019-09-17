@@ -20,6 +20,7 @@ using Uniconta.Common;
 using UnicontaClient.Pages.Project.TimeManagement;
 using Uniconta.ClientTools.Controls;
 using System.Globalization;
+using static UnicontaClient.Pages.Project.TimeManagement.TMJournalLineHelper;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage

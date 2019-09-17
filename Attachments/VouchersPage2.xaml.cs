@@ -190,7 +190,7 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                     else
                     {
-                        ClosePage(4); // full refresh
+                        await ClosePage(4); // full refresh
                         dockCtrl.CloseDockItem();
                         Utility.UpdateBuffers(api, buffers, multiVouchers);
                         busyIndicator.IsBusy = false;
@@ -203,7 +203,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (LoadedRow == null)
             {
                 buf = voucherClientRow._Data;
-                if (buf != null && buf.Length > 10000)
+                if (buf != null && buf.Length > 100000)
                     voucherClientRow._Data = null;
                 else
                     buf = null;

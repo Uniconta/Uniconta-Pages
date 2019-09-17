@@ -50,12 +50,18 @@ namespace UnicontaClient.Pages.CustomPage
         public ProjectPage(UnicontaBaseEntity master)
             : base(master)
         {
-            dgProjectGrid.UpdateMaster(master);
-            Init();
+            Init(master);
         }
-        private void Init()
+        private void Init(UnicontaBaseEntity master = null)
         {
             InitializeComponent();
+            if (master != null)
+            {
+                var dclin = master as DebtorOrderLineClient;
+                if (dclin != null)
+                    master = dclin.Order;
+                dgProjectGrid.UpdateMaster(master);
+            }
             localMenu.dataGrid = dgProjectGrid;
             LayoutControl = detailControl.layoutItems;
             dgProjectGrid.api = api;
@@ -286,9 +292,9 @@ namespace UnicontaClient.Pages.CustomPage
         private void CreateOrder(ProjectClient selectedItem)
         {
 #if SILVERLIGHT
-            var cwCreateOrder = new CWCreateOrderFromProject(api,GetSystemDefaultDate());
+            var cwCreateOrder = new CWCreateOrderFromProject(api);
 #else
-            var cwCreateOrder = new UnicontaClient.Pages.CWCreateOrderFromProject(api, GetSystemDefaultDate());
+            var cwCreateOrder = new UnicontaClient.Pages.CWCreateOrderFromProject(api);
             cwCreateOrder.DialogTableId = 2000000053;
 #endif
             cwCreateOrder.Closed += async delegate
@@ -406,7 +412,7 @@ namespace UnicontaClient.Pages.CustomPage
                 journal = journals.First();
             else
             {
-                var employeeCache = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.Employee)) ?? await api.CompanyEntity.LoadCache(typeof(Uniconta.DataModel.Employee), api);
+                var employeeCache = api.GetCache(typeof(Uniconta.DataModel.Employee)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Employee));
                 var employee = ((Uniconta.DataModel.Employee[])employeeCache.GetNotNullArray).Where(e => e._Uid == api.session.Uid).FirstOrDefault();
                 if (employee == null)
                 {

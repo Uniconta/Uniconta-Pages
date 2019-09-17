@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.Common;
 using Uniconta.DataModel;
+using UnicontaClient.Pages.Creditor.Payments;
 
 namespace UnicontaISO20022CreditTransfer
 {
@@ -274,7 +275,7 @@ namespace UnicontaISO20022CreditTransfer
         /// </summary>
         public override List<string> Ustrd(string externalAdvText, ISO20022PaymentTypes ISOPaymType, PaymentTypes paymentMethod)
         {
-            var ustrdText = externalAdvText;
+            var ustrdText = StandardPaymentFunctions.RegularExpressionReplace(externalAdvText, allowedCharactersRegEx, replaceCharactersRegEx);
 
             int maxLines = 0;
             int maxStrLen = 0;

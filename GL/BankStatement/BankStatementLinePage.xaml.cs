@@ -129,7 +129,7 @@ namespace UnicontaClient.Pages.CustomPage
             dgBankStatementLine.api = api;
             tranApi = new Uniconta.API.GeneralLedger.ReportAPI(api);
             bankTransApi = new BankStatementAPI(api);
-            SetRibbonControl(localMenu, dgAccountsTransGrid);
+            SetRibbonControl(localMenu, dgBankStatementLine);
             dgBankStatementLine.BusyIndicator = busyIndicator;
             dgAccountsTransGrid.BusyIndicator = busyIndicator;
             dgAccountsTransGrid.api = api;

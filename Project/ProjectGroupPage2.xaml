@@ -31,6 +31,9 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectGroupPage2"
                     <CorasauControls:CorasauLayoutItem x:Name="liIsDefault" FieldName="IsDefault">
                         <CheckBox IsChecked="{Binding IsDefault,Mode=TwoWay}" />
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="liInvoiceable" FieldName="Invoiceable">
+                        <CheckBox IsChecked="{Binding Invoiceable,Mode=TwoWay}" />
+                    </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="AutoNumber" x:Name="liAutoNumber">
                         <CorasauControls:LookupEditor x:Name="leAutoNumber" Text="{Binding AutoNumber,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
@@ -62,6 +65,12 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectGroupPage2"
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem x:Name="liAdjustmentOffset" FieldName="AdjustmentOffset">
                         <CorasauControls:LookupEditor x:Name="leAdjustmentOffset" Text="{Binding AdjustmentOffset,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="liInvoiceAdjustment" FieldName="InvoiceAdjustment">
+                        <CorasauControls:LookupEditor x:Name="leInvoiceAdjustment" Text="{Binding InvoiceAdjustment,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="liInvoiceAdjustmentOffset" FieldName="InvoiceAdjustmentOffset">
+                        <CorasauControls:LookupEditor x:Name="leInvoiceAdjustmentOffset" Text="{Binding InvoiceAdjustmentOffset,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
             </CorasauControls:CorasauLayoutControl>

@@ -151,8 +151,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override async void LoadCacheInBackGround()
         {
-            var api = this.api;
-            accountCache = api.GetCache(typeof(Uniconta.DataModel.Debtor)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Debtor));
+            accountCache = api.GetCache(typeof(Uniconta.DataModel.Debtor)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Debtor)).ConfigureAwait(false);
         }
 
         private void DgDebtorTranOpenGrid_OnPrintClick()

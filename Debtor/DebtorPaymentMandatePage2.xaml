@@ -20,31 +20,39 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorPaymentMandatePage2"
             </Grid.RowDefinitions>
             <CorasauControls:CorasauRibbonControl x:Name="frmRibbon" XMLSourcePath=";component/Pages/Debtor/DebtorPaymentMandatePage2GridRibbon.xml" Grid.Row="0"/>
             <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Vertical" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
-                <CorasauControls:CorasauLayoutGroup x:Name="grpDescription" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Description}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="350">
+                <CorasauControls:CorasauLayoutGroup x:Name="grpDescription" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Description}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="400">
                     <CorasauControls:CorasauLayoutItem x:Name="liDCAccount"  FieldName="DCAccount" Visibility="Collapsed">
                         <CorasauControls:LookupEditor x:Name="lookupDCAccount" Text="{Binding DCAccount,Mode=TwoWay}"  />
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem x:Name="liMandateId" FieldName="MandateId" >
-                        <CorasauControls:IntegerEditor Text="{Binding MandateId, Mode=OneWay}" IsReadOnly="True" />
+                        <CorasauControls:TextEditor Text="{Binding MandateId, Mode=OneWay}" IsReadOnly="True"/>
                     </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liMandateStatus" FieldName="MandateStatus" >
-                        <CorasauControls:ComboBoxEditor x:Name="cmbMandateStatus" SelectedItem="{Binding MandateStatus ,Mode=OneWay}" IsEnabled="False" IsReadOnly="True"/>
-                    </CorasauControls:CorasauLayoutItem>                    
+                    <CorasauControls:CorasauLayoutItem x:Name="liAltMandateId" FieldName="AltMandateId" >
+                        <CorasauControls:TextEditor x:Name="txtAltMandateId" Text="{Binding AltMandateId, Mode=TwoWay}" IsReadOnly="False"/>
+                    </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
                 <CorasauControls:CorasauLayoutGroup x:Name="grpOptions" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Options}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="400">
                     <CorasauControls:CorasauLayoutItem x:Name="liAgreementId" FieldName="AgreementId" >
-                        <CorasauControls:TextEditor Text="{Binding AgreementId, Mode=OneWay}" IsEnabled="false" IsReadOnly="True"/>
+                        <CorasauControls:TextEditor Text="{Binding AgreementId, Mode=TwoWay}" IsEnabled="true" IsReadOnly="false"/>
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
                 <CorasauControls:CorasauLayoutGroup x:Name="grpStatus" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Status}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="400">
+                    <CorasauControls:CorasauLayoutItem x:Name="liMandateStatus" FieldName="MandateStatus" >
+                        <CorasauControls:ComboBoxEditor x:Name="cmbMandateStatus" SelectedItem="{Binding MandateStatus ,Mode=TwoWay}" IsEnabled="False" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem x:Name="liActivationDate" FieldName="ActivationDate" >
-                        <CorasauControls:DateEditor x:Name="deActivationDate" EditValue="{Binding ActivationDate,Mode=OneWay}" IsEnabled="false" IsReadOnly="True"/>
+                        <CorasauControls:DateEditor x:Name="deActivationDate" EditValue="{Binding ActivationDate,Mode=TwoWay}" IsEnabled="False" IsReadOnly="True"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem x:Name="liCancellationDate" FieldName="CancellationDate" >
-                        <CorasauControls:DateEditor x:Name="deCancellationDate" EditValue="{Binding CancellationDate,Mode=OneWay}" IsEnabled="False" IsReadOnly="True"/>
+                        <CorasauControls:DateEditor x:Name="deCancellationDate" EditValue="{Binding CancellationDate,Mode=TwoWay}" IsEnabled="False" IsReadOnly="True"/>
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
-                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="gpStatusInfo" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=StatusInfo}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Stretch" >
+                <CorasauControls:CorasauLayoutGroup x:Name="grpSEPA" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=SEPA}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="400" Visibility="Hidden">
+                    <CorasauControls:CorasauLayoutItem x:Name="liDirectDebitScheme" FieldName="DirectDebitScheme" >
+                        <CorasauControls:ComboBoxEditor x:Name="cmbDirectDebitScheme" SelectedItem="{Binding DirectDebitScheme ,Mode=TwoWay}" IsEnabled="True" IsReadOnly="False"/>
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="gpStatusInfo" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=StatusInfo}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="800">
                     <CorasauControls:CorasauLayoutItem x:Name="liStatusInfo" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=StatusInfo}" VerticalAlignment="Top" VerticalContentAlignment="Top" LabelVerticalAlignment="Top">
                         <CorasauControls:TextEditor x:Name="txtStatusInfo" Text="{Binding StatusInfo,Mode=OneWay}" HorizontalContentAlignment="Left"
                                                 MinHeight="200" VerticalContentAlignment="Top" IsReadOnly="True" />

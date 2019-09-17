@@ -1,0 +1,178 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools" 
+        xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.WorkInProgressReportPage"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
+        xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
+        xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="10"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Project/WorkInProgressReportPageGridRibbon.xml" x:Name="localMenu"/>
+        <Grid Grid.Row="1"  Margin="5">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FromDate}" Grid.Column="0" Grid.Row="0" Margin="3,3,3,3"/>
+            <CorasauControls:DateEditor x:Name="txtDateFrm" Grid.Column="2" Grid.Row="0" Margin="0,3,3,3"/>
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ToDate}" Grid.Column="0" Grid.Row="1" Margin="3,3,3,3"/>
+            <CorasauControls:DateEditor x:Name="txtDateTo" Grid.Column="2" Grid.Row="1" Margin="0,3,3,3"/>
+
+            <!--<TextBlock x:Name="lblFrmPerInChrg" Grid.Column="4" Grid.Row="0" Margin="3,3,3,3"/>
+            <CorasauControls:LookupEditor EditValueChanged="leFromPerInChre_EditValueChanged" x:Name="leFromPerInChre" Grid.Column="6" Grid.Row="0" Margin="0,3,3,3" Text="{Binding FromPerInCharge,Mode=TwoWay}"/>
+            <TextBlock x:Name="lblToPerInChrg" Grid.Column="4" Grid.Row="1" Margin="3,3,3,3"/>
+            <CorasauControls:LookupEditor EditValueChanged="leToPerInChre_EditValueChanged" x:Name="leToPerInChre" Grid.Column="6" Grid.Row="1" Margin="0,3,3,3" Text="{Binding ToPerInCharge,Mode=TwoWay}"/>
+
+            <TextBlock x:Name="lblFrmDebtor" Grid.Column="8" Grid.Row="0" Margin="3,3,3,3"/>
+            <CorasauControls:LookupEditor EditValueChanged="leFromDebtor_EditValueChanged" x:Name="leFromDebtor" Grid.Column="10" Grid.Row="0" Margin="0,3,3,3" Text="{Binding FromDebtor,Mode=TwoWay}"/>
+            <TextBlock x:Name="lblToDebtor" Grid.Column="8" Grid.Row="1" Margin="3,3,3,3"/>
+            <CorasauControls:LookupEditor EditValueChanged="leToDebtor_EditValueChanged" x:Name="leToDebtor" Grid.Column="10" Grid.Row="1" Margin="0,3,3,3" Text="{Binding ToDebtor,Mode=TwoWay}"/>-->
+        </Grid>
+        <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{StaticResource WindowHeaderGradient}" />
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="3" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <local:WorkInProgressReportGrid  x:Name="dgWorkInProgressRpt" AutoGenerateColumns="None" HorizontalAlignment="Stretch">
+                <local:WorkInProgressReportGrid.Columns>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Debtor" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DebtorName" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Project" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ProjectName" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PersonInCharge" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PersonInChargeName" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="cldim1" Width="70" FieldName="Dimension1" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="cldim2" Width="70" FieldName="Dimension2" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="cldim3" Width="70" FieldName="Dimension3" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="cldim4" Width="70" FieldName="Dimension4" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="cldim5" Width="70" FieldName="Dimension5" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="OpeningBalance">
+                        <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <CorasauControls:TextEditor IsPrintingMode="True" HorizontalContentAlignment="Right" Text="{Binding Path=DataContext.RowData.Row.OpeningBalance,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" Mask="N2" MaskUseAsDisplayFormat="True" MaskType="Numeric" Width="110"/>
+                            </ControlTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="EmployeeFee">
+                        <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <CorasauControls:TextEditor IsPrintingMode="True" HorizontalContentAlignment="Right" Text="{Binding Path=DataContext.RowData.Row.EmployeeFee,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" Mask="N2" MaskUseAsDisplayFormat="True" MaskType="Numeric" Width="100"/>
+                                </ControlTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Expenses">
+                        <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <CorasauControls:TextEditor IsPrintingMode="True" HorizontalContentAlignment="Right" Text="{Binding Path=DataContext.RowData.Row.Expenses,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" Mask="N2" MaskUseAsDisplayFormat="True" MaskType="Numeric" Width="100"/>
+                            </ControlTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Revenue">
+                        <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <CorasauControls:TextEditor IsPrintingMode="True" HorizontalContentAlignment="Right" Text="{Binding Path=DataContext.RowData.Row.Revenue,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" Mask="N2" MaskUseAsDisplayFormat="True" MaskType="Numeric" Width="100"/>
+                            </ControlTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="OnAccount">
+                        <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <CorasauControls:TextEditor IsPrintingMode="True" HorizontalContentAlignment="Right" Text="{Binding Path=DataContext.RowData.Row.OnAccount,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" Mask="N2" MaskUseAsDisplayFormat="True" MaskType="Numeric" Width="100"/>
+                            </ControlTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Invoiced">
+                        <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <CorasauControls:TextEditor IsPrintingMode="True" HorizontalContentAlignment="Right" Text="{Binding Path=DataContext.RowData.Row.Invoiced,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" Mask="N2" MaskUseAsDisplayFormat="True" MaskType="Numeric" Width="100"/>
+                            </ControlTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="TotalInvoiced">
+                        <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <CorasauControls:TextEditor IsPrintingMode="True" HorizontalContentAlignment="Right" Text="{Binding Path=DataContext.RowData.Row.TotalInvoiced,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" Mask="N2" MaskUseAsDisplayFormat="True" MaskType="Numeric" Width="100"/>
+                            </ControlTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Adjustment">
+                        <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <CorasauControls:TextEditor IsPrintingMode="True" HorizontalContentAlignment="Right" Text="{Binding Path=DataContext.RowData.Row.Adjustment,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" Mask="N2" MaskUseAsDisplayFormat="True" MaskType="Numeric" Width="100"/>
+                            </ControlTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
+                    <!--<local:CorasauDataGridTemplateColumnClient x:Name="BudgetQty" Visible="False">
+                        <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <CorasauControls:TextEditor IsPrintingMode="True" HorizontalContentAlignment="Right" Text="{Binding Path=DataContext.RowData.Row.BudgetQty,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" Mask="N2" MaskUseAsDisplayFormat="True" MaskType="Numeric" Width="100"/>
+                            </ControlTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="BudgetCost" Visible="False">
+                    <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                        <ControlTemplate>
+                            <CorasauControls:TextEditor IsPrintingMode="True" HorizontalContentAlignment="Right" Text="{Binding Path=DataContext.RowData.Row.BudgetCost,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" Mask="N2" MaskUseAsDisplayFormat="True" MaskType="Numeric" Width="100"/>
+                        </ControlTemplate>
+                    </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="BudgetSales" Visible="False">
+                        <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <CorasauControls:TextEditor IsPrintingMode="True" HorizontalContentAlignment="Right" Text="{Binding Path=DataContext.RowData.Row.BudgetSales,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" Mask="N2" MaskUseAsDisplayFormat="True" MaskType="Numeric" Width="100"/>
+                            </ControlTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>-->
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ClosingBalance">
+                        <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <CorasauControls:TextEditor IsPrintingMode="True" HorizontalContentAlignment="Right" Text="{Binding Path=DataContext.RowData.Row.ClosingBalance,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" Mask="N2" MaskUseAsDisplayFormat="True" MaskType="Numeric" Width="110"/>
+                            </ControlTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
+                </local:WorkInProgressReportGrid.Columns>
+                <local:WorkInProgressReportGrid.GroupSummary >
+                    <local:SumColumn FieldName="EmployeeFee" SummaryType="Sum" ShowInGroupColumnFooter="EmployeeFee"/>
+                    <local:SumColumn FieldName="Expenses" SummaryType="Sum" ShowInGroupColumnFooter="Expenses"/>
+                    <local:SumColumn FieldName="Revenue" SummaryType="Sum" ShowInGroupColumnFooter="Revenue"/>
+                    <local:SumColumn FieldName="OnAccount" SummaryType="Sum" ShowInGroupColumnFooter="OnAccount"/>
+                    <local:SumColumn FieldName="Invoiced" SummaryType="Sum" ShowInGroupColumnFooter="Invoiced"/>
+                    <local:SumColumn FieldName="TotalInvoiced" SummaryType="Sum" ShowInGroupColumnFooter="TotalInvoiced"/>
+                    <local:SumColumn FieldName="Adjustment" SummaryType="Sum" ShowInGroupColumnFooter="Adjustment"/>
+                    <local:SumColumn FieldName="OpeningBalance" SummaryType="Sum" ShowInGroupColumnFooter="OpeningBalance"/>
+                    <local:SumColumn FieldName="ClosingBalance" SummaryType="Sum" ShowInGroupColumnFooter="ClosingBalance"/>
+                </local:WorkInProgressReportGrid.GroupSummary>
+                <local:WorkInProgressReportGrid.TotalSummary >
+                    <local:SumColumn FieldName="EmployeeFee" SummaryType="Sum"/>
+                    <local:SumColumn FieldName="Expenses" SummaryType="Sum"/>
+                    <local:SumColumn FieldName="Revenue" SummaryType="Sum"/>
+                    <local:SumColumn FieldName="OnAccount" SummaryType="Sum"/>
+                    <local:SumColumn FieldName="Invoiced" SummaryType="Sum"/>
+                    <local:SumColumn FieldName="TotalInvoiced" SummaryType="Sum"/>
+                    <local:SumColumn FieldName="Adjustment" SummaryType="Sum"/>
+                    <local:SumColumn FieldName="OpeningBalance" SummaryType="Sum"/>
+                    <local:SumColumn FieldName="ClosingBalance" SummaryType="Sum"/>
+                </local:WorkInProgressReportGrid.TotalSummary>
+            </local:WorkInProgressReportGrid>
+        </CorasauControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

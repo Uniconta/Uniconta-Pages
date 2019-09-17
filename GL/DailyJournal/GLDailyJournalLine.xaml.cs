@@ -57,12 +57,20 @@ namespace UnicontaClient.Pages.CustomPage
         }
         internal GLDailyJournalLine GridBase;
 
-        internal void GoToCol(string col)
+        internal void GoToCol(string col, bool setToPrevious = false)
         {
-            var actCol = this.Columns[col];
-            if (actCol != null && actCol.Visible)
+            var column = this.Columns[col];
+            if (column?.Visible == true)
             {
-                this.CurrentCol = actCol;
+                var visibleIndex = column.VisibleIndex;
+                if (visibleIndex > 0)
+                {
+                    int index = 0;
+                    if (setToPrevious)
+                        index = 1;/* get one column before because of Enter default movement */
+                    column = this.Columns.Where(c => c.VisibleIndex == visibleIndex - index).FirstOrDefault();
+                }
+                this.CurrentCol = column;
             }
         }
 
@@ -873,7 +881,7 @@ namespace UnicontaClient.Pages.CustomPage
                     var txt = cw.Text;
                     if (!string.IsNullOrEmpty(txt))
                     {
-                        var journalLines = dgGLDailyJournalLine.GetVisibleRows() as List<JournalLineGridClient>;
+                        var journalLines = dgGLDailyJournalLine.GetVisibleRows() as IList<JournalLineGridClient>;
                         foreach (var line in journalLines)
                         {
                             if (line._Text != txt)
@@ -892,7 +900,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         void SetInvertSign()
         {
-            var journalLines = dgGLDailyJournalLine.GetVisibleRows() as List<JournalLineGridClient>;
+            var journalLines = dgGLDailyJournalLine.GetVisibleRows() as IList<JournalLineGridClient>;
             foreach (var line in journalLines)
             {
                 dgGLDailyJournalLine.SetLoadedRow(line);
@@ -956,9 +964,10 @@ namespace UnicontaClient.Pages.CustomPage
         private void SetSettlementsForJournalLine(JournalLineGridClient selectedItem, string settlementStr, double MarkedRemainingAmt, double MarkedRemainingAmtCur, string Currency, bool Offset)
         {
             dgGLDailyJournalLine.SetLoadedRow(selectedItem);
-            if (Currency != null)
+            if (Currency != null || selectedItem.AmountCur != 0)
             {
-                selectedItem.Currency = Currency;
+                if (Currency != null)
+                    selectedItem.Currency = Currency;
                 selectedItem.AmountCur = Offset ? MarkedRemainingAmtCur : -MarkedRemainingAmtCur;
             }
             else if (selectedItem.Amount == 0d || selectedItem.AmountSetBySystem)
@@ -1716,7 +1725,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 }
                             }
                             if (Acc._DebetCredit > 0)
-                                dgGLDailyJournalLine.GoToCol(Acc._DebetCredit == DebitCreditPreference.Debet ? "Debit" : "Credit");
+                                dgGLDailyJournalLine.GoToCol(Acc._DebetCredit == DebitCreditPreference.Debet ? "Debit" : "Credit", true);
                         }
                     }
                     if (rec.Amount != 0d)

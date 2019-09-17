@@ -53,8 +53,6 @@ namespace UnicontaClient.Pages.CustomPage
     }
     public partial class DebtorTotals : GridBasePage
     {
-        protected override bool IsLayoutSaveRequired() { return false; }
-
         static int reportType = 0;
         static DateTime balDate = BasePage.GetSystemDefaultDate();
         static int interval = 31;
@@ -199,18 +197,19 @@ namespace UnicontaClient.Pages.CustomPage
             balDate = BalanceDate.DateTime;
             interval = (int)NumberConvert.ToInt(intervalEdit.Text);
             count = (int)NumberConvert.ToInt(countEdit.Text);
-            int columnCount = dgDebtorTotalsGrid.Columns.Count;
-            int start = count + 3;
-            for (int i = 0; i < columnCount; i++)
+            for (int i = 0; i < 10; i++)
             {
-                GridColumn column = dgDebtorTotalsGrid.Columns[i];
-                ColumnBase cb = (ColumnBase)column;
-                cb.Visible = (i < start);
+                var index = NumberConvert.ToString(i);
+                GridColumn column = dgDebtorTotalsGrid.Columns.Where(x => x.Name.Contains(index)).FirstOrDefault();
+                if (column != null)
+                {
+                    ColumnBase cb = (ColumnBase)column;
+                    if (i < count)
+                        cb.Visible = cb.ShowInColumnChooser = true;
+                    else
+                        cb.Visible = cb.ShowInColumnChooser = false;
+                }
             }
-
-            GridColumn lastColumn = dgDebtorTotalsGrid.Columns[columnCount - 1];
-            ColumnBase totalCol = (ColumnBase)lastColumn;
-            totalCol.Visible = true;
 
             inputs = new List<PropValuePair>();
             if (cmbReportType.SelectedIndex == 0)
@@ -335,9 +334,10 @@ namespace UnicontaClient.Pages.CustomPage
                     hdr = Uniconta.ClientTools.Localization.lookup("Older");
                 else
                     hdr = String.Format("{0:d}", date);
-                var col = dgDebtorTotalsGrid.Columns[i + 3];
-                col.Header = hdr;
-                col.VisibleIndex = i + 3;
+                var index = NumberConvert.ToString(i);
+                GridColumn col = dgDebtorTotalsGrid.Columns.Where(x => x.Name.Contains(index)).FirstOrDefault();
+                if (col != null)
+                    col.Header = hdr;
                 date = NextDate;
             }
         }

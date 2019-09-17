@@ -104,7 +104,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void CreateMulitOrder(bool IsMultiOrder = true)
         {
-            var cwCreateOrder = new CWCreateOrderFromProject(api, BasePage.GetSystemDefaultDate());
+            var cwCreateOrder = new CWCreateOrderFromProject(api);
 #if !SILVERLIGHT
             cwCreateOrder.DialogTableId = 2000000052;
 #endif

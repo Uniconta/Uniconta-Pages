@@ -26,16 +26,24 @@ namespace UnicontaClient.Pages.CustomPage
     {
         [ForeignKeyAttribute(ForeignKeyTable = typeof(Uniconta.DataModel.DebtorPaymentFormat))]
         public DebtorPaymentFormatClient PaymentFormat { get; set; }
+        public DirectDebitScheme directDebitScheme { get; set; }
+        private bool showSchemeType;
+        private bool showActivateWarning;
 
         CrudAPI Capi;
 
-        public CWDirectDebit(CrudAPI api, string title)
+        public CWDirectDebit(CrudAPI api, string title, bool showSchemeType = false, bool showActivateWarning = false)
         {
             Capi = api;
             this.DataContext = this;
+            this.showSchemeType = showSchemeType;
+            this.showActivateWarning = showActivateWarning;
             InitializeComponent();
+
             debPaymentFormat.api = api;
             SetPaymentFormat();
+            cmbDirectDebitScheme.ItemsSource = Enum.GetValues(typeof(DirectDebitScheme));
+
 #if !SILVERLIGHT
             this.Title = title;
 #endif
@@ -43,6 +51,8 @@ namespace UnicontaClient.Pages.CustomPage
             Utility.SetThemeBehaviorOnChildWindow(this);
 #endif
             this.Loaded += CW_Loaded;
+            SetDefaultPaymentFormat();
+            DirectDebitSchemeVisible();
         }
 
         private async void SetPaymentFormat()
@@ -52,10 +62,42 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
 
+        private void ShowActivateWarning()
+        {
+            if (showActivateWarning && this.PaymentFormat != null && ((DebtorPaymFormatType)this.PaymentFormat?._ExportFormat != DebtorPaymFormatType.SEPA))
+            {
+                txtActivateWarning.Visibility = Visibility.Visible;
+                txtActivateWarning.Text = Uniconta.ClientTools.Localization.lookup("DirectDebitActivateWarning");
+            }
+            else
+            {
+                rowWarning.Height = new GridLength(0);
+                double h = this.Height - 120;
+                this.Height = h;
+            }
+        }
+
+        private void DirectDebitSchemeVisible()
+        {
+            if (showSchemeType && this.PaymentFormat != null && ((DebtorPaymFormatType)this.PaymentFormat?._ExportFormat == DebtorPaymFormatType.SEPA))
+            {
+                lblDirectDebitScheme.Visibility = Visibility.Visible;
+                cmbDirectDebitScheme.Visibility = Visibility.Visible;
+
+                cmbDirectDebitScheme.SelectedIndex = (int)DirectDebitScheme.CORE;
+            }
+            else
+            {
+                lblDirectDebitScheme.Visibility = Visibility.Collapsed;
+                cmbDirectDebitScheme.Visibility = Visibility.Collapsed;
+            }
+
+            ShowActivateWarning();
+        }
+
         private void CW_Loaded(object sender, RoutedEventArgs e)
         {
             Dispatcher.BeginInvoke(new Action(() => { OKButton.Focus(); }));
-            SetDefaultPaymentFormat();
         }
         async void SetDefaultPaymentFormat()
         {
@@ -64,10 +106,11 @@ namespace UnicontaClient.Pages.CustomPage
                 cache = await Capi.CompanyEntity.LoadCache(typeof(Uniconta.DataModel.DebtorPaymentFormat), Capi);
             foreach (var r in cache.GetRecords)
             {
-                var rec = r as DebtorPaymentFormat;
+                var rec = r as DebtorPaymentFormatClient;
                 if (rec != null && rec._Default)
                 {
                     debPaymentFormat.SelectedItem = rec;
+                    this.PaymentFormat = rec;
                     break;
                 }
             }
@@ -89,9 +132,22 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
+
+        private void debPaymentFormat_SelectedIndexChanged(object sender, RoutedEventArgs e)
+        {
+
+            if (debPaymentFormat.SelectedItem == null || debPaymentFormat.SelectedIndex == -1) return;
+            this.PaymentFormat = debPaymentFormat.SelectedItem as DebtorPaymentFormatClient;
+
+            DirectDebitSchemeVisible();
+        }
+
+
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
             PaymentFormat = debPaymentFormat.SelectedItem as DebtorPaymentFormatClient;
+
+            directDebitScheme = (DirectDebitScheme)cmbDirectDebitScheme.SelectedIndex;
 
             if (PaymentFormat != null)
             {

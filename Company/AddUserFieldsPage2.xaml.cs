@@ -88,7 +88,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
             else if ((_FieldType == CustomTypeCode.String))
             {
-                var referenceTables = new List<string>();
+                var referenceTables = new List<string>(200);
 
                 var userTables = api.CompanyEntity.UserTables;
                 if (userTables != null)
@@ -104,8 +104,15 @@ namespace UnicontaClient.Pages.CustomPage
                 layoutRefTable.Visibility = Visibility.Visible;
                 liMultiline.Visibility = Visibility.Visible;
             }
+            else if ((_FieldType == CustomTypeCode.Double) || (_FieldType == CustomTypeCode.Single))
+            {
+                liMath.Visibility = Visibility.Visible;
+                layoutRefTable.Visibility = Visibility.Collapsed;
+                liMultiline.Visibility = Visibility.Collapsed;
+            }
             else
             {
+                liMath.Visibility = Visibility.Collapsed;
                 layoutRefTable.Visibility = Visibility.Collapsed;
                 liMultiline.Visibility = Visibility.Collapsed;
             }

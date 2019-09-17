@@ -148,11 +148,15 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 itemsBalance = new ObservableCollection<Balance>(lstEntity.ToList());
                 cbBalance.ItemsSource = itemsBalance;
-                cbBalance.DisplayMember = "Name";
                 if (LastGeneratedBalance != null)
                     cbBalance.SelectedItem = LastGeneratedBalance;
                 else
                     cbBalance.SelectedIndex = 0;
+            }
+            else
+            {
+                itemsBalance = new ObservableCollection<Balance>();
+                cbBalance.ItemsSource = itemsBalance;
             }
             busyIndicator.IsBusy = false;
         }

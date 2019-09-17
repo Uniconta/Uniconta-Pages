@@ -63,7 +63,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ReportCriteria"
                                             <RowDefinition Height="5"/>
                                         </Grid.RowDefinitions>
                                         <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ReportBalance}" FontWeight="Bold" HorizontalAlignment="Right" Grid.Column="0" VerticalAlignment="Center" TextWrapping="Wrap"/>
-                                        <CorasauControls:DimComboBoxEditor x:Name="cbBalance" Margin="10 0 0 0" Grid.Column="1" MinWidth="120" SelectedIndexChanged="cbBalance_SelectedIndexChanged"/>
+                                        <CorasauControls:DimComboBoxEditor x:Name="cbBalance" DisplayMember="Name" Margin="10 0 0 0" Grid.Column="1" MinWidth="120" SelectedIndexChanged="cbBalance_SelectedIndexChanged"/>
                                         <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Name}" FontWeight="Bold" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" TextWrapping="Wrap"/>
                                         <CorasauControls:TextEditor x:Name="txtbalanceName" Margin="10 0 0 0" Grid.Column="3" MinWidth="120"/>
                                     </Grid>

@@ -132,13 +132,14 @@ namespace UnicontaClient.Pages.CustomPage
         protected override void OnLayoutLoaded()
         {
             base.OnLayoutLoaded();
-            var Comp = api.CompanyEntity;
             UnicontaClient.Utilities.Utility.SetDimensionsGrid(api, coldim1, coldim2, coldim3, coldim4, coldim5);
         }
 
         public async override Task InitQuery()
         {
             await dgDebtorOrderProjectLineGrid.Filter(null);
+            if (debtorOrder != null)
+                await api.Read(debtorOrder);
             RecalculateAmount();
         }
 

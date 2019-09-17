@@ -151,7 +151,11 @@ namespace UnicontaClient.Pages.CustomPage
             if (pInfo != null)
             {
                 var voucher = pInfo.GetValue(syncMaster, null);
-                string header = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("VoucherTransactions"), voucher);
+                string header = string.Empty;
+                if (syncMaster is GLAccountClient)
+                    header = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("AccountsTransaction"), voucher);
+                else
+                    header = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("VoucherTransactions"), voucher);
                 SetHeader(header);
             }
         }
@@ -174,11 +178,16 @@ namespace UnicontaClient.Pages.CustomPage
                 RemoveMenuItem();
             else
             {
-                if (api.session.User._Role < (byte)Uniconta.Common.User.UserRoles.Distributor)
+                var CountryId = Comp._CountryId;
+                if (CountryId == CountryCode.Iceland)
                 {
-                    var CountryId = Comp._CountryId;
-                    if (CountryId == CountryCode.Iceland || CountryId == CountryCode.SouthAfrica || CountryId == CountryCode.UnitedKingdom || CountryId == CountryCode.Germany)
+                    if (api.session.User._Role < (byte)Uniconta.Common.User.UserRoles.Reseller)
                         RemoveDeleteVoucher();
+                }
+                else if ((CountryId == CountryCode.SouthAfrica || CountryId == CountryCode.UnitedKingdom || CountryId == CountryCode.Germany)
+                     && api.session.User._Role < (byte)Uniconta.Common.User.UserRoles.Distributor)
+                {
+                    RemoveDeleteVoucher();
                 }
                 if (Comp._UseQtyInLedger == false)
                     RemoveChangeQuantity();
@@ -198,7 +207,10 @@ namespace UnicontaClient.Pages.CustomPage
         IEnumerable<PropValuePair> filter;
         public override Task InitQuery()
         {
-            return dgAccountsTransGrid.Filter(filter);
+            if (filter != null)
+                return dgAccountsTransGrid.Filter(filter);
+            else
+                return Filter();
         }
 
         private void DgAccountsTransGrid_RowDoubleClick()
@@ -236,7 +248,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override void LoadCacheInBackGround()
         {
-            LoadType(new Type[] { typeof(Uniconta.DataModel.GLAccount), typeof(Uniconta.DataModel.Debtor), typeof(Uniconta.DataModel.Creditor) });
+            LoadType(new Type[] { typeof(Uniconta.DataModel.Debtor), typeof(Uniconta.DataModel.Creditor), typeof(Uniconta.DataModel.GLDailyJournal), typeof(Uniconta.DataModel.GLVat), typeof(Uniconta.DataModel.GLTransType), typeof(Uniconta.DataModel.NumberSerie) });
         }
 
         private void localMenu_OnItemClicked(string ActionType)

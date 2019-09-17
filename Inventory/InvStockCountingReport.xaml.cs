@@ -458,8 +458,11 @@ namespace UnicontaClient.Pages.CustomPage
             api.AllowBackgroundCrud = true;
             var result = await api.Insert(invJournalLineList);
             UtilDisplay.ShowErrorCode(result);
+            if (result == ErrorCodes.Succes)
+                isTransToJrnl = true;
         }
 
+        bool isTransToJrnl = false;
         private void DockCtrl_ClosingCancelled(object sender)
         {
             PostInvJournal();
@@ -470,7 +473,10 @@ namespace UnicontaClient.Pages.CustomPage
         {
             get
             {
-                return CheckDifference();
+                if (isTransToJrnl)
+                    return false;
+                else
+                    return CheckDifference();
             }
         }
 

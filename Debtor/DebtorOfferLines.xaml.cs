@@ -597,12 +597,27 @@ namespace UnicontaClient.Pages.CustomPage
                         string.Format(Uniconta.ClientTools.Localization.lookup("AddOBJ"), Uniconta.ClientTools.Localization.lookup("Variants")), null, floatingLoc: Utility.GetDefaultLocation());
                     }
                     break;
+                case "CreateProduction":
+                    if (selectedItem != null)
+                        CreateProductionOrder(selectedItem);
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
             RecalculateAmount();
         }
+
+        async void CreateProductionOrder(DebtorOfferLineClient offerLine)
+        {
+            var t = saveGridLocal();
+            if (t != null && offerLine.RowId == 0)
+                await t;
+
+            object[] arr = new object[3] { api, offerLine, dgDebtorOfferLineGrid.masterRecord };
+            AddDockItem(TabControls.ProductionOrdersPage2, arr, Uniconta.ClientTools.Localization.lookup("Production"), ";component/Assets/img/Add_16x16.png");
+        }
+
         public override void Utility_Refresh(string screenName, object argument)
         {
             if (screenName == TabControls.AddMultipleInventoryItem)
@@ -706,6 +721,7 @@ namespace UnicontaClient.Pages.CustomPage
                 selectedItem.Qty = 0;
                 selectedItem.DiscountPct = 0;
                 selectedItem.Discount = 0;
+                selectedItem.CostPrice = 0;
                 dgDebtorOfferLineGrid.SetModifiedRow(selectedItem);
             }
             busyIndicator.IsBusy = false;

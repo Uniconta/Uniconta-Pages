@@ -68,6 +68,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (LoadedRow == null)
             {
+                SetTemplateDefault(userDocsClientRow);
                 api.AllowBackgroundCrud = false;
                 frmRibbon.DisableButtons("Delete");
             }

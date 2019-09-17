@@ -73,6 +73,9 @@ x:Class="UnicontaClient.Pages.CustomPage.GLVatPage2"
                     <CorasauControls:CorasauLayoutItem FieldName="ShowZeroOnInvoice" x:Name="liShowZeroOnInvoice">
                         <CorasauControls:CheckEditor IsChecked="{Binding ShowZeroOnInvoice,Mode=TwoWay}" />
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="ExternalCode" x:Name="liExternalCode">
+                        <CorasauControls:TextEditor Text="{Binding ExternalCode,Mode=TwoWay}" />
+                    </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
                 <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpAccounts" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Accounts}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                     <CorasauControls:CorasauLayoutItem FieldName="FollowAccount" x:Name="liFollowAccount">

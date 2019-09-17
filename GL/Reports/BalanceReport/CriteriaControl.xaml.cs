@@ -244,7 +244,7 @@ namespace UnicontaClient.Pages.CustomPage
                 txtColA.IsEnabled = txtColB.IsEnabled = false;
             }
 
-            if (SelectedVal == (int)BalanceColumnMethod.FromTrans || SelectedVal == (int)BalanceColumnMethod.OnlyJournals)
+            if (SelectedVal == (int)BalanceColumnMethod.FromTrans || SelectedVal == (int)BalanceColumnMethod.OnlyJournals || SelectedVal == (int)BalanceColumnMethod.TransQty)
             {
                 cmbJournal.IsEnabled = true;
             }
@@ -253,7 +253,7 @@ namespace UnicontaClient.Pages.CustomPage
                 cmbJournal.SelectedItem = null;
                 cmbJournal.IsEnabled = false;
             }
-            if (SelectedVal == (int)BalanceColumnMethod.FromBudget)
+            if (SelectedVal == (int)BalanceColumnMethod.FromBudget || SelectedVal == (int)BalanceColumnMethod.BudgetQty)
             {
                 cmbBudgetModel.IsEnabled = true;
             }

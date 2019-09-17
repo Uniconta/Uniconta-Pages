@@ -64,6 +64,7 @@ namespace UnicontaClient.Pages.CustomPage
 #else
             this.KeyDown += AddMultipleInventoryItemPage_KeyDown;
 #endif
+            DXSerializerHandler.AvoidSaveHeader(false);
         }
 
         private void AddMultipleInventoryItemPage_KeyDown(object sender, KeyEventArgs e)

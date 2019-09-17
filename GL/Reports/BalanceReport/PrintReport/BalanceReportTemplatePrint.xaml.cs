@@ -227,6 +227,28 @@ namespace UnicontaClient.Pages.CustomPage
 
     public partial class BalanceReportTemplatePrint : BasePage
     {
+        public string PrintBalanceReportPageFormat;
+        public override object GetPrintParameter()
+        {
+#if !SILVERLIGHT
+            switch (PrintBalanceReportPageFormat)
+            {
+                case "Excel":
+                    custPrint.Export(ExportFormat.Xlsx);
+                    break;
+                case "Docs":
+                    custPrint.Export(ExportFormat.Docx);
+                    break;
+                case "CSV":
+                    custPrint.Export(ExportFormat.Csv);
+                    break;
+                default:
+                    custPrint.Print();
+                    break;
+            }
+#endif
+            return base.GetPrintParameter();
+        }
         public override string NameOfControl
         {
             get { return TabControls.BalanceReportTemplatePrint.ToString(); }

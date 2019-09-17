@@ -66,7 +66,10 @@ namespace UnicontaClient.Pages.CustomPage
             if (Comp.RoundTo100)
                 CurBalance.HasDecimals = Overdue.HasDecimals = false;
             if (Comp.CRM)
-                LoadType(new Type[] { typeof(Uniconta.DataModel.CrmInterest), typeof(Uniconta.DataModel.CrmProduct) });
+                LoadType(new Type[] { typeof(Uniconta.DataModel.DebtorGroup), typeof(Uniconta.DataModel.CrmInterest), typeof(Uniconta.DataModel.CrmProduct) });
+            else
+                LoadNow(typeof(Uniconta.DataModel.DebtorGroup));
+
             dgDebtorAccountGrid.ShowTotalSummary();
 
 #if SILVERLIGHT
@@ -163,7 +166,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                     {
                         object[] Params = new object[2] { selectedItem, true };
-                        AddDockItem(TabControls.DebtorAccountPage2, Params, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("DebtorAccount"), selectedItem.Account));
+                        AddDockItem(TabControls.DebtorAccountPage2, Params, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("DebtorAccount"), selectedItem._Account));
                     }
                     break;
                 case "DebtorTran":
@@ -290,6 +293,10 @@ namespace UnicontaClient.Pages.CustomPage
                         AddDockItem(TabControls.DebtorInvoiceLinesPivotReport, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Pivot"), selectedItem._Name));
                     break;
 #endif
+                case "Project":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.Project, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Project"), selectedItem._Name));
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -309,30 +316,47 @@ namespace UnicontaClient.Pages.CustomPage
 #if !SILVERLIGHT
         async void CreateMandates(IList debtors)
         {
-            var lstDebtors = debtors.Cast<DebtorClient>();
-            var lstInsert = new List<Uniconta.DataModel.DebtorPaymentMandate>();
-            var comp = api.CompanyEntity;
+            var mandateCache = api.GetCache(typeof(Uniconta.DataModel.DebtorPaymentMandate)) ?? await api.LoadCache(typeof(Uniconta.DataModel.DebtorPaymentMandate));
 
-            var mandateCache = comp.GetCache(typeof(Uniconta.DataModel.DebtorPaymentMandate)) ?? await comp.LoadCache(typeof(Uniconta.DataModel.DebtorPaymentMandate), api);
-
-            foreach (var rec in lstDebtors)
+            CWDirectDebit cwwin = new CWDirectDebit(api, string.Format(Uniconta.ClientTools.Localization.lookup("CreateOBJ"), Uniconta.ClientTools.Localization.lookup("Mandates")), true);
+            cwwin.Closing += delegate
             {
-                var mandate = (Uniconta.DataModel.DebtorPaymentMandate)mandateCache?.Get(rec.Account);
+                if (cwwin.DialogResult == true)
+                {
+                    var lstDebtors = debtors.Cast<Uniconta.ClientTools.DataModel.DebtorClient>();
+                    var lstInsert = new List<Uniconta.DataModel.DebtorPaymentMandate>();
+                    var lstUpdate = new List<Uniconta.DataModel.Debtor>();
 
-                if (mandate != null)
-                    continue;
-                
-                var newMandate = new Uniconta.DataModel.DebtorPaymentMandate();
-                newMandate._DCAccount = rec.Account;
-                newMandate._StatusInfo = string.Format("({0}) Mandate created", Uniconta.DirectDebitPayment.Common.GetTimeStamp()); ;
-                lstInsert.Add(newMandate);
+                    foreach (var rec in lstDebtors)
+                    {
+                        var mandate = (Uniconta.DataModel.DebtorPaymentMandate)mandateCache?.Get(rec._Account);
+                        if (mandate != null)
+                            continue;
 
-            }
-            if (lstInsert.Any())
-            {                
-                 api.InsertNoResponse(lstInsert);
-                 UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("RecordsUpdated"), lstInsert.Count, Uniconta.ClientTools.Localization.lookup("Mandates")), Uniconta.ClientTools.Localization.lookup("Information"));
-            }
+                        var newMandate = new Uniconta.DataModel.DebtorPaymentMandate();
+                        newMandate._DCAccount = rec._Account;
+                        newMandate._Scheme = cwwin.directDebitScheme;
+                        newMandate._StatusInfo = string.Format("({0}) Mandate created", Uniconta.DirectDebitPayment.Common.GetTimeStamp()); ;
+                        lstInsert.Add(newMandate);
+
+                        if (rec.PaymentFormat != cwwin.PaymentFormat._Format)
+                        {
+                            rec.PaymentFormat = cwwin.PaymentFormat._Format;
+                            lstUpdate.Add(rec);
+                        }
+                    }
+
+                    if (lstInsert.Count > 0)
+                    {
+                        api.InsertNoResponse(lstInsert);
+                        UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("RecordsUpdated"), lstInsert.Count, Uniconta.ClientTools.Localization.lookup("Mandates")), Uniconta.ClientTools.Localization.lookup("Information"));
+                    }
+
+                    if (lstUpdate.Count > 0)
+                        api.UpdateNoResponse(lstUpdate);
+                }
+            };
+            cwwin.Show();
         }
 #endif
 

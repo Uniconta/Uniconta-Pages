@@ -181,6 +181,9 @@ x:Class="UnicontaClient.Pages.CustomPage.CreateCompany"
                         <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Groups}">
                             <CorasauControls:CheckEditor x:Name="chkGroups" IsChecked="true"/>
                         </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Project}">
+                            <CorasauControls:CheckEditor x:Name="chkProject" IsChecked="true"/>
+                        </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
                 </CorasauControls:CorasauLayoutGroup>
             </CorasauControls:CorasauLayoutControl>

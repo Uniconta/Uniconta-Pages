@@ -179,7 +179,7 @@ namespace UnicontaClient.Pages.CustomPage
                 var lineTotal = DebtorInvoice._LineTotal;
                 IsCreditNote = (lineTotal < -0.0001d);
 
-                ReportName = layoutType != CompanyLayoutType.Invoice ? layoutType.ToString() : invoiceNumber == 0 ? "ProformaInvoice"
+                ReportName = layoutType != CompanyLayoutType.Invoice ? layoutType.ToString() : invoiceNumber == 0 ? IsCreditNote? "ProformaCreditNote": "ProformaInvoice"
                     : IsCreditNote ? "Creditnote" : "Invoice";
 
                 MessageClient = await GetMessageClient(lang);

@@ -223,19 +223,6 @@ namespace UnicontaClient.Pages.CustomPage
 
         public override void Utility_Refresh(string screenName, object argument = null)
         {
-            if (screenName == TabControls.InvItemStoragePage && argument != null)
-            {
-                var storeloc = argument as InvItemStorageClient;
-                if (storeloc == null) return;
-                var selected = dgCreditorOrderLineGrid.SelectedItem as CreditorOrderLineClient;
-                if (selected == null) return;
-                dgCreditorOrderLineGrid.SetLoadedRow(selected);
-                selected.Warehouse = storeloc.Warehouse;
-                selected.Location = storeloc.Location;
-                dgCreditorOrderLineGrid.SetModifiedRow(selected);
-                this.DataChanged = true;
-            }
-
             if (screenName == TabControls.AddMultipleInventoryItem)
             {
                 var param = argument as object[];
@@ -398,6 +385,8 @@ namespace UnicontaClient.Pages.CustomPage
             var orderLine = (CreditorOrderLineClient)rec;
             if (orderLine._Item != null)
             {
+                if (Comp._InvoiceUseQtyNowCre)
+                    orderLine.QtyNow = orderLine._Qty;
                 var selectedItem = (InvItem)items.Get(orderLine._Item);
                 if (selectedItem != null)
                 {
@@ -439,6 +428,8 @@ namespace UnicontaClient.Pages.CustomPage
                             rec.Qty = selectedItem._PurchaseQty;
                         else if (Comp._PurchaseLineOne)
                             rec.Qty = 1d;
+                        if (Comp._InvoiceUseQtyNowCre)
+                            rec.QtyNow = rec._Qty;
                         rec.SetItemValues(selectedItem, Comp._PurchaseLineStorage);
                         if (this.PriceLookup != null)
                             this.PriceLookup.SetPriceFromItem(rec, selectedItem);
@@ -463,6 +454,8 @@ namespace UnicontaClient.Pages.CustomPage
                 case "Qty":
                     if (this.PriceLookup != null && this.PriceLookup.UseCustomerPrices)
                         this.PriceLookup.GetCustomerPrice(rec, false);
+                    if (api.CompanyEntity._InvoiceUseQtyNowCre)
+                        rec.QtyNow = rec._Qty;
                     break;
                 case "Warehouse":
                     if (warehouse != null)
@@ -509,7 +502,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (ProjectCache == null)
             {
                 var api = this.api;
-                ProjectCache = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.Project)) ?? await api.CompanyEntity.LoadCache(typeof(Uniconta.DataModel.Project), api);
+                ProjectCache = api.GetCache(typeof(Uniconta.DataModel.Project)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Project));
             }
             var proj = (Uniconta.DataModel.Project)ProjectCache?.Get(rec._Project);
             if (proj != null)
@@ -724,14 +717,17 @@ namespace UnicontaClient.Pages.CustomPage
         static bool showInvPrintPreview = true;
         private void OrderConfirmation(CreditorOrderClient dbOrder, CompanyLayoutType doctype)
         {
+            var savetask = saveGridLocal();
             InvoiceAPI Invapi = new InvoiceAPI(api);
             var creditor = dbOrder.Creditor;
             bool showSendByMail = true;
             if (creditor != null)
                 showSendByMail = !string.IsNullOrEmpty(creditor._InvoiceEmail);
             string creditorName = creditor?._Name ?? dbOrder._DCAccount;
-            bool showUpdateInv = api.CompanyEntity.Storage;
-            CWGenerateInvoice GenrateOfferDialog = new CWGenerateInvoice(false, Uniconta.ClientTools.Localization.lookup(doctype.ToString()), isShowInvoiceVisible: true, askForEmail: true, showNoEmailMsg: !showSendByMail, debtorName: creditorName, isShowUpdateInv: showUpdateInv);
+            var comp = api.CompanyEntity;
+            bool showUpdateInv = comp.Storage || (doctype == CompanyLayoutType.PurchasePacknote && comp.CreditorPacknote);
+            CWGenerateInvoice GenrateOfferDialog = new CWGenerateInvoice(false, doctype.ToString(), showInputforInvNumber: doctype == CompanyLayoutType.PurchasePacknote ? true : false, isShowInvoiceVisible: true, 
+                askForEmail: true, showNoEmailMsg: !showSendByMail, debtorName: creditorName, isShowUpdateInv: showUpdateInv);
 #if !SILVERLIGHT
             switch (doctype)
             {
@@ -751,8 +747,20 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 if (GenrateOfferDialog.DialogResult == true)
                 {
-                    showInvPrintPreview = GenrateOfferDialog.ShowInvoice || GenrateOfferDialog.InvoiceQuickPrint;
+                    if (savetask != null)
+                    {
+                        var err = await savetask;
+                        if (err != ErrorCodes.Succes)
+                            return;
+                    }
 
+                    showInvPrintPreview = GenrateOfferDialog.ShowInvoice || GenrateOfferDialog.InvoiceQuickPrint;
+                    long documentNumber = 0;
+                    if (doctype == CompanyLayoutType.PurchasePacknote)
+                    {
+                        documentNumber = GenrateOfferDialog.InvoiceNumber;
+                        dbOrder._InvoiceNumber = documentNumber;
+                    }
                     var invoicePostingResult = new InvoicePostingPrintGenerator(api, this, dbOrder, null, GenrateOfferDialog.GenrateDate, 0, !GenrateOfferDialog.UpdateInventory, doctype,
                         showInvPrintPreview, GenrateOfferDialog.InvoiceQuickPrint, GenrateOfferDialog.NumberOfPages, GenrateOfferDialog.SendByEmail, GenrateOfferDialog.Emails, GenrateOfferDialog.sendOnlyToThisEmail);
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");

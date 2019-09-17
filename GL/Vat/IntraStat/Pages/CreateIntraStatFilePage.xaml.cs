@@ -40,7 +40,6 @@ namespace UnicontaClient.Pages.CustomPage
     public class CreateIntraStatFilePageGrid : CorasauDataGridClient
     {
         public override Type TableType { get { return typeof(IntrastatClient); } }
-        protected override IList ToList(UnicontaBaseEntity[] Arr) { return ((IntrastatClient[])Arr).ToList(); }
         public override bool Readonly { get { return false; } }
     }
 

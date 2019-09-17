@@ -55,7 +55,8 @@ namespace UnicontaISO20022CreditTransfer
             XmlElement dbtr = baseDoc.AppendElement(doc, parent, HDBTR);
             baseDoc.AppendElement(doc, dbtr, NAME, debtorName);
 
-            AppendPostalAddress(baseDoc, doc, dbtr, PSTLADR, this.PostalAddress);
+            if (this.postalAddress != null)
+                AppendPostalAddress(baseDoc, doc, dbtr, PSTLADR, this.PostalAddress);
 
             if (debtorIdentificationCode != string.Empty)
             {

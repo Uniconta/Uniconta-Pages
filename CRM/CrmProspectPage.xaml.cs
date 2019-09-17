@@ -64,7 +64,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
         protected override void LoadCacheInBackGround()
         {
-            LoadType(new Type[] { typeof(CrmInterest), typeof(CrmProduct) });
+            LoadType(new Type[] { typeof(CrmInterest), typeof(CrmProduct), typeof(Contact) });
         }
         
         public override void Utility_Refresh(string screenName, object argument = null)

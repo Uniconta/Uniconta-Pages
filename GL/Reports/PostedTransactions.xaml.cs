@@ -106,9 +106,9 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override void LoadCacheInBackGround()
         {
-            LoadType(new Type[] { typeof(Uniconta.DataModel.GLAccount), typeof(Uniconta.DataModel.Debtor), typeof(Uniconta.DataModel.Creditor) });
+            LoadType(new Type[] { typeof(Uniconta.DataModel.GLAccount), typeof(Uniconta.DataModel.Debtor), typeof(Uniconta.DataModel.Creditor), typeof(Uniconta.DataModel.GLDailyJournal), typeof(Uniconta.DataModel.GLVat), typeof(Uniconta.DataModel.GLTransType) });
         }
-       
+
         private Task Filter(IEnumerable<PropValuePair> propValuePair)
         {
             return dgPostedTran.Filter(propValuePair);

@@ -120,7 +120,7 @@ namespace UnicontaClient.Pages.CustomPage
         public override bool CheckIfBindWithUserfield(out bool isReadOnly, out bool useBinding)
         {
             isReadOnly = true;
-            useBinding = true;
+            useBinding = false;
             return true;
         }
 
@@ -175,10 +175,16 @@ namespace UnicontaClient.Pages.CustomPage
 
         async private void JournalPosted(ProjectTransClient selectedItem)
         {
-            var result = await api.Query(new GLDailyJournalPostedClient(), new UnicontaBaseEntity[] { selectedItem }, null);
+            var pairPostedJour = new PropValuePair[]
+            {
+                PropValuePair.GenereteWhereElements(nameof(ProjectJournalPostedClient.GLJournalPostedId), typeof(int), selectedItem._JournalPostedId.ToString())
+            };
+
+            var result = await api.Query<ProjectJournalPostedClient>(pairPostedJour);
+
             if (result != null && result.Length == 1)
             {
-                CWGLPostedClientFormView cwPostedClient = new CWGLPostedClientFormView(result[0]);
+                CWProjPostedClientFormView cwPostedClient = new CWProjPostedClientFormView(result[0]);
                 cwPostedClient.Show();
             }
         }

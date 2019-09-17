@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<root>
+  <RibbonItem TabId="0" LocalizedNameKey="Home">
+    <RibbonItem Action="Search" LocalizedNameKey="Search" LargeGlyph="Validate_32x32.png" ShortcutKey="Ctrl+H" />   
+  </RibbonItem>
+  <RibbonItem>
+      <RibbonItem Action="GroupByDebtor" LocalizedNameKey="GroupByOBJ" Parameter="Debtor" LargeGlyph="Employee_32x32.png" />
+      <RibbonItem Action="GroupByPersonInCharge"  LocalizedNameKey="GroupByOBJ" Parameter="PersonInCharge" LargeGlyph="UsresOf_32x32.png"/>
+      <RibbonItem Action="GroupByDimension1"  LargeGlyph="Group_by_32x32.png"/>
+      <RibbonItem Action="GroupByDimension2"  LargeGlyph="Group_by_32x32.png"/>
+      <RibbonItem Action="GroupByDimension3"  LargeGlyph="Group_by_32x32.png"/>
+      <RibbonItem Action="GroupByDimension4"  LargeGlyph="Group_by_32x32.png"/>
+      <RibbonItem Action="GroupByDimension5"  LargeGlyph="Group_by_32x32.png"/>
+      <RibbonItem Action="UnGroupAll" LocalizedNameKey="ClearOBJ" Parameter="MenuColumnGroup" LargeGlyph="Group_by_Clear_32x32.png"/>
+    </RibbonItem>  
+  <RibbonItem >
+   <RibbonItem Action="Transactions" LocalizedNameKey="Transactions"  LargeGlyph="Account-statement_32x32.png" ShortcutKey="CTRL+T"/>
+  </RibbonItem>
+  <RibbonItem >
+    <RibbonItem Action="SalesOrder" LocalizedNameKey="GenerateOnAccountInvoice" LargeGlyph="Orders_32x32.png"/>  
+    <RibbonItem Action="CreateOrder" LocalizedNameKey="GenerateFinalInvoice" LargeGlyph="AccountInvoice_16x16.png"/>
+  </RibbonItem>
+  <RibbonItem >
+    <RibbonItem Action="DebtorAccount" LocalizedNameKey="DebtorAccount" LargeGlyph="Contacts_32x32.png"/>
+  </RibbonItem>
+  <RibbonItem>
+    <!---If we want to create a new group in same PageTab-->
+    <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32.png">
+      <!---If we want Inner menu-->
+      <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
+      <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16.png" ShortcutKey="" />
+      <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveOBJ" Parameter="Layout" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
+      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16.png" ShortcutKey=""/>
+      <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16.png" ShortcutKey="Ctrl+U"/>
+      <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportOBJ"  Parameter="Layout" EnableSeperator="True" Glyph="ExportLayout_16x16.png" LargeGlyph="ExportLayout_16x16.png" ShortcutKey=""/>
+      <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportOBJ" Parameter="Layout" Glyph="Import_16x16.png" LargeGlyph="Import_16x16.png" ShortcutKey=""/>
+      <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16.png" ShortcutKey=""/>
+    </RibbonItem>
+  </RibbonItem>
+</root>

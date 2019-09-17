@@ -18,6 +18,7 @@ namespace UnicontaISO20022CreditTransfer
         Swedbank,
         LHV_bank,
         Deutsche_Kreditwirtschaft,
-        SEB
+        SEB,
+        Volks_Raiffeisenbanken
     }
 }

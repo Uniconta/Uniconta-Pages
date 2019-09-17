@@ -114,6 +114,8 @@ namespace UnicontaClient.Pages.CustomPage
                 Account.Visible = true;
                 AccountName.Visible = true;
             }
+            if (! api.CompanyEntity._UseQtyInLedger)
+                Qty.Visible = false;
         }
 
         /*

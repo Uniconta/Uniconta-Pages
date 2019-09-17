@@ -2,7 +2,7 @@
 <root>
   <RibbonItem TabId="0" LocalizedNameKey="Home">
     <!---When we create a new group and a new TabPage -->
-    <RibbonItem Action="AddRow" LocalizedNameKey="Add" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png"/>
+    <RibbonItem Action="AddRow" LocalizedNameKey="Add" ControlName="CreditorOrdersPage2" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png"/>
     <RibbonItem Action="EditRow" ShortcutKey="Ctrl+E" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>
   </RibbonItem>
   <RibbonItem>
@@ -16,7 +16,7 @@
       <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
       <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16.png" ShortcutKey="" />
       <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveOBJ" Parameter="Layout" Glyph="Edit_16x16.png"  ShortcutKey=""/>
-      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="SwitchToDefault" Glyph="Delete_16x16.png" ShortcutKey=""/>
+      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16.png" ShortcutKey=""/>
       <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16.png" ShortcutKey="Ctrl+U"/>
       <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportOBJ"  Parameter="Layout" EnableSeperator="True" Glyph="ExportLayout_16x16.png"  ShortcutKey=""/>
       <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportOBJ" Parameter="Layout" Glyph="Import_16x16.png"  ShortcutKey=""/>
@@ -25,32 +25,32 @@
   </RibbonItem>
   <RibbonItem>
     <RibbonItem LocalizedNameKey="PhysicalVoucher" Glyph="Cover_16x16.png" LargeGlyph="View_Voucher_32x32.png" >
-      <RibbonItem Action="ViewVoucher" LocalizedNameKey="View" Glyph="View_16x16.png"  ShortcutKey="F7"/>
-      <RibbonItem Action="RefVoucher" LocalizedNameKey="Attach" Glyph="Attachments_16x16.png"  ShortcutKey="Ctrl+T"/>
+      <RibbonItem Action="ViewVoucher" LocalizedNameKey="View" ControlName="VouchersPage3" Glyph="View_16x16.png"  ShortcutKey="F7"/>
+      <RibbonItem Action="RefVoucher" LocalizedNameKey="Attach" ControlName="AttachVoucherGridPage" Glyph="Attachments_16x16.png"  ShortcutKey="Ctrl+T"/>
       <RibbonItem Action="ImportVoucher" LocalizedNameKey="ImportFile" Glyph="Add_16x16.png" ShortcutKey="Ctrl+J" />
       <RibbonItem Action="RemoveVoucher" LocalizedNameKey="Remove" Glyph="Delete_16x16.png" ShortcutKey="Ctrl+I" />
     </RibbonItem>
   </RibbonItem>
   
   <RibbonItem>
-    <RibbonItem Action="OrderLine" LocalizedNameKey="PurchaseLines" LargeGlyph="Order_Lines_Highlighted_32x32.png" ShortcutKey="ALT+L"/>
+    <RibbonItem Action="OrderLine" LocalizedNameKey="PurchaseLines" ControlName="CreditorOrderLines" LargeGlyph="Order_Lines_Highlighted_32x32.png" ShortcutKey="ALT+L"/>
     <RibbonItem Action="PrintDocument" LocalizedNameKey="UpdateOBJ" Parameter="Document" LargeGlyph="Order_Confirmation_32x32.png">
       <RibbonItem Action="UpdateRequisition" LocalizedNameKey="Requisition" Glyph="AccountInvoice_16x16.png" ShortcutKey="Ctrl+H" />
       <RibbonItem Action="UpdatePurchaseOrder" LocalizedNameKey="PurchaseOrder" Glyph="Sales_16x16.png" ShortcutKey="Ctrl+Q"/>
-      <RibbonItem Action="UpdateDeliveryNote" LocalizedNameKey="Packnote" Glyph="Note_16x16.png" ShortcutKey="Ctrl+K" />
+      <RibbonItem Action="UpdateDeliveryNote" LocalizedNameKey="CreditorPackNote" Glyph="Note_16x16.png" ShortcutKey="Ctrl+K" />
       <RibbonItem Action="CreateInvoice" LocalizedNameKey="Invoice" Glyph="Invoice_16x16.png" ShortcutKey="Ctrl+M"/>
     </RibbonItem>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="Contacts" LocalizedNameKey="Contacts" Module="Contacts" LargeGlyph="Contacts_32x32.png">
+    <RibbonItem Action="Contacts" LocalizedNameKey="Contacts" ControlName="ContactPage" Module="Contacts" LargeGlyph="Contacts_32x32.png">
     </RibbonItem>
     <RibbonItem Module="Attachments" LocalizedNameKey="Attachments" LargeGlyph="Attachments_32x32.png">
-      <RibbonItem Action="AddNote" ShortcutKey="Alt+N" LocalizedNameKey="Note" Glyph="Add_Notes_16x16.png" />
-      <RibbonItem Action="AddDoc" LocalizedNameKey="Document" Glyph="Accounts_Statement_Report_16x16.png" ShortcutKey="Ctrl+O" />
+      <RibbonItem Action="AddNote" ShortcutKey="Alt+N" LocalizedNameKey="Note" ControlName="UserNotesPage" Glyph="Add_Notes_16x16.png" />
+      <RibbonItem Action="AddDoc" LocalizedNameKey="Document" ControlName="UserDocsPage" Glyph="Accounts_Statement_Report_16x16.png" ShortcutKey="Ctrl+O" />
     </RibbonItem>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="EditCreditor" LocalizedNameKey="EditOBJ" Parameter="Creditor" LargeGlyph="Vendor_32x32.png"/>
+    <RibbonItem Action="EditCreditor" LocalizedNameKey="EditOBJ" Parameter="Creditor" ControlName="CreditorAccountPage2" LargeGlyph="Vendor_32x32.png"/>
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="CreateOrder" LocalizedNameKey="CreateOBJ" Parameter="PurchaseSalesOrder" Glyph="refresh.png" LargeGlyph="Orders_32x32.png"/>
@@ -59,7 +59,7 @@
     <RibbonItem Action="ReadOIOUBL" LocalizedNameKey="ImportOBJ" Parameter="OIOUBL" LargeGlyph="Import_32x32.png"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="PurchaseCharges" LocalizedNameKey="PurchaseCharges" Module="PurchaseCharges" LargeGlyph="Purchase_Lines_32x32.png"/>
+    <RibbonItem Action="PurchaseCharges" LocalizedNameKey="PurchaseCharges" ControlName="CreditorOrderCostLinePage" Module="PurchaseCharges" LargeGlyph="Purchase_Lines_32x32.png"/>
   </RibbonItem>
   <RibbonItem TabId="1" LocalizedNameKey="EditAll">
     <RibbonItem Action="EditAll"  LocalizedNameKey="EditAll"  LargeGlyph="Edit_32x32.png"/>

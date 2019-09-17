@@ -13,11 +13,13 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Uniconta.API.Service;
+using Uniconta.API.System;
 using Uniconta.ClientTools;
 using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using UnicontaClient.Models;
+using Uniconta.Common;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -35,12 +37,23 @@ namespace UnicontaClient.Pages.CustomPage
 
     public partial class AllUserDocumentsPage : GridBasePage
     {
+        public AllUserDocumentsPage(UnicontaBaseEntity rec, CrudAPI api) : base(api, string.Empty)
+        {
+            InitPage(rec);
+        }
+
         public AllUserDocumentsPage(BaseAPI API) : base(API, string.Empty)
+        {
+            InitPage(null);
+        }
+
+        void InitPage(UnicontaBaseEntity rec)
         {
             InitializeComponent();
             dgDocsGrid.BusyIndicator = busyIndicator;
             dgDocsGrid.api = api;
             SetRibbonControl(localMenu, dgDocsGrid);
+            dgDocsGrid.UpdateMaster(rec);
             localMenu.OnItemClicked += localMenu_OnItemClicked;
         }
 
@@ -65,6 +78,36 @@ namespace UnicontaClient.Pages.CustomPage
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
+        }
+
+        protected override LookUpTable HandleLookupOnLocalPage(LookUpTable lookup, CorasauDataGrid dg)
+        {
+            var doc = dg.SelectedItem as UserDocsClient;
+            if (doc != null && dg.CurrentColumn?.Name == "KeyStr")
+            {
+                switch (doc._TableId)
+                {
+                    case Uniconta.DataModel.Debtor.CLASSID://50
+                        lookup.TableType = typeof(Uniconta.DataModel.Debtor);
+                        break;
+                    case Uniconta.DataModel.Creditor.CLASSID://51
+                        lookup.TableType = typeof(Uniconta.DataModel.Creditor);
+                        break;
+                    case Uniconta.DataModel.Subscription.CLASSID://308
+                        lookup.TableType = typeof(Uniconta.DataModel.Subscription);
+                        break;
+                    case Uniconta.DataModel.DebtorOrder.CLASSID://71
+                        lookup.TableType = typeof(Uniconta.DataModel.DebtorOrder);
+                        break;
+                    case Uniconta.DataModel.CreditorOrder.CLASSID://72
+                        lookup.TableType = typeof(Uniconta.DataModel.CreditorOrder);
+                        break;
+                    case Uniconta.DataModel.InvItem.CLASSID://23
+                        lookup.TableType = typeof(Uniconta.DataModel.InvItem);
+                        break;
+                }
+            }
+            return lookup;
         }
 
 #if !SILVERLIGHT

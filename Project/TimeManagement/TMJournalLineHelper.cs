@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -36,10 +37,15 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
         private List<TMJournalLineError> checkErrors;
         private EmpPayrollCategoryEmployeeClient[] empPriceLst;
         private DateTime startDate;
+        private DateTime endDate;
         private CrudAPI api;
         private Uniconta.DataModel.Employee employee;
         private SQLTableCache<Uniconta.DataModel.EmpPayrollCategory> empPayrollCatList;
+        private SQLTableCache<Uniconta.DataModel.ProjectGroup> projGroupList;
+
         #endregion
+
+        public enum TMJournalActionType { Close, Open, Approve }
 
         public TMJournalLineHelper(CrudAPI api, Uniconta.DataModel.Employee employee)
         {
@@ -54,10 +60,26 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
 
             this.empPayrollCatList = empPayrollCatList;
 
+            PreValidateEmployee();
             PreValidateNormHours(normHoursTotal);
             PreValidatePayrollCategory();
 
             return checkErrors;
+        }
+
+
+        /// <summary>
+        /// Validate - Employee
+        /// </summary>
+        private void PreValidateEmployee()
+        {
+            if (employee._TMCloseDate < employee._TMApproveDate && employee._TMCloseDate != DateTime.MinValue && employee._TMApproveDate != DateTime.MinValue)
+            {
+                checkErrors.Add(new TMJournalLineError()
+                {
+                    Message = string.Format("Close Date ('{0}') is less than Approve Date ('{1}'). This is not allowed. Please change the dates for the Employee.", employee._TMCloseDate.ToShortDateString(), employee._TMApproveDate.ToShortDateString()),
+                });
+            }
         }
 
         /// <summary>
@@ -100,14 +122,19 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
         #endregion
 
         #region Validate Hours
-        public List<TMJournalLineError> ValidateLinesHours(IEnumerable<TMJournalLineClientLocal> lines, DateTime startDate, EmpPayrollCategoryEmployeeClient[] empPriceLst, SQLTableCache<Uniconta.DataModel.EmpPayrollCategory> empPayrollCatList)
+        public List<TMJournalLineError> ValidateLinesHours(IEnumerable<TMJournalLineClientLocal> lines, DateTime startDate, DateTime endDate, 
+                                                           EmpPayrollCategoryEmployeeClient[] empPriceLst, SQLTableCache<Uniconta.DataModel.EmpPayrollCategory> empPayrollCatList,
+                                                           SQLTableCache<Uniconta.DataModel.ProjectGroup> projGroupList)
         {
             checkErrors = new List<TMJournalLineError>();
 
             this.empPayrollCatList = empPayrollCatList;
+            this.projGroupList = projGroupList;
             this.comp = api.CompanyEntity;
             this.empPriceLst = empPriceLst;
-            this.startDate = startDate;
+            var approveDate = employee._TMApproveDate;
+            this.startDate = approveDate >= startDate ? approveDate.AddDays(1) : startDate;
+            this.endDate = endDate;
 
             foreach (var rec in lines)
             {
@@ -165,7 +192,7 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
         /// </summary>
         private void ValidateHoursPrice(IEnumerable<TMJournalLineClientLocal> lines)
         {
-            SetEmplPrice(lines, empPriceLst, startDate, true);
+            SetEmplPrice(lines, empPriceLst, startDate, endDate, true);
         }
 
         private static string fieldCannotBeEmpty(string field)
@@ -204,6 +231,7 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
                 return;
 
             var payrollCat = empPayrollCatList?.Get(rec.PayrollCategory);
+            var projGroup = projGroupList?.Get(rec.ProjectRef.Group);
 
             if (payrollCat._PrCategory == null)
             {
@@ -215,6 +243,30 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
 
                 err = true;
             }
+
+            if (projGroup != null && payrollCat._Invoiceable && !projGroup._Invoiceable)
+            {
+                checkErrors.Add(new TMJournalLineError()
+                {
+                    Message = String.Format("Invoiceable Payroll category '{0}' cant be posted to a none Invoiceable project", rec.PayrollCategory),
+                    RowId = rec.RowId
+                });
+
+                err = true;
+            }
+
+
+            if (projGroup != null && !payrollCat._Invoiceable && projGroup._Invoiceable)
+            {
+                checkErrors.Add(new TMJournalLineError()
+                {
+                    Message = String.Format("None invoiceable Payroll category '{0}' cant be posted to a Invoiceable project", rec.PayrollCategory),
+                    RowId = rec.RowId
+                });
+
+                err = true;
+            }
+
 
             if (payrollCat._InternalType == InternalType.Mileage)
             {
@@ -418,12 +470,16 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
 
         #endregion
 
-        public void SetEmplPrice(IEnumerable<TMJournalLineClientLocal> lst, EmpPayrollCategoryEmployeeClient[] empPriceLst, DateTime startDate, bool validate = false)
+        public void SetEmplPrice(IEnumerable<TMJournalLineClientLocal> lst, EmpPayrollCategoryEmployeeClient[] empPriceLst, DateTime startDate, DateTime endDate, bool validate = false)
         {
 #if !SILVERLIGHT
             bool foundErr;
             try
             {
+                int dayOfWeekStart = startDate.DayOfWeek == DayOfWeek.Sunday ? 7 : (int)startDate.DayOfWeek;
+                int dayOfWeekEnd = endDate.DayOfWeek == DayOfWeek.Sunday ? 7 : (int)endDate.DayOfWeek;
+
+
                 var defaultPayrollCategory = empPayrollCatList.Where(s => s.KeyStr == "Default" && s._PrCategory == null).FirstOrDefault(); 
 
                 foreach (var trans in lst)
@@ -431,8 +487,11 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
                     var payrollCat = empPayrollCatList?.Get(trans.PayrollCategory);
 
                     foundErr = false;
-                    for (int x = 1; x <= 7; x++)
+                    for (int x = dayOfWeekStart; x <= dayOfWeekEnd; x++)
                     {
+                        if ((double)trans.GetType().GetProperty(string.Format("Day{0}", x)).GetValue(trans) == 0)
+                            continue;
+
                         double salesPrice = 0, costPrice = 0;
 
                         List<EmpPayrollCategoryEmployeeClient> prices = null;
@@ -553,7 +612,196 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
 #endif
         }
 
-        # region Google Maps calculate distance
+        public static string GetPeriod(DateTime Date)
+        {
+            var dayOffset = DayOfWeek.Thursday - Date.DayOfWeek;
+            if (dayOffset > 0)
+                Date = Date.AddDays(dayOffset);
+
+            var week = CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(Date, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday).ToString();
+
+            return string.Format("{0}_{1}", Date.Year, week.PadLeft(2, '0'));
+        }
+
+        #region TMJournalLineClientPage
+        public class TMJournalLineClientLocal : TMJournalLineClient 
+        {
+
+            private string _ErrorInfo;
+            [Display(Name = "SystemInfo", ResourceType = typeof(DCTransText))]
+            public string ErrorInfo { get { return _ErrorInfo; } set { _ErrorInfo = value; NotifyPropertyChanged("ErrorInfo"); } }
+
+            private Double _SalesPriceDay1;
+            [Display(Name = "SalesPriceDay1")]
+            public Double SalesPriceDay1 { get { return _SalesPriceDay1; } set { _SalesPriceDay1 = value; NotifyPropertyChanged("SalesPriceDay1"); } }
+
+            private Double _SalesPriceDay2;
+            [Display(Name = "SalesPriceDay2")]
+            public Double SalesPriceDay2 { get { return _SalesPriceDay2; } set { _SalesPriceDay2 = value; NotifyPropertyChanged("SalesPriceDay2"); } }
+
+            private Double _SalesPriceDay3;
+            [Display(Name = "SalesPriceDay3")]
+            public Double SalesPriceDay3 { get { return _SalesPriceDay3; } set { _SalesPriceDay3 = value; NotifyPropertyChanged("SalesPriceDay3"); } }
+
+            private Double _SalesPriceDay4;
+            [Display(Name = "SalesPriceDay4")]
+            public Double SalesPriceDay4 { get { return _SalesPriceDay4; } set { _SalesPriceDay4 = value; NotifyPropertyChanged("SalesPriceDay4"); } }
+
+            private Double _SalesPriceDay5;
+            [Display(Name = "SalesPriceDay5")]
+            public Double SalesPriceDay5 { get { return _SalesPriceDay5; } set { _SalesPriceDay5 = value; NotifyPropertyChanged("SalesPriceDay5"); } }
+
+            private Double _SalesPriceDay6;
+            [Display(Name = "SalesPriceDay6")]
+            public Double SalesPriceDay6 { get { return _SalesPriceDay6; } set { _SalesPriceDay6 = value; NotifyPropertyChanged("SalesPriceDay6"); } }
+
+            private Double _SalesPriceDay7;
+            [Display(Name = "SalesPriceDay7")]
+            public Double SalesPriceDay7 { get { return _SalesPriceDay7; } set { _SalesPriceDay7 = value; NotifyPropertyChanged("SalesPriceDay7"); } }
+
+            private Double _CostPriceDay1;
+            [Display(Name = "CostPriceDay1")]
+            public Double CostPriceDay1 { get { return _CostPriceDay1; } set { _CostPriceDay1 = value; NotifyPropertyChanged("CostPriceDay1"); } }
+
+            private Double _CostPriceDay2;
+            [Display(Name = "CostPriceDay2")]
+            public Double CostPriceDay2 { get { return _CostPriceDay2; } set { _CostPriceDay2 = value; NotifyPropertyChanged("CostPriceDay2"); } }
+
+            private Double _CostPriceDay3;
+            [Display(Name = "CostPriceDay3")]
+            public Double CostPriceDay3 { get { return _CostPriceDay3; } set { _CostPriceDay3 = value; NotifyPropertyChanged("CostPriceDay3"); } }
+
+            private Double _CostPriceDay4;
+            [Display(Name = "CostPriceDay4")]
+            public Double CostPriceDay4 { get { return _CostPriceDay4; } set { _CostPriceDay4 = value; NotifyPropertyChanged("CostPriceDay4"); } }
+
+            private Double _CostPriceDay5;
+            [Display(Name = "CostPriceDay5")]
+            public Double CostPriceDay5 { get { return _CostPriceDay5; } set { _CostPriceDay5 = value; NotifyPropertyChanged("CostPriceDay5"); } }
+
+            private Double _CostPriceDay6;
+            [Display(Name = "CostPriceDay6")]
+            public Double CostPriceDay6 { get { return _CostPriceDay6; } set { _CostPriceDay6 = value; NotifyPropertyChanged("CostPriceDay6"); } }
+
+            private Double _CostPriceDay7;
+            [Display(Name = "CostPriceDay7")]
+            public Double CostPriceDay7 { get { return _CostPriceDay7; } set { _CostPriceDay7 = value; NotifyPropertyChanged("CostPriceDay7"); } }
+
+
+            public int StatusDay1 { get { return GetStatus(_Date); } }
+            public int StatusDay2 { get { return GetStatus(_Date.AddDays(1)); } }
+            public int StatusDay3 { get { return GetStatus(_Date.AddDays(2)); } }
+            public int StatusDay4 { get { return GetStatus(_Date.AddDays(3)); } }
+            public int StatusDay5 { get { return GetStatus(_Date.AddDays(4)); } }
+            public int StatusDay6 { get { return GetStatus(_Date.AddDays(5)); } }
+            public int StatusDay7 { get { return GetStatus(_Date.AddDays(6)); } }
+
+            public int IsEditable
+            {
+                get
+                {
+                    if (_RowId > 0 && !AllSevenDaysStatus(_Date, true))
+                        return 1;
+                    else
+                        return 0;
+                }
+            }
+
+            int GetStatus(DateTime date)
+            {
+                int _getStatus = 0;
+                if (EmployeeRef._Hired != DateTime.MinValue && date < EmployeeRef._Hired)
+                    _getStatus = 3;
+                else if (EmployeeRef._TMCloseDate == DateTime.MinValue && EmployeeRef._TMApproveDate == DateTime.MinValue)
+                    _getStatus = 0; //Editable
+                else if (date <= EmployeeRef._TMCloseDate && EmployeeRef._TMApproveDate == DateTime.MinValue)
+                    _getStatus = 1; //Non Edittable yellow
+                else if (date <= EmployeeRef._TMCloseDate && date <= EmployeeRef._TMApproveDate)
+                    _getStatus = 2; //Non Edittable green
+                else if (date >= EmployeeRef._TMApproveDate && date <= EmployeeRef._TMCloseDate)
+                    _getStatus = 1; //Non Edittable yellow
+                else if (EmployeeRef._TMCloseDate == DateTime.MinValue && date <= EmployeeRef._TMApproveDate)
+                    _getStatus = 2; //Non Edittable Green
+                else if (date > EmployeeRef._TMCloseDate && date > EmployeeRef._TMApproveDate)
+                {
+                    if (_RowId > 0 && !AllSevenDaysStatus(date))
+                        _getStatus = 3; // Non editable if date is greater then TMClose and TMApprove date
+                }
+                return _getStatus;
+            }
+
+            bool AllSevenDaysStatus(DateTime Date, bool isStartdate = false)
+            {
+                bool _status = false;
+                if (isStartdate && Date > EmployeeRef._TMCloseDate && Date > EmployeeRef._TMApproveDate
+                    && Date.AddDays(6) > EmployeeRef._TMCloseDate && Date.AddDays(6) > EmployeeRef._TMApproveDate)
+                    _status = true;
+                if (isStartdate && Date < EmployeeRef._TMCloseDate && Date <= EmployeeRef._TMApproveDate
+                    && EmployeeRef._TMCloseDate < Date.AddDays(6) && EmployeeRef._TMApproveDate < Date.AddDays(6) && EmployeeRef._TMApproveDate != EmployeeRef._TMCloseDate)
+                {
+                    if (Total == 0d || IsFieldEditable())
+                        _status = true;
+                }
+                else if (!isStartdate && Date > EmployeeRef._TMCloseDate && EmployeeRef._TMApproveDate == DateTime.MinValue)
+                    _status = true;
+                else if (!isStartdate && Date > EmployeeRef._TMApproveDate && EmployeeRef._TMCloseDate == DateTime.MinValue)
+                    _status = true;
+                else if (!isStartdate && EmployeeRef._TMApproveDate == EmployeeRef._TMCloseDate && Date > EmployeeRef._TMApproveDate && Date > EmployeeRef._TMCloseDate)
+                    _status = true;
+                else if (!isStartdate && FirstDayOfWeek(Date) > EmployeeRef._TMCloseDate && FirstDayOfWeek(Date) > EmployeeRef._TMApproveDate)
+                    _status = true;
+                else if (!isStartdate && Date > EmployeeRef._TMCloseDate && Date > EmployeeRef._TMApproveDate)
+                    _status = true;
+                return _status;
+            }
+
+            DateTime FirstDayOfWeek(DateTime selectedDate)
+            {
+                var dt = selectedDate;
+                int diff = (7 + (dt.DayOfWeek - DayOfWeek.Monday)) % 7;
+                return dt.AddDays(-1 * diff).Date;
+            }
+
+            bool IsFieldEditable()
+            {
+                bool isFieldEditable = false;
+                var lstDictionary = new Dictionary<string, double>();
+                if (StatusDay1 == 1 || StatusDay1 == 2)
+                    lstDictionary.Add("Day1", Day1);
+                if (StatusDay2 == 1 || StatusDay2 == 2)
+                    lstDictionary.Add("Day2", Day2);
+                if (StatusDay3 == 1 || StatusDay3 == 2)
+                    lstDictionary.Add("Day3", Day3);
+                if (StatusDay4 == 1 || StatusDay4 == 2)
+                    lstDictionary.Add("Day4", Day4);
+                if (StatusDay5 == 1 || StatusDay5 == 2)
+                    lstDictionary.Add("Day5", Day5);
+                if (StatusDay6 == 1 || StatusDay6 == 2)
+                    lstDictionary.Add("Day6", Day6);
+                if (StatusDay7 == 1 || StatusDay7 == 2)
+                    lstDictionary.Add("Day7", Day7);
+
+                var count = lstDictionary.Sum(x => x.Value);
+                if (count == 0)
+                    isFieldEditable = true;
+                return isFieldEditable;
+            }
+
+            public bool IsMatched
+            {
+                get
+                {
+                    bool isMatched = false;
+                    if (_RegistrationType == Uniconta.DataModel.RegistrationType.Hours)
+                        if (!string.IsNullOrEmpty(PayrollCategory) && !string.IsNullOrEmpty(InternalType))
+                            isMatched = true;
+                    return isMatched;
+                }
+            }
+        }
+        #endregion
+
+        #region Google Maps calculate distance
         public static double GetDistance(string fromAddress, string toAddress, bool avoidFerries = true, int decimals = 1)
         {
             var distance = 0;

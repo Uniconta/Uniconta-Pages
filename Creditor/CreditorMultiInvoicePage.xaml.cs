@@ -255,7 +255,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void UpdateDocument(CompanyLayoutType documentType)
         {
             bool showUpdateInv = api.CompanyEntity.Storage;
-            var generateDoc = new CWGenerateInvoice(false, Uniconta.ClientTools.Localization.lookup(documentType.ToString()), false, true, true, isQuickPrintVisible:false ,isShowUpdateInv: showUpdateInv);
+            var generateDoc = new CWGenerateInvoice(false, documentType.ToString(), false, true, true, isQuickPrintVisible:false ,isShowUpdateInv: showUpdateInv);
 #if !SILVERLIGHT
             generateDoc.DialogTableId = 2000000000;
 #endif

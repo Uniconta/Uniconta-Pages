@@ -21,19 +21,19 @@ x:Class="UnicontaClient.Pages.CustomPage.TimeSheetApprovalReport"
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <local:TimeSheetApprovalReportGrid  x:Name="dgTimeSheetApprovalRpt" AutoGenerateColumns="None" HorizontalAlignment="Stretch">
                 <local:TimeSheetApprovalReportGrid.Columns>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Employee" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Employee" Width="80"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="EmployeeName" Width="120" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="EmployeeGroup" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="EmployeeGroupName" Width="90"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="EmployeeGroup" Visible="False" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="EmployeeGroupName" Visible="False" Width="90"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Date" Width="100" Visible="False"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="cldim1" Width="70" FieldName="Dimension1" />
-                    <local:CorasauDataGridTemplateColumnClient  x:Name="cldim2" Width="70" FieldName="Dimension2"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="cldim3" Width="70" FieldName="Dimension3" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="cldim4" Width="70" FieldName="Dimension4" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="cldim5" Width="70" FieldName="Dimension5" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Total" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="NormHours" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="TotalHours">
+                    <local:CorasauDataGridTemplateColumnClient x:Name="cldim1" Width="70" Visible="False" FieldName="Dimension1" />
+                    <local:CorasauDataGridTemplateColumnClient  x:Name="cldim2" Width="70" Visible="False" FieldName="Dimension2"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="cldim3" Width="70" Visible="False" FieldName="Dimension3" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="cldim4" Width="70" Visible="False" FieldName="Dimension4" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="cldim5" Width="70" Visible="False" FieldName="Dimension5" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Total" Width="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="NormHours" Width="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="TotalHours" Width="100">
                         <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                             <ControlTemplate>
                                 <TextBlock Margin="2" HorizontalAlignment="Right"
@@ -42,24 +42,25 @@ x:Class="UnicontaClient.Pages.CustomPage.TimeSheetApprovalReport"
                             </ControlTemplate>
                         </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                     </local:CorasauDataGridTemplateColumnClient>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Mileage" Visible="True"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="MileageYTD" Visible="True"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Vacation" Visible="True"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="VacationYTD" Visible="True"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="OtherVacation" Visible="False"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="OtherVacationYTD" Visible="False"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="OverTime" Visible="False"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="OverTimeYTD" Visible="False"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="FlexTime" Visible="False"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="FlexTimeYTD" Visible="False"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Sickness" Visible="False"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="OtherAbsence" Visible="False"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="InvoiceableHours" Visible="False"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="NotInvoiceableHours" Visible="False"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="EfficiencyPercentage" Visible="True"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Period" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Mileage" Visible="False" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="MileageYTD" Visible="False" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Vacation" Visible="False" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="VacationYTD" Visible="False" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="OtherVacation" Visible="False" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="OtherVacationYTD" Visible="False" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="OverTime" Visible="False" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="OverTimeYTD" Visible="False" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="FlexTime" Visible="False" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="FlexTimeYTD" Visible="False" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Sickness" Visible="True" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="OtherAbsence" Visible="False" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="InvoiceableHours" Visible="True" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="NotInvoiceableHours" Visible="True" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="EfficiencyPercentage" Visible="True" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Period" Width="80"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="TMClosedBy"  Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="TMApprovedBy" Visible="False" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ErrorInfo" Visible="False" AllowEditing="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Status" Width="120">
                         <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                             <ControlTemplate>

@@ -59,6 +59,9 @@ namespace ISO20022CreditTransfer
 
             var credCache = company.GetCache(typeof(Uniconta.DataModel.Creditor));
 
+            doc.AllowedCharactersRegEx = bankSpecific.AllowedCharactersRegEx();
+            doc.ReplaceCharactersRegExDict = bankSpecific.ReplaceCharactersRegEx();
+           
             doc.CompanyBank = bankSpecific.CompanyBank();
             doc.BatchBooking = bankSpecific.BatchBooking();
             doc.AuthstnCodeTest = bankSpecific.TestMarked();
@@ -72,7 +75,7 @@ namespace ISO20022CreditTransfer
             doc.DebtorIdentificationCode = bankSpecific.DebtorIdentificationCode(bankAccount._BankCompanyId); 
 
             doc.IdentificationCode = bankSpecific.IdentificationCode();
-
+            doc.CompanyName = bankSpecific.CompanyName(company.Name);
             doc.CompanyBBAN = bankSpecific.CompanyBBAN(bankAccount._BankAccountPart1, bankAccount._BankAccountPart2);
             doc.CompanyIBAN = bankSpecific.CompanyIBAN(bankAccount._IBAN);
             doc.CompanyCcy = UnicontaCurrencyISO(company, bankAccount); 
@@ -82,6 +85,8 @@ namespace ISO20022CreditTransfer
             doc.CompanyCountryId = UnicontaCountryToISO(company._CountryId);
             bankSpecific.CompanyCountryId = doc.CompanyCountryId;
             doc.EncodingFormat = bankSpecific.EncodingFormat();
+           
+            doc.ChargeBearer = bankSpecific.ChargeBearerDebtor();
 
             doc.CompanyID = company.CompanyId;
             doc.NumberSeqPaymentFileId = maxFileId;
@@ -100,7 +105,7 @@ namespace ISO20022CreditTransfer
                 doc.CompanyPaymentMethod = "BBAN";
             }
 
-            doc.InitgPty = new InitgPty(company._Name, doc.IdentificationId, doc.IdentificationCode);
+            doc.InitgPty = new InitgPty(doc.CompanyName, doc.IdentificationId, doc.IdentificationCode);
 
             //Update ISO PaymentType >>
             foreach (var rec in queryPaymentTrans)
@@ -169,30 +174,16 @@ namespace ISO20022CreditTransfer
 
                 var creditor = (Creditor)credCache.Get(rec.Account);
 
-                string credName = string.IsNullOrEmpty(creditor._Name) ? BaseDocument.VALUE_NOT_AVAILABLE : creditor._Name;
+                string credName = bankSpecific.CreditorName(creditor._Name);
 
                 var internalAdvText = UnicontaClient.Pages.Creditor.Payments.StandardPaymentFunctions.InternalMessage(credPaymFormat._OurMessage, rec, company, creditor);
                 string instructionId = bankSpecific.InstructionId(internalAdvText);
 
                 PostalAddress creditorAddress = new PostalAddress();
-                if (creditor._ZipCode != null)
-                {
-                    creditorAddress.ZipCode = creditor._ZipCode ?? BaseDocument.VALUE_NOT_AVAILABLE;
-                    creditorAddress.CityName = creditor._City ?? BaseDocument.VALUE_NOT_AVAILABLE;
-                    creditorAddress.StreetName = creditor._Address1 ?? BaseDocument.VALUE_NOT_AVAILABLE;
-                }
-                else
-                {
-                    creditorAddress.AddressLine1 = creditor._Address1;
-                    creditorAddress.AddressLine2 = creditor._Address2;
-                    creditorAddress.AddressLine3 = creditor._Address3;
-                    creditorAddress.Unstructured = true;
-                }
+                creditorAddress = bankSpecific.CreditorAddress(creditor, creditorAddress);
 
-                if (creditor._Country != 0)
-                    creditorAddress.CountryId = UnicontaCountryToISO(creditor._Country);
-
-                creditorAddress = bankSpecific.CreditorAddress(creditorAddress);
+                //if (creditor._Country != 0)
+                //    creditorAddress.CountryId = UnicontaCountryToISO(creditor._Country);
 
                 string credBankName = string.Empty;
                 string credBankCountryId = UnicontaCountryToISO(creditor._Country);  
@@ -273,9 +264,9 @@ namespace ISO20022CreditTransfer
                 {
                     doc.PmtInfList.Add(new PmtInf(doc,
                         new PmtTpInf(doc.ExtServiceCode, doc.ExternalLocalInstrument, doc.ExtCategoryPurpose, doc.InstructionPriority),
-                        new Dbtr(company._Name, debtorAddress, doc.DebtorIdentificationCode),
+                        new Dbtr(doc.CompanyName, debtorAddress, doc.DebtorIdentificationCode),
                         new DbtrAcct(doc.CompanyCcy, companyAccountId, companyBIC),
-                        new DbtrAgt(doc.CompanyBIC, doc.CompanyBankName)));
+                        new DbtrAgt(doc.CompanyBIC, doc.CompanyBankName), doc.ChargeBearer));
                 }
 
                 var cdtrAgtCountryId = bankSpecific.CdtrAgtCountryId(credBankCountryId);

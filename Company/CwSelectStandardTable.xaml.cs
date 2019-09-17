@@ -23,12 +23,14 @@ namespace UnicontaClient.Pages.CustomPage
     {
         CrudAPI api;
         public Type table;
+        bool defaultAll;
         public CwSelectStandardTable(CrudAPI api) : this(api, false)
         {
         }
-        public CwSelectStandardTable(CrudAPI api, bool onlyIdKeyTables)
+        public CwSelectStandardTable(CrudAPI api, bool onlyIdKeyTables, bool _defaultAll = false)
         {
             this.DataContext = this;
+            defaultAll = _defaultAll;
             InitializeComponent();
             this.Title = Uniconta.ClientTools.Localization.lookup("Table");
             this.api = api;
@@ -73,6 +75,8 @@ namespace UnicontaClient.Pages.CustomPage
                 else
                     xlist.Add(new TableList() { Name = type.Name, Type = type });
             }
+            if (defaultAll)
+                xlist.Add(new TableList());
             cmbStdTables.ItemsSource = xlist.OrderBy(x => x.Name).ToList();
             cmbStdTables.SelectedIndex = 0;
         }
@@ -80,7 +84,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var selectedTable = cmbStdTables.SelectedItem as TableList;
             table = selectedTable?.Type;
-            if (selectedTable != null)
+            if (selectedTable != null || defaultAll)
                 this.DialogResult = true;
             else
                 this.DialogResult = false;

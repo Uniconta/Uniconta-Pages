@@ -101,6 +101,13 @@ x:Class="UnicontaClient.Pages.CustomPage.PurchaseLinesPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PostingAccount" Width="80" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Vat" Width="80" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Employee" Width="50" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="UpdatedAt"   Visible="False">
+                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <CorasauControls:TextEditor  x:Name="PART_Editor" HorizontalContentAlignment="Right"  MaskUseAsDisplayFormat="True" Mask="g" MaskType="DateTime"  Text="{Binding Path=DataContext.RowData.Row.UpdatedAt,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}"/>
+                            </DataTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                    </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Variant1Name" Width="100" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Variant2Name" Width="100" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Variant3Name" Width="100" Visible="False"/>

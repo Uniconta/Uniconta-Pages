@@ -41,6 +41,7 @@ namespace UnicontaClient.Pages.CustomPage
                 return new List<string>() { "Name", "ItemGroupName" };
             }
         }
+        protected override bool SetValuesOnPaste { get { return true; } }
 
         internal byte FixedDCType;
         public override void SetDefaultValues(UnicontaBaseEntity dataEntity, int selectedIndex)
@@ -82,6 +83,14 @@ namespace UnicontaClient.Pages.CustomPage
                     lst.Add(line);
                 }
                 return lst;
+            }
+            else if (row.GetType() == type)
+            {
+                foreach (var inv in copyFromRows)
+                {
+                   inv.GetType().GetField("ExchangeRate").SetValue(inv, this.ExchangeRate);
+                }
+                return copyFromRows;
             }
             return null;
         }

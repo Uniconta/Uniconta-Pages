@@ -75,9 +75,6 @@ namespace UnicontaClient.Pages.CustomPage
         [Display(Name = "NumberOfCopies", ResourceType = typeof(InputFieldDataText))]
         public short NumberOfPages { get; set; } = 1;
 
-        [ForeignKeyAttribute(ForeignKeyTable = typeof(Uniconta.DataModel.PrCategory))]
-        public string PrCategory { get; set; }
-
         CrudAPI api;
 
 #if !SILVERLIGHT
@@ -161,7 +158,6 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
-            InvoiceCategory = PrCategory;
             GenrateDate = dpDate.DateTime;
             FromDate = fromDate.DateTime;
             ToDate = toDate.DateTime;

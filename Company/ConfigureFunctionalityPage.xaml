@@ -106,6 +106,9 @@ x:Class="UnicontaClient.Pages.CustomPage.ConfigureFunctionalityPage"
                     <CorasauControls:CorasauLayoutItem  Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=PurchaseCharges}">
                         <CorasauControls:CheckEditor IsChecked="{Binding PurchaseCharges,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem  Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Packnote}">
+                        <CorasauControls:CheckEditor IsChecked="{Binding CreditorPacknote,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
 
                 <CorasauControls:CorasauLayoutGroup View="GroupBox" Orientation="Vertical" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Project}"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
@@ -155,6 +158,9 @@ x:Class="UnicontaClient.Pages.CustomPage.ConfigureFunctionalityPage"
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem x:Name="cbProfiles" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Profiles}">
                         <CorasauControls:CheckEditor IsChecked="{Binding Profiles ,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="cbBilagscan" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Bilagscan}">
+                        <CorasauControls:CheckEditor IsChecked="{Binding Bilagscan ,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
             </CorasauControls:CorasauLayoutControl>

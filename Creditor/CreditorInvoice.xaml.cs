@@ -49,6 +49,16 @@ namespace UnicontaClient.Pages.CustomPage
     {
         private SynchronizeEntity syncEntity;
         public override string NameOfControl { get { return TabControls.CreditorInvoice.ToString(); } }
+        DateTime filterDate;
+        protected override Filter[] DefaultFilters()
+        {
+            if (filterDate != DateTime.MinValue)
+            {
+                Filter dateFilter = new Filter() { name = "Date", value = String.Format("{0:d}..", filterDate) };
+                return new Filter[] { dateFilter };
+            }
+            return base.DefaultFilters();
+        }
         public CreditorInvoice(BaseAPI API)
             : base(API, string.Empty)
         {
@@ -90,9 +100,10 @@ namespace UnicontaClient.Pages.CustomPage
             SetRibbonControl(localMenu, dgCrdInvoicesGrid);
             localMenu.dataGrid = dgCrdInvoicesGrid;
             dgCrdInvoicesGrid.api = api;
+            var Comp = api.CompanyEntity;
+            filterDate = BasePage.GetFilterDate(Comp, master != null);
             dgCrdInvoicesGrid.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
-            var Comp = api.CompanyEntity;
             if (Comp.RoundTo100)
                 NetAmount.HasDecimals = TotalAmount.HasDecimals = false;
 
@@ -132,7 +143,30 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override void LoadCacheInBackGround()
         {
-            LoadType(new Type[] { typeof(Uniconta.DataModel.Creditor), typeof(Uniconta.DataModel.InvItem) });
+            var Comp = api.CompanyEntity;
+
+            var lst = new List<Type>(12) { typeof(Uniconta.DataModel.Creditor), typeof(Uniconta.DataModel.InvItem), typeof(Uniconta.DataModel.PaymentTerm), typeof(Uniconta.DataModel.GLVat), typeof(Uniconta.DataModel.Employee) };
+            if (Comp.ItemVariants)
+            {
+                lst.Add(typeof(Uniconta.DataModel.InvVariant1));
+                lst.Add(typeof(Uniconta.DataModel.InvVariant2));
+                var n = Comp.NumberOfVariants;
+                if (n >= 3)
+                    lst.Add(typeof(Uniconta.DataModel.InvVariant3));
+                if (n >= 4)
+                    lst.Add(typeof(Uniconta.DataModel.InvVariant4));
+                if (n >= 5)
+                    lst.Add(typeof(Uniconta.DataModel.InvVariant5));
+            }
+            if (Comp.Warehouse)
+                lst.Add(typeof(Uniconta.DataModel.InvWarehouse));
+            if (Comp.Shipments)
+            {
+                lst.Add(typeof(Uniconta.DataModel.ShipmentType));
+                lst.Add(typeof(Uniconta.DataModel.DeliveryTerm));
+            }
+
+            LoadType(lst);
         }
 
         private void localMenu_OnItemClicked(string ActionType)
@@ -288,15 +322,15 @@ namespace UnicontaClient.Pages.CustomPage
 
                 if (packnoteReports.Count() > 0)
                 {
-                    var reportName = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ShowPrint"), Uniconta.ClientTools.Localization.lookup("Packnote"));
+                    var reportName = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ShowPrint"), Uniconta.ClientTools.Localization.lookup("CreditorPackNote"));
                     AddDockItem(TabControls.StandardPrintReportPage, new object[] { packnoteReports, reportName }, reportName);
                 }
                 else
-                    UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("LayoutDoesNotExist"), Uniconta.ClientTools.Localization.lookup("Packnote")),
+                    UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("LayoutDoesNotExist"), Uniconta.ClientTools.Localization.lookup("CreditorPackNote")),
                        Uniconta.ClientTools.Localization.lookup("Error"), MessageBoxButton.OK);
 #elif SILVERLIGHT
 
-                                DefaultPrint(creditInvoice, true, new Point(top, left));
+                        DefaultPrint(creditInvoice, true, new Point(top, left));
                                 left = left - left / count;
                                 top = top - top / count;
                             }
@@ -308,7 +342,7 @@ namespace UnicontaClient.Pages.CustomPage
             catch (Exception ex)
             {
                 busyIndicator.IsBusy = false;
-                api.ReportException(ex, string.Format("Invoices.ShowPackNote(), CompanyId={0}", api.CompanyId));
+                api.ReportException(ex, string.Format("Invoices.ShowPurchaseSlip(), CompanyId={0}", api.CompanyId));
             }
             finally { busyIndicator.IsBusy = false; }
         }
@@ -492,8 +526,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         public async override Task InitQuery()
         {
-            await dgCrdInvoicesGrid.Filter(null);
-
+            await Filter();
             var api = this.api;
             if (api.CompanyEntity.DeliveryAddress)
             {

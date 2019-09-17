@@ -83,7 +83,7 @@ namespace UnicontaClient.Pages.CustomPage
 #endif
             OwnerUidItem.ButtonClicked += OwnerUidItem_ButtonClicked;
 
-            txtZipCode.EditValueChanged += TextEditor_EditValueChanged;
+            editrow.PropertyChanged += Editrow_PropertyChanged;
 
             if (api.session.User._Role < (byte)Uniconta.Common.User.UserRoles.Reseller)
                 chkBlocked.IsReadOnly = true;
@@ -131,14 +131,27 @@ namespace UnicontaClient.Pages.CustomPage
             get { return TabControls.SubscriptionsPage; }
         }
 
-        private async void TextEditor_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
+        string zip;
+        private async void Editrow_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            var s = sender as TextEditor;
-            if (s != null && s.IsLoaded)
+            if (e.PropertyName == "ZipCode")
             {
-                var city = await UtilDisplay.GetCityName(s.Text,editrow.Country);
-                if (city != null)
-                    editrow.City = city;
+                if (zip == null)
+                {
+                    var city = await UtilDisplay.GetCityAndAddress(txtZipCode.Text, editrow.Country);
+                    if (city != null)
+                    {
+                        editrow.City = city[0];
+                        var add1 = city[1];
+                        if (!string.IsNullOrEmpty(add1))
+                            editrow.Address1 = add1;
+                        zip = city[2];
+                        if (!string.IsNullOrEmpty(zip))
+                            editrow.ZipCode = zip;
+                    }
+                }
+                else
+                    zip = null;
             }
         }
 

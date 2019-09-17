@@ -23,6 +23,7 @@ using UnicontaClient.Controls;
 using System.ComponentModel.DataAnnotations;
 using Uniconta.Common;
 using Uniconta.DataModel;
+using static UnicontaClient.Pages.Project.TimeManagement.TMJournalLineHelper;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -42,15 +43,15 @@ namespace UnicontaClient.Pages.CustomPage
         protected override bool ShowTableValueButton { get { return true; } }
 #endif
 
-        public CwSetPeriodPerDate(string label, DateTime startDate, CrudAPI api)
+        public CwSetPeriodPerDate(TMJournalActionType actionType, DateTime startDate, CrudAPI api)
         {
             InitializeComponent();
-            if (label == "Approve" || label=="Close")
+            if (actionType == TMJournalActionType.Approve || actionType == TMJournalActionType.Close)
                 StartDate = startDate.AddDays(6);
             else
                 StartDate = startDate;
             this.DataContext = this;
-            if (label != "Approve")
+            if (actionType != TMJournalActionType.Approve)
             {
                 showJournal.Height = new GridLength(0);
                 double h = this.Height - 30;
@@ -58,9 +59,9 @@ namespace UnicontaClient.Pages.CustomPage
             }
             lejournal.api = api;
             var lblStr = string.Empty;
-            if (label == "Open")
+            if (actionType == TMJournalActionType.Open)
                 lblStr = Uniconta.ClientTools.Localization.lookup("OpenPeriodPer");
-            else if (label == "Close")
+            else if (actionType == TMJournalActionType.Close)
                 lblStr = Uniconta.ClientTools.Localization.lookup("ClosePeriodPer");
             else
                 lblStr = Uniconta.ClientTools.Localization.lookup("ApprovePeriodPer");

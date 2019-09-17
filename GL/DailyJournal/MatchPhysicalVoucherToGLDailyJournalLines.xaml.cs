@@ -273,7 +273,7 @@ namespace UnicontaClient.Pages.CustomPage
             var gl = dgGldailyJournalLinesGrid.SelectedItem as GLDailyJournalLineClient;
             if (gl != null && gl._DocumentRef != 0)
             {
-                var visibleRows = dgvoucherGrid.GetVisibleRows() as List<VouchersClientLocal>;
+                var visibleRows = dgvoucherGrid.GetVisibleRows() as IList<VouchersClientLocal>;
                 dgvoucherGrid.SelectedItem = visibleRows?.Where(v => v.PrimaryKeyId == gl._DocumentRef).FirstOrDefault();
             }
         }

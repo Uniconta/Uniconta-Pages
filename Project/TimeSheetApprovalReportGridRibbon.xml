@@ -11,7 +11,7 @@
       <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
       <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16.png" ShortcutKey="" />
       <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveOBJ" Parameter="Layout" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
-      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="SwitchToDefault" Glyph="Delete_16x16.png" ShortcutKey=""/>
+      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16.png" ShortcutKey=""/>
       <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16.png" ShortcutKey="Ctrl+U"/>
       <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportOBJ"  Parameter="Layout" EnableSeperator="True" Glyph="ExportLayout_16x16.png" LargeGlyph="ExportLayout_16x16.png" ShortcutKey=""/>
       <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportOBJ" Parameter="Layout" Glyph="Import_16x16.png" LargeGlyph="Import_16x16.png" ShortcutKey=""/>
@@ -21,7 +21,7 @@
 <RibbonItem>
       <RibbonItem Action="GroupByEmployee" LocalizedNameKey="GroupByOBJ" Parameter="Employee" LargeGlyph="Employee_32x32.png" />
       <RibbonItem Action="GroupByEmployeeGroup"  LocalizedNameKey="GroupByOBJ" Parameter="Group" LargeGlyph="UsresOf_32x32.png"/>
-      <RibbonItem Action="GroupByPeriod"  LocalizedNameKey="GroupByOBJ" Parameter="Period" LargeGlyph="Group_by_32x32.png"/>
+      <RibbonItem Action="GroupByPeriod"  LocalizedNameKey="GroupByOBJ" Parameter="Period" LargeGlyph="Group_by_period_32x32.png"/>
       <RibbonItem Action="GroupByDimension1"  LargeGlyph="Group_by_32x32.png"/>
       <RibbonItem Action="GroupByDimension2"  LargeGlyph="Group_by_32x32.png"/>
       <RibbonItem Action="GroupByDimension3"  LargeGlyph="Group_by_32x32.png"/>
@@ -30,7 +30,7 @@
       <RibbonItem Action="UnGroupAll" LocalizedNameKey="MenuColumnUnGroup" LargeGlyph="Group_by_Clear_32x32.png"/>
     </RibbonItem>  
  <RibbonItem >
-    <!---RibbonItem Action="Approve" LocalizedNameKey="Approve"  LargeGlyph="Allow_32x32.png"/-->
-   <RibbonItem Action="TimeSheet"  LocalizedNameKey="TimeRegistration"  LargeGlyph="Journal_Lines_32x32.png"/>
+   <RibbonItem Action="Approve" LocalizedNameKey="Approve"  LargeGlyph="Order_Confirmation_32x32.png"/>
+   <RibbonItem Action="TimeSheet"  LocalizedNameKey="TimeRegistration"  LargeGlyph="Timesheet_32x32.png"/>
   </RibbonItem>
 </root>

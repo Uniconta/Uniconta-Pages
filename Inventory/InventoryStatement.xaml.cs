@@ -25,6 +25,8 @@ using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using Uniconta.ClientTools.Util;
 using Uniconta.API.Service;
+using System.Windows.Data;
+using DevExpress.Data.Filtering;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -122,6 +124,47 @@ namespace UnicontaClient.Pages.CustomPage
         }
 #endif
 
+        void MasterRowExpanded(object sender, RowEventArgs e)
+        {
+            var detailView = GetDetailView(e.RowHandle);
+            if (detailView == null)
+                return;
+            detailView.ShowSearchPanelMode = ShowSearchPanelMode.Never;
+            detailView.SearchPanelHighlightResults = true;
+            BindingOperations.SetBinding(detailView, DataViewBase.SearchStringProperty, new Binding("SearchText") { Source = ribbonControl.SearchControl });
+        }
+
+        TableView GetDetailView(int rowHandle)
+        {
+            var detail = childDgInvTrans.GetDetail(rowHandle) as GridControl;
+            return detail == null ? null : detail.View as TableView;
+        }
+
+#if !SILVERLIGHT
+
+        void SubstituteFilter(object sender, DevExpress.Data.SubstituteFilterEventArgs e)
+        {
+            if (string.IsNullOrEmpty(ribbonControl.SearchControl.SearchText))
+                return;
+            e.Filter = new GroupOperator(GroupOperatorType.Or, e.Filter, GetDetailFilter(ribbonControl.SearchControl.SearchText));
+        }
+
+        List<OperandProperty> operands;
+        AggregateOperand GetDetailFilter(string searchString)
+        {
+            if (operands == null)
+            {
+                var visibleColumns = childDgInvTrans.Columns.Where(c => c.Visible).Select(c => string.IsNullOrEmpty(c.FieldName) ? c.Name : c.FieldName);
+                operands = new List<OperandProperty>();
+                foreach (var col in visibleColumns)
+                    operands.Add(new OperandProperty(col));
+            }
+            GroupOperator detailOperator = new GroupOperator(GroupOperatorType.Or);
+            foreach (var op in operands)
+                detailOperator.Operands.Add(new FunctionOperator(FunctionOperatorType.Contains, op, new OperandValue(searchString)));
+            return new AggregateOperand("ChildRecord", Aggregate.Exists, detailOperator);
+        }
+#endif
         public override Task InitQuery()
         {
             return null;

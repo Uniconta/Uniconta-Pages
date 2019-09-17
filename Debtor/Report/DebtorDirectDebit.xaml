@@ -47,6 +47,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorDirectDebit"
                     <local:CorasauDataGridTemplateColumnClient x:Name="Name" ReadOnly="True" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Date" ReadOnly="True" Width="80"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="DueDate" ReadOnly="True" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="CashDiscountDate" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="PaymentDate" Width="90"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Text" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Invoice" AllowThousandMask="false" Width="60"/>
@@ -58,12 +59,13 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorDirectDebit"
                     <local:CorasauDataGridTemplateColumnClient x:Name="VoucherX"  Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="PostType" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="StatusInfo" AllowEditing="False"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Comment" />                   
-                    <local:CorasauDataGridTemplateColumnClient x:Name="ErrorInfo" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Comment" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Message" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ErrorInfo" AllowEditing="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="PaymentFormat" Width="90"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Voucher" AllowThousandMask="false" Width="60"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Payment"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="PaymentRefId" Visible="False" AllowEditing="True"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PaymentRefId" Visible="False" AllowEditing="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="MergeDataId" Visible="False" AllowEditing="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Currency" Visible="False">
                         <local:CorasauDataGridTemplateColumnClient.CellTemplate>
@@ -74,8 +76,8 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorDirectDebit"
                     </local:CorasauDataGridTemplateColumnClient>
                     <local:CorasauDataGridTemplateColumnClient x:Name="AmountOpenCur" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="AmountCur" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="UsedCachDiscount" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="CashDiscount"  Visible="False"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="CashDiscountDate" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Debit" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Credit" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="DebitCur" Visible="False" />

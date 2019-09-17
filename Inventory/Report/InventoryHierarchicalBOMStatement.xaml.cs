@@ -20,6 +20,7 @@ using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
 using Uniconta.Common;
 using Uniconta.DataModel;
+using DevExpress.Xpf.Core;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -61,6 +62,19 @@ namespace UnicontaClient.Pages.CustomPage
             if (invClient is InvItem && invClient._ItemType == (byte)Uniconta.DataModel.ItemType.ProductionBOM)
                 this.colUnfoldBom.Visible = true;
             SetTreeListViewStyle();
+            dgInvBomclientGrid.View.ShownColumnChooser += View_ShownColumnChooser;
+        }
+
+        private void View_ShownColumnChooser(object sender, RoutedEventArgs e)
+        {
+            dgInvBomclientGrid.View.ColumnChooserState = new DefaultColumnChooserState() { Location = Mouse.GetPosition(this) };
+        }
+
+        public override void PerformAction(ShortcutAction action)
+        {
+            if (action == ShortcutAction.ShowColumnChooser)
+                dgInvBomclientGrid.View.ShowColumnChooser();
+            base.PerformAction(action);
         }
 
         private void SetDefaultFilterValues()

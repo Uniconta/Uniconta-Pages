@@ -23,6 +23,7 @@ using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
 using Uniconta.Common;
 using Uniconta.DataModel;
+using Uniconta.ClientTools;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -35,6 +36,8 @@ namespace UnicontaClient.Pages.CustomPage
 
     public partial class DebtorPaymentFileReport : GridBasePage
     {
+        SQLCache paymentFormatCache;
+
         public override string NameOfControl { get { return TabControls.DebtorPaymentFileReport.ToString(); } }
 
         public DebtorPaymentFileReport(BaseAPI API) : base(API, string.Empty)
@@ -86,6 +89,7 @@ namespace UnicontaClient.Pages.CustomPage
                         cw.Show();
                     }
                     break;
+
 #endif
                 default:
                     gridRibbon_BaseActions(ActionType);
@@ -122,7 +126,16 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        void ExportFiles(IList lstFiles)
+        protected override async void LoadCacheInBackGround()
+        {
+            var api = this.api;
+            var Comp = api.CompanyEntity;
+          
+            paymentFormatCache = Comp.GetCache(typeof(Uniconta.DataModel.DebtorPaymentFormat)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.DebtorPaymentFormat), api).ConfigureAwait(false);
+        }
+
+
+        async void ExportFiles(IList lstFiles)
         {
             try
             {
@@ -130,7 +143,7 @@ namespace UnicontaClient.Pages.CustomPage
                 int countFiles = 0;
                 System.Windows.Forms.FolderBrowserDialog folderBrowserDialog = null;
 
-                List<DebtorPaymentFileClient> lstDirectDebitFiles = new List<DebtorPaymentFileClient>();
+                var lstUpdate = new List<DebtorPaymentFileClient>();
 
                 var qrFiles = lstFiles.Cast<DebtorPaymentFileClient>();
 
@@ -153,7 +166,26 @@ namespace UnicontaClient.Pages.CustomPage
                         File.WriteAllBytes(filename, rec._Data);
                     else
                         File.WriteAllText(filename, Encoding.GetEncoding("iso-8859-1").GetString(rec._Data));
+
+                    if (paymentFormatCache == null)
+                        paymentFormatCache = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.DebtorPaymentFormat)) ?? await api.CompanyEntity.LoadCache(typeof(Uniconta.DataModel.DebtorPaymentFormat), api);
+                    
+                    var paymentFormat = (DebtorPaymentFormatClient)paymentFormatCache.Get(rec.PaymentFormat);
+#if !SILVERLIGHT
+                    if (paymentFormat != null && (paymentFormat._ExportFormat == (byte)Uniconta.DataModel.DebtorPaymFormatType.SEPA || paymentFormat._ExportFormat == (byte)Uniconta.DataModel.DebtorPaymFormatType.Iceland))
+                    {
+                        rec.StatusInfo = string.Format("({0}) {1}\n{2}", Uniconta.DirectDebitPayment.Common.GetTimeStamp(), Uniconta.ClientTools.Localization.lookup("Exported"), rec._StatusInfo);
+                        rec.Status = AppEnums.DebtorPaymentStatus.ToString((int)DebtorPaymentStatus.Ok);
+                        lstUpdate.Add(rec);
+                    }
+#endif
                 }
+
+                if (lstUpdate != null && lstUpdate.Any())
+                    api.UpdateNoResponse(lstUpdate);
+
+                if (countFiles != 0)
+                    UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("TotalFilesExported"), countFiles), Uniconta.ClientTools.Localization.lookup("Message"));
             }
             catch (Exception ex)
             {

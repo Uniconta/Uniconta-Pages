@@ -27,7 +27,9 @@ namespace ISO20022CreditTransfer
         private CompanyBankENUM companyBankEnum;
         private CreditorPaymentFormat credPaymFormat;
         private BankSpecificSettings bankSpecificSettings;
-
+        private bool SWIFTok;
+        private bool IBANok;
+        private bool formatTypeISO;
         List<PreCheckError> preCheckErrors = new List<PreCheckError>();
         #endregion
 
@@ -112,6 +114,7 @@ namespace ISO20022CreditTransfer
         {
             XmlDocument dummyDoc = new XmlDocument();
 
+
             var bankAccount = (BankStatement)bankAccountCache.Get(credPaymFormat._BankAccount);
 
             if (bankAccount == null)
@@ -123,6 +126,10 @@ namespace ISO20022CreditTransfer
                 CompanyBank(credPaymFormat);
 
                 var paymentformat = (ExportFormatType)credPaymFormat._ExportFormat;
+
+                formatTypeISO = paymentformat == ExportFormatType.ISO20022_DK || paymentformat == ExportFormatType.ISO20022_NL ||
+                                paymentformat == ExportFormatType.ISO20022_NO || paymentformat == ExportFormatType.ISO20022_DE || paymentformat == ExportFormatType.ISO20022_SE;
+
                 CompanyBankName(paymentformat);
                 CustomerIdentificationId(bankAccount._BankCompanyId, paymentformat);
                 BankIdentificationId(bankAccount._ContractId, paymentformat);
@@ -130,8 +137,12 @@ namespace ISO20022CreditTransfer
                 CompanySWIFT(bankAccount._SWIFT, paymentformat);
                 CompanyIBAN(bankAccount._IBAN, paymentformat);
 
-                CompanyBBANRegNum(bankAccount._BankAccountPart1, paymentformat);
-                CompanyBBAN(bankAccount._BankAccountPart2, paymentformat);
+                //For ISO20022 only validate BBAN if IBAN/SWIFT are not available
+                if (formatTypeISO && (!IBANok || !SWIFTok) || !formatTypeISO)
+                {
+                    CompanyBBANRegNum(bankAccount._BankAccountPart1, paymentformat);
+                    CompanyBBAN(bankAccount._BankAccountPart2, paymentformat);
+                }
             }
 
             return new XMLDocumentGenerateResult(dummyDoc, PreCheckErrors.Count > 0, 0, PreCheckErrors);
@@ -144,7 +155,7 @@ namespace ISO20022CreditTransfer
         public void CompanyBankName(ExportFormatType exportFormat)
         {
             //TODO: Need to check ExportFormatType, because Sebastion also use PreValidation - CSV files could also use Properties it would solve it
-            if (companyBankEnum == CompanyBankENUM.None && (exportFormat == ExportFormatType.ISO20022_DK || exportFormat == ExportFormatType.ISO20022_NO || exportFormat == ExportFormatType.ISO20022_NL || exportFormat == ExportFormatType.ISO20022_DE))
+            if (companyBankEnum == CompanyBankENUM.None && formatTypeISO)
                 preCheckErrors.Add(new PreCheckError(String.Format("No bank has been choosen under properties. (Format: {0})", credPaymFormat._Format)));
         }
 
@@ -197,19 +208,22 @@ namespace ISO20022CreditTransfer
         /// </summary>
         public void CompanySWIFT(String swift, ExportFormatType exportFormat)
         {
-            swift = swift ?? string.Empty;
-            swift = Regex.Replace(swift, "[^\\w\\d]", "");
-
             //For now we require that IBAN/SWIFT is always filled in for ISO20022 payments - we probably has to ease the rule on the long run
-            if (exportFormat == ExportFormatType.ISO20022_DK || exportFormat == ExportFormatType.ISO20022_NL || exportFormat == ExportFormatType.ISO20022_NO || exportFormat == ExportFormatType.ISO20022_DE)
+            if (formatTypeISO)
             {
+                SWIFTok = true;
+                swift = swift ?? string.Empty;
+                swift = Regex.Replace(swift, "[^\\w\\d]", "");
+
                 if (string.IsNullOrEmpty(swift))
                 {
                     preCheckErrors.Add(new PreCheckError(String.Format("The SWIFT code has not been filled in. (Format: {0})", credPaymFormat._Format)));
+                    SWIFTok = false;
                 }
                 else if (!StandardPaymentFunctions.ValidateBIC(swift))
                 {
                     preCheckErrors.Add(new PreCheckError(String.Format("The SWIFT code has not a valid format. (Format: {0})", credPaymFormat._Format)));
+                    SWIFTok = false;
                 }
             }
         }
@@ -220,19 +234,22 @@ namespace ISO20022CreditTransfer
         /// </summary>
         public void CompanyIBAN(String iban, ExportFormatType exportFormat)
         {
-            iban = iban ?? string.Empty;
-            iban = Regex.Replace(iban, "[^\\w\\d]", "");
-
             //For now we require that IBAN/SWIFT is always filled in for ISO20022 payments - we probably has to ease the rule on the long run
-            if (exportFormat == ExportFormatType.ISO20022_DK || exportFormat == ExportFormatType.ISO20022_NL || exportFormat == ExportFormatType.ISO20022_NO || exportFormat == ExportFormatType.ISO20022_DE)
+            if (formatTypeISO)
             {
+                IBANok = true;
+                iban = iban ?? string.Empty;
+                iban = Regex.Replace(iban, "[^\\w\\d]", "");
+
                 if (string.IsNullOrEmpty(iban))
                 {
                     preCheckErrors.Add(new PreCheckError(String.Format("The IBAN number has not been filled in. (Format: {0})", credPaymFormat._Format)));
+                    IBANok = false;
                 }
                 else if (!StandardPaymentFunctions.ValidateIBAN(iban))
                 {
                     preCheckErrors.Add(new PreCheckError(String.Format("The IBAN number has not a valid format. (Format: {0})", credPaymFormat._Format)));
+                    IBANok = false;
                 }
             }
         }

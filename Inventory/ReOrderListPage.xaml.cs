@@ -360,8 +360,7 @@ namespace UnicontaClient.Pages.CustomPage
                             {
                                 ReOrderListPageGridClient item = new ReOrderListPageGridClient();
                                 StreamingManager.Copy(cw.InvItem, item);
-                                var list = new List<UnicontaBaseEntity>();
-                                list.Add(item);
+                                var list = new UnicontaBaseEntity[] { item };
                                 dgReOrderList.PasteRows(list);
                             }
                         }
@@ -394,7 +393,7 @@ namespace UnicontaClient.Pages.CustomPage
                         AddDockItem(TabControls.ProductionOrders, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ProductionOrders"), selectedItem._Item));
                     break;
                 case "ProductionLines":
-                    if (selectedItem != null && selectedItem._ItemType == (byte)Uniconta.DataModel.ItemType.ProductionBOM)
+                    if (selectedItem != null)
                         AddDockItem(TabControls.ProductionOrderLineReport, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ProductionLines"), selectedItem._Item));
                     break;
                 case "MoveFromWarehouse":
@@ -417,10 +416,15 @@ namespace UnicontaClient.Pages.CustomPage
         {
             return Filter(null, null, true);
         }
+
+        bool isCorrectType;
+        InvItemStorageClientSort reservedSort;
+        Uniconta.DataModel.InvItemStorage[] Reserved;
+        Uniconta.DataModel.InvItemStorage searchrec;
+
         private async Task Filter(IEnumerable<PropValuePair> propValuePair, FilterSorter PropSort, bool firstTime)
         {
-            BusyIndicator.IsBusy = true;
-
+            SetBusy();
             Task< Uniconta.DataModel.InvItemStorage[]> ReservedTask;
 
             if (_useStorage)
@@ -429,7 +433,6 @@ namespace UnicontaClient.Pages.CustomPage
                 ReservedTask = null;
 
             IEnumerable<InvItem> lstEntity;
-            bool isCorrectType;
             if (propValuePair != null)
             {
                 var query = await api.Query<ReOrderListPageGridClient>(propValuePair);
@@ -448,12 +451,9 @@ namespace UnicontaClient.Pages.CustomPage
                 isCorrectType = false;
             }
 
-            InvItemStorageClientSort reservedSort = null;
-            Uniconta.DataModel.InvItemStorage[] Reserved = null;
-            Uniconta.DataModel.InvItemStorage searchrec = null;
-            int len = 0;
-            bool ReorderPrWarehouse = false;
-            bool ReorderPrLocation = false;
+            reservedSort = null;
+            Reserved = null;
+            searchrec = null;
             if (ReservedTask != null)
             {
                 Reserved = await ReservedTask;
@@ -461,18 +461,16 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     reservedSort = new InvItemStorageClientSort();
                     Array.Sort(Reserved, reservedSort);
-                    len = Reserved.Length;
                     searchrec = new Uniconta.DataModel.InvItemStorage();
-                    ReorderPrWarehouse = ReOrderListPage.ReorderPrWarehouse;
-                    if (ReorderPrWarehouse)
-                        ReorderPrLocation = ReOrderListPage.ReorderPrLocation;
+                    if (! ReOrderListPage.ReorderPrWarehouse)
+                        ReOrderListPage.ReorderPrLocation = false;
                 }
             }
 
             if (firstTime)
                 StartLoadCache();
 
-            var lst = new List<ReOrderListPageGridClient>();
+            var lst = new List<ReOrderListPageGridClient>(200);
             if (lstEntity != null)
             {
                 foreach (var rec in lstEntity)
@@ -482,113 +480,119 @@ namespace UnicontaClient.Pages.CustomPage
                     if (rec._HideInPurchase && rec._ItemType != (byte)Uniconta.DataModel.ItemType.ProductionBOM)
                         continue;
 
-                    ReOrderListPageGridClient varrec;
-
-                    bool found = false;
-                    double QtyReserved = 0d, QtyOrdered = 0d, Qty = 0d;
-                    double MinStockLevel = rec._MinStockLevel;
-                    double MaxStockLevel = rec._MaxStockLevel;
-                    string Variant1 = null, Variant2 = null, Variant3 = null, Variant4 = null, Variant5 = null, Warehouse = null, Location = null;
-                    if (searchrec != null)
-                    {
-                        var _useVariants = rec._UseVariants;
-                        searchrec._Item = rec._Item;
-                        var pos = Array.BinarySearch(Reserved, searchrec, reservedSort);
-                        if (pos < 0)
-                            pos = ~pos;
-
-                        for (; (pos < len); pos++)
-                        {
-                            var r = Reserved[pos];
-                            if (r._Item != rec._Item)
-                                break;
-                            if (_useVariants || ReorderPrWarehouse)
-                            {
-                                if (!found || Variant1 != r._Variant1 || Variant2 != r._Variant2 || Variant3 != r._Variant3 || Variant4 != r._Variant4 || Variant5 != r._Variant5 ||
-                                    (ReorderPrWarehouse && r._Warehouse != Warehouse) ||
-                                    (ReorderPrLocation && r._Location != Location))
-                                {
-                                    if (found)
-                                    {
-                                        varrec = new ReOrderListPageGridClient();
-                                        StreamingManager.Copy(rec, varrec);
-                                        varrec._Qty = 0d;
-                                        varrec._Item = rec._Item;
-                                        varrec._Variant1 = Variant1;
-                                        varrec._Variant2 = Variant2;
-                                        varrec._Variant3 = Variant3;
-                                        varrec._Variant4 = Variant4;
-                                        varrec._Variant5 = Variant5;
-                                        if (ReorderPrWarehouse)
-                                        {
-                                            varrec._Warehouse = Warehouse;
-                                            if (ReorderPrLocation)
-                                                varrec._Location = Location;
-                                        }
-                                        AddToLst(lst, varrec, QtyReserved, QtyOrdered, Qty, MinStockLevel, MaxStockLevel);
-                                        QtyReserved = 0d; QtyOrdered = 0d; Qty = 0d;
-                                    }
-                                    Variant1 = r._Variant1;
-                                    Variant2 = r._Variant2;
-                                    Variant3 = r._Variant3;
-                                    Variant4 = r._Variant4;
-                                    Variant5 = r._Variant5;
-                                    if (ReorderPrWarehouse)
-                                    {
-                                        Warehouse = r._Warehouse;
-                                        if (ReorderPrLocation)
-                                            Location = r._Location;
-                                    }
-                                    if (r._MinStockLevel != 0 || r._MaxStockLevel != 0)
-                                    {
-                                        MinStockLevel = r._MinStockLevel;
-                                        MaxStockLevel = r._MaxStockLevel;
-                                    }
-                                    else
-                                    {
-                                        MinStockLevel = rec._MinStockLevel;
-                                        MaxStockLevel = rec._MaxStockLevel;
-                                    }
-                                }
-                            }
-
-                            Qty += r._Qty;
-                            QtyOrdered += r._QtyOrdered;
-                            QtyReserved += r._QtyReserved;
-                            found = true;
-                        }
-                    }
-
-                    if (!found)
-                        Qty = rec._qtyOnStock;
-
-                    if (isCorrectType)
-                        varrec = (ReOrderListPageGridClient)rec;
-                    else
-                    {
-                        varrec = new ReOrderListPageGridClient();
-                        StreamingManager.Copy(rec, varrec);
-                    }
-
-                    varrec._Variant1 = Variant1;
-                    varrec._Variant2 = Variant2;
-                    varrec._Variant3 = Variant3;
-                    varrec._Variant4 = Variant4;
-                    varrec._Variant5 = Variant5;
-                    if (ReorderPrWarehouse)
-                    {
-                        varrec._Warehouse = Warehouse;
-                        if (ReorderPrLocation)
-                            varrec._Location = Location;
-                    }
-                    AddToLst(lst, varrec, QtyReserved, QtyOrdered, Qty, MinStockLevel, MaxStockLevel);
-                }
+                    AddEntry(lst, rec);
+                 }
             }
 
             dgReOrderList.ItemsSource = lst;
             dgReOrderList.Visibility = Visibility.Visible;
 
-            BusyIndicator.IsBusy = false;
+            ClearBusy();
+        }
+
+        ReOrderListPageGridClient AddEntry(List<ReOrderListPageGridClient> lst, InvItem rec)
+        {
+            ReOrderListPageGridClient varrec;
+
+            bool found = false;
+            double QtyReserved = 0d, QtyOrdered = 0d, Qty = 0d;
+            double MinStockLevel = rec._MinStockLevel;
+            double MaxStockLevel = rec._MaxStockLevel;
+            string Variant1 = null, Variant2 = null, Variant3 = null, Variant4 = null, Variant5 = null, Warehouse = null, Location = null;
+            if (searchrec != null)
+            {
+                var _useVariants = rec._UseVariants;
+                searchrec._Item = rec._Item;
+                var pos = Array.BinarySearch(Reserved, searchrec, reservedSort);
+                if (pos < 0)
+                    pos = ~pos;
+
+                for (; (pos < Reserved.Length); pos++)
+                {
+                    var r = Reserved[pos];
+                    if (r._Item != rec._Item)
+                        break;
+                    if (_useVariants || ReorderPrWarehouse)
+                    {
+                        if (!found || Variant1 != r._Variant1 || Variant2 != r._Variant2 || Variant3 != r._Variant3 || Variant4 != r._Variant4 || Variant5 != r._Variant5 ||
+                            (ReorderPrWarehouse && r._Warehouse != Warehouse) ||
+                            (ReorderPrLocation && r._Location != Location))
+                        {
+                            if (found)
+                            {
+                                varrec = new ReOrderListPageGridClient();
+                                StreamingManager.Copy(rec, varrec);
+                                varrec._Qty = 0d;
+                                varrec._Item = rec._Item;
+                                varrec._Variant1 = Variant1;
+                                varrec._Variant2 = Variant2;
+                                varrec._Variant3 = Variant3;
+                                varrec._Variant4 = Variant4;
+                                varrec._Variant5 = Variant5;
+                                if (ReorderPrWarehouse)
+                                {
+                                    varrec._Warehouse = Warehouse;
+                                    if (ReorderPrLocation)
+                                        varrec._Location = Location;
+                                }
+                                AddToLst(lst, varrec, QtyReserved, QtyOrdered, Qty, MinStockLevel, MaxStockLevel);
+                                QtyReserved = 0d; QtyOrdered = 0d; Qty = 0d;
+                            }
+                            Variant1 = r._Variant1;
+                            Variant2 = r._Variant2;
+                            Variant3 = r._Variant3;
+                            Variant4 = r._Variant4;
+                            Variant5 = r._Variant5;
+                            if (ReorderPrWarehouse)
+                            {
+                                Warehouse = r._Warehouse;
+                                if (ReorderPrLocation)
+                                    Location = r._Location;
+                            }
+                            if (r._MinStockLevel != 0 || r._MaxStockLevel != 0)
+                            {
+                                MinStockLevel = r._MinStockLevel;
+                                MaxStockLevel = r._MaxStockLevel;
+                            }
+                            else
+                            {
+                                MinStockLevel = rec._MinStockLevel;
+                                MaxStockLevel = rec._MaxStockLevel;
+                            }
+                        }
+                    }
+
+                    Qty += r._Qty;
+                    QtyOrdered += r._QtyOrdered;
+                    QtyReserved += r._QtyReserved;
+                    found = true;
+                }
+            }
+
+            if (!found)
+                Qty = rec._qtyOnStock;
+
+            if (isCorrectType)
+                varrec = (ReOrderListPageGridClient)rec;
+            else
+            {
+                varrec = new ReOrderListPageGridClient();
+                StreamingManager.Copy(rec, varrec);
+            }
+
+            varrec._Variant1 = Variant1;
+            varrec._Variant2 = Variant2;
+            varrec._Variant3 = Variant3;
+            varrec._Variant4 = Variant4;
+            varrec._Variant5 = Variant5;
+            if (ReorderPrWarehouse)
+            {
+                varrec._Warehouse = Warehouse;
+                if (ReorderPrLocation)
+                    varrec._Location = Location;
+            }
+            AddToLst(lst, varrec, QtyReserved, QtyOrdered, Qty, MinStockLevel, MaxStockLevel);
+            return varrec;
         }
 
         bool SetPurchaseQty(ReOrderListPageGridClient rec, double MinStockLevel, double MaxStockLevel)
@@ -629,10 +633,9 @@ namespace UnicontaClient.Pages.CustomPage
         protected override async void LoadCacheInBackGround()
         {
             var api = this.api;
-            var Comp = api.CompanyEntity;
             if (this.items == null)
-                this.items = Comp.GetCache(typeof(Uniconta.DataModel.InvItem)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.InvItem), api).ConfigureAwait(false);
-            if (Comp.Warehouse)
+                this.items = api.GetCache(typeof(Uniconta.DataModel.InvItem)) ?? await api.LoadCache(typeof(Uniconta.DataModel.InvItem)).ConfigureAwait(false);
+            if (api.CompanyEntity.Warehouse)
                 LoadType(new Type[] { typeof(Uniconta.DataModel.Creditor), typeof(Uniconta.DataModel.InvWarehouse), typeof(Uniconta.DataModel.InvJournal) });
             else
                 LoadType(new Type[] { typeof(Uniconta.DataModel.Creditor), typeof(Uniconta.DataModel.InvJournal) });
@@ -671,7 +674,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var rows = dgReOrderList.ItemsSource as List<ReOrderListPageGridClient>;
 
-            var newItems = new List<ReOrderListPageGridClient>();
+            var newItems = new List<ReOrderListPageGridClient>(100);
             var cmp = new SearchItem();
             var key = new ReOrderListPageGridClient();
             bool anyFound = false;
@@ -681,11 +684,13 @@ namespace UnicontaClient.Pages.CustomPage
             var bomSort = new InvBOMSort();
             var bomSearch = new InvBOM();
             bomSearch._LineNumber = float.MinValue;
+            isCorrectType = false;
 
-            var looprows = dgReOrderList.GetVisibleRows() as List<ReOrderListPageGridClient>;
+            var looprows = dgReOrderList.GetVisibleRows() as IList<ReOrderListPageGridClient>;
             if (looprows == null || looprows.Count == 0)
                 return;
 
+            var bomLst = new List<InvBOM>(100);
             for (int loop = 10; (--loop >= 0);) // we loop up to 10 times to reserved nested BOMs
             {
                 int i = -1;
@@ -701,12 +706,11 @@ namespace UnicontaClient.Pages.CustomPage
                     if (rec.QtyExpanded >= QtyReserved)
                         continue;
 
-                    var bomLst = rec.bomLst;
-                    if (bomLst == null)
+                    if (rec.bomLst == null)
                     {
                         if (bomArr == null)
                         {
-                            BusyIndicator.IsBusy = true;
+                            SetBusy();
                             bomArr = await api.Query<Uniconta.DataModel.InvBOM>();
                             if (bomArr == null || bomArr.Length == 0)
                                 return;
@@ -714,7 +718,6 @@ namespace UnicontaClient.Pages.CustomPage
                             Array.Sort(bomArr, bomSort);
                         }
 
-                        rec.bomLst = bomLst = new List<InvBOM>();
                         var item = rec._Item;
                         bomSearch._ItemMaster = item;
                         var idx = Array.BinarySearch(bomArr, bomSearch, bomSort);
@@ -728,12 +731,14 @@ namespace UnicontaClient.Pages.CustomPage
                             r._ItemMaster = item;
                             bomLst.Add(r);
                         }
+                        rec.bomLst = new List<InvBOM>(bomLst);
+                        bomLst.Clear();
                     }
 
                     QtyReserved -= rec.QtyExpanded;
                     rec.QtyExpanded = rec._QtyReserved;
 
-                    foreach (var part in bomLst)
+                    foreach (var part in rec.bomLst)
                     {
                         var itemPart = part._ItemPart;
                         var variant1 = part._Variant1;
@@ -769,37 +774,38 @@ namespace UnicontaClient.Pages.CustomPage
                                 var item = (InvItem)items.Get(itemPart);
                                 if (item == null || item._ItemType == (byte)Uniconta.DataModel.ItemType.Service)
                                     continue;
-                                recItem = new ReOrderListPageGridClient();
-                                StreamingManager.Copy(item, recItem);
-                                recItem._Item = itemPart;
-                                recItem._Variant1 = variant1;
-                                recItem._Variant2 = variant2;
-                                recItem._Variant3 = variant3;
-                                recItem._Variant4 = variant4;
-                                recItem._Variant5 = variant5;
-                                newItems.Add(recItem);
+
+                                recItem = AddEntry(newItems, item);
+                                if (newItems.Count == 0 || !object.ReferenceEquals(recItem, newItems[newItems.Count-1]))
+                                    newItems.Add(recItem);
                             }
                         }
                         recItem._QtyReserved += qtyRes;
                         recItem._Expanded = true;
                         loopFound = true;
-                        SetPurchaseQty(recItem, recItem.MinStockLevel, recItem.MaxStockLevel);
                     }
                 }
                 if (!loopFound)
                     break;
-                anyFound = true;
             }
 
             if (newItems.Count > 0)
             {
-                rows.AddRange(newItems);
-                rows.Sort(cmp);
+                foreach(var rec in newItems)
+                {
+                    if (SetPurchaseQty(rec, rec.MinStockLevel, rec.MaxStockLevel))
+                    {
+                        rows.Add(rec);
+                        anyFound = true;
+                    }
+                }
+                if (anyFound)
+                {
+                    rows.Sort(cmp);
+                    dgReOrderList.RefreshData();
+                }
             }
-            if (anyFound)
-                dgReOrderList.RefreshData();
-
-            BusyIndicator.IsBusy = false;
+            ClearBusy();
         }
 
         private async void CreateOrder(Uniconta.DataModel.CreditorOrder dfltCreditorOrder, bool PrWarehouse, bool PrLocation)
@@ -814,7 +820,7 @@ namespace UnicontaClient.Pages.CustomPage
             var CompCur = Comp._Currency;
             var Creditors = Comp.GetCache(typeof(Uniconta.DataModel.Creditor));
 
-            var creditorOrders = new List<CreditorOrderClient>();
+            var creditorOrders = new List<CreditorOrderClient>(accounts.Count);
             foreach (var acc in accounts)
             {
                 var creditor = (Uniconta.DataModel.Creditor)Creditors.Get(acc);
@@ -864,7 +870,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 var PriceLookup = new Uniconta.API.DebtorCreditor.FindPrices(api);
 
-                var orderList = new List<CreditorOrderLineClient>();
+                var orderList = new List<CreditorOrderLineClient>(creditorOrders.Count * 2);
                 foreach (var order in creditorOrders)
                 {
                     await PriceLookup.OrderChanged(order);
@@ -937,9 +943,13 @@ namespace UnicontaClient.Pages.CustomPage
                                 last._Location = lin._Location = null;
                         }
                         last = lin;
-                        var t = PriceLookup.SetPriceFromItem(lin, item);
-                        if (t != null)
-                            await t;
+                        if (item._PurchaseUnit == 0 || item._PurchaseUnit == item._Unit)
+                        {
+                            lin._Unit = item._Unit;
+                            var t = PriceLookup.SetPriceFromItem(lin, item);
+                            if (t != null)
+                                await t;
+                        }
                     }
                 }
                 api.InsertNoResponse(orderList);

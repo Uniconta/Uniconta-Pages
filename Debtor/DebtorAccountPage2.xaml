@@ -110,6 +110,9 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorAccountPage2"
                         <CorasauControls:CorasauLayoutItem FieldName="BankAccount" x:Name="liBankAccount">
                             <CorasauControls:TextEditor Text="{Binding BankAccount,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="SWIFT" x:Name="liSWIFT">
+                            <CorasauControls:TextEditor Text="{Binding SWIFT,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="RefInPayment" x:Name="liRefInPayment">
                             <CorasauControls:TextEditor Text="{Binding RefInPayment,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>

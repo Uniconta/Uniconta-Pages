@@ -86,8 +86,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             StartLoadCache();
 
-            txtZipCode.EditValueChanged += TextEditor_EditValueChanged;
-            txtDelZipCode.EditValueChanged += TxtDelZipCode_EditValueChanged;
+            editrow.PropertyChanged += Editrow_PropertyChanged;
             txtCompanyRegNo.EditValueChanged += TxtCVR_EditValueChanged;
         }
 
@@ -109,10 +108,10 @@ namespace UnicontaClient.Pages.CustomPage
                 dAddress.Visibility = Visibility.Collapsed;
             if (!Comp.Shipments)
                 shipmentItem.Visibility = Visibility.Collapsed;
-            if (Comp.NumberOfDimensions == 0)
-                usedim.Visibility = Visibility.Collapsed;
             if (!Comp.Project)
                 liPrCategory.Visibility = Visibility.Collapsed;
+            if (Comp.NumberOfDimensions == 0)
+                usedim.Visibility = Visibility.Collapsed;
             else
                 Utility.SetDimensions(api, lbldim1, lbldim2, lbldim3, lbldim4, lbldim5, dim1lookupeditior, dim2lookupeditior, dim3lookupeditior, dim4lookupeditior, dim5lookupeditior, usedim);
 
@@ -146,25 +145,47 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
 
-        private async void TextEditor_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
+        string zip;
+        private async void Editrow_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            var s = sender as TextEditor;
-            if (s != null && s.IsLoaded)
+            if (e.PropertyName == "ZipCode")
             {
-                var city = await UtilDisplay.GetCityName(s.Text, editrow.Country);
-                if (city != null)
-                    editrow.City = city;
+                if (zip == null)
+                {
+                    var city = await UtilDisplay.GetCityAndAddress(txtZipCode.Text, editrow.Country);
+                    if (city != null)
+                    {
+                        editrow.City = city[0];
+                        var add1 = city[1];
+                        if (!string.IsNullOrEmpty(add1))
+                            editrow.Address1 = add1;
+                        zip = city[2];
+                        if (!string.IsNullOrEmpty(zip))
+                            editrow.ZipCode = zip;
+                    }
+                }
+                else
+                    zip = null;
             }
-        }
-        private async void TxtDelZipCode_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
-        {
-            var s = sender as TextEditor;
-            if (s != null && s.IsLoaded)
+            else if (e.PropertyName == "DeliveryZipCode")
             {
-                var deliveryCountry = editrow.DeliveryCountry ?? editrow.Country;
-                var city = await UtilDisplay.GetCityName(s.Text, deliveryCountry);
-                if (city != null)
-                    editrow.DeliveryCity = city;
+                if (zip == null)
+                {
+                    var deliveryCountry = editrow.DeliveryCountry ?? editrow.Country;
+                    var city = await UtilDisplay.GetCityAndAddress(txtDelZipCode.Text, deliveryCountry);
+                    if (city != null)
+                    {
+                        editrow.DeliveryCity = city[0];
+                        var add1 = city[1];
+                        if (!string.IsNullOrEmpty(add1))
+                            editrow.DeliveryAddress1 = add1;
+                        zip = city[2];
+                        if (!string.IsNullOrEmpty(zip))
+                            editrow.DeliveryZipCode = zip;
+                    }
+                }
+                else
+                    zip = null;
             }
         }
 

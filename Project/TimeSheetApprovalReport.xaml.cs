@@ -26,6 +26,10 @@ using Uniconta.Common;
 using Uniconta.DataModel;
 using Uniconta.ClientTools;
 using System.Resources;
+using UnicontaClient.Pages.Project.TimeManagement;
+using static UnicontaClient.Pages.Project.TimeManagement.TMJournalLineHelper;
+using System.Text.RegularExpressions;
+using Uniconta.API.GeneralLedger;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -40,7 +44,9 @@ namespace UnicontaClient.Pages.CustomPage
         TMApprovalSetupClient[] approverLst;
         Uniconta.DataModel.Employee employee;
         static DateTime fromDate;
-        SQLCache employeeCache, empPayrollCatCache;
+        SQLCache employeeCache;
+        SQLTableCache<Uniconta.DataModel.EmpPayrollCategory> payrollCache;
+        SQLTableCache<Uniconta.DataModel.ProjectGroup> projGroupCache;
 
         public TimeSheetApprovalReport(UnicontaBaseEntity master, TMApprovalSetupClient[] approvalList) : base(master)
         {
@@ -118,8 +124,11 @@ namespace UnicontaClient.Pages.CustomPage
             if (calendarFromDate < todayDate.AddYears(-2))
                 calendarFromDate = todayDate.AddYears(-2);
 
-            foreach (var rec in approverLst.Where(s => s.Employee != null))
+            foreach (var rec in approverLst)
             {
+                if (rec._Employee == null)
+                    continue;
+
                 var calenders = lstCalenderSetup.Where(x => (x._Employee == rec.Employee && (x.ValidTo >= calendarFromDate || x.ValidTo == DateTime.MinValue)));
 
                 foreach (var recCal in calenders)
@@ -134,6 +143,9 @@ namespace UnicontaClient.Pages.CustomPage
                     };
 
                     var tmEmpCalenderLineLst = await api.Query<TMEmpCalendarLineClient>(pairCalendar);
+
+                    if (tmEmpCalenderLineLst == null)
+                        continue;
 
                     var grpCalendarLst = tmEmpCalenderLineLst.GroupBy(x => new { x.Period, x.Calendar }).Select(x => new { Key = x.Key, Hours = x.Sum(y => y.Hours) }).ToList();
 
@@ -176,7 +188,7 @@ namespace UnicontaClient.Pages.CustomPage
         async void LoadGrid()
         {
             busyIndicator.IsBusy = true;
-
+        
             await LoadCalenders();
 
             var todayDate = DateTime.Today;
@@ -205,16 +217,17 @@ namespace UnicontaClient.Pages.CustomPage
                 }
             }
             //Internal Registration <<
-
-            var tsApprovalLst = new List<TimeSheetApprovalLocalClient>();
+         
+            var tsApprovalLst = new List<TimeSheetApprovalLocalClient>(approverLst.Length);
             foreach (var rec in approverLst.Where(s => s.Employee != null))
             {
                 var empl = emplCache.Get(rec.Employee);
-
                 if (empl == null)
                     continue;
 
-                var startDate = todayDate;
+                await api.Read(empl);
+
+                var startDate = DateTime.MinValue;
                 DateTime startDateMonday = DateTime.MinValue;
                 var endDate = todayDate;
 
@@ -230,6 +243,9 @@ namespace UnicontaClient.Pages.CustomPage
                     if (startDate < tmEmpCalender.ValidFrom)
                         startDate = tmEmpCalender.ValidFrom;
                 }
+
+                startDate = startDate == DateTime.MinValue ? todayDate : startDate;
+
 
                 if ((empl.Hired != DateTime.MinValue && empl.Hired <= rec._ValidFrom) || empl.Hired == DateTime.MinValue)
                     startDate = rec._ValidFrom == DateTime.MinValue ? startDate : rec._ValidFrom;
@@ -310,6 +326,8 @@ namespace UnicontaClient.Pages.CustomPage
                         vacationStartDate = new DateTime(startDate.Year, 5, 1);
                         if (startDate < vacationStartDate)
                             vacationStartDate = vacationStartDate.AddYears(-1);
+
+                        startDate = startDate == vacationStartDate ? startDate.AddDays(1) : startDate;
 
                         foreach (var zy in payrollCatLst)
                         {
@@ -402,7 +420,7 @@ namespace UnicontaClient.Pages.CustomPage
             List<DateTime> lstMondays = new List<DateTime>();
             DateTime date = startDate;
              
-            EmployeeClient empl = (Uniconta.ClientTools.DataModel.EmployeeClient)employeeCache.Get(approvalSetuUp.Employee);
+            EmployeeClient empl = (Uniconta.ClientTools.DataModel.EmployeeClient)employeeCache.Get(approvalSetuUp._Employee);
 
             while (date <= endDate)
             {
@@ -555,20 +573,17 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     var grpLst = lstHours.GroupBy(x => x._Date).Select(x => new { Date = x.Key, Sum = x.Sum(y => y.Total), Period = x.Select(y => y.Date).FirstOrDefault() }).FirstOrDefault();
 
-                    var tsApproval = new TimeSheetApprovalLocalClient();
-                    tsApproval.Employee = approvalSetuUp.Employee;
-                    tsApproval.EmployeeName = approvalSetuUp.EmployeeName;
-                    tsApproval.EmployeeGroup = empl._Group;
-                    tsApproval.EmployeeGroupName = GetEmployeeGroupName(empl);
+                    var tsApproval = new TimeSheetApprovalLocalClient() { CompanyId = api.CompanyId };
+                    tsApproval._Employee = approvalSetuUp._Employee;
+                    tsApproval._EmployeeGroup = empl._Group;
                     tsApproval.Date = grpLst.Date;
                     tsApproval.Total = grpLst.Sum;
-                    tsApproval.Period = GetPeriod(grpLst.Date);
+                    tsApproval.Period = Project.TimeManagement.TMJournalLineHelper.GetPeriod(grpLst.Date);
                     tsApproval.Dimension1 = empl._Dim1;
                     tsApproval.Dimension2 = empl._Dim2;
                     tsApproval.Dimension3 = empl._Dim3;
                     tsApproval.Dimension4 = empl._Dim4;
                     tsApproval.Dimension5 = empl._Dim5;
-                    tsApproval.EmplyeeRef = empl;
                     tsApproval.NormHours = await GetNormalHours(empl, grpLst.Date, tsApproval.Period);
                     tsApproval.Status = GetStatus(empl, monday, tsApproval.TotalHours);
                     tsApproval.Mileage = mileageWeek;
@@ -591,7 +606,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                             foreach (var rec in grpLstInternal)
                             {
-                                var empPayCat = (Uniconta.DataModel.EmpPayrollCategory)empPayrollCatCache.Get(rec.GroupKey._PayrollCategory);
+                                var empPayCat = payrollCache.Get(rec.GroupKey._PayrollCategory);
                                 double factor = 0;
                                 switch (rec.GroupKey._InternalType)
                                 {
@@ -638,20 +653,17 @@ namespace UnicontaClient.Pages.CustomPage
                 }
                 else
                 {
-                    var tsApproval = new TimeSheetApprovalLocalClient();
-                    tsApproval.Employee = approvalSetuUp.Employee;
-                    tsApproval.EmployeeName = approvalSetuUp.EmployeeName;
-                    tsApproval.EmployeeGroup = empl._Group;
-                    tsApproval.EmployeeGroupName = GetEmployeeGroupName(empl);
+                    var tsApproval = new TimeSheetApprovalLocalClient() { CompanyId = api.CompanyId };
+                    tsApproval._Employee = approvalSetuUp._Employee;
+                    tsApproval._EmployeeGroup = empl._Group;
                     tsApproval.Date = monday;
-                    tsApproval.Period = GetPeriod(monday);
+                    tsApproval.Period = Project.TimeManagement.TMJournalLineHelper.GetPeriod(monday);
                     tsApproval.Dimension1 = empl._Dim1;
                     tsApproval.Dimension2 = empl._Dim2;
                     tsApproval.Dimension3 = empl._Dim3;
                     tsApproval.Dimension4 = empl._Dim4;
                     tsApproval.Dimension5 = empl._Dim5;
-                    tsApproval.EmplyeeRef = empl;
-                    tsApproval.NormHours = await GetNormalHours(empl, monday, GetPeriod(monday)); 
+                    tsApproval.NormHours = await GetNormalHours(empl, monday, Project.TimeManagement.TMJournalLineHelper.GetPeriod(monday)); 
                     tsApproval.Status = GetMissingRecordsStatus(monday,tsApproval.TotalHours);
                     tsApproval.Mileage = mileageWeek;
                     tsApproval.MileageYTD = mileageYTD;
@@ -779,7 +791,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             StatusType status = StatusType.Missing;
             var firstDayOfWeek = FirstDayOfWeek(System.DateTime.Today);
-            if (startDate >= firstDayOfWeek && startDate <= firstDayOfWeek.AddDays(6))
+            if (startDate >= firstDayOfWeek && startDate <= firstDayOfWeek.AddDays(6) && startDate > employee._TMApproveDate && startDate > employee.TMCloseDate)
                 status = StatusType.Empty;
             else if (employee._TMCloseDate == DateTime.MinValue && employee._TMApproveDate == DateTime.MinValue)
             {
@@ -818,34 +830,12 @@ namespace UnicontaClient.Pages.CustomPage
             return dt.AddDays(-1 * diff).Date;
         }
 
-        string GetPeriod(DateTime Date)
-        {
-            var dayOffset = DayOfWeek.Thursday - Date.DayOfWeek;
-            if (dayOffset > 0)
-                Date = Date.AddDays(dayOffset);
-
-            var week = CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(Date, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday).ToString();
-
-            return string.Format("{0}_{1}", Date.Year, week.PadLeft(2, '0'));
-        }
-
-        string  GetEmployeeGroupName(EmployeeClient employee) //TODO:Ligger denne ikke på Client-class - der må være en smartere måde
-        {
-            var GroupName = string.Empty;
-            if (employee != null)
-            {
-                if (employee._Group != null)
-                {
-                    var rec = ClientHelper.GetRef(api.CompanyId, typeof(Uniconta.DataModel.EmployeeGroup), employee._Group);
-                    GroupName = ((Uniconta.DataModel.EmployeeGroup)rec)?._Name;
-                }
-            }
-            return GroupName;
-        }
-
         private void localMenu_OnItemClicked(string ActionType)
         {
+            var dgTimeSheetApprovalRpt = this.dgTimeSheetApprovalRpt;
             var selectedItem = dgTimeSheetApprovalRpt.SelectedItem as TimeSheetApprovalLocalClient;
+            var selectedItems = dgTimeSheetApprovalRpt.SelectedItems;
+
             switch (ActionType)
             {
                 case "RefreshGrid":
@@ -953,28 +943,293 @@ namespace UnicontaClient.Pages.CustomPage
                 case "TimeSheet":
                     if (selectedItem != null)
                     {
-                        var employee = selectedItem.EmplyeeRef;
+                        var employee = selectedItem.EmployeeRef;
                         var startDate = selectedItem.Date;
                         var param = new object[2] { employee, startDate };
                         AddDockItem(TabControls.TMJournalLinePage, param, string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("TimeRegistration"), employee._Name));
                     }
                     break;
-                 default:
+                case "Approve":
+                    var markedRows = selectedItems.Cast<TimeSheetApprovalLocalClient>();
+                    if (markedRows != null && markedRows.Count() > 0)
+                        Approve(markedRows);
+                    break;
+                default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
         }
 
+        
+        private async void Approve(IEnumerable<TimeSheetApprovalLocalClient> journalList)
+        {
+            dgTimeSheetApprovalRpt.Columns.GetColumnByName("ErrorInfo").Visible = true;
+            var cntJournals = journalList.Count();
+            var cntOK = 0;
+
+            foreach (var rec in journalList.OrderBy(s => s.Employee).ThenBy(s => s.Date))
+            {
+                rec.ErrorInfo = TMJournalLineHelper.VALIDATE_OK;
+                var emplApprove = rec.EmployeeRef;
+                await api.Read(emplApprove);
+
+                var curStatus = (StatusType)AppEnums.StatusType.IndexOf(GetStatus(emplApprove, rec.Date, rec.TotalHours));
+
+                if (curStatus == StatusType.Approved)
+                {
+                    rec.ErrorInfo = Uniconta.ClientTools.Localization.lookup("PeriodAlreadyApproved");
+                    continue;
+                }
+                else if (curStatus != StatusType.ApprovedClosed && curStatus != StatusType.Closed && curStatus != StatusType.ClosedEmpty)
+                {
+                    rec.ErrorInfo = Uniconta.ClientTools.Localization.lookup("ClosePeriodNotApproved");
+                    continue;
+                }
+
+                var approveDate = emplApprove._TMApproveDate;
+                var closeDate = emplApprove._TMCloseDate;
+                var startDateWeek = rec.Date;
+                var startDateApprove = approveDate >= startDateWeek ? approveDate.AddDays(1) : startDateWeek;
+                var endDateApprove = closeDate >= startDateWeek.AddDays(6) ? startDateWeek.AddDays(6) : closeDate;
+
+                if (emplApprove._TMApproveDate < startDateWeek.AddDays(-1))
+                {
+                    rec.ErrorInfo = string.Format("Please Approve previous period(s) first");
+                    continue;
+                }
+
+                var tmHelper = new TMJournalLineHelper(api, emplApprove);
+
+                IEnumerable<TMJournalLineClientLocal> tmLinesHours = null;
+                IEnumerable<TMJournalLineClientLocal> tmLinesMileage = null;
+                EmpPayrollCategoryEmployeeClient[] empPriceLst = null;
+
+                string errText = null;
+
+                var preValidateRes = tmHelper.PreValidate(rec.NormHours, payrollCache);
+
+                if (preValidateRes != null && preValidateRes.Count() > 0)
+                {
+                    foreach (var error in preValidateRes)
+                    {
+                        rec.ErrorInfo = error.Message;
+                    }
+                }
+                else
+                {
+                    var pairTM = new PropValuePair[]
+                    {
+                        PropValuePair.GenereteWhereElements(nameof(TMJournalLineClient.Employee), typeof(string), rec.Employee),
+                        PropValuePair.GenereteWhereElements(nameof(TMJournalLineClient.Date), typeof(DateTime), String.Format("{0:d}", startDateWeek))
+                    };
+
+                    var journalLineLst = await api.Query<TMJournalLineClientLocal>(pairTM);
+
+                    if (journalLineLst == null)
+                        continue;
+
+                    empPriceLst = await api.Query<EmpPayrollCategoryEmployeeClient>(emplApprove);
+
+                    #region Validate Hours
+                    tmLinesHours = journalLineLst.Where(s => s._RegistrationType == RegistrationType.Hours);
+                    var valErrorsHours = tmHelper.ValidateLinesHours(tmLinesHours, startDateApprove, endDateApprove, empPriceLst, payrollCache, projGroupCache); 
+                    var cntErrLinesHours = tmLinesHours.Where(s => s.ErrorInfo != TMJournalLineHelper.VALIDATE_OK).Count();
+                    #endregion
+
+                    #region Validate Mileage
+                    tmLinesMileage = journalLineLst.Where(s => s._RegistrationType == RegistrationType.Mileage);
+                    var valErrorsMileage = tmHelper.ValidateLinesMileage(tmLinesMileage, startDateWeek, payrollCache); 
+                    var cntErrLinesMileage = tmLinesMileage.Where(s => s.ErrorInfo != TMJournalLineHelper.VALIDATE_OK).Count();
+                    #endregion
+
+                    if (cntErrLinesHours + cntErrLinesMileage != 0)
+                    {
+                        errText = string.Format("{0}: {1} {2}", Uniconta.ClientTools.Localization.lookup("TimeRegistration"), cntErrLinesHours + cntErrLinesMileage, Uniconta.ClientTools.Localization.lookup("JournalFailedValidation"));
+                        rec.ErrorInfo = errText;
+                        continue;
+                    }
+                }
+
+                var lstInsert = new List<ProjectJournalLineClient>();
+
+                int startDayOfWeek = startDateApprove.DayOfWeek == DayOfWeek.Sunday ? 7 : (int)startDateApprove.DayOfWeek;
+                int endDayOfWeek = endDateApprove.DayOfWeek == DayOfWeek.Sunday ? 7 : (int)endDateApprove.DayOfWeek;
+
+                #region Hours
+                tmHelper.SetEmplPrice(tmLinesHours, empPriceLst, startDateApprove, endDateApprove); 
+
+                foreach (var line in tmLinesHours)
+                {
+                    for (int x = startDayOfWeek; x <= endDayOfWeek; x++) 
+                    {
+                        var qty = (double)line.GetType().GetProperty(string.Format("Day{0}", x)).GetValue(line);
+
+                        if (qty != 0)
+                        {
+                            var lineclient = new ProjectJournalLineClient();
+
+                            lineclient._Approved = true;
+                            lineclient._Text = line.Text;
+                            lineclient._Unit = Uniconta.DataModel.ItemUnit.Hours;
+                            lineclient._TransType = line.TransType;
+                            lineclient._Project = line.Project;
+                            lineclient._PayrollCategory = line.PayrollCategory;
+                            lineclient._Task = line.Task;
+
+                            var payrollCat = (Uniconta.DataModel.EmpPayrollCategory)payrollCache.Get(line.PayrollCategory);
+
+                            if (payrollCat._InternalType == Uniconta.DataModel.InternalType.OverTime || payrollCat._InternalType == Uniconta.DataModel.InternalType.FlexTime)
+                            {
+                                var factor = payrollCat._Factor == 0 ? 1 : payrollCat._Factor;
+                                lineclient._Qty = qty * factor;
+                            }
+                            else
+                                lineclient._Qty = qty;
+
+                            lineclient._PrCategory = payrollCat._PrCategory;
+                            lineclient._Employee = line.Employee;
+                            lineclient._Dim1 = emplApprove._Dim1;
+                            lineclient._Dim2 = emplApprove._Dim2;
+                            lineclient._Dim3 = emplApprove._Dim3;
+                            lineclient._Dim4 = emplApprove._Dim4;
+                            lineclient._Dim5 = emplApprove._Dim5;
+                            lineclient._Invoiceable = line.Invoiceable;
+
+                            lineclient._Date = line.Date.AddDays(x - 1);
+
+                            lineclient._SalesPrice = (double)line.GetType().GetProperty(string.Format("SalesPriceDay{0}", x)).GetValue(line);
+                            lineclient._CostPrice = (double)line.GetType().GetProperty(string.Format("CostPriceDay{0}", x)).GetValue(line);
+
+                            lstInsert.Add(lineclient);
+                        }
+                    }
+                }
+                #endregion
+
+                #region Mileage
+                foreach (var line in tmLinesMileage)
+                {
+                    for (int x = startDayOfWeek; x <= endDayOfWeek; x++)
+                    {
+                        var qty = (double)line.GetType().GetProperty(string.Format("Day{0}", x)).GetValue(line);
+
+                        if (qty != 0)
+                        {
+                            var lineclient = new ProjectJournalLineClient();
+
+                            lineclient._Approved = true;
+
+                            var purpose = Regex.Replace(line.Text ?? string.Empty, @"\r\n?|\n", ", ") + Environment.NewLine;
+                            var fromAdr = Regex.Replace(line.AddressFrom ?? string.Empty, @"\r\n?|\n", ", ") + Environment.NewLine;
+                            var toAdr = Regex.Replace(line.AddressTo ?? string.Empty, @"\r\n?|\n", ", ") + Environment.NewLine;
+                            var VechicleNo = Regex.Replace(line.VechicleRegNo ?? string.Empty, @"\r\n?|\n", ", ") + Environment.NewLine;
+
+                            lineclient._Text = string.Format("{0}: {1}{2}: {3}{4}: {5}{6}: {7}", Uniconta.ClientTools.Localization.lookup("Purpose"), purpose, Uniconta.ClientTools.Localization.lookup("From"), fromAdr, Uniconta.ClientTools.Localization.lookup("To"), toAdr, Uniconta.ClientTools.Localization.lookup("VechicleRegNo"), line.VechicleRegNo);
+                            lineclient._Unit = Uniconta.DataModel.ItemUnit.km;
+                            lineclient._TransType = line.TransType;
+                            lineclient._Project = line.Project;
+                            lineclient._PayrollCategory = line.PayrollCategory;
+
+                            var payrollCat = (Uniconta.DataModel.EmpPayrollCategory)payrollCache.Get(line.PayrollCategory);
+
+                            lineclient._PrCategory = payrollCat._PrCategory;
+                            lineclient._Employee = line.Employee;
+
+                            lineclient._Dim1 = emplApprove._Dim1;
+                            lineclient._Dim2 = emplApprove._Dim2;
+                            lineclient._Dim3 = emplApprove._Dim3;
+                            lineclient._Dim4 = emplApprove._Dim4;
+                            lineclient._Dim5 = emplApprove._Dim5;
+
+                            lineclient._Qty = qty;
+                            lineclient._Invoiceable = line.Invoiceable;
+
+                            lineclient._Date = line.Date.AddDays(x - 1);
+
+                            lineclient._SalesPrice = payrollCat._Rate;
+
+                            lstInsert.Add(lineclient);
+                        }
+                    }
+                }
+                #endregion
+
+                var postingApi = new UnicontaAPI.Project.API.PostingAPI(api);
+
+                this.api.AllowBackgroundCrud = false;
+                var savetask = saveGrid();
+                this.api.AllowBackgroundCrud = true;
+
+                var comment = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Period"), GetPeriod(startDateWeek));
+          
+                busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
+                busyIndicator.IsBusy = true;
+                if (savetask != null)
+                    await savetask;
+
+                if (lstInsert.Count() != 0)
+                {
+                    Task<PostingResult> task;
+
+                    task = postingApi.PostEmpJournal((Uniconta.DataModel.Employee)emplApprove, lstInsert, endDateApprove, comment, false, new GLTransClientTotal());
+
+                    var postingResult = await task;
+
+                    busyIndicator.IsBusy = false;
+                    busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("LoadingMsg");
+                    if (postingResult == null)
+                        continue;
+
+                    if (postingResult.Err != ErrorCodes.Succes)
+                    {
+                        rec.ErrorInfo = Uniconta.ClientTools.Localization.lookup(postingResult.Err.ToString());
+                    }
+                    else
+                    {
+                        emplApprove._TMApproveDate = endDateApprove;
+                        cntOK++;
+                        rec.ErrorInfo = Uniconta.ClientTools.Localization.lookup("Approved");
+                    }
+                }
+                else
+                {
+                    var res = await postingApi.EmployeeSetDates(emplApprove._Number, emplApprove._TMCloseDate, endDateApprove);
+
+                    busyIndicator.IsBusy = false;
+                    busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("LoadingMsg");
+
+                    if (res != ErrorCodes.Succes)
+                        rec.ErrorInfo = Uniconta.ClientTools.Localization.lookup(res.ToString());
+                    else
+                    {
+                        cntOK++;
+                        emplApprove._TMApproveDate = endDateApprove;
+                        rec.ErrorInfo = Uniconta.ClientTools.Localization.lookup("Approved");
+                    }
+                }
+            }
+            
+            var cntErr = cntJournals - cntOK;
+            string msgText = null;
+
+            msgText = cntOK != 0 ? string.Format("{0}: {1} {2}", Uniconta.ClientTools.Localization.lookup("TimeRegistration"), cntOK, Uniconta.ClientTools.Localization.lookup("Approved")) : msgText; 
+            msgText = cntErr != 0 && msgText != null ? Environment.NewLine : msgText;
+            msgText = cntErr != 0 ? string.Format("{0}: {1} {2}", Uniconta.ClientTools.Localization.lookup("NotApproved"), cntErr, Uniconta.ClientTools.Localization.lookup("JournalEntry")) : msgText; 
+
+            UnicontaMessageBox.Show(msgText, Uniconta.ClientTools.Localization.lookup("TimeSheetApproval"), MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
         protected override async void LoadCacheInBackGround()
         {
-            var comp = api.CompanyEntity;
-            LoadType(new Type[] { typeof(Uniconta.DataModel.TMEmpCalendar) });
-
             if (employeeCache == null)
                 employeeCache = await api.LoadCache(typeof(Uniconta.DataModel.Employee)).ConfigureAwait(false);
 
-            if (empPayrollCatCache == null)
-                empPayrollCatCache = await api.LoadCache(typeof(Uniconta.DataModel.EmpPayrollCategory)).ConfigureAwait(false);
+            if (payrollCache == null)
+                payrollCache = api.GetCache<Uniconta.DataModel.EmpPayrollCategory>() ?? await api.LoadCache<Uniconta.DataModel.EmpPayrollCategory>().ConfigureAwait(false);
+            if (projGroupCache == null)
+                projGroupCache = api.GetCache<Uniconta.DataModel.ProjectGroup>() ?? await api.LoadCache<Uniconta.DataModel.ProjectGroup>().ConfigureAwait(false);
+
+            LoadType(new Type[] { typeof(Uniconta.DataModel.TMEmpCalendar), typeof(Uniconta.DataModel.EmployeeGroup) });
         }
 
         internal class Calender
@@ -987,18 +1242,25 @@ namespace UnicontaClient.Pages.CustomPage
 
     public class TimeSheetApprovalLocalClient :  INotifyPropertyChanged
     {
-        string _Employee;
+        public int CompanyId;
+
+        public string _Employee;
+        [ForeignKeyAttribute(ForeignKeyTable = typeof(Uniconta.DataModel.Employee))]
         [Display(Name = "Employee", ResourceType = typeof(ProjectTransClientText))]
-        public string Employee { get { return _Employee; } set { if (ClientHelper.KeyEqual(_Employee, value)) return; _Employee = value; NotifyPropertyChanged("Employee"); } }
+        public string Employee { get { return _Employee; } set { if (ClientHelper.KeyEqual(_Employee, value)) return; _Employee = value; NotifyPropertyChanged("Employee"); NotifyPropertyChanged("EmployeeName"); } }
 
         [Display(Name = "EmployeeName", ResourceType = typeof(ProjectTransClientText))]
-        public string EmployeeName { get; set; }
+        [NoSQL]
+        public string EmployeeName { get { return ClientHelper.GetName(CompanyId, typeof(Uniconta.DataModel.Employee), _Employee); } }
 
+        public string _EmployeeGroup;
+        [ForeignKeyAttribute(ForeignKeyTable = typeof(Uniconta.DataModel.EmployeeGroup))]
         [Display(Name = "Group", ResourceType = typeof(TMJournalLineText))]
-        public string EmployeeGroup { get; set; }
+        public string EmployeeGroup { get { return _EmployeeGroup; } set { if (ClientHelper.KeyEqual(_EmployeeGroup, value)) return; _Employee = value; NotifyPropertyChanged("EmployeeGroup"); NotifyPropertyChanged("EmployeeGroupName"); } }
 
         [Display(Name = "GroupName", ResourceType = typeof(TMJournalLineText))]
-        public string EmployeeGroupName { get; set; }
+        [NoSQL]
+        public string EmployeeGroupName { get { return ClientHelper.GetName(CompanyId, typeof(Uniconta.DataModel.EmployeeGroup), _EmployeeGroup); } }
 
         [Display(Name = "StartDate", ResourceType = typeof(ProjectText))]
         public DateTime Date { get; set; }
@@ -1088,7 +1350,7 @@ namespace UnicontaClient.Pages.CustomPage
         [Display(Name = "ApprovedBy", ResourceType = typeof(TMJournalLineText))]
         public string TMApprovedBy { get; set; }
 
-        StatusType _Status;
+        public StatusType _Status;
         [Display(Name = "Status", ResourceType = typeof(TMJournalLineText))]
         public string Status
         {
@@ -1103,13 +1365,33 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
+        private string _ErrorInfo;
+        [Display(Name = "SystemInfo", ResourceType = typeof(DCTransText))]
+        public string ErrorInfo { get { return _ErrorInfo; } set { _ErrorInfo = value; NotifyPropertyChanged("ErrorInfo"); } }
+
         public string Dimension1 { get; set; }
         public string Dimension2 { get; set; }
         public string Dimension3 { get; set; }
         public string Dimension4 { get; set; }
         public string Dimension5 { get; set; }
 
-        public EmployeeClient EmplyeeRef { get; set; }
+        [ReportingAttribute]
+        public EmployeeClient EmployeeRef
+        {
+            get
+            {
+                return ClientHelper.GetRefClient<EmployeeClient>(CompanyId, typeof(Uniconta.DataModel.Employee), _Employee);
+            }
+        }
+
+        [ReportingAttribute]
+        public EmployeeGroupClient EmployeeGroupRef
+        {
+            get
+            {
+                return ClientHelper.GetRefClient<EmployeeGroupClient>(CompanyId, typeof(Uniconta.DataModel.EmployeeGroup), _EmployeeGroup);
+            }
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
         public void NotifyPropertyChanged(string propertyName)

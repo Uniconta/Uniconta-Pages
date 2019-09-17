@@ -154,6 +154,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorAccount"
                             </DataTemplate>
                         </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                     </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="SWIFT" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="BankAccount" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="LastInvoice" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="EndDiscountPct" Visible="False"/>

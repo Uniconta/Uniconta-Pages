@@ -15,7 +15,7 @@ x:Class="UnicontaClient.Pages.CustomPage.TextInHtmlPage"
         <dxre:HtmlToContentConverter x:Key="htmlToContentConverter" />
     </UserControl.Resources>
     <CorasauControls:BusyIndicator x:Name="busyIndicator" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BusyMessage}">
-        <Grid x:Name="LayoutRoot" Margin="2">
+        <Grid x:Name="LayoutRoot" Margin="2" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="40" />
@@ -26,9 +26,8 @@ x:Class="UnicontaClient.Pages.CustomPage.TextInHtmlPage"
                               VerticalScrollBarVisibility="Visible" 
                               HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="2,0,2,2"
                               Content="{Binding Path=Description, Converter={StaticResource htmlToContentConverter}, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" AutoCorrect="txtHtmlControl_AutoCorrect" UnhandledException="txtHtmlControl_UnhandledException">
-                <!--#region Ribbon Customization-->
                 <dxre:RichEditControl.RibbonActions>
-                    <dxb:InsertAction Index="1" ContainerName="{x:Static dxre:DefaultBarItemNames.RibbonPage_Insert}">
+                    <dxb:InsertAction Index="2" ContainerName="{x:Static dxre:DefaultBarItemNames.RibbonPage_Home}">
                         <dxr:RibbonPageGroup Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Properties}">
                             <dxb:BarEditItem x:Name="cmbExternType" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Type}" EditWidth="100" EditValueChanged="cmbExternType_EditValueChanged"  >
                                 <dxb:BarEditItem.EditSettings>
@@ -55,44 +54,25 @@ x:Class="UnicontaClient.Pages.CustomPage.TextInHtmlPage"
                             </dxb:BarButtonItem>
                         </dxr:RibbonPageGroup>
                     </dxb:InsertAction>
-
-                    <dxb:UpdateAction ElementName="{x:Static dxre:DefaultBarItemNames.RibbonPage_Insert}" PropertyName="IsSelected"  Value="True"/>
+                    <dxb:UpdateAction ElementName="{x:Static dxre:DefaultBarItemNames.RibbonPage_Home}" PropertyName="IsSelected"  Value="True"/>
                     <dxb:RemoveAction ElementName="{x:Static dxre:DefaultBarItemNames.RibbonCategory_HeaderFooterTools}"  />
                     <dxb:RemoveAction ElementName="{x:Static dxre:DefaultBarItemNames.RibbonCategory_TableTools}" />
                     <dxb:RemoveAction ElementName="{x:Static dxre:DefaultBarItemNames.RibbonCategory_PictureTools}" />
-                    <dxb:RemoveAction ElementName="{x:Static dxre:DefaultBarItemNames.RibbonGroup_File_Info}" />
-                    <dxb:RemoveAction ElementName="{x:Static dxre:DefaultBarItemNames.RibbonItem_File_Common_New}" />
-                    <dxb:RemoveAction ElementName="{x:Static dxre:DefaultBarItemNames.RibbonItem_File_Common_Open}" />
-                    <dxb:RemoveAction ElementName="{x:Static dxre:DefaultBarItemNames.RibbonItem_File_Common_Save}" />
-                    <dxb:RemoveAction ElementName="{x:Static dxre:DefaultBarItemNames.RibbonItem_File_Common_SaveAs}" />
-                    <dxb:RemoveAction ElementName="{x:Static dxre:DefaultBarItemNames.RibbonItem_File_Common_QuickPrint}" />
-                    <dxb:RemoveAction ElementName="{x:Static dxre:DefaultBarItemNames.RibbonItem_File_Common_Print}" />
-                    <dxb:RemoveAction ElementName="{x:Static dxre:DefaultBarItemNames.RibbonItem_File_Common_PrintPreview}" />
-                    <dxb:UpdateAction ElementName="{x:Static dxre:DefaultBarItemNames.RibbonPage_Home}" PropertyName="IsSelected" Value="True" />
                     <dxb:RemoveAction ElementName="{x:Static dxre:DefaultBarItemNames.RibbonGroup_Home_Paragraph}" />
                     <dxb:RemoveAction ElementName="{x:Static dxre:DefaultBarItemNames.RibbonGroup_Home_Styles}" />
                     <dxb:RemoveAction ElementName="{x:Static dxre:DefaultBarItemNames.RibbonGroup_Home_Editing}" />
                     <dxb:RemoveAction ElementName="{x:Static dxre:DefaultBarItemNames.RibbonItem_Home_Clipboard_PasteSpecial}" />
-                    <dxb:RemoveAction ElementName="{x:Static dxre:DefaultBarItemNames.RibbonGroup_Insert_Pages}" />
-                    <dxb:RemoveAction ElementName="{x:Static dxre:DefaultBarItemNames.RibbonGroup_Insert_Tables}" />
-                    <dxb:RemoveAction ElementName="{x:Static dxre:DefaultBarItemNames.RibbonGroup_Insert_Illustrations}" />
-                    <dxb:RemoveAction ElementName="{x:Static dxre:DefaultBarItemNames.RibbonGroup_Insert_HeaderFooter}" />
-                    <dxb:RemoveAction ElementName="{x:Static dxre:DefaultBarItemNames.RibbonGroup_Insert_Text}" />
-                    <dxb:RemoveAction ElementName="{x:Static dxre:DefaultBarItemNames.RibbonGroup_Insert_Symbols}" />
-                    <dxb:RemoveAction ElementName="{x:Static dxre:DefaultBarItemNames.RibbonItem_Insert_Links_Bookmark}" />
                     <dxb:UpdateAction ElementName="{x:Static dxre:DefaultBarItemNames.RibbonPage_PageLayout}" PropertyName="IsVisible" Value="False" />
                     <dxb:UpdateAction ElementName="{x:Static dxre:DefaultBarItemNames.RibbonPage_References}" PropertyName="IsVisible" Value="False" />
                     <dxb:UpdateAction ElementName="{x:Static dxre:DefaultBarItemNames.RibbonPage_MailMerge}" PropertyName="IsVisible" Value="False" />
                     <dxb:UpdateAction ElementName="{x:Static dxre:DefaultBarItemNames.RibbonPage_Review}" PropertyName="IsVisible" Value="False" />
                     <dxb:UpdateAction ElementName="{x:Static dxre:DefaultBarItemNames.RibbonPage_View}" PropertyName="IsVisible" Value="False" />
+                    <dxb:UpdateAction ElementName="{x:Static dxre:DefaultBarItemNames.RibbonPage_Insert}" PropertyName="IsVisible" Value="False" />
+                    <dxb:UpdateAction ElementName="{x:Static dxre:DefaultBarItemNames.RibbonPage_File}" PropertyName="IsVisible" Value="False" />
                     <dxb:UpdateAction ElementName="{x:Static dxre:DefaultBarItemNames.RibbonControl}"
                                       Property="{x:Static dxr:RibbonControl.ToolbarShowModeProperty}"
                                       Value="Hide" />
                 </dxre:RichEditControl.RibbonActions>
-                <!--#endregion-->
-                <dxre:RichEditControl.HyperlinkOptions>
-                    <dxre:DXRichEditHyperlinkOptions ModifierKeys="None"/>
-                </dxre:RichEditControl.HyperlinkOptions>
             </CorasauControls:RichTextEditorControl>
         <Button x:Name="CancelButton" IsCancel="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=Cancel}" Click="CancelButton_Click"  Width="75" Height="23" 
                 HorizontalAlignment="Right" Margin="0,12,0,0" Grid.Row="1" />
