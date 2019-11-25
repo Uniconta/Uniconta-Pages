@@ -138,12 +138,11 @@ namespace UnicontaClient.Pages.CustomPage
         protected override async void LoadCacheInBackGround()
         {
             var api = this.api;
-            var Comp = api.CompanyEntity;
-            var Cache = Comp.GetCache(typeof(InvItem)) ?? await Comp.LoadCache(typeof(InvItem), api).ConfigureAwait(false);
+            var Cache = api.GetCache(typeof(InvItem)) ?? await api.LoadCache(typeof(InvItem)).ConfigureAwait(false);
             leProdItem.cacheFilter = new BOMCacheFilter(Cache);
 
-            if (Comp.Warehouse)
-                this.warehouse = Comp.GetCache(typeof(Uniconta.DataModel.InvWarehouse)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.InvWarehouse), api).ConfigureAwait(false);
+            if (api.CompanyEntity.Warehouse)
+                this.warehouse = api.GetCache(typeof(Uniconta.DataModel.InvWarehouse)) ?? await api.LoadCache(typeof(Uniconta.DataModel.InvWarehouse)).ConfigureAwait(false);
         }
 
         private void frmRibbon_OnItemClicked(string ActionType)
@@ -179,7 +178,7 @@ namespace UnicontaClient.Pages.CustomPage
                     var result = await prodAPI.CreateProductionLines(productionOrder, (StorageRegister)dialog.storage);
                     if (result == ErrorCodes.Succes)
                     {
-                        var olheader = string.Format("{0}:{1},{2}", Uniconta.ClientTools.Localization.lookup("ProductionLines"), productionOrder._DCAccount, productionOrder._OrderNumber);
+                        var olheader = string.Format("{0}: {1}, {2}", Uniconta.ClientTools.Localization.lookup("ProductionLines"), productionOrder._OrderNumber, productionOrder._DCAccount);
                         AddDockItem(TabControls.ProductionOrderLines, productionOrder, olheader);
                         dockCtrl?.JustClosePanel(this.ParentControl);
                     }
@@ -216,7 +215,10 @@ namespace UnicontaClient.Pages.CustomPage
                 if (item != null)
                 {
                     editrow.ProdQty = item._PurchaseQty;
+                    editrow.Warehouse = item._Warehouse;
+                    editrow.Location = item._Location;
                     editrow.NotifyPropertyChanged("ProdQty");
+                    TableField.SetUserFieldsFromRecord(item, editrow);
                 }
             }
         }

@@ -206,7 +206,7 @@ namespace UnicontaISO20022CreditTransfer
         /// SUPP Supplier payment (Default Value)
         /// TREA Financial payment
         /// </summary>
-        public override string ExtCategoryPurpose()
+        public override string ExtCategoryPurpose(ISO20022PaymentTypes ISOPaymType)
         {
             return string.Empty;
         }

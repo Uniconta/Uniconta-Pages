@@ -35,6 +35,7 @@ using UnicontaClient.Controls;
 using System.Windows;
 using DevExpress.Xpf.Editors;
 using Uniconta.API.Service;
+using Uniconta.Common.Utility;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -146,6 +147,8 @@ namespace UnicontaClient.Pages.CustomPage
                 grpFinancialYear.IsEnabled = true;
                 grpFinancialYear.Visibility = Visibility.Visible;
                 grpFinancialYear.IsCollapsed = false;
+
+                invoiceDateCounter.EditValue = 5;
             }
             else /*Import*/
             {
@@ -568,6 +571,8 @@ namespace UnicontaClient.Pages.CustomPage
                     if (setupType != 1)
                     {
 #if !SILVERLIGHT
+                        var pastYears = string.IsNullOrWhiteSpace(invoiceDateCounter.Text) ? 0 : - (int)NumberConvert.ToInt(invoiceDateCounter.Text);
+                        DateTime invoiceFrmDate = DateTime.Today.AddYears(pastYears); 
                         var listOfNavDim = new List<string>();
                         var dim = string.IsNullOrWhiteSpace(txtNavDim1.Text) ? string.Empty : txtNavDim1.Text;
                         listOfNavDim.Add(dim);
@@ -582,7 +587,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                         var arrayOfNavDim = listOfNavDim.ToArray();
 
-                        object[] compParams = new object[17];
+                        object[] compParams = new object[18];
                         compParams[0] = path;
                         compParams[1] = editrow;
                         compParams[2] = (ImportFrom)importFrom;
@@ -600,6 +605,7 @@ namespace UnicontaClient.Pages.CustomPage
                         compParams[14] = set0InCustAcc;
                         compParams[15] = set0InVendAcc;
                         compParams[16] = concatC5ItemNames;
+                        compParams[17] = invoiceFrmDate;
 
                         string header = string.Format(Uniconta.ClientTools.Localization.lookup("ImportOBJ"), Uniconta.ClientTools.Localization.lookup("Company"));
                         AddDockItem(TabControls.ImportFromOtherCompanySetup, compParams, header);

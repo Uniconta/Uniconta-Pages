@@ -31,11 +31,11 @@ namespace UnicontaClient.Pages.CustomPage
             set
             {
                 _api = value;
-                Utility.SetDimensions(api, lbldim1, lbldim2, lbldim3, lbldim4, lbldim5, dim1lookupeditior, dim2lookupeditior, dim3lookupeditior, dim4lookupeditior, dim5lookupeditior, Dimension);
+                Utility.SetDimensions(api, lbldim1, lbldim2, lbldim3, lbldim4, lbldim5, dim1lookupeditior, dim2lookupeditior, dim3lookupeditior, dim4lookupeditior, dim5lookupeditior, usedim);
                 setUserFields();
                 var Comp = _api.CompanyEntity;
                 if (_api.CompanyEntity.NumberOfDimensions == 0)
-                    Dimension.Visibility = Visibility.Collapsed;
+                    usedim.Visibility = Visibility.Collapsed;
                 if (!Comp._UseVatOperation)
                     ItemVatOprlookupeditior.Visibility = Visibility.Collapsed;
                 if (!Comp._HasWithholding)

@@ -46,7 +46,7 @@ namespace UnicontaClient.Pages.CustomPage
     }
     public partial class PartInvItemsPage : GridBasePage
     {
-        SQLCache items;
+        SQLCache items, warehouse;
         InvItemClient Invitem;
         UnicontaBaseEntity master;
         public override void PageClosing()
@@ -102,8 +102,67 @@ namespace UnicontaClient.Pages.CustomPage
             dgPartInvItemsGrid.UpdateMaster(master);
             dgPartInvItemsGrid.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
+            dgPartInvItemsGrid.SelectedItemChanged += DgPartInvItemsGrid_SelectedItemChanged;
             InitialLoad();
             dgPartInvItemsGrid.ShowTotalSummary();
+        }
+
+        private void DgPartInvItemsGrid_SelectedItemChanged(object sender, SelectedItemChangedEventArgs e)
+        {
+            var oldSelectedItem = e.OldItem as InvBOMClient;
+            if (oldSelectedItem != null)
+                oldSelectedItem.PropertyChanged -= DgPartInvItemsGrid_PropertyChanged;
+
+            var selectedItem = e.NewItem as InvBOMClient;
+            if (selectedItem != null)
+                selectedItem.PropertyChanged += DgPartInvItemsGrid_PropertyChanged;
+        }
+
+        private void DgPartInvItemsGrid_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            var rec = sender as InvBOMClient;
+            switch (e.PropertyName)
+            {
+                case "Warehouse":
+                    if (warehouse != null)
+                    {
+                        var selected = (InvWarehouse)warehouse.Get(rec._Warehouse);
+                        setLocation(selected, rec);
+                    }
+                    break;
+                case "Location":
+                    if (string.IsNullOrEmpty(rec._Warehouse))
+                        rec._Location = null;
+                    break;
+            }
+        }
+
+        async void setLocation(InvWarehouse master, InvBOMClient rec)
+        {
+            if (api.CompanyEntity.Location)
+            {
+                if (master != null)
+                    rec.locationSource = master.Locations ?? await master.LoadLocations(api);
+                else
+                {
+                    rec.locationSource = null;
+                    rec.Location = null;
+                }
+                rec.NotifyPropertyChanged("LocationSource");
+            }
+        }
+
+        private void PART_Editor_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if (warehouse == null)
+                return;
+
+            var selectedItem = dgPartInvItemsGrid.SelectedItem as InvBOMClient;
+            if (selectedItem?._Warehouse != null)
+            {
+                var selected = (InvWarehouse)warehouse.Get(selectedItem._Warehouse);
+                setLocation(selected, selectedItem);
+            }
         }
 
         protected override void OnLayoutLoaded()
@@ -122,6 +181,12 @@ namespace UnicontaClient.Pages.CustomPage
             if (Invitem != null && Invitem._ItemType == (byte)Uniconta.DataModel.ItemType.ProductionBOM)
                 this.UnfoldBOM.Visible = true;
 
+            var company = api.CompanyEntity;
+            if (!company.Location || !company.Warehouse)
+                Location.Visible = Location.ShowInColumnChooser = false;
+            if (!company.Warehouse)
+                Warehouse.Visible = Warehouse.ShowInColumnChooser = false;
+
             MoveType.Visible = showFields;
             ShowOnInvoice.Visible = showFields;
             ShowOnPacknote.Visible = showFields;
@@ -134,6 +199,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var Comp = api.CompanyEntity;
             this.items = Comp.GetCache(typeof(Uniconta.DataModel.InvItem));
+            this.warehouse = Comp.GetCache(typeof(InvWarehouse));
         }
 
         protected override async void LoadCacheInBackGround()
@@ -142,6 +208,8 @@ namespace UnicontaClient.Pages.CustomPage
             var Comp = api.CompanyEntity;
             if (this.items == null)
                 this.items = await Comp.LoadCache(typeof(Uniconta.DataModel.InvItem), api).ConfigureAwait(false);
+            if (Comp.Warehouse && this.warehouse == null)
+                this.warehouse = api.GetCache(typeof(Uniconta.DataModel.InvWarehouse)) ?? await api.LoadCache(typeof(Uniconta.DataModel.InvWarehouse)).ConfigureAwait(false);
         }
 
         CorasauGridLookupEditorClient prevVariant1;

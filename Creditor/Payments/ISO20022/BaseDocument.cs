@@ -102,6 +102,8 @@ namespace UnicontaISO20022CreditTransfer
         internal const string CCYDKK = "DKK";
         internal const string CCYSEK = "SEK";
         internal const string CCYNOK = "NOK";
+        internal const string CCYGBP = "GBP";
+
         internal const string FIK71 = "71";
         internal const string FIK73 = "73";
         internal const string FIK75 = "75";
@@ -116,7 +118,7 @@ namespace UnicontaISO20022CreditTransfer
 
         internal const string INSTRUCTIONPRIORITY_NORM = "NORM";
         internal const string EXTCATEGORYPURPOSE_SUPP = "SUPP";
-
+   
         internal const string CHRGBR_CRED = "CRED";
         internal const string CHRGBR_DEBT = "DEBT";
         internal const string CHRGBR_SHAR = "SHAR";

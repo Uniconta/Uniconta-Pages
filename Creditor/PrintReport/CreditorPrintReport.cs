@@ -22,6 +22,7 @@ namespace UnicontaClient.Pages.CustomPage
         public string ReportName { get; private set; }
         public CreditorOrderClient CreditorOrder { get; private set; }
         public bool IsCreditNote { get; private set; }
+        public string CreditorMessage { get; private set; }
         private bool isRePrint;
         private readonly CrudAPI crudApi;
         private InvoicePostingResult invoicePostingResult;
@@ -67,7 +68,7 @@ namespace UnicontaClient.Pages.CustomPage
             CreditorOrder = orderClient;
         }
 
-        async public Task<bool> InstantiaeFields()
+        async public Task<bool> InstantiateFields()
         {
             try
             {
@@ -134,7 +135,18 @@ namespace UnicontaClient.Pages.CustomPage
                 else
                     Creditor = cred as CreditorClient;
 
+                var contacts = await crudApi.Query<ContactClient>(Creditor);
+                Creditor.Contacts = contacts;
                 UnicontaClient.Pages.DebtorOrders.SetDeliveryAdress(creditorInvoiceClientUser, Creditor, crudApi);
+
+                /*In case debtor order is null, fill from DCInvoice*/
+                if (CreditorOrder == null)
+                {
+                    var creditorOrderUserType = ReportUtil.GetUserType(typeof(CreditorOrderClient), Comp);
+                    var creditorOrderUser = Activator.CreateInstance(creditorOrderUserType) as CreditorOrderClient;
+                    creditorOrderUser.CopyFrom(creditorInvoiceClientUser, Creditor);
+                    CreditorOrder = creditorOrderUser;
+                }
 
                 Company = Utility.GetCompanyClientUserInstance(Comp);
 
@@ -143,12 +155,13 @@ namespace UnicontaClient.Pages.CustomPage
                 CompanyLogo = await Uniconta.ClientTools.Util.UtilDisplay.GetLogo(crudApi);
 
                 Language lang = ReportGenUtil.GetLanguage(Creditor, Comp);
-                InvTransInvoiceLines = LayoutPrintReport.SetInvTransLines(CreditorInvoice, InvTransInvoiceLines, InvCache, creditorInvoiceLineUserType, lang, false);
+                InvTransInvoiceLines = LayoutPrintReport.SetInvTransLines(CreditorInvoice, InvTransInvoiceLines, InvCache, crudApi, creditorInvoiceLineUserType, lang, false);
 
                 var lineTotal = CreditorInvoice._LineTotal;
                 IsCreditNote = CreditorInvoice._LineTotal < -0.0001d && layoutType == CompanyLayoutType.PurchaseInvoice;
                 ReportName = IsCreditNote ? "CreditNote" : layoutType.ToString();
 
+                CreditorMessage = await GetMessageClientText(lang);
                 return true;
             }
             catch (Exception ex)
@@ -158,6 +171,30 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-
+        /// <summary>
+        /// Gets Message Client text    
+        /// </summary>
+        /// <param name="lang">Language</param>
+        /// <returns>Text</returns>
+        async private Task<string> GetMessageClientText(Language lang)
+        {
+            DebtorMessagesClient messageClient = null;
+            switch (layoutType)
+            {
+                case CompanyLayoutType.PurchaseInvoice:
+                    messageClient = await Utility.GetDebtorMessageClient(crudApi, lang, DebtorEmailType.PurchaseInvoice);
+                    break;
+                case CompanyLayoutType.PurchaseOrder:
+                    messageClient = await Utility.GetDebtorMessageClient(crudApi, lang, DebtorEmailType.PurchaseOrder);
+                    break;
+                case CompanyLayoutType.PurchasePacknote:
+                    messageClient = await Utility.GetDebtorMessageClient(crudApi, lang, DebtorEmailType.PurchasePacknote);
+                    break;
+                case CompanyLayoutType.Requisition:
+                    messageClient = await Utility.GetDebtorMessageClient(crudApi, lang, DebtorEmailType.Requisition);
+                    break;
+            }
+            return messageClient?._Text;
+        }
     }
 }

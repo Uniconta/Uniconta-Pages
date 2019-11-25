@@ -314,7 +314,7 @@ namespace UnicontaClient.Pages.CustomPage
                 colVariant5.Visible = colVariant5.ShowInColumnChooser = colInvItemVariant5.Visible = colInvItemVariant5.ShowInColumnChooser = Variant5Name.ShowInColumnChooser = Variant5Name.Visible = false;
         }
 
-        public override void Utility_Refresh(string screenName, object argument)
+        public override async void Utility_Refresh(string screenName, object argument)
         {
             if (screenName == TabControls.InvItemStoragePage && argument != null)
             {
@@ -356,9 +356,29 @@ namespace UnicontaClient.Pages.CustomPage
                     dgDebtorOrderLineGrid.PasteRows(invItems);
                 }
             }
+
+            if (screenName == TabControls.SerialToOrderLinePage)
+            {
+                var param = argument as object[];
+                if (param != null)
+                {
+                    var orderLine = param[0] as DebtorOrderLineClient;
+                    refreshOnHand = orderLine != null && orderLine.RowId == 0;
+                    if (IsDataChaged)
+                    {
+                        var t = saveGrid();
+                        if (t != null && orderLine.RowId == 0)
+                            await t;
+                    }
+                    if (api.CompanyEntity.Warehouse)
+                        dgDebtorOrderLineGrid.SetLoadedRow(orderLine);
+                }
+            }
+
             if (screenName == TabControls.RegenerateOrderFromProjectPage)
                 InitQuery();
         }
+
         public bool DataChaged;
 
         public override void AssignMultipleGrid(List<Uniconta.ClientTools.Controls.CorasauDataGrid> gridCtrls)
@@ -470,6 +490,8 @@ namespace UnicontaClient.Pages.CustomPage
                         TableField.SetUserFieldsFromRecord(selectedItem, rec);
                         if (selectedItem._Blocked)
                             UtilDisplay.ShowErrorCode(ErrorCodes.ItemIsOnHold, null);
+
+                        globalEvents.NotifyRefreshViewer(NameOfControl, selectedItem);
                     }
                     break;
                 case "Qty":
@@ -506,7 +528,7 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                     break;
                 case "EAN":
-                    DebtorOfferLines.FindOnEAN(rec, this.items, api);
+                    DebtorOfferLines.FindOnEAN(rec, this.items, api, this.PriceLookup);
                     break;
                 case "Variant1":
                     if (rec._Variant1 != null)
@@ -639,12 +661,16 @@ namespace UnicontaClient.Pages.CustomPage
             double Amountsum = ret.Item1;
             double Costsum = ret.Item2;
             double sales = ret.Item3;
+            if (Order._EndDiscountPct != 0)
+                sales *= (100d - Order._EndDiscountPct) / 100d;
+
             RibbonBase rb = (RibbonBase)localMenu.DataContext;
             var groups = UtilDisplay.GetMenuCommandsByStatus(rb, true);
 
             var strAmount = Uniconta.ClientTools.Localization.lookup("Amount");
             var strCost = Uniconta.ClientTools.Localization.lookup("CostValue");
             var strDB = Uniconta.ClientTools.Localization.lookup("DB");
+            var strProjTotal = Uniconta.ClientTools.Localization.lookup("ProjectTotal");
             foreach (var grp in groups)
             {
                 if (grp.Caption == strAmount)
@@ -661,6 +687,11 @@ namespace UnicontaClient.Pages.CustomPage
                     else
                         str = margin.ToString("N2");
                     grp.StatusValue = str;
+                }
+                else if (grp.Caption == strProjTotal)
+                {
+                    var projTotal = Order.ProjectTotal != 0d ? Order.ProjectTotal : 0d;
+                    grp.StatusValue = projTotal.ToString("N2");
                 }
                 else
                     grp.StatusValue = string.Empty;
@@ -786,18 +817,19 @@ namespace UnicontaClient.Pages.CustomPage
                         string.Format(Uniconta.ClientTools.Localization.lookup("AddOBJ"), Uniconta.ClientTools.Localization.lookup("InventoryItems")), null, floatingLoc: Utility.GetDefaultLocation());
                     break;
                 case "EditOrder":
-                    AddDockItem(TabControls.DebtorOrdersPage2, Order, string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("Orders"), Order._OrderNumber));
+                    AddDockItem(TabControls.DebtorOrdersPage2, Order, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Orders"), Order._OrderNumber));
                     break;
                 case "ProjectTransaction":
                     {
+                        saveGridLocal();
                         var o = Order;
-                        AddDockItem(TabControls.DebtorOrderProjectLinePage, o, string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("ProjectAdjustments"), o._OrderNumber));
+                        AddDockItem(TabControls.DebtorOrderProjectLinePage, o, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ProjectAdjustments"), o._OrderNumber));
                         break;
                     }
                 case "RegenerateOrderFromProject":
                     {
                         var o = Order;
-                        AddDockItem(TabControls.RegenerateOrderFromProjectPage, o, string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("RegenerateOrder"), o._OrderNumber));
+                        AddDockItem(TabControls.RegenerateOrderFromProjectPage, o, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("RegenerateOrder"), o._OrderNumber));
                         break;
                     }
                 case "AddVariants":
@@ -813,16 +845,15 @@ namespace UnicontaClient.Pages.CustomPage
                 case "CreateFromInvoice":
                     try
                     {
-                        CWCreateOrderFromQuickInvoice createOrderCW = new CWCreateOrderFromQuickInvoice(api, Order.Account);
-                        createOrderCW.Closing += async delegate
+                        CWCreateOrderFromQuickInvoice createOrderCW = new CWCreateOrderFromQuickInvoice(api, Order.Account, true, Order);
+                        createOrderCW.Closing +=  delegate
                         {
                             if (createOrderCW.DialogResult == true)
                             {
                                 var orderApi = new OrderAPI(api);
                                 var checkIfCreditNote = createOrderCW.chkIfCreditNote.IsChecked.HasValue ? createOrderCW.chkIfCreditNote.IsChecked.Value : false;
                                 var debtorInvoice = createOrderCW.dgCreateOrderGrid.SelectedItem as DebtorInvoiceLocal;
-                                await CreateOrderLinesFromInvoice(Order, debtorInvoice, checkIfCreditNote);
-                                dgDebtorOrderLineGrid.ItemsSource = Order.Lines;
+                                dgDebtorOrderLineGrid.PasteRows(createOrderCW.debtorOrderLines);
                             }
                         };
                         createOrderCW.Show();
@@ -838,68 +869,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
             RecalculateAmount();
         }
-
-        async Task CreateOrderLinesFromInvoice(DebtorOrderClient order, DebtorInvoiceLocal invoice, bool checkIfCreditNote)
-        {
-            var orderlines = new List<DebtorOrderLineClient>();
-            order.Lines = orderlines;
-            var invoiceLines = await api.Query<DebtorInvoiceLines>(invoice);
-            if (invoiceLines == null || invoiceLines.Length == 0)
-                return;
-
-            orderlines.Capacity = invoiceLines.Length;
-            int lineNo = 0;
-            double sign = checkIfCreditNote ? -1d : 1d;
-            foreach (var invoiceline in invoiceLines)
-            {
-                var line = new DebtorOrderLineClient();
-                line.SetMaster(order);
-
-                line._LineNumber = ++lineNo;
-                line._Item = invoiceline._Item;
-                line._DiscountPct = invoiceline._DiscountPct;
-                line._Discount = invoiceline._Discount;
-                line._Qty = invoiceline.InvoiceQty * sign;
-                line._Price = (invoiceline.CurrencyEnum != null ? invoiceline._PriceCur : invoiceline._Price);
-                if (line._Price != 0)
-                    line._Price += invoiceline._PriceVatPart;
-
-                if (line._Qty * line._Price == 0)
-                    line._AmountEntered = ((invoiceline.CurrencyEnum != null ? invoiceline._AmountCur : invoiceline._Amount) + invoiceline._PriceVatPart) * sign;
-
-                line._Dim1 = invoiceline._Dim1;
-                line._Dim2 = invoiceline._Dim2;
-                line._Dim3 = invoiceline._Dim3;
-                line._Dim4 = invoiceline._Dim4;
-                line._Dim5 = invoiceline._Dim5;
-                line._Employee = invoiceline._Employee;
-                line._Note = invoiceline._Note;
-                line._Text = invoiceline._Text;
-                line._Unit = invoiceline._Unit;
-                line._Variant1 = invoiceline._Variant1;
-                line._Variant2 = invoiceline._Variant2;
-                line._Variant3 = invoiceline._Variant3;
-                line._Variant4 = invoiceline._Variant4;
-                line._Variant5 = invoiceline._Variant5;
-                line._Warehouse = invoiceline._Warehouse;
-                line._Location = invoiceline._Location;
-
-                var selectedItem = (InvItem)items?.Get(invoiceline._Item);
-                if (selectedItem != null)
-                {
-                    line._Item = selectedItem._Item;
-                    line._CostPriceLine = selectedItem._CostPrice;
-                    if (selectedItem._Unit != 0)
-                        line._Unit = selectedItem._Unit;
-                }
-
-                orderlines.Add(line);
-            }
-
-            if (orderlines.Capacity > 0)
-                this.DataChaged = true;
-        }
-
+      
         async void CreateProductionOrder(DebtorOrderLineClient orderLine)
         {
             var t = saveGridLocal();
@@ -923,7 +893,8 @@ namespace UnicontaClient.Pages.CustomPage
             string debtorName = debtor?._Name ?? dbOrder._DCAccount;
             bool showUpdateInv = api.CompanyEntity.Storage;
             bool invoiceInXML = debtor?._InvoiceInXML ?? false;
-            CWGenerateInvoice GenrateOfferDialog = new CWGenerateInvoice(false, doctype.ToString(), isShowInvoiceVisible: true, askForEmail: true, showNoEmailMsg: !showSendByMail, debtorName: debtorName, isShowUpdateInv: showUpdateInv, isDebtorOrder: true, InvoiceInXML: invoiceInXML);
+            var accountName = string.Format("{0} ({1})", dbOrder._DCAccount, dbOrder.Name);
+            CWGenerateInvoice GenrateOfferDialog = new CWGenerateInvoice(false, doctype.ToString(), isShowInvoiceVisible: true, askForEmail: true, showNoEmailMsg: !showSendByMail, debtorName: debtorName, isShowUpdateInv: showUpdateInv, isDebtorOrder: true, InvoiceInXML: invoiceInXML, AccountName:accountName);
 #if !SILVERLIGHT
             GenrateOfferDialog.DialogTableId = 2000000007;
 #endif
@@ -1048,11 +1019,11 @@ namespace UnicontaClient.Pages.CustomPage
         async void LinkSerialNumber(DebtorOrderLineClient orderLine)
         {
             var t = saveGridLocal();
-            if (t != null && orderLine.RowId == 0)
+            if (t != null && orderLine.RowId == 0) 
                 await t;
             if (api.CompanyEntity.Warehouse)
                 dgDebtorOrderLineGrid.SetLoadedRow(orderLine); // serial page add warehouse and location
-            AddDockItem(TabControls.SerialToOrderLinePage, orderLine, string.Format("{0}:{1}/{2},{3}", Uniconta.ClientTools.Localization.lookup("SerialBatchNumbers"), orderLine.OrderRowId, orderLine._Item, orderLine.RowId));
+            AddDockItem(TabControls.SerialToOrderLinePage, dgDebtorOrderLineGrid.syncEntity, string.Format("{0}:{1}/{2},{3}", Uniconta.ClientTools.Localization.lookup("SerialBatchNumbers"), orderLine.OrderRowId, orderLine._Item, orderLine.RowId));
         }
 
         async void ViewStorage()
@@ -1073,7 +1044,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        private void GenerateInvoice(DCOrder dbOrder)
+        private void GenerateInvoice(DebtorOrderClient dbOrder)
         {
             var savetask = saveGridLocal();
             var curpanel = dockCtrl.Activpanel;
@@ -1106,10 +1077,14 @@ namespace UnicontaClient.Pages.CustomPage
             }
             string debtorName = debtor?._Name ?? dbOrder._DCAccount;
             bool invoiceInXML = debtor?._InvoiceInXML ?? false;
-            CWGenerateInvoice GenrateInvoiceDialog = new CWGenerateInvoice(true, string.Empty, false, true, true, showNoEmailMsg: !showSendByMail, debtorName: debtorName, isOrderOrQuickInv: true, isDebtorOrder: true, InvoiceInXML: invoiceInXML);
+            var accountName = string.Format("{0} ({1})", dbOrder._DCAccount, dbOrder.Name);
+            CWGenerateInvoice GenrateInvoiceDialog = new CWGenerateInvoice(true, string.Empty, false, true, true, showNoEmailMsg: !showSendByMail, debtorName: debtorName, isOrderOrQuickInv: true, isDebtorOrder: true, InvoiceInXML: invoiceInXML, AccountName: accountName);
 #if !SILVERLIGHT
             GenrateInvoiceDialog.DialogTableId = 2000000008;
 #endif
+            if (dbOrder._InvoiceDate != DateTime.MinValue)
+                GenrateInvoiceDialog.SetInvoiceDate(dbOrder._InvoiceDate);
+
             GenrateInvoiceDialog.Closed += async delegate
             {
                 if (GenrateInvoiceDialog.DialogResult == true)
@@ -1287,6 +1262,8 @@ namespace UnicontaClient.Pages.CustomPage
                     invJournalLine._Variant4 = bom._Variant4;
                     invJournalLine._Variant5 = bom._Variant5;
                     item = (InvItem)items.Get(bom._ItemPart);
+                    invJournalLine._Warehouse = bom._Warehouse ?? item._Warehouse ?? selectedItem._Warehouse;
+                    invJournalLine._Location = bom._Location ?? item._Location ?? selectedItem._Location;
                     invJournalLine._CostPriceLine = item._CostPrice;
                     invJournalLine.SetItemValues(item, selectedItem._Storage);
                     invJournalLine._Qty = Math.Round(bom.GetBOMQty(Qty), item._Decimals);

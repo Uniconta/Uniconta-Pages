@@ -67,7 +67,7 @@ namespace UnicontaISO20022CreditTransfer
         /// Identification assigned by an institution.
         /// Max. 35 characters.
         /// </summary>
-        public override string IdentificationId(String identificationId, string companyCVR)
+        public override string IdentificationId(string identificationId, string companyCVR)
         {
             identificationId = identificationId ?? string.Empty;
             companyCVR = companyCVR ?? string.Empty;
@@ -212,7 +212,7 @@ namespace UnicontaISO20022CreditTransfer
         /// SUPP Supplier payment (Default Value)
         /// TREA Financial payment
         /// </summary>
-        public override string ExtCategoryPurpose()
+        public override string ExtCategoryPurpose(ISO20022PaymentTypes ISOPaymType)
         {
             return string.Empty;
         }

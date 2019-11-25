@@ -18,6 +18,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using Uniconta.ClientTools.Controls;
+using Uniconta.ClientTools.Util;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -28,7 +29,7 @@ namespace UnicontaClient.Pages.CustomPage
         public override Type TableType { get { return typeof(DebtorTransOpenClient); } }
     }
     public partial class DebtorTranOpen : GridBasePage
-    {      
+    {
         public override string NameOfControl
         {
             get { return TabControls.DebtorTranOpen.ToString(); }
@@ -53,6 +54,7 @@ namespace UnicontaClient.Pages.CustomPage
             dgDebtorTransOpen.api = api;
             dgDebtorTransOpen.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
+            ribbonControl.DisableButtons( "SaveGrid" );
             var Comp = api.CompanyEntity;
             dgDebtorTransOpen.tableView.ShowTotalSummary = true;
             if (Comp.RoundTo100)
@@ -82,6 +84,10 @@ namespace UnicontaClient.Pages.CustomPage
             var selectedItem = dgDebtorTransOpen.SelectedItem as DebtorTransOpenClient;
             switch (ActionType)
             {
+                case "EditAll":
+                    if (dgDebtorTransOpen.Visibility == System.Windows.Visibility.Visible)
+                        EditAll();
+                    break;
                 case "EditRow":
                     if (selectedItem != null)
                         AddDockItem(TabControls.DebtorTranPage2, selectedItem, Uniconta.ClientTools.Localization.lookup("TransactionOutstanding"), ";component/Assets/img/Edit_16x16.png");
@@ -96,9 +102,81 @@ namespace UnicontaClient.Pages.CustomPage
                     string vheader = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("VoucherTransactions"), selectedItem.Trans._Voucher);
                     AddDockItem(TabControls.AccountsTransaction, dgDebtorTransOpen.syncEntity, vheader);
                     break;
+                case "SaveGrid":
+                    saveGrid();
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
+            }
+        }
+
+        bool copyRowIsEnabled = false;
+        bool editAllChecked;
+        private void EditAll()
+        {
+            RibbonBase rb = (RibbonBase)localMenu.DataContext;
+            var ibase = UtilDisplay.GetMenuCommandByName(rb, "EditAll");
+            if (ibase == null)
+                return;
+            if (dgDebtorTransOpen.Readonly)
+            {
+                api.AllowBackgroundCrud = false;
+                dgDebtorTransOpen.MakeEditable();
+                UserFieldControl.MakeEditable(dgDebtorTransOpen);
+                ibase.Caption = Uniconta.ClientTools.Localization.lookup("LeaveEditAll");
+                ribbonControl.EnableButtons( "SaveGrid" );
+                copyRowIsEnabled = true;
+                editAllChecked = false;
+            }
+            else
+            {
+                if (IsDataChaged)
+                {
+                    string message = Uniconta.ClientTools.Localization.lookup("SaveChangesPrompt");
+                    CWConfirmationBox confirmationDialog = new CWConfirmationBox(message);
+                    confirmationDialog.Closing += async delegate
+                    {
+                        if (confirmationDialog.DialogResult == null)
+                            return;
+                        switch (confirmationDialog.ConfirmationResult)
+                        {
+                            case CWConfirmationBox.ConfirmationResultEnum.Yes:
+                                var err = await dgDebtorTransOpen.SaveData();
+                                if (err != 0)
+                                {
+                                    api.AllowBackgroundCrud = true;
+                                    return;
+                                }
+                                break;
+                            case CWConfirmationBox.ConfirmationResultEnum.No:
+                                break;
+                        }
+                        editAllChecked = true;
+                        dgDebtorTransOpen.Readonly = true;
+                        dgDebtorTransOpen.tableView.CloseEditor();
+                        ibase.Caption = Uniconta.ClientTools.Localization.lookup("EditAll");
+                        ribbonControl.DisableButtons( "SaveGrid" );
+                        copyRowIsEnabled = false;
+                    };
+                    confirmationDialog.Show();
+                }
+                else
+                {
+                    dgDebtorTransOpen.Readonly = true;
+                    dgDebtorTransOpen.tableView.CloseEditor();
+                    ibase.Caption = Uniconta.ClientTools.Localization.lookup("EditAll");
+                    ribbonControl.DisableButtons( "SaveGrid" );
+                    copyRowIsEnabled = false;
+                }
+            }
+        }
+
+        public override bool IsDataChaged
+        {
+            get
+            {
+                return editAllChecked ? false : dgDebtorTransOpen.HasUnsavedData;
             }
         }
     }

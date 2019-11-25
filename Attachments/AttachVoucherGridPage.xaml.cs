@@ -136,7 +136,7 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         var dapi = new Uniconta.API.GeneralLedger.DocumentAPI(api);
                         voucherViewer.HasMultipleVouchers = true;
-                        voucherViewer.Vouchers = (VouchersClient[])await dapi.GetFolderContent(selectedVoucherClient, true);
+                        voucherViewer.Vouchers = (VouchersClient[])await dapi.GetEnvelopeContent(selectedVoucherClient, true);
                     }
 
                 }

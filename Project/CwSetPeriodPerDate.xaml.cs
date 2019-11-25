@@ -56,6 +56,8 @@ namespace UnicontaClient.Pages.CustomPage
                 showJournal.Height = new GridLength(0);
                 double h = this.Height - 30;
                 this.Height = h;
+                lblJournal.Visibility = Visibility.Collapsed;
+                lejournal.Visibility = Visibility.Collapsed;
             }
             lejournal.api = api;
             var lblStr = string.Empty;

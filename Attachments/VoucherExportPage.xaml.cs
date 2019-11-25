@@ -104,20 +104,23 @@ namespace UnicontaClient.Pages.CustomPage
                 zipOutputStream.UseZip64 = UseZip64.Dynamic;
                 foreach (var voucher in vouchers)
                 {
+                    if (voucher._Envelope)
+                        continue;
                     if (voucher._Data == null)
-                    {
                         await api.Read(voucher);
-                    }
                     byte[] attachment = voucher.Buffer;
                     if (attachment == null)
                         continue;
                     // Write the data to the ZIP file  
-                    string name = string.Format("{0}_{1}.{2}", voucher.Text, voucher.RowId, Enum.GetName(typeof(FileextensionsTypes), voucher.Fileextension));
+                    string name = string.Format("{0}_{1}.{2}", voucher._Text, voucher.RowId, Enum.GetName(typeof(FileextensionsTypes), voucher._Fileextension));
                     name = name.Replace("/", "-").Replace(@"\", "-");
                     ZipEntry entry = new ZipEntry(name);
                     zipOutputStream.PutNextEntry(entry);
                     zipOutputStream.Write(attachment, 0, attachment.Length);
                     WriteLogLine(string.Format(Uniconta.ClientTools.Localization.lookup("ExportingFile"), name));
+
+                    voucher._Data = null;
+                    voucher._LoadedData = null;
                 }
                 zipOutputStream.Finish();
             }

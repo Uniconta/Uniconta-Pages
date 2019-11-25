@@ -59,16 +59,28 @@ namespace UnicontaClient.Pages.CustomPage
     {
         DCOrderLineClient dcorderlineMaster;
         InvItem invItemMaster;
+        Company Comp;
+        SQLCache itemCache;
+
+        public SerialToOrderLinePage(SynchronizeEntity syncEntity)
+           : base(syncEntity, false)
+        {
+            InitPage(syncEntity.Row);
+        }
 
         public SerialToOrderLinePage(UnicontaBaseEntity master)
             : base(null)
         {
-            InitializeComponent();
+            InitPage(master);
+        }
 
+        void InitPage(UnicontaBaseEntity master)
+        {
+            InitializeComponent();
             dcorderlineMaster = master as DCOrderLineClient;
-            var Comp = api.CompanyEntity;
-            var cache = Comp.GetCache(typeof(InvItem));
-            invItemMaster = cache.Get(dcorderlineMaster._Item) as InvItem;
+            Comp = api.CompanyEntity;
+            itemCache = Comp.GetCache(typeof(InvItem));
+            invItemMaster = itemCache.Get(dcorderlineMaster._Item) as InvItem;
             SetRibbonControl(localMenu, dgLinkedGrid);
             dgLinkedGrid.invItemMaster = invItemMaster;
             dgLinkedGrid.dcorderlineMaster = dcorderlineMaster;
@@ -88,7 +100,53 @@ namespace UnicontaClient.Pages.CustomPage
             ribbonControl.UpperSearchNullText = Uniconta.ClientTools.Localization.lookup("Link");
             ribbonControl.LowerSearchNullText = Uniconta.ClientTools.Localization.lookup("Unlinked");
         }
-       
+
+        protected override void SyncEntityMasterRowChanged(UnicontaBaseEntity args)
+        {
+            if (args is DebtorOrderLineClient)
+            {
+                var orderLine = args as DebtorOrderLineClient;
+                if (orderLine._Item == null)
+                    return;
+                var argsArray = new object[1];
+                argsArray[0] = args;
+                globalEvents.OnRefresh(NameOfControl, argsArray);
+            }
+            if (args is CreditorOrderLineClient)
+            {
+                var orderLine = args as DCOrderLineClient;
+                if (orderLine._Item == null)
+                    return;
+                var item = (InvItem)itemCache.Get(orderLine._Item);
+                if (!item._UseSerialBatch)
+                    return;
+                var argsArray = new object[1];
+                argsArray[0] = args;
+                globalEvents.OnRefresh(NameOfControl, argsArray);
+            }
+            SetupMaster(args);
+            SetHeader(args);
+            InitQuery();
+        }
+
+        void SetupMaster(UnicontaBaseEntity args)
+        {
+            dcorderlineMaster = args as DCOrderLineClient;
+            invItemMaster = itemCache.Get(dcorderlineMaster._Item) as InvItem;
+            dgLinkedGrid.invItemMaster = invItemMaster;
+            dgLinkedGrid.dcorderlineMaster = dcorderlineMaster;
+        }
+
+        void SetHeader(UnicontaBaseEntity args)
+        {
+            string header = null;
+            var orderLine = args as DCOrderLineClient;
+            if(orderLine!= null)
+                header = string.Format("{0}:{1}/{2},{3}", Uniconta.ClientTools.Localization.lookup("SerialBatchNumbers"), orderLine.OrderRowId, orderLine._Item, orderLine.RowId);
+            if (header != null)
+                SetHeader(header);
+        }
+
         protected override async void LoadCacheInBackGround()
         {
             if (warehouse == null)
@@ -194,9 +252,11 @@ namespace UnicontaClient.Pages.CustomPage
             return res;
         }
 
+        bool saveAndExit = false;
         async private void SaveExit()
         {
             await dgLinkedGrid.SaveData();
+            saveAndExit = true;
             await LinkRows(true);
             dockCtrl?.CloseDockItem();
         }
@@ -292,7 +352,8 @@ namespace UnicontaClient.Pages.CustomPage
             else
             {
                 dcorderlineMaster.SerieBatchMarked = true;
-                InitQuery();
+                if (!saveAndExit)
+                    InitQuery();
             }
         }
 

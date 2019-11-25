@@ -69,7 +69,7 @@ namespace UnicontaClient.Pages.CustomPage
             SetRibbonControl(localMenu, dgProjectGrid);
             dgProjectGrid.ShowTotalSummary();
             localMenu.OnItemClicked += localMenu_OnItemClicked;
-            ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "SaveGrid" });
+            ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "UndoDelete", "SaveGrid" });
             dgProjectGrid.CustomSummary += DgProjectGrid_CustomSummary;
 #if SILVERLIGHT
             Application.Current.RootVisual.KeyDown += RootVisual_KeyDown;
@@ -137,7 +137,7 @@ namespace UnicontaClient.Pages.CustomPage
             var selectedItem = dgProjectGrid.SelectedItem as ProjectClient;
             string salesHeader = string.Empty;
             if (selectedItem != null)
-                salesHeader = string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("Project"), selectedItem._Number);
+                salesHeader = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Project"), selectedItem._Number);
             switch (ActionType)
             {
                 case "AddRow":
@@ -161,21 +161,21 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                     else
                     {
-                        var param = new object[2] { selectedItem, true };
+                        var param = new object[] { selectedItem, true };
                         AddDockItem(TabControls.ProjectPage2, param, salesHeader);
                     }
                     break;
                 case "PrTrans":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.ProjectTransactionPage, dgProjectGrid.syncEntity, string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("Transactions"), selectedItem._Number));
+                        AddDockItem(TabControls.ProjectTransactionPage, dgProjectGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Transactions"), selectedItem._Number));
                     break;
                 case "ProjectCategory":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.ProjectCategoryPage, dgProjectGrid.syncEntity, string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("ProjectCategory"), selectedItem._Number));
+                        AddDockItem(TabControls.ProjectCategoryPage, dgProjectGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ProjectCategory"), selectedItem._Number));
                     break;
                 case "Budget":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.ProjectBudgetPage, dgProjectGrid.syncEntity, string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("ProjectBudget"), selectedItem._Name ?? salesHeader));
+                        AddDockItem(TabControls.ProjectBudgetPage, dgProjectGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ProjectBudget"), selectedItem._Name ?? salesHeader));
                     break;
                 case "ProjectTransSum":
                     if (selectedItem != null)
@@ -187,7 +187,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "InvoiceBase":
                     if (selectedItem != null)
                     {
-                        salesHeader = string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("GenerateInvoice"), selectedItem._Number);
+                        salesHeader = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("GenerateInvoice"), selectedItem._Number);
                         AddDockItem(TabControls.ProjectInvoiceBase, dgProjectGrid.syncEntity, salesHeader);
                     }
                     break;
@@ -198,7 +198,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "SalesOrder":
                     if (selectedItem != null)
                     {
-                        salesHeader = string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("SalesOrder"), selectedItem._DCAccount);
+                        salesHeader = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("SalesOrder"), selectedItem._DCAccount);
                         AddDockItem(TabControls.DebtorOrders, dgProjectGrid.syncEntity, salesHeader);
                     }
                     break;
@@ -236,7 +236,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "Offers":
                     if (selectedItem != null)
                     {
-                        salesHeader = string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("Offers"), selectedItem._DCAccount);
+                        salesHeader = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Offers"), selectedItem._DCAccount);
                         AddDockItem(TabControls.DebtorOffers, dgProjectGrid.syncEntity, salesHeader);
                     }
                     break;
@@ -249,14 +249,14 @@ namespace UnicontaClient.Pages.CustomPage
                     UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("SilverlightSupport"), Uniconta.ClientTools.Localization.lookup("Message"), MessageBoxButton.OK);
 #else
                     if (selectedItem != null)
-                        AddDockItem(TabControls.ProjectTaskPage, selectedItem, string.Format("{0}({1}) : {2}", Uniconta.ClientTools.Localization.lookup("Tasks"), Uniconta.ClientTools.Localization.lookup("EnableChart")
+                        AddDockItem(TabControls.ProjectTaskPage, selectedItem, string.Format("{0}({1}): {2}", Uniconta.ClientTools.Localization.lookup("Tasks"), Uniconta.ClientTools.Localization.lookup("EnableChart")
                             , selectedItem._Number));
 #endif
                     break;
 
                 case "GridView":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.ProjectTaskGridPage, selectedItem, string.Format("{0}({1}) : {2}", Uniconta.ClientTools.Localization.lookup("Tasks"), Uniconta.ClientTools.Localization.lookup("DataGrid")
+                        AddDockItem(TabControls.ProjectTaskGridPage, selectedItem, string.Format("{0}({1}): {2}", Uniconta.ClientTools.Localization.lookup("Tasks"), Uniconta.ClientTools.Localization.lookup("DataGrid")
                             , selectedItem._Number));
                     break;
                 case "CopyRecord":
@@ -283,6 +283,13 @@ namespace UnicontaClient.Pages.CustomPage
                         AddDockItem(TabControls.Invoices, dgProjectGrid.syncEntity, header);
                     }
                     break;
+                case "ZeroInvoice":
+                    if (selectedItem != null)
+                        CreateZeroInvoice(selectedItem);
+                    break;
+                case "UndoDelete":
+                    dgProjectGrid.UndoDeleteRow();
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -307,8 +314,8 @@ namespace UnicontaClient.Pages.CustomPage
                      var debtorOrderType = api.CompanyEntity.GetUserType(typeof(DebtorOrderClient)) ?? typeof(DebtorOrderClient);
                      var debtorOrderInstance = Activator.CreateInstance(debtorOrderType) as DebtorOrderClient;
                      var invoiceApi = new Uniconta.API.Project.InvoiceAPI(api);
-                     var result = await invoiceApi.CreateOrderFromProject(debtorOrderInstance, selectedItem._Number, cwCreateOrder.InvoiceCategory, cwCreateOrder.GenrateDate,
-                         cwCreateOrder.FromDate, cwCreateOrder.ToDate);
+                     var result = await invoiceApi.CreateOrderFromProject(debtorOrderInstance, selectedItem._Number, CWCreateOrderFromProject.InvoiceCategory, CWCreateOrderFromProject.GenrateDate,
+                         CWCreateOrderFromProject.FromDate, CWCreateOrderFromProject.ToDate);
                      busyIndicator.IsBusy = false;
                      if (result != ErrorCodes.Succes)
                          UtilDisplay.ShowErrorCode(result);
@@ -317,6 +324,40 @@ namespace UnicontaClient.Pages.CustomPage
                  }
              };
             cwCreateOrder.Show();
+        }
+
+        void CreateZeroInvoice(ProjectClient selectedItem)
+        {
+            var cwCreateZeroInvoice = new UnicontaClient.Pages.CwCreateZeroInvoice(api);
+#if !SILVERLIGHT
+            cwCreateZeroInvoice.DialogTableId = 2000000067;
+#endif
+            cwCreateZeroInvoice.Closed += async delegate
+            {
+                if (cwCreateZeroInvoice.DialogResult == true)
+                {
+                    busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
+                    busyIndicator.IsBusy = true;
+                    var invoiceApi = new Uniconta.API.Project.InvoiceAPI(api);
+                    var result = await invoiceApi.CreateZeroInvoice(selectedItem._Number, cwCreateZeroInvoice.InvoiceCategory, cwCreateZeroInvoice.InvoiceDate, cwCreateZeroInvoice.ToDate,
+                        cwCreateZeroInvoice.Simulate, new GLTransClientTotal());
+                    busyIndicator.IsBusy = false;
+                    busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("LoadingMsg");
+                    var ledgerRes = result.ledgerRes;
+                    if (ledgerRes == null)
+                        return;
+                    if (result.Err != ErrorCodes.Succes)
+                        Utility.ShowJournalError(ledgerRes, dgProjectGrid);
+                    else if (cwCreateZeroInvoice.Simulate && ledgerRes.SimulatedTrans != null)
+                        AddDockItem(TabControls.SimulatedTransactions, ledgerRes.SimulatedTrans, Uniconta.ClientTools.Localization.lookup("SimulatedTransactions"), null, true);
+                    else
+                    {
+                        var msg = string.Format("{0} {1}={2}", Uniconta.ClientTools.Localization.lookup("JournalHasBeenPosted"), Uniconta.ClientTools.Localization.lookup("JournalPostedId"), ledgerRes.JournalPostedlId);
+                        UnicontaMessageBox.Show(msg, Uniconta.ClientTools.Localization.lookup("Message"));
+                    }
+                }
+            };
+            cwCreateZeroInvoice.Show();
         }
 
         private void ShowOrderLines(DebtorOrderClient order)
@@ -430,7 +471,7 @@ namespace UnicontaClient.Pages.CustomPage
                     return;
                 }
             }
-            var header = string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("Journal"), journal._Journal);
+            var header = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Journal"), journal._Journal);
             var param = new object[2] { journal, project };
             AddDockItem(TabControls.WorkOrderInput, param, header);
         }
@@ -448,7 +489,7 @@ namespace UnicontaClient.Pages.CustomPage
                 dgProjectGrid.MakeEditable();
                 UserFieldControl.MakeEditable(dgProjectGrid);
                 iBase.Caption = Uniconta.ClientTools.Localization.lookup("LeaveEditAll");
-                ribbonControl.EnableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "SaveGrid" });
+                ribbonControl.EnableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "UndoDelete", "SaveGrid" });
                 editAllChecked = false;
                 HasNotes.Visible = false;
                 HasDocs.Visible = false;
@@ -484,7 +525,7 @@ namespace UnicontaClient.Pages.CustomPage
                         dgProjectGrid.Readonly = true;
                         dgProjectGrid.tableView.CloseEditor();
                         iBase.Caption = Uniconta.ClientTools.Localization.lookup("EditAll");
-                        ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "SaveGrid" });
+                        ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "UndoDelete", "SaveGrid" });
                         copyRowIsEnabled = false;
                     };
                     confirmationDialog.Show();
@@ -496,7 +537,7 @@ namespace UnicontaClient.Pages.CustomPage
                     dgProjectGrid.Readonly = true;
                     dgProjectGrid.tableView.CloseEditor();
                     iBase.Caption = Uniconta.ClientTools.Localization.lookup("EditAll");
-                    ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "SaveGrid" });
+                    ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "UndoDelete", "SaveGrid" });
                     copyRowIsEnabled = false;
                 }
             }
@@ -517,7 +558,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (screenName == TabControls.ProjectPage2)
                 dgProjectGrid.UpdateItemSource(argument);
-            if (dgProjectGrid.Visibility == Visibility.Collapsed)
+            if (dgProjectGrid.Visibility == Visibility.Collapsed && screenName == TabControls.ProjectPage2)
                 detailControl.Refresh(argument, dgProjectGrid.SelectedItem);
             if (screenName == TabControls.UserNotesPage || screenName == TabControls.UserDocsPage && argument != null)
                 dgProjectGrid.UpdateItemSource(argument);

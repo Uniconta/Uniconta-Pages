@@ -67,6 +67,21 @@ namespace UnicontaClient.Pages.CustomPage
             Initialize(master);
         }
 
+        public PostedTransactions(SynchronizeEntity syncEntity)
+           : base(syncEntity, false)
+        {
+            master = syncEntity.Row;
+            Initialize(syncEntity.Row);
+        }
+
+        protected override void SyncEntityMasterRowChanged(UnicontaBaseEntity args)
+        {
+            master = args;
+            masterList = new List<UnicontaBaseEntity>() { master };
+            SetHeader();
+            InitQuery();
+        }
+
         private void Initialize(UnicontaBaseEntity master)
         {
             InitializeComponent();
@@ -77,12 +92,22 @@ namespace UnicontaClient.Pages.CustomPage
             SetRibbonControl(localMenu, dgPostedTran);
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgPostedTran.BusyIndicator = busyIndicator;
-            
+
+        }
+
+        void SetHeader()
+        {
+            string header = null;
+            var prodPosted = dgPostedTran.masterRecord as ProductionPostedClient;
+            if (prodPosted != null)
+                header = string.Format("{0} / {1}", Uniconta.ClientTools.Localization.lookup("PostedTransactions"), prodPosted._JournalPostedId);
+            if (header != null)
+                SetHeader(header);
         }
 
         public async override Task InitQuery()
         {
-            if (master is GLDailyJournalPostedClient || master is DebtorInvoiceClient)
+            if (master is GLDailyJournalPostedClient || master is DebtorInvoiceClient || master is ProductionPostedClient)
             {
                 dgPostedTran.masterRecords = masterList;
                 await Filter(null);

@@ -326,7 +326,18 @@ namespace UnicontaClient.Pages.CustomPage
                         return;
                     CopyBankFormat(selectedbankFormat);
                     break;
+                case "ViewBankstatement":
+                    ViewBankStatemnt();
+                    break;
             }
+        }
+
+        void ViewBankStatemnt()
+        {
+#if !SILVERLIGHT
+            var objCw = new CwViewBankStatementData(ctrlBrowseFile.FilePath);
+            objCw.Show();
+#endif
         }
 
         void CopyBankFormat(BankImportFormatClient selectedItem)

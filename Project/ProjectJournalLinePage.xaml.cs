@@ -51,6 +51,9 @@ namespace UnicontaClient.Pages.CustomPage
         public object TaskSource { get { return taskSource; } }
 
         public PrCategoryCacheFilter PrCategorySource { get; internal set; }
+
+        internal object serieBatchSource;
+        public object SerieBatchSource { get { return serieBatchSource; } }
     }
 
     public class ProjectJournalLinePageGrid : CorasauDataGridClient
@@ -280,6 +283,61 @@ namespace UnicontaClient.Pages.CustomPage
                         rec._TimeTo = 0;
                     }
                     break;
+                case "EAN":
+                    FindOnEAN(rec);
+                    break;
+                case "SerieBatch":
+                    if (ItemsCache != null)
+                    {
+                        if (rec._Item == null || rec._Item == string.Empty)
+                            GetItemFromSerailNumber(rec);
+                    }
+                    break;
+            }
+        }
+
+        async void GetItemFromSerailNumber(ProjectJournalLineLocal rec)
+        {
+            var reportApi = new Uniconta.API.Inventory.ReportAPI(api);
+            busyIndicator.IsBusy = true;
+            var rowId = await reportApi.GetItemFromSerialNumber(rec.SerieBatch);
+            busyIndicator.IsBusy = false;
+            if (rowId == 0) return;
+            var item = (InvItem)ItemsCache.Get((int)rowId);
+            if (item != null)
+            {
+                rec.Item = item._Item;
+                rec.NotifyPropertyChanged("Item");
+            }
+        }
+
+        void FindOnEAN(ProjectJournalLineLocal rec)
+        {
+            var EAN = rec._EAN;
+            if (string.IsNullOrWhiteSpace(EAN))
+                return;
+            var found = (from item in (InvItem[])ItemsCache.GetNotNullArray where string.Compare(item._EAN, EAN, StringComparison.CurrentCultureIgnoreCase) == 0 select item).FirstOrDefault();
+            if (found != null)
+            {
+                rec._EAN = found._EAN;
+                rec.Item = found._Item;
+            }
+            else
+                FindOnEANVariant(rec);
+        }
+
+        async void FindOnEANVariant(ProjectJournalLineLocal rec)
+        {
+            var ap = new Uniconta.API.Inventory.ReportAPI(api);
+            var variant = await ap.GetInvVariantDetail(rec._EAN);
+            if (variant != null)
+            {
+                rec.Item = variant._Item;
+                rec.Variant1 = variant._Variant1;
+                rec.Variant2 = variant._Variant2;
+                rec._EAN = variant._EAN;
+                if (variant._CostPrice != 0d)
+                    rec.CostPrice = variant._CostPrice;
             }
         }
         async void setLocation(InvWarehouse master, ProjectJournalLineLocal rec)
@@ -423,6 +481,8 @@ namespace UnicontaClient.Pages.CustomPage
                 rec._Unit = item._Unit;
                 rec.NotifyPropertyChanged("Unit");
             }
+
+            globalEvents?.NotifyRefreshViewer(NameOfControl, item);
         }
 
         async void getCostAndSales(ProjectJournalLineLocal rec)
@@ -522,6 +582,9 @@ namespace UnicontaClient.Pages.CustomPage
                 case "DeleteRow":
                     dgProjectJournalLinePageGrid.DeleteRow();
                     break;
+                case "UndoDelete":
+                    dgProjectJournalLinePageGrid.UndoDeleteRow();
+                    break;
                 case "CheckJournal":
                     CheckJournal();
                     break;
@@ -542,6 +605,31 @@ namespace UnicontaClient.Pages.CustomPage
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
+        }
+
+        private void SerieBatch_GotFocus(object sender, RoutedEventArgs e)
+        {
+            ProjectJournalLineLocal selectedItem = dgProjectJournalLinePageGrid.SelectedItem as ProjectJournalLineLocal;
+            if (selectedItem?._Item != null)
+            {
+                var selected = ItemsCache.Get<InvItem>(selectedItem._Item);
+                setSerieBatch(selected, selectedItem);
+            }
+        }
+        async void setSerieBatch(InvItem master, ProjectJournalLineLocal rec)
+        {
+            if (master != null && master._UseSerialBatch)
+            {
+                var serie = new InvSerieBatchOpen() { _Item = rec._Item };
+                var lst = await api.Query<InvSerieBatchClient>(serie);
+                rec.serieBatchSource = lst?.Select(x => x.Number).ToList();
+            }
+            else
+            {
+                rec.serieBatchSource = null;
+                rec.SerieBatch = null;
+            }
+            rec.NotifyPropertyChanged("SerieBatchSource");
         }
 
         async void UnfoldBOM(ProjectJournalLineLocal selectedItem)

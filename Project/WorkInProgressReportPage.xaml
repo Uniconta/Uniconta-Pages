@@ -39,27 +39,20 @@ x:Class="UnicontaClient.Pages.CustomPage.WorkInProgressReportPage"
             <CorasauControls:DateEditor x:Name="txtDateFrm" Grid.Column="2" Grid.Row="0" Margin="0,3,3,3"/>
             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ToDate}" Grid.Column="0" Grid.Row="1" Margin="3,3,3,3"/>
             <CorasauControls:DateEditor x:Name="txtDateTo" Grid.Column="2" Grid.Row="1" Margin="0,3,3,3"/>
-
-            <!--<TextBlock x:Name="lblFrmPerInChrg" Grid.Column="4" Grid.Row="0" Margin="3,3,3,3"/>
-            <CorasauControls:LookupEditor EditValueChanged="leFromPerInChre_EditValueChanged" x:Name="leFromPerInChre" Grid.Column="6" Grid.Row="0" Margin="0,3,3,3" Text="{Binding FromPerInCharge,Mode=TwoWay}"/>
-            <TextBlock x:Name="lblToPerInChrg" Grid.Column="4" Grid.Row="1" Margin="3,3,3,3"/>
-            <CorasauControls:LookupEditor EditValueChanged="leToPerInChre_EditValueChanged" x:Name="leToPerInChre" Grid.Column="6" Grid.Row="1" Margin="0,3,3,3" Text="{Binding ToPerInCharge,Mode=TwoWay}"/>
-
-            <TextBlock x:Name="lblFrmDebtor" Grid.Column="8" Grid.Row="0" Margin="3,3,3,3"/>
-            <CorasauControls:LookupEditor EditValueChanged="leFromDebtor_EditValueChanged" x:Name="leFromDebtor" Grid.Column="10" Grid.Row="0" Margin="0,3,3,3" Text="{Binding FromDebtor,Mode=TwoWay}"/>
-            <TextBlock x:Name="lblToDebtor" Grid.Column="8" Grid.Row="1" Margin="3,3,3,3"/>
-            <CorasauControls:LookupEditor EditValueChanged="leToDebtor_EditValueChanged" x:Name="leToDebtor" Grid.Column="10" Grid.Row="1" Margin="0,3,3,3" Text="{Binding ToDebtor,Mode=TwoWay}"/>-->
         </Grid>
         <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{StaticResource WindowHeaderGradient}" />
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="3" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <local:WorkInProgressReportGrid  x:Name="dgWorkInProgressRpt" AutoGenerateColumns="None" HorizontalAlignment="Stretch">
                 <local:WorkInProgressReportGrid.Columns>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Debtor" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="DebtorName" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Debtor" Visible="False" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DebtorName" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Project" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="ProjectName" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Phase" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="RootProject" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="PersonInCharge" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="PersonInChargeName" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PersonInChargeName" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="IsSubProject" AllowEditing="False" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="cldim1" Width="70" FieldName="Dimension1" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="cldim2" Width="70" FieldName="Dimension2" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="cldim3" Width="70" FieldName="Dimension3" />
@@ -77,6 +70,20 @@ x:Class="UnicontaClient.Pages.CustomPage.WorkInProgressReportPage"
                             <ControlTemplate>
                                 <CorasauControls:TextEditor IsPrintingMode="True" HorizontalContentAlignment="Right" Text="{Binding Path=DataContext.RowData.Row.EmployeeFee,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" Mask="N2" MaskUseAsDisplayFormat="True" MaskType="Numeric" Width="100"/>
                                 </ControlTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="EmployeeHoursJournal" Visible="False">
+                        <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <CorasauControls:TextEditor IsPrintingMode="True" HorizontalContentAlignment="Right" Text="{Binding Path=DataContext.RowData.Row.EmployeeHoursJournal,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" Mask="N2" MaskUseAsDisplayFormat="True" MaskType="Numeric" Width="100"/>
+                            </ControlTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="EmployeeFeeJournal" Visible="False">
+                        <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <CorasauControls:TextEditor IsPrintingMode="True" HorizontalContentAlignment="Right" Text="{Binding Path=DataContext.RowData.Row.EmployeeFeeJournal,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" Mask="N2" MaskUseAsDisplayFormat="True" MaskType="Numeric" Width="100"/>
+                            </ControlTemplate>
                         </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                     </local:CorasauDataGridTemplateColumnClient>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Expenses">
@@ -121,27 +128,6 @@ x:Class="UnicontaClient.Pages.CustomPage.WorkInProgressReportPage"
                             </ControlTemplate>
                         </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                     </local:CorasauDataGridTemplateColumnClient>
-                    <!--<local:CorasauDataGridTemplateColumnClient x:Name="BudgetQty" Visible="False">
-                        <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
-                            <ControlTemplate>
-                                <CorasauControls:TextEditor IsPrintingMode="True" HorizontalContentAlignment="Right" Text="{Binding Path=DataContext.RowData.Row.BudgetQty,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" Mask="N2" MaskUseAsDisplayFormat="True" MaskType="Numeric" Width="100"/>
-                            </ControlTemplate>
-                        </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
-                    </local:CorasauDataGridTemplateColumnClient>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="BudgetCost" Visible="False">
-                    <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
-                        <ControlTemplate>
-                            <CorasauControls:TextEditor IsPrintingMode="True" HorizontalContentAlignment="Right" Text="{Binding Path=DataContext.RowData.Row.BudgetCost,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" Mask="N2" MaskUseAsDisplayFormat="True" MaskType="Numeric" Width="100"/>
-                        </ControlTemplate>
-                    </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
-                    </local:CorasauDataGridTemplateColumnClient>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="BudgetSales" Visible="False">
-                        <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
-                            <ControlTemplate>
-                                <CorasauControls:TextEditor IsPrintingMode="True" HorizontalContentAlignment="Right" Text="{Binding Path=DataContext.RowData.Row.BudgetSales,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" Mask="N2" MaskUseAsDisplayFormat="True" MaskType="Numeric" Width="100"/>
-                            </ControlTemplate>
-                        </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
-                    </local:CorasauDataGridTemplateColumnClient>-->
                     <local:CorasauDataGridTemplateColumnClient x:Name="ClosingBalance">
                         <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                             <ControlTemplate>
@@ -149,9 +135,12 @@ x:Class="UnicontaClient.Pages.CustomPage.WorkInProgressReportPage"
                             </ControlTemplate>
                         </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                     </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ErrorInfo" Visible="False" AllowEditing="False"/>
                 </local:WorkInProgressReportGrid.Columns>
                 <local:WorkInProgressReportGrid.GroupSummary >
                     <local:SumColumn FieldName="EmployeeFee" SummaryType="Sum" ShowInGroupColumnFooter="EmployeeFee"/>
+                    <local:SumColumn FieldName="EmployeeHoursJournal" SummaryType="Sum" ShowInGroupColumnFooter="EmployeeHoursJournal"/>
+                    <local:SumColumn FieldName="EmployeeFeeJournal" SummaryType="Sum" ShowInGroupColumnFooter="EmployeeFeeJournal"/>
                     <local:SumColumn FieldName="Expenses" SummaryType="Sum" ShowInGroupColumnFooter="Expenses"/>
                     <local:SumColumn FieldName="Revenue" SummaryType="Sum" ShowInGroupColumnFooter="Revenue"/>
                     <local:SumColumn FieldName="OnAccount" SummaryType="Sum" ShowInGroupColumnFooter="OnAccount"/>
@@ -163,6 +152,8 @@ x:Class="UnicontaClient.Pages.CustomPage.WorkInProgressReportPage"
                 </local:WorkInProgressReportGrid.GroupSummary>
                 <local:WorkInProgressReportGrid.TotalSummary >
                     <local:SumColumn FieldName="EmployeeFee" SummaryType="Sum"/>
+                    <local:SumColumn FieldName="EmployeeHoursJournal" SummaryType="Sum"/>
+                    <local:SumColumn FieldName="EmployeeFeeJournal" SummaryType="Sum"/>
                     <local:SumColumn FieldName="Expenses" SummaryType="Sum"/>
                     <local:SumColumn FieldName="Revenue" SummaryType="Sum"/>
                     <local:SumColumn FieldName="OnAccount" SummaryType="Sum"/>

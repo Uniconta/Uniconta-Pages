@@ -217,8 +217,6 @@ namespace UnicontaClient.Pages.CustomPage
         void RemoveMenuItem()
         {
             RibbonBase rb = (RibbonBase)localMenu.DataContext;
-            UtilDisplay.RemoveMenuCommand(rb, "GenerateInvoice");
-            UtilDisplay.RemoveMenuCommand(rb, "PrintDocument");
             var ibase = UtilDisplay.GetMenuCommandByName(rb, "EditOrder");
             if (ibase != null)
                 ibase.Caption = string.Format(Uniconta.ClientTools.Localization.lookup("EditOBJ"), Uniconta.ClientTools.Localization.lookup("Offers"));
@@ -294,6 +292,8 @@ namespace UnicontaClient.Pages.CustomPage
                         TableField.SetUserFieldsFromRecord(selectedItem, rec);
                         if (selectedItem._Blocked)
                             UtilDisplay.ShowErrorCode(ErrorCodes.ItemIsOnHold, null);
+
+                        globalEvents?.NotifyRefreshViewer(NameOfControl, selectedItem);
                     }
                     break;
                 case "Qty":
@@ -321,7 +321,7 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                     break;
                 case "EAN":
-                    FindOnEAN(rec, this.items, api);
+                    FindOnEAN(rec, this.items, api, this.PriceLookup);
                     break;
                 case "Variant1":
                     if (rec._Variant1 != null)
@@ -339,7 +339,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        static public void FindOnEAN(DCOrderLineClient rec, SQLCache Items, QueryAPI api)
+        static public void FindOnEAN(DCOrderLineClient rec, SQLCache Items, QueryAPI api, Uniconta.API.DebtorCreditor.FindPrices PriceLookup = null)
         {
             var EAN = rec._EAN;
             if (string.IsNullOrWhiteSpace(EAN))
@@ -351,11 +351,17 @@ namespace UnicontaClient.Pages.CustomPage
                 rec.Item = found._Item;
             }
             else
-                FindOnEANVariant(rec, api);
+                FindOnEANVariant(rec, api, PriceLookup);
         }
 
-        static async void FindOnEANVariant(DCOrderLineClient rec, QueryAPI api)
+        static async void FindOnEANVariant(DCOrderLineClient rec, QueryAPI api, Uniconta.API.DebtorCreditor.FindPrices PriceLookup)
         {
+            if (PriceLookup != null && PriceLookup.UseCustomerPrices)
+            {
+                var found = await PriceLookup.GetCustomerPriceFromEAN(rec);
+                if (found)
+                    return;
+            }
             var ap = new Uniconta.API.Inventory.ReportAPI(api);
             var variant = await ap.GetInvVariantDetail(rec._EAN);
             if (variant != null)
@@ -378,7 +384,7 @@ namespace UnicontaClient.Pages.CustomPage
                 return;
 
             //Check for Variant2 Exist
-            if (string.IsNullOrEmpty(api?.CompanyEntity?._Variant2))
+            if (string.IsNullOrEmpty(api.CompanyEntity?._Variant2))
                 SetVariant2 = false;
 
             var item = (InvItem)items.Get(rec._Item);
@@ -455,7 +461,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         static public Tuple<double, double, double> RecalculateLineSum(IList source, double exRate)
         {
-            double lastTotal = 0d;
+            double lastTotal = 0d, lastCost = 0d;
             double Amountsum = 0d;
             double Costsum = 0d;
             if (source != null)
@@ -480,12 +486,14 @@ namespace UnicontaClient.Pages.CustomPage
                         if (subtotal != orderLine._AmountEntered)
                         {
                             orderLine._AmountEntered = subtotal;
+                            orderLine._CostPrice = Costsum - lastCost;
                             if (orderLine._Price != 0d)
                                 orderLine.Price = 0d; // this will redraw screen 
                             else
                                 orderLine.NotifyPropertyChanged(nameof(orderLine.Total));
                         }
                         lastTotal = Amountsum;
+                        lastCost = Costsum;
                     }
                 }
             }
@@ -500,6 +508,8 @@ namespace UnicontaClient.Pages.CustomPage
             double Amountsum = ret.Item1;
             double Costsum = ret.Item2;
             double sales = ret.Item3;
+            if (Order._EndDiscountPct != 0)
+                sales *= (100d - Order._EndDiscountPct) / 100d;
 
             RibbonBase rb = (RibbonBase)localMenu.DataContext;
             var groups = UtilDisplay.GetMenuCommandsByStatus(rb, true);
@@ -601,13 +611,34 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         CreateProductionOrder(selectedItem);
                     break;
+                case "CreateFromInvoice":
+                    try
+                    {
+                        CWCreateOrderFromQuickInvoice createOrderCW = new CWCreateOrderFromQuickInvoice(api, Order.Account, false, Order);
+                        createOrderCW.Closing +=  delegate
+                        {
+                            if (createOrderCW.DialogResult == true)
+                            {
+                                var orderApi = new OrderAPI(api);
+                                var checkIfCreditNote = createOrderCW.chkIfCreditNote.IsChecked.HasValue ? createOrderCW.chkIfCreditNote.IsChecked.Value : false;
+                                var debtorInvoice = createOrderCW.dgCreateOrderGrid.SelectedItem as DebtorInvoiceLocal;
+                                dgDebtorOfferLineGrid.PasteRows(createOrderCW.debtorOfferLines);
+                            }
+                        };
+                        createOrderCW.Show();
+                    }
+                    catch (Exception ex)
+                    {
+                        UnicontaMessageBox.Show(ex.Message, Uniconta.ClientTools.Localization.lookup("Exception"));
+                    }
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
             RecalculateAmount();
         }
-
+      
         async void CreateProductionOrder(DebtorOfferLineClient offerLine)
         {
             var t = saveGridLocal();
@@ -684,7 +715,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                 var type = dgDebtorOfferLineGrid.TableTypeUser;
                 var Qty = selectedItem._Qty;
-                var lst = new List<UnicontaBaseEntity>();
+                var lst = new List<UnicontaBaseEntity>(list.Length);
                 foreach (var bom in list)
                 {
                     var invJournalLine = Activator.CreateInstance(type) as DebtorOfferLineClient;
@@ -702,6 +733,8 @@ namespace UnicontaClient.Pages.CustomPage
                     invJournalLine._Variant4 = bom._Variant4;
                     invJournalLine._Variant5 = bom._Variant5;
                     item = (InvItem)items.Get(bom._ItemPart);
+                    invJournalLine._Warehouse = bom._Warehouse ?? item._Warehouse ?? selectedItem._Warehouse;
+                    invJournalLine._Location = bom._Location ?? item._Location ?? selectedItem._Location;
                     invJournalLine._CostPriceLine = item._CostPrice;
                     invJournalLine.SetItemValues(item, selectedItem._Storage);
                     invJournalLine._Qty = Math.Round(bom.GetBOMQty(Qty), item._Decimals);

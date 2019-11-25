@@ -10,6 +10,9 @@
     <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh.png" LargeGlyph="refresh.png"/>
   </RibbonItem>
   <RibbonItem>
+    <RibbonItem Action="PageViewMode" ShortcutKey="" LocalizedNameKey="HideOBJ" Parameter="Folders"  LargeGlyph="Folder_32x32.png"/>
+  </RibbonItem>
+  <RibbonItem>
     <RibbonItem Action="ViewDownloadRow" ShortcutKey="F7" LocalizedNameKey="View" LargeGlyph="View_Highlighted_32x32.png" />
     <RibbonItem Action="GenerateJournalLines" LocalizedNameKey="GenerateJournalLines" LargeGlyph="Generate_32x32.png" ShortcutKey="Ctrl+G" />
     <RibbonItem Action="ViewJournalLines" LocalizedNameKey="Journallines" LargeGlyph="Journal_Lines_32x32.png" />
@@ -41,7 +44,7 @@
     <RibbonItem Action="OffSetAccount" LocalizedNameKey="OffSetAccount"  LargeGlyph="Offset_Account_32x32.png"/>
   </RibbonItem>
    <RibbonItem>
-    <RibbonItem Action="FolderWizard" LocalizedNameKey="CreateOBJ" Parameter="Folder" Glyph="Folder_32x32.png" LargeGlyph="Folder_32x32.png"/>
+    <RibbonItem Action="EnvelopeWizard" LocalizedNameKey="CreateOBJ" Parameter="Envelope" Glyph="Folder_32x32.png" LargeGlyph="Folder_32x32.png"/>
   </RibbonItem>
   <RibbonItem>
   <RibbonItem Action="CopyOrMoveVoucher" LocalizedNameKey="CopyOrMoveOBJ" Parameter="Attachments" LargeGlyph="Job_Change_32x32.png" />
@@ -49,8 +52,11 @@
   <RibbonItem>
     <RibbonItem Action="RemoveFromInbox" LocalizedNameKey="RemoveFromInbox" LargeGlyph="Clear_32x32.png" />
   </RibbonItem>
-  <RibbonItem TabId="1" LocalizedNameKey="Folders">
-    <RibbonItem Action="AddFolder"  LocalizedNameKey="Add" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png"/>
-    <RibbonItem Action="EditFolder" LocalizedNameKey="EditOBJ" Parameter="FolderContent" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>
+  <RibbonItem>
+    <RibbonItem Action="ResendToApprover" LocalizedNameKey="ResendToApprover" LargeGlyph="Email_Add_32x32.png" />
+  </RibbonItem>
+  <RibbonItem TabId="1" LocalizedNameKey="Envelopes">
+    <RibbonItem Action="AddEnvelope" LocalizedNameKey="Add" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png"/>
+    <RibbonItem Action="EditEnvelope" LocalizedNameKey="EditOBJ" Parameter="Content" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>
   </RibbonItem>
 </root>

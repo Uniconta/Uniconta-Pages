@@ -34,7 +34,11 @@ namespace UnicontaClient.Pages.CustomPage
         {
             get { return TabControls.ProductionOrders.ToString(); }
         }
-
+        public ProductionOrdersPage(BaseAPI api, string lookupKey)
+            : base(api, lookupKey)
+        {
+            Init(null);
+        }
         public ProductionOrdersPage(BaseAPI API) : base(API, string.Empty)
         {
             Init(null);
@@ -56,7 +60,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgProductionOrders.RowDoubleClick += DgProductionOrders_RowDoubleClick;
-
+            ribbonControl.DisableButtons("SaveGrid");
 #if SILVERLIGHT
             HideMenuItems();
 #endif
@@ -138,7 +142,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "ProductionLines":
                     if (selectedItem != null)
                     {
-                        var olheader = string.Format("{0}:{1},{2}", Uniconta.ClientTools.Localization.lookup("ProductionLines"), selectedItem._DCAccount, selectedItem._OrderNumber);
+                        var olheader = string.Format("{0}: {1}, {2}", Uniconta.ClientTools.Localization.lookup("ProductionLines"), selectedItem._OrderNumber, selectedItem._DCAccount);
                         AddDockItem(TabControls.ProductionOrderLines, dgProductionOrders.syncEntity, olheader);
                     }
                     break;
@@ -164,9 +168,85 @@ namespace UnicontaClient.Pages.CustomPage
                         CreateProductionReport(selectedItem);
                     break;
 #endif
+                case "EditAll":
+                    if (dgProductionOrders.Visibility == Visibility.Visible)
+                        EditAll();
+                    break;
+                case "SaveGrid":
+                    Save();
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
+            }
+        }
+
+        private async void Save()
+        {
+            dgProductionOrders.BusyIndicator.IsBusy = true;
+            var err = await dgProductionOrders.SaveData();
+            if (err != ErrorCodes.Succes)
+                api.AllowBackgroundCrud = true;
+            dgProductionOrders.BusyIndicator.IsBusy = false;
+        }
+
+        bool editAllChecked;
+        private void EditAll()
+        {
+            RibbonBase rb = (RibbonBase)localMenu.DataContext;
+            var iBase = UtilDisplay.GetMenuCommandByName(rb, "EditAll");
+            if (iBase == null) return;
+
+            if (dgProductionOrders.Readonly)
+            {
+                dgProductionOrders.MakeEditable();
+                UserFieldControl.MakeEditable(dgProductionOrders);
+                iBase.Caption = Uniconta.ClientTools.Localization.lookup("LeaveEditAll");
+                ribbonControl.EnableButtons( "SaveGrid");
+                editAllChecked = false;
+            }
+            else
+            {
+                if (IsDataChaged)
+                {
+                    string message = Uniconta.ClientTools.Localization.lookup("SaveChangesPrompt");
+                    CWConfirmationBox confirmationDialog = new CWConfirmationBox(message);
+                    confirmationDialog.Closing += async delegate
+                    {
+                        if (confirmationDialog.DialogResult == null)
+                            return;
+
+                        switch (confirmationDialog.ConfirmationResult)
+                        {
+                            case CWConfirmationBox.ConfirmationResultEnum.Yes:
+                                await dgProductionOrders.SaveData();
+                                break;
+                            case CWConfirmationBox.ConfirmationResultEnum.No:
+                                break;
+                        }
+                        editAllChecked = true;
+                        dgProductionOrders.Readonly = true;
+                        dgProductionOrders.tableView.CloseEditor();
+                        iBase.Caption = Uniconta.ClientTools.Localization.lookup("EditAll");
+                        ribbonControl.DisableButtons( "SaveGrid");
+                    };
+                    confirmationDialog.Show();
+                }
+                else
+                {
+                    dgProductionOrders.Readonly = true;
+                    dgProductionOrders.tableView.CloseEditor();
+                    iBase.Caption = Uniconta.ClientTools.Localization.lookup("EditAll");
+                    ribbonControl.DisableButtons( "DeleteRow");
+                }
+            }
+        }
+
+        public override bool IsDataChaged
+        {
+            get
+            {
+                return editAllChecked ? false : dgProductionOrders.HasUnsavedData;
             }
         }
 
@@ -196,8 +276,9 @@ namespace UnicontaClient.Pages.CustomPage
             if (productionOrderLines != null && productionOrderLines.Length > 0)
             {
                 var productionReportSource = new ProductionStandardReportClient(companyClient, productionOrder, productionOrderLines, getLogo, Uniconta.ClientTools.Localization.lookup("ProductionOrder"));
-                var standardReportSrc = new IProductionStandardReport[] { productionReportSource };
+                var standardReportSrc = new [] { productionReportSource };
                 var standardPrint = new StandardPrintReport(api, standardReportSrc, (int)StandardReports.ProductionOrder);
+                standardPrint.UseReportCache = true;
                 await standardPrint.InitializePrint();
 
                 if (standardPrint?.Report != null)
@@ -228,7 +309,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (postingResult == null)
                         return;
                     if (postingResult.Err != ErrorCodes.Succes)
-                        Utility.ShowJournalError(postingResult, dgProductionOrders);
+                        Utility.ShowJournalError(postingResult, dgProductionOrders, goToLinesMsg:false);
                     else if (invpostingDialog.Simulation)
                     {
                         if (postingResult.SimulatedTrans != null)

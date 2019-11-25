@@ -66,7 +66,7 @@ namespace UnicontaClient.Pages.CustomPage
         protected override bool ShowTableValueButton { get { return true; } }
 #endif
         public CWGenerateInvoice(bool showSimulation = true, string title = "", bool showInputforInvNumber = false, bool askForEmail = false, bool showInvoice = true, bool isShowInvoiceVisible = true, bool showNoEmailMsg = false, string debtorName = "",
-            bool isShowUpdateInv = false, bool isOrderOrQuickInv = false, bool isQuickPrintVisible = true, bool isDebtorOrder = false, bool InvoiceInXML = false, bool isPageCountVisible = true)
+            bool isShowUpdateInv = false, bool isOrderOrQuickInv = false, bool isQuickPrintVisible = true, bool isDebtorOrder = false, bool InvoiceInXML = false, bool isPageCountVisible = true, string AccountName = null)
         {
             this.DataContext = this;
             InitializeComponent();
@@ -82,8 +82,15 @@ namespace UnicontaClient.Pages.CustomPage
                 chkOIOUBL.IsChecked = InvoiceInXML;
             }
 #endif
-            dpDate.DateTime = BasePage.GetSystemDefaultDate();
+            dpDate.DateTime = dpDate.DateTime == DateTime.MinValue ? BasePage.GetSystemDefaultDate() : dpDate.DateTime;
 
+            if (AccountName == null)
+            {
+                RowAccount.Height = new GridLength(0);
+                double h = this.Height - 30;
+                this.Height = h;
+            }
+            else txtAccountName.Text = AccountName;
 
             if (!showSimulation)
             {

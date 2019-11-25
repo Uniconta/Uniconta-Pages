@@ -17,8 +17,8 @@ x:Class="UnicontaClient.Pages.CustomPage.InvItemDetailControl"
         <CorasauControls:CorasauLayoutControl x:FieldModifier="public" x:Name="layoutItems" Orientation="Horizontal"  Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
 
             <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="grpFirst">
-               
-                <CorasauControls:CorasauLayoutGroup View="GroupBox" Width="400" x:Name="Description" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Description}" Orientation="Vertical" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" Width="400" x:Name="grpDescription" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Description}" Orientation="Vertical" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                     <CorasauControls:CorasauLayoutItem FieldName="Item" x:Name="liItem">
                         <CorasauControls:TextEditor Text="{Binding Item}" IsReadOnly="True"/>
                     </CorasauControls:CorasauLayoutItem>
@@ -34,7 +34,7 @@ x:Class="UnicontaClient.Pages.CustomPage.InvItemDetailControl"
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
 
-                <CorasauControls:CorasauLayoutGroup View="GroupBox" Width="400" x:Name="Prices" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Prices}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" Width="400" x:Name="grpPrices" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Prices}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                     <CorasauControls:CorasauLayoutItem FieldName="CostPrice" x:Name="liCostPrice">
                         <StackPanel Orientation="Horizontal">
                             <CorasauControls:DoubleEditor FieldName="CostPrice" IsReadOnly="True"/>
@@ -73,7 +73,7 @@ x:Class="UnicontaClient.Pages.CustomPage.InvItemDetailControl"
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
 
-                <CorasauControls:CorasauLayoutGroup View="GroupBox" Width="400" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Group}" Orientation="Vertical" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" Width="400" x:Name="grpGroup" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Group}" Orientation="Vertical" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                     <CorasauControls:CorasauLayoutItem FieldName="Group" x:Name="liGroup">
                         <CorasauControls:TextEditor x:Name="leGroup" Text="{Binding Group,Mode=TwoWay}" IsReadOnly="True"/>
                     </CorasauControls:CorasauLayoutItem>
@@ -106,7 +106,7 @@ x:Class="UnicontaClient.Pages.CustomPage.InvItemDetailControl"
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
 
-                <CorasauControls:CorasauLayoutGroup View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Settings}"  Orientation="Vertical" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" MinWidth="400">
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpSettings" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Settings}"  Orientation="Vertical" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" MinWidth="400">
                     <CorasauControls:CorasauLayoutItem FieldName="CostModel" x:Name="liCostModel">
                         <CorasauControls:TextEditor  Text="{Binding CostModel}" IsReadOnly="True" />
                     </CorasauControls:CorasauLayoutItem>
@@ -179,7 +179,7 @@ x:Class="UnicontaClient.Pages.CustomPage.InvItemDetailControl"
 
                 </CorasauControls:CorasauLayoutGroup>
 
-                <CorasauControls:CorasauLayoutGroup View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Size}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpSize" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Size}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
 
                     <CorasauControls:CorasauLayoutItem FieldName="Weight" x:Name="liWeight">
                         <StackPanel Orientation="Horizontal">
@@ -210,7 +210,7 @@ x:Class="UnicontaClient.Pages.CustomPage.InvItemDetailControl"
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
 
-                <CorasauControls:CorasauLayoutGroup View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=StockLevels}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpStockLevels" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=StockLevels}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
 
                     <CorasauControls:CorasauLayoutItem FieldName="MinStockLevel" x:Name="liMinStockLevel">
                         <StackPanel Orientation="Horizontal">
@@ -257,8 +257,8 @@ x:Class="UnicontaClient.Pages.CustomPage.InvItemDetailControl"
                         <CorasauControls:TextEditor Text="{Binding AlternativeItem ,Mode=TwoWay}" IsReadOnly="True"/>
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
-                
-                <CorasauControls:CorasauLayoutGroup View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=EUsales}"  Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpEUSales" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=EUsales}"  Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
 
                     <CorasauControls:CorasauLayoutItem FieldName="TariffNumber" x:Name="liTariffNumber">
                         <CorasauControls:TextEditor Text="{Binding TariffNumber,Mode=TwoWay}" IsReadOnly="True"/>

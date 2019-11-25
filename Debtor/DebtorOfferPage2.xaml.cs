@@ -120,8 +120,7 @@ namespace UnicontaClient.Pages.CustomPage
                     editrow.ContactName = Contact.Name;
                     cmbContactName.IsEnabled = false;
                 }
-                if (Prospect != null)
-                    editrow.SetMaster(Prospect);
+                editrow.SetMaster(master); // cound be prospect or project
             }
             else
             {
@@ -333,20 +332,29 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         int contactRefId;
+        void SetContactSource(SQLCache cache, Debtor debtor)
+        {
+            cmbContactName.ItemsSource = ((IEnumerable<Uniconta.DataModel.Contact>)cache?.GetNotNullArray).Where(x => x._DCType == 1 && x._DCAccount == debtor._Account);
+        }
+
         async void BindContact(Debtor debtor)
         {
             if (debtor == null) return;
 
-            contactRefId = editrow._ContactRef;
-            var Comp = api.CompanyEntity;
-            var cache = Comp.GetCache(typeof(Uniconta.DataModel.Contact)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.Contact), api);
-            var items = (cache != null) ? ((IEnumerable<Uniconta.DataModel.Contact>)cache.GetNotNullArray).Where(x => x._DCType == 1 && x._DCAccount == debtor._Account) : null;
-            cmbContactName.ItemsSource = items;
+            var cache = api.GetCache(typeof(Uniconta.DataModel.Contact)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Contact));
+            SetContactSource(cache, debtor);
             cmbContactName.DisplayMember = "KeyName";
 
-            if (contactRefId != 0 && items != null)
+            contactRefId = editrow._ContactRef;
+            if (contactRefId != 0 && cache != null)
             {
-                var contact = items.Where(x => x.RowId == contactRefId).FirstOrDefault();
+                var contact = cache.Get(contactRefId);
+                if (contact == null)
+                {
+                    cache = api.LoadCache(typeof(Uniconta.DataModel.Contact), true).GetAwaiter().GetResult();
+                    contact = cache.Get(contactRefId);
+                    SetContactSource(cache, debtor);
+                }
                 cmbContactName.SelectedItem = contact;
                 if (contact == null)
                 {

@@ -200,7 +200,7 @@ namespace ISO20022CreditTransfer
             creditorCountryId = creditorCountryId ?? string.Empty;
 
             isoPaymentType = BankSpecificSettings.ISOPaymentType(paymentCcy, companyIBAN, creditorIBAN, creditorSWIFT, creditorCountryId, companyCountryId);
-            
+
             if (credPaymFormat._ExportFormat == (byte)ExportFormatType.ISO20022_DK && (CompanyBankEnum == CompanyBankENUM.DanskeBank || CompanyBankEnum == CompanyBankENUM.Nordea_DK || CompanyBankEnum == CompanyBankENUM.Nordea_NO))
             {
                 if (paymentType != PaymentTypes.IBAN && isoPaymentType == ISO20022PaymentTypes.DOMESTIC && paymentCcy == BaseDocument.CCYEUR)
@@ -214,6 +214,12 @@ namespace ISO20022CreditTransfer
             {
                 if (paymentType == PaymentTypes.IBAN && isoPaymentType == ISO20022PaymentTypes.DOMESTIC) //Not sure which banks has this requirement.
                     checkErrors.Add(new CheckError(String.Format("It's not allowed to use IBAN as creditor account for domestic payments.")));
+            }
+
+            if (credPaymFormat._ExportFormat == (byte)ExportFormatType.ISO20022_LT && bankSpecificSettings.CompanyBankEnum == CompanyBankENUM.Standard)
+            {
+                if (isoPaymentType != ISO20022PaymentTypes.SEPA)
+                    checkErrors.Add(new CheckError(String.Format("Only SEPA payments are allowed")));
             }
         }
 

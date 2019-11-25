@@ -2,22 +2,22 @@
 <root>
   <RibbonItem TabId="0" LocalizedNameKey="Home">
     <!---When we create a new group and a new TabPage -->
-   <RibbonItem Action="AddRow" LocalizedNameKey="Add"  Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png" ControlName="DebtorAccountPage2">
-      <RibbonItem Action="AddRow" LocalizedNameKey="Add"  Glyph="Add_16x16.png" LargeShortcutKey="CTRL+N" ControlName="DebtorAccountPage2"/>
+   <RibbonItem Action="AddRow" LocalizedNameKey="Add"  Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png">
+      <RibbonItem Action="AddRow" LocalizedNameKey="Add" ControlName="DebtorAccountPage2"  Glyph="Add_16x16.png" LargeShortcutKey="CTRL+N"/>
       <RibbonItem Action="CopyRecord" LocalizedNameKey="Copy"   Glyph="Copy_16x16.png" LargeShortcutKey="Shift+F2"/>
     </RibbonItem>
     <RibbonItem Action="EditRow" ShortcutKey="Ctrl+E" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>
     <RibbonItem Action="DetailView" LocalizedNameKey="DetailView" Glyph="Detailed_View_32x32.png" LargeGlyph="Detailed_View_32x32.png"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+ALT+R" LocalizedNameKey="Refresh" Glyph="refresh.png" LargeGlyph="refresh.png"/>
+    <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh.png" LargeGlyph="refresh.png"/>
     <RibbonItem Action="Filter" ShortcutKey="Ctrl+I" LocalizedNameKey="Filter" LargeGlyph="Filter_32x32.png"/>
   </RibbonItem>
   <RibbonItem>
     <!---If we want to create a new group in same PageTab-->
      <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32.png">
       <!---If we want Inner menu-->
-      <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey="" ControlName="DebtorAccountPage2"/>
+      <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
       <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16.png" ShortcutKey="" />
       <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveOBJ" Parameter="Layout" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
       <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16.png" ShortcutKey=""/>
@@ -28,51 +28,49 @@
     </RibbonItem>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="Contacts" LocalizedNameKey="Contacts" Module="Contacts" LargeGlyph="Contacts_32x32.png" ShortcutKey=""/>
-    <RibbonItem Action="DeliveryAddresses" LocalizedNameKey="DeliveryAddresses" Module="DeliveryAddress" LargeGlyph="Delivery_32x32.png" ShortcutKey=""/>
+    <RibbonItem Action="Contacts" LocalizedNameKey="Contacts" ControlName="ContactPage" Module="Contacts" LargeGlyph="Contacts_32x32.png" ShortcutKey=""/>
+    <RibbonItem Action="DeliveryAddresses" LocalizedNameKey="DeliveryAddresses" ControlName="WorkInstallationPage" Module="DeliveryAddress" LargeGlyph="Delivery_32x32.png" ShortcutKey=""/>
     <RibbonItem Action="ClientItemNumber" LocalizedNameKey="ClientItemNumber" Module="InvClientName" LargeGlyph="Item_Number_32x32.png" ShortcutKey=""/>
     <RibbonItem Action="CreateMandates" LocalizedNameKey="CreateOBJ" Parameter="Mandates" Module="_DirectDebit" LargeGlyph="Contacts_32x32.png" ShortcutKey=""/>
-    <RibbonItem Action="Prices" LocalizedNameKey="SalesPricesAndDiscounts" Module="InvPrice" LargeGlyph="PriceTag_32x32.png"/>
-    <RibbonItem Action="FollowUp" LocalizedNameKey="FollowUp" Module="CRM" LargeGlyph="CrmFollowUp.png"/>
+    <RibbonItem Action="Prices" LocalizedNameKey="SalesPricesAndDiscounts" ControlName="CustomerPriceListLinePage" Module="InvPrice" LargeGlyph="PriceTag_32x32.png"/>
+    <RibbonItem Action="FollowUp" LocalizedNameKey="FollowUp" ControlName="CrmFollowUpPage" Module="CRM" LargeGlyph="CrmFollowUp.png"/>
     <RibbonItem Module="Attachments" LocalizedNameKey="Attachments" LargeGlyph="Attachments_32x32.png">
-      <RibbonItem Action="AddNote" ShortcutKey="Alt+N" LocalizedNameKey="Note" Glyph="Note_16x16.png"/>
-      <RibbonItem Action="AddDoc" LocalizedNameKey="Document" Glyph="Document_Attachment_16x16.png" ShortcutKey=""/>
+      <RibbonItem Action="AddNote" ShortcutKey="Alt+N" ControlName="UserNotesPage" LocalizedNameKey="Note" Glyph="Note_16x16.png"/>
+      <RibbonItem Action="AddDoc" LocalizedNameKey="Document" ControlName="UserDocsPage" Glyph="Document_Attachment_16x16.png" ShortcutKey=""/>
     </RibbonItem>
   </RibbonItem>
-  <RibbonItem>
-    <RibbonItem Action="DebtorTran" LocalizedNameKey="Transactions" Glyph="Cover_16x16.png" LargeGlyph="Account-statement_32x32.png" ShortcutKey="CTRL+T">
-    </RibbonItem>
-    <RibbonItem Action="OpenTran" LocalizedNameKey="OpenTrans" LargeGlyph="Open_Transaction_32x32.png">
-    </RibbonItem>
-    <RibbonItem Action="DebtorStatement" LocalizedNameKey="Statement" LargeGlyph="Show_Invoice_32x32.png">
-    </RibbonItem>
-    <RibbonItem Action="InvTran" LocalizedNameKey="InvTransactions" LargeGlyph="Inventory_Trans_32x32.png">
-    </RibbonItem>
-    <RibbonItem Action="DebtorTransPivot" LocalizedNameKey="PivotTable" LargeGlyph="Category_Charge_32x32.png" />
+  <RibbonItem LocalizedNameKey="Reports">
+    <RibbonItem Action="DebtorTran" LocalizedNameKey="Transactions" Glyph="Cover_16x16.png" LargeGlyph="Account-statement_32x32.png" ShortcutKey="CTRL+T"/>
+    <RibbonItem Action="OpenTran" LocalizedNameKey="OpenTrans" LargeGlyph="Open_Transaction_32x32.png"/>
+    <RibbonItem Action="DebtorStatement" LocalizedNameKey="Statement" ControlName="DebtorStatement" LargeGlyph="Show_Invoice_32x32.png"/>
+    <RibbonItem Action="InvTran" LocalizedNameKey="InvTransactions" ControlName="InvTransactions" LargeGlyph="Inventory_Trans_32x32.png"/>
+    <RibbonItem Action="DebtorTransPivot" LocalizedNameKey="PivotTable" ControlName="DebtorInvoiceLinesPivotReport" LargeGlyph="Category_Charge_32x32.png" />
   </RibbonItem>
-  <RibbonItem>
-    <RibbonItem Action="Orders" LocalizedNameKey="Orders" LargeGlyph="Orders_32x32.png" Module="Order">
-    </RibbonItem>
-    <RibbonItem Action="Offers" LocalizedNameKey="Offers" LargeGlyph="Offer_32x32.png">
-    </RibbonItem>
-    <RibbonItem Action="Project" LocalizedNameKey="Project" Module="Project" LargeGlyph="Folder_32x32.png"/>
+  <RibbonItem LocalizedNameKey="Sales">
+    <RibbonItem Action="Orders" LocalizedNameKey="Orders" ControlName="DebtorOrdersMultiple" Module="Order" LargeGlyph="Orders_32x32.png"/>
+    <RibbonItem Action="Offers" LocalizedNameKey="Offers" ControlName="DebtorOffers" Module="Order" LargeGlyph="Offer_32x32.png"/>
+    <RibbonItem Action="Project" LocalizedNameKey="Project" ControlName="Project" Module="Project" LargeGlyph="Folder_32x32.png"/>
     <RibbonItem Action="Invoice" LocalizedNameKey="Invoices" LargeGlyph="Invoice_32x32.png">
-         <RibbonItem Action="Invoices" LocalizedNameKey="Invoices" Glyph="AccountInvoice_16x16.png" />
-         <RibbonItem Action="QuickInvoice" LocalizedNameKey="CreateOBJ" Parameter="Invoice" Glyph="Invoice_16x16.png" />
+       <RibbonItem Action="Invoices" LocalizedNameKey="Invoices" ControlName="Invoices" Glyph="AccountInvoice_16x16.png" />
+       <RibbonItem Action="QuickInvoice" LocalizedNameKey="CreateOBJ" Parameter="Invoice" ControlName="CreateInvoicePage" Glyph="Invoice_16x16.png" />
     </RibbonItem>
   </RibbonItem>
   <RibbonItem>    
     <RibbonItem Action="QueriesandReports" LocalizedNameKey="QueriesandReports" LargeGlyph="Statistics_32x32.png">      
-      <RibbonItem Action="AccountStat" LocalizedNameKey="AccountStat" LargeGlyph=""/>
+      <RibbonItem Action="AccountStat" LocalizedNameKey="AccountStat" ControlName="InventoryTotals" LargeGlyph=""/>
       <RibbonItem Action="AccountStatDate" LocalizedNameKey="AccountStatDate" LargeGlyph=""/>
     </RibbonItem>
   </RibbonItem>
   <RibbonItem TabId="1" LocalizedNameKey="EditAll">
-    <RibbonItem Action="EditAll"  LocalizedNameKey="EditAll" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ControlName="DebtorAccountPage2"/>
+    <RibbonItem Action="EditAll"  LocalizedNameKey="EditAll" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>
     <RibbonItem Action="AddLine"  LocalizedNameKey="AddOBJ" Parameter="Debtor" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png"/>
     <RibbonItem Action="CopyRow" LocalizedNameKey="CopyOBJ" Parameter="Debtor" LargeGlyph="Copy_32x32.png"/>
-    <RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="DeleteOBJ" Parameter="Debtor" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png"/>
+    </RibbonItem>
+  <RibbonItem>
+     <RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="DeleteOBJ" Parameter="Debtor" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png"/>
+    <RibbonItem Action="UndoDelete" ShortcutKey="CTRL+Z" LocalizedNameKey="UndoDelete" LargeGlyph="Undo_Delete_32x32.png"/>
+      </RibbonItem>
+   <RibbonItem>
     <RibbonItem Action="SaveGrid" ShortcutKey="CTRL+S" LocalizedNameKey="Save" Glyph="save-16x16.png" LargeGlyph="save-32x32.png"/>
-  </RibbonItem>
-  
+    </RibbonItem>
 </root>

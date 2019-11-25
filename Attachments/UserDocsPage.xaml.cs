@@ -142,7 +142,6 @@ namespace UnicontaClient.Pages.CustomPage
             SetRibbonControl(localMenu, dgDocsGrid);
 
             localMenu.OnItemClicked += localMenu_OnItemClicked;
-            this.BeforeClose += DocumentsInfo_BeforeClose;
 
 #if SILVERLIGHT
             RibbonBase rb = (RibbonBase)localMenu.DataContext;
@@ -251,24 +250,9 @@ namespace UnicontaClient.Pages.CustomPage
         {
             await dgDocsGrid.Filter(null);
             SetColumn();
-
-          
-            var filter = new List<PropValuePair> { PropValuePair.GenereteWhereElements(nameof(DebtorOfferClient.Account), "-1", CompareOperator.Equal) };
-
-            var query = (await api.Query<DebtorOfferClient>(filter)).FirstOrDefault();
-
-            var lines = await api.Query<DebtorOfferLineClient>(query);
-
         }
 
         protected override void LoadCacheInBackGround() { LoadType(typeof(Uniconta.DataModel.AttachmentGroup)); }
-
-        void DocumentsInfo_BeforeClose()
-        {
-#if !SILVERLIGHT
-            docViewer?.Close();
-#endif
-        }
 
         private void localMenu_OnItemClicked(string ActionType)
         {
@@ -306,7 +290,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                 case "ViewDownloadRow":
                     if (selectedItem != null)
-                        ViewDocument(dgDocsGrid.syncEntity);
+                        ViewDocument(TabControls.UserDocsPage3, dgDocsGrid.syncEntity);
                     break;
 
                 case "Save":
@@ -319,35 +303,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-#if !SILVERLIGHT
-        DocumentViewerWindow docViewer;
-#endif
-        void ViewDocument(SynchronizeEntity sourceData)
-        {
-            string header = string.Format("{0} {1}", Uniconta.ClientTools.Localization.lookup("View"), Uniconta.ClientTools.Localization.lookup("Documents"));
-
-#if SILVERLIGHT
-            AddDockItem(TabControls.UserDocsPage3, sourceData, true, header, ";component/Assets/img/View_16x16.png");
-#else
-
-            if (docViewer == null)
-            {
-                docViewer = new DocumentViewerWindow(sourceData as SynchronizeEntity, this.api, header);
-                docViewer.Owner = Uniconta.ClientTools.Util.UtilDisplay.GetCurentWindow();
-                docViewer.Closing += delegate { docViewer.Owner = null; };
-                docViewer.Closed += delegate { docViewer = null; };
-            }
-            if (DocumentViewerWindow.lastHeight != 0)
-            {
-                docViewer.Width = DocumentViewerWindow.lastWidth;
-                docViewer.Height = DocumentViewerWindow.lastHeight;
-            }
-            if (DocumentViewerWindow.isMaximized)
-                docViewer.WindowState = WindowState.Maximized;
-            docViewer.Show();
-#endif
-
-        }
+        
         public override void Utility_Refresh(string screenName, object argument = null)
         {
             if (screenName == TabControls.UserDocsPage2)

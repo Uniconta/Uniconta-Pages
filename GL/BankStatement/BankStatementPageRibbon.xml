@@ -22,19 +22,15 @@
     </RibbonItem>
   </RibbonItem>
   <RibbonItem>
-    <!---When we create new TabPage -->
     <RibbonItem Action="MatchLines" LocalizedNameKey="MatchLines" ControlName="BankStatementLinePage" Glyph="Match_Lines_32x32.png" LargeGlyph="Match_Lines_32x32.png"/>
     <RibbonItem Action="RemoveSettlements" LocalizedNameKey="RemoveOBJ" Parameter="Settlements" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png" />
-    <!--RibbonItem Action="LedgerPosting" LocalizedNameKey="LedgerPostng" LargeGlyph="Posted_Journal_32x32.png"/-->
   </RibbonItem>
-  <RibbonItem>
-    <!---When we create new TabPage -->
+  <RibbonItem LocalizedNameKey="Reports">
     <RibbonItem Action="StLines" LocalizedNameKey="BankStatement" ControName="StatementLine" Glyph="Bank_Statement_32x32.png" LargeGlyph="Bank_Statement_32x32.png"/>
     <RibbonItem Action="GLTrans" LocalizedNameKey="LedgerTransactions" ControlName="StatementLineTransPage" Glyph="Transactions_32x32.png" LargeGlyph="Transactions_32x32.png"/>
   </RibbonItem>
-  <RibbonItem>
-    <!---When we create new TabPage -->
-    <RibbonItem Action="ImportBankStatement" LocalizedNameKey="ImportOBJ" ControlName="ImportGLDailyJournal" Parameter="BankStatement" LargeGlyph="Import_32x32.png"/>
-    <RibbonItem Action="DeleteStatement" LocalizedNameKey="DeleteOBJ" Parameter="BankStatement" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png" />
+  <RibbonItem  LocalizedNameKey="BankStatement">
+    <RibbonItem Action="ImportBankStatement" LocalizedNameKey="LoadFile" ControlName="ImportGLDailyJournal"  LargeGlyph="Import_32x32.png"/>
+    <RibbonItem Action="DeleteStatement" LocalizedNameKey="DeleteOBJ" Parameter="Imported" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png" />
   </RibbonItem>
 </root>

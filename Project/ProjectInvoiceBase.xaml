@@ -29,9 +29,9 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectInvoiceBase"
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FromDate}" Grid.Column="0" Grid.Row="0" Margin="3,3,3,3"/>
-            <CorasauControls:DateEditor x:Name="txtDateFrm" Grid.Column="2" Grid.Row="0" Margin="0,3,3,3"/>
+            <CorasauControls:DateEditor x:Name="txtDateFrm" Height="23" Grid.Column="2" Grid.Row="0" Margin="0,3,3,3"/>
             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ToDate}" Grid.Column="0" Grid.Row="1" Margin="3,3,3,3"/>
-            <CorasauControls:DateEditor x:Name="txtDateTo" Grid.Column="2" Grid.Row="1" Margin="0,3,3,3"/>
+            <CorasauControls:DateEditor x:Name="txtDateTo" Grid.Column="2" Height="23" Grid.Row="1" Margin="0,3,3,3"/>
 
             <StackPanel Orientation="Horizontal"  Grid.Row="0" Grid.Column="3" Margin="0 5 0 0">
                 <StackPanel Orientation="Horizontal" Name="chkBoxStackGroup">

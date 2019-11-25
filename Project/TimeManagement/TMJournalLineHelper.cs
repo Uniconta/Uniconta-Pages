@@ -42,10 +42,12 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
         private Uniconta.DataModel.Employee employee;
         private SQLTableCache<Uniconta.DataModel.EmpPayrollCategory> empPayrollCatList;
         private SQLTableCache<Uniconta.DataModel.ProjectGroup> projGroupList;
+        private SQLTableCache<Uniconta.ClientTools.DataModel.ProjectClient> projCache;
+
 
         #endregion
 
-        public enum TMJournalActionType { Close, Open, Approve }
+        public enum TMJournalActionType { Close, Open, Approve, Validate }
 
         public TMJournalLineHelper(CrudAPI api, Uniconta.DataModel.Employee employee)
         {
@@ -53,15 +55,20 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
             this.employee = employee;
         }
 
+        public TMJournalLineHelper(CrudAPI api)
+        {
+            this.api = api;
+        }
+
         #region Prevalidate
-        public List<TMJournalLineError> PreValidate(double normHoursTotal, SQLTableCache<Uniconta.DataModel.EmpPayrollCategory> empPayrollCatList)
+        public List<TMJournalLineError> PreValidate(TMJournalActionType actionType, double valNormHours, double valRegHours, SQLTableCache<Uniconta.DataModel.EmpPayrollCategory> empPayrollCatList)
         {
             checkErrors = new List<TMJournalLineError>();
 
             this.empPayrollCatList = empPayrollCatList;
 
             PreValidateEmployee();
-            PreValidateNormHours(normHoursTotal);
+            PreValidateCalendar(valNormHours, valRegHours, actionType);
             PreValidatePayrollCategory();
 
             return checkErrors;
@@ -85,13 +92,13 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
         /// <summary>
         /// Validate - Norm Hours
         /// </summary>
-        private void PreValidateNormHours(double normHoursTotal)
+        private void PreValidateCalendar(double valNormHours, double valRegHours, TMJournalActionType actionType)
         {
-            if (normHoursTotal == 0)
+            if ((actionType == TMJournalActionType.Validate || actionType == TMJournalActionType.Close) && (valRegHours - valNormHours) < 0)
             {
                 checkErrors.Add(new TMJournalLineError()
                 {
-                    Message = Uniconta.ClientTools.Localization.lookup("EmployeeNormHoursMissing"),
+                    Message = Uniconta.ClientTools.Localization.lookup("NormHoursNotFulfilled"),
                 });
             }
         }
@@ -122,16 +129,23 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
         #endregion
 
         #region Validate Hours
-        public List<TMJournalLineError> ValidateLinesHours(IEnumerable<TMJournalLineClientLocal> lines, DateTime startDate, DateTime endDate, 
-                                                           EmpPayrollCategoryEmployeeClient[] empPriceLst, SQLTableCache<Uniconta.DataModel.EmpPayrollCategory> empPayrollCatList,
-                                                           SQLTableCache<Uniconta.DataModel.ProjectGroup> projGroupList)
+        public List<TMJournalLineError> ValidateLinesHours(IEnumerable<TMJournalLineClientLocal> lines, 
+                                                           DateTime startDate, 
+                                                           DateTime endDate, 
+                                                           EmpPayrollCategoryEmployeeClient[] empPriceLst,
+                                                           SQLTableCache<Uniconta.DataModel.EmpPayrollCategory> empPayrollCatList,
+                                                           SQLTableCache<Uniconta.ClientTools.DataModel.ProjectClient> projCache,
+                                                           SQLTableCache<Uniconta.DataModel.ProjectGroup> projGroupList,
+                                                           Uniconta.DataModel.Employee employee)
         {
             checkErrors = new List<TMJournalLineError>();
 
             this.empPayrollCatList = empPayrollCatList;
             this.projGroupList = projGroupList;
+            this.projCache = projCache;
             this.comp = api.CompanyEntity;
             this.empPriceLst = empPriceLst;
+            this.employee = employee;
             var approveDate = employee._TMApproveDate;
             this.startDate = approveDate >= startDate ? approveDate.AddDays(1) : startDate;
             this.endDate = endDate;
@@ -190,9 +204,16 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
         /// <summary>
         /// Validate - Prices
         /// </summary>
-        private void ValidateHoursPrice(IEnumerable<TMJournalLineClientLocal> lines)
+        private void ValidateHoursPrice(IEnumerable<TMJournalLineClientLocal> lines) //TODO:TEST
         {
-            SetEmplPrice(lines, empPriceLst, startDate, endDate, true);
+            SetEmplPrice(lines, 
+                         empPriceLst,
+                         this.empPayrollCatList,
+                         this.projCache,
+                         startDate, 
+                         endDate, 
+                         this.employee,
+                         true);
         }
 
         private static string fieldCannotBeEmpty(string field)
@@ -470,21 +491,28 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
 
         #endregion
 
-        public void SetEmplPrice(IEnumerable<TMJournalLineClientLocal> lst, EmpPayrollCategoryEmployeeClient[] empPriceLst, DateTime startDate, DateTime endDate, bool validate = false)
+        public void SetEmplPrice(IEnumerable<TMJournalLineClientLocal> lst, 
+                                 EmpPayrollCategoryEmployeeClient[] empPriceLst, 
+                                 SQLTableCache<Uniconta.DataModel.EmpPayrollCategory> empPayrollCatLst,
+                                 SQLTableCache<Uniconta.ClientTools.DataModel.ProjectClient> projLst,
+                                 DateTime startDate, 
+                                 DateTime endDate,
+                                 Uniconta.DataModel.Employee employee,
+                                 bool validate = false)
         {
 #if !SILVERLIGHT
             bool foundErr;
             try
             {
+                this.employee = employee;
                 int dayOfWeekStart = startDate.DayOfWeek == DayOfWeek.Sunday ? 7 : (int)startDate.DayOfWeek;
                 int dayOfWeekEnd = endDate.DayOfWeek == DayOfWeek.Sunday ? 7 : (int)endDate.DayOfWeek;
 
-
-                var defaultPayrollCategory = empPayrollCatList.Where(s => s.KeyStr == "Default" && s._PrCategory == null).FirstOrDefault(); 
+                var defaultPayrollCategory = empPayrollCatLst.Where(s => s.KeyStr == "Default" && s._PrCategory == null).FirstOrDefault(); 
 
                 foreach (var trans in lst)
                 {
-                    var payrollCat = empPayrollCatList?.Get(trans.PayrollCategory);
+                    var payrollCat = empPayrollCatLst?.Get(trans.PayrollCategory);
 
                     foundErr = false;
                     for (int x = dayOfWeekStart; x <= dayOfWeekEnd; x++)
@@ -506,7 +534,7 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
                             if (prices.Count == 0)
                                 prices = empPriceLst.Where(s => s.Employee == trans.Employee &&
                                                                 s.PayrollCategory == trans.PayrollCategory &&
-                                                                s.Account == trans.ProjectRef.Account &&
+                                                                s.Account == projLst?.Get(trans.Project)._DCAccount &&
                                                                 s.Project == null &&
                                                                (s.ValidTo >= startDate.AddDays(x - 1) || s.ValidTo == DateTime.MinValue) && s.ValidFrom <= startDate.AddDays(x - 1)).ToList();
 
@@ -627,6 +655,10 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
         public class TMJournalLineClientLocal : TMJournalLineClient 
         {
 
+            internal object _projectSource;
+            public object ProjectSource { get { return _projectSource; } }
+
+
             private string _ErrorInfo;
             [Display(Name = "SystemInfo", ResourceType = typeof(DCTransText))]
             public string ErrorInfo { get { return _ErrorInfo; } set { _ErrorInfo = value; NotifyPropertyChanged("ErrorInfo"); } }
@@ -712,45 +744,21 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
                 int _getStatus = 0;
                 if (EmployeeRef._Hired != DateTime.MinValue && date < EmployeeRef._Hired)
                     _getStatus = 3;
-                else if (EmployeeRef._TMCloseDate == DateTime.MinValue && EmployeeRef._TMApproveDate == DateTime.MinValue)
+                else if (EmployeeRef._TMCloseDate == DateTime.MinValue || date > EmployeeRef._TMCloseDate)
                     _getStatus = 0; //Editable
-                else if (date <= EmployeeRef._TMCloseDate && EmployeeRef._TMApproveDate == DateTime.MinValue)
-                    _getStatus = 1; //Non Edittable yellow
-                else if (date <= EmployeeRef._TMCloseDate && date <= EmployeeRef._TMApproveDate)
+                else if (date <= EmployeeRef._TMApproveDate)
                     _getStatus = 2; //Non Edittable green
-                else if (date >= EmployeeRef._TMApproveDate && date <= EmployeeRef._TMCloseDate)
+                else if (date <= EmployeeRef._TMCloseDate)
                     _getStatus = 1; //Non Edittable yellow
-                else if (EmployeeRef._TMCloseDate == DateTime.MinValue && date <= EmployeeRef._TMApproveDate)
-                    _getStatus = 2; //Non Edittable Green
-                else if (date > EmployeeRef._TMCloseDate && date > EmployeeRef._TMApproveDate)
-                {
-                    if (_RowId > 0 && !AllSevenDaysStatus(date))
-                        _getStatus = 3; // Non editable if date is greater then TMClose and TMApprove date
-                }
                 return _getStatus;
             }
 
             bool AllSevenDaysStatus(DateTime Date, bool isStartdate = false)
             {
                 bool _status = false;
-                if (isStartdate && Date > EmployeeRef._TMCloseDate && Date > EmployeeRef._TMApproveDate
-                    && Date.AddDays(6) > EmployeeRef._TMCloseDate && Date.AddDays(6) > EmployeeRef._TMApproveDate)
+                if (isStartdate && Date > EmployeeRef._TMCloseDate)
                     _status = true;
-                if (isStartdate && Date < EmployeeRef._TMCloseDate && Date <= EmployeeRef._TMApproveDate
-                    && EmployeeRef._TMCloseDate < Date.AddDays(6) && EmployeeRef._TMApproveDate < Date.AddDays(6) && EmployeeRef._TMApproveDate != EmployeeRef._TMCloseDate)
-                {
-                    if (Total == 0d || IsFieldEditable())
-                        _status = true;
-                }
-                else if (!isStartdate && Date > EmployeeRef._TMCloseDate && EmployeeRef._TMApproveDate == DateTime.MinValue)
-                    _status = true;
-                else if (!isStartdate && Date > EmployeeRef._TMApproveDate && EmployeeRef._TMCloseDate == DateTime.MinValue)
-                    _status = true;
-                else if (!isStartdate && EmployeeRef._TMApproveDate == EmployeeRef._TMCloseDate && Date > EmployeeRef._TMApproveDate && Date > EmployeeRef._TMCloseDate)
-                    _status = true;
-                else if (!isStartdate && FirstDayOfWeek(Date) > EmployeeRef._TMCloseDate && FirstDayOfWeek(Date) > EmployeeRef._TMApproveDate)
-                    _status = true;
-                else if (!isStartdate && Date > EmployeeRef._TMCloseDate && Date > EmployeeRef._TMApproveDate)
+                if (isStartdate && Date <= EmployeeRef._TMCloseDate && (Total == 0d || IsFieldEditable()))
                     _status = true;
                 return _status;
             }

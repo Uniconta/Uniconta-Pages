@@ -106,7 +106,12 @@ x:Class="UnicontaClient.Pages.CustomPage.CreateCompany"
                             <CorasauControls:CheckEditor x:Name="chkDebtorTransactions" IsChecked="True"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem x:Name="lblImportInvoice">
-                            <CorasauControls:CheckEditor x:Name="chkImportInvoice" IsChecked="True" />
+                            <StackPanel Orientation="Horizontal">
+                                <CorasauControls:CheckEditor x:Name="chkImportInvoice" IsChecked="True" />
+                                <TextBlock Margin="5,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ImportFrom}"/>
+                                <CorasauControls:IntegerEditor Margin="5,0,0,0" SetMask="False" MaskType="RegEx"  Mask="\d+"  x:Name="invoiceDateCounter" Width="35" SetMinWidth="False" HorizontalContentAlignment="Right" />
+                                <TextBlock Margin="3,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Years}"/>
+                            </StackPanel>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem x:Name="lblDimC5" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Dimensions}">
                             <CorasauControls:ComboBoxEditor x:Name="cmbImportDimension" />

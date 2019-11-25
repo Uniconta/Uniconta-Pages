@@ -197,114 +197,147 @@ namespace UnicontaClient.Pages.CustomPage
             var calCommission = new CWCalculateCommission(api);
             calCommission.Closing += async delegate
             {
-                if (calCommission.DialogResult == false)
-                    return;
+                if (calCommission.DialogResult == true)
+                {
+                    var fromDate = calCommission.FromDateTime;
+                    var toDate = calCommission.ToDateTime;
 
-                var fromDate = calCommission.FromDateTime;
-                var toDate = calCommission.ToDateTime;
+                    var commAll = ((IList)dgEmployeeCommissionGrid.ItemsSource).Cast<EmployeeCommissionClient>();
+                    var commlstLine = new List<EmployeeCommissionClient>();
+                    var commlstHead = new List<EmployeeCommissionClient>();
+                    var employee = (master as Uniconta.DataModel.Employee)?._Number;
 
-                var commAll = ((IList)dgEmployeeCommissionGrid.ItemsSource).Cast<EmployeeCommissionClient>();
-                var commlstLine = new List<EmployeeCommissionClient>();
-                var commlstHead = new List<EmployeeCommissionClient>();
-                var employee = (master as Uniconta.DataModel.Employee)?._Number;
+                    var company = api.CompanyEntity;
+                    var debtors = company.GetCache(typeof(Uniconta.DataModel.Debtor)) ??
+                                           await company.LoadCache(typeof(Uniconta.DataModel.Debtor), api);
 
-                var company = api.CompanyEntity;
-                var debtors = company.GetCache(typeof(Uniconta.DataModel.Debtor)) ??
-                                       await company.LoadCache(typeof(Uniconta.DataModel.Debtor), api);
+                    var invItems = company.GetCache(typeof(Uniconta.DataModel.InvItem)) ??
+                           await company.LoadCache(typeof(Uniconta.DataModel.InvItem), api);
 
-                var invItems = company.GetCache(typeof(Uniconta.DataModel.InvItem)) ??
-                       await company.LoadCache(typeof(Uniconta.DataModel.InvItem), api);
-
-                var propValuePairList = new List<PropValuePair>()
+                    var propValuePairList = new List<PropValuePair>()
                 {
                     PropValuePair.GenereteWhereElements("Date", typeof(DateTime), string.Format("{0}..{1}", fromDate.ToShortDateString(), toDate.ToShortDateString())),
                     PropValuePair.GenereteWhereElements("Disabled", typeof(int), "0")
                 };
-                var invoiceHeaders = await api.Query<DebtorInvoiceClient>(dgEmployeeCommissionGrid.masterRecords, propValuePairList);
-                foreach (var rec in commAll)
-                {
-                    if (rec._Disabled)
-                        continue;
-
-                    if (rec._FromDate != DateTime.MinValue && rec._FromDate > toDate)
-                        continue;
-
-                    if (rec._ToDate != DateTime.MinValue && rec._ToDate < fromDate)
-                        continue;
-
-                    if (employee !=null && employee != rec._Employee)
-                        continue;
-
-                    if (rec._PerLine)
-                        commlstLine.Add(rec);
-                    else
-                        commlstHead.Add(rec);
-                }
-
-                var sort = new EmployeeCommissionClientSort();
-                commlstLine.Sort(sort);
-                commlstHead.Sort(sort);
-
-                var calComs = new List<CalCommissionClient>();
-                if (commlstLine.Count > 0)
-                {
-                    propValuePairList.RemoveAt(1); // remove disabled
-                    propValuePairList.Add(PropValuePair.GenereteWhereElements("MovementType", typeof(int), "1"));
-
-                    var trans = await api.Query<InvTransClient>(dgEmployeeCommissionGrid.masterRecords, propValuePairList); //sandt
-                    if (trans != null)
+                    var invoiceHeaders = await api.Query<DebtorInvoiceClient>(dgEmployeeCommissionGrid.masterRecords, propValuePairList);
+                    foreach (var rec in commAll)
                     {
-                        // lets sort invoices so we can find employee on invoice header
-                        var invSort = new InvoiceSort();
-                        DebtorInvoiceClient invKey = null;
-                        if (invoiceHeaders != null && invoiceHeaders.Length > 0)
-                        {
-                            Array.Sort(invoiceHeaders, invSort);
-                            invKey = new DebtorInvoiceClient();
-                        }
+                        if (rec._Disabled)
+                            continue;
 
-                        foreach (var tran in trans)
-                        {
-                            var item = tran._Item;
-                            var acc = tran._DCAccount;
-                            var emp = tran._Employee;
-                            string debGroup = null;
-                            string itemGroup = null;
+                        if (rec._FromDate != DateTime.MinValue && rec._FromDate > toDate)
+                            continue;
 
-                            if (item != null)
+                        if (rec._ToDate != DateTime.MinValue && rec._ToDate < fromDate)
+                            continue;
+
+                        if (employee != null && employee != rec._Employee)
+                            continue;
+
+                        if (rec._PerLine)
+                            commlstLine.Add(rec);
+                        else
+                            commlstHead.Add(rec);
+                    }
+
+                    var sort = new EmployeeCommissionClientSort();
+                    commlstLine.Sort(sort);
+                    commlstHead.Sort(sort);
+
+                    var calComs = new List<CalCommissionClient>();
+                    if (commlstLine.Count > 0)
+                    {
+                        propValuePairList.RemoveAt(1); // remove disabled
+                        propValuePairList.Add(PropValuePair.GenereteWhereElements("MovementType", typeof(int), "1"));
+
+                        var trans = await api.Query<InvTransClient>(dgEmployeeCommissionGrid.masterRecords, propValuePairList); //sandt
+                        if (trans != null)
+                        {
+                            // lets sort invoices so we can find employee on invoice header
+                            var invSort = new InvoiceSort();
+                            DebtorInvoiceClient invKey = null;
+                            if (invoiceHeaders != null && invoiceHeaders.Length > 0)
                             {
-                                var inv = (InvItem)invItems.Get(item);
-                                itemGroup = inv?._Group;
+                                Array.Sort(invoiceHeaders, invSort);
+                                invKey = new DebtorInvoiceClient();
                             }
+
+                            foreach (var tran in trans)
+                            {
+                                var item = tran._Item;
+                                var acc = tran._DCAccount;
+                                var emp = tran._Employee;
+                                string debGroup = null;
+                                string itemGroup = null;
+
+                                if (item != null)
+                                {
+                                    var inv = (InvItem)invItems.Get(item);
+                                    itemGroup = inv?._Group;
+                                }
+                                if (acc != null)
+                                {
+                                    var deb = (Debtor)debtors.Get(acc);
+                                    debGroup = deb?._Group;
+                                }
+                                if (emp == null && invKey != null)
+                                {
+                                    invKey._InvoiceNumber = tran._InvoiceNumber;
+                                    invKey._DCAccount = tran._DCAccount;
+                                    invKey._Date = tran._Date;
+                                    var pos = Array.BinarySearch(invoiceHeaders, invKey, invSort);
+                                    if (pos >= 0 && pos < invoiceHeaders.Length)
+                                    {
+                                        var rec = invoiceHeaders[pos];
+                                        emp = tran._Employee = rec._Employee;
+                                    }
+                                }
+
+                                foreach (var c in commlstLine)
+                                {
+                                    var cmp = string.Compare(c._Employee, emp);
+                                    if (cmp > 0)
+                                        break;
+
+                                    if (cmp == 0 &&
+                                         CompareKey(c._Item, item) && CompareKey(c._Account, acc) && CompareKey(c._ItemGroup, itemGroup) &&
+                                         CompareKey(c._DebGroup, debGroup))
+                                    {
+                                        var calculatedCommission = CalculateCommissionInvTran(tran, c);
+                                        if (calculatedCommission == null || calculatedCommission._Commission == 0)
+                                            continue;
+
+                                        calComs.Add(calculatedCommission);
+
+                                        if (!c._KeepLooking)
+                                            break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (commlstHead.Count > 0 && invoiceHeaders != null)
+                    {
+                        foreach (var it in invoiceHeaders)
+                        {
+                            string debGroup = null;
+                            var emp = it._Employee;
+                            var acc = it._DCAccount;
                             if (acc != null)
                             {
                                 var deb = (Debtor)debtors.Get(acc);
                                 debGroup = deb?._Group;
                             }
-                            if (emp == null && invKey != null)
-                            {
-                                invKey._InvoiceNumber = tran._InvoiceNumber;
-                                invKey._DCAccount = tran._DCAccount;
-                                invKey._Date = tran._Date;
-                                var pos = Array.BinarySearch(invoiceHeaders, invKey, invSort);
-                                if (pos >= 0 && pos < invoiceHeaders.Length)
-                                {
-                                    var rec = invoiceHeaders[pos];
-                                    emp = tran._Employee = rec._Employee;
-                                }
-                            }
 
-                            foreach (var c in commlstLine)
+                            foreach (var c in commlstHead)
                             {
                                 var cmp = string.Compare(c._Employee, emp);
                                 if (cmp > 0)
                                     break;
 
-                                if (cmp == 0 &&
-                                     CompareKey(c._Item, item) && CompareKey(c._Account, acc) && CompareKey(c._ItemGroup, itemGroup) &&
-                                     CompareKey(c._DebGroup, debGroup))
+                                if (cmp == 0 && CompareKey(c._Account, acc) && CompareKey(c._DebGroup, debGroup))
                                 {
-                                    var calculatedCommission = CalculateCommissionInvTran(tran, c);
+                                    var calculatedCommission = CalculateCommissionDebInvoice(it, c);
                                     if (calculatedCommission == null || calculatedCommission._Commission == 0)
                                         continue;
 
@@ -316,51 +349,19 @@ namespace UnicontaClient.Pages.CustomPage
                             }
                         }
                     }
-                }
-                if (commlstHead.Count > 0 && invoiceHeaders != null)
-                {
-                    foreach (var it in invoiceHeaders)
+                    if (calComs.Count <= 0)
                     {
-                        string debGroup = null;
-                        var emp = it._Employee;
-                        var acc = it._DCAccount;
-                        if (acc != null)
-                        {
-                            var deb = (Debtor)debtors.Get(acc);
-                            debGroup = deb?._Group;
-                        }
-
-                        foreach (var c in commlstHead)
-                        {
-                            var cmp = string.Compare(c._Employee, emp);
-                            if (cmp > 0)
-                                break;
-
-                            if (cmp == 0 && CompareKey(c._Account, acc) && CompareKey(c._DebGroup, debGroup))
-                            {
-                                var calculatedCommission = CalculateCommissionDebInvoice(it, c);
-                                if (calculatedCommission == null || calculatedCommission._Commission == 0)
-                                    continue;
-
-                                calComs.Add(calculatedCommission);
-
-                                if (!c._KeepLooking)
-                                    break;
-                            }
-                        }
+                        UnicontaMessageBox.Show(Localization.lookup("NoRecordExport"), Uniconta.ClientTools.Localization.lookup("Message"));
+                        return;
                     }
+                    var arr = calComs.ToArray();
+                    Array.Sort(arr, new CalCommissionClientSort());
+                    AddDockItem(TabControls.CalculatedCommissionPage, new object[] { arr }, Uniconta.ClientTools.Localization.lookup("CalculateCommission"), null, true);
                 }
-                if (calComs.Count <= 0)
-                {
-                    UnicontaMessageBox.Show(Localization.lookup("NoRecordExport"), Uniconta.ClientTools.Localization.lookup("Message"));
-                    return;
-                }
-                var arr = calComs.ToArray();
-                Array.Sort(arr, new CalCommissionClientSort());
-                AddDockItem(TabControls.CalculatedCommissionPage, new object[] { arr }, Uniconta.ClientTools.Localization.lookup("CalculateCommission"), null, true);
             };
             calCommission.Show();
         }
+
         static bool CompareKey(string filter, string value)
         {
             return filter == null || filter == value;

@@ -58,8 +58,7 @@ namespace ISO20022CreditTransfer
             List<CheckError> checkErrors = new List<CheckError>();
 
             var credCache = company.GetCache(typeof(Uniconta.DataModel.Creditor));
-
-            doc.AllowedCharactersRegEx = bankSpecific.AllowedCharactersRegEx();
+            bankSpecific.AllowedCharactersRegEx(false);
             doc.ReplaceCharactersRegExDict = bankSpecific.ReplaceCharactersRegEx();
            
             doc.CompanyBank = bankSpecific.CompanyBank();
@@ -71,8 +70,8 @@ namespace ISO20022CreditTransfer
 
             doc.CreDtTm = bankSpecific.CreDtTim();
             doc.NumberDecimalDigits = 2;
-            doc.IdentificationId = bankSpecific.IdentificationId(bankAccount._ContractId, company._Id);
-            doc.DebtorIdentificationCode = bankSpecific.DebtorIdentificationCode(bankAccount._BankCompanyId); 
+            doc.IdentificationId = bankSpecific.IdentificationId(bankAccount._ContractId, company._Id);  //Field Bank "Identifikation af aftalen"
+            doc.DebtorIdentificationCode = bankSpecific.DebtorIdentificationCode(bankAccount._BankCompanyId); //Field Bank "Kunde-Id"
 
             doc.IdentificationCode = bankSpecific.IdentificationCode();
             doc.CompanyName = bankSpecific.CompanyName(company.Name);
@@ -129,6 +128,7 @@ namespace ISO20022CreditTransfer
 
                 var creditor = (Creditor)credCache.Get(rec.Account);
 
+                rec.internationalPayment = bankSpecific.InternationalPayment(bankAccount._IBAN, IBANnumber, BICnumber, UnicontaCountryToISO(creditor._Country), doc.CompanyCountryId);
                 doc.ISOPaymentType = bankSpecific.ISOPaymentType(currency, bankAccount._IBAN, IBANnumber, BICnumber, UnicontaCountryToISO(creditor._Country), doc.CompanyCountryId);
                 rec.ISOPaymentType = doc.ISOPaymentType.ToString();
             }
@@ -146,6 +146,8 @@ namespace ISO20022CreditTransfer
 
             foreach (var rec in queryPaymentTransSorted)
             {
+                bankSpecific.AllowedCharactersRegEx(rec.internationalPayment);
+
                 doc.HeaderNumberOfTrans++;
                 doc.PmtInfNumberOfTransActive = bankSpecific.PmtInfNumberOfTransActive();
 
@@ -158,9 +160,9 @@ namespace ISO20022CreditTransfer
                 string currency = rec._CurrencyLocal;
                 currency = string.IsNullOrEmpty(currency) ? doc.CompanyCcy : currency;
 
-                doc.EndToEndId = bankSpecific.EndtoendId(rec._PaymentRefId);
+                doc.EndToEndId = bankSpecific.EndtoendId(rec.PaymentEndToEndId);
 
-                if (doMergePayment)
+                if (doMergePayment && rec.MergePaymId != UnicontaClient.Pages.Creditor.Payments.StandardPaymentFunctions.MERGEID_SINGLEPAYMENT)
                     doc.PaymentInfoId = bankSpecific.PaymentInfoId(doc.NumberSeqPaymentFileId, doc.EndToEndId);
                 else 
                     doc.PaymentInfoId = bankSpecific.PaymentInfoId(doc.NumberSeqPaymentFileId, doc.RequestedExecutionDate, currency, rec.ISOPaymentType, doc.CompanyPaymentMethod, rec._PaymentMethod);
@@ -181,9 +183,6 @@ namespace ISO20022CreditTransfer
 
                 PostalAddress creditorAddress = new PostalAddress();
                 creditorAddress = bankSpecific.CreditorAddress(creditor, creditorAddress);
-
-                //if (creditor._Country != 0)
-                //    creditorAddress.CountryId = UnicontaCountryToISO(creditor._Country);
 
                 string credBankName = string.Empty;
                 string credBankCountryId = UnicontaCountryToISO(creditor._Country);  
@@ -249,7 +248,7 @@ namespace ISO20022CreditTransfer
                 doc.ExtServiceCode = bankSpecific.ExtServiceCode(doc.ISOPaymentType); 
                 doc.ExternalLocalInstrument = bankSpecific.ExternalLocalInstrument(currency, doc.RequestedExecutionDate);
                 doc.InstructionPriority = bankSpecific.InstructionPriority();
-                doc.ExtCategoryPurpose = bankSpecific.ExtCategoryPurpose();
+                doc.ExtCategoryPurpose = bankSpecific.ExtCategoryPurpose(doc.ISOPaymentType);
                 doc.ExcludeSectionCdtrAgt = bankSpecific.ExcludeSectionCdtrAgt(doc.ISOPaymentType, creditorBIC);
 
                 isOCRPayment = string.IsNullOrEmpty(creditorOCRPaymentId) ? false : true;

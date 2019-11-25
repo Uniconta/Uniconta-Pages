@@ -225,10 +225,34 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrderLines"
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="ItemName" Width="200" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="InvItemWarehouse" FieldName="Warehouse" Width="100"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="InvItemLocation" FieldName="Location" Width="100"/>
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Available" Width="80" />
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="inItemQty" FieldName="Qty" Width="80"/>
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="QtyReserved" Width="80"/>
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="QtyOrdered" Width="80"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Available" Width="80">
+                                    <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                                        <DataTemplate>
+                                            <CorasauControls:TextEditor  x:Name="PART_Editor" HorizontalContentAlignment="Right" Mask="{Binding Path=DataContext.RowData.Row.Decimals,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource MaskConverter},ConverterParameter=Decimals}" MaskUseAsDisplayFormat="True" MaskType="Numeric" EditValue="{Binding Path=DataContext.RowData.Row.Available,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}"/>
+                                        </DataTemplate>
+                                    </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                                </localPage:CorasauDataGridTemplateColumnClient>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="inItemQty" FieldName="Qty" Width="80">
+                                    <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                                        <DataTemplate>
+                                            <CorasauControls:TextEditor  x:Name="PART_Editor" HorizontalContentAlignment="Right" Mask="{Binding Path=DataContext.RowData.Row.Decimals,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource MaskConverter},ConverterParameter=Decimals}" MaskUseAsDisplayFormat="True" MaskType="Numeric" EditValue="{Binding Path=DataContext.RowData.Row.Qty,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}"/>
+                                        </DataTemplate>
+                                    </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                                </localPage:CorasauDataGridTemplateColumnClient>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="QtyReserved" Width="80">
+                                    <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                                        <DataTemplate>
+                                            <CorasauControls:TextEditor  x:Name="PART_Editor" HorizontalContentAlignment="Right" Mask="{Binding Path=DataContext.RowData.Row.Decimals,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource MaskConverter},ConverterParameter=Decimals}" MaskUseAsDisplayFormat="True" MaskType="Numeric" EditValue="{Binding Path=DataContext.RowData.Row.QtyReserved,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}"/>
+                                        </DataTemplate>
+                                    </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                                </localPage:CorasauDataGridTemplateColumnClient>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="QtyOrdered" Width="80">
+                                    <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                                        <DataTemplate>
+                                            <CorasauControls:TextEditor  x:Name="PART_Editor" HorizontalContentAlignment="Right" Mask="{Binding Path=DataContext.RowData.Row.Decimals,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource MaskConverter},ConverterParameter=Decimals}" MaskUseAsDisplayFormat="True" MaskType="Numeric" EditValue="{Binding Path=DataContext.RowData.Row.QtyOrdered,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}"/>
+                                        </DataTemplate>
+                                    </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                                </localPage:CorasauDataGridTemplateColumnClient>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="MinStockLevel" Width="80"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="MaxStockLevel" Width="80"/>
                             </localPage:InvItemStorageClientGrid.Columns>

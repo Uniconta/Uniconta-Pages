@@ -153,8 +153,6 @@ namespace UnicontaClient.Pages.CustomPage
             link.PaperKind = System.Drawing.Printing.PaperKind.A4;
             link.PrintingSystem.ExportOptions.Html.EmbedImagesInHTML = true;
             ExportOptions options = link.PrintingSystem.ExportOptions;
-            options.Xls.ExportMode = XlsExportMode.SingleFile;
-            options.Xlsx.ExportMode = XlsxExportMode.SingleFile;
             ExportOptionKind[] OptionsKinds = new ExportOptionKind[]{
                 ExportOptionKind.PdfConvertImagesToJpeg,
                 ExportOptionKind.PdfACompatibility,
@@ -402,7 +400,7 @@ namespace UnicontaClient.Pages.CustomPage
         public Visibility IsVisible { get; set; }
         public FontWeight isBold { get; set; }
         public byte[] Line { get; set; }
-
+        public string Underline { get; set; }
         public Visibility isSumOrExpression { get; set; }
 
         public int Dim1Width { get { return hdrData.Dim1Width; } }

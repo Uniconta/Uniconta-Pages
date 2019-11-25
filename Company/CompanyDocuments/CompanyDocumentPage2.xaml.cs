@@ -103,16 +103,22 @@ namespace UnicontaClient.Pages.CustomPage
         }
         async void SaveDoc()
         {
-            await saveForm();
-            var companyClient = api.CompanyEntity as CompanyClient;
+            closePageOnSave = false;
+            var recordSaved = await saveForm();
 
-            if (companyDocumentClientRow.UseFor == CompanyDocumentUse.TopBarLogo)
+            if (recordSaved)
             {
-                companyClient.TopBarLogo = null;
-                globalEvents.NotifyCompanyLogoUpdate(this, new CompanyEventArgs(companyClient));
+                var companyClient = api.CompanyEntity as CompanyClient;
+
+                if (companyDocumentClientRow.UseFor == CompanyDocumentUse.TopBarLogo)
+                {
+                    companyClient.TopBarLogo = null;
+                    globalEvents?.NotifyCompanyLogoUpdate(this, new CompanyEventArgs(companyClient));
+                }
+                else if (companyDocumentClientRow.UseFor == CompanyDocumentUse.CompanyLogo)
+                    companyClient.Logo = null;
             }
-            else if(companyDocumentClientRow.UseFor == CompanyDocumentUse.CompanyLogo)
-                companyClient.Logo = null;
+            dockCtrl.CloseDockItem();
         }
         async void DeleteDoc()
         {
@@ -123,7 +129,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (companyDocumentClientRow.UseFor == CompanyDocumentUse.TopBarLogo)
             {
                 companyClient.TopBarLogo = null;
-                globalEvents.NotifyCompanyLogoUpdate(this, new CompanyEventArgs(companyClient));
+                globalEvents?.NotifyCompanyLogoUpdate(this, new CompanyEventArgs(companyClient));
             }
             else if (companyDocumentClientRow.UseFor == CompanyDocumentUse.CompanyLogo)
                 companyClient.Logo = null;

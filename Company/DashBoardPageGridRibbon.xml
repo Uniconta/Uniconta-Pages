@@ -25,6 +25,5 @@
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="OpenDashboard" LocalizedNameKey="DashBoard" Glyph=";component/Assets/img/GanttChart_32x32.png" LargeGlyph=";component/Assets/img/GanttChart_32x32.png"/>
-   <RibbonItem Action="CompareData" LocalizedNameKey="CompareData" Glyph="" LargeGlyph=";component/Assets/img/Match_32x32.png"/>
   </RibbonItem>
 </root>

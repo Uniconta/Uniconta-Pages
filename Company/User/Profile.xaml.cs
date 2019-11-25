@@ -177,11 +177,36 @@ namespace UnicontaClient.Pages.CustomPage
                 case "UserLoginHistory":
                     AddDockItem(TabControls.AllUsersLoginHistoryPage, api.session.User, string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("UserLoginHistory"), editrow._Name));
                     break;
+                case "PasswordOnEmail":
+                    SetEmailPassowrd();
+                    break;
                 default:
                     frmRibbon_BaseActions(ActionType);
                     break;
             }
         }
+
+        async void SetEmailPassowrd()
+        {
+            var employee = await api.Query<Uniconta.DataModel.Employee>(editrow);
+            if (employee.FirstOrDefault() != null)
+            {
+                var cw = new CwSetEmailPassword(employee.FirstOrDefault() as Uniconta.DataModel.Employee);
+                cw.Closing += async delegate
+                 {
+                     if (cw.DialogResult == true)
+                     {
+                         var empApi = new EmployeeAPI(api);
+                         var result = await empApi.SetPasswordOnEmployee(cw.Password);
+                         UtilDisplay.ShowErrorCode(result);
+                     }
+                 };
+                cw.Show();
+            }
+            else
+                UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("UserNotEmployee"), editrow.Name), Uniconta.ClientTools.Localization.lookup("Error"));
+        }
+
         public static async void DownloadLatestXap(CrudAPI api, System.Windows.Threading.Dispatcher Dispatcher)
         {
             CWConfirmationBox dialog = new CWConfirmationBox(Uniconta.ClientTools.Localization.lookup("AreYouSureToContinue"), Uniconta.ClientTools.Localization.lookup("Confirmation"), false);
@@ -209,7 +234,12 @@ namespace UnicontaClient.Pages.CustomPage
                                     return;
                                 }
                             }));
-                            File.WriteAllBytes(string.Format("{0}application.xap", path), buffer);
+                            using (var file = File.Create(path + "application.xap"))
+                            {
+                                buffer.CopyTo(file);
+                            }
+                            buffer.Release();
+
                             Dispatcher.BeginInvoke(new Action(() => { UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("SlUpdate"), Uniconta.ClientTools.Localization.lookup("Message")); }));
                         }
                         catch (Exception ex)

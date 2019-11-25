@@ -134,8 +134,8 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         var selectedItem = proj as ProjectClient;
                         debtorOrderInstance = Activator.CreateInstance(debtorOrderType) as DebtorOrderClient;
-                        var result = await invoiceApi.CreateOrderFromProject(debtorOrderInstance, selectedItem._Number, cwCreateOrder.InvoiceCategory, cwCreateOrder.GenrateDate,
-                            cwCreateOrder.FromDate, cwCreateOrder.ToDate);
+                        var result = await invoiceApi.CreateOrderFromProject(debtorOrderInstance, selectedItem._Number, CWCreateOrderFromProject.InvoiceCategory, CWCreateOrderFromProject.GenrateDate,
+                            CWCreateOrderFromProject.FromDate, CWCreateOrderFromProject.ToDate);
 
                         if (result != Uniconta.Common.ErrorCodes.Succes)
                         {
@@ -381,9 +381,9 @@ namespace UnicontaClient.Pages.CustomPage
 
                 if (isInitializedSuccess)
                 {
-                    DebtorInvoiceReportClient standardDebtorInvoice = new DebtorInvoiceReportClient(debtorInvoicePrint.Company, debtorInvoicePrint.Debtor, debtorInvoicePrint.DebtorInvoice, debtorInvoicePrint.InvTransInvoiceLines, debtorInvoicePrint.DebtorOrder,
+                    var standardDebtorInvoice = new DebtorInvoiceReportClient(debtorInvoicePrint.Company, debtorInvoicePrint.Debtor, debtorInvoicePrint.DebtorInvoice, debtorInvoicePrint.InvTransInvoiceLines, debtorInvoicePrint.DebtorOrder,
                         debtorInvoicePrint.CompanyLogo, debtorInvoicePrint.ReportName, isCreditNote: debtorInvoicePrint.IsCreditNote, messageClient: debtorInvoicePrint.MessageClient);
-                    standardPrint = new StandardPrintReport(api, new IDebtorStandardReport[1] { standardDebtorInvoice }, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.Invoice);
+                    standardPrint = new StandardPrintReport(api, new [] { standardDebtorInvoice }, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.Invoice);
                     standardPrint = new LayoutPrintReport(api, invoicePostingResult, layoutType);
                 }
                 await standardPrint.InitializePrint();

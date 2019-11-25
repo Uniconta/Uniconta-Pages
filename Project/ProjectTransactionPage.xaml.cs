@@ -19,6 +19,7 @@ using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
 using Uniconta.Common;
+using System.Threading.Tasks;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -32,6 +33,9 @@ namespace UnicontaClient.Pages.CustomPage
     {
         public override string NameOfControl { get { return TabControls.ProjectTransactionPage; } }
 
+        ItemBase iIncludeSubProBase;
+        static bool includeSubProject;
+        UnicontaBaseEntity master;
         protected override Filter[] DefaultFilters()
         {
             if (dgProjectTransaction.masterRecords != null)
@@ -84,26 +88,30 @@ namespace UnicontaClient.Pages.CustomPage
             SetHeader(header);
         }
 
-        void InitializePage(UnicontaBaseEntity master)
+        void InitializePage(UnicontaBaseEntity _master)
         {
             this.DataContext = this;
+            master = _master;
             SetRibbonControl(localMenu, dgProjectTransaction);
-
+            RibbonBase rb = (RibbonBase)localMenu.DataContext;
             if (master != null)
             {
                 dgProjectTransaction.UpdateMaster(master);
                 ribbonControl.DisableButtons("Save");
             }
             else
-            {
-                RibbonBase rb = (RibbonBase)localMenu.DataContext;
                 UtilDisplay.RemoveMenuCommand(rb, new string[] { "EditAll", "Save" });
-            }
+
+            if (master is Uniconta.DataModel.Project)
+                iIncludeSubProBase = UtilDisplay.GetMenuCommandByName(rb, "InclSubProjects");
+            else
+                UtilDisplay.RemoveMenuCommand(rb, "InclSubProjects");
 
             dgProjectTransaction.api = api;
             dgProjectTransaction.BusyIndicator = busyIndicator;
             dgProjectTransaction.ShowTotalSummary();
             localMenu.OnItemClicked += LocalMenu_OnItemClicked;
+            localMenu.OnChecked += LocalMenu_OnChecked;
         }
 
         protected override void OnLayoutLoaded()
@@ -155,12 +163,11 @@ namespace UnicontaClient.Pages.CustomPage
                     if (dgProjectTransaction.HasUnsavedData)
                         Utility.ShowConfirmationOnRefreshGrid(dgProjectTransaction);
                     else
-                        dgProjectTransaction.Filter(null);
+                        InitQuery();
                     break;
                 case "Filter":
                     if (dgProjectTransaction.HasUnsavedData)
                         Utility.ShowConfirmationOnRefreshGrid(dgProjectTransaction);
-
                     gridRibbon_BaseActions(ActionType);
                     break;
                 case "PostedBy":
@@ -171,6 +178,37 @@ namespace UnicontaClient.Pages.CustomPage
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
+        }
+
+        async Task LoadGrid()
+        {
+            List<PropValuePair> filter = new List<PropValuePair>();
+            if (includeSubProject)
+            {
+                var propValuePairFolder = PropValuePair.GenereteParameter("IncludeSubProject", typeof(string), "1");
+                filter.Add(propValuePairFolder);
+            }
+            await dgProjectTransaction.Filter(filter);
+        }
+
+        public override Task InitQuery()
+        {
+            if (master is Uniconta.DataModel.Project)
+                return ShowInculdeSubProject();
+            else
+                return base.InitQuery();
+        }
+
+        private void LocalMenu_OnChecked(string actionType, bool IsChecked)
+        {
+            includeSubProject = IsChecked;
+            ShowInculdeSubProject();
+        }
+
+        Task ShowInculdeSubProject()
+        {
+            iIncludeSubProBase.IsChecked = includeSubProject;
+            return LoadGrid();
         }
 
         async private void JournalPosted(ProjectTransClient selectedItem)

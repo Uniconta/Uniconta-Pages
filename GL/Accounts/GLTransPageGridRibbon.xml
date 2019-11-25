@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<root>
+  <RibbonItem TabId="0" LocalizedNameKey="Home">
+    <!---When we create a new group and a new TabPage -->
+    <RibbonItem Action="Export" LocalizedNameKey="CreateExportFile" LargeGlyph="Export_32x32.png">
+      <RibbonItem Action="ExportToCSV" LocalizedNameKey="CSV" Glyph="Export_CSV_16x16.png"/>
+      <RibbonItem Action="ExportToExcel" LocalizedNameKey="Excel" Glyph="Export_xl_16x16.png" />
+      <RibbonItem Action="ExportToDatev" LocalizedNameKey="Datev" Glyph="DateV_16x16.png" />
+    </RibbonItem>
+    <RibbonItem Action="SaveExport" LocalizedNameKey="SaveOBJ" Parameter="Export" LargeGlyph="save-32x32.png" ShortcutKey="Ctrl+S"/>
+    <RibbonItem Action="CreateSupplement"   LocalizedNameKey="CreateOBJ" Parameter="SupplementaryTransactions"  LargeGlyph="Transactions_32x32.png"/>
+    <RibbonItem Action="DatevHeader" LocalizedNameKey="DatevHeader" LargeGlyph="CreateExit_32x32.png"/>
+  </RibbonItem>
+  <RibbonItem>
+    <!---If we want to create a new group in same PageTab-->
+    <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32.png">
+      <!---If we want Inner menu-->
+      <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
+      <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16.png" ShortcutKey="" />
+      <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveOBJ" Parameter="Layout" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
+      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16.png" ShortcutKey=""/>
+      <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16.png" ShortcutKey="Ctrl+U"/>
+      <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportOBJ"  Parameter="Layout" EnableSeperator="True" Glyph="ExportLayout_16x16.png"  ShortcutKey=""/>
+      <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportOBJ" Parameter="Layout" Glyph="Import_16x16.png"  ShortcutKey=""/>
+      <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16.png" ShortcutKey=""/>
+    </RibbonItem>
+  </RibbonItem>
+</root>

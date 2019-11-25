@@ -35,20 +35,24 @@
       <RibbonItem Action="AddDoc" LocalizedNameKey="Document" ControlName="UserDocsPage" Glyph="Document_Attachment_16x16.png" />
     </RibbonItem>
   </RibbonItem>
-  <RibbonItem>
-    <RibbonItem Action="GLTran" LocalizedNameKey="AccountStatement" ControlName="TransactionReport" LargeGlyph="Account-statement_32x32.png">
-    </RibbonItem>
+  <RibbonItem LocalizedNameKey="Reports">
+    <RibbonItem Action="GLTran" LocalizedNameKey="AccountStatement" ControlName="TransactionReport" LargeGlyph="Account-statement_32x32.png" />
     <RibbonItem Action="Trans" LocalizedNameKey="Transactions" ControlName="AccountsTransaction" LargeGlyph="Posted_Transaction_32x32.png" ShortcutKey="CTRL+T" />
-     <RibbonItem Action="GLTransSum" LocalizedNameKey="AccountTotals" ControlName="GLTransSumClientPage"  LargeGlyph="Validate_Add_32x32.png" />
+    <RibbonItem Action="GLTransSum" LocalizedNameKey="AccountTotals" ControlName="GLTransSumClientPage"  LargeGlyph="Validate_Add_32x32.png" />
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="VatOnClient" LocalizedNameKey="VATprDC" ControlName="VatOnClientsReport" LargeGlyph="VAT_32x32.png"/>
   </RibbonItem>
-  <RibbonItem TabId="1" LocalizedNameKey="EditAll">
-    <RibbonItem Action="EditAll"  LocalizedNameKey="EditAll" LargeGlyph="Edit_32x32.png"/>
-    <RibbonItem Action="AddRow"  LocalizedNameKey="AddOBJ" Parameter="LedgerAccount" LargeGlyph="Add_32x32.png"/>
+  <RibbonItem TabId="1" TabHeader="EditAll" LocalizedNameKey="Add">
+    <RibbonItem Action="EditAll"  LocalizedNameKey="EditAll" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>
+    <RibbonItem Action="AddRow"  LocalizedNameKey="AddOBJ" Parameter="LedgerAccount" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png"/>
     <RibbonItem Action="CopyRow" LocalizedNameKey="CopyOBJ" Parameter="LedgerAccount" LargeGlyph="Copy_32x32.png"/>
-    <RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="DeleteOBJ" Parameter="LedgerAccount" LargeGlyph="Delete_32x32.png"/>
-    <RibbonItem Action="SaveGrid" ShortcutKey="CTRL+S" LocalizedNameKey="Save" LargeGlyph="save-32x32.png"/>
+  </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="DeleteOBJ" Parameter="LedgerAccount" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png"/>
+    <RibbonItem Action="UndoDelete" ShortcutKey="CTRL+Z" LocalizedNameKey="UndoDelete" LargeGlyph="Undo_Delete_32x32.png"/>
+  </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="SaveGrid" ShortcutKey="CTRL+S" LocalizedNameKey="Save" Glyph="save-16x16.png" LargeGlyph="save-32x32.png"/>
   </RibbonItem>
 </root>

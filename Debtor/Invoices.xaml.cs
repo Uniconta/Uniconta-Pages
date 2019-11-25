@@ -50,7 +50,7 @@ namespace UnicontaClient.Pages.CustomPage
         public string SystemInfo { get { return _SystemInfo; } }
         public string _SystemInfo;
 
-        internal void NotifySystemInfoSet()
+        public void NotifySystemInfoSet()
         {
             NotifyPropertyChanged("SystemInfo");
         }
@@ -477,10 +477,10 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (isInitializedSuccess)
             {
-                var standardDebtorInvoice = new DebtorInvoiceReportClient(debtorInvoicePrint.Company, debtorInvoicePrint.Debtor, debtorInvoicePrint.DebtorInvoice, debtorInvoicePrint.InvTransInvoiceLines, null,
+                var standardDebtorInvoice = new DebtorInvoiceReportClient(debtorInvoicePrint.Company, debtorInvoicePrint.Debtor, debtorInvoicePrint.DebtorInvoice, debtorInvoicePrint.InvTransInvoiceLines, debtorInvoicePrint.DebtorOrder,
                     debtorInvoicePrint.CompanyLogo, debtorInvoicePrint.ReportName, isCreditNote: debtorInvoicePrint.IsCreditNote, messageClient: debtorInvoicePrint.MessageClient);
 
-                var standardReports = new IDebtorStandardReport[] { standardDebtorInvoice };
+                var standardReports = new [] { standardDebtorInvoice };
                 iprintReport = new StandardPrintReport(api, standardReports, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.Invoice);
                 await iprintReport.InitializePrint();
 
@@ -509,7 +509,7 @@ namespace UnicontaClient.Pages.CustomPage
                 var standardDebtorInvoice = new DebtorQCPReportClient(debtorInvoicePrint.Company, debtorInvoicePrint.Debtor, debtorInvoicePrint.DebtorInvoice, debtorInvoicePrint.InvTransInvoiceLines, null,
                     debtorInvoicePrint.CompanyLogo, debtorInvoicePrint.ReportName, (int)packnote, messageClient: debtorInvoicePrint.MessageClient);
 
-                var standardReports = new IDebtorStandardReport[] { standardDebtorInvoice };
+                var standardReports = new [] { standardDebtorInvoice };
                 iprintReport = new StandardPrintReport(api, standardReports, (byte)packnote);
                 await iprintReport.InitializePrint();
 
@@ -532,7 +532,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             var InvCache = Comp.GetCache(typeof(Uniconta.DataModel.InvItem)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.InvItem), api);
             var VatCache = Comp.GetCache(typeof(Uniconta.DataModel.GLVat)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.GLVat), api);
-         
+
             SystemInfo.Visible = true;
 
             var applFilePath = string.Empty;
@@ -587,10 +587,15 @@ namespace UnicontaClient.Pages.CustomPage
                 else if (Comp._CountryId == CountryCode.Iceland)
                 {
                     var paymFormatCache = Comp.GetCache(typeof(DebtorPaymentFormatClientIceland)) ?? await Comp.LoadCache(typeof(DebtorPaymentFormatClientIceland), api);
-                    result = TS136137.GenerateTS136137XML(Comp, debtor, deliveryAccount, invClient, invoiceLines, InvCache, VatCache, invItemText, contactPerson, paymFormatCache);
+                    TableAddOnData[] attachments = await UBL.Iceland.Attachments.CollectInvoiceAttachments(invClient, api);
+
+                    result = TS136137.GenerateTS136137XML(Comp, debtor, deliveryAccount, invClient, invoiceLines, InvCache, VatCache, invItemText, contactPerson, paymFormatCache, attachments);
                 }
                 else
-                    result = Uniconta.API.DebtorCreditor.OIOUBL.GenerateOioXML(Comp, debtor, deliveryAccount, invClient, invoiceLines, InvCache, VatCache, invItemText, contactPerson);
+                {
+                    TableAddOnData[] attachments = await FromXSDFile.OIOUBL.ExportImport.Attachments.CollectInvoiceAttachments(invClient, api);
+                    result = Uniconta.API.DebtorCreditor.OIOUBL.GenerateOioXML(Comp, debtor, deliveryAccount, invClient, invoiceLines, InvCache, VatCache, invItemText, contactPerson, attachments);
+                }
 
                 bool createXmlFile = true;
 

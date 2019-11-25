@@ -20,7 +20,7 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryHierarchicalBOMStatement"
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1"  BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <dxg:GridControl x:Name="dgInvBomclientGrid">
                 <dxg:GridControl.Columns>
-                    <dxg:GridColumn FieldName="ItemPart" Width="90" AllowEditing="False" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Item}"/>
+                    <dxg:GridColumn FieldName="ItemPart" x:Name="ItemPart" Width="90" AllowEditing="False" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Item}"/>
                     <dxg:GridColumn FieldName="Name" Width="80" AllowEditing="False" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Name}"/>
                     <dxg:GridColumn FieldName="ItemType" Width="80" Visible="false" AllowEditing="False" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ItemType}"/>
                     <dxg:GridColumn x:Name="colVariant1" FieldName="Variant1" AllowEditing="False"/>

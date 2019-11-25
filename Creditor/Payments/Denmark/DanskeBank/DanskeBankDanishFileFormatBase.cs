@@ -163,9 +163,9 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
 
 
             danishFields.DebtorsIdentificationOfThePayment = string.Empty;
-            danishFields.Reference = tran._PaymentRefId.ToString();  
+            danishFields.Reference = tran.PaymentEndToEndId.ToString();  
             danishFields.Orderingofelectronicaladvice = string.Empty;
-            danishFields.UniquePaymRef = tran._PaymentRefId.ToString();
+            danishFields.UniquePaymRef = tran.PaymentEndToEndId.ToString();
 
             return danishFields;
         }

@@ -77,6 +77,9 @@ namespace UnicontaClient.Pages.CustomPage
         }
         private void CW_Loaded(object sender, RoutedEventArgs e)
         {
+            if (BankAsOffset)
+                cbBankAccountPos.SelectedIndex = 1;
+
             Dispatcher.BeginInvoke(new Action(() => { lookupJournal.Focus(); }));
         }
         private void ChildWindow_KeyDown(object sender, KeyEventArgs e)

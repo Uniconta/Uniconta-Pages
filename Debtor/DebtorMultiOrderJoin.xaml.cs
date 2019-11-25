@@ -79,8 +79,7 @@ namespace UnicontaClient.Pages.CustomPage
                     AddDockItem(TabControls.DebtorOrderLines, dgJoinMultiOrderGrid.syncEntity, olheader);
                     break;
                 case "JoinManyOrders":
-                    if (selectedItem != null)
-                        JoinManyOrders(selectedItem);
+                        JoinOrdersPerCustomer();
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);
@@ -88,12 +87,47 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        private void JoinManyOrders(DebtorOrderClient selectedItem)
+        private void JoinOrdersPerCustomer()
         {
             var ordersToBeJoined = dgJoinMultiOrderGrid.GetVisibleRows() as IEnumerable<DebtorOrderClient>;
-            var firstRecord = ordersToBeJoined.FirstOrDefault();
-            var lst = ordersToBeJoined?.GroupBy(x => x.Account).Select(x=>x.First()).ToList();
-            JoinAllOrdersToSelectedItem(firstRecord, lst);
+            if (ordersToBeJoined.Count() == 0 || ordersToBeJoined== null)
+                return;
+            var allOrderList = ordersToBeJoined?.GroupBy(x => x.Account).Select(x => x.First()).ToList();
+            EraseYearWindow EraseYearWindowDialog = new EraseYearWindow("", true);
+            EraseYearWindowDialog.Closed += async delegate
+            {
+                if (EraseYearWindowDialog.DialogResult == true)
+                {
+                    var ordersApi = new OrderAPI(api);
+                    List<int> errors = new List<int>();
+                    List<int> orders = new List<int>();
+                    foreach (var order in allOrderList)
+                    {
+                        foreach (var customerOrder in ordersToBeJoined)
+                        {
+                            if (order.Account == customerOrder.Account)
+                            {
+                                if (order._OrderNumber == customerOrder._OrderNumber)
+                                    continue;
+                                var result = await ordersApi.JoinTwoOrders(customerOrder, order);
+                                if (result != Uniconta.Common.ErrorCodes.Succes)
+                                {
+                                    errors.Add(customerOrder._OrderNumber);
+                                    orders.Add(order._OrderNumber);
+                                }
+                            }
+                        }
+                    }
+                    if (errors.Count > 0)
+                    {
+                        var failedOrderNumbers = string.Format("{0} {1}", Uniconta.ClientTools.Localization.lookup("OrderNumber"), string.Join(",", errors));
+                        var message = string.Format(Uniconta.ClientTools.Localization.lookup("FailedJoinOBJ"), failedOrderNumbers, string.Join(",", orders));
+                        UnicontaMessageBox.Show(message, Uniconta.ClientTools.Localization.lookup("Error"), MessageBoxButton.OK);
+                    }
+                    InitQuery();
+                }
+            };
+            EraseYearWindowDialog.Show();
         }
 
         private void JoinToSelectedItem(DebtorOrderClient selectedItem)

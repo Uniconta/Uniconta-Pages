@@ -89,25 +89,21 @@ x:Class="UnicontaClient.Pages.CustomPage.VouchersPage2"
                     <CorasauControls:CorasauLayoutItem FieldName="PaymentMethod" x:Name="liPaymentMethod">
                         <CorasauControls:ComboBoxEditor x:Name="cmbPaymentMethod" SelectedItem="{Binding PaymentMethod ,Mode=TwoWay}" />
                     </CorasauControls:CorasauLayoutItem>
-
                     <CorasauControls:CorasauLayoutItem FieldName="PaymentId" x:Name="liPaymentId">
                         <CorasauControls:TextEditor  x:Name="txtPaymentId" MaxLength="50" Text="{Binding PaymentId,Mode=TwoWay}" />
                     </CorasauControls:CorasauLayoutItem>
-
                     <CorasauControls:CorasauLayoutItem FieldName="Approved" x:Name="liApproved">
                         <CorasauControls:CheckEditor  x:Name="chkApproved" IsChecked="{Binding Approved,Mode=TwoWay}" />
                     </CorasauControls:CorasauLayoutItem>
-                    
                     <CorasauControls:CorasauLayoutItem FieldName="Approver1" x:Name="liApprover1">
                         <CorasauControls:LookupEditor  x:Name="leApprover1" Text="{Binding Approver1,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
-
                     <CorasauControls:CorasauLayoutItem FieldName="Approver2" x:Name="liApprover2">
                         <CorasauControls:LookupEditor x:Name="leApprover2" Text="{Binding Approver2 ,Mode=TwoWay}" />
                     </CorasauControls:CorasauLayoutItem>
-
-                  
-
+                    <CorasauControls:CorasauLayoutItem FieldName="ViewInFolder" x:Name="liViewInFolder">
+                        <CorasauControls:ComboBoxEditor x:Name="cmbViewInFolder" SelectedItem="{Binding ViewInFolder ,Mode=TwoWay}" />
+                    </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
 
                 <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="usedim"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=UseDimensions}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">

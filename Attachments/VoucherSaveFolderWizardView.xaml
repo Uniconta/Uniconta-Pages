@@ -9,7 +9,6 @@ x:Class="UnicontaClient.Pages.CustomPage.VoucherSaveFolderWizardView"
              xmlns:wizard="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
     <Grid x:Name="LayoutRoot" Margin="2" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="5" />
             <RowDefinition Height="*" />
             <RowDefinition Height="5" />
@@ -22,10 +21,7 @@ x:Class="UnicontaClient.Pages.CustomPage.VoucherSaveFolderWizardView"
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
         <!-- Row 1-->
-        <TextBlock Text="{Binding Header}" Grid.Row="0" HorizontalAlignment="Left" Grid.ColumnSpan="2" />
-
-        <!-- Row 2-->
-        <local:VouchersFolderGrid x:Name="dgVoucherFolderGrid" AutoGenerateColumns="None" Grid.Row="2" Grid.ColumnSpan="2">
+        <local:VouchersFolderGrid x:Name="dgVoucherFolderGrid" AutoGenerateColumns="None" Grid.Row="1" Grid.ColumnSpan="2">
             <local:VouchersFolderGrid.Columns>
                 <local:CorasauDataGridTemplateColumnClient FieldName="RowId" Header="Row Id"  AllowEditing="False" />
                 <local:CorasauDataGridTemplateColumnClient FieldName="Text"  Header="Text" AllowEditing="False"/>
@@ -35,11 +31,11 @@ x:Class="UnicontaClient.Pages.CustomPage.VoucherSaveFolderWizardView"
         </local:VouchersFolderGrid>
         
         <!--Row 3-->
-        <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Name}" Grid.Row="4" HorizontalAlignment="Left"></TextBlock>
-        <CorasauControls:TextEditor x:Name="txtFolder" Grid.Row="4" HorizontalAlignment="Left" Grid.Column="1" Margin="5,0,0,0" Width="200" />
+        <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Name}" Grid.Row="3" HorizontalAlignment="Left"></TextBlock>
+        <CorasauControls:TextEditor x:Name="txtFolder" Grid.Row="3" HorizontalAlignment="Left" Grid.Column="1" Margin="5,0,0,0" Width="200" />
 
         <!--Row 4-->
-        <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Content}" Grid.Column="0" Grid.Row="6" />
-        <CorasauControls:ComboBoxEditor x:Name="cmbContentTypes" Grid.Column="1" HorizontalAlignment="Left"  Grid.Row="6" Margin="5,0,0,0" Width="200" />
+        <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Content}" Grid.Column="0" Grid.Row="5" />
+        <CorasauControls:ComboBoxEditor x:Name="cmbContentTypes" Grid.Column="1" HorizontalAlignment="Left"  Grid.Row="5" Margin="5,0,0,0" Width="200" />
     </Grid>
 </wizard:UnicontaWizardControl>

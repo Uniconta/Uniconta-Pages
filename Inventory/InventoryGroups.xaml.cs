@@ -45,9 +45,17 @@ namespace UnicontaClient.Pages.CustomPage
             SetRibbonControl(localMenu, dgInventoryGroupGrid);
             dgInventoryGroupGrid.api = api;
             dgInventoryGroupGrid.BusyIndicator = busyIndicator;
-
             localMenu.OnItemClicked += localMenu_OnItemClicked;
+            
         }
+        protected override void OnLayoutLoaded()
+        {
+            base.OnLayoutLoaded();
+            var Comp = api.CompanyEntity;
+            if (!Comp.InvDuty)
+                DutyGroup.ShowInColumnChooser = DutyGroup.Visible = false;
+        }
+
         public override void Utility_Refresh(string screenName, object argument = null)
         {
             if (screenName == TabControls.InventoryGroupPage2)

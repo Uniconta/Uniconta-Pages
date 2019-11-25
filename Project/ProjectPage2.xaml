@@ -36,6 +36,9 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectPage2"
                         <CorasauControls:CorasauLayoutItem x:Name="liMasterProject" FieldName="MasterProject">
                             <CorasauControls:LookupEditor  x:Name="leMasterProject" Text="{Binding MasterProject,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liInvoicingMethod" FieldName="InvoicingMethod">
+                            <CorasauControls:ComboBoxEditor  x:Name="leInvoicingMethod" AutoComplete="True" SelectedItem="{Binding InvoicingMethod,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem x:Name="liPrType" FieldName="PrType">
                             <CorasauControls:LookupEditor  x:Name="lePrType" Text="{Binding PrType,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>

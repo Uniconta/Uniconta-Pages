@@ -34,26 +34,22 @@ namespace UnicontaClient.Pages.CustomPage
     public partial class CWCreateOrderFromProject : ChildWindow
     {
         [InputFieldData]
+        [ForeignKeyAttribute(ForeignKeyTable = typeof(Uniconta.DataModel.PrCategory))]
         [Display(Name = "Category", ResourceType = typeof(InputFieldDataText))]
-        public string InvoiceCategory { get; set; }
+        static public string InvoiceCategory { get; set; }
 
         [InputFieldData]
         [Display(Name = "Date", ResourceType = typeof(InputFieldDataText))]
-        public DateTime GenrateDate { get; set; }
+        static public DateTime GenrateDate { get; set; }
 
         [InputFieldData]
         [Display(Name = "FromDate", ResourceType = typeof(InputFieldDataText))]
-        public DateTime FromDate { get; set; }
+        static public DateTime FromDate { get; set; }
 
         [InputFieldData]
         [Display(Name = "ToDate", ResourceType = typeof(InputFieldDataText))]
-        public DateTime ToDate { get; set; }
+        static public DateTime ToDate { get; set; }
 
-        [ForeignKeyAttribute(ForeignKeyTable = typeof(Uniconta.DataModel.PrCategory))]
-        public string PrCategory { get; set; }
-
-        static string LastInvoiceCategory;
-        static DateTime LastToDate, LastFromDate, LastGenerateDate;
         CrudAPI api;
 #if !SILVERLIGHT
         public int DialogTableId;
@@ -63,15 +59,11 @@ namespace UnicontaClient.Pages.CustomPage
 
         public CWCreateOrderFromProject(CrudAPI crudApi)
         {
-            this.GenrateDate = LastGenerateDate != DateTime.MinValue ? LastGenerateDate : Uniconta.ClientTools.Page.BasePage.GetSystemDefaultDate();
-            this.ToDate = LastToDate;
-            this.FromDate = LastFromDate;
-            this.PrCategory = LastInvoiceCategory;
-            this.InvoiceCategory = LastInvoiceCategory;
+            GenrateDate = GenrateDate != DateTime.MinValue ? GenrateDate : Uniconta.ClientTools.Page.BasePage.GetSystemDefaultDate();
             this.DataContext = this;
             InitializeComponent();
             this.Title = string.Format(Uniconta.ClientTools.Localization.lookup("CreateOBJ"), Uniconta.ClientTools.Localization.lookup("Order"));
-            dpDate.DateTime = this.GenrateDate;
+            dpDate.DateTime = GenrateDate;
             api = crudApi;
             cmbCategory.api = crudApi;
             Loaded += CWCreateOrderFromProject_Loaded;
@@ -112,10 +104,10 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
-            this.InvoiceCategory = LastInvoiceCategory = PrCategory;
-            this.GenrateDate = LastGenerateDate = dpDate.DateTime;
-            this.FromDate = LastFromDate = fromDate.DateTime;
-            this.ToDate = LastToDate = toDate.DateTime;
+            InvoiceCategory = cmbCategory.SelectedText;
+            GenrateDate = dpDate.DateTime;
+            FromDate = fromDate.DateTime;
+            ToDate = toDate.DateTime;
             this.DialogResult = true;
         }
 

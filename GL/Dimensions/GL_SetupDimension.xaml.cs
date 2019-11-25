@@ -38,23 +38,62 @@ namespace UnicontaClient.Pages.CustomPage
             layoutControl = layoutItems;
             CompanyClient compClient = new CompanyClient();
             StreamingManager.Copy(api.CompanyEntity, compClient);
-            editrow =compClient as CompanyClient;
+            editrow = compClient as CompanyClient;
             layoutItems.DataContext = editrow;
             SetDimensions(editrow.NumberOfDimensions);
             frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
         }
+
+        public override bool BeforeSetUserField(ref CorasauLayoutGroup parentGroup)
+        {
+            return false;
+        }
         private void frmRibbon_OnItemClicked(string ActionType)
         {
-            if (ActionType == "Save" && !ValidateForm())
+            string errorMsg;
+            if (ActionType == "Save" && !ValidateForm(out errorMsg))
             {
-                UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("CannotBeBlank"), Uniconta.ClientTools.Localization.lookup("Dimensions")), 
-                    Uniconta.ClientTools.Localization.lookup("Error"));
+                UnicontaMessageBox.Show(errorMsg, Uniconta.ClientTools.Localization.lookup("Error"));
                 return;
             }
             frmRibbon_BaseActions(ActionType);
         }
 
-        private bool ValidateForm()
+        private bool ValidateForm(out string errorLabel)
+        {
+            errorLabel = null;
+            if (!ValidateDimensionEmpty())
+            {
+                errorLabel = string.Format(Uniconta.ClientTools.Localization.lookup("CannotBeBlank"), Uniconta.ClientTools.Localization.lookup("Dimensions"));
+                return false;
+            }
+            else if (!ValidateDimensionName())
+            {
+                errorLabel = string.Format(Uniconta.ClientTools.Localization.lookup("AlreadyExistOBJ"), Uniconta.ClientTools.Localization.lookup("Dimension"));
+                return false;
+            }
+
+            return true;
+        }
+
+        private bool ValidateDimensionName()
+        {
+            if (txtDim5.Visibility == Visibility.Visible)
+                return string.Compare(txtDim5.Text, txtDim4.Text) != 0 ? string.Compare(txtDim5.Text, txtDim3.Text) != 0 ? string.Compare(txtDim5.Text, txtDim2.Text) != 0 ?
+                    string.Compare(txtDim5.Text, txtDim1.Text) != 0 ? true : false : false : false : false;
+            else if (txtDim4.Visibility == Visibility.Visible)
+                return string.Compare(txtDim4.Text, txtDim3.Text) != 0 ? string.Compare(txtDim4.Text, txtDim2.Text) != 0 ? string.Compare(txtDim4.Text, txtDim1.Text) != 0 ?
+                    true : false : false : false;
+            else if (txtDim3.Visibility == Visibility.Visible)
+                return string.Compare(txtDim3.Text, txtDim2.Text) != 0 ? string.Compare(txtDim3.Text, txtDim1.Text) != 0 ? true : false : false;
+            else if (txtDim2.Visibility == Visibility.Visible)
+                return string.Compare(txtDim2.Text, txtDim1.Text) != 0 ? true : false;
+
+            return true;
+
+        }
+
+        private bool ValidateDimensionEmpty()
         {
             if (txtDim5.Visibility == Visibility.Visible)
                 return string.IsNullOrWhiteSpace(txtDim5.Text) ? false : string.IsNullOrWhiteSpace(txtDim4.Text) ? false : string.IsNullOrWhiteSpace(txtDim3.Text) ?
@@ -68,6 +107,7 @@ namespace UnicontaClient.Pages.CustomPage
                 return string.IsNullOrWhiteSpace(txtDim2.Text) ? false : string.IsNullOrWhiteSpace(txtDim1.Text) ? false : true;
             else if (txtDim1.Visibility == Visibility.Visible)
                 return string.IsNullOrWhiteSpace(txtDim1.Text) ? false : true;
+
             return true;
         }
 

@@ -11,5 +11,6 @@
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="Import" LocalizedNameKey="Import" LargeGlyph="Import_32x32.png"/>
+   <RibbonItem Action="ViewBankstatement" LocalizedNameKey="ViewOBJ" Parameter="BankStatement" LargeGlyph="View_32x32.png"/>
   </RibbonItem>
 </root>

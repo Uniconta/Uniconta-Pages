@@ -10,6 +10,9 @@
   <RibbonItem>
     <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh.png" LargeGlyph="refresh.png"/>
   </RibbonItem>
+   <RibbonItem>
+    <RibbonItem Action="ViewPhoto" ShortcutKey="" LocalizedNameKey="ViewOBJ" Parameter="Photo" LargeGlyph="View_Highlighted_32x32.png"/>
+  </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="CalculateGrid" LocalizedNameKey="CalculateCommission" Glyph="refresh.png" LargeGlyph="Calculator_32x32.png"/>
   </RibbonItem>

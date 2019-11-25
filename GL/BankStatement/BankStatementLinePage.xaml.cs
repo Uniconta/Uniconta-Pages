@@ -552,21 +552,31 @@ namespace UnicontaClient.Pages.CustomPage
                     
                     break;
                 case "ViewVoucher":
-                    var page = this as GridBasePage;
-                    if (page.CurrentKeyDownGrid == dgAccountsTransGrid)
+                    bool useGLTrans = true;
+                    if (selectedItem != null)
                     {
-                        var actTransSelected = dgAccountsTransGrid.SelectedItem as UnicontaBaseEntity;
-                        if (actTransSelected == null)
-                            return;
-                        dgAccountsTransGrid.syncEntity.Row = actTransSelected;
-                        busyIndicator.IsBusy = true;
-                        ViewVoucher(TabControls.VouchersPage3, dgAccountsTransGrid.syncEntity);
-                        busyIndicator.IsBusy = false;
+                        var actTransSelected = dgAccountsTransGrid.SelectedItem as GLTrans;
+                        if (actTransSelected == null || actTransSelected._DocumentRef == 0)
+                            useGLTrans = false;
+                        else if (selectedItem._DocumentRef != 0 && selectedItem._DocumentRef != actTransSelected._DocumentRef)
+                        {
+                            var page = this as GridBasePage;
+                            useGLTrans = (page.CurrentKeyDownGrid == dgAccountsTransGrid);
+                        }
                     }
-                    else
+                    if (useGLTrans)
                     {
-                        if (selectedItem == null)
-                            return;
+                        var actTransSelected = dgAccountsTransGrid.SelectedItem as GLTrans;
+                        if (actTransSelected != null)
+                        {
+                            dgAccountsTransGrid.syncEntity.Row = actTransSelected;
+                            busyIndicator.IsBusy = true;
+                            ViewVoucher(TabControls.VouchersPage3, dgAccountsTransGrid.syncEntity);
+                            busyIndicator.IsBusy = false;
+                        }
+                    }
+                    else if(selectedItem != null)
+                    {
                         dgBankStatementLine.syncEntity.Row = selectedItem;
                         busyIndicator.IsBusy = true;
                         ViewVoucher(TabControls.VouchersPage3, dgBankStatementLine.syncEntity);

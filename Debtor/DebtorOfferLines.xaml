@@ -26,7 +26,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOfferLines"
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Debtor/DebtorOrderLineGridRibbon.xml" x:Name="localMenu"/>
+        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Debtor/DebtorOfferLineGridRibbon.xml" x:Name="localMenu"/>
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <localPage:DebtorOfferLineGrid  x:Name="dgDebtorOfferLineGrid" AutoGenerateColumns="None" HorizontalAlignment="Stretch">
                 <localPage:DebtorOfferLineGrid.Columns>

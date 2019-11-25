@@ -45,25 +45,25 @@ namespace UnicontaClient.Pages.CustomPage
         public InvBOMPartOfPage(SynchronizeEntity syncEntity) : base(syncEntity, true)
         {
             InitPage(syncEntity.Row);
-            SetHeader();
+            SetHeader(syncEntity.Row);
         }
 
         protected override void SyncEntityMasterRowChanged(UnicontaBaseEntity args)
         {
-            dgInvBOMPartOfGrid.UpdateMaster(args);
             InitialLoad(args);
-            SetHeader();
+            SetHeader(args);
             InitQuery();
         }
 
-        private void SetHeader()
+        private void SetHeader(UnicontaBaseEntity table)
         {
-            var table = dgInvBOMPartOfGrid.masterRecord;
-            string key = string.Empty;
+            if (table == null)
+                return;
+            string key;
             if (table is InvItem)
                 key = (table as InvItem)?._Item;
             else
-                key = Utility.GetHeaderString(dgInvBOMPartOfGrid.masterRecord);
+                key = Utility.GetHeaderString(table);
             if (string.IsNullOrEmpty(key)) return;
             string header = string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("BOM"), key);
             SetHeader(header);
@@ -129,7 +129,9 @@ namespace UnicontaClient.Pages.CustomPage
                     InitQuery();
                     break;
                 case "HierarichalInvBOMReport":
-                    AddDockItem(TabControls.InventoryHierarchicalBOMStatement, dgInvBOMPartOfGrid.masterRecord, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("HierarchicalBOM"), MasterItem));
+                    var selectItem = dgInvBOMPartOfGrid.SelectedItem;
+                    if (selectItem != null)
+                        AddDockItem(TabControls.InventoryHierarchicalBOMStatement, selectItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("HierarchicalBOM"), MasterItem));
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);
@@ -140,7 +142,6 @@ namespace UnicontaClient.Pages.CustomPage
         protected override void OnLayoutLoaded()
         {
             base.OnLayoutLoaded();
-            var company = api.CompanyEntity;
             var inv = dgInvBOMPartOfGrid.masterRecord as Uniconta.DataModel.InvItem;
             bool showFields = (inv != null && inv._ItemType == (byte)Uniconta.DataModel.ItemType.BOM);
             MoveType.Visible = showFields;
@@ -153,10 +154,8 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override async void LoadCacheInBackGround()
         {
-            var api = this.api;
-            var Comp = api.CompanyEntity;
             if (this.items == null)
-                this.items = await Comp.LoadCache(typeof(Uniconta.DataModel.InvItem), api).ConfigureAwait(false);
+                this.items = await api.LoadCache(typeof(Uniconta.DataModel.InvItem)).ConfigureAwait(false);
         }
 
         public override bool CheckIfBindWithUserfield(out bool isReadOnly, out bool useBinding)

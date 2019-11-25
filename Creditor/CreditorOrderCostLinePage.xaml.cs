@@ -70,8 +70,7 @@ namespace UnicontaClient.Pages.CustomPage
         SQLCache CostGroups;
         protected async override void LoadCacheInBackGround()
         {
-            var api = this.api;
-            CostGroups = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.CreditorOrderCost)) ?? await api.CompanyEntity.LoadCache(typeof(Uniconta.DataModel.CreditorOrderCost), api).ConfigureAwait(false);
+            CostGroups = api.GetCache(typeof(Uniconta.DataModel.CreditorOrderCost)) ?? await api.LoadCache(typeof(Uniconta.DataModel.CreditorOrderCost)).ConfigureAwait(false);
         }
 
         public override Task InitQuery()
@@ -137,7 +136,7 @@ namespace UnicontaClient.Pages.CustomPage
             var syncMaster = master as CreditorOrder;
             if (syncMaster == null)
                 return;
-            var header = string.Format("{0}: {1},{2}", Uniconta.ClientTools.Localization.lookup("PurchaseCharges"), syncMaster._DCAccount, syncMaster._OrderNumber);
+            var header = string.Format("{0}: {1}, {2}", Uniconta.ClientTools.Localization.lookup("PurchaseCharges"), syncMaster._OrderNumber, syncMaster._DCAccount);
             SetHeader(header);
         }
 

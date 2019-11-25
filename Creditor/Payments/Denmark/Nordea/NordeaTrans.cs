@@ -209,7 +209,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
             danishFields.PromptAdvice = danishFields.TransTypeCommand == NordeaPaymentFormat.TRANSTYPE_45 ? "0" : string.Empty;
             danishFields.Blanks3 = string.Empty;
 
-            danishFields.UniquePaymRef = danishFields.TransTypeCommand == NordeaPaymentFormat.TRANSTYPE_45 ? tran._PaymentRefId.ToString() : string.Empty;
+            danishFields.UniquePaymRef = danishFields.TransTypeCommand == NordeaPaymentFormat.TRANSTYPE_45 ? tran.PaymentEndToEndId.ToString() : string.Empty;
             danishFields.ExpenseCode = danishFields.TransTypeCommand == NordeaPaymentFormat.TRANSTYPE_49 ? NordeaPaymentFormat.EXPENSECODE_BOTH : string.Empty;
 
             return danishFields;

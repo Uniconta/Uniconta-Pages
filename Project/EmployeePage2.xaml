@@ -87,6 +87,9 @@ x:Class="UnicontaClient.Pages.CustomPage.EmployeePage2"
                         <CorasauControls:CorasauLayoutItem FieldName="ShowCost" x:Name="liShowCost">
                             <CorasauControls:CheckEditor IsChecked="{Binding ShowCost,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="ApproveOnEmail" x:Name="liApproveOnEmail">
+                            <CorasauControls:CheckEditor IsChecked="{Binding ApproveOnEmail,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
                 </CorasauControls:CorasauLayoutGroup>
                 <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="lastGroup">

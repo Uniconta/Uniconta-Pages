@@ -221,7 +221,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         bool DataChanged;
 
-        public override void Utility_Refresh(string screenName, object argument = null)
+        public override async void Utility_Refresh(string screenName, object argument = null)
         {
             if (screenName == TabControls.AddMultipleInventoryItem)
             {
@@ -246,6 +246,23 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     var invItems = param[0] as List<UnicontaBaseEntity>;
                     dgCreditorOrderLineGrid.PasteRows(invItems);
+                }
+            }
+
+            if (screenName == TabControls.SerialToOrderLinePage)
+            {
+                var param = argument as object[];
+                if (param != null)
+                {
+                    var orderLine = param[0] as CreditorOrderLineClient;
+                    if (dgCreditorOrderLineGrid.HasUnsavedData)
+                    {
+                        var t = saveGrid();
+                        if (t != null && orderLine.RowId == 0)
+                            await t;
+                    }
+                    if (api.CompanyEntity.Warehouse)
+                        dgCreditorOrderLineGrid.SetLoadedRow(orderLine);
                 }
             }
         }
@@ -449,6 +466,8 @@ namespace UnicontaClient.Pages.CustomPage
                         TableField.SetUserFieldsFromRecord(selectedItem, rec);
                         if (selectedItem._Blocked)
                             UtilDisplay.ShowErrorCode(ErrorCodes.ItemIsOnHold, null);
+
+                        globalEvents.NotifyRefreshViewer(NameOfControl, selectedItem);
                     }
                     break;
                 case "Qty":
@@ -469,7 +488,7 @@ namespace UnicontaClient.Pages.CustomPage
                         rec._Location = null;
                     break;
                 case "EAN":
-                    DebtorOfferLines.FindOnEAN(rec, this.items, api);
+                    DebtorOfferLines.FindOnEAN(rec, this.items, api, this.PriceLookup);
                     break;
                 case "Total":
                     RecalculateAmount();
@@ -670,7 +689,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                 var type = dgCreditorOrderLineGrid.TableTypeUser;
                 var Qty = selectedItem._Qty;
-                var lst = new List<UnicontaBaseEntity>();
+                var lst = new List<UnicontaBaseEntity>(list.Length);
                 foreach (var bom in list)
                 {
                     var invJournalLine = Activator.CreateInstance(type) as CreditorOrderLineClient;
@@ -688,6 +707,8 @@ namespace UnicontaClient.Pages.CustomPage
                     invJournalLine._Variant4 = bom._Variant4;
                     invJournalLine._Variant5 = bom._Variant5;
                     item = (InvItem)items.Get(bom._ItemPart);
+                    invJournalLine._Warehouse = bom._Warehouse ?? item._Warehouse ?? selectedItem._Warehouse;
+                    invJournalLine._Location = bom._Location ?? item._Location ?? selectedItem._Location;
                     invJournalLine._CostPriceLine = item._CostPrice;
                     invJournalLine.SetItemValues(item, selectedItem._Storage);
                     invJournalLine._Qty = Math.Round(bom.GetBOMQty(Qty), item._Decimals);
@@ -825,7 +846,7 @@ namespace UnicontaClient.Pages.CustomPage
                 await t;
             if (api.CompanyEntity.Warehouse)
                 dgCreditorOrderLineGrid.SetLoadedRow(orderLine); // serial page add warehouse and location
-            AddDockItem(TabControls.SerialToOrderLinePage, orderLine, string.Format("{0}:{1}/{2},{3}", Uniconta.ClientTools.Localization.lookup("SerialBatchNumbers"), orderLine.OrderRowId, orderLine._Item, orderLine.RowId));
+            AddDockItem(TabControls.SerialToOrderLinePage, dgCreditorOrderLineGrid.syncEntity, string.Format("{0}:{1}/{2},{3}", Uniconta.ClientTools.Localization.lookup("SerialBatchNumbers"), orderLine.OrderRowId, orderLine._Item, orderLine.RowId));
         }
         async void ViewStorage()
         {
@@ -848,8 +869,8 @@ namespace UnicontaClient.Pages.CustomPage
                 if (confirmationMsgBox != MessageBoxResult.OK)
                     return;
             }
-
-            CWGenerateInvoice GenrateInvoiceDialog = new CWGenerateInvoice(true, string.Empty, true, false, false);
+            var accountName = string.Format("{0} ({1})", orderMaster._DCAccount, orderMaster.Name);
+            CWGenerateInvoice GenrateInvoiceDialog = new CWGenerateInvoice(true, string.Empty, true, false, false, AccountName: accountName);
 #if !SILVERLIGHT
             GenrateInvoiceDialog.DialogTableId = 2000000001;
 #endif

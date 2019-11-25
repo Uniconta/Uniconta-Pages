@@ -136,11 +136,11 @@ namespace UnicontaISO20022CreditTransfer
         /// <param name="cdtr">Party to which an amount of money is due.</param> 
         /// <param name="cdtrAcct">Unambiguous identification of the account of the creditor to which a credit entry will be posted as a result of the payment transaction.</param> 
         /// <param name="rmtInf">Information that enables the matching, ie, reconciliation, of a payment with the items that the payment is intended to settle, eg, commercial invoices in an account receivable system.</param> 
-        public CdtTrfTxInf(string paymentInfoIdReference, string instructionId, int endToEndId, double amount, string currencyCode, CdtrAgt cdtrAgt, Cdtr cdtr, CdtrAcct cdtrAcct, RmtInf rmtInf, string chargeBearer = BaseDocument.CHRGBR_SHAR)
+        public CdtTrfTxInf(string paymentInfoIdReference, string instructionId, string endToEndId, double amount, string currencyCode, CdtrAgt cdtrAgt, Cdtr cdtr, CdtrAcct cdtrAcct, RmtInf rmtInf, string chargeBearer = BaseDocument.CHRGBR_SHAR)
         {
             this.paymentInfoIdReference = paymentInfoIdReference;
             this.instructionId = instructionId;
-            this.endToEndId = Convert.ToString(endToEndId);
+            this.endToEndId = endToEndId;
             this.amount = amount;
             this.currencyCode = currencyCode;
             this.chargeBearer = chargeBearer;

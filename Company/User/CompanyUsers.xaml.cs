@@ -175,6 +175,21 @@ namespace UnicontaClient.Pages.CustomPage
                     };
                     userTask.Show();
                     break;
+                case "FixedProfiles":
+                    if (selectedItem == null)
+                        return;
+                    selectedRowIndex = dgCompanyUsersGrid.tableView.FocusedRowHandle;
+                    CWFixedProfiles profile = new CWFixedProfiles(companyAPI, selectedItem);
+                    profile.Closing += delegate
+                    {
+                        if (profile.DialogResult == true)
+                        {
+                            selectedItem._Rights = profile.userAccess._Rights;
+                            selectedItem.NotifyPropertyChanged("FixedProfile");
+                        }
+                    };
+                    profile.Show();
+                    break;
                 case "UserOf":
                     if (selectedItem != null)
                     {

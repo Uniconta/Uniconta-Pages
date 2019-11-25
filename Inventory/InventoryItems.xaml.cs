@@ -22,7 +22,6 @@ using Uniconta.ClientTools.Controls;
 using System.Collections;
 using Uniconta.API.Service;
 using Uniconta.DataModel;
-using DevExpress.Xpf.Grid;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -61,7 +60,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgInventoryItemsGrid.SelectedItemChanged += DgInventoryItemsGrid_SelectedItemChanged;
-            ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "SaveGrid" });
+            ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "UndoDelete", "SaveGrid" });
 #if SILVERLIGHT
             Application.Current.RootVisual.KeyDown += RootVisual_KeyDown;
 #else
@@ -69,20 +68,9 @@ namespace UnicontaClient.Pages.CustomPage
 #endif
             this.BeforeClose += DebtorAccount_BeforeClose;
             LoadNow(typeof(InvGroup));
-            dgInventoryItemsGrid.tableView.ShownEditor += TableView_ShownEditor;
         }
 
-        private void TableView_ShownEditor(object sender, DevExpress.Xpf.Grid.EditorEventArgs e)
-        {
-            var view = (TableView)sender;
-            if (e.Column.Name == "Warehouse")
-            {
-                var editor = (LookupEditor)view.ActiveEditor;
-                editor.GetGridControl().FilterString = "[Name]='123'";
-            }
-        }
-
-            private void RootVisual_KeyDown(object sender, KeyEventArgs e)
+        private void RootVisual_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.F8 && Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
                 localMenu_OnItemClicked("InvTrans");
@@ -224,7 +212,7 @@ namespace UnicontaClient.Pages.CustomPage
                 PurchaseUnit.Visible = PurchaseUnit.ShowInColumnChooser = false;
                 UnitGroup.Visible = UnitGroup.ShowInColumnChooser = false;
             }
-            if(!Comp.InvDuty)
+            if (!Comp.InvDuty)
                 DutyGroup.Visible = DutyGroup.ShowInColumnChooser = false;
 
             setDim();
@@ -299,13 +287,15 @@ namespace UnicontaClient.Pages.CustomPage
                         CopyRecord(selectedItem);
                     break;
                 case "DeleteRow":
-                    dgInventoryItemsGrid.DeleteRow();
+                    if (selectedItem != null)
+                        dgInventoryItemsGrid.DeleteRow();
                     break;
                 case "SaveGrid":
                     Save();
                     break;
                 case "Storage":
-                    AddDockItem(TabControls.InvItemStoragePage, dgInventoryItemsGrid.syncEntity, true, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("OnHand"), selectedItem._Name));
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.InvItemStoragePage, dgInventoryItemsGrid.syncEntity, true, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("OnHand"), selectedItem._Name));
                     break;
                 case "VariantCombi":
                     if (selectedItem != null && selectedItem._UseVariants)
@@ -349,6 +339,9 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         AddDockItem(TabControls.InventoryHierarchicalBOMStatement, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("HierarchicalBOM"), selectedItem._Item));
                     break;
+                case "UndoDelete":
+                    dgInventoryItemsGrid.UndoDeleteRow();
+                    break;
 #if !SILVERLIGHT
                 case "InvTransPivot":
                     if (selectedItem != null)
@@ -391,7 +384,7 @@ namespace UnicontaClient.Pages.CustomPage
                 dgInventoryItemsGrid.MakeEditable();
                 UserFieldControl.MakeEditable(dgInventoryItemsGrid);
                 ibase.Caption = Uniconta.ClientTools.Localization.lookup("LeaveEditAll");
-                ribbonControl.EnableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "SaveGrid" });
+                ribbonControl.EnableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "UndoDelete", "SaveGrid" });
                 editAllChecked = false;
                 copyRowIsEnabled = true;
             }
@@ -423,7 +416,7 @@ namespace UnicontaClient.Pages.CustomPage
                         dgInventoryItemsGrid.Readonly = true;
                         dgInventoryItemsGrid.tableView.CloseEditor();
                         ibase.Caption = Uniconta.ClientTools.Localization.lookup("EditAll");
-                        ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "SaveGrid" });
+                        ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "UndoDelete", "SaveGrid" });
                         copyRowIsEnabled = false;
                     };
                     confirmationDialog.Show();
@@ -433,7 +426,7 @@ namespace UnicontaClient.Pages.CustomPage
                     dgInventoryItemsGrid.Readonly = true;
                     dgInventoryItemsGrid.tableView.CloseEditor();
                     ibase.Caption = Uniconta.ClientTools.Localization.lookup("EditAll");
-                    ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "SaveGrid" });
+                    ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "UndoDelete", "SaveGrid" });
                     copyRowIsEnabled = false;
                 }
             }
@@ -449,9 +442,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             dgInventoryItemsGrid.BusyIndicator.IsBusy = true;
             var err = await dgInventoryItemsGrid.SaveData();
-            if (err == ErrorCodes.Succes)
-                Filter(null);
-            else
+            if (err != ErrorCodes.Succes)
                 api.AllowBackgroundCrud = true;
             dgInventoryItemsGrid.BusyIndicator.IsBusy = false;
         }

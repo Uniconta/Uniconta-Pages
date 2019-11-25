@@ -12,6 +12,8 @@ using Uniconta.API.Service;
 using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools;
 using UnicontaClient.Utilities;
+using Uniconta.ClientTools.Util;
+using DevExpress.Xpf.Grid;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -86,10 +88,48 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         CreateProdcution(selectedItem);
                     break;
+                case "PostedTransaction":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.PostedTransactions, dgProductionPostedGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("PostedTransactions"), selectedItem._Item));
+                    break;
+                case "DeleteProduction":
+                    if (selectedItem != null)
+                        DeleteJournal(selectedItem);
+                    break;
+                case "AddDoc":
+                    if (selectedItem != null)
+                    {
+                        string header = string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("Documents"), selectedItem._OrderNumber);
+                        AddDockItem(TabControls.UserDocsPage, dgProductionPostedGrid.syncEntity, header);
+                    }
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
+        }
+
+        private void DeleteJournal(ProductionPostedClient selectedItem)
+        {
+            if (selectedItem == null)
+                return;
+            var deleteDialog = new DeletePostedJournal();
+            deleteDialog.Closed += async delegate
+            {
+                if (deleteDialog.DialogResult == true)
+                {
+                    var pApi = new ProductionAPI(api);
+                    ErrorCodes res = await pApi.DeletePostedProduction(selectedItem, deleteDialog.Comment);
+                    if (res == ErrorCodes.Succes)
+                    {
+                        UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("Journaldeleted"), selectedItem._LineNumber), Uniconta.ClientTools.Localization.lookup("Message"));
+                        dgProductionPostedGrid.UpdateItemSource(3, selectedItem);
+                    }
+                    else
+                        UtilDisplay.ShowErrorCode(res);
+                }
+            };
+            deleteDialog.Show();
         }
 
         private void CreateProdcution(ProductionPostedClient fromProductionPosted)

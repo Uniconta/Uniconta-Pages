@@ -17,7 +17,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
 {
     class CreditorPaymentsMerge
     {
-
+        public const string MERGEID_SINGLEPAYMENT = "-";
         public bool MergePayments(Company company, PaymentsGrid dgCreditorTranOpenGrid, CreditorPaymentFormat credPaymFormat, SQLCache bankAccountCache)
         {
             string creditorAcc = string.Empty;
@@ -147,6 +147,14 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
                     rec._MergePaymId = mergePaymId.ToString();
                     rec.NotifyMergePaymIdSet();
                 }
+
+                var noDuplicates = grid.Where(x => x._MergePaymId != Uniconta.ClientTools.Localization.lookup("Excluded")).GroupBy(s => s._MergePaymId).Where(grp => grp.Count() == 1).SelectMany(x => x);
+
+                foreach (var rec in noDuplicates)
+                {
+                    rec._MergePaymId = MERGEID_SINGLEPAYMENT;
+                }
+
                 return true;
             }
             catch (Exception ex)

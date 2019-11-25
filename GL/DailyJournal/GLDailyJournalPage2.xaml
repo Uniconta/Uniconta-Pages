@@ -43,10 +43,10 @@ x:Class="UnicontaClient.Pages.CustomPage.GLDailyJournalPage2"
                         <CorasauControls:CheckEditor  IsChecked="{Binding ManualAllocation,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="GenerateVoucher" x:Name="liGenerateVoucher">
-                        <CorasauControls:CheckEditor  IsChecked="{Binding GenerateVoucher,Mode=TwoWay}"/>
+                        <CorasauControls:CheckEditor x:Name="chkGenerateVou" IsChecked="{Binding GenerateVoucher,Mode=TwoWay}" />
                     </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="OneVoucherForAll" x:Name="liOneVoucherForAll">
-                        <CorasauControls:CheckEditor  IsChecked="{Binding OneVoucherForAll,Mode=TwoWay}" IsEnabled="{Binding GenerateVoucher,Mode=TwoWay}"/>
+                    <CorasauControls:CorasauLayoutItem FieldName="AssignVoucher" x:Name="liAssignVoucher">
+                        <CorasauControls:ComboBoxEditor x:Name="cbAssignVoucher" IsEnabled="{Binding ElementName=chkGenerateVou, Path=IsChecked}" SelectedItem="{Binding AssignVoucher,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
 

@@ -26,12 +26,12 @@
   <RibbonItem>
     <RibbonItem Action="MatchVoucherToJournalLines" LocalizedNameKey="MatchVoucherToJournalLines" ControlName="MatchPhysicalVoucherToGLDailyJournalLines" LargeGlyph="Match_32x32.png" />
   </RibbonItem>
-  <RibbonItem>
+  <RibbonItem LocalizedNameKey="Load">
     <RibbonItem Action="ImportBankStatement" LocalizedNameKey="ImportOBJ" Parameter="BankStatement" ControlName="ImportGLDailyJournal" LargeGlyph="Import_32x32.png"/>
     <RibbonItem Action="ImportData" LocalizedNameKey="ImportFromFile" Parameter="" LargeGlyph="Import_32x32.png"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="BilagscanReadVouchers" LocalizedNameKey="BilagscanRead" LargeGlyph="Import_32x32.png" />
+    <RibbonItem Action="BilagscanReadVouchers" LocalizedNameKey="BilagscanRead" Module="Bilagscan" LargeGlyph="Import_32x32.png" />
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="DeleteAllJournalLines" LocalizedNameKey="DeleteAllJournalLines" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png" />

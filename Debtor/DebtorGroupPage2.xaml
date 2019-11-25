@@ -46,6 +46,9 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorGroupPage2"
                     <CorasauControls:CorasauLayoutItem FieldName="ExemptDuty" x:Name="liExemptDuty">
                         <CheckBox IsChecked="{Binding ExemptDuty,Mode=TwoWay}" />
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="MandatoryItem" x:Name="liMandatoryItem">
+                        <CorasauControls:CheckEditor  IsChecked="{Binding MandatoryItem,Mode=TwoWay}" />
+                    </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
                 <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpInvoice" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Invoice}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                     <CorasauControls:CorasauLayoutItem FieldName="PriceGroup" x:Name="liPriceGroup">

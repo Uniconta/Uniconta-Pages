@@ -64,8 +64,7 @@ namespace UnicontaClient.Pages.CustomPage
     {
     }
     public class BalanceReportManagerGridColumn : DevExpress.Xpf.Grid.GridColumn
-    {
-    }
+    { }
     public class BalanceReportManagerGridColumnGridControlBand : GridControlBand
     {
     }
@@ -273,7 +272,8 @@ namespace UnicontaClient.Pages.CustomPage
             this.dim3details = PassedCriteria.dim3details;
             this.dim4details = PassedCriteria.dim4details;
             this.dim5details = PassedCriteria.dim5details;
-            this.CriteriaLst = PassedCriteria.selectedCriteria;
+            CriteriaLst = new List<SelectedCriteria>();
+            CriteriaLst.AddRange(PassedCriteria.selectedCriteria);
             this.AppliedTemplate = PassedCriteria.Template;
             if (string.IsNullOrWhiteSpace(this.AppliedTemplate))
                 this.AppliedTemplate = null;
@@ -432,13 +432,13 @@ namespace UnicontaClient.Pages.CustomPage
             busyIndicator.IsBusy = true;
             var Cache = api.GetCache(typeof(GLAccount)) ?? await api.LoadCache(typeof(GLAccount));
 
-            var CriteriaLst = this.CriteriaLst;
+            var CriteriaList = CriteriaLst;
             int k;
 
             bool CalcFound = false;
-            for (k = CriteriaLst.Count; (--k >= 0); )
+            for (k = CriteriaList.Count; (--k >= 0);)
             {
-                var method = CriteriaLst[k].balcolMethod;
+                var method = CriteriaList[k].balcolMethod;
                 if (method > BalanceColumnMethod.FromBudget && method < BalanceColumnMethod.OnlyJournals)
                 {
                     CalcFound = true;
@@ -449,13 +449,13 @@ namespace UnicontaClient.Pages.CustomPage
             int Cols = 0;
             bool first = true;
             bool hiddenFound = false;
-            for (k = 0; (k < CriteriaLst.Count); k++)
+            for (k = 0; (k < CriteriaList.Count); k++)
             {
-                var Crit = CriteriaLst[k];
+                var Crit = CriteriaList[k];
                 if (Crit._Hide)
                 {
                     hiddenFound = true;
-                    if (! CalcFound) // if we do not have calculated columns, we do not need to calculate the hidden column
+                    if (!CalcFound) // if we do not have calculated columns, we do not need to calculate the hidden column
                     {
                         Cols++;
                         continue;
@@ -513,9 +513,9 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (CalcFound)
             {
-                for (k = 0; (k < CriteriaLst.Count); k++)
+                for (k = 0; (k < CriteriaList.Count); k++)
                 {
-                    var Crit = CriteriaLst[k];
+                    var Crit = CriteriaList[k];
                     var ColA = Crit.ColA - 1;
                     var ColB = Crit.ColB - 1;
                     var Method = Crit.balcolMethod;
@@ -581,20 +581,20 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (hiddenFound)
             {
-                for (k = CriteriaLst.Count; (--k >= 0);)
+                for (k = CriteriaList.Count; (--k >= 0);)
                 {
-                    if (CriteriaLst[k]._Hide)
+                    if (CriteriaList[k]._Hide)
                     {
-                        CriteriaLst.RemoveAt(k);
+                        CriteriaList.RemoveAt(k);
                         foreach (var col in BalanceList)
                             col.RemoveColumn(k);
                     }
                 }
             }
 
-            for (k = 0; (k < CriteriaLst.Count); k++)
+            for (k = 0; (k < CriteriaList.Count); k++)
             {
-                var Crit = CriteriaLst[k];
+                var Crit = CriteriaList[k];
                 if (Crit.balanceColumnFormat == BalanceColumnFormat.Thousand)
                 {
                     foreach (var col in BalanceList)
@@ -711,7 +711,6 @@ namespace UnicontaClient.Pages.CustomPage
                 Text.Visible = false;
                 dgBalanceReport.ItemsSource = arr;
             }
-            //ShowColumns();
             dgBalanceReport.Visibility = Visibility.Visible;
         }
 
@@ -781,6 +780,8 @@ namespace UnicontaClient.Pages.CustomPage
             for (int i = 0; (i < CriteriaLst.Count); i++)
             {
                 var Crit = CriteriaLst[i];
+                if (Crit._Hide)
+                    continue;
                 string str = setDateFormat(Crit);
                 bool ShowDebitCredit = Crit.ShowDebitCredit;
                 bool ShowAmount = !ShowDebitCredit;
@@ -1007,6 +1008,7 @@ namespace UnicontaClient.Pages.CustomPage
                     data.isBold = (AcType <= GLAccountTypes.CalculationExpression) ? FontWeights.Bold : FontWeights.Normal;
                     data.IsVisible = (AcType == GLAccountTypes.Header) ? Visibility.Collapsed : Visibility.Visible;
                     data.Line = (AcType == GLAccountTypes.Header) ? Utilities.Utility.GetImageData("Black_Small_Line.png") : null;
+                    data.Underline = (AcType == GLAccountTypes.Header) ? "Underline" : null;
                     data.isSumOrExpression = (AcType == GLAccountTypes.CalculationExpression || AcType == GLAccountTypes.Sum) ? Visibility.Visible : Visibility.Collapsed;
                     data.ISPageBreak = blc.PageBreak ? Visibility.Visible : Visibility.Collapsed;
                     listdata.BalanceReportlist.Add(data);

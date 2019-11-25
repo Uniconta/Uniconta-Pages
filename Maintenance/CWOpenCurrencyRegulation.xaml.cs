@@ -11,43 +11,73 @@ using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.Util;
 using Uniconta.Common;
 using Uniconta.DataModel;
+using Uniconta.ClientTools.DataModel;
+using UnicontaClient.Controls;
+using System.ComponentModel.DataAnnotations;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
-   
+
     public partial class CWOpenCurrencyRegulation : ChildWindow
     {
+        public Uniconta.DataModel.GLDailyJournal Jour;
+
         [ForeignKeyAttribute(ForeignKeyTable = typeof(Uniconta.DataModel.GLDailyJournal))]
+        [InputFieldData]
+        [Display(Name = "Journal", ResourceType = typeof(InputFieldDataText))]
         public string Journal { get; set; }
 
+        [InputFieldData]
+        [Display(Name = "Date", ResourceType = typeof(InputFieldDataText))]
         public DateTime Date { get; set; }
 
+        [InputFieldData]
+        [Display(Name = "AssignVoucherNumber", ResourceType = typeof(InputFieldDataText))]
         public bool AddVoucherNumber { get; set; }
 
         [ForeignKeyAttribute(ForeignKeyTable = typeof(GLTransType))]
+        [InputFieldData]
+        [Display(Name = "TransType", ResourceType = typeof(InputFieldDataText))]
         public string TransType { get; set; }
 
         [ForeignKeyAttribute(ForeignKeyTable = typeof(GLAccount))]
+        [InputFieldData]
+        [Display(Name = "Debtor", ResourceType = typeof(InputFieldDataText))]
         public string DebtorAccount { get; set; }
 
         [ForeignKeyAttribute(ForeignKeyTable = typeof(GLAccount))]
+        [InputFieldData]
+        [Display(Name = "DebtorOffset", ResourceType = typeof(InputFieldDataText))]
         public string DebtorOffset { get; set; }
 
         [ForeignKeyAttribute(ForeignKeyTable = typeof(GLAccount))]
+        [InputFieldData]
+        [Display(Name = "Creditor", ResourceType = typeof(InputFieldDataText))]
         public string CreditorAccount { get; set; }
 
         [ForeignKeyAttribute(ForeignKeyTable = typeof(GLAccount))]
+        [InputFieldData]
+        [Display(Name = "CreditorOffset", ResourceType = typeof(InputFieldDataText))]
         public string CreditorOffset { get; set; }
 
+        [ForeignKeyAttribute(ForeignKeyTable = typeof(GLAccount))]
+        public string LedgerOffset { get; set; }
+
         CrudAPI api;
+
+#if !SILVERLIGHT
+        protected override int DialogId { get { return DialogTableId; } }
+        public int DialogTableId { get; set; }
+        protected override bool ShowTableValueButton { get { return true; } }
+#endif
         public CWOpenCurrencyRegulation(CrudAPI crudapi)
         {
             this.DataContext = this;
             InitializeComponent();
             this.api = crudapi;
-            leJournal.api= leTransType.api=leDebtorAccount.api= leDebtorAccount.api= 
-                leCreditorAccount.api=leCreditorOffset.api = api;
+            leJournal.api = leTransType.api = leDebtorAccount.api = leDebtorAccount.api =
+                leCreditorAccount.api = leCreditorOffset.api = api;
 
             this.Title = Uniconta.ClientTools.Localization.lookup("CurrencyAdjustment");
 #if SILVERLIGHT
@@ -81,17 +111,17 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
+        SQLCache glDlJournalCache;
         protected async void LoadCacheInBackGround()
         {
             var api = this.api;
-            var Comp = api.CompanyEntity;
-            var glAccCache = Comp.GetCache(typeof(Uniconta.DataModel.GLAccount)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.GLAccount), api);
-            var glDlJournalCache = Comp.GetCache(typeof(Uniconta.DataModel.GLDailyJournal)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.GLDailyJournal), api);
-            var glTransTypeCache = Comp.GetCache(typeof(Uniconta.DataModel.GLTransType)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.GLTransType), api);
+            var glAccCache = api.GetCache(typeof(Uniconta.DataModel.GLAccount)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLAccount));
+            glDlJournalCache = api.GetCache(typeof(Uniconta.DataModel.GLDailyJournal)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLDailyJournal));
+            var glTransTypeCache = api.GetCache(typeof(Uniconta.DataModel.GLTransType)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLTransType));
 
             leJournal.ItemsSource = glDlJournalCache;
             leTransType.ItemsSource = glTransTypeCache;
-            leDebtorAccount.ItemsSource = leDebtorOffset.ItemsSource= leCreditorAccount.ItemsSource= leCreditorOffset.ItemsSource = glAccCache;
+            leDebtorAccount.ItemsSource = leDebtorOffset.ItemsSource= leCreditorAccount.ItemsSource= leCreditorOffset.ItemsSource = leLedgerOffset.ItemsSource = glAccCache;
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
@@ -102,6 +132,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
             Journal = leJournal.Text;
+            Jour = (Uniconta.DataModel.GLDailyJournal)glDlJournalCache.Get(Journal);
             Date = date.DateTime;
             AddVoucherNumber = (bool)chkAddVouNo.IsChecked;
             TransType = leTransType.Text;
@@ -109,6 +140,7 @@ namespace UnicontaClient.Pages.CustomPage
             DebtorOffset = leDebtorOffset.Text;
             CreditorAccount = leCreditorAccount.Text;
             CreditorOffset = leCreditorOffset.Text;
+            LedgerOffset = leLedgerOffset.Text;
             this.DialogResult = true;
         }
     }

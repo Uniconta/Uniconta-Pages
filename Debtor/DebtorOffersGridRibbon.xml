@@ -43,9 +43,16 @@
     </RibbonItem>
     <RibbonItem Action="FollowUp" LocalizedNameKey="FollowUp" ControlName="CrmFollowUpPage" Module="CRM" LargeGlyph="CrmFollowUp.png"/>
   </RibbonItem>
-   <RibbonItem TabId="1" LocalizedNameKey="EditAll">
-    <RibbonItem Action="EditAll"  LocalizedNameKey="EditAll" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>
-       <RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="DeleteOBJ" Parameter="Order" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png"/>
-    <RibbonItem Action="SaveGrid" ShortcutKey="CTRL+S" LocalizedNameKey="Save" Glyph="save-16x16.png" LargeGlyph="save-32x32.png"/>
+  <RibbonItem TabId="1" LocalizedNameKey="EditAll">
+    <RibbonItem Action="EditAll"  LocalizedNameKey="EditAll"  LargeGlyph="Edit_32x32.png"/>
   </RibbonItem>
+    <RibbonItem>
+      <RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="DeleteOBJ" Parameter="Offer" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png"/>
+    </RibbonItem>
+    <RibbonItem>
+      <RibbonItem Action="UndoDelete" ShortcutKey="CTRL+Z" LocalizedNameKey="UndoDelete" LargeGlyph="Undo_Delete_32x32.png"/>
+    </RibbonItem>
+    <RibbonItem>
+      <RibbonItem Action="SaveGrid" ShortcutKey="CTRL+S" LocalizedNameKey="Save" Glyph="save-16x16.png" LargeGlyph="save-32x32.png"/>
+    </RibbonItem>
 </root>

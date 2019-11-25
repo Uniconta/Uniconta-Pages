@@ -53,6 +53,8 @@ namespace UnicontaClient.Pages.CustomPage
     public partial class ProjectInvoiceBase : GridBasePage
     {
         UnicontaBaseEntity master;
+        ItemBase iIncludeSubProBase;
+        static bool includeSubProject;
         public override string NameOfControl { get { return TabControls.ProjectInvoiceBase; } }
         public ProjectInvoiceBase(UnicontaBaseEntity master)
            : base(master)
@@ -100,6 +102,15 @@ namespace UnicontaClient.Pages.CustomPage
             localMenu.DisableButtons(new string[] { "Aggregate", "GenerateInvoice", "MarkAsInvoice" });
             ((DevExpress.Xpf.Grid.TableView)dgProjectTransClientInvoiceGrid.View).RowStyle = Application.Current.Resources["DisableStyleRow"] as Style;
             Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
+            RibbonBase rb = (RibbonBase)localMenu.DataContext;
+            if (master is Uniconta.DataModel.Project)
+            {
+                iIncludeSubProBase = UtilDisplay.GetMenuCommandByName(rb, "InclSubProjects");
+                iIncludeSubProBase.IsChecked = includeSubProject;
+            }
+            else
+                UtilDisplay.RemoveMenuCommand(rb, "InclSubProjects");
+            localMenu.OnChecked += LocalMenu_OnChecked;
         }
 
         public override Task InitQuery()
@@ -107,14 +118,25 @@ namespace UnicontaClient.Pages.CustomPage
             return null;
         }
 
+        private void LocalMenu_OnChecked(string actionType, bool IsChecked)
+        {
+            includeSubProject = IsChecked;
+            ShowInculdeSubProject();
+        }
+
+        void ShowInculdeSubProject()
+        {
+            iIncludeSubProBase.IsChecked = includeSubProject;
+            BindGrid();
+        }
+
         SQLCache ItemCache, CategoryCache;
         protected override async void LoadCacheInBackGround()
         {
-            var Comp = api.CompanyEntity;
-            ItemCache = Comp.GetCache(typeof(Uniconta.DataModel.InvItem)) ??
-                        await Comp.LoadCache(typeof(Uniconta.DataModel.InvItem), api).ConfigureAwait(false);
-            CategoryCache = Comp.GetCache(typeof(Uniconta.DataModel.PrCategory)) ??
-                        await Comp.LoadCache(typeof(Uniconta.DataModel.PrCategory), api).ConfigureAwait(false);
+            ItemCache = api.GetCache(typeof(Uniconta.DataModel.InvItem)) ??
+                        await api.LoadCache(typeof(Uniconta.DataModel.InvItem)).ConfigureAwait(false);
+            CategoryCache = api.GetCache(typeof(Uniconta.DataModel.PrCategory)) ??
+                        await api.LoadCache(typeof(Uniconta.DataModel.PrCategory)).ConfigureAwait(false);
         }
 
         void localMenu_OnItemClicked(string ActionType)
@@ -160,70 +182,75 @@ namespace UnicontaClient.Pages.CustomPage
 
         void GenerateOrderLines()
         {
-            var orderLines = new List<DebtorOrderLineClient>();
-            var source = (IEnumerable<ProjectTransInvoiceClient>)dgProjectTransClientInvoiceGrid.GetVisibleRows();
-            if (source != null)
+            var source = (ICollection<ProjectTransInvoiceClient>)dgProjectTransClientInvoiceGrid.GetVisibleRows();
+            if (source == null)
+                return;
+
+            var orderLines = new DebtorOrderLineClient[source.Count];
+            int i = 0;
+            foreach (var line in source)
             {
-                int i = 0;
-                foreach (var line in source)
+                if (!line._canInvoice)
+                    continue;
+
+                var ol = new DebtorOrderLineClient();
+                orderLines[i] = ol;
+
+                ol._LineNumber = ++i;
+                ol._Unit = (ItemUnit)line._Unit;
+                ol._Date = line._Date;
+                ol._CostPrice = line._CostPrice;
+                ol._Text = line._Text;
+                ol._Item = line._Item;
+                ol._Variant1 = line._Variant1;
+                ol._Variant2 = line._Variant2;
+                ol._Variant3 = line._Variant3;
+                ol._Variant4 = line._Variant4;
+                ol._Variant5 = line._Variant5;
+                var itm = (InvItem)ItemCache.Get(line._Item);
+                if (itm != null)
                 {
-                    if (! line._canInvoice)
-                        continue;
+                    if (ol._Text == null)
+                        ol._Text = itm._Name;
+                    ol._Dim1 = itm._Dim1;
+                    ol._Dim2 = itm._Dim2;
+                    ol._Dim3 = itm._Dim3;
+                    ol._Dim4 = itm._Dim4;
+                    ol._Dim5 = itm._Dim5;
+                    if (ol._Unit == 0)
+                        ol._Unit = itm._Unit;
+                }
+                if (line._Dim1 != null)
+                    ol._Dim1 = line._Dim1;
+                if (line._Dim2 != null)
+                    ol._Dim2 = line._Dim2;
+                if (line._Dim3 != null)
+                    ol._Dim3 = line._Dim3;
+                if (line._Dim4 != null)
+                    ol._Dim4 = line._Dim4;
+                if (line._Dim5 != null)
+                    ol._Dim5 = line._Dim5;
 
-                    var ol = new DebtorOrderLineClient();
-                    ol._LineNumber = ++i;
-                    ol._Unit = (ItemUnit)line._Unit;
-                    ol._Date = line._Date;
-                    ol._CostPrice = line._CostPrice;
-                    ol._Text = line._Text;
-                    ol._Item = line._Item;
-                    ol._Variant1 = line._Variant1;
-                    ol._Variant2 = line._Variant2;
-                    ol._Variant3 = line._Variant3;
-                    ol._Variant4 = line._Variant4;
-                    ol._Variant5 = line._Variant5;
-                    var itm = (InvItem)ItemCache.Get(line._Item);
-                    if (itm != null)
-                    {
-                        if (ol._Text == null)
-                            ol._Text = itm._Name;
-                        ol._Dim1 = itm._Dim1;
-                        ol._Dim2 = itm._Dim2;
-                        ol._Dim3 = itm._Dim3;
-                        ol._Dim4 = itm._Dim4;
-                        ol._Dim5 = itm._Dim5;
-                        if (ol._Unit == 0)
-                            ol._Unit = itm._Unit;
-                    }
-                    if (line._Dim1 != null)
-                        ol._Dim1 = line._Dim1;
-                    if (line._Dim2 != null)
-                        ol._Dim2 = line._Dim2;
-                    if (line._Dim3 != null)
-                        ol._Dim3 = line._Dim3;
-                    if (line._Dim4 != null)
-                        ol._Dim4 = line._Dim4;
-                    if (line._Dim5 != null)
-                        ol._Dim5 = line._Dim5;
-
-                    ol._Employee = line._Employee;
-                    ol._Qty = line._Qty != 0d ? line._Qty : 1d;
-                    if (line._SalesPrice != 0)
-                    {
-                        ol._Price = line._SalesPrice;
-                        ol._DiscountPct = line._DiscountPct;
-                    }
-                    else
-                        ol._AmountEntered = line._SalesAmountAgr;
-                    if (ol._Unit == 0 && line._PrCategory != null)
-                    {
-                        var cat = (PrCategory)CategoryCache.Get(line._PrCategory);
-                        if (cat != null)
-                            ol._Unit = cat._Unit;
-                    }
-                    orderLines.Add(ol);
+                ol._Employee = line._Employee;
+                ol._Qty = line._Qty != 0d ? line._Qty : 1d;
+                if (line._SalesPrice != 0)
+                {
+                    ol._Price = line._SalesPrice;
+                    ol._DiscountPct = line._DiscountPct;
+                }
+                else
+                    ol._AmountEntered = line._SalesAmountAgr;
+                if (ol._Unit == 0 && line._PrCategory != null)
+                {
+                    var cat = (PrCategory)CategoryCache.Get(line._PrCategory);
+                    if (cat != null)
+                        ol._Unit = cat._Unit;
                 }
             }
+
+            if (i != orderLines.Length)
+                Array.Resize(ref orderLines, i);
+
             var order = new DebtorOrder();
             order.SetMaster(master);
             order._NoItemUpdate = true;
@@ -239,7 +266,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             order._PrCategory = ValueFound;
 
-            var paramArr = new object[] { order, orderLines.ToArray() };
+            var paramArr = new object[] { order, orderLines };
             AddDockItem(TabControls.CreateInvoicePage, paramArr);
         }
 
@@ -252,7 +279,7 @@ namespace UnicontaClient.Pages.CustomPage
             cbxCategory.IsEnabled = true;
             cbxEmployee.IsEnabled = true;
             await Filter();
-            var source = dgProjectTransClientInvoiceGrid.ItemsSource as IList<ProjectTransInvoiceClient>;
+            var source = dgProjectTransClientInvoiceGrid.ItemsSource as ICollection<ProjectTransInvoiceClient>;
             var removeList = new List<ProjectTransInvoiceClient>();
             if (source != null)
             {
@@ -304,6 +331,14 @@ namespace UnicontaClient.Pages.CustomPage
                 dateFilterTo.name = "Date";
                 dateFilterTo.value = String.Format("..{0:d}", txtDateTo.DateTime);
                 Filter.Add(dateFilterTo);
+            }
+            if (includeSubProject)
+            {
+                Filter subProjectFilter = new Filter();
+                subProjectFilter.name = "IncludeSubProject";
+                subProjectFilter.value = "1";
+                subProjectFilter.parameterType = typeof(bool);
+                Filter.Add(subProjectFilter);
             }
             var invoiced = new Filter() { name = "Invoiced", value = "0" };
             Filter.Add(invoiced);

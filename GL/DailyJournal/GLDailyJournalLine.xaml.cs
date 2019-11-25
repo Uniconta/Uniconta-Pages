@@ -804,6 +804,9 @@ namespace UnicontaClient.Pages.CustomPage
                 case "RemoveAllVouchers":
                     RemoveAllVouchers();
                     break;
+                case "UndoDelete":
+                    dgGLDailyJournalLine.UndoDeleteRow();
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -964,13 +967,17 @@ namespace UnicontaClient.Pages.CustomPage
         private void SetSettlementsForJournalLine(JournalLineGridClient selectedItem, string settlementStr, double MarkedRemainingAmt, double MarkedRemainingAmtCur, string Currency, bool Offset)
         {
             dgGLDailyJournalLine.SetLoadedRow(selectedItem);
-            if (Currency != null || selectedItem.AmountCur != 0)
+            if (Currency != null)
             {
-                if (Currency != null)
-                    selectedItem.Currency = Currency;
-                selectedItem.AmountCur = Offset ? MarkedRemainingAmtCur : -MarkedRemainingAmtCur;
+                if (selectedItem.AmountSetBySystem || (selectedItem.Amount == 0d && selectedItem.AmountCur == 0d))
+                {
+                    selectedItem.AmountSetBySystem = true;
+                    if (Currency != null)
+                        selectedItem.Currency = Currency;
+                    selectedItem.AmountCur = Offset ? MarkedRemainingAmtCur : -MarkedRemainingAmtCur;
+                }
             }
-            else if (selectedItem.Amount == 0d || selectedItem.AmountSetBySystem)
+            else if (selectedItem.AmountSetBySystem || selectedItem.Amount == 0d)
             {
                 selectedItem.AmountSetBySystem = true;
                 selectedItem.Amount = Offset ? MarkedRemainingAmt : -MarkedRemainingAmt;
@@ -1133,7 +1140,27 @@ namespace UnicontaClient.Pages.CustomPage
 
             var saveTask = saveGrid();
 
-            CWPosting postingDialog = new CWPosting(masterRecord, api.CompanyEntity?.Name);
+            string dateMsg;
+            if (masterRecord._DateFunction == GLJournalDate.Free)
+            {
+                DateTime smallestDate = DateTime.MaxValue;
+                DateTime largestDate = DateTime.MinValue;
+                foreach (var rec in source as IEnumerable<JournalLineGridClient>)
+                {
+                    var dt = rec._Date;
+                    if (dt != DateTime.MinValue)
+                    {
+                        if (dt < smallestDate)
+                            smallestDate = dt;
+                        if (dt > largestDate)
+                            largestDate = dt;
+                    }
+                }
+                dateMsg = string.Format(Uniconta.ClientTools.Localization.lookup("PostingDateMsg"), smallestDate.ToShortDateString(), largestDate.ToShortDateString());
+            }
+            else
+                dateMsg = null;
+            CWPosting postingDialog = new CWPosting(masterRecord, api.CompanyEntity?.Name, dateMsg);
 #if !SILVERLIGHT
             postingDialog.DialogTableId = 2000000014;
 #endif
@@ -1572,7 +1599,7 @@ namespace UnicontaClient.Pages.CustomPage
             var dc = getDCAccount(type, Acc);
             if (dc == null)
                 return null;
-            if (rec._DocumentDate != DateTime.MinValue || rec._Date != DateTime.MinValue)
+            if ((rec._DocumentDate != DateTime.MinValue || rec._Date != DateTime.MinValue) && rec._DCPostType != Uniconta.DataModel.DCPostType.Creditnote && (rec._DCPostType < Uniconta.DataModel.DCPostType.Payment || rec._DCPostType > Uniconta.DataModel.DCPostType.PartialPayment))
             {
                 var pay = (Uniconta.DataModel.PaymentTerm)PaymentCache?.Get(dc._Payment);
                 if (pay != null)
@@ -1609,7 +1636,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         void assignOffsetVat(JournalLineGridClient rec, string vat, string vatOperation)
         {
-            if (rec._DCPostType == Uniconta.DataModel.DCPostType.Payment || rec._DCPostType == Uniconta.DataModel.DCPostType.PartialPayment)
+            if (rec._DCPostType >= Uniconta.DataModel.DCPostType.Payment || rec._DCPostType <= Uniconta.DataModel.DCPostType.PartialPayment)
                 return;
 
             if (vat != null)

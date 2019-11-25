@@ -5,9 +5,18 @@ x:Class="UnicontaClient.Pages.CustomPage.CWCreateOrderFromQuickInvoice"
            xmlns:cw="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
            xmlns:controls="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls"  
            xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
-        xmlns:UnicontaControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
-          xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage" Width="700" Height="650" KeyDown="ChildWindow_KeyDown">
-
+           xmlns:UnicontaControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+           xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
+           xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+           xmlns:docking="http://schemas.devexpress.com/winfx/2008/xaml/docking"
+           xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage" Width="700" Height="650" KeyDown="ChildWindow_KeyDown">
+    <cw:ChildWindow.Resources>
+        <Style x:Key="StyleRow" TargetType="dxg:RowControl">
+            <Setter Property="Height" Value="Auto"/>
+        </Style>
+        <Util:RowIndexConverter x:Key="RowIndexConverter" />
+        <Util:MaskConverter x:Key="MaskConverter" />
+    </cw:ChildWindow.Resources>
     <Grid x:Name="LayoutRoot" Margin="2" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -16,17 +25,41 @@ x:Class="UnicontaClient.Pages.CustomPage.CWCreateOrderFromQuickInvoice"
         </Grid.RowDefinitions>
         <UnicontaControls:CorasauRibbonControl XMLSourcePath=";component/Assets/FilterLayoutRibbon.xml" x:Name="localMenu"/>
         <UnicontaControls:BusyIndicator x:Name="busyIndicator" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}" Grid.Row="1">
-            <localPage:InvoicesGrid x:Name="dgCreateOrderGrid" AutoGenerateColumns="None">
-                <localPage:InvoicesGrid.Columns>
-                    <UnicontaControls:CorasauDataGridTemplateColumn FieldName="Account" IsSmart="True" AllowEditing="False" Width="120"/>
-                    <UnicontaControls:CorasauDataGridTemplateColumn FieldName="Name" IsSmart="True" AllowEditing="False" Width="120"/>
-                    <UnicontaControls:CorasauDataGridTemplateColumn FieldName="Date" IsSmart="True" AllowEditing="False" Width="80" />
-                    <UnicontaControls:CorasauDataGridTemplateColumn FieldName="InvoiceNumber" IsSmart="True" AllowEditing="False" Width="50"/>
-                    <UnicontaControls:CorasauDataGridTemplateColumn FieldName="TotalAmount" IsSmart="True" AllowEditing="False" Width="120"/>
-                </localPage:InvoicesGrid.Columns>
-            </localPage:InvoicesGrid>
+            <docking:DockLayoutManager x:Name="DockingControl" Visibility="Visible" AllowCustomization="False">
+                <docking:LayoutGroup x:Name="lGroup" AllowDrag="False" AllowDock="False" AllowFloat="False" Orientation="Vertical" AllowContextMenu="False" >
+                    <docking:LayoutPanel x:Name="layOutDebtorInvoiceLine" Visibility="Visible" FloatOnDoubleClick="False" AllowDrag="False" AllowDock="False" AllowClose="False" AllowContextMenu="False" AllowMaximize="False" AllowDockToDocumentGroup="False" ShowCloseButton="False"  ShowPinButton="False">
+                        <localPage:InvoicesGrid x:FieldModifier="public" x:Name="dgCreateOrderGrid" AutoGenerateColumns="None">
+                            <localPage:InvoicesGrid.Columns>
+                                <UnicontaControls:CorasauDataGridTemplateColumn FieldName="Account" IsSmart="True" AllowEditing="False" Width="120"/>
+                                <UnicontaControls:CorasauDataGridTemplateColumn FieldName="Name" IsSmart="True" AllowEditing="False" Width="120"/>
+                                <UnicontaControls:CorasauDataGridTemplateColumn FieldName="Date" IsSmart="True" AllowEditing="False" Width="80" />
+                                <UnicontaControls:CorasauDataGridTemplateColumn FieldName="InvoiceNumber" IsSmart="True" AllowEditing="False" Width="50"/>
+                                <UnicontaControls:CorasauDataGridTemplateColumn FieldName="TotalAmount" IsSmart="True" AllowEditing="False" Width="120"/>
+                            </localPage:InvoicesGrid.Columns>
+                        </localPage:InvoicesGrid>
+                    </docking:LayoutPanel>
+                    <docking:LayoutPanel x:Name="layOutOrderline" FloatOnDoubleClick="False" AllowDrag="False" AllowDock="False" AllowClose="False" AllowContextMenu="False" AllowMaximize="False" AllowDockToDocumentGroup="False" ShowCloseButton="False"  ShowPinButton="False">
+                        <localPage:DCorderGrid x:Name="dcOrderlineGrid"  AutoGenerateColumns="None">
+                            <localPage:DCorderGrid.Columns>
+                                <UnicontaControls:CorasauDataGridTemplateColumn FieldName="Item" IsSmart="True" AllowEditing="False" Width="120"/>
+                                <UnicontaControls:CorasauDataGridTemplateColumn x:Name="colVariant" FieldName="Variant"/>
+                                <UnicontaControls:CorasauDataGridTemplateColumn FieldName="Text" IsSmart="True" AllowEditing="False" Width="120"/>
+                                <UnicontaControls:CorasauDataGridTemplateColumn FieldName="Qty" IsSmart="True" AllowEditing="False" Width="50"/>
+                                <UnicontaControls:CorasauDataGridTemplateColumn FieldName="Unit" IsSmart="True" AllowEditing="False" Width="50"/>
+                                <UnicontaControls:CorasauDataGridTemplateColumn FieldName="DiscountPct" IsSmart="True" AllowEditing="False" Width="80" />
+                                <UnicontaControls:CorasauDataGridTemplateColumn FieldName="Discount" IsSmart="True" AllowEditing="False" Width="80" />
+                                <UnicontaControls:CorasauDataGridTemplateColumn FieldName="Total" IsSmart="True" AllowEditing="False" Width="120"/>
+                                <UnicontaControls:CorasauDataGridTemplateColumn FieldName="Employee" IsSmart="True" AllowEditing="False" Width="120"/>
+                                <UnicontaControls:CorasauDataGridTemplateColumn FieldName="Warehouse" IsSmart="True" AllowEditing="False" Width="120"/>
+                                <UnicontaControls:CorasauDataGridTemplateColumn FieldName="Location" IsSmart="True" AllowEditing="False" Width="50"/>
+                                <UnicontaControls:CorasauDataGridTemplateColumn FieldName="Warehouse" IsSmart="True" AllowEditing="False" Width="120"/>
+                            </localPage:DCorderGrid.Columns>
+                        </localPage:DCorderGrid>
+                    </docking:LayoutPanel>
+                </docking:LayoutGroup>
+            </docking:DockLayoutManager>
         </UnicontaControls:BusyIndicator>
-        <CheckBox x:Name="chkIfCreditNote" Grid.Row="2" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CreditNote}" Height="23" HorizontalAlignment="Left" />
+        <CheckBox x:FieldModifier="public" x:Name="chkIfCreditNote" Grid.Row="2" Unchecked="chkIfCreditNote_Checked" Checked="chkIfCreditNote_Checked" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CreditNote}" Height="23" HorizontalAlignment="Left" />
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0 10 0 10">
             <Button x:Name="CreateButton" IsDefault="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CopyLine}" Click="CreateButton_Click"  Height="23" HorizontalAlignment="Right" />
             <Button x:Name="CancelButton" IsCancel="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Cancel}" Click="CancelButton_Click"  Height="23"  Margin="3,0,0,0" />

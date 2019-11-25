@@ -63,6 +63,34 @@ namespace UnicontaClient.Pages.CustomPage
                 this.colUnfoldBom.Visible = true;
             SetTreeListViewStyle();
             dgInvBomclientGrid.View.ShownColumnChooser += View_ShownColumnChooser;
+#if SILVERLIGHT
+            Application.Current.RootVisual.KeyDown += RootVisual_KeyDown;
+#else
+            this.PreviewKeyDown += RootVisual_KeyDown;
+#endif
+            this.BeforeClose += InventoryHierarchicalBOMStatement_BeforeClose;
+        }
+
+        private void InventoryHierarchicalBOMStatement_BeforeClose()
+        {
+#if SILVERLIGHT
+            Application.Current.RootVisual.KeyDown -= RootVisual_KeyDown;
+#else
+            this.PreviewKeyDown -= RootVisual_KeyDown;
+#endif
+        }
+
+        private void RootVisual_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == Key.F6 && dgInvBomclientGrid.CurrentColumn == ItemPart)
+            {
+                var itempart = dgInvBomclientGrid.CurrentCellValue;
+                var lookupTable = new LookUpTable();
+                lookupTable.api = this.api;
+                lookupTable.KeyStr = Convert.ToString(itempart);
+                lookupTable.TableType = typeof(InvItem);
+                this.LookUpTable(lookupTable, Uniconta.ClientTools.Localization.lookup("Lookup"), TabControls.InventoryItems);
+            }
         }
 
         private void View_ShownColumnChooser(object sender, RoutedEventArgs e)

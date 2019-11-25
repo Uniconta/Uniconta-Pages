@@ -265,7 +265,7 @@ namespace UnicontaClient.Pages.CustomPage
                         var result = await Invapi.PostInvoice(dbOrder, null, InvoiceDate,
                             0, GenrateInvoiceDialog.IsSimulation, new DebtorInvoiceClient(),
                             new DebtorInvoiceLines(), GenrateInvoiceDialog.SendByEmail, (GenrateInvoiceDialog.ShowInvoice || GenrateInvoiceDialog.InvoiceQuickPrint || GenrateInvoiceDialog.GenerateOIOUBLClicked), 0,
-                            GenrateInvoiceDialog.Emails, GenrateInvoiceDialog.sendOnlyToThisEmail, null, null, GenrateInvoiceDialog.PostOnlyDelivered);
+                            GenrateInvoiceDialog.Emails, GenrateInvoiceDialog.sendOnlyToThisEmail, null, null, GenrateInvoiceDialog.PostOnlyDelivered, false);
                         if (result != null && result.Err == 0)
                         {
 #if SILVERLIGHT
@@ -392,7 +392,7 @@ namespace UnicontaClient.Pages.CustomPage
                         var result = await Invapi.PostInvoice(dbOrder, null, GenrateInvoiceDialog.GenrateDate, 0,
                           !updateStatus, new DebtorInvoiceClient(),
                           new DebtorInvoiceLines(), GenrateInvoiceDialog.SendByEmail, GenrateInvoiceDialog.ShowInvoice || GenrateInvoiceDialog.InvoiceQuickPrint, docType,
-                          GenrateInvoiceDialog.Emails, GenrateInvoiceDialog.sendOnlyToThisEmail, null, null, GenrateInvoiceDialog.PostOnlyDelivered);
+                          GenrateInvoiceDialog.Emails, GenrateInvoiceDialog.sendOnlyToThisEmail, null, null, GenrateInvoiceDialog.PostOnlyDelivered, false);
 
                         if (result != null && result.Err == 0 && (GenrateInvoiceDialog.ShowInvoice || GenrateInvoiceDialog.InvoiceQuickPrint))
                         {
@@ -658,7 +658,7 @@ namespace UnicontaClient.Pages.CustomPage
                     var result = await Invapi.PostInvoice(dbOrder, null, GenrateInvoiceDialog.GenrateDate,
                        0, GenrateInvoiceDialog.IsSimulation, new DebtorInvoiceClient(), new DebtorInvoiceLines(),
                        GenrateInvoiceDialog.SendByEmail, (showOrPrint || GenrateInvoiceDialog.GenerateOIOUBLClicked), 0, GenrateInvoiceDialog.Emails, GenrateInvoiceDialog.sendOnlyToThisEmail,
-                       null, null, GenrateInvoiceDialog.PostOnlyDelivered);
+                       null, null, GenrateInvoiceDialog.PostOnlyDelivered, false);
 
                     busyIndicator.IsBusy = false;
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
@@ -766,7 +766,10 @@ namespace UnicontaClient.Pages.CustomPage
                 if (Comp._CountryId == CountryCode.Norway || Comp._CountryId == CountryCode.Netherlands)
                     cResult = ubl_norway_uniconta.EHF.GenerateEHFXML(Comp, debtor, deliveryAccount, invClient, invoiceLines, InvCache, VatCache, invItemText, contactPerson);
                 else
-                    cResult = Uniconta.API.DebtorCreditor.OIOUBL.GenerateOioXML(Comp, debtor, deliveryAccount, invClient, invoiceLines, InvCache, VatCache, invItemText, contactPerson);
+                {
+                    TableAddOnData[] attachments = await FromXSDFile.OIOUBL.ExportImport.Attachments.CollectInvoiceAttachments(invClient, api);
+                    cResult = Uniconta.API.DebtorCreditor.OIOUBL.GenerateOioXML(Comp, debtor, deliveryAccount, invClient, invoiceLines, InvCache, VatCache, invItemText, contactPerson, attachments);
+                }
 
                 bool createXmlFile = true;
 
@@ -852,7 +855,6 @@ namespace UnicontaClient.Pages.CustomPage
         {
             busyIndicator.BusyContent = string.Format("{0} {1}: {2}", !isPrint ? Uniconta.ClientTools.Localization.lookup("LoadingMsg") : Uniconta.ClientTools.Localization.lookup("Printing"),
                 Uniconta.ClientTools.Localization.lookup("OrderNumber"), dbOrder?.OrderNumber);
-            IPrintReport standardPrint = null;
 
             try
             {
@@ -861,6 +863,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                 if (isInitializedSuccess)
                 {
+                    StandardPrintReport standardPrint;
                     DebtorInvoiceReportClient standardDebtorInvoice = null;
                     if (layoutType == CompanyLayoutType.OrderConfirmation || layoutType == CompanyLayoutType.Packnote)
                     {
@@ -868,29 +871,29 @@ namespace UnicontaClient.Pages.CustomPage
                             Uniconta.ClientTools.Controls.Reporting.StandardReports.PackNote;
                         standardDebtorInvoice = new DebtorQCPReportClient(debtorInvoicePrint.Company, debtorInvoicePrint.Debtor, debtorInvoicePrint.DebtorInvoice, debtorInvoicePrint.InvTransInvoiceLines, debtorInvoicePrint.DebtorOrder,
                             debtorInvoicePrint.CompanyLogo, debtorInvoicePrint.ReportName, (byte)standardDocVersion, messageClient: debtorInvoicePrint.MessageClient);
-                        standardPrint = new StandardPrintReport(api, new IDebtorStandardReport[1] { standardDebtorInvoice }, (byte)standardDocVersion);
+                        standardPrint = new StandardPrintReport(api, new [] { standardDebtorInvoice }, (byte)standardDocVersion);
                     }
                     else if (layoutType == CompanyLayoutType.PickingList)
                     {
                         standardDebtorInvoice = new DebtorSalesPickingListReportClient(debtorInvoicePrint.Company, debtorInvoicePrint.Debtor, debtorInvoicePrint.DebtorInvoice, debtorInvoicePrint.InvTransInvoiceLines, debtorInvoicePrint.DebtorOrder,
                             debtorInvoicePrint.CompanyLogo, debtorInvoicePrint.ReportName, messageClient: debtorInvoicePrint.MessageClient);
-                        standardPrint = new StandardPrintReport(api, new IDebtorStandardReport[1] { standardDebtorInvoice }, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.SalesPickingList);
+                        standardPrint = new StandardPrintReport(api, new [] { standardDebtorInvoice }, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.SalesPickingList);
                     }
                     else // layout type for Invoice
                     {
                         standardDebtorInvoice = new DebtorInvoiceReportClient(debtorInvoicePrint.Company, debtorInvoicePrint.Debtor, debtorInvoicePrint.DebtorInvoice, debtorInvoicePrint.InvTransInvoiceLines, debtorInvoicePrint.DebtorOrder,
                         debtorInvoicePrint.CompanyLogo, debtorInvoicePrint.ReportName, isCreditNote: debtorInvoicePrint.IsCreditNote, messageClient: debtorInvoicePrint.MessageClient);
-                        standardPrint = new StandardPrintReport(api, new IDebtorStandardReport[1] { standardDebtorInvoice }, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.Invoice);
+                        standardPrint = new StandardPrintReport(api, new [] { standardDebtorInvoice }, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.Invoice);
                     }
 
                     await standardPrint.InitializePrint();
 
+                    if (standardPrint.Report != null)
+                        return standardPrint;
 
-                    if (standardPrint?.Report == null)
-                    {
-                        standardPrint = new LayoutPrintReport(api, result, layoutType);
-                        await standardPrint.InitializePrint();
-                    }
+                    var layoutPrint = new LayoutPrintReport(api, result, layoutType);
+                    await layoutPrint.InitializePrint();
+                    return layoutPrint;
                 }
             }
             catch (Exception ex)
@@ -899,7 +902,7 @@ namespace UnicontaClient.Pages.CustomPage
                 api.ReportException(ex, string.Format("MultiInvoicePage.ValidateStandardPrint(), CompanyId={0}", api.CompanyId));
             }
 
-            return standardPrint;
+            return null;
         }
 #endif
 

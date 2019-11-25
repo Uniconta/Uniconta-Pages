@@ -35,6 +35,9 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryGroupPage2"
                     <CorasauControls:CorasauLayoutItem FieldName="AutoNumber" x:Name="liAutoNumber">
                         <CorasauControls:LookupEditor x:Name="leAutoNumber" Text="{Binding AutoNumber,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="DutyGroup" x:Name="liDutyGroup">
+                        <CorasauControls:LookupEditor x:Name="leDutyGroup" Text="{Binding DutyGroup,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
                 <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpEUSales" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=EUsales}"  Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                     <CorasauControls:CorasauLayoutItem FieldName="TariffNumber" x:Name="liTraiffNumber">

@@ -143,7 +143,7 @@ namespace UnicontaClient.Pages.CustomPage
             this.KeyDown += Page_KeyDown;
 #endif
         }
-        
+
         private void Page_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.F8)
@@ -273,16 +273,21 @@ namespace UnicontaClient.Pages.CustomPage
                 if (param != null)
                 {
                     var invItems = param[0] as List<UnicontaBaseEntity>;
+                    if (invItems == null || invItems.Count == 0)
+                        return;
                     var iSource = dgDebtorOrderLineGrid.ItemsSource as IEnumerable<DebtorOrderLineClient>;
-                    var nonemptyList = new List<UnicontaBaseEntity>();
                     if (iSource != null)
                     {
+                        var removeList = new List<int>();
+                        int i = -1;
                         foreach (var row in iSource)
                         {
-                            if (row._Item != null || row._Text != null || row._Note != null)
-                                nonemptyList.Add(row);
+                            i++;
+                            if (row._Item == null && row._Text == null && row._Note == null)
+                                removeList.Add(i);
                         }
-                        dgDebtorOrderLineGrid.SetSource(nonemptyList.ToArray());
+                        for (i = removeList.Count; (--i >= 0); )
+                            dgDebtorOrderLineGrid.tableView.DeleteRow(removeList[i]);
                     }
                     dgDebtorOrderLineGrid.PasteRows(invItems);
                 }
@@ -380,7 +385,7 @@ namespace UnicontaClient.Pages.CustomPage
                         rec._Location = null;
                     break;
                 case "EAN":
-                    DebtorOfferLines.FindOnEAN(rec, this.items, api);
+                    DebtorOfferLines.FindOnEAN(rec, this.items, api, this.PriceLookup);
                     break;
                 case "Variant1":
                     if (rec._Variant1 != null)
@@ -395,7 +400,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (this.PriceLookup != null && this.PriceLookup.UseCustomerPrices)
                         this.PriceLookup.GetCustomerPrice(rec, false);
                     break;
-               
+
             }
         }
         async void RecalculateAmount()
@@ -412,6 +417,8 @@ namespace UnicontaClient.Pages.CustomPage
             double Amountsum = ret.Item1;
             double Costsum = ret.Item2;
             double sales = ret.Item3;
+            if (Order._EndDiscountPct != 0)
+                sales *= (100d - Order._EndDiscountPct) / 100d;
             RibbonBase rb = (RibbonBase)localMenu.DataContext;
             var groups = UtilDisplay.GetMenuCommandsByStatus(rb, true);
             foreach (var grp in groups)
@@ -711,11 +718,14 @@ namespace UnicontaClient.Pages.CustomPage
 
             string debtorName = dbOrder.Debtor?.Name ?? dbOrder._DCAccount;
             bool invoiceInXML = dc?.InvoiceInXML ?? false;
-            CWGenerateInvoice GenrateInvoiceDialog = new CWGenerateInvoice(true, string.Empty, false, askForEmail: true, showNoEmailMsg: !hasEmail, debtorName: debtorName, isOrderOrQuickInv: true, isDebtorOrder: true, InvoiceInXML: invoiceInXML);
+            var accountName = string.Format("{0} ({1})", dbOrder._DCAccount, dbOrder.Name);
+            CWGenerateInvoice GenrateInvoiceDialog = new CWGenerateInvoice(true, string.Empty, false, askForEmail: true, showNoEmailMsg: !hasEmail, debtorName: debtorName, isOrderOrQuickInv: true, isDebtorOrder: true, InvoiceInXML: invoiceInXML, AccountName:accountName);
 #if !SILVERLIGHT
             GenrateInvoiceDialog.DialogTableId = 2000000005;
 #endif
             GenrateInvoiceDialog.SetInvPrintPreview(showInvPrintPrv);
+            if (dbOrder._InvoiceDate != DateTime.MinValue)
+                GenrateInvoiceDialog.SetInvoiceDate(dbOrder._InvoiceDate);
             GenrateInvoiceDialog.Closed += async delegate
             {
                 if (GenrateInvoiceDialog.DialogResult == true)
@@ -738,7 +748,7 @@ namespace UnicontaClient.Pages.CustomPage
                         if (!GenrateInvoiceDialog.IsSimulation)
                         {
                             documents = null;
-                            if(attachDocMenu!= null)
+                            if (attachDocMenu != null)
                                 attachDocMenu.Caption = string.Format(Uniconta.ClientTools.Localization.lookup("AttachOBJ"), Uniconta.ClientTools.Localization.lookup("Documents"));
                         }
 

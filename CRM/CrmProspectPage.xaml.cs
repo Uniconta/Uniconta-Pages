@@ -50,7 +50,7 @@ namespace UnicontaClient.Pages.CustomPage
             SetRibbonControl(localMenu, dgCrmProspectGrid);
             
             localMenu.OnItemClicked += localMenu_OnItemClicked;
-            ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "SaveGrid" });
+            ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "UndoDelete", "SaveGrid" });
         }
         protected override void OnLayoutCtrlLoaded()
         {
@@ -146,6 +146,9 @@ namespace UnicontaClient.Pages.CustomPage
                 case "CopyRecord":
                     CopyRecord(selectedItem);
                     break;
+                case "UndoDelete":
+                    dgCrmProspectGrid.UndoDeleteRow();
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -175,7 +178,7 @@ namespace UnicontaClient.Pages.CustomPage
                 dgCrmProspectGrid.MakeEditable();
                 UserFieldControl.MakeEditable(dgCrmProspectGrid);
                 ibase.Caption = Uniconta.ClientTools.Localization.lookup("LeaveEditAll");
-                ribbonControl.EnableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "SaveGrid" });
+                ribbonControl.EnableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "UndoDelete", "SaveGrid" });
                 editAllChecked = false;
                 copyRowIsEnabled = true;
             }
@@ -207,7 +210,7 @@ namespace UnicontaClient.Pages.CustomPage
                         dgCrmProspectGrid.Readonly = true;
                         dgCrmProspectGrid.tableView.CloseEditor();
                         ibase.Caption = Uniconta.ClientTools.Localization.lookup("EditAll");
-                        ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "SaveGrid" });
+                        ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "UndoDelete", "SaveGrid" });
                         copyRowIsEnabled = false;
                     };
                     confirmationDialog.Show();
@@ -217,7 +220,7 @@ namespace UnicontaClient.Pages.CustomPage
                     dgCrmProspectGrid.Readonly = true;
                     dgCrmProspectGrid.tableView.CloseEditor();
                     ibase.Caption = Uniconta.ClientTools.Localization.lookup("EditAll");
-                    ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "SaveGrid" });
+                    ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "UndoDelete", "SaveGrid" });
                     copyRowIsEnabled = false;
                 }
             }

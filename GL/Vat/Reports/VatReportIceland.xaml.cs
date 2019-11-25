@@ -18,49 +18,49 @@ using Localization = Uniconta.ClientTools.Localization;
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
-  public class VatReportIcelandGrid : CorasauDataGridClient
-  {
-    public override Type TableType
+    public class VatReportIcelandGrid : CorasauDataGridClient
     {
-      get { return typeof(VatSumOperationReport); }
+        public override Type TableType
+        {
+            get { return typeof(VatSumOperationReport); }
+        }
+
+        public override bool Readonly
+        {
+            get { return true; }
+        }
     }
 
-    public override bool Readonly
+    public partial class VatReportIceland : GridBasePage
     {
-      get { return true; }
-    }
-  }
+        #region Member Constants
 
-  public partial class VatReportIceland : GridBasePage
-  {
-#region Member Constants
+        #endregion
 
-#endregion
+        #region Member variables
 
-#region Member variables
+        protected List<VatSumOperationReport> vatSumOperationLst;
 
-    protected List<VatSumOperationReport> vatSumOperationLst;
+        #endregion
 
-#endregion
+        #region Properties
 
-#region Properties
+        private List<VatSumOperationReport> VatSumOperationLst
+        {
+            get { return vatSumOperationLst; }
 
-    private List<VatSumOperationReport> VatSumOperationLst
-    {
-      get { return vatSumOperationLst; }
+            set { vatSumOperationLst = value; }
+        }
 
-      set { vatSumOperationLst = value; }
-    }
+        private DateTime FromDate { get; }
+        private DateTime ToDate { get; }
 
-    private DateTime FromDate { get; }
-    private DateTime ToDate { get; }
+        #endregion
 
-#endregion
-
-    public override string NameOfControl
-    {
-      get { return "VatReportIceland"; }
-    }
+        public override string NameOfControl
+        {
+            get { return "VatReportIceland"; }
+        }
 
         public VatReportIceland(List<VatSumOperationReport> VatSumOperationLst, DateTime fromDate, DateTime toDate) : base(null)
         {
@@ -120,7 +120,7 @@ namespace UnicontaClient.Pages.CustomPage
             txtKennitala.Text = api.CompanyEntity._Id;
             txtVatNo.Text = api.CompanyEntity._VatNumber;
             // Can add if necessary
-            txtPassword.Text = (string)(api.CompanyEntity.GetUserField("RskPassword") ?? string.Empty);
+            //txtPassword.Text = (string)(api.CompanyEntity.GetUserField("RskPassword") ?? string.Empty);
 #endif
         }
 
@@ -144,11 +144,10 @@ namespace UnicontaClient.Pages.CustomPage
                     busyIndicator.IsBusy = true;
                     //MessageBox.Show("sending to rsk");
                     var sendingResult = await SendToRSK(VatSumOperationLst);
-                    if (sendingResult != null
-                     && sendingResult.status.code == 0)
+                    if (sendingResult != null)
                     {
-                        var pdfBytes = sendingResult.Svar.PDFKvittun;
-                        var savingResult = await SavePdfFileToVouchers(api, sendingResult.Svar);
+                        var pdfBytes = sendingResult.PDFKvittun;
+                        var savingResult = await SavePdfFileToVouchers(api, sendingResult);
                         if (savingResult == ErrorCodes.Succes)
                         {
                             Dispatcher?.Invoke(() => DisplaySavedPdf(pdfBytes));
@@ -171,98 +170,102 @@ namespace UnicontaClient.Pages.CustomPage
             busyIndicator.BusyContent = previousContent;
         }
 #if !SILVERLIGHT
-    private void DisplaySavedPdf(
-      byte[] pdfBytes)
-    {
-      var ms = new MemoryStream(pdfBytes);
-      pdfViewer.DocumentSource = ms;
-      var controlWidth = gridColumn.Width;
-      gridColumn.Width = pdfColumn.Width;
-      pdfColumn.Width = controlWidth;
-    }
+        private void DisplaySavedPdf(
+          byte[] pdfBytes)
+        {
+            var ms = new MemoryStream(pdfBytes);
+            pdfViewer.DocumentSource = ms;
+            var controlWidth = gridColumn.Width;
+            gridColumn.Width = pdfColumn.Width;
+            pdfColumn.Width = controlWidth;
+        }
 
-    private async Task<ErrorCodes> SavePdfFileToVouchers(
-      CrudAPI crudApi,
-      docType_ns_VSKSkyrslaSvar reply)
-    {
-      var errorCode = ErrorCodes.NoSucces;
-      byte[] docBytes = reply.PDFKvittun;
-      var vc = new VouchersClient
-      {
-        _Data = docBytes,
-        Fileextension = FileextensionsTypes.PDF,
-        Text = "VSK skil",
-        _Amount = reply.NidurstadaSkila.Fjarhaedir.TilGreidslu ?? 0,
-        _Content = ContentTypes.Documents,
-      };
-      var success = false;
-      while (!success)
-      {
-        errorCode = await crudApi.Insert(vc);
-        success = errorCode == ErrorCodes.Succes;
-        if (!success)
-          UnicontaMessageBox.Show(
-            Localization.GetLocalization(Uniconta.Common.Language.Is).Lookup(errorCode.ToString()) + "\nReyna aftur?", // Try again?
-            "Villa við vistun", // Error while saving
-            messageBoxImage: MessageBoxImage.Error,
-            messageBoxButton: MessageBoxButton.YesNo
-          );
-      }
-      return errorCode;
-    }
+        private async Task<ErrorCodes> SavePdfFileToVouchers(
+          CrudAPI crudApi,
+          docType_ns_VSKSkyrslaSvar reply)
+        {
+            var errorCode = ErrorCodes.NoSucces;
+            byte[] docBytes = reply.PDFKvittun;
+            var vc = new VouchersClient
+            {
+                _Data = docBytes,
+                Fileextension = FileextensionsTypes.PDF,
+                Text = "VSK skil",
+                _Amount = reply.NidurstadaSkila.Fjarhaedir.TilGreidslu ?? 0,
+                _Content = ContentTypes.Documents,
+            };
+            var success = false;
+            while (!success)
+            {
+                errorCode = await crudApi.Insert(vc);
+                success = errorCode == ErrorCodes.Succes;
+                if (!success)
+                    UnicontaMessageBox.Show(
+                      Localization.GetLocalization(Uniconta.Common.Language.Is).Lookup(errorCode.ToString()) + "\nReyna aftur?", // Try again?
+                      "Villa við vistun", // Error while saving
+                      messageBoxImage: MessageBoxImage.Error,
+                      messageBoxButton: MessageBoxButton.YesNo
+                    );
+            }
+            return errorCode;
+        }
 
-    private async Task ResetTestVSK(
-      CrudAPI crudApi,
-      List<VatSumOperationReport> vatSumOperationReports) // Only for test service URI
-    {
-      try
-      {
-        var client = new VskClient(txtKennitala.Text, txtPassword.Text);
-        var result = await client.ResetTestAsync(txtKennitala.Text, ToDate, api.CompanyEntity._VatNumber);
-        if (result.EydaSkyrsluIProfunSvar != null)
-          UnicontaMessageBox.Show(result.EydaSkyrsluIProfunSvar.status.message, "Villa " + result.EydaSkyrsluIProfunSvar.status.code);
-      } catch (MessageSecurityException)
-      {
-        UnicontaMessageBox.Show("Rangt notendanafn eða lykilorð", "Villa"); //Wrong UserName or Password
-      } catch (Exception e)
-      {
-        UnicontaMessageBox.Show($"{e.Message} \n\n {e.StackTrace}" , "Villa");
-      }
-    }
+        private async Task ResetTestVSK(
+          CrudAPI crudApi,
+          List<VatSumOperationReport> vatSumOperationReports) // Only for test service URI
+        {
+            try
+            {
+                var client = new VskClient(txtKennitala.Text, txtPassword.Text);
+                var result = await client.ResetTestAsync(txtKennitala.Text, ToDate, api.CompanyEntity._VatNumber);
+                if (result.EydaSkyrsluIProfunSvar != null)
+                    UnicontaMessageBox.Show(result.EydaSkyrsluIProfunSvar.status.message, "Villa " + result.EydaSkyrsluIProfunSvar.status.code);
+            }
+            catch (MessageSecurityException)
+            {
+                UnicontaMessageBox.Show("Rangt notendanafn eða lykilorð", "Villa"); //Wrong UserName or Password
+            }
+            catch (Exception e)
+            {
+                UnicontaMessageBox.Show($"{e.Message} \n\n {e.StackTrace}", "Villa");
+            }
+        }
 
-    private async Task<SkilaVSKSkyrsluSvar> SendToRSK(
-      List<VatSumOperationReport> vatSumOperationReports)
-    {
-      SkilaVSKSkyrsluResponse response = null;
-      try
-      {
-        var client = new VskClient(txtKennitala.Text, txtPassword.Text);
-        long[] longsOrdered = vatSumOperationReports.OrderBy(o => o._Line)
-                                                    .Select(i => (long)Math.Round(i._Amount != 0 ? i._Amount : i._AmountBase != 0 ? i._AmountBase : 0))
-                                                    .ToArray();
-        response = await client.SkilaVSKSkyrsluAsync(
-          kennitala: txtKennitala.Text,
-          vskNumer: txtVatNo.Text,
-          toDate: ToDate,
-          velta24: longsOrdered[0],
-          velta11: longsOrdered[1],
-          velta0: longsOrdered[2],
-          ut24: longsOrdered[3],
-          ut11: longsOrdered[4],
-          inn24: longsOrdered[5],
-          inn11: longsOrdered[6]
-        );
-      } catch (MessageSecurityException)
-      {
-        UnicontaMessageBox.Show("Rangt notendanafn eða lykilorð", "Villa"); // Wrong user/pass
-      } catch (Exception e)
-      {
-        UnicontaMessageBox.Show(e.Message, "Villa");
-      }
+        private async Task<docType_ns_VSKSkyrslaSvar> SendToRSK(
+          List<VatSumOperationReport> vatSumOperationReports)
+        {
+            docType_ns_VSKSkyrslaSvar response = null;
+            try
+            {
+                var client = new VskClient(txtKennitala.Text, txtPassword.Text);
+                long[] longsOrdered = vatSumOperationReports.OrderBy(o => o._Line)
+                                                            .Select(i => (long)Math.Round(i._Amount != 0 ? i._Amount : i._AmountBase != 0 ? i._AmountBase : 0))
+                                                            .ToArray();
+                response = await client.SkilaVSKSkyrsluAsync(
+                  kennitala: txtKennitala.Text,
+                  vskNumer: txtVatNo.Text,
+                  toDate: ToDate,
+                  velta24: longsOrdered[0],
+                  velta11: longsOrdered[1],
+                  velta0: longsOrdered[2],
+                  ut24: longsOrdered[3],
+                  ut11: longsOrdered[4],
+                  inn24: longsOrdered[5],
+                  inn11: longsOrdered[6]
+                );
+            }
+            catch (MessageSecurityException)
+            {
+                UnicontaMessageBox.Show("Rangt notendanafn eða lykilorð", "Villa"); // Wrong user/pass
+            }
+            catch (Exception e)
+            {
+                UnicontaMessageBox.Show(e.Message, "Villa");
+            }
 
-      return response?.SkilaVSKSkyrsluSvar;
-    }
+            return response;
+        }
 
 #endif
-  }
+    }
 }

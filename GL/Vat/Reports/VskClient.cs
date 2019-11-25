@@ -46,29 +46,42 @@ namespace RSK
                 return response.NaIVSKNumerSvar.Svar.Tokst ? string.Join(", ", response.NaIVSKNumerSvar.Svar.ListiVSKNumer) : "";
             }
 
-            public async Task<SkilaVSKSkyrsluResponse> SkilaVSKSkyrsluAsync(string kennitala, string vskNumer, DateTime toDate, long velta24 = 0, long velta11 = 0, long velta0 = 0, long ut24 = 0, long ut11 = 0, long inn24 = 0, long inn11 = 0 )
+        public async Task<docType_ns_VSKSkyrslaSvar> SkilaVSKSkyrsluAsync(string kennitala, string vskNumer, DateTime toDate, long velta24 = 0, long velta11 = 0, long velta0 = 0, long ut24 = 0, long ut11 = 0, long inn24 = 0, long inn11 = 0)
+        {
+            var request = new docType_ns_VSKSkyrsla();
+            docType_ns_VSKSkyrslaSvar svar = null;
+            request.Kennitala = kennitala;
+            request.VSKNumer = vskNumer;
+            request.Ar = toDate.Year.ToString();
+            request.Timabil = $"{toDate.Month * 4:D2}";
+            request.KerfiUtgafa = VersionID;
+            request.ReiknaAlag = true;
+            List<Tuple<TegundFaerslu, long>> tuplesList = new List<Tuple<TegundFaerslu, long>>();
+            tuplesList.Add(new Tuple<TegundFaerslu, long>(TegundFaerslu.VeltaAnVSK24, velta24));
+            tuplesList.Add(new Tuple<TegundFaerslu, long>(TegundFaerslu.VeltaAnVSK11, velta11));
+            tuplesList.Add(new Tuple<TegundFaerslu, long>(TegundFaerslu.UndantheginVelta0, velta0));
+            tuplesList.Add(new Tuple<TegundFaerslu, long>(TegundFaerslu.Utskattur24, ut24));
+            tuplesList.Add(new Tuple<TegundFaerslu, long>(TegundFaerslu.Utskattur11, ut11));
+            tuplesList.Add(new Tuple<TegundFaerslu, long>(TegundFaerslu.Innskattur24, inn24));
+            tuplesList.Add(new Tuple<TegundFaerslu, long>(TegundFaerslu.Innskattur11, inn11));
+            List<docType_ns_Faersla> faerslaList = tuplesList.Where(o => o.Item2 != 0).Select(tuple => PackDocNsFaersla(tuple.Item1, tuple.Item2)).ToList();
+            request.Faerslur = faerslaList.SkipWhile(o => o == null).ToArray();
+            SkilaVSKSkyrsluResponse response = await Client.SkilaVSKSkyrsluAsync(request);
+            svar = response?.SkilaVSKSkyrsluSvar?.Svar;
+            if (svar != null && response.SkilaVSKSkyrsluSvar?.Svar?.NidurstadaSkila != null)
             {
-                var request = new docType_ns_VSKSkyrsla();
-                request.Kennitala = kennitala;
-                request.VSKNumer = vskNumer;
-                request.Ar = toDate.Year.ToString();
-                request.Timabil = $"{toDate.Month*4:D2}";
-                request.KerfiUtgafa = VersionID;
-                request.ReiknaAlag = true;
-                List<Tuple<TegundFaerslu, long>> tuplesList = new List<Tuple<TegundFaerslu, long>>();
-                tuplesList.Add(new Tuple<TegundFaerslu, long>(TegundFaerslu.VeltaAnVSK24, velta24));
-                tuplesList.Add(new Tuple<TegundFaerslu, long>(TegundFaerslu.VeltaAnVSK11, velta11));
-                tuplesList.Add(new Tuple<TegundFaerslu, long>(TegundFaerslu.UndantheginVelta0, velta0));
-                tuplesList.Add(new Tuple<TegundFaerslu, long>(TegundFaerslu.Utskattur24, ut24));
-                tuplesList.Add(new Tuple<TegundFaerslu, long>(TegundFaerslu.Utskattur11, ut11));
-                tuplesList.Add(new Tuple<TegundFaerslu, long>(TegundFaerslu.Innskattur24, inn24));
-                tuplesList.Add(new Tuple<TegundFaerslu, long>(TegundFaerslu.Innskattur11, inn11));
-                List<docType_ns_Faersla> faerslaList = tuplesList.Where(o=>o.Item2 != 0).Select(tuple => PackDocNsFaersla(tuple.Item1, tuple.Item2)).ToList();
-                request.Faerslur = faerslaList.SkipWhile(o => o == null).ToArray();
-                SkilaVSKSkyrsluResponse response = await Client.SkilaVSKSkyrsluAsync(request);
-                if (response?.SkilaVSKSkyrsluSvar?.Svar?.NidurstadaSkila != null)
+                UnicontaMessageBox.Show("Aðgerð tókst", "Skila til RSK");
+            }
+            else if (response.SkilaVSKSkyrsluSvar != null)
+            {
+                MessageBoxResult mbResult = MessageBoxResult.No;
+                if (response?.SkilaVSKSkyrsluSvar?.status.code == 999)
                 {
-                    UnicontaMessageBox.Show("Aðgerð tókst", "Skila til RSK");
+                    mbResult = UnicontaMessageBox.Show(
+                        response.SkilaVSKSkyrsluSvar.status.message + "\n\nLeiðrétta fyrri skýrslu?",
+                        "Villa " + response.SkilaVSKSkyrsluSvar.status.code,
+                        MessageBoxButton.YesNo
+                    );
                 }
                 else
                 {
@@ -77,10 +90,27 @@ namespace RSK
                         "Villa " + response.SkilaVSKSkyrsluSvar.status.code
                     );
                 }
-                return response;
-            }
 
-            private void TestSerialize(
+                if (mbResult != MessageBoxResult.Yes) return svar;
+                var correctionResponse = await Client.LeidrettaVSKSkyrsluAsync(request);
+                svar = correctionResponse?.LeidrettaVSKSkyrsluSvar?.Svar;
+                if (svar != null && correctionResponse.LeidrettaVSKSkyrsluSvar.Svar?.NidurstadaSkila != null)
+                {
+                    UnicontaMessageBox.Show("Aðgerð tókst", "Skila til RSK");
+                }
+                else
+                {
+                    UnicontaMessageBox.Show(
+                        correctionResponse.LeidrettaVSKSkyrsluSvar.status.message,
+                        "Villa " + correctionResponse.LeidrettaVSKSkyrsluSvar.status.code
+                    );
+                }
+
+            }
+            return svar;
+        }
+
+        private void TestSerialize(
                 object request)
             {
                 var s = string.Empty;

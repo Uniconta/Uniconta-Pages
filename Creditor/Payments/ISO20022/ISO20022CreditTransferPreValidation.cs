@@ -127,8 +127,8 @@ namespace ISO20022CreditTransfer
 
                 var paymentformat = (ExportFormatType)credPaymFormat._ExportFormat;
 
-                formatTypeISO = paymentformat == ExportFormatType.ISO20022_DK || paymentformat == ExportFormatType.ISO20022_NL ||
-                                paymentformat == ExportFormatType.ISO20022_NO || paymentformat == ExportFormatType.ISO20022_DE || paymentformat == ExportFormatType.ISO20022_SE;
+                formatTypeISO = paymentformat == ExportFormatType.ISO20022_DK || paymentformat == ExportFormatType.ISO20022_NL || paymentformat == ExportFormatType.ISO20022_NO || 
+                                paymentformat == ExportFormatType.ISO20022_DE || paymentformat == ExportFormatType.ISO20022_SE || paymentformat == ExportFormatType.ISO20022_UK || paymentformat == ExportFormatType.ISO20022_LT;
 
                 CompanyBankName(paymentformat);
                 CustomerIdentificationId(bankAccount._BankCompanyId, paymentformat);
@@ -287,7 +287,8 @@ namespace ISO20022CreditTransfer
                 switch (companyBankEnum)
                 {
                     //Unique identification of Corporate Cash Management agreement with Nordea. Customer agreement identification with Nordea is mandatory (BANK)and the identification consist of minimum 10 and maximum 18 digits.
-                      case CompanyBankENUM.Nordea_DK:
+                    case CompanyBankENUM.Nordea_DK:
+                    case CompanyBankENUM.Handelsbanken:
                         if (string.IsNullOrEmpty(bankIdentificationId) || (bankIdentificationId.Length < 10 || bankIdentificationId.Length > 18))
                             preCheckErrors.Add(new PreCheckError(String.Format("The Bank Identification Id is mandatory for '{0}'.  (Min 10 and Max 18 characters may be allowed)", companyBankEnum)));
                         break;

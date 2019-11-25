@@ -65,7 +65,7 @@ namespace UnicontaClient.Pages.CustomPage
             layoutControl = layoutItems;
             if (LoadedRow == null)
             {
-                frmRibbon.DisableButtons(new string[] { "Delete" });
+                frmRibbon.DisableButtons("Delete");
                 if (!isCopiedRow)
                     editrow = CreateNew() as GLAccountClient;
                 for (int n = Comp.NumberOfDimensions; (n > 0); n--)
@@ -87,7 +87,7 @@ namespace UnicontaClient.Pages.CustomPage
                 usedim.Visibility = Visibility.Collapsed;
                 useNewdim.Visibility = Visibility.Collapsed;
             }
-            if (Comp._CountryId != CountryCode.Germany)
+            if (Comp._CountryId != CountryCode.Germany && Comp._CountryId != CountryCode.Austria)
                 liDATEVAuto.Visibility = Visibility.Collapsed;
 
             SetAccountTotals();

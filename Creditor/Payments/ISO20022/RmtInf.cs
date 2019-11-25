@@ -47,10 +47,11 @@ namespace UnicontaISO20022CreditTransfer
 
             XmlElement rmtInf = baseDoc.AppendElement(doc, parent, HRMTINF);
 
-            foreach (var i in unstructuredList)
-            {
-                baseDoc.AppendElement(doc, rmtInf, USTRD, i);
-            }
+            if (unstructuredList != null)
+                foreach (var i in unstructuredList)
+                {
+                    baseDoc.AppendElement(doc, rmtInf, USTRD, i);
+                }
 
             if (isOCRPayment == true)
             {

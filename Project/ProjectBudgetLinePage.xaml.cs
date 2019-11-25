@@ -393,6 +393,8 @@ namespace UnicontaClient.Pages.CustomPage
                 rec._Unit = item._Unit;
                 rec.NotifyPropertyChanged("Unit");
             }
+
+            globalEvents.NotifyRefreshViewer(NameOfControl, item);
         }
 
         async void setTask(ProjectClient project, ProjectBudgetLineLocal rec)

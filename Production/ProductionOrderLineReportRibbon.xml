@@ -5,6 +5,9 @@
     <RibbonItem Action="ClearFilter" ShortcutKey="Ctrl+K" LocalizedNameKey="ClearFilter" Glyph="Filter_Clear_32x32.png" LargeGlyph="Filter_Clear_32x32.png"/>
   </RibbonItem>
   <RibbonItem>
+    <RibbonItem Action="ViewPhoto" ShortcutKey="" LocalizedNameKey="ViewOBJ" Parameter="Photo" LargeGlyph="View_Highlighted_32x32.png"/>
+  </RibbonItem>
+  <RibbonItem>
     <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32.png">
       <!---If we want Inner menu-->
       <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>

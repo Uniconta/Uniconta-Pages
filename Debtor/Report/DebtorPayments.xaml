@@ -14,6 +14,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorPayments"
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="10"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
         <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Debtor/Report/DebtorPaymentsRibbon.xml" x:Name="localMenu"/>
@@ -22,19 +23,37 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorPayments"
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="80"/>
-                <ColumnDefinition Width="170"/>
-                <ColumnDefinition Width="80"/>
-                <ColumnDefinition Width="170"/>
-                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="3"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="3"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="20"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="3"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="3"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <Button x:Name="btnSerach" Grid.Column="4" Grid.Row="0" Margin="10,3,3,3" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Search}" Height="23" Width="80" Click="btnSerach_Click"/>
             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DueDate}" Grid.Column="0" Grid.Row="0" VerticalAlignment="Center"/>
-            <CorasauControls:DateEditor x:Name="txtDateFrm" Grid.Column="1" Grid.Row="0" Height="23"/>
-            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DueDate}" Grid.Column="2" Grid.Row="0" Margin="5,0,0,0" VerticalAlignment="Center"/>
-            <CorasauControls:DateEditor x:Name="txtDateTo" Grid.Column="3" Grid.Row="0" Height="23"/>
+            <CorasauControls:DateEditor x:Name="txtDateFrm" Grid.Column="2" Grid.Row="0" Height="23"/>
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DueDate}" Grid.Column="4" Grid.Row="0" VerticalAlignment="Center"/>
+            <CorasauControls:DateEditor x:Name="txtDateTo" Grid.Column="6" Grid.Row="0" Height="23"/>
+            <Button x:Name="btnSerach" Grid.Column="8" Grid.Row="0" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Search}" Height="23" Width="80" Click="btnSerach_Click"/>
+            <Border VerticalAlignment="Stretch"  Width="1" HorizontalAlignment="Center" Grid.Row="0" Grid.Column="9" BorderBrush="{StaticResource WindowHeaderBorderBrush}" BorderThickness="1" Background="{StaticResource WindowHeaderGradient}"  />
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=PrintPreview}" Grid.Column="10" Grid.Row="0" VerticalAlignment="Center"/>
+            <CorasauControls:DimComboBoxEditor x:Name="cmbPrintintPreview" Grid.Column="12" Grid.Row="0"  SelectedIndexChanged="cmbPrintintPreview_SelectedIndexChanged" IsTextEditable="False"  />
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ShowCurrency}" TextWrapping="Wrap" Grid.Column="14" Grid.Row="1" VerticalAlignment="Center" />
+            <CorasauControls:CheckEditor x:Name="chkShowCurrency" Grid.Column="16" Grid.Row="1" />
         </Grid>
-        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="2" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+        <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{StaticResource WindowHeaderGradient}" />
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="3" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <local:DebtorPaymentsGrid  x:Name="dgDebtorTranOpenGrid" AutoGenerateColumns="None">
                 <local:DebtorPaymentsGrid.Columns>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Account" ReadOnly="True" Width="90"/>

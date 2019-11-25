@@ -148,10 +148,13 @@ namespace UnicontaClient.Pages.CustomPage
                 sltype = dialogType;
 
             FilterSortHelper FilterSortingHelper = new FilterSortHelper(sltype, null, null, api, null);
-            var displayProperties = FilterSortingHelper.GetDisplayProperties(true);
+            var displayProperties = FilterSortingHelper.GetDisplayProperties(true, true);
             displayProperties.AddRange(GetAllInputPropertiesFromType(sltype, api.CompanyEntity));
             dgTableValueGrid.Tag = displayProperties;
             var customDictioary = UtilFunctions.GetCustomFormattedNonReadOnlyDisplayPropertyNames(sltype, null);
+            var dimProp = (from p in displayProperties where p.PropertyName.StartsWith("Dim") select p);
+            foreach(var dim in dimProp)
+                customDictioary.Add(dim.PropertyName, string.Format("{0} ({1})", dim.PropertyName, dim.DisplayName));
             cmbTableProperties.ItemsSource = customDictioary.OrderBy(s => s.Value);
         }
 
@@ -244,7 +247,7 @@ namespace UnicontaClient.Pages.CustomPage
             else if (property.PropertyType == typeof(double))
                 return CreateTemplateforDouble(property.PropertyType);
             else if (property.PropertyType == typeof(int))
-                return GenericTypeTemplate;
+                    return GenericTypeTemplate;
 
             return base.SelectTemplate(item, container);
         }
@@ -297,7 +300,7 @@ namespace UnicontaClient.Pages.CustomPage
 #endif
         }
 
-       
+
 #if !SILVERLIGHT
         /// <summary>
         /// Creates a Template for Enum Type Property

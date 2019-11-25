@@ -164,6 +164,24 @@ namespace UnicontaClient.Pages.CustomPage
                     };
                     dialogISOSE.Show();
                     break;
+                case ExportFormatType.ISO20022_UK:
+                    CWISOUK_PaymentSetup dialogISOUK = new CWISOUK_PaymentSetup(this.api, editrow);
+                    dialogISOUK.Closing += delegate
+                    {
+                        if (dialogISOUK.DialogResult == true)
+                            StreamingManager.Copy(dialogISOUK.paymentFormatISOUK, editrow);
+                    };
+                    dialogISOUK.Show();
+                    break;
+                case ExportFormatType.ISO20022_LT:
+                    CWISOLT_PaymentSetup dialogISOLT = new CWISOLT_PaymentSetup(this.api, editrow);
+                    dialogISOLT.Closing += delegate
+                    {
+                        if (dialogISOLT.DialogResult == true)
+                            StreamingManager.Copy(dialogISOLT.paymentFormatISOLT, editrow);
+                    };
+                    dialogISOLT.Show();
+                    break;
 #endif
                 default:
                     UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("NoOptions"), Uniconta.ClientTools.Localization.lookup("Information"));

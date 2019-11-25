@@ -31,5 +31,7 @@
   <RibbonItem>
     <RibbonItem Action="UserLayout" LocalizedNameKey="UserLayout" LargeGlyph="UserFieldData_32x32.png"/>
   </RibbonItem>
-
+  <RibbonItem>
+    <RibbonItem Action="PasswordOnEmail" LocalizedNameKey="PasswordOnEmail" LargeGlyph="User_Rights_32x32.png"/>
+  </RibbonItem>
 </root>

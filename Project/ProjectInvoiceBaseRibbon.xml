@@ -32,4 +32,7 @@
   <RibbonItem>
     <RibbonItem LocalizedNameKey="MarkAsInvoice" Action="MarkAsInvoice" LargeGlyph="Invoice_32x32.png"></RibbonItem>
   </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="InclSubProjects" LocalizedNameKey="InclSubProjects" IsCheckBox="True" />
+  </RibbonItem>
 </root>

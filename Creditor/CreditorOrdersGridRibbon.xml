@@ -31,7 +31,7 @@
       <RibbonItem Action="RemoveVoucher" LocalizedNameKey="Remove" Glyph="Delete_16x16.png" ShortcutKey="Ctrl+I" />
     </RibbonItem>
   </RibbonItem>
-  
+
   <RibbonItem>
     <RibbonItem Action="OrderLine" LocalizedNameKey="PurchaseLines" ControlName="CreditorOrderLines" LargeGlyph="Order_Lines_Highlighted_32x32.png" ShortcutKey="ALT+L"/>
     <RibbonItem Action="PrintDocument" LocalizedNameKey="UpdateOBJ" Parameter="Document" LargeGlyph="Order_Confirmation_32x32.png">
@@ -63,7 +63,14 @@
   </RibbonItem>
   <RibbonItem TabId="1" LocalizedNameKey="EditAll">
     <RibbonItem Action="EditAll"  LocalizedNameKey="EditAll"  LargeGlyph="Edit_32x32.png"/>
-    <RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="DeleteOBJ" Parameter="Order"  LargeGlyph="Delete_32x32.png"/>
-    <RibbonItem Action="SaveGrid" ShortcutKey="CTRL+S" LocalizedNameKey="Save"  LargeGlyph="save-32x32.png"/>
-  </RibbonItem>
+     </RibbonItem>
+    <RibbonItem>
+      <RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="DeleteOBJ" Parameter="Order"  LargeGlyph="Delete_32x32.png"/>
+    </RibbonItem>
+    <RibbonItem>
+      <RibbonItem Action="UndoDelete" ShortcutKey="CTRL+Z" LocalizedNameKey="UndoDelete" LargeGlyph="Undo_Delete_32x32.png"/>
+    </RibbonItem>
+    <RibbonItem>
+      <RibbonItem Action="SaveGrid" ShortcutKey="CTRL+S" LocalizedNameKey="Save"  LargeGlyph="save-32x32.png"/>
+    </RibbonItem>
 </root>

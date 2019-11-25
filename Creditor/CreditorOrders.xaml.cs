@@ -41,6 +41,9 @@ namespace UnicontaClient.Pages.CustomPage
     }
     public partial class CreditorOrders : GridBasePage
     {
+
+        SQLCache creditorCache;
+
         public override string NameOfControl
         {
             get { return TabControls.CreditorOrders.ToString(); }
@@ -101,11 +104,13 @@ namespace UnicontaClient.Pages.CustomPage
             SetRibbonControl(localMenu, dgCreditorOrdersGrid);
 
             localMenu.OnItemClicked += localMenu_OnItemClicked;
-            ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "SaveGrid" });
+            ribbonControl.DisableButtons(new string[] { "UndoDelete", "DeleteRow", "SaveGrid" });
 
             RemoveMenuItem();
 
             LoadNow(typeof(Uniconta.DataModel.Creditor));
+
+            creditorCache = api.GetCache(typeof(Uniconta.DataModel.Creditor));
         }
 
         void RemoveMenuItem()
@@ -117,7 +122,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (Comp._CountryId != CountryCode.Denmark)
                 UtilDisplay.RemoveMenuCommand(rb, "ReadOIOUBL");
 #else
-             UtilDisplay.RemoveMenuCommand(rb, "ReadOIOUBL");
+            UtilDisplay.RemoveMenuCommand(rb, "ReadOIOUBL");
 #endif
         }
 
@@ -304,13 +309,16 @@ namespace UnicontaClient.Pages.CustomPage
                 case "DeleteRow":
                     dgCreditorOrdersGrid.DeleteRow();
                     break;
+                case "UndoDelete":
+                    dgCreditorOrdersGrid.UndoDeleteRow();
+                    break;
                 case "SaveGrid":
                     Save();
                     break;
                 case "PurchaseCharges":
                     if (selectedItem == null)
                         return;
-                    var header = string.Format("{0}:{1},{2}", Uniconta.ClientTools.Localization.lookup("PurchaseCharges"), selectedItem._DCAccount, selectedItem._OrderNumber);
+                    var header = string.Format("{0}: {1}, {2}", Uniconta.ClientTools.Localization.lookup("PurchaseCharges"), selectedItem._OrderNumber, selectedItem._DCAccount);
                     AddDockItem(TabControls.CreditorOrderCostLinePage, dgCreditorOrdersGrid.syncEntity, header);
                     break;
                 case "CreateInvoice":
@@ -339,9 +347,10 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        private void GenerateInvoice(DCOrder creditorOrderClient)
+        private void GenerateInvoice(CreditorOrderClient creditorOrderClient)
         {
-            CWGenerateInvoice GenrateInvoiceDialog = new CWGenerateInvoice(true, string.Empty, true, false, false);
+            var accountName = string.Format("{0} ({1})", creditorOrderClient._DCAccount, creditorOrderClient.Name);
+            CWGenerateInvoice GenrateInvoiceDialog = new CWGenerateInvoice(true, string.Empty, true, false, false, AccountName: accountName);
 #if !SILVERLIGHT
             GenrateInvoiceDialog.DialogTableId = 2000000002;
 #endif
@@ -366,9 +375,8 @@ namespace UnicontaClient.Pages.CustomPage
 
                     if (result)
                     {
-                        Task reloadTask = null;
-                        if (!GenrateInvoiceDialog.IsSimulation && creditorOrderClient._DeleteLines)
-                            reloadTask = Filter();
+                        if (invoicePostingResult.PostingResult.OrderDeleted)
+                            dgCreditorOrdersGrid.UpdateItemSource(3, dgCreditorOrdersGrid.SelectedItem as CreditorOrderClient);
 
                         string msg;
                         if (invoicePostingResult.PostingResult.Header._InvoiceNumber != 0)
@@ -398,7 +406,7 @@ namespace UnicontaClient.Pages.CustomPage
                 dgCreditorOrdersGrid.MakeEditable();
                 UserFieldControl.MakeEditable(dgCreditorOrdersGrid);
                 iBase.Caption = Uniconta.ClientTools.Localization.lookup("LeaveEditAll");
-                ribbonControl.EnableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "SaveGrid" });
+                ribbonControl.EnableButtons(new string[] { "UndoDelete", "DeleteRow", "SaveGrid" });
                 editAllChecked = false;
             }
             else
@@ -429,7 +437,7 @@ namespace UnicontaClient.Pages.CustomPage
                         dgCreditorOrdersGrid.Readonly = true;
                         dgCreditorOrdersGrid.tableView.CloseEditor();
                         iBase.Caption = Uniconta.ClientTools.Localization.lookup("EditAll");
-                        ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "SaveGrid" });
+                        ribbonControl.DisableButtons(new string[] { "UndoDelete", "DeleteRow", "SaveGrid" });
                     };
                     confirmationDialog.Show();
                 }
@@ -438,23 +446,26 @@ namespace UnicontaClient.Pages.CustomPage
                     dgCreditorOrdersGrid.Readonly = true;
                     dgCreditorOrdersGrid.tableView.CloseEditor();
                     iBase.Caption = Uniconta.ClientTools.Localization.lookup("EditAll");
-                    ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "SaveGrid" });
+                    ribbonControl.DisableButtons(new string[] { "UndoDelete", "DeleteRow", "SaveGrid" });
                 }
             }
         }
+
 
         public async void ReadOIOUBL(bool oneOrMultiple)
         {
 #if !SILVERLIGHT
             try
             {
-                var creditor = await api.Query<CreditorClient>();
-                var orderlist = ((CreditorOrderClient[])dgCreditorOrdersGrid.ItemsSource).ToList();
+                if (creditorCache == null)
+                    creditorCache = api.GetCache(typeof(Uniconta.DataModel.Creditor)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Creditor));
+
+                var orderlist = dgCreditorOrdersGrid.ItemsSource as List<CreditorOrderClient>;
 
                 if (!oneOrMultiple)
                 {
                     var orderlistToAddToGrid = new List<CreditorOrderClient>();
-                    var listOfFailedFiles = Uniconta.ClientTools.Localization.lookup("ViewerFailed") + ":\n";
+                    string listOfFailedFiles = null;
 
                     var openFolderDialog = UtilDisplay.LoadFolderBrowserDialog;
                     if (openFolderDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
@@ -465,11 +476,11 @@ namespace UnicontaClient.Pages.CustomPage
                     foreach (string file in files)
                     {
                         var xmlText = File.ReadAllText(file);
-                        var order = await OIOUBL.ReadInvoiceCreditNoteOrOrder(xmlText, creditor, api, oneOrMultiple);
+                        var order = await OIOUBL.ReadInvoiceCreditNoteOrOrder(xmlText, creditorCache, api, oneOrMultiple);
 
                         if (order == null)
                         {
-                            listOfFailedFiles = listOfFailedFiles + file + "\n";
+                            listOfFailedFiles += string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ViewerFailed"), file + Environment.NewLine);
                             continue;
                         }
 
@@ -479,7 +490,7 @@ namespace UnicontaClient.Pages.CustomPage
                         var err = await api.Insert(order);
                         if (err != ErrorCodes.Succes)
                         {
-                            listOfFailedFiles = listOfFailedFiles + file + "\n";
+                            listOfFailedFiles += string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ViewerFailed"), file + Environment.NewLine);
                             continue;
                         }
 
@@ -493,10 +504,9 @@ namespace UnicontaClient.Pages.CustomPage
                         var err2 = await api.Insert(orderlines);
                         if (err2 != ErrorCodes.Succes)
                         {
-                            listOfFailedFiles = listOfFailedFiles + file + "\n";
+                            listOfFailedFiles += string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ViewerFailed"), file + Environment.NewLine);
                             continue;
                         }
-
 
                         if (order.DocumentRef != 0)
                             UpdateVoucher(order);
@@ -505,14 +515,14 @@ namespace UnicontaClient.Pages.CustomPage
                         orderlistToAddToGrid.Add(order);
                     }
 
-                    if (orderlist == null || orderlist.Count <= 0)
+                    if (orderlist == null || orderlist.Count() <= 0)
                         orderlist = orderlistToAddToGrid;
                     else
                         orderlist.AddRange(orderlistToAddToGrid);
 
                     dgCreditorOrdersGrid.ItemsSource = orderlist;
 
-                    if (listOfFailedFiles != null || listOfFailedFiles.Length > 20)
+                    if (listOfFailedFiles != null)
                     {
                         listOfFailedFiles = listOfFailedFiles + Uniconta.ClientTools.Localization.lookup("RunFileIndividual");
                         UnicontaMessageBox.Show(listOfFailedFiles, Uniconta.ClientTools.Localization.lookup("Error"));
@@ -532,7 +542,7 @@ namespace UnicontaClient.Pages.CustomPage
                         using (var sr = new StreamReader(stream))
                         {
                             var oioublText = await sr.ReadToEndAsync();
-                            var order = await OIOUBL.ReadInvoiceCreditNoteOrOrder(oioublText, creditor, api, oneOrMultiple);
+                            var order = await OIOUBL.ReadInvoiceCreditNoteOrOrder(oioublText, creditorCache, api, oneOrMultiple);
 
                             if (order == null)
                                 return;
@@ -594,8 +604,6 @@ namespace UnicontaClient.Pages.CustomPage
         {
             busyIndicator.IsBusy = true;
             var err = await dgCreditorOrdersGrid.SaveData();
-            if (err == ErrorCodes.Succes)
-                await BindGrid();
             busyIndicator.IsBusy = false;
         }
         public void ImportVoucher(UnicontaBaseEntity selectedItem, VouchersClient voucher = null)

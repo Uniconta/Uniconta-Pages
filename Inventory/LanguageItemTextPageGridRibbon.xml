@@ -7,4 +7,7 @@
     <RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="DeleteRow" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png"/>
     <RibbonItem Action="SaveGrid" ShortcutKey="CTRL+S" LocalizedNameKey="Save" Glyph="save-16x16.png" LargeGlyph="save-32x32.png"/>
   </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="ViewPhoto" ShortcutKey="" LocalizedNameKey="ViewOBJ" Parameter="Photo" LargeGlyph="View_Highlighted_32x32.png"/>
+  </RibbonItem>
 </root>

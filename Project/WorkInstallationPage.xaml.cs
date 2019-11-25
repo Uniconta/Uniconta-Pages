@@ -118,6 +118,14 @@ namespace UnicontaClient.Pages.CustomPage
                         AddDockItem(TabControls.WorkInstallationPage2,para, selectedItem.Name, null,true);
                     }
                     break;
+                case "AddNote":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.UserNotesPage, dgWorkInstallation.syncEntity);
+                    break;
+                case "AddDoc":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.UserDocsPage, dgWorkInstallation.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Documents"), selectedItem._Name));
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -129,6 +137,20 @@ namespace UnicontaClient.Pages.CustomPage
             isReadOnly = false;
             useBinding = true;
             return true;
+        }
+
+        private void HasDocImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            var client = (sender as Image).Tag as WorkInstallationClient;
+            if (client != null)
+                AddDockItem(TabControls.UserDocsPage, dgWorkInstallation.syncEntity);
+        }
+
+        private void HasNoteImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            var client = (sender as Image).Tag as WorkInstallationClient;
+            if (client != null)
+                AddDockItem(TabControls.UserNotesPage, dgWorkInstallation.syncEntity);
         }
     }
 }

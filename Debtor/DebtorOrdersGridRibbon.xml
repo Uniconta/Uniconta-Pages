@@ -46,15 +46,18 @@
   <RibbonItem>
     <RibbonItem Action="CreateOrder" LocalizedNameKey="CreateOBJ" Parameter="PurchaseSalesOrder" Glyph="refresh.png" LargeGlyph="Orders_32x32.png"/>
   </RibbonItem>
-  <RibbonItem>
-    <RibbonItem LocalizedNameKey="Project" Module="Project" LargeGlyph="Folder_32x32.png">
-      <RibbonItem Action="ProjectTransaction" LocalizedNameKey="ProjectAdjustments" ControlName="DebtorOrderProjectLinePage" Glyph="Transactions_16x16.png"/>
-      <RibbonItem Action="RegenerateOrderFromProject" LocalizedNameKey="TransactionOrigin" ControlName="RegenerateOrderFromProjectPage" Glyph="Add_Notes_16x16.png" ShortcutKey="CTRL+T"/>
-    </RibbonItem>
+    <RibbonItem LocalizedNameKey="Project" Module="Project">
+      <RibbonItem Action="ProjectTransaction" LocalizedNameKey="Adjustments" LargeGlyph="Transactions_32x32.png"/>
+      <RibbonItem Action="RegenerateOrderFromProject" LocalizedNameKey="TransactionOrigin" LargeGlyph="Add_Menu_32x32.png" ShortcutKey="CTRL+T"/>
   </RibbonItem>
   <RibbonItem TabId="1" LocalizedNameKey="EditAll">
-    <RibbonItem Action="EditAll"  LocalizedNameKey="EditAll" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>
-    <RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="DeleteOBJ" Parameter="Order"  LargeGlyph="Delete_32x32.png"/>
-    <RibbonItem Action="SaveGrid" ShortcutKey="CTRL+S" LocalizedNameKey="Save"  LargeGlyph="save-32x32.png"/>
+    <RibbonItem Action="EditAll"  LocalizedNameKey="EditAll"  LargeGlyph="Edit_32x32.png"/>
   </RibbonItem>
+    <RibbonItem>
+      <RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="DeleteOBJ" Parameter="Order"  LargeGlyph="Delete_32x32.png"/>
+      <RibbonItem Action="UndoDelete" ShortcutKey="CTRL+Z" LocalizedNameKey="UndoDelete" LargeGlyph="Undo_Delete_32x32.png"/>
+    </RibbonItem>
+    <RibbonItem>
+      <RibbonItem Action="SaveGrid" ShortcutKey="CTRL+S" LocalizedNameKey="Save"  LargeGlyph="save-32x32.png"/>
+    </RibbonItem>
 </root>

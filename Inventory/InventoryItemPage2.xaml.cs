@@ -112,7 +112,8 @@ namespace UnicontaClient.Pages.CustomPage
             layoutControl = layoutItems;
             cbCountry.ItemsSource = Enum.GetValues(typeof(Uniconta.Common.CountryCode));
             leAlternativeItem.api = leGroup.api = cmbDim1.api = cmbDim2.api = cmbDim3.api = cmbDim4.api = cmbDim5.api = cmbPrCategory.api =
-                leBrandGrp.api = leCategoryGrp.api = cmbPayrollCategory.api = cmbPurchaseAccount.api = cmbWarehouse.api = cmbLocation.api = leDiscountGroup.api = leUnitGroup.api = leDutyGroup.api = crudapi;
+                leBrandGrp.api = leCategoryGrp.api = cmbPayrollCategory.api = cmbPurchaseAccount.api = cmbWarehouse.api = cmbLocation.api =
+                leDiscountGroup.api = leUnitGroup.api = leDutyGroup.api = crudapi;
 
             if (LoadedRow == null)
             {
@@ -196,6 +197,28 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var selectedItem = cmbWarehouse.SelectedItem as InvWarehouseClient;
             setLocation(selectedItem);
+        }
+
+        bool lookupIsSet = false;
+        private void liPhoto_LookupButtonClicked(object sender)
+        {
+            var lookupEditor = sender as LookupEditor;
+
+            if (!lookupIsSet)
+            {
+                lookupEditor.PopupContentTemplate = (Application.Current).Resources["LookUpDocumentClientPopupContent"] as ControlTemplate;
+                lookupEditor.ValueMember = "RowId";
+                lookupEditor.SelectedIndexChanged += LookupEditor_SelectedIndexChanged;
+                lookupIsSet = true;
+                lookupEditor.ItemsSource = api.Query<UserDocsClient>(editrow).GetAwaiter().GetResult();
+            }
+        }
+
+        private void LookupEditor_SelectedIndexChanged(object sender, RoutedEventArgs e)
+        {
+            var lookupEditor = sender as LookupEditor;
+            var docsClient = lookupEditor.SelectedItem as UserDocsClient;
+            editrow.Photo = docsClient?._RowId ?? 0;
         }
 
         private void txtItem_LostFocus(object sender, RoutedEventArgs e)

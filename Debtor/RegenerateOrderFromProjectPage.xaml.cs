@@ -34,23 +34,26 @@ namespace UnicontaClient.Pages.CustomPage
     {
         public override string NameOfControl { get { return TabControls.RegenerateOrderFromProjectPage; } }
 
+        Uniconta.DataModel.DebtorOrder master;
+
         public RegenerateOrderFromProjectPage(UnicontaBaseEntity master): base(master)
         {
+            this.master = master as Uniconta.DataModel.DebtorOrder;
             InitializeComponent();
             SetRibbonControl(localMenu, dgGenerateOrder);
             dgGenerateOrder.UpdateMaster(master);
             dgGenerateOrder.api = api;
             dgGenerateOrder.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += LocalMenu_OnItemClicked;
+            dgGenerateOrder.ShowTotalSummary();
         }
 
         public override bool IsDataChaged { get { return false; } }
-       
+
         protected override void OnLayoutLoaded()
         {
             base.OnLayoutLoaded();
-            var master = dgGenerateOrder.masterRecords?.First();
-            this.ProjectCol.Visible = !(master is Uniconta.DataModel.Project);
+            //this.ProjectCol.Visible = !(master is Uniconta.DataModel.Project);
             Utility.SetupVariants(api, null, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
             dgGenerateOrder.Readonly = true;
             Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
@@ -62,25 +65,86 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 case "RegenerateOrder":
                     RegenerateOrderFromProjectTrans();
-                break;
+                    break;
+                case "AppendProjTrans":
+                    var defaultdate = BasePage.GetSystemDefaultDate().Date;
+                    var cw = new CWInterval(DateTime.MinValue, defaultdate);
+                    cw.Closing += delegate
+                    {
+                        if (cw.DialogResult == true)
+                            LoadNotInvoiced(cw.FromDate, cw.ToDate);
+                    };
+                    cw.Show();
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
         }
 
+        async void LoadNotInvoiced(DateTime fromdate, DateTime todate)
+        {
+            busyIndicator.IsBusy = true;
+
+            var invApi = new InvoiceAPI(api);
+            var lst = (ProjectTransClientLocal[])await invApi.GetTransNotOnOrder(master, fromdate, todate, new ProjectTransClientLocal());
+            if (lst == null || lst.Length == 0)
+            {
+                busyIndicator.IsBusy = false;
+                UtilDisplay.ShowErrorCode(ErrorCodes.NoLinesFound);
+                return;
+            }
+
+            var orgList = dgGenerateOrder.ItemsSource as ICollection<ProjectTransClientLocal>;
+            var newList = new List<ProjectTransClientLocal>(orgList.Count + lst.Length);
+            foreach(var rec in orgList)
+            {
+                if (rec._SendToOrder != 0)
+                    newList.Add(rec);
+            }
+            for (int i = 0; (i < lst.Length); i++)
+            {
+                var rec = lst[i];
+                rec._remove = true;
+                newList.Add(rec);
+            }
+            busyIndicator.IsBusy = false;
+            dgGenerateOrder.ItemsSource = newList;
+        }
+
         async void RegenerateOrderFromProjectTrans()
         {
+            var OrderNumber = master._OrderNumber;
+            List<ProjectTransClientLocal> excludedTransLst = null, includedTransLst = null;
             var transLst = dgGenerateOrder.GetVisibleRows() as IEnumerable<ProjectTransClientLocal>;
-            var excludedTransLst = transLst?.Where(x => x._remove);
-            if (excludedTransLst == null || !excludedTransLst.Any())
+            if (transLst == null)
+                return;
+            foreach(var x in transLst)
+            {
+                if (x._remove)
+                {
+                    if (x._SendToOrder == OrderNumber)
+                    {
+                        if (excludedTransLst == null)
+                            excludedTransLst = new List<ProjectTransClientLocal>();
+                        excludedTransLst.Add(x);
+                    }
+                }
+                else if (x._SendToOrder == 0)
+                {
+                    if (includedTransLst == null)
+                        includedTransLst = new List<ProjectTransClientLocal>();
+                    includedTransLst.Add(x);
+                }
+            }
+            if (excludedTransLst == null && includedTransLst == null)
             {
                 UtilDisplay.ShowErrorCode(ErrorCodes.NoLinesFound);
                 return;
             }
             busyIndicator.IsBusy = true;
             var invApi = new InvoiceAPI(api);
-            var result = await invApi.RegenerateOrderFromProject(dgGenerateOrder.masterRecord as Uniconta.DataModel.DCOrder, excludedTransLst);
+            var result = await invApi.RegenerateOrderFromProject(master, excludedTransLst, includedTransLst);
             busyIndicator.IsBusy = false;
             UtilDisplay.ShowErrorCode(result);
             if (result == ErrorCodes.Succes)

@@ -174,13 +174,13 @@ namespace UnicontaClient.Pages.CustomPage
             var selectedItem = dgCrdInvoicesGrid.SelectedItem as CreditorInvoiceLocal;
             string salesHeader = string.Empty;
             if (selectedItem != null)
-                salesHeader = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Orders"), selectedItem.OrderNumber);
+                salesHeader = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Orders"), selectedItem._OrderNumber);
             switch (ActionType)
             {
                 case "InvoiceLine":
                     if (selectedItem == null)
                         return;
-                    AddDockItem(TabControls.CreditorInvoiceLine, dgCrdInvoicesGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("InvoiceNumber"), selectedItem.InvoiceNumber));
+                    AddDockItem(TabControls.CreditorInvoiceLine, dgCrdInvoicesGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("InvoiceNumber"), selectedItem._InvoiceNumber));
                     break;
                 case "ShowInvoice":
                     if (dgCrdInvoicesGrid.SelectedItems == null || dgCrdInvoicesGrid.SelectedItem == null)
@@ -221,7 +221,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "PurchaseCharges":
                     if (selectedItem == null)
                         return;
-                    var header = string.Format("{0}: {1},{2}", Uniconta.ClientTools.Localization.lookup("PurchaseCharges"), selectedItem._DCAccount, selectedItem._InvoiceNumber);
+                    var header = string.Format("{0}: {1}, {2}", Uniconta.ClientTools.Localization.lookup("PurchaseCharges"), selectedItem._InvoiceNumber, selectedItem._DCAccount);
                     AddDockItem(TabControls.CreditorOrderCostLinePage, dgCrdInvoicesGrid.syncEntity, header);
                     break;
                 case "PostedBy":
@@ -306,7 +306,7 @@ namespace UnicontaClient.Pages.CustomPage
 #elif SILVERLIGHT
                         int top = 200;
                         int left = 300;
-                        int count = invoicesList.Count();
+                        int count = invoicesList.Count;
 
                         if (count > 1)
                         {
@@ -315,12 +315,11 @@ namespace UnicontaClient.Pages.CustomPage
                 {
 #if !SILVERLIGHT
                     IPrintReport printReport = await PrintPackNote(creditInvoice);
-
                     if (printReport?.Report != null)
                         packnoteReports.Add(printReport);
                 }
 
-                if (packnoteReports.Count() > 0)
+                if (packnoteReports.Count > 0)
                 {
                     var reportName = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ShowPrint"), Uniconta.ClientTools.Localization.lookup("CreditorPackNote"));
                     AddDockItem(TabControls.StandardPrintReportPage, new object[] { packnoteReports, reportName }, reportName);
@@ -427,7 +426,7 @@ namespace UnicontaClient.Pages.CustomPage
             ob[0] = creditorInvoiceClient;
             ob[1] = CompanyLayoutType.PurchaseInvoice;
             AddDockItem(TabControls.ProformaInvoice, ob, isFloat, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Invoice"),
-                creditorInvoiceClient.InvoiceNumber), floatingLoc: position);
+                creditorInvoiceClient._InvoiceNumber), floatingLoc: position);
         }
 
         private void DefaultPrint(CreditorInvoiceLocal creditorInvoiceClient)
@@ -435,7 +434,7 @@ namespace UnicontaClient.Pages.CustomPage
             object[] ob = new object[2];
             ob[0] = creditorInvoiceClient;
             ob[1] = CompanyLayoutType.PurchaseInvoice;
-            AddDockItem(TabControls.ProformaInvoice, ob, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Invoice"), creditorInvoiceClient.InvoiceNumber));
+            AddDockItem(TabControls.ProformaInvoice, ob, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Invoice"), creditorInvoiceClient._InvoiceNumber));
         }
 #endif
 
@@ -446,16 +445,15 @@ namespace UnicontaClient.Pages.CustomPage
             IPrintReport iprintReport = null;
 
             var creditorInvoicePrint = new CreditorPrintReport(creditorInvoice, api, CompanyLayoutType.PurchaseInvoice);
-            var isCreditorInitialized = await creditorInvoicePrint.InstantiaeFields();
+            var isCreditorInitialized = await creditorInvoicePrint.InstantiateFields();
             if (isCreditorInitialized)
             {
-                var creditorStandardInvoice = new CreditorStandardReportClient(creditorInvoicePrint.Company, creditorInvoicePrint.Creditor, creditorInvoicePrint.CreditorInvoice, creditorInvoicePrint.InvTransInvoiceLines, null,
-                    creditorInvoicePrint.CompanyLogo, creditorInvoicePrint.ReportName, (int)Uniconta.ClientTools.Controls.Reporting.StandardReports.PurchaseInvoice, creditorInvoicePrint.IsCreditNote);
+                var creditorStandardInvoice = new CreditorStandardReportClient(creditorInvoicePrint.Company, creditorInvoicePrint.Creditor, creditorInvoicePrint.CreditorInvoice, creditorInvoicePrint.InvTransInvoiceLines, creditorInvoicePrint.CreditorOrder,
+                    creditorInvoicePrint.CompanyLogo, creditorInvoicePrint.ReportName, (int)Uniconta.ClientTools.Controls.Reporting.StandardReports.PurchaseInvoice, creditorInvoicePrint.CreditorMessage, creditorInvoicePrint.IsCreditNote);
 
-                var creditorStandardReport = new ICreditorStandardReport[1] { creditorStandardInvoice };
+                var creditorStandardReport = new[] { creditorStandardInvoice };
                 iprintReport = new StandardPrintReport(api, creditorStandardReport, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.PurchaseInvoice);
                 await iprintReport.InitializePrint();
-
 
                 if (iprintReport?.Report == null)
                 {
@@ -470,20 +468,19 @@ namespace UnicontaClient.Pages.CustomPage
         {
             IPrintReport iprintReport = null;
 
-            var packnote = Uniconta.ClientTools.Controls.Reporting.StandardReports.PackNote;
+            var packnote = Uniconta.ClientTools.Controls.Reporting.StandardReports.PurchasePackNote;
 
             var creditorInvoicePrint = new UnicontaClient.Pages.CreditorPrintReport(creditorInvoice, api, CompanyLayoutType.Packnote);
-            var isInitializedSuccess = await creditorInvoicePrint.InstantiaeFields();
+            var isInitializedSuccess = await creditorInvoicePrint.InstantiateFields();
 
             if (isInitializedSuccess)
             {
-                var standardCreditorInvoice = new CreditorStandardReportClient(creditorInvoicePrint.Company, creditorInvoicePrint.Creditor, creditorInvoicePrint.CreditorInvoice, creditorInvoicePrint.InvTransInvoiceLines, null,
-                    creditorInvoicePrint.CompanyLogo, creditorInvoicePrint.ReportName, (int)packnote);
+                var standardCreditorInvoice = new CreditorStandardReportClient(creditorInvoicePrint.Company, creditorInvoicePrint.Creditor, creditorInvoicePrint.CreditorInvoice, creditorInvoicePrint.InvTransInvoiceLines, creditorInvoicePrint.CreditorOrder,
+                    creditorInvoicePrint.CompanyLogo, creditorInvoicePrint.ReportName, (int)packnote, creditorInvoicePrint.CreditorMessage);
 
-                var standardReports = new ICreditorStandardReport[] { standardCreditorInvoice };
+                var standardReports = new[] { standardCreditorInvoice };
                 iprintReport = new StandardPrintReport(api, standardReports, (byte)packnote);
                 await iprintReport.InitializePrint();
-
 
                 if (iprintReport?.Report == null)
                 {

@@ -27,6 +27,8 @@ using Uniconta.API.Service;
 using UnicontaClient.Controls.Dialogs;
 using Uniconta.Common.Utility;
 using System.Text.RegularExpressions;
+using UnicontaClient.Controls;
+using DevExpress.Xpf.Bars;
 #if !SILVERLIGHT
 using Bilagscan;
 using System.Net.Http;
@@ -75,7 +77,6 @@ namespace UnicontaClient.Pages.CustomPage
                 }
 
                 var result = await base.SaveData();
-
                 if (result == ErrorCodes.Succes)
                     Utility.UpdateBuffers(api, buffers, vouchersClient);
 
@@ -89,11 +90,32 @@ namespace UnicontaClient.Pages.CustomPage
             return await base.SaveData();
 #endif
         }
+#if !SILVERLIGHT
+
+        public override IList ModifyDraggedRows(DevExpress.Xpf.Grid.DragDrop.GridDropEventArgs e)
+        {
+            var tr = e.TargetRow as VouchersClient;
+            foreach (var row in e.DraggedRows)
+            {
+                var dr = row as VouchersClient;
+                if (tr != null && dr != null)
+                {
+                    this.SetLoadedRow(dr);
+                    dr._ViewInFolder = tr._ViewInFolder;
+                    this.SetModifiedRow(dr);
+                }
+            }
+            return e.DraggedRows;
+        }
+#endif
     }
 
     public partial class Vouchers : GridBasePage
     {
         object cache;
+        public static bool IsGridMode = false;
+        ItemBase ibaseGridMode;
+        RibbonBase rb;
         public Vouchers(BaseAPI API)
             : base(API, string.Empty)
         {
@@ -129,8 +151,8 @@ namespace UnicontaClient.Pages.CustomPage
 
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             this.BeforeClose += Vouchers_BeforeClose;
-
-            RemoveMenuItem();
+            rb = (RibbonBase)localMenu.DataContext;
+            RemoveMenuItem(rb);
 
 #if SILVERLIGHT
             Application.Current.RootVisual.KeyDown += RootVisual_KeyDown;
@@ -139,12 +161,69 @@ namespace UnicontaClient.Pages.CustomPage
             dgVoucherGrid.tableView.AllowDragDrop = true;
             dgVoucherGrid.tableView.DropRecord += dgVoucherGridView_DropRecord;
             dgVoucherGrid.tableView.DragRecordOver += dgVoucherGridView_DragRecordOver;
+            accordionView.ItemsSource = new AccordionFilterGroup[] { new AccordionFilterGroup(Uniconta.ClientTools.Localization.lookup("Folders"), "ViewInFolder", AppEnums.ViewBin,
+                Uniconta.ClientTools.Localization.lookup("All")) };
+            accordionView.SelectedItem = ((UnicontaClient.Controls.AccordionFilterGroup)(accordionView.Items.FirstOrDefault())).FilterItems[0];
+            accordionView.MouseLeftButtonUp += AccordionView_MouseLeftButtonUp;
+            CreateContextMenu();
+            dgVoucherGrid.ItemsSourceChanged += DgVoucherGrid_ItemsSourceChanged;
 #endif
             dgVoucherGrid.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;
             SetFooterDetailText();
         }
 
 #if !SILVERLIGHT
+        private void AccordionView_MouseLeftButtonUp(object sender, MouseEventArgs e)
+        {
+            var txt = e.OriginalSource as TextBlock;
+            if (txt == null)
+                return;
+            if (dgVoucherGrid.dragStarted)
+            {
+                SetRowsWithFolderValue(txt.Text);
+                dgVoucherGrid.dragStarted = false;
+            }
+        }
+
+        void SetRowsWithFolderValue(string binText)
+        {
+            int index = AppEnums.ViewBin.TryIndexOf(binText);
+            if (index > -1)
+            {
+                var selectedItems = dgVoucherGrid.SelectedItems ?? new List<object> { dgVoucherGrid.SelectedItem };
+                if (selectedItems != null)
+                {
+                    foreach (var row in selectedItems)
+                    {
+                        var dr = row as VouchersClient;
+                        if (dr != null)
+                        {
+                            if (dr._ViewInFolder != (byte)index)
+                            {
+                                dgVoucherGrid.SetLoadedRow(dr);
+                                dr._ViewInFolder = (byte)index;
+                                dr.NotifyPropertyChanged("ViewInFolder");
+                                dgVoucherGrid.SetModifiedRow(dr);
+                            }
+                        }
+                    }
+                }
+#if WPF
+                dgVoucherGrid.RefreshData();
+#endif
+            }
+        }
+
+        bool load = false;
+        private void DgVoucherGrid_ItemsSourceChanged(object sender, DevExpress.Xpf.Grid.ItemsSourceChangedEventArgs e)
+        {
+            if (!load)
+            {
+                ChangeScreenViewMode();
+                load = true;
+            }
+        }
+
         private void dgVoucherGridView_DragRecordOver(object sender, DevExpress.Xpf.Core.DragRecordOverEventArgs e)
         {
             if (e.Data.GetFormats().Contains("FileName"))
@@ -178,6 +257,40 @@ namespace UnicontaClient.Pages.CustomPage
                 cwErrorBox.Show();
             }
         }
+        void ChangeScreenViewMode()
+        {
+            if (IsGridMode)
+            {
+                colAccordion.Width = new GridLength(0);
+                accordionView.Visibility = Visibility.Collapsed;
+                dgVoucherGrid.FilterString = string.Empty;
+            }
+            else
+            {
+                colAccordion.Width = new GridLength();
+                accordionView.Visibility = Visibility.Visible;
+            }
+            if (ibaseGridMode == null)
+                ibaseGridMode = UtilDisplay.GetMenuCommandByName(rb, "PageViewMode");
+
+            if (IsGridMode)
+                ibaseGridMode.Caption = string.Format(Uniconta.ClientTools.Localization.lookup("ShowOBJ"), Uniconta.ClientTools.Localization.lookup("Folders"));
+            else
+                ibaseGridMode.Caption = string.Format(Uniconta.ClientTools.Localization.lookup("HideOBJ"), Uniconta.ClientTools.Localization.lookup("Folders"));
+        }
+
+        private void accordionView_SelectedItemChanged(object sender, DevExpress.Xpf.Accordion.AccordionSelectedItemChangedEventArgs e)
+        {
+            if (e.NewItem != null)
+            {
+                var filterItem = e.NewItem as AccordionFilterItem;
+                var filterString = filterItem.FilterString;
+                if (string.IsNullOrEmpty(filterItem.FilterString))
+                    dgVoucherGrid.FilterString = string.Empty;
+                else
+                    dgVoucherGrid.FilterString = filterItem.FilterString;
+            }
+        }
 #endif
         SQLCache LedgerCache, CreditorCache, PaymentCache, ProjectCache, TextTypes;
         protected override async void LoadCacheInBackGround()
@@ -189,15 +302,15 @@ namespace UnicontaClient.Pages.CustomPage
                 this.CreditorCache = api.GetCache(typeof(Uniconta.DataModel.Creditor)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Creditor)).ConfigureAwait(false);
             if (this.PaymentCache == null)
                 this.PaymentCache = api.GetCache(typeof(Uniconta.DataModel.PaymentTerm)) ?? await api.LoadCache(typeof(Uniconta.DataModel.PaymentTerm)).ConfigureAwait(false);
-            LoadType( new Type[] { typeof(Uniconta.DataModel.Employee), typeof(Uniconta.DataModel.GLVat) });
+            LoadType(new Type[] { typeof(Uniconta.DataModel.Employee), typeof(Uniconta.DataModel.GLVat) });
         }
 
-        void RemoveMenuItem()
+        void RemoveMenuItem(RibbonBase rb)
         {
 #if SILVERLIGHT
-            RibbonBase rb = (RibbonBase)localMenu.DataContext;
-            UtilDisplay.RemoveMenuCommand(rb,"SplitPDF");
-            UtilDisplay.RemoveMenuCommand(rb,"JoinPDF");
+            UtilDisplay.RemoveMenuCommand(rb, "PageViewMode");
+            UtilDisplay.RemoveMenuCommand(rb, "SplitPDF");
+            UtilDisplay.RemoveMenuCommand(rb, "JoinPDF");
 #endif
         }
 
@@ -337,7 +450,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             this.selectedPageIndex = selectedPageIndex;
             if (selectedPageIndex == 1)
-                dgVoucherGrid.FilterString = "Contains([Folder],'true')";
+                dgVoucherGrid.FilterString = "Contains([Envelope],'true')";
             else
                 dgVoucherGrid.FilterString = ""; //dgVoucherGrid.ClearFilter();
         }
@@ -380,10 +493,7 @@ namespace UnicontaClient.Pages.CustomPage
             switch (ActionType)
             {
                 case "AddRow":
-                    object[] parameters = new object[2];
-                    parameters[0] = api;
-                    parameters[1] = "";
-                    AddDockItem(TabControls.VouchersPage2, parameters, Uniconta.ClientTools.Localization.lookup("Vouchers"), ";component/Assets/img/Add_16x16.png");
+                    AddRow();
                     break;
 
                 case "DeleteRow":
@@ -480,7 +590,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 {
                                     Uniconta.DataModel.GLDailyJournal jour;
 
-                                    var cache = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.GLDailyJournal));
+                                    var cache = api.GetCache(typeof(Uniconta.DataModel.GLDailyJournal));
                                     if (cache != null)
                                         jour = (Uniconta.DataModel.GLDailyJournal)cache.Get(journalName);
                                     else
@@ -496,14 +606,14 @@ namespace UnicontaClient.Pages.CustomPage
                     };
                     journals.Show();
                     break;
-                case "AddFolder":
+                case "AddEnvelope":
                     var newItemFolder = dgVoucherGrid.GetChildInstance();
                     object[] paramFolder = new object[2];
                     paramFolder[0] = newItemFolder;
                     paramFolder[1] = "Create";
-                    AddDockItem(TabControls.VoucherFolderPage, paramFolder, Uniconta.ClientTools.Localization.lookup("Folder"), ";component/Assets/img/Add_16x16.png");
+                    AddDockItem(TabControls.VoucherFolderPage, paramFolder, Uniconta.ClientTools.Localization.lookup("Envelope"), ";component/Assets/img/Add_16x16.png");
                     break;
-                case "EditFolder":
+                case "EditEnvelope":
                     if (selectedItem == null)
                         return;
                     object[] paramFolderEdit = new object[2];
@@ -511,8 +621,8 @@ namespace UnicontaClient.Pages.CustomPage
                     paramFolderEdit[1] = "Edit";
                     AddDockItem(TabControls.VoucherFolderPage, paramFolderEdit, selectedItem.Text, ";component/Assets/img/Edit_16x16.png");
                     break;
-                case "FolderWizard":
-                    LaunchWizardFolder();
+                case "EnvelopeWizard":
+                    LaunchEnvelopeWizard();
                     break;
                 case "OffSetAccount":
                     CallOffsetAccount(selectedItem);
@@ -536,6 +646,10 @@ namespace UnicontaClient.Pages.CustomPage
                 case "JoinPDF":
                     JoinPDFVouchers();
                     break;
+                case "PageViewMode":
+                    IsGridMode = !IsGridMode;
+                    ChangeScreenViewMode();
+                    break;
 #endif
                 case "CopyOrMoveVoucher":
                     if (selectedItem != null)
@@ -545,12 +659,45 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         UpdateInBox(selectedItem);
                     break;
+                case "ResendToApprover":
+                    if (selectedItem == null || (selectedItem._Approver1== null && selectedItem._Approver2 == null  ))
+                        return;
+                    var cw = new CwSendEmailToApprover(selectedItem);
+#if !SILVERLIGHT
+                    cw.DialogTableId = 2000000069;
+#endif
+                    cw.Closing += async delegate
+                    {
+                        if (cw.DialogResult == true)
+                        {
+                            var docApi = new DocumentAPI(api);
+                            var result = await docApi.SendEmail2Approver(selectedItem, cw.Approver, cw.Note);
+                            UtilDisplay.ShowErrorCode(result);
+                        }
+                    };
+                    cw.Show();
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
         }
 
+        void AddRow()
+        {
+            object[] parameters = new object[2];
+            parameters[0] = api;
+#if !SILVERLIGHT
+            var accordionItem = accordionView.SelectedItem as AccordionFilterItem;
+            if (accordionItem != null && !string.IsNullOrEmpty(accordionItem.FilterName) && AppEnums.ViewBin.TryIndexOf(accordionItem.FilterName) > -1)
+                parameters[1] = accordionItem.FilterName;
+            else
+                parameters[1] = "";
+#else
+            parameters[1] = "";
+#endif
+            AddDockItem(TabControls.VouchersPage2, parameters, Uniconta.ClientTools.Localization.lookup("Vouchers"), ";component/Assets/img/Add_16x16.png");
+        }
         void UpdateInBox(VouchersClient selectedItem)
         {
             var rec = new DocumentNoRef();
@@ -611,10 +758,10 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (dgVoucherGrid.SelectedItems != null)
             {
-                VouchersClient[] vouchers = dgVoucherGrid.SelectedItems.Cast<VouchersClient>().ToArray();
-                if (vouchers?.Length == 0)
+                var vouchers = dgVoucherGrid.SelectedItems.Cast<VouchersClient>().ToArray();
+                if (vouchers.Length == 0)
                     return;
-                if (vouchers.Where(v => v._Fileextension != FileextensionsTypes.PDF).Count() > 0)
+                if (vouchers.Where(v => v._Fileextension != FileextensionsTypes.PDF).Any())
                 {
                     UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("InvalidFileFormat"), Uniconta.ClientTools.Localization.lookup("Error"), MessageBoxButton.OK);
                     return;
@@ -795,6 +942,33 @@ namespace UnicontaClient.Pages.CustomPage
             finally { busyIndicator.IsBusy = false; }
         }
 
+        void CreateContextMenu()
+        {
+            var menu = dgVoucherGrid.tableView.RowCellMenuCustomizations;
+            var moveToMenu = new BarSubItem()
+            {
+                Content = Uniconta.ClientTools.Localization.lookup("MoveTo"),
+
+            };
+            foreach (var bin in AppEnums.ViewBin.Values)
+            {
+                var binMenu = new BarButtonItem()
+                {
+                    Content = bin,
+                };
+                binMenu.ItemClick += BinMenu_ItemClick;
+                moveToMenu.Items.Add(binMenu);
+
+            }
+            menu.Add(moveToMenu);
+        }
+
+        private void BinMenu_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            string bin = Convert.ToString(e.Item.Content);
+            if (!string.IsNullOrEmpty(bin))
+                SetRowsWithFolderValue(bin);
+        }
 #endif
         //async void CreateAttachment(bool deletePhysicalVoucher)
         //{
@@ -815,26 +989,26 @@ namespace UnicontaClient.Pages.CustomPage
         //    }
         //    UtilDisplay.ShowErrorCode(err);
         //}
-        private void LaunchWizardFolder()
+        private void LaunchEnvelopeWizard()
         {
             if (dgVoucherGrid.ItemsSource == null)
                 return;
 
-            var folderWizard = new WizardWindow(new UnicontaClient.Pages.VoucherGridFolderWizard(api), string.Format(Uniconta.ClientTools.Localization.lookup("CreateOBJ"),
-                Uniconta.ClientTools.Localization.lookup("Folder")));
+            var EnvelopeWizard = new WizardWindow(new UnicontaClient.Pages.VoucherGridFolderWizard(api), string.Format(Uniconta.ClientTools.Localization.lookup("CreateOBJ"),
+                string.Format("{0} {1}", Uniconta.ClientTools.Localization.lookup("Envelope"), Uniconta.ClientTools.Localization.lookup("Wizard"))));
 
-            folderWizard.Closed += async delegate
+            EnvelopeWizard.Closed += async delegate
             {
-                if (folderWizard.DialogResult == true)
+                if (EnvelopeWizard.DialogResult == true)
                 {
-                    var result = await SaveFolderData(folderWizard.WizardData);
+                    var result = await SaveFolderData(EnvelopeWizard.WizardData);
                     if (result == ErrorCodes.Succes)
                         globalEvents.OnRefresh(TabControls.VoucherFolderPage);
                     else
                         UtilDisplay.ShowErrorCode(result);
                 }
             };
-            folderWizard.Show();
+            EnvelopeWizard.Show();
         }
 
         async private Task<ErrorCodes> SaveFolderData(object wizarddata)
@@ -846,11 +1020,11 @@ namespace UnicontaClient.Pages.CustomPage
                 var data = wizarddata as object[];
                 var voucherClient = new VouchersClient();
                 var voucherList = data[0] as IEnumerable<VouchersClient>;
-                voucherClient.Text = data[1] as string;
+                voucherClient._Text = data[1] as string;
                 voucherClient.Content = data[2] as string;
                 var documentApi = new DocumentAPI(api);
 
-                result = await documentApi.CreateFolder(voucherClient, voucherList);
+                result = await documentApi.CreateEnvelope(voucherClient, voucherList);
             }
             return result;
         }
@@ -863,7 +1037,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 dgVoucherGrid.Filter(null);
                 if (selectedPageIndex == 1)
-                    dgVoucherGrid.FilterString = "Contains([Folder],'true')";
+                    dgVoucherGrid.FilterString = "Contains([Envelope],'true')";
             }
         }
 
@@ -1161,7 +1335,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "joint_payment_id", true) == 0).FirstOrDefault();
                                 if (bsItem != null)
                                     jointPaymentId = bsItem.value;
-                               
+
                                 var paymentMethod = PaymentTypes.VendorBankAccount;
                                 switch (paymentCodeId)
                                 {
@@ -1182,14 +1356,14 @@ namespace UnicontaClient.Pages.CustomPage
                                     originalVoucher._PaymentMethod = PaymentTypes.VendorBankAccount;
                                     originalVoucher._PaymentId = string.Format("{0}-{1}", bbanRegNum, bbanAcc);
                                 }
-                                else if (swiftNo != null && ibanNo != null) 
+                                else if (swiftNo != null && ibanNo != null)
                                 {
                                     originalVoucher._PaymentMethod = PaymentTypes.IBAN;
                                     originalVoucher._PaymentId = ibanNo;
                                 }
 
                                 Uniconta.DataModel.Creditor creditor = null;
-                               
+
                                 if (hint.CreditorAccount != null)
                                     creditor = (Uniconta.DataModel.Creditor)credCache.Get(hint.CreditorAccount);
                                 if (hint.Amount != 0)
@@ -1201,17 +1375,17 @@ namespace UnicontaClient.Pages.CustomPage
                                     originalVoucher._PaymentId = hint.PaymentId;
                                     originalVoucher.PaymentMethod = hint.PaymentMethod;
                                 }
-                               
+
                                 var creditorCVRNum = Regex.Replace(creditorCVR, "[^0-9]", string.Empty);
 
                                 if (creditor == null)
-                                    creditor = creditors.Where(s => (s._LegalIdent == creditorCVR || s._LegalIdent == creditorCVRNum)).FirstOrDefault();
-                             
+                                    creditor = creditors.Where(s => (Regex.Replace(s._LegalIdent ?? string.Empty, "[^0-9.]", "") == creditorCVRNum)).FirstOrDefault();
+
                                 if (creditor == null)
                                 {
                                     var newCreditor = new CreditorClient()
                                     {
-                                        _Account = creditorCVR, 
+                                        _Account = creditorCVR,
                                         _LegalIdent = creditorCVR,
                                         _PaymentMethod = originalVoucher._PaymentMethod,
                                         _PaymentId = originalVoucher._PaymentId,
@@ -1304,5 +1478,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
 #endif
         }
+
+
     }
 }

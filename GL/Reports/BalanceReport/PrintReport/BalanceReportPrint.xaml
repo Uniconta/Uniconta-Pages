@@ -30,7 +30,7 @@ x:Class="UnicontaClient.Pages.CustomPage.BalanceReportPrint"
                     <RowDefinition Height="2"/>
                 </Grid.RowDefinitions>
                 <dxe:TextEdit IsPrintingMode="True" HorizontalContentAlignment="Left" Grid.Row="0" Text="{Binding Content.BalanceName,Mode=OneWay}" VerticalAlignment="Top"  FontSize="18" FontWeight="Bold"/>
-                <dxe:ImageEdit IsPrintingMode="True" Grid.Row="1" Width="{Binding Path=UsablePageWidth, Mode=OneWay}"  Height="2" dxp:ExportSettings.TargetType="Image" Source="{Binding Path=Content.Lines.Line,Mode=OneWay,Converter={StaticResource imageDataConverter}}"  />
+                <dxe:ImageEdit Grid.Row="1" Width="{Binding Path=UsablePageWidth, Mode=OneWay}"  Height="2" dxp:ExportSettings.TargetType="Image" Source="{Binding Path=Content.Lines.Line,Mode=OneWay,Converter={StaticResource imageDataConverter}}"  />
                 <Grid Grid.Row="2" VerticalAlignment="Center" Width="{Binding Path=UsablePageWidth, Mode=OneWay}" HorizontalAlignment="Stretch" dxp:ExportSettings.TargetType="Panel">
                     <StackPanel Orientation="Horizontal"  HorizontalAlignment="Left">
                         <dxe:TextEdit HorizontalContentAlignment="Left" Text="{Binding Content.Company.CompanyName, Mode=OneWay}"  FontSize="14" FontWeight="Bold"/>
@@ -44,7 +44,7 @@ x:Class="UnicontaClient.Pages.CustomPage.BalanceReportPrint"
                              sd:PageNumberExportSettings.Format="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=PageXofY}"/>
                     </StackPanel>
                 </Grid>
-                <dxe:ImageEdit IsPrintingMode="True" Grid.Row="3" Width="{Binding Path=UsablePageWidth, Mode=OneWay}"  Height="2" dxp:ExportSettings.TargetType="Image" Source="{Binding Path=Content.Lines.Line,Mode=OneWay,Converter={StaticResource imageDataConverter}}"  />
+                <dxe:ImageEdit Grid.Row="3" Width="{Binding Path=UsablePageWidth, Mode=OneWay}"  Height="2" dxp:ExportSettings.TargetType="Image" Source="{Binding Path=Content.Lines.Line,Mode=OneWay,Converter={StaticResource imageDataConverter}}"  />
                 <Grid Grid.Row="4"  Width="{Binding Path=UsablePageWidth, Mode=OneWay}"  HorizontalAlignment="Stretch" dxp:ExportSettings.TargetType="Panel">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="{Binding Content.AccountColWidth, Mode=OneWay}"/>
@@ -260,7 +260,7 @@ x:Class="UnicontaClient.Pages.CustomPage.BalanceReportPrint"
                         <dxe:TextEdit Visibility="{Binding Content.ShowDCCol13,Mode=OneWay}" Width="{Binding Content.DClblWidth, Mode=OneWay}" HorizontalContentAlignment="Right" Grid.Row="1"  Grid.Column="1" Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Credit, Mode=OneWay}"  FontSize="{Binding Content.FontSize, Mode=OneWay}"  FontWeight="Bold" VerticalAlignment="Bottom"/>
                     </Grid>
                 </Grid>
-                <dxe:ImageEdit IsPrintingMode="True" Grid.Row="5" Width="{Binding Path=UsablePageWidth, Mode=OneWay}"  Height="2" dxp:ExportSettings.TargetType="Image" Source="{Binding Path=Content.Lines.Line,Mode=OneWay,Converter={StaticResource imageDataConverter}}"  />
+                <dxe:ImageEdit Grid.Row="5" Width="{Binding Path=UsablePageWidth, Mode=OneWay}"  Height="2" dxp:ExportSettings.TargetType="Image" Source="{Binding Path=Content.Lines.Line,Mode=OneWay,Converter={StaticResource imageDataConverter}}"  />
             </Grid>
         </DataTemplate>
         <!---Details -->
@@ -295,9 +295,8 @@ x:Class="UnicontaClient.Pages.CustomPage.BalanceReportPrint"
                     </Grid.ColumnDefinitions>
                     <dxe:TextEdit IsPrintingMode="True"  Padding="{Binding Content.LeftMargin, Mode=OneWay}"  HorizontalAlignment="Left" Width="{Binding Content.AccountColWidth,Mode=OneWay}" Text="{Binding Content.AccountNo, Mode=OneWay}" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.isBold, Mode=OneWay}" Grid.Column="0" />
                     <StackPanel Orientation="Vertical" Grid.Column="1" Margin="3,0,0,0">
-                        <dxe:TextEdit IsPrintingMode="True"  HorizontalAlignment="Left" Width="{Binding Content.AccountNameColWidth,Mode=OneWay}"  Text="{Binding Content.AccountName, Mode=OneWay}" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.isBold, Mode=OneWay}" Padding="2 0 0 0" />
-                        <dxe:ImageEdit IsPrintingMode="True" HorizontalAlignment="Left"  Height="2" dxp:ExportSettings.TargetType="Image" Width="{Binding Content.AccountNameColWidth,Mode=OneWay}"
-                      Source="{Binding Path=Content.Line,Mode=OneWay,Converter={StaticResource imageDataConverter}}"  />
+                        <dxe:TextEdit IsPrintingMode="True" TextDecorations="{Binding Content.Underline,Mode=OneWay}" HorizontalAlignment="Left" Width="{Binding Content.AccountNameColWidth,Mode=OneWay}"  Text="{Binding Content.AccountName, Mode=OneWay}" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.isBold, Mode=OneWay}" Padding="2 0 0 0">
+                        </dxe:TextEdit>
                     </StackPanel>
                     <dxe:TextEdit IsPrintingMode="True"  Text="{Binding Content.Dim1, Mode=OneWay}" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.isBold, Mode=OneWay}" Grid.Column="2" Width="{Binding Content.Dim1Width, Mode=OneWay}" Padding="2 0 0 0"/>
                     <dxe:TextEdit IsPrintingMode="True"  Text="{Binding Content.Dim2, Mode=OneWay}" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.isBold, Mode=OneWay}" Grid.Column="3" Width="{Binding Content.Dim2Width, Mode=OneWay}" Padding="2 0 0 0"/>

@@ -110,7 +110,7 @@ namespace UnicontaClient.Pages.CustomPage
 
     public partial class DebtorOrderProjectLinePage : GridBasePage
     {
-        public override string NameOfControl { get { return TabControls.DebtorOrderProjectLinePage.ToString(); } }
+        public override string NameOfControl { get { return TabControls.DebtorOrderProjectLinePage; } }
 
         SQLCache ItemsCache, ProjectCache, DebtorCache, CategoryCache, EmployeeCache, PrStandardCache;
         Dictionary<string, Uniconta.API.DebtorCreditor.FindPrices> dictPriceLookup;
@@ -332,13 +332,12 @@ namespace UnicontaClient.Pages.CustomPage
         protected override async void LoadCacheInBackGround()
         {
             var api = this.api;
-            var Comp = api.CompanyEntity;
-            ProjectCache = Comp.GetCache(typeof(Uniconta.DataModel.Project)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.Project), api).ConfigureAwait(false);
-            ItemsCache = Comp.GetCache(typeof(Uniconta.DataModel.InvItem)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.InvItem), api).ConfigureAwait(false);
-            DebtorCache = Comp.GetCache(typeof(Uniconta.DataModel.Debtor)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.Debtor), api).ConfigureAwait(false);
-            CategoryCache = Comp.GetCache(typeof(Uniconta.DataModel.PrCategory)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.PrCategory), api).ConfigureAwait(false);
-            EmployeeCache = Comp.GetCache(typeof(Uniconta.DataModel.Employee)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.Employee), api).ConfigureAwait(false);
-            PrStandardCache = Comp.GetCache(typeof(Uniconta.DataModel.PrStandard)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.PrStandard), api).ConfigureAwait(false);
+            ProjectCache = api.GetCache(typeof(Uniconta.DataModel.Project)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Project)).ConfigureAwait(false);
+            ItemsCache = api.GetCache(typeof(Uniconta.DataModel.InvItem)) ?? await api.LoadCache(typeof(Uniconta.DataModel.InvItem)).ConfigureAwait(false);
+            DebtorCache = api.GetCache(typeof(Uniconta.DataModel.Debtor)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Debtor)).ConfigureAwait(false);
+            CategoryCache = api.GetCache(typeof(Uniconta.DataModel.PrCategory)) ?? await api.LoadCache(typeof(Uniconta.DataModel.PrCategory)).ConfigureAwait(false);
+            EmployeeCache = api.GetCache(typeof(Uniconta.DataModel.Employee)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Employee)).ConfigureAwait(false);
+            PrStandardCache = api.GetCache(typeof(Uniconta.DataModel.PrStandard)) ?? await api.LoadCache(typeof(Uniconta.DataModel.PrStandard)).ConfigureAwait(false);
         }
 
         void RecalculateAmount()

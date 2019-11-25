@@ -69,7 +69,9 @@ namespace UnicontaISO20022CreditTransfer
         internal virtual void Append(BaseDocument baseDoc, XmlDocument doc, XmlElement parent)
         {
             XmlElement pmtTpInf = baseDoc.AppendElement(doc, parent, HPMTTPINF);
-            baseDoc.AppendElement(doc, pmtTpInf, INSTRPRTY, instructionPriority);
+
+            if (instructionPriority != string.Empty)
+                baseDoc.AppendElement(doc, pmtTpInf, INSTRPRTY, instructionPriority);
 
             XmlElement svcLvl = baseDoc.AppendElement(doc, pmtTpInf, HSVCLVL);
             baseDoc.AppendElement(doc, svcLvl, CD, extServiceCode);

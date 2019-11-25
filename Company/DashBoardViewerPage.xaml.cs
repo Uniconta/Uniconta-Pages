@@ -47,6 +47,20 @@ namespace UnicontaClient.Pages.CustomPage
         {
             company = api.CompanyEntity;
             InitializeComponent();
+            InitPage(dashBoard);
+        }
+
+        string dashboardName;
+        public DashBoardViewerPage(string _dashboard) : base(null)
+        {
+            company = api.CompanyEntity;
+            InitializeComponent();
+            dashboardName = _dashboard;
+            InitPage(null);
+        }
+
+        void InitPage(UnicontaBaseEntity dashBoard)
+        {
             dashboardViewerUniconta.ObjectDataSourceLoadingBehavior = DevExpress.DataAccess.DocumentLoadingBehavior.LoadAsIs;
             _selectedDashBoard = dashBoard as DashboardClient;
             dataSourceAndTypeMap = new Dictionary<string, Type>();
@@ -74,7 +88,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        bool isDashBoardLaoded = false;  
+        bool isDashBoardLaoded = false;
         private void DashboardViewerUniconta_Loaded(object sender, RoutedEventArgs e)
         {
             if (isDashBoardLaoded)
@@ -82,10 +96,18 @@ namespace UnicontaClient.Pages.CustomPage
             Initialise();
             isDashBoardLaoded = true;
         }
-      
+
         private async Task<bool> Initialise()
         {
             busyIndicator.IsBusy = true;
+            if (_selectedDashBoard == null)
+            {
+                int rowId;
+                int.TryParse(dashboardName, out rowId);
+                var dbrdLst = await api.Query<DashboardClient>() as IEnumerable<UserReportDevExpressClient>;
+                var dashboard = dbrdLst?.Where(x => x.RowId == rowId || x._Name == dashboardName).ToList();
+                _selectedDashBoard = dashboard?.FirstOrDefault() as DashboardClient;
+            }
             DashboardClient selectedDashBoard = _selectedDashBoard;
             if (selectedDashBoard != null)
             {
@@ -160,7 +182,7 @@ namespace UnicontaClient.Pages.CustomPage
                 return retVal;
             }
         }
-      
+
         private List<Type> GetReportTableTypes()
         {
             var list = new List<Type>();
@@ -218,7 +240,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
             catch
             {
-                
+
             }
         }
 
@@ -263,10 +285,10 @@ namespace UnicontaClient.Pages.CustomPage
             return retType;
         }
 
-      
+
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-                OpenFilterDialog();
+            OpenFilterDialog();
         }
 
         public void OpenFilterDialog()
@@ -288,7 +310,7 @@ namespace UnicontaClient.Pages.CustomPage
                     else
                         PropSort = null;
 
-                    filterDialog = new CWServerFilter(api,tableType,null,null,null);
+                    filterDialog = new CWServerFilter(api, tableType, null, null, null);
                     filterDialog.Closing += FilterDialog_Closing;
                 }
 
@@ -346,8 +368,8 @@ namespace UnicontaClient.Pages.CustomPage
     public class DashBoardVM
     {
         public Dashboard UnicontaDashboard { get; set; }
-        public ImageSource FilterImage { get { return  UnicontaClient.Utilities.Utility.GetGlyph(";component/Assets/img/Filter_32x32.png"); } }
-        public ImageSource ClearFilterImage { get { return  UnicontaClient.Utilities.Utility.GetGlyph(";component/Assets/img/Filter_Clear_32x32.png");  } }
+        public ImageSource FilterImage { get { return UnicontaClient.Utilities.Utility.GetGlyph(";component/Assets/img/Filter_32x32.png"); } }
+        public ImageSource ClearFilterImage { get { return UnicontaClient.Utilities.Utility.GetGlyph(";component/Assets/img/Filter_Clear_32x32.png"); } }
         public ImageSource RefreshImage { get { return UnicontaClient.Utilities.Utility.GetGlyph(";component/Assets/img/refresh.png"); } }
     }
 

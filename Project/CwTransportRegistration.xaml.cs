@@ -140,8 +140,8 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 cmbFromAdd.SelectedIndex = 0;
                 cmbToAdd.SelectedIndex = 2;
-                txtFromAdd.Text = addressList.Count >= 1 ? addressList[0].ContactAddress : string.Empty;
-                txtToAdd.Text = addressList.Count >= 2 ? addressList[2].ContactAddress : string.Empty;
+                txtFromAdd.Text = addressList.Count >= 1 ? addressList[0]?.ContactAddress : string.Empty;
+                txtToAdd.Text = addressList.Count >= 2 ? addressList[2]?.ContactAddress : string.Empty;
             }
 
             if (string.IsNullOrEmpty(txtFromAdd.Text))

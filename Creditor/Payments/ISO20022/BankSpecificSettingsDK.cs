@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Uniconta.ClientTools.DataModel;
+using Uniconta.ClientTools.Page;
 using Uniconta.Common;
 using Uniconta.DataModel;
 using UnicontaClient.Pages.Creditor.Payments;
@@ -41,6 +42,9 @@ namespace UnicontaISO20022CreditTransfer
                 case dkBank.BankConnect:
                     companyBankEnum = CompanyBankENUM.BankConnect;
                     return companyBankEnum;
+                case dkBank.Handelsbanken:
+                    companyBankEnum = CompanyBankENUM.Handelsbanken;
+                    return companyBankEnum;
                 default:
                     return CompanyBankENUM.None;
             }
@@ -59,6 +63,8 @@ namespace UnicontaISO20022CreditTransfer
                     return "Danske Bank";
                 case CompanyBankENUM.BankConnect:
                     return "Bank Connect"; // CredPaymFormat.BankCentral.ToString();
+                case CompanyBankENUM.Handelsbanken:
+                    return "Handelsbanken"; 
                 default:
                     return string.Empty;
             }
@@ -75,10 +81,27 @@ namespace UnicontaISO20022CreditTransfer
         /// <summary>
         /// Allowed characters
         /// </summary>
-        public override string AllowedCharactersRegEx()
+        public override void AllowedCharactersRegEx(bool internationalPayment = false)
         {
-            allowedCharactersRegEx = "[^a-zA-Z0-9æøåÆØÅ &-?:().,'+/]";
-            return allowedCharactersRegEx;
+            if (internationalPayment)
+                allowedCharactersRegEx = "[^a-zA-Z0-9 -?:().,'+/]";
+            else
+                allowedCharactersRegEx = "[^a-zA-Z0-9æøåÆØÅ &-?:().,'+/]";
+
+        }
+
+        /// <summary>
+        /// Date and time at which the message was created
+        /// </summary>
+        public override string CreDtTim()
+        {
+            switch (companyBankEnum)
+            {
+                case CompanyBankENUM.Handelsbanken:
+                    return DateTimeOffset.Now.ToString("yyyy-MM-ddTHH:mm:ss.fffzzz");
+                default:
+                    return DateTimeOffset.Now.ToString("o");
+            }
         }
 
         /// <summary>
@@ -136,7 +159,7 @@ namespace UnicontaISO20022CreditTransfer
         /// NORDEA CUST: Customer identification Signer Id as agreed with (or assigned by) Nordea, min. 10 and max. 18 characters.
         /// Danske Bank: It's not used but Danske Bank recommend to use the CVR number
         /// </summary>
-        public override string IdentificationId(String identificationId, string companyCVR)
+        public override string IdentificationId(string identificationId, string companyCVR)
         {
             identificationId = identificationId ?? string.Empty;
             companyCVR = companyCVR ?? string.Empty;
@@ -144,7 +167,8 @@ namespace UnicontaISO20022CreditTransfer
             switch (companyBankEnum)
             {
                 case CompanyBankENUM.Nordea_DK:
-                    return identificationId; //Pt. ukendt - Kode skal sandsynligvis aftale med Banken (Nordea krav er min 10 og max 18 karakterer)
+                case CompanyBankENUM.Handelsbanken: //Its called SHB no. for Handelsbanken
+                    return identificationId; 
                 case CompanyBankENUM.DanskeBank:
                     identificationId = companyCVR.Replace(" ", String.Empty);
                     return identificationId;
@@ -168,6 +192,7 @@ namespace UnicontaISO20022CreditTransfer
                 case CompanyBankENUM.BankConnect:
                 case CompanyBankENUM.Nordea_DK:
                     return "CUST"; //Nordea only accept the code CUST
+                case CompanyBankENUM.Handelsbanken:
                 case CompanyBankENUM.DanskeBank:
                     return "BANK"; //Default value for Danske Bank
                 default:
@@ -187,10 +212,8 @@ namespace UnicontaISO20022CreditTransfer
             {
                 case CompanyBankENUM.BankConnect:
                 case CompanyBankENUM.Nordea_DK:
-                    if (currencyCode == BaseDocument.CCYDKK && DateTime.Now.Date == executionDate)
-                        return "SDCL"; //SDCL code for same day payments
-                    else
-                        return string.Empty;
+                    return string.Empty;
+                case CompanyBankENUM.Handelsbanken:
                 case CompanyBankENUM.DanskeBank:
                     return "ONCL"; //Default value for Danske Bank
                 default:

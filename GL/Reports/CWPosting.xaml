@@ -12,7 +12,7 @@ x:Class="UnicontaClient.Pages.CustomPage.GL.ChartOfAccount.Reports.CWPosting"
         </Grid.RowDefinitions>
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="30"/>
+                <RowDefinition Height="40"/>
                 <RowDefinition Height="30"/>
                 <RowDefinition Height="30"/>
                 <RowDefinition Height="30"/>
@@ -22,8 +22,11 @@ x:Class="UnicontaClient.Pages.CustomPage.GL.ChartOfAccount.Reports.CWPosting"
                 <ColumnDefinition Width="5"/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CompanyName}" VerticalAlignment="Center"></TextBlock>
-            <TextBlock x:Name="txtCompName" Grid.Column="2" VerticalAlignment="Center"></TextBlock>
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CompanyName}" VerticalAlignment="Top" HorizontalAlignment="Left"></TextBlock>
+            <StackPanel Orientation="Vertical" Grid.Column="2">
+                <TextBlock x:Name="txtCompName" Grid.Column="2" VerticalAlignment="Center"/>
+                <TextBlock x:Name="txtDateMsg" Margin="0,2,0,0" VerticalAlignment="Center"/>
+            </StackPanel>
             <TextBlock Grid.Row="1" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Simulation}" VerticalAlignment="Center"></TextBlock>
             <CheckBox x:Name="chkSimulation" Grid.Row="1" VerticalAlignment="Center" Grid.Column="2" IsChecked="{Binding IsSimulation, Mode=TwoWay}"></CheckBox>
             <TextBlock Grid.Row="2" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Comment}" VerticalAlignment="Center"></TextBlock>

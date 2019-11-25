@@ -88,10 +88,12 @@ namespace UnicontaISO20022CreditTransfer
         /// <summary>
         /// Allowed characters
         /// </summary>
-        public override string AllowedCharactersRegEx()
+        public override void AllowedCharactersRegEx(bool internationalPayment = false)
         {
-            allowedCharactersRegEx = "[^a-zA-Z0-9äöüÄÖÜß -?:().,'+/]";
-            return allowedCharactersRegEx;
+            if (internationalPayment)
+                allowedCharactersRegEx = "[^a-zA-Z0-9 -?:().,'+/]";
+            else
+                allowedCharactersRegEx = "[^a-zA-Z0-9äöüÄÖÜß -?:().,'+/]";
         }
 
         /// <summary>
@@ -116,7 +118,7 @@ namespace UnicontaISO20022CreditTransfer
         /// Identification assigned by an institution.
         /// Max. 35 characters.
         /// </summary>
-        public override string IdentificationId(String identificationId, string companyCVR)
+        public override string IdentificationId(string identificationId, string companyCVR)
         {
             identificationId = identificationId ?? string.Empty;
             companyCVR = companyCVR ?? string.Empty;
@@ -237,7 +239,7 @@ namespace UnicontaISO20022CreditTransfer
                 case CompanyBankENUM.Volks_Raiffeisenbanken:
                     return null;
                 default:
-                    return base.CreditorAddress(creditor, creditorAddress); //TODO:TEST DENNE
+                    return base.CreditorAddress(creditor, creditorAddress);
             }
         }
 

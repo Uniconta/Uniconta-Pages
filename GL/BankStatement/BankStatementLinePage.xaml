@@ -67,6 +67,7 @@ x:Class="UnicontaClient.Pages.CustomPage.BankStatementLinePage"
 
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Date" Width="90"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Text" Width="200" />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="OriginalText" Width="200" Visible="False" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Amount" Width="90"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Debit" Visible="False" Width="90"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Credit" Visible="False" Width="90"/>

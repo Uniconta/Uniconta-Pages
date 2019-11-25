@@ -90,6 +90,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         public string ISOPaymentType;
+        public bool internationalPayment;
         public StringBuilder invoiceNumbers;
         public bool hasBeenMerged;
         public StringBuilder rowNumbers;
@@ -401,10 +402,10 @@ namespace UnicontaClient.Pages.CustomPage
                                 {
                                     int rowHandle = dgCreditorTranOpenGrid.GetRowHandleByListIndex(index);
                                     index++;
-                                    if (!dgCreditorTranOpenGrid.IsRowVisible(rowHandle) || rec._OnHold || (rec._PaymentAmount <= 0d && rec._PaymentRefId == 0))
+                                    if (!dgCreditorTranOpenGrid.IsRowVisible(rowHandle) || rec._OnHold || (rec._PaymentAmount <= 0d && rec.PaymentRefId == 0))
                                         continue;
 
-                                    var paymRefId = rec._PaymentRefId != 0 ? rec._PaymentRefId : -rec.PrimaryKeyId;
+                                    var paymRefId = rec.PaymentRefId != 0 ? rec.PaymentRefId : -rec.PrimaryKeyId;
 
                                     if (dictPaymTransfer.TryGetValue(paymRefId, out mergePaymentRefId)) 
                                     {
@@ -422,7 +423,7 @@ namespace UnicontaClient.Pages.CustomPage
                                         mergePaymentRefId = new CreditorTransPayment();
                                         StreamingManager.Copy(rec, mergePaymentRefId);
                                         mergePaymentRefId._CurrencyLocal = rec._CurrencyLocal;
-                                        mergePaymentRefId._PaymentRefId = paymRefId;
+                                        mergePaymentRefId.PaymentRefId = paymRefId;
                                         mergePaymentRefId._PaymentAmount = rec._PaymentAmount; 
                                         mergePaymentRefId.invoiceNumbers = new StringBuilder();
                                         mergePaymentRefId.invoiceNumbers.Append(rec.Invoice);
@@ -436,10 +437,15 @@ namespace UnicontaClient.Pages.CustomPage
                                     }
                                     paymentListTransfer = dictPaymTransfer.Values.ToList();
                                 }
-                                
+                                if (paymentListTransfer == null)
+                                {
+                                    busyIndicator.IsBusy = false;
+                                    return;
+                                }
+
                                 foreach (var cTOpenClient in paymentListTransfer)
                                 {
-                                    var lineclient = new Uniconta.DataModel.GLDailyJournalLine();
+                                    var lineclient = new GLDailyJournalLineClient();
                                     lineclient.SetMaster(DJclient);
                                     lineclient._DCPostType = DCPostType.Payment;
                                     lineclient._LineNumber = ++LineNumber;
@@ -466,14 +472,14 @@ namespace UnicontaClient.Pages.CustomPage
                                     if (curOpen != 0d && cTOpenClient.Currency.HasValue)
                                     {
                                         lineclient._Currency = (byte)cTOpenClient.Currency.Value;
-                                        lineclient._DebitCur = cTOpenClient._PaymentAmount;
+                                        lineclient.AmountCur = cTOpenClient._PaymentAmount;
                                         if (cTOpenClient._PaymentAmount == -cTOpenClient._AmountOpen)
-                                            lineclient._Debit = -cTOpenClient._AmountOpen;
+                                            lineclient.Amount = -cTOpenClient._AmountOpen;
                                         else
-                                            lineclient._Debit = cTOpenClient._AmountOpen * cTOpenClient._PaymentAmount / curOpen; // payAmount different sign than curOpen, so no minus.
+                                            lineclient.Amount = cTOpenClient._AmountOpen * cTOpenClient._PaymentAmount / curOpen; // payAmount different sign than curOpen, so no minus.
                                     }
                                     else
-                                        lineclient._Debit = cTOpenClient._PaymentAmount;
+                                        lineclient.Amount = cTOpenClient._PaymentAmount;
 
                                     if (nextVoucherNumber != 0)
                                     {
@@ -765,19 +771,25 @@ namespace UnicontaClient.Pages.CustomPage
                                         if (paymentFormatRec._PaymentGrouping == PaymentGroupingType.All)
                                             mergePayment._PaymentDate = rec._PaymentDate < mergePayment._PaymentDate ? rec._PaymentDate : mergePayment._PaymentDate;
 
-                                        rec._PaymentRefId = paymNumSeqRefId; 
+                                        if (rec._MergePaymId == StandardPaymentFunctions.MERGEID_SINGLEPAYMENT)
+                                        {
+                                            paymNumSeqRefId++;
+                                            rec.PaymentRefId = paymNumSeqRefId;
+                                        }
+                                        else
+                                            rec.PaymentRefId = paymNumSeqRefId;
                                     }
                                     else
                                     {
                                         paymNumSeqRefId++;
-                                        rec._PaymentRefId = paymNumSeqRefId;
+                                        rec.PaymentRefId = paymNumSeqRefId;
 
                                         mergePayment = new CreditorTransPayment();
                                         StreamingManager.Copy(rec, mergePayment);
                                         mergePayment._MergePaymId = rec._MergePaymId;
                                         mergePayment._CurrencyLocal = rec._CurrencyLocal;
                                         mergePayment.ISOPaymentType = rec.ISOPaymentType;
-                                        mergePayment._PaymentRefId = rec._PaymentRefId;
+                                        mergePayment.PaymentRefId = rec._PaymentRefId;
                                         mergePayment.invoiceNumbers = new StringBuilder();
                                         mergePayment.invoiceNumbers.Append(rec.Invoice);
                                         mergePayment._PaymentAmount = rec._PaymentAmount;
@@ -790,29 +802,33 @@ namespace UnicontaClient.Pages.CustomPage
                                 else
                                 {
                                     paymNumSeqRefId++;
-                                    rec._PaymentRefId = paymNumSeqRefId;
+                                    rec.PaymentRefId = paymNumSeqRefId;
                                 }
-                                rec.NotifyPropertyChanged("PaymentRefId");
                             }
 
                             List<CreditorTransPayment> paymentList = null;
                             if (doMergePaym)
                             {
-                                foreach(var rec in paymentListMerged)
+                                foreach (var rec in paymentListMerged)
                                 {
-                                    if (rec._PaymentAmount < 0)
+                                    if (rec._PaymentAmount <= 0)
                                     {
                                         rec._MergePaymId = Localization.lookup("Excluded");
 
-                                        foreach (var recTrans in queryPaymentTrans.Where(s => s._PaymentRefId == rec._PaymentRefId))
+                                        foreach (var recTrans in queryPaymentTrans.Where(s => s.PaymentRefId == rec.PaymentRefId))
                                         {
-                                            recTrans._ErrorInfo = "Merged amount is negative";
+                                            recTrans._ErrorInfo = "Merged amount is negative or zero";
                                             recTrans._MergePaymId = Localization.lookup("Excluded");
                                             recTrans.NotifyErrorSet();
                                         }
                                     }
                                 }
-                                paymentList = paymentListMerged.Where(s => s._MergePaymId != Localization.lookup("Excluded")).ToList();
+
+                                paymentList = paymentListMerged.Where(s => s._MergePaymId != Localization.lookup("Excluded") && s.MergePaymId != StandardPaymentFunctions.MERGEID_SINGLEPAYMENT).ToList();
+                                foreach (var rec in queryPaymentTrans.Where(s => (s.MergePaymId == StandardPaymentFunctions.MERGEID_SINGLEPAYMENT)))
+                                {
+                                    paymentList.Add(rec);
+                                }
                             }
                             else
                             {
@@ -880,7 +896,8 @@ namespace UnicontaClient.Pages.CustomPage
                             {
                                 BECPayFormat.GenerateFile(paymentList, paymentListTotal, api, paymentFormatRec, paymentReference, BankAccountCache, CreditorCache, glJournalGenerated);
                             }
-                            else if (paymMethod == ExportFormatType.ISO20022_DK || paymMethod == ExportFormatType.ISO20022_NL || paymMethod == ExportFormatType.ISO20022_NO || paymMethod == ExportFormatType.ISO20022_DE || paymMethod == ExportFormatType.ISO20022_EE || paymMethod == ExportFormatType.ISO20022_SE)
+                            else if (paymMethod == ExportFormatType.ISO20022_DK || paymMethod == ExportFormatType.ISO20022_NL || paymMethod == ExportFormatType.ISO20022_NO || paymMethod == ExportFormatType.ISO20022_DE ||
+                                     paymMethod == ExportFormatType.ISO20022_EE || paymMethod == ExportFormatType.ISO20022_SE || paymMethod == ExportFormatType.ISO20022_UK || paymMethod == ExportFormatType.ISO20022_LT)
                             {
                                 GeneratePaymentFileISO20022(paymentList, paymentListTotal, paymentFormatRec, paymentReference);
                             }
@@ -1079,8 +1096,8 @@ namespace UnicontaClient.Pages.CustomPage
             var paymentISO20022Validate = new PaymentISO20022Validate();
 
             var paymentformat = (ExportFormatType)credPaymFormat._ExportFormat;
-            if (glJournalGenerated && (paymentformat == ExportFormatType.ISO20022_DK || paymentformat == ExportFormatType.ISO20022_NL ||
-                paymentformat == ExportFormatType.ISO20022_NO || paymentformat == ExportFormatType.ISO20022_DE || paymentformat == ExportFormatType.ISO20022_EE || paymentformat == ExportFormatType.ISO20022_SE))
+            if (glJournalGenerated && (paymentformat == ExportFormatType.ISO20022_DK || paymentformat == ExportFormatType.ISO20022_NL ||paymentformat == ExportFormatType.ISO20022_NO || paymentformat == ExportFormatType.ISO20022_DE ||
+                                       paymentformat == ExportFormatType.ISO20022_EE || paymentformat == ExportFormatType.ISO20022_SE || paymentformat == ExportFormatType.ISO20022_UK || paymentformat == ExportFormatType.ISO20022_LT))
             {
                 UnicontaMessageBox.Show(string.Format("Payment format '{0}' is not available for GL Journal generated payments.", credPaymFormat._ExportFormat), Uniconta.ClientTools.Localization.lookup("Warning"));
                 return false;

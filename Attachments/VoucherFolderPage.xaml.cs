@@ -43,19 +43,19 @@ namespace UnicontaClient.Pages.CustomPage
         VouchersClient voucherClient;
         string action;
         List<int> removedRowIds = null;
-        public VoucherFolderPage(UnicontaBaseEntity sourceData, string folderAction) :
+        public VoucherFolderPage(UnicontaBaseEntity sourceData, string envelopeAction) :
             base(sourceData)
         {
             InitializeComponent();
-            InitPage(folderAction);
+            InitPage(envelopeAction);
         }
 
-        string folderAction;
-        private void InitPage(string _folderAction)
+        string envelopeAction;
+        private void InitPage(string _envelopeAction)
         {
             MainControl = dgVoucherFolderGrid;
-            folderAction = _folderAction;
-            action = folderAction;
+            envelopeAction = _envelopeAction;
+            action = _envelopeAction;
             ribbonControl = localMenu;
             dgVouchersGrid.api = dgVoucherFolderGrid.api = api;
             dgVoucherFolderGrid.Readonly = false;
@@ -64,12 +64,12 @@ namespace UnicontaClient.Pages.CustomPage
                 voucherClient = new VouchersClient();
             else
                 voucherClient = LoadedRow as VouchersClient;
-            SetRibbon(folderAction);
+            SetRibbon(envelopeAction);
         }
 
-        private void SetRibbon(string folderAction)
+        private void SetRibbon(string Action)
         {
-            switch (folderAction)
+            switch (Action)
             {
                 case "Remove":
                     ribbonControl.DisableButtons(new string[] { "AddVoucher", "AddPhysicalVoucher", "ViewPhysicalVoucher" });
@@ -80,23 +80,23 @@ namespace UnicontaClient.Pages.CustomPage
         public async override Task InitQuery()
         {
             await dgVouchersGrid.Filter(null);
-            var defaultFilterString = "Contains([Folder],'false')";
+            var defaultFilterString = "Contains([Envelope],'false')";
             dgVouchersGrid.FilterString = defaultFilterString;
             dgVoucherFolderGrid.Visibility = Visibility.Visible;
             removedRowIds = new List<int>();
 
-            switch (folderAction)
+            switch (envelopeAction)
             {
                 case "Create":
                     dgVouchersGrid.Visibility = Visibility.Visible;
                     break;
                 case "Edit":
                     var dapi = new DocumentAPI(api);
-                    var items = (VouchersClient[])await dapi.GetFolderContent(voucherClient, false);
+                    var items = (VouchersClient[])await dapi.GetEnvelopeContent(voucherClient, false);
                     dgVoucherFolderGrid.ItemsSource = items.ToList(); // we need to do a toList, so we can update the list
-                    var folderrowIds = items.Select(p => p.RowId).ToList();
-                    if (folderrowIds.Count > 0)
-                        dgVouchersGrid.FilterString = GetFilterString(defaultFilterString, folderrowIds);
+                    var rowIds = items.Select(p => p.RowId).ToList();
+                    if (rowIds.Count > 0)
+                        dgVouchersGrid.FilterString = GetFilterString(defaultFilterString, rowIds);
                     dgVouchersGrid.Visibility = Visibility.Visible;
                     break;
             }
@@ -128,8 +128,8 @@ namespace UnicontaClient.Pages.CustomPage
             var selectedVoucherFolder = dgVoucherFolderGrid.SelectedItem as VouchersClient;
             switch (ActionType)
             {
-                case "SaveFolder":
-                    SaveFolder();
+                case "Save":
+                    Save();
                     break;
                 case "AddVoucher":
                     var itemsOld = dgVoucherFolderGrid.ItemsSource == null ? null : ((IEnumerable<VouchersClient>)dgVoucherFolderGrid.ItemsSource).Select(p => p.RowId).ToList();
@@ -142,7 +142,7 @@ namespace UnicontaClient.Pages.CustomPage
                         AddVouchers(selectedList);
                     }
                     var itemsNew = VouchersAdd.Select(p => p.RowId).ToList();
-                    dgVouchersGrid.FilterString = GetFilterString("Contains([Folder],'false')", itemsNew, itemsOld);
+                    dgVouchersGrid.FilterString = GetFilterString("Contains([Envelope],'false')", itemsNew, itemsOld);
                     dgVoucherFolderGrid.Visibility = Visibility.Visible;
                     break;
                 case "RemoveVoucher":
@@ -155,7 +155,7 @@ namespace UnicontaClient.Pages.CustomPage
                     var voucherRow = ((IEnumerable<VoucherExtendedClient>)dgVouchersGrid.ItemsSource).Where(p => p.RowId == rowId).SingleOrDefault();
                     voucherRow.IsAdded = false;
                     var itemExisting = ((IEnumerable<VouchersClient>)dgVoucherFolderGrid.ItemsSource).Select(p => p.RowId).ToList();
-                    dgVouchersGrid.FilterString = GetFilterString("Contains([Folder],'false')", null, itemExisting);
+                    dgVouchersGrid.FilterString = GetFilterString("Contains([Envelope],'false')", null, itemExisting);
                     break;
                 case "ViewPhysicalVoucher":
                 case "ViewVoucher":
@@ -189,7 +189,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        async private void SaveFolder()
+        async private void Save()
         {
             var result = false;
             var documentApi = new DocumentAPI(api);
@@ -208,7 +208,7 @@ namespace UnicontaClient.Pages.CustomPage
                                    {
                                        voucherClient.Text = createFolderDialog.FolderName;
                                        voucherClient.Content = createFolderDialog.ContentType;
-                                       var createResult = await documentApi.CreateFolder(voucherClient, newlist);
+                                       var createResult = await documentApi.CreateEnvelope(voucherClient, newlist);
                                        // Folder now contains a full record with the content.
                                        if (createResult == ErrorCodes.Succes)
                                        {
@@ -238,7 +238,7 @@ namespace UnicontaClient.Pages.CustomPage
                                     listRemove.Add(tempVoucher);
                             }
 
-                            var removeResult = await documentApi.RemoveFromFolder(voucherClient, listRemove);
+                            var removeResult = await documentApi.RemoveFromEnvelope(voucherClient, listRemove);
                             result = (removeResult == ErrorCodes.Succes);
                         }
 
@@ -247,7 +247,7 @@ namespace UnicontaClient.Pages.CustomPage
                         var appendList = (IEnumerable<VouchersClient>)dgVoucherFolderGrid.ItemsSource;
                         if (appendList != null)
                         {
-                            var appendResult = await documentApi.AppendToFolder(voucherClient, appendList);
+                            var appendResult = await documentApi.AppendToEnvelope(voucherClient, appendList);
                             result = (appendResult == ErrorCodes.Succes);
                         }
                         
@@ -256,7 +256,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
             catch (Exception ex)
             {
-                documentApi.ReportException(ex, string.Format("Folders, Action={0}", action));
+                documentApi.ReportException(ex, "Envelopes, Action=" + action);
                 result = false;
             }
             if (action != "Create")

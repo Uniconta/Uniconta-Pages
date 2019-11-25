@@ -149,7 +149,10 @@ namespace UnicontaClient.Pages.CustomPage
                 itemsBalance = new ObservableCollection<Balance>(lstEntity.ToList());
                 cbBalance.ItemsSource = itemsBalance;
                 if (LastGeneratedBalance != null)
-                    cbBalance.SelectedItem = LastGeneratedBalance;
+                {
+                    var lastSelBalance = itemsBalance?.Where(x => x.RowId == LastGeneratedBalance.RowId).FirstOrDefault();
+                    cbBalance.SelectedItem = lastSelBalance;
+                }
                 else
                     cbBalance.SelectedIndex = 0;
             }

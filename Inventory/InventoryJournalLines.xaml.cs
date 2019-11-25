@@ -35,7 +35,7 @@ namespace UnicontaClient.Pages.CustomPage
         public override string LineNumberProperty { get { return "_LineNumber"; } }
         public override bool AllowSort { get { return false; } }
         public override bool IsAutoSave { get { return _AutoSave; } }
-        internal bool _AutoSave;
+        public bool _AutoSave;
 
         public override bool AddRowOnPageDown()
         {
@@ -333,6 +333,7 @@ namespace UnicontaClient.Pages.CustomPage
                             rec.NotifyPropertyChanged("Variant2Source");
                         }
                         setVariant(rec, false);
+                        globalEvents?.NotifyRefreshViewer(NameOfControl, selectedItem);
                     }
                     break;
                 case "Warehouse":
@@ -498,6 +499,9 @@ namespace UnicontaClient.Pages.CustomPage
                         string.Format(Uniconta.ClientTools.Localization.lookup("AddOBJ"), Uniconta.ClientTools.Localization.lookup("Variants")), null, floatingLoc: Utility.GetDefaultLocation());
                     }
                     break;
+                case "UndoDelete":
+                    dgInvJournalLine.UndoDeleteRow();
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -517,7 +521,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (list != null && list.Length > 0)
             {
                 Array.Sort(list, new InvBOMSort());
-                var lst = new List<UnicontaBaseEntity>();
+                var lst = new List<UnicontaBaseEntity>(list.Length);
                 foreach (var bom in list)
                 {
                     var invJournalLine = new InvJournalLineGridClient();
@@ -536,8 +540,8 @@ namespace UnicontaClient.Pages.CustomPage
                     invJournalLine._Variant3 = bom._Variant3;
                     invJournalLine._Variant4 = bom._Variant4;
                     invJournalLine._Variant5 = bom._Variant5;
-                    invJournalLine._Warehouse = item._Warehouse;
-                    invJournalLine._Location = item._Location;
+                    invJournalLine._Warehouse = bom._Warehouse ?? item._Warehouse ?? selectedItem._Warehouse;
+                    invJournalLine._Location = bom._Location ?? item._Location ?? selectedItem._Location;
                     invJournalLine._CostPrice = item._CostPrice;
                     invJournalLine._Qty = -Math.Round(bom.GetBOMQty(selectedItem._Qty), item._Decimals);
                     lst.Add(invJournalLine);

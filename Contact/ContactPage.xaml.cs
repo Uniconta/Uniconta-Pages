@@ -20,6 +20,7 @@ using Uniconta.DataModel;
 using System.Collections;
 using Uniconta.ClientTools.Controls;
 using Uniconta.API.Service;
+using System.Windows;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -65,12 +66,12 @@ namespace UnicontaClient.Pages.CustomPage
             string header;
             var syncMaster = dgContactGrid.masterRecord as DCAccount;
             if (syncMaster != null)
-                header = string.Format("{0}: {1}, {2}", Localization.lookup("Contacts"), syncMaster._Account, syncMaster._Name);
+                header = string.Format("{0}: {1}, {2}", Uniconta.ClientTools.Localization.lookup("Contacts"), syncMaster._Account, syncMaster._Name);
             else
             {
                 var syncMaster2 = dgContactGrid.masterRecord as CrmProspect;
                 if (syncMaster2 != null)
-                    header = string.Format("{0}: {1}", Localization.lookup("Contacts"), syncMaster2._Name);
+                    header = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Contacts"), syncMaster2._Name);
                 else
                     return;
             }
@@ -107,6 +108,52 @@ namespace UnicontaClient.Pages.CustomPage
                 LoadType(load.ToArray());
            
             dgContactGrid.SelectedItemChanged += DgContactGrid_SelectedItemChanged;
+
+#if SILVERLIGHT
+            Application.Current.RootVisual.KeyDown += RootVisual_KeyDown;
+#else
+            this.PreviewKeyDown += RootVisual_KeyDown;
+#endif
+            this.BeforeClose += ContactPage_BeforeClose;
+        }
+
+        private void ContactPage_BeforeClose()
+        {
+#if SILVERLIGHT
+            Application.Current.RootVisual.KeyDown -= RootVisual_KeyDown;
+#else
+            this.PreviewKeyDown -= RootVisual_KeyDown;
+#endif
+        }
+
+        private void RootVisual_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == Key.F6 && ( dgContactGrid.CurrentColumn == DCType || dgContactGrid.CurrentColumn == DCAccount))
+            {
+                var currentRow = dgContactGrid.SelectedItem as ContactClient;
+                if(currentRow!= null)
+                {
+                    var lookupTable = new LookUpTable();
+                    lookupTable.api = this.api;
+                    lookupTable.KeyStr = Convert.ToString(currentRow._DCAccount);
+                    if (currentRow._DCType == 1)
+                    {
+                        lookupTable.TableType = typeof(Uniconta.DataModel.Debtor);
+                        this.LookUpTable(lookupTable, Uniconta.ClientTools.Localization.lookup("Lookup"), TabControls.DebtorAccount);
+                    }
+                    if (currentRow._DCType == 2)
+                    {
+                        lookupTable.TableType = typeof(Uniconta.DataModel.Creditor);
+                        this.LookUpTable(lookupTable, Uniconta.ClientTools.Localization.lookup("Lookup"), TabControls.CreditorAccount);
+                    }
+                    if (currentRow._DCType == 3)
+                    {
+                        lookupTable.TableType = typeof(Uniconta.DataModel.CrmProspect);
+                        this.LookUpTable(lookupTable, Uniconta.ClientTools.Localization.lookup("Lookup"), TabControls.CrmProspectPage);
+                    }
+                }
+               
+            }
         }
 
         private void DgContactGrid_SelectedItemChanged(object sender, DevExpress.Xpf.Grid.SelectedItemChangedEventArgs e)

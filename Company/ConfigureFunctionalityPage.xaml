@@ -151,6 +151,9 @@ x:Class="UnicontaClient.Pages.CustomPage.ConfigureFunctionalityPage"
                     <CorasauControls:CorasauLayoutItem x:Name="cbTraceFieldChanges" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FieldChangeLog}">
                         <CorasauControls:CheckEditor IsChecked="{Binding TraceFieldChanges ,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="cbBilagscan" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Bilagscan}">
+                        <CorasauControls:CheckEditor IsChecked="{Binding Bilagscan ,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
                 <CorasauControls:CorasauLayoutGroup x:Name="grpBoxAddins" View="GroupBox" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                     <CorasauControls:CorasauLayoutItem  Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Attachments}">
@@ -158,9 +161,6 @@ x:Class="UnicontaClient.Pages.CustomPage.ConfigureFunctionalityPage"
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem x:Name="cbProfiles" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Profiles}">
                         <CorasauControls:CheckEditor IsChecked="{Binding Profiles ,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="cbBilagscan" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Bilagscan}">
-                        <CorasauControls:CheckEditor IsChecked="{Binding Bilagscan ,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
             </CorasauControls:CorasauLayoutControl>

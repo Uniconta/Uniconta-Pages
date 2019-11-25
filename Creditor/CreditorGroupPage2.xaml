@@ -43,6 +43,9 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorGroupPage2"
                     <CorasauControls:CorasauLayoutItem FieldName="CompressPosting" x:Name="liCompressPosting">
                         <CheckBox IsChecked="{Binding CompressPosting,Mode=TwoWay}" />
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="MandatoryItem" x:Name="liMandatoryItem">
+                        <CorasauControls:CheckEditor  IsChecked="{Binding MandatoryItem,Mode=TwoWay}" />
+                    </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
                 <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpInvoice" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Invoice}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                     <CorasauControls:CorasauLayoutItem FieldName="PriceList" x:Name="liPriceList">

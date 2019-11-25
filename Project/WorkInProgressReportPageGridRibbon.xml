@@ -6,6 +6,7 @@
   <RibbonItem>
       <RibbonItem Action="GroupByDebtor" LocalizedNameKey="GroupByOBJ" Parameter="Debtor" LargeGlyph="Employee_32x32.png" />
       <RibbonItem Action="GroupByPersonInCharge"  LocalizedNameKey="GroupByOBJ" Parameter="PersonInCharge" LargeGlyph="UsresOf_32x32.png"/>
+      <RibbonItem Action="GroupByRootProject"  LocalizedNameKey="GroupByOBJ" Parameter="RootProject" LargeGlyph="Project_32x32.png"/>    
       <RibbonItem Action="GroupByDimension1"  LargeGlyph="Group_by_32x32.png"/>
       <RibbonItem Action="GroupByDimension2"  LargeGlyph="Group_by_32x32.png"/>
       <RibbonItem Action="GroupByDimension3"  LargeGlyph="Group_by_32x32.png"/>
@@ -19,9 +20,14 @@
   <RibbonItem >
     <RibbonItem Action="SalesOrder" LocalizedNameKey="GenerateOnAccountInvoice" LargeGlyph="Orders_32x32.png"/>  
     <RibbonItem Action="CreateOrder" LocalizedNameKey="GenerateFinalInvoice" LargeGlyph="AccountInvoice_16x16.png"/>
+    <RibbonItem Action="ZeroInvoice" LocalizedNameKey="CreateOBJ" Parameter="ZeroInvoice" LargeGlyph="Blank_32x32.png"/>
   </RibbonItem>
   <RibbonItem >
     <RibbonItem Action="DebtorAccount" LocalizedNameKey="DebtorAccount" LargeGlyph="Contacts_32x32.png"/>
+  </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="InclZeroBalance" LocalizedNameKey="IncludeZeroBalance" IsCheckBox="True" />
+    <RibbonItem Action="InclJournals" LocalizedNameKey="IncludeJournals" IsCheckBox="True" />
   </RibbonItem>
   <RibbonItem>
     <!---If we want to create a new group in same PageTab-->

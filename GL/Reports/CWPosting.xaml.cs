@@ -43,10 +43,11 @@ namespace UnicontaClient.Pages.CustomPage.GL.ChartOfAccount.Reports
         public int DialogTableId { get; set; }
         protected override bool ShowTableValueButton { get { return true; } }
 #endif
-        string companyName;
-        public CWPosting(Uniconta.DataModel.GLDailyJournal journal, string compName)
+        string companyName, dateMsg;
+        public CWPosting(Uniconta.DataModel.GLDailyJournal journal, string compName, string _dateMsg)
         {
             companyName = compName;
+            dateMsg = _dateMsg;
             InitPage(journal);
         }
         void InitPage(object objJournal)
@@ -75,6 +76,7 @@ namespace UnicontaClient.Pages.CustomPage.GL.ChartOfAccount.Reports
 
             }
             txtCompName.Text = companyName;
+            txtDateMsg.Text = dateMsg;
             this.Loaded += CW_Loaded;
         }
 

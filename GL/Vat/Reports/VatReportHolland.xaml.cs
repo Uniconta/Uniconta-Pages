@@ -74,11 +74,34 @@ namespace UnicontaClient.Pages.CustomPage
 
             bool SumIsneg = false;
             double sum = 0d, sumBase = 0d, sum19 = 0d;
-            foreach (var rec in VatSumOperationLst)
+            int lastIndex = 0;
+            var lst = new VatSumOperationReport[23];
+            for (int lin = 1; (lin <= 23); lin++)
+            //foreach (var rec in VatSumOperationLst)
             {
                 string s, opr;
+                VatSumOperationReport rec = null;
+                while (lastIndex < VatSumOperationLst.Count)
+                {
+                    rec = VatSumOperationLst[lastIndex];
+                    if (rec != null)
+                    {
+                        if (rec._Line == lin)
+                            break;
+                        if (rec._Line > lin)
+                        {
+                            rec = null;
+                            break;
+                        }
+                        rec = null;
+                    }
+                    lastIndex++;
+                }
+                if (rec == null)
+                    rec = new VatSumOperationReport() { _Line = lin };
 
-                var lin = rec._Line;
+                lst[lin - 1] = rec;
+
                 if (lin == 17 || lin == 19 || lin == 23)
                     rec._Amount = rec._AmountBase = 0d;
 
@@ -162,7 +185,7 @@ namespace UnicontaClient.Pages.CustomPage
                 rec._UnicontaOperation = opr;
             }
 
-            dgVatReportHolland.ItemsSource = VatSumOperationLst;
+            dgVatReportHolland.ItemsSource = lst;
             dgVatReportHolland.Visibility = Visibility.Visible;
         }
     }

@@ -68,7 +68,7 @@ namespace UnicontaISO20022CreditTransfer
         /// Max. 35 characters.
         /// SEB: It's not used but Danske Bank recommend to use the CVR number (Setup as Danske Bank)
         /// </summary>
-        public override string IdentificationId(String identificationId, string companyCVR)
+        public override string IdentificationId(string identificationId, string companyCVR)
         {
             identificationId = identificationId ?? string.Empty;
             companyCVR = companyCVR ?? string.Empty;

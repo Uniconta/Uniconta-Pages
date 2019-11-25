@@ -32,7 +32,6 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorDirectDebit"
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <Button x:Name="btnSerach" Grid.Column="6" Grid.Row="0" Margin="10,3,3,3" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Search}" Height="23" Width="80" Click="btnSerach_Click"/>
             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DueDate}" Grid.Column="0" Grid.Row="0" Margin="10,3,3,3" VerticalAlignment="Center"/>
             <CorasauControls:DateEditor x:Name="txtDateFrm" Grid.Column="1" Grid.Row="0" Margin="10,3,3,3"  Height="23"/>
             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=To}" Grid.Column="2" Grid.Row="0" Margin="10,3,3,3" VerticalAlignment="Center"/>

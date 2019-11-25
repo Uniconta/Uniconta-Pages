@@ -196,6 +196,8 @@ namespace UnicontaClient.Pages.CustomPage
                         TableField.SetUserFieldsFromRecord(selectedItem, rec);
                         if (selectedItem._Blocked)
                             UtilDisplay.ShowErrorCode(ErrorCodes.ItemIsOnHold, null);
+
+                        globalEvents?.NotifyRefreshViewer(NameOfControl, selectedItem);
                     }
                     break;
                 case "Warehouse":

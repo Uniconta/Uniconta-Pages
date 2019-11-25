@@ -27,6 +27,7 @@ namespace UnicontaISO20022CreditTransfer
         protected CompanyBankENUM companyBankEnum;
         protected string companyCountryId;
         protected string allowedCharactersRegEx;
+        protected bool internationalPayment;
         protected Dictionary<string, string> replaceCharactersRegEx;
         #endregion
 
@@ -73,6 +74,12 @@ namespace UnicontaISO20022CreditTransfer
                     return new BankSpecificSettingsDE(credPaymFormat);
                 case (byte)ExportFormatType.ISO20022_EE:
                     return new BankSpecificSettingsEE(credPaymFormat);
+                case (byte)ExportFormatType.ISO20022_SE:
+                    return new BankSpecificSettingsSE(credPaymFormat);
+                case (byte)ExportFormatType.ISO20022_UK:
+                    return new BankSpecificSettingsUK(credPaymFormat);
+                case (byte)ExportFormatType.ISO20022_LT:
+                    return new BankSpecificSettingsLT(credPaymFormat);
                 default:
                     return new BankSpecificSettingsDK(credPaymFormat); //This is active for all the proprietary bank formats - In a future version Test class has to be differentiated
             }
@@ -97,10 +104,9 @@ namespace UnicontaISO20022CreditTransfer
         /// <summary>
         /// Allowed characters
         /// </summary>
-        public virtual string AllowedCharactersRegEx()
+        public virtual void AllowedCharactersRegEx(bool internationalPayment = false)
         {
             allowedCharactersRegEx = "[^a-zA-Z0-9 -?:().,'+/]";
-            return allowedCharactersRegEx;
         }
 
         /// <summary>
@@ -144,7 +150,7 @@ namespace UnicontaISO20022CreditTransfer
         /// NORDEA CUST: Customer identification Signer Id as agreed with (or assigned by) Nordea, min. 10 and max. 18 characters.
         /// Danske Bank: It's not used but Danske Bank recommend to use the CVR number
         /// </summary>
-        public virtual string IdentificationId(String identificationId, string companyCVR)
+        public virtual string IdentificationId(string identificationId, string companyCVR)
         {
             return string.Empty;
         }
@@ -194,7 +200,7 @@ namespace UnicontaISO20022CreditTransfer
         /// SUPP Supplier payment (Default Value)
         /// TREA Financial payment
         /// </summary>
-        public virtual string ExtCategoryPurpose()
+        public virtual string ExtCategoryPurpose(ISO20022PaymentTypes ISOPaymType)
         {
             return BaseDocument.EXTCATEGORYPURPOSE_SUPP;
         }
@@ -273,9 +279,9 @@ namespace UnicontaISO20022CreditTransfer
         /// <summary>
         /// Merged payments
         /// </summary>
-        public virtual string PaymentInfoId(int fileSeqNumber, int recordSeqNumber)
+        public virtual string PaymentInfoId(int fileSeqNumber, string endToEndId)
         {
-            var result = string.Format("{0}-{1}-MERGED", fileSeqNumber.ToString().PadLeft(6, '0'), recordSeqNumber.ToString().PadLeft(6, '0'));
+            var result = string.Format("{0}-{1}-MERGED", fileSeqNumber.ToString().PadLeft(6, '0'), endToEndId);
             return StandardPaymentFunctions.RegularExpressionReplace(result, allowedCharactersRegEx, replaceCharactersRegEx);
         }
 
@@ -326,20 +332,8 @@ namespace UnicontaISO20022CreditTransfer
         /// <summary>
         /// This is the requested execution date when the payment will be processed if sufficient funds on the account.
         /// </summary>
-        public virtual DateTime RequestedExecutionDate(string companyIBAN, DateTime executionDate) //, List<BankHolidaysTable> bankHolidaysList )
+        public virtual DateTime RequestedExecutionDate(string companyIBAN, DateTime executionDate)
         {
-            //This part is excluded until we have the new table for Bank Holidays. Be aware the the sorting will not work correctly if the Payment date is prosponed forward
-            //var companyBankCountryId = companyIBAN.Substring(0, 2);
-            //var content = (CountryISOCode)Enum.Parse(typeof(CountryISOCode), companyBankCountryId);
-
-            //var bankHoliday = bankHolidaysList.Any(s => s.Country == content && s.BankDate == executionDate) ||
-            //                  (executionDate.DayOfWeek == DayOfWeek.Saturday ||
-            //                   executionDate.DayOfWeek == DayOfWeek.Sunday);
-            //if (bankHoliday)
-            //{
-            //    executionDate = executionDate.AddDays(1);
-            //    executionDate = RequestedExecutionDate(companyIBAN, executionDate, bankHolidaysList);
-            //}
 
             return executionDate;
         }
@@ -405,6 +399,44 @@ namespace UnicontaISO20022CreditTransfer
 
             return ISO20022PaymentTypes.DOMESTIC;
         }
+
+
+        /// <summary>
+        /// International payment or Local payment (Transfers within the same country)
+        /// Used to identifify the correct character set
+        /// </summary>
+        public virtual bool InternationalPayment(string companyIBAN, string creditorIBAN, string creditorSWIFT, string creditorCountryId, string companyCountryId)
+        {
+            companyIBAN = companyIBAN ?? string.Empty;
+            creditorIBAN = creditorIBAN ?? string.Empty;
+            creditorSWIFT = creditorSWIFT ?? string.Empty;
+            companyCountryId = companyCountryId ?? string.Empty;
+            creditorCountryId = creditorCountryId ?? string.Empty;
+
+            //Company
+            var companyBankCountryId = string.Empty;
+            if (companyIBAN.Length >= 2)
+                companyBankCountryId = companyIBAN.Substring(0, 2);
+            else
+                companyBankCountryId = companyCountryId;
+
+            //Creditor
+            var creditorBankCountryId = string.Empty;
+            if (creditorIBAN.Length >= 2)
+                creditorBankCountryId = creditorIBAN.Substring(0, 2);
+            else if (creditorSWIFT.Length > 6)
+                creditorBankCountryId = creditorSWIFT.Substring(4, 2);
+            else
+                creditorBankCountryId = creditorCountryId;
+
+            if (companyBankCountryId != creditorBankCountryId)
+                internationalPayment = true;
+            else
+                internationalPayment = false;
+
+            return internationalPayment;
+        }
+
 
         /// <summary>
         /// Specifies a pre-agreed service or level of service between the parties, as 
@@ -636,17 +668,17 @@ namespace UnicontaISO20022CreditTransfer
         /// </summary>
         public virtual PostalAddress CreditorAddress(Uniconta.DataModel.Creditor creditor, PostalAddress creditorAddress)
         {
-            var adr1 = creditor._Address1;
-            var adr2 = creditor._Address2;
-            var adr3 = creditor._Address3;
-            var zipCode = creditor._ZipCode;
-            var city = creditor._City;
+            var adr1 = StandardPaymentFunctions.RegularExpressionReplace(creditor._Address1, allowedCharactersRegEx, replaceCharactersRegEx);
+            var adr2 = StandardPaymentFunctions.RegularExpressionReplace(creditor._Address2, allowedCharactersRegEx, replaceCharactersRegEx);
+            var adr3 = StandardPaymentFunctions.RegularExpressionReplace(creditor._Address3, allowedCharactersRegEx, replaceCharactersRegEx);
+            var zipCode = StandardPaymentFunctions.RegularExpressionReplace(creditor._ZipCode, allowedCharactersRegEx, replaceCharactersRegEx);
+            var city = StandardPaymentFunctions.RegularExpressionReplace(creditor._City, allowedCharactersRegEx, replaceCharactersRegEx);
 
             if (creditor._ZipCode != null)
             {
-                creditorAddress.ZipCode = StandardPaymentFunctions.RegularExpressionReplace(zipCode, allowedCharactersRegEx, replaceCharactersRegEx);
-                creditorAddress.CityName = StandardPaymentFunctions.RegularExpressionReplace(city, allowedCharactersRegEx, replaceCharactersRegEx);
-                creditorAddress.StreetName = StandardPaymentFunctions.RegularExpressionReplace(adr1, allowedCharactersRegEx, replaceCharactersRegEx);
+                creditorAddress.ZipCode = zipCode;
+                creditorAddress.CityName =city;
+                creditorAddress.StreetName = adr1;
             }
             else
             {
@@ -680,9 +712,9 @@ namespace UnicontaISO20022CreditTransfer
         /// <summary>
         /// The End to End Reference must be unique. This will be used for duplicate control on transaction level, if Instruction Id is not present. It will be returned in the status reports and will be forwarded to beneficiary.
         /// </summary>
-        public virtual int EndtoendId(int endtoendId)
+        public virtual string EndtoendId(long endtoendId)
         {
-            return endtoendId;
+            return endtoendId.ToString();
         }
 
         /// <summary>
@@ -800,6 +832,11 @@ namespace UnicontaISO20022CreditTransfer
             }
 
             return resultList;
+        }
+
+        protected string AddSeparator(string value)
+        {
+            return value != null ? ", " : string.Empty;
         }
 
     }

@@ -216,16 +216,21 @@ namespace UnicontaClient.Pages.CustomPage
                 if (param != null)
                 {
                     var invItems = param[0] as List<UnicontaBaseEntity>;
+                    if (invItems == null || invItems.Count == 0)
+                        return;
                     var iSource = dgCreditorOrderLineGrid.ItemsSource as IEnumerable<CreditorOrderLineClient>;
-                    var nonemptyList = new List<UnicontaBaseEntity>();
                     if (iSource != null)
                     {
+                        var removeList = new List<int>();
+                        int i = -1;
                         foreach (var row in iSource)
                         {
-                            if (row._Item != null || row._Text != null || row._Note != null)
-                                nonemptyList.Add(row);
+                            i++;
+                            if (row._Item == null && row._Text == null && row._Note == null)
+                                removeList.Add(i);
                         }
-                        dgCreditorOrderLineGrid.SetSource(nonemptyList.ToArray());
+                        for (i = removeList.Count; (--i >= 0);)
+                            dgCreditorOrderLineGrid.tableView.DeleteRow(removeList[i]);
                     }
                     dgCreditorOrderLineGrid.PasteRows(invItems);
                 }
@@ -424,7 +429,7 @@ namespace UnicontaClient.Pages.CustomPage
                         rec._Location = null;
                     break;
                 case "EAN":
-                    DebtorOfferLines.FindOnEAN(rec, this.items, api);
+                    DebtorOfferLines.FindOnEAN(rec, this.items, api, this.PriceLookup);
                     break;
                 case "Total":
                     RecalculateAmount();
@@ -761,8 +766,7 @@ namespace UnicontaClient.Pages.CustomPage
                     var sr = new StreamReader(stream);
                     var oioublText = await sr.ReadToEndAsync();
 
-                    var creditors2 = (Uniconta.DataModel.Creditor[])creditors?.GetNotNullArray;
-                    var order = await OIOUBL.ReadInvoiceCreditNoteOrOrder(oioublText, creditors2, api, true);
+                    var order = await OIOUBL.ReadInvoiceCreditNoteOrOrder(oioublText, creditors, api, true);
 
                     if (order == null)
                     {

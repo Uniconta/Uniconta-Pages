@@ -51,6 +51,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorGroup"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CurrencyAdjustment" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PaymentFee" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ExemptDuty" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="MandatoryItem" Visible="False" />
                 </localPage:DebtorGroupGrid.Columns>
             </localPage:DebtorGroupGrid>
         </CorasauControls:BusyIndicator>

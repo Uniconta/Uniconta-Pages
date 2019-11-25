@@ -38,6 +38,9 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryItemPage2"
                         <CorasauControls:CorasauLayoutItem FieldName="Blocked" x:Name="liBlocked">
                             <CorasauControls:CheckEditor x:Name="Blocked" IsChecked="{Binding Blocked,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="Photo" x:Name="liPhoto" Style="{StaticResource LayoutItemsLookUpEditstyle}" LookupButtonClicked="liPhoto_LookupButtonClicked">
+                            <CorasauControls:IntegerEditor HorizontalContentAlignment="Left" Text="{Binding Photo,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
                     <CorasauControls:CorasauLayoutGroup View="GroupBox" MinWidth="400" x:Name="grpPrices" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Prices}"  Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                         <CorasauControls:CorasauLayoutItem FieldName="CostPrice" x:Name="liCostPrice">

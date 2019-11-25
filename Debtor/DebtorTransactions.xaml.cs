@@ -37,7 +37,7 @@ namespace UnicontaClient.Pages.CustomPage
     {
         public override Type TableType { get { return typeof(DebtorTransClient); } }
     }
-    public partial class DebtorTransactions : GridBasePage  
+    public partial class DebtorTransactions : GridBasePage
     {
         public override string NameOfControl { get { return TabControls.DebtorTransactions; } }
         DateTime filterDate;
@@ -117,7 +117,7 @@ namespace UnicontaClient.Pages.CustomPage
             bool showFields = (dgDebtorTran.masterRecords == null);
             colAccount.Visible = showFields;
             colName.Visible = showFields;
-            Open.Visible = ! showFields;
+            Open.Visible = !showFields;
             if (!api.CompanyEntity.Project)
                 Project.Visible = false;
             Text.ReadOnly = Invoice.ReadOnly = PostType.ReadOnly = TransType.ReadOnly = showFields;
@@ -267,7 +267,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 invoiceNumber = projectTrans._Invoice;
                                 if (projectTrans._CreditorAccount != null)
                                     dcType = 2;
-                                else 
+                                else
                                     dcType = 1;
                             }
                             else
@@ -352,55 +352,44 @@ namespace UnicontaClient.Pages.CustomPage
 
         public static async Task<IPrintReport> StandardPrint(DebtorInvoiceClient debtorInvoice, CrudAPI crudapi)
         {
-            IPrintReport iprintReport = null;
             var debtorInvoicePrint = new UnicontaClient.Pages.DebtorInvoicePrintReport(debtorInvoice, crudapi);
             var isInitializedSuccess = await debtorInvoicePrint.InstantiateFields();
-
             if (isInitializedSuccess)
             {
-                var standardDebtorInvoice = new DebtorInvoiceReportClient(debtorInvoicePrint.Company, debtorInvoicePrint.Debtor, debtorInvoicePrint.DebtorInvoice, debtorInvoicePrint.InvTransInvoiceLines, null,
+                var standardDebtorInvoice = new DebtorInvoiceReportClient(debtorInvoicePrint.Company, debtorInvoicePrint.Debtor, debtorInvoicePrint.DebtorInvoice, debtorInvoicePrint.InvTransInvoiceLines, debtorInvoicePrint.DebtorOrder,
                     debtorInvoicePrint.CompanyLogo, debtorInvoicePrint.ReportName, isCreditNote: debtorInvoicePrint.IsCreditNote, messageClient: debtorInvoicePrint.MessageClient);
 
-                var standardReports = new IDebtorStandardReport[1] { standardDebtorInvoice };
-
-                iprintReport = new StandardPrintReport(crudapi, standardReports, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.Invoice);
+                var iprintReport = new StandardPrintReport(crudapi, new[] { standardDebtorInvoice }, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.Invoice) { UseReportCache = true };
                 await iprintReport.InitializePrint();
+                if (iprintReport.Report != null)
+                    return iprintReport;
 
-
-                if (iprintReport?.Report == null)
-                {
-                    iprintReport = new LayoutPrintReport(crudapi, debtorInvoice);
-                    await iprintReport.InitializePrint();
-                }
+                var layoutReport = new LayoutPrintReport(crudapi, debtorInvoice);
+                await layoutReport.InitializePrint();
+                return layoutReport;
             }
-
-            return iprintReport;
+            return null;
         }
 
-        private static async Task<IPrintReport> StandardPrint(CreditorInvoiceClient creditorInvoice,CrudAPI crudApi)
+        private static async Task<IPrintReport> StandardPrint(CreditorInvoiceClient creditorInvoice, CrudAPI crudApi)
         {
-            IPrintReport iprintReport = null;
             var creditorInvoicePrint = new UnicontaClient.Pages.CreditorPrintReport(creditorInvoice, crudApi);
-            var isInitializedSuccess = await creditorInvoicePrint.InstantiaeFields();
-
-            if(isInitializedSuccess)
+            var isInitializedSuccess = await creditorInvoicePrint.InstantiateFields();
+            if (isInitializedSuccess)
             {
-                var standardCreditorInvoice = new CreditorStandardReportClient(creditorInvoicePrint.Company, creditorInvoicePrint.Creditor, creditorInvoicePrint.CreditorInvoice, creditorInvoicePrint.InvTransInvoiceLines, null,
-                    creditorInvoicePrint.CompanyLogo, creditorInvoicePrint.ReportName, (int)Uniconta.ClientTools.Controls.Reporting.StandardReports.PurchaseInvoice,creditorInvoicePrint.IsCreditNote);
+                var standardCreditorInvoice = new CreditorStandardReportClient(creditorInvoicePrint.Company, creditorInvoicePrint.Creditor, creditorInvoicePrint.CreditorInvoice, creditorInvoicePrint.InvTransInvoiceLines, creditorInvoicePrint.CreditorOrder,
+                    creditorInvoicePrint.CompanyLogo, creditorInvoicePrint.ReportName, (int)Uniconta.ClientTools.Controls.Reporting.StandardReports.PurchaseInvoice, creditorInvoicePrint.CreditorMessage, creditorInvoicePrint.IsCreditNote);
 
-                var standardReports = new ICreditorStandardReport[1] { standardCreditorInvoice };
-
-                iprintReport = new StandardPrintReport(crudApi, standardReports, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.PurchaseInvoice);
+                var iprintReport = new StandardPrintReport(crudApi, new[] { standardCreditorInvoice }, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.PurchaseInvoice) { UseReportCache = true };
                 await iprintReport.InitializePrint();
+                if (iprintReport.Report != null)
+                    return iprintReport;
 
-                if(iprintReport?.Report == null)
-                {
-                    iprintReport = new LayoutPrintReport(crudApi, creditorInvoice);
-                    await iprintReport.InitializePrint();
-                }
-
+                var layoutReport = new LayoutPrintReport(crudApi, creditorInvoice);
+                await layoutReport.InitializePrint();
+                return layoutReport;
             }
-            return iprintReport;
+            return null;
         }
 #endif
     }

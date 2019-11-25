@@ -25,14 +25,35 @@ namespace UnicontaClient.Pages.CustomPage
     public partial class UserDocsPage3 : FormBasePage
     {
         UserDocsClient userDocClient;
-
+        static SynchronizeEntity GetUserDoc(SynchronizeEntity syncEntity)
+        {
+            if (syncEntity.Row is InvItemClient)
+            {
+                var userDocClient = new UserDocsClient();
+                userDocClient.SetMaster(syncEntity.Row);
+                syncEntity.Row = userDocClient;
+            }
+            return syncEntity;
+        }
         public UserDocsPage3(SynchronizeEntity master)
-            : base(true, master)
+            : base(true, GetUserDoc(master))
         {
             this.DataContext = this;
             InitializeComponent();
             var corasauMaster = master.Row;
             InitMaster(corasauMaster, true);
+            Loaded += UserDocsPage3_Loaded;
+        }
+
+        private void UserDocsPage3_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (globalEvents != null)
+                globalEvents.OnRefreshViewer += GlobalEvents_OnRefreshViewer;
+        }
+
+        private void GlobalEvents_OnRefreshViewer(string pageName, UnicontaBaseEntity baseEntity)
+        {
+            InitMaster(baseEntity, true);
         }
 
         protected override void SyncEntityMasterRowChanged(UnicontaBaseEntity args)
@@ -45,9 +66,9 @@ namespace UnicontaClient.Pages.CustomPage
             if (corasauMaster == null)
                 return;
 
-            ModifiedRow = corasauMaster;
+            ModifiedRow = UtilDisplay.GetAttachment(corasauMaster, api.CompanyEntity);
 
-            if (userDocClient._Data == null)
+            if (userDocClient._Data == null && userDocClient._Url == null)
             {
                 busyIndicator.IsBusy = true;
                 await api.Read(userDocClient);
@@ -73,7 +94,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         public override Type TableType { get { return typeof(UserDocsClient); } }
-        public override UnicontaBaseEntity ModifiedRow { get { return userDocClient; } set { userDocClient = (UserDocsClient)value; } }
+        public override UnicontaBaseEntity ModifiedRow { get { return userDocClient; } set { userDocClient = value as UserDocsClient; } }
 
         public override void OnClosePage(object[] refreshParams) { globalEvents.OnRefresh(NameOfControl, refreshParams); }
 

@@ -50,7 +50,7 @@ namespace UnicontaClient.Pages.CustomPage
             LayoutControl = detailControl.layoutItems;
             SetRibbonControl(localMenu, dgCreditorAccountGrid);
             localMenu.OnItemClicked += localMenu_OnItemClicked;
-            ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "SaveGrid" });
+            ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "UndoDelete", "SaveGrid" });
             var Comp = api.CompanyEntity;
             if (Comp.RoundTo100)
                 CurBalance.HasDecimals = Overdue.HasDecimals = false;
@@ -228,6 +228,9 @@ namespace UnicontaClient.Pages.CustomPage
                 case "CopyRecord":
                     CopyRecord(selectedItem);
                     break;
+                case "UndoDelete":
+                    dgCreditorAccountGrid.UndoDeleteRow();
+                    break;
                 /*
                  * Code from John which is not completed
                 case "CreditorPrices":
@@ -271,7 +274,7 @@ namespace UnicontaClient.Pages.CustomPage
                 dgCreditorAccountGrid.MakeEditable();
                 UserFieldControl.MakeEditable(dgCreditorAccountGrid);
                 ibase.Caption = Uniconta.ClientTools.Localization.lookup("LeaveEditAll");
-                ribbonControl.EnableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "SaveGrid" });
+                ribbonControl.EnableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "UndoDelete", "SaveGrid" });
                 copyRowIsEnabled = true;
                 editAllChecked = false;
             }
@@ -303,7 +306,7 @@ namespace UnicontaClient.Pages.CustomPage
                         dgCreditorAccountGrid.Readonly = true;
                         dgCreditorAccountGrid.tableView.CloseEditor();
                         ibase.Caption = Uniconta.ClientTools.Localization.lookup("EditAll");
-                        ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "SaveGrid" });
+                        ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "UndoDelete", "SaveGrid" });
                         copyRowIsEnabled = false;
                     };
                     confirmationDialog.Show();
@@ -313,7 +316,7 @@ namespace UnicontaClient.Pages.CustomPage
                     dgCreditorAccountGrid.Readonly = true;
                     dgCreditorAccountGrid.tableView.CloseEditor();
                     ibase.Caption = Uniconta.ClientTools.Localization.lookup("EditAll");
-                    ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "SaveGrid" });
+                    ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "UndoDelete", "SaveGrid" });
                     copyRowIsEnabled = false;
                 }
             }
@@ -329,9 +332,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             dgCreditorAccountGrid.BusyIndicator.IsBusy = true;
             var err = await dgCreditorAccountGrid.SaveData();
-            if (err == ErrorCodes.Succes)
-                BindGrid();
-            else
+            if (err != ErrorCodes.Succes)
                 api.AllowBackgroundCrud = true;
             dgCreditorAccountGrid.BusyIndicator.IsBusy = false;
         }

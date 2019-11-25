@@ -869,6 +869,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (result == ErrorCodes.Succes)
             {
                 var PriceLookup = new Uniconta.API.DebtorCreditor.FindPrices(api);
+                var _InvoiceUseQtyNowCre = Comp._InvoiceUseQtyNowCre;
 
                 var orderList = new List<CreditorOrderLineClient>(creditorOrders.Count * 2);
                 foreach (var order in creditorOrders)
@@ -891,6 +892,8 @@ namespace UnicontaClient.Pages.CustomPage
                                         (!PrLocation || lin._Location == item._Location))
                                     {
                                         lin._Qty += item._Quantity;
+                                        if (_InvoiceUseQtyNowCre)
+                                            lin._QtyNow = lin._Qty;
                                         found = true;
                                         break;
                                     }
@@ -910,6 +913,8 @@ namespace UnicontaClient.Pages.CustomPage
                             orderLine._Warehouse = item._Warehouse;
                             orderLine._Location = item._Location;
                             orderLine._Qty = item._Quantity;
+                            if (_InvoiceUseQtyNowCre)
+                                orderLine._QtyNow = orderLine._Qty;
                             orderLine._Storage = defaultStorage;
                             if (item._Project != null)
                             {

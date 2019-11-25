@@ -8,12 +8,10 @@ x:Class="UnicontaClient.Pages.CustomPage.VoucherGridFolderWizard"
              xmlns:wizard="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
     <Grid x:Name="LayoutRoot" Margin="2" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="5" />
             <RowDefinition />
         </Grid.RowDefinitions>
-        <TextBlock Text="{Binding Header}" Grid.Row="0" HorizontalAlignment="Left" />
-        <CorasauControls:BusyIndicator Grid.Row="2" x:Name="busyIndicator" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+        <CorasauControls:BusyIndicator Grid.Row="1" x:Name="busyIndicator" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <Grid x:Name="containerLayout">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />

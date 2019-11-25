@@ -43,7 +43,7 @@ namespace UnicontaClient.Pages.CustomPage
             cmbContentTypes.SelectedIndex = 0;
         }
 
-        public override string Header { get { return Uniconta.ClientTools.Localization.lookup("FolderContent"); } }
+        public override string Header { get { return string.Format("{0} {1}",Uniconta.ClientTools.Localization.lookup("Envelope") ,Uniconta.ClientTools.Localization.lookup("Content")); } }
 
         public override bool IsLastView { get { return true; } }
 

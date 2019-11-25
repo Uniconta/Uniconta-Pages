@@ -88,7 +88,7 @@ namespace UnicontaISO20022CreditTransfer
         protected string companyCountryId;
         protected string instructionPriority;
         protected string extCategoryPurpose;
-        protected int endToEndId;
+        protected string endToEndId;
 
 
         protected string uuid;
@@ -116,7 +116,6 @@ namespace UnicontaISO20022CreditTransfer
         protected bool authstnCodeTest;
         protected string creDtTm;
         protected Encoding encodingFormat;
-        protected string allowedCharactersRegEx;
         protected Dictionary<string, string> replaceCharactersRegExDict;
         protected string chargeBearer;
 
@@ -733,7 +732,7 @@ namespace UnicontaISO20022CreditTransfer
         /// Nordea: If Instruction Id is missing, Nordea will use EndToEndId as customer reference. This will be used for duplicate control on transaction level.
         /// Danske Bank: Unique for each Business Online agreement min. 3 monthsIf not unique - payment will be rejected.EndToEndIdentification will be returned in PSR
         /// </summary>
-        public int EndToEndId
+        public string EndToEndId
         {
             get
             {
@@ -795,22 +794,7 @@ namespace UnicontaISO20022CreditTransfer
             }
         }
 
-        /// <summary>
-        /// Allowed characters - Regular expression
-        /// </summary>
-        public string AllowedCharactersRegEx
-        {
-            get
-            {
-                return allowedCharactersRegEx;
-            }
-
-            set
-            {
-                allowedCharactersRegEx = value;
-            }
-        }
-
+      
         /// <summary>
         /// Allowed characters - Regular expression
         /// </summary>

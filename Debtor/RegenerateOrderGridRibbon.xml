@@ -18,6 +18,7 @@
     </RibbonItem>
   </RibbonItem>
   <RibbonItem>
+    <RibbonItem Action="AppendProjTrans" LocalizedNameKey="AppendOBJ" Parameter="PrTransaction" LargeGlyph="Settled_Transaction_32x32.png"/>
     <RibbonItem Action="RegenerateOrder" LocalizedNameKey="RecreateOBJ" Parameter="Order" LargeGlyph="Generate_32x32.png"/>
   </RibbonItem>
 </root>

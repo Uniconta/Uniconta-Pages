@@ -35,36 +35,36 @@ namespace UnicontaClient.Pages.CustomPage
         [Display(Name = "Table", ResourceType = typeof(TableChangeEventClientText))]
         public string Table { get { return GetTableName(_TableId); } set { _table = value;  _TableId = GetClassId(_table);} }
 
-        string GetTableName(int id)
+        static string GetTableName(int id)
         {
-            string tableName = string.Empty;
-            if(id!=0)
+            if (id != 0) 
             {
                 foreach (var type in Global.GetStandardRefTables())
                 {
                     var table = Activator.CreateInstance(type) as UnicontaBaseEntity;
                     if (id == table.ClassId())
-                    {
-                        tableName= type.Name;
-                        break;
-                    }
+                        return type.Name;
                 }
+                if (id == InvItemStorage.CLASSID)
+                    return "InvItemStorage";
             }
-            return tableName;
+            return string.Empty;
         }
-        int GetClassId(string key)
+
+        static int GetClassId(string key)
         {
-            int id = 0;
-            if(!string.IsNullOrEmpty(key))
+            if (!string.IsNullOrEmpty(key))
             {
-                var table = Global.GetStandardRefTables().Where(x => x.Name == key).FirstOrDefault();
-                if(table!= null)
+                var table = Global.GetStandardRefTables().FirstOrDefault(x => x.Name == key);
+                if (table != null)
                 {
                     var tableType = Activator.CreateInstance(table) as UnicontaBaseEntity;
-                    id = tableType.ClassId();
+                    return tableType.ClassId();
                 }
+                if (key == "InvItemStorage")
+                    return InvItemStorage.CLASSID;
             }
-            return id;
+            return 0;
         }
     }
     public partial class ChangeNotificationPage : GridBasePage
@@ -83,13 +83,15 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void BindRefTable()
         {
-            var referenceTables = new List<string>();
+            var referenceTables = new List<string>(100);
             foreach (Type tabletype in Global.GetStandardRefTables())
             {
                 if (tabletype == typeof(DebtorOrder) || tabletype == typeof(DebtorOffer) || tabletype == typeof(CreditorOrder) || tabletype == typeof(ProductionOrder))
                     continue;
                 referenceTables.Add(tabletype.Name);
             }
+            referenceTables.Add("InvItemStorage");
+            referenceTables.Sort();
             cmbTableTypes.ItemsSource = referenceTables;
         }
 

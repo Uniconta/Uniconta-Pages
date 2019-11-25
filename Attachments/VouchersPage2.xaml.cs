@@ -32,6 +32,7 @@ namespace UnicontaClient.Pages.CustomPage
         VouchersClient voucherClientRow;
         VouchersClient[] multiVouchers;
         bool isFieldsAvailableForEdit;
+        string viewInbin = string.Empty;
 
         public override Type TableType { get { return typeof(VouchersClient); } }
 
@@ -48,10 +49,11 @@ namespace UnicontaClient.Pages.CustomPage
             InitPage(api);
         }
 
-        public VouchersPage2(CrudAPI crudApi, string dummy)
-            : base(crudApi, dummy)
+        public VouchersPage2(CrudAPI crudApi, string viewInBin)
+            : base(crudApi, viewInBin)
         {
             InitializeComponent();
+            viewInbin = viewInBin;
             InitPage(crudApi);
 #if !SILVERLIGHT
             FocusManager.SetFocusedElement(cmbContentTypes, cmbContentTypes);
@@ -68,7 +70,7 @@ namespace UnicontaClient.Pages.CustomPage
             cmbDim1.api = cmbDim2.api = cmbDim3.api = cmbDim4.api = cmbDim5.api = crudApi;
 
             if (LoadedRow == null)
-                frmRibbon.DisableButtons(new string[] { "Delete" });
+                frmRibbon.DisableButtons("Delete");
 
             var Comp = api.CompanyEntity;
             if (Comp.NumberOfDimensions == 0)
@@ -77,6 +79,9 @@ namespace UnicontaClient.Pages.CustomPage
                 Utility.SetDimensions(crudApi, lbldim1, lbldim2, lbldim3, lbldim4, lbldim5, cmbDim1, cmbDim2, cmbDim3, cmbDim4, cmbDim5, usedim);
             if (LoadedRow == null)
                 voucherClientRow = CreateNew() as VouchersClient;
+
+            if (!string.IsNullOrEmpty(viewInbin))
+                voucherClientRow.ViewInFolder = viewInbin;
 
             if (!api.CompanyEntity._UseVatOperation)
                 VatOPerationItem.Visibility = Visibility.Collapsed;
@@ -105,12 +110,9 @@ namespace UnicontaClient.Pages.CustomPage
         protected override async void LoadCacheInBackGround()
         {
             var api = this.api;
-            var Comp = api.CompanyEntity;
-
-            this.LedgerCache = Comp.GetCache(typeof(Uniconta.DataModel.GLAccount)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.GLAccount), api).ConfigureAwait(false);
+            this.LedgerCache = api.GetCache(typeof(Uniconta.DataModel.GLAccount)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLAccount)).ConfigureAwait(false);
             if (PaymentCache == null)
-                PaymentCache = await Comp.LoadCache(typeof(Uniconta.DataModel.PaymentTerm), api).ConfigureAwait(false);
-
+                PaymentCache = await api.LoadCache(typeof(Uniconta.DataModel.PaymentTerm)).ConfigureAwait(false);
             LoadType(new Type[] { typeof(Uniconta.DataModel.Creditor), typeof(Uniconta.DataModel.GLVat) });
         }
 
@@ -190,7 +192,7 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                     else
                     {
-                        await ClosePage(4); // full refresh
+                        ClosePage(4); // full refresh
                         dockCtrl.CloseDockItem();
                         Utility.UpdateBuffers(api, buffers, multiVouchers);
                         busyIndicator.IsBusy = false;
@@ -248,7 +250,8 @@ namespace UnicontaClient.Pages.CustomPage
                 isSucess = true;
                 var url = voucherClientRow._Url;
                 int indexOfExtention = voucherClientRow._Url.LastIndexOf('.');
-                voucherClientRow._Fileextension = DocumentConvert.GetDocumentType(url.Substring(indexOfExtention, url.Length - indexOfExtention));
+                if (indexOfExtention > -1)
+                    voucherClientRow._Fileextension = DocumentConvert.GetDocumentType(url.Substring(indexOfExtention, url.Length - indexOfExtention));
                 return isSucess;
             }
 #endif
@@ -348,7 +351,9 @@ namespace UnicontaClient.Pages.CustomPage
             vc.PrCategory = leProjectcat.Text;
             vc._PostingInstruction = txedPostingInstruction.Text;
             vc.PaymentMethod = Convert.ToString(cmbPaymentMethod.SelectedItemValue);
-
+#if !SILVERLIGHT
+            vc._ViewInFolder = (byte)AppEnums.ViewBin.TryIndexOf(Convert.ToString(cmbViewInFolder.SelectedItem));
+#endif
             if (lbldim1.Visibility == Visibility.Visible)
                 vc.Dimension1 = cmbDim1.Text;
             if (lbldim2.Visibility == Visibility.Visible)

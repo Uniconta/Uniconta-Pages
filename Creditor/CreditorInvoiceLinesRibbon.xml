@@ -7,6 +7,9 @@
     <RibbonItem Action="ClearFilter" ShortcutKey="Ctrl+K" LocalizedNameKey="ClearFilter" LargeGlyph="Filter_Clear_32x32.png"/>
    </RibbonItem>
   <RibbonItem>
+    <RibbonItem Action="ViewPhoto" ShortcutKey="" LocalizedNameKey="ViewOBJ" Parameter="Photo" LargeGlyph="View_Highlighted_32x32.png"/>
+  </RibbonItem>
+  <RibbonItem>
     <RibbonItem Action="ChangeVariant" LocalizedNameKey="EditOBJ" Parameter="Variant" Module="ItemVariants" Glyph="refresh.png" LargeGlyph="Variants_32x32.png"/>
     <RibbonItem Action="ChangeStorage" LocalizedNameKey="EditOBJ" Parameter="Storage" Module="Storage" Glyph="refresh.png" LargeGlyph="Inventory_Trans_32x32.png"/>
   </RibbonItem>

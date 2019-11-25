@@ -3,9 +3,12 @@
   <RibbonItem TabId="0" LocalizedNameKey="Home">
     <!---When we create a new group and a new TabPage -->
     <RibbonItem Action="AddRow" LocalizedNameKey="AddOBJ" Parameter="Line" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png"/>
-    <RibbonItem Action="CopyRow" LocalizedNameKey="CopyLine" LargeGlyph="Copy_32x32.png"/>    
-    <RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="DeleteOBJ" Parameter="Line" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png"/>        
-    <RibbonItem Action="SaveGrid" ShortcutKey="CTRL+S" LocalizedNameKey="Save" Glyph="save-16x16.png" LargeGlyph="save-32x32.png"/>        
+    <RibbonItem Action="CopyRow" LocalizedNameKey="CopyLine" LargeGlyph="Copy_32x32.png"/>
+    <RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="DeleteOBJ" Parameter="Line" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png"/>
+    <RibbonItem Action="SaveGrid" ShortcutKey="CTRL+S" LocalizedNameKey="Save" Glyph="save-16x16.png" LargeGlyph="save-32x32.png"/>
+  </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="ViewPhoto" ShortcutKey="" LocalizedNameKey="ViewOBJ" Parameter="Photo" LargeGlyph="View_Highlighted_32x32.png"/>
   </RibbonItem>
   <RibbonItem>
     <!---next group-->
@@ -40,12 +43,12 @@
       <RibbonItem Action="CreateProduction" LocalizedNameKey="CreateOBJ" Parameter="ProductionOrder" Glyph="Column_Head_16x16.png" LargeGlyph="Column_Head_16x16.png"/>
     </RibbonItem>
   </RibbonItem>
-   <RibbonItem>
+  <RibbonItem>
     <RibbonItem Action="MarkSales" LocalizedNameKey="MarkSales" LargeGlyph="Check_Journal_32x32.png">
       <RibbonItem Action="MarkOrderLine" LocalizedNameKey="PurchaseLines" Glyph="Marked_OrderLine_16x16.png" LargeGlyph="Marked_OrderLine_16x16.png"/>
       <RibbonItem Action="MarkInvTrans" LocalizedNameKey="InvTransactions"  Glyph="Marked_Inventory_16x16.png" LargeGlyph="Marked_Inventory_16x16.png" />
       <RibbonItem Action="MarkOrderLineAgnstOL" LocalizedNameKey="MarkOBJ" Parameter="PurchaseLines"  Glyph="Marked_OrderLine_from_OrderLine_16x16.png" LargeGlyph="Marked_OrderLine_from_OrderLine_16x16.png"/>
-		  <RibbonItem Action="MarkOrderLineAgnstInvTrans" LocalizedNameKey="MarkOBJ" Parameter="InvTransactions"  Glyph="Marked_Inventory_from_Inventory_16x16.png" LargeGlyph="Marked_Inventory_from_Inventory_16x16.png"/>
+      <RibbonItem Action="MarkOrderLineAgnstInvTrans" LocalizedNameKey="MarkOBJ" Parameter="InvTransactions"  Glyph="Marked_Inventory_from_Inventory_16x16.png" LargeGlyph="Marked_Inventory_from_Inventory_16x16.png"/>
     </RibbonItem>
   </RibbonItem>
 </root>

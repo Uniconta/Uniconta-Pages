@@ -52,6 +52,9 @@ x:Class="UnicontaClient.Pages.CustomPage.TMJournalVoucherNumberSerie"
                 <CorasauControls:CorasauLayoutItem FieldName="ProjectDimFromTrans" x:Name="liProjectDimFromTrans">
                     <CorasauControls:CheckEditor  IsChecked="{Binding ProjectDimFromTrans,Mode=TwoWay}" />
                 </CorasauControls:CorasauLayoutItem>
+                <CorasauControls:CorasauLayoutItem FieldName="ZeroInvoiceItem" x:Name="liZeroInvoiceItem">
+                    <CorasauControls:LookupEditor x:Name="leZeroInvoiceItem" Text="{Binding ZeroInvoiceItem,Mode=TwoWay}"/>
+                </CorasauControls:CorasauLayoutItem>
             </CorasauControls:CorasauLayoutGroup>
         </CorasauControls:CorasauLayoutControl>
     </Grid>

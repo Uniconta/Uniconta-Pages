@@ -54,14 +54,15 @@ namespace UnicontaClient.Pages.CustomPage
             BusyIndicator = busyIndicator;
             cbdefaultAccount.ItemsSource = cboffsetAccount.ItemsSource = AppEnums.GLAccountType.Values;
             cbDateFunction.ItemsSource = AppEnums.GLJournalDate.Values;
+            cbAssignVoucher.ItemsSource = AppEnums.AssignVoucher.Values;
             numSerielookupeditor.api = dim1lookupeditior.api = dim2lookupeditior.api = dim3lookupeditior.api = dim4lookupeditior.api = dim5lookupeditior.api =
             Vatlookupeditior.api = AccountLookupEditor.api = OffsetAccountLookupEditor.api = crudapi;
             TraceAccountEditior.api = TraceAccountEditior2.api = TraceAccountEditior3.api = TraceAccountEditior4.api = TraceAccountEditior5.api = TraceAccountEditior6.api = leTransType.api= crudapi;
             layoutControl = layoutItems;
             if (LoadedRow == null)
             {
-                frmRibbon.DisableButtons("Delete" );
-                editrow =CreateNew() as GLDailyJournalClient;
+                frmRibbon.DisableButtons("Delete");
+                editrow = CreateNew() as GLDailyJournalClient;
             }
             layoutItems.DataContext = editrow;
             Utility.SetDimensions(api, lbldim1, lbldim2, lbldim3, lbldim4, lbldim5, dim1lookupeditior, dim2lookupeditior, dim3lookupeditior, dim4lookupeditior, dim5lookupeditior, useDim);
@@ -107,11 +108,7 @@ namespace UnicontaClient.Pages.CustomPage
                     t = typeof(Uniconta.DataModel.Creditor);
                     break;
             }
-            var api = this.api;
-            var Comp = api.CompanyEntity;
-            var Cache = Comp.GetCache(t);
-            if (Cache == null)
-                Cache = await Comp.LoadCache(t, api);
+            var Cache = api.GetCache(t) ?? await api.LoadCache(t);
             editrow.OffsetAccountSource = Cache;
         }
         private async void SetAccountSource()
@@ -129,11 +126,7 @@ namespace UnicontaClient.Pages.CustomPage
                     t = typeof(Uniconta.DataModel.Creditor);
                     break;
             }
-            var api = this.api;
-            var Comp = api.CompanyEntity;
-            var Cache = Comp.GetCache(t);
-            if (Cache == null)
-                Cache = await Comp.LoadCache(t, api);
+            var Cache = api.GetCache(t) ?? await api.LoadCache(t);
             editrow.AccountSource = Cache;
         }
 
@@ -145,9 +138,7 @@ namespace UnicontaClient.Pages.CustomPage
         protected override async void LoadCacheInBackGround()
         {
             var api = this.api;
-            var Comp = api.CompanyEntity;
-
-            var Cache = Comp.GetCache(typeof(Uniconta.DataModel.NumberSerie)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.NumberSerie), api).ConfigureAwait(false);
+            var Cache = api.GetCache(typeof(Uniconta.DataModel.NumberSerie)) ?? await api.LoadCache(typeof(Uniconta.DataModel.NumberSerie)).ConfigureAwait(false);
             var numbers = new NumberSerieSQLCacheFilter(Cache, false);
             numSerielookupeditor.cacheFilter = numbers;
 

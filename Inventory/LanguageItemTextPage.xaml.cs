@@ -112,7 +112,10 @@ namespace UnicontaClient.Pages.CustomPage
                 case "Item":
                     var selectedItem = (InvItem)items.Get(rec._Item);
                     if (selectedItem != null)
+                    {
                         rec.UpdateDefaultText();
+                        globalEvents?.NotifyRefreshViewer(NameOfControl, selectedItem);
+                    }
                     break;
                 case "EAN":
                     if (!UnicontaClient.Utilities.Utility.IsValidEAN(rec.EAN, api.CompanyEntity))

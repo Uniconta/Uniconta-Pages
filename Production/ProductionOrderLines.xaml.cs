@@ -316,6 +316,8 @@ namespace UnicontaClient.Pages.CustomPage
                             TableField.SetUserFieldsFromRecord(selectedItem, rec);
                             if (selectedItem._Blocked)
                                 UtilDisplay.ShowErrorCode(ErrorCodes.ItemIsOnHold, null);
+
+                            globalEvents?.NotifyRefreshViewer(NameOfControl, selectedItem);
                         }
                     }
                     break;
@@ -391,7 +393,7 @@ namespace UnicontaClient.Pages.CustomPage
             var syncMaster = Order;
             string header = null;
             if (syncMaster != null)
-                header = string.Format("{0}:{1},{2}", Uniconta.ClientTools.Localization.lookup("ProductionLine"), syncMaster._DCAccount, syncMaster._OrderNumber);
+                header = string.Format("{0}: {1}, {2}", Uniconta.ClientTools.Localization.lookup("ProductionLine"), syncMaster._OrderNumber, syncMaster._DCAccount);
             if (header != null)
                 SetHeader(header);
         }
@@ -486,8 +488,8 @@ namespace UnicontaClient.Pages.CustomPage
             if (list != null && list.Length > 0)
             {
                 var type = dgProductionOrderLineGrid.TableTypeUser;
-                var Qty = selectedItem.Qty;
-                var lst = new List<UnicontaBaseEntity>();
+                var Qty = selectedItem._Qty;
+                var lst = new List<UnicontaBaseEntity>(list.Length);
                 foreach (var bom in list)
                 {
                     var invJournalLine = Activator.CreateInstance(type) as ProductionOrderLineClient;
@@ -505,6 +507,8 @@ namespace UnicontaClient.Pages.CustomPage
                     invJournalLine._Variant4 = bom._Variant4;
                     invJournalLine._Variant5 = bom._Variant5;
                     item = (InvItem)items.Get(bom._ItemPart);
+                    invJournalLine._Warehouse = bom._Warehouse ?? item._Warehouse ?? selectedItem._Warehouse;
+                    invJournalLine._Location = bom._Location ?? item._Location ?? selectedItem._Location;
                     invJournalLine._CostPriceLine = item._CostPrice;
                     invJournalLine.SetItemValues(item, selectedItem._Storage);
                     invJournalLine._Qty = Math.Round(bom.GetBOMQty(Qty), item._Decimals);
@@ -620,14 +624,14 @@ namespace UnicontaClient.Pages.CustomPage
         private void SerieBatch_GotFocus(object sender, RoutedEventArgs e)
         {
             var selItem = dgProductionOrderLineGrid.SelectedItem as ProductionOrderLineClient;
-            if (selItem == null || string.IsNullOrEmpty(selItem._Item))
+            if (string.IsNullOrEmpty(selItem?._Item))
                 return;
             setSerieBatchSource(selItem);
         }
 
         async void setSerieBatchSource(ProductionOrderLineClient row)
         {
-            var cache = api.CompanyEntity.GetCache(typeof(InvItem));
+            var cache = api.GetCache(typeof(InvItem));
             var invItemMaster = cache.Get(row._Item) as InvItem;
             if (invItemMaster == null)
                 return;
@@ -656,13 +660,12 @@ namespace UnicontaClient.Pages.CustomPage
         protected override async void LoadCacheInBackGround()
         {
             var api = this.api;
-            var Comp = api.CompanyEntity;
 
             if (this.items == null)
-                this.items = await Comp.LoadCache(typeof(Uniconta.DataModel.InvItem), api).ConfigureAwait(false);
+                this.items = await api.LoadCache(typeof(Uniconta.DataModel.InvItem)).ConfigureAwait(false);
 
-            if (Comp.Warehouse && this.warehouse == null)
-                this.warehouse = await Comp.LoadCache(typeof(Uniconta.DataModel.InvWarehouse), api).ConfigureAwait(false);
+            if (api.CompanyEntity.Warehouse && this.warehouse == null)
+                this.warehouse = await api.LoadCache(typeof(Uniconta.DataModel.InvWarehouse)).ConfigureAwait(false);
         }
     }
 }

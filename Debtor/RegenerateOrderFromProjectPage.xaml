@@ -36,9 +36,6 @@ x:Class="UnicontaClient.Pages.CustomPage.RegenerateOrderFromProjectPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="PayrollCategoryName" Visible="False" AllowEditing="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Employee" Width="80" AllowEditing="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="CreditorAccount" Visible="False" AllowEditing="False"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="PayrollCategory" Width="70" AllowEditing="False"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="TimeFrom" Width="80" ShowTimeElapsed="True" AllowEditing="False"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="TimeTo" Width="80" ShowTimeElapsed="True" AllowEditing="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Qty" AllowEditing="False" Width="80">
                         <local:CorasauDataGridTemplateColumnClient.CellTemplate>
                             <DataTemplate>
@@ -47,10 +44,6 @@ x:Class="UnicontaClient.Pages.CustomPage.RegenerateOrderFromProjectPage"
                         </local:CorasauDataGridTemplateColumnClient.CellTemplate>
                     </local:CorasauDataGridTemplateColumnClient>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Unit" Width="60" AllowEditing="False"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="PurchasePrice" AllowEditing="False" Width="80"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="CostPrice" AllowEditing="False" Width="80"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="SalesPrice" AllowEditing="False" Width="80"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="DiscountPct" AllowEditing="False" Width="50"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="CostAmount" Width="100" AllowEditing="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="SalesAmount" Width="100" AllowEditing="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Voucher" Width="80" AllowEditing="False"/>
@@ -84,6 +77,11 @@ x:Class="UnicontaClient.Pages.CustomPage.RegenerateOrderFromProjectPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="cldim4" Width="70" FieldName="Dimension4" AllowEditing="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="cldim5" Width="70" FieldName="Dimension5" AllowEditing="False" />
                 </local:RegenerateOrderFromProjectPageGridClient.Columns>
+                <local:RegenerateOrderFromProjectPageGridClient.TotalSummary>
+                    <local:SumColumn FieldName="Qty" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <local:SumColumn FieldName="CostAmount" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <local:SumColumn FieldName="SalesAmount" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                </local:RegenerateOrderFromProjectPageGridClient.TotalSummary>
             </local:RegenerateOrderFromProjectPageGridClient>
         </CorasauControls:BusyIndicator>
     </Grid>

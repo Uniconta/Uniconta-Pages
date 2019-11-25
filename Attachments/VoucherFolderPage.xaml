@@ -29,7 +29,7 @@ x:Class="UnicontaClient.Pages.CustomPage.VoucherFolderPage"
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
-                    <TextBlock Margin="3,0,0,3" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FolderContent}" 
+                    <TextBlock Margin="3,0,0,3" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Content}" 
                            HorizontalAlignment="Left" VerticalAlignment="Bottom" Grid.Row="0" />
                     <local:VouchersFolderGrid x:Name="dgVoucherFolderGrid" AutoGenerateColumns="None" Grid.Row="1">
                         <local:VouchersFolderGrid.Columns>

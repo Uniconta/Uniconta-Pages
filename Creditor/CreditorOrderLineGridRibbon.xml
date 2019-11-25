@@ -11,6 +11,9 @@
     <RibbonItem Action="EditOrder" LocalizedNameKey="EditOBJ" Parameter="Order" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>        
   </RibbonItem>
   <RibbonItem>
+    <RibbonItem Action="ViewPhoto" ShortcutKey="" LocalizedNameKey="ViewOBJ" Parameter="Photo" LargeGlyph="View_Highlighted_32x32.png"/>
+  </RibbonItem>
+  <RibbonItem>
     <!---next group-->
     <RibbonItem Action="Templates" LocalizedNameKey="Templates" LargeGlyph="Layout_32x32.png">
       <!---If we want Inner menu-->

@@ -270,10 +270,9 @@ namespace UnicontaClient.Pages.CustomPage
                 var standardDebtorPackNote = new DebtorQCPReportClient(debtorQcpPrint.Company, debtorQcpPrint.Debtor, debtorQcpPrint.DebtorInvoice, debtorQcpPrint.InvTransInvoiceLines, null,
                     debtorQcpPrint.CompanyLogo, debtorQcpPrint.ReportName, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.PackNote, messageClient: debtorQcpPrint.MessageClient);
 
-                var standardReports = new IDebtorStandardReport[] { standardDebtorPackNote };
+                var standardReports = new [] { standardDebtorPackNote };
                 iprintReport = new StandardPrintReport(api, standardReports, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.PackNote);
                 await iprintReport.InitializePrint();
-
 
                 if (iprintReport?.Report == null)
                 {

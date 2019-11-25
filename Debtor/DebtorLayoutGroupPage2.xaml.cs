@@ -53,7 +53,7 @@ namespace UnicontaClient.Pages.CustomPage
 #endif
             }
         }
-        public override string NameOfControl { get { return TabControls.DebtorLayoutGroupPage2.ToString(); } }
+        public override string NameOfControl { get { return TabControls.DebtorLayoutGroupPage2; } }
         public override Type TableType { get { return typeof(DebtorLayoutGroupClient); } }
         public override UnicontaBaseEntity ModifiedRow { get { return editrow; } set { editrow = (DebtorLayoutGroupClient)value; } }
         void InitPage(CrudAPI crudapi)
@@ -64,7 +64,7 @@ namespace UnicontaClient.Pages.CustomPage
             SetSource();
             if (editrow == null && LoadedRow == null)
             {
-                frmRibbon.DisableButtons(new string[] { "Delete" });
+                frmRibbon.DisableButtons( "Delete" );
                 editrow =CreateNew() as DebtorLayoutGroupClient;
             }
             layoutItems.DataContext = editrow;
@@ -94,9 +94,8 @@ namespace UnicontaClient.Pages.CustomPage
         async private Task<string[]> PrepareSource(Type type)
         {
             var instance = Activator.CreateInstance(type) as UnicontaBaseEntity;
-            var list = (UserReportDevExpressClient[])await api.Query(instance, null, null);
-
-            return list.Select(p => p.Name).ToArray();
+            var list = (IEnumerable<UserReportDevExpress>)await api.Query(instance, null, null);
+            return list?.Select(p => p._Name).ToArray();
         }
 
         async void GetDebtorEmailSetup()
@@ -110,7 +109,7 @@ namespace UnicontaClient.Pages.CustomPage
             cmbOrderConfirmationEmail.ItemsSource = emailList.Where(x => x._EmailType == DebtorEmailType.OrderConfirmation).Select(x => x._Name).ToList();
             cmbOfferEmail.ItemsSource = emailList.Where(x => x._EmailType == DebtorEmailType.Offer).Select(x => x._Name).ToList();
             cmbStatementEmail.ItemsSource = emailList.Where(x => x._EmailType == DebtorEmailType.AccountStatement).Select(x => x._Name).ToList();
-            cmbStatementCurEmail.ItemsSource = emailList.Where(x => x._EmailType == DebtorEmailType.Requisition).Select(x => x._Name).ToList();
+            cmbStatementCurEmail.ItemsSource = emailList.Where(x => x._EmailType == DebtorEmailType.AccountStatement).Select(x => x._Name).ToList();
             cmbCollectionEmail.ItemsSource = emailList.Where(x => x._EmailType == DebtorEmailType.Collection || x._EmailType == DebtorEmailType.CollectionLetter1 || 
             x._EmailType == DebtorEmailType.CollectionLetter2 || x._EmailType == DebtorEmailType.CollectionLetter3 || x._EmailType == DebtorEmailType.PaymentReminder).Select(x => x._Name).ToList();
             cmbInterestNoteEmail.ItemsSource = emailList.Where(x => x._EmailType == DebtorEmailType.InterestNote).Select(x => x._Name).ToList();

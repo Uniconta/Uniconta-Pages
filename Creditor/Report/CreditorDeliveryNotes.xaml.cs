@@ -50,7 +50,6 @@ namespace UnicontaClient.Pages.CustomPage
     /// </summary>
     public partial class CreditorDeliveryNotes : GridBasePage
     {
-        public override string NameOfControl => UnicontaTabs.AccountantClientPage;
         SQLCache Credcache;
         public CreditorDeliveryNotes(BaseAPI api) : base(api, string.Empty)
         {
@@ -117,7 +116,7 @@ namespace UnicontaClient.Pages.CustomPage
             var selectedItem = dgCreditorDeliveryNoteGrid.SelectedItem as CreditorDeliveryNoteLocal;
             string purchaseHeader = string.Empty;
             if (selectedItem == null)
-                purchaseHeader = string.Format("{0} :{1}", Uniconta.ClientTools.Localization.lookup("Orders"), selectedItem._OrderNumber);
+                purchaseHeader = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Orders"), selectedItem._OrderNumber);
 
             switch (ActionType)
             {
@@ -194,8 +193,8 @@ namespace UnicontaClient.Pages.CustomPage
                 if (count > 1)
                 {
 #endif
-                    foreach (var pckNote in packNotelist)
-                    {
+                foreach (var pckNote in packNotelist)
+                {
 #if !SILVERLIGHT
                     IPrintReport printreport = await PrintPacknote(pckNote);
                     invNumber = pckNote._InvoiceNumber;
@@ -204,7 +203,7 @@ namespace UnicontaClient.Pages.CustomPage
                         reports.Add(printreport);
                     else
                         failedPrints.Add(invNumber);
-                    }
+                }
 
                 if (reports.Count > 0)
                 {
@@ -254,13 +253,13 @@ namespace UnicontaClient.Pages.CustomPage
             IPrintReport iprintReport = null;
 
             var creditorPrint = new UnicontaClient.Pages.CreditorPrintReport(creditorInvoice, api, Uniconta.DataModel.CompanyLayoutType.PurchasePacknote);
-            var isInitializedSuccess = await creditorPrint.InstantiaeFields();
+            var isInitializedSuccess = await creditorPrint.InstantiateFields();
             if (isInitializedSuccess)
             {
-                var standardCreditorInvoice = new CreditorStandardReportClient(creditorPrint.Company, creditorPrint.Creditor, creditorPrint.CreditorInvoice, creditorPrint.InvTransInvoiceLines, null,
-                    creditorPrint.CompanyLogo, creditorPrint.ReportName, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.PurchasePackNote);
+                var standardCreditorInvoice = new CreditorStandardReportClient(creditorPrint.Company, creditorPrint.Creditor, creditorPrint.CreditorInvoice, creditorPrint.InvTransInvoiceLines, creditorPrint.CreditorOrder,
+                    creditorPrint.CompanyLogo, creditorPrint.ReportName, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.PurchasePackNote, creditorPrint.CreditorMessage);
 
-                var standardReports = new ICreditorStandardReport[] { standardCreditorInvoice };
+                var standardReports = new[] { standardCreditorInvoice };
                 iprintReport = new StandardPrintReport(api, standardReports, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.PurchasePackNote);
                 await iprintReport.InitializePrint();
 
@@ -338,9 +337,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
         async void InitialLoad()
         {
-            var comp = api.CompanyEntity;
-            Credcache = comp.GetCache(typeof(Uniconta.DataModel.Creditor)) ?? await comp.LoadCache(typeof(Uniconta.DataModel.Creditor), api);
+            Credcache = api.GetCache(typeof(Uniconta.DataModel.Creditor)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Creditor));
         }
-
     }
 }

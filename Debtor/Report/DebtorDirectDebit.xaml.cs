@@ -257,11 +257,13 @@ namespace UnicontaClient.Pages.CustomPage
                     if (dgDebtorTranOpenGrid.ItemsSource == null) return;
                     GenerateJournalLines();
                     break;
+                case "Search":
+                    btnSearch();
+                    break;
                 case "RefreshGrid":
                     if (dgDebtorTranOpenGrid.HasUnsavedData)
                         Utility.ShowConfirmationOnRefreshGrid(dgDebtorTranOpenGrid);
-
-                    btnSerach_Click(null, null);
+                    btnSearch();
                     setMergeUnMergePaym(false);
                     break;
                 case "Filter":
@@ -998,7 +1000,7 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                 }
 
-                if (paymFormatClient != null && paymFormatClient._ExportFormat == (byte)DebtorPaymFormatType.NetsBS && (rec._PaymentStatus == PaymentStatusLevel.None || rec._PaymentStatus == PaymentStatusLevel.Resend || rec._PaymentStatus == PaymentStatusLevel.StopPayment))
+                if (paymFormatClient != null && paymFormatClient._ExportFormat == (byte)DebtorPaymFormatType.NetsBS && rec.Invoice != 0 && (rec._PaymentStatus == PaymentStatusLevel.None || rec._PaymentStatus == PaymentStatusLevel.Resend || rec._PaymentStatus == PaymentStatusLevel.StopPayment))
                 {
                     rec.TransactionText = await Uniconta.DirectDebitPayment.Common.GetInvoiceText(api, rec, PaymentFormatCache);
                 }
@@ -1011,7 +1013,7 @@ namespace UnicontaClient.Pages.CustomPage
             return true;
         }
 
-        private async void btnSerach_Click(object sender, System.Windows.RoutedEventArgs e)
+        private async void btnSearch()
         {
             if (txtDateFrm.Text == string.Empty)
                 fromDate = DateTime.MinValue;

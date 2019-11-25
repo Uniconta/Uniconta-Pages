@@ -41,7 +41,7 @@ namespace UnicontaClient.Pages.CustomPage
             dgEmployeeGrid.api = this.api;
             dgEmployeeGrid.BusyIndicator = busyIndicator;
             SetRibbonControl(localMenu, dgEmployeeGrid);
-            ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "SaveGrid" });
+            ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "UndoDelete", "SaveGrid" });
             localMenu.OnItemClicked += localMenu_OnItemClicked;
         }
 
@@ -135,10 +135,18 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "PhysicalVoucher":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.Vouchers, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("PhysicalVoucher"), selectedItem._Name));
+                    {
+                        var param= new object[2];
+                        param[0] = api;
+                        param[1] = selectedItem;
+                        AddDockItem(TabControls.DocumentsApprovalPage, param, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("PhysicalVoucher"), selectedItem._Name));
+                    }
                     break;
                 case "SaveGrid":
                     saveGrid();
+                    break;
+                case "UndoDelete":
+                    dgEmployeeGrid.UndoDeleteRow();
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);
@@ -169,7 +177,7 @@ namespace UnicontaClient.Pages.CustomPage
                 dgEmployeeGrid.MakeEditable();
                 UserFieldControl.MakeEditable(dgEmployeeGrid);
                 ibase.Caption = Uniconta.ClientTools.Localization.lookup("LeaveEditAll");
-                ribbonControl.EnableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "SaveGrid" });
+                ribbonControl.EnableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "UndoDelete", "SaveGrid" });
                 copyRowIsEnabled = true;
                 editAllChecked = false;
             }
@@ -201,7 +209,7 @@ namespace UnicontaClient.Pages.CustomPage
                         dgEmployeeGrid.Readonly = true;
                         dgEmployeeGrid.tableView.CloseEditor();
                         ibase.Caption = Uniconta.ClientTools.Localization.lookup("EditAll");
-                        ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "SaveGrid" });
+                        ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "UndoDelete", "SaveGrid" });
                         copyRowIsEnabled = false;
                     };
                     confirmationDialog.Show();
@@ -211,7 +219,7 @@ namespace UnicontaClient.Pages.CustomPage
                     dgEmployeeGrid.Readonly = true;
                     dgEmployeeGrid.tableView.CloseEditor();
                     ibase.Caption = Uniconta.ClientTools.Localization.lookup("EditAll");
-                    ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "SaveGrid" });
+                    ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "UndoDelete", "SaveGrid" });
                     copyRowIsEnabled = false;
                 }
             }

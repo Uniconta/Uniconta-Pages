@@ -22,44 +22,50 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorTranOpen"
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <localPage:CreditorTransOpenGrid  x:Name="dgCreditorTranOpenGrid" AutoGenerateColumns="None">
                 <localPage:CreditorTransOpenGrid.Columns>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Account" Width="100"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Name"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Date" Width="90"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Account" Width="100" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Date" Width="90" ReadOnly="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DueDate" Width="90"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Text" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Invoice" Width="60"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Amount" Width="90"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="AmountOpen" Width="90"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Overdue" Width="90"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Text" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Invoice" Width="60" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Amount" Width="90" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="AmountOpen" Width="90" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Overdue" Width="90" ReadOnly="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Comment" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PostType"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PostType" ReadOnly="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="OnHold" Width="50"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Paid" Width="50"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="HasVoucher" Width="50" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="SendToCollection" Visible="False" Width="50"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="TransType" Visible="False" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="NumberSerie" Visible="False" Width="60"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="VoucherX" Visible="False" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Voucher" Width="60"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Project" Width="90"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PaymentMethod" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="HasVoucher" Width="50" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="SendToCollection" Visible="False" Width="50" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="TransType" Visible="False" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="NumberSerie" Visible="False" Width="60" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="VoucherX" Visible="False" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Voucher" Width="60" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Project" Width="90" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PaymentMethod">
+                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="PaymentMethod" />
+                            </DataTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                    </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PaymentId" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Payment" Width="60"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Currency" Width="40"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="AmountCur" Width="90"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="AmountOpenCur" Width="90"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="OverdueCur" Width="90"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CashDiscount" Width="90"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Payment" Width="60" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Currency" Width="40" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="AmountCur" Width="90" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="AmountOpenCur" Width="90" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="OverdueCur" Width="90" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CashDiscount" Width="90" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CashDiscountDate" Width="90"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="LastInterest" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="LastCollectionLetter" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CollectionsLetters" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Debit" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Credit" Visible="False" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DebitCur" Visible="False" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CreditCur" Visible="False" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="JournalPostedId" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryAccount" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="LastInterest" Visible="False" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="LastCollectionLetter" Visible="False" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CollectionsLetters" Visible="False" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Debit" Visible="False" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Credit" Visible="False" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DebitCur" Visible="False" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CreditCur" Visible="False" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="JournalPostedId" Visible="False" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryAccount" Visible="False" ReadOnly="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="YourRef" Visible="False"/>
                 </localPage:CreditorTransOpenGrid.Columns>
                 <localPage:CreditorTransOpenGrid.TotalSummary>

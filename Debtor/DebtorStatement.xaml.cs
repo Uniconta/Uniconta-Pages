@@ -104,7 +104,7 @@ namespace UnicontaClient.Pages.CustomPage
         [Display(Name = "LayoutGroup", ResourceType = typeof(DCAccountText))]
         public string LayoutGrp { get { return deb._LayoutGroup; } }
 
-        public List<DebtorTransClientTotal> ChildRecords { get; set; }
+        public DebtorTransClientTotal[] ChildRecords { get; set; }
 
         public double _SumAmount;
         public double SumAmount { get { return _SumAmount; } }
@@ -298,6 +298,9 @@ namespace UnicontaClient.Pages.CustomPage
             isChildGridExist = true;
         }
 
+        string lastMessage;
+        Language messageLanguage;
+
         async private void PrintData()
         {
             busyIndicator.IsBusy = true;
@@ -314,7 +317,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (dgDebtorTrans.SelectedItem != null)
                 {
                     var selectedItem = dgDebtorTrans.SelectedItem as DebtorStatementList;
-                    if (selectedItem.ChildRecords.Count == 0) return;
+                    if (selectedItem.ChildRecords.Length == 0) return;
 
                     var debt = new DebtorClient();
                     StreamingManager.Copy(selectedItem.deb, debt);
@@ -327,11 +330,19 @@ namespace UnicontaClient.Pages.CustomPage
                         foreach (var rec in debt.Transactions)
                             rec.LocOb = debtLocalize;
 
-                        var debtorMessageClient = await Utility.GetDebtorMessageClient(api, debt._Language, DebtorEmailType.AccountStatement);
-                        string messageText = debtorMessageClient?._Text;
+                        var lan = UtilDisplay.GetLanguage(debt, companyClient);
+                        if (lastMessage == null || messageLanguage != lan)
+                        {
+                            messageLanguage = lan;
+                            var msg = await Utility.GetDebtorMessageClient(api, lan, DebtorEmailType.AccountStatement);
+                            if (msg != null)
+                                lastMessage = msg._Text;
+                            else
+                                lastMessage = string.Empty;
+                        }
 
                         DebtorStatementCustomPrint dbStatementCustomPrint = new DebtorStatementCustomPrint(api, selectedItem, companyClient, debt,
-                                    txtDateFrm.DateTime, txtDateTo.DateTime, getLogoBytes, messageText);
+                                    txtDateFrm.DateTime, txtDateTo.DateTime, getLogoBytes, lastMessage);
 
                         object[] obj = new object[1];
                         obj[0] = dbStatementCustomPrint as Controls.CustomPrintTemplateData;
@@ -345,10 +356,7 @@ namespace UnicontaClient.Pages.CustomPage
                 IEnumerable<DebtorStatementList> debtorStatementList = (IEnumerable<DebtorStatementList>)dgDebtorTrans.ItemsSource;
                 var layoutSelectedDebtorStatementList = new Dictionary<string, List<DebtorStatementList>>();
 
-                var Comp = api.CompanyEntity;
-                var layoutgrpCache = Comp.GetCache(typeof(Uniconta.DataModel.DebtorLayoutGroup));
-                if (layoutgrpCache == null)
-                    layoutgrpCache = await Comp.LoadCache(typeof(Uniconta.DataModel.DebtorLayoutGroup), api);
+                var layoutgrpCache = api.GetCache(typeof(Uniconta.DataModel.DebtorLayoutGroup)) ?? await api.LoadCache(typeof(Uniconta.DataModel.DebtorLayoutGroup));
 
                 var xtraReports = new List<DevExpress.XtraReports.UI.XtraReport>();
                 var iReports = new List<IPrintReport>();
@@ -356,19 +364,14 @@ namespace UnicontaClient.Pages.CustomPage
 
                 foreach (var db in debtorStatementList)
                 {
-                    if (db.ChildRecords.Count == 0 || (marked && !db.Mark))
+                    if (db.ChildRecords.Length == 0 || (marked && !db.Mark))
                         continue;
 
                     var statementPrint = await GenerateStandardStatementReport(companyClient, txtDateFrm.DateTime, txtDateTo.DateTime, db, getLogoBytes);
                     if (statementPrint == null) continue;
 
-                    var standardReports = new IDebtorStandardReport[1] { statementPrint };
-
-                    IPrintReport standardPrint;
-                    if (chkShowCurrency.IsChecked == true)
-                        standardPrint = new StandardPrintReport(api, standardReports, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.StatementCurrency);
-                    else
-                        standardPrint = new StandardPrintReport(api, standardReports, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.Statement);
+                    var standardReports = new [] { statementPrint };
+                    var standardPrint = new StandardPrintReport(api, standardReports, chkShowCurrency.IsChecked == true ? (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.StatementCurrency : (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.Statement);
                     await standardPrint.InitializePrint();
 
                     if (standardPrint.Report != null)
@@ -392,7 +395,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
 #if !SILVERLIGHT
-        async private Task<IDebtorStandardReport> GenerateStandardStatementReport(CompanyClient companyClient, DateTime defaultFromDate, DateTime defaultToDate, DebtorStatementList selectedItem, byte[] logo)
+        async private Task<DebtorStatementReportClient> GenerateStandardStatementReport(CompanyClient companyClient, DateTime defaultFromDate, DateTime defaultToDate, DebtorStatementList selectedItem, byte[] logo)
         {
             var debtorType = Uniconta.Reports.Utilities.ReportUtil.GetUserType(typeof(DebtorClient), api.CompanyEntity);
             var debt = Activator.CreateInstance(debtorType) as DebtorClient;
@@ -404,19 +407,26 @@ namespace UnicontaClient.Pages.CustomPage
             foreach (var rec in debt.Transactions)
                 rec.LocOb = debtLocalize;
 
-            var debtorMessageClient = await Utility.GetDebtorMessageClient(api, debt._Language, DebtorEmailType.AccountStatement);
+            var lan = UtilDisplay.GetLanguage(debt, companyClient);
+            if (lastMessage == null || messageLanguage != lan)
+            {
+                messageLanguage = lan;
+                var msg = await Utility.GetDebtorMessageClient(api, lan, DebtorEmailType.AccountStatement);
+                if (msg != null)
+                    lastMessage = msg._Text;
+                else
+                    lastMessage = string.Empty;
+            }
 
-            return new DebtorStatementReportClient(companyClient, debt, defaultFromDate, defaultToDate, "Statement", logo, debtorMessageClient);
+            return new DebtorStatementReportClient(companyClient, debt, defaultFromDate, defaultToDate, "Statement", logo, lastMessage);
         }
 #endif
         Task<SQLCache> accountCacheTask;
         protected override async void LoadCacheInBackGround()
         {
-            var api = this.api;
-            var Comp = api.CompanyEntity;
             if (accountCache == null)
             {
-                accountCacheTask = Comp.LoadCache(typeof(Uniconta.DataModel.Debtor), api);
+                accountCacheTask = api.LoadCache(typeof(Uniconta.DataModel.Debtor));
                 accountCache = await accountCacheTask.ConfigureAwait(false);
                 accountCacheTask = null;
             }
@@ -631,7 +641,7 @@ namespace UnicontaClient.Pages.CustomPage
                     var result = await transApi.DebtorAccountStatement(fromDate, toDate, t.AccountNumber, t.AccountNumber, OnlyOpen, null, RunInBack, debtorFilterValues, emails, onlyThisEmail);
                     if (result != ErrorCodes.Succes)
                     {
-                        string error = string.Format("{0}:{1}", t.AccountNumber, Uniconta.ClientTools.Localization.lookup(result.ToString()));
+                        string error = string.Format("{0}: {1}", t.AccountNumber, Uniconta.ClientTools.Localization.lookup(result.ToString()));
                         errorList.Add(error);
                         if (!RunInBack)
                             break;
@@ -724,62 +734,72 @@ namespace UnicontaClient.Pages.CustomPage
                 if (t != null)
                     accountCache = await t;
 
-                string currentItem = string.Empty;
-                DebtorStatementList masterDbStatement = null;
-                List<DebtorTransClientTotal> dbTransClientChildList = null;
-                double SumAmount = 0d, SumAmountCur = 0d;
-
-                foreach (var trans in listTrans)
-                {
-                    if (trans._Account != currentItem)
-                    {
-                        currentItem = trans._Account;
-
-                        if (masterDbStatement != null)
-                        {
-                            if (!skipBlank || SumAmount != 0 || dbTransClientChildList.Count > 1)
-                                statementList.Add(masterDbStatement);
-                            if (!isAscending)
-                                dbTransClientChildList.Reverse();
-                        }
-
-                        masterDbStatement = new DebtorStatementList((Debtor)accountCache.Get(currentItem));
-                        dbTransClientChildList = new List<DebtorTransClientTotal>();
-                        masterDbStatement.ChildRecords = dbTransClientChildList;
-                        SumAmount = SumAmountCur = 0d;
-                        if (trans._Text == null && trans._Primo)
-                            trans._Text = Uniconta.ClientTools.Localization.lookup("Primo");
-                    }
-                    SumAmount += OnlyOpen ? trans._AmountOpen : trans._Amount;
-                    trans._SumAmount = SumAmount;
-                    masterDbStatement._SumAmount = SumAmount;
-
-                    SumAmountCur += OnlyOpen ? trans._AmountOpenCur : trans._AmountCur;
-                    trans._SumAmountCur = SumAmountCur;
-                    masterDbStatement._SumAmountCur = SumAmountCur;
-
-                    dbTransClientChildList.Add(trans);
-                }
-
-                if (masterDbStatement != null)
-                {
-                    if (!skipBlank || SumAmount != 0 || dbTransClientChildList.Count > 1)
-                        statementList.Add(masterDbStatement);
-                    if (!isAscending)
-                        dbTransClientChildList.Reverse();
-                }
-
-                if (statementList.Any())
-                {
-                    dgDebtorTrans.ItemsSource = null;
-                    dgDebtorTrans.ItemsSource = statementList;
-                }
-                dgDebtorTrans.Visibility = Visibility.Visible;
+                FillStatement(listTrans, isAscending, skipBlank, OnlyOpen);
             }
             busyIndicator.IsBusy = false;
 
             if (_master != null)
                 SetExpandAndCollapse(false);
+        }
+
+        void FillStatement(DebtorTransClientTotal[] listTrans, bool isAscending, bool skipBlank, bool OnlyOpen)
+        {
+            string currentItem = string.Empty;
+            DebtorStatementList masterDbStatement = null;
+            List<DebtorTransClientTotal> dbTransClientChildList = new List<DebtorTransClientTotal>(100);
+            double SumAmount = 0d, SumAmountCur = 0d;
+
+            foreach (var trans in listTrans)
+            {
+                if (trans._Account != currentItem)
+                {
+                    currentItem = trans._Account;
+
+                    if (masterDbStatement != null)
+                    {
+                        if (!skipBlank || SumAmount != 0 || dbTransClientChildList.Count > 1)
+                        {
+                            statementList.Add(masterDbStatement);
+                            masterDbStatement.ChildRecords = dbTransClientChildList.ToArray();
+                            if (!isAscending)
+                                masterDbStatement.ChildRecords.Reverse();
+                        }
+                    }
+
+                    masterDbStatement = new DebtorStatementList((Debtor)accountCache.Get(currentItem));
+                    dbTransClientChildList.Clear();
+                    SumAmount = SumAmountCur = 0d;
+                    if (trans._Text == null && trans._Primo)
+                        trans._Text = Uniconta.ClientTools.Localization.lookup("Primo");
+                }
+                SumAmount += OnlyOpen ? trans._AmountOpen : trans._Amount;
+                trans._SumAmount = SumAmount;
+                masterDbStatement._SumAmount = SumAmount;
+
+                SumAmountCur += OnlyOpen ? trans._AmountOpenCur : trans._AmountCur;
+                trans._SumAmountCur = SumAmountCur;
+                masterDbStatement._SumAmountCur = SumAmountCur;
+
+                dbTransClientChildList.Add(trans);
+            }
+
+            if (masterDbStatement != null)
+            {
+                if (!skipBlank || SumAmount != 0 || dbTransClientChildList.Count > 1)
+                {
+                    statementList.Add(masterDbStatement);
+                    masterDbStatement.ChildRecords = dbTransClientChildList.ToArray();
+                    if (!isAscending)
+                        masterDbStatement.ChildRecords.Reverse();
+                }
+            }
+
+            if (statementList.Count > 0)
+            {
+                dgDebtorTrans.ItemsSource = null;
+                dgDebtorTrans.ItemsSource = statementList;
+            }
+            dgDebtorTrans.Visibility = Visibility.Visible;
         }
 
         private void cmbPrintintPreview_SelectedIndexChanged(object sender, RoutedEventArgs e)
@@ -817,7 +837,6 @@ namespace UnicontaClient.Pages.CustomPage
         }
         public CustomTableView(MasterNodeContainer masterRootNode, MasterRowsContainer masterRootDataItem, DataControlDetailDescriptor detailDescriptor) : base(masterRootNode, masterRootDataItem, detailDescriptor)
         {
-
         }
         public bool HasPageBreak { get; set; }
 #if !SILVERLIGHT
@@ -839,7 +858,6 @@ namespace UnicontaClient.Pages.CustomPage
         {
             return new CustomGridMasterDetailPrintingNode(HasPageBreak, 1, container, rowNode, this, node, index, pageSize);
         }
-
     }
 
     public class CustomGridMasterDetailPrintingNode : GridMasterDetailPrintingNode, IDataNode

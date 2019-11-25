@@ -62,11 +62,24 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectJournalLinePage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="TimeFrom" Width="80" ShowTimeElapsed="True" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="TimeTo" Width="80" ShowTimeElapsed="True" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Text" Width="150" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Width="70" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Qty" Width="80">
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="EAN" Width="150" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="SerieBatch" Visible="False" Width="150">
+                        <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <TextBlock Margin="2" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.SerieBatch,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"></TextBlock>
+                            </ControlTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                         <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                             <DataTemplate>
-                                <CorasauControls:TextEditor  x:Name="PART_Editor" HorizontalContentAlignment="Right" Mask="{Binding Path=DataContext.RowData.Row.Decimals,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource MaskConverter},ConverterParameter=Decimals}" MaskUseAsDisplayFormat="True" MaskType="Numeric" EditValue="{Binding Path=DataContext.RowData.Row.Qty,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"/>
+                                <CorasauControls:ComboBoxEditor IsEditable="True" GotFocus="SerieBatch_GotFocus" x:Name="PART_Editor" ItemsSource="{Binding DataContext.RowData.Row.SerieBatchSource,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" />
+                            </DataTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                    </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Width="70" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Qty" Width="80" AllowMath="True">
+                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <CorasauControls:TextEditor  x:Name="PART_Editor" HorizontalContentAlignment="Right" ValidateOnEnterKeyPressed="False" ValidateOnTextInput="False" DisplayFormatString="{Binding Path=DataContext.RowData.Row.Decimals,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource MaskConverter},ConverterParameter=Decimals}" MaskUseAsDisplayFormat="False" EditValue="{Binding Path=DataContext.RowData.Row.Qty,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}"/>
                             </DataTemplate>
                         </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                     </localPage:CorasauDataGridTemplateColumnClient>
@@ -79,8 +92,10 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectJournalLinePage"
                     </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Origin" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PurchasePrice" Width="80" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CostPrice" Width="80"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="SalesPrice" Width="80"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CostPrice" Width="80" AllowMath="True">
+                        
+                    </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="SalesPrice" Width="80" AllowMath="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DiscountPct" Width="50"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="SalesAmount" Width="100"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CostAmount" Width="100"/>

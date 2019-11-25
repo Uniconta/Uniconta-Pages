@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <root>
-  <RibbonItem TabId="0" LocalizedNameKey="Home">
+  <RibbonItem TabId="0" TabHeader="Home" LocalizedNameKey="Add" >
     <!---When we create a new group and a new TabPage -->
     <RibbonItem Action="AddRow" LocalizedNameKey="AddNewRow" ShortcutKey="CTRL+N" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png"/>
     <RibbonItem Action="CopyRow" LocalizedNameKey="CopyRow" ShortcutKey="Shift+F2" LargeGlyph="Copy_32x32.png"/>
-    <RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="DeleteRow" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png"/>
-    <RibbonItem Action="SaveGrid" ShortcutKey="CTRL+S" LocalizedNameKey="Save" Glyph="save-16x16.png" LargeGlyph="save-32x32.png"/>
   </RibbonItem>
+    <RibbonItem LocalizedNameKey="Delete">
+     <RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="DeleteRow" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png"/>
+     <RibbonItem Action="UndoDelete" ShortcutKey="CTRL+Z" LocalizedNameKey="UndoDelete" LargeGlyph="Undo_Delete_32x32.png"/>
+    </RibbonItem>
+    <RibbonItem>
+      <RibbonItem Action="SaveGrid" ShortcutKey="CTRL+S" LocalizedNameKey="Save" Glyph="save-16x16.png" LargeGlyph="save-32x32.png"/>
+    </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="AllFields" LocalizedNameKey="AllFields"  LargeGlyph="UserField_32x32.png"/>
   </RibbonItem>
@@ -34,10 +39,9 @@
       <RibbonItem Action="FieldSetting" LocalizedNameKey="FieldSetting" Glyph="Setup_16x16.png" ShortcutKey=""/>
     </RibbonItem>
   </RibbonItem>
-  <RibbonItem>
+  <RibbonItem LocalizedNameKey="Posting">
     <RibbonItem Action="CheckJournal" LocalizedNameKey="CheckJournal" LargeGlyph="Check_Journal_32x32.png"/>
     <RibbonItem Action="PostJournal" LocalizedNameKey="PostJournal" LargeGlyph="Posted_Journal_32x32.png"/>
-
   </RibbonItem>
   <RibbonItem>
     <RibbonItem LocalizedNameKey="PhysicalVoucher" Glyph="Cover_16x16.png" LargeGlyph="View_Voucher_32x32.png" >
@@ -46,8 +50,6 @@
       <RibbonItem Action="ImportVoucher" LocalizedNameKey="ImportFile" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png" />
       <RibbonItem Action="RemoveVoucher" LocalizedNameKey="Remove" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png" />
     </RibbonItem>
-  </RibbonItem>
-  <RibbonItem>
     <RibbonItem Action="Transactions" LocalizedNameKey="Transactions" LargeGlyph="Transactions_32x32.png">
       <!---If we want Inner menu-->
       <RibbonItem Action="Account" LocalizedNameKey="Account" Glyph="Account_16x16.png" LargeGlyph=""/>
@@ -55,6 +57,8 @@
       <RibbonItem Action="All" LocalizedNameKey="All" Glyph="Cover_16x16.png" LargeGlyph=""/>
       <RibbonItem Action="OpenTran" LocalizedNameKey="OpenTrans" Glyph="Open_Transaction_16x16.png" LargeGlyph=""/>
     </RibbonItem>
+  </RibbonItem>
+  <RibbonItem>
     <RibbonItem Action="Functions" LocalizedNameKey="Functions" LargeGlyph="Generate_32x32.png" ShortcutKey="CTRL+G">
       <!---If we want Inner menu-->
       <RibbonItem Action="CreatePaymentsFile" LocalizedNameKey="CreatePaymentsFile" Glyph="Import_16x16.png" LargeGlyph=""/>
@@ -65,8 +69,6 @@
       <RibbonItem Action="SetAmountZero" LocalizedNameKey="SetOBJ" Parameter="AmountToZero" Glyph="Budget_16x16.png" LargeGlyph=""/>
       <RibbonItem Action="RemoveAllVouchers" LocalizedNameKey="RemoveOBJ" Parameter="Attachments" Glyph="Delete_16x16.png"  LargeGlyph=""/>
     </RibbonItem>
-  </RibbonItem>
-  <RibbonItem>
     <RibbonItem Action="OffSetAccount" LocalizedNameKey="OffSetAccount"  LargeGlyph="Offset_Account_32x32.png"/>
   </RibbonItem>
   <RibbonItem>

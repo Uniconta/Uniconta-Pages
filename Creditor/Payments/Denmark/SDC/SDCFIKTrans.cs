@@ -109,7 +109,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
                 danishFields.AdviceTextLines = string.Empty;
             }
 
-            danishFields.UniquePaymRef = tran._PaymentRefId.ToString();
+            danishFields.UniquePaymRef = tran.PaymentEndToEndId.ToString();
 
             return danishFields;
         }

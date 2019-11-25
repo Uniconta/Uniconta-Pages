@@ -115,7 +115,7 @@ x:Class="UnicontaClient.Pages.CustomPage.TMJournalLinePage"
                                     </localPage:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
                                     <localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
                                         <DataTemplate>
-                                            <localPage:CorasauGridLookupEditorClient IsReadOnly="{Binding DataContext.RowData.Row.IsEditable,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToBoolConverter}}"  x:Name="PART_Editor" />
+                                            <localPage:CorasauGridLookupEditorClient HasCustomLookUp="true" IsReadOnly="{Binding DataContext.RowData.Row.IsEditable,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToBoolConverter}}"  x:Name="PART_Editor" ItemsSource="{Binding DataContext.RowData.Row.ProjectSource,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" LostFocus="PART_Editor_LostFocus"  GotFocus="PART_Editor_GotFocus"/>
                                         </DataTemplate>
                                     </localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridForeignKeyColumnClient>
@@ -171,108 +171,108 @@ x:Class="UnicontaClient.Pages.CustomPage.TMJournalLinePage"
                                         </DataTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridTemplateColumnClient>
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="clDay1" Width="75" FieldName="Day1">
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="clDay1" Width="75" FieldName="Day1" AllowMath="True" >
                                     <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                                         <ControlTemplate>
                                             <StackPanel Orientation="Horizontal" >
                                                 <Ellipse Width="12" Height="12" Stroke="Black" HorizontalAlignment="Left" Margin="5,0,0,0" Fill="{Binding DataContext.RowData.Row.StatusDay1,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToColorConverter}}"  Visibility="{Binding DataContext.RowData.Row.StatusDay1,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToVisibilityConverter}}"/>
-                                                <CorasauControls:TextEditor Margin="30,4,0,0" IsPrintingMode="True" EditMode="InplaceInactive" Text="{Binding Path=DataContext.RowData.Row.Day1,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource DoubleValConverter}}" Mask="N2" MaskUseAsDisplayFormat="True" MaskType="Numeric"/>
+                                                <CorasauControls:TextEditor Margin="30,4,0,0" IsPrintingMode="True" EditMode="InplaceInactive" EditValue="{Binding Path=DataContext.RowData.Row.Day1,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource DoubleValConverter}}" ValidateOnEnterKeyPressed="False" ValidateOnTextInput="False" DisplayFormatString="N2"  MaskUseAsDisplayFormat="False"/>
                                             </StackPanel>
                                         </ControlTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                                     <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                         <DataTemplate>
-                                            <CorasauControls:TextEditor  x:Name="PART_Editor" IsReadOnly="{Binding DataContext.RowData.Row.StatusDay1,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToBoolConverter}}" HorizontalContentAlignment="Right" Mask="N2" MaskUseAsDisplayFormat="True" MaskType="Numeric" EditValue="{Binding Path=DataContext.RowData.Row.Day1,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"/>
+                                            <CorasauControls:TextEditor  x:Name="PART_Editor" IsReadOnly="{Binding DataContext.RowData.Row.StatusDay1,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToBoolConverter}}" HorizontalContentAlignment="Right" ValidateOnEnterKeyPressed="False" ValidateOnTextInput="False" DisplayFormatString="N2"  MaskUseAsDisplayFormat="False"  EditValue="{Binding Path=DataContext.RowData.Row.Day1,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}"/>
                                         </DataTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridTemplateColumnClient>
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="clDay2" Width="75" FieldName="Day2">
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="clDay2" Width="75" FieldName="Day2" AllowMath="True">
                                     <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                                         <ControlTemplate>
                                             <StackPanel Orientation="Horizontal" >
                                                 <Ellipse  Width="12" Height="12" Stroke="Black" Fill="{Binding DataContext.RowData.Row.StatusDay2,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToColorConverter}}" Margin="5,0,0,0" Visibility="{Binding DataContext.RowData.Row.StatusDay2,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToVisibilityConverter}}"/>
-                                                <CorasauControls:TextEditor Margin="30,4,0,0" IsPrintingMode="True" EditMode="InplaceInactive" Text="{Binding Path=DataContext.RowData.Row.Day2,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource DoubleValConverter}}" Mask="N2" MaskUseAsDisplayFormat="True" MaskType="Numeric" />
+                                                <CorasauControls:TextEditor Margin="30,4,0,0" IsPrintingMode="True" EditMode="InplaceInactive" EditValue="{Binding Path=DataContext.RowData.Row.Day2,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource DoubleValConverter}}" ValidateOnEnterKeyPressed="False" ValidateOnTextInput="False" DisplayFormatString="N2"  MaskUseAsDisplayFormat="False" />
                                             </StackPanel>
                                         </ControlTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                                     <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                         <DataTemplate>
-                                            <CorasauControls:TextEditor  x:Name="PART_Editor" IsReadOnly="{Binding DataContext.RowData.Row.StatusDay2,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToBoolConverter}}" HorizontalContentAlignment="Right" Mask="N2" MaskUseAsDisplayFormat="True" MaskType="Numeric" EditValue="{Binding Path=DataContext.RowData.Row.Day2,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"/>
+                                            <CorasauControls:TextEditor  x:Name="PART_Editor" IsReadOnly="{Binding DataContext.RowData.Row.StatusDay2,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToBoolConverter}}" HorizontalContentAlignment="Right" ValidateOnEnterKeyPressed="False" ValidateOnTextInput="False" DisplayFormatString="N2"  MaskUseAsDisplayFormat="False" EditValue="{Binding Path=DataContext.RowData.Row.Day2,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}"/>
                                         </DataTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridTemplateColumnClient>
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="clDay3" Width="75" FieldName="Day3">
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="clDay3" Width="75" FieldName="Day3" AllowMath="True">
                                     <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                                         <ControlTemplate>
                                             <StackPanel Orientation="Horizontal" >
                                                 <Ellipse  Width="12" Height="12" Stroke="Black" Fill="{Binding DataContext.RowData.Row.StatusDay3,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToColorConverter}}" Margin="5,0,0,0" Visibility="{Binding DataContext.RowData.Row.StatusDay3,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToVisibilityConverter}}"/>
-                                                <CorasauControls:TextEditor Margin="30,4,0,0" IsPrintingMode="True" EditMode="InplaceInactive" Text="{Binding Path=DataContext.RowData.Row.Day3,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource DoubleValConverter}}" Mask="N2" MaskUseAsDisplayFormat="True" MaskType="Numeric"/>
+                                                <CorasauControls:TextEditor Margin="30,4,0,0" IsPrintingMode="True" EditMode="InplaceInactive" EditValue="{Binding Path=DataContext.RowData.Row.Day3,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource DoubleValConverter}}" ValidateOnEnterKeyPressed="False" ValidateOnTextInput="False" DisplayFormatString="N2"  MaskUseAsDisplayFormat="False"/>
                                             </StackPanel>
                                         </ControlTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                                     <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                         <DataTemplate>
-                                            <CorasauControls:TextEditor  x:Name="PART_Editor" IsReadOnly="{Binding DataContext.RowData.Row.StatusDay3,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToBoolConverter}}" HorizontalContentAlignment="Right" Mask="N2" MaskUseAsDisplayFormat="True" MaskType="Numeric" EditValue="{Binding Path=DataContext.RowData.Row.Day3,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"/>
+                                            <CorasauControls:TextEditor  x:Name="PART_Editor" IsReadOnly="{Binding DataContext.RowData.Row.StatusDay3,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToBoolConverter}}" HorizontalContentAlignment="Right" ValidateOnEnterKeyPressed="False" ValidateOnTextInput="False" DisplayFormatString="N2"  MaskUseAsDisplayFormat="False" EditValue="{Binding Path=DataContext.RowData.Row.Day3,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}"/>
                                         </DataTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridTemplateColumnClient>
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="clDay4" Width="75" FieldName="Day4">
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="clDay4" Width="75" FieldName="Day4" AllowMath="True">
                                     <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                                         <ControlTemplate>
                                             <StackPanel Orientation="Horizontal" >
                                                 <Ellipse  Width="12" Height="12" Stroke="Black" Fill="{Binding DataContext.RowData.Row.StatusDay4,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToColorConverter}}" Margin="5,0,0,0" Visibility="{Binding DataContext.RowData.Row.StatusDay4,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToVisibilityConverter}}"/>
-                                                <CorasauControls:TextEditor Margin="30,4,0,0" IsPrintingMode="True" EditMode="InplaceInactive" Text="{Binding Path=DataContext.RowData.Row.Day4,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource DoubleValConverter}}" Mask="N2" MaskUseAsDisplayFormat="True" MaskType="Numeric"/>
+                                                <CorasauControls:TextEditor Margin="30,4,0,0" IsPrintingMode="True" EditMode="InplaceInactive" EditValue="{Binding Path=DataContext.RowData.Row.Day4,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource DoubleValConverter}}" ValidateOnEnterKeyPressed="False" ValidateOnTextInput="False" DisplayFormatString="N2"  MaskUseAsDisplayFormat="False"/>
                                             </StackPanel>
                                         </ControlTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                                     <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                         <DataTemplate>
-                                            <CorasauControls:TextEditor  x:Name="PART_Editor" IsReadOnly="{Binding DataContext.RowData.Row.StatusDay4,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToBoolConverter}}" HorizontalContentAlignment="Right" Mask="N2" MaskUseAsDisplayFormat="True" MaskType="Numeric" EditValue="{Binding Path=DataContext.RowData.Row.Day4,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"/>
+                                            <CorasauControls:TextEditor  x:Name="PART_Editor" IsReadOnly="{Binding DataContext.RowData.Row.StatusDay4,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToBoolConverter}}" HorizontalContentAlignment="Right" ValidateOnEnterKeyPressed="False" ValidateOnTextInput="False" DisplayFormatString="N2"  MaskUseAsDisplayFormat="False" EditValue="{Binding Path=DataContext.RowData.Row.Day4,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}"/>
                                         </DataTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridTemplateColumnClient>
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="clDay5" Width="75" FieldName="Day5">
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="clDay5" Width="75" FieldName="Day5" AllowMath="True">
                                     <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                                         <ControlTemplate>
                                             <StackPanel Orientation="Horizontal" >
                                                 <Ellipse  Width="12" Height="12" Stroke="Black" Fill="{Binding DataContext.RowData.Row.StatusDay5,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToColorConverter}}" Margin="5,0,0,0" Visibility="{Binding DataContext.RowData.Row.StatusDay5,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToVisibilityConverter}}"/>
-                                                <CorasauControls:TextEditor Margin="30,4,0,0" IsPrintingMode="True" EditMode="InplaceInactive" Text="{Binding Path=DataContext.RowData.Row.Day5,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource DoubleValConverter}}" Mask="N2" MaskUseAsDisplayFormat="True" MaskType="Numeric"/>
+                                                <CorasauControls:TextEditor Margin="30,4,0,0" IsPrintingMode="True" EditMode="InplaceInactive" EditValue="{Binding Path=DataContext.RowData.Row.Day5,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource DoubleValConverter}}" ValidateOnEnterKeyPressed="False" ValidateOnTextInput="False" DisplayFormatString="N2"  MaskUseAsDisplayFormat="False"/>
                                             </StackPanel>
                                         </ControlTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                                     <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                         <DataTemplate>
-                                            <CorasauControls:TextEditor  x:Name="PART_Editor" IsReadOnly="{Binding DataContext.RowData.Row.StatusDay5,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToBoolConverter}}" HorizontalContentAlignment="Right" Mask="N2" MaskUseAsDisplayFormat="True" MaskType="Numeric" EditValue="{Binding Path=DataContext.RowData.Row.Day5,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"/>
+                                            <CorasauControls:TextEditor  x:Name="PART_Editor" IsReadOnly="{Binding DataContext.RowData.Row.StatusDay5,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToBoolConverter}}" HorizontalContentAlignment="Right" ValidateOnEnterKeyPressed="False" ValidateOnTextInput="False" DisplayFormatString="N2"  MaskUseAsDisplayFormat="False" EditValue="{Binding Path=DataContext.RowData.Row.Day5,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}"/>
                                         </DataTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridTemplateColumnClient>
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="clDay6" Width="75" FieldName="Day6">
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="clDay6" Width="75" FieldName="Day6" AllowMath="True">
                                     <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                                         <ControlTemplate>
                                             <StackPanel Orientation="Horizontal" >
                                                 <Ellipse  Width="12" Height="12" Stroke="Black" Fill="{Binding DataContext.RowData.Row.StatusDay6,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToColorConverter}}" Margin="5,0,0,0" Visibility="{Binding DataContext.RowData.Row.StatusDay6,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToVisibilityConverter}}"/>
-                                                <CorasauControls:TextEditor Margin="30,4,0,0" IsPrintingMode="True" EditMode="InplaceInactive" Text="{Binding Path=DataContext.RowData.Row.Day6,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource DoubleValConverter}}" Mask="N2" MaskUseAsDisplayFormat="True" MaskType="Numeric"/>
+                                                <CorasauControls:TextEditor Margin="30,4,0,0" IsPrintingMode="True" EditMode="InplaceInactive" EditValue="{Binding Path=DataContext.RowData.Row.Day6,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource DoubleValConverter}}" ValidateOnEnterKeyPressed="False" ValidateOnTextInput="False" DisplayFormatString="N2"  MaskUseAsDisplayFormat="False"/>
                                             </StackPanel>
                                         </ControlTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                                     <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                         <DataTemplate>
-                                            <CorasauControls:TextEditor  x:Name="PART_Editor" IsReadOnly="{Binding DataContext.RowData.Row.StatusDay6,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToBoolConverter}}" HorizontalContentAlignment="Right" Mask="N2" MaskUseAsDisplayFormat="True" MaskType="Numeric" EditValue="{Binding Path=DataContext.RowData.Row.Day6,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"/>
+                                            <CorasauControls:TextEditor  x:Name="PART_Editor" IsReadOnly="{Binding DataContext.RowData.Row.StatusDay6,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToBoolConverter}}" HorizontalContentAlignment="Right" ValidateOnEnterKeyPressed="False" ValidateOnTextInput="False" DisplayFormatString="N2"  MaskUseAsDisplayFormat="False" EditValue="{Binding Path=DataContext.RowData.Row.Day6,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}"/>
                                         </DataTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridTemplateColumnClient>
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="clDay7" Width="75" FieldName="Day7">
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="clDay7" Width="75" FieldName="Day7" AllowMath="True">
                                     <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                                         <ControlTemplate>
                                             <StackPanel Orientation="Horizontal" >
                                                 <Ellipse Width="12" Height="12" Stroke="Black" Fill="{Binding DataContext.RowData.Row.StatusDay7,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToColorConverter}}" Margin="5,0,0,0" Visibility="{Binding DataContext.RowData.Row.StatusDay7,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToVisibilityConverter}}"/>
-                                                <CorasauControls:TextEditor Margin="30,4,0,0" IsPrintingMode="True" EditMode="InplaceInactive" Text="{Binding Path=DataContext.RowData.Row.Day7,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource DoubleValConverter}}" Mask="N2" MaskUseAsDisplayFormat="True" MaskType="Numeric"/>
+                                                <CorasauControls:TextEditor Margin="30,4,0,0" IsPrintingMode="True" EditMode="InplaceInactive" EditValue="{Binding Path=DataContext.RowData.Row.Day7,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource DoubleValConverter}}" ValidateOnEnterKeyPressed="False" ValidateOnTextInput="False" DisplayFormatString="N2"  MaskUseAsDisplayFormat="False"/>
                                             </StackPanel>
                                         </ControlTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                                     <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                         <DataTemplate>
-                                            <CorasauControls:TextEditor  x:Name="PART_Editor" IsReadOnly="{Binding DataContext.RowData.Row.StatusDay7,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToBoolConverter}}" HorizontalContentAlignment="Right" Mask="N2" MaskUseAsDisplayFormat="True" MaskType="Numeric" EditValue="{Binding Path=DataContext.RowData.Row.Day7,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"/>
+                                            <CorasauControls:TextEditor  x:Name="PART_Editor" IsReadOnly="{Binding DataContext.RowData.Row.StatusDay7,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToBoolConverter}}" HorizontalContentAlignment="Right" ValidateOnEnterKeyPressed="False" ValidateOnTextInput="False" DisplayFormatString="N2"  MaskUseAsDisplayFormat="False" EditValue="{Binding Path=DataContext.RowData.Row.Day7,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}"/>
                                         </DataTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridTemplateColumnClient>
@@ -292,6 +292,7 @@ x:Class="UnicontaClient.Pages.CustomPage.TMJournalLinePage"
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="ErrorInfo" Visible="False" AllowEditing="False"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="InternalType" Visible="False" AllowEditing="False"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="JournalPostedId" Visible="False" AllowEditing="False"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="LineNumber" Width="70" Visible="False"/>
                             </localPage:TMJournalLinePageGrid.Columns>
                             <localPage:TMJournalLinePageGrid.TotalSummary >
                                 <localPage:SumColumn SerializableTag="Sum"  FieldName="Project" SummaryType="Custom" />
@@ -362,7 +363,7 @@ x:Class="UnicontaClient.Pages.CustomPage.TMJournalLinePage"
                                     </localPage:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
                                     <localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
                                         <DataTemplate>
-                                            <localPage:CorasauGridLookupEditorClient IsReadOnly="{Binding DataContext.RowData.Row.IsEditable,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToBoolConverter}}"  x:Name="PART_Editor" />
+                                            <localPage:CorasauGridLookupEditorClient HasCustomLookUp="true" IsReadOnly="{Binding DataContext.RowData.Row.IsEditable,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToBoolConverter}}"  x:Name="PART_Editor" ItemsSource="{Binding DataContext.RowData.Row.ProjectSource,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" LostFocus="MilageGrid_LostFocus"  GotFocus="MilageGrid_GotFocus" />
                                         </DataTemplate>
                                     </localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridForeignKeyColumnClient>
@@ -429,108 +430,108 @@ x:Class="UnicontaClient.Pages.CustomPage.TMJournalLinePage"
                                     </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridTemplateColumnClient>
 
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="colDay1" Width="75" FieldName="Day1">
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="colDay1" Width="75" FieldName="Day1" AllowMath="True">
                                     <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                                         <ControlTemplate>
                                             <StackPanel Orientation="Horizontal" >
                                                 <Ellipse Width="12" Height="12" Stroke="Black" HorizontalAlignment="Left" Margin="5,0,0,0" Fill="{Binding DataContext.RowData.Row.StatusDay1,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToColorConverter}}"  Visibility="{Binding DataContext.RowData.Row.StatusDay1,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToVisibilityConverter}}"/>
-                                                <CorasauControls:TextEditor Margin="30,4,0,0" IsPrintingMode="True" EditMode="InplaceInactive" HorizontalAlignment="Right" Text="{Binding Path=DataContext.RowData.Row.Day1,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource DoubleValConverter}}" Mask="N2" MaskUseAsDisplayFormat="True" MaskType="Numeric"/>
+                                                <CorasauControls:TextEditor Margin="30,4,0,0" IsPrintingMode="True" EditMode="InplaceInactive" HorizontalAlignment="Right" EditValue="{Binding Path=DataContext.RowData.Row.Day1,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource DoubleValConverter}}" ValidateOnEnterKeyPressed="False" ValidateOnTextInput="False" DisplayFormatString="N2"  MaskUseAsDisplayFormat="False"/>
                                             </StackPanel>
                                         </ControlTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                                     <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                         <DataTemplate>
-                                            <CorasauControls:TextEditor  x:Name="PART_Editor" IsReadOnly="{Binding DataContext.RowData.Row.StatusDay1,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToBoolConverter}}" HorizontalContentAlignment="Right" Mask="N2" MaskUseAsDisplayFormat="True" MaskType="Numeric" EditValue="{Binding Path=DataContext.RowData.Row.Day1,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"/>
+                                            <CorasauControls:TextEditor  x:Name="PART_Editor" IsReadOnly="{Binding DataContext.RowData.Row.StatusDay1,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToBoolConverter}}" HorizontalContentAlignment="Right" ValidateOnEnterKeyPressed="False" ValidateOnTextInput="False" DisplayFormatString="N2"  MaskUseAsDisplayFormat="False" EditValue="{Binding Path=DataContext.RowData.Row.Day1,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}"/>
                                         </DataTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridTemplateColumnClient>
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="colDay2" Width="75" FieldName="Day2">
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="colDay2" Width="75" FieldName="Day2" AllowMath="True">
                                     <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                                         <ControlTemplate>
                                             <StackPanel Orientation="Horizontal" >
                                                 <Ellipse  Width="12" Height="12" Stroke="Black" Fill="{Binding DataContext.RowData.Row.StatusDay2,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToColorConverter}}" Margin="5,0,0,0" Visibility="{Binding DataContext.RowData.Row.StatusDay2,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToVisibilityConverter}}"/>
-                                                <CorasauControls:TextEditor Margin="30,4,0,0" IsPrintingMode="True" EditMode="InplaceInactive" Text="{Binding Path=DataContext.RowData.Row.Day2,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource DoubleValConverter}}" Mask="N2" MaskUseAsDisplayFormat="True" MaskType="Numeric"/>
+                                                <CorasauControls:TextEditor Margin="30,4,0,0" IsPrintingMode="True" EditMode="InplaceInactive" EditValue="{Binding Path=DataContext.RowData.Row.Day2,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource DoubleValConverter}}" ValidateOnEnterKeyPressed="False" ValidateOnTextInput="False" DisplayFormatString="N2"  MaskUseAsDisplayFormat="False"/>
                                             </StackPanel>
                                         </ControlTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                                     <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                         <DataTemplate>
-                                            <CorasauControls:TextEditor  x:Name="PART_Editor" IsReadOnly="{Binding DataContext.RowData.Row.StatusDay2,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToBoolConverter}}" HorizontalContentAlignment="Right" Mask="N2" MaskUseAsDisplayFormat="True" MaskType="Numeric" EditValue="{Binding Path=DataContext.RowData.Row.Day2,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"/>
+                                            <CorasauControls:TextEditor  x:Name="PART_Editor" IsReadOnly="{Binding DataContext.RowData.Row.StatusDay2,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToBoolConverter}}" HorizontalContentAlignment="Right" ValidateOnEnterKeyPressed="False" ValidateOnTextInput="False" DisplayFormatString="N2"  MaskUseAsDisplayFormat="False" EditValue="{Binding Path=DataContext.RowData.Row.Day2,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}"/>
                                         </DataTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridTemplateColumnClient>
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="colDay3" Width="75" FieldName="Day3">
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="colDay3" Width="75" FieldName="Day3" AllowMath="True">
                                     <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                                         <ControlTemplate>
                                             <StackPanel Orientation="Horizontal" >
                                                 <Ellipse  Width="12" Height="12" Stroke="Black" Fill="{Binding DataContext.RowData.Row.StatusDay3,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToColorConverter}}" Margin="5,0,0,0" Visibility="{Binding DataContext.RowData.Row.StatusDay3,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToVisibilityConverter}}"/>
-                                                <CorasauControls:TextEditor Margin="30,4,0,0" IsPrintingMode="True" EditMode="InplaceInactive" Text="{Binding Path=DataContext.RowData.Row.Day3,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource DoubleValConverter}}" Mask="N2" MaskUseAsDisplayFormat="True" MaskType="Numeric"/>
+                                                <CorasauControls:TextEditor Margin="30,4,0,0" IsPrintingMode="True" EditMode="InplaceInactive" EditValue="{Binding Path=DataContext.RowData.Row.Day3,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource DoubleValConverter}}" ValidateOnEnterKeyPressed="False" ValidateOnTextInput="False" DisplayFormatString="N2"  MaskUseAsDisplayFormat="False"/>
                                             </StackPanel>
                                         </ControlTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                                     <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                         <DataTemplate>
-                                            <CorasauControls:TextEditor  x:Name="PART_Editor" IsReadOnly="{Binding DataContext.RowData.Row.StatusDay3,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToBoolConverter}}" HorizontalContentAlignment="Right" Mask="N2" MaskUseAsDisplayFormat="True" MaskType="Numeric" EditValue="{Binding Path=DataContext.RowData.Row.Day3,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"/>
+                                            <CorasauControls:TextEditor  x:Name="PART_Editor" IsReadOnly="{Binding DataContext.RowData.Row.StatusDay3,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToBoolConverter}}" HorizontalContentAlignment="Right" ValidateOnEnterKeyPressed="False" ValidateOnTextInput="False" DisplayFormatString="N2"  MaskUseAsDisplayFormat="False" EditValue="{Binding Path=DataContext.RowData.Row.Day3,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}"/>
                                         </DataTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridTemplateColumnClient>
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="colDay4" Width="75" FieldName="Day4">
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="colDay4" Width="75" FieldName="Day4" AllowMath="True">
                                     <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                                         <ControlTemplate>
                                             <StackPanel Orientation="Horizontal" >
                                                 <Ellipse  Width="12" Height="12" Stroke="Black" Fill="{Binding DataContext.RowData.Row.StatusDay4,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToColorConverter}}" Margin="5,0,0,0" Visibility="{Binding DataContext.RowData.Row.StatusDay4,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToVisibilityConverter}}"/>
-                                                <CorasauControls:TextEditor Margin="30,4,0,0" IsPrintingMode="True" EditMode="InplaceInactive" Text="{Binding Path=DataContext.RowData.Row.Day4,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource DoubleValConverter}}" Mask="N2" MaskUseAsDisplayFormat="True" MaskType="Numeric"/>
+                                                <CorasauControls:TextEditor Margin="30,4,0,0" IsPrintingMode="True" EditMode="InplaceInactive" EditValue="{Binding Path=DataContext.RowData.Row.Day4,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource DoubleValConverter}}" ValidateOnEnterKeyPressed="False" ValidateOnTextInput="False" DisplayFormatString="N2"  MaskUseAsDisplayFormat="False"/>
                                             </StackPanel>
                                         </ControlTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                                     <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                         <DataTemplate>
-                                            <CorasauControls:TextEditor  x:Name="PART_Editor" IsReadOnly="{Binding DataContext.RowData.Row.StatusDay4,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToBoolConverter}}" HorizontalContentAlignment="Right" Mask="N2" MaskUseAsDisplayFormat="True" MaskType="Numeric" EditValue="{Binding Path=DataContext.RowData.Row.Day4,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"/>
+                                            <CorasauControls:TextEditor  x:Name="PART_Editor" IsReadOnly="{Binding DataContext.RowData.Row.StatusDay4,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToBoolConverter}}" HorizontalContentAlignment="Right" ValidateOnEnterKeyPressed="False" ValidateOnTextInput="False" DisplayFormatString="N2"  MaskUseAsDisplayFormat="False" EditValue="{Binding Path=DataContext.RowData.Row.Day4,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}"/>
                                         </DataTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridTemplateColumnClient>
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="colDay5" Width="75" FieldName="Day5">
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="colDay5" Width="75" FieldName="Day5" AllowMath="True">
                                     <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                                         <ControlTemplate>
                                             <StackPanel Orientation="Horizontal" >
                                                 <Ellipse  Width="12" Height="12" Stroke="Black" Fill="{Binding DataContext.RowData.Row.StatusDay5,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToColorConverter}}" Margin="5,0,0,0" Visibility="{Binding DataContext.RowData.Row.StatusDay5,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToVisibilityConverter}}"/>
-                                                <CorasauControls:TextEditor Margin="30,4,0,0" IsPrintingMode="True" EditMode="InplaceInactive" Text="{Binding Path=DataContext.RowData.Row.Day5,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource DoubleValConverter}}" Mask="N2" MaskUseAsDisplayFormat="True" MaskType="Numeric"/>
+                                                <CorasauControls:TextEditor Margin="30,4,0,0" IsPrintingMode="True" EditMode="InplaceInactive" EditValue="{Binding Path=DataContext.RowData.Row.Day5,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource DoubleValConverter}}" ValidateOnEnterKeyPressed="False" ValidateOnTextInput="False" DisplayFormatString="N2"  MaskUseAsDisplayFormat="False"/>
                                             </StackPanel>
                                         </ControlTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                                     <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                         <DataTemplate>
-                                            <CorasauControls:TextEditor  x:Name="PART_Editor" IsReadOnly="{Binding DataContext.RowData.Row.StatusDay5,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToBoolConverter}}" HorizontalContentAlignment="Right" Mask="N2" MaskUseAsDisplayFormat="True" MaskType="Numeric" EditValue="{Binding Path=DataContext.RowData.Row.Day5,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"/>
+                                            <CorasauControls:TextEditor  x:Name="PART_Editor" IsReadOnly="{Binding DataContext.RowData.Row.StatusDay5,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToBoolConverter}}" HorizontalContentAlignment="Right" ValidateOnEnterKeyPressed="False" ValidateOnTextInput="False" DisplayFormatString="N2"  MaskUseAsDisplayFormat="False" EditValue="{Binding Path=DataContext.RowData.Row.Day5,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}"/>
                                         </DataTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridTemplateColumnClient>
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="colDay6" Width="75" FieldName="Day6">
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="colDay6" Width="75" FieldName="Day6" AllowMath="True">
                                     <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                                         <ControlTemplate>
                                             <StackPanel Orientation="Horizontal" >
                                                 <Ellipse  Width="12" Height="12" Stroke="Black" Fill="{Binding DataContext.RowData.Row.StatusDay6,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToColorConverter}}" Margin="5,0,0,0" Visibility="{Binding DataContext.RowData.Row.StatusDay6,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToVisibilityConverter}}"/>
-                                                <CorasauControls:TextEditor Margin="30,4,0,0" IsPrintingMode="True" EditMode="InplaceInactive" Text="{Binding Path=DataContext.RowData.Row.Day6,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent},  Converter={StaticResource DoubleValConverter}}" Mask="N2" MaskUseAsDisplayFormat="True" MaskType="Numeric"/>
+                                                <CorasauControls:TextEditor Margin="30,4,0,0" IsPrintingMode="True" EditMode="InplaceInactive" EditValue="{Binding Path=DataContext.RowData.Row.Day6,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent},  Converter={StaticResource DoubleValConverter}}" ValidateOnEnterKeyPressed="False" ValidateOnTextInput="False" DisplayFormatString="N2"  MaskUseAsDisplayFormat="False"/>
                                             </StackPanel>
                                         </ControlTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                                     <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                         <DataTemplate>
-                                            <CorasauControls:TextEditor  x:Name="PART_Editor" IsReadOnly="{Binding DataContext.RowData.Row.StatusDay6,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToBoolConverter}}" HorizontalContentAlignment="Right" Mask="N2" MaskUseAsDisplayFormat="True" MaskType="Numeric" EditValue="{Binding Path=DataContext.RowData.Row.Day6,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"/>
+                                            <CorasauControls:TextEditor  x:Name="PART_Editor" IsReadOnly="{Binding DataContext.RowData.Row.StatusDay6,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToBoolConverter}}" HorizontalContentAlignment="Right" ValidateOnEnterKeyPressed="False" ValidateOnTextInput="False" DisplayFormatString="N2"  MaskUseAsDisplayFormat="False" EditValue="{Binding Path=DataContext.RowData.Row.Day6,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}"/>
                                         </DataTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridTemplateColumnClient>
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="colDay7" Width="75" FieldName="Day7">
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="colDay7" Width="75" FieldName="Day7" AllowMath="True">
                                     <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                                         <ControlTemplate>
                                             <StackPanel Orientation="Horizontal" >
                                                 <Ellipse Width="12" Height="12" Stroke="Black" Fill="{Binding DataContext.RowData.Row.StatusDay7,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToColorConverter}}" Margin="5,0,0,0" Visibility="{Binding DataContext.RowData.Row.StatusDay7,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToVisibilityConverter}}"/>
-                                                <CorasauControls:TextEditor Margin="30,4,0,0" IsPrintingMode="True" EditMode="InplaceInactive" Text="{Binding Path=DataContext.RowData.Row.Day7,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource DoubleValConverter}}" Mask="N2" MaskUseAsDisplayFormat="True" MaskType="Numeric"/>
+                                                <CorasauControls:TextEditor Margin="30,4,0,0" IsPrintingMode="True" EditMode="InplaceInactive" EditValue="{Binding Path=DataContext.RowData.Row.Day7,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource DoubleValConverter}}" ValidateOnEnterKeyPressed="False" ValidateOnTextInput="False" DisplayFormatString="N2"  MaskUseAsDisplayFormat="False"/>
                                             </StackPanel>
                                         </ControlTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                                     <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                         <DataTemplate>
-                                            <CorasauControls:TextEditor  x:Name="PART_Editor" IsReadOnly="{Binding DataContext.RowData.Row.StatusDay7,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToBoolConverter}}" HorizontalContentAlignment="Right" Mask="N2" MaskUseAsDisplayFormat="True" MaskType="Numeric" EditValue="{Binding Path=DataContext.RowData.Row.Day7,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"/>
+                                            <CorasauControls:TextEditor  x:Name="PART_Editor" IsReadOnly="{Binding DataContext.RowData.Row.StatusDay7,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToBoolConverter}}" HorizontalContentAlignment="Right" ValidateOnEnterKeyPressed="False" ValidateOnTextInput="False" DisplayFormatString="N2"  MaskUseAsDisplayFormat="False" EditValue="{Binding Path=DataContext.RowData.Row.Day7,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}"/>
                                         </DataTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridTemplateColumnClient>

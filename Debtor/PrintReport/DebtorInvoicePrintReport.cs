@@ -157,6 +157,9 @@ namespace UnicontaClient.Pages.CustomPage
                     debtorClientUser._ZipCode = previousAddressClient._ZipCode;
                 }
 
+                //to Contact listing for the current debtor
+                if (Comp.Contacts)
+                    debtorClientUser.Contacts = await crudApi.Query<ContactClient>(debtorClientUser);
                 Debtor = debtorClientUser;
 
                 if (dcInv._Installation != null && Comp.GetCache(typeof(Uniconta.DataModel.WorkInstallation)) == null)
@@ -165,6 +168,15 @@ namespace UnicontaClient.Pages.CustomPage
                 UnicontaClient.Pages.DebtorOrders.SetDeliveryAdress(debtorInvoiceClientUser, debtorClientUser, crudApi);
                 debtorInvoiceClientUser.SetInvoiceAddress(debtorClientUser);
 
+                /*In case debtor order is null, fill from DCInvoice*/
+                if (DebtorOrder == null)
+                {
+                    var debtorOrderUserType = ReportUtil.GetUserType(typeof(DebtorOrderClient), Comp);
+                    var debtorOrderUser = Activator.CreateInstance(debtorOrderUserType) as DebtorOrderClient;
+                    debtorOrderUser.CopyFrom(debtorInvoiceClientUser, debtorClientUser);
+                    DebtorOrder = debtorOrderUser;
+                }
+
                 Company = Utility.GetCompanyClientUserInstance(Comp);
 
                 var InvCache = Comp.GetCache(typeof(InvItem)) ?? await Comp.LoadCache(typeof(InvItem), crudApi);
@@ -172,14 +184,14 @@ namespace UnicontaClient.Pages.CustomPage
                 CompanyLogo = await Uniconta.ClientTools.Util.UtilDisplay.GetLogo(crudApi);
 
                 Language lang = ReportGenUtil.GetLanguage(debtorClientUser, Comp);
-                InvTransInvoiceLines = LayoutPrintReport.SetInvTransLines(DebtorInvoice, InvTransInvoiceLines, InvCache, debtorInvoiceLineUserType, lang, false);
+                InvTransInvoiceLines = LayoutPrintReport.SetInvTransLines(DebtorInvoice, InvTransInvoiceLines, InvCache, crudApi, debtorInvoiceLineUserType, lang, false);
 
                 //Setting ReportName and Version
                 var invoiceNumber = DebtorInvoice._InvoiceNumber;
                 var lineTotal = DebtorInvoice._LineTotal;
                 IsCreditNote = (lineTotal < -0.0001d);
 
-                ReportName = layoutType != CompanyLayoutType.Invoice ? layoutType.ToString() : invoiceNumber == 0 ? IsCreditNote? "ProformaCreditNote": "ProformaInvoice"
+                ReportName = layoutType != CompanyLayoutType.Invoice ? layoutType.ToString() : invoiceNumber == 0 ? IsCreditNote ? "ProformaCreditNote" : "ProformaInvoice"
                     : IsCreditNote ? "Creditnote" : "Invoice";
 
                 MessageClient = await GetMessageClient(lang);

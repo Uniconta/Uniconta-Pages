@@ -66,7 +66,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (api.session.User._Role < (byte)Uniconta.Common.User.UserRoles.Distributor)
             {
                 var CountryId = api.CompanyEntity._CountryId;
-                if (CountryId == CountryCode.Iceland || CountryId == CountryCode.SouthAfrica || CountryId == CountryCode.UnitedKingdom || CountryId == CountryCode.Germany)
+                if ((CountryId == CountryCode.Iceland && api.session.User._Role < (byte)Uniconta.Common.User.UserRoles.Reseller) || CountryId == CountryCode.SouthAfrica || CountryId == CountryCode.UnitedKingdom || CountryId == CountryCode.Germany)
                     RemoveMenuItemDelete();
             }
             localMenu.OnItemClicked += localMenu_OnItemClicked;

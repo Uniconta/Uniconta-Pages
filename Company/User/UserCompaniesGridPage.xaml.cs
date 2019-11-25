@@ -182,7 +182,7 @@ namespace UnicontaClient.Pages.CustomPage
                         if (!selectedItem._Delete)
                         {
                             globalEvents?.NotifyCompanyChange(this, new Uniconta.ClientTools.Util.CompanyEventArgs(selectedItem));
-                            dockCtrl.CloseDockItem();
+                            dockCtrl?.CloseDockItem();
                         }
                         else
                             UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("CompanyDeleted"), Uniconta.ClientTools.Localization.lookup("Warning"), MessageBoxButton.OK);
@@ -196,7 +196,7 @@ namespace UnicontaClient.Pages.CustomPage
                         {
                             var mainWindow = new HomePage(selectedItem.CompanyId, null);
                             mainWindow.Show();
-                            dockCtrl.CloseDockItem();
+                            dockCtrl?.CloseDockItem();
                         }
                         else
                             UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("CompanyDeleted"), Uniconta.ClientTools.Localization.lookup("Warning"), MessageBoxButton.OK);
@@ -204,7 +204,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
 #endif
                 case "Cancel":
-                    dockCtrl.CloseDockItem();
+                    dockCtrl?.CloseDockItem();
                     break;
                 case "RefreshGrid":
                     GetCompanies(true);

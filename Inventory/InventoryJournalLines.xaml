@@ -98,6 +98,7 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryJournalLines"
                             </DataTemplate>
                         </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                       </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Expire" Width="70" ShowInColumnChooser="False" Visible="{Binding ElementName=SerieBatch, Path=Visible, Mode=TwoWay}" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ItemName" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Price" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CostPrice"/>

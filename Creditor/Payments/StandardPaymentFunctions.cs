@@ -14,6 +14,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
 {
     public static class StandardPaymentFunctions
     {
+        public const string MERGEID_SINGLEPAYMENT = "-";
         /// <summary>
         /// It returns the default PaymentFormat
         /// </summary>
@@ -42,7 +43,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
             iban = iban ?? string.Empty;
             iban = iban.ToUpper();
 
-            if (System.Text.RegularExpressions.Regex.IsMatch(iban, "^[A-Z0-9]"))
+            if (System.Text.RegularExpressions.Regex.IsMatch(iban, "^[A-Z0-9]") && iban.Length > 3)
             {
                 iban = iban.Replace(" ", String.Empty);
                 string bank = iban.Substring(4, iban.Length - 4) + iban.Substring(0, 4);
@@ -111,9 +112,9 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
             }
             else
             {
-                label_Acc = "Acc:";
-                label_Inv = "Inv:";
-                label_Ref = "Ref:";
+                label_Acc = "Acc";
+                label_Inv = "Inv";
+                label_Ref = "Ref";
             }
 
             return Tuple.Create(label_Acc, label_Inv, label_Ref);
@@ -131,7 +132,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
             {
                 var format = string.Empty;
 
-                if (rec.invoiceNumbers != null)
+                if (rec.invoiceNumbers != null && rec._MergePaymId != MERGEID_SINGLEPAYMENT)
                 {
                     messageFormat = messageFormat.Replace("Fak:%1", "").Trim(); //Removes invoicenumbers for merge payment due to limitation of characters 
                     messageFormat = messageFormat.Replace("Fak: %1", "").Trim();
@@ -139,14 +140,14 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
                 }
 
                 format = messageFormat.Replace("%1", "{0}").Replace("%2", "{1}").Replace("%3", "{2}").Replace("%4", "{3}").Replace("%5", "{4}");
-                advText = string.Format(format, rec.Invoice == 0 ? string.Empty : rec.Invoice.ToString(), creditor?._Account, creditor?._Name, rec.Voucher == 0 ? string.Empty : rec.Voucher.ToString(), rec.PaymentRefId == 0 ? string.Empty : rec.PaymentRefId.ToString());
+                advText = string.Format(format, rec.Invoice == 0 ? string.Empty : rec.Invoice.ToString(), creditor?._Account, creditor?._Name, rec.Voucher == 0 ? string.Empty : rec.Voucher.ToString(), rec.PaymentRefId == 0 ? string.Empty : rec.PaymentEndToEndId.ToString());
             }
             else //Default message
             {
-                if (rec.invoiceNumbers == null) //Merged payments
+                if (rec.invoiceNumbers == null || rec._MergePaymId == MERGEID_SINGLEPAYMENT)
                     sbAdvText = BuildBankAdviceText(sbAdvText, rec.Invoice == 0 ? string.Empty : rec.Invoice.ToString(), tuple.Item2);
                 sbAdvText = BuildBankAdviceText(sbAdvText, creditor?._Account, tuple.Item1);
-                sbAdvText = BuildBankAdviceText(sbAdvText, rec.PaymentRefId.ToString(), tuple.Item3);
+                sbAdvText = BuildBankAdviceText(sbAdvText, rec.PaymentEndToEndId.ToString(), tuple.Item3);
                 advText = sbAdvText.ToString();
 
             }
@@ -163,7 +164,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
             var country = company._CountryId;
             var tuple = MessageLabel(country);
 
-            if (UIMessage == false && rec.invoiceNumbers != null) //Merged payments
+            if (UIMessage == false && rec.invoiceNumbers != null && rec._MergePaymId != MERGEID_SINGLEPAYMENT)
             {
                 var invNumbers = rec.invoiceNumbers.ToString();
                 var invNumbersCheck = Regex.Replace(invNumbers, "[^1-9]", "");

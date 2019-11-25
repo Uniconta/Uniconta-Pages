@@ -19,6 +19,9 @@ namespace UnicontaISO20022CreditTransfer
         LHV_bank,
         Deutsche_Kreditwirtschaft,
         SEB,
-        Volks_Raiffeisenbanken
+        Volks_Raiffeisenbanken,
+        Luminor,
+        Standard,
+        Handelsbanken
     }
 }

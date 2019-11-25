@@ -61,10 +61,18 @@ namespace UnicontaClient.Pages.CustomPage
             frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
 
             var TableId = userDocsClientRow._TableId;
-            if (TableId != 71 && TableId != 72 && TableId != 73 && TableId != 77 && TableId != 78 && TableId != 79) // Sales Order, purchase order, Offer, Invoices
+            if (TableId != 71 && TableId != 72 && TableId != 73 && TableId != 77 && TableId != 78 && TableId != 79 && TableId != 205) // Sales Order, purchase order, Offer, Invoices, Production Order
                 groupInclude.Visibility = Visibility.Collapsed;
             else if (TableId != 72) /*Purchase Order */
                 layoutRequisition.Visibility = Visibility.Collapsed;
+
+            if (TableId == 205) /*Production Order*/
+            {
+                layoutInvoice.Visibility = Visibility.Collapsed;
+                layoutOffer.Visibility = Visibility.Collapsed;
+                layoutConfirmation.Visibility = Visibility.Collapsed;
+                layoutPacknote.Visibility = Visibility.Collapsed;
+            }
 
             if (LoadedRow == null)
             {
@@ -109,9 +117,18 @@ namespace UnicontaClient.Pages.CustomPage
                         int indexOfpath = url.LastIndexOf('/') + 1;
                         if (indexOfpath == -1)
                             indexOfpath = url.LastIndexOf('\\') + 1;
-                        var nameOfFile = indexOfpath > 0 ? url.Substring(indexOfpath, indexOfExtention - indexOfpath) : url;
-                        userDocsClientRow.DocumentType = DocumentConvert.GetDocumentType(url.Substring(indexOfExtention, url.Length - indexOfExtention));
-                        userDocsClientRow.Text = string.IsNullOrWhiteSpace(txedUserDocNotes.Text) ? nameOfFile : txedUserDocNotes.Text;
+                        if (indexOfExtention > indexOfpath)
+                        {
+                            var nameOfFile = indexOfpath > 0 ? url.Substring(indexOfpath, indexOfExtention - indexOfpath) : url;
+                            userDocsClientRow.DocumentType = DocumentConvert.GetDocumentType(url.Substring(indexOfExtention, url.Length - indexOfExtention));
+                            userDocsClientRow.Text = string.IsNullOrWhiteSpace(txedUserDocNotes.Text) ? nameOfFile : txedUserDocNotes.Text;
+                        }
+                        else
+                        {
+                            userDocsClientRow.DocumentType = FileextensionsTypes.UNK;
+                            userDocsClientRow.Text = txedUserDocNotes.Text;
+
+                        }
                     }
                     else
                         userDocsClientRow.Text = txedUserDocNotes.Text;
@@ -119,7 +136,12 @@ namespace UnicontaClient.Pages.CustomPage
                 }
             }
             else
+            {
+                if (ActionType == "Delete")
+                    api.CompanyEntity.AttachmentCacheDelete(userDocsClientRow);
+
                 frmRibbon_BaseActions(ActionType);
+            }
         }
 
         private bool ValidateSave()

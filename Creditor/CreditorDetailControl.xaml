@@ -17,7 +17,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorDetailControl"
         <CorasauControls:CorasauLayoutControl x:FieldModifier="public" x:Name="layoutItems" Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
             <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="grpFirst">
 
-                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="Desc" Header="{Binding Converter={StaticResource LocalizationValueConverter},ConverterParameter=Description}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="400">
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpDescription" Header="{Binding Converter={StaticResource LocalizationValueConverter},ConverterParameter=Description}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="400">
                     <CorasauControls:CorasauLayoutItem FieldName="Account" x:Name="liAccount">
                         <CorasauControls:TextEditor Text="{Binding Account}" IsReadOnly="True"/>
                     </CorasauControls:CorasauLayoutItem>
@@ -67,7 +67,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorDetailControl"
                         <CorasauControls:CheckEditor x:Name="Blocked" IsChecked="{Binding Blocked}"  IsReadOnly="True"/>
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
-                <CorasauControls:CorasauLayoutGroup View="GroupBox"  x:Name="Group" Header="{Binding Converter={StaticResource LocalizationValueConverter},ConverterParameter=Group}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="400">
+                <CorasauControls:CorasauLayoutGroup View="GroupBox"  x:Name="grpGroup" Header="{Binding Converter={StaticResource LocalizationValueConverter},ConverterParameter=Group}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="400">
                     <CorasauControls:CorasauLayoutItem FieldName="Group" x:Name="liGroup">
                         <CorasauControls:TextEditor  x:Name="grouplookupeditor" Text="{Binding Group}" IsReadOnly="True"/>
                     </CorasauControls:CorasauLayoutItem>
@@ -175,7 +175,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorDetailControl"
                         <CorasauControls:TextEditor x:Name="cbDeliveryCountry" Text="{Binding DeliveryCountry}" IsReadOnly="True"/>
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
-                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="Dimension" Header="{Binding Converter={StaticResource LocalizationValueConverter},ConverterParameter=Dimension}" Orientation="Vertical"  Width="400" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="usedim" Header="{Binding Converter={StaticResource LocalizationValueConverter},ConverterParameter=Dimension}" Orientation="Vertical"  Width="400" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                     <CorasauControls:CorasauLayoutItem x:Name="lbldim1">
                         <CorasauControls:TextEditor x:Name="dim1lookupeditior" Text="{Binding Dimension1}" IsReadOnly="True">
                         </CorasauControls:TextEditor>

@@ -45,13 +45,13 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectTransPivotReport"
                             <UnicontaControls:UnicontaPivotGridField x:Name="fieldYear" FieldName="Date"  GroupInterval="DateYear" AreaIndex="13"  Width="60" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Year}" />
                             <UnicontaControls:UnicontaPivotGridField x:Name="fieldQuarter" ValueFormat="Quarter {0}" FieldName="Date" AreaIndex="14" GroupInterval="DateQuarter" Width="60" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Quarter}" />
 
-                            <UnicontaControls:UnicontaPivotGridField x:Name="fieldQty" FieldName="Qty" SummaryType="Sum" ShowSummaryTypeName="True"  Area="DataArea" Width="120" AllowFilter="False"
+                            <UnicontaControls:UnicontaPivotGridField x:Name="fieldQty" FieldName="Qty" SummaryType="Sum" ShowSummaryTypeName="True"  Area="DataArea" Width="120" AllowFilter="False" CellFormat="{}{0:N2}"
                                 AreaIndex="0" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Qty}"/>
-                            <UnicontaControls:UnicontaPivotGridField x:Name="fieldSalesAmt" FieldName="SalesAmount" SummaryType="Sum" ShowSummaryTypeName="True" Area="DataArea"  Width="120" AllowFilter="False"
+                            <UnicontaControls:UnicontaPivotGridField x:Name="fieldSalesAmt" FieldName="SalesAmount" SummaryType="Sum" ShowSummaryTypeName="True" Area="DataArea"  Width="120" AllowFilter="False" CellFormat="{}{0:N2}"
                                 AreaIndex="1" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=SalesAmount}"  />
-                            <UnicontaControls:UnicontaPivotGridField x:Name="fieldMargin" FieldName="Margin" SummaryType="Sum" ShowSummaryTypeName="True" Area="DataArea" Width="120" AllowFilter="False"
+                            <UnicontaControls:UnicontaPivotGridField x:Name="fieldMargin" FieldName="Margin" SummaryType="Sum" ShowSummaryTypeName="True" Area="DataArea" Width="120" AllowFilter="False" CellFormat="{}{0:N2}"
                                 AreaIndex="2" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Margin}" />
-                            <UnicontaControls:UnicontaPivotGridField x:Name="fieldCostAmount" FieldName="CostAmount" SummaryType="Sum" ShowSummaryTypeName="True" Area="DataArea" Width="120" AllowFilter="False"
+                            <UnicontaControls:UnicontaPivotGridField x:Name="fieldCostAmount" FieldName="CostAmount" SummaryType="Sum" ShowSummaryTypeName="True" Area="DataArea" Width="120" AllowFilter="False"  CellFormat="{}{0:N2}"
                                 AreaIndex="3" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CostAmount}" />
                         </UnicontaControls:UnicontaPivotDataGrid.Fields>
                     </UnicontaControls:UnicontaPivotDataGrid>

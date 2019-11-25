@@ -36,7 +36,7 @@ namespace UnicontaClient.Pages.CustomPage
     public partial class VouchersPage3 : FormBasePage
     {
         VouchersClient voucherClient;
-        VouchersClient[] folders;
+        VouchersClient[] envelopes;
         int selectedIndex;
         object cache;
 
@@ -72,7 +72,7 @@ namespace UnicontaClient.Pages.CustomPage
         void Vouchers_BeforeClose()
         {
             cache = null;
-            folders = null;
+            envelopes = null;
             voucherClient = null;
             this.BeforeClose -= Vouchers_BeforeClose;
         }
@@ -132,21 +132,21 @@ namespace UnicontaClient.Pages.CustomPage
                 this.documentViewer.Children.Clear();
 
                 brdMetaInfo.Visibility = Visibility.Visible;
-                if (voucherClient._Folder)
+                if (voucherClient._Envelope)
                 {
                     btnPrev.IsEnabled = false;
                     busyIndicator.IsBusy = true;
                     var dapi = new DocumentAPI(api);
-                    folders = (VouchersClient[])await dapi.GetFolderContent(voucherClient, true);
+                    envelopes = (VouchersClient[])await dapi.GetEnvelopeContent(voucherClient, true);
                     gridPrevNext.Visibility = Visibility.Visible;
-                    if (folders != null && folders.Length > 0)
+                    if (envelopes != null && envelopes.Length > 0)
                     {
-                        totalBlk.Text = NumberConvert.ToString(folders.Length);
+                        totalBlk.Text = NumberConvert.ToString(envelopes.Length);
                         MoveToVoucherAtIndex(selectedIndex, setFocus);
 
                         /*
                         currentBlk.Text = NumberConvert.ToString(selectedIndex + 1);
-                        var doc = folders[selectedIndex];
+                        var doc = envelopes[selectedIndex];
                         this.documentViewer.Children.Add(UtilDisplay.LoadControl(doc.Buffer, doc._Fileextension, false, setFocus));
                         */
                     }
@@ -204,9 +204,9 @@ namespace UnicontaClient.Pages.CustomPage
             if (voucherClient == null)
                 return;
             busyIndicator.IsBusy = true;
-            if (voucherClient.Folder)
+            if (voucherClient._Envelope)
             {
-                VouchersClient vClient = folders[selectedIndex];
+                VouchersClient vClient = envelopes[selectedIndex];
                 UtilDisplay.SaveData(vClient.Buffer, vClient._Fileextension);
             }
             else
@@ -231,19 +231,19 @@ namespace UnicontaClient.Pages.CustomPage
 
         async void MoveToVoucherAtIndex(int index, bool setFocus = false)
         {
-            if (index < 0 || folders == null || index > folders.Length - 1)
+            if (index < 0 || envelopes == null || index > envelopes.Length - 1)
                 return;
             btnPrev.IsEnabled = btnNext.IsEnabled = true;
             if (selectedIndex == 0)
                 btnPrev.IsEnabled = false;
-            if (selectedIndex == folders.Length - 1)
+            if (selectedIndex == envelopes.Length - 1)
                 btnNext.IsEnabled = false;
             this.documentViewer.Children.Clear();
             currentBlk.Text = NumberConvert.ToString(index + 1);
 
             try
             {
-                VouchersClient vClient = folders[selectedIndex];
+                VouchersClient vClient = envelopes[selectedIndex];
                 if (vClient._Data != null)
                     VoucherCache.SetGlobalVoucherCache(vClient);
                 else
@@ -274,11 +274,11 @@ namespace UnicontaClient.Pages.CustomPage
             if (voucherClient == null)
                 return;
             busyIndicator.IsBusy = true;
-            if (voucherClient.Folder)
+            if (voucherClient._Envelope)
             {
-                if (selectedIndex > folders.Length - 1)
+                if (selectedIndex > envelopes.Length - 1)
                     return;
-                VouchersClient vClient = folders[selectedIndex];
+                VouchersClient vClient = envelopes[selectedIndex];
                 if (vClient._Data != null)
                     ViewInProgram(vClient.Buffer, vClient._Fileextension);
             }

@@ -77,6 +77,9 @@ namespace UnicontaClient.Pages.CustomPage
                 country != CountryCode.FaroeIslands &&
                 country != CountryCode.Norway)
                 liPymtCodeOpt.Visibility = Visibility.Collapsed;
+
+            if (country != CountryCode.Denmark && country != CountryCode.FaroeIslands && country != CountryCode.Greenland)
+                liPymtCodeOpt.Visibility = Visibility.Collapsed;
         }
 
         private bool onlyRunOnce;
@@ -187,7 +190,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         void EditCompany_SaveComplete(object args)
         {
-            globalEvents.OnRefresh(TabControls.CreateCompany, editrow.CompanyId);
+            globalEvents?.OnRefresh(TabControls.CreateCompany, editrow.CompanyId);
         }
         public override Type TableType { get { return typeof(CompanyClient); } }
         public override UnicontaBaseEntity ModifiedRow { get { return editrow; } set { editrow = (CompanyClient)value; } }

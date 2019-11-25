@@ -600,7 +600,12 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void BindGrid()
         {
-            Filter();
+            var pairs = ribbonControl.filterValues;
+            var sort = ribbonControl.PropSort;
+            if (pairs != null || sort != null)
+                ribbonControl.FilterGrid?.Filter(pairs, sort);
+            else
+                Filter();
         }
         void setDim()
         {

@@ -59,8 +59,8 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectPage"
                             </ControlTemplate>
                         </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                     </local:CorasauDataGridTemplateColumnClient>
-                    
-                    <local:CorasauDataGridForeignKeyColumnClient x:Name="Account">
+
+                    <local:CorasauDataGridForeignKeyColumnClient x:Name="Account" Visible="False">
                         <local:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
                             <ControlTemplate>
                                 <TextBlock Margin="2" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.Account,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" />
@@ -72,39 +72,39 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectPage"
                             </DataTemplate>
                         </local:CorasauDataGridForeignKeyColumnClient.CellTemplate>
                     </local:CorasauDataGridForeignKeyColumnClient>
-                   
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Name"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DebtorName" Width="200" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Number"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="DebtorName"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="EndDiscountPct"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Payment"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Name" Width="200"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="MasterProject" Visible="True"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="RootProject" Visible="false"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="EndDiscountPct" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Payment" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Group"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Vat"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Vat" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Blocked" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Currency">
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Currency" Visible="False">
                         <local:CorasauDataGridTemplateColumnClient.CellTemplate>
                             <DataTemplate>
                                 <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="Currencies" />
                             </DataTemplate>
                         </local:CorasauDataGridTemplateColumnClient.CellTemplate>
                     </local:CorasauDataGridTemplateColumnClient>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="MasterProject"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="WorkAddress1"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="WorkAddress2"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="WorkAddress3"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="YourRef"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="OurRef"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Requisition" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Email"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Mobil" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="WorkAddress1" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="WorkAddress2" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="WorkAddress3" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="YourRef" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="OurRef" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Requisition" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Email" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Mobil" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Description" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="StartDate" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="EndDate" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="PersonInCharge"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="PrStandard"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="PrType"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Installation"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="FixedPrice" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PrStandard" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PrType" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Installation" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="FixedPrice" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Phase">
                         <local:CorasauDataGridTemplateColumnClient.CellTemplate>
                             <DataTemplate>
@@ -133,10 +133,17 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="OtherCost" Width="100" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="OtherSales" Width="100" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Revenue"  Width="100" Visible="False"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="OnAccountSales" Width="100" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="WIP" Width="100" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="OnAccountSales" Width="100" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="WIP" Width="100" Visible="True"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Margin" Width="100" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="MarginRatio" Width="100" Visible="False" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="InvoicingMethod" Visible="False">
+                        <local:CorasauDataGridTemplateColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="InvoicingMethod" />
+                            </DataTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.CellTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
                 </local:ProjectGrid.Columns>
                 <local:ProjectGrid.TotalSummary>
                     <local:SumColumn FieldName="Revenue" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>

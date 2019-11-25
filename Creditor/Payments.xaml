@@ -79,7 +79,8 @@ x:Class="UnicontaClient.Pages.CustomPage.Payments"
                     </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PaymentId" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="SWIFT" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PaymentRefId" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PaymentRefId" AllowEditing="False" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PaymentEndToEndId" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="MergePaymId" Visible="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="LastInterest"  Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="LastCollectionLetter"  Visible="False"/>

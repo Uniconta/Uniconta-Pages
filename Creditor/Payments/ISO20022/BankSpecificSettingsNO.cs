@@ -127,7 +127,7 @@ namespace UnicontaISO20022CreditTransfer
         /// Max. 35 characters.
         /// Danske Bank: It's not used but Danske Bank recommend to use the CVR number
         /// </summary>
-        public override string IdentificationId(String identificationId, string companyCVR)
+        public override string IdentificationId(string identificationId, string companyCVR)
         {
             identificationId = identificationId ?? string.Empty;
             companyCVR = companyCVR ?? string.Empty;
@@ -194,7 +194,7 @@ namespace UnicontaISO20022CreditTransfer
         /// SUPP Supplier payment (Default Value)
         /// TREA Financial payment
         /// </summary>
-        public override string ExtCategoryPurpose()
+        public override string ExtCategoryPurpose(ISO20022PaymentTypes ISOPaymType)
         {
             switch (companyBankEnum)
             {

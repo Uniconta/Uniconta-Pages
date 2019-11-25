@@ -91,7 +91,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
                 NETSNorge.processString(string.Empty, 215, false)
             };
 
-            danishFields.UniquePaymRef = tran._PaymentRefId.ToString();
+            danishFields.UniquePaymRef = tran.PaymentEndToEndId.ToString();
 
             return danishFields;
         }
@@ -112,7 +112,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
             danishFields.TransTypeCommand = BankDataPayFormat.TRANSTYPE_IB030204000003;
             danishFields.Index = BankDataPayFormat.INDEX02;
 
-            danishFields.TransferType = 0;
+           
             danishFields.Blanks = NETSNorge.processString(string.Empty, 1, false);
             danishFields.SwiftAddress = NETSNorge.processString(danishFields.SwiftAddress, 11, false);
 
@@ -130,6 +130,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
             danishFields.ReceiverIBAN = NETSNorge.processString(danishFields.ReceiverIBAN, 35, false);  
 
             var paymentType = ISOPaymentType(tran._CurrencyLocal, bankAccount, danishFields.ReceiverIBAN, company);
+            danishFields.TransferType = paymentType == UnicontaISO20022CreditTransfer.ISO20022PaymentTypes.SEPA ? 1 : 0; ;
             danishFields.TransferTypeForeign = paymentType == UnicontaISO20022CreditTransfer.ISO20022PaymentTypes.SEPA ? 1 : 0;
             danishFields.Blanks2 = NETSNorge.processString(string.Empty, 15, false);
 
@@ -169,7 +170,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
             };
 
 
-            danishFields.UniquePaymRef = tran._PaymentRefId.ToString();
+            danishFields.UniquePaymRef = tran.PaymentEndToEndId.ToString();
 
             return danishFields;
         }

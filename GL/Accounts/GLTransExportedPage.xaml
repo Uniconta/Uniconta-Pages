@@ -1,0 +1,34 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools" 
+        xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.GLTransExportedPage"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
+        xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/GL/Accounts/GLTransExportedPageRibbon.xml" x:Name="localMenu"/>
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <local:GLTransExportedPageGrid  x:Name="dgGLTransExported" AutoGenerateColumns="None">
+                <local:GLTransExportedPageGrid.Columns>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="FromDate" Width="90"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ToDate" Width="90"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Lines"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="MaxJournalPostedId" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ExportedBy" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="SuppLines" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="SuppJournalPostedId"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="SupplementBy" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Exported" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="LastSupplement" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Comment" Width="150"/>
+                </local:GLTransExportedPageGrid.Columns>
+            </local:GLTransExportedPageGrid>
+        </CorasauControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

@@ -35,6 +35,7 @@ x:Class="UnicontaClient.Pages.CustomPage.GLDailyJournal"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Blocked"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="UseApproved" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="NumberSerie" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="AssignVoucher" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="GenerateVoucher"  Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ManualAllocation"  Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="TwoVatCodes" Visible="False"/>

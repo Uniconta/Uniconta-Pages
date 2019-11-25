@@ -73,7 +73,7 @@ namespace UnicontaClient.Pages.CustomPage
             var type = this.TableTypeUser;
             if (row is InvItem)
             {
-                var lst = new List<InvPriceListLineClient>();
+                var lst = new List<InvPriceListLineClient>(copyFromRows.Count());
                 foreach (var _it in copyFromRows)
                 {
                     var it = (InvItem)_it;
@@ -87,9 +87,8 @@ namespace UnicontaClient.Pages.CustomPage
             else if (row.GetType() == type)
             {
                 foreach (var inv in copyFromRows)
-                {
-                   inv.GetType().GetField("ExchangeRate").SetValue(inv, this.ExchangeRate);
-                }
+                   ((InvPriceListLineClient)inv).ExchangeRate = this.ExchangeRate;
+
                 return copyFromRows;
             }
             return null;

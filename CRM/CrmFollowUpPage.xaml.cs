@@ -91,7 +91,7 @@ namespace UnicontaClient.Pages.CustomPage
             CrmProspectCache = api.GetCache(typeof(Uniconta.DataModel.CrmProspect));
             ContactCache = api.GetCache(typeof(Uniconta.DataModel.Contact));
 
-            ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "SaveGrid" });
+            ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "UndoDelete", "SaveGrid" });
             dgCrmFollowUpGrid.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;
             dgCrmFollowUpGrid.ShowTotalSummary();
         }
@@ -255,6 +255,13 @@ namespace UnicontaClient.Pages.CustomPage
                         dgCrmFollowUpGrid.UpdateItemSource(2, selectedItem);
                     }
                     break;
+                case "Contacts":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.ContactPage, dgCrmFollowUpGrid.syncEntity);
+                    break;
+                case "UndoDelete":
+                    dgCrmFollowUpGrid.UndoDeleteRow();
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -288,7 +295,7 @@ namespace UnicontaClient.Pages.CustomPage
                 dgCrmFollowUpGrid.MakeEditable();
                 UserFieldControl.MakeEditable(dgCrmFollowUpGrid);
                 ibase.Caption = Uniconta.ClientTools.Localization.lookup("LeaveEditAll");
-                ribbonControl.EnableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "SaveGrid" });
+                ribbonControl.EnableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "UndoDelete", "SaveGrid" });
                 editAllChecked = false;
             }
             else
@@ -319,7 +326,7 @@ namespace UnicontaClient.Pages.CustomPage
                         dgCrmFollowUpGrid.Readonly = true;
                         dgCrmFollowUpGrid.tableView.CloseEditor();
                         ibase.Caption = Uniconta.ClientTools.Localization.lookup("EditAll");
-                        ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "SaveGrid" });
+                        ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "UndoDelete", "SaveGrid" });
                     };
                     confirmationDialog.Show();
                 }
@@ -328,7 +335,7 @@ namespace UnicontaClient.Pages.CustomPage
                     dgCrmFollowUpGrid.Readonly = true;
                     dgCrmFollowUpGrid.tableView.CloseEditor();
                     ibase.Caption = Uniconta.ClientTools.Localization.lookup("EditAll");
-                    ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "SaveGrid" });
+                    ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "UndoDelete", "SaveGrid" });
                 }
             }
 

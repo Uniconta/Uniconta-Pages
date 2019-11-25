@@ -82,6 +82,7 @@ x:Class="UnicontaClient.Pages.CustomPage.Invoices"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Remark" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Requisition" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ReferenceNumber" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="VoidInvoice" Width="60" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ExchangeRate" Mask="n4" AllowThousandMask="True" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ExchangeSymbol" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="AmountLocalCur" Visible="False" />

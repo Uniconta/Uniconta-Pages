@@ -69,7 +69,7 @@ namespace ISO20022CreditTransfer
                                 queryPaymentTrans = Trans.Where(paymentTrans =>
                                 {
                                 var endToEndID = Regex.Replace(paymStatusRec.TransEndToEndId ?? "0", "[^0-9]", "");
-                                    return paymentTrans != null && (paymentTrans._PaymentRefId == int.Parse(endToEndID));
+                                    return paymentTrans != null && (paymentTrans.PaymentEndToEndId.ToString() == endToEndID);
                                 });
 
                                 foreach (var rec in queryPaymentTrans)

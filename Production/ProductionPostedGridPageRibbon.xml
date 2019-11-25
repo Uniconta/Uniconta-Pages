@@ -28,4 +28,9 @@
   <RibbonItem>
     <RibbonItem Action="CreateProduction" LocalizedNameKey="CreateOBJ" Parameter="ProductionOrder" LargeGlyph="Orders_32x32.png"/>
   </RibbonItem>
+ <RibbonItem>
+    <RibbonItem Action="PostedTransaction" LocalizedNameKey="PostedTransactions"  LargeGlyph="Posted_Transaction_32x32.png" />
+    <RibbonItem Action="DeleteProduction" LocalizedNameKey="DeleteOBJ" Parameter="Production" LargeGlyph="Delete_32x32.png"/>
+   <RibbonItem Module="Attachments" Action="AddDoc" LocalizedNameKey="Attachments" ControlName="UserDocsPage"  LargeGlyph="Attachments_32x32.png"/>
+ </RibbonItem>
 </root>

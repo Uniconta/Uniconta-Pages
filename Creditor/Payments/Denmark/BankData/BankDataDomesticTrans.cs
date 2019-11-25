@@ -87,7 +87,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
             danishFields.Blanks = NETSNorge.processString(string.Empty, 1, false);
             danishFields.Blanks2 = NETSNorge.processString(string.Empty, 215, false);
             
-            danishFields.UniquePaymRef = tran._PaymentRefId.ToString();
+            danishFields.UniquePaymRef = tran.PaymentEndToEndId.ToString();
 
             return danishFields;
         }
