@@ -629,7 +629,7 @@ namespace UnicontaClient.Pages.CustomPage
             setSerieBatchSource(selItem);
         }
 
-        async void setSerieBatchSource(ProductionOrderLineClient row)
+        async void SetSerieBatchSource(ProductionOrderLineClient row)
         {
             var cache = api.GetCache(typeof(InvItem));
             var invItemMaster = cache.Get(row._Item) as InvItem;
