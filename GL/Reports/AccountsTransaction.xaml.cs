@@ -25,7 +25,6 @@ using UnicontaClient.Pages.GL.ChartOfAccount.Reports;
 using Uniconta.DataModel;
 using System.Collections;
 using UnicontaClient.Controls.Dialogs;
-using UnicontaClient.Controls.Dialogs;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using Uniconta.Client.Pages;
@@ -171,7 +170,7 @@ namespace UnicontaClient.Pages.CustomPage
             this.DataContext = this;
             InitializeComponent();
             var Comp = this.api.CompanyEntity;
-            filterDate = BasePage.GetFilterDate(Comp, masters != null && masters.Any());
+            filterDate = BasePage.GetFilterDate(Comp, masters != null && masters.Count > 0);
             localMenu.dataGrid = dgAccountsTransGrid;
             SetRibbonControl(localMenu, dgAccountsTransGrid);
             if (IsmenuRemove)
@@ -248,7 +247,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override void LoadCacheInBackGround()
         {
-            LoadType(new Type[] { typeof(Uniconta.DataModel.Debtor), typeof(Uniconta.DataModel.Creditor), typeof(Uniconta.DataModel.GLDailyJournal), typeof(Uniconta.DataModel.GLVat), typeof(Uniconta.DataModel.GLTransType), typeof(Uniconta.DataModel.NumberSerie) });
+            LoadType(new Type[] { typeof(Uniconta.DataModel.Debtor), typeof(Uniconta.DataModel.Creditor), typeof(Uniconta.DataModel.GLDailyJournal), typeof(Uniconta.DataModel.GLVat), typeof(Uniconta.DataModel.GLTransType), typeof(Uniconta.DataModel.NumberSerie), typeof(Uniconta.DataModel.FAM) });
         }
 
         private void localMenu_OnItemClicked(string ActionType)
@@ -278,7 +277,7 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         var glAccount = selectedItem.Master;
                         if (glAccount == null) return;
-                        string accHeader = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("AccountsTransaction"), selectedItem.Account);
+                        string accHeader = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("AccountsTransaction"), selectedItem._Account);
                         AddDockItem(TabControls.AccountsTransaction, glAccount, accHeader);
                     }
                     break;
@@ -290,7 +289,7 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         if (addVouvhersDialog.DialogResult == true)
                         {
-                            if (addVouvhersDialog.VoucherRowIds.Count() > 0 && addVouvhersDialog.vouchersClient != null)
+                            if (addVouvhersDialog.VoucherRowIds.Length > 0 && addVouvhersDialog.vouchersClient != null)
                                 SaveAttachment(selectedItem, addVouvhersDialog.vouchersClient);
                         }
                     };
@@ -357,8 +356,7 @@ namespace UnicontaClient.Pages.CustomPage
                     var source = (IList)dgAccountsTransGrid.ItemsSource;
                     if (source != null)
                     {
-                        IEnumerable<GLTransClient> gridItems = source.Cast<GLTransClient>();
-                        foreach (var statementLine in gridItems)
+                        foreach (var statementLine in (IEnumerable<GLTrans>)source)
                             if (statementLine._DocumentRef != 0)
                                 _refferedVouchers.Add(statementLine._DocumentRef);
                     }
@@ -474,7 +472,7 @@ namespace UnicontaClient.Pages.CustomPage
             var voucher = selectedItem._Voucher;
 
             string dc = null;
-            GLJournalAccountType DCType = 0;
+            GLTransRefType DCType = 0;
             var lst = (IEnumerable<GLTrans>)dgAccountsTransGrid.ItemsSource;
             foreach (var rec in lst)
             {
@@ -633,7 +631,7 @@ namespace UnicontaClient.Pages.CustomPage
                         lookup.TableType = typeof(Uniconta.DataModel.Creditor);
                         break;
                     case 3:
-                        lookup.TableType = typeof(Uniconta.DataModel.CrmProspect);
+                        lookup.TableType = typeof(Uniconta.DataModel.FAM);
                         break;
                 }
             }

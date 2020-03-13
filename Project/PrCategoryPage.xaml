@@ -21,13 +21,7 @@ x:Class="UnicontaClient.Pages.CustomPage.PrCategoryPage"
                 <localPage:PrCategoryGrid.Columns>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Number" Width="100"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" Width="200"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CatType" Width="80">
-                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                            <DataTemplate>
-                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="CategoryType" />
-                            </DataTemplate>
-                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                    </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:ComboBoxColumnClient x:Name="CatType" Width="80" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Sum" Width="100"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Item" Width="100"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ItemName" Width="150" />

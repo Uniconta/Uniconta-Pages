@@ -151,31 +151,36 @@ namespace UnicontaClient.Pages.CustomPage
             var displayProperties = FilterSortingHelper.GetDisplayProperties(true, true);
             displayProperties.AddRange(GetAllInputPropertiesFromType(sltype, api.CompanyEntity));
             dgTableValueGrid.Tag = displayProperties;
-            var customDictioary = UtilFunctions.GetCustomFormattedNonReadOnlyDisplayPropertyNames(sltype, null);
+            var customDictionary = UtilFunctions.GetCustomFormattedNonReadOnlyDisplayPropertyNames(sltype, null);
             var dimProp = (from p in displayProperties where p.PropertyName.StartsWith("Dim") select p);
-            foreach(var dim in dimProp)
-                customDictioary.Add(dim.PropertyName, string.Format("{0} ({1})", dim.PropertyName, dim.DisplayName));
-            cmbTableProperties.ItemsSource = customDictioary.OrderBy(s => s.Value);
+            foreach (var dim in dimProp)
+            {
+                var prName = dim.PropertyName;
+                if (!customDictionary.ContainsKey(prName))
+                    customDictionary.Add(prName, string.Concat(prName, " (", dim.DisplayName, ")"));
+            }
+            cmbTableProperties.ItemsSource = customDictionary.OrderBy(s => s.Value);
         }
 
         public List<DisplayProperties> GetAllInputPropertiesFromType(Type type, Company comp)
         {
             List<DisplayProperties> names = new List<DisplayProperties>();
             var propertyNames = (from p in type.GetProperties()
-                                 where p.GetCustomAttributes(typeof(InputFieldDataAttribute), true).Any()
+                                 where p.GetCustomAttributes(typeof(InputFieldDataAttribute), true).Length > 0
                                  select p).ToList();
             if (propertyNames == null)
                 return names;
+            names.Capacity = propertyNames.Count;
             foreach (var p in propertyNames)
             {
                 var prop = new DisplayProperties() { PropertyName = p.Name, DisplayName = p.Name, PropertyType = p.PropertyType };
                 names.Add(prop);
                 var ForeignKeys = p.GetCustomAttributes(typeof(ForeignKeyAttribute), true);
-                if (ForeignKeys != null && ForeignKeys.Any())
-                    prop.ForeignKey = ((ForeignKeyAttribute)ForeignKeys.First()).ForeignKeyTable;
+                if (ForeignKeys.Length > 0)
+                    prop.ForeignKey = ((ForeignKeyAttribute)ForeignKeys[0]).ForeignKeyTable;
                 var AppEnumNames = p.GetCustomAttributes(typeof(AppEnumAttribute), true);
-                if (AppEnumNames != null && AppEnumNames.Any())
-                    prop.EnumName = ((AppEnumAttribute)AppEnumNames.First()).EnumName;
+                if (AppEnumNames.Length > 0)
+                    prop.EnumName = ((AppEnumAttribute)AppEnumNames[0]).EnumName;
             }
             return names;
         }

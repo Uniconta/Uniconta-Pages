@@ -187,14 +187,16 @@ namespace UnicontaClient.Pages.CustomPage
                     var err = await api.Insert(multiVouchers);
                     if (err != ErrorCodes.Succes)
                     {
+                        for (int i = 0; (i < l); i++)
+                            multiVouchers[i]._Data = buffers[i];
                         busyIndicator.IsBusy = false;
                         UtilDisplay.ShowErrorCode(err);
                     }
                     else
                     {
+                        Utility.UpdateBuffers(api, buffers, multiVouchers);
                         ClosePage(4); // full refresh
                         dockCtrl.CloseDockItem();
-                        Utility.UpdateBuffers(api, buffers, multiVouchers);
                         busyIndicator.IsBusy = false;
                     }
                     return;
@@ -205,7 +207,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (LoadedRow == null)
             {
                 buf = voucherClientRow._Data;
-                if (buf != null && buf.Length > 100000)
+                if (buf != null && buf.Length > 200000)
                     voucherClientRow._Data = null;
                 else
                     buf = null;
@@ -214,11 +216,12 @@ namespace UnicontaClient.Pages.CustomPage
             await saveForm();
             busyIndicator.IsBusy = false;
 
-            if (buf != null && voucherClientRow.RowId != 0)
+            if (buf != null)
             {
-                voucherClientRow._Data = buf;
-                VoucherCache.SetGlobalVoucherCache(voucherClientRow);
-                api.UpdateNoResponse(voucherClientRow);
+                if (voucherClientRow.RowId != 0)
+                    Utility.UpdateBuffers(api, new[] { buf }, new[] { voucherClientRow });
+                else
+                    voucherClientRow._Data = buf;
             }
             else
                 VoucherCache.SetGlobalVoucherCache(voucherClientRow);
@@ -332,7 +335,8 @@ namespace UnicontaClient.Pages.CustomPage
             vc.Content = Convert.ToString(cmbContentTypes.SelectedItemValue);
             vc._Amount = NumberConvert.ToDouble(txtAmount.Text);
             vc._Qty = NumberConvert.ToDouble(txtQty.Text);
-            vc._Invoice = (int)NumberConvert.ToInt(txtInvoice.Text);
+            if (!string.IsNullOrWhiteSpace(txtInvoice.Text))
+                vc._Invoice = txtInvoice.Text;
             vc._DocumentDate = txtDocumentDate.DateTime;
             vc._PostingDate = txtPostingDate.DateTime;
             vc.Currency = Convert.ToString(cmbCurrency.SelectedItem);
@@ -352,7 +356,7 @@ namespace UnicontaClient.Pages.CustomPage
             vc._PostingInstruction = txedPostingInstruction.Text;
             vc.PaymentMethod = Convert.ToString(cmbPaymentMethod.SelectedItemValue);
 #if !SILVERLIGHT
-            vc._ViewInFolder = (byte)AppEnums.ViewBin.TryIndexOf(Convert.ToString(cmbViewInFolder.SelectedItem));
+            vc.ViewInFolder = Convert.ToString(cmbViewInFolder.SelectedItem);
 #endif
             if (lbldim1.Visibility == Visibility.Visible)
                 vc.Dimension1 = cmbDim1.Text;
@@ -384,7 +388,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (browseControl.SelectedFileInfos?.Length == 1)
             {
-                var selectedFileInfo = browseControl.SelectedFileInfos.First();
+                var selectedFileInfo = browseControl.SelectedFileInfos[0];
                 browseUrl = selectedFileInfo.FilePath;
                 if (chkIncludeOnlyReference.IsChecked == true)
                     voucherClientRow.Url = browseUrl;
@@ -403,6 +407,79 @@ namespace UnicontaClient.Pages.CustomPage
                 }
                 else
                     voucherClientRow.Url = null;
+            }
+        }
+
+        /// <summary>
+        /// Loads Voucher page2 with the files dropped
+        /// </summary>
+        /// <param name="filePaths"></param>
+        public void LoadPageOnFileDrop(string[] filePaths)
+        {
+            browseControl.Visibility = Visibility.Collapsed;
+            int fileCount = filePaths.Length;
+            var fileInfos = new List<SelectedFileInfo>(fileCount);
+            var failedFiles = new List<string>();
+            try
+            {
+                foreach (var file in filePaths)
+                {
+                    var fileBytes = UtilFunctions.GetFileBytes(file);
+                    var fileName = System.IO.Path.GetFileNameWithoutExtension(file);
+                    var fileExt = DocumentConvert.GetDocumentType(System.IO.Path.GetExtension(file));
+
+                    if (fileBytes != null && fileBytes.Length <= TableAddOnData.MaxDocSize)
+                        fileInfos.Add(new SelectedFileInfo()
+                        {
+                            FileBytes = UtilFunctions.GetFileBytes(file),
+                            FileExtension = DocumentConvert.GetDocumentType(System.IO.Path.GetExtension(file)).ToString(),
+                            FileName = System.IO.Path.GetFileNameWithoutExtension(file),
+                            FilePath = file
+                        });
+                    else
+                        failedFiles.Add(string.Format("{0}: {1}", file, Uniconta.ClientTools.Localization.lookup("MaxFileSize")));
+                }
+                if (failedFiles.Count > 0)
+                {
+                    var cwErrorBox = new CWErrorBox(failedFiles.ToArray(), true);
+                    cwErrorBox.Show();
+                }
+
+                txedVoucherComments.Text = fileInfos.Count > 1 ? string.Empty : fileInfos.SingleOrDefault()?.FileName;
+                browseControl.SelectedFileInfos = fileInfos.Count > 0 ? fileInfos.ToArray() : null;
+            }
+            catch (Exception ex)
+            {
+                UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("FileError"), ex.Message), Uniconta.ClientTools.Localization.lookup("Exception"));
+            }
+        }
+
+        /// <summary>
+        /// Load files when outlook mail dropped
+        /// </summary>
+        /// <param name="dataObject">Dropped data object</param>
+        public void LoadPageOnOutlookMailDrop(IDataObject dataObject)
+        {
+            try
+            {
+                browseControl.Visibility = Visibility.Collapsed;
+                var header = dataObject.GetData(DataFormats.UnicodeText)?.ToString();
+                var outlookMailDataObject = new OutlookMailDataObject(dataObject);
+                var filename = (string[])outlookMailDataObject.GetData("FileGroupDescriptor");
+                var fileExtVals = filename?.FirstOrDefault().Split('.');
+                var fileExtension = DocumentConvert.GetDocumentType(fileExtVals[fileExtVals.Length - 1]);
+                var subject = fileExtension == FileextensionsTypes.MSG ? Utility.GetMailSubject(header, filename[0]) : Utility.GetMailSubject((Stream)dataObject.GetData("FileGroupDescriptor"));
+                MemoryStream[] emailMemoryStream = (MemoryStream[])outlookMailDataObject.GetData("FileContents");
+                var memoryStream = emailMemoryStream.FirstOrDefault();
+                var binaryReader = new BinaryReader(memoryStream);
+                var emailbytes = binaryReader.ReadBytes((int)memoryStream.Length);
+                txedVoucherComments.Text = subject;
+                var selectedfileInfo = new SelectedFileInfo() { FileBytes = emailbytes, FileExtension = fileExtension.ToString(), FileName = subject, FilePath = string.Empty };
+                browseControl.SelectedFileInfos = new SelectedFileInfo[] { selectedfileInfo };
+            }
+            catch (Exception ex)
+            {
+                UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("FileError"), ex.Message), Uniconta.ClientTools.Localization.lookup("Exception"));
             }
         }
 #endif

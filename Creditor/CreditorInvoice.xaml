@@ -26,7 +26,8 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorInvoice"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Date" Width="90" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="OrderCreated" Width="90" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="OrderNumber" Width="60" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceNumber" Width="60" AllowThousandMask="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceAN" Width="70" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceNumber" Width="60" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Voucher" Width="60" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="JournalPostedId" Width="60" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="EndDiscountPct" Width="60" />

@@ -34,7 +34,7 @@ namespace UnicontaClient.Pages.CustomPage
             globalEvents.OnRefresh(NameOfControl, RefreshParams);
 
         }
-        public override string NameOfControl { get { return TabControls.InventoryItemPage2.ToString(); } }
+        public override string NameOfControl { get { return TabControls.InventoryItemPage2; } }
         public override UnicontaBaseEntity ModifiedRow { get { return editrow; } set { editrow = (InvItemClient)value; } }
         bool isCopiedRow = false;
 
@@ -58,6 +58,8 @@ namespace UnicontaClient.Pages.CustomPage
         void InitPage(CrudAPI crudapi)
         {
             var Comp = crudapi.CompanyEntity;
+            itemCache = Comp.GetCache(typeof(Uniconta.DataModel.InvItem));
+
             if (!Comp.Storage || Comp.StorageOnAll)
                 itemUsestorage.Visibility = Visibility.Collapsed;
             if (!Comp.SerialBatchNumbers)
@@ -101,7 +103,9 @@ namespace UnicontaClient.Pages.CustomPage
                 itemWarehouse.Visibility = Visibility.Collapsed;
             else
                 this.warehouse = Comp.GetCache(typeof(Uniconta.DataModel.InvWarehouse));
-
+            
+            if (!Comp.SetupSizes)
+                grpSize.Visibility = Visibility.Collapsed;
             if (!Comp.Storage)
                 grpQty.Visibility = Visibility.Collapsed;
 
@@ -160,15 +164,14 @@ namespace UnicontaClient.Pages.CustomPage
         protected override async void LoadCacheInBackGround()
         {
             var api = this.api;
-            var Comp = api.CompanyEntity;
-            if (Comp.Warehouse && this.warehouse == null)
-                this.warehouse = await Comp.LoadCache(typeof(Uniconta.DataModel.InvWarehouse), api).ConfigureAwait(false);
-            itemCache = Comp.GetCache(typeof(Uniconta.DataModel.InvItem)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.InvItem), api).ConfigureAwait(false);
-
-            var t = new List<Type> { typeof(Uniconta.DataModel.InvGroup) };
-            if (Comp.ItemVariants)
+            if (api.CompanyEntity.Warehouse && this.warehouse == null)
+                this.warehouse = await api.LoadCache(typeof(Uniconta.DataModel.InvWarehouse)).ConfigureAwait(false);
+            if (itemCache == null)
+                itemCache = await api.LoadCache(typeof(Uniconta.DataModel.InvItem)).ConfigureAwait(false);
+            var t = new List<Type>(2) { typeof(Uniconta.DataModel.InvGroup) };
+            if (api.CompanyEntity.ItemVariants)
                 t.Add(typeof(Uniconta.DataModel.InvStandardVariant));
-            LoadType(t.ToArray());
+            LoadType(t);
         }
 
         private void cmbWarehouse_SelectedIndexChanged(object sender, RoutedEventArgs e)
@@ -187,7 +190,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (master != null)
                     editrow.locationSource = master.Locations ?? await master.LoadLocations(api);
                 else
-                    editrow.locationSource = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.InvLocation));
+                    editrow.locationSource = api.GetCache(typeof(Uniconta.DataModel.InvLocation));
 
                 cmbLocation.ItemsSource = editrow.LocationSource;
             }

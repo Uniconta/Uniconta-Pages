@@ -48,13 +48,7 @@ x:Class="UnicontaClient.Pages.CustomPage.GLOffsetAccountTemplate"
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="3" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <local:GLOffsetAccountLineGrid x:Name="dgGlOffSetAccountTplt" AutoGenerateColumns="None" >
                 <local:GLOffsetAccountLineGrid.Columns>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="AccountType" Width="80">
-                        <local:CorasauDataGridTemplateColumnClient.CellTemplate>
-                            <DataTemplate>
-                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="GLAccountType" />
-                            </DataTemplate>
-                        </local:CorasauDataGridTemplateColumnClient.CellTemplate>
-                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:ComboBoxColumnClient x:Name="AccountType" Width="80"/>
                     <local:CorasauDataGridForeignKeyColumnClient x:Name="Account" Width="100">
                         <local:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
                             <ControlTemplate>

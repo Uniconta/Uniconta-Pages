@@ -98,6 +98,9 @@ namespace UnicontaClient.Pages.CustomPage
         {
             this.DataContext = this;
             InitializeComponent();
+#if !SILVERLIGHT
+            FocusManager.SetFocusedElement(txtbalanceName, txtbalanceName);
+#endif
             cbFromAccount.api = cbToAccount.api = cbTemplate.api = api;
             ribbonControl = frmRibbon;
             setDim();
@@ -486,9 +489,6 @@ namespace UnicontaClient.Pages.CustomPage
             ClearcolumnList();
             ClearGrid();
             var Crit = objCriteria.selectedCriteria[0];
-            Crit.criteriaName = string.Empty;
-            Crit.journal = string.Empty;
-            Crit.budgetModel = string.Empty;
             Crit._ShowDebitCredit = true;
             Crit.balcolFormat = BalanceColumnFormat.Decimal2;
             SetDefaultDate(Crit);
@@ -651,7 +651,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private bool ValidateBalanceBudgetField()
         {
-            var hasMissignModel = objCriteria.selectedCriteria.Where(p => p.balcolMethod == BalanceColumnMethod.FromBudget && string.IsNullOrEmpty(p.budgetModel)).Any();
+            var hasMissignModel = objCriteria.selectedCriteria.Any(p => p.balcolMethod == BalanceColumnMethod.FromBudget && string.IsNullOrEmpty(p.budgetModel));
             if (hasMissignModel)
             {
                 UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("CannotBeBlank"), Uniconta.ClientTools.Localization.lookup("BudgetModel")),
@@ -700,7 +700,7 @@ namespace UnicontaClient.Pages.CustomPage
             row.Dims4 = objColCriteria.dimval4;
             row.Dims5 = objColCriteria.dimval5;
             row._ForCompanyId = objColCriteria.ForCompany == null ? 0 : objColCriteria.ForCompany.CompanyId;
-            row._Hide = objColCriteria.Hide;
+            row._Hide = objColCriteria._Hide;
             row._Account100 = objColCriteria.account100;
             return row;
         }

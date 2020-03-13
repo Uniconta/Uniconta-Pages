@@ -29,5 +29,7 @@
     <RibbonItem Action="Link" LocalizedNameKey="Link" LargeGlyph="Match_Add_32x32.png"/>
     <RibbonItem Action="Unlink" LocalizedNameKey="Unlink" Glyph="Next_32x32.png" LargeGlyph="Match_Remove_32x32.png"/>
   </RibbonItem>
- 
+  <RibbonItem>
+    <RibbonItem Action="BatchLocations" LocalizedNameKey="BatchLocations" Module="Warehouse" LargeGlyph="Location_32x32.png"/>
+  </RibbonItem>
  </root>

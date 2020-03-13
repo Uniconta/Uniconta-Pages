@@ -79,6 +79,11 @@ namespace UnicontaClient.Pages.CustomPage
                 Project.Visible = false;
         }
 
+        protected override void LoadCacheInBackGround()
+        {
+            LoadType(new List<Type>(2) { typeof(Uniconta.DataModel.GLVat), typeof(Uniconta.DataModel.PaymentTerm) });
+        }
+
         private void localMenu_OnItemClicked(string ActionType)
         {
             var selectedItem = dgDebtorTransOpen.SelectedItem as DebtorTransOpenClient;
@@ -90,7 +95,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "EditRow":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.DebtorTranPage2, selectedItem, Uniconta.ClientTools.Localization.lookup("TransactionOutstanding"), ";component/Assets/img/Edit_16x16.png");
+                        AddDockItem(TabControls.DebtorTranPage2, selectedItem, Uniconta.ClientTools.Localization.lookup("TransactionOutstanding"), "Edit_16x16.png");
                     break;
                 case "ViewDownloadRow":
                     if (selectedItem != null)
@@ -111,7 +116,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        bool copyRowIsEnabled = false;
+        bool copyRowIsEnabled;
         bool editAllChecked;
         private void EditAll()
         {

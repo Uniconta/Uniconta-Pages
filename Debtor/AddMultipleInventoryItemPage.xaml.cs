@@ -133,13 +133,13 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 Marked(false);
                 ibase.Caption = Uniconta.ClientTools.Localization.lookup("Marked");
-                ibase.LargeGlyph = Utility.GetGlyph(";component/Assets/img/Check_Journal_32x32.png");
+                ibase.LargeGlyph = Utility.GetGlyph("Check_Journal_32x32.png");
             }
             else if (ibase.Caption == Uniconta.ClientTools.Localization.lookup("Marked"))
             {
                 Marked(true);
                 ibase.Caption = Uniconta.ClientTools.Localization.lookup("All");
-                ibase.LargeGlyph = Utility.GetGlyph(";component/Assets/img/Item_Number_32x32.png");
+                ibase.LargeGlyph = Utility.GetGlyph("Item_Number_32x32.png");
             }
         }
 
@@ -180,12 +180,12 @@ namespace UnicontaClient.Pages.CustomPage
             if (markedState)
             {
                 ibase.Caption = Uniconta.ClientTools.Localization.lookup("Marked");
-                ibase.LargeGlyph = Utility.GetGlyph(";component/Assets/img/Collapse_32x32.png");
+                ibase.LargeGlyph = Utility.GetGlyph("Collapse_32x32.png");
             }
             else
             {
                 ibase.Caption = Uniconta.ClientTools.Localization.lookup("All");
-                ibase.LargeGlyph = Utility.GetGlyph(";component/Assets/img/Expand_32x32.png");
+                ibase.LargeGlyph = Utility.GetGlyph("Expand_32x32.png");
             }
         }
     }
@@ -213,7 +213,7 @@ namespace UnicontaClient.Pages.CustomPage
         public int ClassId() { return 8765; }
 
         public Type BaseEntityType() { return typeof(InventoryItem); }
-        public int CompanyId { get { return item.CompanyId; } }
+        public int CompanyId { get { return item.CompanyId; } set { item.CompanyId = value; } }
 
         public double _Quantity;
         [Display(Name = "Qty", ResourceType = typeof(DCOrderText))]

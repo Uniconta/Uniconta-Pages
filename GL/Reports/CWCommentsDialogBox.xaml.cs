@@ -36,7 +36,7 @@ namespace UnicontaClient.Pages.CustomPage.GL.ChartOfAccount.Reports
 
         public CWCommentsDialogBox(string title)
         {
-            Init(title, Uniconta.ClientTools.Localization.lookup("Comment"));
+            Init(title, Uniconta.ClientTools.Localization.lookup("Note"));
         }
 
         public CWCommentsDialogBox(string title, bool enableDateField, DateTime dateField) : this(title)

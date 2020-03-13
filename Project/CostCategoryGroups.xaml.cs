@@ -50,8 +50,6 @@ namespace UnicontaClient.Pages.CustomPage
             SetRibbonControl(localMenu, dgProjectCostCategoryGroupGrid);
             dgProjectCostCategoryGroupGrid.api = api;
             dgProjectCostCategoryGroupGrid.BusyIndicator = busyIndicator;
-            dgProjectCostCategoryGroupGrid.api = api;
-
             localMenu.OnItemClicked += localMenu_OnItemClicked;
         }   
 
@@ -61,7 +59,7 @@ namespace UnicontaClient.Pages.CustomPage
             switch (ActionType)
             {
                 case "AddRow":
-                    AddDockItem(TabControls.CostCategoryGroupPage2, api, Uniconta.ClientTools.Localization.lookup("CategoryGroups"), ";component/Assets/img/Add_16x16.png");
+                    AddDockItem(TabControls.CostCategoryGroupPage2, api, Uniconta.ClientTools.Localization.lookup("CategoryGroups"), "Add_16x16.png");
                     break;
                 case "EditRow":
                     if (selectedItem == null)

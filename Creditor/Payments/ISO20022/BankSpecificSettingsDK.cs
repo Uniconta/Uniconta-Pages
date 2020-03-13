@@ -415,10 +415,26 @@ namespace UnicontaISO20022CreditTransfer
         /// <summary>
         /// Unstructured Remittance Information
         /// </summary>
-        public override List<string> Ustrd(string externalAdvText, ISO20022PaymentTypes ISOPaymType, PaymentTypes paymentMethod)
+        public override List<string> Ustrd(string externalAdvText, ISO20022PaymentTypes ISOPaymType, PaymentTypes paymentMethod, bool extendedText)
          {
+
             var ustrdText = StandardPaymentFunctions.RegularExpressionReplace(externalAdvText, allowedCharactersRegEx, replaceCharactersRegEx);
-            
+
+            if (ustrdText == null)
+                return null;
+
+            //Extended notification
+            if (ISOPaymType == ISO20022PaymentTypes.DOMESTIC)
+            {
+                if (extendedText)
+                {
+                    if (ustrdText.Length <= 20)
+                        return null;
+                }
+                else
+                    return null;
+            }
+
             int maxLines = 0;
             int maxStrLen = 0;
             List<string> resultList = new List<string>();
@@ -431,6 +447,13 @@ namespace UnicontaISO20022CreditTransfer
 
                     maxLines = 4;
                     maxStrLen = 35;
+                    if (paymentMethod == PaymentTypes.PaymentMethod6 || paymentMethod == PaymentTypes.PaymentMethod3) //Not allowed for FIK71 and Giro04 
+                        return resultList;
+                    break;
+
+                case CompanyBankENUM.Handelsbanken:
+                    maxLines = 1;
+                    maxStrLen = 140;
                     if (paymentMethod == PaymentTypes.PaymentMethod6 || paymentMethod == PaymentTypes.PaymentMethod3) //Not allowed for FIK71 and Giro04 
                         return resultList;
                     break;

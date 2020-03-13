@@ -62,7 +62,18 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
             var message = externalAdvText;
 
             danishFields.ReceiverAccountStatement = NETSNorge.processString(externalAdvText, 35, false);
-            
+
+            //Extended notification
+            if (paymentFormat._ExtendedText)
+            {
+                if (message == null || message.Length <= 35)
+                    message = string.Empty;
+            }
+            else
+            {
+                message = string.Empty;
+            }
+
             message = NETSNorge.processString(message, 315, false);
 
             int maxStrLen = 35;
@@ -80,7 +91,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
                             .Select(i => message.Substring(i, message.Length - i >= maxStrLen ? maxStrLen : message.Length - i)).ToList<string>();
             }
 
-            danishFields.ReceiverAccountStatement = NETSNorge.processString(message, 35, false);
+            //danishFields.ReceiverAccountStatement = NETSNorge.processString(message, 35, false);
             danishFields.AdviceText = messageList;
             //Message to Beneficiary <<             
 

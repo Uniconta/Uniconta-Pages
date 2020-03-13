@@ -24,6 +24,6 @@
     </RibbonItem>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="OpenDashboard" LocalizedNameKey="DashBoard" Glyph=";component/Assets/img/GanttChart_32x32.png" LargeGlyph=";component/Assets/img/GanttChart_32x32.png"/>
+    <RibbonItem Action="OpenDashboard" LocalizedNameKey="DashBoard" Glyph="GanttChart_32x32.png" LargeGlyph="GanttChart_32x32.png"/>
   </RibbonItem>
 </root>

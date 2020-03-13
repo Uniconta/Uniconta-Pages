@@ -5,11 +5,11 @@
     <RibbonItem Action="AddRow" LocalizedNameKey="Add" ControlName="DebtorOfferPage2" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png"/>
     <RibbonItem Action="EditRow" ShortcutKey="Ctrl+E" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>
   </RibbonItem>
-   <RibbonItem>
-     <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh.png" LargeGlyph="refresh.png"/>
-     <RibbonItem Action="Filter" ShortcutKey="Ctrl+I" LocalizedNameKey="Filter" LargeGlyph="Filter_32x32.png"/>
-   </RibbonItem>
-  <RibbonItem>   
+  <RibbonItem>
+    <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh.png" LargeGlyph="refresh.png"/>
+    <RibbonItem Action="Filter" ShortcutKey="Ctrl+I" LocalizedNameKey="Filter" LargeGlyph="Filter_32x32.png"/>
+  </RibbonItem>
+  <RibbonItem>
     <!---If we want to create a new group in same PageTab-->
     <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32.png">
       <!---If we want Inner menu-->
@@ -24,19 +24,16 @@
     </RibbonItem>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="OfferLine" LocalizedNameKey="OfferLine" ControlName="DebtorOfferLines" LargeGlyph="Order_Lines_Highlighted_32x32.png" ShortcutKey="ALT+L">
-    </RibbonItem>
-    <RibbonItem Action="ConvertOfferToOrder" LocalizedNameKey="ConvertOfferToOrder" LargeGlyph="Default_Values_32x32.png">
-    </RibbonItem>
+    <RibbonItem Action="OfferLine" LocalizedNameKey="OfferLine" ControlName="DebtorOfferLines" LargeGlyph="Order_Lines_Highlighted_32x32.png" ShortcutKey="ALT+L" />
+    <RibbonItem Action="PrintOffer" LocalizedNameKey="Offer" LargeGlyph="Print_32x32.png"/>
+  </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="ConvertOfferToOrder" LocalizedNameKey="ConvertOfferToOrder" LargeGlyph="Default_Values_32x32.png" />
     <RibbonItem Action="CreateOrder" LocalizedNameKey="CreateOBJ" Parameter="PurchaseSalesOrder" Glyph="refresh.png" LargeGlyph="Orders_32x32.png"/>
     <RibbonItem Action="StockLines" LocalizedNameKey="InvTransactions" LargeGlyph="Inventory_Trans_32x32.png"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem LocalizedNameKey="Offer" Action="PrintOffer" LargeGlyph="Print_32x32.png"></RibbonItem>
-  </RibbonItem>
-  <RibbonItem>
-    <RibbonItem Action="Contacts" LocalizedNameKey="Contacts" ControlName="ContactPage" Module="Contacts" LargeGlyph="Contacts_32x32.png">
-    </RibbonItem>
+    <RibbonItem Action="Contacts" LocalizedNameKey="Contacts" ControlName="ContactPage" Module="Contacts" LargeGlyph="Contacts_32x32.png" />
     <RibbonItem Module="Attachments" LocalizedNameKey="Attachments" LargeGlyph="Attachments_32x32.png">
       <RibbonItem Action="AddNote" ShortcutKey="Alt+N" LocalizedNameKey="Note" ControlName="UserNotesPage" Glyph="Add_Notes_16x16.png" />
       <RibbonItem Action="AddDoc" LocalizedNameKey="Document" ControlName="UserDocsPage" Glyph="Accounts_Statement_Report_16x16.png" />
@@ -46,13 +43,13 @@
   <RibbonItem TabId="1" LocalizedNameKey="EditAll">
     <RibbonItem Action="EditAll"  LocalizedNameKey="EditAll"  LargeGlyph="Edit_32x32.png"/>
   </RibbonItem>
-    <RibbonItem>
-      <RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="DeleteOBJ" Parameter="Offer" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png"/>
-    </RibbonItem>
-    <RibbonItem>
-      <RibbonItem Action="UndoDelete" ShortcutKey="CTRL+Z" LocalizedNameKey="UndoDelete" LargeGlyph="Undo_Delete_32x32.png"/>
-    </RibbonItem>
-    <RibbonItem>
-      <RibbonItem Action="SaveGrid" ShortcutKey="CTRL+S" LocalizedNameKey="Save" Glyph="save-16x16.png" LargeGlyph="save-32x32.png"/>
-    </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="DeleteOBJ" Parameter="Offer" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png"/>
+  </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="UndoDelete" ShortcutKey="CTRL+Z" LocalizedNameKey="UndoDelete" LargeGlyph="Undo_Delete_32x32.png"/>
+  </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="SaveGrid" ShortcutKey="CTRL+S" LocalizedNameKey="Save" Glyph="save-16x16.png" LargeGlyph="save-32x32.png"/>
+  </RibbonItem>
 </root>

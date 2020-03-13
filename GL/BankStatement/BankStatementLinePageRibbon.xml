@@ -2,7 +2,7 @@
 <root>
   <RibbonItem TabId="0" LocalizedNameKey="Home">
     <!---When we create new TabPage -->
-    <RibbonItem Action="Save" ShortcutKey="Ctrl+S" LocalizedNameKey="Save" Glyph="save-16x16.png" LargeGlyph="save-32x32.png"/>    
+    <RibbonItem Action="Save" ShortcutKey="Ctrl+S" LocalizedNameKey="Save" Glyph="save-16x16.png" LargeGlyph="save-32x32.png"/>
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="Pre" LocalizedNameKey="PrevMonth" Glyph="Previous_32x32.png" LargeGlyph="Previous_32x32.png"/>
@@ -35,12 +35,13 @@
     <RibbonItem Action="VoucherTransactions" ShortcutKey="Alt+T" LocalizedNameKey="VoucherTransactions" Glyph="Voucher_Transactions_32x32.png" LargeGlyph="Voucher_Transactions_32x32.png" />
   </RibbonItem>
   <RibbonItem>
-	  <RibbonItem Action="MarkForMatch" LocalizedNameKey="MarkForMatch" Glyph="Match_32x32.png" LargeGlyph="Match_32x32.png"/>
-      <RibbonItem Action="AddMatch" LocalizedNameKey="AddOBJ" Parameter="Match" Glyph="Match_Add_32x32.png" LargeGlyph="Match_Add_32x32.png"/>
-      <RibbonItem Action="RemoveMatch" LocalizedNameKey="RemoveOBJ" Parameter="Match" Glyph="Match_Remove_32x32.png" LargeGlyph="Match_Remove_32x32.png" />
-      <RibbonItem Action="AutoMatch" LocalizedNameKey="AutoMatch" Glyph="Match_Lines_32x32.png" LargeGlyph="Match_Lines_32x32.png" />
-      <RibbonItem Action="VoidTransaction" LocalizedNameKey="VoidTransaction" Glyph="Cancel_Voucher_32x32.png" LargeGlyph="Cancel_Voucher_32x32.png" />
-      <RibbonItem Action="AddMapping" LocalizedNameKey="AddOBJ" Parameter="PostingRule" LargeGlyph="Match_32x32.png" />
+    <RibbonItem Action="MarkForMatch" LocalizedNameKey="MarkForMatch" Glyph="Match_32x32.png" LargeGlyph="Match_32x32.png"/>
+    <RibbonItem Action="AddMatch" LocalizedNameKey="AddOBJ" Parameter="Match" Glyph="Match_Add_32x32.png" LargeGlyph="Match_Add_32x32.png"/>
+    <RibbonItem Action="RemoveMatch" LocalizedNameKey="RemoveOBJ" Parameter="Match" Glyph="Match_Remove_32x32.png" LargeGlyph="Match_Remove_32x32.png" />
+    <RibbonItem Action="AutoMatch" LocalizedNameKey="AutoMatch" Glyph="Match_Lines_32x32.png" LargeGlyph="Match_Lines_32x32.png" />
+    <RibbonItem Action="VoidTransaction" LocalizedNameKey="VoidTransaction" Glyph="Cancel_Voucher_32x32.png" LargeGlyph="Cancel_Voucher_32x32.png" />
+    <RibbonItem Action="AddMapping" LocalizedNameKey="AddOBJ" Parameter="PostingRule" LargeGlyph="Match_32x32.png" />
+    <RibbonItem Action="OpenTran" LocalizedNameKey="OpenTrans" ShortcutKey="F8" LargeGlyph="Open_Transaction_32x32.png" />
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="TransferBankStatement" LocalizedNameKey="GenerateJournalLines" LargeGlyph="Transfer_32x32.png" />
@@ -57,4 +58,4 @@
     <RibbonItem LocalizedNameKey="FromDate" StatusValue="a"></RibbonItem>
     <RibbonItem LocalizedNameKey="ToDate" StatusValue="b" />
   </RibbonItem>
- </root>
+</root>

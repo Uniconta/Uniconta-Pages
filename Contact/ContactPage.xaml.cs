@@ -32,6 +32,7 @@ namespace UnicontaClient.Pages.CustomPage
     }
     public partial class ContactPage : GridBasePage
     {
+        SQLCache CrmProspectCache, DebtorCache, CreditorCache;
         public override string NameOfControl
         {
             get { return TabControls.ContactPage.ToString(); }
@@ -106,8 +107,10 @@ namespace UnicontaClient.Pages.CustomPage
             }
             if (load.Count != 0)
                 LoadType(load.ToArray());
-           
+
             dgContactGrid.SelectedItemChanged += DgContactGrid_SelectedItemChanged;
+            dgContactGrid.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;
+            ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "UndoDelete", "SaveGrid" });
 
 #if SILVERLIGHT
             Application.Current.RootVisual.KeyDown += RootVisual_KeyDown;
@@ -115,6 +118,35 @@ namespace UnicontaClient.Pages.CustomPage
             this.PreviewKeyDown += RootVisual_KeyDown;
 #endif
             this.BeforeClose += ContactPage_BeforeClose;
+        }
+
+        private void DataControl_CurrentItemChanged(object sender, DevExpress.Xpf.Grid.CurrentItemChangedEventArgs e)
+        {
+            ContactClient oldSelectedItem = e.OldItem as ContactClient;
+            if (oldSelectedItem != null)
+            {
+                oldSelectedItem.PropertyChanged -= ContactClient_PropertyChanged;
+                var cache = GetCache(oldSelectedItem._DCType);
+                if (cache != null && cache.Count > 1000)
+                {
+                    oldSelectedItem.accntSource = null;
+                    oldSelectedItem.NotifyPropertyChanged("AccountSource");
+                }
+            }
+            ContactClient selectedItem = e.NewItem as ContactClient;
+            if (selectedItem != null)
+                selectedItem.PropertyChanged += ContactClient_PropertyChanged;
+        }
+
+        private void ContactClient_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            var rec = sender as ContactClient;
+            switch (e.PropertyName)
+            {
+                case "DCType":
+                    SetAccountSource(rec);
+                    break;
+            }
         }
 
         private void ContactPage_BeforeClose()
@@ -128,10 +160,10 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void RootVisual_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
-            if (e.Key == Key.F6 && ( dgContactGrid.CurrentColumn == DCType || dgContactGrid.CurrentColumn == DCAccount))
+            if (e.Key == Key.F6 && (dgContactGrid.CurrentColumn == DCType || dgContactGrid.CurrentColumn == DCAccount))
             {
                 var currentRow = dgContactGrid.SelectedItem as ContactClient;
-                if(currentRow!= null)
+                if (currentRow != null)
                 {
                     var lookupTable = new LookUpTable();
                     lookupTable.api = this.api;
@@ -152,7 +184,7 @@ namespace UnicontaClient.Pages.CustomPage
                         this.LookUpTable(lookupTable, Uniconta.ClientTools.Localization.lookup("Lookup"), TabControls.CrmProspectPage);
                     }
                 }
-               
+
             }
         }
 
@@ -219,7 +251,7 @@ namespace UnicontaClient.Pages.CustomPage
                     param[0] = newItem;
                     param[1] = false;
                     param[2] = dgContactGrid.masterRecord;
-                    AddDockItem(TabControls.ContactPage2, param, Uniconta.ClientTools.Localization.lookup("Contacts"), ";component/Assets/img/Add_16x16.png");
+                    AddDockItem(TabControls.ContactPage2, param, Uniconta.ClientTools.Localization.lookup("Contacts"), "Add_16x16.png");
                     break;
                 case "EditRow":
                     if (selectedItem == null)
@@ -257,12 +289,115 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         AddDockItem(TabControls.CreditorOrders, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("CreditorOrders"), selectedItem._Name));
                     break;
+                case "EditAll":
+                    if (dgContactGrid.Visibility == Visibility.Visible)
+                        EditAll();
+                    break;
+                case "AddLine":
+                    dgContactGrid.AddRow();
+                    break;
+                case "CopyRow":
+                    if (copyRowIsEnabled)
+                        dgContactGrid.CopyRow();
+                    break;
+                case "DeleteRow":
+                    dgContactGrid.DeleteRow();
+                    break;
+                case "UndoDelete":
+                    dgContactGrid.UndoDeleteRow();
+                    break;
+                case "SaveGrid":
+                    Save();
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
         }
 
+        async protected override void LoadCacheInBackGround()
+        {
+            var comp = api.CompanyEntity;
+
+            if (DebtorCache == null)
+                DebtorCache = comp.GetCache(typeof(Debtor)) ?? await api.LoadCache(typeof(Debtor)).ConfigureAwait(false);
+            if (CreditorCache == null)
+                CreditorCache = comp.GetCache(typeof(Uniconta.DataModel.Creditor)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Creditor)).ConfigureAwait(false);
+            if (CrmProspectCache == null)
+                CrmProspectCache = comp.GetCache(typeof(CrmProspect)) ?? await api.LoadCache(typeof(CrmProspect)).ConfigureAwait(false);
+        }
+        private async void Save()
+        {
+            SetBusy();
+            var err = await dgContactGrid.SaveData();
+            if (err != ErrorCodes.Succes)
+                api.AllowBackgroundCrud = true;
+            ClearBusy();
+        }
+
+        bool copyRowIsEnabled = false;
+        bool editAllChecked;
+        private void EditAll()
+        {
+            RibbonBase rb = (RibbonBase)localMenu.DataContext;
+            var ibase = UtilDisplay.GetMenuCommandByName(rb, "EditAll");
+            if (ibase == null)
+                return;
+            if (dgContactGrid.Readonly)
+            {
+                api.AllowBackgroundCrud = false;
+                dgContactGrid.MakeEditable();
+                UserFieldControl.MakeEditable(dgContactGrid);
+                ibase.Caption = Uniconta.ClientTools.Localization.lookup("LeaveEditAll");
+                ribbonControl.EnableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "UndoDelete", "SaveGrid" });
+                copyRowIsEnabled = true;
+                editAllChecked = false;
+            }
+            else
+            {
+                if (IsDataChaged)
+                {
+                    string message = Uniconta.ClientTools.Localization.lookup("SaveChangesPrompt");
+                    CWConfirmationBox confirmationDialog = new CWConfirmationBox(message);
+                    confirmationDialog.Closing += async delegate
+                    {
+                        if (confirmationDialog.DialogResult == null)
+                            return;
+
+                        switch (confirmationDialog.ConfirmationResult)
+                        {
+                            case CWConfirmationBox.ConfirmationResultEnum.Yes:
+                                var err = await dgContactGrid.SaveData();
+                                if (err != 0)
+                                {
+                                    api.AllowBackgroundCrud = true;
+                                    return;
+                                }
+                                break;
+                            case CWConfirmationBox.ConfirmationResultEnum.No:
+                                break;
+                        }
+                        editAllChecked = true;
+                        dgContactGrid.Readonly = true;
+                        dgContactGrid.tableView.CloseEditor();
+                        ibase.Caption = Uniconta.ClientTools.Localization.lookup("EditAll");
+                        ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "UndoDelete", "SaveGrid" });
+                        copyRowIsEnabled = false;
+                    };
+                    confirmationDialog.Show();
+                }
+                else
+                {
+                    dgContactGrid.Readonly = true;
+                    dgContactGrid.tableView.CloseEditor();
+                    ibase.Caption = Uniconta.ClientTools.Localization.lookup("EditAll");
+                    ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "UndoDelete", "SaveGrid" });
+                    copyRowIsEnabled = false;
+                }
+            }
+        }
+
+        public override bool IsDataChaged { get { return editAllChecked ? false : dgContactGrid.HasUnsavedData; } }
         public override bool CheckIfBindWithUserfield(out bool isReadOnly, out bool useBinding)
         {
             isReadOnly = true;
@@ -282,6 +417,48 @@ namespace UnicontaClient.Pages.CustomPage
             var contactClient = (sender as Image).Tag as ContactClient;
             if (contactClient != null)
                 AddDockItem(TabControls.UserNotesPage, dgContactGrid.syncEntity);
+        }
+
+        private void SetAccountSource(ContactClient rec)
+        {
+            var act = rec._DCType;
+            SQLCache cache = GetCache(act);
+
+            if (cache != null)
+            {
+                    rec.accntSource = cache.GetNotNullArray;
+                    if (rec.accntSource != null)
+                        rec.NotifyPropertyChanged("AccountSource");
+            }
+        }
+
+        SQLCache GetCache(byte AccountType)
+        {
+            switch (AccountType)
+            {
+                case 1:
+                    return DebtorCache;
+                case 2:
+                    return CreditorCache;
+                case 3:
+                    return CrmProspectCache;
+                default: return null;
+            }
+        }
+
+        CorasauGridLookupEditorClient prevAccount;
+        private void Account_GotFocus(object sender, RoutedEventArgs e)
+        {
+            var selectedItem = dgContactGrid.SelectedItem as ContactClient;
+            if (selectedItem != null)
+            {
+                SetAccountSource(selectedItem);
+                if (prevAccount != null)
+                    prevAccount.isValidate = false;
+                var editor = (CorasauGridLookupEditorClient)sender;
+                prevAccount = editor;
+                editor.isValidate = true;
+            }
         }
 
 #if !SILVERLIGHT

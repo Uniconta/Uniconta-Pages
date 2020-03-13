@@ -50,33 +50,33 @@ namespace UnicontaClient.Pages.CustomPage
             InitPage();
         }
 
+        public DebtorEmailSetupPage2(CrudAPI crudApi, string dummy) : base(crudApi, dummy)
+        {
+            InitializeComponent();
+            InitPage();
+        }
+
         private void InitPage()
         {
             layoutControl = layoutItems;
             if (LoadedRow == null && editrow == null)
             {
-                frmRibbon.DisableButtons(new string[] { "Delete" });
+                frmRibbon.DisableButtons( "Delete" );
                 editrow = CreateNew() as DebtorEmailSetupClient;
             }
             layoutItems.DataContext = editrow;
             BusyIndicator = busyIndicator;
-            if (!string.IsNullOrEmpty(editrow._host))
+            if (editrow._host != null || editrow._companySMTP != null)
                 grpSmtp.IsCollapsed = true;
             frmRibbon.OnItemClicked += FrmRibbon_OnItemClicked;
-            
-            cmbExternType.ItemsSource = new List<string> { "Debtor", "DebtorInvoice" };
+            leCompanySMTP.api = api;
+            cmbExternType.ItemsSource = new List<string> { "Debtor", "DebtorInvoice", "Creditor", "CreditorInvoice" };
             cmbExternType.SelectedIndex = 0;
             layoutProp.Label = string.Format(Uniconta.ClientTools.Localization.lookup("AddOBJ"), Uniconta.ClientTools.Localization.lookup("Properties"));
 #if !SILVERLIGHT
             liTextinHtml.Label = Uniconta.ClientTools.Localization.lookup("TextInHtml");
 #endif
             txtSmptPwd.Text = editrow._smtpPassword;
-        }
-
-        public DebtorEmailSetupPage2(CrudAPI crudApi, string dummy) : base(crudApi, dummy)
-        {
-            InitializeComponent();
-            InitPage();
         }
 
         public override void Utility_Refresh(string screenName, object argument = null)
@@ -147,26 +147,26 @@ namespace UnicontaClient.Pages.CustomPage
                     objWizardWindow.MinHeight = 120.0d;
                     objWizardWindow.MinWidth = 350.0d;
 
-                    objWizardWindow.Closed +=  delegate
-                   {
-                       if (objWizardWindow.DialogResult == true)
-                       {
-                           var emailSetup = objWizardWindow.WizardData as ServerInformation;
-                           if (!string.IsNullOrEmpty(emailSetup?.User) && Utilities.Utility.EmailValidation(emailSetup?.User))
-                           {
-                               editrow.Host = emailSetup.Host;
-                               editrow.SmtpUser = emailSetup.User;
-                               editrow._smtpPassword = txtSmptPwd.Text =  emailSetup.Password;
-                               editrow.Port = emailSetup.Port;
-                               editrow.UseSSL = emailSetup.SSL;
-                           }
-                           else
-                           {
-                               UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("InvalidValue"), Uniconta.ClientTools.Localization.lookup("Email"), emailSetup.User), 
-                                   Uniconta.ClientTools.Localization.lookup("Warning"));
-                           }
-                       }
-                   };
+                    objWizardWindow.Closed += delegate
+                  {
+                      if (objWizardWindow.DialogResult == true)
+                      {
+                          var emailSetup = objWizardWindow.WizardData as ServerInformation;
+                          if (!string.IsNullOrEmpty(emailSetup?.User) && Utilities.Utility.EmailValidation(emailSetup?.User))
+                          {
+                              editrow.Host = emailSetup.Host;
+                              editrow.SmtpUser = emailSetup.User;
+                              editrow._smtpPassword = txtSmptPwd.Text = emailSetup.Password;
+                              editrow.Port = emailSetup.Port;
+                              editrow.UseSSL = emailSetup.SSL;
+                          }
+                          else
+                          {
+                              UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("InvalidValue"), Uniconta.ClientTools.Localization.lookup("Email"), emailSetup.User),
+                                  Uniconta.ClientTools.Localization.lookup("Warning"));
+                          }
+                      }
+                  };
                     objWizardWindow.Show();
                     break;
                 case "Save":
@@ -255,16 +255,31 @@ namespace UnicontaClient.Pages.CustomPage
         }
         private void cmbExternType_SelectedIndexChanged(object sender, RoutedEventArgs e)
         {
-            Type type;
+            Type type = null;
             var comp = api?.CompanyEntity;
-            if (cmbExternType.SelectedIndex == 0)
-                type = comp?.GetUserType(typeof(DebtorClient)) ?? typeof(DebtorClient);
-            else
-                type = comp?.GetUserType(typeof(DebtorInvoiceClient)) ?? typeof(DebtorInvoiceClient);
 
-            List<string> propertyNames = UtilFunctions.GetAllDisplayPropertyNames(type, api.CompanyEntity, false, false);
-            cmbProperties.ItemsSource = propertyNames;
-            cmbProperties.SelectedIndex = 0;
+            switch (cmbExternType.SelectedIndex)
+            {
+                case 0:
+                    type = comp?.GetUserType(typeof(DebtorClient)) ?? typeof(DebtorClient);
+                    break;
+                case 1:
+                    type = comp?.GetUserType(typeof(DebtorInvoiceClient)) ?? typeof(DebtorInvoiceClient);
+                    break;
+                case 2:
+                    type = comp?.GetUserType(typeof(CreditorClient)) ?? typeof(CreditorClient);
+                    break;
+                case 3:
+                    type = comp?.GetUserType(typeof(CreditorInvoiceClient)) ?? typeof(CreditorInvoiceClient);
+                    break;
+            }
+
+            if (type != null)
+            {
+                List<string> propertyNames = UtilFunctions.GetAllDisplayPropertyNames(type, api.CompanyEntity, false, false);
+                cmbProperties.ItemsSource = propertyNames;
+                cmbProperties.SelectedIndex = 0;
+            }
         }
 
         private void btnTextInHtml_Click(object sender, RoutedEventArgs e)

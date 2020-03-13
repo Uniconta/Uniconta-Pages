@@ -4,6 +4,8 @@
     <!---When we create new TabPage -->
     <RibbonItem Action="AddRow" LocalizedNameKey="AddOBJ" Parameter="BankAccount" ControlName="BankStatementPage2"  LargeGlyph="Add_32x32.png"/>
     <RibbonItem Action="EditRow" ShortcutKey="Ctrl+E" LocalizedNameKey="Edit"  LargeGlyph="Edit_32x32.png"/>
+  </RibbonItem>
+  <RibbonItem>
     <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh"  LargeGlyph="refresh.png"/>
   </RibbonItem>
 

@@ -28,6 +28,7 @@ using Uniconta.ClientTools.Util;
 using Uniconta.API.Service;
 using System.Windows.Data;
 using System.Globalization;
+using Uniconta.Common.Utility;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -41,6 +42,7 @@ namespace UnicontaClient.Pages.CustomPage
             TableView tv = new TableView();
             tv.AllowEditing = false;
             tv.ShowGroupPanel = false;
+            tv.AllowFixedColumnMenu = true;
             SetTableViewStyle(tv);
             this.View = tv;
             this.LookupTableType = typeof(BalanceClient);
@@ -67,6 +69,7 @@ namespace UnicontaClient.Pages.CustomPage
     { }
     public class BalanceReportManagerGridColumnGridControlBand : GridControlBand
     {
+        public string CriteriaName;
     }
 
     internal class BalanceClientSort : IComparer<BalanceClient>
@@ -236,7 +239,6 @@ namespace UnicontaClient.Pages.CustomPage
         public override string NameOfControl { get { return TabControls.BalanceReport; } }
         ReportAPI tranApi;
         List<BalanceClient> balanceClient;
-        QueryAPI qapi;
         SQLCache dim1, dim2, dim3, dim4, dim5;
         object[] templateReportData;
         const int SizeFactor = 5;
@@ -281,7 +283,6 @@ namespace UnicontaClient.Pages.CustomPage
             tranApi = new ReportAPI(api);
             if (master is GLClosingSheet)
                 tranApi.SetClosingSheet((GLClosingSheet)master);
-            qapi = new QueryAPI(tranApi);
             balanceClient = new List<BalanceClient>();
             ((TableView)dgBalanceReport.View).RowStyle = Application.Current.Resources["RowStyle"] as Style;
             setColumnDim();
@@ -290,8 +291,63 @@ namespace UnicontaClient.Pages.CustomPage
             dgBalanceReport.api = api;
             SetRibbonControl(null, dgBalanceReport);
             dgBalanceReport.PrintClick += dgBalanceReport_PrintClick;
+#if SILVERLIGHT
+            Application.Current.RootVisual.KeyDown += Page_KeyDown;
+#else
+            this.KeyDown += Page_KeyDown;
+#endif
+            dgBalanceReport.RowDoubleClick += dgBalanceReport_RowDoubleClick;
+
         }
 
+        private void dgBalanceReport_RowDoubleClick()
+        {
+            OpenTransactionReport();
+        }
+
+        private void Page_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.F8)
+                OpenTransactionReport();
+        }
+
+        void OpenTransactionReport()
+        {
+            var Acc = (dgBalanceReport.SelectedItem as BalanceClient)?.Acc;
+            if (Acc != null && Acc.AccountTypeEnum > GLAccountTypes.CalculationExpression)
+            {
+                var bandColumn = dgBalanceReport.CurrentColumn?.ParentBand as BalanceReportManagerGridColumnGridControlBand;
+                if (bandColumn != null)
+                {
+                    string criteriaName = bandColumn.CriteriaName;
+                    SelectedCriteria criteria = null;
+                    for (int i = 0; i < CriteriaLst.Count; i++)
+                    {
+                        var crit = CriteriaLst[i];
+                        if (crit.ColNameNumber == criteriaName)
+                        {
+                            criteria = crit;
+                            break;
+                        }
+                    }
+                    if (criteria?.balanceColumnMethod == BalanceColumnMethod.FromTrans)
+                    {
+                        var fieldName = dgBalanceReport.CurrentColumn.FieldName;
+                        var fName = fieldName.Substring(fieldName.LastIndexOf('.') + 1);
+                        if (fName == "Debit" || fName == "Credit" || fName == "Amount")
+                        {
+                            var args = new object[2];
+                            args[0] = Acc;
+                            args[1] = true;
+                            string header = string.Concat(Uniconta.ClientTools.Localization.lookup("AccountStatement"), "/", Acc._Account);
+                            var transactionReport = dockCtrl.AddDockItem(TabControls.TransactionReport, this.ParentControl, args, header) as TransactionReport;
+                            if (transactionReport != null)
+                                transactionReport.SetControlsAndLoadGLTrans(criteria.FromDate, criteria.ToDate, criteria.Dim1, criteria.Dim2, criteria.Dim3, criteria.Dim4, criteria.Dim5, criteria.journal);
+                        }
+                    }
+                }
+            }
+        }
         public override Task InitQuery()
         {
             return null;
@@ -371,20 +427,19 @@ namespace UnicontaClient.Pages.CustomPage
         async void ColumndimData()
         {
             dim1 = dim2 = dim3 = dim4 = dim5 = null;
-            var Comp = api.CompanyEntity;
-            int nDim = Comp.NumberOfDimensions;
+            var api = this.api;
+            int nDim = api.CompanyEntity.NumberOfDimensions;
             if (nDim >= 5)
-                dim5 = Comp.GetCache(typeof(Uniconta.DataModel.GLDimType5)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.GLDimType5), qapi);
+                dim5 = api.GetCache(typeof(Uniconta.DataModel.GLDimType5)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLDimType5));
             if (nDim >= 4)
-                dim4 = Comp.GetCache(typeof(Uniconta.DataModel.GLDimType4)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.GLDimType4), qapi);
+                dim4 = api.GetCache(typeof(Uniconta.DataModel.GLDimType4)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLDimType4));
             if (nDim >= 3)
-                dim3 = Comp.GetCache(typeof(Uniconta.DataModel.GLDimType3)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.GLDimType3), qapi);
+                dim3 = api.GetCache(typeof(Uniconta.DataModel.GLDimType3)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLDimType3));
             if (nDim >= 2)
-                dim2 = Comp.GetCache(typeof(Uniconta.DataModel.GLDimType2)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.GLDimType2), qapi);
+                dim2 = api.GetCache(typeof(Uniconta.DataModel.GLDimType2)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLDimType2));
             if (nDim >= 1)
-                dim1 = Comp.GetCache(typeof(Uniconta.DataModel.GLDimType1)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.GLDimType1), qapi);
+                dim1 = api.GetCache(typeof(Uniconta.DataModel.GLDimType1)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLDimType1));
         }
-
 
         static IEnumerable<int> ValidateDimValues(List<int> values)
         {
@@ -516,8 +571,8 @@ namespace UnicontaClient.Pages.CustomPage
                 for (k = 0; (k < CriteriaList.Count); k++)
                 {
                     var Crit = CriteriaList[k];
-                    var ColA = Crit.ColA - 1;
-                    var ColB = Crit.ColB - 1;
+                    var ColA = Crit.colA - 1;
+                    var ColB = Crit.colB - 1;
                     var Method = Crit.balcolMethod;
                     if (Method == BalanceColumnMethod.SumAtoB)
                     {
@@ -625,7 +680,7 @@ namespace UnicontaClient.Pages.CustomPage
                 var Skip0Account = this.Skip0Account;
                 var SkipSumAccount = this.SkipSumAccount;
                 int ShowAccType = this.ShowType;
-                if (ShowAccType > 2)
+                if (ShowAccType > 2 || ShowAccType == -1)
                     ShowAccType = 0;
                 bool lastSkipped = false;
 
@@ -716,25 +771,23 @@ namespace UnicontaClient.Pages.CustomPage
 
         static string setDateFormat(SelectedCriteria objCrit)
         {
-            string strRes = string.Format("{0}{1}", (string.IsNullOrEmpty(objCrit.CriteriaName) ? string.Empty : objCrit.CriteriaName), Environment.NewLine);
+            var name = objCrit.criteriaName;
+            if (string.IsNullOrWhiteSpace(name))
+                name = null;
+            string strRes;
             if (objCrit.balanceColumnMethod < BalanceColumnMethod.ColAMinusColB)
-                strRes = string.Format("{0}{1}{2}{3}", strRes, objCrit.FromDate.ToString("d"), Environment.NewLine, objCrit.ToDate.ToString("d"));
+                strRes = string.Concat(objCrit.frmdateval.ToString("d"), Environment.NewLine, objCrit.todateval.ToString("d"));
             else
-                strRes = string.Format("{0}{1}{2}{3}", strRes, string.Empty, Environment.NewLine, string.Empty);
-            return strRes;
+                strRes = string.Concat(string.Empty, Environment.NewLine, string.Empty);
+            return string.Concat(name, Environment.NewLine, strRes);
         }
 
-        void AddGridBandColumn(int i, string header, string bandHeader, bool ShowAmount, bool ShowDebitCredit, TextEditSettings editSettings)
+        void AddGridBandColumn(string i, string header, string bandHeader, bool ShowAmount, bool ShowDebitCredit, TextEditSettings editSettings, DateTime fromDate, DateTime toDate, string criteriaName)
         {
-            editSettings.HorizontalContentAlignment = EditSettingsHorizontalAlignment.Right;
-            var controlBand = new BalanceReportManagerGridColumnGridControlBand();
-            controlBand.Name = string.Format("BandColumn{0}", i);
-            controlBand.Header = bandHeader;
-
             var amountCol = new BalanceReportManagerGridColumn();
-            amountCol.Name = string.Format("AmountCol{0}", i);
+            amountCol.Name = "AmountCol" + i;
             var amountBinding = new Binding();
-            amountBinding.Path = new PropertyPath(string.Format("Columns[{0}].Amount", i));
+            amountBinding.Path = new PropertyPath(string.Concat("Columns[", i, "].Amount"));
             amountBinding.Mode = BindingMode.OneWay;
             amountCol.Binding = amountBinding;
             // amountCol.FieldName = 
@@ -744,10 +797,10 @@ namespace UnicontaClient.Pages.CustomPage
             amountCol.Visible = ShowAmount;
 
             var amountDebitCol = new BalanceReportManagerGridColumn();
-            amountDebitCol.Name = string.Format("Amount{0}Debit", i);
+            amountDebitCol.Name = string.Concat("Amount", i, "Debit");
 
             var debitBinding = new Binding();
-            debitBinding.Path = new PropertyPath(string.Format("Columns[{0}].Debit", i));
+            debitBinding.Path = new PropertyPath(string.Concat("Columns[", i, "].Debit"));
             debitBinding.Mode = BindingMode.OneWay;
             amountDebitCol.Binding = debitBinding;
             //  amountDebitCol.FieldName = string.Format("Columns[{0}].Debit", i);
@@ -757,10 +810,10 @@ namespace UnicontaClient.Pages.CustomPage
             amountDebitCol.Header = Uniconta.ClientTools.Localization.lookup("Debit");
 
             var amountCreditCol = new BalanceReportManagerGridColumn();
-            amountCreditCol.Name = string.Format("Amount{0}Credit", i);
+            amountCreditCol.Name = string.Concat("Amount", i, "Credit");
             //     amountCreditCol.FieldName = string.Format("Columns[{0}].Credit", i);
             var creditBinding = new Binding();
-            creditBinding.Path = new PropertyPath(string.Format("Columns[{0}].Credit", i));
+            creditBinding.Path = new PropertyPath(string.Concat("Columns[", i, "].Credit"));
             creditBinding.Mode = BindingMode.OneWay;
             amountCreditCol.Binding = creditBinding;
             amountCreditCol.IsSmart = true;
@@ -768,6 +821,7 @@ namespace UnicontaClient.Pages.CustomPage
             amountCreditCol.Visible = ShowDebitCredit;
             amountCreditCol.Header = Uniconta.ClientTools.Localization.lookup("Credit");
 
+            var controlBand = new BalanceReportManagerGridColumnGridControlBand() { Name = "BandColumn" + i, Header = bandHeader, CriteriaName = criteriaName };
             controlBand.Columns.Add(amountCol);
             controlBand.Columns.Add(amountDebitCol);
             controlBand.Columns.Add(amountCreditCol);
@@ -777,18 +831,39 @@ namespace UnicontaClient.Pages.CustomPage
         private void ShowColumns()
         {
             var AmountHeader = Uniconta.ClientTools.Localization.lookup("Amount");
+            TextEditSettings formatter0 = null, formatter1 = null, formatter2 = null;
+
+            int col = -1;
             for (int i = 0; (i < CriteriaLst.Count); i++)
             {
                 var Crit = CriteriaLst[i];
                 if (Crit._Hide)
                     continue;
+
                 string str = setDateFormat(Crit);
                 bool ShowDebitCredit = Crit.ShowDebitCredit;
                 bool ShowAmount = !ShowDebitCredit;
-                var format = Crit.balanceColumnFormat;
-                var formatter = SetColumnsFormat(format);
-                string Header;
 
+                string numberFormat;
+                TextEditSettings formatter;
+                switch (Crit.balanceColumnFormat)
+                {
+                    case BalanceColumnFormat.Thousand:
+                    case BalanceColumnFormat.Decimal0:
+                        formatter = formatter0 ?? (formatter0 = GetColumnFormat("n0"));
+                        numberFormat = "N0";
+                        break;
+                    case BalanceColumnFormat.Decimal1:
+                        formatter = formatter1 ?? (formatter1 = GetColumnFormat("n1"));
+                        numberFormat = "N1";
+                        break;
+                    default:
+                        formatter = formatter2 ?? (formatter2 = GetColumnFormat("n2"));
+                        numberFormat = "N2";
+                        break;
+                }
+
+                string Header;
                 if (Crit.balcolMethod >= BalanceColumnMethod.ColAMinusColBDivColB && Crit.balcolMethod <= BalanceColumnMethod.Account100)
                 {
                     ShowDebitCredit = false;
@@ -799,136 +874,107 @@ namespace UnicontaClient.Pages.CustomPage
                 }
                 else
                     Header = AmountHeader;
-                AddGridBandColumn(i, Header, str, ShowAmount, ShowDebitCredit, formatter);
-                switch (i)
+
+                col++;
+                if (col == 13) // max 13 columns
+                    break;
+
+                AddGridBandColumn(NumberConvert.ToString(col), Header, str, ShowAmount, ShowDebitCredit, formatter, Crit.frmdateval, Crit.todateval, Crit.colNameNumber);
+                var dccol = ShowDebitCredit == true ? Visibility.Visible : Visibility.Collapsed;
+                switch (col)
                 {
                     case 0:
                         hdrData.ColName1 = str;
                         hdrData.Col1AmountHeader = Header;
-                        hdrData.Col1Format = GetColumnFormat(Crit.balanceColumnFormat);
-                        hdrData.ShowDCCol1 = ShowDebitCredit == true ? Visibility.Visible : Visibility.Collapsed;
+                        hdrData.Col1Format = numberFormat;
+                        hdrData.ShowDCCol1 = dccol;
                         break;
                     case 1:
                         hdrData.ColName2 = str;
                         hdrData.Col2AmountHeader = Header;
-                        hdrData.Col2Format = GetColumnFormat(Crit.balanceColumnFormat);
-                        hdrData.ShowDCCol2 = ShowDebitCredit == true ? Visibility.Visible : Visibility.Collapsed;
+                        hdrData.Col2Format = numberFormat;
+                        hdrData.ShowDCCol2 = dccol;
                         break;
                     case 2:
                         hdrData.ColName3 = str;
                         hdrData.Col3AmountHeader = Header;
-                        hdrData.Col3Format = GetColumnFormat(Crit.balanceColumnFormat);
-                        hdrData.ShowDCCol3 = ShowDebitCredit == true ? Visibility.Visible : Visibility.Collapsed;
+                        hdrData.Col3Format = numberFormat;
+                        hdrData.ShowDCCol3 = dccol;
                         break;
                     case 3:
                         hdrData.ColName4 = str;
                         hdrData.Col4AmountHeader = Header;
-                        hdrData.Col4Format = GetColumnFormat(Crit.balanceColumnFormat);
-                        hdrData.ShowDCCol4 = ShowDebitCredit == true ? Visibility.Visible : Visibility.Collapsed;
+                        hdrData.Col4Format = numberFormat;
+                        hdrData.ShowDCCol4 = dccol;
                         break;
                     case 4:
                         hdrData.ColName5 = str;
                         hdrData.Col5AmountHeader = Header;
-                        hdrData.Col5Format = GetColumnFormat(Crit.balanceColumnFormat);
-                        hdrData.ShowDCCol5 = ShowDebitCredit == true ? Visibility.Visible : Visibility.Collapsed;
+                        hdrData.Col5Format = numberFormat;
+                        hdrData.ShowDCCol5 = dccol;
                         break;
                     case 5:
                         hdrData.ColName6 = str;
                         Header = hdrData.Col6AmountHeader = Header;
-                        hdrData.Col6Format = GetColumnFormat(Crit.balanceColumnFormat);
-                        hdrData.ShowDCCol6 = ShowDebitCredit == true ? Visibility.Visible : Visibility.Collapsed;
+                        hdrData.Col6Format = numberFormat;
+                        hdrData.ShowDCCol6 = dccol;
                         break;
                     case 6:
                         hdrData.ColName7 = str;
                         Header = hdrData.Col7AmountHeader = Header;
-                        hdrData.Col7Format = GetColumnFormat(Crit.balanceColumnFormat);
-                        hdrData.ShowDCCol7 = ShowDebitCredit == true ? Visibility.Visible : Visibility.Collapsed;
+                        hdrData.Col7Format = numberFormat;
+                        hdrData.ShowDCCol7 = dccol;
                         break;
                     case 7:
                         hdrData.ColName8 = str;
                         hdrData.Col8AmountHeader = Header;
-                        hdrData.Col8Format = GetColumnFormat(Crit.balanceColumnFormat);
-                        hdrData.ShowDCCol8 = ShowDebitCredit == true ? Visibility.Visible : Visibility.Collapsed;
+                        hdrData.Col8Format = numberFormat;
+                        hdrData.ShowDCCol8 = dccol;
                         break;
                     case 8:
                         hdrData.ColName9 = str;
                         hdrData.Col9AmountHeader = Header;
-                        hdrData.Col9Format = GetColumnFormat(Crit.balanceColumnFormat);
-                        hdrData.ShowDCCol9 = ShowDebitCredit == true ? Visibility.Visible : Visibility.Collapsed;
+                        hdrData.Col9Format = numberFormat;
+                        hdrData.ShowDCCol9 = dccol;
                         break;
                     case 9:
                         hdrData.ColName10 = str;
                         hdrData.Col10AmountHeader = Header;
-                        hdrData.Col10Format = GetColumnFormat(Crit.balanceColumnFormat);
-                        hdrData.ShowDCCol10 = ShowDebitCredit == true ? Visibility.Visible : Visibility.Collapsed;
+                        hdrData.Col10Format = numberFormat;
+                        hdrData.ShowDCCol10 = dccol;
                         break;
                     case 10:
                         hdrData.ColName11 = str;
                         hdrData.Col11AmountHeader = Header;
-                        hdrData.Col11Format = GetColumnFormat(Crit.balanceColumnFormat);
-                        hdrData.ShowDCCol11 = ShowDebitCredit == true ? Visibility.Visible : Visibility.Collapsed;
+                        hdrData.Col11Format = numberFormat;
+                        hdrData.ShowDCCol11 = dccol;
                         break;
                     case 11:
                         hdrData.ColName12 = str;
                         hdrData.Col12AmountHeader = Header;
-                        hdrData.Col12Format = GetColumnFormat(Crit.balanceColumnFormat);
-                        hdrData.ShowDCCol12 = ShowDebitCredit == true ? Visibility.Visible : Visibility.Collapsed;
+                        hdrData.Col12Format = numberFormat;
+                        hdrData.ShowDCCol12 = dccol;
                         break;
                     case 12:
                         hdrData.ColName13 = str;
                         hdrData.Col13AmountHeader = Header;
-                        hdrData.Col13Format = GetColumnFormat(Crit.balanceColumnFormat);
-                        hdrData.ShowDCCol13 = ShowDebitCredit == true ? Visibility.Visible : Visibility.Collapsed;
+                        hdrData.Col13Format = numberFormat;
+                        hdrData.ShowDCCol13 = dccol;
                         break;
                 }
             }
             busyIndicator.IsBusy = false;
         }
 
-        TextEditSettings SetColumnsFormat(BalanceColumnFormat format)
+        TextEditSettings GetColumnFormat(string format)
         {
-            TextEditSettings te = new TextEditSettings();
-            te.MaskType = MaskType.Numeric;
-            te.MaskUseAsDisplayFormat = true;
-            switch (format)
-            {
-                case BalanceColumnFormat.Thousand:
-                case BalanceColumnFormat.Decimal0:
-                    te.Mask = "n0";
-                    break;
-                case BalanceColumnFormat.Decimal1:
-                    te.Mask = "n1";
-                    break;
-                case BalanceColumnFormat.Decimal2:
-                    te.Mask = "n2";
-                    break;
-            }
-            return te;
-        }
-
-        string GetColumnFormat(BalanceColumnFormat format)
-        {
-            string numberFormat = "N2";
-            switch (format)
-            {
-                case BalanceColumnFormat.Thousand:
-                case BalanceColumnFormat.Decimal0:
-                    numberFormat = "N0";
-                    break;
-                case BalanceColumnFormat.Decimal1:
-                    numberFormat = "N1";
-                    break;
-                case BalanceColumnFormat.Decimal2:
-                    numberFormat = "N2";
-                    break;
-            }
-            return numberFormat;
+            return new TextEditSettings() { MaskType = MaskType.Numeric, MaskUseAsDisplayFormat = true, Mask = format, HorizontalContentAlignment = EditSettingsHorizontalAlignment.Right };
         }
 
         private void CreateBalanceRow(BalanceHeader finbal, int ColNo, bool FirstTime)
         {
             var AccountRowId = finbal.Account.RowId;
-            var colCount = Math.Max(PassedCriteria.selectedCriteria.Count, 13);
+            var colCount = PassedCriteria.selectedCriteria.Count;
             if (finbal.SumOfDimensions != null)
             {
                 foreach (var dimValue in finbal.SumOfDimensions)
@@ -968,7 +1014,7 @@ namespace UnicontaClient.Pages.CustomPage
         string FormatKey(IdKey rec)
         {
             if (rec != null)
-                return this.ShowDimName ? string.Format("{0}-{1}", rec.KeyStr, rec.KeyName) : rec.KeyStr;
+                return this.ShowDimName ? string.Concat(rec.KeyStr, "-", rec.KeyName) : rec.KeyStr;
             return string.Empty;
         }
         void SetDimKeystr(BalanceClient client)

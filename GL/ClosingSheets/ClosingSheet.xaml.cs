@@ -63,7 +63,7 @@ namespace UnicontaClient.Pages.CustomPage
             switch (ActionType)
             {
                 case "AddRow":
-                    AddDockItem(TabControls.ClosingSheetPage2, api, Uniconta.ClientTools.Localization.lookup("ClosingSheet"), ";component/Assets/img/Add_16x16.png");
+                    AddDockItem(TabControls.ClosingSheetPage2, api, Uniconta.ClientTools.Localization.lookup("ClosingSheet"), "Add_16x16.png");
                     break;
                 case "EditRow":
                     if (selectedItem == null)

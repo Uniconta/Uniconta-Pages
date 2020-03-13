@@ -7,9 +7,9 @@
     <RibbonItem Action="SaveGrid" ShortcutKey="CTRL+S" LocalizedNameKey="Save" Glyph="save-16x16.png" LargeGlyph="save-32x32.png"/>
   </RibbonItem>
   <RibbonItem>
+    <RibbonItem Action="RefreshGrid" ShortcutKey="CTRL+R" LocalizedNameKey="Refresh" Glyph="refresh.png" LargeGlyph="refresh.png"/>
     <RibbonItem Action="Filter" ShortcutKey="CTRL+I" LocalizedNameKey="Filter" Glyph="Filter_16x16.png" LargeGlyph="Filter_32x32.png"/>
     <RibbonItem Action="ClearFilter" ShortcutKey="CTRL+K" LocalizedNameKey="ClearFilter" Glyph="Filter_Clear_32x32.png" LargeGlyph="Filter_Clear_32x32.png"/>
-    <RibbonItem Action="RefreshGrid" ShortcutKey="CTRL+R" LocalizedNameKey="Refresh" Glyph="refresh.png" LargeGlyph="refresh.png"/>
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="ViewPhoto" ShortcutKey="" LocalizedNameKey="ViewOBJ" Parameter="Photo" LargeGlyph="View_Highlighted_32x32.png"/>

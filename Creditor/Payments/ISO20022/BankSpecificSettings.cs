@@ -206,6 +206,14 @@ namespace UnicontaISO20022CreditTransfer
         }
 
         /// <summary>
+        /// Used for Lithuania
+        /// </summary>
+        public virtual string ExtProprietaryCode()
+        {
+            return string.Empty;
+        }
+
+        /// <summary>
         /// Exclude section CdtrAgt
         /// DNB Norway: CdtrAgt isn't needed for Domestic paymenst and if included BIC or Address need to be provided.
         /// </summary>
@@ -277,56 +285,26 @@ namespace UnicontaISO20022CreditTransfer
         }
 
         /// <summary>
-        /// Merged payments
+        /// Generate filename
         /// </summary>
-        public virtual string PaymentInfoId(int fileSeqNumber, string endToEndId)
+        public virtual string GenerateFileName(int fileID, int companyID)
         {
-            var result = string.Format("{0}-{1}-MERGED", fileSeqNumber.ToString().PadLeft(6, '0'), endToEndId);
-            return StandardPaymentFunctions.RegularExpressionReplace(result, allowedCharactersRegEx, replaceCharactersRegEx);
+            return string.Format("{0}_{1}_{2}", "ISO20022", fileID.ToString().PadLeft(5, '0'), companyID);
         }
 
-
         /// <summary>
-        /// 
+        /// Merged payments
         /// </summary>
-        public virtual string PaymentInfoId(int fileSeqNumber, DateTime requestedExecutionDate, string paymentCurrency, string isoPaymentType, string companyPaymentMethod, PaymentTypes paymentMethod)
+        public virtual string PaymentInfoId(int fileSeqNumber, string endToEndId, bool merged = false)
         {
-            var paymentMethodDescription = "TYPE";
+            string result = string.Empty;
 
-            switch (paymentMethod)
-            {
-                case PaymentTypes.VendorBankAccount:
-                    paymentMethodDescription = "BBAN";
-                    break;
+            if (merged)
+                result = string.Format("{0}-{1}-MERGED", fileSeqNumber.ToString().PadLeft(6, '0'), endToEndId);
+            else
+                result = string.Format("{0}-{1}", fileSeqNumber.ToString().PadLeft(6, '0'), endToEndId);
 
-                case PaymentTypes.IBAN: 
-                    paymentMethodDescription = "IBAN";
-                    break;
-
-                case PaymentTypes.PaymentMethod3:
-                    paymentMethodDescription = "FIK71";
-                    break;
-
-                case PaymentTypes.PaymentMethod5:
-                    paymentMethodDescription = "FIK75";
-                    break;
-
-                case PaymentTypes.PaymentMethod4:
-                    paymentMethodDescription = "FIK73";
-                    break;
-                
-                case PaymentTypes.PaymentMethod6:
-                    paymentMethodDescription = "FIK04";
-                    break;
-            }
-
-            var paymentInfoIdStr = string.Format("{0}-{1}-{2}-{3}-{4}-{5}", fileSeqNumber, requestedExecutionDate.ToString("yyMMdd"), paymentCurrency, isoPaymentType, companyPaymentMethod, paymentMethodDescription);
-            paymentInfoIdStr = StandardPaymentFunctions.RegularExpressionReplace(paymentInfoIdStr, allowedCharactersRegEx, replaceCharactersRegEx);
-
-            if (paymentInfoIdStr.Length > 35)
-                paymentInfoIdStr = paymentInfoIdStr.Substring(0, 35);
-
-            return paymentInfoIdStr;
+            return StandardPaymentFunctions.RegularExpressionReplace(result, allowedCharactersRegEx, replaceCharactersRegEx);
         }
 
         /// <summary>
@@ -813,10 +791,10 @@ namespace UnicontaISO20022CreditTransfer
         /// <summary>
         /// Unstructured Remittance Information
         /// </summary>
-        public virtual List<string> Ustrd(string externalAdvText, ISO20022PaymentTypes ISOPaymType, PaymentTypes paymentMethod)
+        public virtual List<string> Ustrd(string externalAdvText, ISO20022PaymentTypes ISOPaymType, PaymentTypes paymentMethod, bool extendedText)
         {
-            var ustrdText = StandardPaymentFunctions.RegularExpressionReplace(externalAdvText, allowedCharactersRegEx, replaceCharactersRegEx); 
-
+            var ustrdText = StandardPaymentFunctions.RegularExpressionReplace(externalAdvText, allowedCharactersRegEx, replaceCharactersRegEx);
+            
             int maxLines = 1;
             int maxStrLen = 140;
             List<string> resultList = new List<string>();

@@ -183,7 +183,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (mainList == null)
                 mainList = (IList<EmployeeDebSales>)dgSalesRepCustomerStat.ItemsSource;
-            if (mainList == null || !mainList.Any())
+            if (mainList == null || mainList.Count == 0)
             {
                 UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("NoDataCollected"), Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OK);
                 return;

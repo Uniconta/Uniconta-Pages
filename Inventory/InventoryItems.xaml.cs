@@ -163,7 +163,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
         protected override async void LoadCacheInBackGround()
         {
-            var lst = new List<Type>() { typeof(Uniconta.DataModel.InvGroup) };
+            var lst = new List<Type>(3) { typeof(Uniconta.DataModel.InvGroup) };
             var Comp = api.CompanyEntity;
             if (Comp.ItemVariants)
                 lst.Add(typeof(Uniconta.DataModel.InvStandardVariant));
@@ -240,7 +240,7 @@ namespace UnicontaClient.Pages.CustomPage
                         EditAll();
                     break;
                 case "AddRow":
-                    AddDockItem(TabControls.InventoryItemPage2, api, Uniconta.ClientTools.Localization.lookup("InventoryItems"), ";component/Assets/img/Add_16x16.png");
+                    AddDockItem(TabControls.InventoryItemPage2, api, Uniconta.ClientTools.Localization.lookup("InventoryItems"), "Add_16x16.png");
                     break;
                 case "EditRow":
                     if (selectedItem != null)
@@ -367,10 +367,10 @@ namespace UnicontaClient.Pages.CustomPage
             invItem._qtyOrdered = 0;
             invItem._qtyReserved = 0;
             var parms = new object[2] { invItem, false };
-            AddDockItem(TabControls.InventoryItemPage2, parms, Uniconta.ClientTools.Localization.lookup("InventoryItems"), ";component/Assets/img/Add_16x16.png");
+            AddDockItem(TabControls.InventoryItemPage2, parms, Uniconta.ClientTools.Localization.lookup("InventoryItems"), "Add_16x16.png");
         }
 
-        bool copyRowIsEnabled = false;
+        bool copyRowIsEnabled;
         bool editAllChecked;
         private void EditAll()
         {
@@ -440,11 +440,11 @@ namespace UnicontaClient.Pages.CustomPage
         }
         private async void Save()
         {
-            dgInventoryItemsGrid.BusyIndicator.IsBusy = true;
+            SetBusy();
             var err = await dgInventoryItemsGrid.SaveData();
             if (err != ErrorCodes.Succes)
                 api.AllowBackgroundCrud = true;
-            dgInventoryItemsGrid.BusyIndicator.IsBusy = false;
+            ClearBusy();
         }
         private InvItemClient GetSelectedItem()
         {

@@ -50,13 +50,12 @@ namespace UnicontaClient.Pages.CustomPage
 
         static DateTime postDte;
         string header { get; set; }
-
+        public bool showCompanyName= false;
 #if !SILVERLIGHT
         protected override int DialogId { get { return DialogTableId; } }
         public int DialogTableId { get; set; }
         protected override bool ShowTableValueButton { get { return true; } }
 #endif
-
         public CWInvPosting(CrudAPI api, string headerName = null, bool showNumberSeries = false)
         {
             InitializeComponent();
@@ -77,6 +76,7 @@ namespace UnicontaClient.Pages.CustomPage
             else
                 lookupNumberSeries.api = api;
             this.DataContext = this;
+            txtCompName.Text = api.CompanyEntity.Name;
             this.Loaded += CW_Loaded;
         }
 
@@ -88,6 +88,13 @@ namespace UnicontaClient.Pages.CustomPage
                     txtComment.Focus();
                 else
                     OKButton.Focus();
+                if (!showCompanyName)
+                {
+                    rowComp.Height = new GridLength(0);
+                    double h = this.Height - 30;
+                    this.Height = h;
+                    tbCompName.Visibility = txtCompName.Visibility = Visibility.Collapsed;
+                }
             }));
         }
 

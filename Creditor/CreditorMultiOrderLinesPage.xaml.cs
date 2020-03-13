@@ -327,7 +327,7 @@ namespace UnicontaClient.Pages.CustomPage
                     dgMultiCreditorOrderLine.DeleteRow();
                     break;
                 case "AddOrder":
-                    AddDockItem(TabControls.CreditorOrdersPage2, api, Uniconta.ClientTools.Localization.lookup("Orders"), ";component/Assets/img/Add_16x16.png");
+                    AddDockItem(TabControls.CreditorOrdersPage2, api, Uniconta.ClientTools.Localization.lookup("Orders"), "Add_16x16.png");
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);

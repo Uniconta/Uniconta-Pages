@@ -22,13 +22,7 @@ x:Class="UnicontaClient.Pages.CustomPage.GLReportLinePage"
                 <localPage:ReportLineGrid.Columns>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PrimaryKeyId" Width="70" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Text"  Width="200"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="LineType" Width="100">
-                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                            <DataTemplate>
-                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="GLTemplateType" />
-                            </DataTemplate>
-                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                    </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:ComboBoxColumnClient x:Name="LineType" Width="100"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Accounts" Width="200"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="SaveTotal" Width="60" AllowThousandMask="false"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Indent" Width="60" AllowThousandMask="false"/>

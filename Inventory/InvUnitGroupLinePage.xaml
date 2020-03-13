@@ -23,21 +23,9 @@ x:Class="UnicontaClient.Pages.CustomPage.InvUnitGroupLinePage"
             <local:InvUnitGroupLinePageGrid  x:Name="dgInvUnitGroupLineGrid" AutoGenerateColumns="None" HorizontalAlignment="Stretch">
                 <local:InvUnitGroupLinePageGrid.Columns>
                     <local:CorasauDataGridTemplateColumnClient x:Name="UnitGroup" Visible="False" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="FromUnit" Width="100">
-                        <local:CorasauDataGridTemplateColumnClient.CellTemplate>
-                            <DataTemplate>
-                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="ItemUnit"/>
-                            </DataTemplate>
-                        </local:CorasauDataGridTemplateColumnClient.CellTemplate>
-                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:ComboBoxColumnClient x:Name="FromUnit" Width="100"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Factor" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="ToUnit" Width="100">
-                        <local:CorasauDataGridTemplateColumnClient.CellTemplate>
-                            <DataTemplate>
-                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="ItemUnit"/>
-                            </DataTemplate>
-                        </local:CorasauDataGridTemplateColumnClient.CellTemplate>
-                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:ComboBoxColumnClient x:Name="ToUnit" Width="100"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="FromTo" Width="200"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="ToFrom" Width="200"/>
                 </local:InvUnitGroupLinePageGrid.Columns>

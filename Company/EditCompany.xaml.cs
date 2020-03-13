@@ -110,7 +110,7 @@ namespace UnicontaClient.Pages.CustomPage
                 }
                 catch (Exception ex)
                 {
-                    UnicontaMessageBox.Show(ex.Message, Uniconta.ClientTools.Localization.lookup("Exception"), MessageBoxButton.OK);
+                    UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"), MessageBoxButton.OK);
                     return;
                 }
 

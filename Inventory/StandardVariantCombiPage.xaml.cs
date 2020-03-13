@@ -201,7 +201,7 @@ namespace UnicontaClient.Pages.CustomPage
             var duplicateValues = lstStandardVariantCombi.GroupBy(x => new { Var1 = x.Variant1, Var2 = x.Variant2, Var3 = x.Variant3, Var4 = x.Variant4, Var5 = x.Variant5 }).Where(g => g.Count() > 1).Select(y => y.Key)
               .ToList();
 
-            if (duplicateValues.Count() > 0)
+            if (duplicateValues.Count > 0)
             {
                 retVal = false;
                 int index = 0;

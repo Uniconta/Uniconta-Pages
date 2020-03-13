@@ -50,6 +50,6 @@
     <RibbonItem Action="OtherVacationBal" LocalizedNameKey="OtherVacation" StatusValue=""/>
     <RibbonItem Action="OvertimeBal" LocalizedNameKey="Overtime" StatusValue="" />
     <RibbonItem Action="FlexTimeBal" LocalizedNameKey="Flextime" StatusValue="" />
-    <RibbonItem Action="MileageHighRateBal" LocalizedNameKey="MileageHighRate" StatusValue="" />
+    <RibbonItem Action="MileageBal" LocalizedNameKey="Mileage" StatusValue="" />
   </RibbonItem>
 </root>

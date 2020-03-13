@@ -135,6 +135,7 @@ x:Class="UnicontaClient.Pages.CustomPage.WorkInProgressReportPage"
                             </ControlTemplate>
                         </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                     </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="OpenSalesOrder" AllowEditing="False" Visible="True" />                    
                     <local:CorasauDataGridTemplateColumnClient x:Name="ErrorInfo" Visible="False" AllowEditing="False"/>
                 </local:WorkInProgressReportGrid.Columns>
                 <local:WorkInProgressReportGrid.GroupSummary >

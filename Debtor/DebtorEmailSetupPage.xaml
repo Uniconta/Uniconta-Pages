@@ -21,7 +21,8 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorEmailSetupPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Language" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="EmailType" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Default" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Html" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CompanySMTP"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Html" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Bcc" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Host" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Port" Visible="False" />

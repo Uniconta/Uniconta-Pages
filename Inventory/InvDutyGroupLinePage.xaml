@@ -22,13 +22,7 @@ x:Class="UnicontaClient.Pages.CustomPage.InvDutyGroupLinePage"
                 <local:InvDutyGroupLineGrid.Columns>
                     <local:CorasauDataGridTemplateColumnClient x:Name="RowNumber" Width="70" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="DutyGroup" Visible="False" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="DutyCalculation" Width="150">
-                        <local:CorasauDataGridTemplateColumnClient.CellTemplate>
-                            <DataTemplate>
-                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="DutyCalculation"/>
-                            </DataTemplate>
-                        </local:CorasauDataGridTemplateColumnClient.CellTemplate>
-                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:ComboBoxColumnClient x:Name="DutyCalculation" Width="150" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Amount" Width="90" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Account" Width="100" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="AccountName" Width="150" Visible="False" />
@@ -36,13 +30,7 @@ x:Class="UnicontaClient.Pages.CustomPage.InvDutyGroupLinePage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="OffsetAccountName" Width="150" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Item" Width="100"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="ItemName" Width="150" Visible="False" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="DutyShow" Width="150">
-                        <local:CorasauDataGridTemplateColumnClient.CellTemplate>
-                            <DataTemplate>
-                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="DutyShowOnInvoice"/>
-                            </DataTemplate>
-                        </local:CorasauDataGridTemplateColumnClient.CellTemplate>
-                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:ComboBoxColumnClient x:Name="DutyShow" Width="150" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Sales" Width="70" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Purchase" Width="70" />
                 </local:InvDutyGroupLineGrid.Columns>

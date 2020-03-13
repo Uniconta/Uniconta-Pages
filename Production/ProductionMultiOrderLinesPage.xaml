@@ -94,25 +94,13 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionMultiOrderLinesPage"
                             </DataTemplate>
                         </local:CorasauDataGridForeignKeyColumnClient.CellTemplate>
                     </local:CorasauDataGridForeignKeyColumnClient>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Storage" Width="100">
-                        <local:CorasauDataGridTemplateColumnClient.CellTemplate>
-                            <DataTemplate>
-                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="StorageRegister"/>
-                            </DataTemplate>
-                        </local:CorasauDataGridTemplateColumnClient.CellTemplate>
-                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:ComboBoxColumnClient x:Name="Storage" Width="100"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="IgnoreBlocked" Width="50" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="ReferenceNumber" Width="70" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Week" Width="50" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Date" Width="90" Visible="False">
                     </local:CorasauDataGridTemplateColumnClient>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Unit" Width="50" Visible="False" >
-                        <local:CorasauDataGridTemplateColumnClient.CellTemplate>
-                            <DataTemplate>
-                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="ItemUnit"/>
-                            </DataTemplate>
-                        </local:CorasauDataGridTemplateColumnClient.CellTemplate>
-                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:ComboBoxColumnClient x:Name="Unit" Width="50" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Project" Width="100" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Width="100" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="PostingAccount" Width="100" Visible="False"/>

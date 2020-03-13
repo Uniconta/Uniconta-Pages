@@ -41,7 +41,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ExchangeRateCompanyPage"
                             </DataTemplate>
                         </local:CorasauDataGridTemplateColumnClient.CellTemplate>
                     </local:CorasauDataGridTemplateColumnClient>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Rate" AllowThousandMask="True" Mask="N5"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Rate" AllowThousandMask="True" Mask="N10" Width="130"/>
                 </local:ExchangeRateCompanyGrid.Columns>
             </local:ExchangeRateCompanyGrid>
         </CorasauControls:BusyIndicator>

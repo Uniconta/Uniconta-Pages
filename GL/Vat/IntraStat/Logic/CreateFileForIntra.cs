@@ -40,7 +40,7 @@ namespace UnicontaClient.Pages.CustomPage
             var tempImpList = listOfIntraStat.Where(a => a.ImportOrExport == CreateIntraStatFilePage.ImportOrExportIntrastat.Import).ToList();
             var tempExppList = listOfIntraStat.Where(a => a.ImportOrExport == CreateIntraStatFilePage.ImportOrExportIntrastat.Export).ToList();
 
-            foreach (var c in api.CompanyEntity._Id.ToCharArray())
+            foreach (var c in api.CompanyEntity._Id)
             {
                 if (Char.IsDigit(c))
                 {
@@ -202,7 +202,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
             catch (Exception ex)
             {
-                UnicontaMessageBox.Show(ex.Message, Uniconta.ClientTools.Localization.lookup("Exception"));
+                UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"));
                 return null;
             }
 

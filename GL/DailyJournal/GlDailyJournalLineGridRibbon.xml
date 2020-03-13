@@ -55,7 +55,7 @@
       <RibbonItem Action="Account" LocalizedNameKey="Account" Glyph="Account_16x16.png" LargeGlyph=""/>
       <RibbonItem Action="OffsetAccount" LocalizedNameKey="OffsetAccount"  Glyph="Account_16x16.png" LargeGlyph=""/>
       <RibbonItem Action="All" LocalizedNameKey="All" Glyph="Cover_16x16.png" LargeGlyph=""/>
-      <RibbonItem Action="OpenTran" LocalizedNameKey="OpenTrans" Glyph="Open_Transaction_16x16.png" LargeGlyph=""/>
+      <RibbonItem Action="OpenTran" LocalizedNameKey="OpenTrans" ShortcutKey="F8" Glyph="Open_Transaction_16x16.png" LargeGlyph=""/>
     </RibbonItem>
   </RibbonItem>
   <RibbonItem>

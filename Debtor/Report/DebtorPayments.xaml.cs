@@ -126,7 +126,6 @@ namespace UnicontaClient.Pages.CustomPage
             dgDebtorTranOpenGrid.api = api;
             SetRibbonControl(localMenu, dgDebtorTranOpenGrid);
             dgDebtorTranOpenGrid.BusyIndicator = busyIndicator;
-            dgDebtorTranOpenGrid.api = api;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgDebtorTranOpenGrid.OnPrintClick += DgDebtorTranOpenGrid_OnPrintClick;
             statementList = new List<DebtorPaymentStatementList>();
@@ -194,10 +193,6 @@ namespace UnicontaClient.Pages.CustomPage
                         await PrintDebtorPaymentStatementPage(companyClient, logo, selectedItem, collectionType);
                 }
 #else
-                var layoutSelectedDebtorCollectionList = new Dictionary<string, List<IDebtorStandardReport>>();
-                var layoutgrpCache = api.GetCache(typeof(DebtorLayoutGroup)) ?? await api.LoadCache(typeof(DebtorLayoutGroup));
-
-                var xtraReports = new List<IPrintReport>();
                 int indexDebtorEmailType = 0;
 
                 if (string.IsNullOrEmpty(collectionType))
@@ -210,24 +205,9 @@ namespace UnicontaClient.Pages.CustomPage
                 var debtorEmailType = (DebtorEmailType)indexDebtorEmailType;
                 var date = BasePage.GetSystemDefaultDate();
 
-                foreach (var debt in statementList.ToList())
-                {
-                    var selectedItem = debt as DebtorPaymentStatementList;
-                    var collectionPrint = await GenerateStandardCollectionReport(companyClient, date, selectedItem, logo, debtorEmailType);
-                    if (collectionPrint == null)
-                        continue;
+                var xtraReports = await GeneratePrintReport(statementList, companyClient, date, logo, debtorEmailType);
 
-                    var standardReports = new[] { collectionPrint };
-                    var standardPrint = new StandardPrintReport(api, standardReports, this.AddInterest ? chkShowCurrency.IsChecked == true ? (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.InterestNoteCurrency :
-                        (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.InterestNote : chkShowCurrency.IsChecked == true ? (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.CollectionLetterCurrency :
-                        (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.CollectionLetter);
-                    await standardPrint.InitializePrint();
-
-                    if (standardPrint.Report != null)
-                        xtraReports.Add(standardPrint);
-                }
-
-                if (xtraReports.Count > 0)
+                if (xtraReports.Count() > 0)
                 {
                     var reportName = AddInterest ? Uniconta.ClientTools.Localization.lookup("InterestNote") : Uniconta.ClientTools.Localization.lookup("CollectionLetter");
                     var dockName = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Preview"), reportName);
@@ -239,7 +219,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 busyIndicator.IsBusy = false;
                 api.ReportException(ex, string.Format("DebtorPayment.PrintData(), CompanyId={0}", api.CompanyId));
-                UnicontaMessageBox.Show(ex.Message, Uniconta.ClientTools.Localization.lookup("Exception"), MessageBoxButton.OK);
+                UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"), MessageBoxButton.OK);
             }
             finally
             {
@@ -251,6 +231,72 @@ namespace UnicontaClient.Pages.CustomPage
         Language messageLanguage;
 
 #if !SILVERLIGHT
+        async private void OpenOutlook()
+        {
+            try
+            {
+                busyIndicator.IsBusy = true;
+                busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("LaunchingWaitMsg");
+                var selectedAccount = ((DebtorTransPayment)dgDebtorTranOpenGrid.SelectedItem).Account;
+                byte[] logo = await UtilDisplay.GetLogo(api);
+                var Comp = api.CompanyEntity;
+
+                var companyUserType = Comp.GetUserType(typeof(CompanyClient)) ?? typeof(CompanyClient);
+                var companyClient = Activator.CreateInstance(companyUserType) as CompanyClient;
+                StreamingManager.Copy(Comp, companyClient);
+
+                lastMessage = null; // just to reload message in case it has changed
+                LoadDataForReport();
+
+                int indexDebtorEmailType = 0;
+
+                if (string.IsNullOrEmpty(collectionType))
+                    indexDebtorEmailType = SelectCollectionType();
+                else
+                    indexDebtorEmailType = AppEnums.DebtorEmailType.IndexOf(collectionType);
+                if (indexDebtorEmailType == -1)
+                    return;
+
+                var debtorCache = api.GetCache(typeof(Debtor)) ?? await api.LoadCache(typeof(Debtor)).ConfigureAwait(false);
+                Debtor debtor = debtorCache.Get(selectedAccount) as Debtor;
+                var debtorEmailType = (DebtorEmailType)indexDebtorEmailType;
+                var date = BasePage.GetSystemDefaultDate();
+                var selectedAccountstatementList = statementList.Where(p => p.AccountNumber == selectedAccount);
+                var paymentStandardReport = await GeneratePrintReport(selectedAccountstatementList, companyClient, date, logo, debtorEmailType);
+                if (paymentStandardReport != null && paymentStandardReport.Count() == 1)
+                    InvoicePostingPrintGenerator.OpenReportInOutlook(api, paymentStandardReport.Single(), debtor, debtorEmailType);
+            }
+            catch (Exception ex)
+            {
+                UnicontaMessageBox.Show(ex.Message, Uniconta.ClientTools.Localization.lookup("Exception"));
+            }
+            finally { busyIndicator.IsBusy = false; }
+        }
+
+        async private Task<IEnumerable<IPrintReport>> GeneratePrintReport(IEnumerable<DebtorPaymentStatementList> paymentStatementList, CompanyClient companyClient, DateTime date, byte[] logo, DebtorEmailType debtorEmailType)
+        {
+            var iprintReportList = new List<IPrintReport>();
+
+            foreach (var debt in paymentStatementList.ToList())
+            {
+                var selectedItem = debt as DebtorPaymentStatementList;
+                var collectionPrint = await GenerateStandardCollectionReport(companyClient, date, selectedItem, logo, debtorEmailType);
+                if (collectionPrint == null)
+                    continue;
+
+                var standardReports = new[] { collectionPrint };
+                var standardPrint = new StandardPrintReport(api, standardReports, this.AddInterest ? chkShowCurrency.IsChecked == true ? (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.InterestNoteCurrency :
+                    (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.InterestNote : chkShowCurrency.IsChecked == true ? (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.CollectionLetterCurrency :
+                    (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.CollectionLetter);
+                await standardPrint.InitializePrint();
+
+                if (standardPrint.Report != null)
+                    iprintReportList.Add(standardPrint);
+            }
+
+            return iprintReportList;
+        }
+
         async private Task<DebtorCollectionReportClient> GenerateStandardCollectionReport(CompanyClient companyClient, DateTime dueDate, DebtorPaymentStatementList selectedItem, byte[] logo, DebtorEmailType debtorEmailType)
         {
             var dbClientTotal = selectedItem.ChildRecords.FirstOrDefault();
@@ -405,18 +451,18 @@ namespace UnicontaClient.Pages.CustomPage
                                     var rowsGroupBy = rows.GroupBy(a => a.Account);
                                     foreach (var group in rowsGroupBy)
                                     {
-                                        long invoice;
+                                        string invoice;
                                         double aggregatedFeeAmount;
                                         var rec = group.FirstOrDefault();
                                         if (group.Count() > 1)
                                         {
                                             aggregatedFeeAmount = group.Sum(p => p._FeeAmount);
-                                            invoice = 0;
+                                            invoice = null;
                                         }
                                         else
                                         {
                                             aggregatedFeeAmount = rec._FeeAmount;
-                                            invoice = rec.Invoice;
+                                            invoice = rec.InvoiceAN;
                                         }
                                         if (group.Key == lastAcc)
                                             continue;
@@ -434,7 +480,7 @@ namespace UnicontaClient.Pages.CustomPage
                                         if (!object.ReferenceEquals(row, lastRec))
                                         {
                                             lastRec = row;
-                                            listLineClient.Add(CreateGLDailyJournalLine(row.Account, row._FeeAmount, row.Invoice, DJclient, ++LineNumber, cwLine.Date, cwLine.TransType, cwLine.BankAccount, row.Currency, nextVoucherNumber, payment));
+                                            listLineClient.Add(CreateGLDailyJournalLine(row.Account, row._FeeAmount, row.InvoiceAN, DJclient, ++LineNumber, cwLine.Date, cwLine.TransType, cwLine.BankAccount, row.Currency, nextVoucherNumber, payment));
                                             if (nextVoucherNumber != 0)
                                                 nextVoucherNumber++;
                                         }
@@ -475,13 +521,11 @@ namespace UnicontaClient.Pages.CustomPage
                     SetFee(false);
                     break;
                 case "SendAllEmail":
-                    var visibleAllRows = (ICollection<DebtorTransPayment>)dgDebtorTranOpenGrid.GetVisibleRows();
-                    if (visibleAllRows.Count > 0)
-                        SendReport(visibleAllRows);
+                    SendReport((IEnumerable<DebtorTransPayment>)dgDebtorTranOpenGrid.GetVisibleRows());
                     break;
                 case "SendMarkedEmail":
-                    var markedRows = (ICollection<DebtorTransPayment>)dgDebtorTranOpenGrid.SelectedItems;
-                    if (markedRows != null && markedRows.Count > 0)
+                    var markedRows = dgDebtorTranOpenGrid.SelectedItems?.Cast<DebtorTransPayment>();
+                    if (markedRows != null)
                         SendReport(markedRows);
                     break;
                 case "SendCurrentEmail":
@@ -500,13 +544,18 @@ namespace UnicontaClient.Pages.CustomPage
                         cwSendInvoice.Show();
                     }
                     break;
+#if !SILVERLIGHT
+                case "SendAsOutlook":
+                    OpenOutlook();
+                    break;
+#endif
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
         }
 
-        private Uniconta.DataModel.GLDailyJournalLine CreateGLDailyJournalLine(string account, double feeAmount, long invoice, Uniconta.DataModel.GLDailyJournal dailyJournal, long lineNumber, DateTime date, string transType, string offsetAccount, Currencies? currency, int nextVoucherNumber, string payment)
+        private Uniconta.DataModel.GLDailyJournalLine CreateGLDailyJournalLine(string account, double feeAmount, string invoice, Uniconta.DataModel.GLDailyJournal dailyJournal, long lineNumber, DateTime date, string transType, string offsetAccount, Currencies? currency, int nextVoucherNumber, string payment)
         {
             var glDailJournallineclient = new Uniconta.DataModel.GLDailyJournalLine();
             glDailJournallineclient.SetMaster(dailyJournal);
@@ -538,10 +587,9 @@ namespace UnicontaClient.Pages.CustomPage
             return glDailJournallineclient;
         }
 
-        void SendReport(ICollection<DebtorTransPayment> paymentList, string emails = null, bool onlyThisEmail = false)
+        void SendReport(IEnumerable<DebtorTransPayment> dcTransOpenClientlist, string emails = null, bool onlyThisEmail = false)
         {
-            var dcTransOpenClientlist = paymentList;
-            var n = dcTransOpenClientlist.Count;
+            var n = dcTransOpenClientlist.Count();
             if (n > 0)
             {
                 var feelist = new double[n];
@@ -607,9 +655,7 @@ namespace UnicontaClient.Pages.CustomPage
                 else
                     collectionType = -1;
             };
-
             collectionLetterWin.Show();
-
             return collectionType;
         }
 
@@ -651,6 +697,9 @@ namespace UnicontaClient.Pages.CustomPage
         void SetFee(bool AddInterest)
         {
             CWSetFeeAmount cwwin = new CWSetFeeAmount(AddInterest);
+#if !SILVERLIGHT
+            cwwin.DialogTableId = AddInterest ? 2000000070 : 2000000071;
+#endif
             collectionType = string.Empty;
             cwwin.Closing += delegate
             {
@@ -674,7 +723,6 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         Currencies currencuEnum;
                         Enum.TryParse(cwwin.FeeCurrency, out currencuEnum);
-
                         if (cwwin.SelectedType == Uniconta.ClientTools.Localization.lookup("Transaction"))
                             SetFeeAmount(debtorPayments, cwwin.value, currencuEnum);
                         else if (cwwin.SelectedType == Uniconta.ClientTools.Localization.lookup("Account"))

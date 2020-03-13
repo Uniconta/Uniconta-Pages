@@ -56,6 +56,7 @@ namespace UnicontaClient.Pages.CustomPage
         List<UnicontaBaseEntity> masterList;
 
         static public DateTime DefaultFromDate, DefaultToDate;
+        bool LateLoading, NoPrimo;
 
         public TransactionReport(SynchronizeEntity master)
             : base(master, true)
@@ -75,7 +76,14 @@ namespace UnicontaClient.Pages.CustomPage
             InitMaster(master);
             Initialize();
         }
-
+        public TransactionReport(UnicontaBaseEntity master, bool LateLoading) : base(master)
+        {
+            this.DataContext = this;
+            this.LateLoading = LateLoading;
+            InitializeComponent();
+            InitMaster(master);
+            Initialize();
+        }
         private void InitMaster(UnicontaBaseEntity master)
         {
             if (master == null)
@@ -111,8 +119,19 @@ namespace UnicontaClient.Pages.CustomPage
             txtDateFrm.DateTime = DefaultFromDate;
 
             localMenu.OnItemClicked += localMenu_OnItemClicked;
+            dgGLTran.RowDoubleClick += DgGLTran_RowDoubleClick;
             dgGLTran.ShowTotalSummary();
             InitialLoad();
+        }
+
+        private void DgGLTran_RowDoubleClick()
+        {
+            var selectedItem = dgGLTran.SelectedItem as GLTransClientTotal;
+            if (selectedItem != null)
+            {
+                string vheader = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("VoucherTransactions"), selectedItem._Voucher);
+                AddDockItem(TabControls.AccountsTransaction, selectedItem, vheader);
+            }
         }
 
         public override Task InitQuery()
@@ -122,12 +141,12 @@ namespace UnicontaClient.Pages.CustomPage
 
         async void InitialLoad()
         {
-            await SetHeaderAndLoad();
+            if (!LateLoading)
+                await SetHeaderAndLoad();
             await SetNoOfDimensions(api.CompanyEntity.NumberOfDimensions);
             var t = SetDailyJournal(cmbJournal, api);
             StartLoadCache(t);
         }
-
         protected override void OnLayoutLoaded()
         {
             base.OnLayoutLoaded();
@@ -358,7 +377,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             string journal = cmbJournal.Text;
             var dimensionParams = BalanceReport.SetDimensionParameters(dim1, dim2, dim3, dim4, dim5, true, true, true, true, true);
-            var listtran = (GLTransClientTotal[])await tranApi.GetTransactions(new GLTransClientTotal(), journal, masterClient._Account, masterClient._Account, DefaultFromDate, DefaultToDate, dimensionParams,showDimOnPrimo);
+            var listtran = (GLTransClientTotal[])await tranApi.GetTransactions(new GLTransClientTotal(), journal, masterClient._Account, masterClient._Account, DefaultFromDate, DefaultToDate, dimensionParams, NoPrimo ? ReportAPI.NoPrimo : (showDimOnPrimo ? ReportAPI.PrimoPrDimension : ReportAPI.SimplePrimo));
             if (listtran != null)
             {
                 long Total = 0, TotalCur = 0;
@@ -385,6 +404,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
             else if (tranApi.LastError != 0)
             {
+                busyIndicator.IsBusy = false;
                 Uniconta.ClientTools.Util.UtilDisplay.ShowErrorCode(tranApi.LastError);
             }
         }
@@ -452,9 +472,30 @@ namespace UnicontaClient.Pages.CustomPage
                 DefaultToDate = todateeditor.DateTime.Date;
         }
 
+        private void HasVoucherImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            busyIndicator.IsBusy = true;
+            ViewVoucher(TabControls.VouchersPage3, dgGLTran.syncEntity);
+            busyIndicator.IsBusy = false;
+        }
+
         protected override LookUpTable HandleLookupOnLocalPage(LookUpTable lookup, CorasauDataGrid dg)
         {
             return AccountsTransaction.HandleLookupOnLocalPage(dgGLTran, lookup);
+        }
+
+        public void SetControlsAndLoadGLTrans(DateTime fromDate, DateTime toDate, List<object> Dim1, List<object> Dim2, List<object> Dim3, List<object> Dim4, List<object> Dim5, string journals)
+        {
+            txtDateFrm.EditValue = fromDate;
+            txtDateTo.EditValue = toDate;
+            cbdim1.EditValue = Dim1;
+            cbdim2.EditValue = Dim2;
+            cbdim3.EditValue = Dim3;
+            cbdim4.EditValue = Dim4;
+            cbdim5.EditValue = Dim5;
+            cmbJournal.Text = journals;
+            this.NoPrimo = true;
+            LoadGlTran();
         }
     }
 

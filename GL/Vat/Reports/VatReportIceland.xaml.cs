@@ -260,7 +260,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
             catch (Exception e)
             {
-                UnicontaMessageBox.Show(e.Message, "Villa");
+                UnicontaMessageBox.Show(e, "Villa");
             }
 
             return response;

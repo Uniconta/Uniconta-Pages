@@ -458,9 +458,28 @@ namespace UnicontaClient.Pages.CustomPage
                     object[] param = new object[] { selectedItem };
                     AddDockItem(TabControls.InventoryTransactionsMarkedPage, param, true);
                     break;
+                case "AddNote":
+                case "AddDoc":
+                    if (selectedItem != null)
+                        AddAttachment(ActionType, selectedItem);
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
+            }
+        }
+
+        async void AddAttachment(string actionType, ProductionOrderLineClient productionOrderLineClient)
+        {
+            var invBomResult = await api.Query<InvBOMClient>(productionOrderLineClient);
+            if (invBomResult != null && invBomResult.Length > 0)
+            {
+                var invBom = invBomResult.FirstOrDefault();
+
+                if (actionType == "AddNote")
+                    AddDockItem(TabControls.UserNotesPage, invBom);
+                else if (actionType == "AddDoc")
+                    AddDockItem(TabControls.UserDocsPage, invBom);
             }
         }
 
@@ -471,7 +490,7 @@ namespace UnicontaClient.Pages.CustomPage
                 await t;
 
             object[] arr = new object[2] { api, orderLine };
-            AddDockItem(TabControls.ProductionOrdersPage2, arr, Uniconta.ClientTools.Localization.lookup("Production"), ";component/Assets/img/Add_16x16.png");
+            AddDockItem(TabControls.ProductionOrdersPage2, arr, Uniconta.ClientTools.Localization.lookup("Production"), "Add_16x16.png");
         }
 
         async void UnfoldBOM(ProductionOrderLineClient selectedItem)
@@ -507,6 +526,11 @@ namespace UnicontaClient.Pages.CustomPage
                     invJournalLine._Variant4 = bom._Variant4;
                     invJournalLine._Variant5 = bom._Variant5;
                     item = (InvItem)items.Get(bom._ItemPart);
+                    if (item == null)
+                    {
+                        items = await api.LoadCache(typeof(InvItem), true);
+                        item = (InvItem)items.Get(bom._ItemPart);
+                    }
                     invJournalLine._Warehouse = bom._Warehouse ?? item._Warehouse ?? selectedItem._Warehouse;
                     invJournalLine._Location = bom._Location ?? item._Location ?? selectedItem._Location;
                     invJournalLine._CostPriceLine = item._CostPrice;

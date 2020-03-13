@@ -33,6 +33,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
         public override bool Readonly { get { return false; } }
+        protected override bool RenderAllColumns { get { return true; } }
     }
 
     public partial class BankImportMapping : GridBasePage

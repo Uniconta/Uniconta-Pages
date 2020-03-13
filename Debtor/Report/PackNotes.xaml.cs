@@ -96,7 +96,6 @@ namespace UnicontaClient.Pages.CustomPage
             SetRibbonControl(localMenu, dgPackNotesGrid);
             dgPackNotesGrid.api = api;
             dgPackNotesGrid.BusyIndicator = busyIndicator;
-            dgPackNotesGrid.api = api;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
 #if SILVERLIGHT
             RibbonBase rb = (RibbonBase)localMenu.DataContext;
@@ -160,9 +159,17 @@ namespace UnicontaClient.Pages.CustomPage
                 salesHeader = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Orders"), selectedItem._OrderNumber);
             switch (ActionType)
             {
+                case "EditRow":
+                    if (selectedItem == null)
+                        return;
+                    object[] EditParam = new object[2];
+                    EditParam[0] = selectedItem as DebtorInvoiceClient;
+                    EditParam[1] = true;
+                    AddDockItem(TabControls.InvoicePage2, EditParam, string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("PackNote"), selectedItem.Name));
+                    break;
                 case "DeliveryNoteLine":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.DebtorInvoiceLines, dgPackNotesGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("PackNoteNumber"), selectedItem._InvoiceNumber));
+                        AddDockItem(TabControls.DebtorInvoiceLines, dgPackNotesGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("PackNoteNumber"), selectedItem.InvoiceNum));
                     break;
                 case "ShowDeliveryNote":
                     if (selectedItem == null || dgPackNotesGrid.SelectedItems == null)
@@ -176,11 +183,17 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "AddDoc":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.UserDocsPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Documents"), selectedItem._InvoiceNumber));
+                        AddDockItem(TabControls.UserDocsPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Documents"), selectedItem.InvoiceNum));
                     break;
                 case "RefreshGrid":
                     InitQuery();
                     break;
+#if !SILVERLIGHT
+                case "SendAsOutlook":
+                    if (selectedItem != null)
+                        OpenOutLook(selectedItem);
+                    break;
+#endif
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -197,8 +210,14 @@ namespace UnicontaClient.Pages.CustomPage
                 var invoicesList = debtorInvoices.ToList();
 #if !SILVERLIGHT
                 var failedPrints = new List<long>();
-                var invoiceReports = new List<IPrintReport>();
-                long invNumber = 0;
+                var count = invoicesList.Count;
+                string dockName = null, reportName = null;
+
+                if (count > 1)
+                {
+                    dockName = string.Concat(Uniconta.ClientTools.Localization.lookup("ShowPrint"), ":", Uniconta.ClientTools.Localization.lookup("Packnote"));
+                    reportName = Uniconta.ClientTools.Localization.lookup("Packnote");
+                }
 #elif SILVERLIGHT
                 int top = 200, left = 300;
                 int count = invoicesList.Count();
@@ -209,37 +228,40 @@ namespace UnicontaClient.Pages.CustomPage
                 foreach (var debtInvoice in invoicesList)
                 {
 #if !SILVERLIGHT
-                    IPrintReport printReport = await PrintInvoice(debtInvoice);
-                    invNumber = debtInvoice._InvoiceNumber;
+                    isGeneratingPacknote = true;
+                    IPrintReport printReport = await PrintPacknote(debtInvoice);
                     if (printReport?.Report != null)
-                        invoiceReports.Add(printReport);
+                    {
+                        if (count > 1 && isGeneratingPacknote)
+                        {
+                            ribbonControl.DisableButtons(new string[] { "ShowDeliveryNote" });
+                            if (standardViewerPrintPage == null)
+                                standardViewerPrintPage = dockCtrl.AddDockItem(api?.CompanyEntity, TabControls.StandardPrintReportPage, ParentControl, new object[] { printReport }, dockName) as StandardPrintReportPage;
+                            else
+                                standardViewerPrintPage.InsertToMasterReport(printReport.Report);
+                        }
+                        else
+                        {
+                            var pckNumber = debtInvoice.InvoiceNumber;
+                            reportName = string.Format("{0}_{1}", Uniconta.ClientTools.Localization.lookup("PackNote"), pckNumber);
+                            dockName = string.Format("{0} {1}", Uniconta.ClientTools.Localization.lookup("Preview"), string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("PackNote"), pckNumber));
+
+                            AddDockItem(TabControls.StandardPrintReportPage, new object[] { new List<IPrintReport> { printReport }, reportName }, dockName);
+                        }
+                    }
                     else
                         failedPrints.Add(debtInvoice.InvoiceNumber);
+
                 }
 
-                if (invoiceReports.Count() > 0)
+                isGeneratingPacknote = false;
+                ribbonControl.EnableButtons(new string[] { "ShowDeliveryNote" });
+
+                if (failedPrints.Count > 0)
                 {
-                    if (invoiceReports.Count == 1 && invNumber > 0)
-                    {
-                        var reportName = string.Format("{0}_{1}", Uniconta.ClientTools.Localization.lookup("PackNote"), invNumber);
-                        var dockName = string.Format("{0} {1}", Uniconta.ClientTools.Localization.lookup("Preview"), string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("PackNote"), invNumber));
-                        AddDockItem(TabControls.StandardPrintReportPage, new object[] { invoiceReports, reportName }, dockName);
-                    }
-                    else
-                    {
-                        var reportsName = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ShowPrint"), Uniconta.ClientTools.Localization.lookup("PackNotes"));
-                        AddDockItem(TabControls.StandardPrintReportPage, new object[] { invoiceReports, Uniconta.ClientTools.Localization.lookup("PackNotes") }, reportsName);
-                    }
-
-                    if (failedPrints.Count > 0)
-                    {
-                        var failedList = string.Join(",", failedPrints);
-                        UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("FailedPrintmsg") + failedList, Uniconta.ClientTools.Localization.lookup("Error"), MessageBoxButton.OK);
-                    }
+                    var failedList = string.Join(",", failedPrints);
+                    UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("FailedPrintmsg") + failedList, Uniconta.ClientTools.Localization.lookup("Error"), MessageBoxButton.OK);
                 }
-                else
-                    UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("LayoutDoesNotExist"), Uniconta.ClientTools.Localization.lookup("PackNote")),
-                       Uniconta.ClientTools.Localization.lookup("Error"), MessageBoxButton.OK);
 #elif SILVERLIGHT
                         DefaultPrint(debtInvoice, true, new Point(top, left));
                         left = left - left / count;
@@ -259,7 +281,27 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
 #if !SILVERLIGHT
-        private async Task<IPrintReport> PrintInvoice(DebtorInvoiceClient debtorInvoice)
+
+        async private void OpenOutLook(DebtorInvoiceClient invClient)
+        {
+            try
+            {
+                busyIndicator.IsBusy = true;
+                busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("LaunchingWaitMsg");
+                var debtor = invClient.Debtor;
+                var invoiceReport = await PrintPacknote(invClient);
+                InvoicePostingPrintGenerator.OpenReportInOutlook(api, invoiceReport, invClient, debtor, CompanyLayoutType.Packnote);
+            }
+            catch (Exception ex)
+            {
+                UnicontaMessageBox.Show(ex.Message, Uniconta.ClientTools.Localization.lookup("Exception"));
+            }
+            finally { busyIndicator.IsBusy = false; }
+        }
+
+        bool isGeneratingPacknote;
+        StandardPrintReportPage standardViewerPrintPage;
+        private async Task<IPrintReport> PrintPacknote(DebtorInvoiceClient debtorInvoice)
         {
             IPrintReport iprintReport = null;
 
@@ -270,7 +312,7 @@ namespace UnicontaClient.Pages.CustomPage
                 var standardDebtorPackNote = new DebtorQCPReportClient(debtorQcpPrint.Company, debtorQcpPrint.Debtor, debtorQcpPrint.DebtorInvoice, debtorQcpPrint.InvTransInvoiceLines, null,
                     debtorQcpPrint.CompanyLogo, debtorQcpPrint.ReportName, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.PackNote, messageClient: debtorQcpPrint.MessageClient);
 
-                var standardReports = new [] { standardDebtorPackNote };
+                var standardReports = new[] { standardDebtorPackNote };
                 iprintReport = new StandardPrintReport(api, standardReports, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.PackNote);
                 await iprintReport.InitializePrint();
 
@@ -283,6 +325,8 @@ namespace UnicontaClient.Pages.CustomPage
             return iprintReport;
         }
 
+        public override bool IsDataChaged => isGeneratingPacknote;
+
 #elif SILVERLIGHT
         private void DefaultPrint(DebtorInvoiceClient debtorInvoice)
         {
@@ -290,8 +334,7 @@ namespace UnicontaClient.Pages.CustomPage
             ob[0] = debtorInvoice;
             ob[1] = CompanyLayoutType.Packnote;
             string headerName = "PackNote";
-            AddDockItem(TabControls.ProformaInvoice, ob, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup(headerName),
-                debtorInvoice._InvoiceNumber));
+            AddDockItem(TabControls.ProformaInvoice, ob, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup(headerName), debtorInvoice.InvoiceNum));
         }
 
         private void DefaultPrint(DebtorInvoiceClient debtorInvoice, bool isFloat, Point position, bool isPackNote = false)
@@ -300,8 +343,7 @@ namespace UnicontaClient.Pages.CustomPage
             ob[0] = debtorInvoice;
             ob[1] = CompanyLayoutType.Packnote;
             string headerName = "PackNote";
-            AddDockItem(TabControls.ProformaInvoice, ob, isFloat, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup(headerName),
-                debtorInvoice._InvoiceNumber), floatingLoc: position);
+            AddDockItem(TabControls.ProformaInvoice, ob, isFloat, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup(headerName), debtorInvoice.InvoiceNum), floatingLoc: position);
         }
 #endif
 
@@ -386,6 +428,19 @@ namespace UnicontaClient.Pages.CustomPage
         void setDim()
         {
             UnicontaClient.Utilities.Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
+        }
+
+        public override void Utility_Refresh(string screenName, object argument = null)
+        {
+            if (screenName == TabControls.StandardPrintReportPage)
+            {
+#if !SILVERLIGHT
+                isGeneratingPacknote = false;
+                standardViewerPrintPage = null;
+#endif
+            }
+            if (screenName == TabControls.InvoicePage2)
+                dgPackNotesGrid.UpdateItemSource(argument);
         }
     }
 }

@@ -35,13 +35,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorTransactions"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Debit" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Credit" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Open" Width="30"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PostType" Width="90" >
-                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                            <DataTemplate>
-                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="DCPostType" />
-                            </DataTemplate>
-                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                    </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:ComboBoxColumnClient x:Name="PostType" Width="90" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="VoucherX" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Amount" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Currency" Width="40" />

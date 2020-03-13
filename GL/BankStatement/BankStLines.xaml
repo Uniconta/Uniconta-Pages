@@ -70,6 +70,13 @@ x:Class="UnicontaClient.Pages.CustomPage.BankStLines"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="AccountName" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Vat" Width="60" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="VatOperation" Width="35" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Note" Width="50" Visible="False" AllowEditing="True" >
+                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <CorasauControls:MemoEditor Name="PART_Editor"  PopupFooterButtons="None" ShowIcon="{Binding DataContext.RowData.Row.HasNote, RelativeSource={RelativeSource TemplatedParent}}" MaxLength="1000"/>
+                            </DataTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                    </localPage:CorasauDataGridTemplateColumnClient>
                 </localPage:BankStLineGrid.Columns>
                 </localPage:BankStLineGrid>       
         </CorasauControls:BusyIndicator>

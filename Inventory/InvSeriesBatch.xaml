@@ -22,8 +22,8 @@ x:Class="UnicontaClient.Pages.CustomPage.InvSeriesBatch"
 
             <local:InvSeriesBatchGrid   x:Name="dgInvSeriesBatchGrid" AutoGenerateColumns="None">
                 <local:InvSeriesBatchGrid.Columns>
-                       <local:CorasauDataGridForeignKeyColumnClient x:Name="Item">
-                        <local:CorasauDataGridForeignKeyColumnClient.CellTemplateSelector>
+                    <local:CorasauDataGridTemplateColumnClient  x:Name="Item">
+                        <local:CorasauDataGridTemplateColumnClient.CellTemplateSelector>
                             <local:ItemDataTemplateSelector>
                                 <local:ItemDataTemplateSelector.TextTemplate>
                                     <DataTemplate>
@@ -36,13 +36,8 @@ x:Class="UnicontaClient.Pages.CustomPage.InvSeriesBatch"
                                     </DataTemplate>
                                 </local:ItemDataTemplateSelector.LookupTemplate>
                           </local:ItemDataTemplateSelector>
-                        </local:CorasauDataGridForeignKeyColumnClient.CellTemplateSelector>
-                        <local:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
-                            <ControlTemplate>
-                                <TextBlock Margin="2" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.Item,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"></TextBlock>
-                            </ControlTemplate>
-                        </local:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
-                   </local:CorasauDataGridForeignKeyColumnClient>
+                        </local:CorasauDataGridTemplateColumnClient.CellTemplateSelector>
+                   </local:CorasauDataGridTemplateColumnClient>
                    <local:CorasauDataGridTemplateColumnClient x:Name="ItemName" Width="150"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="QtyInitial" MinWidth="80" >
                         <local:CorasauDataGridTemplateColumnClient.CellTemplate>

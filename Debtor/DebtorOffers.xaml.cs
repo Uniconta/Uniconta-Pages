@@ -171,11 +171,11 @@ namespace UnicontaClient.Pages.CustomPage
                     if (dgDebtorOffers.masterRecords != null)
                     {
                         object[] arr = new object[2] { api, dgDebtorOffers.masterRecord };
-                        AddDockItem(TabControls.DebtorOfferPage2, arr, Uniconta.ClientTools.Localization.lookup("Offers"), ";component/Assets/img/Add_16x16.png", true);
+                        AddDockItem(TabControls.DebtorOfferPage2, arr, Uniconta.ClientTools.Localization.lookup("Offers"), "Add_16x16.png", true);
                     }
                     else
                     {
-                        AddDockItem(TabControls.DebtorOfferPage2, api, Uniconta.ClientTools.Localization.lookup("Offers"), ";component/Assets/img/Add_16x16.png", true);
+                        AddDockItem(TabControls.DebtorOfferPage2, api, Uniconta.ClientTools.Localization.lookup("Offers"), "Add_16x16.png", true);
                     }
                     break;
                 case "EditRow":
@@ -308,7 +308,7 @@ namespace UnicontaClient.Pages.CustomPage
                 dgDebtorOffers.MakeEditable();
                 UserFieldControl.MakeEditable(dgDebtorOffers);
                 iBase.Caption = Uniconta.ClientTools.Localization.lookup("LeaveEditAll");
-                ribbonControl.EnableButtons(new string[] {  "UndoDelete", "DeleteRow", "SaveGrid" });
+                ribbonControl.EnableButtons(new string[] { "UndoDelete", "DeleteRow", "SaveGrid" });
                 editAllChecked = false;
             }
             else
@@ -334,7 +334,7 @@ namespace UnicontaClient.Pages.CustomPage
                         dgDebtorOffers.Readonly = true;
                         dgDebtorOffers.tableView.CloseEditor();
                         iBase.Caption = Uniconta.ClientTools.Localization.lookup("EditAll");
-                        ribbonControl.DisableButtons(new string[] {  "UndoDelete", "DeleteRow", "SaveGrid" });
+                        ribbonControl.DisableButtons(new string[] { "UndoDelete", "DeleteRow", "SaveGrid" });
                     };
                     confirmationDialog.Show();
                 }
@@ -343,7 +343,7 @@ namespace UnicontaClient.Pages.CustomPage
                     dgDebtorOffers.Readonly = true;
                     dgDebtorOffers.tableView.CloseEditor();
                     iBase.Caption = Uniconta.ClientTools.Localization.lookup("EditAll");
-                    ribbonControl.DisableButtons(new string[] {  "UndoDelete", "DeleteRow", "SaveGrid" });
+                    ribbonControl.DisableButtons(new string[] { "UndoDelete", "DeleteRow", "SaveGrid" });
                 }
             }
         }
@@ -357,7 +357,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (debtor != null)
             {
                 debtorName = debtor._Name ?? dbOrder._DCAccount;
-                showSendByMail = !string.IsNullOrEmpty(debtor.InvoiceEmail);
+                showSendByMail = (!string.IsNullOrEmpty(debtor.InvoiceEmail) || debtor.EmailDocuments);
             }
             else if (dbOrder._Prospect == 0)
             {
@@ -382,7 +382,7 @@ namespace UnicontaClient.Pages.CustomPage
                     var showOrPrintOffer = GenrateOfferDialog.InvoiceQuickPrint || GenrateOfferDialog.ShowInvoice;
                     var invoicePostingResult = new InvoicePostingPrintGenerator(api, this, dbOrder, null, GenrateOfferDialog.GenrateDate, 0, true, CompanyLayoutType.Offer, showOrPrintOffer, GenrateOfferDialog.InvoiceQuickPrint,
                         GenrateOfferDialog.NumberOfPages, GenrateOfferDialog.SendByEmail, GenrateOfferDialog.Emails, GenrateOfferDialog.sendOnlyToThisEmail, false, GenrateOfferDialog.PostOnlyDelivered, null);
-
+                    invoicePostingResult.OpenAsOutlook = GenrateOfferDialog.SendByOutlook;
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
                     busyIndicator.IsBusy = true;
                     var result = await invoicePostingResult.Execute();
@@ -435,6 +435,20 @@ namespace UnicontaClient.Pages.CustomPage
         void setDim()
         {
             UnicontaClient.Utilities.Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
+        }
+
+        private void HasDocImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            var offer = (sender as Image).Tag as DebtorOfferClient;
+            if (offer != null)
+                AddDockItem(TabControls.UserDocsPage, dgDebtorOffers.syncEntity);
+        }
+
+        private void HasNoteImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            var offer = (sender as Image).Tag as DebtorOfferClient;
+            if (offer != null)
+                AddDockItem(TabControls.UserNotesPage, dgDebtorOffers.syncEntity);
         }
     }
 }

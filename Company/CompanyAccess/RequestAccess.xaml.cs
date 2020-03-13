@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -52,7 +51,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
         private async void OKButton_Click(object sender, RoutedEventArgs e)
         {
-            ErrorCodes res = await BasePage.session.RequestCompanyAccess(txtCompanyName.Text);
+            ErrorCodes res = await BasePage.session.RequestCompanyAccess(txtCompanyName.Text, txtCompanyId.EditValue != null ? (int)txtCompanyId.EditValue:0);
             if (res == ErrorCodes.Succes)
                 this.DialogResult = true;
             UtilDisplay.ShowErrorCode(res);             

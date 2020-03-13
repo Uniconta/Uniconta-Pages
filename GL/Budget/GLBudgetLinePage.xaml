@@ -34,13 +34,7 @@ x:Class="UnicontaClient.Pages.CustomPage.GLBudgetLinePage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="Debit" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Credit" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Qty" Width="60"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Recurring" Width="90">
-                        <local:CorasauDataGridTemplateColumnClient.CellTemplate>
-                            <DataTemplate>
-                                <UnicontaControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="RecurringMethod" />
-                            </DataTemplate>
-                        </local:CorasauDataGridTemplateColumnClient.CellTemplate>
-                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:ComboBoxColumnClient x:Name="Recurring" Width="90"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Regulate" Width="60"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="ToDate" Width="90" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Disable" Width="50"/>

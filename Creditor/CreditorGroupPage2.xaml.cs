@@ -115,5 +115,17 @@ namespace UnicontaClient.Pages.CustomPage
 
             LoadType(typeof(Uniconta.DataModel.GLAccount));
         }
+
+        protected override void OnLayoutCtrlLoaded()
+        {
+            AdjustLayout();
+        }
+
+        void AdjustLayout()
+        {
+            var Comp = api.CompanyEntity;
+            if (!Comp.InvDuty)
+                liExemptDuty.Visibility = Visibility.Collapsed;
+        }
     }
 }

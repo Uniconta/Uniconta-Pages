@@ -115,7 +115,7 @@ x:Class="UnicontaClient.Pages.CustomPage.TMJournalLinePage"
                                     </localPage:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
                                     <localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
                                         <DataTemplate>
-                                            <localPage:CorasauGridLookupEditorClient HasCustomLookUp="true" IsReadOnly="{Binding DataContext.RowData.Row.IsEditable,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToBoolConverter}}"  x:Name="PART_Editor" ItemsSource="{Binding DataContext.RowData.Row.ProjectSource,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" LostFocus="PART_Editor_LostFocus"  GotFocus="PART_Editor_GotFocus"/>
+                                            <localPage:CorasauGridLookupEditorClient HasCustomLookUp="true" IsReadOnly="{Binding DataContext.RowData.Row.IsEditable,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToBoolConverter}}"  x:Name="PART_Editor" ItemsSource="{Binding DataContext.RowData.Row.ProjectSource,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" LostFocus="Hours_Project_LostFocus"  GotFocus="Hours_Project_GotFocus"/>
                                         </DataTemplate>
                                     </localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridForeignKeyColumnClient>
@@ -128,7 +128,7 @@ x:Class="UnicontaClient.Pages.CustomPage.TMJournalLinePage"
                                     </localPage:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
                                     <localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
                                         <DataTemplate>
-                                            <localPage:CorasauGridLookupEditorClient IsReadOnly="{Binding DataContext.RowData.Row.IsEditable,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToBoolConverter}}"  x:Name="PART_Editor" />
+                                            <localPage:CorasauGridLookupEditorClient HasCustomLookUp="true" IsReadOnly="{Binding DataContext.RowData.Row.IsEditable,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToBoolConverter}}"  x:Name="PART_Editor" ItemsSource="{Binding DataContext.RowData.Row.PayrollSource,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" LostFocus="Hours_Payroll_LostFocus"  GotFocus="Hours_Payroll_GotFocus"/>
                                         </DataTemplate>
                                     </localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridForeignKeyColumnClient>
@@ -363,7 +363,7 @@ x:Class="UnicontaClient.Pages.CustomPage.TMJournalLinePage"
                                     </localPage:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
                                     <localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
                                         <DataTemplate>
-                                            <localPage:CorasauGridLookupEditorClient HasCustomLookUp="true" IsReadOnly="{Binding DataContext.RowData.Row.IsEditable,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToBoolConverter}}"  x:Name="PART_Editor" ItemsSource="{Binding DataContext.RowData.Row.ProjectSource,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" LostFocus="MilageGrid_LostFocus"  GotFocus="MilageGrid_GotFocus" />
+                                            <localPage:CorasauGridLookupEditorClient HasCustomLookUp="true" IsReadOnly="{Binding DataContext.RowData.Row.IsEditable,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToBoolConverter}}"  x:Name="PART_Editor" ItemsSource="{Binding DataContext.RowData.Row.ProjectSource,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" LostFocus="Milage_Project_LostFocus"  GotFocus="Milage_Project_GotFocus" />
                                         </DataTemplate>
                                     </localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridForeignKeyColumnClient>
@@ -376,7 +376,7 @@ x:Class="UnicontaClient.Pages.CustomPage.TMJournalLinePage"
                                     </localPage:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
                                     <localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
                                         <DataTemplate>
-                                            <localPage:CorasauGridLookupEditorClient IsReadOnly="{Binding DataContext.RowData.Row.IsEditable,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToBoolConverter}}"  x:Name="PART_Editor" />
+                                            <localPage:CorasauGridLookupEditorClient  HasCustomLookUp="true" IsReadOnly="{Binding DataContext.RowData.Row.IsEditable,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToBoolConverter}}"  x:Name="PART_Editor" ItemsSource="{Binding DataContext.RowData.Row.PayrollSource,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" LostFocus="Milage_Payroll_LostFocus"  GotFocus="Milage_Payroll_GotFocus" />
                                         </DataTemplate>
                                     </localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridForeignKeyColumnClient>

@@ -2,13 +2,13 @@
 <root>
   <RibbonItem TabId="0" LocalizedNameKey="Home">
     <RibbonItem Action="SaveGrid" ShortcutKey="CTRL+S" LocalizedNameKey="Save" Glyph="save-16x16.png" LargeGlyph="save-32x32.png"/>
-    <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh.png" LargeGlyph="refresh.png"/>
     <RibbonItem Action="Settlements" LocalizedNameKey="Settlements" Glyph="Settled_Transaction_32x32.png" LargeGlyph="Settled_Transaction_32x32.png"/>
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="ViewDownloadRow" ShortcutKey="Alt+P" LocalizedNameKey="PhysicalVoucher" Glyph="View_Voucher_32x32.png" LargeGlyph="View_Voucher_32x32.png" />
   </RibbonItem>
   <RibbonItem>
+    <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh.png" LargeGlyph="refresh.png"/>
     <RibbonItem Action="Filter" ShortcutKey="Ctrl+I" LocalizedNameKey="Filter" LargeGlyph="Filter_32x32.png"/>
     <RibbonItem Action="ClearFilter" ShortcutKey="Ctrl+K" LocalizedNameKey="ClearFilter" LargeGlyph="Filter_Clear_32x32.png"/>
   </RibbonItem>

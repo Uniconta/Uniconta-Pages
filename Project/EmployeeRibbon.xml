@@ -45,11 +45,11 @@
     <RibbonItem Action="Settings" LocalizedNameKey="Settings" LargeGlyph="Settings_32x32.png">
       <RibbonItem Action="Commission" LocalizedNameKey="Commission" ControlName="EmployeeCommissionPage" Glyph="Budget_16x16.png" LargeGlyph="Budget_32x32.png"/>
       <RibbonItem Action="EmpPayrollCategory" LocalizedNameKey="EmployeeRates" ControlName="EmpPayrolCategoryPage" Module="Project" Glyph="PriceTag_16x16.png" LargeGlyph="Contacts_32x32.png"/>
-      <RibbonItem Action="TMEmpCalendarSetup" LocalizedNameKey="Calendar" ControlName="TMEmpCalendarSetupPage" Module="TimeManagement" Glyph="Calendar_16x16.png" LargeGlyph="Calendar_32x32.png"/>      
+      <RibbonItem Action="TMEmpCalendarSetup" LocalizedNameKey="Calendar" ControlName="TMEmpCalendarSetupPage" Module="TimeManagement" Glyph="Calendar_16x16.png"/>      
     </RibbonItem>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="PhysicalVoucher" LocalizedNameKey="PhysicalVouchersInbox" ControlName="Vouchers" Glyph="View_Voucher_32x32.png" LargeGlyph="View_Voucher_32x32.png"/>
+    <RibbonItem Action="ApproveDocument" LocalizedNameKey="ApproveDocument" ControlName="DocumentsApprovalPage" Glyph="View_Voucher_32x32.png" LargeGlyph="View_Voucher_32x32.png"/>
   </RibbonItem>
    <RibbonItem TabId="1" LocalizedNameKey="EditAll">
     <RibbonItem Action="EditAll"  LocalizedNameKey="EditAll" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>

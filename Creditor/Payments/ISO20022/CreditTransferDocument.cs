@@ -88,6 +88,7 @@ namespace UnicontaISO20022CreditTransfer
         protected string companyCountryId;
         protected string instructionPriority;
         protected string extCategoryPurpose;
+        protected string extProprietaryCode;
         protected string endToEndId;
 
 
@@ -550,6 +551,33 @@ namespace UnicontaISO20022CreditTransfer
             set
             {
                 extCategoryPurpose = value;
+            }
+        }
+
+        /// <summary>
+        /// Accepted codes:
+        /// NORM
+        /// HIGH
+        /// - payment type is set to urgent for Domestic, European and International non-European
+        /// payments
+        /// EXPR
+        /// - payment type is set to urgent for Domestic, European and International non-European
+        /// payments(please look execption below)
+        /// - payment type is set to express for international non-European payments in EUR, USD(Estonia,
+        /// Lithuania) and EUR, USD, SEK, GBP, RUB (Latvia)
+        /// Value dates and cut - off times of different payment types are available in Price List.
+        /// Other values will be set to NORM
+        /// </summary>
+        public string ExtProprietaryCode
+        {
+            get
+            {
+                return extProprietaryCode;
+            }
+
+            set
+            {
+                extProprietaryCode = value;
             }
         }
 

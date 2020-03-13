@@ -30,43 +30,31 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryItems"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="HasNotes" Width="30" ReadOnly="True">
                         <localPage:CorasauDataGridTemplateColumnClient.HeaderTemplate>
                             <DataTemplate>
-                                <Image Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=;component/Assets/img/Note_16x16.png}" Width="16" Height="16" VerticalAlignment="Center"/>
+                                <Image Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Note_16x16.png}" Width="16" Height="16" VerticalAlignment="Center"/>
                             </DataTemplate>
                         </localPage:CorasauDataGridTemplateColumnClient.HeaderTemplate>
                         <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                             <ControlTemplate>
-                                <Image Margin="5" Tag="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=;component/Assets/img/Note_16x16.png}" MouseLeftButtonDown="HasNoteImage_MouseLeftButtonDown" Visibility="{Binding DataContext.RowData.Row.HasNotes,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource VisibilityBoolConverter}}" Stretch="Fill" Width="16" Height="16" RenderOptions.BitmapScalingMode="NearestNeighbor" RenderOptions.EdgeMode="Aliased" />
+                                <Image Margin="5" Tag="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Note_16x16.png}" MouseLeftButtonDown="HasNoteImage_MouseLeftButtonDown" Visibility="{Binding DataContext.RowData.Row.HasNotes,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource VisibilityBoolConverter}}" Stretch="Fill" Width="16" Height="16" RenderOptions.BitmapScalingMode="NearestNeighbor" RenderOptions.EdgeMode="Aliased" />
                             </ControlTemplate>
                         </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                     </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="HasDocs" ReadOnly="True"  Width="30" >
                         <localPage:CorasauDataGridTemplateColumnClient.HeaderTemplate>
                             <DataTemplate>
-                                <Image Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=;component/Assets/img/Document_Attachment_16x16.png}" Width="16" Height="16" VerticalAlignment="Center"/>
+                                <Image Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Document_Attachment_16x16.png}" Width="16" Height="16" VerticalAlignment="Center"/>
                             </DataTemplate>
                         </localPage:CorasauDataGridTemplateColumnClient.HeaderTemplate>
                         <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                             <ControlTemplate>
-                                <Image Margin="5" Tag="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=;component/Assets/img/Document_Attachment_16x16.png}" MouseLeftButtonDown="HasDocImage_MouseLeftButtonDown" Visibility="{Binding DataContext.RowData.Row.HasDocs,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource VisibilityBoolConverter}}" Stretch="Fill" Width="16" Height="16" RenderOptions.BitmapScalingMode="NearestNeighbor" RenderOptions.EdgeMode="Aliased" />
+                                <Image Margin="5" Tag="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Document_Attachment_16x16.png}" MouseLeftButtonDown="HasDocImage_MouseLeftButtonDown" Visibility="{Binding DataContext.RowData.Row.HasDocs,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource VisibilityBoolConverter}}" Stretch="Fill" Width="16" Height="16" RenderOptions.BitmapScalingMode="NearestNeighbor" RenderOptions.EdgeMode="Aliased" />
                             </ControlTemplate>
                         </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                     </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Item" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" Width="200"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ItemType" Width="90">
-                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                            <DataTemplate>
-                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="ItemType" />
-                            </DataTemplate>
-                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                    </localPage:CorasauDataGridTemplateColumnClient>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CostModel" Width="90">
-                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                            <DataTemplate>
-                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="InventCostModel" />
-                            </DataTemplate>
-                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                    </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:ComboBoxColumnClient x:Name="ItemType" Width="90" />
+                    <localPage:ComboBoxColumnClient x:Name="CostModel" Width="90" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CostPrice" Width="70"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="SalesPrice1" Width="70"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="SalesPrice2" Width="70"/>
@@ -79,54 +67,18 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryItems"
                             </DataTemplate>
                         </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                     </localPage:CorasauDataGridTemplateColumnClient>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Unit" Width="50">
-                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                            <DataTemplate>
-                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="ItemUnit" />
-                            </DataTemplate>
-                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                    </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:ComboBoxColumnClient x:Name="Unit" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Decimals" Width="30"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Currency1" Width="35">
-                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                            <DataTemplate>
-                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="Currencies" />
-                            </DataTemplate>
-                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                    </localPage:CorasauDataGridTemplateColumnClient>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Currency2" Width="35">
-                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                            <DataTemplate>
-                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="Currencies" />
-                            </DataTemplate>
-                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                    </localPage:CorasauDataGridTemplateColumnClient>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Currency3" Width="35">
-                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                            <DataTemplate>
-                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="Currencies" />
-                            </DataTemplate>
-                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                    </localPage:CorasauDataGridTemplateColumnClient>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PurchaseCurrency" Width="35">
-                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                            <DataTemplate>
-                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="Currencies" />
-                            </DataTemplate>
-                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                    </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:ComboBoxColumnClient x:Name="Currency1" Width="35" />
+                    <localPage:ComboBoxColumnClient x:Name="Currency2" Width="35"/>
+                    <localPage:ComboBoxColumnClient x:Name="Currency3" Width="35"/>
+                    <localPage:ComboBoxColumnClient x:Name="PurchaseCurrency" Width="35"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="AverageCost" Width="70"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CostValue" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="UseStorage" Visible="False" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="SerialOrBatch" Visible="False" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="EAN" Visible="False" Width="90"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="UseAlternative" Visible="False" Width="70" >
-                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                            <DataTemplate>
-                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="UseAlternativeItem" />
-                            </DataTemplate>
-                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                    </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:ComboBoxColumnClient x:Name="UseAlternative" Visible="False" Width="70" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="AlternativeItem" Visible="False" Width="90" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="TariffNumber" Visible="False" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="StockPosition" Visible="False" Width="90"/>
@@ -209,20 +161,8 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryItems"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="HideInSales" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="HideInPurchase" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CountryOfOrigin" Visible="False" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="SalesUnit" Visible="False" Width="100">
-                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                            <DataTemplate>
-                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="ItemUnit" />
-                            </DataTemplate>
-                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                    </localPage:CorasauDataGridTemplateColumnClient>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PurchaseUnit" Visible="False" Width="100">
-                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                            <DataTemplate>
-                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="ItemUnit" />
-                            </DataTemplate>
-                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                    </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:ComboBoxColumnClient x:Name="SalesUnit" Visible="False" Width="100" />
+                    <localPage:ComboBoxColumnClient x:Name="PurchaseUnit" Visible="False" Width="100"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="UnitGroup" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DutyGroup" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PurchaseMin" Visible="False" />

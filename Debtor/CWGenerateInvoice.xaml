@@ -23,6 +23,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CWGenerateInvoice"
                 <!-- This row not required anymore-->
                 <RowDefinition Height="Auto" x:Name="RowInvNo"/>
                 <RowDefinition Height="Auto" x:Name="RowInvoice"/>
+                <RowDefinition Height="Auto" x:Name="RowSendByOutlook"/>
                 <RowDefinition Height="Auto" x:Name="RowSendByEmail"/>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
@@ -35,8 +36,8 @@ x:Class="UnicontaClient.Pages.CustomPage.CWGenerateInvoice"
                 <ColumnDefinition Width="5"/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Account}" VerticalAlignment="Center"></TextBlock>
-            <TextBlock x:Name="txtAccountName" VerticalAlignment="Center" Grid.Column="2" ></TextBlock>
+            <TextBlock x:Name="txtAccountLabel" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Account}" VerticalAlignment="Center" />
+            <TextBlock x:Name="txtAccountName" VerticalAlignment="Center" Grid.Column="2" />
 
             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Simulation}" Grid.Row="1" VerticalAlignment="Center"></TextBlock>
             <CheckBox x:Name="chkSimulation" VerticalAlignment="Center" Grid.Column="2" Grid.Row="1" IsChecked="{Binding IsSimulation, Mode=TwoWay}"></CheckBox>
@@ -72,22 +73,25 @@ x:Class="UnicontaClient.Pages.CustomPage.CWGenerateInvoice"
                 </StackPanel>
             </Grid>
 
-            <TextBlock Grid.Row="7" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=SendInvoiceByEmail}" VerticalAlignment="Center" Margin="0 0 0 10"></TextBlock>
-            <CheckBox x:Name="chkSendEmail" IsChecked="{Binding SendByEmail, Mode=TwoWay}" Grid.Row="7" VerticalAlignment="Center" Grid.Column="2" Margin="0 0 0 10"></CheckBox>
+            <TextBlock Grid.Row="7" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=SendInvoiceInOutLook}" VerticalAlignment="Center" Margin="0 0 0 10" />
+            <CheckBox x:Name="chkSendOutlook" IsChecked="{Binding SendByOutlook, Mode=TwoWay}" Grid.Row="7" VerticalAlignment="Center" Grid.Column="2" Margin="0 0 0 10" Checked="chkSendOutlook_Checked"/>
 
-            <TextBlock Grid.Row="8" x:Name="tbShEmail" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Email,Mode=OneWay}" VerticalAlignment="Center" Margin="0 0 0 10"></TextBlock>
-            <ClientToolsControls:TextEditor x:Name="txtEmail" Text="{Binding Emails, Mode=TwoWay}" HandleKeyDown="False" MaskType="RegEx" Mask="{StaticResource EmailValidationRegx}" Grid.Row="8" Grid.Column="2" Width="200" Height="25"  VerticalAlignment="Center" HorizontalAlignment="Left" Margin="0 0 0 10"/>
+            <TextBlock Grid.Row="8" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=SendInvoiceByEmail}" VerticalAlignment="Center" Margin="0 0 0 10" />
+            <CheckBox x:Name="chkSendEmail" IsChecked="{Binding SendByEmail, Mode=TwoWay}" Grid.Row="8" VerticalAlignment="Center" Grid.Column="2" Margin="0 0 0 10" Checked="chkSendEmail_Checked" />
+            
+            <TextBlock Grid.Row="9" x:Name="tbShEmail" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Email,Mode=OneWay}" VerticalAlignment="Center" Margin="0 0 0 10"></TextBlock>
+            <ClientToolsControls:TextEditor x:Name="txtEmail" Text="{Binding Emails, Mode=TwoWay}" HandleKeyDown="False" MaskType="RegEx" Mask="{StaticResource EmailValidationRegx}" Grid.Row="9" Grid.Column="2" Width="200" Height="25"  VerticalAlignment="Center" HorizontalAlignment="Left" Margin="0 0 0 10"/>
 
-            <TextBlock Grid.Row="9" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=SendOnlyToThisEmail}" VerticalAlignment="Center" Margin="0 0 0 10"></TextBlock>
-            <CheckBox x:Name="chkSendOnlyEmail" Grid.Row="9" IsChecked="{Binding sendOnlyToThisEmail, Mode=TwoWay}" VerticalAlignment="Center" Grid.Column="2" Margin="0 0 0 10"></CheckBox>
+            <TextBlock Grid.Row="10" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=SendOnlyToThisEmail}" VerticalAlignment="Center" Margin="0 0 0 10"></TextBlock>
+            <CheckBox x:Name="chkSendOnlyEmail" Grid.Row="10" IsChecked="{Binding sendOnlyToThisEmail, Mode=TwoWay}" VerticalAlignment="Center" Grid.Column="2" Margin="0 0 0 10"></CheckBox>
 
-            <TextBlock Grid.Row="10" x:Name="txtNoMailMsg" VerticalAlignment="Center" Grid.ColumnSpan="3" HorizontalAlignment="Left" Margin="0 0 0 10"></TextBlock>
+            <TextBlock Grid.Row="11" x:Name="txtNoMailMsg" VerticalAlignment="Center" Grid.ColumnSpan="3" HorizontalAlignment="Left" Margin="0 0 0 10"></TextBlock>
 
-            <TextBlock Grid.Row="11" x:Name="tbOIOUBL" Visibility="Collapsed" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=GenerateInvoiceOIOUBL,Mode=OneWay}" VerticalAlignment="Center" Margin="0 0 0 10"></TextBlock>
-            <CheckBox x:Name="chkOIOUBL" IsChecked="{Binding GenerateOIOUBLClicked, Mode=TwoWay}" Grid.Row="11" Visibility="Collapsed" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="0 0 0 10"/>
+            <TextBlock Grid.Row="12" x:Name="tbOIOUBL" Visibility="Collapsed" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=GenerateInvoiceOIOUBL,Mode=OneWay}" VerticalAlignment="Center" Margin="0 0 0 10"></TextBlock>
+            <CheckBox x:Name="chkOIOUBL" IsChecked="{Binding GenerateOIOUBLClicked, Mode=TwoWay}" Grid.Row="12" Visibility="Collapsed" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="0 0 0 10"/>
 
-            <TextBlock Grid.Row="12" x:Name="tbPostOnlyDelL" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=PostOnlyDelivered,Mode=OneWay}" VerticalAlignment="Center" Margin="0 0 0 10"></TextBlock>
-            <CheckBox x:Name="chkPostOnlyDel" IsChecked="{Binding PostOnlyDelivered, Mode=TwoWay}" Grid.Row="12"  Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="0 0 0 10"/>
+            <TextBlock Grid.Row="13" x:Name="tbPostOnlyDelL" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=PostOnlyDelivered,Mode=OneWay}" VerticalAlignment="Center" Margin="0 0 0 10"></TextBlock>
+            <CheckBox x:Name="chkPostOnlyDel" IsChecked="{Binding PostOnlyDelivered, Mode=TwoWay}" Grid.Row="13"  Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="0 0 0 10"/>
 
         </Grid>
         <StackPanel x:Name="actionButton" HorizontalAlignment="Right" Grid.Row="1" Orientation="Horizontal" Margin="0 10 0 0">

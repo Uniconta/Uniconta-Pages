@@ -89,18 +89,7 @@ x:Class="UnicontaClient.Pages.CustomPage.MatchPhysicalVoucherToGLDailyJournalLin
                         <localPage:CorasauDataGridTemplateColumnClient FieldName="DocumentRef" AllowThousandMask="false" Width="80" ReadOnly="True" />
                         <localPage:CorasauDataGridTemplateColumnClient FieldName="Date" x:Name="colDate" Width="90" ReadOnly="True"/>
                         <localPage:CorasauDataGridTemplateColumnClient FieldName="Voucher" x:Name="colVoucher" AllowThousandMask="false" Width="80" ReadOnly="True"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="AccountType" Width="100">
-                            <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
-                                <ControlTemplate>
-                                    <TextBlock Margin="2" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.AccountType,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"></TextBlock>
-                                </ControlTemplate>
-                            </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
-                            <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                                <DataTemplate>
-                                    <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="GLAccountType" />
-                                </DataTemplate>
-                            </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                        </localPage:CorasauDataGridTemplateColumnClient>
+                        <localPage:ComboBoxColumnClient x:Name="AccountType" Width="100" />
                         <localPage:CorasauDataGridForeignKeyColumnClient x:Name="Account">
                             <localPage:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
                                 <ControlTemplate>
@@ -119,13 +108,7 @@ x:Class="UnicontaClient.Pages.CustomPage.MatchPhysicalVoucherToGLDailyJournalLin
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="colCredit" FieldName="Credit" ReadOnly="True"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="TraceBalance" Visible="False" ReadOnly="True"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Invoice" AllowThousandMask="False" Width="80" ReadOnly="True"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="OffsetAccountType" >
-                            <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                                <DataTemplate>
-                                    <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="GLAccountType"/>
-                                </DataTemplate>
-                            </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                        </localPage:CorasauDataGridTemplateColumnClient>
+                        <localPage:ComboBoxColumnClient x:Name="OffsetAccountType" />
                         <localPage:CorasauDataGridForeignKeyColumnClient x:Name="OffsetAccount">
                             <localPage:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
                                 <ControlTemplate>

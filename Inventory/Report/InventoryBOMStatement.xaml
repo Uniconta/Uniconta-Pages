@@ -54,20 +54,8 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryBOMStatement"
                                 </local:CorasauDataGridTemplateColumnClient>
                                 <local:CorasauDataGridTemplateColumnClient x:Name="UnitSize" Width="80" />
                                 <local:CorasauDataGridTemplateColumnClient x:Name="CostPriceFactor" Width="80" />
-                                <local:CorasauDataGridTemplateColumnClient x:Name="QtyType" Width="100">
-                                    <local:CorasauDataGridTemplateColumnClient.CellTemplate>
-                                        <DataTemplate>
-                                            <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="BOMQtyType"/>
-                                        </DataTemplate>
-                                    </local:CorasauDataGridTemplateColumnClient.CellTemplate>
-                                </local:CorasauDataGridTemplateColumnClient>
-                                <local:CorasauDataGridTemplateColumnClient x:Name="MoveType" Width="100">
-                                    <local:CorasauDataGridTemplateColumnClient.CellTemplate>
-                                        <DataTemplate>
-                                            <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="BOMMoveType"/>
-                                        </DataTemplate>
-                                    </local:CorasauDataGridTemplateColumnClient.CellTemplate>
-                                </local:CorasauDataGridTemplateColumnClient>
+                                <local:ComboBoxColumnClient x:Name="QtyType" Width="100"/>
+                                <local:ComboBoxColumnClient x:Name="MoveType" Width="100"/>
                                 <local:CorasauDataGridTemplateColumnClient x:Name="CostValue" Width="80"/>
                                 <local:CorasauDataGridTemplateColumnClient x:Name="SalesValue" Width="80"/>
                                 <local:CorasauDataGridTemplateColumnClient x:Name="ShowOnInvoice" Width="60"/>

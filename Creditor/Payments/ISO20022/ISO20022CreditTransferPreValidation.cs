@@ -114,39 +114,44 @@ namespace ISO20022CreditTransfer
         {
             XmlDocument dummyDoc = new XmlDocument();
 
-
-            var bankAccount = (BankStatement)bankAccountCache.Get(credPaymFormat._BankAccount);
-
-            if (bankAccount == null)
+            if (bankAccountCache.Count == 0 || credPaymFormat._BankAccount == null)
             {
                 PreCheckErrors.Add(new PreCheckError(String.Format("There need to be specified a bank in Creditor Payment Format setup for '{0}'.", credPaymFormat._Format)));
             }
             else
             {
-                CompanyBank(credPaymFormat);
+                var bankAccount = (BankStatement)bankAccountCache.Get(credPaymFormat._BankAccount);
 
-                var paymentformat = (ExportFormatType)credPaymFormat._ExportFormat;
-
-                formatTypeISO = paymentformat == ExportFormatType.ISO20022_DK || paymentformat == ExportFormatType.ISO20022_NL || paymentformat == ExportFormatType.ISO20022_NO || 
-                                paymentformat == ExportFormatType.ISO20022_DE || paymentformat == ExportFormatType.ISO20022_SE || paymentformat == ExportFormatType.ISO20022_UK || paymentformat == ExportFormatType.ISO20022_LT;
-
-                CompanyBankName(paymentformat);
-                CustomerIdentificationId(bankAccount._BankCompanyId, paymentformat);
-                BankIdentificationId(bankAccount._ContractId, paymentformat);
-
-                CompanySWIFT(bankAccount._SWIFT, paymentformat);
-                CompanyIBAN(bankAccount._IBAN, paymentformat);
-
-                //For ISO20022 only validate BBAN if IBAN/SWIFT are not available
-                if (formatTypeISO && (!IBANok || !SWIFTok) || !formatTypeISO)
+                if (bankAccount == null)
                 {
-                    CompanyBBANRegNum(bankAccount._BankAccountPart1, paymentformat);
-                    CompanyBBAN(bankAccount._BankAccountPart2, paymentformat);
+                    PreCheckErrors.Add(new PreCheckError(String.Format("There need to be specified a bank in Creditor Payment Format setup for '{0}'.", credPaymFormat._Format)));
+                }
+                else
+                {
+                    CompanyBank(credPaymFormat);
+
+                    var paymentformat = (ExportFormatType)credPaymFormat._ExportFormat;
+
+                    formatTypeISO = paymentformat == ExportFormatType.ISO20022_DK || paymentformat == ExportFormatType.ISO20022_NL || paymentformat == ExportFormatType.ISO20022_NO ||
+                                    paymentformat == ExportFormatType.ISO20022_DE || paymentformat == ExportFormatType.ISO20022_SE || paymentformat == ExportFormatType.ISO20022_UK || paymentformat == ExportFormatType.ISO20022_LT;
+
+                    CompanyBankName(paymentformat);
+                    CustomerIdentificationId(bankAccount._BankCompanyId, paymentformat);
+                    BankIdentificationId(bankAccount._ContractId, paymentformat);
+
+                    CompanySWIFT(bankAccount._SWIFT, paymentformat);
+                    CompanyIBAN(bankAccount._IBAN, paymentformat);
+
+                    //For ISO20022 only validate BBAN if IBAN/SWIFT are not available
+                    if (formatTypeISO && (!IBANok || !SWIFTok) || !formatTypeISO)
+                    {
+                        CompanyBBANRegNum(bankAccount._BankAccountPart1, paymentformat);
+                        CompanyBBAN(bankAccount._BankAccountPart2, paymentformat);
+                    }
                 }
             }
 
             return new XMLDocumentGenerateResult(dummyDoc, PreCheckErrors.Count > 0, 0, PreCheckErrors);
-
         }
 
         /// <summary>

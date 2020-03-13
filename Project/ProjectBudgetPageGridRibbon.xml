@@ -12,7 +12,8 @@
    <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32.png">
       <!---If we want Inner menu-->
       <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
-      <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16.png" ShortcutKey="" />
+     <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh.png" LargeGlyph="refresh.png"/>
+     <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16.png" ShortcutKey="" />
       <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveOBJ" Parameter="Layout" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
       <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16.png" ShortcutKey=""/>
       <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16.png" ShortcutKey="Ctrl+U"/>
@@ -24,5 +25,9 @@
   <RibbonItem>
     <RibbonItem Action="BudgetLines" LocalizedNameKey="Lines" Glyph="Add_16x16.png" LargeGlyph="Order_Lines_Highlighted_32x32.png" ShortcutKey="ALT+L"/>
     <RibbonItem Action="BudgetCategorySum" LocalizedNameKey="BudgetCategorySum" Glyph="Add_16x16.png" LargeGlyph="Balance_Report_32x32.png"/>
+  </RibbonItem>
+<RibbonItem>
+      <RibbonItem Action="CreateBudget" LocalizedNameKey="CreateOBJ" Parameter="Budget" Glyph="Add_Menu_32x32.png" LargeGlyph="Add_Menu_32x32.png" ShortcutKey=""/>
+      <RibbonItem Action="UpdatePrices" LocalizedNameKey="UpdateOBJ" Parameter="Prices" Glyph="Update_32x32.png" LargeGlyph="Update_32x32.png" ShortcutKey=""/>
   </RibbonItem>
 </root>

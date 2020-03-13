@@ -39,7 +39,12 @@ namespace UnicontaClient.Pages.CustomPage
     {
         public AllUserDocumentsPage(UnicontaBaseEntity rec, CrudAPI api) : base(api, string.Empty)
         {
-            InitPage(rec);
+            InitPage(new List<UnicontaBaseEntity>() { rec });
+        }
+
+        public AllUserDocumentsPage(List<UnicontaBaseEntity> masters, CrudAPI api) : base(api, string.Empty)
+        {
+            InitPage(masters);
         }
 
         public AllUserDocumentsPage(BaseAPI API) : base(API, string.Empty)
@@ -47,13 +52,13 @@ namespace UnicontaClient.Pages.CustomPage
             InitPage(null);
         }
 
-        void InitPage(UnicontaBaseEntity rec)
+        void InitPage(List<UnicontaBaseEntity> rec)
         {
             InitializeComponent();
             dgDocsGrid.BusyIndicator = busyIndicator;
             dgDocsGrid.api = api;
             SetRibbonControl(localMenu, dgDocsGrid);
-            dgDocsGrid.UpdateMaster(rec);
+            dgDocsGrid.masterRecords = rec;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
         }
 
@@ -69,7 +74,7 @@ namespace UnicontaClient.Pages.CustomPage
 #if !SILVERLIGHT
                         ViewDocument(dgDocsGrid.syncEntity, header);
 #else
-                        AddDockItem(TabControls.UserDocsPage3, dgDocsGrid.syncEntity, true, header, ";component/Assets/img/View_16x16.png");
+                        AddDockItem(TabControls.UserDocsPage3, dgDocsGrid.syncEntity, true, header, "View_16x16.png");
 #endif
                     }
                     break;

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <root>
   <RibbonItem TabId="0" LocalizedNameKey="Home">
-    <RibbonItem Action="ExpandAndCollapse" LocalizedNameKey="ExpandAll" ShortcutKey="Ctrl+O" Glyph="Cover_16x16.png" LargeGlyph="Expand_32x32.png" />
+    <RibbonItem Action="ExpandAndCollapse" LocalizedNameKey="ExpandAll" ShortcutKey="Ctrl+O" LargeGlyph="Expand_32x32.png" />
+    <RibbonItem Action="ExpandCollapseCurrent" LocalizedNameKey="ExpandCurrent"  LargeGlyph="Expand_32x32.png" />
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="ViewDownloadRow" ShortcutKey="F7" LocalizedNameKey="PhysicalVoucher" Glyph="Cover_16x16.png" LargeGlyph="View_Voucher_32x32.png" />

@@ -43,7 +43,7 @@ namespace UnicontaClient.Pages.CustomPage
             globalEvents.OnRefresh(NameOfControl, refreshParams);
             base.PageClosing();
         }
-        private List<long> selectedInvoices;
+        private List<string> selectedInvoices;
         private List<int> selectedVouchers;
         private List<int> selectedRowIds;
 
@@ -52,6 +52,7 @@ namespace UnicontaClient.Pages.CustomPage
         private double RemainingAmt, RemainingAmtCur;
         string settleCur;
         GLDailyJournalLineClient SelectedJournalLine;
+        BankStatementLineClient SelectedBankStatemenLine;
         bool OffSet, RoundTo100;
         private object[] refreshParams;
         private List<long> markedlist;
@@ -62,7 +63,11 @@ namespace UnicontaClient.Pages.CustomPage
             this.OffSet = offSet;
             this.OpenTransactionType = openTransType;
             InitializePage(baseEntity, openTransType);
-            SelectedJournalLine = selectedjournalLine as GLDailyJournalLineClient;
+            if (selectedjournalLine is GLDailyJournalLineClient)
+                SelectedJournalLine = selectedjournalLine as GLDailyJournalLineClient;
+            else if (selectedjournalLine is BankStatementLineClient)
+                SelectedBankStatemenLine = selectedjournalLine as BankStatementLineClient;
+
             ((DevExpress.Xpf.Grid.TableView)dgOpenTransactionGrid.View).RowStyle = Application.Current.Resources["DisableStyleRow"] as Style;
             InitGridView(markedList);
         }
@@ -70,7 +75,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void InitializePage(UnicontaBaseEntity baseEntity, byte openTransType)
         {
             settlement = string.Empty;
-            selectedInvoices = new List<long>();
+            selectedInvoices = new List<string>();
             selectedVouchers = new List<int>();
             selectedRowIds = new List<int>();
             dgOpenTransactionGrid.api = api;
@@ -105,26 +110,42 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void InitGridView(IEnumerable<string> markedList)
         {
-            var settle = SelectedJournalLine._Settlements;
+            var settle = SelectedJournalLine?._Settlements ?? SelectedBankStatemenLine?._Settlement;
             if (settle != null)
             {
-                var SettleValue = SelectedJournalLine._SettleValue;
                 var settlements = settle.Split(';');
-                foreach (var p in settlements)
+
+                if (SelectedJournalLine != null)
                 {
-                    var n = NumberConvert.ToInt(p);
-                    if (n == 0)
-                        continue;
-                    if (SettleValue == Uniconta.DataModel.SettleValueType.Voucher)
-                        selectedVouchers.Add((int)n);
-                    else if (SettleValue == Uniconta.DataModel.SettleValueType.Invoice)
-                        selectedInvoices.Add(n);
-                    else if (SettleValue == Uniconta.DataModel.SettleValueType.RowId)
-                        selectedRowIds.Add((int)n);
+                    var SettleValue = SelectedJournalLine._SettleValue;
+                    foreach (var p in settlements)
+                    {
+                        if (string.IsNullOrWhiteSpace(p))
+                            continue;
+                        if (SettleValue == Uniconta.DataModel.SettleValueType.Invoice)
+                            selectedInvoices.Add(p);
+                        else
+                        {
+                            var n = NumberConvert.ToInt(p);
+                            if (n == 0)
+                                continue;
+                            if (SettleValue == Uniconta.DataModel.SettleValueType.Voucher)
+                                selectedVouchers.Add((int)n);
+                            else if (SettleValue == Uniconta.DataModel.SettleValueType.RowId)
+                                selectedRowIds.Add((int)n);
+                        }
+                    }
                 }
+                else if (SelectedBankStatemenLine != null)
+                    selectedInvoices.AddRange(settlements);
             }
-            else if (SelectedJournalLine._Invoice != 0)
-                selectedInvoices.Add(SelectedJournalLine._Invoice);
+            else
+            {
+                if (SelectedJournalLine?._Invoice != null)
+                    selectedInvoices.Add(SelectedJournalLine._Invoice);
+                else if (SelectedBankStatemenLine?._Invoice != null)
+                    selectedInvoices.Add(SelectedBankStatemenLine._Invoice);
+            }
 
             markedlist = GetAllReadyMarked(markedList);
 
@@ -144,10 +165,11 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     var Voucher = item.Voucher;
                     var Invoice = item.Invoice;
+                    var InvoiceAN = item.InvoiceAN;
                     var rowId = item.PrimaryKeyId;
 
                     item.IsEnabled = !(markedlist != null && (markedlist.Contains(Voucher) || markedlist.Contains(Invoice) || markedlist.Contains(rowId)));
-                    item.IsChecked = (selectedVouchers.Contains(Voucher) || selectedInvoices.Contains(Invoice) || markedlist.Contains(Voucher) || markedlist.Contains(Invoice) || selectedRowIds.Contains(rowId));
+                    item.IsChecked = (selectedVouchers.Contains(Voucher) || selectedInvoices.Contains(InvoiceAN) || markedlist.Contains(Voucher) || markedlist.Contains(Invoice) || selectedRowIds.Contains(rowId));
 
                     if (selectedVouchers.Contains(Voucher))
                         selectedRowIds.Add(rowId);
@@ -168,10 +190,11 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     var Voucher = item.Voucher;
                     var Invoice = item.Invoice;
+                    var InvoiceAN = item.InvoiceAN;
                     var rowId = item.PrimaryKeyId;
 
                     item.IsEnabled = !(markedlist != null && (markedlist.Contains(Voucher) || markedlist.Contains(Invoice) || markedlist.Contains(rowId)));
-                    item.IsChecked = (selectedVouchers.Contains(Voucher) || selectedInvoices.Contains(Invoice) || markedlist.Contains(Voucher) || markedlist.Contains(Invoice) || selectedRowIds.Contains(rowId));
+                    item.IsChecked = (selectedVouchers.Contains(Voucher) || selectedInvoices.Contains(InvoiceAN) || markedlist.Contains(Voucher) || markedlist.Contains(Invoice) || selectedRowIds.Contains(rowId));
 
                     if (selectedVouchers.Contains(Voucher))
                         selectedRowIds.Add(rowId);
@@ -273,7 +296,7 @@ namespace UnicontaClient.Pages.CustomPage
                 foreach (var mark in marked)
                 {
                     string[] markStr = mark.Split(';');
-                    markedList.AddRange(markStr.Where(p => !string.IsNullOrEmpty(p)).Select(i => NumberConvert.ToInt(i)));
+                    markedList.AddRange(markStr.Where(p => !string.IsNullOrEmpty(p)).Select(i => NumberConvert.GetOnlyNumbers(i)));
                 }
             }
             return markedList;
@@ -313,7 +336,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (selectedInvoices != null && selectedRowIds != null)
             {
                 var sb = new StringBuilder(50);
-                if (selectedInvoices.Count > 0 && !selectedInvoices.Contains(0))
+                if (selectedInvoices.Count > 0)
                 {
                     sb.Append("I:");
                     foreach (var inv in selectedInvoices)
@@ -333,13 +356,22 @@ namespace UnicontaClient.Pages.CustomPage
 
                 settlement = sb.ToString();
 
-                refreshParams = new object[6];
-                refreshParams[0] = SelectedJournalLine;
-                refreshParams[1] = settlement;
-                refreshParams[2] = RemainingAmt;
-                refreshParams[3] = RemainingAmtCur;
-                refreshParams[4] = settleCur;
-                refreshParams[5] = OffSet;
+                if (SelectedJournalLine != null)
+                {
+                    refreshParams = new object[6];
+                    refreshParams[0] = SelectedJournalLine;
+                    refreshParams[1] = settlement;
+                    refreshParams[2] = RemainingAmt;
+                    refreshParams[3] = RemainingAmtCur;
+                    refreshParams[4] = settleCur;
+                    refreshParams[5] = OffSet;
+                }
+                else if (SelectedBankStatemenLine != null)
+                {
+                    refreshParams = new object[2];
+                    refreshParams[0] = SelectedBankStatemenLine;
+                    refreshParams[1] = settlement;
+                }
                 dockCtrl.CloseDockItem();
             }
         }
@@ -356,7 +388,7 @@ namespace UnicontaClient.Pages.CustomPage
             return false;
         }
 
-        void Check(int voucher, long invoice, int rowId, double amtOpen, Currencies? currency, double? amtOpenCur)
+        void Check(int voucher, string invoice, int rowId, double amtOpen, Currencies? currency, double? amtOpenCur)
         {
             bool isFirst = ResetFields();
 
@@ -400,12 +432,12 @@ namespace UnicontaClient.Pages.CustomPage
             SetStatusText(RemainingAmt, RemainingAmtCur);
         }
 
-        void UnCheck(int voucher, long invoice, int rowId, double amtOpen, Currencies? currency, double? amtOpenCur)
+        void UnCheck(int voucher, string invoice, int rowId, double amtOpen, Currencies? currency, double? amtOpenCur)
         {
             bool isFirst = ResetFields();
 
             selectedVouchers.Remove(voucher);
-            selectedInvoices.Remove(Convert.ToInt64(invoice));
+            selectedInvoices.Remove(invoice);
             selectedRowIds.Remove(rowId);
             RemainingAmt -= amtOpen;
 
@@ -469,7 +501,8 @@ namespace UnicontaClient.Pages.CustomPage
             }
             var row = selectedItem as DCTransOpenClient;
             var amountOpen = row.AmountOpen;
-            if (row._CashDiscount != 0 && row._CashDiscountDate <= SelectedJournalLine._Date)
+            var dt = SelectedJournalLine?._Date ?? SelectedBankStatemenLine?._Date;
+            if (row._CashDiscount != 0 && row._CashDiscountDate <= dt)
             {
                 if (amountOpen > 0)
                     amountOpen -= Math.Abs(row._CashDiscount);
@@ -477,9 +510,9 @@ namespace UnicontaClient.Pages.CustomPage
                     amountOpen += Math.Abs(row._CashDiscount);
             }
             if (isChecked)
-                Check(row.Voucher, row.Invoice, row.PrimaryKeyId, amountOpen, row.Currency, row.AmountOpenCur);
+                Check(row.Voucher, row.InvoiceAN, row.PrimaryKeyId, amountOpen, row.Currency, row.AmountOpenCur);
             else
-                UnCheck(row.Voucher, row.Invoice, row.PrimaryKeyId, amountOpen, row.Currency, row.AmountOpenCur);
+                UnCheck(row.Voucher, row.InvoiceAN, row.PrimaryKeyId, amountOpen, row.Currency, row.AmountOpenCur);
         }
 
         public override bool IsDataChaged { get { return false; } }

@@ -42,7 +42,7 @@ namespace UnicontaClient.Pages.CustomPage
         private  void BindCompany()
         {
             Company[] companies = CWDefaultCompany.loadedCompanies;
-            cbCompany.ItemsSource =  companies.ToList();
+            cbCompany.ItemsSource = companies.ToList();
         }
 
         private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
@@ -82,12 +82,10 @@ namespace UnicontaClient.Pages.CustomPage
             Company = await BasePage.session.OpenCompany(Company.RowId, true, new CompanyClient());
             var copyCompanyAPI = new CrudAPI(BasePage.session, Company);
             var lstEntity = await copyCompanyAPI.Query<Balance>();
-            List<Balance> balanceList = new List<Balance>();
             if (lstEntity != null && lstEntity.Length > 0)
             {
                 cbBalance.ItemsSource = null;
-                var itemsBalance = new List<Balance>(lstEntity.ToList());
-                cbBalance.ItemsSource = itemsBalance;
+                cbBalance.ItemsSource = lstEntity;
                 cbBalance.DisplayMember = "Name";
                 cbBalance.SelectedIndex = 0;
             }

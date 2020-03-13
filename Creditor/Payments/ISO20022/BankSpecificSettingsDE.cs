@@ -133,6 +133,22 @@ namespace UnicontaISO20022CreditTransfer
         }
 
         /// <summary>
+        /// Name of the identification scheme, in a coded form as published in an external list
+        /// Valid codes: CUST and BANK
+        /// Max. 35 characters.
+        /// </summary>
+        public override string IdentificationCode()
+        {
+            switch (companyBankEnum)
+            {
+                case CompanyBankENUM.Volks_Raiffeisenbanken:
+                    return null;
+                default:
+                    return "BANK";
+            }
+        }
+
+        /// <summary>
         /// Total of all individual amounts incluede in the message, irrespective of currencies
         /// </summary>
         public override double HeaderCtrlSum(double amount)
@@ -177,7 +193,33 @@ namespace UnicontaISO20022CreditTransfer
             }
         }
 
-        
+        /// <summary>
+        /// Generate filename
+        /// </summary>
+        public override string GenerateFileName(int fileID, int companyID)
+        {
+            string bankName;
+            switch (companyBankEnum)
+            {
+                case CompanyBankENUM.StarMoney_SFirm:
+                    bankName = "StarMoney";
+                    break;
+                case CompanyBankENUM.Deutsche_Kreditwirtschaft:
+                    bankName = "Kreditwirtschaft";
+                    break;
+                case CompanyBankENUM.Volks_Raiffeisenbanken:
+                    bankName = "VolksRaiffeisen";
+                    break;
+                default:
+                    bankName = null;
+                    break;
+            }
+
+            if (bankName == null)
+                return string.Format("{0}_{1}_{2}", "ISO20022", fileID.ToString().PadLeft(5, '0'), companyID);
+            else
+                return string.Format("{0}_{1}_{2}_{3}", "ISO20022", bankName, fileID.ToString().PadLeft(5, '0'), companyID);
+        }
 
         /// <summary>
         /// Valid codes:

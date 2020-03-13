@@ -14,7 +14,8 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorDeliveryNotes"
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <local:CreditorDeliveryNotesGrid x:Name="dgCreditorDeliveryNoteGrid" AutoGenerateColumns="None">
                 <local:CreditorDeliveryNotesGrid.Columns>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="PackNoteNumber" Width="100" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PackNoteNumber" Width="100" Visible="False" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PackNoteAN" Width="100" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Account" Width="100" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Name" Width="150" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Date" Width="90" />

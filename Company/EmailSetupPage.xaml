@@ -1,0 +1,37 @@
+<Pages:GridBasePage xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.EmailSetupPage"
+                    xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
+                    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+                    xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage">
+    <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+        <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Company/EmailSetupGridRibbon.xml" x:Name="localMenu"/>
+            <localPage:EmailSetupGrid x:Name="dgEmailSetupGrid" AutoGenerateColumns="None" Grid.Row="1">
+                <localPage:EmailSetupGrid.Columns>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Number" Width="100"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" Width="120"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="EmailSendFrom" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="NameInEmail" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Subject" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Language" Width="100"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Comment" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Default" Width="70"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Host" Width="120" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="SmtpUser" Width="120"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Html" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="SendTo" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CC" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Bcc" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Port" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ReplyTo" Visible="False" />
+                </localPage:EmailSetupGrid.Columns>
+            </localPage:EmailSetupGrid>
+        </Grid>
+    </CorasauControls:BusyIndicator>
+</Pages:GridBasePage>

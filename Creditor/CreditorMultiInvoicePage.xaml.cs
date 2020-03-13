@@ -152,7 +152,7 @@ namespace UnicontaClient.Pages.CustomPage
                         if (addVouvhersDialog.DialogResult == true)
                         {
                             var propertyInfo = selectedItem.GetType().GetProperty("DocumentRef");
-                            if (addVouvhersDialog.VoucherRowIds.Count() > 0 && propertyInfo != null)
+                            if (propertyInfo != null && addVouvhersDialog.VoucherRowIds.Length > 0)
                             {
                                 propertyInfo.SetValue(selectedItem, addVouvhersDialog.VoucherRowIds[0], null);
                                 UpdateVoucher(selectedItem);
@@ -207,6 +207,7 @@ namespace UnicontaClient.Pages.CustomPage
             UnicontaClient.Pages.CWGenerateInvoice GenrateInvoiceDialog = new UnicontaClient.Pages.CWGenerateInvoice(true, string.Empty, false, true, true, isQuickPrintVisible: false);
 #if !SILVERLIGHT
             GenrateInvoiceDialog.DialogTableId = 2000000000;
+            GenrateInvoiceDialog.HideOutlookOption(true);
 #endif
             GenrateInvoiceDialog.tbShowInv.Visibility = Visibility.Collapsed;
             GenrateInvoiceDialog.chkShowInvoice.Visibility = Visibility.Collapsed;
@@ -223,7 +224,7 @@ namespace UnicontaClient.Pages.CustomPage
                     var crVisibleOrders = dgMultiInvGrid.GetVisibleRows() as IEnumerable<CreditorOrderClient>;
                     foreach (var crOrder in crVisibleOrders)
                     {
-                        var result = await Invapi.PostInvoice(crOrder, null, GenrateInvoiceDialog.GenrateDate, 0,
+                        var result = await Invapi.PostInvoice(crOrder, null, GenrateInvoiceDialog.GenrateDate, null,
                             GenrateInvoiceDialog.IsSimulation, new CreditorInvoiceClient(),
                             new CreditorInvoiceLines(),
                             GenrateInvoiceDialog.SendByEmail, false, Emails: GenrateInvoiceDialog.Emails, OnlyToThisEmail: GenrateInvoiceDialog.sendOnlyToThisEmail);
@@ -258,6 +259,7 @@ namespace UnicontaClient.Pages.CustomPage
             var generateDoc = new CWGenerateInvoice(false, documentType.ToString(), false, true, true, isQuickPrintVisible:false ,isShowUpdateInv: showUpdateInv);
 #if !SILVERLIGHT
             generateDoc.DialogTableId = 2000000000;
+            generateDoc.HideOutlookOption(true);
 #endif
             generateDoc.tbShowInv.Visibility = Visibility.Collapsed;
             generateDoc.chkShowInvoice.Visibility = Visibility.Collapsed;
@@ -274,7 +276,7 @@ namespace UnicontaClient.Pages.CustomPage
                      var crVisibleOrders = dgMultiInvGrid.GetVisibleRows() as IEnumerable<CreditorOrderClient>;
                      foreach (var crOrder in crVisibleOrders)
                      {
-                         var result = await Invapi.PostInvoice(crOrder, null, generateDoc.GenrateDate, 0, !generateDoc.UpdateInventory, new CreditorInvoiceClient(), new CreditorInvoiceLines(),
+                         var result = await Invapi.PostInvoice(crOrder, null, generateDoc.GenrateDate, null, !generateDoc.UpdateInventory, new CreditorInvoiceClient(), new CreditorInvoiceLines(),
                              generateDoc.SendByEmail, false, Emails: generateDoc.Emails, OnlyToThisEmail: generateDoc.sendOnlyToThisEmail);
                          if (result != null && result.Err == 0)
                              cnt++;

@@ -244,14 +244,17 @@ namespace UnicontaClient.Pages.CustomPage
             var Comp = api.CompanyEntity;
             var Debs = Comp.GetCache(typeof(Uniconta.DataModel.Debtor));
             var lst = (IEnumerable<DebtorTotalClient>)dgDebtorTotalsGrid.ItemsSource;
-            foreach (var rec in lst)
+            if (lst != null)
             {
-                rec.deb = (Uniconta.DataModel.Debtor)Debs.Get(rec._Account);
-                var a = rec._Amount;
-                double tot = 0d;
-                for (int i = a.Length; (--i >= 0);)
-                    tot += a[i];
-                rec._Total = tot;
+                foreach (var rec in lst)
+                {
+                    rec.deb = (Uniconta.DataModel.Debtor)Debs.Get(rec._Account);
+                    var a = rec._Amount;
+                    double tot = 0d;
+                    for (int i = a.Length; (--i >= 0);)
+                        tot += a[i];
+                    rec._Total = tot;
+                }
             }
             dgDebtorTotalsGrid.UpdateTotalSummary();
             /*

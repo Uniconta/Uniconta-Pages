@@ -810,8 +810,8 @@ namespace UnicontaClient.Pages.CustomPage
 
         private async void CreateOrder(Uniconta.DataModel.CreditorOrder dfltCreditorOrder, bool PrWarehouse, bool PrLocation)
         {
-            var rows = dgReOrderList.GetVisibleRows() as IEnumerable<ReOrderListPageGridClient>;
-            if (rows == null || rows.Count() == 0)
+            var rows = dgReOrderList.GetVisibleRows() as ICollection<ReOrderListPageGridClient>;
+            if (rows == null || rows.Count == 0)
                 return;
             var accounts = (from rec in rows where rec._PurchaseAccount != null select rec._PurchaseAccount).Distinct().ToList();
 
@@ -846,8 +846,8 @@ namespace UnicontaClient.Pages.CustomPage
                         ord._DeliveryAddress1 = creditor._DeliveryAddress1;
                         ord._DeliveryAddress2 = creditor._DeliveryAddress2;
                         ord._DeliveryAddress3 = creditor._DeliveryAddress3;
-                        ord.DeliveryZipCode = creditor._DeliveryZipCode;
                         ord.DeliveryCity = creditor._DeliveryCity;
+                        ord.DeliveryZipCode = creditor._DeliveryZipCode;
                         if (creditor._DeliveryCountry != 0)
                             ord._DeliveryCountry = creditor._DeliveryCountry;
                     }
@@ -967,8 +967,8 @@ namespace UnicontaClient.Pages.CustomPage
 
         private async void CreateProductionOrder(Uniconta.DataModel.ProductionOrder dfltProductionOrder, bool createProdLines, int storage)
         {
-            var rows = dgReOrderList.GetVisibleRows() as IEnumerable<ReOrderListPageGridClient>;
-            if (rows == null || rows.Count() == 0)
+            var rows = dgReOrderList.GetVisibleRows() as ICollection<ReOrderListPageGridClient>;
+            if (rows == null || rows.Count == 0)
                 return;
 
             var productionOrders = new List<ProductionOrderClient>();

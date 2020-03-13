@@ -54,8 +54,10 @@ namespace UnicontaClient.Pages.CustomPage
         private async void GetRights()
         {
             Rights = await accessAPI.GetAccountantRights();
-            foreach (CompanyTasks task in Enum.GetValues(typeof(CompanyTasks)))
+            var tasks = (CompanyTasks[])Enum.GetValues(typeof(CompanyTasks));
+            for (int i = 0; i <= (int)AccessLevel.MaxTask; i++)
             {
+                var task = tasks[i];
                 TasksAccess access = new TasksAccess();
                 access._task = task;
                 access._permission = AccessLevel.Get(Rights, task);

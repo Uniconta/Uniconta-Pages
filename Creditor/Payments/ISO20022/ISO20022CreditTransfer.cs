@@ -163,9 +163,9 @@ namespace ISO20022CreditTransfer
                 doc.EndToEndId = bankSpecific.EndtoendId(rec.PaymentEndToEndId);
 
                 if (doMergePayment && rec.MergePaymId != UnicontaClient.Pages.Creditor.Payments.StandardPaymentFunctions.MERGEID_SINGLEPAYMENT)
+                    doc.PaymentInfoId = bankSpecific.PaymentInfoId(doc.NumberSeqPaymentFileId, doc.EndToEndId, true);
+                else
                     doc.PaymentInfoId = bankSpecific.PaymentInfoId(doc.NumberSeqPaymentFileId, doc.EndToEndId);
-                else 
-                    doc.PaymentInfoId = bankSpecific.PaymentInfoId(doc.NumberSeqPaymentFileId, doc.RequestedExecutionDate, currency, rec.ISOPaymentType, doc.CompanyPaymentMethod, rec._PaymentMethod);
 
                 doc.PaymentMethod = BaseDocument.PAYMENTMETHOD_TRF;
 
@@ -249,6 +249,7 @@ namespace ISO20022CreditTransfer
                 doc.ExternalLocalInstrument = bankSpecific.ExternalLocalInstrument(currency, doc.RequestedExecutionDate);
                 doc.InstructionPriority = bankSpecific.InstructionPriority();
                 doc.ExtCategoryPurpose = bankSpecific.ExtCategoryPurpose(doc.ISOPaymentType);
+                doc.ExtProprietaryCode = bankSpecific.ExtProprietaryCode();
                 doc.ExcludeSectionCdtrAgt = bankSpecific.ExcludeSectionCdtrAgt(doc.ISOPaymentType, creditorBIC);
 
                 isOCRPayment = string.IsNullOrEmpty(creditorOCRPaymentId) ? false : true;
@@ -257,12 +258,12 @@ namespace ISO20022CreditTransfer
 
                 string remittanceInfo = bankSpecific.RemittanceInfo(externalAdvText, doc.ISOPaymentType, rec._PaymentMethod);
 
-                List<string> unstructuredPaymInfoList = bankSpecific.Ustrd(externalAdvText, doc.ISOPaymentType, rec._PaymentMethod);
+                List<string> unstructuredPaymInfoList = bankSpecific.Ustrd(externalAdvText, doc.ISOPaymentType, rec._PaymentMethod, credPaymFormat._ExtendedText);
 
                 if (doc.PaymentInfoId != paymentInfoIdPrev)
                 {
                     doc.PmtInfList.Add(new PmtInf(doc,
-                        new PmtTpInf(doc.ExtServiceCode, doc.ExternalLocalInstrument, doc.ExtCategoryPurpose, doc.InstructionPriority),
+                        new PmtTpInf(doc.ExtServiceCode, doc.ExternalLocalInstrument, doc.ExtCategoryPurpose, doc.InstructionPriority, doc.ExtProprietaryCode),
                         new Dbtr(doc.CompanyName, debtorAddress, doc.DebtorIdentificationCode),
                         new DbtrAcct(doc.CompanyCcy, companyAccountId, companyBIC),
                         new DbtrAgt(doc.CompanyBIC, doc.CompanyBankName), doc.ChargeBearer));
@@ -279,11 +280,12 @@ namespace ISO20022CreditTransfer
                 paymentInfoIdPrev = doc.PaymentInfoId;
             }
 
+            var generatedFileName = bankSpecific.GenerateFileName(doc.NumberSeqPaymentFileId, doc.CompanyID);
             doc.Validate = schemaValidation;
 
             XmlDocument creditTransferDoc = doc.CreateXmlDocument();
             
-            return new XMLDocumentGenerateResult(creditTransferDoc, (preCheckErrors.Count > 0 || checkErrors.Count > 0), doc.HeaderNumberOfTrans, checkErrors, doc.EncodingFormat);
+            return new XMLDocumentGenerateResult(creditTransferDoc, (preCheckErrors.Count > 0 || checkErrors.Count > 0), doc.HeaderNumberOfTrans, checkErrors, doc.EncodingFormat, generatedFileName);
         }
     }
 }

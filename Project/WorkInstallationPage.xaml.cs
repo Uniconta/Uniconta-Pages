@@ -106,7 +106,7 @@ namespace UnicontaClient.Pages.CustomPage
                     var header = Uniconta.ClientTools.Localization.lookup("WorkInstallation");
                     if (dgWorkInstallation.masterRecord != null)
                         header = Uniconta.ClientTools.Localization.lookup("DeliveryAddresses");
-                    AddDockItem(TabControls.WorkInstallationPage2, param, header, ";component/Assets/img/Add_16x16.png");
+                    AddDockItem(TabControls.WorkInstallationPage2, param, header, "Add_16x16.png");
                     break;
                 case "EditRow":
                     if (selectedItem != null)

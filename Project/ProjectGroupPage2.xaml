@@ -42,6 +42,9 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectGroupPage2"
                     <CorasauControls:CorasauLayoutItem FieldName="UseCostInWIP" x:Name="liUseCostInWIP">
                         <CorasauControls:ComboBoxEditor x:Name="cbUseCostInWIP" SelectedItem="{Binding UseCostInWIP,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="liAutoWIP" FieldName="AutoWIP">
+                        <CheckBox IsChecked="{Binding AutoWIP,Mode=TwoWay}" />
+                    </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem x:Name="liWorkInProgress" FieldName="WorkInProgress">
                         <CorasauControls:LookupEditor x:Name="leWorkInProgress" Text="{Binding WorkInProgress,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>

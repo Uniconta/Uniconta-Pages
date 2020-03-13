@@ -6,7 +6,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Serialization;
 using UnicontaClient.Models;
@@ -17,8 +16,6 @@ using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.Common;
 using Uniconta.DataModel;
-using MessageBox = System.Windows.Forms.MessageBox;
-
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
@@ -82,7 +79,7 @@ namespace UnicontaClient.Pages.CustomPage
             this.fromDate = fromDate;
             this.toDate = toDate;
             InitializeComponent();
-          
+
             dgVatReportEstonia.api = api;
             dgVatReportEstonia.BusyIndicator = busyIndicator;
 
@@ -232,8 +229,14 @@ namespace UnicontaClient.Pages.CustomPage
             exportToXml.Name = "Expordi XMLi";
             exportToXml.LargeGlyph = LargeIcon.Generate.ToString();
 
+            var deleteRowItem = new TreeRibbon();
+            deleteRowItem.ActionName = "Delete";
+            deleteRowItem.Name = "Kustuta";
+            deleteRowItem.LargeGlyph = LargeIcon.Delete.ToString();
+
             ribbonItems.Add(editRowItem);
             ribbonItems.Add(saveRowItem);
+            ribbonItems.Add(deleteRowItem);
             ribbonItems.Add(exportToXml);
 
             return ribbonItems;
@@ -259,7 +262,8 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void LocalMenu_OnItemClicked(string ActionType)
         {
-            var selectedItem = reportGrid.SelectedItem as EEInfLines;
+            var selectedInfAItem = reportGrid.SelectedItem as EEInfLines;
+            var selectedInfBItem = reportGridB.SelectedItem as EEInfLines;
             switch (ActionType)
             {
                 case "EditAll":
@@ -270,8 +274,8 @@ namespace UnicontaClient.Pages.CustomPage
                     ribbonControl.EnableButtons(new string[] { "Save" });
                     break;
                 case "Save":
-                    reportGrid.SaveData();
-                    reportGridB.SaveData();
+                    //reportGrid.SaveData();
+                    //reportGridB.SaveData();
                     reportGrid.Readonly = true;
                     reportGridB.Readonly = true;
                     reportGrid.tableView.CloseEditor();
@@ -296,6 +300,25 @@ namespace UnicontaClient.Pages.CustomPage
                             sfd.OpenFile(), 
 #endif
                             fromDate, toDate, VatSumOperationLst, InfALines, InfBLines, noOfCar50, noOfCar100, !cbInfA.IsChecked.Value, !cbInfB.IsChecked.Value);
+
+                    break;
+                case "Delete":
+                    if (tabItemInfA.IsSelected)
+                    {
+                        InfALines.Remove(selectedInfAItem);
+                        reportGrid.UpdateItemSource(3, selectedInfAItem);
+                    }
+
+                    if (tabItemInfB.IsSelected)
+                    {
+                        InfBLines.Remove(selectedInfBItem);
+                        reportGridB.UpdateItemSource(3, selectedInfBItem);
+                    }
+
+                    if (tabItemYld.IsSelected)
+                    {
+                        MessageBox.Show("Antud tabelist ei saa ridu kustutada");
+                    }
 
                     break;
                 default:
@@ -324,8 +347,8 @@ namespace UnicontaClient.Pages.CustomPage
         }
     }
 
-#region Data classes
-    public class EEInfLines
+    #region Data classes
+    public class EEInfLines : UnicontaBaseEntity
     {
         public EEInfLines()
         {
@@ -341,7 +364,7 @@ namespace UnicontaClient.Pages.CustomPage
                 ErrorMessage += "Kirjel puudub registrikood või isikukood";
 
             InvoiceDate = invoice.Date;
-            InvoiceNumber = invoice.InvoiceNumber;
+            InvoiceNumber = invoice.InvoiceNumber.ToString();
             InfAInvoiceSumWoVat = invoice.NetAmount;
         }
 
@@ -354,8 +377,25 @@ namespace UnicontaClient.Pages.CustomPage
             if (String.IsNullOrEmpty(AccountRegNo))
                 ErrorMessage += "Kirjel puudub registrikood või isikukood";
 
-            InvoiceDate = invoice.Date;
-            InvoiceNumber = invoice.InvoiceNumber;
+            var documentDate = invoice.GetUserFieldDateTimeNull(0);
+            if (documentDate.HasValue && documentDate.Value != DateTime.MinValue)
+            {
+                InvoiceDate = documentDate.Value;
+            }
+            else
+            {
+                InvoiceDate = invoice.Date;
+            }
+
+            var invoiceNumberStr = invoice.GetUserFieldString(1);
+            if (!string.IsNullOrEmpty(invoiceNumberStr))
+            {
+                InvoiceNumber = invoiceNumberStr;
+            }
+            else
+            {
+                InvoiceNumber = invoice.InvoiceNumber.ToString();
+            }
             InfBInvoiceSumWVat = invoice.TotalAmount;
         }
 
@@ -363,7 +403,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         public string AccountName { get; set; }
 
-        public long InvoiceNumber { get; set; }
+        public string InvoiceNumber { get; set; }
 
         public DateTime InvoiceDate { get; set; }
 
@@ -406,10 +446,36 @@ namespace UnicontaClient.Pages.CustomPage
         public int LineNr { get; set; }
 
         public string ErrorMessage { get; set; }
-    }
-#endregion
+        public void loadFields(CustomReader r, int SavedWithVersion)
+        {
 
-#region Generator classes
+        }
+
+        public void saveFields(CustomWriter w, int SaveVersion)
+        {
+
+        }
+
+        public int Version(int ClientAPIVersion)
+        {
+            return ClientAPIVersion;
+        }
+
+        public int ClassId()
+        {
+            return 12003;
+        }
+
+        public Type BaseEntityType()
+        {
+            return GetType();
+        }
+
+        public int CompanyId { get; set; }
+    }
+    #endregion
+
+    #region Generator classes
     public class InfBaseGeneration
     {
         internal CrudAPI _api;
@@ -600,6 +666,17 @@ namespace UnicontaClient.Pages.CustomPage
 
             await LisaArved(currentAccount, currentAccountInvoices);
 
+            // Remove all reg codes that total inv amount is less than 1000
+            var regCodes = InfRead.Select(i => i.AccountRegNo).Distinct().ToList();
+            foreach (var regCode in regCodes)
+            {
+                var sumTotal = InfRead.Where(a => a.AccountRegNo == regCode).Sum(s => s.InfAInvoiceSumWoVat);
+                if (sumTotal < Constants.SalesLimitInvoiceAmount)
+                {
+                    InfRead.RemoveAll(i => i.AccountRegNo == regCode);
+                }
+            }
+
             return InfRead;
         }
 
@@ -610,8 +687,8 @@ namespace UnicontaClient.Pages.CustomPage
                 var debtorAccount = oneAccountInvoices[0].Debtor;
 
                 // TODO: Siia lisada see väärtus ka.
-                var isNotKmdDeclarable = debtorAccount._EEIsNotVatDeclOrg;
-                if (debtorAccount != null && debtorAccount._VatZone == VatZones.Domestic && !isNotKmdDeclarable)
+                var isKmdDeclarable = debtorAccount._EEIsNotVatDeclOrg;
+                if (debtorAccount != null && debtorAccount._VatZone == VatZones.Domestic && isKmdDeclarable)
                 {
                     foreach (var accountInv in oneAccountInvoices)
                     {
@@ -633,7 +710,8 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 if (glt.VatCode == null || glt.VatCode.Rate == 0)
                     continue;
-
+                //glt.inv_DCType 
+                //GLJournalAccountType.Debtor
                 double vatRate = glt.VatCode.Rate;
                 // Esimene tingimus, et tavaarved korda saada kõigepealt
                 if (glt.AmountVat != 0 && glt.Amount != 0)
@@ -659,7 +737,17 @@ namespace UnicontaClient.Pages.CustomPage
                         }
                     }
 
-                    InfRead.Add(uusArve);
+                    var tempArve = InfRead.FirstOrDefault(i =>
+                        i.InvoiceNumber == uusArve.InvoiceNumber && i.InfAVatRate == uusArve.InfAVatRate &&
+                        i.ExceptionCode == uusArve.ExceptionCode);
+                    if (tempArve != null)
+                    {
+                        tempArve.InfATaxableRevenue += uusArve.InfATaxableRevenue;
+                    }
+                    else
+                    {
+                        InfRead.Add(uusArve);
+                    }
                 }
             }
         }
@@ -717,6 +805,17 @@ namespace UnicontaClient.Pages.CustomPage
 
             await LisaOstuArved(arved, currentAccount, currentAccountInvoices);
 
+            var regCodes = arved.Select(i => i.AccountRegNo).Distinct().ToList();
+            foreach (var regCode in regCodes)
+            {
+                var sumTotalPositive = arved.Where(a => a.AccountRegNo == regCode && a.InfBInvoiceSumWVat > 0).Sum(s => s.InfBInvoiceSumWVat - s.InfBPeriodInVatAmoun);
+                var sumTotalNegative = arved.Where(a => a.AccountRegNo == regCode && a.InfBInvoiceSumWVat < 0).Sum(s => s.InfBInvoiceSumWVat - s.InfBPeriodInVatAmoun);
+                if (sumTotalPositive < Constants.SalesLimitInvoiceAmount && Math.Abs(sumTotalNegative) < Pages.Constants.SalesLimitInvoiceAmount)
+                {
+                    arved.RemoveAll(i => i.AccountRegNo == regCode);
+                }
+            }
+
             return arved;
         }
 
@@ -727,8 +826,8 @@ namespace UnicontaClient.Pages.CustomPage
                 var crit = new List<PropValuePair>();
                 var creditorAccount = await GetCreditorByAccount(currentAccount);
                 EEInfLines uusArve = null;
-                var isNotKmdDeclarable = creditorAccount._EEIsNotVatDeclOrg;
-                if (creditorAccount != null && creditorAccount._VatZone == VatZones.Domestic && !isNotKmdDeclarable)
+                var isKmdDeclarable = creditorAccount._EEIsNotVatDeclOrg;
+                if (creditorAccount != null && creditorAccount._VatZone == VatZones.Domestic && isKmdDeclarable)
                     foreach (var accountInv in oneAccountInvoices)
                     {
                         var exceptionCode = ExceptionCodeCheck(null, true, accountInv);
@@ -803,6 +902,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             serializer.Serialize(xmlWriter, mainDeclaration, ns);
             xmlWriter.Close();
+            sfd.Close();
         }
 
         private VatDeclaration _mainDeclaration;
@@ -1008,9 +1108,9 @@ namespace UnicontaClient.Pages.CustomPage
             return result;
         }
     }
-#endregion
+    #endregion
 
-#region XML classes
+    #region XML classes
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1389,5 +1489,5 @@ namespace UnicontaClient.Pages.CustomPage
         [System.Xml.Serialization.XmlElementAttribute("saleLine")]
         public SaleLine[] saleLine;
     }
-#endregion
+    #endregion
 }

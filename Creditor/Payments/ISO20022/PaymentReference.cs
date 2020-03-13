@@ -88,7 +88,7 @@ namespace UnicontaISO20022CreditTransfer
             var seqRefId = 1;
 
             var queryCreditorPaymRef = await capi.Query<CreditorPaymentReference>();
-            if (queryCreditorPaymRef.Any())
+            if (queryCreditorPaymRef.Length > 0)
             {
                 seqFileId = queryCreditorPaymRef.Max(s => s._PaymentFileId) + 1;
                 seqRefId = queryCreditorPaymRef.Max(s => s._PaymentRefId);

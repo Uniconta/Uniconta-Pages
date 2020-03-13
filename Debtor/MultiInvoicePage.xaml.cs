@@ -18,6 +18,9 @@ using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
 using Uniconta.Common;
 using Uniconta.DataModel;
+#if !SILVERLIGHT
+using UBL.Iceland;
+#endif
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -191,7 +194,7 @@ namespace UnicontaClient.Pages.CustomPage
                     var dbVisibleOrders = dgMultiInvGrid.GetVisibleRows() as IEnumerable<DebtorOrderClient>;
                     foreach (var dbOrder in dbVisibleOrders)
                     {
-                        var result = await Invapi.PostInvoice(dbOrder, null, selectedDate, 0, false, new DebtorInvoiceClient(), new DebtorInvoiceLines(), false, cwPickingList.ShowDocument || cwPickingList.PrintDocument,
+                        var result = await Invapi.PostInvoice(dbOrder, null, selectedDate, null, false, new DebtorInvoiceClient(), new DebtorInvoiceLines(), false, cwPickingList.ShowDocument || cwPickingList.PrintDocument,
                             CompanyLayoutType.PickingList);
 
                         if (result.Err == ErrorCodes.Succes)
@@ -243,6 +246,7 @@ namespace UnicontaClient.Pages.CustomPage
             UnicontaClient.Pages.CWGenerateInvoice GenrateInvoiceDialog = new UnicontaClient.Pages.CWGenerateInvoice(true, string.Empty, false, true, true, isOrderOrQuickInv: true, isQuickPrintVisible: true, isPageCountVisible: false, isDebtorOrder: true);
 #if !SILVERLIGHT
             GenrateInvoiceDialog.DialogTableId = 2000000011;
+            GenrateInvoiceDialog.HideOutlookOption(true);
 #endif
             GenrateInvoiceDialog.SetInvPrintPreview(printPreview);
             GenrateInvoiceDialog.Closed += async delegate
@@ -263,7 +267,7 @@ namespace UnicontaClient.Pages.CustomPage
                             continue;
 
                         var result = await Invapi.PostInvoice(dbOrder, null, InvoiceDate,
-                            0, GenrateInvoiceDialog.IsSimulation, new DebtorInvoiceClient(),
+                            null, GenrateInvoiceDialog.IsSimulation, new DebtorInvoiceClient(),
                             new DebtorInvoiceLines(), GenrateInvoiceDialog.SendByEmail, (GenrateInvoiceDialog.ShowInvoice || GenrateInvoiceDialog.InvoiceQuickPrint || GenrateInvoiceDialog.GenerateOIOUBLClicked), 0,
                             GenrateInvoiceDialog.Emails, GenrateInvoiceDialog.sendOnlyToThisEmail, null, null, GenrateInvoiceDialog.PostOnlyDelivered, false);
                         if (result != null && result.Err == 0)
@@ -368,7 +372,7 @@ namespace UnicontaClient.Pages.CustomPage
 #else
             confirmOrder = new Dictionary<InvoicePostingResult, DebtorOrderClient>();
 #endif
-            UnicontaClient.Pages.CWGenerateInvoice GenrateInvoiceDialog = new UnicontaClient.Pages.CWGenerateInvoice(false, docType.ToString(),isShowInvoiceVisible: true, askForEmail: true, showInputforInvNumber: false, 
+            UnicontaClient.Pages.CWGenerateInvoice GenrateInvoiceDialog = new UnicontaClient.Pages.CWGenerateInvoice(false, docType.ToString(), isShowInvoiceVisible: true, askForEmail: true, showInputforInvNumber: false,
                 showInvoice: true, isShowUpdateInv: true, isQuickPrintVisible: true, isDebtorOrder: true, isPageCountVisible: false);
 #if !SILVERLIGHT
             GenrateInvoiceDialog.DialogTableId = 2000000012;
@@ -389,7 +393,7 @@ namespace UnicontaClient.Pages.CustomPage
                     var dgOrderVisible = dgMultiInvGrid.GetVisibleRows() as IEnumerable<DebtorOrderClient>;
                     foreach (var dbOrder in dgOrderVisible)
                     {
-                        var result = await Invapi.PostInvoice(dbOrder, null, GenrateInvoiceDialog.GenrateDate, 0,
+                        var result = await Invapi.PostInvoice(dbOrder, null, GenrateInvoiceDialog.GenrateDate, null,
                           !updateStatus, new DebtorInvoiceClient(),
                           new DebtorInvoiceLines(), GenrateInvoiceDialog.SendByEmail, GenrateInvoiceDialog.ShowInvoice || GenrateInvoiceDialog.InvoiceQuickPrint, docType,
                           GenrateInvoiceDialog.Emails, GenrateInvoiceDialog.sendOnlyToThisEmail, null, null, GenrateInvoiceDialog.PostOnlyDelivered, false);
@@ -638,7 +642,7 @@ namespace UnicontaClient.Pages.CustomPage
             var debtor = dbOrder.Debtor;
             bool showSendByMail = true;
             if (debtor != null)
-                showSendByMail = !string.IsNullOrEmpty(debtor.InvoiceEmail);
+                showSendByMail = (!string.IsNullOrEmpty(debtor.InvoiceEmail) || debtor.EmailDocuments);
             else
                 api.LoadCache(typeof(Debtor), true);
 
@@ -656,7 +660,7 @@ namespace UnicontaClient.Pages.CustomPage
                     busyIndicator.IsBusy = true;
                     var showOrPrint = GenrateInvoiceDialog.ShowInvoice || GenrateInvoiceDialog.InvoiceQuickPrint;
                     var result = await Invapi.PostInvoice(dbOrder, null, GenrateInvoiceDialog.GenrateDate,
-                       0, GenrateInvoiceDialog.IsSimulation, new DebtorInvoiceClient(), new DebtorInvoiceLines(),
+                       null, GenrateInvoiceDialog.IsSimulation, new DebtorInvoiceClient(), new DebtorInvoiceLines(),
                        GenrateInvoiceDialog.SendByEmail, (showOrPrint || GenrateInvoiceDialog.GenerateOIOUBLClicked), 0, GenrateInvoiceDialog.Emails, GenrateInvoiceDialog.sendOnlyToThisEmail,
                        null, null, GenrateInvoiceDialog.PostOnlyDelivered, false);
 
@@ -724,24 +728,26 @@ namespace UnicontaClient.Pages.CustomPage
             bool hasUserFolder = false;
             var applFilePath = string.Empty;
 
+            var InvCache = api.GetCache(typeof(Uniconta.DataModel.InvItem)) ?? await api.LoadCache(typeof(Uniconta.DataModel.InvItem));
+            var VatCache = api.GetCache(typeof(Uniconta.DataModel.GLVat)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLVat));
+            var Debcache = api.GetCache(typeof(Debtor)) ?? await api.LoadCache(typeof(Debtor));
+            SQLCache Contacts = null;
+
             foreach (var item in invoicePosted)
             {
                 var invClient = (DebtorInvoiceClient)item.Key.Header;
                 var invoiceLines = (InvTransClient[])item.Key.Lines;
 
-                var InvCache = api.GetCache(typeof(Uniconta.DataModel.InvItem)) ?? await api.LoadCache(typeof(Uniconta.DataModel.InvItem));
-                var VatCache = api.GetCache(typeof(Uniconta.DataModel.GLVat)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLVat));
-                var Debcache = api.GetCache(typeof(Debtor)) ?? await api.LoadCache(typeof(Debtor));
                 var debtor = (Debtor)Debcache.Get(invClient._DCAccount);
-
-                if (!debtor._InvoiceInXML || invClient.SendTime != DateTime.MinValue)
+                if (debtor == null || !debtor._InvoiceInXML || invClient.SendTime != DateTime.MinValue)
                     continue;
 
                 Contact contactPerson = null;
                 if (invClient._ContactRef != 0)
                 {
-                    var queryContact = await api.Query<Contact>(invClient);
-                    foreach (var contact in queryContact)
+                    if (Contacts == null)
+                        Contacts = api.GetCache(typeof(Uniconta.DataModel.Contact)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Contact));
+                    foreach (var contact in (Uniconta.DataModel.Contact[])Contacts.GetRecords)
                         if (contact.RowId == invClient._ContactRef)
                         {
                             contactPerson = contact;
@@ -765,6 +771,12 @@ namespace UnicontaClient.Pages.CustomPage
 
                 if (Comp._CountryId == CountryCode.Norway || Comp._CountryId == CountryCode.Netherlands)
                     cResult = ubl_norway_uniconta.EHF.GenerateEHFXML(Comp, debtor, deliveryAccount, invClient, invoiceLines, InvCache, VatCache, invItemText, contactPerson);
+                else if (Comp._CountryId == CountryCode.Iceland)
+                {
+                    var paymFormatCache = api.GetCache(typeof(DebtorPaymentFormatClientIceland)) ?? await api.LoadCache(typeof(DebtorPaymentFormatClientIceland));
+                    TableAddOnData[] attachments = await UBL.Iceland.Attachments.CollectInvoiceAttachments(invClient, api);
+                    cResult = TS136137.GenerateTS136137XML(Comp, debtor, deliveryAccount, invClient, invoiceLines, InvCache, VatCache, invItemText, contactPerson, paymFormatCache, attachments);
+                }
                 else
                 {
                     TableAddOnData[] attachments = await FromXSDFile.OIOUBL.ExportImport.Attachments.CollectInvoiceAttachments(invClient, api);
@@ -871,19 +883,19 @@ namespace UnicontaClient.Pages.CustomPage
                             Uniconta.ClientTools.Controls.Reporting.StandardReports.PackNote;
                         standardDebtorInvoice = new DebtorQCPReportClient(debtorInvoicePrint.Company, debtorInvoicePrint.Debtor, debtorInvoicePrint.DebtorInvoice, debtorInvoicePrint.InvTransInvoiceLines, debtorInvoicePrint.DebtorOrder,
                             debtorInvoicePrint.CompanyLogo, debtorInvoicePrint.ReportName, (byte)standardDocVersion, messageClient: debtorInvoicePrint.MessageClient);
-                        standardPrint = new StandardPrintReport(api, new [] { standardDebtorInvoice }, (byte)standardDocVersion);
+                        standardPrint = new StandardPrintReport(api, new[] { standardDebtorInvoice }, (byte)standardDocVersion);
                     }
                     else if (layoutType == CompanyLayoutType.PickingList)
                     {
                         standardDebtorInvoice = new DebtorSalesPickingListReportClient(debtorInvoicePrint.Company, debtorInvoicePrint.Debtor, debtorInvoicePrint.DebtorInvoice, debtorInvoicePrint.InvTransInvoiceLines, debtorInvoicePrint.DebtorOrder,
                             debtorInvoicePrint.CompanyLogo, debtorInvoicePrint.ReportName, messageClient: debtorInvoicePrint.MessageClient);
-                        standardPrint = new StandardPrintReport(api, new [] { standardDebtorInvoice }, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.SalesPickingList);
+                        standardPrint = new StandardPrintReport(api, new[] { standardDebtorInvoice }, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.SalesPickingList);
                     }
                     else // layout type for Invoice
                     {
                         standardDebtorInvoice = new DebtorInvoiceReportClient(debtorInvoicePrint.Company, debtorInvoicePrint.Debtor, debtorInvoicePrint.DebtorInvoice, debtorInvoicePrint.InvTransInvoiceLines, debtorInvoicePrint.DebtorOrder,
                         debtorInvoicePrint.CompanyLogo, debtorInvoicePrint.ReportName, isCreditNote: debtorInvoicePrint.IsCreditNote, messageClient: debtorInvoicePrint.MessageClient);
-                        standardPrint = new StandardPrintReport(api, new [] { standardDebtorInvoice }, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.Invoice);
+                        standardPrint = new StandardPrintReport(api, new[] { standardDebtorInvoice }, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.Invoice);
                     }
 
                     await standardPrint.InitializePrint();

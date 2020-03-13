@@ -23,26 +23,23 @@ namespace UnicontaClient.Pages.CustomPage
         async Task<List<BalanceClient>> GenerateTemplateGrid(int Cols)
         {
             GLReportTemplate template;
-            var templateCache = api.CompanyEntity.GetCache(typeof(GLReportTemplate));
+            var templateCache = api.GetCache(typeof(GLReportTemplate));
             if (templateCache != null)
                 template = (GLReportTemplate)templateCache.Get(AppliedTemplate);
             else
             {
-                template = new GLReportTemplate();
-                template._Name = AppliedTemplate;
+                template = new GLReportTemplate() { _Name = AppliedTemplate };
                 await api.Read(template);
             }
             if (template == null || template.RowId == 0)
                 return null;
 
-            List<UnicontaBaseEntity> master = new List<UnicontaBaseEntity>();
-            master.Add(template);
-            var reportline = await api.Query<GLReportLine>(master, null);
+            var reportline = await api.Query<GLReportLine>(template);
             TemplateDataContext items = new TemplateDataContext();
             List<BalanceClient> newBalance = new List<BalanceClient>();
 
             TemplateSumContext SumContext = new TemplateSumContext(Cols);
-            var colCount = Math.Max(PassedCriteria.selectedCriteria.Count, 13);
+            var colCount = PassedCriteria.selectedCriteria.Count;
             foreach (var line in reportline)
             {
                 var amounts = new long[colCount];

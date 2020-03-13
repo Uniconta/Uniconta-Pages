@@ -41,7 +41,7 @@
   </RibbonItem>
   <RibbonItem LocalizedNameKey="Reports">
     <RibbonItem Action="DebtorTran" LocalizedNameKey="Transactions" Glyph="Cover_16x16.png" LargeGlyph="Account-statement_32x32.png" ShortcutKey="CTRL+T"/>
-    <RibbonItem Action="OpenTran" LocalizedNameKey="OpenTrans" LargeGlyph="Open_Transaction_32x32.png"/>
+    <RibbonItem Action="OpenTran" LocalizedNameKey="OpenTrans" ShortcutKey="F8" LargeGlyph="Open_Transaction_32x32.png"/>
     <RibbonItem Action="DebtorStatement" LocalizedNameKey="Statement" ControlName="DebtorStatement" LargeGlyph="Show_Invoice_32x32.png"/>
     <RibbonItem Action="InvTran" LocalizedNameKey="InvTransactions" ControlName="InvTransactions" LargeGlyph="Inventory_Trans_32x32.png"/>
     <RibbonItem Action="DebtorTransPivot" LocalizedNameKey="PivotTable" ControlName="DebtorInvoiceLinesPivotReport" LargeGlyph="Category_Charge_32x32.png" />

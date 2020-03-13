@@ -81,6 +81,8 @@ namespace UnicontaClient.Pages.CustomPage
             localMenu.OnItemClicked += localMenu_OnItemClicked;
         }
 
+        public override bool IsDataChaged { get { return false; } }
+
         protected override Filter[] DefaultFilters()
         {
             Filter dateFilter = new Filter() { name = "Date" };

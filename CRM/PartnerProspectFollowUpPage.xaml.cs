@@ -117,7 +117,7 @@ namespace UnicontaClient.Pages.CustomPage
                     param[0] = newItem;
                     param[1] = false;
                     param[2] = dgCrmFollowUpGrid.masterRecord;
-                    AddDockItem(TabControls.PartnerProspectFollowUpPage2, param, Uniconta.ClientTools.Localization.lookup("FollowUp"), ";component/Assets/img/Add_16x16.png");
+                    AddDockItem(TabControls.PartnerProspectFollowUpPage2, param, Uniconta.ClientTools.Localization.lookup("FollowUp"), "Add_16x16.png");
                     break;
                 case "EditRow":
                     if (selectedItem == null)
@@ -162,7 +162,7 @@ namespace UnicontaClient.Pages.CustomPage
             var followUp = Activator.CreateInstance(selectedItem.GetType()) as PartnerProspectFollowUpClient;
             StreamingManager.Copy(selectedItem, followUp);
             var parms = new object[3] { followUp, false, dgCrmFollowUpGrid.masterRecord };
-            AddDockItem(TabControls.PartnerProspectFollowUpPage2, parms, Uniconta.ClientTools.Localization.lookup("FollowUp"), ";component/Assets/img/Add_16x16.png");
+            AddDockItem(TabControls.PartnerProspectFollowUpPage2, parms, Uniconta.ClientTools.Localization.lookup("FollowUp"), "Add_16x16.png");
         }
     }
 }

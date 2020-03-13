@@ -68,7 +68,7 @@ namespace UnicontaClient.Pages.CustomPage
                     objectItemsForUpdate[0] = api;
                     objectItemsForUpdate[1] = dgFinanceYearGrid;
                     objectItemsForUpdate[2] = "";
-                    AddDockItem(TabControls.FinanceYearPage2, objectItemsForUpdate, Uniconta.ClientTools.Localization.lookup("AccountingYear"), ";component/Assets/img/Add_16x16.png");
+                    AddDockItem(TabControls.FinanceYearPage2, objectItemsForUpdate, Uniconta.ClientTools.Localization.lookup("AccountingYear"), "Add_16x16.png");
                     break;
                 case "EditRow":
                     if (selectedItem == null)
@@ -76,7 +76,7 @@ namespace UnicontaClient.Pages.CustomPage
                     var objectItemsForUpdate2 = new object[2];
                     objectItemsForUpdate2[0] = selectedItem;
                     objectItemsForUpdate2[1] = dgFinanceYearGrid;
-                    AddDockItem(TabControls.FinanceYearPage2, objectItemsForUpdate2, Uniconta.ClientTools.Localization.lookup("AccountingYear"), ";component/Assets/img/Edit_16x16.png");
+                    AddDockItem(TabControls.FinanceYearPage2, objectItemsForUpdate2, Uniconta.ClientTools.Localization.lookup("AccountingYear"), "Edit_16x16.png");
                     break;                          
                 case "RecalcPeriodSum":
                     RecalcPeriodSum();

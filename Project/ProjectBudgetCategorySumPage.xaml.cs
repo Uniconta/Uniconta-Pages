@@ -74,14 +74,14 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 CatType.GroupIndex = 1;
                 ibase.Caption = string.Format(Uniconta.ClientTools.Localization.lookup("MenuColumnUnGroup"), Uniconta.ClientTools.Localization.lookup("Type"));
-                ibase.LargeGlyph = Utility.GetGlyph(";component/Assets/img/Group_by_Clear_32x32.png");
+                ibase.LargeGlyph = Utility.GetGlyph("Group_by_Clear_32x32.png");
                 group = false;
             }
             else
             {
                 group = true;
                 ibase.Caption = string.Format(Uniconta.ClientTools.Localization.lookup("GroupByOBJ"), Uniconta.ClientTools.Localization.lookup("Type"));
-                ibase.LargeGlyph = Utility.GetGlyph(";component/Assets/img/Group_by_32x32.png");
+                ibase.LargeGlyph = Utility.GetGlyph("Group_by_32x32.png");
                 CatType.GroupIndex = -1;
                 CatType.Visible = true;
 

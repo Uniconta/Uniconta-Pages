@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <root>
   <RibbonItem TabId="0" LocalizedNameKey="Home">
-    <RibbonItem Action="Save" LocalizedNameKey="SaveOBJ" Parameter="Folder" LargeGlyph="save-32x32.png"/>
+    <RibbonItem Action="Save" LocalizedNameKey="SaveOBJ" Parameter="Envelope" LargeGlyph="save-32x32.png"/>
     <RibbonItem Action="Cancel" LocalizedNameKey="Cancel" Glyph="close-16x16.png" LargeGlyph="close-32x32.png"/>
   </RibbonItem>
   <RibbonItem>

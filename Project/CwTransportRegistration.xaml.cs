@@ -32,11 +32,11 @@ namespace UnicontaClient.Pages.CustomPage
         public string Purpose { get; set; }
         [ForeignKeyAttribute(ForeignKeyTable = typeof(Uniconta.DataModel.Project))]
         public string Project { get; set; }
-        public string InternalProject { get; set; }
+        public string RegistrationProject { get; set; }
         [ForeignKeyAttribute(ForeignKeyTable = typeof(Uniconta.DataModel.EmpPayrollCategory))]
         public string PayType { get; set; }
-        string _ProjectName;
-        public string ProjectName { get { return _ProjectName; } }
+        //string _ProjectName;
+        //public string ProjectName { get { return _ProjectName; } }
         public bool Returning { get; set; }
         public string VechicleRegNo { get; set; }
         public double Day1 { get; set; }
@@ -47,8 +47,6 @@ namespace UnicontaClient.Pages.CustomPage
         public double Day6 { get; set; }
         public double Day7 { get; set; }
         public double Total { get; set; }
-        public double MileageHighRte { get; set; }
-        public double MileageLowRte { get; set; }
         public bool ExistingTransportJrnlLine { get; set; }
         List<Address> addressList;
         Uniconta.DataModel.Employee employee;
@@ -58,9 +56,9 @@ namespace UnicontaClient.Pages.CustomPage
         TMJournalLineClientLocal journalline;
         CrudAPI crudApi;
         bool addMileage = false;
-        double mileageHighTotal;
-        private const double MileageHighRateMax = 20000;
-        public CwTransportRegistration(TMJournalLineClientLocal tmJournalLine, CrudAPI _crudApi, double mileageHighTotal, bool returning, bool _addMileage = false)
+        double mileageTotal;
+       
+        public CwTransportRegistration(TMJournalLineClientLocal tmJournalLine, CrudAPI _crudApi, double mileageTotal, bool returning, bool _addMileage = false)
         {
             crudApi = _crudApi;
             journalline = tmJournalLine;
@@ -81,7 +79,7 @@ namespace UnicontaClient.Pages.CustomPage
                 installation = tmJournalLine.ProjectRef?.InstallationRef;
             }
             addMileage = _addMileage;
-            this.mileageHighTotal = mileageHighTotal;
+            this.mileageTotal = mileageTotal;
             LoadControls();
             this.DataContext = this;
         }
@@ -139,9 +137,9 @@ namespace UnicontaClient.Pages.CustomPage
             else
             {
                 cmbFromAdd.SelectedIndex = 0;
-                cmbToAdd.SelectedIndex = 2;
+                cmbToAdd.SelectedIndex = 1;
                 txtFromAdd.Text = addressList.Count >= 1 ? addressList[0]?.ContactAddress : string.Empty;
-                txtToAdd.Text = addressList.Count >= 2 ? addressList[2]?.ContactAddress : string.Empty;
+                txtToAdd.Text = addressList.Count == 2 ? addressList[1]?.ContactAddress : string.Empty;
             }
 
             if (string.IsNullOrEmpty(txtFromAdd.Text))
@@ -168,7 +166,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (addMileage)
                 CalulateMileage();
             else
-                mileageHighTotal = mileageHighTotal - journalline.Total;
+                mileageTotal = mileageTotal - journalline.Total;
 
             CalculateTotal();
         }
@@ -186,13 +184,13 @@ namespace UnicontaClient.Pages.CustomPage
         async void intializeProperties()
         {
             var payrollCategoryLst = await crudApi.LoadCache<Uniconta.DataModel.EmpPayrollCategory>();
-            var payrollCategory = payrollCategoryLst.Where(s => s._InternalType == Uniconta.DataModel.InternalType.Mileage && s._Invoiceable == false).OrderByDescending(s => s._Rate).FirstOrDefault();
+            var payrollCategory = payrollCategoryLst.Where(s => s._InternalType == Uniconta.DataModel.InternalType.Mileage).OrderByDescending(s => s._Rate).FirstOrDefault(); //TODO:Mangler håndtering af Høj/Lav sats
 
             if (journalline.RowId != 0 && journalline._RegistrationType == RegistrationType.Mileage)
                 Project = string.Empty;
             else
                 Project = journalline.Project;
-            InternalProject = payrollCategory?._InternalProject;
+            RegistrationProject = payrollCategory?._InternalProject ?? journalline?.Project;
             PayType = payrollCategory?._Number;
             if (journalline._RegistrationType == RegistrationType.Mileage)
             {
@@ -240,13 +238,8 @@ namespace UnicontaClient.Pages.CustomPage
             total = Day1 + Day2 + Day3 + Day4 + Day5 + Day6 + Day7;
             txtTotal.Text = total.ToString();
 
-            var mileageTotal = Returning ? mileageHighTotal + total*2 : mileageHighTotal + total;
-
-            var mileageHigh = mileageTotal > MileageHighRateMax ? MileageHighRateMax : mileageTotal;
-            var mileageLow = mileageTotal > MileageHighRateMax ? Math.Round(mileageTotal - MileageHighRateMax, 1) : 0;
-
-            txtMilHighRate.EditValue = mileageHigh.ToString();
-            txtMilLowRate.EditValue = mileageLow.ToString();
+            var calcmileageTotal = Returning ? mileageTotal + total*2 : mileageTotal + total;
+            txtMileageBal.EditValue = calcmileageTotal.ToString();
         }
 
         private void cmb1_SelectedIndexChanged(object sender, RoutedEventArgs e)

@@ -198,7 +198,7 @@ namespace UnicontaClient.Pages.CustomPage
                         }
                         catch (Exception e)
                         {
-                            UnicontaMessageBox.Show(e.Message, Uniconta.ClientTools.Localization.lookup("Exception"));
+                            UnicontaMessageBox.Show(e, Uniconta.ClientTools.Localization.lookup("Exception"));
                             throw;
                         }
                     break;
@@ -259,7 +259,7 @@ namespace UnicontaClient.Pages.CustomPage
                         }
                         catch (Exception e)
                         {
-                            UnicontaMessageBox.Show(e.Message, Uniconta.ClientTools.Localization.lookup("Exception"));
+                            UnicontaMessageBox.Show(e, Uniconta.ClientTools.Localization.lookup("Exception"));
                             throw;
                         }
                     }

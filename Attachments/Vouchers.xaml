@@ -3,18 +3,18 @@ x:Class="UnicontaClient.Pages.CustomPage.Vouchers"
            xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
            xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
-           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
            xmlns:localControls="clr-namespace:UnicontaClient.Controls"
-           xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools" 
+           xmlns:Controls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools" 
            xmlns:converter="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
            xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage" 
-           xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
-           xmlns:dxn="http://schemas.devexpress.com/winfx/2008/xaml/navbar"
-            xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors">
+           xmlns:sys="clr-namespace:System;assembly=mscorlib"
+           xmlns:dxat="http://schemas.devexpress.com/winfx/2008/xaml/accordion/themekeys"
+           xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors">
     <UserControl.Resources>
         <converter:VisibilityBoolConverter x:Key="VisibilityBoolConverter" />
-        <Util:RowIndexConverter x:Key="RowIndexConverter" />
+        <converter:RowIndexConverter x:Key="RowIndexConverter" />
+        <sys:Double x:Key="{dxat:AccordionItemThemeKeys ResourceKey=RootItemHeaderHeight, IsThemeIndependent=true}">22</sys:Double>
+        <Thickness x:Key="{dxat:AccordionItemThemeKeys ResourceKey=HeaderElementsMargin, ThemeName=Office2016ColorfulSE}">0,0,0,0</Thickness> 
     </UserControl.Resources>
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
@@ -22,20 +22,49 @@ x:Class="UnicontaClient.Pages.CustomPage.Vouchers"
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <CorasauControls:CorasauRibbonControl x:Name="localMenu" XMLSourcePath=";component/Pages/Attachments/VouchersGridRibbon.xml" Grid.Row="0"/>
-        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+        <Controls:CorasauRibbonControl x:Name="localMenu" XMLSourcePath=";component/Pages/Attachments/VouchersGridRibbon.xml" Grid.Row="0"/>
+        <Controls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <Grid x:Name="outlookViewLayout">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" x:Name="colAccordion" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <localControls:AccordionAppEnumView x:Name="accordionView" SelectedItemChanged="accordionView_SelectedItemChanged" Visibility="Collapsed" MinWidth="150" />
+                <localControls:AccordionAppEnumView x:Name="accordionView" SelectedItemChanged="accordionView_SelectedItemChanged" Visibility="Collapsed" MinWidth="150">
+                    <localControls:AccordionAppEnumView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <TextBlock Text="{Binding}" HorizontalAlignment="Left"/>
+                                <Controls:MenuBarManager VerticalAlignment="Center"  Visibility="{Binding ShowButton, Mode=OneWay}" HorizontalAlignment="Right" Height="16">
+                                    <Controls:MenuBarManager.Categories>
+                                        <Controls:MenuBarManagerCategory Name="Folders" />
+                                    </Controls:MenuBarManager.Categories>
+                                    <Controls:MenuBarManager.Bars>
+                                        <Controls:MenuBar Caption="MainMenu" IsMainMenu="True" AllowCustomizationMenu="False">
+                                            <Controls:MenuBar.DockInfo>
+                                                <Controls:MenuDockInfo ContainerType="Top"/>
+                                            </Controls:MenuBar.DockInfo>
+                                            <Controls:MenuBarSplitButtonItem ActAsDropDown="True" CategoryName="Folders" GlyphAlignment="Top" Glyph="/UnicontaPages;component/Assets/img/Grid_Transactions_16x16.png" Hint="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Folder}">
+                                                <Controls:MenuBarSplitButtonItem.PopupControl>
+                                                    <Controls:MenuBarPopupMenu>
+                                                        <Controls:MenuBarButtonItem ItemClick="OpenFolderWindow" Tag="Add" x:Name="Add" Glyph="/UnicontaPages;component/Assets/img/Grid_Add_16x16.png" CategoryName="Folders" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=Add}"/>
+                                                        <Controls:MenuBarButtonItem ItemClick="OpenFolderWindow" Tag="Edit" x:Name="Edit" Glyph="/UnicontaPages;component/Assets/img/Grid_Edit_16x16.png" CategoryName="Folders" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=Edit}"/>
+                                                        <Controls:MenuBarButtonItem ItemClick="OpenFolderWindow" Tag="Delete" x:Name="Delete" Glyph="/UnicontaPages;component/Assets/img/Grid_Delete_16x16.png" CategoryName="Folders" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=Delete}"/>
+                                                    </Controls:MenuBarPopupMenu>
+                                                </Controls:MenuBarSplitButtonItem.PopupControl>
+                                            </Controls:MenuBarSplitButtonItem>
+                                        </Controls:MenuBar>
+                                    </Controls:MenuBarManager.Bars>
+                                </Controls:MenuBarManager>
+                            </Grid> 
+                        </DataTemplate>
+                    </localControls:AccordionAppEnumView.ItemTemplate>
+                </localControls:AccordionAppEnumView>
                 <localPage:VouchersGrid x:Name="dgVoucherGrid" AutoGenerateColumns="None" Grid.Column="1">
                     <localPage:VouchersGrid.Columns>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="PostingInstruction" Width="50" >
                             <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 <DataTemplate>
-                                    <CorasauControls:MemoEditor Name="PART_Editor" ShowIcon="{Binding DataContext.RowData.Row.HasNote, RelativeSource={RelativeSource TemplatedParent}}" MaxLength="1000"/>
+                                    <Controls:MemoEditor Name="PART_Editor" ShowIcon="{Binding DataContext.RowData.Row.HasNote, RelativeSource={RelativeSource TemplatedParent}}" MaxLength="1000"/>
                                 </DataTemplate>
                             </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                         </localPage:CorasauDataGridTemplateColumnClient>
@@ -54,26 +83,16 @@ x:Class="UnicontaClient.Pages.CustomPage.Vouchers"
                             </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                         </localPage:CorasauDataGridTemplateColumnClient>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="InJournal" ShowCheckBoxInHeader="False" HideHeaderCheck="True" ReadOnly="True" Width="60"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="Content">
-                            <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                                <DataTemplate>
-                                    <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="ContentTypes"/>
-                                </DataTemplate>
-                            </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                        </localPage:CorasauDataGridTemplateColumnClient>
+                        <localPage:ComboBoxColumnClient x:Name="Content" />
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="PostingDate" AllowEditing="True" Width="85"/>
+                        <localPage:CorasauDataGridTemplateColumnClient x:Name="TransType"  AllowEditing="True" Width="100" />
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Invoice" AllowEditing="True" Width="60" />
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Voucher" AllowEditing="True" Width="60" Visible="False" />
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Amount" AllowEditing="True" Width="85" />
+                        <localPage:CorasauDataGridTemplateColumnClient x:Name="EnteredVatAmount" AllowEditing="True" Width="60" Visible="False" />
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Debit" AllowEditing="True" Width="85" Visible="False"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Credit" AllowEditing="True" Width="85" Visible="False"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="Currency" Width="35">
-                            <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                                <DataTemplate>
-                                    <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="Currencies"/>
-                                </DataTemplate>
-                            </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                        </localPage:CorasauDataGridTemplateColumnClient>
+                        <localPage:ComboBoxColumnClient x:Name="Currency" Width="35"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="HasOffSetAccounts" Width="30" ReadOnly="True" Visible="False" >
                             <localPage:CorasauDataGridTemplateColumnClient.HeaderTemplate>
                                 <DataTemplate>
@@ -93,13 +112,7 @@ x:Class="UnicontaClient.Pages.CustomPage.Vouchers"
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Vat" Width="60" Visible="False"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Project" Visible="False" Width="90"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Visible="False" Width="90"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="PaymentMethod" Width="80" Visible="False">
-                            <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                                <DataTemplate>
-                                    <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="PaymentMethod" />
-                                </DataTemplate>
-                            </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                        </localPage:CorasauDataGridTemplateColumnClient>
+                        <localPage:ComboBoxColumnClient x:Name="PaymentMethod" Width="80" Visible="False" />
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="PaymentId" AllowEditing="True" MinWidth="100" Visible="False"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Approver1" Visible="False" Width="80"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Approver2" Visible="False" Width="80"/>
@@ -108,7 +121,7 @@ x:Class="UnicontaClient.Pages.CustomPage.Vouchers"
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Text" Width="300" AllowEditing="True" PrintCellStyle="{StaticResource DefaultTextPrintStyle}">
                             <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 <DataTemplate>
-                                    <CorasauControls:TextEditor x:Name="PART_Editor" NullText="{Binding DataContext.RowData.Row.DefaultText,RelativeSource={RelativeSource TemplatedParent}}" />
+                                    <Controls:TextEditor x:Name="PART_Editor" NullText="{Binding DataContext.RowData.Row.DefaultText,RelativeSource={RelativeSource TemplatedParent}}" />
                                 </DataTemplate>
                             </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                         </localPage:CorasauDataGridTemplateColumnClient>
@@ -119,7 +132,6 @@ x:Class="UnicontaClient.Pages.CustomPage.Vouchers"
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Envelope" AllowEditing="False" Visible="False" Width="55" />
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="PayDate" AllowEditing="True" Width="85" Visible="False" />
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="VatOperation"  Visible="False"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="TransType"  Visible="False" />
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="PurchaseNumber" Width="85" Visible="False" />
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="clDim1" Width="70" FieldName="Dimension1" Visible="False" />
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="clDim2" Width="70" FieldName="Dimension2" Visible="False" />
@@ -139,17 +151,17 @@ x:Class="UnicontaClient.Pages.CustomPage.Vouchers"
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="SizeKB" Visible="False"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="OnHold" />
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Reference" Visible="False" />
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="ViewInFolder" Visible="False" ColumnFilterMode="DisplayText">
-                            <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                                <DataTemplate>
-                                    <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="ViewBin"/>
-                                </DataTemplate>
-                            </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                        </localPage:CorasauDataGridTemplateColumnClient>
+                        <localPage:CorasauDataGridTemplateColumnClient x:Name="ViewInFolder" Visible="False" ColumnFilterMode="DisplayText" ReadOnly="True"/>
+
+
+                        <localPage:CorasauDataGridTemplateColumnClient x:Name="Split" Visible="False" />
+                        <localPage:CorasauDataGridTemplateColumnClient x:Name="SplitFromDate" Visible="False" />
+                        <localPage:CorasauDataGridTemplateColumnClient x:Name="SplitToDate" Visible="False" />
+                        <localPage:CorasauDataGridTemplateColumnClient x:Name="FromEmail" Visible="False" />
                     </localPage:VouchersGrid.Columns>
                 </localPage:VouchersGrid>
             </Grid>
-        </CorasauControls:BusyIndicator>
+        </Controls:BusyIndicator>
         <Grid DataContext="{Binding Path=SelectedItem,ElementName=dgVoucherGrid}" Grid.Row="2">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>

@@ -81,7 +81,7 @@ namespace UnicontaClient.Pages.CustomPage
             switch (ActionType)
             {
                 case "AddRow":
-                    AddDockItem(TabControls.BankStatementPage2, api, Uniconta.ClientTools.Localization.lookup("BankStatement"), ";component/Assets/img/Add_16x16.png");
+                    AddDockItem(TabControls.BankStatementPage2, api, Uniconta.ClientTools.Localization.lookup("BankStatement"), "Add_16x16.png");
                     break;
                 case "EditRow":
                     if (selectedItem != null)
@@ -124,7 +124,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var text = string.Format("{0}: {1}, {2}", Uniconta.ClientTools.Localization.lookup("BankStatement"), selectedItem._Account, selectedItem._Name);
             var defaultdate = BasePage.GetSystemDefaultDate().Date;
-            CWInterval Wininterval = new CWInterval(defaultdate, defaultdate);
+            CWInterval Wininterval = new CWInterval(defaultdate, defaultdate, showJrPostId:true);
             Wininterval.Closing += delegate
             {
                 if (Wininterval.DialogResult == true)
@@ -140,7 +140,7 @@ namespace UnicontaClient.Pages.CustomPage
                             if (ActionType == "DeleteStatement")
                                 result = await bkapi.DeleteLines(selectedItem, Wininterval.FromDate, Wininterval.ToDate);
                             else if (ActionType == "RemoveSettlements")
-                                result = await bkapi.RemoveSettlements(selectedItem, Wininterval.FromDate, Wininterval.ToDate);
+                                result = await bkapi.RemoveSettlements(selectedItem, Wininterval.FromDate, Wininterval.ToDate, Wininterval.JournalPostedId);
 
                             if (result != ErrorCodes.Succes)
                                 UtilDisplay.ShowErrorCode(result);

@@ -106,7 +106,8 @@ namespace UnicontaClient.Pages.CustomPage
             switch (ActionType)
             {
                 case "UpdateRow":
-                    UploadData(selectedItem);
+                    if (selectedItem != null)
+                        UploadData(selectedItem);
                     break;
                 case "ViewDownloadRow":
                     if (selectedItem != null)
@@ -114,9 +115,8 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
 
                 case "ViewTransactions":
-                    if (selectedItem == null)
-                        return;
-                    AddDockItem(TabControls.AccountsTransaction, dgAttachedVoucherGrid.syncEntity, string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("VoucherTransactions"), selectedItem.RowId));
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.AccountsTransaction, dgAttachedVoucherGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("VoucherTransactions"), selectedItem.RowId));
                     break;
                 case "ExportVouchers":
                     var vouchers = (IEnumerable<VouchersClient>)dgAttachedVoucherGrid.GetVisibleRows();
@@ -199,7 +199,7 @@ namespace UnicontaClient.Pages.CustomPage
                 }
                 catch (Exception ex)
                 {
-                    UnicontaMessageBox.Show(ex.Message, Uniconta.ClientTools.Localization.lookup("Exception"), MessageBoxButton.OK);
+                    UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"), MessageBoxButton.OK);
                     return;
                 }
             }

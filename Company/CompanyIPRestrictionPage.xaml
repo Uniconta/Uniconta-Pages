@@ -29,7 +29,9 @@ x:Class="UnicontaClient.Pages.CustomPage.CompanyIPRestrictionPage"
                             </DataTemplate>
                         </local:CorasauDataGridTemplateColumnClient.CellTemplate>
                     </local:CorasauDataGridTemplateColumnClient>
-            </local:CompanyIPRestrictionPageGrid.Columns>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Disabled" HideHeaderCheck="True" Width="70"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Comment" Width="120" />
+                </local:CompanyIPRestrictionPageGrid.Columns>
             </local:CompanyIPRestrictionPageGrid>
         </CorasauControls:BusyIndicator>
     </Grid>

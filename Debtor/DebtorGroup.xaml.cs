@@ -52,7 +52,6 @@ namespace UnicontaClient.Pages.CustomPage
             SetRibbonControl(localMenu, dgDebtorGroupGrid);
             dgDebtorGroupGrid.api = api;
             dgDebtorGroupGrid.BusyIndicator = busyIndicator;
-            dgDebtorGroupGrid.api = api;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
         }
 
@@ -69,7 +68,7 @@ namespace UnicontaClient.Pages.CustomPage
             switch (ActionType)
             {
                 case "AddRow":
-                    AddDockItem(TabControls.DebtorGroupPage2, api, Uniconta.ClientTools.Localization.lookup("DebtorGroup"), ";component/Assets/img/Add_16x16.png");
+                    AddDockItem(TabControls.DebtorGroupPage2, api, Uniconta.ClientTools.Localization.lookup("DebtorGroup"), "Add_16x16.png");
                     break;
                 case "EditRow":
                     if (selectedItem == null)

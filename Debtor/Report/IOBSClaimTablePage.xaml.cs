@@ -63,7 +63,7 @@ namespace UnicontaClient.Pages.CustomPage
             switch (ActionType)
             {
                 case "AddRow":
-                    AddDockItem(TabControls.IOBSClaimTablePage2, api, Uniconta.ClientTools.Localization.lookup("CliamTable"), ";component/Assets/img/Add_16x16.png");
+                    AddDockItem(TabControls.IOBSClaimTablePage2, api, Uniconta.ClientTools.Localization.lookup("CliamTable"), "Add_16x16.png");
                     break;
                 case "EditRow":
                     if (selectedItem == null)

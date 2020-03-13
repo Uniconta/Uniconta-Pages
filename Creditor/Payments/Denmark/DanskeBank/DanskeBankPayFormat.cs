@@ -83,7 +83,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
                 }
                 catch (Exception ex)
                 {
-                    UnicontaMessageBox.Show(ex.Message, Uniconta.ClientTools.Localization.lookup("Exception"));
+                    UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"));
                 }
             }
             else

@@ -42,6 +42,7 @@ namespace UnicontaClient.Pages.CustomPage
         string selectedDataSourceName;
         Company company;
         DashBoardVM dashBoardVM = new DashBoardVM();
+        DashboardState dState = new DashboardState();
         string blankString = new string(' ', 18);
         public DashBoardViewerPage(UnicontaBaseEntity dashBoard) : base(dashBoard)
         {
@@ -69,6 +70,24 @@ namespace UnicontaClient.Pages.CustomPage
             lstOfSorters = new Dictionary<string, FilterSorter>();
             dashboardViewerUniconta.Loaded += DashboardViewerUniconta_Loaded;
             dashboardViewerUniconta.DashboardItemMouseUp += DashboardViewerUniconta_DashboardItemMouseUp;
+            dashboardViewerUniconta.DashboardLoaded += DashboardViewerUniconta_DashboardLoaded;
+            dashboardViewerUniconta.SetInitialDashboardState += DashboardViewerUniconta_SetInitialDashboardState;
+        }
+
+        private void DashboardViewerUniconta_SetInitialDashboardState(object sender, DevExpress.DashboardWpf.SetInitialDashboardStateWpfEventArgs e)
+        {
+            e.InitialState = dState;
+        }
+
+        private void DashboardViewerUniconta_DashboardLoaded(object sender, DevExpress.DashboardWpf.DashboardLoadedEventArgs e)
+        {
+            XElement data = e.Dashboard.UserData;
+            if (data != null)
+            {
+                var state = data.Element("DashboardState");
+                if (state != null)
+                    dState.LoadFromXml(XDocument.Parse(state.Value));
+            }
         }
 
         private void DashboardViewerUniconta_DashboardItemMouseUp(object sender, DevExpress.DashboardWpf.DashboardItemMouseActionWpfEventArgs e)
@@ -88,6 +107,11 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
+        private void Timer_Tick(object sender, EventArgs e)
+        {
+            dashboardViewerUniconta.ReloadData();
+        }
+
         bool isDashBoardLaoded = false;
         private void DashboardViewerUniconta_Loaded(object sender, RoutedEventArgs e)
         {
@@ -105,22 +129,23 @@ namespace UnicontaClient.Pages.CustomPage
                 int rowId;
                 int.TryParse(dashboardName, out rowId);
                 var dbrdLst = await api.Query<DashboardClient>() as IEnumerable<UserReportDevExpressClient>;
-                var dashboard = dbrdLst?.Where(x => x.RowId == rowId || x._Name == dashboardName).ToList();
-                _selectedDashBoard = dashboard?.FirstOrDefault() as DashboardClient;
+                if (rowId != 0)
+                    _selectedDashBoard = dbrdLst?.FirstOrDefault(x => x.RowId == rowId) as DashboardClient;
+                else 
+                    _selectedDashBoard = dbrdLst?.FirstOrDefault(x => string.Compare(x._Name, dashboardName, StringComparison.CurrentCultureIgnoreCase) == 0) as DashboardClient;
             }
-            DashboardClient selectedDashBoard = _selectedDashBoard;
-            if (selectedDashBoard != null)
+            if (_selectedDashBoard != null)
             {
-                var error = await api.Read(selectedDashBoard);
-                if (error != ErrorCodes.Succes)
-                    UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup(error.ToString()), Uniconta.ClientTools.Localization.lookup("Error"));
-            }
-            if (selectedDashBoard != null)
-            {
-                DashBoardName = selectedDashBoard.Name;
-                if (selectedDashBoard.Layout != null)
-                    ReadDataFromDB(selectedDashBoard.Layout);
-                dashboardViewerUniconta.Dashboard.Title.Visible = true;
+                var result = await api.Read(_selectedDashBoard);
+                if (result == ErrorCodes.Succes)
+                {
+                    DashBoardName = _selectedDashBoard.Name;
+                    if (_selectedDashBoard.Layout != null)
+                        ReadDataFromDB(_selectedDashBoard.Layout);
+                    dashboardViewerUniconta.Dashboard.Title.Visible = true;
+                }
+                else
+                    UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup(result.ToString()), Uniconta.ClientTools.Localization.lookup("Error"));
             }
             busyIndicator.IsBusy = false;
             return true;
@@ -168,6 +193,23 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                 }
                 cs.Release();
+                XDocument xdoc = XDocument.Load(st);
+                var exist = xdoc.Root.Attributes().Where(x => x.Name == "RefreshTimer").FirstOrDefault();
+                if (exist != null)
+                {
+                    var element = xdoc.Root.Attribute("RefreshTimer") as XAttribute;
+                    if (element != null || element.Name == "RefreshTimer")
+                    {
+                        refreshTimer = Convert.ToInt16(element.Value);
+                        if (refreshTimer > 0)
+                        {
+                            System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer();
+                            timer.Interval = refreshTimer < 300 ? 300 * 1000 : refreshTimer * 1000;
+                            timer.Tick += Timer_Tick;
+                            timer.Start();
+                        }
+                    }
+                }
                 st.Seek(0, System.IO.SeekOrigin.Begin);
                 dashboardViewerUniconta.LoadDashboard(st);
                 st.Release();
@@ -176,7 +218,7 @@ namespace UnicontaClient.Pages.CustomPage
             catch (Exception ex)
             {
                 retVal = false;
-                UnicontaMessageBox.Show(ex.Message, Uniconta.ClientTools.Localization.lookup("Exception"));
+                UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"));
                 dockCtrl?.CloseDockItem();
                 busyIndicator.IsBusy = false;
                 return retVal;
@@ -318,7 +360,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
             catch (Exception ex)
             {
-                UnicontaMessageBox.Show(ex.Message, Uniconta.ClientTools.Localization.lookup("Exception"));
+                UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"));
             }
         }
 
@@ -368,9 +410,9 @@ namespace UnicontaClient.Pages.CustomPage
     public class DashBoardVM
     {
         public Dashboard UnicontaDashboard { get; set; }
-        public ImageSource FilterImage { get { return UnicontaClient.Utilities.Utility.GetGlyph(";component/Assets/img/Filter_32x32.png"); } }
-        public ImageSource ClearFilterImage { get { return UnicontaClient.Utilities.Utility.GetGlyph(";component/Assets/img/Filter_Clear_32x32.png"); } }
-        public ImageSource RefreshImage { get { return UnicontaClient.Utilities.Utility.GetGlyph(";component/Assets/img/refresh.png"); } }
+        public ImageSource FilterImage { get { return UnicontaClient.Utilities.Utility.GetGlyph("Filter_32x32.png"); } }
+        public ImageSource ClearFilterImage { get { return UnicontaClient.Utilities.Utility.GetGlyph("Filter_Clear_32x32.png"); } }
+        public ImageSource RefreshImage { get { return UnicontaClient.Utilities.Utility.GetGlyph("refresh.png"); } }
     }
 
     public class DashBoardDataSource

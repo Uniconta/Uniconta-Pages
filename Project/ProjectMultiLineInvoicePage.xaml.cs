@@ -222,7 +222,7 @@ namespace UnicontaClient.Pages.CustomPage
                         string msg = Uniconta.ClientTools.Localization.lookup("InvoiceProposal");
                         if (invoicePostingResult.PostingResult.Header._InvoiceNumber != 0)
                         {
-                            msg = string.Format(Uniconta.ClientTools.Localization.lookup("InvoiceHasBeenGenerated"), invoicePostingResult.PostingResult.Header._InvoiceNumber);
+                            msg = string.Format(Uniconta.ClientTools.Localization.lookup("InvoiceHasBeenGenerated"), invoicePostingResult.PostingResult.Header.InvoiceNum);
                             msg = string.Format("{0}{1}{2} {3}", msg, Environment.NewLine, Uniconta.ClientTools.Localization.lookup("LedgerVoucher"), invoicePostingResult.PostingResult.Header._Voucher);
 
 #if !SILVERLIGHT

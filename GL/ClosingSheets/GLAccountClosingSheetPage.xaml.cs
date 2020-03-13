@@ -187,7 +187,7 @@ namespace UnicontaClient.Pages.CustomPage
                     AddDockItem(TabControls.AllNotesPage, masters3, Uniconta.ClientTools.Localization.lookup("Notes"));
                     break;
                 case "AddItem":
-                    AddDockItem(TabControls.GLAccountPage2, api, Uniconta.ClientTools.Localization.lookup("Accounts"), ";component/Assets/img/Add_16x16.png");
+                    AddDockItem(TabControls.GLAccountPage2, api, Uniconta.ClientTools.Localization.lookup("Accounts"), "Add_16x16.png");
                     break;
                 case "EditItem":
                     if (selectedItem == null)
@@ -271,7 +271,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                     if (postingResult == null)
                         return;
-                    if (postingResult.SimulatedTrans != null && postingResult.SimulatedTrans.Count() > 0)
+                    if (postingResult.SimulatedTrans != null && postingResult.SimulatedTrans.Length > 0)
                     {
                         AddDockItem(TabControls.SimulatedTransactions, postingResult.SimulatedTrans, Uniconta.ClientTools.Localization.lookup("SimulatedTransactions"));
                         this.UpdateLines(postingResult.ClosingLines, postingResult.SimulatedTrans);

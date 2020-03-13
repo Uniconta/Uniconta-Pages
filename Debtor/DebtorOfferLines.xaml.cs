@@ -159,7 +159,7 @@ namespace UnicontaClient.Pages.CustomPage
         public void Init(UnicontaBaseEntity master)
         {
             InitializeComponent();
-           ((TableView)dgDebtorOfferLineGrid.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
+            ((TableView)dgDebtorOfferLineGrid.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
             SetRibbonControl(localMenu, dgDebtorOfferLineGrid);
             dgDebtorOfferLineGrid.api = api;
             RemoveMenuItem();
@@ -339,7 +339,8 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        static public void FindOnEAN(DCOrderLineClient rec, SQLCache Items, QueryAPI api, Uniconta.API.DebtorCreditor.FindPrices PriceLookup = null)
+        static public void FindOnEAN(DCOrderLineClient rec, SQLCache Items, QueryAPI api) { FindOnEAN(rec, Items, api, null); }
+        static public void FindOnEAN(DCOrderLineClient rec, SQLCache Items, QueryAPI api, Uniconta.API.DebtorCreditor.FindPrices PriceLookup)
         {
             var EAN = rec._EAN;
             if (string.IsNullOrWhiteSpace(EAN))
@@ -396,8 +397,8 @@ namespace UnicontaClient.Pages.CustomPage
                     return;
                 if (master._AllowAllCombinations)
                 {
-                    rec.Variant1Source = this.variants1?.GetKeyStrRecords.Cast<InvVariant1>();
-                    rec.Variant2Source = this.variants2?.GetKeyStrRecords.Cast<InvVariant2>();
+                    rec.Variant1Source = (IEnumerable<InvVariant1>)this.variants1?.GetKeyStrRecords;
+                    rec.Variant2Source = (IEnumerable<InvVariant2>)this.variants2?.GetKeyStrRecords;
                 }
                 else
                 {
@@ -461,11 +462,27 @@ namespace UnicontaClient.Pages.CustomPage
 
         static public Tuple<double, double, double> RecalculateLineSum(IList source, double exRate)
         {
+            return RecalculateLineSum(null, (IEnumerable<DCOrderLineClient>)source, exRate);
+        }
+        static public Tuple<double, double, double> RecalculateLineSum(DCOrder order, IEnumerable<DCOrderLineClient>source, double exRate)
+        {
             double lastTotal = 0d, lastCost = 0d;
             double Amountsum = 0d;
             double Costsum = 0d;
+            double vat = 0d;
+            string VatCode = null;
+            var inclVat = (order != null) ? order._PricesInclVat : false;
             if (source != null)
             {
+                if (inclVat)
+                {
+                    var dct = order.__DCType();
+                    if (dct == 1 || dct == 3)
+                        VatCode = ((Debtor)ClientHelper.GetRef(order.CompanyId, typeof(Debtor), order._DCAccount))?._Vat;
+                    else
+                        inclVat = false;
+                }
+
                 foreach (var lin in source)
                 {
                     var orderLine = (DCOrderLineClient)lin;
@@ -479,6 +496,13 @@ namespace UnicontaClient.Pages.CustomPage
                             orderLine._ExchangeRate = exRate;
                         else
                             exRate = orderLine._ExchangeRate;
+
+                        if (inclVat && VatCode == null)
+                        {
+                            VatCode = orderLine._Vat;
+                            if (VatCode == null && orderLine._Item != null)
+                                VatCode = orderLine.InvItem?.InventoryGroup?.SalesVat;
+                        }
                     }
                     else
                     {
@@ -498,13 +522,20 @@ namespace UnicontaClient.Pages.CustomPage
                 }
             }
             double AmountsumCur = exRate == 0d ? Amountsum : Math.Round(Amountsum / exRate, 2);
+
+            if (inclVat && VatCode != null)
+            {
+                var vatRef = (GLVat)ClientHelper.GetRef(order.CompanyId, typeof(GLVat), VatCode);
+                if (vatRef != null && vatRef._Rate != 0d)
+                    AmountsumCur = Math.Round(AmountsumCur * 100 / (100 + vatRef._Rate), 2);
+            }
             Costsum = Math.Round(Costsum, 2);
             return Tuple.Create(Amountsum, Costsum, AmountsumCur);
         }
 
         void RecalculateAmount()
         {
-            var ret = RecalculateLineSum((IList)dgDebtorOfferLineGrid.ItemsSource, this.exchangeRate);
+            var ret = RecalculateLineSum(Order, (IEnumerable<DCOrderLineClient>)dgDebtorOfferLineGrid.ItemsSource, this.exchangeRate);
             double Amountsum = ret.Item1;
             double Costsum = ret.Item2;
             double sales = ret.Item3;
@@ -615,22 +646,26 @@ namespace UnicontaClient.Pages.CustomPage
                     try
                     {
                         CWCreateOrderFromQuickInvoice createOrderCW = new CWCreateOrderFromQuickInvoice(api, Order.Account, false, Order);
-                        createOrderCW.Closing +=  delegate
-                        {
-                            if (createOrderCW.DialogResult == true)
-                            {
-                                var orderApi = new OrderAPI(api);
-                                var checkIfCreditNote = createOrderCW.chkIfCreditNote.IsChecked.HasValue ? createOrderCW.chkIfCreditNote.IsChecked.Value : false;
-                                var debtorInvoice = createOrderCW.dgCreateOrderGrid.SelectedItem as DebtorInvoiceLocal;
-                                dgDebtorOfferLineGrid.PasteRows(createOrderCW.debtorOfferLines);
-                            }
-                        };
+                        createOrderCW.Closing += delegate
+                       {
+                           if (createOrderCW.DialogResult == true)
+                           {
+                               var orderApi = new OrderAPI(api);
+                               var checkIfCreditNote = createOrderCW.chkIfCreditNote.IsChecked.HasValue ? createOrderCW.chkIfCreditNote.IsChecked.Value : false;
+                               var debtorInvoice = createOrderCW.dgCreateOrderGrid.SelectedItem as DebtorInvoiceLocal;
+                               dgDebtorOfferLineGrid.PasteRows(createOrderCW.debtorOfferLines);
+                           }
+                       };
                         createOrderCW.Show();
                     }
                     catch (Exception ex)
                     {
-                        UnicontaMessageBox.Show(ex.Message, Uniconta.ClientTools.Localization.lookup("Exception"));
+                        UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"));
                     }
+                    break;
+                case "PrintOffer":
+                    if (Order != null)
+                        GenerateOffer();
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);
@@ -638,7 +673,55 @@ namespace UnicontaClient.Pages.CustomPage
             }
             RecalculateAmount();
         }
-      
+
+        private void GenerateOffer()
+        {
+            saveGridLocal();
+            bool showSendByMail = false;
+            var dbOrder = Order;
+            string debtorName;
+            var debtor = dbOrder.Debtor;
+
+            if (debtor != null)
+            {
+                debtorName = debtor?._Name ?? dbOrder._DCAccount;
+                showSendByMail = (!string.IsNullOrEmpty(debtor.InvoiceEmail) || debtor.EmailDocuments);
+            }
+            else if(dbOrder._Prospect==0)
+            {
+                UtilDisplay.ShowErrorCode(ErrorCodes.AccountIsMissing);
+                return;
+            }
+            else
+            {
+                debtorName = Uniconta.ClientTools.Localization.lookup("Prospect");
+                showSendByMail = true;
+            }
+
+            var generateOfferDialog = new CWGenerateInvoice(false, CompanyLayoutType.Offer.ToString(), askForEmail: true, showNoEmailMsg: !showSendByMail, debtorName: debtorName, isDebtorOrder: true);
+#if !SILVERLIGHT
+            generateOfferDialog.DialogTableId = 2000000075;
+#endif
+            generateOfferDialog.Closed += async delegate
+            {
+                if (generateOfferDialog.DialogResult == true)
+                {
+                    var showOrPrintOffer = generateOfferDialog.InvoiceQuickPrint || generateOfferDialog.ShowInvoice;
+                    var invoicePostingResult = new InvoicePostingPrintGenerator(api, this, dbOrder, null, generateOfferDialog.GenrateDate, 0, true, CompanyLayoutType.Offer, showOrPrintOffer, generateOfferDialog.InvoiceQuickPrint,
+                        generateOfferDialog.NumberOfPages, generateOfferDialog.SendByEmail, generateOfferDialog.Emails, generateOfferDialog.sendOnlyToThisEmail, false, generateOfferDialog.PostOnlyDelivered, null);
+                    invoicePostingResult.OpenAsOutlook = generateOfferDialog.SendByOutlook;
+                    busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
+                    busyIndicator.IsBusy = true;
+                    var result = await invoicePostingResult.Execute();
+                    busyIndicator.IsBusy = false;
+
+                    if (!result)
+                        Utility.ShowJournalError(invoicePostingResult.PostingResult.ledgerRes, dgDebtorOfferLineGrid);
+                }
+            };
+            generateOfferDialog.Show();
+        }
+
         async void CreateProductionOrder(DebtorOfferLineClient offerLine)
         {
             var t = saveGridLocal();
@@ -646,7 +729,7 @@ namespace UnicontaClient.Pages.CustomPage
                 await t;
 
             object[] arr = new object[3] { api, offerLine, dgDebtorOfferLineGrid.masterRecord };
-            AddDockItem(TabControls.ProductionOrdersPage2, arr, Uniconta.ClientTools.Localization.lookup("Production"), ";component/Assets/img/Add_16x16.png");
+            AddDockItem(TabControls.ProductionOrdersPage2, arr, Uniconta.ClientTools.Localization.lookup("Production"), "Add_16x16.png");
         }
 
         public override void Utility_Refresh(string screenName, object argument)

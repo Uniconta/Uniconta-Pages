@@ -2,6 +2,9 @@
 <root>
   <RibbonItem TabId="0" LocalizedNameKey="Home">
     <!---If we want to create a new group in same PageTab-->
+    <RibbonItem Action="AccountPostingBalance" LocalizedNameKey="ShowOBJ" Parameter="TraceBalance" LargeGlyph="Budget_32x32.png" ShortcutKey=""/>
+  </RibbonItem>
+  <RibbonItem>
     <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32.png">
       <!---If we want Inner menu-->
       <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>

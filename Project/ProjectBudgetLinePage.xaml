@@ -27,7 +27,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectBudgetLinePage"
                     <localPage:CorasauDataGridTemplateColumnClient FieldName="Date" x:Name="colDate" Width="90" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Project" Width="80"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ProjectName" Width="80" Visible="False"/>
-                    <localPage:CorasauDataGridForeignKeyColumnClient x:Name="Task" Width="80">
+                    <localPage:CorasauDataGridForeignKeyColumnClient x:Name="Task" Width="80" Visible="False">
                         <localPage:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
                             <ControlTemplate>
                                 <TextBlock Margin="2" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.Task,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"></TextBlock>
@@ -39,9 +39,13 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectBudgetLinePage"
                             </DataTemplate>
                         </localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
                     </localPage:CorasauDataGridForeignKeyColumnClient>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Employee" Width="70"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="EmployeeName" Width="100" Visible="False"/>                    
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Width="80" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CategoryName" Width="100" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Item" Width="100"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PayrollCategory" Width="70" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PayrollCategoryName" Width="100" Visible="False"/>                    
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Item" Width="100" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant" FieldName="Variant">
                         <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                             <DataTemplate>
@@ -61,8 +65,8 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectBudgetLinePage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Variant5Name" Width="100" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Text" Width="150" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ItemName" Width="100" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="TimeFrom" Width="80" ShowTimeElapsed="True" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="TimeTo" Width="80" ShowTimeElapsed="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="TimeFrom" Width="80" ShowTimeElapsed="True" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="TimeTo" Width="80" ShowTimeElapsed="True" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Qty" Width="80">
                         <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                             <DataTemplate>
@@ -70,27 +74,22 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectBudgetLinePage"
                             </DataTemplate>
                         </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                     </localPage:CorasauDataGridTemplateColumnClient>
-
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Unit" Width="50" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CostPrice" Width="80"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="SalesPrice" Width="80"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Cost" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Sales" Width="90"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Margin" Width="90"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="MarginRatio" Width="50"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Margin" Width="90" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="MarginRatio" Width="50" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Completed" Width="50" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Employee" Width="70"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="EmployeeName" Width="100" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CreditorAccount" Width="70" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CreditorAccount" Width="70" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CreditorName" Width="100" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PayrollCategory" Width="70" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PayrollCategoryName" Width="100" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ReferenceNumber" Width="100"/>
-                    <localPage:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension1" x:Name="coldim1"/>
-                    <localPage:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension2" x:Name="coldim2"/>
-                    <localPage:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension3" x:Name="coldim3"/>
-                    <localPage:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension4" x:Name="coldim4"/>
-                    <localPage:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension5" x:Name="coldim5"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ReferenceNumber" Width="100" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension1" x:Name="coldim1" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension2" x:Name="coldim2" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension3" x:Name="coldim3" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension4" x:Name="coldim4" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension5" x:Name="coldim5" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Dimension1Name" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Dimension2Name" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Dimension3Name" Visible="False"/>

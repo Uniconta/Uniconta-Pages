@@ -31,6 +31,7 @@ using DevExpress.XtraReports.UI;
 using System.Reflection;
 using Uniconta.API.Service;
 using DevExpress.Xpf.Editors;
+using Uniconta.Common.Utility;
 #if !SILVERLIGHT
 using ubl_norway_uniconta;
 using UnicontaClient.Pages;
@@ -190,7 +191,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (zip == null)
                 {
                     var deliveryCountry = Order.DeliveryCountry ?? api.CompanyEntity._CountryId;
-                    var city = await UtilDisplay.GetCityAndAddress(txtDelZipCode.Text, deliveryCountry);
+                    var city = await UtilDisplay.GetCityAndAddress(Order.DeliveryZipCode, deliveryCountry);
                     if (city != null)
                     {
                         Order.DeliveryCity = city[0];
@@ -223,8 +224,8 @@ namespace UnicontaClient.Pages.CustomPage
                 Order.DeliveryAddress1 = orderClient._DeliveryAddress1;
                 Order.DeliveryAddress2 = orderClient._DeliveryAddress2;
                 Order.DeliveryAddress3 = orderClient._DeliveryAddress3;
-                Order.DeliveryZipCode = orderClient._DeliveryZipCode;
                 Order.DeliveryCity = orderClient._DeliveryCity;
+                Order.DeliveryZipCode = orderClient._DeliveryZipCode;
                 if (orderClient._DeliveryCountry != 0)
                     Order.DeliveryCountry = orderClient._DeliveryCountry;
 
@@ -286,7 +287,7 @@ namespace UnicontaClient.Pages.CustomPage
                             if (row._Item == null && row._Text == null && row._Note == null)
                                 removeList.Add(i);
                         }
-                        for (i = removeList.Count; (--i >= 0); )
+                        for (i = removeList.Count; (--i >= 0);)
                             dgDebtorOrderLineGrid.tableView.DeleteRow(removeList[i]);
                     }
                     dgDebtorOrderLineGrid.PasteRows(invItems);
@@ -306,9 +307,12 @@ namespace UnicontaClient.Pages.CustomPage
             get
             {
                 var lst = dgDebtorOrderLineGrid.ItemsSource as IEnumerable<DCOrderLine>;
-                if (lst == null || !lst.Any())
+                if (lst == null)
                     return false;
-                if (lst.Count() > 1)
+                var cnt = lst.Count();
+                if (cnt == 0)
+                    return false;
+                if (cnt > 1)
                     return true;
                 var lin = lst.First();
                 return lin._Item != null || lin._Qty != 0 || lin._Amount != 0;
@@ -413,7 +417,7 @@ namespace UnicontaClient.Pages.CustomPage
                     this.exchangeRate = await t;
             }
 
-            var ret = DebtorOfferLines.RecalculateLineSum((IList)dgDebtorOrderLineGrid.ItemsSource, this.exchangeRate);
+            var ret = DebtorOfferLines.RecalculateLineSum(Order, (IEnumerable<DCOrderLineClient>)dgDebtorOrderLineGrid.ItemsSource, this.exchangeRate);
             double Amountsum = ret.Item1;
             double Costsum = ret.Item2;
             double sales = ret.Item3;
@@ -539,7 +543,7 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                     catch (Exception ex)
                     {
-                        UnicontaMessageBox.Show(ex.Message, Uniconta.ClientTools.Localization.lookup("Exception"));
+                        UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"));
                     }
                     break;
                 case "StockLines":
@@ -601,8 +605,8 @@ namespace UnicontaClient.Pages.CustomPage
             order.DeliveryAddress1 = invoice._DeliveryAddress1;
             order.DeliveryAddress2 = invoice._DeliveryAddress2;
             order.DeliveryAddress3 = invoice._DeliveryAddress3;
-            order.DeliveryZipCode = invoice._DeliveryZipCode;
             order.DeliveryCity = invoice._DeliveryCity;
+            order.DeliveryZipCode = invoice._DeliveryZipCode;
             order.DeliveryCountry = invoice._DeliveryCountry;
             order.Installation = invoice._Installation;
             order.YourRef = invoice._YourRef;
@@ -623,7 +627,7 @@ namespace UnicontaClient.Pages.CustomPage
             order.Dimension4 = invoice._Dim4;
             order.Dimension5 = invoice._Dim5;
             if (checkIfCreditNote)
-                order.Settlements = invoice._InvoiceNumber;
+                order.Settlements = invoice.InvoiceNum;
 
             var orderlines = new List<DebtorOrderLineClient>();
             order.Lines = orderlines;
@@ -696,7 +700,7 @@ namespace UnicontaClient.Pages.CustomPage
         static bool showInvPrintPrv = true;
         private void GenerateInvoice(DebtorOrderClient dbOrder)
         {
-            IEnumerable<DCOrderLineClient> lines = (IEnumerable<DCOrderLineClient>)dgDebtorOrderLineGrid.ItemsSource;
+            var lines = (IEnumerable<DCOrderLineClient>)dgDebtorOrderLineGrid.ItemsSource;
             if (lines == null || lines.Count() == 0)
                 return;
             var dc = dbOrder.Debtor;
@@ -719,7 +723,7 @@ namespace UnicontaClient.Pages.CustomPage
             string debtorName = dbOrder.Debtor?.Name ?? dbOrder._DCAccount;
             bool invoiceInXML = dc?.InvoiceInXML ?? false;
             var accountName = string.Format("{0} ({1})", dbOrder._DCAccount, dbOrder.Name);
-            CWGenerateInvoice GenrateInvoiceDialog = new CWGenerateInvoice(true, string.Empty, false, askForEmail: true, showNoEmailMsg: !hasEmail, debtorName: debtorName, isOrderOrQuickInv: true, isDebtorOrder: true, InvoiceInXML: invoiceInXML, AccountName:accountName);
+            CWGenerateInvoice GenrateInvoiceDialog = new CWGenerateInvoice(true, string.Empty, false, askForEmail: true, showNoEmailMsg: !hasEmail, debtorName: debtorName, isOrderOrQuickInv: true, isDebtorOrder: true, InvoiceInXML: invoiceInXML, AccountName: accountName);
 #if !SILVERLIGHT
             GenrateInvoiceDialog.DialogTableId = 2000000005;
 #endif
@@ -737,7 +741,7 @@ namespace UnicontaClient.Pages.CustomPage
                     var invoicePostingResult = new InvoicePostingPrintGenerator(api, this, dbOrder, lines, GenrateInvoiceDialog.GenrateDate, 0, GenrateInvoiceDialog.IsSimulation, CompanyLayoutType.Invoice, showOrPrintInvoice,
                         GenrateInvoiceDialog.InvoiceQuickPrint, GenrateInvoiceDialog.NumberOfPages, GenrateInvoiceDialog.SendByEmail, GenrateInvoiceDialog.Emails, GenrateInvoiceDialog.sendOnlyToThisEmail, GenrateInvoiceDialog.GenerateOIOUBLClicked,
                         GenrateInvoiceDialog.PostOnlyDelivered, documents);
-
+                    invoicePostingResult.OpenAsOutlook = !GenrateInvoiceDialog.IsSimulation && GenrateInvoiceDialog.SendByOutlook;
                     busyIndicator.IsBusy = true;
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
                     var result = await invoicePostingResult.Execute();
@@ -754,7 +758,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                         if (invoicePostingResult.PostingResult.Header._InvoiceNumber != 0)
                         {
-                            var msg = string.Format(Uniconta.ClientTools.Localization.lookup("InvoiceHasBeenGenerated"), invoicePostingResult.PostingResult.Header._InvoiceNumber);
+                            var msg = string.Format(Uniconta.ClientTools.Localization.lookup("InvoiceHasBeenGenerated"), invoicePostingResult.PostingResult.Header.InvoiceNum);
                             msg = string.Format("{0}{1}{2} {3}", msg, Environment.NewLine, Uniconta.ClientTools.Localization.lookup("LedgerVoucher"), invoicePostingResult.PostingResult.Header._Voucher);
                             var resultMessage = UnicontaMessageBox.Show(msg, Uniconta.ClientTools.Localization.lookup("Message"));
 #if !SILVERLIGHT
@@ -783,8 +787,8 @@ namespace UnicontaClient.Pages.CustomPage
                 Order.DeliveryAddress1 = Debtor._DeliveryAddress1;
                 Order.DeliveryAddress2 = Debtor._DeliveryAddress2;
                 Order.DeliveryAddress3 = Debtor._DeliveryAddress3;
-                Order.DeliveryZipCode = Debtor._DeliveryZipCode;
                 Order.DeliveryCity = Debtor._DeliveryCity;
+                Order.DeliveryZipCode = Debtor._DeliveryZipCode;
                 if (Debtor._DeliveryCountry != 0)
                     Order.DeliveryCountry = Debtor._DeliveryCountry;
                 Order.Payment = Debtor._Payment;
@@ -795,7 +799,9 @@ namespace UnicontaClient.Pages.CustomPage
                 Order.LayoutGroup = Debtor._LayoutGroup;
                 Order.Employee = Debtor._Employee;
                 Order.DeliveryTerm = Debtor._DeliveryTerm;
-                hasEmail = Debtor._InvoiceEmail != null;
+                if (Order._Project == null)
+                    Order.SetMaster(Debtor);
+                hasEmail = Debtor._InvoiceEmail != null || Debtor._EmailDocuments;
                 PriceLookup?.OrderChanged(Order);
                 BindContact(Debtor);
                 if (installationCache != null)
@@ -832,8 +838,8 @@ namespace UnicontaClient.Pages.CustomPage
                     return;
                 if (master._AllowAllCombinations)
                 {
-                    rec.Variant1Source = this.variants1?.GetKeyStrRecords.Cast<InvVariant1>();
-                    rec.Variant2Source = this.variants2?.GetKeyStrRecords.Cast<InvVariant2>();
+                    rec.Variant1Source = (IEnumerable<InvVariant1>)this.variants1?.GetKeyStrRecords;
+                    rec.Variant2Source = (IEnumerable<InvVariant2>)this.variants2?.GetKeyStrRecords;
                 }
                 else
                 {
@@ -1032,7 +1038,7 @@ namespace UnicontaClient.Pages.CustomPage
             object[] param = new object[2];
             param[0] = api;
             param[1] = null;
-            AddDockItem(TabControls.DebtorAccountPage2, param, Uniconta.ClientTools.Localization.lookup("DebtorAccount"), ";component/Assets/img/Add_16x16.png");
+            AddDockItem(TabControls.DebtorAccountPage2, param, Uniconta.ClientTools.Localization.lookup("DebtorAccount"), "Add_16x16.png");
         }
 
         FileBrowseControl fileBrowser;
@@ -1054,7 +1060,7 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     documents.Add(new TableAddOnData
                     {
-                        _Text = file.FileName,
+                        _Text = System.IO.Path.GetFileNameWithoutExtension(file.FileName),
                         _DocumentType = DocumentConvert.GetDocumentType(file.FileExtension),
                         _Data = file.FileBytes
                     });

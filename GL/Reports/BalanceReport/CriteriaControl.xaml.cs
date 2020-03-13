@@ -37,7 +37,7 @@ namespace UnicontaClient.Pages.CustomPage
         public DateTime todateval;
         internal BalanceColumnFormat balcolFormat;
         internal BalanceColumnMethod balcolMethod;
-        string colNameNumber;
+        internal string colNameNumber;
         public BalanceColumnFormat balanceColumnFormat { get { return balcolFormat; } set { balcolFormat = value; NotifyPropertyChanged("BalanceFormat"); } }
         public BalanceColumnMethod balanceColumnMethod { get { return balcolMethod; } set { balcolMethod = value; NotifyPropertyChanged("BalanceMethod"); } }
         internal int colA, colB;

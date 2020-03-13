@@ -26,6 +26,7 @@ namespace UnicontaClient.Pages.CustomPage
     {
         public override Type TableType { get { return typeof(GLTransTypeGridClient); } }
         public override bool Readonly { get { return false; } }
+        protected override bool RenderAllColumns { get { return true; } }
     }
     public partial class GLTransTypePage : GridBasePage
     {

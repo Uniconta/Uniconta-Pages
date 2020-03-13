@@ -121,7 +121,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         public bool allowSave = true;
-        public override bool AllowSave { get{ return allowSave; }}
+        public override bool AllowSave { get { return allowSave; } }
     }
 
     public partial class CreditorOrderLines : GridBasePage
@@ -315,8 +315,8 @@ namespace UnicontaClient.Pages.CustomPage
                     return;
                 if (master._AllowAllCombinations)
                 {
-                    rec.Variant1Source = this.variants1?.GetKeyStrRecords.Cast<InvVariant1>();
-                    rec.Variant2Source = this.variants2?.GetKeyStrRecords.Cast<InvVariant2>();
+                    rec.Variant1Source = (IEnumerable<InvVariant1>)this.variants1?.GetKeyStrRecords;
+                    rec.Variant2Source = (IEnumerable<InvVariant2>)this.variants2?.GetKeyStrRecords;
                 }
                 else
                 {
@@ -584,7 +584,8 @@ namespace UnicontaClient.Pages.CustomPage
                     ViewStorage();
                     break;
                 case "Serial":
-                    LinkSerialNumber();
+                    if (selectedItem != null)
+                        LinkSerialNumber(selectedItem);
                     break;
                 case "InsertSubTotal":
                     row = dgCreditorOrderLineGrid.AddRow() as CreditorOrderLineClient;
@@ -747,7 +748,7 @@ namespace UnicontaClient.Pages.CustomPage
             string creditorName = creditor?._Name ?? dbOrder._DCAccount;
             var comp = api.CompanyEntity;
             bool showUpdateInv = comp.Storage || (doctype == CompanyLayoutType.PurchasePacknote && comp.CreditorPacknote);
-            CWGenerateInvoice GenrateOfferDialog = new CWGenerateInvoice(false, doctype.ToString(), showInputforInvNumber: doctype == CompanyLayoutType.PurchasePacknote ? true : false, isShowInvoiceVisible: true, 
+            CWGenerateInvoice GenrateOfferDialog = new CWGenerateInvoice(false, doctype.ToString(), showInputforInvNumber: doctype == CompanyLayoutType.PurchasePacknote ? true : false, isShowInvoiceVisible: true,
                 askForEmail: true, showNoEmailMsg: !showSendByMail, debtorName: creditorName, isShowUpdateInv: showUpdateInv);
 #if !SILVERLIGHT
             switch (doctype)
@@ -776,7 +777,7 @@ namespace UnicontaClient.Pages.CustomPage
                     }
 
                     showInvPrintPreview = GenrateOfferDialog.ShowInvoice || GenrateOfferDialog.InvoiceQuickPrint;
-                    long documentNumber = 0;
+                    string documentNumber = null;
                     if (doctype == CompanyLayoutType.PurchasePacknote)
                     {
                         documentNumber = GenrateOfferDialog.InvoiceNumber;
@@ -784,6 +785,7 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                     var invoicePostingResult = new InvoicePostingPrintGenerator(api, this, dbOrder, null, GenrateOfferDialog.GenrateDate, 0, !GenrateOfferDialog.UpdateInventory, doctype,
                         showInvPrintPreview, GenrateOfferDialog.InvoiceQuickPrint, GenrateOfferDialog.NumberOfPages, GenrateOfferDialog.SendByEmail, GenrateOfferDialog.Emails, GenrateOfferDialog.sendOnlyToThisEmail);
+                    invoicePostingResult.OpenAsOutlook = GenrateOfferDialog.UpdateInventory && GenrateOfferDialog.SendByOutlook;
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
                     busyIndicator.IsBusy = true;
                     var result = await invoicePostingResult.Execute();
@@ -833,13 +835,10 @@ namespace UnicontaClient.Pages.CustomPage
                 UtilDisplay.ShowErrorCode(res);
         }
 
-        async void LinkSerialNumber()
+        async void LinkSerialNumber(CreditorOrderLineClient orderLine)
         {
-            var orderLine = dgCreditorOrderLineGrid.SelectedItem as CreditorOrderLineClient;
-            if (orderLine == null || orderLine._Item == null)
-                return;
             var item = (InvItem)items.Get(orderLine._Item);
-            if (!item._UseSerialBatch)
+            if (item == null || !item._UseSerialBatch)
                 return;
             var t = saveGridLocal();
             if (t != null && orderLine.RowId == 0)
@@ -874,8 +873,7 @@ namespace UnicontaClient.Pages.CustomPage
 #if !SILVERLIGHT
             GenrateInvoiceDialog.DialogTableId = 2000000001;
 #endif
-            if (dbOrder._InvoiceNumber != 0)
-                GenrateInvoiceDialog.SetInvoiceNumber(dbOrder._InvoiceNumber);
+            GenrateInvoiceDialog.SetInvoiceNumber(dbOrder._InvoiceNumber);
             if (dbOrder._InvoiceDate != DateTime.MinValue)
                 GenrateInvoiceDialog.SetInvoiceDate(dbOrder._InvoiceDate);
 
@@ -893,6 +891,7 @@ namespace UnicontaClient.Pages.CustomPage
                     var showOrPrint = GenrateInvoiceDialog.ShowInvoice || GenrateInvoiceDialog.InvoiceQuickPrint;
                     var invoicePostingResult = new InvoicePostingPrintGenerator(api, this, dbOrder, null, GenrateInvoiceDialog.GenrateDate, GenrateInvoiceDialog.InvoiceNumber, GenrateInvoiceDialog.IsSimulation,
                         CompanyLayoutType.PurchaseInvoice, showOrPrint, GenrateInvoiceDialog.InvoiceQuickPrint, GenrateInvoiceDialog.NumberOfPages, false, GenrateInvoiceDialog.Emails, GenrateInvoiceDialog.sendOnlyToThisEmail);
+                    invoicePostingResult.OpenAsOutlook =!GenrateInvoiceDialog.IsSimulation && GenrateInvoiceDialog.SendByOutlook;
 
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
                     busyIndicator.IsBusy = true;
@@ -907,7 +906,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                         if (invoicePostingResult.PostingResult.Header._InvoiceNumber != 0)
                         {
-                            var msg = string.Format(Uniconta.ClientTools.Localization.lookup("InvoiceHasBeenGenerated"), invoicePostingResult.PostingResult.Header._InvoiceNumber);
+                            var msg = string.Format(Uniconta.ClientTools.Localization.lookup("InvoiceHasBeenGenerated"), invoicePostingResult.PostingResult.Header.InvoiceNum);
                             msg = string.Format("{0}{1}{2} {3}", msg, Environment.NewLine, Uniconta.ClientTools.Localization.lookup("LedgerVoucher"), invoicePostingResult.PostingResult.Header._Voucher);
                             UnicontaMessageBox.Show(msg, Uniconta.ClientTools.Localization.lookup("Message"));
 

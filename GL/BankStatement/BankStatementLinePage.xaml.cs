@@ -30,6 +30,7 @@ using UnicontaClient.Controls.Dialogs;
 using DevExpress.Xpf.Grid;
 using System.ComponentModel;
 using UnicontaClient.Pages;
+using Uniconta.Common.Utility;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -52,7 +53,9 @@ namespace UnicontaClient.Pages.CustomPage
         public override IComparer GridSorting { get { return new BankStatementLineSort(); } }
         public override bool Readonly { get { return false; } }
         public override bool CanInsert { get { return false; } }
+        public override bool CanDelete { get { return false; } }
         public override bool IsAutoSave { get { return true; } }
+        protected override bool RenderAllColumns { get { return true; } }
     }
 
     public class TransGrid : CorasauDataGridClient
@@ -87,6 +90,7 @@ namespace UnicontaClient.Pages.CustomPage
         GLTransClientTotalBank[] GlTransList;
         BankStatementLineGridClient[] BankList;
         Orientation orient;
+        List<BankStatementAPI.BankRemoveJournal> _JournalsRemoved;
 
         string bankStatCaption;
         string transactionCaption;
@@ -151,7 +155,7 @@ namespace UnicontaClient.Pages.CustomPage
             ribbonControl.lowerSearchGrid = dgAccountsTransGrid;
             ribbonControl.UpperSearchNullText = bankStatCaption;
             ribbonControl.LowerSearchNullText = transactionCaption;
-          
+
 #if SILVERLIGHT
             Application.Current.RootVisual.KeyDown += RootVisual_KeyDown;
 #else
@@ -338,7 +342,7 @@ namespace UnicontaClient.Pages.CustomPage
                     SetAccountSource(rec);
                     break;
                 case "Invoice":
-                    if (rec._Invoice != 0)
+                    if (rec._Invoice != null)
                     {
                         GLJournalAccountType type = rec._AmountCent > 0 ? GLJournalAccountType.Debtor : GLJournalAccountType.Creditor;
                         rec.AccountType = AppEnums.GLAccountType.ToString((int)type);
@@ -420,6 +424,7 @@ namespace UnicontaClient.Pages.CustomPage
             var ShowCurrency = this.ShowCurrency;
             if (listtran != null)
             {
+                Array.Sort(listtran, new GLTransClientSort());
                 long Total = 0;
                 llisttranLen = listtran.Length;
                 for (int i = 0; (i < llisttranLen); i++)
@@ -457,6 +462,8 @@ namespace UnicontaClient.Pages.CustomPage
                         else
                             startGLSearch = 0;
 
+                        var BankStatementLineId = ((int)SmallDate.Pack(p._Date) << 16) + p.LineNumber;
+
                         for (int n = startGLSearch; (n < llisttranLen); n++)
                         {
                             var t = listtran[n];
@@ -464,14 +471,15 @@ namespace UnicontaClient.Pages.CustomPage
                                 startGLSearch = n;
                             else if (t._Date == PostedDate)
                             {
-                                if (t._Voucher == p._Voucher && t._VoucherLine == p._VoucherLine && t._JournalPostedId == p._JournalPostedId)
+                                if ((t._JournalPostedId != 0 && t._Voucher == p._Voucher && t._VoucherLine == p._VoucherLine && t._JournalPostedId == p._JournalPostedId) ||
+                                    (t.BankStatementLine == BankStatementLineId))
                                 {
                                     if (p._Trans == null)
-                                        p._Trans = new List<GLTransClientTotalBank>();
+                                        p._Trans = new List<GLTransClientTotalBank>(1);
                                     p._Trans.Add(t);
 
                                     if (t._StatementLines == null)
-                                        t._StatementLines = new List<BankStatementLineGridClient>();
+                                        t._StatementLines = new List<BankStatementLineGridClient>(1);
                                     t._StatementLines.Add(p);
 
                                     if (p.MultiMark != null)
@@ -485,14 +493,17 @@ namespace UnicontaClient.Pages.CustomPage
                                                 t = listtran[cnt];
                                                 if (t._Date == PostedDate)
                                                 {
-                                                    if (t._Voucher == mark.Voucher && t._VoucherLine == mark.VoucherLine && t._JournalPostedId == mark.JournalPostedId
-                                                        && (ShowCurrency ? t._AmountCur : t._Amount) == mark.Amount)
+                                                    if ((t._Voucher == mark.Voucher && t._VoucherLine == mark.VoucherLine && t._JournalPostedId == mark.JournalPostedId
+                                                        && (ShowCurrency ? t._AmountCur : t._Amount) == mark.Amount) ||
+                                                        (t.JournalId == mark.JournalId && t.JourRowId == mark.JourRowId))
                                                     {
                                                         p._Trans.Add(t);
                                                         if (t._StatementLines == null)
-                                                            t._StatementLines = new List<BankStatementLineGridClient>();
+                                                            t._StatementLines = new List<BankStatementLineGridClient>(1);
                                                         t._StatementLines.Add(p);
                                                         t._Reconciled = true;
+                                                        if (t.JournalId != 0)
+                                                            t.BankStatementLine = BankStatementLineId;
                                                         break;
                                                     }
                                                 }
@@ -549,7 +560,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                         AddDockItem(TabControls.AttachVoucherGridPage, new object[1] { _refferedVouchers }, true);
                     }
-                    
+
                     break;
                 case "ViewVoucher":
                     bool useGLTrans = true;
@@ -575,7 +586,7 @@ namespace UnicontaClient.Pages.CustomPage
                             busyIndicator.IsBusy = false;
                         }
                     }
-                    else if(selectedItem != null)
+                    else if (selectedItem != null)
                     {
                         dgBankStatementLine.syncEntity.Row = selectedItem;
                         busyIndicator.IsBusy = true;
@@ -668,34 +679,110 @@ namespace UnicontaClient.Pages.CustomPage
                 case "OffSetAccount":
                     CallOffsetAccount(selectedItem);
                     break;
+                case "OpenTran":
+                    if (selectedItem == null) return;
+                    SettleOpenTransactionPage(selectedItem);
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
         }
 
+        private void SettleOpenTransactionPage(BankStatementLineGridClient selectedItem)
+        {
+            var dcAccount = selectedItem.Account;
+            var dcAccountObj = selectedItem._AccountType == (int)GLJournalAccountType.Debtor ? DebtorCache.Get(dcAccount) : CreditorCache.Get(dcAccount);
+
+            if (dcAccountObj != null)
+            {
+                var lst = GetSettledItems(selectedItem, dcAccount, selectedItem._AccountType);
+                object[] param = new object[5];
+                param[0] = dcAccountObj;
+                param[1] = (object)selectedItem._AccountType;
+                param[2] = selectedItem;
+                param[3] = false;
+                param[4] = lst;
+
+                AddDockItem(TabControls.SettleOpenTransactionPage, param, true);
+            }
+        }
+
+        private List<string> GetSettledItems(BankStatementLineGridClient currentRow, string account, byte actType)
+        {
+            var gridRows = (IEnumerable<BankStatementLineGridClient>)dgBankStatementLine.ItemsSource;
+            if (gridRows == null)
+                return null;
+
+            List<string> lines = null;
+
+            foreach (var row in gridRows)
+            {
+                if ((row._Settlement != null || row._Invoice != null) && (row._AccountType == actType && row._Account == account))
+                {
+                    if (!object.ReferenceEquals(row, currentRow))
+                    {
+                        if (lines == null)
+                            lines = new List<string>();
+                        if (row._Settlement != null)
+                            lines.Add(row._Settlement);
+                        else if (row._Invoice != null)
+                            lines.Add(row._Invoice);
+                    }
+                }
+            }
+
+            return lines;
+        }
+
         public override void Utility_Refresh(string screenName, object argument = null)
         {
-            if(screenName == TabControls.AttachVoucherGridPage && argument !=null)
+            if (screenName == TabControls.AttachVoucherGridPage && argument != null)
             {
                 var voucherObj = argument as object[];
 
-                if(voucherObj[0] is VouchersClient)
+                if (voucherObj[0] is VouchersClient)
                 {
                     var voucher = voucherObj[0] as VouchersClient;
                     var selectedItem = dgBankStatementLine.SelectedItem as BankStatementLineGridClient;
 
-                    if(selectedItem!=null && voucher.RowId!=0)
+                    if (selectedItem != null && voucher.RowId != 0)
                     {
                         dgBankStatementLine.SetLoadedRow(selectedItem);
                         selectedItem.VoucherReference = voucher.RowId;
-                        if (voucher._Invoice != 0)
-                            selectedItem.Invoice = voucher._Invoice;
+                        selectedItem.Invoice = voucher._Invoice;
                         dgBankStatementLine.SetModifiedRow(selectedItem);
                     }
                 }
             }
+
+            if (screenName == TabControls.SettleOpenTransactionPage)
+            {
+                var obj = argument as object[];
+                if (obj != null && obj.Length == 2)
+                    SetSettlementForBankStatemenLine(obj[0] as BankStatementLineGridClient, obj[1] as string);
+            }
         }
+
+        private void SetSettlementForBankStatemenLine(BankStatementLineGridClient bankStatementLine, string settlementStr)
+        {
+            if (bankStatementLine == null) return;
+
+            dgBankStatementLine.SetLoadedRow(bankStatementLine);
+            var settleValues = settlementStr.Split(':');
+            if (!settleValues[1].Contains(';'))
+            {
+                bankStatementLine.Invoice = settlementStr;
+                bankStatementLine.Settlement = null;
+            }
+            else
+            {
+                bankStatementLine.Settlement = settleValues[1];
+                bankStatementLine.Invoice = null;
+            }
+            dgBankStatementLine.SetModifiedRow(bankStatementLine);
+        }
+
         private void ShowAmountWindow()
         {
             CWShowAmount winShowAmount = new CWShowAmount();
@@ -724,12 +811,12 @@ namespace UnicontaClient.Pages.CustomPage
             if (hideGreen)
             {
                 ibase.Caption = string.Format(Uniconta.ClientTools.Localization.lookup("ShowOBJ"), Uniconta.ClientTools.Localization.lookup("Green"));
-                ibase.LargeGlyph = Utilities.Utility.GetGlyph(";component/Assets/img/ShowGreen_32x32.png");
+                ibase.LargeGlyph = Utilities.Utility.GetGlyph("ShowGreen_32x32.png");
             }
             else
             {
                 ibase.Caption = string.Format(Uniconta.ClientTools.Localization.lookup("HideOBJ"), Uniconta.ClientTools.Localization.lookup("Green"));
-                ibase.LargeGlyph = Utilities.Utility.GetGlyph(";component/Assets/img/HideGreen_32x32.png");
+                ibase.LargeGlyph = Utilities.Utility.GetGlyph("HideGreen_32x32.png");
             }
         }
         async void ChangeVoidState(GLTransClientTotalBank trans)
@@ -758,7 +845,7 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     master._Journal = winTransfer.Journal;
                     PostingAPI pApi = new PostingAPI(api);
-                    var res = await pApi.TransferBankStatementToJournal(master, winTransfer.FromDate, winTransfer.ToDate, winTransfer.BankAsOffset, winTransfer.isMarkLine,winTransfer.AddVoucherNumber);
+                    var res = await pApi.TransferBankStatementToJournal(master, winTransfer.FromDate, winTransfer.ToDate, winTransfer.BankAsOffset, winTransfer.isMarkLine, winTransfer.AddVoucherNumber);
                     if (res == ErrorCodes.Succes)
                     {
                         string strmsg = string.Format("{0}; {1}! {2} ?", Uniconta.ClientTools.Localization.lookup("GenerateJournalLines"), Uniconta.ClientTools.Localization.lookup("Completed"),
@@ -1024,15 +1111,21 @@ namespace UnicontaClient.Pages.CustomPage
                 return false;
             var markedbstList = lstbsl.Where(bl => bl.Mark == true && bl.State == (byte)1).ToList();
             var markedactList = lstAct.Where(ac => ac.Mark == true && ac.State == (byte)1).ToList();
-            if (!markedbstList.Any() && !markedactList.Any())
+            if (markedbstList.Count == 0 && markedactList.Count == 0)
             {
                 /* take selected item */
                 var bl = getBSLSelecteditem();
                 if (bl != null && bl.State == (byte)1)
+                {
+                    markedbstList.Capacity = 1;
                     markedbstList.Add(bl);
+                }
                 var ac = dgAccountsTransGrid.CurrentItem as GLTransClientTotalBank;
                 if (ac != null && ac.State == (byte)1)
-                    markedactList = new List<GLTransClientTotalBank>() { ac };
+                {
+                    markedactList.Capacity = 1;
+                    markedactList.Add(ac);
+                }
             }
             /*
             if (markedbstList.Count > 1 && markedactList.Count > 1)
@@ -1043,7 +1136,7 @@ namespace UnicontaClient.Pages.CustomPage
             */
             var ShowCurrency = this.ShowCurrency;
 
-            if (markedbstList.Any() && markedactList.Any())
+            if (markedbstList.Count > 0 && markedactList.Count > 0)
             {
                 long sum1 = 0;
                 foreach (var rec in markedbstList)
@@ -1067,17 +1160,31 @@ namespace UnicontaClient.Pages.CustomPage
 
                 if (markedbstList.Count == 1)
                 {
-                    var bst = markedbstList.First();
+                    var bst = markedbstList[0];
                     bst.Updated = true;
                     bst.Mark = false;
                     bst.Trans = markedactList;
                     bool first = true;
+                    int BankStatementLineId = 0;
                     foreach (var act in markedactList)
                     {
                         if (first)
                         {
                             first = false;
+                            if (act.JournalId != 0)
+                            {
+                                bst._InJournal = true;
+                                BankStatementLineId = ((int)SmallDate.Pack(bst._Date) << 16) + bst.LineNumber;
+                                act.BankStatementLine = BankStatementLineId;
+                            }
                             Join(bst, act, true);
+                        }
+                        else if (BankStatementLineId != 0)
+                        {
+                            if (act.JournalId != 0)
+                                act.BankStatementLine = BankStatementLineId;
+                            else
+                                bst._InJournal = false;
                         }
                         act.StatementLines = markedbstList;
                         act._Reconciled = true;
@@ -1087,7 +1194,7 @@ namespace UnicontaClient.Pages.CustomPage
                 }
                 else if (markedactList.Count == 1)
                 {
-                    var act = markedactList.First();
+                    var act = markedactList[0];
                     act._Reconciled = true;
                     act.Mark = false;
                     act.IsMatched = true;
@@ -1128,7 +1235,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var lstbsl = ((IEnumerable<BankStatementLineGridClient>)dgBankStatementLine.ItemsSource);
             var markedbstList = lstbsl.Where(bl => bl.Mark == true && bl.State != (byte)1).ToList();
-            if (!markedbstList.Any())
+            if (markedbstList.Count == 0)
             {
                 /* take selected item */
                 var bt = getBSLSelecteditem();
@@ -1137,10 +1244,10 @@ namespace UnicontaClient.Pages.CustomPage
             }
             if (markedbstList.Count == 1)
             {
-                var bt = markedbstList.First();
+                var bt = markedbstList[0];
                 if (bt._Trans != null && bt._Trans.Count == 1)
                 {
-                    var ac = bt._Trans.First();
+                    var ac = bt._Trans[0];
                     if (ac.StatementLines.Count > 1)
                     {
                         ac.IsCleared = true;
@@ -1151,7 +1258,6 @@ namespace UnicontaClient.Pages.CustomPage
 
             foreach (var bst in markedbstList)
             {
-                bst.Updated = true;
                 bst._JournalPostedId = 0;
                 bst.Voucher = 0;
                 bst.VoucherLine = 0;
@@ -1160,9 +1266,31 @@ namespace UnicontaClient.Pages.CustomPage
                 bst._DocumentRef = 0;
                 bst.AccountType = null;
                 bst.Account = null;
+                bst._InJournal = false;
                 if (bst._Trans != null)
                 {
-                    bst._Trans.ForEach(tr => { tr.StatementLines = null; tr.Mark = false; tr._Reconciled = false; tr.IsMatched = false; });  // remove point back
+                    if (bst._Trans.Count > 1)
+                        bst.Updated = true;
+
+                    foreach (var tr in bst._Trans)
+                    {
+                        if (tr.BankStatementLine != 0)
+                        {
+                            if (this._JournalsRemoved == null)
+                                this._JournalsRemoved = new List<BankStatementAPI.BankRemoveJournal>();
+                            var lin = new BankStatementAPI.BankRemoveJournal()
+                            {
+                                JournalId = tr.JournalId,
+                                JourRowId = tr.JourRowId,
+                                BankLine = bst
+                            };
+                            this._JournalsRemoved.Add(lin);
+                            tr.BankStatementLine = 0;
+                        }
+                        else
+                            bst.Updated = true;
+                        tr._StatementLines = null; tr._Reconciled = false; tr.Mark = false; tr.IsMatched = false;
+                    }
                     bst._Trans = null;
                     bst.UpdateState();
                 }
@@ -1220,13 +1348,13 @@ namespace UnicontaClient.Pages.CustomPage
                 bank.Updated = false;
 
                 var _Trans = bank._Trans;
-                if (_Trans != null && _Trans.Count == 1 && _Trans.First().StatementLines.Count > 1)
+                if (_Trans != null && _Trans.Count == 1 && _Trans[0].StatementLines.Count > 1)
                 {
                     if (multiSettleBank == null)
                         multiSettleBank = new List<BankStatementAPI.TransSettle>();
 
-                    BankStatementAPI.TransSettle bs = new BankStatementAPI.TransSettle();
-                    var t = _Trans.First();
+                    var bs = new BankStatementAPI.TransSettle();
+                    var t = _Trans[0];
                     if (t.IsCleared)
                     {
                         t.IsCleared = false;
@@ -1268,11 +1396,17 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                 }
             }
-            if (multiSettleTrans != null || multiSettleBank != null)
+            if (multiSettleTrans != null || multiSettleBank != null || (_JournalsRemoved != null && _JournalsRemoved.Count > 0))
             {
                 var bapi = new BankStatementAPI(api);
 
                 err = 0;
+                if (_JournalsRemoved != null && _JournalsRemoved.Count > 0)
+                {
+                    err = await bapi.RemoveJournalBank(_JournalsRemoved);
+                    if (err == 0)
+                        _JournalsRemoved.Clear();
+                }
                 if (multiSettleBank != null)
                     err = await bapi.Settle(this.master, multiSettleBank);
                 if (err == 0 && multiSettleTrans != null)
@@ -1316,7 +1450,6 @@ namespace UnicontaClient.Pages.CustomPage
                     grp.StatusValue = toDate.ToString("d");
                 }
             }
-
         }
         void setDim()
         {
@@ -1434,8 +1567,12 @@ namespace UnicontaClient.Pages.CustomPage
             get
             {
                 var lstbsl = ((IEnumerable<BankStatementLineGridClient>)dgBankStatementLine.ItemsSource);
-                if (lstbsl != null && lstbsl.Any(l => l.Updated))
-                    return true;
+                if (lstbsl != null)
+                {
+                    foreach (var l in lstbsl)
+                        if (l.Updated)
+                            return true;
+                }
                 return base.IsDataChaged;
             }
         }
@@ -1462,7 +1599,7 @@ namespace UnicontaClient.Pages.CustomPage
         internal object accntSource;
         public object AccountSource { get { return accntSource; } }
 
-        internal List<GLTransClientTotalBank> _Trans;
+         internal List<GLTransClientTotalBank> _Trans;
         internal List<GLTransClientTotalBank> Trans { get { return _Trans; } set { _Trans = value; NotifyPropertyChanged("State"); } }
 
         internal bool Updated;
@@ -1479,10 +1616,11 @@ namespace UnicontaClient.Pages.CustomPage
         internal bool _IsMatched;
         public bool IsMatched { get { return _IsMatched; } set { _IsMatched = value; NotifyPropertyChanged("IsMatched"); NotifyPropertyChanged("State"); NotifyPropertyChanged("AllowEditing"); } }
         public bool AllowEditing { get { return State == 1 || _Void; } }
-        public byte State { get { return _Trans != null || _Primo || this._JournalPostedId != 0 ? (byte)3 : _Void ? (byte)4 : (_InJournal ? (byte)2 : (byte)1); } }
+        public byte State { get { return _InJournal ? (byte)2 : (_Trans != null || _Primo || this._JournalPostedId != 0 ? (byte)3 : _Void ? (byte)4 : (byte)1); } }
         internal bool _Mark;
         public bool Mark { get { return _Mark; } set { if (_Mark == value) return; _Mark = value; NotifyPropertyChanged("Mark"); } }
 
+        public bool IsNoteReadonly { get { return !AllowEditing; } }
         public bool HasOffSetAccounts { get { return _HasOffsetAccounts; } }
     }
 
@@ -1490,13 +1628,15 @@ namespace UnicontaClient.Pages.CustomPage
     {
         internal List<BankStatementLineGridClient> _StatementLines;
         public List<BankStatementLineGridClient> StatementLines { get { return _StatementLines; } set { _StatementLines = value; NotifyPropertyChanged("State"); } }
-        public byte State { get { return _StatementLines != null || _Reconciled || _PrimoTrans ? (byte)3 : _Void ? (byte)4 : (byte)1; } }
+        public new byte State { get { return this.BankStatementLine != 0 ? (byte)2 : (_StatementLines != null || _Reconciled || _PrimoTrans ? (byte)3 : _Void ? (byte)4 : (byte)1); } }
         public bool AllowEditing { get { return State == 1 || _Void; } }
         internal bool _IsMatched;
         public bool IsMatched { get { return _IsMatched; } set { _IsMatched = value; NotifyPropertyChanged("IsMatched"); NotifyPropertyChanged("State"); NotifyPropertyChanged("AllowEditing"); } }
         internal bool _Mark;
         public bool Mark { get { return _Mark; } set { if (_Mark == value) return; _Mark = value; NotifyPropertyChanged("Mark"); } }
         internal bool IsCleared;
+
+       
 
         public void UpdateState()
         {

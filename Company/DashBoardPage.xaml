@@ -24,6 +24,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DashBoardPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="AllCompanies"  />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Comment" Width="300" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="ForSubId"  />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="colUserId" FieldName="Uid" /> 
                 </local:DashBoardPageGrid.Columns>
             </local:DashBoardPageGrid>
         </UnicontaControls:BusyIndicator>

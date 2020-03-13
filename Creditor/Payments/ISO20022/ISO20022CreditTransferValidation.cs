@@ -14,6 +14,7 @@ using UnicontaClient.Pages;
 using System.Windows;
 using Uniconta.ClientTools.Page;
 using UnicontaClient.Pages.Creditor.Payments;
+using Uniconta.Common.Utility;
 
 namespace ISO20022CreditTransfer
 {
@@ -151,6 +152,9 @@ namespace ISO20022CreditTransfer
             if (trans.PaymentMethod == null)
                 checkErrors.Add(new CheckError(String.Format("Method of payment must not be empty")));
 
+            if (trans.MergePaymId == Uniconta.ClientTools.Localization.lookup("Excluded") && trans.PaymentAmount <= 0)
+                checkErrors.Add(new CheckError(String.Format("Credit amount is not allowed")));
+
             switch (trans._PaymentMethod)
             {
                 case PaymentTypes.VendorBankAccount:
@@ -182,11 +186,11 @@ namespace ISO20022CreditTransfer
 
             var countryCode = glJournalGenerated ? (CountryCode)company._Country : creditor._Country;
 
-            ISOPaymentType(trans._CurrencyLocal.ToString(), bankAccount._IBAN, trans._PaymentMethod, UnicontaCountryToISO(countryCode));
+            ISOPaymentType(trans._CurrencyLocal, bankAccount._IBAN, trans._PaymentMethod, UnicontaCountryToISO(countryCode));
             
             //Validations <<
 
-            return new XMLDocumentGenerateResult(dummyDoc, CheckError.Count > 0, 0, CheckError, Encoding.UTF8);
+            return new XMLDocumentGenerateResult(dummyDoc, CheckError.Count > 0, 0, CheckError);
         }
        
 
@@ -263,28 +267,21 @@ namespace ISO20022CreditTransfer
 
             if (exportFormat == ExportFormatType.Nordea_CSV || exportFormat == ExportFormatType.BEC_CSV)
             {
-                var iban = string.Empty;
                 var countryId = string.Empty;
-                swift = swift ?? string.Empty;
-
                 if (paymentType == PaymentTypes.IBAN)
                 {
-                    iban = paymentId ?? string.Empty;
-                    if (iban != string.Empty)
+                    if (! string.IsNullOrEmpty(paymentId))
                     {
-                        iban = Regex.Replace(iban, "[^\\w\\d]", "");
-                        iban = iban.ToUpper();
-                        countryId = iban.Substring(0, 2);
+                        paymentId = Regex.Replace(paymentId, "[^\\w\\d]", "");
+                        countryId = paymentId.Substring(0, 2).ToUpper();
                     }
                 }
 
-                swift = swift ?? string.Empty;
-                if (swift != string.Empty)
+                if (! string.IsNullOrEmpty(swift))
                 {
                     swift = Regex.Replace(swift, "[^\\w\\d]", "");
-                    swift = swift.ToUpper();
-                    if(swift.Length > 6)
-                        countryId = countryId == string.Empty ? swift.Substring(4, 2) : countryId;
+                    if (swift.Length > 6)
+                        countryId = countryId == string.Empty ? swift.Substring(4, 2).ToUpper() : countryId;
                 }
 
                 if (paymentType == PaymentTypes.VendorBankAccount && paymentCcy != BaseDocument.CCYDKK && (countryId == string.Empty || countryId == BaseDocument.COUNTRY_DK))
@@ -299,7 +296,6 @@ namespace ISO20022CreditTransfer
         private void CreditorAddress(Creditor creditor)
         {
             string countryId = UnicontaCountryToISO(creditor._Country);
-
             if (string.IsNullOrEmpty(countryId))
             {
                 var string1 = fieldCannotBeEmpty("Country");
@@ -313,9 +309,7 @@ namespace ISO20022CreditTransfer
         /// </summary>
         private void CreditorBIC(String swift, bool bbanSwift = false)
         {
-            swift = swift ?? string.Empty;
-
-            if (swift != string.Empty)
+            if (! string.IsNullOrEmpty(swift))
             {
                 swift = Regex.Replace(swift, "[^\\w\\d]", "");
 
@@ -390,9 +384,7 @@ namespace ISO20022CreditTransfer
             }
             else
             {
-                iban = iban ?? string.Empty;
-
-                if (iban != string.Empty)
+                if (!string.IsNullOrEmpty(iban))
                 {
                     creditorIBAN = Regex.Replace(iban, "[^\\w\\d]", "");
 
@@ -466,16 +458,13 @@ namespace ISO20022CreditTransfer
             }
             else
             {
-                bban = bban ?? string.Empty;
-
-                if (bban == string.Empty)
+                if (string.IsNullOrEmpty(bban))
                 {
                     checkErrors.Add(new CheckError(Uniconta.ClientTools.Localization.lookup("CredBBANMissing")));
                 }
                 else
                 {
                     bban = Regex.Replace(bban, "[^0-9]", "");
-
                     if (bban.Length <= 4)
                     {
                         checkErrors.Add(new CheckError(String.Format("The Creditor bank account number (BBAN) doesn't have a valid format")));
@@ -500,9 +489,7 @@ namespace ISO20022CreditTransfer
         /// </summary>
         private Boolean PaymentMethodFIK71(String ocrLine)
         {
-            ocrLine = ocrLine ?? string.Empty;
-              
-            if (ocrLine == string.Empty)
+            if (string.IsNullOrEmpty(ocrLine))
             {
                 checkErrors.Add(new CheckError(String.Format("Field PaymentId must not be empty. Need to be filled in with a FIK71 OCR-reference")));
                 return false;
@@ -513,7 +500,6 @@ namespace ISO20022CreditTransfer
                 checkErrors.Add(new CheckError(String.Format("The FIK mask doesn't have a valid format.")));
                 return false;
             }
-
 
             string paymID = string.Empty;
             string creditorAccount = string.Empty;
@@ -531,7 +517,7 @@ namespace ISO20022CreditTransfer
             }
 
             if (paymID == string.Empty)
-            { 
+            {
                 checkErrors.Add(new CheckError(String.Format("Payment Id part of the FIK71 OCR-reference could not be found due to an invalid format.")));
                 return false;
             }
@@ -554,7 +540,7 @@ namespace ISO20022CreditTransfer
                 return false;
             }
 
-            if (creditorAccount.Substring(0,1) != "8")
+            if (creditorAccount[0] != '8')
             {
                 checkErrors.Add(new CheckError(String.Format("Creditor account part of the FIK71 OCR-reference must start with the character 8 or it will be invalid.")));
                 return false;
@@ -585,23 +571,18 @@ namespace ISO20022CreditTransfer
         /// </summary>
         private Boolean PaymentMethodFIK73(String ocrLine)
         {
-            ocrLine = ocrLine ?? string.Empty;
-
-            if (ocrLine == string.Empty)
+            if (string.IsNullOrEmpty(ocrLine))
             {
                 checkErrors.Add(new CheckError(String.Format("Field PaymentId must not be empty. Need to be filled in with a Creditor account")));
                 return false;
             }
-
-            string creditorAccount = string.Empty;
 
             ocrLine = ocrLine.Replace(" ", "");
             ocrLine = ocrLine.Replace("+73<", "");
             ocrLine = ocrLine.Replace(">73<", "");
             ocrLine = ocrLine.Replace("<", "");
             ocrLine = ocrLine.Replace(">", "");
-            creditorAccount = ocrLine.Replace("+", "");
-
+            var creditorAccount = ocrLine.Replace("+", "");
             if (creditorAccount == string.Empty)
             {
                 checkErrors.Add(new CheckError(String.Format("Creditor account could not be found due to an invalid format.")));
@@ -614,7 +595,7 @@ namespace ISO20022CreditTransfer
                 return false;
             }
 
-            if (creditorAccount.Substring(0, 1) != "8")
+            if (creditorAccount[0] != '8')
             {
                 checkErrors.Add(new CheckError(String.Format("Creditor account must start with the character 8 or it will be invalid.")));
                 return false;
@@ -639,9 +620,7 @@ namespace ISO20022CreditTransfer
         /// </summary>
         private Boolean PaymentMethodFIK75(String ocrLine)
         {
-            ocrLine = ocrLine ?? string.Empty;
-
-            if (ocrLine == string.Empty)
+            if (string.IsNullOrEmpty(ocrLine))
             {
                 checkErrors.Add(new CheckError(String.Format("Field PaymentId must not be empty. Need to be filled in with a FIK75 OCR-reference")));
                 return false;
@@ -692,7 +671,7 @@ namespace ISO20022CreditTransfer
                 return false;
             }
 
-            if (creditorAccount.Substring(0, 1) != "8")
+            if (creditorAccount[0] != '8')
             {
                 checkErrors.Add(new CheckError(String.Format("Creditor account part of the FIK75 OCR-reference must start with the character 8 or it will be invalid.")));
                 return false;
@@ -723,9 +702,7 @@ namespace ISO20022CreditTransfer
         /// </summary>
         private Boolean PaymentMethodFIK04(String ocrLine)
         {
-            ocrLine = ocrLine ?? string.Empty;
-
-            if (ocrLine == string.Empty)
+            if (string.IsNullOrEmpty(ocrLine))
             {
                 checkErrors.Add(new CheckError(String.Format("Field PaymentId must not be empty. Need to be filled in with a FIK04 OCR-reference")));
                 return false;
@@ -829,7 +806,6 @@ namespace ISO20022CreditTransfer
             }
         }
 
-
         /// <summary>
         /// Modulus 10 check digit validation
         /// </summary>
@@ -839,10 +815,9 @@ namespace ISO20022CreditTransfer
 
             var total = 0;
             var alt = false;
-            var digits = number.ToCharArray();
-            for (int i = digits.Length - 1; i >= 0; i--)
+            for (int i = number.Length; (--i >= 0); )
             {
-                var curDigit = (int)char.GetNumericValue(digits[i]);
+                var curDigit = (number[i] - '0');
                 if (alt)
                 {
                     curDigit *= 2;
@@ -860,24 +835,26 @@ namespace ISO20022CreditTransfer
         /// </summary>
         private bool Mod11Check(string number)
         {
-            number = number.Trim() ?? string.Empty;
-
-            if (number == string.Empty)
+            if (number == null)
+                return false;
+            number = number.Trim();
+            var i = number.Length - 1;
+            if (i <= 0)
                 return false;
 
-            string checkCiffer = number.Substring(number.Length - 1, 1);
-            number = number.Substring(0, number.Length - 1);
-
+            int checkCiffer = number[i] - '0';
             int Sum = 0;
-            for (int i = number.Length - 1, Multiplier = 2; i >= 0; i--)
+            int Multiplier = 2;
+            while (--i >= 0)
             {
-                Sum += (int)char.GetNumericValue(number[i]) * Multiplier;
-
+                Sum += (number[i] - '0') * Multiplier;
                 if (++Multiplier > 7) Multiplier = 2;
             }
-            string checkCifferCalc = (11 - (Sum % 11)).ToString();
+            int checkCifferCalc = (11 - (Sum % 11));
+            if (checkCifferCalc >= 10)
+                checkCifferCalc -= 10;
 
-            return checkCiffer == checkCifferCalc ? true : false;
+            return (checkCiffer == checkCifferCalc);
         }
     }
 }

@@ -65,14 +65,9 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorDirectDebit"
                     <local:CorasauDataGridTemplateColumnClient x:Name="Voucher" AllowThousandMask="false" Width="60"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Payment"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="PaymentRefId" Visible="False" AllowEditing="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PaymentId" Visible="False" AllowEditing="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="MergeDataId" Visible="False" AllowEditing="False"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Currency" Visible="False">
-                        <local:CorasauDataGridTemplateColumnClient.CellTemplate>
-                            <DataTemplate>
-                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="Currencies" />
-                            </DataTemplate>
-                        </local:CorasauDataGridTemplateColumnClient.CellTemplate>
-                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:ComboBoxColumnClient x:Name="Currency" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="AmountOpenCur" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="AmountCur" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="UsedCachDiscount" Visible="False" />

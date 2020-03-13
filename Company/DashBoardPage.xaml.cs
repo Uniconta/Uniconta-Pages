@@ -38,6 +38,7 @@ namespace UnicontaClient.Pages.CustomPage
             SetRibbonControl(localMenu, dgDashboardpage);
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgDashboardpage.RowDoubleClick += DgDashboardpage_RowDoubleClick;
+            colUserId.Header = Uniconta.ClientTools.Localization.lookup("UserId");
         }
 
         private void DgDashboardpage_RowDoubleClick()

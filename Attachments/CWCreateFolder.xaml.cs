@@ -24,7 +24,7 @@ namespace UnicontaClient.Pages.CustomPage.Attachments
             this.DataContext = this;
             cmbContentTypes.ItemsSource = AppEnums.ContentTypes.Values;
             cmbContentTypes.SelectedIndex = 0;
-            this.Title = string.Format(Uniconta.ClientTools.Localization.lookup("CreateOBJ"), Uniconta.ClientTools.Localization.lookup("Folder"));
+            this.Title = string.Format(Uniconta.ClientTools.Localization.lookup("CreateOBJ"), Uniconta.ClientTools.Localization.lookup("Envelope"));
             this.KeyDown += CWCreateFolder_KeyDown;
             this.Loaded += CWCreateFolder_Loaded;
         }

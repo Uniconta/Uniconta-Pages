@@ -101,7 +101,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         async void Settle()
         {
-            if (transOpenMaster != null && settles != null && settles.Count() > 0)
+            if (transOpenMaster != null && settles != null && settles.Count > 0)
             {
                 TransactionAPI transApi = new TransactionAPI(api);
                 var err = await transApi.Settle(transOpenMaster, settles);
@@ -120,7 +120,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "EditRow":
                     if (selectedItem == null)
                         return;
-                    AddDockItem(TabControls.CreditorTranOpenPage2, selectedItem, Uniconta.ClientTools.Localization.lookup("AmountToPay"), ";component/Assets/img/Edit_16x16.png");
+                    AddDockItem(TabControls.CreditorTranOpenPage2, selectedItem, Uniconta.ClientTools.Localization.lookup("AmountToPay"), "Edit_16x16.png");
                     break;
                 case "SettleTran":
                     Settle();
@@ -299,6 +299,10 @@ namespace UnicontaClient.Pages.CustomPage
                     CheckBoxClick(row);
                 }
             }
+        }
+        protected override void LoadCacheInBackGround()
+        {
+            LoadType(new List<Type>(2) { typeof(Uniconta.DataModel.GLVat), typeof(Uniconta.DataModel.PaymentTerm) });
         }
     }
 }

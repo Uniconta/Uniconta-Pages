@@ -1,0 +1,93 @@
+<Pages:PivotBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"   
+          xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.ProjectTransBudgetPivotPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"              
+             xmlns:dxc="http://schemas.devexpress.com/winfx/2008/xaml/charts"
+             xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+             xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage" 
+            xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools">
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="2"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Project/ProjectTransBudgetPivotPageGridRibbon.xml" x:Name="localMenu"/>
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Row="1" Margin="0,12,0,10">
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FromDate}"  Margin="10 0 0 0"/>
+            <CorasauControls:DateEditor x:Name="txtFromDate"  Margin="10 0 0 0" ShowToday="True"/>
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ToDate}"  Margin="10 0 0 0"/>
+            <CorasauControls:DateEditor x:Name="txtToDate"  Margin="10 0 0 0" ShowToday="True"/>
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BudgetGroup}" Margin="10,0,0,0"/>
+            <CorasauControls:LookupEditor x:Name="cmbBudgetGroup" Margin="10,0,0,0" Text="{Binding BudgetGroup,Mode=TwoWay}"  />
+        </StackPanel>
+        <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{StaticResource WindowHeaderGradient}" />
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="3" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+
+            <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Vertical" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="5" x:Name="rowgridSplitter"/>
+                        <RowDefinition Height="Auto" x:Name="rowChartControl"/>
+                    </Grid.RowDefinitions>
+                    <CorasauControls:UnicontaPivotDataGrid x:Name="pivotDgProjectPlanning" Visibility="Collapsed" 
+             RowTotalsLocation="Far" RowTreeWidth="305"  ShowBorder="False" Loaded="pivotDgProjectTrans_Loaded" CustomSummary="pivotDgProjectPlanning_CustomSummary"
+             VerticalAlignment="Stretch" ChartProvideDataByColumns="False" ChartSelectionOnly="True" ChartProvideColumnGrandTotals="False"
+             ChartProvideRowGrandTotals="False"  ChartDataProvideMode="UseCustomSettings" >
+                        <CorasauControls:UnicontaPivotDataGrid.Fields>
+                            <CorasauControls:UnicontaPivotGridField x:Name="fieldProject"  FieldName="Project"  AllowFilter="True" AreaIndex="0" Width="100" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Project}"/>
+                            <CorasauControls:UnicontaPivotGridField x:Name="fieldProjectName"  FieldName="ProjectName"  AllowFilter="True" AreaIndex="1" Width="100" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ProjectName}"/>
+                            <CorasauControls:UnicontaPivotGridField x:Name="fieldEmployee"  FieldName="Employee" Area="RowArea"  AllowFilter="True" AreaIndex="2" Width="100" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Employee}"/>
+                            <CorasauControls:UnicontaPivotGridField x:Name="fieldEmployeeName"  FieldName="EmployeeName"  AllowFilter="True" AreaIndex="3" Width="100" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=EmployeeName}"/>
+                            <CorasauControls:UnicontaPivotGridField x:Name="fieldPrCategory"  FieldName="PrCategory"  AllowFilter="True" AreaIndex="4" Width="100" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Category}"/>
+                            <CorasauControls:UnicontaPivotGridField x:Name="fieldPayrollCategory"  FieldName="PayrollCategory"  AllowFilter="True" AreaIndex="5" Width="100" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=PayrollCategory}"/>
+                            <CorasauControls:UnicontaPivotGridField x:Name="fieldDate" FieldName="Date" GroupInterval="DateMonth" Area="ColumnArea"  AreaIndex="6" Width="60" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=MonthView}" />
+                            <CorasauControls:UnicontaPivotGridField x:Name="fieldYear" FieldName="Date"  GroupInterval="DateYear" AreaIndex="7"  Width="60" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Year}" />
+                            <CorasauControls:UnicontaPivotGridField x:Name="fieldQuarter" ValueFormat="Quarter {0}" FieldName="Date" AreaIndex="8" GroupInterval="DateQuarter" Width="60" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Quarter}" />
+                            <CorasauControls:UnicontaPivotGridField x:Name="fieldNormQty" FieldName="NormQty" SummaryType="Sum" ShowSummaryTypeName="False" Area="DataArea"  Width="60" AllowFilter="False" CellFormat="{}{0:N2}" AreaIndex="9"/>
+                            <CorasauControls:UnicontaPivotGridField x:Name="fieldBudgetQty" FieldName="BudgetQty" Area="DataArea" SummaryType="Sum" ShowSummaryTypeName="False"  Width="60" AllowFilter="False"  CellFormat="{}{0:N2}" AreaIndex="10" />                            
+                            <CorasauControls:UnicontaPivotGridField x:Name="fieldQty" FieldName="Qty" SummaryType="Sum" ShowSummaryTypeName="False"  Width="60" AllowFilter="False" CellFormat="{}{0:N2}" AreaIndex="11" />
+                            <CorasauControls:UnicontaPivotGridField x:Name="fieldBudgetCost" FieldName="BudgetCost" SummaryType="Sum" ShowSummaryTypeName="False"  Width="80" AllowFilter="False"  CellFormat="{}{0:N2}" AreaIndex="12" />
+                            <CorasauControls:UnicontaPivotGridField x:Name="fieldCost" FieldName="Cost" SummaryType="Sum" ShowSummaryTypeName="False"  Width="80" AllowFilter="False" CellFormat="{}{0:N2}" AreaIndex="13" />
+                            <CorasauControls:UnicontaPivotGridField x:Name="fieldBudgetSales" FieldName="BudgetSales" SummaryType="Sum" ShowSummaryTypeName="False"  Width="80" AllowFilter="False"  CellFormat="{}{0:N2}" AreaIndex="14" />
+                            <CorasauControls:UnicontaPivotGridField x:Name="fieldSales" FieldName="Sales" SummaryType="Sum" ShowSummaryTypeName="False"  Width="80" AllowFilter="False"  CellFormat="{}{0:N2}" AreaIndex="15" />
+                            <CorasauControls:UnicontaPivotGridField x:Name="fieldQtyNormBudDiff"  SummaryType="Custom" Area="DataArea" ShowSummaryTypeName="False"  Width="60" AllowFilter="False"  CellFormat="{}{0:N2}" AreaIndex="16"/>
+                            <CorasauControls:UnicontaPivotGridField x:Name="fieldQtyActualBudDiff"  SummaryType="Custom" ShowSummaryTypeName="False"  Width="60" AllowFilter="False"  CellFormat="{}{0:N2}" AreaIndex="17" />
+                            <CorasauControls:UnicontaPivotGridField x:Name="fieldQtyActualNormDiff"  SummaryType="Custom" ShowSummaryTypeName="False"  Width="60" AllowFilter="False"  CellFormat="{}{0:N2}" AreaIndex="18" Visible="False" />
+                            <CorasauControls:UnicontaPivotGridField x:Name="fieldSalesActualBudgetDiff"  SummaryType="Custom" ShowSummaryTypeName="False"  Width="80" AllowFilter="False"  CellFormat="{}{0:N2}" AreaIndex="19" />
+                            <CorasauControls:UnicontaPivotGridField x:Name="fieldCostActualBudgetDiff"  SummaryType="Custom" ShowSummaryTypeName="False"  Width="80" AllowFilter="False"  CellFormat="{}{0:N2}" AreaIndex="20" />
+                            <CorasauControls:UnicontaPivotGridField x:Name="fieldEmployeeTerminated"  FieldName="Terminated"  AllowFilter="True" AreaIndex="21" Width="100" Visible="False" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Terminated}"/>
+                            <CorasauControls:UnicontaPivotGridField x:Name="fieldEmplDim1" FieldName="EmplDim1"  Width="120" AllowFilter="True"  AreaIndex="22" Visible="False" />
+                            <CorasauControls:UnicontaPivotGridField x:Name="fieldEmplDim2" FieldName="EmplDim2" Width="120" AllowFilter="True"  AreaIndex="23" Visible="False" />
+                            <CorasauControls:UnicontaPivotGridField x:Name="fieldEmplDim3" FieldName="EmplDim3" Width="120" AllowFilter="True"  AreaIndex="24" Visible="False" />
+                            <CorasauControls:UnicontaPivotGridField x:Name="fieldEmplDim4" FieldName="EmplDim4" Width="120" AllowFilter="True"  AreaIndex="25" Visible="False" />
+                            <CorasauControls:UnicontaPivotGridField x:Name="fieldEmplDim5" FieldName="EmplDim5" Width="120" AllowFilter="True"  AreaIndex="26" Visible="False" />
+                            <CorasauControls:UnicontaPivotGridField x:Name="fieldProjDim1" FieldName="ProjDim1"  Width="120" AllowFilter="True"  AreaIndex="27" Visible="False" />
+                            <CorasauControls:UnicontaPivotGridField x:Name="fieldProjDim2" FieldName="ProjDim2" Width="120" AllowFilter="True"  AreaIndex="28" Visible="False" />
+                            <CorasauControls:UnicontaPivotGridField x:Name="fieldProjDim3" FieldName="ProjDim3" Width="120" AllowFilter="True"  AreaIndex="29" Visible="False" />
+                            <CorasauControls:UnicontaPivotGridField x:Name="fieldProjDim4" FieldName="ProjDim4" Width="120" AllowFilter="True"  AreaIndex="30" Visible="False" />
+                            <CorasauControls:UnicontaPivotGridField x:Name="fieldProjDim5" FieldName="ProjDim5" Width="120" AllowFilter="True"  AreaIndex="31" Visible="False" />
+                            <CorasauControls:UnicontaPivotGridField x:Name="fieldPrCategoryName"  FieldName="CategoryName"  AllowFilter="True" AreaIndex="32" Width="100" Visible="False"/>
+                            <CorasauControls:UnicontaPivotGridField x:Name="fieldPayrollCategoryName"  FieldName="PayrollCategoryName"  AllowFilter="True" AreaIndex="33" Width="100" Visible="False" />
+                            <CorasauControls:UnicontaPivotGridField x:Name="fieldPercentage"  SummaryType="Custom" Area="DataArea" ShowSummaryTypeName="False"  Width="60"  AllowFilter="False" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Percent}"  CellFormat="{}{0:N2}" AreaIndex="34"/>
+                        </CorasauControls:UnicontaPivotDataGrid.Fields>
+                    </CorasauControls:UnicontaPivotDataGrid>
+                    <GridSplitter  x:Name="gridSplitter" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Visibility="{Binding ElementName=chartControl,Path=Visibility}" />
+                    <CorasauControls:UnicontaChart x:Name="chartControl" Grid.Row="2" VerticalAlignment="Stretch"  Visibility="Collapsed" DataSource="{Binding ElementName=pivotDgProjectPlanning, Path=ChartDataSource}" >
+                        <dxc:ChartControl.CrosshairOptions>
+                            <dxc:CrosshairOptions ShowArgumentLine="False"/>
+                        </dxc:ChartControl.CrosshairOptions>
+                        <dxc:ChartControl.Legend>
+                            <dxc:Legend ReverseItems="True"  />
+                        </dxc:ChartControl.Legend>
+                    </CorasauControls:UnicontaChart>
+                </Grid>
+            </CorasauControls:CorasauLayoutControl>
+        </CorasauControls:BusyIndicator>
+    </Grid>
+</Pages:PivotBasePage>

@@ -52,7 +52,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override void LoadCacheInBackGround()
         {
-            LoadType(new Type[] { typeof(Uniconta.DataModel.GLVat), typeof(Uniconta.DataModel.GLAccount) });
+            LoadType(new Type[] { typeof(Uniconta.DataModel.GLVat), typeof(Uniconta.DataModel.GLAccount), typeof(Uniconta.DataModel.PaymentTerm), typeof(Uniconta.DataModel.Debtor), typeof(Uniconta.DataModel.Creditor) });
         }
 
         private void localMenu_OnItemClicked(string ActionType)
@@ -62,8 +62,8 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 case "NewExport":
                     var today = System.DateTime.Today;
-                    var lst = (IEnumerable<Uniconta.DataModel.GLTransExported>)dgGLTransExported.ItemsSource;
-                    var maxDate = (lst != null && lst.Count() > 0) ? (from rec in lst select rec._ToDate).Max() : today.AddYears(-1).AddDays(-today.Day);
+                    var lst = (ICollection<GLTransExportedClient>)dgGLTransExported.ItemsSource;
+                    var maxDate = (lst != null && lst.Count > 0) ? (from rec in lst select rec._ToDate).Max() : today.AddYears(-1).AddDays(-today.Day);
 
                     var start = maxDate.AddDays(1);
                     var end = start.AddMonths(1).AddDays(-1);

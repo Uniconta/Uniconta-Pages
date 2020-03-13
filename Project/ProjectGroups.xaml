@@ -35,6 +35,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectGroups"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="AdjustmentOffset" Width="100" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceAdjustment" Width="80" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceAdjustmentOffset" Width="80" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="AutoWIP" Width="50" Visible="False"/>
                 </localPage:ProjectGroupGrid.Columns>
             </localPage:ProjectGroupGrid>
         </CorasauControls:BusyIndicator>

@@ -35,7 +35,6 @@ namespace UnicontaClient.Pages.CustomPage
         static public string Journal { get; set; }
 
         CrudAPI api;
-        SQLCache GlAccounts;
         public CWImportToJournal(CrudAPI crudApi, string title = null)
         {
             DataContext = this;
@@ -44,63 +43,74 @@ namespace UnicontaClient.Pages.CustomPage
             api = crudApi;
             lookupJournal.api = crudApi;
             browseFile.Filter = UtilFunctions.GetFilteredExtensions(FileextensionsTypes.CSV);
-            GlAccounts = api.GetCache(typeof(Uniconta.DataModel.GLAccount));
+            browseFile.NotLoadFileInfo = true;
+            InitCaches(crudApi);
+        }
+
+        async private void InitCaches(CrudAPI api)
+        {
+            if (api.GetCache(typeof(Uniconta.DataModel.GLVat)) == null)
+                await api.LoadCache(typeof(Uniconta.DataModel.GLVat)).ConfigureAwait(false);
+            if (api.GetCache(typeof(Uniconta.DataModel.GLAccount)) == null)
+                await api.LoadCache(typeof(Uniconta.DataModel.GLAccount)).ConfigureAwait(false);
+            if (api.GetCache(typeof(Uniconta.DataModel.Debtor)) == null)
+                await api.LoadCache(typeof(Uniconta.DataModel.Debtor)).ConfigureAwait(false);
+            if (api.GetCache(typeof(Uniconta.DataModel.Creditor)) == null)
+                await api.LoadCache(typeof(Uniconta.DataModel.Creditor)).ConfigureAwait(false);
         }
 
         async private void ImportButton_Click(object sender, RoutedEventArgs e)
         {
-            var fileContents = browseFile.FileBytes;
-            if (fileContents != null && fileContents.Length > 0)
+            System.IO.FileStream stream = null;
+            try
             {
-                System.IO.FileStream stream = null;
-                try
+                var selectedJournal = lookupJournal.SelectedItem as GLDailyJournalClient;
+                if (selectedJournal == null)
                 {
-                    stream = new System.IO.FileStream(browseFile.FilePath, System.IO.FileMode.Open, System.IO.FileAccess.Read);
-                    var importDateV = new ImportDATEV(api, stream);
-                    var selectedJournal = lookupJournal.SelectedItem as GLDailyJournalClient;
-                    if (selectedJournal == null)
+                    UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("RecordNotSelected"), Uniconta.ClientTools.Localization.lookup("Error"));
+                    return;
+                }
+
+                var importDateV = new ImportDATEV(api, selectedJournal);
+
+                stream = new System.IO.FileStream(browseFile.FilePath, System.IO.FileMode.Open, System.IO.FileAccess.Read);
+                var journalLines = await importDateV.CreateJournalLines(stream);
+                stream.Dispose();
+                stream = null;
+
+                if (importDateV.faultyAccounts.Count != 0)
+                {
+                    journalLines = null;
+                    var sb = new StringBuilder();
+                    sb.AppendFormat(Uniconta.ClientTools.Localization.lookup("MissingOBJ"), Uniconta.ClientTools.Localization.lookup("Account")).AppendLine(":");
+                    foreach (var s in importDateV.faultyAccounts)
+                        sb.AppendLine(s);
+
+                    UnicontaMessageBox.Show(sb.ToString(), "", MessageBoxButton.OK);
+                    return;
+                }
+
+                if (journalLines != null && journalLines.Count > 0)
+                {
+                    var result = await api.Insert(journalLines);
+                    if (result == ErrorCodes.Succes)
                     {
-                        UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("RecordNotSelected"), Uniconta.ClientTools.Localization.lookup("Error"));
-                        return;
-                    }
-
-                    if (GlAccounts == null)
-                        GlAccounts = await api.LoadCache(typeof(Uniconta.DataModel.GLAccount)).ConfigureAwait(false);
-
-                    var glAccount = GlAccounts.Get<Uniconta.DataModel.GLAccount>(selectedJournal.Account);
-
-                    var journalLines = await importDateV.CreateJournalLines(selectedJournal);
-
-                    if (glAccount != null && glAccount._DATEVAuto)
-                    {
-                        foreach (var journalLine in journalLines)
-                            journalLine.Vat = glAccount._Vat;
-                    }
-
-                    if (journalLines != null && journalLines.Length > 0)
-                    {
-                        var result = await api.Insert(journalLines);
-                        if (result == ErrorCodes.Succes)
-                        {
-                            UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("Succes"), Uniconta.ClientTools.Localization.lookup("Message"));
-                            DialogResult = true;
-                        }
-                    }
-                    else
-                    {
-                        UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("NoJournalLinesCreated"), Uniconta.ClientTools.Localization.lookup("Error"));
-                        return;
+                        UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("Succes"), Uniconta.ClientTools.Localization.lookup("Message"));
+                        DialogResult = true;
                     }
                 }
-                catch (Exception ex)
+                else
                 {
-                    UnicontaMessageBox.Show(ex.Message, Uniconta.ClientTools.Localization.lookup("Exception"));
-                    DialogResult = false;
+                    UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("NoJournalLinesCreated"), Uniconta.ClientTools.Localization.lookup("Error"));
+                    return;
                 }
-                finally { stream?.Close(); }
             }
-            else
-                UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("NoFilesSelected"), Uniconta.ClientTools.Localization.lookup("Error"));
+            catch (Exception ex)
+            {
+                stream?.Dispose();
+                UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"));
+                DialogResult = false;
+            }
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
@@ -114,8 +124,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 this.DialogResult = false;
             }
-            else
-                if (e.Key == Key.Enter)
+            else if (e.Key == Key.Enter)
             {
                 if (ImportButton.IsFocused)
                     ImportButton_Click(null, null);

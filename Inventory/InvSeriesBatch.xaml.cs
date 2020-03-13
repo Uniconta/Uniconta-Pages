@@ -31,7 +31,7 @@ namespace UnicontaClient.Pages.CustomPage
 {
     public class InvSeriesBatchGrid : CorasauDataGridClient
     {
-        public override Type TableType { get { return typeof(InvSerieBatchClientLocal); } }
+        public override Type TableType { get { return typeof(InvSerieBatchClient); } }
 
         public override bool AllowSort { get { return false; } }
         public override bool Readonly { get { return false; } }
@@ -39,7 +39,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         public override bool AddRowOnPageDown()
         {
-            var selectedItem = (InvSerieBatchClientLocal)this.SelectedItem;
+            var selectedItem = (InvSerieBatchClient)this.SelectedItem;
             return (selectedItem?._Number != null);
         }
     }
@@ -132,18 +132,18 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void DataControl_CurrentItemChanged(object sender, CurrentItemChangedEventArgs e)
         {
-            var oldSelectedItem = e.OldItem as InvSerieBatchClientLocal;
+            var oldSelectedItem = e.OldItem as InvSerieBatchClient;
             if (oldSelectedItem != null)
                 oldSelectedItem.PropertyChanged -= InvSerieBatch_Changed;
 
-            var selectedItem = e.NewItem as InvSerieBatchClientLocal;
+            var selectedItem = e.NewItem as InvSerieBatchClient;
             if (selectedItem != null)
                 selectedItem.PropertyChanged += InvSerieBatch_Changed;
         }
 
         private void InvSerieBatch_Changed(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            var rec = (InvSerieBatchClientLocal)sender;
+            var rec = (InvSerieBatchClient)sender;
 
             switch (e.PropertyName)
             {
@@ -195,7 +195,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         }
 
-        async void SetLocation(InvWarehouse master, InvSerieBatchClientLocal rec)
+        async void SetLocation(InvWarehouse master, InvSerieBatchClient rec)
         {
             if (api.CompanyEntity.Location)
             {
@@ -214,7 +214,7 @@ namespace UnicontaClient.Pages.CustomPage
         ItemBase ibase;
         private void LocalMenu_OnItemClicked(string ActionType)
         {
-            InvSerieBatchClient selectedItem = dgInvSeriesBatchGrid.SelectedItem as InvSerieBatchClientLocal;
+            InvSerieBatchClient selectedItem = dgInvSeriesBatchGrid.SelectedItem as InvSerieBatchClient;
             switch (ActionType)
             {
                 case "AddRow":
@@ -266,6 +266,10 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         AddDockItem(TabControls.UserDocsPage, dgInvSeriesBatchGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Documents"), selectedItem._Number));
                     break;
+                case "BatchLocations":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.InvSerieBatchStorage, dgInvSeriesBatchGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("BatchLocations"), selectedItem._Number));
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -288,7 +292,7 @@ namespace UnicontaClient.Pages.CustomPage
         CorasauGridLookupEditorClient prevLocation;
         private void Location_GotFocus(object sender, RoutedEventArgs e)
         {
-            var selectedItem = dgInvSeriesBatchGrid.SelectedItem as InvSerieBatchClientLocal;
+            var selectedItem = dgInvSeriesBatchGrid.SelectedItem as InvSerieBatchClient;
             if (selectedItem?._Warehouse != null && warehouseCache != null)
             {
                 var selected = (InvWarehouse)warehouseCache.Get(selectedItem._Warehouse);
@@ -309,14 +313,6 @@ namespace UnicontaClient.Pages.CustomPage
         }
     }
 
-    public class InvSerieBatchClientLocal : InvSerieBatchClient
-    {
-        public bool IsEnabled { get { return this.RowId == 0; } }
-
-        internal object locationSource;
-        public object LocationSource { get { return locationSource; } }
-    }
-
     public class ItemDataTemplateSelector : DataTemplateSelector
     {
         public DataTemplate TextTemplate { get; set; }
@@ -332,7 +328,7 @@ namespace UnicontaClient.Pages.CustomPage
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
             var data = item as EditGridCellData;
-            var row = data.RowData.Row as InvSerieBatchClientLocal;
+            var row = data.RowData.Row as InvSerieBatchClient;
 
             if (row?.IsEnabled == true)
                 return LookupTemplate;

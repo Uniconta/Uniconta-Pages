@@ -30,4 +30,8 @@
   <RibbonItem>
     <RibbonItem Action="PostJournal" LocalizedNameKey="GenerateJournalLines" Glyph="Delete_16x16.png" LargeGlyph="Orders_32x32.png" />
   </RibbonItem>
+ <RibbonItem>
+    <RibbonItem Action="Export" LocalizedNameKey="Export"  LargeGlyph="Export_32x32.png"/>
+    <RibbonItem Action="Import" LocalizedNameKey="Import"  Module="SerialBatchNumbers" LargeGlyph="Import_32x32.png"/>
+  </RibbonItem>
 </root>

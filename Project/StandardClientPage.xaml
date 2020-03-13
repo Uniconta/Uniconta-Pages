@@ -23,13 +23,6 @@ x:Class="UnicontaClient.Pages.CustomPage.StandardClientPage"
                 <localPage:PrStandardGrid.Columns>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" Width="100"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Comment" Width="300"/>
-                    <!--localPage:CorasauDataGridTemplateColumnClient x:Name="ItemPriceCalculation" Width="300" >
-                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                            <DataTemplate>
-                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="ItemPriceCalcMethods" />
-                            </DataTemplate>
-                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                    </-->                   
                 </localPage:PrStandardGrid.Columns>
             </localPage:PrStandardGrid>
         </CorasauControls:BusyIndicator>

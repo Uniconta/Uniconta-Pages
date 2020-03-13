@@ -86,13 +86,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOrderLines"
                             </DataTemplate>
                         </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                     </localPage:CorasauDataGridTemplateColumnClient>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Unit" Width="100" Visible="False" >
-                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                            <DataTemplate>
-                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="ItemUnit"/>
-                            </DataTemplate>
-                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                    </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:ComboBoxColumnClient x:Name="Unit" Width="100" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="SerieBatch" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="EAN" Visible="False" Width="150"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Price" Width="90"/>
@@ -129,13 +123,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOrderLines"
                             </DataTemplate>
                         </localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
                     </localPage:CorasauDataGridForeignKeyColumnClient>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Storage" Width="100">
-                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                            <DataTemplate>
-                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="StorageRegisterPurchage"/>
-                            </DataTemplate>
-                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                    </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:ComboBoxColumnClient x:Name="Storage" Width="100"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="IgnoreBlocked" Width="50" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ReferenceNumber" Width="70" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Week" Width="100" Visible="False" />
@@ -179,6 +167,9 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOrderLines"
                             </DataTemplate>
                         </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                     </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Cartons" Width="100" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Weight" Width="100" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Volume" Width="100" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim1" Width="70" FieldName="Dimension1" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim2" Width="70" FieldName="Dimension2" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim3" Width="70" FieldName="Dimension3" Visible="False"/>

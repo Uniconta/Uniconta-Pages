@@ -90,9 +90,9 @@ namespace UnicontaClient.Pages.CustomPage
         private void JoinOrdersPerCustomer()
         {
             var ordersToBeJoined = dgJoinMultiOrderGrid.GetVisibleRows() as IEnumerable<DebtorOrderClient>;
-            if (ordersToBeJoined.Count() == 0 || ordersToBeJoined== null)
+            if (ordersToBeJoined == null || ordersToBeJoined.Count() == 0)
                 return;
-            var allOrderList = ordersToBeJoined?.GroupBy(x => x.Account).Select(x => x.First()).ToList();
+            var allOrderList = ordersToBeJoined.GroupBy(x => x.Account).Select(x => x.First()).ToList();
             EraseYearWindow EraseYearWindowDialog = new EraseYearWindow("", true);
             EraseYearWindowDialog.Closed += async delegate
             {

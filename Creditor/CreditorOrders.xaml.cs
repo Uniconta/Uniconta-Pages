@@ -144,6 +144,9 @@ namespace UnicontaClient.Pages.CustomPage
                 DeliveryCountry.Visible = false;
             }
             dgCreditorOrdersGrid.Readonly = true;
+
+            if (!api.CompanyEntity.ApprovePurchaseOrders)
+                Approver.ShowInColumnChooser = Approved.ShowInColumnChooser = ApprovedDate.ShowInColumnChooser = false;
         }
 
         void dgCreditorOrdersGrid_RowDoubleClick()
@@ -154,6 +157,7 @@ namespace UnicontaClient.Pages.CustomPage
         VouchersClient attachedVoucher;
         private void localMenu_OnItemClicked(string ActionType)
         {
+            var dgCreditorOrdersGrid = this.dgCreditorOrdersGrid;
             var selectedItem = dgCreditorOrdersGrid.SelectedItem as CreditorOrderClient;
             string salesHeader = string.Empty;
             if (selectedItem != null)
@@ -164,10 +168,10 @@ namespace UnicontaClient.Pages.CustomPage
                     if (dgCreditorOrdersGrid.masterRecords != null)
                     {
                         object[] arr = new object[2] { api, dgCreditorOrdersGrid.masterRecord };
-                        AddDockItem(TabControls.CreditorOrdersPage2, arr, Uniconta.ClientTools.Localization.lookup("Orders"), ";component/Assets/img/Add_16x16.png");
+                        AddDockItem(TabControls.CreditorOrdersPage2, arr, Uniconta.ClientTools.Localization.lookup("Orders"), "Add_16x16.png");
                     }
                     else
-                        AddDockItem(TabControls.CreditorOrdersPage2, api, Uniconta.ClientTools.Localization.lookup("Orders"), ";component/Assets/img/Add_16x16.png");
+                        AddDockItem(TabControls.CreditorOrdersPage2, api, Uniconta.ClientTools.Localization.lookup("Orders"), "Add_16x16.png");
                     break;
                 case "EditRow":
                     if (selectedItem == null)
@@ -325,6 +329,9 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         GenerateInvoice(selectedItem);
                     break;
+                case "RefreshGrid":
+                    TestCreditorReload(true, dgCreditorOrdersGrid.ItemsSource as IEnumerable<CreditorOrder>);
+                    break;
                 case "ReadOIOUBL":
 #if !SILVERLIGHT
                     var orderOIOCW = new CWOrderOIOUBLImport();
@@ -341,6 +348,10 @@ namespace UnicontaClient.Pages.CustomPage
                     gridRibbon_BaseActions("RefreshGrid");
 #endif
                     break;
+                case "ApproveOrder":
+                    if (selectedItem != null && api.CompanyEntity.ApprovePurchaseOrders)
+                        Utility.ApproveOrder(api, selectedItem);
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -354,8 +365,7 @@ namespace UnicontaClient.Pages.CustomPage
 #if !SILVERLIGHT
             GenrateInvoiceDialog.DialogTableId = 2000000002;
 #endif
-            if (creditorOrderClient._InvoiceNumber != 0)
-                GenrateInvoiceDialog.SetInvoiceNumber(creditorOrderClient._InvoiceNumber);
+            GenrateInvoiceDialog.SetInvoiceNumber(creditorOrderClient._InvoiceNumber);
             if (creditorOrderClient._InvoiceDate != DateTime.MinValue)
                 GenrateInvoiceDialog.SetInvoiceDate(creditorOrderClient._InvoiceDate);
 
@@ -367,6 +377,7 @@ namespace UnicontaClient.Pages.CustomPage
                     var showOrPrint = GenrateInvoiceDialog.ShowInvoice || GenrateInvoiceDialog.InvoiceQuickPrint;
                     var invoicePostingResult = new InvoicePostingPrintGenerator(api, this, creditorOrderClient, null, GenrateInvoiceDialog.GenrateDate, GenrateInvoiceDialog.InvoiceNumber, GenrateInvoiceDialog.IsSimulation,
                         CompanyLayoutType.PurchaseInvoice, showOrPrint, GenrateInvoiceDialog.InvoiceQuickPrint, GenrateInvoiceDialog.NumberOfPages, false, GenrateInvoiceDialog.Emails, GenrateInvoiceDialog.sendOnlyToThisEmail);
+                    invoicePostingResult.OpenAsOutlook = !GenrateInvoiceDialog.IsSimulation && GenrateInvoiceDialog.SendByOutlook;
 
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
                     busyIndicator.IsBusy = true;
@@ -381,7 +392,7 @@ namespace UnicontaClient.Pages.CustomPage
                         string msg;
                         if (invoicePostingResult.PostingResult.Header._InvoiceNumber != 0)
                         {
-                            msg = string.Format(Uniconta.ClientTools.Localization.lookup("InvoiceHasBeenGenerated"), invoicePostingResult.PostingResult.Header._InvoiceNumber);
+                            msg = string.Format(Uniconta.ClientTools.Localization.lookup("InvoiceHasBeenGenerated"), invoicePostingResult.PostingResult.Header.InvoiceNum);
                             msg = string.Format("{0}{1}{2} {3}", msg, Environment.NewLine, Uniconta.ClientTools.Localization.lookup("LedgerVoucher"), invoicePostingResult.PostingResult.Header._Voucher);
                             UnicontaMessageBox.Show(msg, Uniconta.ClientTools.Localization.lookup("Message"), MessageBoxButton.OK);
                         }
@@ -451,6 +462,35 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
+        async void TestCreditorReload(bool refresh, IEnumerable<CreditorOrder> lst)
+        {
+            bool reload = false;
+            if (lst != null && lst.Count() > 0)
+            {
+                var cache = api.GetCache(typeof(Uniconta.DataModel.Creditor));
+                if (cache == null)
+                    return;
+
+                var Contacts = api.GetCache(typeof(Uniconta.DataModel.Contact));
+                foreach (var rec in lst)
+                {
+                    if (rec._DCAccount != null && cache.Get(rec._DCAccount) == null)
+                    {
+                        reload = true;
+                        break;
+                    }
+                    if (rec._ContactRef != 0 && Contacts != null && Contacts.Get(rec._ContactRef) == null)
+                    {
+                        Contacts = null;
+                        api.LoadCache(typeof(Uniconta.DataModel.Contact), true);
+                    }
+                }
+                if (reload)
+                    await api.LoadCache(typeof(Uniconta.DataModel.Creditor), true);
+            }
+            if (refresh)
+                gridRibbon_BaseActions("RefreshGrid");
+        }
 
         public async void ReadOIOUBL(bool oneOrMultiple)
         {
@@ -587,7 +627,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
             catch (Exception e)
             {
-                UnicontaMessageBox.Show(e.Message, Uniconta.ClientTools.Localization.lookup("Exception"));
+                UnicontaMessageBox.Show(e, Uniconta.ClientTools.Localization.lookup("Exception"));
             }
 #endif
         }
@@ -610,7 +650,6 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (selectedItem == null)
                 return;
-
         }
 
         async void UpdateVoucher(CreditorOrderClient selectedItem)
@@ -708,7 +747,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (GenrateOfferDialog.DialogResult == true)
                 {
                     showInvPrintPreview = GenrateOfferDialog.ShowInvoice || GenrateOfferDialog.InvoiceQuickPrint;
-                    long documentNumber = 0;
+                    string documentNumber = null;
                     if (doctype == CompanyLayoutType.PurchasePacknote)
                     {
                         documentNumber = GenrateOfferDialog.InvoiceNumber;
@@ -716,6 +755,8 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                     var invoicePostingResult = new InvoicePostingPrintGenerator(api, this, dbOrder, null, GenrateOfferDialog.GenrateDate, documentNumber, !GenrateOfferDialog.UpdateInventory, doctype,
                         showInvPrintPreview, GenrateOfferDialog.InvoiceQuickPrint, GenrateOfferDialog.NumberOfPages, GenrateOfferDialog.SendByEmail, GenrateOfferDialog.Emails, GenrateOfferDialog.sendOnlyToThisEmail);
+                    invoicePostingResult.OpenAsOutlook = GenrateOfferDialog.UpdateInventory && GenrateOfferDialog.SendByOutlook;
+
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
                     busyIndicator.IsBusy = true;
                     var result = await invoicePostingResult.Execute();
@@ -751,14 +792,16 @@ namespace UnicontaClient.Pages.CustomPage
             else if (screenName == TabControls.AttachVoucherGridPage)
             {
                 var voucherObj = argument as object[];
-
-                if (voucherObj != null && voucherObj[0] is VouchersClient)
+                attachedVoucher = voucherObj?.FirstOrDefault() as VouchersClient;
+                if (attachedVoucher != null)
                 {
                     var selectedItem = dgCreditorOrdersGrid.SelectedItem as CreditorOrderClient;
-                    attachedVoucher = voucherObj[0] as VouchersClient;
-                    selectedItem.DocumentRef = attachedVoucher.RowId;
-                    UpdateAttachedVoucher(selectedItem._OrderNumber);
-                    UpdateVoucher(selectedItem);
+                    if (selectedItem != null)
+                    {
+                        selectedItem.DocumentRef = attachedVoucher.RowId;
+                        UpdateAttachedVoucher(selectedItem._OrderNumber);
+                        UpdateVoucher(selectedItem);
+                    }
                 }
             }
         }
@@ -770,6 +813,9 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override void LoadCacheInBackGround()
         {
+            var orders = api.GetCache(typeof(Uniconta.DataModel.CreditorOrder));
+            TestCreditorReload(false, orders?.GetNotNullArray as IEnumerable<CreditorOrder>);
+
             var Comp = api.CompanyEntity;
             var lst = new List<Type>(12) { typeof(Uniconta.DataModel.InvItem), typeof(Uniconta.DataModel.CreditorGroup) };
             if (Comp.Contacts)
@@ -797,6 +843,20 @@ namespace UnicontaClient.Pages.CustomPage
         void setDim()
         {
             UnicontaClient.Utilities.Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
+        }
+
+        private void HasDocImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            var order = (sender as Image).Tag as CreditorOrderClient;
+            if (order != null)
+                AddDockItem(TabControls.UserDocsPage, dgCreditorOrdersGrid.syncEntity);
+        }
+
+        private void HasNoteImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            var order = (sender as Image).Tag as CreditorOrderClient;
+            if (order != null)
+                AddDockItem(TabControls.UserNotesPage, dgCreditorOrdersGrid.syncEntity);
         }
     }
 }

@@ -92,14 +92,14 @@ namespace UnicontaClient.Pages.CustomPage
             var copyFromDim = cmbFromDimension.SelectedItem as GLDimType;
             var copyToDim = cmbToDimension.SelectedItem as GLDimType;
 
-            if (copyFromDim != null && copyToDim != null)
+            if (copyFromDim != null)
             {
                 var mainTableApi = new MaintableAPI(crudApi);
                 JoinResult = mainTableApi.JoinTwoDimensions(copyFromDim, copyToDim);
                 DialogResult = true;
             }
             else
-                Uniconta.ClientTools.Controls.UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("MandatoryField"), (Uniconta.ClientTools.Localization.lookup("Dimension"))), Uniconta.ClientTools.Localization.lookup("Error"));
+                Uniconta.ClientTools.Controls.UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("MandatoryField"), (Uniconta.ClientTools.Localization.lookup("CopyFrom"))), Uniconta.ClientTools.Localization.lookup("Error"));
         }
     }
 }

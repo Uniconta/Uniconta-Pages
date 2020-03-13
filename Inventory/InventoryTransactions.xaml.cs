@@ -286,6 +286,10 @@ namespace UnicontaClient.Pages.CustomPage
                 Location.Visible = Location.ShowInColumnChooser = false;
             if (!company.Warehouse)
                 Warehouse.Visible = Warehouse.ShowInColumnChooser = false;
+            if(!company.Project)
+                Project.Visible = Project.ShowInColumnChooser = false;
+            if (!company.ProjectTask)
+                Task.Visible = Task.ShowInColumnChooser = false;
 
             Utilities.Utility.SetupVariants(api, null, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
             Utilities.Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);

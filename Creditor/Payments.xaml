@@ -44,19 +44,14 @@ x:Class="UnicontaClient.Pages.CustomPage.Payments"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PaymentDate" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="TransType" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Text" Width="120"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Invoice" AllowThousandMask="false" Width="60"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceAN" Width="70"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Invoice" Width="60" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceAmount"  Width="100"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="RemainingAmount"  Width="100"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="UsedCachDiscount" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CashDiscount" Visible="False" />                    
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PaymentAmount"  Width="100"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CurrencyLocal" Width="40">
-                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                            <DataTemplate>
-                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="Currencies" />
-                            </DataTemplate>
-                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                    </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CurrencyLocal" Width="40"/>
 
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="NumberSerie" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="VoucherX"  Visible="False" />
@@ -70,13 +65,7 @@ x:Class="UnicontaClient.Pages.CustomPage.Payments"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Paid" Width="50"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="HasVoucher" Width="50"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Payment" Width="90"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PaymentMethod">
-                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                            <DataTemplate>
-                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="PaymentMethod"/>
-                            </DataTemplate>
-                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                    </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:ComboBoxColumnClient x:Name="PaymentMethod"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PaymentId" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="SWIFT" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PaymentRefId" AllowEditing="False" Visible="False"/>

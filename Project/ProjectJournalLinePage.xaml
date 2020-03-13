@@ -83,13 +83,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectJournalLinePage"
                             </DataTemplate>
                         </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                     </localPage:CorasauDataGridTemplateColumnClient>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Unit" Width="50" Visible="False">
-                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                            <DataTemplate>
-                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="ItemUnit"/>
-                            </DataTemplate>
-                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                    </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:ComboBoxColumnClient x:Name="Unit" Width="50" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Origin" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PurchasePrice" Width="80" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CostPrice" Width="80" AllowMath="True">

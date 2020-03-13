@@ -161,7 +161,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (zip == null)
                 {
                     var deliveryCountry = editrow.DeliveryCountry ?? editrow.Country;
-                    var city = await UtilDisplay.GetCityAndAddress(txtDelZipCode.Text, deliveryCountry);
+                    var city = await UtilDisplay.GetCityAndAddress(editrow.DeliveryZipCode, deliveryCountry);
                     if (city != null)
                     {
                         editrow.DeliveryCity = city[0];
@@ -198,6 +198,10 @@ namespace UnicontaClient.Pages.CustomPage
             }
             if (!Comp.Shipments)
                 itemShipment.Visibility = Visibility.Collapsed;
+            if (!Comp.ApprovePurchaseOrders)
+                grpApproval.Visibility = Visibility.Collapsed;
+            if (!Comp.SetupSizes)
+                grpSize.Visibility = Visibility.Collapsed;
         }
         public override bool BeforeSetUserField(ref CorasauLayoutGroup parentGroup)
         {
@@ -312,7 +316,7 @@ namespace UnicontaClient.Pages.CustomPage
             object[] param = new object[2];
             param[0] = api;
             param[1] = null;
-            AddDockItem(TabControls.CreditorAccountPage2, param, Uniconta.ClientTools.Localization.lookup("Creditorsaccount"), ";component/Assets/img/Add_16x16.png");
+            AddDockItem(TabControls.CreditorAccountPage2, param, Uniconta.ClientTools.Localization.lookup("Creditorsaccount"), "Add_16x16.png");
         }
 
         private void leAccount_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
@@ -336,14 +340,15 @@ namespace UnicontaClient.Pages.CustomPage
             editrow._PaymentMethod = creditor._PaymentMethod;
             editrow.Shipment = creditor._Shipment;
             editrow.DeliveryTerm = creditor._DeliveryTerm;
+            editrow.SetMaster(creditor);
             if (!RecordLoadedFromTemplate || creditor._DeliveryAddress1 != null)
             {
                 editrow.DeliveryName = creditor._DeliveryName;
                 editrow.DeliveryAddress1 = creditor._DeliveryAddress1;
                 editrow.DeliveryAddress2 = creditor._DeliveryAddress2;
                 editrow.DeliveryAddress3 = creditor._DeliveryAddress3;
-                editrow.DeliveryZipCode = creditor._DeliveryZipCode;
                 editrow.DeliveryCity = creditor._DeliveryCity;
+                editrow.DeliveryZipCode = creditor._DeliveryZipCode;
                 if (creditor._DeliveryCountry != 0)
                     editrow.DeliveryCountry = creditor._DeliveryCountry;
                 else

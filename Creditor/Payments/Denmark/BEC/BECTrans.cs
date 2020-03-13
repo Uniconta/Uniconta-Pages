@@ -142,10 +142,25 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
             if (tran._PaymentMethod == PaymentTypes.VendorBankAccount && danishFields.TransTypeCommand != BECPayFormat.TRANSTYPE_ERH400)
                 danishFields.PaymentId = ShortenWordToCriteria(message, 20);
 
+
+            //Extended notification
+            if (danishFields.TransTypeCommand != BECPayFormat.TRANSTYPE_ERH400)
+            {
+                if (paymentFormat._ExtendedText)
+                {
+                    if (message == null || message.Length <= 20)
+                        message = string.Empty;
+                }
+                else
+                {
+                    message = string.Empty;
+                }
+            }
+                          
             int maxStrLen = 35;
             int maxLines = 6;
 
-            if (tran._PaymentMethod == PaymentTypes.PaymentMethod4 || tran._PaymentMethod == PaymentTypes.PaymentMethod5 || 
+            if (tran._PaymentMethod == PaymentTypes.PaymentMethod4 || tran._PaymentMethod == PaymentTypes.PaymentMethod5 ||
                 tran._PaymentMethod == PaymentTypes.VendorBankAccount || tran._PaymentMethod == PaymentTypes.IBAN)
             {
                 message = NETSNorge.processString(message, maxStrLen * maxLines, false);

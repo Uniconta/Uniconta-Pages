@@ -152,7 +152,7 @@ namespace UnicontaClient.Pages.CustomPage
                         string msg = Uniconta.ClientTools.Localization.lookup("InvoiceProposal");
                         if (invoicePostingResult.PostingResult.Header._InvoiceNumber != 0)
                         {
-                            msg = string.Format(Uniconta.ClientTools.Localization.lookup("InvoiceHasBeenGenerated"), invoicePostingResult.PostingResult.Header._InvoiceNumber);
+                            msg = string.Format(Uniconta.ClientTools.Localization.lookup("InvoiceHasBeenGenerated"), invoicePostingResult.PostingResult.Header.InvoiceNum);
                             msg = string.Format("{0}{1}{2} {3}", msg, Environment.NewLine, Uniconta.ClientTools.Localization.lookup("LedgerVoucher"), invoicePostingResult.PostingResult.Header._Voucher);
 
 #if !SILVERLIGHT
@@ -179,16 +179,14 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var api = this.api;
             var Comp = api.CompanyEntity;
-
-            var InvCache = Comp.GetCache(typeof(Uniconta.DataModel.InvItem)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.InvItem), api);
-            var VatCache = Comp.GetCache(typeof(Uniconta.DataModel.GLVat)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.GLVat), api);
+            var InvCache = api.GetCache(typeof(Uniconta.DataModel.InvItem)) ?? await api.LoadCache(typeof(Uniconta.DataModel.InvItem));
+            var VatCache = api.GetCache(typeof(Uniconta.DataModel.GLVat)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLVat));
 
             //SystemInfo.Visible = true;
 
             int countErr = 0;
             SaveFileDialog saveDialog = null;
             Uniconta.API.DebtorCreditor.InvoiceAPI Invapi = new Uniconta.API.DebtorCreditor.InvoiceAPI(api);
-
 
             var listPropval = new List<PropValuePair>()
             {
@@ -202,10 +200,10 @@ namespace UnicontaClient.Pages.CustomPage
             if (invClient == null)
                 return;
 
-            var Debcache = Comp.GetCache(typeof(Debtor)) ?? await Comp.LoadCache(typeof(Debtor), api);
+            var Debcache = Comp.GetCache(typeof(Debtor)) ?? await api.LoadCache(typeof(Debtor));
             var debtor = (Debtor)Debcache.Get(invClient._DCAccount);
 
-            if ((!debtor._InvoiceInXML || invClient.SendTime != DateTime.MinValue))
+            if (debtor == null || !debtor._InvoiceInXML || invClient.SendTime != DateTime.MinValue)
             {
                 if (!debtor._InvoiceInXML)
                     UnicontaMessageBox.Show("Faktura i OIOUBL er ikke sat til denne debitor", Uniconta.ClientTools.Localization.lookup("Warning"));
@@ -222,8 +220,8 @@ namespace UnicontaClient.Pages.CustomPage
             Contact contactPerson = null;
             if (invClient._ContactRef != 0)
             {
-                var queryContact = await api.Query<Contact>(Invoicemasters, null);
-                foreach (var contact in queryContact)
+                var Contacts = api.GetCache(typeof(Uniconta.DataModel.Contact)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Contact));
+                foreach (var contact in (Uniconta.DataModel.Contact[])Contacts.GetRecords)
                     if (contact.RowId == invClient._ContactRef)
                     {
                         contactPerson = contact;

@@ -64,6 +64,7 @@ namespace UnicontaClient.Pages.CustomPage
             else
                 newRow._Date = BasePage.GetSystemDefaultDate().Date;
         }
+        protected override bool RenderAllColumns { get { return true; } }
     }
     public partial class InventoryJournalLines : GridBasePage
     {
@@ -121,7 +122,7 @@ namespace UnicontaClient.Pages.CustomPage
                 dgInvJournalLine.IsLoadedFromLayoutSaved = false;
             }
         }
-        
+
         protected override void OnLayoutLoaded()
         {
             base.OnLayoutLoaded();
@@ -193,7 +194,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (master != null && master._UseSerialBatch)
             {
                 var serie = new InvSerieBatchOpen() { _Item = rec._Item };
-                var lst = await api.Query<InvSerieBatchClient>(serie); 
+                var lst = await api.Query<InvSerieBatchClient>(serie);
                 rec.serieBatchSource = lst?.Select(x=>x.Number).ToList() ;
             }
             else
@@ -362,7 +363,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (rec._Variant1 != null)
                         setVariant(rec, true);
                     break;
-                 case "MovementType":
+                case "MovementType":
                     SetAccountSource(rec);
                     break;
                 case "EAN":
@@ -417,6 +418,9 @@ namespace UnicontaClient.Pages.CustomPage
                 rec.Item = variant._Item;
                 rec.Variant1 = variant._Variant1;
                 rec.Variant2 = variant._Variant2;
+                rec.Variant3 = variant._Variant3;
+                rec.Variant4 = variant._Variant4;
+                rec.Variant5 = variant._Variant5;
                 rec._EAN = variant._EAN;
                 if (variant._CostPrice != 0d)
                     rec.CostPrice = variant._CostPrice;
@@ -426,27 +430,26 @@ namespace UnicontaClient.Pages.CustomPage
         protected override async void LoadCacheInBackGround()
         {
             var api = this.api;
-            var Comp = api.CompanyEntity;
 
             if (debtors == null)
-                debtors = await Comp.LoadCache(typeof(Debtor), api).ConfigureAwait(false);
+                debtors = await api.LoadCache(typeof(Uniconta.DataModel.Debtor)).ConfigureAwait(false);
             if (creditors == null)
-                creditors = await Comp.LoadCache(typeof(Uniconta.DataModel.Creditor), api).ConfigureAwait(false);
+                creditors = await api.LoadCache(typeof(Uniconta.DataModel.Creditor)).ConfigureAwait(false);
 
             if (this.items == null)
-                this.items = await Comp.LoadCache(typeof(Uniconta.DataModel.InvItem), api).ConfigureAwait(false);
+                this.items = await api.LoadCache(typeof(Uniconta.DataModel.InvItem)).ConfigureAwait(false);
 
-            if (Comp.Warehouse && this.warehouse == null)
-                this.warehouse = await Comp.LoadCache(typeof(Uniconta.DataModel.InvWarehouse), api);
+            if (api.CompanyEntity.Warehouse && this.warehouse == null)
+                this.warehouse = await api.LoadCache(typeof(Uniconta.DataModel.InvWarehouse));
 
-            if (Comp.ItemVariants)
+            if (api.CompanyEntity.ItemVariants)
             {
                 if (this.standardVariants == null)
-                    this.standardVariants = await Comp.LoadCache(typeof(Uniconta.DataModel.InvStandardVariant), api).ConfigureAwait(false);
+                    this.standardVariants = await api.LoadCache(typeof(Uniconta.DataModel.InvStandardVariant)).ConfigureAwait(false);
                 if (this.variants1 == null)
-                    this.variants1 = await Comp.LoadCache(typeof(Uniconta.DataModel.InvVariant1), api).ConfigureAwait(false);
+                    this.variants1 = await api.LoadCache(typeof(Uniconta.DataModel.InvVariant1)).ConfigureAwait(false);
                 if (this.variants2 == null)
-                    this.variants2 = await Comp.LoadCache(typeof(Uniconta.DataModel.InvVariant2), api).ConfigureAwait(false);
+                    this.variants2 = await api.LoadCache(typeof(Uniconta.DataModel.InvVariant2)).ConfigureAwait(false);
             }
             Dispatcher.BeginInvoke(new Action(() =>
             {
@@ -569,6 +572,7 @@ namespace UnicontaClient.Pages.CustomPage
                 return;
 
             CWInvPosting invpostingDialog = new CWInvPosting(api);
+            invpostingDialog.showCompanyName = true;
 #if !SILVERLIGHT
             invpostingDialog.DialogTableId = 2000000039;
 #endif
@@ -700,11 +704,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void SetAccountSource(InvJournalLineGridClient rec)
         {
-            SQLCache cache;
-            if (rec.MovementType == AppEnums.InvJournalMovementType.ToString(2))
-                cache = creditors;
-            else
-                cache = debtors;
+            SQLCache cache = (rec._MovementType == InvMovementType.Creditor) ? creditors : debtors;
             if (cache != null)
             {
                 rec.accountSource = null;

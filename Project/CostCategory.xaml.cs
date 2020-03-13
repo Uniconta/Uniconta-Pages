@@ -56,7 +56,7 @@ namespace UnicontaClient.Pages.CustomPage
             switch (ActionType)
             {
                 case "AddRow":
-                    AddDockItem(TabControls.CostCategoryPage2, api, Uniconta.ClientTools.Localization.lookup("CostCategory"), ";component/Assets/img/Add_16x16.png");
+                    AddDockItem(TabControls.CostCategoryPage2, api, Uniconta.ClientTools.Localization.lookup("CostCategory"), "Add_16x16.png");
                     break;
                 case "EditRow":
                     if (selectedItem == null)

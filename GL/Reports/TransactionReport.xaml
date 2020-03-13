@@ -8,12 +8,13 @@ x:Class="UnicontaClient.Pages.CustomPage.TransactionReport"
     mc:Ignorable="d"
     xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
     xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage" 
-    xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools" 
+    xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools" 
     xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors"   
     d:DesignHeight="300" d:DesignWidth="400">
     <UserControl.Resources>
-        <SolidColorBrush x:Key="LayoutGridColor" Color="Transparent">
-        </SolidColorBrush>
+        <SolidColorBrush x:Key="LayoutGridColor" Color="Transparent" />
+        <Util:VisibilityBoolConverter x:Key="VisibilityBoolConverter" />
+        <Util:ImageNameToImagesourceConverter x:Key="ImageNameToImagesourceConverter"/>
     </UserControl.Resources>
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
@@ -28,7 +29,7 @@ x:Class="UnicontaClient.Pages.CustomPage.TransactionReport"
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>            
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
@@ -49,7 +50,7 @@ x:Class="UnicontaClient.Pages.CustomPage.TransactionReport"
             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FromDate}" Grid.Column="0" Grid.Row="0" Margin="3,3,3,3"/>
             <CorasauControls:DateEditor x:Name="txtDateFrm" Grid.Column="2" Grid.Row="0" Margin="0,3,3,3"/>
             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ToDate}" Grid.Column="0" Grid.Row="1" Margin="3,3,3,3"/>
-            <CorasauControls:DateEditor x:Name="txtDateTo" Grid.Column="2" Grid.Row="1" Margin="0,3,3,3"/>            
+            <CorasauControls:DateEditor x:Name="txtDateTo" Grid.Column="2" Grid.Row="1" Margin="0,3,3,3"/>
             <TextBlock x:Name="lblDim1" Grid.Column="4" Grid.Row="0" Margin="10,3,3,3"/>
             <CorasauControls:DimComboBoxEditor Width="200" x:Name="cbdim1" Grid.Column="6" Grid.Row="0" Margin="10,3,3,3" ShowCustomItems="False">
                 <CorasauControls:DimComboBoxEditor.StyleSettings>
@@ -86,17 +87,17 @@ x:Class="UnicontaClient.Pages.CustomPage.TransactionReport"
 
             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ShowDimOnPrimo}" Grid.Column="8" Grid.Row="1" Margin="10,3,3,3"/>
             <CheckBox x:Name="cbxShowDimOnPrimo" Grid.Column="10" Grid.Row="1" Margin="10,3,3,3" IsChecked="true"/>
-            
+
             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=IncludeJournal}" Grid.Column="8" Grid.Row="2" Margin="10,3,3,3"/>
             <CorasauControls:ComboBoxEditor x:Name="cmbJournal" Width="200" Grid.Column="10" Grid.Row="2" Margin="10,3,3,3">
                 <CorasauControls:ComboBoxEditor.StyleSettings>
                     <editor:CheckedComboBoxStyleSettings />
                 </CorasauControls:ComboBoxEditor.StyleSettings>
             </CorasauControls:ComboBoxEditor>
-            
+
         </Grid>
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="2" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
-            <localPage:GLTranGrid x:Name="dgGLTran" AutoGenerateColumns="None"  >               
+            <localPage:GLTranGrid x:Name="dgGLTran" AutoGenerateColumns="None"  >
                 <localPage:GLTranGrid.Columns>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Date" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="NumberSerie" Width="50"/>
@@ -117,7 +118,21 @@ x:Class="UnicontaClient.Pages.CustomPage.TransactionReport"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="AmountCur" Width="100"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="TotalCur" Width="100"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="AmountBase" Visible="False" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="HasVoucher" Width="50" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="HasVoucher" Width="50" >
+                        <localPage:CorasauDataGridTemplateColumnClient.HeaderTemplate>
+                            <DataTemplate>
+                                <Image Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Document_Attachment_16x16.png}" Width="16" Height="16" VerticalAlignment="Center"/>
+                            </DataTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.HeaderTemplate>
+                        <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <Image Margin="5" Tag="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" 
+                                       Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Document_Attachment_16x16.png}" 
+                                       MouseLeftButtonDown="HasVoucherImage_MouseLeftButtonDown" Visibility="{Binding DataContext.RowData.Row.HasVoucher,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource VisibilityBoolConverter}}" 
+                                       Stretch="Fill" Width="16" Height="16" />
+                            </ControlTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="JournalPostedId" Width="50" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DCType" Width="50" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DCAccount" />

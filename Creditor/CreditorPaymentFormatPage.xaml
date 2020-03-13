@@ -24,6 +24,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorPaymentFormatPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="BankAccount"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Journal"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="NoneBankDayAction"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ExtendedText" Visible="False"/>
                 </local:CreditorPaymentFormatGrid.Columns>
             </local:CreditorPaymentFormatGrid>
         </CorasauControls:BusyIndicator>

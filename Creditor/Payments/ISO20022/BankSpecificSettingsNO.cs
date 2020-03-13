@@ -273,7 +273,7 @@ namespace UnicontaISO20022CreditTransfer
         /// <summary>
         /// Unstructured Remittance Information
         /// </summary>
-        public override List<string> Ustrd(string externalAdvText, ISO20022PaymentTypes ISOPaymType, PaymentTypes paymentMethod)
+        public override List<string> Ustrd(string externalAdvText, ISO20022PaymentTypes ISOPaymType, PaymentTypes paymentMethod, bool extendedText)
         {
             var ustrdText = StandardPaymentFunctions.RegularExpressionReplace(externalAdvText, allowedCharactersRegEx, replaceCharactersRegEx);
 

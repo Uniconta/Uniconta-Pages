@@ -19,68 +19,72 @@ namespace UnicontaClient.Pages.CustomPage
     public class ImportDATEV
     {
         private CrudAPI _api;
-        private List<string[]> _lines;
         private SQLCache GLAccCache, DebtorCache, CreditorCache, VATCache;
         int DebtorLower, CreditorLower;
+        public HashSet<string> faultyAccounts;
+        GLDailyJournalClient GLDailyJournal;
 
-        public ImportDATEV(CrudAPI api, FileStream fileStream)
+        public ImportDATEV(CrudAPI api, GLDailyJournalClient GLDailyJournal)
         {
+            InitCaches(api);
+            faultyAccounts = new HashSet<string>();
             _api = api;
-            _lines = new List<string[]>();
-            using (StreamReader reader = new StreamReader(fileStream))
-            {
-                while (!reader.EndOfStream)
-                    _lines.Add(reader.ReadLine().Split(';'));
-            }
-            InitCaches();
+            this.GLDailyJournal = GLDailyJournal;
         }
 
-        async private void InitCaches()
+        async private void InitCaches(CrudAPI api)
         {
-            GLAccCache = await _api.LoadCache(typeof(GLAccount));
-            DebtorCache = await _api.LoadCache(typeof(Debtor));
-            CreditorCache = await _api.LoadCache(typeof(Uniconta.DataModel.Creditor));
-            VATCache = await _api.LoadCache(typeof(GLVat));
+            GLAccCache = api.GetCache(typeof(Uniconta.DataModel.GLAccount));
+            DebtorCache = api.GetCache(typeof(Uniconta.DataModel.Debtor));
+            CreditorCache = api.GetCache(typeof(Uniconta.DataModel.Creditor));
+            VATCache = api.GetCache(typeof(Uniconta.DataModel.GLVat));
+            if (GLAccCache == null)
+                GLAccCache =  await api.LoadCache(typeof(Uniconta.DataModel.GLAccount)).ConfigureAwait(false);
+            if (DebtorCache == null)
+                DebtorCache = await api.LoadCache(typeof(Uniconta.DataModel.Debtor)).ConfigureAwait(false);
+            if (CreditorCache == null)
+                CreditorCache = await api.LoadCache(typeof(Uniconta.DataModel.Creditor)).ConfigureAwait(false);
+            if (VATCache == null)
+                VATCache = await api.LoadCache(typeof(Uniconta.DataModel.GLVat)).ConfigureAwait(false);
         }
 
-        async public Task<GLDailyJournalLineClient[]> CreateJournalLines(GLDailyJournalClient GLDailyJournal)
+        async public Task<List<GLDailyJournalLineClient>> CreateJournalLines(FileStream fileStream)
         {
-            if (_lines == null) return null;
+            var encoding = Uniconta.ClientTools.Util.UtilFunctions.FindEncoding(fileStream);
+            var reader = new StreamReader(fileStream, encoding);
 
-            var header = _lines[0];
-            var validHeader = await ValidateHeader(header);
-            if (!validHeader) return null;
+            var sp = new StringSplit(';');
+            var line = new List<string>();
 
-            if(_lines.Skip(1).Any(l => l.Length !=116))
-            {
-                UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("InvalidFile"), "", MessageBoxButton.OK);
+            var rawLine = reader.ReadLine();
+            sp.Split(rawLine, line);
+            if (! await ValidateHeader(line))
                 return null;
-            }
 
-            var year = GetYearFromHeader(_lines[0]);
-            SetLimits(_lines[0]);
+            var year = GetYearFromHeader(line);
+            var AccLen = SetLimits(line);
 
             var vats = VATCache.GetRecords as GLVat[];
-            var faultyAccounts = new HashSet<string>();
 
-            // two first lines are skipped
-            var nlines = _lines.Count - 2;
-            var _journalLines = new GLDailyJournalLineClient[nlines];
-            for (int n = 0; (n < nlines); n++)
+            // After header we have an empty line.
+            reader.ReadLine();
+
+            var _journalLines = new List<GLDailyJournalLineClient>(2000);
+            for(;;)
             {
-                var line = _lines[n + 2];
-                var account = line[6];
-                var contraAccount = line[7];
+                rawLine = await reader.ReadLineAsync().ConfigureAwait(false);
+                if (rawLine == null)
+                    break;
 
-                if (!ValidateAccount(account))
-                    faultyAccounts.Add(account);
-                if (!ValidateAccount(contraAccount))
-                    faultyAccounts.Add(contraAccount);
+                sp.Split(rawLine, line);
+
+                var account = testAccount(line[6], AccLen);
+                var contraAccount = testAccount(line[7], AccLen);
 
                 string vatcode = null;
-                if (! string.IsNullOrEmpty(line[8]))
+                var extcode = line[8];
+                if (! string.IsNullOrEmpty(extcode))
                 {
-                    var extcode = line[8];
                     for (int i = 0; (i < vats.Length); i++)
                     {
                         var v = vats[i];
@@ -94,25 +98,42 @@ namespace UnicontaClient.Pages.CustomPage
 
                 var journalLine = GetJournalLine(line, year, account, contraAccount, vatcode);
                 journalLine.SetMaster(GLDailyJournal);
-                _journalLines[n] = journalLine;
-            }
-
-            if (faultyAccounts.Count != 0)
-            {
-                var sb = new StringBuilder();
-                sb.AppendFormat(Uniconta.ClientTools.Localization.lookup("MissingOBJ"), Uniconta.ClientTools.Localization.lookup("Account")).AppendLine(":");
-                foreach (var s in faultyAccounts)
-                    sb.AppendLine(s);
-
-                UnicontaMessageBox.Show(sb.ToString(), "", MessageBoxButton.OK);
-                return null;
+                _journalLines.Add(journalLine);
             }
 
             return _journalLines;
         }
 
-        private GLDailyJournalLineClient GetJournalLine(string[] line, int year, string account, string contraAccount,
-            string VAT)
+        string testAccount(string ac, int AccLen)
+        {
+            if (ac == null || ac.Length == 0)
+                return null;
+            if (ac.Length <= AccLen)
+            {
+                var rec = GLAccCache.Get(ac);
+                if (rec != null)
+                    return rec.KeyStr;
+                if (ac.Length < AccLen)
+                {
+                    rec = GLAccCache.Get(ac.PadLeft(AccLen, '0'));
+                    if (rec != null)
+                        return rec.KeyStr;
+                }
+            }
+            else
+            {
+                var rec = DebtorCache.Get(ac);
+                if (rec != null)
+                    return rec.KeyStr;
+                rec = CreditorCache.Get(ac);
+                if (rec != null)
+                    return rec.KeyStr;
+            }
+            faultyAccounts.Add(ac);
+            return ac; 
+        }
+
+        private GLDailyJournalLineClient GetJournalLine(List<string> line, int year, string account, string contraAccount, string VAT)
         {
             var date = DateTime.ParseExact(line[9], "ddMM", null);
             date = new DateTime(year, date.Month, date.Day);
@@ -128,16 +149,16 @@ namespace UnicontaClient.Pages.CustomPage
                 // 0-9999=Ledger, 10000-69999=Customer, 70000-99999=Vendor
                 _AccountType = (accInt < DebtorLower ? (byte)GLJournalAccountType.Finans : (accInt < CreditorLower ? (byte)GLJournalAccountType.Debtor : (byte)GLJournalAccountType.Creditor)),
                 _OffsetAccountType = (offaccInt < DebtorLower ? (byte)GLJournalAccountType.Finans : (offaccInt < CreditorLower ? (byte)GLJournalAccountType.Debtor : (byte)GLJournalAccountType.Creditor)),
-                _Text = line[13].Replace("\"", ""),
-                _Dim1 = line[36].Replace("\"", ""),
-                _Dim2 = line[37].Replace("\"", ""),
+                _Text = line[13],
+                _Dim1 = line[36],
+                _Dim2 = line[37],
             };
 
-            var amount = double.Parse(line[0]);
-            var amountLin = line[1].Replace("\"", "");
-            if (amountLin.Equals("S"))
+            var amount = NumberConvert.ToDoubleNoThousandSeperator(line[0]);
+            var amountLin = line[1][0];
+            if (amountLin == 'S')
                 journalLine._Debit = amount;
-            else if (amountLin.Equals("H"))
+            else if (amountLin == 'H')
                 journalLine._Credit = amount;
 
             journalLine._OffsetAccount = contraAccount;
@@ -152,16 +173,7 @@ namespace UnicontaClient.Pages.CustomPage
             return journalLine;
         }
 
-        private bool ValidateAccount(string account)
-        {
-            if (GLAccCache.Get(account) != null)
-                return true;
-            if (DebtorCache.Get(account) != null)
-                return true;
-            return (CreditorCache.Get(account) != null);
-        }
-
-        private void SetLimits(string[] strings)
+        private int SetLimits(List<string> strings)
         {
             var length = int.Parse(strings[13]);
             int DebtorLower = 1;
@@ -174,14 +186,15 @@ namespace UnicontaClient.Pages.CustomPage
             }
             this.DebtorLower = DebtorLower;
             this.CreditorLower = CreditorLower;
+            return length;
         }
 
-        private int GetYearFromHeader(string[] header)
+        private int GetYearFromHeader(List<string> header)
         {
             return DateTime.ParseExact(header[15], "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None).Year;
         }
 
-        private async Task<bool> ValidateHeader(string[] header)
+        private async Task<bool> ValidateHeader(List<string> header)
         {
             DateTime date, fromDate, toDate;
 

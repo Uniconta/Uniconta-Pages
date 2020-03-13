@@ -62,10 +62,21 @@ x:Class="UnicontaClient.Pages.CustomPage.ImportGLDailyJournal"
                         </Grid>
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
+
+                <CorasauControls:CorasauLayoutGroup x:Name="grpInterval"  View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Interval}" Orientation="Vertical" MinWidth="350" 
+                                                CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                    <CorasauControls:CorasauLayoutItem   x:Name="liFromDate" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FromDate}">
+                        <CorasauControls:DateEditor x:Name="txtFromDate"  />
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem   x:Name="liToDate" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ToDate}">
+                        <CorasauControls:DateEditor x:Name="txtToDate"  />
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
+                
                 <CorasauControls:CorasauLayoutGroup x:Name="grpUserLogin" Visibility="Collapsed" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Login}" Orientation="Vertical" MinWidth="350" 
                                                 CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                     <CorasauControls:CorasauLayoutItem FieldName="LoginId"  x:Name="liLoginId">
-                        <CorasauControls:TextEditor Text="{Binding LoginId,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
+                        <CorasauControls:TextEditor x:Name="txtLoginId" Text="{Binding LoginId,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="Passowrd"  x:Name="liPassword">
                         <CorasauControls:PasswordBoxEditor x:Name="txtPassowrd" Text="{Binding Password,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
@@ -74,6 +85,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ImportGLDailyJournal"
                         <CorasauControls:TextEditor x:Name="txtBankAccount" />
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
+
             </CorasauControls:CorasauLayoutControl>
         </CorasauControls:BusyIndicator>
     </Grid>

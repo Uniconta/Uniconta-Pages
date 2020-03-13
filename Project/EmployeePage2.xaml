@@ -69,6 +69,12 @@ x:Class="UnicontaClient.Pages.CustomPage.EmployeePage2"
                         <CorasauControls:CorasauLayoutItem x:Name="liPayrollCategory" FieldName="PayrollCategory">
                             <CorasauControls:LookupEditor x:Name="lePayrollCategory" Text="{Binding PayrollCategory,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liApprover" FieldName="Approver">
+                            <CorasauControls:LookupEditor x:Name="leApprover" Text="{Binding Approver,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liApprover2" FieldName="Approver2">
+                            <CorasauControls:LookupEditor x:Name="leApprover2" Text="{Binding Approver2,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem x:Name="liUserLoginId" FieldName="UserLoginId">
                             <CorasauControls:TextEditor Text="{Binding UserLoginId,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>

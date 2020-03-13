@@ -36,7 +36,8 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOpenTrans"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Date" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DueDate" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Text" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Invoice" Width="60"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceAN" Width="70"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Invoice" Width="60" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Amount" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="AmountOpen" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Overdue" Width="90"/>

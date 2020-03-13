@@ -100,13 +100,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionOrderLineReport"
                             </DataTemplate>
                         </local:CorasauDataGridForeignKeyColumnClient.CellTemplate>
                     </local:CorasauDataGridForeignKeyColumnClient>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Storage" Width="100">
-                        <local:CorasauDataGridTemplateColumnClient.CellTemplate>
-                            <DataTemplate>
-                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="StorageRegister"/>
-                            </DataTemplate>
-                        </local:CorasauDataGridTemplateColumnClient.CellTemplate>
-                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:ComboBoxColumnClient x:Name="Storage" Width="100"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="ReportAsFinished" Width="70"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="ReportAsFinishedDeep" Width="70"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="IgnoreBlocked" Width="50" Visible="False" />

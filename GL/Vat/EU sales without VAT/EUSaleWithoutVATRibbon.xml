@@ -2,14 +2,14 @@
 <root>
   <RibbonItem TabId="0" LocalizedNameKey="Home">
     <!---When we create a new group and a new TabPage -->
-    <RibbonItem Action="AddRow" LocalizedNameKey="Add" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png" ShortcutKey="CTRL+N"/>
+    <RibbonItem Action="Search" LocalizedNameKey="Search" LargeGlyph="Validate_32x32.png" ShortcutKey="Ctrl+H" />
     <RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="Delete" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png"/>
   </RibbonItem>
 
   <RibbonItem>
-    <!-- <RibbonItem Action="InvoiceLines" LocalizedNameKey="InvoiceLines" LargeGlyph="Import_32x32.png"/> -->
-    <RibbonItem Action="ImportFile" LocalizedNameKey="CreateOBJ" Parameter="File" LargeGlyph="Import_32x32.png"/>
     <RibbonItem Action="Validate" LocalizedNameKey="Validate" LargeGlyph="Check_Journal_32x32.png"/>
+    <RibbonItem Action="Compress" LocalizedNameKey="Compress" LargeGlyph="Match_Add_32x32.png"/>
+    <RibbonItem Action="CreateFile" LocalizedNameKey="CreateOBJ" Parameter="File" LargeGlyph="Import_32x32.png"/>
   </RibbonItem>
   <RibbonItem>
     <!---If we want to create a new group in same PageTab-->

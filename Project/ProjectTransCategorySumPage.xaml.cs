@@ -24,6 +24,7 @@ using Uniconta.DataModel;
 using DevExpress.Xpf.Grid;
 using DevExpress.Data;
 using Uniconta.API.Service;
+using Uniconta.Common.Utility;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -247,17 +248,17 @@ namespace UnicontaClient.Pages.CustomPage
             }
             if (InvoicedTrans > 0)
             {
-                var propValuePairFolder = PropValuePair.GenereteParameter("InvoicedTrans", typeof(string), Convert.ToString(InvoicedTrans));
+                var propValuePairFolder = PropValuePair.GenereteParameter("InvoicedTrans", typeof(string), NumberConvert.ToString(InvoicedTrans));
                 filter.Add(propValuePairFolder);
             }
             if (fromDate != DateTime.MinValue)
             {
-                var propValuePairFolder = PropValuePair.GenereteParameter("FromDate", typeof(string), Convert.ToString(fromDate.Ticks));
+                var propValuePairFolder = PropValuePair.GenereteParameter("FromDate", typeof(string), NumberConvert.ToString(fromDate.Ticks));
                 filter.Add(propValuePairFolder);
             }
             if (toDate != DateTime.MinValue)
             {
-                var propValuePairFolder = PropValuePair.GenereteParameter("ToDate", typeof(string), Convert.ToString(toDate.Ticks));
+                var propValuePairFolder = PropValuePair.GenereteParameter("ToDate", typeof(string), NumberConvert.ToString(toDate.Ticks));
                 filter.Add(propValuePairFolder);
             }
 
@@ -507,7 +508,7 @@ namespace UnicontaClient.Pages.CustomPage
                 CostDiff.Visible = true;
                 SalesDiff.Visible = true;
                 iBudgetbase.Caption = string.Format(Uniconta.ClientTools.Localization.lookup("HideOBJ"), Uniconta.ClientTools.Localization.lookup("Budget"));
-                iBudgetbase.LargeGlyph = Utility.GetGlyph(";component/Assets/img/Clear_Budget_32x32.png");
+                iBudgetbase.LargeGlyph = Utility.GetGlyph("Clear_Budget_32x32.png");
             }
             else
             {
@@ -518,7 +519,7 @@ namespace UnicontaClient.Pages.CustomPage
                 CostDiff.Visible = false;
                 SalesDiff.Visible = false;
                 iBudgetbase.Caption = string.Format(Uniconta.ClientTools.Localization.lookup("ViewOBJ"), Uniconta.ClientTools.Localization.lookup("Budget"));
-                iBudgetbase.LargeGlyph = Utility.GetGlyph(";component/Assets/img/Budget_32x32.png");
+                iBudgetbase.LargeGlyph = Utility.GetGlyph("Budget_32x32.png");
             }
 
         }
@@ -538,13 +539,13 @@ namespace UnicontaClient.Pages.CustomPage
                 group = false;
                 CatType.GroupIndex = 1;
                 ibase.Caption = string.Format(Uniconta.ClientTools.Localization.lookup("MenuColumnUnGroup"), Uniconta.ClientTools.Localization.lookup("Type"));
-                ibase.LargeGlyph = Utility.GetGlyph(";component/Assets/img/Group_by_Clear_32x32.png");
+                ibase.LargeGlyph = Utility.GetGlyph("Group_by_Clear_32x32.png");
             }
             else
             {
                 group = true;
                 ibase.Caption = string.Format(Uniconta.ClientTools.Localization.lookup("GroupByOBJ"), Uniconta.ClientTools.Localization.lookup("Type"));
-                ibase.LargeGlyph = Utility.GetGlyph(";component/Assets/img/Group_by_32x32.png");
+                ibase.LargeGlyph = Utility.GetGlyph("Group_by_32x32.png");
                 CatType.GroupIndex = -1;
                 CatType.Visible = true;
             }

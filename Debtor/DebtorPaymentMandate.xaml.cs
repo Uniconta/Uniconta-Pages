@@ -31,7 +31,6 @@ using Uniconta.DirectDebitPayment;
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
-
     public class DebtorPaymentMandateGrid : CorasauDataGridClient
     {
         public override Type TableType { get { return typeof(DebtorMandateDirectDebit); } }
@@ -100,11 +99,8 @@ namespace UnicontaClient.Pages.CustomPage
             if (load.Count != 0)
                 LoadType(load.ToArray());
 
-
-            var Comp = api.CompanyEntity;
-
-            DebtorCache = Comp.GetCache(typeof(Uniconta.DataModel.Debtor));
-            PaymentFormatCache = Comp.GetCache(typeof(Uniconta.DataModel.DebtorPaymentFormat));
+            DebtorCache = api.GetCache(typeof(Uniconta.DataModel.Debtor));
+            PaymentFormatCache = api.GetCache(typeof(Uniconta.DataModel.DebtorPaymentFormat));
 
             GetShowHideStatusInfoSection();
             SetShowHideStatusInfoSection(true);
@@ -132,11 +128,9 @@ namespace UnicontaClient.Pages.CustomPage
         protected override async void LoadCacheInBackGround()
         {
             var api = this.api;
-
             DebtorCache = api.GetCache(typeof(Uniconta.DataModel.Debtor)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Debtor)).ConfigureAwait(false);
             PaymentFormatCache = api.GetCache(typeof(Uniconta.DataModel.DebtorPaymentFormat)) ?? await api.LoadCache(typeof(Uniconta.DataModel.DebtorPaymentFormat)).ConfigureAwait(false);
         }
-
 
         private void localMenu_OnItemClicked(string ActionType)
         {
@@ -151,7 +145,7 @@ namespace UnicontaClient.Pages.CustomPage
                     param[0] = newItem;
                     param[1] = false;
                     param[2] = dgDebtorPaymentMandate.masterRecord;
-                    AddDockItem(TabControls.DebtorPaymentMandatePage2, param, Uniconta.ClientTools.Localization.lookup("Mandates"), ";component/Assets/img/Add_16x16.png");
+                    AddDockItem(TabControls.DebtorPaymentMandatePage2, param, Uniconta.ClientTools.Localization.lookup("Mandates"), "Add_16x16.png");
                     break;
                 case "EditRow":
                     if (selectedItem != null)
@@ -220,7 +214,7 @@ namespace UnicontaClient.Pages.CustomPage
                         else
                             continue;
 
-                        if (LstDebMandate.Count() == 0)
+                        if (LstDebMandate.Count == 0)
                         {
                             UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("NoRecordSelected"), Uniconta.ClientTools.Localization.lookup("Warning"));
                             return;
@@ -253,7 +247,7 @@ namespace UnicontaClient.Pages.CustomPage
                         preErrors.Add(error.Message);
                     }
 
-                    if (preErrors.Count() != 0)
+                    if (preErrors.Count != 0)
                     {
                         CWErrorBox cwError = new CWErrorBox(preErrors.ToArray());
                         cwError.Show();
@@ -278,7 +272,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                 foreach (MandateError error in valErrors)
                 {
-                    var recErr = queryDebMandate.Where(s => s.RowId == error.RowId).First();
+                    var recErr = queryDebMandate.First(s => s.RowId == error.RowId);
 
                     if (recErr.ErrorInfo == Common.VALIDATE_OK)
                         recErr.ErrorInfo = error.Message;
@@ -286,7 +280,7 @@ namespace UnicontaClient.Pages.CustomPage
                         recErr.ErrorInfo += Environment.NewLine + error.Message;
                 }
 
-                if (queryDebMandate.Where(s => s.ErrorInfo == Common.VALIDATE_OK).Count() == 0 && validateOnly == false)
+                if (queryDebMandate.Any(s => s.ErrorInfo == Common.VALIDATE_OK) == false && validateOnly == false)
                 {
                     UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("NoRecordSelected"), Uniconta.ClientTools.Localization.lookup("Warning"));
                     return false;
@@ -302,7 +296,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
             catch (Exception ex)
             {
-                UnicontaMessageBox.Show(ex.Message, Uniconta.ClientTools.Localization.lookup("Exception"));
+                UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"));
             }
 
             return true;
@@ -326,19 +320,16 @@ namespace UnicontaClient.Pages.CustomPage
                     }
 
                     List<DebtorMandateDirectDebit> LstDebMandate = new List<DebtorMandateDirectDebit>();
-
-                    var qrMandates = lstMandates.Cast<DebtorMandateDirectDebit>();
-
-                    foreach (var rec in qrMandates.Where(s => (s.PaymentFormat == cwwin.PaymentFormat._Format && 
-                                                              (s._Status == Uniconta.DataModel.MandateStatus.None || 
-                                                               s._Status == Uniconta.DataModel.MandateStatus.Unregistered || 
-                                                               s._Status == Uniconta.DataModel.MandateStatus.Unregister ||
-                                                               s._Status == Uniconta.DataModel.MandateStatus.Error))))
+                    foreach (var s in lstMandates.Cast<DebtorMandateDirectDebit>())
                     {
-                        LstDebMandate.Add(rec);
+                        if ((s._Status == Uniconta.DataModel.MandateStatus.None ||
+                             s._Status == Uniconta.DataModel.MandateStatus.Unregistered ||
+                             s._Status == Uniconta.DataModel.MandateStatus.Unregister ||
+                             s._Status == Uniconta.DataModel.MandateStatus.Error) && s.PaymentFormat == debPaymentFormat._Format)
+                            LstDebMandate.Add(s);
                     }
 
-                    if (LstDebMandate.Count() == 0)
+                    if (LstDebMandate.Count == 0)
                     {
                         UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("NoRecordSelected"), Uniconta.ClientTools.Localization.lookup("Error"));
                         return;
@@ -353,7 +344,7 @@ namespace UnicontaClient.Pages.CustomPage
                         }
                         catch (Exception ex)
                         {
-                            UnicontaMessageBox.Show(ex.Message, Uniconta.ClientTools.Localization.lookup("Exception"));
+                            UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"));
                         }
                     }
 
@@ -371,17 +362,14 @@ namespace UnicontaClient.Pages.CustomPage
                 if (cwwin.DialogResult == true)
                 {
                     var debPaymentFormat = cwwin.PaymentFormat;
-
                     List<DebtorMandateDirectDebit> LstDebMandate = new List<DebtorMandateDirectDebit>();
-
                     var qrMandates = lstMandates.Cast<DebtorMandateDirectDebit>();
-
-                    foreach (var rec in qrMandates.Where(s => (s.PaymentFormat == cwwin.PaymentFormat._Format && (s._Status == Uniconta.DataModel.MandateStatus.Registered))))
+                    foreach (var s in qrMandates)
                     {
-                        LstDebMandate.Add(rec);
+                        if (s._Status == Uniconta.DataModel.MandateStatus.Registered && s.PaymentFormat == debPaymentFormat._Format)
+                            LstDebMandate.Add(s);
                     }
-
-                    if (LstDebMandate.Count() == 0)
+                    if (LstDebMandate.Count == 0)
                     {
                         UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("NoRecordSelected"), Uniconta.ClientTools.Localization.lookup("Error"));
                         return;
@@ -396,7 +384,7 @@ namespace UnicontaClient.Pages.CustomPage
                         }
                         catch (Exception ex)
                         {
-                            UnicontaMessageBox.Show(ex.Message, Uniconta.ClientTools.Localization.lookup("Exception"));
+                            UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"));
                         }
                     }
                 }
@@ -413,7 +401,6 @@ namespace UnicontaClient.Pages.CustomPage
                 if (cwwin.DialogResult == true)
                 {
                     var debPaymentFormat = cwwin.PaymentFormat;
-
                     if (debPaymentFormat._ExportFormat != (byte)Uniconta.DataModel.DebtorPaymFormatType.NetsLS && debPaymentFormat._ExportFormat != (byte)Uniconta.DataModel.DebtorPaymFormatType.NetsBS)
                     {
                         UnicontaMessageBox.Show(string.Format("Function not available for Payment format '{0}'", (Uniconta.DataModel.DebtorPaymFormatType)debPaymentFormat._ExportFormat), string.Format(Uniconta.ClientTools.Localization.lookup("ChangeOBJ"), Uniconta.ClientTools.Localization.lookup("Mandates")));
@@ -423,15 +410,13 @@ namespace UnicontaClient.Pages.CustomPage
                     dgDebtorPaymentMandate.Columns.GetColumnByName("OldMandateId").Visible = true;
 
                     List<DebtorMandateDirectDebit> LstDebMandate = new List<DebtorMandateDirectDebit>();
-
                     var qrMandates = lstMandates.Cast<DebtorMandateDirectDebit>();
-
-                    foreach (var rec in qrMandates.Where(s => (s.PaymentFormat == cwwin.PaymentFormat._Format)))
+                    foreach (var s in qrMandates)
                     {
-                        LstDebMandate.Add(rec);
+                        if (s.PaymentFormat == debPaymentFormat._Format)
+                            LstDebMandate.Add(s);
                     }
-
-                    if (LstDebMandate.Count() == 0)
+                    if (LstDebMandate.Count == 0)
                     {
                         UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("NoRecordSelected"), Uniconta.ClientTools.Localization.lookup("Error"));
                         return;
@@ -446,7 +431,7 @@ namespace UnicontaClient.Pages.CustomPage
                         }
                         catch (Exception ex)
                         {
-                            UnicontaMessageBox.Show(ex.Message, Uniconta.ClientTools.Localization.lookup("Exception"));
+                            UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"));
                         }
                     }
                 }
@@ -463,7 +448,6 @@ namespace UnicontaClient.Pages.CustomPage
                 if (cwwin.DialogResult == true)
                 {
                     var debPaymentFormat = cwwin.PaymentFormat;
-
                     if (debPaymentFormat._ExportFormat != (byte)Uniconta.DataModel.DebtorPaymFormatType.NetsLS && debPaymentFormat._ExportFormat != (byte)Uniconta.DataModel.DebtorPaymFormatType.NetsBS)
                     {
                         UnicontaMessageBox.Show(string.Format("{0} '{1}'", Uniconta.ClientTools.Localization.lookup("NonSupportSEPA"), (Uniconta.DataModel.DebtorPaymFormatType)debPaymentFormat._ExportFormat), Uniconta.ClientTools.Localization.lookup("Activate")); //TODO:Test denne
@@ -471,15 +455,13 @@ namespace UnicontaClient.Pages.CustomPage
                     }
 
                     List<DebtorMandateDirectDebit> LstDebMandate = new List<DebtorMandateDirectDebit>();
-
                     var qrMandates = lstMandates.Cast<DebtorMandateDirectDebit>();
-
-                    foreach (var rec in qrMandates.Where(s => (s.PaymentFormat == cwwin.PaymentFormat._Format)))
+                    foreach (var s in qrMandates)
                     {
-                        LstDebMandate.Add(rec);
+                        if (s.PaymentFormat == debPaymentFormat._Format)
+                            LstDebMandate.Add(s);
                     }
-
-                    if (LstDebMandate.Count() == 0)
+                    if (LstDebMandate.Count == 0)
                     {
                         UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("NoRecordSelected"), Uniconta.ClientTools.Localization.lookup("Error"));
                         return;
@@ -511,7 +493,7 @@ namespace UnicontaClient.Pages.CustomPage
                         }
                         catch (Exception ex)
                         {
-                            UnicontaMessageBox.Show(ex.Message, Uniconta.ClientTools.Localization.lookup("Exception"));
+                            UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"));
                         }
                     }
                 }
@@ -530,7 +512,6 @@ namespace UnicontaClient.Pages.CustomPage
                     try
                     {
                         var debtorPaymentFormat = cwwin.PaymentFormat;
-
                         if (debtorPaymentFormat._ExportFormat != (byte)Uniconta.DataModel.DebtorPaymFormatType.NetsLS && debtorPaymentFormat._ExportFormat != (byte)Uniconta.DataModel.DebtorPaymFormatType.NetsBS)
                         {
                             UnicontaMessageBox.Show(string.Format("Function not available for Payment format '{0}'", (Uniconta.DataModel.DebtorPaymFormatType)debtorPaymentFormat._ExportFormat), string.Format(Uniconta.ClientTools.Localization.lookup("Load"), Uniconta.ClientTools.Localization.lookup("Mandates")));
@@ -557,24 +538,19 @@ namespace UnicontaClient.Pages.CustomPage
                         var lines = File.ReadAllLines(sfd.FileName).Select(a => a.Split(';'));
 
                         var updateRecords = new List<UnicontaBaseEntity>();
-                        
                         var cnt = 0;
                         foreach (var rec in lines)
                         {
-                            
                             if (debtorPaymentFormat._ExportFormat == (byte)DebtorPaymFormatType.NetsBS)
                             {
-                                if (rec.Count() < 3)
+                                if (rec.Length < 3)
                                     continue;
 
                                 var debtorAccValue = rec.GetValue(0).ToString();
                                 var oldMandateValue = rec.GetValue(1).ToString();
                                 var agreementId = rec.GetValue(2).ToString();
 
-                                var mandate = mandateLst.Where(s => s.DCAccount == debtorAccValue).FirstOrDefault();
-
-
-
+                                var mandate = mandateLst.FirstOrDefault(s => s.DCAccount == debtorAccValue);
                                 if (mandate != null)
                                 {
                                     var debtor = mandate.Debtor;
@@ -593,14 +569,13 @@ namespace UnicontaClient.Pages.CustomPage
                             }
                             else
                             {
-                                if (rec.Count() < 2)
+                                if (rec.Length < 2)
                                     continue;
 
                                 var debtorAccValue = rec.GetValue(0).ToString();
                                 var oldMandateValue = rec.GetValue(1).ToString();
 
-                                var mandate = mandateLst.Where(s => s.DCAccount == debtorAccValue).FirstOrDefault();
-
+                                var mandate = mandateLst.FirstOrDefault(s => s.DCAccount == debtorAccValue);
                                 if (mandate != null)
                                 {
                                     var debtor = mandate.Debtor;
@@ -632,14 +607,14 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                     catch (Exception e)
                     {
-                        UnicontaMessageBox.Show(e.Message, Uniconta.ClientTools.Localization.lookup("Exception"));
+                        UnicontaMessageBox.Show(e, Uniconta.ClientTools.Localization.lookup("Exception"));
                     }
                 }
             };
             cwwin.Show();
         }
 #endif
-                        ItemBase ibase;
+        ItemBase ibase;
         bool hideStatusInfoSection = true;
         void GetShowHideStatusInfoSection()
         {

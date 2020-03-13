@@ -17,7 +17,8 @@
     <RibbonItem Action="ApproveWithComments" LocalizedNameKey="ApproveWithComments" LargeGlyph="Check_Journal_32x32.png"/>
     <RibbonItem Action="Reject" LocalizedNameKey="Reject" LargeGlyph="Cross_Journal_32x32.png" />
     <RibbonItem Action="Await" LocalizedNameKey="Await" LargeGlyph="Edit_Mileage_32x32.png" />
-  </RibbonItem>
+    <RibbonItem Action="ModifyApprover" LocalizedNameKey="NewOBJ" Parameter="Approver" LargeGlyph="Change_Ownership_32x32.png" />
+</RibbonItem>
 <RibbonItem>
    <RibbonItem Action="ViewVoucher" ShortcutKey="F7" LocalizedNameKey="View" LargeGlyph="View_Highlighted_32x32.png" />
    </RibbonItem>

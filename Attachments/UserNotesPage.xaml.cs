@@ -23,6 +23,7 @@ using System.Windows.Data;
 using DevExpress.Xpf.Grid;
 using System.Windows;
 using Uniconta.API.System;
+using Uniconta.DataModel;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -151,7 +152,7 @@ namespace UnicontaClient.Pages.CustomPage
         async void SaveNotes()
         {
             dgNotesGrid.SelectedItem = null;
-            
+
             await dgNotesGrid.SaveData();
             var master = dgNotesGrid.masterRecord as IdKey;
             if (master != null)
@@ -160,8 +161,19 @@ namespace UnicontaClient.Pages.CustomPage
                     master.HasNotes = true;
                 else
                     master.HasNotes = false;
+                globalEvents.OnRefresh(TabControls.UserNotesPage, master);
             }
-            globalEvents.OnRefresh(TabControls.UserNotesPage, master);
+            else if (master == null)
+            {
+                var tableType = dgNotesGrid.masterRecord?.GetType();
+                var hasNotesProp = tableType?.GetProperty("HasNotes");
+                if (hasNotesProp != null)
+                {
+                    var hasRecords = dgNotesGrid.VisibleRowCount > 0 ? true : false;
+                    hasNotesProp.SetValue(dgNotesGrid.masterRecord, hasRecords, null);
+                    globalEvents.OnRefresh(TabControls.UserNotesPage, dgNotesGrid.masterRecord);
+                }
+            }
         }
 
         public override string NameOfControl { get { return TabControls.UserNotesPage; } }

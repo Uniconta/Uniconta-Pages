@@ -8,6 +8,7 @@ namespace UnicontaISO20022CreditTransfer
         private readonly string extServiceCode;
         private readonly string externalLocalInstrument;
         private readonly string extCategoryPurpose;
+        private readonly string extProprietaryCode;
         private readonly string instructionPriority;
         
         private const string HPMTTPINF = "PmtTpInf";
@@ -16,6 +17,7 @@ namespace UnicontaISO20022CreditTransfer
         private const string HLCLINSTRM = "LclInstrm";
         private const string HCTGYPURP = "CtgyPurp";
         private const string CD = "Cd";
+        private const string PRTRY = "Prtry";
 
         /// <summary>
         /// ExternalServiceLevel1Code
@@ -56,13 +58,13 @@ namespace UnicontaISO20022CreditTransfer
         /// <param name="paymentInfoId">Unique identification, as assigned by the initiating party, to unambiguously identify the payment.</param> 
         /// <param name="paymentMethod">Specifies the means of payment that will be used to move the amount of money. CHK Cheque TRF CreditTransfer.</param>
         /// <param name="requestedExecutionDate">Date at which the initiating party requests the clearing agent to process the payment..</param>
-        public PmtTpInf(string extServiceCode, string externalLocalInstrument, string extCategoryPurpose, string instructionPriority)
+        public PmtTpInf(string extServiceCode, string externalLocalInstrument, string extCategoryPurpose, string instructionPriority, string extProprietaryCode)
         {
             this.instructionPriority = instructionPriority;
             this.extServiceCode = extServiceCode;
             this.externalLocalInstrument = externalLocalInstrument;
             this.extCategoryPurpose = extCategoryPurpose;
-
+            this.extProprietaryCode = extProprietaryCode;
         }
 
 
@@ -76,10 +78,15 @@ namespace UnicontaISO20022CreditTransfer
             XmlElement svcLvl = baseDoc.AppendElement(doc, pmtTpInf, HSVCLVL);
             baseDoc.AppendElement(doc, svcLvl, CD, extServiceCode);
 
-            if (externalLocalInstrument != string.Empty)
+            if (externalLocalInstrument != string.Empty || extProprietaryCode != string.Empty)
             {
                 XmlElement lclInstrm = baseDoc.AppendElement(doc, pmtTpInf, HLCLINSTRM);
-                baseDoc.AppendElement(doc, lclInstrm, CD, externalLocalInstrument);
+
+                if (externalLocalInstrument != string.Empty)
+                    baseDoc.AppendElement(doc, lclInstrm, CD, externalLocalInstrument);
+
+                if (extProprietaryCode != string.Empty)
+                    baseDoc.AppendElement(doc, lclInstrm, PRTRY, extProprietaryCode);
             }
 
             if (extCategoryPurpose != string.Empty)

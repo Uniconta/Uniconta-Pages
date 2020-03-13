@@ -68,7 +68,7 @@ namespace UnicontaClient.Pages.CustomPage
                     object[] paramAdd = new object[2];
                     paramAdd[0] = api;
                     paramAdd[1] = documents;
-                    AddDockItem(TabControls.CompanyDocumentPage2, paramAdd, Uniconta.ClientTools.Localization.lookup("CompanyImages"), ";component/Assets/img/Add_16x16.png");
+                    AddDockItem(TabControls.CompanyDocumentPage2, paramAdd, Uniconta.ClientTools.Localization.lookup("CompanyImages"), "Add_16x16.png");
                     break;
 
                 case "EditRow":
@@ -77,7 +77,7 @@ namespace UnicontaClient.Pages.CustomPage
                     object[] paramEdit = new object[2];
                     paramEdit[0] = selectedItem;
                     paramEdit[1] = documents;
-                    AddDockItem(TabControls.CompanyDocumentPage2, paramEdit, Uniconta.ClientTools.Localization.lookup("CompanyImages"), ";component/Assets/img/Edit_16x16.png");
+                    AddDockItem(TabControls.CompanyDocumentPage2, paramEdit, Uniconta.ClientTools.Localization.lookup("CompanyImages"), "Edit_16x16.png");
                     break;
 
                 case "RefreshGrid":

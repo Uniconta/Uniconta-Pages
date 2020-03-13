@@ -42,6 +42,10 @@
       <RibbonItem Action="UnfoldBOM" LocalizedNameKey="UnfoldBOM"  Glyph="CopyUserTable_16x16.png" LargeGlyph="CopyUserTable_16x16.png"/>
       <RibbonItem Action="CreateProduction" LocalizedNameKey="CreateOBJ" Parameter="ProductionOrder" Glyph="Column_Head_16x16.png" LargeGlyph="Column_Head_16x16.png"/>
     </RibbonItem>
+    <RibbonItem Module="Attachments" LocalizedNameKey="Attachments" LargeGlyph="Attachments_32x32.png">
+      <RibbonItem Action="AddNote" ShortcutKey="Alt+N" ControlName="UserNotesPage" LocalizedNameKey="Note" Glyph="Note_16x16.png"/>
+      <RibbonItem Action="AddDoc" LocalizedNameKey="Document" ControlName="UserDocsPage" Glyph="Document_Attachment_16x16.png" ShortcutKey=""/>
+    </RibbonItem>
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="MarkSales" LocalizedNameKey="MarkSales" LargeGlyph="Check_Journal_32x32.png">

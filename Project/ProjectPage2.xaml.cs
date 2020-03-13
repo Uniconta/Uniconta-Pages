@@ -111,7 +111,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 if (zip == null)
                 {
-                    var city = await UtilDisplay.GetCityAndAddress(txtZipCode.Text, editrow._WorkCountry != 0 ? editrow._WorkCountry : api.CompanyEntity._CountryId);
+                    var city = await UtilDisplay.GetCityAndAddress(editrow.ZipCode, editrow._WorkCountry != 0 ? editrow._WorkCountry : api.CompanyEntity._CountryId);
                     if (city != null)
                     {
                         editrow.City = city[0];

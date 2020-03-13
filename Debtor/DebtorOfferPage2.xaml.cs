@@ -200,7 +200,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (zip == null)
                 {
                     var deliveryCountry = editrow.DeliveryCountry ?? editrow.Country;
-                    var city = await UtilDisplay.GetCityAndAddress(txtDelZipCode.Text, deliveryCountry);
+                    var city = await UtilDisplay.GetCityAndAddress(editrow.DeliveryZipCode, deliveryCountry);
                     if (city != null)
                     {
                         editrow.DeliveryCity = city[0];
@@ -272,7 +272,7 @@ namespace UnicontaClient.Pages.CustomPage
             object[] param = new object[2];
             param[0] = api;
             param[1] = null;
-            AddDockItem(TabControls.DebtorAccountPage2, param, Uniconta.ClientTools.Localization.lookup("DebtorAccount"), ";component/Assets/img/Add_16x16.png");
+            AddDockItem(TabControls.DebtorAccountPage2, param, Uniconta.ClientTools.Localization.lookup("DebtorAccount"), "Add_16x16.png");
         }
 
         private void leAccount_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
@@ -301,14 +301,16 @@ namespace UnicontaClient.Pages.CustomPage
             editrow.Employee = debtor._Employee;
             editrow.DeliveryTerm = debtor._DeliveryTerm;
             editrow.PriceList = debtor._PriceList;
+            if (this.Prospect == null) // no master
+                editrow.SetMaster(debtor);
             if (!RecordLoadedFromTemplate || debtor._DeliveryAddress1 != null)
             {
                 editrow.DeliveryName = debtor._DeliveryName;
                 editrow.DeliveryAddress1 = debtor._DeliveryAddress1;
                 editrow.DeliveryAddress2 = debtor._DeliveryAddress2;
                 editrow.DeliveryAddress3 = debtor._DeliveryAddress3;
-                editrow.DeliveryZipCode = debtor._DeliveryZipCode;
                 editrow.DeliveryCity = debtor._DeliveryCity;
+                editrow.DeliveryZipCode = debtor._DeliveryZipCode;
                 if (debtor._DeliveryCountry != 0)
                     editrow.DeliveryCountry = debtor._DeliveryCountry;
                 else

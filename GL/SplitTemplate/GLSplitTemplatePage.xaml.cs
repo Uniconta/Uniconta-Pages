@@ -53,7 +53,7 @@ namespace UnicontaClient.Pages.CustomPage
             var selectedItem = dgSplittemplateGrid.SelectedItem as GLSplitTemplateClient;
             if (selectedItem == null)
                 return;
-            AddDockItem(TabControls.GLSplitTemplatePage2, selectedItem, Localization.lookup("SplitTemplate"), ";component/Assets/img/Edit_16x16.png");
+            AddDockItem(TabControls.GLSplitTemplatePage2, selectedItem, Localization.lookup("SplitTemplate"), "Edit_16x16.png");
         }
 
         private void localMenu_OnItemClicked(string ActionType)
@@ -62,12 +62,12 @@ namespace UnicontaClient.Pages.CustomPage
             switch (ActionType)
             {
                 case "AddRow":
-                    AddDockItem(TabControls.GLSplitTemplatePage2, api, Uniconta.ClientTools.Localization.lookup("SplitTemplate"), ";component/Assets/img/Add_16x16.png");
+                    AddDockItem(TabControls.GLSplitTemplatePage2, api, Uniconta.ClientTools.Localization.lookup("SplitTemplate"), "Add_16x16.png");
                     break;
                 case "EditRow":
                     if (selectedItem == null)
                         return;
-                    AddDockItem(TabControls.GLSplitTemplatePage2, selectedItem, Uniconta.ClientTools.Localization.lookup("SplitTemplate"), ";component/Assets/img/Edit_16x16.png");
+                    AddDockItem(TabControls.GLSplitTemplatePage2, selectedItem, Uniconta.ClientTools.Localization.lookup("SplitTemplate"), "Edit_16x16.png");
                     break;
                 case "SplitLine":
                     if (selectedItem == null)

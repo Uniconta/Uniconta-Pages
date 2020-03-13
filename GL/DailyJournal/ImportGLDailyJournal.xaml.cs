@@ -129,16 +129,16 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        void doImport(BankImportFormatClient selectedbankFormat, PostingAPI postingApi, bool Append, string journal = null)
+        async void doImport(BankImportFormatClient selectedbankFormat, PostingAPI postingApi, bool Append, string journal = null)
         {
-            if (selectedbankFormat.Format != BankImportFormatType.LANDSBANKINN)
+            if (selectedbankFormat.Format != BankImportFormatType.LANDSBANKINN && selectedbankFormat.Format != BankImportFormatType.ISLANDSBANKI && selectedbankFormat.Format != BankImportFormatType.ARION)
                 if (ctrlBrowseFile.SelectedFileInfos == null && voucherClient == null)
                     return;
             selectedbankFormat.BankAccountPos = cbBankAccountPos.Text;
             selectedbankFormat._Reverse = chkReverse.IsChecked.Value;
             if (!selectedbankFormat._BankReconciliation)
             {
-                if (selectedbankFormat.Format == BankImportFormatType.LANDSBANKINN)
+                if (selectedbankFormat.Format == BankImportFormatType.LANDSBANKINN || selectedbankFormat.Format == BankImportFormatType.ISLANDSBANKI || selectedbankFormat.Format == BankImportFormatType.ARION)
                     selectedbankFormat._BankAccountNo = txtBankAccount.Text;
                 else
                     selectedbankFormat._BankAccount = BankAccountLookupEditor.Text;
@@ -146,79 +146,70 @@ namespace UnicontaClient.Pages.CustomPage
             }
             else
             {
-                if (selectedbankFormat.Format == BankImportFormatType.LANDSBANKINN)
+                if (selectedbankFormat.Format == BankImportFormatType.LANDSBANKINN || selectedbankFormat.Format == BankImportFormatType.ISLANDSBANKI || selectedbankFormat.Format == BankImportFormatType.ARION)
                     selectedbankFormat._BankAccountNo = txtBankAccount.Text;
             }
 
-            var defaultdate = DateTime.MinValue;
-            CWInterval winInterval = new CWInterval(defaultdate, defaultdate);
-            winInterval.Closed += async delegate
+            Task<ErrorCodes> errt;
+            ErrorCodes err = ErrorCodes.NoSucces;
+            var selectedFileInfo = ctrlBrowseFile.SelectedFileInfos;
+            if (selectedFileInfo != null && selectedFileInfo.Length > 0 && (selectedbankFormat.Format != BankImportFormatType.LANDSBANKINN || selectedbankFormat.Format != BankImportFormatType.ISLANDSBANKI || selectedbankFormat.Format != BankImportFormatType.ARION))
             {
-                if (winInterval.DialogResult == true)
+                busyIndicator.IsBusy = true;
+                foreach (var fileInfo in selectedFileInfo)
                 {
-                    Task<ErrorCodes> errt;
-                    ErrorCodes err = ErrorCodes.NoSucces;
-                    var selectedFileInfo = ctrlBrowseFile.SelectedFileInfos;
-                    if (selectedFileInfo != null && selectedFileInfo.Length > 0 && selectedbankFormat.Format != BankImportFormatType.LANDSBANKINN)
-                    {
-                        busyIndicator.IsBusy = true;
-                        foreach (var fileInfo in selectedFileInfo)
-                        {
-                            if (fileInfo.FileExtension == ".zip")
-                                err = await ImportFromZipFile(selectedbankFormat, fileInfo, postingApi, Append, winInterval.FromDate, winInterval.ToDate);
-                            else
-                            {
-                                errt = postingApi.ImportJournalLines(selectedbankFormat, new MemoryStream(fileInfo.FileBytes), Append, winInterval.FromDate, winInterval.ToDate);
-                                err = await errt;
-                            }
-
-                            if (err != ErrorCodes.Succes)
-                                break;
-                        }
-                    }
-                    else if (selectedbankFormat.Format == BankImportFormatType.LANDSBANKINN)
-                    {
-                        busyIndicator.IsBusy = true;
-                        errt = postingApi.ImportJournalLines(selectedbankFormat, new MemoryStream(), Append, winInterval.FromDate, winInterval.ToDate);
-                        err = await errt;
-                    }
-                    else if (voucherClient != null)
-                    {
-                        busyIndicator.IsBusy = true;
-                        errt = postingApi.ImportJournalLines(selectedbankFormat, voucherClient, Append, winInterval.FromDate, winInterval.ToDate);
-                        err = await errt;
-                    }
+                    if (fileInfo.FileExtension == ".zip")
+                        err = await ImportFromZipFile(selectedbankFormat, fileInfo, postingApi, Append, txtFromDate.DateTime, txtToDate.DateTime);
                     else
-                        return;
-
-                    busyIndicator.IsBusy = false;
+                    {
+                        errt = postingApi.ImportJournalLines(selectedbankFormat, new MemoryStream(fileInfo.FileBytes), Append, txtFromDate.DateTime, txtToDate.DateTime);
+                        err = await errt;
+                    }
 
                     if (err != ErrorCodes.Succes)
-                        UtilDisplay.ShowErrorCode(err);
-                    else
-                    {
-                        var bsClient = importMaster as Uniconta.DataModel.BankStatement;
-                        if (bsClient != null)
-                            bsClient._BankImportId = selectedbankFormat.RowId;
-
-                        ctrlBrowseFile.ResetControl();
-                        var text = string.Concat(Uniconta.ClientTools.Localization.lookup("ImportCompleted"), Environment.NewLine, string.Format(Uniconta.ClientTools.Localization.lookup("GoTo"),
-                            !string.IsNullOrEmpty(journal) ? Uniconta.ClientTools.Localization.lookup("Journallines") : Uniconta.ClientTools.Localization.lookup("BankStatement")), " ?");
-
-                        var select = UnicontaMessageBox.Show(text, Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OKCancel);
-
-                        if (select == MessageBoxResult.OK)
-                        {
-                            errt = selectedbankFormat._BankReconciliation ? ShowBankStatementLines(selectedbankFormat.BankAccount) : ShowGlDailyJournalLines(journal);
-                            err = await errt;
-                        }
-
-                        if (err != ErrorCodes.Succes)
-                            UtilDisplay.ShowErrorCode(err);
-                    }
+                        break;
                 }
-            };
-            winInterval.Show();
+            }
+            else if (selectedbankFormat.Format == BankImportFormatType.LANDSBANKINN || selectedbankFormat.Format == BankImportFormatType.ISLANDSBANKI || selectedbankFormat.Format == BankImportFormatType.ARION)
+            {
+                busyIndicator.IsBusy = true;
+                errt = postingApi.ImportJournalLines(selectedbankFormat, new MemoryStream(), Append, txtFromDate.DateTime, txtToDate.DateTime);
+                err = await errt;
+            }
+            else if (voucherClient != null)
+            {
+                busyIndicator.IsBusy = true;
+                errt = postingApi.ImportJournalLines(selectedbankFormat, voucherClient, Append, txtFromDate.DateTime, txtToDate.DateTime);
+                err = await errt;
+            }
+            else
+                return;
+
+            busyIndicator.IsBusy = false;
+
+            if (err != ErrorCodes.Succes)
+                UtilDisplay.ShowErrorCode(err);
+            else
+            {
+                var bsClient = importMaster as Uniconta.DataModel.BankStatement;
+                if (bsClient != null)
+                    bsClient._BankImportId = selectedbankFormat.RowId;
+
+                ctrlBrowseFile.ResetControl();
+                var text = string.Concat(Uniconta.ClientTools.Localization.lookup("ImportCompleted"), Environment.NewLine, string.Format(Uniconta.ClientTools.Localization.lookup("GoTo"),
+                    !string.IsNullOrEmpty(journal) ? Uniconta.ClientTools.Localization.lookup("Journallines") : Uniconta.ClientTools.Localization.lookup("BankStatement")), " ?");
+
+                var select = UnicontaMessageBox.Show(text, Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OKCancel);
+
+                if (select == MessageBoxResult.OK)
+                {
+                    errt = selectedbankFormat._BankReconciliation ? ShowBankStatementLines(selectedbankFormat.BankAccount) : ShowGlDailyJournalLines(journal);
+                    err = await errt;
+                }
+
+                if (err != ErrorCodes.Succes)
+                    UtilDisplay.ShowErrorCode(err);
+            }
         }
 
         async private Task<ErrorCodes> ImportFromZipFile(BankImportFormatClient selectedbankFormat, SelectedFileInfo fileInfo, PostingAPI postingapi, bool append, DateTime fromDate, DateTime toDate)
@@ -288,9 +279,9 @@ namespace UnicontaClient.Pages.CustomPage
                 case "Import":
                     if (selectedbankFormat != null)
                     {
-                        if(selectedbankFormat.Format == BankImportFormatType.LANDSBANKINN)
+                        if(selectedbankFormat.Format == BankImportFormatType.LANDSBANKINN || selectedbankFormat.Format == BankImportFormatType.ISLANDSBANKI || selectedbankFormat.Format == BankImportFormatType.ARION)
                         {
-                            if (string.IsNullOrEmpty(selectedbankFormat.LoginId) || string.IsNullOrEmpty(selectedbankFormat.Password) || string.IsNullOrWhiteSpace(txtBankAccount.Text))
+                            if (string.IsNullOrWhiteSpace(txtLoginId.Text) || string.IsNullOrEmpty(txtPassowrd.Text) || string.IsNullOrWhiteSpace(txtBankAccount.Text))
                             {
                                 string message = string.IsNullOrEmpty(selectedbankFormat.LoginId) ? "LoginId" : string.IsNullOrEmpty(selectedbankFormat.Password) ? "Passord" : "BankAccount";
                                 UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("OBJisEmpty"), Uniconta.ClientTools.Localization.lookup(message)), Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OK);
@@ -308,13 +299,13 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "AddBankFormat":
 
-                    AddDockItem(TabControls.ImportGLDailyJournalPage2, null, Uniconta.ClientTools.Localization.lookup("BankFormatName"), ";component/Assets/img/Add_16x16.png");
+                    AddDockItem(TabControls.ImportGLDailyJournalPage2, null, Uniconta.ClientTools.Localization.lookup("BankFormatName"), "Add_16x16.png");
                     break;
                 case "EditBankFormat":
                     if (selectedbankFormat != null)
                     {
                         object[] Params = new object[2] { selectedbankFormat, true };
-                        AddDockItem(TabControls.ImportGLDailyJournalPage2, Params, Uniconta.ClientTools.Localization.lookup("BankFormatName"), ";component/Assets/img/Edit_16x16.png");
+                        AddDockItem(TabControls.ImportGLDailyJournalPage2, Params, Uniconta.ClientTools.Localization.lookup("BankFormatName"), "Edit_16x16.png");
                     }
                     break;
                 case "LookupAccounts":
@@ -346,7 +337,7 @@ namespace UnicontaClient.Pages.CustomPage
             StreamingManager.Copy(selectedItem, bankFormat);
             bankFormat.SetMaster(api.CompanyEntity);
             var parms = new object[2] { bankFormat, false };
-            AddDockItem(TabControls.ImportGLDailyJournalPage2, parms, Uniconta.ClientTools.Localization.lookup("BankFormatName"), ";component/Assets/img/Add_16x16.png");
+            AddDockItem(TabControls.ImportGLDailyJournalPage2, parms, Uniconta.ClientTools.Localization.lookup("BankFormatName"), "Add_16x16.png");
         }
 
         public override void OnClosePage(object[] refreshParams)
@@ -403,7 +394,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             SetMaster(currentBankFormat);
             this.DataContext = currentBankFormat;
-            if (currentBankFormat.Format == BankImportFormatType.LANDSBANKINN)
+            if (currentBankFormat.Format == BankImportFormatType.LANDSBANKINN || currentBankFormat.Format == BankImportFormatType.ISLANDSBANKI || currentBankFormat.Format == BankImportFormatType.ARION)
             {
                 if (!string.IsNullOrEmpty(currentBankFormat._BankAccountNo))
                     txtBankAccount.Text = currentBankFormat._BankAccountNo;
@@ -435,7 +426,7 @@ namespace UnicontaClient.Pages.CustomPage
                     liBankAccount.Visibility = Visibility.Collapsed;
                     liBankAccountPos.Visibility = Visibility.Collapsed;
                     liAddVoucherNumber.Visibility = Visibility.Collapsed;
-                    if (currentBankFormat.Format == BankImportFormatType.LANDSBANKINN)
+                    if (currentBankFormat.Format == BankImportFormatType.LANDSBANKINN || currentBankFormat.Format == BankImportFormatType.ISLANDSBANKI || currentBankFormat.Format == BankImportFormatType.ARION)
                         txtBankAccount.Text = bsClient._Account;
                     else
                         grpUserLogin.Visibility = Visibility.Collapsed;

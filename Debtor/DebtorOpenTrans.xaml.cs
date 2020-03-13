@@ -29,7 +29,6 @@ namespace UnicontaClient.Pages.CustomPage
     {
         public override Type TableType { get { return typeof(DebtorTransOpenClient); } }
         public override bool Readonly { get { return false; } }
-       
     }
     public partial class DebtorOpenTrans : GridBasePage
     {
@@ -125,7 +124,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "EditRow":
                     if (selectedItem == null)
                         return;
-                    AddDockItem(TabControls.DebtorTranPage2, selectedItem, Uniconta.ClientTools.Localization.lookup("TransactionOutstanding"), ";component/Assets/img/Edit_16x16.png");
+                    AddDockItem(TabControls.DebtorTranPage2, selectedItem, Uniconta.ClientTools.Localization.lookup("TransactionOutstanding"), "Edit_16x16.png");
                     break;
                 case "SettleTran":
                     Settle();
@@ -306,6 +305,11 @@ namespace UnicontaClient.Pages.CustomPage
                     CheckBoxClick(row);
                 }
             }
+        }
+
+        protected override void LoadCacheInBackGround()
+        {
+            LoadType(new List<Type>(2) { typeof(Uniconta.DataModel.GLVat), typeof(Uniconta.DataModel.PaymentTerm) });
         }
     }
 }

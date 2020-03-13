@@ -13,6 +13,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionOrdersPage"
         <Util:RowIndexConverter x:Key="RowIndexConverter" />
         <Util:VisibilityBoolConverter x:Key="VisibilityBoolConverter" />
         <Util:MaskConverter x:Key="MaskConverter" />
+        <Util:ImageNameToImagesourceConverter x:Key="ImageNameToImagesourceConverter"/>
     </UserControl.Resources>
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
@@ -23,6 +24,30 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionOrdersPage"
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <local:ProductionOrdersPageGrid  x:Name="dgProductionOrders" AutoGenerateColumns="None">
                 <local:ProductionOrdersPageGrid.Columns>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="HasNotes" Width="30" ReadOnly="True">
+                        <local:CorasauDataGridTemplateColumnClient.HeaderTemplate>
+                            <DataTemplate>
+                                <Image Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Note_16x16.png}" Width="16" Height="16" VerticalAlignment="Center"/>
+                            </DataTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.HeaderTemplate>
+                        <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <Image Margin="5" Tag="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Note_16x16.png}" MouseLeftButtonDown="HasNoteImage_MouseLeftButtonDown" Visibility="{Binding DataContext.RowData.Row.HasNotes,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource VisibilityBoolConverter}}" Stretch="Fill" Width="16" Height="16" RenderOptions.BitmapScalingMode="NearestNeighbor" RenderOptions.EdgeMode="Aliased" />
+                            </ControlTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="HasDocs" ReadOnly="True"  Width="30" >
+                        <local:CorasauDataGridTemplateColumnClient.HeaderTemplate>
+                            <DataTemplate>
+                                <Image Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Document_Attachment_16x16.png}" Width="16" Height="16" VerticalAlignment="Center"/>
+                            </DataTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.HeaderTemplate>
+                        <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <Image Margin="5" Tag="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Document_Attachment_16x16.png}" MouseLeftButtonDown="HasDocImage_MouseLeftButtonDown" Visibility="{Binding DataContext.RowData.Row.HasDocs,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource VisibilityBoolConverter}}" Stretch="Fill" Width="16" Height="16" RenderOptions.BitmapScalingMode="NearestNeighbor" RenderOptions.EdgeMode="Aliased" />
+                            </ControlTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Account" Width="70"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="AccountName" Width="100"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Group" Width="70"/>
@@ -53,6 +78,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionOrdersPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="Requisition" Width="90"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Remark" Width="150" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="BatchNumber" Width="100" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Expire"  Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="RelatedOrder" Width="90"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Employee" Visible="False" Width="90"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="ReferenceNumber" Visible="False" Width="90"/>

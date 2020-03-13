@@ -14,6 +14,7 @@ namespace ISO20022CreditTransfer
         private readonly IEnumerable<PreCheckError> preCheckErrors;
         private readonly IEnumerable<CheckError> checkErrors;
         private readonly Encoding encoding;
+        private readonly string fileName;
 
         public XMLDocumentGenerateResult(XmlDocument document, bool hasErrors, int payments, IEnumerable<PreCheckError> preCheckErrors)
         {
@@ -23,14 +24,22 @@ namespace ISO20022CreditTransfer
             this.preCheckErrors = preCheckErrors;
         }
 
+        public XMLDocumentGenerateResult(XmlDocument document, bool hasErrors, int payments, IEnumerable<CheckError> checkErrors)
+        {
+            this.document = document;
+            this.hasErrors = hasErrors;
+            this.numberOfPayments = payments;
+            this.checkErrors = checkErrors;
+        }
 
-        public XMLDocumentGenerateResult(XmlDocument document, bool hasErrors, int payments, IEnumerable<CheckError> checkErrors, Encoding encoding)
+        public XMLDocumentGenerateResult(XmlDocument document, bool hasErrors, int payments, IEnumerable<CheckError> checkErrors, Encoding encoding, string fileName)
         {
             this.document = document;
             this.hasErrors = hasErrors;
             this.numberOfPayments = payments;
             this.checkErrors = checkErrors;
             this.encoding = encoding;
+            this.fileName = fileName;
         }
 
         public XmlDocument Document
@@ -78,6 +87,14 @@ namespace ISO20022CreditTransfer
             get
             {
                 return encoding;
+            }
+        }
+
+        public string FileName
+        {
+            get
+            {
+                return fileName;
             }
         }
     }

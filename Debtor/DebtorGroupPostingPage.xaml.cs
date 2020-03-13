@@ -69,16 +69,16 @@ namespace UnicontaClient.Pages.CustomPage
                     object[] addParam = new object[2];
                     addParam[0] = api;
                     addParam[1] = dgGroupPosting.masterRecord;
-                    AddDockItem(TabControls.DebtorGroupPostingPage2, addParam, Uniconta.ClientTools.Localization.lookup("CustomerPosting"), ";component/Assets/img/Add_16x16.png");
+                    AddDockItem(TabControls.DebtorGroupPostingPage2, addParam, Uniconta.ClientTools.Localization.lookup("CustomerPosting"), "Add_16x16.png");
                     break;
 
                 case "EditRow":
                     if (selectedItem == null) return;
-                    string grpPostingHeader = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("CustomerPosting"), selectedItem.Group);
+                    string grpPostingHeader = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("CustomerPosting"), selectedItem._Group);
                     object[] EditParam = new object[2];
                     EditParam[0] = selectedItem;
                     EditParam[1] = true;
-                    AddDockItem(TabControls.DebtorGroupPostingPage2, EditParam, grpPostingHeader, ";component/Assets/img/Edit_16x16.png");
+                    AddDockItem(TabControls.DebtorGroupPostingPage2, EditParam, grpPostingHeader, "Edit_16x16.png");
                     break;
 
                 case "CopyRow":
@@ -87,7 +87,7 @@ namespace UnicontaClient.Pages.CustomPage
                     object[] copyParam = new object[2];
                     copyParam[0] = selectedItem;
                     copyParam[1] = false;
-                    string header = string.Format(Uniconta.ClientTools.Localization.lookup("CopyOBJ"), selectedItem.Group);
+                    string header = string.Format(Uniconta.ClientTools.Localization.lookup("CopyOBJ"), selectedItem._Group);
                     AddDockItem(TabControls.DebtorGroupPostingPage2, copyParam, header);
                     break;
 

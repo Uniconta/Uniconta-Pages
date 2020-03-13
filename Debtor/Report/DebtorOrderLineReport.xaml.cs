@@ -49,7 +49,6 @@ namespace UnicontaClient.Pages.CustomPage
             SetRibbonControl(localMenu, dgDebtorOrderlineGrid);
             dgDebtorOrderlineGrid.api = api;
             dgDebtorOrderlineGrid.BusyIndicator = busyIndicator;
-            dgDebtorOrderlineGrid.api = api;
             dgDebtorOrderlineGrid.ShowTotalSummary();
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgDebtorOrderlineGrid.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;

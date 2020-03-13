@@ -69,7 +69,6 @@ namespace UnicontaClient.Pages.CustomPage
 
     public partial class InventoryTransactionStatement : GridBasePage
     {
-        SQLCache ItemCache;
         ItemBase ibase;
         List<InvItemTransStatementList> statementlist;
         public override string NameOfControl { get { return TabControls.InventoryTransactionStatement; } }
@@ -87,12 +86,11 @@ namespace UnicontaClient.Pages.CustomPage
             statementlist = new List<InvItemTransStatementList>();
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             GetMenuItem();
-            LoadInvSeriesBatch();
         }
 
         public override Task InitQuery()
         {
-            return null;
+            return LoadInvSeriesBatch();
         }
 
         public override void AssignMultipleGrid(List<Uniconta.ClientTools.Controls.CorasauDataGrid> gridCtrls)
@@ -124,7 +122,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 ExpandAndCollapseAll(false);
                 ibase.Caption = Uniconta.ClientTools.Localization.lookup("CollapseAll");
-                ibase.LargeGlyph = UnicontaClient.Utilities.Utility.GetGlyph(";component/Assets/img/Collapse_32x32.png");
+                ibase.LargeGlyph = UnicontaClient.Utilities.Utility.GetGlyph("Collapse_32x32.png");
             }
             else
             {
@@ -132,7 +130,7 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     ExpandAndCollapseAll(true);
                     ibase.Caption = Uniconta.ClientTools.Localization.lookup("ExpandAll");
-                    ibase.LargeGlyph = UnicontaClient.Utilities.Utility.GetGlyph(";component/Assets/img/Expand_32x32.png");
+                    ibase.LargeGlyph = UnicontaClient.Utilities.Utility.GetGlyph("Expand_32x32.png");
                 }
             }
         }
@@ -147,14 +145,16 @@ namespace UnicontaClient.Pages.CustomPage
                     dgInvSeriesBatch.CollapseMasterRow(rowHandle);
         }
 
-        private async void LoadInvSeriesBatch()
+        private async Task LoadInvSeriesBatch()
         {
             setExpandAndCollapse(true);
             statementlist.Clear();
             busyIndicator.IsBusy = true;
-            UnicontaMasterDetail[] lstEntity;
+
+            var ItemCache = api.GetCache(typeof(Uniconta.DataModel.InvItem)) ?? await api.LoadCache(typeof(Uniconta.DataModel.InvItem));
+
             var tranApi = new ReportAPI(api);
-            lstEntity = await tranApi.GetSeriaBatchInBOM(master as InvTransClient, new InvSerieBatchClient());
+            var lstEntity = await tranApi.GetSeriaBatchInBOM(master as InvTransClient, new InvSerieBatchClient());
             if (lstEntity != null)
             {
                 string curItem = " ";
@@ -175,7 +175,7 @@ namespace UnicontaClient.Pages.CustomPage
                         ob.ItemNumber = ac._Item;
                         ob.Name = ac._Name;
                         ob.ItemType = AppEnums.ItemType.ToString(ac._ItemType);
-                        tlst = new List<InvSeriesBatchTotal>();
+                        tlst = new List<InvSeriesBatchTotal>(s.Details.Length);
                         ob.ChildRecord = tlst;
                         SumCost = SumQty = 0d;
                         foreach (var detail in s.Details)
@@ -204,11 +204,7 @@ namespace UnicontaClient.Pages.CustomPage
                 }
             }
 
-            if (statementlist.Count > 0)
-            {
-                dgInvSeriesBatch.ItemsSource = null;
-                dgInvSeriesBatch.ItemsSource = statementlist;
-            }
+            dgInvSeriesBatch.ItemsSource = statementlist;
             dgInvSeriesBatch.Visibility = Visibility.Visible;
             busyIndicator.IsBusy = false;
         }
@@ -218,16 +214,6 @@ namespace UnicontaClient.Pages.CustomPage
             RibbonBase rb = (RibbonBase)localMenu.DataContext;
             ibase = UtilDisplay.GetMenuCommandByName(rb, "ExpandAndCollapse");
             UtilDisplay.RemoveMenuCommand(rb, "ViewDownloadRow");
-        }
-
-        protected async override void LoadCacheInBackGround()
-        {
-            var api = this.api;
-            var Comp = api.CompanyEntity;
-            ItemCache = Comp.GetCache(typeof(Uniconta.DataModel.InvItem));
-            if (ItemCache == null)
-                ItemCache = await Comp.LoadCache(typeof(Uniconta.DataModel.InvItem), api).ConfigureAwait(false);
-
         }
     }
 }

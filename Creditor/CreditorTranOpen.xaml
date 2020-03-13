@@ -27,7 +27,8 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorTranOpen"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Date" Width="90" ReadOnly="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DueDate" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Text" ReadOnly="True"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Invoice" Width="60" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceAN" Width="70"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Invoice" Width="60" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Amount" Width="90" ReadOnly="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="AmountOpen" Width="90" ReadOnly="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Overdue" Width="90" ReadOnly="True"/>
@@ -42,13 +43,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorTranOpen"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="VoucherX" Visible="False" ReadOnly="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Voucher" Width="60" ReadOnly="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Project" Width="90" ReadOnly="True"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PaymentMethod">
-                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                            <DataTemplate>
-                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="PaymentMethod" />
-                            </DataTemplate>
-                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                    </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:ComboBoxColumnClient x:Name="PaymentMethod"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PaymentId" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Payment" Width="60" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Currency" Width="40" ReadOnly="True"/>

@@ -213,10 +213,8 @@ namespace UnicontaClient.Pages.CustomPage
 
             // for ProjectBudgetLineClient
             var projBudget = await api.Query<ProjectBudgetClient>();
-            var budgetlst = projBudget.Where(x => x._Current == true);
-            if (budgetlst != null && budgetlst.Count() > 0)
-                _projectBudget = projBudget.First();          // for ProjectBudgetLine master
-            else
+            var _projectBudget = projBudget.FirstOrDefault(x => x._Current == true);
+            if (_projectBudget == null)
             {
                 _projectBudget = new ProjectBudgetClient();
                 _projectBudget.Name = Uniconta.ClientTools.Localization.lookup("Default");

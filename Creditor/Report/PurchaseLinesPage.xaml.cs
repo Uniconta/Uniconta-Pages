@@ -51,7 +51,6 @@ namespace UnicontaClient.Pages.CustomPage
             SetRibbonControl(localMenu, dgCreditorPurchagelineGrid);
             dgCreditorPurchagelineGrid.api = api;
             dgCreditorPurchagelineGrid.BusyIndicator = busyIndicator;
-            dgCreditorPurchagelineGrid.api = api;
             dgCreditorPurchagelineGrid.ShowTotalSummary();
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgCreditorPurchagelineGrid.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;

@@ -21,7 +21,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
-using Uniconta.API.DebtorCreditor;
+using Uniconta.API.GeneralLedger;
 using Uniconta.API.Service;
 using Uniconta.ClientTools;
 using Uniconta.ClientTools.Controls;
@@ -365,7 +365,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 ExpandAndCollapseAll(false);
                 ibase.Caption = Uniconta.ClientTools.Localization.lookup("CollapseAll");
-                ibase.LargeGlyph = Utilities.Utility.GetGlyph(";component/Assets/img/Collapse_32x32.png");
+                ibase.LargeGlyph = Utilities.Utility.GetGlyph("Collapse_32x32.png");
             }
             else
             {
@@ -373,7 +373,7 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     ExpandAndCollapseAll(true);
                     ibase.Caption = Uniconta.ClientTools.Localization.lookup("ExpandAll");
-                    ibase.LargeGlyph = Utilities.Utility.GetGlyph(";component/Assets/img/Expand_32x32.png");
+                    ibase.LargeGlyph = Utilities.Utility.GetGlyph("Expand_32x32.png");
                 }
             }
         }
@@ -440,7 +440,7 @@ namespace UnicontaClient.Pages.CustomPage
             busyIndicator.IsBusy = true;
             var transApi = new Uniconta.API.GeneralLedger.ReportAPI(api);
             var dimensionParams = BalanceReport.SetDimensionParameters(dim1, dim2, dim3, dim4, dim5, true, true, true, true, true);
-            var listTrans = (GLTransClientTotal[])await transApi.GetTransactions(new GLTransClientTotal(), journal, fromAccount, toAccount, fromDate, toDate, dimensionParams);
+            var listTrans = (GLTransClientTotal[])await transApi.GetTransactions(new GLTransClientTotal(), journal, fromAccount, toAccount, fromDate, toDate, dimensionParams, ReportAPI.SimplePrimo);
             if (listTrans != null)
             {
                 string currentItem = null;
@@ -498,7 +498,7 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                 }
 
-                if (statementList.Any())
+                if (statementList.Count > 0)
                 {
                     dgGLTrans.ItemsSource = null;
                     dgGLTrans.ItemsSource = statementList;

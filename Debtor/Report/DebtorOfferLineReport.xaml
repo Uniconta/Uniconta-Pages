@@ -51,13 +51,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOfferLineReport"
                             </DataTemplate>
                         </local:CorasauDataGridTemplateColumnClient.CellTemplate>
                     </local:CorasauDataGridTemplateColumnClient>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Unit" Width="50" Visible="False" >
-                        <local:CorasauDataGridTemplateColumnClient.CellTemplate>
-                            <DataTemplate>
-                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="ItemUnit"/>
-                            </DataTemplate>
-                        </local:CorasauDataGridTemplateColumnClient.CellTemplate>
-                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:ComboBoxColumnClient x:Name="Unit" Width="50" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="SerieBatch" Visible="False">
                         <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                             <ControlTemplate>
@@ -110,13 +104,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOfferLineReport"
                             </DataTemplate>
                         </local:CorasauDataGridTemplateColumnClient.CellTemplate>
                     </local:CorasauDataGridTemplateColumnClient>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Storage" Width="100">
-                        <local:CorasauDataGridTemplateColumnClient.CellTemplate>
-                            <DataTemplate>
-                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="StorageRegister"/>
-                            </DataTemplate>
-                        </local:CorasauDataGridTemplateColumnClient.CellTemplate>
-                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:ComboBoxColumnClient x:Name="Storage" Width="100" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="IgnoreBlocked" Width="50" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="ReferenceNumber" Width="70" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Week" Width="80" Visible="False" />
@@ -133,6 +121,9 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOfferLineReport"
                             </DataTemplate>
                         </local:CorasauDataGridTemplateColumnClient.CellTemplate>
                     </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Cartons" Width="100" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Weight" Width="100" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Volume" Width="100" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Variant1Name" Width="100" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Variant2Name" Width="100" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Variant3Name" Width="100" Visible="False"/>

@@ -18,6 +18,8 @@ using System.Linq;
 using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.Controls.Reporting;
 using Uniconta.API.Service;
+using System.Windows.Input;
+using System.Windows.Controls;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -60,17 +62,19 @@ namespace UnicontaClient.Pages.CustomPage
 
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgProductionOrders.RowDoubleClick += DgProductionOrders_RowDoubleClick;
-            ribbonControl.DisableButtons("SaveGrid");
+            ribbonControl.DisableButtons(new string[] { "DeleteRow", "UndoDelete", "SaveGrid" });
 #if SILVERLIGHT
             HideMenuItems();
 #endif
         }
 
+        
+
         private void HideMenuItems()
         {
             RibbonBase rb = (RibbonBase)localMenu.DataContext;
             if (rb != null)
-                UtilDisplay.RemoveMenuCommand(rb, new string[] { "ProductionReport" });
+                UtilDisplay.RemoveMenuCommand(rb, "ProductionReport" );
         }
         private void DgProductionOrders_RowDoubleClick()
         {
@@ -104,18 +108,18 @@ namespace UnicontaClient.Pages.CustomPage
             var selectedItem = dgProductionOrders.SelectedItem as ProductionOrderClient;
             string salesHeader = string.Empty;
             if (selectedItem != null)
-                salesHeader = string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("Production"), selectedItem._OrderNumber);
+                salesHeader = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Production"), selectedItem._OrderNumber);
             switch (ActionType)
             {
                 case "AddRow":
                     if (dgProductionOrders.masterRecords != null)
                     {
                         object[] arr = new object[2] { api, dgProductionOrders.masterRecord };
-                        AddDockItem(TabControls.ProductionOrdersPage2, arr, Uniconta.ClientTools.Localization.lookup("Production"), ";component/Assets/img/Add_16x16.png", true);
+                        AddDockItem(TabControls.ProductionOrdersPage2, arr, Uniconta.ClientTools.Localization.lookup("Production"), "Add_16x16.png", true);
                     }
                     else
                     {
-                        AddDockItem(TabControls.ProductionOrdersPage2, api, Uniconta.ClientTools.Localization.lookup("Production"), ";component/Assets/img/Add_16x16.png", true);
+                        AddDockItem(TabControls.ProductionOrdersPage2, api, Uniconta.ClientTools.Localization.lookup("Production"), "Add_16x16.png", true);
                     }
                     break;
                 case "EditRow":
@@ -133,11 +137,11 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "AddNote":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.UserNotesPage, selectedItem);
+                        AddDockItem(TabControls.UserNotesPage, dgProductionOrders.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Notes"), selectedItem._OrderNumber));
                     break;
                 case "AddDoc":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.UserDocsPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Documents"), selectedItem._OrderNumber));
+                        AddDockItem(TabControls.UserDocsPage, dgProductionOrders.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Documents"), selectedItem._OrderNumber));
                     break;
                 case "ProductionLines":
                     if (selectedItem != null)
@@ -175,6 +179,16 @@ namespace UnicontaClient.Pages.CustomPage
                 case "SaveGrid":
                     Save();
                     break;
+                case "ViewPhoto":
+                    if (selectedItem != null && selectedItem?.ProdItemRef!= null)
+                        AddDockItem(TabControls.UserDocsPage, selectedItem.ProdItemRef, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Documents"), selectedItem?.ProdItemRef?._Name));
+                    break;
+                case "DeleteRow":
+                    dgProductionOrders.DeleteRow();
+                    break;
+                case "UndoDelete":
+                    dgProductionOrders.UndoDeleteRow();
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -183,11 +197,11 @@ namespace UnicontaClient.Pages.CustomPage
 
         private async void Save()
         {
-            dgProductionOrders.BusyIndicator.IsBusy = true;
+            SetBusy();
             var err = await dgProductionOrders.SaveData();
             if (err != ErrorCodes.Succes)
                 api.AllowBackgroundCrud = true;
-            dgProductionOrders.BusyIndicator.IsBusy = false;
+            ClearBusy();
         }
 
         bool editAllChecked;
@@ -202,7 +216,7 @@ namespace UnicontaClient.Pages.CustomPage
                 dgProductionOrders.MakeEditable();
                 UserFieldControl.MakeEditable(dgProductionOrders);
                 iBase.Caption = Uniconta.ClientTools.Localization.lookup("LeaveEditAll");
-                ribbonControl.EnableButtons( "SaveGrid");
+                ribbonControl.EnableButtons(new string[] { "DeleteRow", "UndoDelete", "SaveGrid" });
                 editAllChecked = false;
             }
             else
@@ -228,7 +242,7 @@ namespace UnicontaClient.Pages.CustomPage
                         dgProductionOrders.Readonly = true;
                         dgProductionOrders.tableView.CloseEditor();
                         iBase.Caption = Uniconta.ClientTools.Localization.lookup("EditAll");
-                        ribbonControl.DisableButtons( "SaveGrid");
+                        ribbonControl.DisableButtons(new string[] { "DeleteRow", "UndoDelete", "SaveGrid" });
                     };
                     confirmationDialog.Show();
                 }
@@ -237,7 +251,7 @@ namespace UnicontaClient.Pages.CustomPage
                     dgProductionOrders.Readonly = true;
                     dgProductionOrders.tableView.CloseEditor();
                     iBase.Caption = Uniconta.ClientTools.Localization.lookup("EditAll");
-                    ribbonControl.DisableButtons( "DeleteRow");
+                    ribbonControl.DisableButtons(new string[] { "DeleteRow", "UndoDelete", "SaveGrid" });
                 }
             }
         }
@@ -357,11 +371,12 @@ namespace UnicontaClient.Pages.CustomPage
         protected override void LoadCacheInBackGround()
         {
             var Comp = api.CompanyEntity;
-            LoadType(new Type[] { typeof(Uniconta.DataModel.InvItem), typeof(Uniconta.DataModel.Debtor) });
+            var lst = new List<Type>(4) { typeof(Uniconta.DataModel.InvItem), typeof(Uniconta.DataModel.Debtor) };
             if (Comp.Warehouse)
-                LoadType(new Type[] { typeof(Uniconta.DataModel.InvWarehouse) });
+                lst.Add(typeof(Uniconta.DataModel.InvWarehouse));
             if (Comp.Project)
-                LoadType(new Type[] { typeof(Uniconta.DataModel.PrCategory) });
+                lst.Add(typeof(Uniconta.DataModel.Project));
+            LoadType(lst);
         }
 
         public override async void Utility_Refresh(string screenName, object argument = null)
@@ -396,11 +411,18 @@ namespace UnicontaClient.Pages.CustomPage
             return dgProductionOrders.Filter(null);
         }
 
-        public override bool CheckIfBindWithUserfield(out bool isReadOnly, out bool useBinding)
+        private void HasDocImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            isReadOnly = false;
-            useBinding = true;
-            return true;
+            var order = (sender as Image).Tag as ProductionOrderClient;
+            if (order != null)
+                AddDockItem(TabControls.UserDocsPage, dgProductionOrders.syncEntity);
+        }
+
+        private void HasNoteImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            var order = (sender as Image).Tag as ProductionOrderClient;
+            if (order != null)
+                AddDockItem(TabControls.UserNotesPage, dgProductionOrders.syncEntity);
         }
     }
 }

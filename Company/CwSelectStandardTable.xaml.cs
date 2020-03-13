@@ -46,7 +46,7 @@ namespace UnicontaClient.Pages.CustomPage
             foreach (var type in tablestype)
             {
                 var clientTableAttr = type.GetCustomAttributes(typeof(ClientTableAttribute), true);
-                if (clientTableAttr != null && clientTableAttr.Any())
+                if (clientTableAttr.Length > 0)
                 {
                     var attr = (ClientTableAttribute)clientTableAttr[0];
                     if (attr.CanUpdate)
@@ -64,7 +64,7 @@ namespace UnicontaClient.Pages.CustomPage
             foreach (var type in Global.GetStandardUserRefTables())
             {
                 var clientTableAttr = type.GetCustomAttributes(typeof(ClientTableAttribute), true);
-                if (clientTableAttr != null && clientTableAttr.Any())
+                if ( clientTableAttr.Length > 0)
                 {
                     if (type == typeof(DebtorOrderClient) || type == typeof(DebtorOfferClient) || type == typeof(CreditorOrderClient) || type == typeof(ProductionOrderClient))
                         continue;

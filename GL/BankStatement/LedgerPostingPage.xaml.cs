@@ -193,7 +193,7 @@ namespace UnicontaClient.Pages.CustomPage
                     SetAccountSource(rec);
                     break;
                 case "Invoice":
-                    if (rec._Invoice != 0)
+                    if (rec._Invoice != null)
                     {
                         GLJournalAccountType type = rec._AmountCent > 0 ? GLJournalAccountType.Debtor : GLJournalAccountType.Creditor;
                         rec.AccountType = AppEnums.GLAccountType.ToString((int)type);
@@ -344,8 +344,7 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         dgBankStatementLine.SetLoadedRow(selectedItem);
                         selectedItem.VoucherReference = voucher.RowId;
-                        if (voucher._Invoice != 0)
-                            selectedItem.Invoice = voucher._Invoice;
+                        selectedItem.Invoice = voucher._Invoice;
                         dgBankStatementLine.SetModifiedRow(selectedItem);
                     }
                 }
@@ -380,12 +379,12 @@ namespace UnicontaClient.Pages.CustomPage
             if (hideGreen)
             {
                 ibase.Caption = string.Format(Uniconta.ClientTools.Localization.lookup("ShowOBJ"), Uniconta.ClientTools.Localization.lookup("Green"));
-                ibase.LargeGlyph = Utilities.Utility.GetGlyph(";component/Assets/img/ShowGreen_32x32.png");
+                ibase.LargeGlyph = Utilities.Utility.GetGlyph("ShowGreen_32x32.png");
             }
             else
             {
                 ibase.Caption = string.Format(Uniconta.ClientTools.Localization.lookup("HideOBJ"), Uniconta.ClientTools.Localization.lookup("Green"));
-                ibase.LargeGlyph = Utilities.Utility.GetGlyph(";component/Assets/img/HideGreen_32x32.png");
+                ibase.LargeGlyph = Utilities.Utility.GetGlyph("HideGreen_32x32.png");
             }
         }
 

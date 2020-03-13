@@ -84,17 +84,17 @@ namespace UnicontaClient.Pages.CustomPage
                     addParam[0] = api;
                     addParam[1] = dgCreditorGroupPosting.masterRecord;
 
-                    AddDockItem(TabControls.CreditorGroupPostingPage2, addParam, Uniconta.ClientTools.Localization.lookup("CreditorPosting"),";component/Assets/img/Add_16x16.png");
+                    AddDockItem(TabControls.CreditorGroupPostingPage2, addParam, Uniconta.ClientTools.Localization.lookup("CreditorPosting"), "Add_16x16.png");
                     break;
 
                 case "EditRow":
                     if (selectedItem == null) return;
-                    string grpPostingHeader = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("CreditorPosting"), selectedItem.Group);
+                    string grpPostingHeader = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("CreditorPosting"), selectedItem._Group);
                     object[] EditParam = new object[2];
                     EditParam[0] = selectedItem;
                     EditParam[1] = true;
 
-                    AddDockItem(TabControls.CreditorGroupPostingPage2, EditParam, grpPostingHeader, ";component/Assets/img/Edit_16x16.png");
+                    AddDockItem(TabControls.CreditorGroupPostingPage2, EditParam, grpPostingHeader, "Edit_16x16.png");
                     break;
 
                 case "CopyRow":

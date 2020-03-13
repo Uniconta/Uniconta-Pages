@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <root>
   <RibbonItem TabId="0" LocalizedNameKey="Home">
-    <RibbonItem Action="ExpandAndCollapse" LocalizedNameKey="ExpandAll" ShortcutKey="CTRL+O" Glyph="Cover_16x16.png" LargeGlyph="Expand_32x32.png" />
+    <RibbonItem Action="ExpandAndCollapse" LocalizedNameKey="ExpandAll" ShortcutKey="CTRL+O" LargeGlyph="Expand_32x32.png" />
+    <RibbonItem Action="ExpandCollapseCurrent" LocalizedNameKey="ExpandCurrent" LargeGlyph="Expand_32x32.png" />
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="DebtorFilter" LocalizedNameKey="FilterOBJ" Parameter="Debtors" Glyph="Filter_16x16.png" LargeGlyph="Filter_32x32.png" ShortcutKey="CTRL+I"/>
@@ -13,7 +14,7 @@
     <RibbonItem Action="ViewTransactions" LocalizedNameKey="Transactions" LargeGlyph="Account-statement_32x32.png" />
   </RibbonItem>
   <RibbonItem>
-     <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32.png">
+    <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32.png">
       <!---If we want Inner menu-->
       <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
       <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16.png" ShortcutKey="" />
@@ -27,5 +28,8 @@
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="SendAsEmail" LocalizedNameKey="Sendinvoicebyemail" LargeGlyph="SendInvoiceMail_32x32.png" />
+  </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="SendAsOutlook" LocalizedNameKey="SendInvoiceInOutLook" LargeGlyph="Posted_Journal_32x32.png" />
   </RibbonItem>
 </root>

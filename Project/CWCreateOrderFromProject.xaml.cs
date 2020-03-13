@@ -81,7 +81,8 @@ namespace UnicontaClient.Pages.CustomPage
         async void SetItemSource(QueryAPI api)
         {
             var prCache = api.GetCache(typeof(Uniconta.DataModel.PrCategory)) ?? await api.LoadCache(typeof(Uniconta.DataModel.PrCategory));
-            cmbCategory.ItemsSource = new PrCategoryRevenueFilter(prCache);
+            var cache = new PrCategoryRevenueFilter(prCache);
+            cmbCategory.cacheFilter = new PrCategoryRevenueFilter(prCache);
         }
 
         private void ChildWindow_KeyDown(object sender, KeyEventArgs e)

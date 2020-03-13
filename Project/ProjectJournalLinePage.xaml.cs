@@ -143,6 +143,7 @@ namespace UnicontaClient.Pages.CustomPage
             dgProjectJournalLinePageGrid.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;
             postingApi = new UnicontaAPI.Project.API.PostingAPI(api);
             dictPriceLookup = new Dictionary<string, Uniconta.API.DebtorCreditor.FindPrices>();
+            this.BeforeClose += JournalLine_BeforeClose;
         }
 
         public override bool CheckIfBindWithUserfield(out bool isReadOnly, out bool useBinding)
@@ -335,9 +336,12 @@ namespace UnicontaClient.Pages.CustomPage
                 rec.Item = variant._Item;
                 rec.Variant1 = variant._Variant1;
                 rec.Variant2 = variant._Variant2;
+                rec.Variant3 = variant._Variant3;
+                rec.Variant4 = variant._Variant4;
+                rec.Variant5 = variant._Variant5;
                 rec._EAN = variant._EAN;
                 if (variant._CostPrice != 0d)
-                    rec.CostPrice = variant._CostPrice;
+                    rec._CostPrice = variant._CostPrice;
             }
         }
         async void setLocation(InvWarehouse master, ProjectJournalLineLocal rec)
@@ -552,17 +556,16 @@ namespace UnicontaClient.Pages.CustomPage
         protected override async void LoadCacheInBackGround()
         {
             var api = this.api;
-            var Comp = api.CompanyEntity;
-            ProjectCache = Comp.GetCache(typeof(Uniconta.DataModel.Project)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.Project), api).ConfigureAwait(false);
-            ItemsCache = Comp.GetCache(typeof(Uniconta.DataModel.InvItem)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.InvItem), api).ConfigureAwait(false);
-            CreditorCache = Comp.GetCache(typeof(Uniconta.DataModel.Creditor)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.Creditor), api).ConfigureAwait(false);
-            CategoryCache = Comp.GetCache(typeof(Uniconta.DataModel.PrCategory)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.PrCategory), api).ConfigureAwait(false);
-            EmployeeCache = Comp.GetCache(typeof(Uniconta.DataModel.Employee)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.Employee), api).ConfigureAwait(false);
-            if (Comp.Payroll)
-                PayrollCache = Comp.GetCache(typeof(Uniconta.DataModel.EmpPayrollCategory)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.EmpPayrollCategory), api).ConfigureAwait(false);
-            PrStandardCache = Comp.GetCache(typeof(Uniconta.DataModel.PrStandard)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.PrStandard), api).ConfigureAwait(false);
-            if (Comp.Warehouse)
-                WarehouseCache = Comp.GetCache(typeof(Uniconta.DataModel.InvWarehouse)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.InvWarehouse), api).ConfigureAwait(false);
+            ProjectCache = api.GetCache(typeof(Uniconta.DataModel.Project)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Project)).ConfigureAwait(false);
+            ItemsCache = api.GetCache(typeof(Uniconta.DataModel.InvItem)) ?? await api.LoadCache(typeof(Uniconta.DataModel.InvItem)).ConfigureAwait(false);
+            CreditorCache = api.GetCache(typeof(Uniconta.DataModel.Creditor)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Creditor)).ConfigureAwait(false);
+            CategoryCache = api.GetCache(typeof(Uniconta.DataModel.PrCategory)) ?? await api.LoadCache(typeof(Uniconta.DataModel.PrCategory)).ConfigureAwait(false);
+            EmployeeCache = api.GetCache(typeof(Uniconta.DataModel.Employee)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Employee)).ConfigureAwait(false);
+            PrStandardCache = api.GetCache(typeof(Uniconta.DataModel.PrStandard)) ?? await api.LoadCache(typeof(Uniconta.DataModel.PrStandard)).ConfigureAwait(false);
+            if (api.CompanyEntity.Payroll)
+                PayrollCache = api.GetCache(typeof(Uniconta.DataModel.EmpPayrollCategory)) ?? await api.LoadCache(typeof(Uniconta.DataModel.EmpPayrollCategory)).ConfigureAwait(false);
+            if (api.CompanyEntity.Warehouse)
+                WarehouseCache = api.GetCache(typeof(Uniconta.DataModel.InvWarehouse)) ?? await api.LoadCache(typeof(Uniconta.DataModel.InvWarehouse)).ConfigureAwait(false);
         }
 
         private void localMenu_OnItemClicked(string ActionType)
@@ -645,7 +648,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (list != null && list.Length > 0)
             {
                 Array.Sort(list, new InvBOMSort());
-                var lst = new List<UnicontaBaseEntity>();
+                var lst = new List<UnicontaBaseEntity>(list.Length);
                 foreach (var bom in list)
                 {
                     var invJournalLine = new ProjectJournalLineLocal();
@@ -668,10 +671,10 @@ namespace UnicontaClient.Pages.CustomPage
                     invJournalLine._Variant5 = bom._Variant5;
                     invJournalLine._PrCategory = item._PrCategory ?? selectedItem._PrCategory;
                     invJournalLine._PayrollCategory = item._PayrollCategory ?? selectedItem._PayrollCategory;
-                    invJournalLine._Warehouse = item._Warehouse;
-                    invJournalLine._Location = item._Location;
+                    invJournalLine._Warehouse = bom._Warehouse ?? item._Warehouse ?? selectedItem._Warehouse;
+                    invJournalLine._Location = bom._Location ?? item._Location ?? selectedItem._Location;
                     invJournalLine._CostPrice = item._CostPrice;
-                    invJournalLine._Qty = -Math.Round(bom.GetBOMQty(selectedItem._Qty), item._Decimals);
+                    invJournalLine._Qty = Math.Round(bom.GetBOMQty(selectedItem._Qty), item._Decimals);
                     lst.Add(invJournalLine);
                 }
                 dgProjectJournalLinePageGrid.PasteRows(lst);
@@ -784,11 +787,35 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void PostJournal()
         {
+            var source = (ICollection<ProjectJournalLineLocal>)dgProjectJournalLinePageGrid.ItemsSource;
+            if (source == null || source.Count == 0)
+                return;
             this.api.AllowBackgroundCrud = false;
             var savetask = saveGrid();
             this.api.AllowBackgroundCrud = true;
-
+            string dateMsg;
+            if (masterJournal._DateFunction == GLJournalDate.Free)
+            {
+                DateTime smallestDate = DateTime.MaxValue;
+                DateTime largestDate = DateTime.MinValue;
+                foreach (var rec in source)
+                {
+                    var dt = rec._Date;
+                    if (dt != DateTime.MinValue)
+                    {
+                        if (dt < smallestDate)
+                            smallestDate = dt;
+                        if (dt > largestDate)
+                            largestDate = dt;
+                    }
+                }
+                dateMsg = string.Format(Uniconta.ClientTools.Localization.lookup("PostingDateMsg"), smallestDate.ToShortDateString(), largestDate.ToShortDateString());
+            }
+            else
+                dateMsg = null;
             CWPosting postingDialog = new CWPosting(masterJournal);
+            postingDialog.dateMsg = dateMsg;
+            postingDialog.companyName = api.CompanyEntity.Name;
 #if !SILVERLIGHT
             postingDialog.DialogTableId = 2000000040;
 #endif
@@ -802,7 +829,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (savetask != null)
                         await savetask;
 
-                    var source = dgProjectJournalLinePageGrid.ItemsSource as IEnumerable<ProjectJournalLineLocal>;
+                   // var source = dgProjectJournalLinePageGrid.ItemsSource as IEnumerable<ProjectJournalLineLocal>;
                     var cnt = source.Count();
 
                     Task<PostingResult> task;
@@ -870,6 +897,17 @@ namespace UnicontaClient.Pages.CustomPage
                 gl._Voucher = 0;
             }
             return false;
+        }
+
+        private void JournalLine_BeforeClose()
+        {
+            var lines = dgProjectJournalLinePageGrid.ItemsSource as IList;
+            int cnt = lines != null ? lines.Count : 0;
+            var mClient = masterJournal as ProjectJournalClient;
+            if (mClient != null)
+                mClient.NumberOfLines = cnt;
+            else
+                masterJournal._NumberOfLines = cnt;
         }
     }
 }

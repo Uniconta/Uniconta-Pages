@@ -68,7 +68,7 @@ namespace UnicontaClient.Pages.CustomPage
                         EditAll();
                     break;
                 case "AddRow":
-                    AddDockItem(TabControls.EmployeePage2, api, Uniconta.ClientTools.Localization.lookup("Employee"), ";component/Assets/img/Add_16x16.png");
+                    AddDockItem(TabControls.EmployeePage2, api, Uniconta.ClientTools.Localization.lookup("Employee"), "Add_16x16.png");
                     break;
                 case "CopyRecord":
                     if (selectedItem != null)
@@ -133,13 +133,13 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         AddDockItem(TabControls.SalesRepCustomerStatPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("SalesRepCustomerStat"), selectedItem._Name));
                     break;
-                case "PhysicalVoucher":
+                case "ApproveDocument":
                     if (selectedItem != null)
                     {
                         var param= new object[2];
                         param[0] = api;
                         param[1] = selectedItem;
-                        AddDockItem(TabControls.DocumentsApprovalPage, param, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("PhysicalVoucher"), selectedItem._Name));
+                        AddDockItem(TabControls.DocumentsApprovalPage, param, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ApproveDocument"), selectedItem._Name));
                     }
                     break;
                 case "SaveGrid":

@@ -87,13 +87,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrderLines"
                                         </DataTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridTemplateColumnClient>
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Unit" Width="50" Visible="False" >
-                                    <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                                        <DataTemplate>
-                                            <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="ItemUnit"/>
-                                        </DataTemplate>
-                                    </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                                </localPage:CorasauDataGridTemplateColumnClient>
+                                <localPage:ComboBoxColumnClient x:Name="Unit" Width="50" Visible="False" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="SerieBatch" Visible="False">
                                     <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                                         <ControlTemplate>
@@ -147,14 +141,8 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrderLines"
                                         </DataTemplate>
                                     </localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridForeignKeyColumnClient>
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Storage" Width="100">
-                                    <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                                        <DataTemplate>
-                                            <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="StorageRegister"/>
-                                        </DataTemplate>
-                                    </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                                </localPage:CorasauDataGridTemplateColumnClient>
-
+                                <localPage:ComboBoxColumnClient x:Name="Storage" Width="100" />
+                                <localPage:CorasauDataGridForeignKeyColumnClient x:Name="Task" Width="80" Visible="False" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="IsMarked" Visible="False" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="IgnoreBlocked" Visible="False" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="ReferenceNumber" Width="70" Visible="False"/>
@@ -164,6 +152,11 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrderLines"
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="PostingAccount" Width="100" Visible="False"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Vat" Width="50" Visible="False"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Employee" Width="50" Visible="False"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Project" Width="100" Visible="False"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Width="100" Visible="False"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Cartons" Width="100" Visible="False"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Weight" Width="100" Visible="False"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Volume" Width="100" Visible="False"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Variant1Name" Width="100" Visible="False"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Variant2Name" Width="100" Visible="False"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Variant3Name" Width="100" Visible="False"/>
@@ -214,8 +207,8 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrderLines"
                                 </StackPanel>
                             </DataTemplate>
                         </docking:LayoutPanel.CaptionTemplate>
-                        <localPage:InvItemStorageClientGrid  x:Name="dgInvItemStorageClientGrid" AutoGenerateColumns="None">
-                            <localPage:InvItemStorageClientGrid.Columns>
+                        <localPage:InvItemStorageClientGridReadOnly  x:Name="dgInvItemStorageClientGrid" AutoGenerateColumns="None">
+                            <localPage:InvItemStorageClientGridReadOnly.Columns>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="invItem" FieldName="Item" Width="100" Visible="False"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="colInvItemVariant1" FieldName="Variant1" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="colInvItemVariant2" FieldName="Variant2"/>
@@ -232,21 +225,21 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrderLines"
                                         </DataTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridTemplateColumnClient>
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="inItemQty" FieldName="Qty" Width="80">
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="inItemQty" FieldName="Qty" Width="80" AllowEditing="false">
                                     <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                         <DataTemplate>
                                             <CorasauControls:TextEditor  x:Name="PART_Editor" HorizontalContentAlignment="Right" Mask="{Binding Path=DataContext.RowData.Row.Decimals,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource MaskConverter},ConverterParameter=Decimals}" MaskUseAsDisplayFormat="True" MaskType="Numeric" EditValue="{Binding Path=DataContext.RowData.Row.Qty,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}"/>
                                         </DataTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridTemplateColumnClient>
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="QtyReserved" Width="80">
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="QtyReserved" Width="80" AllowEditing="false">
                                     <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                         <DataTemplate>
                                             <CorasauControls:TextEditor  x:Name="PART_Editor" HorizontalContentAlignment="Right" Mask="{Binding Path=DataContext.RowData.Row.Decimals,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource MaskConverter},ConverterParameter=Decimals}" MaskUseAsDisplayFormat="True" MaskType="Numeric" EditValue="{Binding Path=DataContext.RowData.Row.QtyReserved,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}"/>
                                         </DataTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridTemplateColumnClient>
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="QtyOrdered" Width="80">
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="QtyOrdered" Width="80" AllowEditing="false">
                                     <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                         <DataTemplate>
                                             <CorasauControls:TextEditor  x:Name="PART_Editor" HorizontalContentAlignment="Right" Mask="{Binding Path=DataContext.RowData.Row.Decimals,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource MaskConverter},ConverterParameter=Decimals}" MaskUseAsDisplayFormat="True" MaskType="Numeric" EditValue="{Binding Path=DataContext.RowData.Row.QtyOrdered,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}"/>
@@ -255,14 +248,14 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrderLines"
                                 </localPage:CorasauDataGridTemplateColumnClient>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="MinStockLevel" Width="80"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="MaxStockLevel" Width="80"/>
-                            </localPage:InvItemStorageClientGrid.Columns>
-                            <localPage:InvItemStorageClientGrid.TotalSummary>
+                            </localPage:InvItemStorageClientGridReadOnly.Columns>
+                            <localPage:InvItemStorageClientGridReadOnly.TotalSummary>
                                 <localPage:SumColumn FieldName="Available" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                                 <localPage:SumColumn FieldName="Qty" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                                 <localPage:SumColumn FieldName="QtyReserved" SummaryType="Sum" DisplayFormat="{}{0:N2}" />
                                 <localPage:SumColumn FieldName="QtyOrdered" SummaryType="Sum" DisplayFormat="{}{0:N2}" />
-                            </localPage:InvItemStorageClientGrid.TotalSummary>
-                        </localPage:InvItemStorageClientGrid>
+                            </localPage:InvItemStorageClientGridReadOnly.TotalSummary>
+                        </localPage:InvItemStorageClientGridReadOnly>
                     </docking:LayoutPanel>
                 </docking:LayoutGroup>
             </docking:DockLayoutManager>

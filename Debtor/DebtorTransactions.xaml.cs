@@ -184,10 +184,10 @@ namespace UnicontaClient.Pages.CustomPage
 
         async private void Save()
         {
-            dgDebtorTran.BusyIndicator.IsBusy = true;
+            SetBusy();
             dgDebtorTran.BusyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("Saving");
             var err = await dgDebtorTran.SaveData();
-            dgDebtorTran.BusyIndicator.IsBusy = false;
+            ClearBusy();
         }
 
         async void ShowInvoiceLines(DebtorTransClient debTrans)
@@ -196,7 +196,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (debInvoice != null && debInvoice.Length > 0)
             {
                 var debInv = debInvoice[0];
-                AddDockItem(TabControls.DebtorInvoiceLines, debInv, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("InvoiceNumber"), debInv._InvoiceNumber));
+                AddDockItem(TabControls.DebtorInvoiceLines, debInv, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("InvoiceNumber"), debInv.InvoiceNum));
             }
         }
 
@@ -204,16 +204,12 @@ namespace UnicontaClient.Pages.CustomPage
 
         private static void DefaultPrint(UnicontaBaseEntity dcInvoice)
         {
-            long invoiceNumber = 0;
             var dc = dcInvoice as DCInvoice;
-            if (dc != null)
-                invoiceNumber = dc._InvoiceNumber;
 
             object[] ob = new object[2];
             ob[0] = dcInvoice;
             ob[1] = CompanyLayoutType.Invoice;
-            DockInvoiceVoucher(TabControls.ProformaInvoice, ob, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Invoice"),
-                invoiceNumber));
+            DockInvoiceVoucher(TabControls.ProformaInvoice, ob, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Invoice"), dc?.InvoiceNum));
         }
 #endif
         public async static void ShowVoucher(SynchronizeEntity selectedRow, CrudAPI crudapi, BusyIndicator voucherBusyIndicator)
@@ -273,11 +269,13 @@ namespace UnicontaClient.Pages.CustomPage
                             else
                             {
                                 var iTrans = Row as InvTrans;
-                                if (iTrans != null)
+                                if (iTrans != null && (iTrans._InvoiceRowId != 0 || iTrans._InvoiceNumber != 0))
                                 {
                                     postType = (byte)DCPostType.Invoice;
                                     dcType = iTrans._MovementType;
                                     invoiceNumber = iTrans._InvoiceNumber;
+                                    if (invoiceNumber == 0)
+                                        invoiceNumber = iTrans._InvoiceRowId;
                                 }
                                 else
                                     return;

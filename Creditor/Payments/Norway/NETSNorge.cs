@@ -136,8 +136,8 @@ namespace UnicontaClient.Creditor.Payments
                     var Cred = (Uniconta.DataModel.Creditor)Creditors.Get(rec.Account);
                     var abbreviatedname = Cred._Account;
                     var creditaccount = Cred._PaymentId;
-                    string internalreference = Convert.ToString(rec.Voucher);
-                    string externalreference = Convert.ToString(rec.Invoice);
+                    string internalreference = NumberConvert.ToString(rec.Voucher);
+                    string externalreference = rec.InvoiceAN;
 
                     //2.5 TRANSACTION RECORDS. 
                     //    AMOUNT POSTING 1. Type = 30, Page 6

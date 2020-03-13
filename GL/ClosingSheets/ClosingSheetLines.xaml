@@ -33,34 +33,12 @@ x:Class="UnicontaClient.Pages.CustomPage.ClosingSheetLines"
                                 </DataTemplate>
                             </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                         </localPage:CorasauDataGridTemplateColumnClient>
-                        <localPage:CorasauDataGridForeignKeyColumnClient x:Name="Account" Width="100">
-                            <localPage:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
-                                <ControlTemplate>
-                                    <TextBlock Margin="2" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.Account,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"></TextBlock>
-                                </ControlTemplate>
-                            </localPage:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
-                            <localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
-                                <DataTemplate>
-                                    <localPage:CorasauGridLookupEditorClient  x:Name="PART_Editor" ItemsSource="{Binding DataContext.RowData.Row.AccountSource,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" />
-                                </DataTemplate>
-                            </localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
-                        </localPage:CorasauDataGridForeignKeyColumnClient>
+                        <localPage:CorasauDataGridTemplateColumnClient x:Name="Account" Width="100" />
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="TransType"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Text" Width="200"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Code" Width="50"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Amount" Width="100"/>
-                        <localPage:CorasauDataGridForeignKeyColumnClient x:Name="OffsetAccount" Width="100">
-                            <localPage:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
-                                <ControlTemplate>
-                                    <TextBlock Margin="2" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.OffsetAccount,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"></TextBlock>
-                                </ControlTemplate>
-                            </localPage:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
-                            <localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
-                                <DataTemplate>
-                                    <localPage:CorasauGridLookupEditorClient  x:Name="PART_Editor" ItemsSource="{Binding DataContext.RowData.Row.AccountSource,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" />
-                                </DataTemplate>
-                            </localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
-                        </localPage:CorasauDataGridForeignKeyColumnClient>
+                        <localPage:CorasauDataGridTemplateColumnClient x:Name="OffsetAccount" Width="100" />
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Date" Width="80" Visible="False"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Voucher" Width="80" Visible="False"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Debit" Width="100" Visible="False"/>

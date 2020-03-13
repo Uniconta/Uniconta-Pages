@@ -16,6 +16,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Uniconta.API.Service;
+using Uniconta.ClientTools;
 using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
@@ -30,11 +31,13 @@ namespace UnicontaClient.Pages.CustomPage
 {
     public class EUSalesWithoutVATGrid : CorasauDataGridClient
     {
-        public override Type TableType { get { return typeof(EUSaleWithoutVATClient); } }
+        public override Type TableType { get { return typeof(EUSaleWithoutVAT); } }
         public override bool Readonly { get { return false; } }
     }
     public partial class EUSalesWithoutVATPage : GridBasePage
     {
+        SQLTableCache<GLVat> glVatCache;
+     
         public override string NameOfControl
         {
             get { return TabControls.EUSalesWithoutVATPage; }
@@ -46,8 +49,13 @@ namespace UnicontaClient.Pages.CustomPage
             InitPage();
         }
 
-        string cvrNumber;
+        private CreateEUSaleWithoutVATFile euSalesHelper;
+        private string companyRegNo;
+        private CountryCode companyCountryId;
         private double sumOfAmount;
+        private bool compressed;
+        static DateTime DefaultFromDate, DefaultToDate;
+
 
         private void InitPage()
         {
@@ -57,10 +65,49 @@ namespace UnicontaClient.Pages.CustomPage
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgEUSalesWithoutVATGrid.api = api;
             dgEUSalesWithoutVATGrid.BusyIndicator = busyIndicator;
+            dgEUSalesWithoutVATGrid.ShowTotalSummary();
             txtDateFrm.DateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 01);
             txtDateTo.DateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month));
             TriangularTradeAmount.Visible = false;
-            cvrNumber = api.CompanyEntity._Id;
+            companyRegNo = Regex.Replace(api.CompanyEntity._Id ?? string.Empty, "[^0-9]", "");
+            companyCountryId = api.CompanyEntity._CountryId;
+
+            euSalesHelper = new CreateEUSaleWithoutVATFile(api, companyRegNo, companyCountryId);
+
+            if (DefaultFromDate == DateTime.MinValue)
+            {
+                var now = BasePage.GetSystemDefaultDate();
+
+                var fromDate = new DateTime(now.Year, now.Month, 1);
+                fromDate = fromDate.AddMonths(-1);
+                
+                DefaultFromDate = fromDate;
+                DefaultToDate = fromDate.AddMonths(1).AddDays(-1);
+            }
+
+            txtDateTo.DateTime = DefaultToDate;
+            txtDateFrm.DateTime = DefaultFromDate;
+            SetDateTime(txtDateFrm, txtDateTo);
+
+            StartLoadCache();
+        }
+
+        public static void SetDateTime(DateEditor frmDateeditor, DateEditor todateeditor)
+        {
+            var now = BasePage.GetSystemDefaultDate();
+            if (frmDateeditor.Text == string.Empty)
+            {
+                var fromDate = new DateTime(now.Year, now.Month, 1);
+                fromDate = fromDate.AddMonths(-1);
+                DefaultFromDate = fromDate;
+            }
+            else
+                DefaultFromDate = frmDateeditor.DateTime.Date;
+
+            if (todateeditor.Text == string.Empty)
+                DefaultToDate = DefaultFromDate.AddMonths(1).AddDays(-1);
+            else
+                DefaultToDate = todateeditor.DateTime.Date;
         }
 
         public override Task InitQuery()
@@ -68,101 +115,44 @@ namespace UnicontaClient.Pages.CustomPage
             return null;
         }
 
-        protected override void LoadCacheInBackGround()
+        protected override async void LoadCacheInBackGround()
         {
+            if (glVatCache == null)
+                glVatCache = await api.LoadCache<Uniconta.DataModel.GLVat>().ConfigureAwait(false);
+           
             LoadType(new Type[] { typeof(Uniconta.DataModel.Debtor), typeof(Uniconta.DataModel.InvGroup) });
         }
 
         private void localMenu_OnItemClicked(string ActionType)
         {
-            var listEuSale = dgEUSalesWithoutVATGrid.GetVisibleRows() as IEnumerable<EUSaleWithoutVATClient>;
-            var selectedItem = dgEUSalesWithoutVATGrid.SelectedItem as EUSaleWithoutVATClient;
-            List<EUSaleWithoutVATClient> listOfFiles = null;
+            var listEuSale = dgEUSalesWithoutVATGrid.GetVisibleRows() as IEnumerable<EUSaleWithoutVAT>;
+            var selectedItem = dgEUSalesWithoutVATGrid.SelectedItem as EUSaleWithoutVAT;
 
             switch (ActionType)
             {
-                case "AddRow":
-                    var row = dgEUSalesWithoutVATGrid.AddRow() as EUSaleWithoutVATClient;
-                    if (row != null)
-                    {
-                        row.SetCompany(api.CompanyId);
-                        row.recNr = "2";
-                        row.euSaleDate = txtDateTo.DateTime;
-                        row.euCountry = EUCountries.Unknown;
-                        row.cvrNummer = Regex.Replace(cvrNumber, "[^0-9]", "");
-                    }
-                    break;
-
                 case "DeleteRow":
                     if (selectedItem != null)
                         dgEUSalesWithoutVATGrid.DeleteRow();
                     break;
 
-                case "Compress":
-                    break;
                 case "Validate":
-                    if (listEuSale != null)
-                    {
-                        listOfFiles = ValidateEuSaleList(listEuSale.ToList(), true);
-                        if (listOfFiles == null && listOfFiles.Count <= 0)
-                        {
-                            UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("ValidateFail"), Uniconta.ClientTools.Localization.lookup("Error"));
-                            break;
-                        }
-                    }
+                    if (listEuSale != null && listEuSale.Count() > 0)
+                        CallValidate(true);
                     break;
-                case "ImportFile":
-#if SILVERLIGHT
-                    var sfd = new System.Windows.Controls.SaveFileDialog
-                    {
-                        Filter = UtilFunctions.GetFilteredExtensions(FileextensionsTypes.CSV)
-                    };
-                    var userClickedSave = sfd.ShowDialog();
-#else
-                    var userClickedSave = true;
-#endif
+
+                case "Compress":
+                    if (listEuSale != null && listEuSale.Count() > 0)
+                        Compress();
+                    break;
+
+                case "Search":
                     if (listEuSale != null)
-                    {
-                        try
-                        {
-                            var result = ValidateEuSaleList(listEuSale.ToList(), false);
+                        btnSearch();
+                    break;
 
-                            if (result != null && result.Count > 0)
-                                if (userClickedSave != true)
-                                    listOfFiles = result;
-                                else
-                                {
-#if SILVERLIGHT
-                                    listOfFiles = CreateEUSaleWithoutVATFile.CreateEUSaleWithoutVATfile(result, api, sfd);
-#else
-                                    listOfFiles = CreateEUSaleWithoutVATFile.CreateEUSaleWithoutVATfile(result, api);
-#endif
-                                }
-                            else
-                            {
-                                UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("ValidateFail"), Uniconta.ClientTools.Localization.lookup("Error"));
-                                break;
-                            }
- 
-                            if (listOfFiles != null && listOfFiles.Count > 0)
-                            {
-                                var trinagleAmount = listOfFiles.Where(x => x.triangularTradeAmount != 0);
-
-                                if (trinagleAmount != null && trinagleAmount.Count() <= 0)
-                                    TriangularTradeAmount.Visible = true;
-                                else
-                                    TriangularTradeAmount.Visible = false;
-
-                                dgEUSalesWithoutVATGrid.ItemsSource = listOfFiles;
-                                dgEUSalesWithoutVATGrid.Visibility = Visibility.Visible;
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            UnicontaMessageBox.Show(e.Message, Uniconta.ClientTools.Localization.lookup("Exception"));
-                            throw;
-                        }
-                    }
+                case "CreateFile":
+                    if (listEuSale != null && listEuSale.Count() > 0)
+                        CreateFile();
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);
@@ -172,6 +162,9 @@ namespace UnicontaClient.Pages.CustomPage
 
         public async void GetInvoiceEuSale(DateTime fromDate, DateTime toDate)
         {
+            SetDateTime(txtDateFrm, txtDateTo);
+
+            busyIndicator.IsBusy = true;
             List<PropValuePair> propValPair = new List<PropValuePair>();
 
             if (fromDate != DateTime.MinValue || toDate != DateTime.MinValue)
@@ -187,222 +180,213 @@ namespace UnicontaClient.Pages.CustomPage
                 propValPair.Add(prop);
             }
 
-            var listOfDebInv = await api.Query<EUSaleWithoutVATClient>( propValPair);
+            if (glVatCache == null)
+                glVatCache = api.GetCache<Uniconta.DataModel.GLVat>() ?? await api.LoadCache<Uniconta.DataModel.GLVat>();
+
+            var vatEUList = glVatCache.Where(s => s._TypeSales == "s3" || s._TypeSales == "s4").Select(x => x._Vat).Distinct();
+            if (vatEUList != null && vatEUList.Count() > 0)
+            {
+                var strLst = string.Join(";", vatEUList);
+                propValPair.Add(PropValuePair.GenereteWhereElements(nameof(DebtorInvoiceLines.Vat), typeof(string), strLst));
+            }
             var listOfDebInvLines = await api.Query<DebtorInvoiceLines>(propValPair);
-            var listdeb = new List<EUSaleWithoutVATClient>();
+            List<EUSaleWithoutVAT> listdeb;
 
-            if ((listOfDebInv != null && listOfDebInv.ToList().Count != 0) && (listOfDebInvLines != null && listOfDebInvLines.ToList().Count != 0))
-                listdeb = UpdateValues(listOfDebInv.ToList(), listOfDebInvLines.ToList());
+            if (listOfDebInvLines != null && listOfDebInvLines.Length != 0)
+                listdeb = UpdateValues(listOfDebInvLines);
+            else
+                listdeb = new List<EUSaleWithoutVAT>();
 
-            if (listdeb == null || listdeb?.Count <= 0)
+            busyIndicator.IsBusy = false;
+
+            if (listdeb.Count == 0)
                 UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("zeroRecords"), Uniconta.ClientTools.Localization.lookup("Warning"));
 
             dgEUSalesWithoutVATGrid.ItemsSource = listdeb;
             dgEUSalesWithoutVATGrid.Visibility = Visibility.Visible;
         }
 
-        public List<EUSaleWithoutVATClient> UpdateValues(List<EUSaleWithoutVATClient> listOfDebInv, List<DebtorInvoiceLines> listOfDebInvLines)
+        public List<EUSaleWithoutVAT> UpdateValues(IEnumerable<DebtorInvoiceLines> listOfDebInvLines)
         {
-            var listOfResults = new List<EUSaleWithoutVATClient>();
+            var listOfResults = new List<EUSaleWithoutVAT>();
+            var companyCountryId = api.CompanyEntity._CountryId;
 
-            foreach (var invoice in listOfDebInv)
+            foreach (var invLine in listOfDebInvLines)
             {
-                var inv = new EUSaleWithoutVATClient();
-                inv.SetCompany(invoice.CompanyId);
-                inv.recNr = "2";
+                var debtor = invLine.Debtor;
 
-                inv.euSaleDate = invoice.Date;
-                if (inv.euSaleDate == DateTime.MinValue)
+                if (invLine._Item == null || debtor._Country == companyCountryId || !Country2Language.IsEU(debtor._Country))
                     continue;
 
-                var debtor = invoice.Debtor;
+                var invoice = new EUSaleWithoutVAT();
+                invoice._CompanyId = api.CompanyId;
+                invoice.CompanyRegNo = companyRegNo;
+                invoice.Account = invLine._DCAccount;
+                invoice.RecordType = "2";
+                invoice.ReferenceNumber = "X";
+                invoice.Date = invLine._Date;
+                invoice.InvoiceNumber = invLine._InvoiceNumber;
+                invoice.Item = invLine._Item;
+                invoice.Vat = invLine._Vat;
 
-                if (debtor == null)
-                    continue;
-
-                inv._DCAccount = invoice._DCAccount;
-                
-
-                CountryCode? country = debtor._Country;
-                if (country.Value == api.CompanyEntity._CountryId)
-                    continue;
-
-                if (Uniconta.Common.Enums.Country2Language.IsEU(country.Value))
-                    inv.euCountry = (EUCountries)Enum.Parse(typeof(EUCountries), country.Value.ToString(), true);
-                else if (country.Value == CountryCode.Unknown)
-                    inv.euCountry = EUCountries.Unknown;
-                else
-                    continue;
-
-                inv.VATBuyerNummer = debtor.CompanyRegNo;
-
-                if (string.IsNullOrWhiteSpace(inv.vatBuyerNummer))
-                    inv.systemField = string.Format(Uniconta.ClientTools.Localization.lookup("MissingOBJ"), Uniconta.ClientTools.Localization.lookup("VATNumber"));
-
-                foreach (var invLine in listOfDebInvLines)
+                switch (invLine.InvItem._ItemType)
                 {
-                    var item = invLine.InvItem;
-
-                    if (item == null)
-                        continue;
-
-                    if (invLine.InvoiceNumber != invoice.InvoiceNumber || invoice._DCAccount != invLine._DCAccount)
-                        continue;
-
-                    inv.interntRefNr = "X";
-                    inv._InvoiceNumber = invoice._InvoiceNumber;
-
-                    switch (item._ItemType)
-                    {
-                        case (byte)Uniconta.DataModel.ItemType.Service:
-                            inv.serviceAmount += NetAmount(invLine);
-                            break;
-                        default:
-                            inv.itemAmount += NetAmount(invLine);
-                            break;
-                    }
+                    case (byte)Uniconta.DataModel.ItemType.Service:
+                        invoice.ServiceAmount += -invLine.NetAmount;
+                        break;
+                    default:
+                        invoice.ItemAmount += -invLine.NetAmount;
+                        break;
                 }
 
-                if (inv.itemAmount == 0 && inv.serviceAmount == 0)
+                var debtorCVR = debtor.CompanyRegNo;
+                if (debtorCVR != null)
+                {
+                    long value;
+                    if (!long.TryParse(debtorCVR, out value))
+                    {
+                        debtorCVR = Regex.Replace(debtorCVR, @"[-/ ]", "");
+                    }
+
+                    if (char.IsLetter(debtorCVR[0]) && char.IsLetter(debtorCVR[1]))
+                        debtorCVR = debtorCVR.Substring(2);
+
+                    invoice._DebtorRegNoFile = debtorCVR;
+                }
+
+                if (invoice.ItemAmount == 0 && invoice.ServiceAmount == 0)
                     continue;
 
-                sumOfAmount = sumOfAmount + inv.ItemAmount + inv.ServiceAmount;
+                sumOfAmount = sumOfAmount + invoice.ItemAmount + invoice.ServiceAmount;
+                listOfResults.Add(invoice);
+            };
 
-                listOfResults.Add(inv);
-            }
             return listOfResults;
         }
 
-        public double NetAmount(DebtorInvoiceLines line)
+        private bool CallPrevalidate()
         {
-            var p = line._Price * line.InvoiceQty;
-            if (p != 0d)
-            {
-                if (line._DiscountPct != 0 || line._EndDiscountPct != 0)
-                    p = p * (100d - line._DiscountPct) * (100d - line._EndDiscountPct) / 10000d;
-                return GLVat.Round(p, (line._Flags & 0x80) != 0);
-            }
-            else if (line._EndDiscountPct == 0d)
-                return line._AmountEntered;
-            else
-                return GLVat.Round(line._AmountEntered * (100d - line._EndDiscountPct) / 100d, (line._Flags & 0x80) != 0);
+            return euSalesHelper.PreValidate();
         }
 
-        public List<EUSaleWithoutVATClient> ValidateEuSaleList(List<EUSaleWithoutVATClient> listOfEU, bool isOnlyValidate)
+        private IEnumerable<EUSaleWithoutVAT> CallValidate(bool onlyValidate)
         {
-            if (!Country2Language.IsEU(api.CompanyEntity._CountryId))
-            {
-                UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("AccountCountryNotEu"), Uniconta.ClientTools.Localization.lookup("Warning"));
+            if (!CallPrevalidate())
                 return null;
-            }
-            if (string.IsNullOrWhiteSpace(cvrNumber))
+
+            dgEUSalesWithoutVATGrid.Columns.GetColumnByName("SystemInfo").Visible = true;
+
+            var listOfEU = (IEnumerable<EUSaleWithoutVAT>)dgEUSalesWithoutVATGrid.GetVisibleRows();
+            euSalesHelper.Validate(listOfEU, compressed, onlyValidate);
+
+            if (onlyValidate)
             {
-                UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("MissingOBJ"), Uniconta.ClientTools.Localization.lookup("VATNumber")), Uniconta.ClientTools.Localization.lookup("Warning"));
-                return null;
+                var countErr = listOfEU.Count(s => s.SystemInfo != CreateEUSaleWithoutVATFile.VALIDATE_OK);
+                if (countErr == 0)
+                    UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("ValidateNoError"), Uniconta.ClientTools.Localization.lookup("Validation"), MessageBoxButton.OK, MessageBoxImage.Information);
+                else
+                    UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("ValidateFailInLines"), countErr), Uniconta.ClientTools.Localization.lookup("Validation"), MessageBoxButton.OK, MessageBoxImage.Warning);
             }
 
-            var companyCountry = (EUCountries)Enum.Parse(typeof(EUCountries), api.CompanyEntity._CountryId.ToString(), true);
-            var notValidated = new List<IntrastatClient>();
-            var ikkeMedtaget = 0;
+            return listOfEU;
+        }
 
-            foreach (var euSale in listOfEU)
+
+        private void Compress()
+        {
+            try
             {
-                euSale.cvrNummer = Regex.Replace(cvrNumber, "[^0-9]", "");
+                if (!CallPrevalidate())
+                    return;
 
-                var hasErrors = false;
-                euSale.systemInfo = "";
-                if (euSale.itemAmount == 0 && euSale.serviceAmount == 0)
+                var listOfEU = euSalesHelper.CompressEUsale((IEnumerable<EUSaleWithoutVAT>)dgEUSalesWithoutVATGrid.GetVisibleRows());
+                if (listOfEU == null || listOfEU.Count == 0)
+                    UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("NoLinesFound"), Uniconta.ClientTools.Localization.lookup("Warning"));
+                else
                 {
-                    hasErrors = true;
-                    euSale.systemInfo += Uniconta.ClientTools.Localization.lookup("NoValues") + ".\n";
+                    var cols = dgEUSalesWithoutVATGrid.Columns;
+                    cols.GetColumnByName("InvoiceNumber").Visible = false;
+                    cols.GetColumnByName("Item").Visible = false;
+                    cols.GetColumnByName("Vat").Visible = false;
+                    cols.GetColumnByName("ItemName").Visible = false;
+                    cols.GetColumnByName("Compressed").Visible = true;
+                    cols.GetColumnByName("TriangularTradeAmount").Visible = true;
+                    cols.GetColumnByName("SystemInfo").Visible = true;
+                    dgEUSalesWithoutVATGrid.ItemsSource = listOfEU;
+                    dgEUSalesWithoutVATGrid.Visibility = Visibility.Visible;
+                    dgEUSalesWithoutVATGrid.UpdateTotalSummary();
+
+                    compressed = true;
+
+                    CallValidate(true);
                 }
-                if (euSale.EUCountry == EUCountries.Unknown)
+            }
+            catch (Exception e)
+            {
+                UnicontaMessageBox.Show(e, Uniconta.ClientTools.Localization.lookup("Exception"));
+                throw;
+            }
+        }
+
+        private void CreateFile()
+        {
+            try
+            {
+                if (compressed == false)
                 {
-                    hasErrors = true;
-                    euSale.systemInfo = euSale.systemInfo + Uniconta.ClientTools.Localization.lookup("CountryNotSet") + ".\n";
-                }
-                if (euSale.EUCountry == companyCountry)
-                {
-                    hasErrors = true;
-                    euSale.systemInfo = euSale.systemInfo + Uniconta.ClientTools.Localization.lookup("OwnCountryProblem") + ".\n";
+                    UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("CompressPosting"), Uniconta.ClientTools.Localization.lookup("Warning"));
+                    return;
                 }
 
-                var vatBuyerNummer = euSale.vatBuyerNummer;
+                var listOfEU = CallValidate(false);
+                if (listOfEU == null)
+                    return;
 
-                if (vatBuyerNummer == null || vatBuyerNummer.Length == 0)
+                var countErr = listOfEU.Count(s => s.SystemInfo != CreateEUSaleWithoutVATFile.VALIDATE_OK);
+                var countOk = listOfEU.Count() - countErr;
+
+                if (listOfEU.Count() > 0)
                 {
-                    hasErrors = true;
-                    euSale.systemInfo += string.Format(Uniconta.ClientTools.Localization.lookup("MissingOBJ"), Uniconta.ClientTools.Localization.lookup("VATNumber")) + ".\n";
+                    if (euSalesHelper.CreateFile(listOfEU))
+                    {
+                        var msgTxt = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Exported"), countOk);
+                        if (countErr > 0)
+                            msgTxt = string.Concat(msgTxt, string.Format("\n{0}: {1}", Uniconta.ClientTools.Localization.lookup("Error"), countErr));
+                        UnicontaMessageBox.Show(msgTxt, Uniconta.ClientTools.Localization.lookup("Message"));
+                    }
                 }
                 else
                 {
-                    if (char.IsLetter(vatBuyerNummer.Substring(0, 2)[0]) && char.IsLetter(vatBuyerNummer.Substring(0, 2)[1]))
-                        vatBuyerNummer = vatBuyerNummer.Substring(2);
-                    
-                     vatBuyerNummer = Regex.Replace(vatBuyerNummer, " ", "");
-
-                    if (vatBuyerNummer.Length > 12)
-                    {
-                        hasErrors = true;
-                        euSale.systemInfo += string.Format(Uniconta.ClientTools.Localization.lookup("FieldTooLongOBJ"), Uniconta.ClientTools.Localization.lookup("VATNumber")) + ".\n";
-                    }
-                    else
-                        euSale.vatBuyerNummer = vatBuyerNummer;
+                    UnicontaMessageBox.Show(string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Exported"), countOk), Uniconta.ClientTools.Localization.lookup("Message"));
                 }
-
-                if (string.IsNullOrWhiteSpace(euSale.systemInfo))
-                    euSale.systemInfo = Uniconta.ClientTools.Localization.lookup("OK");
-
-                if (hasErrors)
-                    ikkeMedtaget++;
-
             }
-
-            if (ikkeMedtaget <= 0)
+            catch (Exception e)
             {
-                dgEUSalesWithoutVATGrid.ItemsSource = listOfEU;
-                dgEUSalesWithoutVATGrid.Visibility = Visibility.Visible;
-                return listOfEU;
+                UnicontaMessageBox.Show(e, Uniconta.ClientTools.Localization.lookup("Exception"));
+                throw;
             }
-
-            if (isOnlyValidate)
-            {
-                UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("ValidateFailInLines"), ikkeMedtaget), Uniconta.ClientTools.Localization.lookup("Error"));
-            }
-            else if (!isOnlyValidate)
-            {
-                var messageOfNotIncluded = string.Format(Uniconta.ClientTools.Localization.lookup("SkipNotValidatedLines"), ikkeMedtaget);
-
-#if !SILVERLIGHT
-                var result = UnicontaMessageBox.Show(messageOfNotIncluded, Uniconta.ClientTools.Localization.lookup("Error"), MessageBoxButton.YesNo);
-                if (MessageBoxResult.No == result)
-                    return null;
-#else
-                var result = UnicontaMessageBox.Show(messageOfNotIncluded, Uniconta.ClientTools.Localization.lookup("Error"), MessageBoxButton.OKCancel);
-                 if (MessageBoxResult.Cancel == result)
-                    return null;
-#endif
-
-            }
-
-            dgEUSalesWithoutVATGrid.ItemsSource = listOfEU;
-            dgEUSalesWithoutVATGrid.Visibility = Visibility.Visible;
-
-            return listOfEU?.Count > 0 ? listOfEU : null;
         }
 
         public override bool IsDataChaged { get { return false; } }
 
-        public override bool HandledOnClearFilter()
+        private void btnSearch()
         {
-            BtnSearch_OnClick(null, null);
-            return true;
+            var cols = dgEUSalesWithoutVATGrid.Columns;
+            cols.GetColumnByName("TriangularTradeAmount").Visible = false;
+            cols.GetColumnByName("InvoiceNumber").Visible = true;
+            cols.GetColumnByName("Item").Visible = true;
+            cols.GetColumnByName("ItemName").Visible = true;
+            cols.GetColumnByName("Vat").Visible = true;
+            cols.GetColumnByName("Compressed").Visible = false;
+
+            compressed = false;
+            GetInvoiceEuSale(txtDateFrm.DateTime, txtDateTo.DateTime);
         }
 
-        private void BtnSearch_OnClick(object sender, RoutedEventArgs e)
+        public override bool HandledOnClearFilter()
         {
-            TriangularTradeAmount.Visible = false;
-            GetInvoiceEuSale(txtDateFrm.DateTime, txtDateTo.DateTime);
+            btnSearch();
+            return true;
         }
     }
 }

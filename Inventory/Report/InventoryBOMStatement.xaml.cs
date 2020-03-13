@@ -221,7 +221,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 ExpandAndCollapseAll(false);
                 ibase.Caption = Uniconta.ClientTools.Localization.lookup("CollapseAll");
-                ibase.LargeGlyph = UnicontaClient.Utilities.Utility.GetGlyph(";component/Assets/img/Collapse_32x32.png");
+                ibase.LargeGlyph = UnicontaClient.Utilities.Utility.GetGlyph("Collapse_32x32.png");
             }
             else
             {
@@ -229,7 +229,7 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     ExpandAndCollapseAll(true);
                     ibase.Caption = Uniconta.ClientTools.Localization.lookup("ExpandAll");
-                    ibase.LargeGlyph = UnicontaClient.Utilities.Utility.GetGlyph(";component/Assets/img/Expand_32x32.png");
+                    ibase.LargeGlyph = UnicontaClient.Utilities.Utility.GetGlyph("Expand_32x32.png");
                 }
             }
         }

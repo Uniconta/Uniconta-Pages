@@ -45,6 +45,8 @@ namespace UnicontaClient.Pages.CustomPage
             SetRibbonControl(localMenu, dgInvSeriesBatchGrid);
             dgInvSeriesBatchGrid.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += LocalMenu_OnItemClicked;
+
+            txtQty.Text = Math.Abs(this.invTrans._Qty).ToString();
         }
 
         private void LocalMenu_OnItemClicked(string ActionType)
@@ -55,14 +57,19 @@ namespace UnicontaClient.Pages.CustomPage
                 case "AttachSerieBatch":
                     if (selectedItem == null)
                         return;
-                    AttachSerieBatch(selectedItem as InvSerieBatch);
+                    double qty = Math.Abs(Uniconta.Common.Utility.NumberConvert.ToDoubleNoThousandSeperator(txtQty.Text));
+                    if (qty == 0d)
+                    {
+                        UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("CannotBeBlank"), Uniconta.ClientTools.Localization.lookup("Qty")), Uniconta.ClientTools.Localization.lookup("Warning")); 
+                        return;
+                    }
+                    AttachSerieBatch(selectedItem, qty);
                     break;
             }
         }
-        async void AttachSerieBatch(InvSerieBatch selectedItem)
+        async void AttachSerieBatch(InvSerieBatch selectedItem, double qty)
         {
             var objTransactionsAPI = new TransactionsAPI(api);
-            double qty = Uniconta.Common.Utility.NumberConvert.ToDoubleNoThousandSeperator(txtQty.Text);
             var res = await objTransactionsAPI.AttachSerieBatch(invTrans, selectedItem, qty);
             if (res != ErrorCodes.Succes)
                 UtilDisplay.ShowErrorCode(res);

@@ -98,7 +98,7 @@ namespace ISO20022CreditTransfer
             }
             catch (Exception ex)
             {
-                UnicontaMessageBox.Show(ex.Message, Uniconta.ClientTools.Localization.lookup("Exception"), System.Windows.MessageBoxButton.OK);
+                UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"), System.Windows.MessageBoxButton.OK);
                 return;
             }
         }

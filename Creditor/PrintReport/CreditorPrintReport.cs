@@ -72,6 +72,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             try
             {
+                var crudApi = this.crudApi;
                 var Comp = crudApi.CompanyEntity;
                 var creditorInvoiceLineUserType = ReportUtil.GetUserType(typeof(CreditorInvoiceLines), Comp);
                 var creditorInvoiceUserType = ReportUtil.GetUserType(typeof(CreditorInvoiceClient), Comp);
@@ -121,7 +122,7 @@ namespace UnicontaClient.Pages.CustomPage
                 CreditorInvoice = creditorInvoiceClientUser;
 
                 //for Gettting user fields for Creditor
-                var dcCahce = Comp.GetCache(typeof(Uniconta.DataModel.Creditor)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.Creditor), crudApi);
+                var dcCahce = Comp.GetCache(typeof(Uniconta.DataModel.Creditor)) ?? await crudApi.LoadCache(typeof(Uniconta.DataModel.Creditor));
                 var cred = dcCahce.Get(CreditorInvoice._DCAccount);
 
                 var creditorUserType = ReportUtil.GetUserType(typeof(CreditorClient), Comp);
@@ -135,8 +136,13 @@ namespace UnicontaClient.Pages.CustomPage
                 else
                     Creditor = cred as CreditorClient;
 
-                var contacts = await crudApi.Query<ContactClient>(Creditor);
-                Creditor.Contacts = contacts;
+                if (Comp.Contacts)
+                {
+                    var contactCache = Comp.GetCache(typeof(Contact)) ?? await crudApi.LoadCache(typeof(Contact));
+                    var contactCacheFilter = new ContactCacheFilter(contactCache, Creditor.__DCType(), Creditor._Account);
+                    var contacts = contactCacheFilter.Cast<ContactClient>().ToArray();
+                    Creditor.Contacts = contacts;
+                }
                 UnicontaClient.Pages.DebtorOrders.SetDeliveryAdress(creditorInvoiceClientUser, Creditor, crudApi);
 
                 /*In case debtor order is null, fill from DCInvoice*/
@@ -150,7 +156,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                 Company = Utility.GetCompanyClientUserInstance(Comp);
 
-                var InvCache = Comp.GetCache(typeof(InvItem)) ?? await Comp.LoadCache(typeof(InvItem), crudApi);
+                var InvCache = Comp.GetCache(typeof(InvItem)) ?? await crudApi.LoadCache(typeof(InvItem));
 
                 CompanyLogo = await Uniconta.ClientTools.Util.UtilDisplay.GetLogo(crudApi);
 

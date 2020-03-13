@@ -47,6 +47,57 @@ x:Class="UnicontaClient.Pages.CustomPage.AttachVoucherGridPage"
                         <local:CorasauDataGridTemplateColumnClient x:Name="Amount" Width="80" />
                         <local:CorasauDataGridTemplateColumnClient x:Name="Invoice" Width="60" />
                         <local:CorasauDataGridTemplateColumnClient x:Name="Text" MinWidth="300" />
+                        <local:CorasauDataGridTemplateColumnClient x:Name="InJournal" ShowCheckBoxInHeader="False" HideHeaderCheck="True" ReadOnly="True" Width="60" Visible="False"/>
+                        <local:CorasauDataGridTemplateColumnClient x:Name="PostingDate" Width="85"/>
+                        <local:CorasauDataGridTemplateColumnClient x:Name="Voucher" Width="60" Visible="False" />
+                        <local:CorasauDataGridTemplateColumnClient x:Name="Debit" Width="85" Visible="False"/>
+                        <local:CorasauDataGridTemplateColumnClient x:Name="Credit" Width="85" Visible="False"/>
+                        <local:CorasauDataGridTemplateColumnClient x:Name="Currency" Width="35" Visible="False" />
+                        <local:CorasauDataGridTemplateColumnClient x:Name="HasOffSetAccounts" Width="30" Visible="False" />
+                        <local:CorasauDataGridTemplateColumnClient x:Name="CostAccount" Width="80" Visible="False"/>
+                        <local:CorasauDataGridTemplateColumnClient x:Name="PayAccount" Width="80" Visible="False"/>
+                        <local:CorasauDataGridTemplateColumnClient x:Name="CreditorAccount" Width="80" Visible="False"/>
+                        <local:CorasauDataGridTemplateColumnClient x:Name="Vat" Width="60" Visible="False"/>
+                        <local:CorasauDataGridTemplateColumnClient x:Name="Project" Visible="False" Width="90"/>
+                        <local:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Visible="False" Width="90"/>
+                        <local:CorasauDataGridTemplateColumnClient x:Name="PaymentMethod" Width="80" Visible="False" />
+                        <local:CorasauDataGridTemplateColumnClient x:Name="PaymentId" MinWidth="100" Visible="False"/>
+                        <local:CorasauDataGridTemplateColumnClient x:Name="Approver1" Visible="False" Width="80"/>
+                        <local:CorasauDataGridTemplateColumnClient x:Name="Approver2" Visible="False" Width="80"/>
+                        <local:CorasauDataGridTemplateColumnClient x:Name="DocumentDate" Visible="False" Width="85"/>
+                        <local:CorasauDataGridTemplateColumnClient x:Name="Url" Visible="False"/>
+                        <local:CorasauDataGridTemplateColumnClient x:Name="Approved"  HideHeaderCheck="True" Width="70" Visible="False"/>
+                        <local:CorasauDataGridTemplateColumnClient x:Name="Approved2" HideHeaderCheck="True" Width="70" Visible="False"/>
+                        <local:CorasauDataGridTemplateColumnClient x:Name="SentToBilagscan" Width="70" Visible="False"/>
+                        <local:CorasauDataGridTemplateColumnClient x:Name="UserLogidId" Width="100"  Visible="False"/>
+                        <local:CorasauDataGridTemplateColumnClient x:Name="Envelope"  Visible="False" Width="55" />
+                        <local:CorasauDataGridTemplateColumnClient x:Name="PayDate"  Width="85" Visible="False" />
+                        <local:CorasauDataGridTemplateColumnClient x:Name="VatOperation"  Visible="False"/>
+                        <local:CorasauDataGridTemplateColumnClient x:Name="TransType"  Visible="False" />
+                        <local:CorasauDataGridTemplateColumnClient x:Name="PurchaseNumber" Width="85" Visible="False" />
+                        <local:CorasauDataGridTemplateColumnClient x:Name="clDim1" Width="70" FieldName="Dimension1" Visible="False" />
+                        <local:CorasauDataGridTemplateColumnClient x:Name="clDim2" Width="70" FieldName="Dimension2" Visible="False" />
+                        <local:CorasauDataGridTemplateColumnClient x:Name="clDim3" Width="70" FieldName="Dimension3" Visible="False" />
+                        <local:CorasauDataGridTemplateColumnClient x:Name="clDim4" Width="70" FieldName="Dimension4" Visible="False" />
+                        <local:CorasauDataGridTemplateColumnClient x:Name="clDim5" Width="70" FieldName="Dimension5" Visible="False" />
+                        <local:CorasauDataGridTemplateColumnClient x:Name="CreditorName" Visible="False"/>
+                        <local:CorasauDataGridTemplateColumnClient x:Name="CostAccountName" Visible="False"/>
+                        <local:CorasauDataGridTemplateColumnClient x:Name="PayAccountName" Visible="False"/>
+                        <local:CorasauDataGridTemplateColumnClient x:Name="Approver1Name" Visible="False" />
+                        <local:CorasauDataGridTemplateColumnClient x:Name="Approved1Date" ShowTime="True" Visible="False" />
+                        <local:CorasauDataGridTemplateColumnClient x:Name="Approver2Name" Visible="False" />
+                        <local:CorasauDataGridTemplateColumnClient x:Name="Approved2Date" ShowTime="True"  Visible="False" />
+                        <local:CorasauDataGridTemplateColumnClient x:Name="ProjectName" Visible="False"/>
+                        <local:CorasauDataGridTemplateColumnClient x:Name="CategoryName" Visible="False"/>
+                        <local:CorasauDataGridTemplateColumnClient x:Name="Qty" Visible="False" AllowThousandMask="True" Mask="N2"/>
+                        <local:CorasauDataGridTemplateColumnClient x:Name="SizeKB" Visible="False"/>
+                        <local:CorasauDataGridTemplateColumnClient x:Name="OnHold" Visible="False"/>
+                        <local:CorasauDataGridTemplateColumnClient x:Name="Reference" Visible="False" />
+                        <local:CorasauDataGridTemplateColumnClient x:Name="ViewInFolder" Visible="True" ColumnFilterMode="DisplayText" />
+                        <local:CorasauDataGridTemplateColumnClient x:Name="Split" Visible="False" />
+                        <local:CorasauDataGridTemplateColumnClient x:Name="SplitFromDate" Visible="False" />
+                        <local:CorasauDataGridTemplateColumnClient x:Name="SplitToDate" Visible="False" />
+                        <local:CorasauDataGridTemplateColumnClient x:Name="FromEmail" Visible="False" />
                     </local:VouchersGrid.Columns>
                 </local:VouchersGrid>
                 <GridSplitter HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="{StaticResource BodyTextColorBrush}" Grid.Column="1" ShowsPreview="True" />

@@ -101,6 +101,17 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
 
             danishFields.TextToBeneficiary = message.Length > 20 ? message.Substring(0, 20) : message;
 
+            //Extended notification
+            if (paymentFormat._ExtendedText)
+            {
+                if (message == null || message.Length <= 20)
+                    message = string.Empty;
+            }
+            else
+            {
+                message = string.Empty;
+            }
+
             int maxStrLen = 35;
             int maxLines = 41;
 

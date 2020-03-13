@@ -21,7 +21,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
-using Uniconta.API.DebtorCreditor;
+using Uniconta.API.GeneralLedger;
 using Uniconta.API.Service;
 using Uniconta.ClientTools;
 using Uniconta.ClientTools.Controls;
@@ -130,13 +130,13 @@ namespace UnicontaClient.Pages.CustomPage
         public string Journal { get; set; }
 
         SQLCache accountCache;
-        ItemBase ibase;
+        ItemBase ibase, ibaseCurrent;
         List<AccountStatementList> statementList;
-        Uniconta.API.GeneralLedger.ReportAPI transApi;
+        ReportAPI transApi;
         Uniconta.DataModel.GLAccount _master;
 
         static public DateTime DefaultFromDate, DefaultToDate;
-
+        static bool IsCollapsed = true;
         public static void SetDateTime(DateEditor frmDateeditor, DateEditor todateeditor)
         {
             if (frmDateeditor.Text == string.Empty)
@@ -149,7 +149,7 @@ namespace UnicontaClient.Pages.CustomPage
                 DefaultToDate = todateeditor.DateTime.Date;
         }
 
-        public AccountStatement(BaseAPI API):base(API, string.Empty)
+        public AccountStatement(BaseAPI API) : base(API, string.Empty)
         {
             Init(null);
         }
@@ -234,7 +234,10 @@ namespace UnicontaClient.Pages.CustomPage
 
             accountCache = Comp.GetCache(typeof(Uniconta.DataModel.GLAccount));
             InitialLoad();
-
+            dgGLTrans.RowDoubleClick += DgGLTrans_RowDoubleClick;
+            dgGLTrans.SelectedItemChanged += DgGLTrans_SelectedItemChanged;
+            dgGLTrans.MasterRowExpanded += DgGLTrans_MasterRowExpanded;
+            dgGLTrans.MasterRowCollapsed += DgGLTrans_MasterRowCollapsed;
             dgGLTrans.ShowTotalSummary();
 #if SILVERLIGHT
             childDgGLTrans.CurrentItemChanged += ChildDgDebtorTrans_CurrentItemChanged;
@@ -248,6 +251,33 @@ namespace UnicontaClient.Pages.CustomPage
                 cmbToAccount.EditValue = _master._Account;
                 LoadGLTrans();
             }
+        }
+
+        private void DgGLTrans_MasterRowCollapsed(object sender, RowEventArgs e)
+        {
+            SetExpandCurrent();
+        }
+
+        private void DgGLTrans_MasterRowExpanded(object sender, RowEventArgs e)
+        {
+            SetCollapseCurrent();
+        }
+
+        private void DgGLTrans_SelectedItemChanged(object sender, SelectedItemChangedEventArgs e)
+        {
+#if SILVERLIGHT
+            if(dgGLTrans.SelectedItem == null || dgGLTrans.Visibility == Visibility.Collapsed)
+#else
+            if (dgGLTrans.SelectedItem == null || !dgGLTrans.IsVisible)
+#endif
+                return;
+
+            SetExpandAndCollapseCurrent(false, false);
+        }
+
+        private void DgGLTrans_RowDoubleClick()
+        {
+            LocalMenu_OnItemClicked("VoucherTransactions");
         }
 
         void MasterRowExpanded(object sender, RowEventArgs e)
@@ -278,7 +308,7 @@ namespace UnicontaClient.Pages.CustomPage
         List<OperandProperty> operands;
         AggregateOperand GetDetailFilter(string searchString)
         {
-            if(operands== null)
+            if (operands == null)
             {
                 var visibleColumns = childDgGLTrans.Columns.Where(c => c.Visible).Select(c => string.IsNullOrEmpty(c.FieldName) ? c.Name : c.FieldName);
                 operands = new List<OperandProperty>();
@@ -288,7 +318,7 @@ namespace UnicontaClient.Pages.CustomPage
             GroupOperator detailOperator = new GroupOperator(GroupOperatorType.Or);
             foreach (var op in operands)
                 detailOperator.Operands.Add(new FunctionOperator(FunctionOperatorType.Contains, op, new OperandValue(searchString)));
-            return new AggregateOperand("ChildRecords", Aggregate.Exists , detailOperator);
+            return new AggregateOperand("ChildRecords", Aggregate.Exists, detailOperator);
         }
 #endif
         public override Task InitQuery()
@@ -344,10 +374,19 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "ExpandAndCollapse":
                     if (dgGLTrans.ItemsSource != null)
-                        SetExpandAndCollapse(dgGLTrans.IsMasterRowExpanded(0));
+                    {
+                        IsCollapsed = dgGLTrans.IsMasterRowExpanded(0);
+                        SetExpandAndCollapse(IsCollapsed);
+                    }
                     break;
                 case "Search":
                     LoadGLTrans();
+                    break;
+                case "ExpandCollapseCurrent":
+                    if (dgGLTrans.SelectedItem != null)
+                        SetExpandAndCollapseCurrent(true, false);
+                    else if (childDgGLTrans.SelectedItem != null)
+                        SetExpandAndCollapseCurrent(true, true);
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);
@@ -363,6 +402,63 @@ namespace UnicontaClient.Pages.CustomPage
             childDgGLTrans.syncEntity.Row = detailsSelectedItem;
         }
 #endif
+        private void SetExpandAndCollapseCurrent(bool changeState, bool isChild)
+        {
+            if (ibaseCurrent == null)
+                return;
+
+            bool expandState = true;
+            int selectedMasterRowHandle;
+
+            if (!isChild)
+            {
+                var selectedRowHandle = dgGLTrans.GetSelectedRowHandles();
+                selectedMasterRowHandle = selectedRowHandle.FirstOrDefault();
+                expandState = dgGLTrans.IsMasterRowExpanded(selectedRowHandle.FirstOrDefault());
+            }
+            else
+                selectedMasterRowHandle = ((TableView)dgGLTrans.View.MasterRootRowsContainer.FocusedView).Grid.GetMasterRowHandle();
+
+            if (!expandState)
+            {
+                if (changeState)
+                {
+                    ExpandAndCollapseCurrent(false, selectedMasterRowHandle);
+                    SetCollapseCurrent();
+                }
+                else
+                    SetExpandCurrent();
+            }
+            else
+            {
+                if (changeState)
+                {
+                    ExpandAndCollapseCurrent(true, selectedMasterRowHandle);
+                    SetExpandCurrent();
+                }
+                else
+                    SetCollapseCurrent();
+            }
+        }
+
+        private void SetCollapseCurrent()
+        {
+            if (ibaseCurrent == null)
+                return;
+
+            ibaseCurrent.Caption = Uniconta.ClientTools.Localization.lookup("CollapseCurrent");
+            ibaseCurrent.LargeGlyph = Utility.GetGlyph("Collapse_32x32.png");
+        }
+
+        private void SetExpandCurrent()
+        {
+            if (ibaseCurrent == null)
+                return;
+
+            ibaseCurrent.Caption = Uniconta.ClientTools.Localization.lookup("ExpandCurrent");
+            ibaseCurrent.LargeGlyph = Utilities.Utility.GetGlyph("Expand_32x32.png");
+        }
+
         bool manualExpanded = false;
         private void SetExpandAndCollapse(bool expandState)
         {
@@ -374,7 +470,7 @@ namespace UnicontaClient.Pages.CustomPage
                 manualExpanded = true;
                 ExpandAndCollapseAll(false);
                 ibase.Caption = Uniconta.ClientTools.Localization.lookup("CollapseAll");
-                ibase.LargeGlyph = Utilities.Utility.GetGlyph(";component/Assets/img/Collapse_32x32.png");
+                ibase.LargeGlyph = Utilities.Utility.GetGlyph("Collapse_32x32.png");
             }
             else
             {
@@ -382,7 +478,7 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     ExpandAndCollapseAll(true);
                     ibase.Caption = Uniconta.ClientTools.Localization.lookup("ExpandAll");
-                    ibase.LargeGlyph = Utilities.Utility.GetGlyph(";component/Assets/img/Expand_32x32.png");
+                    ibase.LargeGlyph = Utilities.Utility.GetGlyph("Expand_32x32.png");
                 }
             }
         }
@@ -391,6 +487,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             RibbonBase rb = (RibbonBase)localMenu.DataContext;
             ibase = UtilDisplay.GetMenuCommandByName(rb, "ExpandAndCollapse");
+            ibaseCurrent = UtilDisplay.GetMenuCommandByName(rb, "ExpandCollapseCurrent");
         }
 
         void ExpandAndCollapseAll(bool IsCollapseAll)
@@ -402,6 +499,14 @@ namespace UnicontaClient.Pages.CustomPage
                     dgGLTrans.ExpandMasterRow(iRow);
                 else
                     dgGLTrans.CollapseMasterRow(iRow);
+        }
+
+        void ExpandAndCollapseCurrent(bool IsCollapseAll, int currentRowHandle)
+        {
+            if (!IsCollapseAll)
+                dgGLTrans.ExpandMasterRow(currentRowHandle);
+            else
+                dgGLTrans.CollapseMasterRow(currentRowHandle);
         }
 
         bool SimulatedVisible;
@@ -451,7 +556,7 @@ namespace UnicontaClient.Pages.CustomPage
             Simulated.Visible = SimulatedVisible && !string.IsNullOrWhiteSpace(journal);
 
             var dimensionParams = BalanceReport.SetDimensionParameters(dim1, dim2, dim3, dim4, dim5, true, true, true, true, true);
-            var listTrans = (GLTransClientTotal[])await transApi.GetTransactions(new GLTransClientTotal(), journal, fromAccount, toAccount, fromDate, toDate, dimensionParams, showDimOnPrimo);
+            var listTrans = (GLTransClientTotal[])await transApi.GetTransactions(new GLTransClientTotal(), journal, fromAccount, toAccount, fromDate, toDate, dimensionParams, (showDimOnPrimo ? ReportAPI.PrimoPrDimension : ReportAPI.SimplePrimo));
             if (listTrans != null)
             {
                 string currentItem = string.Empty;
@@ -510,7 +615,7 @@ namespace UnicontaClient.Pages.CustomPage
                     statementList.Add(masterDbStatement);
                 }
 
-                if (statementList.Any())
+                if (statementList.Count > 0)
                 {
                     dgGLTrans.ItemsSource = null;
                     dgGLTrans.ItemsSource = statementList;
@@ -522,7 +627,7 @@ namespace UnicontaClient.Pages.CustomPage
                 Uniconta.ClientTools.Util.UtilDisplay.ShowErrorCode(transApi.LastError);
             }
             busyIndicator.IsBusy = false;
-            SetExpandAndCollapse(false);
+            SetExpandAndCollapse(IsCollapsed);
         }
 
 
@@ -565,6 +670,11 @@ namespace UnicontaClient.Pages.CustomPage
             cldim3.Header = lblDim3.Text = c._Dim3;
             cldim4.Header = lblDim4.Text = c._Dim4;
             cldim5.Header = lblDim5.Text = c._Dim5;
+        }
+
+        private void cmbFromAccount_EditValueChanged(object sender, EditValueChangedEventArgs e)
+        {
+            cmbToAccount.SelectedItem = cmbFromAccount.SelectedItem;
         }
 
         private async Task SetNoOfDimensions()
@@ -650,6 +760,13 @@ namespace UnicontaClient.Pages.CustomPage
                 await TransactionReport.SetDimValues(typeof(GLDimType1), cbdim1, api);
                 cldim1.ShowInColumnChooser = true;
             }
+        }
+
+        private void HasVoucherImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            var gLTransClientTotal = (sender as Image).Tag as GLTransClientTotal;
+            if (gLTransClientTotal != null)
+                DebtorTransactions.ShowVoucher(childDgGLTrans.syncEntity, api, busyIndicator);
         }
     }
 

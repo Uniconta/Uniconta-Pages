@@ -26,6 +26,8 @@ using Uniconta.ClientTools;
 using UnicontaClient.Models;
 using Uniconta.DataModel;
 using Uniconta.API.Service;
+using Uniconta.API.System;
+using System.IO;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -35,6 +37,29 @@ namespace UnicontaClient.Pages.CustomPage
         public override Type TableType { get { return typeof(InvItemStorageCount); } }
         public override IComparer GridSorting { get { return new InvItemStorageLocalSort(); } }
         public override bool Readonly { get { return false; } }
+    }
+
+    internal class InvItemVariantSort : IComparer<InvItemStorage>
+    {
+        public int Compare(InvItemStorage x, InvItemStorage y)
+        {
+            var c = string.Compare(x._Item, y._Item);
+            if (c != 0)
+                return c;
+            c = string.Compare(x._Variant1, y._Variant1);
+            if (c != 0)
+                return c;
+            c = string.Compare(x._Variant2, y._Variant2);
+            if (c != 0)
+                return c;
+            c = string.Compare(x._Variant3, y._Variant3);
+            if (c != 0)
+                return c;
+            c = string.Compare(x._Variant4, y._Variant4);
+            if (c != 0)
+                return c;
+            return string.Compare(x._Variant5, y._Variant5);
+        }
     }
 
     internal class InvItemStorageLocalSort : IComparer, IComparer<InvItemStorageCount>
@@ -112,7 +137,12 @@ namespace UnicontaClient.Pages.CustomPage
         internal string _SerieBatch;
         [NoSQL]
         [Display(Name = "SerieBatch", ResourceType = typeof(InvSerieBatchText))]
-        public string SerieBatch { get { return _SerieBatch; } }
+        public string SerieBatch { get { return _SerieBatch; } set { _SerieBatch = value; NotifyPropertyChanged("SerieBatch"); } }
+
+        internal string _EAN;
+        [StringLength(20)]
+        [Display(Name = "EANnumber", ResourceType = typeof(InventoryText))]
+        public string EAN { get { return _EAN; } set { _EAN = value; NotifyPropertyChanged("EAN"); } }
 
         Uniconta.DataModel.InvItem _itemRec;
         internal Uniconta.DataModel.InvItem itemRec
@@ -165,10 +195,12 @@ namespace UnicontaClient.Pages.CustomPage
             if (selectedItem != null)
                 selectedItem.PropertyChanged += InvItemStorageClientGrid_PropertyChanged;
         }
-       
+
         private void InvItemStorageClientGrid_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             var rec = sender as InvItemStorageCount;
+            if (rec == null)
+                return;
             if (rec.CompanyId == 0)
                 rec.SetMaster(api.CompanyEntity);
             switch (e.PropertyName)
@@ -182,17 +214,10 @@ namespace UnicontaClient.Pages.CustomPage
                         rec.NotifyPropertyChanged("ItemGroup");
                         rec.NotifyPropertyChanged("ItemLocation");
                         rec.NotifyPropertyChanged("PurchaseAccount");
-
                         rec.SetItemValues(selectedItem, api.CompanyEntity._OrderLineStorage);
-                        if (selectedItem._Qty != 0)
-                        {
-                            rec._Qty = selectedItem._Qty;
-                            rec.NotifyPropertyChanged("Qty");
-                            rec.NotifyPropertyChanged("Difference");
-                        }
                     }
                     break;
-                 case "Warehouse":
+                case "Warehouse":
                     var selected = (InvWarehouse)warehouse?.Get(rec._Warehouse);
                     if (selected != null)
                         setLocation(selected, rec);
@@ -201,6 +226,40 @@ namespace UnicontaClient.Pages.CustomPage
                     if (string.IsNullOrEmpty(rec._Warehouse))
                         rec._Location = null;
                     break;
+                case "EAN":
+                    FindOnEAN(rec, this.items, api);
+                    break;
+            }
+        }
+
+        static public void FindOnEAN(InvItemStorageCount rec, SQLCache Items, QueryAPI api)
+        {
+            var EAN = rec._EAN;
+            if (string.IsNullOrWhiteSpace(EAN))
+                return;
+            var found = (from item in (InvItem[])Items.GetNotNullArray where string.Compare(item._EAN, EAN, StringComparison.CurrentCultureIgnoreCase) == 0 select item).FirstOrDefault();
+            if (found != null)
+            {
+                rec._EAN = found._EAN;
+                rec.Item = found._Item;
+            }
+            else
+                FindOnEANVariant(rec, api);
+        }
+
+        static async void FindOnEANVariant(InvItemStorageCount rec, QueryAPI api)
+        {
+            var ap = new Uniconta.API.Inventory.ReportAPI(api);
+            var variant = await ap.GetInvVariantDetail(rec._EAN);
+            if (variant != null)
+            {
+                rec.Item = variant._Item;
+                rec.Variant1 = variant._Variant1;
+                rec.Variant2 = variant._Variant2;
+                rec.Variant3 = variant._Variant3;
+                rec.Variant4 = variant._Variant4;
+                rec.Variant5 = variant._Variant5;
+                rec._EAN = variant._EAN;
             }
         }
 
@@ -271,10 +330,40 @@ namespace UnicontaClient.Pages.CustomPage
                     var pairs = rb.filterValues;
                     BindGrid(pairs);
                     break;
+                case "Export":
+                    dockCtrl.PrintCurrentTabGrids("CSV");
+                    break;
+                case "Import":
+                    ImportCsv();
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
+        }
+
+        void ImportCsv()
+        {
+#if !SILVERLIGHT
+            var openFileDailog = UtilDisplay.LoadOpenFileDialog;
+            openFileDailog.Filter = "CSV Files |*.csv";
+            openFileDailog.Multiselect = false;
+            bool? userClickedOK = openFileDailog.ShowDialog();
+            if (userClickedOK != true) return;
+            try
+            {
+                using (var sr = new StreamReader(File.OpenRead(openFileDailog.FileName), Encoding.Default))
+                {
+                    dgInvStockStatus.ItemsSource = null;
+                    dgInvStockStatus.CopyFromExcel(sr, ';', true, true, false);
+                }
+            }
+            catch (Exception ex)
+            {
+                UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"), MessageBoxButton.OK);
+                return;
+            }
+#endif
         }
         public override void PageClosing()
         {
@@ -289,19 +378,19 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (batchLoaded)
                 return;
-            BusyIndicator.IsBusy = true;
+            SetBusy();
             var lst = await api.Query<InvSerieBatch>(new InvSerieBatchOpen());
             if (lst == null || lst.Length == 0)
             {
-                BusyIndicator.IsBusy = false;
+                ClearBusy();
                 return;
             }
 
-            var extraItems = new List<InvItemStorageCount>();
             var mainList = (List<InvItemStorageCount>)dgInvStockStatus.ItemsSource;
             var search = new InvItemStorageCount();
             var sort = new InvItemStorageLocalSort();
             var cnt = mainList.Count;
+            var extraItems = new List<InvItemStorageCount>(cnt);
             foreach (var rec in lst)
             {
                 var itm = rec._Item;
@@ -329,7 +418,7 @@ namespace UnicontaClient.Pages.CustomPage
             dgInvStockStatus.ItemsSource = extraItems;
             SerieBatch.Visible = true;
             batchLoaded = true;
-            BusyIndicator.IsBusy = false;
+            ClearBusy();
         }
 
         public override Task InitQuery() { return BindGrid(null); }
@@ -338,19 +427,24 @@ namespace UnicontaClient.Pages.CustomPage
         {
             await dgInvStockStatus.Filter(propValuePair);
             var mainList = (List<InvItemStorageCount>)dgInvStockStatus.ItemsSource;
+            if (mainList == null)
+                return;
+
             var search = new InvItemStorageCount();
             var sort = new InvItemStorageLocalSort();
             var cnt = mainList.Count;
+            var api = this.api;
 
             if (this.items == null)
                 this.items = await api.LoadCache(typeof(Uniconta.DataModel.InvItem));
 
-            if (propValuePair == null && !propValuePair.Any())
+            if (propValuePair == null || propValuePair.Count() == 0)
             {
-                var extraItems = new List<InvItemStorageCount>();
+                var lst = new List<InvItemStorageCount>(cnt);
                 foreach (var item in (Uniconta.DataModel.InvItem[])this.items.GetNotNullArray)
                 {
-                    var isService = (item._ItemType == (byte)ItemType.Service);
+                    if (item._ItemType == (byte)ItemType.Service)
+                        continue;
                     var itm = item._Item;
                     search._Item = itm;
                     var idx = mainList.BinarySearch(search, sort);
@@ -358,24 +452,30 @@ namespace UnicontaClient.Pages.CustomPage
                         idx = ~idx;
                     if (idx >= 0 && idx < cnt && mainList[idx]._Item == itm)
                     {
-                        if (isService)
-                            mainList.RemoveAt(idx);
-                        continue;
+                        lst.Add(mainList[idx]);
                     }
-                    if (!isService)
+                    else
                     {
                         var r = new InvItemStorageCount();
                         r.SetMaster(item);
-                        extraItems.Add(r);
+                        lst.Add(r);
                     }
                 }
-                if (extraItems.Count > 0)
+                lst.Sort(sort);
+                mainList = lst;
+            }
+            if (api.CompanyEntity.ItemVariants && api.CompanyEntity._LoadVariantsInCounting)
+            {
+                var stds = await api.Query<InvStandardVariantCombi>();
+                var newList = AddVariants(mainList, stds);
+                if (newList != null)
                 {
-                    extraItems.AddRange(mainList);
-                    extraItems.Sort(sort);
-                    dgInvStockStatus.ItemsSource = extraItems;
+                    newList.Sort(sort);
+                    mainList = newList;
                 }
             }
+            dgInvStockStatus.ItemsSource = mainList;
+
             SerieBatch.Visible = false;
             batchLoaded = false;
         }
@@ -422,7 +522,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (invJournal == null) return;
             var mainList = (IEnumerable<InvItemStorageCount>)dgInvStockStatus.GetVisibleRows();
-            var invJournalLineList = new List<InvJournalLine>();
+            var invJournalLineList = new List<InvJournalLine>(100);
             foreach (var item in mainList)
             {
                 var dif = item.Difference;
@@ -440,7 +540,9 @@ namespace UnicontaClient.Pages.CustomPage
                     journalLine._Warehouse = item._Warehouse;
                     journalLine._Location = item._Location;
                     journalLine._SerieBatch = item._SerieBatch;
-                    journalLine._CostPrice = item.itemRec._CostPrice;
+                    var itm = item.itemRec;
+                    if (itm != null)
+                        journalLine._CostPrice = itm._CostPrice;
                     journalLine._Qty = dif;
                     journalLine.SetMaster(invJournal);
                     journalLine._Dim1 = invJournal._Dim1;
@@ -452,7 +554,7 @@ namespace UnicontaClient.Pages.CustomPage
                 }
             }
 
-            if (invJournalLineList.Count() == 0)
+            if (invJournalLineList.Count == 0)
                 return;
 
             api.AllowBackgroundCrud = true;
@@ -462,13 +564,14 @@ namespace UnicontaClient.Pages.CustomPage
                 isTransToJrnl = true;
         }
 
-        bool isTransToJrnl = false;
+        bool isTransToJrnl;
         private void DockCtrl_ClosingCancelled(object sender)
         {
-            PostInvJournal();
             dockCtrl.ClosingCancelled -= DockCtrl_ClosingCancelled;
+            PostInvJournal();
+            checkDiff = null;
         }
-
+        bool? checkDiff;
         public override bool IsDataChaged
         {
             get
@@ -476,20 +579,96 @@ namespace UnicontaClient.Pages.CustomPage
                 if (isTransToJrnl)
                     return false;
                 else
-                    return CheckDifference();
+                {
+                    if (checkDiff == null)
+                        checkDiff = CheckDifference();
+                    return checkDiff.Value;
+                }
             }
         }
 
         bool CheckDifference()
         {
             var list = dgInvStockStatus.GetVisibleRows() as IEnumerable<InvItemStorageCount>;
-            if (list != null && list.Select(x => x.Difference).Sum() > 0)
+            if (list != null && list.Any(x => x != null && x.Difference != 0))
             {
                 ShowCustomSaveCloseMessage = true;
-                dockCtrl.ClosingCancelled += DockCtrl_ClosingCancelled;
+                if (checkDiff == null)
+                    dockCtrl.ClosingCancelled += DockCtrl_ClosingCancelled;
                 return true;
             }
             return false;
+        }
+
+        List<InvItemStorageCount> AddVariants(List<InvItemStorageCount> mainList, InvStandardVariantCombi[] stds)
+        {
+            var itemSort = new InvItemVariantSort();
+
+            var stdSort = new InvStandardVariantCombiSort();
+            Array.Sort(stds, stdSort);
+
+            var stdSearch = new InvStandardVariantCombi() { _LineNumber1 = float.MinValue, _LineNumber2 = float.MinValue, _LineNumber3 = float.MinValue, _LineNumber4 = float.MinValue, _LineNumber5 = float.MinValue };
+            var newItems = new List<InvItemStorageCount>(100);
+            var itemSearch = new InvItemStorageCount();
+
+            foreach (var rec in mainList)
+            {
+                var item = (InvItem)items.Get(rec._Item);
+                if (item?._StandardVariant == null || !item._UseVariants)
+                    continue;
+
+                itemSearch._Item = item._Item;
+                var stdVariant = item._StandardVariant;
+                stdSearch._StandardVariant = stdVariant;
+                var pos = Array.BinarySearch(stds, stdSearch, stdSort);
+                if (pos < 0)
+                    pos = ~pos;
+                while (pos < stds.Length)
+                {
+                    var std = stds[pos++];
+                    if (std._StandardVariant != stdVariant)
+                        break;
+
+                    itemSearch._Variant1 = std._Variant1;
+                    itemSearch._Variant2 = std._Variant2;
+                    itemSearch._Variant3 = std._Variant3;
+                    itemSearch._Variant4 = std._Variant4;
+                    itemSearch._Variant5 = std._Variant5;
+                    var itemPos = mainList.BinarySearch(itemSearch, itemSort);
+                    if (itemPos < 0)
+                        itemPos = ~itemPos;
+                    if (itemPos >= mainList.Count)
+                        itemPos = mainList.Count - 1;
+                    var found = mainList[itemPos];
+                    if (found._Item != itemSearch._Item) // item is not in the list, or we are past item.
+                    {
+                        if (itemPos == 0)
+                            continue;
+                        found = mainList[itemPos - 1]; // we need to test one position before, since binarysearch will be past the item with blank variants
+                        if (found._Item != itemSearch._Item) // item is not in the list
+                            continue;
+                    }
+                    if (itemSort.Compare(found, itemSearch) == 0) // we have the variant combination
+                        continue;
+
+                    var newrec = new InvItemStorageCount();
+                    newrec.SetMaster(item);
+                    newrec._Variant1 = std._Variant1;
+                    newrec._Variant2 = std._Variant2;
+                    newrec._Variant3 = std._Variant3;
+                    newrec._Variant4 = std._Variant4;
+                    newrec._Variant5 = std._Variant5;
+                    newrec._Warehouse = item._Warehouse;
+                    newrec._Location = item._Location;
+                    newItems.Add(newrec);
+                }
+            }
+            if (newItems.Count > 0)
+            {
+                newItems.AddRange(mainList);
+                return newItems;
+            }
+            return null;
         }
     }
 }

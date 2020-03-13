@@ -198,7 +198,10 @@ namespace UnicontaClient.Pages.CustomPage
                 Utility.SetDimensions(api, lbldim1, lbldim2, lbldim3, lbldim4, lbldim5, cmbDim1, cmbDim2, cmbDim3, cmbDim4, cmbDim5, usedim);
 
             if (!Comp.SerialBatchNumbers)
+            {
                 liBatchNumber.Visibility = Visibility.Collapsed;
+                liExpire.Visibility = Visibility.Collapsed;
+            }
 
             if (!Comp.Location || !Comp.Warehouse)
                 itemLocation.Visibility = Visibility.Collapsed;

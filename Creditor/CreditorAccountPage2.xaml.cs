@@ -152,7 +152,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 if (zip == null)
                 {
-                    var city = await UtilDisplay.GetCityAndAddress(txtZipCode.Text, editrow.Country);
+                    var city = await UtilDisplay.GetCityAndAddress(editrow.ZipCode, editrow.Country);
                     if (city != null)
                     {
                         editrow.City = city[0];
@@ -172,7 +172,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (zip == null)
                 {
                     var deliveryCountry = editrow.DeliveryCountry ?? editrow.Country;
-                    var city = await UtilDisplay.GetCityAndAddress(txtDelZipCode.Text, deliveryCountry);
+                    var city = await UtilDisplay.GetCityAndAddress(editrow.DeliveryZipCode, deliveryCountry);
                     if (city != null)
                     {
                         editrow.DeliveryCity = city[0];

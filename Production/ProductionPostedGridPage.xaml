@@ -32,9 +32,13 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionPostedGridPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="OrderNumber" Width="60" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="JournalPostedId" Width="60"  />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Voucher" Width="60" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="RelatedOrder" Width="60" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="BatchNumber" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="BatchRowId" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Account" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="AccountName" Visible="False" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Project" Visible="False" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ProjectName" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Remark" />
                 </local:ProductionPostedGridClient.Columns>
             </local:ProductionPostedGridClient>

@@ -61,6 +61,9 @@
   <RibbonItem>
     <RibbonItem Action="PurchaseCharges" LocalizedNameKey="PurchaseCharges" ControlName="CreditorOrderCostLinePage" Module="PurchaseCharges" LargeGlyph="Purchase_Lines_32x32.png"/>
   </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="ApproveOrder" LocalizedNameKey="Approve" LargeGlyph="Allow_32x32.png"/>
+  </RibbonItem>
   <RibbonItem TabId="1" LocalizedNameKey="EditAll">
     <RibbonItem Action="EditAll"  LocalizedNameKey="EditAll"  LargeGlyph="Edit_32x32.png"/>
      </RibbonItem>

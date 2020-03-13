@@ -260,11 +260,11 @@ namespace UnicontaClient.Pages.CustomPage
 
         async void SaveEmailList()
         {
-            var rows = (IEnumerable<CrmCampaignMemberClient>)dgCreateEmailList.GetVisibleRows();
-            if (rows.Count() == 0)
+            var rows = (ICollection<CrmCampaignMemberClient>)dgCreateEmailList.GetVisibleRows();
+            if (rows.Count == 0)
                 return;
 
-            List<CrmCampaignMemberClient> lst = rows as List<CrmCampaignMemberClient>;
+            var lst = rows as List<CrmCampaignMemberClient>;
             if (lst == null)
                 lst = rows.ToList();
 

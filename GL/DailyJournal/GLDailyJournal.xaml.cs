@@ -117,7 +117,7 @@ namespace UnicontaClient.Pages.CustomPage
             switch (ActionType)
             {
                 case "AddRow":
-                    AddDockItem(TabControls.GLDailyJournalPage2, api, Uniconta.ClientTools.Localization.lookup("Posting"), ";component/Assets/img/Add_16x16.png");
+                    AddDockItem(TabControls.GLDailyJournalPage2, api, Uniconta.ClientTools.Localization.lookup("Posting"), "Add_16x16.png");
                     break;
                 case "EditRow":
                     if (selectedItem == null)
@@ -265,12 +265,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                             var bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "voucher_number", true) == 0).FirstOrDefault();
                             if (bsItem != null)
-                            {
-                                var invoiceNumber = bsItem.value;
-                                invoiceNumber = Regex.Replace(invoiceNumber, "[^0-9]", string.Empty);
-                                long tmpNumber = long.TryParse(invoiceNumber, out tmpNumber) ? tmpNumber : 0;
-                                journalLine.Invoice = tmpNumber;
-                            }
+                                journalLine.Invoice = bsItem.value;
 
                             bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "voucher_type", true) == 0).FirstOrDefault();
                             if (bsItem != null)
@@ -290,7 +285,12 @@ namespace UnicontaClient.Pages.CustomPage
 
                             bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "total_amount_incl_vat", true) == 0).FirstOrDefault();
                             if (bsItem != null)
-                                journalLine.Amount = NumberConvert.ToDoubleNoThousandSeperator(bsItem.value);
+                            {
+                                journalLine.Amount = Math.Abs(NumberConvert.ToDoubleNoThousandSeperator(bsItem.value));
+
+                                if (postingType != BilagscanVoucherType.Creditnote)
+                                    journalLine.Amount = -journalLine.Amount;
+                            }
 
                             CountryCode countryCode = CountryCode.Denmark;
                             bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "country", true) == 0).FirstOrDefault();
@@ -397,27 +397,31 @@ namespace UnicontaClient.Pages.CustomPage
                             if (hint != null)
                             {
                                 journalLine._DocumentRef = hint.RowId;
-                                if (hint.CreditorAccount != null)
-                                    creditor = (Uniconta.DataModel.Creditor)credCache.Get(hint.CreditorAccount);
-                                if (hint.Amount != 0)
-                                    journalLine.Amount = hint.Amount;
-                                if (hint.Currency != null && hint.Currency != "-")
-                                    journalLine.Currency = hint.Currency;
-                                if (hint.PaymentId != null)
-                                {
-                                    journalLine._PaymentId = hint.PaymentId;
-                                    journalLine.PaymentMethod = hint.PaymentMethod;
-                                }
+                                //if (hint.CreditorAccount != null)
+                                //    creditor = (Uniconta.DataModel.Creditor)credCache.Get(hint.CreditorAccount);
+                                //if (hint.Amount != 0)
+                                //    journalLine.Amount = hint.Amount;
+                                //if (hint.Currency != null && hint.Currency != "-")
+                                //    journalLine.Currency = hint.Currency;
+                                //if (hint.PaymentId != null)
+                                //{
+                                //    journalLine._PaymentId = hint.PaymentId;
+                                //    journalLine.PaymentMethod = hint.PaymentMethod;
+                                //}
                             }
 
                             journalLine._AccountType = 2;
 
                             var creditorCVRNum = Regex.Replace(creditorCVR, "[^0-9]", string.Empty);
 
-                            if (creditor == null)
+                            if (creditorCVRNum != string.Empty)
                                 creditor = creditors.Where(s => (Regex.Replace(s._LegalIdent ?? string.Empty, "[^0-9.]", "") == creditorCVRNum)).FirstOrDefault();
 
-                            if (creditor == null)
+                            if (creditorCVRNum == string.Empty)
+                            {
+                                journalLine.Text = Uniconta.ClientTools.Localization.lookup("BilagscanNotValidVatNo");
+                            }
+                            else if (creditor == null)
                             {
                                 var newCreditor = new CreditorClient()
                                 {
@@ -435,7 +439,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 }
                                 catch (Exception ex)
                                 {
-                                    UnicontaMessageBox.Show(ex.Message, Uniconta.ClientTools.Localization.lookup("Exception"), MessageBoxButton.OK);
+                                    UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"), MessageBoxButton.OK);
                                     return;
                                 }
 

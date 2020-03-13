@@ -7,7 +7,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CWInvPosting"
            xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
            xmlns:ClientToolsControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
            xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
-           Width="{StaticResource Width31}" Height="{StaticResource Height28}" KeyDown="ChildWindow_KeyDown" SizeToContent="Width">
+           Width="{StaticResource Width31}" Height="{StaticResource Height17}" KeyDown="ChildWindow_KeyDown" SizeToContent="Width">
     <Grid x:Name="LayoutRoot" Margin="2" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
             <RowDefinition />
@@ -15,9 +15,10 @@ x:Class="UnicontaClient.Pages.CustomPage.CWInvPosting"
         </Grid.RowDefinitions>
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="30"/>
+                <RowDefinition Height="30" x:Name="rowComp"/>
                 <RowDefinition Height="30"/>
                 <RowDefinition  Height="30"/>
+                <RowDefinition Height="30"/>
                 <RowDefinition Height="30"/>
                 <RowDefinition Height="30"/>
                 <RowDefinition Height="30"/>
@@ -28,20 +29,22 @@ x:Class="UnicontaClient.Pages.CustomPage.CWInvPosting"
                 <ColumnDefinition Width="5"/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Simulation}" VerticalAlignment="Center"></TextBlock>
-            <CheckBox x:Name="chkSimulation" VerticalAlignment="Center" IsChecked="{Binding Simulation,Mode=TwoWay}" Grid.Column="2"></CheckBox>
-            <TextBlock Grid.Row="1" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Comment}" VerticalAlignment="Center"></TextBlock>
-            <CorasauControls:TextEditor x:Name="txtComment" Width="200" MaxLength="40" Grid.Row="1" HandleKeyDown="False" Text="{Binding Comment,Mode=TwoWay}" Grid.Column="2" Height="25" HorizontalAlignment="Left"/>
-            <TextBlock Grid.Row="2" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=PostingDate}" VerticalAlignment="Center"></TextBlock>
-            <ClientToolsControls:DateEditor Width="200" x:Name="datePosting" EditValue="{Binding Date,Mode=TwoWay}" Height="25" ShowToday="True" Grid.Row="2" Grid.Column="2" HorizontalAlignment="Left"/>           
-            <TextBlock Grid.Row="3" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Text}" VerticalAlignment="Center"/>
-            <CorasauControls:TextEditor Width="200" MaxLength="40" Grid.Row="3" HandleKeyDown="False" Text="{Binding Text,Mode=TwoWay}" Grid.Column="2" Height="25" HorizontalAlignment="Left"/>
-            <TextBlock Grid.Row="4" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TransType}" VerticalAlignment="Center"/>
-            <CorasauControls:LookupEditor x:Name="lookupTransType" Text="{Binding TransType,Mode=TwoWay}" Height="25" Grid.Column="2"  Grid.Row="4" Width="200" HorizontalAlignment="Left"/>
-            <TextBlock Grid.Row="5" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LedgerVoucher}" VerticalAlignment="Center"/>
-            <CorasauControls:TextEditor Width="200" x:Name="txtFixedVoucher" HorizontalContentAlignment="Right" Mask="n0" MaskType="Numeric"  Height="25" Grid.Column="2"  Grid.Row="5" HorizontalAlignment="Left"/>
-            <TextBlock Grid.Row="6" x:Name="txtNumberSerie" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=NumberSerie}" VerticalAlignment="Center"/>
-            <CorasauControls:LookupEditor Width="200" x:Name="lookupNumberSeries" Text="{Binding NumberSeries,Mode=TwoWay}" Height="25" Grid.Column="2"  Grid.Row="6" HorizontalAlignment="Left"/>
+            <TextBlock x:Name="tbCompName" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CompanyName}" VerticalAlignment="Top" HorizontalAlignment="Left"></TextBlock>
+            <TextBlock x:Name="txtCompName" Grid.Column="2" VerticalAlignment="Center" Height="25" HorizontalAlignment="Left"/>
+            <TextBlock Grid.Row="1" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Simulation}" VerticalAlignment="Center"></TextBlock>
+            <CheckBox Grid.Row="1" x:Name="chkSimulation" VerticalAlignment="Center" IsChecked="{Binding Simulation,Mode=TwoWay}" Grid.Column="2"></CheckBox>
+            <TextBlock Grid.Row="2" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Comment}" VerticalAlignment="Center"></TextBlock>
+            <CorasauControls:TextEditor x:Name="txtComment" Width="200" MaxLength="40" Grid.Row="2" HandleKeyDown="False" Text="{Binding Comment,Mode=TwoWay}" Grid.Column="2" Height="25" HorizontalAlignment="Left"/>
+            <TextBlock Grid.Row="3" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=PostingDate}" VerticalAlignment="Center"></TextBlock>
+            <ClientToolsControls:DateEditor Width="200" x:Name="datePosting" EditValue="{Binding Date,Mode=TwoWay}" Height="25" ShowToday="True" Grid.Row="3" Grid.Column="2" HorizontalAlignment="Left"/>           
+            <TextBlock Grid.Row="4" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Text}" VerticalAlignment="Center"/>
+            <CorasauControls:TextEditor Width="200" MaxLength="40" Grid.Row="4" HandleKeyDown="False" Text="{Binding Text,Mode=TwoWay}" Grid.Column="2" Height="25" HorizontalAlignment="Left"/>
+            <TextBlock Grid.Row="5" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TransType}" VerticalAlignment="Center"/>
+            <CorasauControls:LookupEditor x:Name="lookupTransType" Text="{Binding TransType,Mode=TwoWay}" Height="25" Grid.Column="2"  Grid.Row="5" Width="200" HorizontalAlignment="Left"/>
+            <TextBlock Grid.Row="6" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LedgerVoucher}" VerticalAlignment="Center"/>
+            <CorasauControls:TextEditor Width="200" x:Name="txtFixedVoucher" HorizontalContentAlignment="Right" Mask="n0" MaskType="Numeric"  Height="25" Grid.Column="2"  Grid.Row="6" HorizontalAlignment="Left"/>
+            <TextBlock Grid.Row="7" x:Name="txtNumberSerie" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=NumberSerie}" VerticalAlignment="Center"/>
+            <CorasauControls:LookupEditor Width="200" x:Name="lookupNumberSeries" Text="{Binding NumberSeries,Mode=TwoWay}" Height="25" Grid.Column="2"  Grid.Row="7" HorizontalAlignment="Left"/>
 
         </Grid>
         <StackPanel x:Name="actionButton" HorizontalAlignment="Right" Grid.Row="1" Orientation="Horizontal" Margin="0 10 0 0">

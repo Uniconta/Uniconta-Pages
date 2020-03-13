@@ -146,7 +146,10 @@ namespace UnicontaClient.Pages.CustomPage
                 Location.Visible = Location.ShowInColumnChooser = false;
             if (!company.Warehouse)
                 Warehouse.Visible = Warehouse.ShowInColumnChooser = false;
-            
+            if (!company.Project)
+                Project.Visible = Project.ShowInColumnChooser = false;
+            if (!company.ProjectTask)
+                Task.Visible = Task.ShowInColumnChooser = false;
 
             if (this.master != null)
                 colAccount.Visible = AccountName.Visible = false;

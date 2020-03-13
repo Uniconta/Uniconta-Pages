@@ -44,5 +44,6 @@
   <RibbonItem>
     <RibbonItem Action="Storage" LocalizedNameKey="OnHand" Module="Storage" LargeGlyph="Inventory_Trans_32x32.png"/>
     <RibbonItem Action="Transactions" LocalizedNameKey="Transactions"  LargeGlyph="Account-statement_32x32.png"/>
+    <RibbonItem Action="BatchLocations" LocalizedNameKey="BatchLocations" Module="Warehouse" LargeGlyph="Location_32x32.png"/>
   </RibbonItem>
 </root>

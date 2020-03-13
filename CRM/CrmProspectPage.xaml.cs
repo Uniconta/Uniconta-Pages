@@ -88,7 +88,7 @@ namespace UnicontaClient.Pages.CustomPage
                     object[] param = new object[2];
                     param[0] = api;
                     param[1] = null;
-                    AddDockItem(TabControls.CrmProspectPage2, param, Uniconta.ClientTools.Localization.lookup("Prospects"), ";component/Assets/img/Add_16x16.png");
+                    AddDockItem(TabControls.CrmProspectPage2, param, Uniconta.ClientTools.Localization.lookup("Prospects"), "Add_16x16.png");
                     break;
                 case "EditRow":
                     if (selectedItem != null)
@@ -161,7 +161,7 @@ namespace UnicontaClient.Pages.CustomPage
             var prospect = Activator.CreateInstance(selectedItem.GetType()) as CrmProspectClient;
             StreamingManager.Copy(selectedItem, prospect);
             var parms = new object[2] { prospect, false };
-            AddDockItem(TabControls.CrmProspectPage2, parms, Uniconta.ClientTools.Localization.lookup("Prospects"), ";component/Assets/img/Add_16x16.png");
+            AddDockItem(TabControls.CrmProspectPage2, parms, Uniconta.ClientTools.Localization.lookup("Prospects"), "Add_16x16.png");
         }
 
         bool copyRowIsEnabled = false;

@@ -24,20 +24,8 @@ x:Class="UnicontaClient.Pages.CustomPage.EmployeesPayrollPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PrimaryKeyId" Width="70" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Number" Width="80"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" Width="200"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PayrollType" Width="80">
-                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                            <DataTemplate>
-                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="PayrollType" />
-                            </DataTemplate>
-                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                    </localPage:CorasauDataGridTemplateColumnClient>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Unit" Width="50">
-                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                            <DataTemplate>
-                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="ItemUnit" />
-                            </DataTemplate>
-                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                    </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:ComboBoxColumnClient x:Name="PayrollType" Width="80"/>
+                    <localPage:ComboBoxColumnClient x:Name="Unit" Width="50"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceText" Width="150"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CategoryName" Visible="False" />
@@ -47,13 +35,7 @@ x:Class="UnicontaClient.Pages.CustomPage.EmployeesPayrollPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="SalesPrice" Width="70" Visible="True" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Invoiceable" Width="60" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ExternCode"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="InternalType" Visible="False" Width="80">
-                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                            <DataTemplate>
-                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="InternalType" />
-                            </DataTemplate>
-                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                    </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:ComboBoxColumnClient x:Name="InternalType" Visible="False" Width="80"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Factor" Width="70" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="InternalProject" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="InternalProjectName" Visible="False"/>

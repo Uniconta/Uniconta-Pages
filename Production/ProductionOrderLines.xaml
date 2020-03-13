@@ -102,24 +102,11 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionOrderLines"
                                         </DataTemplate>
                                     </local:CorasauDataGridForeignKeyColumnClient.CellTemplate>
                                 </local:CorasauDataGridForeignKeyColumnClient>
-                                <local:CorasauDataGridTemplateColumnClient x:Name="Storage" Width="100">
-                                    <local:CorasauDataGridTemplateColumnClient.CellTemplate>
-                                        <DataTemplate>
-                                            <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="ProductionRegister"/>
-                                        </DataTemplate>
-                                    </local:CorasauDataGridTemplateColumnClient.CellTemplate>
-                                </local:CorasauDataGridTemplateColumnClient>
-
+                                <local:ComboBoxColumnClient x:Name="Storage" Width="100"/>
                                 <local:CorasauDataGridTemplateColumnClient x:Name="ReportAsFinished" Width="70"/>
                                 <local:CorasauDataGridTemplateColumnClient x:Name="ReportAsFinishedDeep" Width="70"/>
                                 <local:CorasauDataGridTemplateColumnClient x:Name="IgnoreBlocked" Width="50" Visible="False" />
-                                <local:CorasauDataGridTemplateColumnClient x:Name="Unit" Width="50" Visible="False" >
-                                    <local:CorasauDataGridTemplateColumnClient.CellTemplate>
-                                        <DataTemplate>
-                                            <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="ItemUnit"/>
-                                        </DataTemplate>
-                                    </local:CorasauDataGridTemplateColumnClient.CellTemplate>
-                                </local:CorasauDataGridTemplateColumnClient>
+                                <local:ComboBoxColumnClient x:Name="Unit" Width="50" Visible="False" />
                                 <local:CorasauDataGridTemplateColumnClient x:Name="ReferenceNumber" Visible="False" />
                                 <local:CorasauDataGridTemplateColumnClient x:Name="PostingAccount" Width="100" Visible="False"/>
                                 <local:CorasauDataGridTemplateColumnClient x:Name="SerieBatchMarked" Width="90" HideHeaderCheck="true" Visible="False"/>
@@ -167,28 +154,28 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionOrderLines"
                                 </StackPanel>
                             </DataTemplate>
                         </docking:LayoutPanel.CaptionTemplate>
-                        <local:InvItemStorageClientGrid  x:Name="dgInvItemStorageClientGrid" AutoGenerateColumns="None">
-                            <local:InvItemStorageClientGrid.Columns>
+                        <local:InvItemStorageClientGridReadOnly  x:Name="dgInvItemStorageClientGrid" AutoGenerateColumns="None">
+                            <local:InvItemStorageClientGridReadOnly.Columns>
                                 <local:CorasauDataGridTemplateColumnClient x:Name="invItem" FieldName="Item" Width="100" Visible="False"/>
                                 <local:CorasauDataGridTemplateColumnClient x:Name="colInvItemVariant1" FieldName="Variant1"/>
                                 <local:CorasauDataGridTemplateColumnClient x:Name="colInvItemVariant2" FieldName="Variant2"/>
                                 <local:CorasauDataGridTemplateColumnClient x:Name="ItemName" Width="200" />
-                                <local:CorasauDataGridTemplateColumnClient x:Name="InvItemWarehouse" FieldName="Warehouse" Width="100"/>
-                                <local:CorasauDataGridTemplateColumnClient x:Name="InvItemLocation" FieldName="Location" Width="100"/>
+                                <local:CorasauDataGridTemplateColumnClient x:Name="InvItemWarehouse" FieldName="Warehouse" Width="100" ReadOnly="True"/>
+                                <local:CorasauDataGridTemplateColumnClient x:Name="InvItemLocation" FieldName="Location" Width="100" ReadOnly="True"/>
                                 <local:CorasauDataGridTemplateColumnClient x:Name="Available" Width="80" />
-                                <local:CorasauDataGridTemplateColumnClient x:Name="inItemQty" FieldName="Qty" Width="80"/>
-                                <local:CorasauDataGridTemplateColumnClient x:Name="QtyReserved" Width="80"/>
-                                <local:CorasauDataGridTemplateColumnClient x:Name="QtyOrdered" Width="80"/>
-                                <local:CorasauDataGridTemplateColumnClient x:Name="MinStockLevel" Width="80"/>
-                                <local:CorasauDataGridTemplateColumnClient x:Name="MaxStockLevel" Width="80"/>
-                            </local:InvItemStorageClientGrid.Columns>
-                            <local:InvItemStorageClientGrid.TotalSummary>
+                                <local:CorasauDataGridTemplateColumnClient x:Name="inItemQty" FieldName="Qty" Width="80" ReadOnly="True"/>
+                                <local:CorasauDataGridTemplateColumnClient x:Name="QtyReserved" Width="80" ReadOnly="True"/>
+                                <local:CorasauDataGridTemplateColumnClient x:Name="QtyOrdered" Width="80" ReadOnly="True"/>
+                                <local:CorasauDataGridTemplateColumnClient x:Name="MinStockLevel" Width="80" ReadOnly="True"/>
+                                <local:CorasauDataGridTemplateColumnClient x:Name="MaxStockLevel" Width="80" ReadOnly="True"/>
+                            </local:InvItemStorageClientGridReadOnly.Columns>
+                            <local:InvItemStorageClientGridReadOnly.TotalSummary>
                                 <local:SumColumn FieldName="Available" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                                 <local:SumColumn FieldName="Qty" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                                 <local:SumColumn FieldName="QtyReserved" SummaryType="Sum" DisplayFormat="{}{0:N2}" />
                                 <local:SumColumn FieldName="QtyOrdered" SummaryType="Sum" DisplayFormat="{}{0:N2}" />
-                            </local:InvItemStorageClientGrid.TotalSummary>
-                        </local:InvItemStorageClientGrid>
+                            </local:InvItemStorageClientGridReadOnly.TotalSummary>
+                        </local:InvItemStorageClientGridReadOnly>
                     </docking:LayoutPanel>
                 </docking:LayoutGroup>
             </docking:DockLayoutManager>

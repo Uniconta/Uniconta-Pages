@@ -382,13 +382,13 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 Unlinked(true);
                 ibase.Caption = Uniconta.ClientTools.Localization.lookup("All");
-                ibase.LargeGlyph = Utilities.Utility.GetGlyph(";component/Assets/img/Account-statement_32x32.png");
+                ibase.LargeGlyph = Utilities.Utility.GetGlyph("Account-statement_32x32.png");
             }
             else if (ibase.Caption == Uniconta.ClientTools.Localization.lookup("All"))
             {
                 Unlinked(false);
                 ibase.Caption = Uniconta.ClientTools.Localization.lookup("Unlinked");
-                ibase.LargeGlyph = Utilities.Utility.GetGlyph(";component/Assets/img/Check_Journal_32x32.png");
+                ibase.LargeGlyph = Utilities.Utility.GetGlyph("Check_Journal_32x32.png");
             }
         }
 

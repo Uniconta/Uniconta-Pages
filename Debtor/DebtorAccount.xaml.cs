@@ -160,7 +160,7 @@ namespace UnicontaClient.Pages.CustomPage
                     object[] param = new object[2];
                     param[0] = api;
                     param[1] = null;
-                    AddDockItem(TabControls.DebtorAccountPage2, param, Uniconta.ClientTools.Localization.lookup("DebtorAccount"), ";component/Assets/img/Add_16x16.png");
+                    AddDockItem(TabControls.DebtorAccountPage2, param, Uniconta.ClientTools.Localization.lookup("DebtorAccount"), "Add_16x16.png");
                     break;
                 case "EditRow":
                     if (selectedItem != null)
@@ -313,7 +313,7 @@ namespace UnicontaClient.Pages.CustomPage
             var debtor = Activator.CreateInstance(selectedItem.GetType()) as DebtorClient;
             StreamingManager.Copy(selectedItem, debtor);
             var parms = new object[2] { debtor, false };
-            AddDockItem(TabControls.DebtorAccountPage2, parms, Uniconta.ClientTools.Localization.lookup("DebtorAccount"), ";component/Assets/img/Add_16x16.png");
+            AddDockItem(TabControls.DebtorAccountPage2, parms, Uniconta.ClientTools.Localization.lookup("DebtorAccount"), "Add_16x16.png");
         }
 
 #if !SILVERLIGHT
@@ -434,11 +434,11 @@ namespace UnicontaClient.Pages.CustomPage
         }
         private async void Save()
         {
-            dgDebtorAccountGrid.BusyIndicator.IsBusy = true;
+            SetBusy();
             var err = await dgDebtorAccountGrid.SaveData();
             if (err != ErrorCodes.Succes)
                 api.AllowBackgroundCrud = true;
-            dgDebtorAccountGrid.BusyIndicator.IsBusy = false;
+            ClearBusy();
         }
         public override void Utility_Refresh(string screenName, object argument = null)
         {

@@ -169,10 +169,10 @@ namespace UnicontaClient.Pages.CustomPage
                         break;
                     }
                 case "Transactions":
-                    if (lin.Account != null)
+                    if (lin?.Account != null)
                     {
                         var dt = PropValuePair.GenereteWhereElements("Date", fromDate, CompareOperator.GreaterThanOrEqual);
-                        dt.OrList.First().SecundaryValue = NumberConvert.ToString(toDate.Ticks);
+                        dt.OrList[0].SecundaryValue = NumberConvert.ToString(toDate.Ticks);
                         var filter = new PropValuePair[]
                         {
                             dt,

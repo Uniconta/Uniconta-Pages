@@ -175,10 +175,10 @@ namespace UnicontaClient.Pages.CustomPage
 
         async private void Save()
         {
-            dgCreditorTrans.BusyIndicator.IsBusy = true;
+            SetBusy();
             dgCreditorTrans.BusyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("Saving");
             var err = await dgCreditorTrans.SaveData();
-            dgCreditorTrans.BusyIndicator.IsBusy = false;
+            ClearBusy();
         }
     }
 }

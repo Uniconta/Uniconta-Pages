@@ -102,7 +102,7 @@ namespace UnicontaClient.Pages.CustomPage
             var duplicateValues = lstGLBudgetBudgetClient.GroupBy(x => new { Var1 = x.SubBudget }).Where(g => g.Count() > 1).Select(y => y.Key)
               .ToList();
 
-            if (duplicateValues.Count() > 0)
+            if (duplicateValues.Count > 0)
             {
                 retVal = false;
                 int index = 0;

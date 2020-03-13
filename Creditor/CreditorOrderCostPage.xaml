@@ -22,21 +22,9 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOrderCostPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="Name" Width="200"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Account" Width="100"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="AccountName" Width="200"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="IsPct" Width="50">
-                        <local:CorasauDataGridTemplateColumnClient.CellTemplate>
-                            <DataTemplate>
-                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="AmountPct" />
-                            </DataTemplate>
-                        </local:CorasauDataGridTemplateColumnClient.CellTemplate>
-                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:ComboBoxColumnClient x:Name="IsPct" Width="50"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Amount" Width="100"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Currency" Width="50">
-                        <local:CorasauDataGridTemplateColumnClient.CellTemplate>
-                            <DataTemplate>
-                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="Currencies" />
-                            </DataTemplate>
-                        </local:CorasauDataGridTemplateColumnClient.CellTemplate>
-                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:ComboBoxColumnClient x:Name="Currency" Width="50"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="PostOnCreditor" />
                 </local:CreditorOrderCostGrid.Columns>
             </local:CreditorOrderCostGrid>

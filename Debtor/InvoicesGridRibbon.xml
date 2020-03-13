@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <root>
   <RibbonItem TabId="0" LocalizedNameKey="Home">
-    <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh.png" LargeGlyph="refresh.png"/>
+    <RibbonItem Action="EditRow" ShortcutKey="Ctrl+E" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>
   </RibbonItem>
   <RibbonItem>
+    <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh.png" LargeGlyph="refresh.png"/>
     <RibbonItem Action="Filter" ShortcutKey="Ctrl+I" LocalizedNameKey="Filter" LargeGlyph="Filter_32x32.png"/>
     <RibbonItem Action="ClearFilter" ShortcutKey="Ctrl+K" LocalizedNameKey="ClearFilter" LargeGlyph="Filter_Clear_32x32.png"/>
   </RibbonItem>
@@ -27,10 +28,11 @@
     <RibbonItem Action="AddDoc" LocalizedNameKey="Attachments" LargeGlyph="Attachments_32x32.png" />
     <RibbonItem Action="InvoiceLine" LocalizedNameKey="InvoiceLines" LargeGlyph="Order_Lines_Highlighted_32x32.png" ShortcutKey="ALT+L"/>
     <RibbonItem Action="ShowInvoice" LocalizedNameKey="ShowInvoice" LargeGlyph="Show_Invoice_32x32.png" />
-    <RibbonItem Action="ShowPackNote" LocalizedNameKey="PackNote" LargeGlyph="Pack_Note_32x32.png" />
+    <RibbonItem Action="ShowPackNote" LocalizedNameKey="ShowOBJ" Parameter="Packnote" LargeGlyph="Pack_Note_32x32.png" />
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="SendInvoice" LocalizedNameKey="Sendinvoicebyemail" LargeGlyph="SendInvoiceMail_32x32.png" />
+    <RibbonItem Action="SendAsOutlook" LocalizedNameKey="SendInvoiceInOutLook" LargeGlyph="Posted_Journal_32x32.png" />
   </RibbonItem>
   <RibbonItem>
     <RibbonItem LocalizedNameKey="GenerateOBJ" Parameter="OIOUBL" LargeGlyph="Account-statement_32x32.png">

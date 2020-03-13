@@ -9,8 +9,6 @@
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh.png" LargeGlyph="refresh.png"/>
-  </RibbonItem>
-  <RibbonItem>
     <RibbonItem Action="Filter" ShortcutKey="Ctrl+I" LocalizedNameKey="Filter" LargeGlyph="Filter_32x32.png"/>
     <RibbonItem Action="ClearFilter" ShortcutKey="Ctrl+K" LocalizedNameKey="ClearFilter" LargeGlyph="Filter_Clear_32x32.png"/>
   </RibbonItem>
@@ -39,5 +37,8 @@
       <RibbonItem Action="SendMarkedEmail" LocalizedNameKey="SelectedRows" Glyph="Item_Number_16x16.png"/>
       <RibbonItem Action="SendCurrentEmail" LocalizedNameKey="CurrentRecord" Glyph="Attachments_16x16.png"/>
     </RibbonItem>
+  </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="SendAsOutlook" LocalizedNameKey="SendInvoiceInOutLook" LargeGlyph="Posted_Journal_32x32.png" />
   </RibbonItem>
 </root>

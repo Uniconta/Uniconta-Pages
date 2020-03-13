@@ -150,7 +150,7 @@ namespace UnicontaISO20022CreditTransfer
         /// Unstructured Remittance Information
         /// UK Danske bank not used for payment types 'Fast transfer' and 'Internal payment'
         /// </summary>
-        public override List<string> Ustrd(string externalAdvText, ISO20022PaymentTypes ISOPaymType, PaymentTypes paymentMethod)
+        public override List<string> Ustrd(string externalAdvText, ISO20022PaymentTypes ISOPaymType, PaymentTypes paymentMethod, bool extendedText)
         {
             List<string> resultList = new List<string>();
             return resultList;

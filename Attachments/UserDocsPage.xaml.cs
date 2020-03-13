@@ -178,7 +178,6 @@ namespace UnicontaClient.Pages.CustomPage
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
                 var files = e.Data.GetData(DataFormats.FileDrop) as string[];
-
                 if (files == null || files.Length == 0)
                     return;
 
@@ -187,9 +186,9 @@ namespace UnicontaClient.Pages.CustomPage
             else if (e.Data.GetDataPresent("FileGroupDescriptor"))
                 errors = Utility.DropOutlookMailsToGrid(dgDocsGrid, e.Data, false);
 
-            if (errors?.Count() > 0)
+            if (errors != null && errors.Length > 0)
             {
-                var cwErrorBox = new CWErrorBox(errors.ToArray(), true);
+                var cwErrorBox = new CWErrorBox(errors, true);
                 cwErrorBox.Show();
             }
         }
@@ -214,7 +213,7 @@ namespace UnicontaClient.Pages.CustomPage
                 var source = dgDocsGrid.ItemsSource as UserDocsClient[];
                 if (source != null && source.Length > 0)
                 {
-                    var userDocsClientRow = source.First();
+                    var userDocsClientRow = source[0];
                     if (userDocsClientRow.TableId == 71) /* Sales Order */
                         Requisition.Visible = false;
                     else if (userDocsClientRow.TableId == 72) /*Purchase Order */
@@ -269,7 +268,7 @@ namespace UnicontaClient.Pages.CustomPage
                     param[0] = newItem;
                     param[1] = false;
                     if (isCompUserDoc) param[2] = crudApi;
-                    AddDockItem(TabControls.UserDocsPage2, param, headerStr, ";component/Assets/img/Add_16x16.png");
+                    AddDockItem(TabControls.UserDocsPage2, param, headerStr, "Add_16x16.png");
                     break;
                 case "EditRow":
                     if (selectedItem == null || selectedItem.Created == DateTime.MinValue)
@@ -278,7 +277,7 @@ namespace UnicontaClient.Pages.CustomPage
                     para[0] = selectedItem;
                     para[1] = true;
                     if (isCompUserDoc) para[2] = crudApi;
-                    AddDockItem(TabControls.UserDocsPage2, para, headerStr, ";component/Assets/img/Edit_16x16.png");
+                    AddDockItem(TabControls.UserDocsPage2, para, headerStr, "Edit_16x16.png");
                     break;
 
                 case "RefreshGrid":
@@ -303,7 +302,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        
+
         public override void Utility_Refresh(string screenName, object argument = null)
         {
             if (screenName == TabControls.UserDocsPage2)
@@ -317,8 +316,18 @@ namespace UnicontaClient.Pages.CustomPage
                     else
                         master.HasDocs = false;
                 }
+                else if (master == null)
+                {
+                    var tableType = dgDocsGrid.masterRecord?.GetType();
+                    var hasDocsProp = tableType?.GetProperty("HasDocs");
+                    if (hasDocsProp != null)
+                    {
+                        var hasRecords = dgDocsGrid.VisibleRowCount > 0 ? true : false;
+                        hasDocsProp.SetValue(dgDocsGrid.masterRecord, hasRecords, null);
+                    }
+                }
+                SetColumn();
             }
-            SetColumn();
         }
 
         public override string NameOfControl

@@ -72,7 +72,7 @@ namespace UnicontaClient.Pages.CustomPage
                     object[] param = new object[2];
                     param[0] = api;
                     param[1] = null;
-                    AddDockItem(TabControls.PartnerProspectPage2, param, Uniconta.ClientTools.Localization.lookup("PartnerProspects"), ";component/Assets/img/Add_16x16.png");
+                    AddDockItem(TabControls.PartnerProspectPage2, param, Uniconta.ClientTools.Localization.lookup("PartnerProspects"), "Add_16x16.png");
                     break;
                 case "EditRow":
                     if (selectedItem != null)
@@ -128,7 +128,7 @@ namespace UnicontaClient.Pages.CustomPage
             var prospect = Activator.CreateInstance(selectedItem.GetType()) as PartnerProspectClient;
             StreamingManager.Copy(selectedItem, prospect);
             var parms = new object[2] { prospect, false };
-            AddDockItem(TabControls.PartnerProspectPage2, parms, Uniconta.ClientTools.Localization.lookup("PartnerProspects"), ";component/Assets/img/Add_16x16.png");
+            AddDockItem(TabControls.PartnerProspectPage2, parms, Uniconta.ClientTools.Localization.lookup("PartnerProspects"), "Add_16x16.png");
         }
 
         private void HasDocImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

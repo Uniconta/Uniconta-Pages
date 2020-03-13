@@ -61,13 +61,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectInvoiceBase"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PayrollCategory" Width="70"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Invoiceable" Width="70"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Qty" Width="80"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Unit" Width="100" Visible="False" >
-                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                            <DataTemplate>
-                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="ItemUnit"/>
-                            </DataTemplate>
-                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                    </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:ComboBoxColumnClient x:Name="Unit" Width="100" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PurchasePrice" Width="80"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CostPrice" Width="80"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="SalesPrice" Width="80"/>

@@ -26,13 +26,7 @@ x:Class="UnicontaClient.Pages.CustomPage.WarehousePage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Warehouse" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Name"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Sorting"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="UseFor">
-                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                            <DataTemplate>
-                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="WarehouseType" />
-                            </DataTemplate>
-                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                    </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:ComboBoxColumnClient x:Name="UseFor"/>
                 </localPage:WarehouseClientGrid.Columns>
             </localPage:WarehouseClientGrid>
         </CorasauControls:BusyIndicator>

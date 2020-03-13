@@ -31,8 +31,14 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorEmailSetupPage2"
                     <CorasauControls:CorasauLayoutItem FieldName="Default" x:Name="liDefault">
                         <CorasauControls:CheckEditor IsChecked="{Binding Default, Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
-
                 </CorasauControls:CorasauLayoutGroup>
+                
+                <CorasauControls:CorasauLayoutGroup x:Name="grpCompanySmtp" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CompanySMTP}" HorizontalAlignment="Left" Orientation="Vertical" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" >
+                    <CorasauControls:CorasauLayoutItem x:Name="CompanySMTP" FieldName="CompanySMTP">
+                        <CorasauControls:LookupEditor x:Name="leCompanySMTP" Text="{Binding CompanySMTP,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
+
                 <CorasauControls:CorasauLayoutGroup x:Name="grpSmtp" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Pop3Host}" HorizontalAlignment="Left" Orientation="Vertical" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" >
                     <CorasauControls:CorasauLayoutItem x:Name="itemHost" FieldName="Host">
                         <CorasauControls:TextEditor  Text="{Binding Host,Mode=TwoWay}"/>

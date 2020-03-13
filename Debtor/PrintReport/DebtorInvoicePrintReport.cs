@@ -93,7 +93,7 @@ namespace UnicontaClient.Pages.CustomPage
                     var invoiceLIneInstance = Activator.CreateInstance(debtorInvoiceLineUserType) as DebtorInvoiceLines;
                     dcInv = debtorInvoice;
                     InvTransInvoiceLines = (DebtorInvoiceLines[])await invApi.GetInvoiceLines(dcInv, invoiceLIneInstance);
-                    previousAddressClient = await GetPreviousAddressForInvoice(dcInv);
+                    previousAddressClient = await LayoutPrintReport.GetPreviousAddressClientForInvoice(dcInv, crudApi);
                 }
                 else
                 {
@@ -159,7 +159,12 @@ namespace UnicontaClient.Pages.CustomPage
 
                 //to Contact listing for the current debtor
                 if (Comp.Contacts)
-                    debtorClientUser.Contacts = await crudApi.Query<ContactClient>(debtorClientUser);
+                {
+                    var ContactsCache = Comp.GetCache(typeof(Uniconta.DataModel.Contact)) ?? await crudApi.LoadCache(typeof(Uniconta.DataModel.Contact)).ConfigureAwait(false);
+                    var contactCacheFilter = new ContactCacheFilter(ContactsCache, debtorClientUser.__DCType(), debtorClientUser._Account);
+                    var contacts = contactCacheFilter.Cast<ContactClient>().ToArray();
+                    debtorClientUser.Contacts = contacts;
+                }
                 Debtor = debtorClientUser;
 
                 if (dcInv._Installation != null && Comp.GetCache(typeof(Uniconta.DataModel.WorkInstallation)) == null)
@@ -221,21 +226,6 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
             }
             return Utility.GetDebtorMessageClient(crudApi, lang, emailType);
-        }
-
-        async private Task<DCPreviousAddressClient> GetPreviousAddressForInvoice(DCInvoiceClient invClient)
-        {
-            if (invClient == null || crudApi == null)
-                return null;
-
-            DCPreviousAddressClient selectedDateInvoiceAddr = null;
-            var propvaluePairList = new System.Collections.Generic.List<PropValuePair>() { PropValuePair.GenereteWhereElements("DateChange", invClient.Date, CompareOperator.GreaterThan) };
-            var previousAddresses = await crudApi.Query<DCPreviousAddressClient>(invClient, propvaluePairList);
-
-            if (previousAddresses != null && previousAddresses.Length > 0)
-                selectedDateInvoiceAddr = previousAddresses.FirstOrDefault();
-
-            return selectedDateInvoiceAddr;
         }
     }
 }

@@ -120,9 +120,17 @@ namespace UnicontaClient.Pages.CustomPage
 
             switch (ActionType)
             {
+                case "EditRow":
+                    if (selectedItem == null)
+                        return;
+                    object[] EditParam = new object[2];
+                    EditParam[0] = selectedItem as CreditorInvoiceClient;
+                    EditParam[1] = true;
+                    AddDockItem(TabControls.CreditorInvoicePage2, EditParam, string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("CreditorPackNote"), selectedItem.Name));
+                    break;
                 case "DeliveryNoteLine":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.CreditorInvoiceLine, dgCreditorDeliveryNoteGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("PackNoteNumber"), selectedItem._InvoiceNumber));
+                        AddDockItem(TabControls.CreditorInvoiceLine, dgCreditorDeliveryNoteGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("PackNoteNumber"), selectedItem.InvoiceNum));
                     break;
                 case "ShowDeliveryNote":
                     if (selectedItem == null || dgCreditorDeliveryNoteGrid.SelectedItems == null)
@@ -136,11 +144,17 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "AddDoc":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.UserDocsPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Documents"), selectedItem._InvoiceNumber));
+                        AddDockItem(TabControls.UserDocsPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Documents"), selectedItem.InvoiceNum));
                     break;
                 case "RefreshGrid":
                     InitQuery();
                     break;
+#if !SILVERLIGHT
+                case "SendAsOutlook":
+                    if (selectedItem != null)
+                        OpenOutLook(selectedItem);
+                    break;
+#endif
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -184,8 +198,14 @@ namespace UnicontaClient.Pages.CustomPage
                 var packNotelist = packNoteItems.ToList();
 #if !SILVERLIGHT
                 var failedPrints = new List<long>();
-                var reports = new List<IPrintReport>();
-                long invNumber = 0;
+                var count = packNotelist.Count;
+                string dockName = null, reportName = null;
+
+                if (count > 1)
+                {
+                    dockName = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Preview"), Uniconta.ClientTools.Localization.lookup("CreditorPackNote"));
+                    reportName = Uniconta.ClientTools.Localization.lookup("CreditorPackNote");
+                }
 #elif SILVERLIGHT
                 int top = 200, left = 300;
                 int count = packNotelist.Count();
@@ -196,38 +216,41 @@ namespace UnicontaClient.Pages.CustomPage
                 foreach (var pckNote in packNotelist)
                 {
 #if !SILVERLIGHT
+                    IsGeneratingPacknote = true;
                     IPrintReport printreport = await PrintPacknote(pckNote);
-                    invNumber = pckNote._InvoiceNumber;
 
                     if (printreport?.Report != null)
-                        reports.Add(printreport);
+                    {
+                        if (count > 1 && IsGeneratingPacknote)
+                        {
+                            ribbonControl.DisableButtons(new string[] { "ShowDeliveryNote" });
+                            if (standardPrintPreviewPage == null)
+                                standardPrintPreviewPage = dockCtrl.AddDockItem(api?.CompanyEntity, TabControls.StandardPrintReportPage, ParentControl, new object[] { printreport }, dockName) as StandardPrintReportPage;
+                            else
+                                standardPrintPreviewPage.InsertToMasterReport(printreport.Report);
+                        }
+                        else
+                        {
+                            var pckNumber = pckNote.InvoiceNumber;
+                            reportName = string.Format("{0}_{1}", Uniconta.ClientTools.Localization.lookup("CreditorPackNote"), pckNumber);
+                            dockName = string.Format("{0} {1}", Uniconta.ClientTools.Localization.lookup("Preview"), string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("CreditorPackNote"), pckNumber));
+
+                            AddDockItem(TabControls.StandardPrintReportPage, new object[] { new List<IPrintReport> { printreport }, reportName }, dockName);
+                            break;
+                        }
+                    }
                     else
-                        failedPrints.Add(invNumber);
+                        failedPrints.Add(pckNote.InvoiceNumber);
                 }
 
-                if (reports.Count > 0)
+                IsGeneratingPacknote = false;
+                ribbonControl.EnableButtons(new string[] { "ShowDeliveryNote" });
+
+                if (failedPrints.Count > 0)
                 {
-                    if (reports.Count == 1 && invNumber > 0)
-                    {
-                        var reportName = string.Format("{0}_{1}", Uniconta.ClientTools.Localization.lookup("CreditorPackNote"), invNumber);
-                        var dockName = string.Format("{0} {1}", Uniconta.ClientTools.Localization.lookup("Preview"), string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("CreditorPackNote"), invNumber));
-                        AddDockItem(TabControls.StandardPrintReportPage, new object[] { reports, reportName }, dockName);
-                    }
-                    else
-                    {
-                        var reportsName = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ShowPrint"), Uniconta.ClientTools.Localization.lookup("CreditorPackNote"));
-                        AddDockItem(TabControls.StandardPrintReportPage, new object[] { reports, Uniconta.ClientTools.Localization.lookup("CreditorPackNote") }, reportsName);
-                    }
-
-                    if (failedPrints.Count > 0)
-                    {
-                        var failedList = string.Join(",", failedPrints);
-                        UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("FailedPrintmsg") + failedList, Uniconta.ClientTools.Localization.lookup("Error"), MessageBoxButton.OK);
-                    }
+                    var failedList = string.Join(",", failedPrints);
+                    UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("FailedPrintmsg") + failedList, Uniconta.ClientTools.Localization.lookup("Error"), MessageBoxButton.OK);
                 }
-                else
-                    UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("LayoutDoesNotExist"), Uniconta.ClientTools.Localization.lookup("CreditorPackNote")),
-                      Uniconta.ClientTools.Localization.lookup("Error"), MessageBoxButton.OK);
 #elif SILVERLIGHT
                         DefaultPrint(pckNote, true, new Point(top, left));
                         left = left - left / count;
@@ -238,16 +261,34 @@ namespace UnicontaClient.Pages.CustomPage
                     DefaultPrint(packNotelist.Single());
 #endif
             }
-
             catch (Exception ex)
             {
                 busyIndicator.IsBusy = false;
-                api.ReportException(ex, string.Format("PurchasePacknote.ShowInvoice(), CompanyId={0}", api.CompanyId));
+                api.ReportException(ex, string.Format("CreditorDeliveryNotes.ShowPackNote(), CompanyId={0}", api.CompanyId));
             }
             finally { busyIndicator.IsBusy = false; }
         }
 
 #if !SILVERLIGHT
+        async private void OpenOutLook(CreditorDeliveryNoteLocal invClient)
+        {
+            try
+            {
+                busyIndicator.IsBusy = true;
+                busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("LaunchingWaitMsg");
+                var creditor = invClient.Creditor;
+                var invoiceReport = await PrintPacknote(invClient);
+                InvoicePostingPrintGenerator.OpenReportInOutlook(api, invoiceReport, invClient, creditor, Uniconta.DataModel.CompanyLayoutType.PurchasePacknote);
+            }
+            catch (Exception ex)
+            {
+                UnicontaMessageBox.Show(ex.Message, Uniconta.ClientTools.Localization.lookup("Exception"));
+            }
+            finally { busyIndicator.IsBusy = false; }
+        }
+
+        bool IsGeneratingPacknote;
+        StandardPrintReportPage standardPrintPreviewPage;
         private async Task<IPrintReport> PrintPacknote(CreditorDeliveryNoteLocal creditorInvoice)
         {
             IPrintReport iprintReport = null;
@@ -266,12 +307,14 @@ namespace UnicontaClient.Pages.CustomPage
 
                 if (iprintReport?.Report == null)
                 {
-                    iprintReport = new LayoutPrintReport(api, standardCreditorInvoice, Uniconta.DataModel.CompanyLayoutType.PurchasePacknote);
+                    iprintReport = new LayoutPrintReport(api, creditorInvoice, Uniconta.DataModel.CompanyLayoutType.PurchasePacknote);
                     await iprintReport.InitializePrint();
                 }
             }
             return iprintReport;
         }
+
+        public override bool IsDataChaged => IsGeneratingPacknote;
 
 #elif SILVERLIGHT
 
@@ -281,8 +324,7 @@ namespace UnicontaClient.Pages.CustomPage
             ob[0] = creditorInvoice;
             ob[1] = Uniconta.DataModel.CompanyLayoutType.PurchasePacknote;
             string headerName = "CreditorPackNote";
-            AddDockItem(TabControls.ProformaInvoice, ob, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup(headerName),
-                creditorInvoice._InvoiceNumber));
+            AddDockItem(TabControls.ProformaInvoice, ob, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup(headerName), creditorInvoice.InvoiceNum));
         }
 
         private void DefaultPrint(CreditorDeliveryNoteLocal creditorInvoice, bool isFloat, Point position)
@@ -291,8 +333,7 @@ namespace UnicontaClient.Pages.CustomPage
             ob[0] = creditorInvoice;
             ob[1] = Uniconta.DataModel.CompanyLayoutType.PurchasePacknote;
             string headerName = "CreditorPackNote";
-            AddDockItem(TabControls.ProformaInvoice, ob, isFloat, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup(headerName),
-                creditorInvoice._InvoiceNumber), floatingLoc: position);
+            AddDockItem(TabControls.ProformaInvoice, ob, isFloat, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup(headerName), creditorInvoice.InvoiceNum), floatingLoc: position);
         }
 #endif
         private void SetHeader()
@@ -338,6 +379,19 @@ namespace UnicontaClient.Pages.CustomPage
         async void InitialLoad()
         {
             Credcache = api.GetCache(typeof(Uniconta.DataModel.Creditor)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Creditor));
+        }
+
+        public override void Utility_Refresh(string screenName, object argument = null)
+        {
+            if (screenName == TabControls.StandardPrintReportPage)
+            {
+#if !SILVERLIGHT
+                IsGeneratingPacknote = false;
+                standardPrintPreviewPage = null;
+#endif
+            }
+            if (screenName == TabControls.InvoicePage2)
+                dgCreditorDeliveryNoteGrid.UpdateItemSource(argument);
         }
     }
 }

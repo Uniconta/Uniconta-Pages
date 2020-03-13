@@ -52,7 +52,7 @@ namespace UnicontaClient.Pages.CustomPage
             var selectedItem = dgGLSplitLineGrid.SelectedItem as GLSplitLineClient;
             if (selectedItem == null)
                 return;
-            AddDockItem(TabControls.GlSplitLinePage2, selectedItem, Uniconta.ClientTools.Localization.lookup("SplitLine"), ";component/Assets/img/Edit_16x16.png");
+            AddDockItem(TabControls.GlSplitLinePage2, selectedItem, Uniconta.ClientTools.Localization.lookup("SplitLine"), "Edit_16x16.png");
         }
 
 
@@ -65,12 +65,12 @@ namespace UnicontaClient.Pages.CustomPage
                     object[] ob = new object[2];
                     ob[0] = dgGLSplitLineGrid.masterRecord;
                     ob[1] = api;
-                    AddDockItem(TabControls.GlSplitLinePage2, ob, Uniconta.ClientTools.Localization.lookup("SplitLine"), ";component/Assets/img/Add_16x16.png");
+                    AddDockItem(TabControls.GlSplitLinePage2, ob, Uniconta.ClientTools.Localization.lookup("SplitLine"), "Add_16x16.png");
                     break;
                 case "EditRow":
                     if (selectedItem == null)
                         return;
-                    AddDockItem(TabControls.GlSplitLinePage2, selectedItem, Uniconta.ClientTools.Localization.lookup("SplitLine"), ";component/Assets/img/Edit_16x16.png");
+                    AddDockItem(TabControls.GlSplitLinePage2, selectedItem, Uniconta.ClientTools.Localization.lookup("SplitLine"), "Edit_16x16.png");
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);

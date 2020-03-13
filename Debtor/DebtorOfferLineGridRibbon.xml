@@ -38,11 +38,12 @@
     </RibbonItem>
   </RibbonItem>
   <RibbonItem>
+    <RibbonItem Action="PrintOffer" LocalizedNameKey="Offer" LargeGlyph="Print_32x32.png"/>
+  </RibbonItem>
+  <RibbonItem>
     <RibbonItem Action="Storage" LocalizedNameKey="OnHand" Module="Storage" LargeGlyph="Storage_32x32.png"/>
     <RibbonItem Action="Serial" LocalizedNameKey="SerialBatchNumbers" Module="SerialBatchNumbers" LargeGlyph="Account-statement_32x32.png"/>
     <RibbonItem Action="StockLines" LocalizedNameKey="InvTransactions" LargeGlyph="Inventory_Trans_32x32.png"/>
-  </RibbonItem>
-  <RibbonItem>
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="InsertSubTotal" LocalizedNameKey="InsertSubTotal" Parameter="Line" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png"/>

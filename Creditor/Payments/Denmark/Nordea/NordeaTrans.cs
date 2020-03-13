@@ -114,6 +114,20 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
             var externalAdvText = StandardPaymentFunctions.ExternalMessage(paymentFormat._Message, tran, company, creditor);
             var message = externalAdvText;
 
+            //Extended notification
+            if (danishFields.TransTypeCommand != NordeaPaymentFormat.TRANSTYPE_49)
+            {
+                if (paymentFormat._ExtendedText)
+                {
+                    if (message == null || message.Length <= 20)
+                        message = string.Empty;
+                }
+                else
+                {
+                    message = string.Empty;
+                }
+            }
+
             int maxStrLen = 35;
             int maxLines = 4;
 
@@ -187,6 +201,8 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
             danishFields.Blanks2 = string.Empty;
 
             danishFields.TextToBeneficiary = danishFields.TransTypeCommand == NordeaPaymentFormat.TRANSTYPE_45 ? ShortenWordToCriteria(externalAdvText, 20) : string.Empty;
+
+          
 
             maxStrLen = 35;
             maxLines = 37;

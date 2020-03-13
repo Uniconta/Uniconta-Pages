@@ -23,6 +23,7 @@ namespace UnicontaClient.Pages.CustomPage
         public override Type TableType { get { return typeof(GLOffsetAccountLineGridClient); } }
         public override bool Readonly { get { return false; } }
         protected override List<string> GridSkipFields { get { return new List<string>() { "AccountName" }; } }
+        protected override bool RenderAllColumns { get { return true; } }
     }
 
     public partial class GLOffsetAccountTemplate : GridBasePage
@@ -154,7 +155,7 @@ namespace UnicontaClient.Pages.CustomPage
         void SaveGridData()
         {
             var lines = dgGlOffSetAccountTplt.ItemsSource as IEnumerable<GLOffsetAccountLine>;
-            if (lines != null && !lines.Any())
+            if (lines != null && lines.Count() == 0)
                 lines = null;
             if (glDailyJournalLine != null)
             {

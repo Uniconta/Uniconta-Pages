@@ -57,14 +57,17 @@ namespace UnicontaClient.Pages.CustomPage
             BusyIndicator = busyIndicator;
             layoutControl = layoutItems;
             StartLoadCache();
-            if (editrow == null && LoadedRow == null)
-            {
-                editrow = CreateNew() as ContactClient;
-                editrow.SetMaster(master != null ? master : api.CompanyEntity);
-            }
             if (LoadedRow == null)
+            {
+                if (editrow == null)
+                {
+                    editrow = CreateNew() as ContactClient;
+                    editrow.SetMaster(master != null ? master : api.CompanyEntity);
+                }
+                else
+                    SetTemplate();
                 frmRibbon.DisableButtons(new string[] { "Delete" });
-
+            }
             lookupDCAccount.api = crudapi;
             layoutItems.DataContext = editrow;
             frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;

@@ -53,7 +53,7 @@ namespace UnicontaClient.Pages.CustomPage
             switch (ActionType)
             {
                 case "AddRow":
-                    AddDockItem(TabControls.DebtorEmailSetupPage2, api, Uniconta.ClientTools.Localization.lookup("EmailSetup"), ";component/Assets/img/Add_16x16.png");
+                    AddDockItem(TabControls.DebtorEmailSetupPage2, api, Uniconta.ClientTools.Localization.lookup("EmailSetup"), "Add_16x16.png");
                     break;
 
                 case "CopyRow":
@@ -62,8 +62,7 @@ namespace UnicontaClient.Pages.CustomPage
                     object[] copyParam = new object[2];
                     copyParam[0] = StreamingManager.Clone(selectedItem);
                     copyParam[1] = false;
-                    AddDockItem(TabControls.DebtorEmailSetupPage2, copyParam, string.Format("{0}: {1}", string.Format(Uniconta.ClientTools.Localization.lookup("CopyOBJ"), Uniconta.ClientTools.Localization.lookup("EmailSetup")), selectedItem.Name),
-                        ";component/Assets/img/Copy_16x16.png");
+                    AddDockItem(TabControls.DebtorEmailSetupPage2, copyParam, string.Format("{0}: {1}", string.Format(Uniconta.ClientTools.Localization.lookup("CopyOBJ"), Uniconta.ClientTools.Localization.lookup("EmailSetup")), selectedItem._Name), "Copy_16x16.png");
                     break;
 
                 case "EditRow":
@@ -72,7 +71,7 @@ namespace UnicontaClient.Pages.CustomPage
                     object[] editParam = new object[2];
                     editParam[0] = selectedItem;
                     editParam[1] = true;
-                    AddDockItem(TabControls.DebtorEmailSetupPage2, editParam, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("EmailSetup"), selectedItem.Name), ";component/Assets/img/Edit_16x16.png");
+                    AddDockItem(TabControls.DebtorEmailSetupPage2, editParam, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("EmailSetup"), selectedItem._Name), "Edit_16x16.png");
                     break;
                 case "Attachments":
                     if (selectedItem != null)

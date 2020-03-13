@@ -100,7 +100,7 @@ namespace UnicontaClient.Pages.CustomPage
                     object[] param = new object[2];
                     param[0] = api;
                     param[1] = null;
-                    AddDockItem(TabControls.UserTablePage2, param, Uniconta.ClientTools.Localization.lookup("UserTables"), ";component/Assets/img/Add_16x16.png");
+                    AddDockItem(TabControls.UserTablePage2, param, Uniconta.ClientTools.Localization.lookup("UserTables"), "Add_16x16.png");
                     break;
                 case "EditRow":
                     if (selectedItem != null && selectedItem._SharedFromCompanyId == 0)

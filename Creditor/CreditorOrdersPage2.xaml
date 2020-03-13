@@ -23,7 +23,6 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOrdersPage2"
             </Grid.RowDefinitions>
             <CorasauControls:CorasauRibbonControl x:Name="frmRibbon" XMLSourcePath=";component/Pages/Debtor/OrderRibbon.xml" Grid.Row="0"/>
             <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
-
                 <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="grpFirst">
                     <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpAccounts" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Accounts}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="425">
                         <CorasauControls:CorasauLayoutItem FieldName="Account" Style="{StaticResource LayoutItemsstyle}" x:Name="AcItem" ButtonContent="+">
@@ -129,6 +128,17 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOrdersPage2"
                             <CorasauControls:CheckEditor  IsChecked="{Binding DeleteLines,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
+                    <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpSize" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Size}"  Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="425">
+                        <CorasauControls:CorasauLayoutItem FieldName="Weight" x:Name="liWeigt">
+                            <CorasauControls:DoubleEditor EditValue="{Binding Weight, Mode=OneWay}" Mask="n3" MaskType="Numeric" IsReadOnly="True" MaskUseAsDisplayFormat="True" BindningIsSet="True"  />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="Volume" x:Name="liVolume">
+                            <CorasauControls:DoubleEditor EditValue="{Binding Volume, Mode=OneWay}" IsReadOnly="True" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="Cartons" x:Name="liCartons">
+                            <CorasauControls:DoubleEditor EditValue="{Binding Cartons, Mode=OneWay}" IsReadOnly="True"/>
+                        </CorasauControls:CorasauLayoutItem>
+                    </CorasauControls:CorasauLayoutGroup>
                 </CorasauControls:CorasauLayoutGroup>
                 <CorasauControls:CorasauLayoutGroup Orientation="Vertical"  x:Name="lastGroup">
                     <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="dAddress" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="425">
@@ -212,14 +222,19 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOrdersPage2"
                         <CorasauControls:CorasauLayoutItem FieldName="PriceList" x:Name="priceListLayoutItem">
                             <CorasauControls:LookupEditor x:Name="PriceListlookupeditior" EditValue="{Binding PriceList,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="Approver" x:Name="liApprover">
-                            <CorasauControls:LookupEditor x:Name="leApprover"  EditValue="{Binding Approver,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="LayoutGroup" x:Name="liLayoutGroup">
                             <CorasauControls:LookupEditor x:Name="leLayoutGroup" EditValue="{Binding LayoutGroup,Mode=TwoWay}"  />
                         </CorasauControls:CorasauLayoutItem>
+                    </CorasauControls:CorasauLayoutGroup>
+                    <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpApproval"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Approval}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="450" >
+                        <CorasauControls:CorasauLayoutItem FieldName="Approver" x:Name="liApprover">
+                            <CorasauControls:LookupEditor x:Name="leApprover"  EditValue="{Binding Approver,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="Approved" x:Name="liApproved">
                             <CorasauControls:CheckEditor  IsChecked="{Binding Approved,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="ApprovedDate" x:Name="liApprovedDate">
+                            <CorasauControls:DateEditor x:Name="deApprovedDate" Mask="g" EditValue="{Binding ApprovedDate,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
                 </CorasauControls:CorasauLayoutGroup>

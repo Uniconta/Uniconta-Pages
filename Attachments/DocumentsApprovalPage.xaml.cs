@@ -29,6 +29,7 @@ namespace UnicontaClient.Pages.CustomPage
     {
         public override Type TableType { get { return typeof(VouchersClient); } }
         public override IComparer GridSorting { get { return new SortDocAttached(); } }
+        public IList ToListLocal(VouchersClient[] Arr) { return this.ToList(Arr); }
     }
     public partial class DocumentsApprovalPage : GridBasePage
     {
@@ -53,56 +54,59 @@ namespace UnicontaClient.Pages.CustomPage
             dgVoucherApproveGrid.BusyIndicator = busyIndicator;
             SetRibbonControl(localMenu, dgVoucherApproveGrid);
             localMenu.OnItemClicked += localMenu_OnItemClicked;
+            docApi = new DocumentAPI(api);
         }
 
         public override bool IsDataChaged { get { return false; } }
-
+        DocumentAPI docApi;
         public async override Task InitQuery()
         {
-            var docApi = new DocumentAPI(api);
             busyIndicator.IsBusy = true;
-            var documents = (VouchersClient[])await docApi.DocumentsForApproval(new VouchersClient(), employee);
-            busyIndicator.IsBusy = false;
-            dgVoucherApproveGrid.ItemsSource = documents?.ToList();
+            var voucherClientUserType = dgVoucherApproveGrid.TableTypeUser;
+            var voucherClientUserObj = Activator.CreateInstance(voucherClientUserType) as VouchersClient;
+            var documents = (VouchersClient[])await docApi.DocumentsForApproval(voucherClientUserObj, employee);
+            dgVoucherApproveGrid.ItemsSource = dgVoucherApproveGrid.ToListLocal(documents);
             dgVoucherApproveGrid.Visibility = Visibility.Visible;
-            dgVoucherApproveGrid.BusyIndicator = busyIndicator;
+            busyIndicator.IsBusy = false;
         }
         private void localMenu_OnItemClicked(string ActionType)
         {
             var selectedItem = dgVoucherApproveGrid.SelectedItem as VouchersClient;
-            if (selectedItem == null)
-                return;
+
             switch (ActionType)
             {
                 case "Approve":
-                    ApproveDoc(selectedItem);
+                    if (selectedItem != null)
+                        ApproveDoc(selectedItem);
                     break;
                 case "ApproveWithComments":
                 case "Reject":
                 case "Await":
-                    CWCommentsDialogBox commentsDialog = new CWCommentsDialogBox(Uniconta.ClientTools.Localization.lookup("Comment"), false, DateTime.MinValue);
-#if !SILVERLIGHT
-                    commentsDialog.DialogTableId = 2000000068;
-#endif
-                    commentsDialog.Closing += async delegate
+                    if (selectedItem != null)
                     {
-                        if (commentsDialog.DialogResult == true)
+                        CWCommentsDialogBox commentsDialog = new CWCommentsDialogBox(Uniconta.ClientTools.Localization.lookup("Note"), false, DateTime.MinValue);
+#if !SILVERLIGHT
+                        commentsDialog.DialogTableId = 2000000068;
+#endif
+                        commentsDialog.Closing += async delegate
                         {
-                            var result = ErrorCodes.NoSucces;
-                            var docApi = new DocumentAPI(api);
-                            if(ActionType == "ApproveWithComments")
-                                result = await docApi.DocumentSetApprove(selectedItem, commentsDialog.Comments, employee);
-                            if (ActionType == "Reject")
-                                result = await docApi.DocumentSetReject(selectedItem, commentsDialog.Comments, employee);
-                            if (ActionType == "Await")
-                                result = await docApi.DocumentSetWait(selectedItem, commentsDialog.Comments, employee);
-                            if (result == ErrorCodes.Succes)
-                                RemoveRow(selectedItem);
-                            else
-                                UtilDisplay.ShowErrorCode(result);
-                        }
-                    };
-                    commentsDialog.Show();
+                            if (commentsDialog.DialogResult == true)
+                            {
+                                var result = ErrorCodes.NoSucces;
+                                if (ActionType == "ApproveWithComments")
+                                    result = await docApi.DocumentSetApprove(selectedItem, commentsDialog.Comments, employee);
+                                if (ActionType == "Reject")
+                                    result = await docApi.DocumentSetReject(selectedItem, commentsDialog.Comments, employee);
+                                if (ActionType == "Await")
+                                    result = await docApi.DocumentSetWait(selectedItem, commentsDialog.Comments, employee);
+                                if (result == ErrorCodes.Succes)
+                                    RemoveRow(selectedItem);
+                                else
+                                    UtilDisplay.ShowErrorCode(result);
+                            }
+                        };
+                        commentsDialog.Show();
+                    }
                     break;
                 case "ViewVoucher":
                     if (selectedItem != null)
@@ -111,16 +115,38 @@ namespace UnicontaClient.Pages.CustomPage
                 case "RefreshGrid":
                     InitQuery();
                     break;
+                case "ModifyApprover":
+                    if (selectedItem != null)
+                        ModifyApprover(selectedItem);
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
         }
 
+        void ModifyApprover(VouchersClient voucher)
+        {
+            var cwEmployee = new CWEmployee(api);
+#if !SILVERLIGHT
+            cwEmployee.DialogTableId = 2000000076;
+#endif
+            cwEmployee.Closed += async delegate
+            {
+                if (cwEmployee.DialogResult == true)
+                {
+                    var result = await docApi.ChangeApprover(voucher, cwEmployee.Employee, cwEmployee.Comment);
+                    if (result == ErrorCodes.Succes)
+                        RemoveRow(voucher);
+                    else
+                        UtilDisplay.ShowErrorCode(result);
+                }
+            };
+            cwEmployee.Show();
+        }
         async void ApproveDoc(VouchersClient selectedItem)
         {
-            var docApi = new DocumentAPI(api);
-            var  result = await docApi.DocumentSetApprove(selectedItem, null, employee);
+            var result = await docApi.DocumentSetApprove(selectedItem, null, employee);
             if (result == ErrorCodes.Succes)
                 RemoveRow(selectedItem);
             else

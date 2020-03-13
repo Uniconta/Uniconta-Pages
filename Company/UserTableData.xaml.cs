@@ -167,8 +167,8 @@ namespace UnicontaClient.Pages.CustomPage
                 childRibbon.Name = nodeText;
                 childRibbon.ActionName = dtlTables.Count > 1 ? "" : string.Format("UserTableData;{0}", tblName);
                 childRibbon.Child = childList;
-                childRibbon.Glyph = ";component/Assets/img/UserFieldData_32x32.png";
-                childRibbon.LargeGlyph = ";component/Assets/img/UserFieldData_32x32.png";
+                childRibbon.Glyph = "UserFieldData_32x32.png";
+                childRibbon.LargeGlyph = "UserFieldData_32x32.png";
                 var userRbnList = new List<TreeRibbon>();
                 userRbnList.Add(childRibbon);
                 var treeRibbon = new TreeRibbon();
@@ -182,8 +182,8 @@ namespace UnicontaClient.Pages.CustomPage
                         var ribbonNode = new TreeRibbon();
                         ribbonNode.Name = !string.IsNullOrEmpty(ur._Prompt) ? UserFieldControl.LocalizePrompt(ur._Prompt) : ur._Name;
                         ribbonNode.ActionName = string.Format("UserTableData;{0}", ur._Name);
-                        ribbonNode.LargeGlyph = ";component/Assets/img/CopyUserTable_16x16.png";
-                        ribbonNode.Glyph = ";component/Assets/img/CopyUserTable_16x16.png";
+                        ribbonNode.LargeGlyph = "CopyUserTable_16x16.png";
+                        ribbonNode.Glyph = "CopyUserTable_16x16.png";
                         ribbonNode.Child = new List<TreeRibbon>();
                         ribbonList.Add(ribbonNode);
                     }
@@ -286,7 +286,7 @@ namespace UnicontaClient.Pages.CustomPage
                         param[0] = api;
                         param[1] = this.thMaster;
                         param[2] = this.master;
-                        AddDockItem(TabControls.UserTableDataPage2, param, (this.thMaster as TableHeader)?._Name, ";component/Assets/img/Add_16x16.png");
+                        AddDockItem(TabControls.UserTableDataPage2, param, (this.thMaster as TableHeader)?._Name, "Add_16x16.png");
                     }
                     break;
                 case "EditItem":
@@ -295,7 +295,7 @@ namespace UnicontaClient.Pages.CustomPage
                         object[] parameter = new object[2];
                         parameter[0] = selectedItem;
                         parameter[1] = this.thMaster;
-                        AddDockItem(TabControls.UserTableDataPage2, parameter, (this.thMaster as TableHeader)?._Name, ";component/Assets/img/Edit_16x16.png");
+                        AddDockItem(TabControls.UserTableDataPage2, parameter, (this.thMaster as TableHeader)?._Name, "Edit_16x16.png");
                     }
                     break;
                 case "AddNote":

@@ -144,11 +144,11 @@ namespace UnicontaClient.Pages.CustomPage
                     if (dgProjectGrid.masterRecords != null)
                     {
                         object[] arr = new object[] { api, dgProjectGrid.masterRecord };
-                        AddDockItem(TabControls.ProjectPage2, arr, Uniconta.ClientTools.Localization.lookup("Project"), ";component/Assets/img/Add_16x16.png");
+                        AddDockItem(TabControls.ProjectPage2, arr, Uniconta.ClientTools.Localization.lookup("Project"), "Add_16x16.png");
                     }
                     else
                     {
-                        AddDockItem(TabControls.ProjectPage2, api, Uniconta.ClientTools.Localization.lookup("Project"), ";component/Assets/img/Add_16x16.png");
+                        AddDockItem(TabControls.ProjectPage2, api, Uniconta.ClientTools.Localization.lookup("Project"), "Add_16x16.png");
                     }
                     break;
                 case "EditRow":
@@ -182,13 +182,6 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         string header = string.Format("{0}/{1}", Uniconta.ClientTools.Localization.lookup("ProjectCategorySum"), selectedItem._Number);
                         AddDockItem(TabControls.ProjectTransCategorySumPage, dgProjectGrid.syncEntity, header);
-                    }
-                    break;
-                case "InvoiceBase":
-                    if (selectedItem != null)
-                    {
-                        salesHeader = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("GenerateInvoice"), selectedItem._Number);
-                        AddDockItem(TabControls.ProjectInvoiceBase, dgProjectGrid.syncEntity, salesHeader);
                     }
                     break;
                 case "OnAccountInvoicing":
@@ -418,7 +411,7 @@ namespace UnicontaClient.Pages.CustomPage
                         string msg = Uniconta.ClientTools.Localization.lookup("InvoiceProposal");
                         if (invoicePostingResult.PostingResult.Header._InvoiceNumber != 0)
                         {
-                            msg = string.Format(Uniconta.ClientTools.Localization.lookup("InvoiceHasBeenGenerated"), invoicePostingResult.PostingResult.Header._InvoiceNumber);
+                            msg = string.Format(Uniconta.ClientTools.Localization.lookup("InvoiceHasBeenGenerated"), invoicePostingResult.PostingResult.Header.InvoiceNum);
                             msg = string.Format("{0}{1}{2} {3}", msg, Environment.NewLine, Uniconta.ClientTools.Localization.lookup("LedgerVoucher"), invoicePostingResult.PostingResult.Header._Voucher);
 
 #if !SILVERLIGHT
@@ -442,7 +435,7 @@ namespace UnicontaClient.Pages.CustomPage
             var project = Activator.CreateInstance(selectedItem.GetType()) as ProjectClient;
             StreamingManager.Copy(selectedItem, project);
             var parms = new object[2] { project, false };
-            AddDockItem(TabControls.ProjectPage2, parms, Uniconta.ClientTools.Localization.lookup("Project"), ";component/Assets/img/Add_16x16.png");
+            AddDockItem(TabControls.ProjectPage2, parms, Uniconta.ClientTools.Localization.lookup("Project"), "Add_16x16.png");
         }
 
         async void WorkOrderInput(ProjectClient project)
@@ -450,7 +443,7 @@ namespace UnicontaClient.Pages.CustomPage
             var journals = await api.Query<ProjectJournalClient>(api.session.User);
             ProjectJournalClient journal;
             if (journals != null && journals.Length > 0)
-                journal = journals.First();
+                journal = journals[0];
             else
             {
                 var employeeCache = api.GetCache(typeof(Uniconta.DataModel.Employee)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Employee));

@@ -57,18 +57,17 @@ namespace UnicontaClient.Pages.CustomPage
 
         async private void Save()
         {
-            dgProjectTaskGrid.BusyIndicator.IsBusy = true;
+            SetBusy();
             dgProjectTaskGrid.BusyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("Saving");
             var err = await dgProjectTaskGrid.SaveData();
-            dgProjectTaskGrid.BusyIndicator.IsBusy = false;
+            ClearBusy();
         }
 
         protected override async void LoadCacheInBackGround()
         {
             var api = this.api;
-            var Comp = api.CompanyEntity;
-            if (Comp.ProjectTask)
-                ProjectCache = Comp.GetCache(typeof(Uniconta.DataModel.Project)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.Project), api).ConfigureAwait(false);
+            if (api.CompanyEntity.ProjectTask)
+                ProjectCache = api.GetCache(typeof(Uniconta.DataModel.Project)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Project)).ConfigureAwait(false);
         }
 
         private void FollowsTask_GotFocus(object sender, RoutedEventArgs e)

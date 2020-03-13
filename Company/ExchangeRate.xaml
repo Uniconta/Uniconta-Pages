@@ -22,20 +22,8 @@ x:Class="UnicontaClient.Pages.CustomPage.ExchangeRate"
             <localPage:ExchangeRateGrid  x:Name="dgExchangeRate" AutoGenerateColumns="None" HorizontalAlignment="Stretch">
                 <localPage:ExchangeRateGrid.Columns>                    
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Date" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CCY1">
-                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                            <DataTemplate>
-                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor"  AppEnumName="Currencies"/>
-                            </DataTemplate>
-                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                    </localPage:CorasauDataGridTemplateColumnClient>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CCY2">
-                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                            <DataTemplate>
-                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="Currencies"/>
-                            </DataTemplate>
-                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                    </localPage:CorasauDataGridTemplateColumnClient>                    
+                    <localPage:ComboBoxColumnClient x:Name="CCY1" />
+                    <localPage:ComboBoxColumnClient x:Name="CCY2" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Rate" AllowThousandMask="True" Mask="N5"/>                    
                 </localPage:ExchangeRateGrid.Columns>
             </localPage:ExchangeRateGrid>

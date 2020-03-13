@@ -53,12 +53,17 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
                     {
                         foreach (CheckError error in validateRes.CheckErrors)
                         {
-                            rec._ErrorInfo += error.ToString() + "\n";
+                            rec._ErrorInfo += rec._ErrorInfo == null ? error.ToString() : Environment.NewLine + rec._ErrorInfo;
                         }
                         rec._MergePaymId = Uniconta.ClientTools.Localization.lookup("Excluded");
                         rec.NotifyMergePaymIdSet();
                         continue;
                     }
+                    else
+                    {
+                        rec._ErrorInfo = BaseDocument.VALIDATE_OK;
+                    }
+                    rec.NotifyErrorSet();
                     //Validate payments <<
 
                     var creditor = (Uniconta.DataModel.Creditor)credCache.Get(rec.Account);
@@ -152,14 +157,23 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
 
                 foreach (var rec in noDuplicates)
                 {
-                    rec._MergePaymId = MERGEID_SINGLEPAYMENT;
+                    if (rec._PaymentAmount <= 0)
+                    {
+                        rec._MergePaymId = Uniconta.ClientTools.Localization.lookup("Excluded");
+                        rec._ErrorInfo = "Credit amount is not allowed";
+                        rec.NotifyErrorSet();
+                    }
+                    else
+                    {
+                        rec._MergePaymId = MERGEID_SINGLEPAYMENT;
+                    }
                 }
 
                 return true;
             }
             catch (Exception ex)
             {
-                UnicontaMessageBox.Show(ex.Message, Uniconta.ClientTools.Localization.lookup("Exception"), System.Windows.MessageBoxButton.OK);
+                UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"), System.Windows.MessageBoxButton.OK);
                 return false;
             }
         }

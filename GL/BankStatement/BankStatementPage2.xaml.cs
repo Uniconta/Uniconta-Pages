@@ -81,9 +81,8 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         if (BankStmtCache == null) return;
                         var list = (IEnumerable<Uniconta.DataModel.BankStatement>)BankStmtCache.GetNotNullArray;
-                        var exist = list.Where(x => x._Account == editrow._Account);
-
-                        if (exist.Count() == 0)
+                        var exist = list.Any(x => x._Account == editrow._Account);
+                        if (!exist)
                             frmRibbon_BaseActions(ActionType);
                         else
                         {

@@ -140,8 +140,8 @@ x:Class="UnicontaClient.Pages.CustomPage.SubscriptionsPage"
                         <CorasauControls:CorasauLayoutItem FieldName="Yearly">
                             <CorasauControls:CheckEditor x:Name="chkYearly" IsChecked="{Binding Yearly,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="Time">
-                            <CorasauControls:CheckEditor x:Name="chkTime" IsChecked="{Binding Time,Mode=TwoWay}" />
+                        <CorasauControls:CorasauLayoutItem FieldName="FreeTime">
+                            <CorasauControls:CheckEditor x:Name="chkTime" IsChecked="{Binding FreeTime,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="FixedPrice">
                             <CorasauControls:CheckEditor x:Name="chkFixedPrice" IsChecked="{Binding FixedPrice,Mode=TwoWay}" />

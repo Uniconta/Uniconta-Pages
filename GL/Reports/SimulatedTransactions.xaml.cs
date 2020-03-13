@@ -46,18 +46,24 @@ namespace UnicontaClient.Pages.CustomPage
         public SimulatedTransactions(UnicontaBaseEntity[] simulatedTransactions)
             : base(simulatedTransactions, 0, 0)
         {
-            Initialize(null, simulatedTransactions);
-		}
+            Initialize(simulatedTransactions);
+            RemoveMenuItem();
+        }
         bool ShowTotal;
 
         AccountPostingBalance[] balance;
         public SimulatedTransactions(AccountPostingBalance[] balance, UnicontaBaseEntity[] simulatedTransactions)
             : base(simulatedTransactions, 0, 0)
         {
-            this.balance = balance;
-            Initialize(null, simulatedTransactions);
+            Initialize(simulatedTransactions);
+
+            if (balance == null || balance.Length == 0)
+                RemoveMenuItem();
+            else
+                this.balance = balance;
         }
-        private void Initialize(UnicontaBaseEntity master, UnicontaBaseEntity[] simulatedTransactions)
+
+        private void Initialize(UnicontaBaseEntity[] simulatedTransactions)
         {
             InitializeComponent();
             dgSimulatedTran.api = api;
@@ -79,9 +85,39 @@ namespace UnicontaClient.Pages.CustomPage
             SetRibbonControl(localMenu, dgSimulatedTran);
             dgSimulatedTran.BusyIndicator = busyIndicator;
 
-            localMenu.OnItemClicked += gridRibbon_BaseActions;
+            localMenu.OnItemClicked += LocalMenu_OnItemClicked; ;
             dgSimulatedTran.ShowTotalSummary();
             LedgerCache = this.api.GetCache(typeof(GLAccount));
+        }
+
+        void RemoveMenuItem()
+        {
+            RibbonBase rb = (RibbonBase)localMenu.DataContext;
+            Uniconta.ClientTools.Util.UtilDisplay.RemoveMenuCommand(rb, "AccountPostingBalance");
+        }
+
+        private void LocalMenu_OnItemClicked(string ActionType)
+        {
+            switch (ActionType)
+            {
+                case "AccountPostingBalance":
+                    ViewAccountPostingBalance();
+                    break;
+                default:
+                    gridRibbon_BaseActions(ActionType);
+                    break;
+            }
+        }
+
+        private void ViewAccountPostingBalance()
+        {
+            if (balance != null)
+            {
+                object[] paramArr = new object[2];
+                paramArr[0] = api;
+                paramArr[1] = balance;
+                AddDockItem(TabControls.AccountPostingBalancePage, paramArr, true, Uniconta.ClientTools.Localization.lookup("TraceBalance"));
+            }
         }
 
         public override Task InitQuery() { return null; }
@@ -106,7 +142,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         SQLCache LedgerCache;
-        
+
         public override object GetPrintParameter()
         {
             if (balance != null && balance.Length > 0)

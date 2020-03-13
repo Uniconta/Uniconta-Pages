@@ -138,7 +138,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 if (zip == null)
                 {
-                    var city = await UtilDisplay.GetCityAndAddress(txtZipCode.Text, editrow.Country);
+                    var city = await UtilDisplay.GetCityAndAddress(editrow.ZipCode, editrow.Country);
                     if (city != null)
                     {
                         editrow.City = city[0];
@@ -183,7 +183,7 @@ namespace UnicontaClient.Pages.CustomPage
                 }
                 catch (Exception ex)
                 {
-                    UnicontaMessageBox.Show(ex.Message, Uniconta.ClientTools.Localization.lookup("Exception"), MessageBoxButton.OK);
+                    UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"), MessageBoxButton.OK);
                     return;
                 }
 

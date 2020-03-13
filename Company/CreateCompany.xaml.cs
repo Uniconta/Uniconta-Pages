@@ -633,7 +633,7 @@ namespace UnicontaClient.Pages.CustomPage
             catch (Exception ex)
             {
                 BasePage.session.ReportException(ex, "Create Company. Setup Page", 0);
-                UnicontaMessageBox.Show(ex.Message, Uniconta.ClientTools.Localization.lookup("Exception"));
+                UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"));
             }
             if (setupType == 1)
                 busyIndicator.IsBusy = false;
@@ -765,7 +765,7 @@ namespace UnicontaClient.Pages.CustomPage
                 }
                 catch (Exception ex)
                 {
-                    UnicontaMessageBox.Show(ex.Message, Uniconta.ClientTools.Localization.lookup("Exception"), MessageBoxButton.OK);
+                    UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"), MessageBoxButton.OK);
                     return;
                 }
 

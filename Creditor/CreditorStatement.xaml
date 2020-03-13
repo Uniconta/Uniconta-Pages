@@ -46,7 +46,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorStatement"
                 <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ToDate}" Grid.Column="0" Grid.Row="1" Margin="3,3,3,3"/>
                 <CorasauControls:DateEditor x:Name="txtDateTo" Grid.Column="2" Grid.Row="1" Margin="0,3,3,3"/>
                 <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FromAccount}" Grid.Column="0" Grid.Row="2" Margin="3,3,3,3"/>
-                <CorasauControls:LookupEditor x:Name="cmbFromAccount" Grid.Column="2" Grid.Row="2" Margin="0,3,3,3" Text="{Binding FromAccount,Mode=TwoWay}"/>
+                <CorasauControls:LookupEditor x:Name="cmbFromAccount" Grid.Column="2" Grid.Row="2" Margin="0,3,3,3" Text="{Binding FromAccount,Mode=TwoWay}" EditValueChanged="cmbFromAccount_EditValueChanged"/>
                 <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ToAccount}" Grid.Column="0" Grid.Row="3" Margin="3,3,3,3"/>
                 <CorasauControls:LookupEditor x:Name="cmbToAccount" Grid.Column="2" Grid.Row="3" Margin="0,3,3,3" Text="{Binding ToAccount,Mode=TwoWay}"/>
 
@@ -81,7 +81,8 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorStatement"
                             <localPage:CreditorStatementGridClient x:Name="dgChildCreditorTrans" AutoGenerateColumns="None" SelectionMode="None">
                                 <localPage:CreditorStatementGridClient.Columns>
                                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Date" Width="90" />
-                                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Invoice" Width="70"/>
+                                    <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceAN" Width="70"/>
+                                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Invoice" Width="60" Visible="False"/>
                                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DueDate" Width="90"/>
                                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Voucher" Width="70"/>
                                     <localPage:CorasauDataGridTemplateColumnClient x:Name="VoucherX" Visible="False" Width="80"/>

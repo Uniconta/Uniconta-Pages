@@ -23,16 +23,16 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrderProjectLinePage"
                     <local:CorasauDataGridTemplateColumnClient FieldName="Account" Width="90"  Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient FieldName="Date" x:Name="colDate" Width="90" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Project" Width="80" Visible="False"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Item" Width="80"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="ItemName" Width="120"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Item" Width="80" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ItemName" Width="120" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Text" Width="150" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Width="70" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Qty" Width="80"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="CostPrice" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="CostPrice" Width="80" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="SalesPrice" Width="80"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="DiscountPct" Width="50"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DiscountPct" Width="50" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="SalesAmount" Width="100"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="CostAmount" Width="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="CostAmount" Width="100" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Employee" Width="70"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="ProjectForward" Width="70"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="ProjectForwardName" Width="120" Visible="False"/>

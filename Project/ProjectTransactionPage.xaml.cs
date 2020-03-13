@@ -20,6 +20,7 @@ using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
 using Uniconta.Common;
 using System.Threading.Tasks;
+using Uniconta.Common.Utility;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -61,12 +62,39 @@ namespace UnicontaClient.Pages.CustomPage
         public ProjectTransactionPage(SynchronizeEntity syncEntity) : base(syncEntity, true)
         {
             InitializeComponent();
-            InitializePage(syncEntity.Row);
+            
+            UnicontaBaseEntity master = syncEntity.Row;
+            UnicontaBaseEntity argsProj = null;
+            var proj = master as Uniconta.DataModel.Project;
+            if (proj != null)
+                argsProj = proj;
+#if !SILVERLIGHT
+            else
+            {
+                var WIPreport = master as UnicontaClient.Pages.ProjectTransLocalClient;
+                if (WIPreport != null)
+                    argsProj = WIPreport.ProjectRef;
+            }
+#endif
+            InitializePage(argsProj);
             SetHeader();
         }
         protected override void SyncEntityMasterRowChanged(UnicontaBaseEntity args)
         {
-            dgProjectTransaction.UpdateMaster(args);
+            UnicontaBaseEntity argsProj = null;
+            var proj = args as Uniconta.DataModel.Project;
+            if (proj != null)
+                argsProj = proj;
+#if !SILVERLIGHT
+            else
+            {
+                var WIPreport = args as UnicontaClient.Pages.ProjectTransLocalClient;
+                if (WIPreport != null)
+                    argsProj = WIPreport.ProjectRef;
+            }
+#endif
+            
+            dgProjectTransaction.UpdateMaster(argsProj);
             SetHeader();
             InitQuery();
         }
@@ -117,8 +145,11 @@ namespace UnicontaClient.Pages.CustomPage
         protected override void OnLayoutLoaded()
         {
             base.OnLayoutLoaded();
-            var master = dgProjectTransaction.masterRecords?.First();
-            this.ProjectCol.Visible = !(master is Uniconta.DataModel.Project);
+            if (!includeSubProject)
+            {
+                var master = dgProjectTransaction.masterRecords?.First();
+                this.ProjectCol.Visible = !(master is Uniconta.DataModel.Project);
+            }
 
             Utility.SetupVariants(api, null, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
             dgProjectTransaction.Readonly = true;
@@ -180,15 +211,14 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        async Task LoadGrid()
+        Task LoadGrid()
         {
-            List<PropValuePair> filter = new List<PropValuePair>();
+            List<PropValuePair> filter;
             if (includeSubProject)
-            {
-                var propValuePairFolder = PropValuePair.GenereteParameter("IncludeSubProject", typeof(string), "1");
-                filter.Add(propValuePairFolder);
-            }
-            await dgProjectTransaction.Filter(filter);
+                filter = new List<PropValuePair>() { PropValuePair.GenereteParameter("IncludeSubProject", typeof(string), "1") };
+            else
+                filter = null;
+            return dgProjectTransaction.Filter(filter);
         }
 
         public override Task InitQuery()
@@ -207,6 +237,8 @@ namespace UnicontaClient.Pages.CustomPage
 
         Task ShowInculdeSubProject()
         {
+            if (includeSubProject)
+                this.ProjectCol.Visible = true;
             iIncludeSubProBase.IsChecked = includeSubProject;
             return LoadGrid();
         }
@@ -215,11 +247,9 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var pairPostedJour = new PropValuePair[]
             {
-                PropValuePair.GenereteWhereElements(nameof(ProjectJournalPostedClient.GLJournalPostedId), typeof(int), selectedItem._JournalPostedId.ToString())
+                PropValuePair.GenereteWhereElements(nameof(ProjectJournalPostedClient.GLJournalPostedId), typeof(int), NumberConvert.ToString(selectedItem._JournalPostedId))
             };
-
             var result = await api.Query<ProjectJournalPostedClient>(pairPostedJour);
-
             if (result != null && result.Length == 1)
             {
                 CWProjPostedClientFormView cwPostedClient = new CWProjPostedClientFormView(result[0]);
@@ -246,7 +276,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             get
             {
-                return editAllChecked?false: dgProjectTransaction.HasUnsavedData;
+                return editAllChecked ? false: dgProjectTransaction.HasUnsavedData;
             }
         }
         bool editAllChecked;

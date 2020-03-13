@@ -53,6 +53,9 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionOrdersPage2"
                         <CorasauControls:CorasauLayoutItem FieldName="BatchNumber" x:Name="liBatchNumber">
                             <CorasauControls:TextEditor Text="{Binding BatchNumber,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="Expire" x:Name="liExpire">
+                            <CorasauControls:DateEditor x:Name="deExpire" EditValue="{Binding Expire,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="ProducedQty" x:Name="liProducedQty">
                             <StackPanel Orientation="Horizontal">
                                 <CorasauControls:DoubleEditor Text="{Binding ProducedQty,Mode=TwoWay}" BindningIsSet="True"

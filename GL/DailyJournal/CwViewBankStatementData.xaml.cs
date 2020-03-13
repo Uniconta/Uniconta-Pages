@@ -66,7 +66,7 @@ namespace UnicontaClient.Pages.CustomPage
                     IWorkbook workBook = importSpreadSheet.Document;
                     workBook.LoadDocument(file);
                     DevExpress.Spreadsheet.Worksheet worksheet = importSpreadSheet.Document.Worksheets[0];
-                    Range range = worksheet.GetUsedRange();
+                    var range = worksheet.GetUsedRange();
                     DataTable dataTable = worksheet.CreateDataTable(range, true);
                     for (int col = 0; col < range.ColumnCount; col++)
                     {
@@ -99,44 +99,38 @@ namespace UnicontaClient.Pages.CustomPage
             }
             catch (Exception ex)
             {
-                UnicontaMessageBox.Show(ex.Message, Uniconta.ClientTools.Localization.lookup("Exception"), MessageBoxButton.OK);
+                UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"), MessageBoxButton.OK);
             }
         }
 
         public DataTable FromCsv(string strFilePath)
         {
-            string delimStr = ";;";
-            char[] delimiter = delimStr.ToCharArray();
+            const char delimiter = ';';
             DataSet oDS = new DataSet();
-            string strFields = null;
-            DataTable oTable = new DataTable();
-            DataRow oRows = null;
-            Int32 intCounter = 0;
             oDS.Tables.Add("Property");
-            StreamReader oSR = new StreamReader(strFilePath);
-            oSR.BaseStream.Seek(0, SeekOrigin.Begin);
-            foreach (string strFields_loopVariable in oSR.ReadLine().Split(delimiter))
+            var oTable = oDS.Tables[0];
+            using (StreamReader oSR = new StreamReader(strFilePath))
             {
-                strFields = strFields_loopVariable;
-                oDS.Tables[0].Columns.Add(strFields);
-            }
-            oTable = oDS.Tables[0];
-            while ((oSR.Peek() > -1))
-            {
-
-                oRows = oTable.NewRow();
-                var colCount = oTable.Columns.Count;
-                foreach (string strFields_loopVariable in oSR.ReadLine().Split(delimiter))
+                foreach (string str in oSR.ReadLine().Split(delimiter))
                 {
-                    strFields = Convert.ToString(strFields_loopVariable);
-                    if (intCounter < 20 && intCounter < colCount)
-                    {
-                        oRows[intCounter] = strFields;
-                        intCounter = intCounter + 1;
-                    }
+                    oTable.Columns.Add(str);
                 }
-                intCounter = 0;
-                oTable.Rows.Add(oRows);
+                string line;
+                while ((line = oSR.ReadLine()) != null)
+                {
+                    int intCounter = 0;
+                    var oRows = oTable.NewRow();
+                    var colCount = Math.Min(oTable.Columns.Count, 20);
+                    foreach (string str in line.Split(delimiter))
+                    {
+                        if (intCounter < colCount)
+                        {
+                            oRows[intCounter] = str;
+                            intCounter++;
+                        }
+                    }
+                    oTable.Rows.Add(oRows);
+                }
             }
             return oTable;
         }

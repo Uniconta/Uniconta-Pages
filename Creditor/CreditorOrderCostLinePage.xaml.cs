@@ -174,12 +174,13 @@ namespace UnicontaClient.Pages.CustomPage
                     BindGrid();
                     break;
                 case "PostCost":
-                    if (dgCreditorOrderCostLine.ItemsSource == null || ((IEnumerable<Uniconta.DataModel.CreditorOrderCostLine>)dgCreditorOrderCostLine.ItemsSource).Count() == 0)
+                    var lst = dgCreditorOrderCostLine.ItemsSource as IEnumerable<Uniconta.DataModel.CreditorOrderCostLine>;
+                    if (lst == null || lst.Count() == 0)
                     {
                         UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("zeroRecords"), Uniconta.ClientTools.Localization.lookup("Warning"), MessageBoxButton.OK);
                         return;
                     }
-                    PostCost();
+                    PostCost(lst);
                     break;
                 case "SyncPage":
                     if (master is CreditorOrder)
@@ -191,7 +192,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        private void PostCost()
+        private void PostCost(IEnumerable<Uniconta.DataModel.CreditorOrderCostLine> lst)
         {
             CWConfirmationBox dialog = new CWConfirmationBox(Uniconta.ClientTools.Localization.lookup("AreYouSureToContinue"), Uniconta.ClientTools.Localization.lookup("Confirmation"), false);
             dialog.Closing += async delegate
@@ -200,7 +201,7 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     busyIndicator.IsBusy = true;
                     InvoiceAPI invoiceApi = new InvoiceAPI(this.api);
-                    var errorCodes = await invoiceApi.InvoiceAddCost(master as Uniconta.DataModel.DCInvoice, dgCreditorOrderCostLine.ItemsSource as IEnumerable<Uniconta.DataModel.CreditorOrderCostLine>);
+                    var errorCodes = await invoiceApi.InvoiceAddCost(master as Uniconta.DataModel.DCInvoice, lst);
                     busyIndicator.IsBusy = false;
                     UtilDisplay.ShowErrorCode(errorCodes);
 

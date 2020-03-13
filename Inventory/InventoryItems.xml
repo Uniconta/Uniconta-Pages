@@ -38,10 +38,10 @@
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="PartInvItems" LocalizedNameKey="BOM" Module="InvBOM" LargeGlyph="Order_Lines_Highlighted_32x32.png" >
-      <RibbonItem Action="InvBOMPartOfContains" LocalizedNameKey="Contains" ControlName="PartInvItemsPage" LargeGlyph="Multiple_16x16.png"/>
-      <RibbonItem Action="InvBOMPartOfWhereUsed" LocalizedNameKey="WhereUsed" ControlName="InvBOMPartOfPage" LargeGlyph="Single_16x16.png"/>
-      <RibbonItem Action="InvBOMProductionPosted" LocalizedNameKey="ProductionPosted" ControlName="ProductionPostedGridPage" LargeGlyph="Offset_Account_16x16.png"/>
-      <RibbonItem Action="InvHierarichalBOM" LocalizedNameKey="HierarchicalBOM" ControlName="InventoryHierarchicalBOMStatement" LargeGlyph="Nested_16x16.png"/>
+      <RibbonItem Action="InvBOMPartOfContains" LocalizedNameKey="Contains" ControlName="PartInvItemsPage" Glyph="Multiple_16x16.png"/>
+      <RibbonItem Action="InvBOMPartOfWhereUsed" LocalizedNameKey="WhereUsed" ControlName="InvBOMPartOfPage" Glyph="Single_16x16.png"/>
+      <RibbonItem Action="InvBOMProductionPosted" LocalizedNameKey="ProductionPosted" ControlName="ProductionPostedGridPage" Glyph="Tick_16x16.png"/>
+      <RibbonItem Action="InvHierarichalBOM" LocalizedNameKey="HierarchicalBOM" ControlName="InventoryHierarchicalBOMStatement" Glyph="Distributor_16x16.png"/>
     </RibbonItem>
   </RibbonItem>
   <RibbonItem LocalizedNameKey="Reports">

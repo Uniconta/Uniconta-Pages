@@ -180,6 +180,9 @@ x:Class="UnicontaClient.Pages.CustomPage.EditCompany"
                         <CorasauControls:CorasauLayoutItem FieldName="Www">
                             <CorasauControls:TextEditor Text="{Binding Www ,Mode=TwoWay}" MaskType="RegEx" Mask="{StaticResource UrlValidationRegx}"/>
                         </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="StartupUrl">
+                            <CorasauControls:TextEditor Text="{Binding StartupUrl ,Mode=TwoWay}" MaskType="RegEx" Mask="{StaticResource UrlValidationRegx}"/>
+                        </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="Email">
                             <CorasauControls:TextEditor Text="{Binding Email,Mode=TwoWay}" MaskType="RegEx" Mask="{StaticResource EmailValidationRegx}"/>
                         </CorasauControls:CorasauLayoutItem>

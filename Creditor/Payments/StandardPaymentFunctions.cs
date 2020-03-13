@@ -140,12 +140,12 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
                 }
 
                 format = messageFormat.Replace("%1", "{0}").Replace("%2", "{1}").Replace("%3", "{2}").Replace("%4", "{3}").Replace("%5", "{4}");
-                advText = string.Format(format, rec.Invoice == 0 ? string.Empty : rec.Invoice.ToString(), creditor?._Account, creditor?._Name, rec.Voucher == 0 ? string.Empty : rec.Voucher.ToString(), rec.PaymentRefId == 0 ? string.Empty : rec.PaymentEndToEndId.ToString());
+                advText = string.Format(format, rec.InvoiceAN == null ? string.Empty : rec.InvoiceAN, creditor?._Account, creditor?._Name, rec.Voucher == 0 ? string.Empty : rec.Voucher.ToString(), rec.PaymentRefId == 0 ? string.Empty : rec.PaymentEndToEndId.ToString());
             }
             else //Default message
             {
                 if (rec.invoiceNumbers == null || rec._MergePaymId == MERGEID_SINGLEPAYMENT)
-                    sbAdvText = BuildBankAdviceText(sbAdvText, rec.Invoice == 0 ? string.Empty : rec.Invoice.ToString(), tuple.Item2);
+                    sbAdvText = BuildBankAdviceText(sbAdvText, rec.InvoiceAN == null ? string.Empty : rec.InvoiceAN, tuple.Item2);
                 sbAdvText = BuildBankAdviceText(sbAdvText, creditor?._Account, tuple.Item1);
                 sbAdvText = BuildBankAdviceText(sbAdvText, rec.PaymentEndToEndId.ToString(), tuple.Item3);
                 advText = sbAdvText.ToString();
@@ -161,7 +161,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
             StringBuilder sbAdvText = new StringBuilder();
 
             var advText = string.Empty;
-            var country = company._CountryId;
+            var country = creditor == null || creditor._Country == CountryCode.Unknown ? company._CountryId : creditor._Country;
             var tuple = MessageLabel(country);
 
             if (UIMessage == false && rec.invoiceNumbers != null && rec._MergePaymId != MERGEID_SINGLEPAYMENT)
@@ -183,7 +183,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
                 if (messageFormat != null)
                 {
                     var parmCode = "%1";
-                    if (messageFormat.IndexOf(parmCode) != -1 && rec.Invoice == 0)
+                    if (messageFormat.IndexOf(parmCode) != -1 && rec.InvoiceAN == null)
                         messageFormat = MessageFormatRemove(messageFormat, parmCode);
 
                     parmCode = "%2";
@@ -203,7 +203,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
                         messageFormat = MessageFormatRemove(messageFormat, parmCode);
 
                     advText = string.Format(messageFormat.Replace("%1", "{0}").Replace("%2", "{1}").Replace("%3", "{2}").Replace("%4", "{3}").Replace("%5", "{4}"),
-                                             rec.Invoice.ToString(),
+                                             rec.InvoiceAN,
                                              company.Name,
                                              rec.CashDiscount,
                                              creditor._OurAccount,
@@ -212,7 +212,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
                 else if (UIMessage == false) //Default message
                 {
                     sbAdvText = BuildBankAdviceText(sbAdvText, creditor?._OurAccount, tuple.Item1);
-                    sbAdvText = BuildBankAdviceText(sbAdvText, rec.Invoice == 0 ? string.Empty : rec.Invoice.ToString(), tuple.Item2);
+                    sbAdvText = BuildBankAdviceText(sbAdvText, rec.InvoiceAN == null ? string.Empty : rec.InvoiceAN, tuple.Item2);
                     sbAdvText = BuildBankAdviceText(sbAdvText, company.Name);
                     advText = sbAdvText.ToString();
                 }

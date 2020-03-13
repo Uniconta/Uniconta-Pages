@@ -46,7 +46,6 @@ namespace UnicontaClient.Pages.CustomPage
             SetRibbonControl(localMenu, dgDebtorPymtFrmtGrid);
             dgDebtorPymtFrmtGrid.api = api;
             dgDebtorPymtFrmtGrid.BusyIndicator = busyIndicator;
-            dgDebtorPymtFrmtGrid.api = api;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
         }
 
@@ -56,7 +55,7 @@ namespace UnicontaClient.Pages.CustomPage
             switch (ActionType)
             {
                 case "AddRow":
-                    AddDockItem(TabControls.DebtorPaymentFormatPage2, api, Uniconta.ClientTools.Localization.lookup("PaymentFormats"), ";component/Assets/img/Add_16x16.png");
+                    AddDockItem(TabControls.DebtorPaymentFormatPage2, api, Uniconta.ClientTools.Localization.lookup("PaymentFormats"), "Add_16x16.png");
                     break;
                 case "EditRow":
                     if (selectedItem == null)

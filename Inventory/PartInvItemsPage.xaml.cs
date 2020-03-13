@@ -90,8 +90,16 @@ namespace UnicontaClient.Pages.CustomPage
                 SetHeader(header);
         }
 
-        void InitPage(UnicontaBaseEntity _master)
+        public override void Utility_Refresh(string screenName, object argument = null)
         {
+            if ( (screenName == TabControls.UserNotesPage || screenName == TabControls.UserDocsPage && argument != null))
+            {
+                dgPartInvItemsGrid.UpdateItemSource(argument);
+            }
+        }
+
+        void InitPage(UnicontaBaseEntity _master)
+        {   
             master = _master;
             Invitem = master as InvItemClient;
             InitializeComponent();
@@ -270,6 +278,18 @@ namespace UnicontaClient.Pages.CustomPage
                 case "HierarichalInvBOMReport":
                     AddDockItem(TabControls.InventoryHierarchicalBOMStatement, Invitem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("HierarchicalBOM"), Invitem._Item));
                     break;
+                case "AddNote":
+                    if (selectedItem != null)
+                    {
+                        AddDockItem(TabControls.UserNotesPage, dgPartInvItemsGrid.syncEntity);
+                    }
+                    break;
+                case "AddDoc":
+                    if (selectedItem != null)
+                    {
+                        AddDockItem(TabControls.UserDocsPage, dgPartInvItemsGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("HierarchicalBOM"), selectedItem.RowId));
+                    }
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -423,6 +443,20 @@ namespace UnicontaClient.Pages.CustomPage
             isReadOnly = false;
             useBinding = false;
             return true;
+        }
+
+        private void HasDocImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            var invBOM = (sender as Image).Tag as InvBOMClient;
+            if (invBOM != null)
+                AddDockItem(TabControls.UserDocsPage, invBOM);
+        }
+
+        private void HasNoteImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            var invBOM = (sender as Image).Tag as InvBOMClient;
+            if (invBOM != null)
+                AddDockItem(TabControls.UserNotesPage, invBOM);
         }
     }
 }

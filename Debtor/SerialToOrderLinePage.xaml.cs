@@ -239,10 +239,20 @@ namespace UnicontaClient.Pages.CustomPage
                 case "SaveAndClose":
                     SaveExit();
                     break;
+                case "BatchLocations":
+                    OpenBatchLocation();
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
+        }
+
+        private void OpenBatchLocation()
+        {
+            var selectedItem = dgUnlinkedGrid.SelectedItem as SerialToOrderLineClient;
+            if (selectedItem != null)
+                AddDockItem(TabControls.InvSerieBatchStorage, dgUnlinkedGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("BatchLocations"), selectedItem._Number));
         }
 
         protected override async Task<ErrorCodes> saveGrid()
@@ -315,7 +325,7 @@ namespace UnicontaClient.Pages.CustomPage
                 var linkedRows = dgLinkedGrid.ItemsSource as List<SerialToOrderLineClient>;
                 if (markedList.Count == 0)
                     return;
-                if (linkedRows.Intersect(markedList).Count() > 0)
+                if (linkedRows.Intersect(markedList).Any())
                 {
                     UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("LinkedRowErrorMsg"), Uniconta.ClientTools.Localization.lookup("Error"));
                     return;

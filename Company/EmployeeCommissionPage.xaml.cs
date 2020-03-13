@@ -202,24 +202,20 @@ namespace UnicontaClient.Pages.CustomPage
                     var fromDate = calCommission.FromDateTime;
                     var toDate = calCommission.ToDateTime;
 
-                    var commAll = ((IList)dgEmployeeCommissionGrid.ItemsSource).Cast<EmployeeCommissionClient>();
-                    var commlstLine = new List<EmployeeCommissionClient>();
-                    var commlstHead = new List<EmployeeCommissionClient>();
                     var employee = (master as Uniconta.DataModel.Employee)?._Number;
 
-                    var company = api.CompanyEntity;
-                    var debtors = company.GetCache(typeof(Uniconta.DataModel.Debtor)) ??
-                                           await company.LoadCache(typeof(Uniconta.DataModel.Debtor), api);
-
-                    var invItems = company.GetCache(typeof(Uniconta.DataModel.InvItem)) ??
-                           await company.LoadCache(typeof(Uniconta.DataModel.InvItem), api);
+                    var debtors = api.GetCache(typeof(Uniconta.DataModel.Debtor)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Debtor));
+                    var invItems = api.GetCache(typeof(Uniconta.DataModel.InvItem)) ?? await api.LoadCache(typeof(Uniconta.DataModel.InvItem));
 
                     var propValuePairList = new List<PropValuePair>()
-                {
-                    PropValuePair.GenereteWhereElements("Date", typeof(DateTime), string.Format("{0}..{1}", fromDate.ToShortDateString(), toDate.ToShortDateString())),
-                    PropValuePair.GenereteWhereElements("Disabled", typeof(int), "0")
-                };
+                    {
+                        PropValuePair.GenereteWhereElements("Date", typeof(DateTime), string.Format("{0}..{1}", fromDate.ToShortDateString(), toDate.ToShortDateString())),
+                        PropValuePair.GenereteWhereElements("Disabled", typeof(int), "0")
+                    };
                     var invoiceHeaders = await api.Query<DebtorInvoiceClient>(dgEmployeeCommissionGrid.masterRecords, propValuePairList);
+                    var commlstLine = new List<EmployeeCommissionClient>(1000);
+                    var commlstHead = new List<EmployeeCommissionClient>(1000);
+                    var commAll = (IEnumerable<EmployeeCommissionClient>)dgEmployeeCommissionGrid.ItemsSource;
                     foreach (var rec in commAll)
                     {
                         if (rec._Disabled)

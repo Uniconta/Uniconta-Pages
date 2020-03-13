@@ -241,6 +241,53 @@ namespace UnicontaISO20022CreditTransfer
             return debtorAddress;
         }
 
+
+        /// <summary>
+        /// Creditor Address
+        /// </summary>
+        public override PostalAddress CreditorAddress(Uniconta.DataModel.Creditor creditor, PostalAddress creditorAddress)
+        {
+            var adr1 = StandardPaymentFunctions.RegularExpressionReplace(creditor._Address1, allowedCharactersRegEx, replaceCharactersRegEx);
+            var adr2 = StandardPaymentFunctions.RegularExpressionReplace(creditor._Address2, allowedCharactersRegEx, replaceCharactersRegEx);
+            var adr3 = StandardPaymentFunctions.RegularExpressionReplace(creditor._Address3, allowedCharactersRegEx, replaceCharactersRegEx);
+            var zipCode = StandardPaymentFunctions.RegularExpressionReplace(creditor._ZipCode, allowedCharactersRegEx, replaceCharactersRegEx);
+            var city = StandardPaymentFunctions.RegularExpressionReplace(creditor._City, allowedCharactersRegEx, replaceCharactersRegEx);
+
+            if (creditor._ZipCode != null)
+            {
+                creditorAddress.ZipCode = zipCode;
+                creditorAddress.CityName = city;
+                creditorAddress.StreetName = adr1;
+            }
+            else
+            {
+                StringBuilder strB = new StringBuilder();
+                if (companyBankEnum == CompanyBankENUM.Rabobank) //Rabobank: Only two Addresslines are accepted
+                {
+                    var adr1_result = strB.Append(adr1).Append(AddSeparator(adr2)).Append(adr2).ToString();
+                    creditorAddress.AddressLine1 = adr1_result.Length > 70 ? adr1_result.Substring(0, 70) : adr1_result;
+                    strB.Clear();
+                    var adr2_result = strB.Append(adr3).Append(AddSeparator(zipCode)).Append(zipCode).Append(AddSeparator(city)).Append(city).ToString();
+                    creditorAddress.AddressLine2 = adr2_result.Length > 70 ? adr2_result.Substring(0, 70) : adr2_result;
+                    creditorAddress.Unstructured = true;
+                }
+                else
+                {
+                    creditorAddress.AddressLine1 = adr1;
+                    creditorAddress.AddressLine2 = adr2;
+                    creditorAddress.AddressLine3 = adr3;
+                    creditorAddress.Unstructured = true;
+                }
+            }
+
+            creditorAddress.CountryId = ((CountryISOCode)creditor._Country).ToString();
+
+            return creditorAddress;
+        }
+
+
+
+
         /// <summary>
         /// Valid codes:
         /// CRED (Creditor)
@@ -294,7 +341,7 @@ namespace UnicontaISO20022CreditTransfer
         /// <summary>
         /// Unstructured Remittance Information
         /// </summary>
-        public override List<string> Ustrd(string externalAdvText, ISO20022PaymentTypes ISOPaymType, PaymentTypes paymentMethod)
+        public override List<string> Ustrd(string externalAdvText, ISO20022PaymentTypes ISOPaymType, PaymentTypes paymentMethod, bool extendedText)
         {
             var ustrdText = StandardPaymentFunctions.RegularExpressionReplace(externalAdvText, allowedCharactersRegEx, replaceCharactersRegEx);
             

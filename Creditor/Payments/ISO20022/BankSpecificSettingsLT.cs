@@ -274,15 +274,27 @@ namespace UnicontaISO20022CreditTransfer
             switch (CredPaymFormat.Bank)
             {
                 case ltBank.Standard:
-                case ltBank.Swedbank:
                 case ltBank.SEB:
-                    return "SDCL";
                 case ltBank.Luminor:
-                    return "ONCL";
+                case ltBank.Swedbank:
+                    return string.Empty;
                 default: return "ONCL";
             }
         }
 
+        /// <summary>
+        /// </summary>
+        public override string ExtProprietaryCode()
+        {
+            switch (CredPaymFormat.Bank)
+            {
+                case ltBank.SEB:
+                case ltBank.Luminor:
+                case ltBank.Swedbank:
+                    return "NORM";
+                default: return string.Empty;
+            }
+        }
 
         /// <summary>
         /// DOMESTIC Payment:

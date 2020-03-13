@@ -24,6 +24,9 @@ using Uniconta.ClientTools.Util;
 using Uniconta.Common;
 using Uniconta.DataModel;
 using Uniconta.ClientTools;
+#if !SILVERLIGHT
+using System.IO.Compression;
+#endif
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -139,7 +142,6 @@ namespace UnicontaClient.Pages.CustomPage
         {
             try
             {
-                string filename = null;
                 int countFiles = 0;
                 System.Windows.Forms.FolderBrowserDialog folderBrowserDialog = null;
 
@@ -149,6 +151,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                 foreach (var rec in qrFiles)
                 {
+#if !SILVERLIGHT
                     countFiles++;
 
                     if (folderBrowserDialog == null)
@@ -159,19 +162,42 @@ namespace UnicontaClient.Pages.CustomPage
                             break;
                     }
 
-                    filename = folderBrowserDialog.SelectedPath;
-                    filename = string.Format("{0}\\{1}", filename, rec._Filename);
-
-                    if (rec._Filename.EndsWith(".zip"))
-                        File.WriteAllBytes(filename, rec._Data);
-                    else
-                        File.WriteAllText(filename, Encoding.GetEncoding("iso-8859-1").GetString(rec._Data));
+                    var filepath = folderBrowserDialog.SelectedPath;
 
                     if (paymentFormatCache == null)
                         paymentFormatCache = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.DebtorPaymentFormat)) ?? await api.CompanyEntity.LoadCache(typeof(Uniconta.DataModel.DebtorPaymentFormat), api);
-                    
+
                     var paymentFormat = (DebtorPaymentFormatClient)paymentFormatCache.Get(rec.PaymentFormat);
-#if !SILVERLIGHT
+
+                    if (rec._Filename.EndsWith(".zip"))
+                    {
+                        if (paymentFormat._ExportFormat == (byte)Uniconta.DataModel.DebtorPaymFormatType.SEPA)
+                        {
+                            Stream data = new MemoryStream(rec._Data);
+
+                            ZipArchive archive = new ZipArchive(data);
+                            foreach (ZipArchiveEntry entry in archive.Entries)
+                            {
+                                using (var stream = entry.Open())
+                                {
+                                    var filename = string.Concat(filepath,"\\", entry.FullName);
+                                    using (var fileStream = new FileStream(filename, FileMode.Create, FileAccess.Write))
+                                    {
+                                        stream.CopyTo(fileStream);
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            File.WriteAllBytes(string.Concat(filepath, @"\", rec._Filename), rec._Data);
+                        }
+                    }
+                    else
+                    {
+                        File.WriteAllText(string.Concat(filepath, @"\", rec._Filename), Encoding.GetEncoding("iso-8859-1").GetString(rec._Data));
+                    }
+
                     if (paymentFormat != null && (paymentFormat._ExportFormat == (byte)Uniconta.DataModel.DebtorPaymFormatType.SEPA || paymentFormat._ExportFormat == (byte)Uniconta.DataModel.DebtorPaymFormatType.Iceland))
                     {
                         rec.StatusInfo = string.Format("({0}) {1}\n{2}", Uniconta.DirectDebitPayment.Common.GetTimeStamp(), Uniconta.ClientTools.Localization.lookup("Exported"), rec._StatusInfo);
@@ -181,7 +207,7 @@ namespace UnicontaClient.Pages.CustomPage
 #endif
                 }
 
-                if (lstUpdate != null && lstUpdate.Any())
+                if (lstUpdate != null && lstUpdate.Count > 0)
                     api.UpdateNoResponse(lstUpdate);
 
                 if (countFiles != 0)

@@ -85,13 +85,7 @@ x:Class="UnicontaClient.Pages.CustomPage.WorkOrderInput"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="TimeFrom" Width="80" ShowTimeElapsed="True" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="TimeTo" Width="80" ShowTimeElapsed="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Qty" Width="80"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Unit" Width="50" Visible="False">
-                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                            <DataTemplate>
-                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="ItemUnit"/>
-                            </DataTemplate>
-                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                    </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:ComboBoxColumnClient x:Name="Unit" Width="50" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Origin" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CostPrice" Width="80"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="SalesPrice" Width="80"/>

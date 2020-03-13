@@ -15,9 +15,9 @@ x:Class="UnicontaClient.Pages.CustomPage.AttachInvSeriesBatch"
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
         <UnicontaControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Inventory/AttachInvSeriesBatchRibbon.xml" x:Name="localMenu"/>
-        <StackPanel Orientation="Horizontal" Grid.Row="1">
-            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Qty}"></TextBlock>
-            <UnicontaControls:DoubleEditor x:Name="txtQty" Height="23" Width="200" Margin="10 0 0 0" BindningIsSet="True"></UnicontaControls:DoubleEditor>
+        <StackPanel Orientation="Horizontal" Grid.Row="1" >
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Qty}" Margin="3,0,0,0" VerticalAlignment="Center"/>
+            <UnicontaControls:DoubleEditor VerticalAlignment="Center" x:Name="txtQty" Height="23" Width="200" Margin="10 0 0 0" BindningIsSet="True"/>
         </StackPanel>
         <UnicontaControls:BusyIndicator x:Name="busyIndicator" Grid.Row="2" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <local:AttachInvSeriesBatchGrid   x:Name="dgInvSeriesBatchGrid" AutoGenerateColumns="None">

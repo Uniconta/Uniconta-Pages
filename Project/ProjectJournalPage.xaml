@@ -22,6 +22,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectJournalPage"
                 <localPage:ProjectJournalGrid.Columns>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Journal" Width="200"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="NumberSerie" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="NumberOfLines" Width="70"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="TransType" Width="200"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Employee" Width="200"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Blocked" Width="70"/>

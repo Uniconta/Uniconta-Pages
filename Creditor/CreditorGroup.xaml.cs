@@ -63,7 +63,7 @@ namespace UnicontaClient.Pages.CustomPage
             switch (ActionType)
             {
                 case "AddRow":
-                    AddDockItem(TabControls.CreditorGroupPage2, api, Uniconta.ClientTools.Localization.lookup("CreditorGroup"), ";component/Assets/img/Add_16x16.png");
+                    AddDockItem(TabControls.CreditorGroupPage2, api, Uniconta.ClientTools.Localization.lookup("CreditorGroup"), "Add_16x16.png");
                     break;
                 case "EditRow":
                     if (selectedItem == null)
@@ -104,6 +104,13 @@ namespace UnicontaClient.Pages.CustomPage
         protected override void LoadCacheInBackGround()
         {
             LoadType(new Type[] { typeof(Uniconta.DataModel.GLAccount), typeof(Uniconta.DataModel.GLVat) });
+        }
+
+        protected override void OnLayoutCtrlLoaded()
+        {
+            var Comp = api.CompanyEntity;
+            if (!Comp.InvDuty)
+                this.ExemptDuty.ShowInColumnChooser = false;
         }
     }
 }

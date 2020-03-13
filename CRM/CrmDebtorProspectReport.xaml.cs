@@ -159,9 +159,9 @@ namespace UnicontaClient.Pages.CustomPage
                     param[1] = null;
 
                     if (ActionType == "AddDebtor")
-                        AddDockItem(TabControls.DebtorAccountPage2, param, Uniconta.ClientTools.Localization.lookup("DebtorAccount"), ";component/Assets/img/Add_16x16.png");
+                        AddDockItem(TabControls.DebtorAccountPage2, param, Uniconta.ClientTools.Localization.lookup("DebtorAccount"), "Add_16x16.png");
                     else if (ActionType == "AddProspect")
-                        AddDockItem(TabControls.CrmProspectPage2, param, Uniconta.ClientTools.Localization.lookup("Prospects"), ";component/Assets/img/Add_16x16.png");
+                        AddDockItem(TabControls.CrmProspectPage2, param, Uniconta.ClientTools.Localization.lookup("Prospects"), "Add_16x16.png");
                     break;
 
                 case "EditRow":

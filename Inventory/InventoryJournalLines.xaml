@@ -29,13 +29,7 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryJournalLines"
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <localPage:InvJournalLineGrid x:Name="dgInvJournalLine"  AutoGenerateColumns="None">
                 <localPage:InvJournalLineGrid.Columns>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="MovementType">
-                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                            <DataTemplate>
-                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" AppEnumName="InvJournalMovementType"/>
-                            </DataTemplate>
-                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                    </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:ComboBoxColumnClient x:Name="MovementType"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Date" Width="90" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Item"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant" FieldName="Variant">

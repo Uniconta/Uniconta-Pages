@@ -24,7 +24,7 @@ namespace UnicontaClient.Pages.CustomPage
 {
     public partial class CWGenerateInvoice : ChildWindow
     {
-        public long InvoiceNumber { get; set; }
+        public string InvoiceNumber { get; set; }
         [InputFieldData]
         [Display(Name = "Simulation", ResourceType = typeof(InputFieldDataText))]
         public bool IsSimulation { get; set; }
@@ -58,13 +58,22 @@ namespace UnicontaClient.Pages.CustomPage
         [InputFieldData]
         [Display(Name = "NumberOfCopies", ResourceType = typeof(InputFieldDataText))]
         public short NumberOfPages { get; set; } = 1;
-
+        [InputFieldData]
+        [Display(Name = "SendByOutlook", ResourceType = typeof(InputFieldDataText))]
+        public bool SendByOutlook { get; set; }
 #if !SILVERLIGHT
 
         protected override int DialogId { get { return DialogTableId; } }
         public int DialogTableId { get; set; }
         protected override bool ShowTableValueButton { get { return true; } }
 #endif
+
+        public CWGenerateInvoice(bool showSimulation, string title, bool showInputforInvNumber, bool askForEmail, bool showInvoice, bool isShowInvoiceVisible, bool showNoEmailMsg, string debtorName,
+            bool isShowUpdateInv, bool isOrderOrQuickInv, bool isQuickPrintVisible, bool isDebtorOrder, bool InvoiceInXML, bool isPageCountVisible)
+            : this(showSimulation, title, showInputforInvNumber, askForEmail, showInvoice, isShowInvoiceVisible, showNoEmailMsg, debtorName, isShowUpdateInv, isOrderOrQuickInv, isQuickPrintVisible, isDebtorOrder, InvoiceInXML, isPageCountVisible, null)
+        {
+        }
+
         public CWGenerateInvoice(bool showSimulation = true, string title = "", bool showInputforInvNumber = false, bool askForEmail = false, bool showInvoice = true, bool isShowInvoiceVisible = true, bool showNoEmailMsg = false, string debtorName = "",
             bool isShowUpdateInv = false, bool isOrderOrQuickInv = false, bool isQuickPrintVisible = true, bool isDebtorOrder = false, bool InvoiceInXML = false, bool isPageCountVisible = true, string AccountName = null)
         {
@@ -186,10 +195,14 @@ namespace UnicontaClient.Pages.CustomPage
 
         public void SetInvoiceNumber(long Number)
         {
-            InvoiceNumber = Number;
-            txtInvNumber.Text = Convert.ToString(Number);
+            SetInvoiceNumber(NumberConvert.ToStringNull(Number));
         }
 
+        public void SetInvoiceNumber(string Number)
+        {
+            InvoiceNumber = Number;
+            txtInvNumber.Text = Number;
+        }
         public void SetInvoiceDate(DateTime date)
         {
             dpDate.DateTime = date;
@@ -205,8 +218,8 @@ namespace UnicontaClient.Pages.CustomPage
             var str = txtInvNumber.Text;
             if (!string.IsNullOrEmpty(str) && str != "0")
             {
-                if (str.Length < 18)
-                    InvoiceNumber = NumberConvert.ToInt(str);
+                if (str.Length <= 20)
+                    InvoiceNumber = str;
                 else
                 {
                     UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("NumberTooBig"), Uniconta.ClientTools.Localization.lookup("Warning"), MessageBoxButton.OK);
@@ -243,6 +256,22 @@ namespace UnicontaClient.Pages.CustomPage
         private void chkPrintInvoice_Checked(object sender, RoutedEventArgs e)
         {
             chkShowInvoice.IsChecked = false;
+        }
+
+        private void chkSendEmail_Checked(object sender, RoutedEventArgs e)
+        {
+            chkSendOutlook.IsChecked = false;
+        }
+
+        private void chkSendOutlook_Checked(object sender, RoutedEventArgs e)
+        {
+            chkSendEmail.IsChecked = false;
+        }
+
+        public void HideOutlookOption(bool isHidden)
+        {
+            if (isHidden)
+                RowSendByOutlook.Height = new GridLength(0);
         }
 #endif
     }

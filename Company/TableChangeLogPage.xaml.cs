@@ -50,7 +50,7 @@ namespace UnicontaClient.Pages.CustomPage
             InitializeComponent();
             localMenu.dataGrid = dgTableChangeLog;
             SetRibbonControl(localMenu, dgTableChangeLog);
-            dgTableChangeLog.api = api;
+            dgTableChangeLog.api = this.api;
             filterDate = BasePage.GetSystemDefaultDate().AddMonths(-3);
             dgTableChangeLog.UpdateMaster(rec);
             dgTableChangeLog.BusyIndicator = busyIndicator;

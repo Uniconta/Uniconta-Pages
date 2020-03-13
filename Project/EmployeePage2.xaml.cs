@@ -60,11 +60,11 @@ namespace UnicontaClient.Pages.CustomPage
         {
             BusyIndicator = busyIndicator;
             layoutControl = layoutItems;
-            cmbDim1.api = cmbDim2.api = cmbDim3.api = cmbDim4.api = cmbDim5.api = leEmpGroup.api = lePayrollCategory.api = crudapi;
+            cmbDim1.api = cmbDim2.api = cmbDim3.api = cmbDim4.api = cmbDim5.api = leEmpGroup.api = lePayrollCategory.api = leApprover.api = leApprover2.api = crudapi;
             Utility.SetDimensions(crudapi, lbldim1, lbldim2, lbldim3, lbldim4, lbldim5, cmbDim1, cmbDim2, cmbDim3, cmbDim4, cmbDim5, usedim);
             if (LoadedRow == null && editrow == null)
             {
-                frmRibbon.DisableButtons("Delete" );
+                frmRibbon.DisableButtons("Delete");
                 editrow = CreateNew() as EmployeeClient;
                 editrow.SetMaster(api.CompanyEntity);
             }
@@ -85,7 +85,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 if (zip == null)
                 {
-                    var city = await UtilDisplay.GetCityAndAddress(txtZipCode.Text, api.CompanyEntity._CountryId);
+                    var city = await UtilDisplay.GetCityAndAddress(editrow.ZipCode, api.CompanyEntity._CountryId);
                     if (city != null)
                     {
                         editrow.City = city[0];
@@ -104,7 +104,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override void OnLayoutCtrlLoaded()
         {
-            if (! api.CompanyEntity.TimeManagement)
+            if (!api.CompanyEntity.TimeManagement)
                 grpTM.Visibility = Visibility.Collapsed;
         }
 
