@@ -159,6 +159,9 @@ x:Class="UnicontaClient.Pages.CustomPage.EditCompany"
                         <CorasauControls:CorasauLayoutItem FieldName="UseVatOperation" x:Name="liUseVatOperation">
                             <CorasauControls:CheckEditor IsChecked="{Binding UseVatOperation,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="OIOUBLSendOnServer" x:Name="liOIOUBLSendOnServer">
+                            <CorasauControls:CheckEditor IsChecked="{Binding OIOUBLSendOnServer,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
 
                     <CorasauControls:CorasauLayoutGroup View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=EditCompany}"  Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" MinWidth="420">

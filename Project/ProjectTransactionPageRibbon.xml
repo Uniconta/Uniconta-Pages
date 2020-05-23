@@ -33,6 +33,6 @@
     <RibbonItem Action="ViewDownloadRow" ShortcutKey="Alt+P" LocalizedNameKey="PhysicalVoucher" Glyph="View_Voucher_32x32.png" LargeGlyph="View_Voucher_32x32.png" />
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="InclSubProjects" LocalizedNameKey="InclSubProjects" IsCheckBox="True" />
+    <RibbonItem Action="InclSubProjects" LocalizedNameKey="InclSubProjects" ButtonType="CheckBox" />
   </RibbonItem>
 </root>

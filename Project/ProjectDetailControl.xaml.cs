@@ -78,7 +78,7 @@ namespace UnicontaClient.Pages.CustomPage
             var project = layoutItems.DataContext as ProjectClient;
             if (project != null)
             {
-                var location = project.WorkAddress1 + "+" + project.WorkAddress2 + "+" + project.WorkAddress3 + "+" + project.ZipCode + "+" + project.City + "+" + project.WorkCountry;
+                var location = project._WorkAddress1 + "+" + project._WorkAddress2 + "+" + project._WorkAddress3 + "+" + project._ZipCode + "+" + project._City + "+" + project.WorkCountry;
                 Utility.OpenGoogleMap(location);
             }
         }

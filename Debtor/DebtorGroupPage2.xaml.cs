@@ -78,7 +78,8 @@ namespace UnicontaClient.Pages.CustomPage
 			leSalesVat2.api = crudapi;
             leSalesVat3.api = crudapi;
             leSalesVat4.api = crudapi;
-            leSalesVatOpr.api = leSalesVatOpr1.api = leSalesVatOpr2.api = leSalesVatOpr3.api = leSalesVatOpr4.api= lookupCurrencyAdjustment.api = crudapi;
+            leSalesVatOpr.api = leSalesVatOpr1.api = leSalesVatOpr2.api = leSalesVatOpr3.api = leSalesVatOpr4.api=
+            lookupCurrencyAdjustment.api = lookupDiscountAccount.api = lookupDiscountAccountOffset.api = crudapi;
             leAutoNumber.api = crudapi;
             layoutGroupLookupEditor.api = crudapi;
             itemNameGroupLookupEditor.api = crudapi;

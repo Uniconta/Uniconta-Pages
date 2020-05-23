@@ -31,9 +31,10 @@
   </RibbonItem>  
   <RibbonItem>
     <RibbonItem Action="PartInvItems" LocalizedNameKey="BOM" LargeGlyph="Order_Lines_Highlighted_32x32.png">
-      <RibbonItem Action="InvBOMPartOfContains" LocalizedNameKey="Contains" LargeGlyph="Multiple_16x16.png"/>
-      <RibbonItem Action="InvBOMPartOfWhereUsed" LocalizedNameKey="WhereUsed" LargeGlyph="Single_16x16.png"/>
-      <RibbonItem Action="InvBOMProductionPosted" LocalizedNameKey="ProductionPosted" LargeGlyph="Offset_Account_16x16.png"/>
+      <RibbonItem Action="InvBOMPartOfContains" LocalizedNameKey="Contains" Glyph="Multiple_16x16.png"/>
+      <RibbonItem Action="InvBOMPartOfWhereUsed" LocalizedNameKey="WhereUsed" Glyph="Single_16x16.png"/>
+      <RibbonItem Action="InvBOMProductionPosted" LocalizedNameKey="ProductionPosted" Glyph="Offset_Account_16x16.png"/>
+      <RibbonItem Action="InvExplodeBOM" LocalizedNameKey="ExplodedBOM" ControlName="InvBOMExplodePage" Glyph="Customer_Group_16x16.png"/>
   </RibbonItem>
   </RibbonItem>
   <RibbonItem>

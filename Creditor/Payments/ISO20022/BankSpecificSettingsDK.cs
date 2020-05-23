@@ -241,20 +241,25 @@ namespace UnicontaISO20022CreditTransfer
         /// Unambiguous identification of the BBAN account of the creditor (domestic account number).
         /// In Denmark it will be: Reg. no. + Account no. 14 char (4+10)
         /// </summary>
-        public override string CreditorBBAN(String recBBAN, String credBBAN)
+        public override string CreditorBBAN(string recBBAN, string credBBAN, string bic)
         {
-            var bban = string.Empty;
-            var regNum = string.Empty;
+            string credbankCountryId = null;
+            if (bic != null && bic.Length > 6)
+                credbankCountryId = bic.Substring(4, 2);
 
-            bban = recBBAN ?? string.Empty;
+            var regNum = string.Empty;
+            var bban = recBBAN ?? string.Empty;
 
             bban = Regex.Replace(bban, "[^0-9]", "");
 
             if (bban != string.Empty)
             {
-                regNum = bban.Substring(0, 4);
-                bban = bban.Remove(0, 4);
-                bban = bban.PadLeft(10, '0');
+                if (credbankCountryId == null || credbankCountryId == "DK")
+                {
+                    regNum = bban.Substring(0, 4);
+                    bban = bban.Remove(0, 4);
+                    bban = bban.PadLeft(10, '0');
+                }
             }
 
             return regNum + bban;
@@ -402,7 +407,7 @@ namespace UnicontaISO20022CreditTransfer
                         case "DOMESTIC":
                             return BaseDocument.CHRGBR_SHAR;
                         case "CROSSBORDER":
-                            return BaseDocument.CHRGBR_DEBT;
+                            return BaseDocument.CHRGBR_SHAR;
                         case "SEPA":
                             return BaseDocument.CHRGBR_SLEV;
                         default:

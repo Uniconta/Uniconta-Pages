@@ -82,11 +82,9 @@ namespace UnicontaClient.Pages.CustomPage
             ShowInvoice = true;
 #if !SILVERLIGHT
             this.Title = Uniconta.ClientTools.Localization.lookup("GenerateInvoice");
-            tbOIOUBL.Text = string.Format(Uniconta.ClientTools.Localization.lookup("CreateOBJ"), Uniconta.ClientTools.Localization.lookup("OIOUBL"));
             if (isOrderOrQuickInv)
             {
-                tbOIOUBL.Visibility = Visibility.Visible;
-                chkOIOUBL.Visibility = Visibility.Visible;
+                lgUBL.Visibility = Visibility.Visible;
                 chkOIOUBL.IsEnabled = true;
                 chkOIOUBL.IsChecked = InvoiceInXML;
             }
@@ -94,39 +92,26 @@ namespace UnicontaClient.Pages.CustomPage
             dpDate.DateTime = dpDate.DateTime == DateTime.MinValue ? BasePage.GetSystemDefaultDate() : dpDate.DateTime;
 
             if (AccountName == null)
-            {
-                RowAccount.Height = new GridLength(0);
-                double h = this.Height - 30;
-                this.Height = h;
-            }
-            else txtAccountName.Text = AccountName;
+                lgAccount.Visibility = Visibility.Collapsed;
+            else
+                txtAccountName.Text = AccountName;
 
             if (!showSimulation)
             {
                 this.IsSimulation = false;
-                RowChk.Height = new GridLength(0);
+                liIsSimulation.Visibility = Visibility.Collapsed;
                 if (!string.IsNullOrEmpty(title))
                     this.Title = Uniconta.ClientTools.Localization.lookup(title);
             }
             if (!showInputforInvNumber)
             {
-                RowInvNo.Height = new GridLength(0);
-                double h = this.Height - 30;
-                this.Height = h;
+                liInvoiceNumber.Visibility = Visibility.Collapsed;
                 txtInvNumber.Text = string.Empty;
             }
             if (!isShowUpdateInv)
-            {
-                RowUpdateInv.Height = new GridLength(0);
-                double h = this.Height - 30;
-                this.Height = h;
-            }
+                liUpdateInventory.Visibility = Visibility.Collapsed;
             if (!isDebtorOrder)
-            {
-                RowPostOnDel.Height = new GridLength(0);
-                double h = this.Height - 30;
-                this.Height = h;
-            }
+                liPostOnlyDelivered.Visibility = Visibility.Collapsed;
             if (askForEmail)
             {
                 if (showNoEmailMsg)
@@ -136,13 +121,13 @@ namespace UnicontaClient.Pages.CustomPage
                 }
                 else
                 {
-                    txtNoMailMsg.Visibility = Visibility.Collapsed;
+                    liNoEmailMsg.Visibility = txtNoMailMsg.Visibility = Visibility.Collapsed;
                     chkSendEmail.IsChecked = true;
                 }
             }
             else
             {
-                RowSendByEmail.Height = new GridLength(0);
+                liSendByEmail.Visibility = Visibility.Collapsed;
                 txtNoMailMsg.Text = string.Empty;
                 txtInvNumber.Text = string.Empty;
             }
@@ -150,23 +135,19 @@ namespace UnicontaClient.Pages.CustomPage
             //Code added to set the correct label for purchase invoice or Purchase pack note
             CompanyLayoutType layoutType;
             if (Enum.TryParse(title, out layoutType) && layoutType == CompanyLayoutType.PurchasePacknote)
-                txtInvNumberLabel.Text = Uniconta.ClientTools.Localization.lookup("PackNoteNumber");
+                liInvoiceNumber.Label = Uniconta.ClientTools.Localization.lookup("PackNoteNumber");
             else
-                txtInvNumberLabel.Text = Uniconta.ClientTools.Localization.lookup("InvoiceNumber");
+                liInvoiceNumber.Label = Uniconta.ClientTools.Localization.lookup("InvoiceNumber");
             txtInvNumber.MaxLength = 17;
             chkShowInvoice.IsChecked = showInvoice;
 #if SILVERLIGHT
             Utilities.Utility.SetThemeBehaviorOnChildWindow(this);
 #endif
             if (!isShowInvoiceVisible)
-            {
-                RowInvoice.Height = new GridLength(0);
-                double h = this.Height - 30;
-                this.Height = h;
-            }
+                liShowInvoice.Visibility = Visibility.Collapsed;
 #if !SILVERLIGHT
-            chkPrintInvoice.Visibility = isQuickPrintVisible ? Visibility.Visible : Visibility.Collapsed;
-            stkPageNumberCount.Visibility = isQuickPrintVisible && isPageCountVisible ? Visibility.Visible : Visibility.Collapsed;
+            lgPrint.Visibility = isQuickPrintVisible ? Visibility.Visible : Visibility.Collapsed;
+            liNumberOfPages.Visibility = isQuickPrintVisible && isPageCountVisible ? Visibility.Visible : Visibility.Collapsed;
 #endif
             this.Loaded += CW_Loaded;
         }
@@ -200,7 +181,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         public void SetInvoiceNumber(string Number)
         {
-            InvoiceNumber = Number;
+            InvoiceNumber = Number; 
             txtInvNumber.Text = Number;
         }
         public void SetInvoiceDate(DateTime date)
@@ -271,7 +252,7 @@ namespace UnicontaClient.Pages.CustomPage
         public void HideOutlookOption(bool isHidden)
         {
             if (isHidden)
-                RowSendByOutlook.Height = new GridLength(0);
+                liSendByOutlook.Visibility = Visibility.Collapsed;
         }
 #endif
     }

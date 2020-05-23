@@ -145,13 +145,6 @@ namespace UnicontaClient.Pages.CustomPage
             if (this.items == null)
                 this.items = await Comp.LoadCache(typeof(Uniconta.DataModel.InvItem), api).ConfigureAwait(false);
         }
-
-        public override bool CheckIfBindWithUserfield(out bool isReadOnly, out bool useBinding)
-        {
-            isReadOnly = false;
-            useBinding = true;
-            return true;
-        }
     }
     public class InvVariantDetailGrid : CorasauDataGridClient
     {

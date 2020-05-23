@@ -21,42 +21,43 @@ x:Class="UnicontaClient.Pages.CustomPage.PartnerProspectFollowUpPage2"
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <CorasauControls:CorasauRibbonControl x:Name="frmRibbon" XMLSourcePath=";component/Assets/FormRibbon.xml" Grid.Row="0"/>
-            <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Vertical" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
+            <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
+                <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="grpFirst">
 
-                <CorasauControls:CorasauLayoutGroup x:Name="grpDescription" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Description}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="350">
-                    <CorasauControls:CorasauLayoutItem x:Name="liCreated" FieldName="Created" >
-                        <CorasauControls:DateEditor x:Name="deCreated" EditValue="{Binding Created, Mode=TwoWay}" Mask="g" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liUpdatedAt" FieldName="UpdatedAt">
-                        <CorasauControls:DateEditor x:Name="deUpdatedAt" EditValue="{Binding UpdatedAt,Mode=OneWay}" Mask="g" IsReadOnly="True" AllowDefaultButton="False" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liText" FieldName="Text" VerticalAlignment="Top" VerticalContentAlignment="Top" LabelVerticalAlignment="Top">
-                        <CorasauControls:TextEditor Text="{Binding Text, Mode=TwoWay}" TextWrapping="Wrap" AcceptsReturn="True"  MinHeight="60" VerticalContentAlignment="Top"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liAmount" FieldName="Amount">
-                        <CorasauControls:DoubleEditor FieldName="Amount" />
-                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutGroup x:Name="grpDescription" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Description}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="350">
+                        <CorasauControls:CorasauLayoutItem x:Name="liCreated" FieldName="Created" >
+                            <CorasauControls:DateEditor x:Name="deCreated" EditValue="{Binding Created, Mode=TwoWay}" Mask="g" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liUpdatedAt" FieldName="UpdatedAt">
+                            <CorasauControls:DateEditor x:Name="deUpdatedAt" EditValue="{Binding UpdatedAt,Mode=OneWay}" Mask="g" IsReadOnly="True" AllowDefaultButton="False" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liText" FieldName="Text" VerticalAlignment="Top" VerticalContentAlignment="Top" LabelVerticalAlignment="Top">
+                            <CorasauControls:TextEditor Text="{Binding Text, Mode=TwoWay}" TextWrapping="Wrap" AcceptsReturn="True"  MinHeight="60" VerticalContentAlignment="Top"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liAmount" FieldName="Amount">
+                            <CorasauControls:DoubleEditor FieldName="Amount" />
+                        </CorasauControls:CorasauLayoutItem>
+                    </CorasauControls:CorasauLayoutGroup>
+
+                    <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpFollowUp" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FollowUp}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="350">
+                        <CorasauControls:CorasauLayoutItem x:Name="liFollowUp" FieldName="FollowUp">
+                            <CorasauControls:DateEditor EditValue="{Binding FollowUp, Mode=TwoWay}" IsReadOnly="False" Mask="g" />
+                        </CorasauControls:CorasauLayoutItem>
+
+                        <CorasauControls:CorasauLayoutItem FieldName="FollowUpAction" x:Name="liFollowUpAction" >
+                            <CorasauControls:ComboBoxEditor x:Name="cbFollowUpAction" SelectedItem="{Binding FollowUpAction,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+
+                        <CorasauControls:CorasauLayoutItem FieldName="Probability" x:Name="liProbability">
+                            <CorasauControls:NumericUpDownEditor MinValue="0" MaxValue="100" Increment="5" Text="{Binding Probability, Mode=TwoWay}"></CorasauControls:NumericUpDownEditor>
+                        </CorasauControls:CorasauLayoutItem>
+
+                        <CorasauControls:CorasauLayoutItem FieldName="Ended" x:Name="liEnded">
+                            <CorasauControls:DateEditor EditValue="{Binding Ended, Mode=TwoWay}" IsReadOnly="False"/>
+                        </CorasauControls:CorasauLayoutItem>
+
+                    </CorasauControls:CorasauLayoutGroup>
                 </CorasauControls:CorasauLayoutGroup>
-              
-                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpFollowUp" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FollowUp}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="350">
-                    <CorasauControls:CorasauLayoutItem x:Name="liFollowUp" FieldName="FollowUp">
-                        <CorasauControls:DateEditor EditValue="{Binding FollowUp, Mode=TwoWay}" IsReadOnly="False" Mask="g" />
-                    </CorasauControls:CorasauLayoutItem>
-
-                    <CorasauControls:CorasauLayoutItem FieldName="FollowUpAction" x:Name="liFollowUpAction" >
-                        <CorasauControls:ComboBoxEditor x:Name="cbFollowUpAction" SelectedItem="{Binding FollowUpAction,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-
-                    <CorasauControls:CorasauLayoutItem FieldName="Probability" x:Name="liProbability">
-                        <CorasauControls:NumericUpDownEditor MinValue="0" MaxValue="100" Increment="5" Text="{Binding Probability, Mode=TwoWay}"></CorasauControls:NumericUpDownEditor>
-                    </CorasauControls:CorasauLayoutItem>
-
-                    <CorasauControls:CorasauLayoutItem FieldName="Ended" x:Name="liEnded">
-                        <CorasauControls:DateEditor EditValue="{Binding Ended, Mode=TwoWay}" IsReadOnly="False"/>
-                    </CorasauControls:CorasauLayoutItem>
-
-                </CorasauControls:CorasauLayoutGroup>
-
             </CorasauControls:CorasauLayoutControl>
         </Grid>
     </CorasauControls:BusyIndicator>

@@ -652,7 +652,7 @@ namespace UnicontaClient.Pages.CustomPage
                            {
                                var orderApi = new OrderAPI(api);
                                var checkIfCreditNote = createOrderCW.chkIfCreditNote.IsChecked.HasValue ? createOrderCW.chkIfCreditNote.IsChecked.Value : false;
-                               var debtorInvoice = createOrderCW.dgCreateOrderGrid.SelectedItem as DebtorInvoiceLocal;
+                               var debtorInvoice = createOrderCW.dgCreateOrderGrid.SelectedItem as DebtorInvoiceClient;
                                dgDebtorOfferLineGrid.PasteRows(createOrderCW.debtorOfferLines);
                            }
                        };
@@ -660,7 +660,7 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                     catch (Exception ex)
                     {
-                        UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"));
+                        UnicontaMessageBox.Show(ex);
                     }
                     break;
                 case "PrintOffer":
@@ -706,10 +706,10 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 if (generateOfferDialog.DialogResult == true)
                 {
-                    var showOrPrintOffer = generateOfferDialog.InvoiceQuickPrint || generateOfferDialog.ShowInvoice;
-                    var invoicePostingResult = new InvoicePostingPrintGenerator(api, this, dbOrder, null, generateOfferDialog.GenrateDate, 0, true, CompanyLayoutType.Offer, showOrPrintOffer, generateOfferDialog.InvoiceQuickPrint,
-                        generateOfferDialog.NumberOfPages, generateOfferDialog.SendByEmail, generateOfferDialog.Emails, generateOfferDialog.sendOnlyToThisEmail, false, generateOfferDialog.PostOnlyDelivered, null);
-                    invoicePostingResult.OpenAsOutlook = generateOfferDialog.SendByOutlook;
+                    var invoicePostingResult = new InvoicePostingPrintGenerator(api, this);
+                    invoicePostingResult.SetUpInvoicePosting(dbOrder, null, CompanyLayoutType.Offer, generateOfferDialog.GenrateDate, null, true, generateOfferDialog.ShowInvoice, generateOfferDialog.PostOnlyDelivered,
+                        generateOfferDialog.InvoiceQuickPrint, generateOfferDialog.NumberOfPages, generateOfferDialog.SendByEmail, generateOfferDialog.SendByOutlook, generateOfferDialog.sendOnlyToThisEmail,
+                        generateOfferDialog.Emails, false, null, false);
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
                     busyIndicator.IsBusy = true;
                     var result = await invoicePostingResult.Execute();
@@ -734,11 +734,14 @@ namespace UnicontaClient.Pages.CustomPage
 
         public override void Utility_Refresh(string screenName, object argument)
         {
+            var param = argument as object[];
+            if (param == null)
+                return;
+
             if (screenName == TabControls.AddMultipleInventoryItem)
             {
-                var param = argument as object[];
-                var orderNumber = (int)param[1];
-                if (param != null && orderNumber == Order._OrderNumber)
+                var orderNumber = Convert.ToInt32(param[1]);
+                if (orderNumber == Order._OrderNumber)
                 {
                     if (dgDebtorOfferLineGrid.isDefaultFirstRow)
                     {
@@ -749,11 +752,10 @@ namespace UnicontaClient.Pages.CustomPage
                     dgDebtorOfferLineGrid.PasteRows(invItems);
                 }
             }
-            if (screenName == TabControls.ItemVariantAddPage)
+            else if (screenName == TabControls.ItemVariantAddPage)
             {
-                var param = argument as object[];
-                var orderNumber = (int)param[1];
-                if (param != null && orderNumber == Order._OrderNumber)
+                var orderNumber = Convert.ToInt32(param[1]);
+                if (orderNumber == Order._OrderNumber)
                 {
                     var invItems = param[0] as List<UnicontaBaseEntity>;
                     dgDebtorOfferLineGrid.PasteRows(invItems);
@@ -892,31 +894,29 @@ namespace UnicontaClient.Pages.CustomPage
         protected override async void LoadCacheInBackGround()
         {
             var api = this.api;
-            var Comp = api.CompanyEntity;
 
             if (this.items == null)
-                this.items = Comp.GetCache(typeof(Uniconta.DataModel.InvItem)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.InvItem), api).ConfigureAwait(false);
+                this.items = api.GetCache(typeof(Uniconta.DataModel.InvItem)) ?? await api.LoadCache(typeof(Uniconta.DataModel.InvItem)).ConfigureAwait(false);
 
-            if (Comp.ItemVariants)
+            if (api.CompanyEntity.ItemVariants)
             {
                 if (this.standardVariants == null)
-                    this.standardVariants = Comp.GetCache(typeof(Uniconta.DataModel.InvStandardVariant)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.InvStandardVariant), api).ConfigureAwait(false);
+                    this.standardVariants = api.GetCache(typeof(Uniconta.DataModel.InvStandardVariant)) ?? await api.LoadCache(typeof(Uniconta.DataModel.InvStandardVariant)).ConfigureAwait(false);
                 if (this.variants1 == null)
-                    this.variants1 = Comp.GetCache(typeof(Uniconta.DataModel.InvVariant1)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.InvVariant1), api).ConfigureAwait(false);
+                    this.variants1 = api.GetCache(typeof(Uniconta.DataModel.InvVariant1)) ?? await api.LoadCache(typeof(Uniconta.DataModel.InvVariant1)).ConfigureAwait(false);
                 if (this.variants2 == null)
-                    this.variants2 = Comp.GetCache(typeof(Uniconta.DataModel.InvVariant2)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.InvVariant2), api).ConfigureAwait(false);
+                    this.variants2 = api.GetCache(typeof(Uniconta.DataModel.InvVariant2)) ?? await api.LoadCache(typeof(Uniconta.DataModel.InvVariant2)).ConfigureAwait(false);
             }
 
-            this.employees = Comp.GetCache(typeof(Uniconta.DataModel.Employee)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.Employee), api).ConfigureAwait(false);
+            if (this.PriceLookup == null)
+                PriceLookup = new Uniconta.API.DebtorCreditor.FindPrices(Order, api);
+            var t = this.PriceLookup.ExchangeTask;
+            this.exchangeRate = this.PriceLookup.ExchangeRate;
+            if (this.exchangeRate == 0d && t != null)
+                this.exchangeRate = await t.ConfigureAwait(false);
 
-            PriceLookup = new Uniconta.API.DebtorCreditor.FindPrices(Order, api);
-            if (this.PriceLookup != null)
-            {
-                var t = this.PriceLookup.ExchangeTask;
-                this.exchangeRate = this.PriceLookup.ExchangeRate;
-                if (this.exchangeRate == 0d && t != null)
-                    this.exchangeRate = await t.ConfigureAwait(false);
-            }
+            this.employees = api.GetCache(typeof(Uniconta.DataModel.Employee)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Employee)).ConfigureAwait(false);
+
             Dispatcher.BeginInvoke(new Action(() =>
             {
                 var selectedItem = dgDebtorOfferLineGrid.SelectedItem as DebtorOfferLineClient;

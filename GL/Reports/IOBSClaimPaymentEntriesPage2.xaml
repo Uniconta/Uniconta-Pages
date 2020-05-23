@@ -14,84 +14,86 @@ x:Class="UnicontaClient.Pages.CustomPage.IOBSClaimPaymentEntriesPage2"
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <CorasauControls:CorasauRibbonControl x:Name="frmRibbon" XMLSourcePath=";component/Assets/FormRibbon.xml" Grid.Row="0"/>
-            <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Vertical" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
-                <CorasauControls:CorasauLayoutGroup x:Name="grpIdentification" View="GroupBox" Header="Kenni" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="400">
-                    <CorasauControls:CorasauLayoutItem x:Name="liClaimNumber" FieldName="ClaimNumber" >
-                        <CorasauControls:IntegerEditor Text="{Binding ClaimNumber, Mode=TwoWay}" SetMask="False"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liClaimKey" FieldName="ClaimKey" >
-                        <CorasauControls:TextEditor Text="{Binding ClaimKey, Mode=TwoWay}" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liIdentifier" FieldName="Identifier" >
-                        <CorasauControls:TextEditor Text="{Binding Identifier, Mode=TwoWay}" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liBatchNumber" FieldName="BatchNumber" >
-                        <CorasauControls:TextEditor Text="{Binding BatchNumber, Mode=TwoWay}" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liReference" FieldName="Reference" >
-                        <CorasauControls:TextEditor Text="{Binding Reference, Mode=TwoWay}" />
-                    </CorasauControls:CorasauLayoutItem>
-                </CorasauControls:CorasauLayoutGroup>
-                <CorasauControls:CorasauLayoutGroup x:Name="grpDetails" View="GroupBox" Header="Ítarupplýsingar" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="400">
-                    <CorasauControls:CorasauLayoutItem x:Name="liCustmerNumber" FieldName="CustmerNumber" >
-                        <CorasauControls:LookupEditor x:Name="leCustomerNumber" Text="{Binding CustmerNumber, Mode=TwoWay}" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liCategoryCode" FieldName="CategoryCode" >
-                        <CorasauControls:TextEditor Text="{Binding CategoryCode, Mode=TwoWay}" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liBillNumber" FieldName="BillNumber" >
-                        <CorasauControls:TextEditor Text="{Binding BillNumber, Mode=TwoWay}" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liTransactionDate" FieldName="TransactionDate" >
-                        <CorasauControls:DateEditor EditValue="{Binding TransactionDate, Mode=TwoWay}" IsReadOnly="False" Mask="g" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liBookingDate" FieldName="BookingDate" >
-                        <CorasauControls:DateEditor EditValue="{Binding BookingDate, Mode=TwoWay}" IsReadOnly="False" Mask="g" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liFinalDueDate" FieldName="FinalDueDate" >
-                        <CorasauControls:DateEditor EditValue="{Binding FinalDueDate, Mode=TwoWay}" IsReadOnly="False" Mask="g" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liPaymentType" FieldName="PaymentType" >
-                        <CorasauControls:TextEditor Text="{Binding PaymentType, Mode=TwoWay}" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liRedeemingBank" FieldName="RedeemingBank" >
-                        <CorasauControls:TextEditor Text="{Binding RedeemingBank, Mode=TwoWay}" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liValueDate" FieldName="ValueDate" >
-                        <CorasauControls:DateEditor EditValue="{Binding ValueDate, Mode=TwoWay}" IsReadOnly="False" Mask="g" />
-                    </CorasauControls:CorasauLayoutItem>
-                </CorasauControls:CorasauLayoutGroup>
-                <CorasauControls:CorasauLayoutGroup x:Name="grpPayment" View="GroupBox" Header="Greiðsla" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="400">
-                    <CorasauControls:CorasauLayoutItem x:Name="liAmount" FieldName="Amount" >
-                        <CorasauControls:DoubleEditor FieldName="Amount" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liAmountDeposited" FieldName="AmountDeposited" >
-                        <CorasauControls:DoubleEditor FieldName="AmountDeposited" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liCapitalGainsTax" FieldName="CapitalGainsTax" >
-                        <CorasauControls:DoubleEditor FieldName="CapitalGainsTax" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liNoticeChargeAmount" FieldName="NoticeChargeAmount" >
-                        <CorasauControls:DoubleEditor FieldName="NoticeChargeAmount" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liDefaultChargeAmount" FieldName="DefaultChargeAmount" >
-                        <CorasauControls:DoubleEditor FieldName="DefaultChargeAmount" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liOtherDefaultCostAmount" FieldName="OtherDefaultCostAmount" >
-                        <CorasauControls:DoubleEditor FieldName="OtherDefaultCostAmount" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liDefautInterestAmount" FieldName="DefautInterestAmount" >
-                        <CorasauControls:DoubleEditor FieldName="DefautInterestAmount" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liDiscountAmount" FieldName="DiscountAmount" >
-                        <CorasauControls:DoubleEditor FieldName="DiscountAmount" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liTotalAmount" FieldName="TotalAmount" >
-                        <CorasauControls:DoubleEditor FieldName="TotalAmount" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liCurrency" FieldName="Currency" >
-                        <CorasauControls:ComboBoxEditor SelectedItem="{Binding Currency,Mode=TwoWay}" />
-                    </CorasauControls:CorasauLayoutItem>
+            <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
+                <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="grpFirst">
+                    <CorasauControls:CorasauLayoutGroup x:Name="grpIdentification" View="GroupBox" Header="Kenni" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="400">
+                        <CorasauControls:CorasauLayoutItem x:Name="liClaimNumber" FieldName="ClaimNumber" >
+                            <CorasauControls:IntegerEditor Text="{Binding ClaimNumber, Mode=TwoWay}" SetMask="False"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liClaimKey" FieldName="ClaimKey" >
+                            <CorasauControls:TextEditor Text="{Binding ClaimKey, Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liIdentifier" FieldName="Identifier" >
+                            <CorasauControls:TextEditor Text="{Binding Identifier, Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liBatchNumber" FieldName="BatchNumber" >
+                            <CorasauControls:TextEditor Text="{Binding BatchNumber, Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liReference" FieldName="Reference" >
+                            <CorasauControls:TextEditor Text="{Binding Reference, Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                    </CorasauControls:CorasauLayoutGroup>
+                    <CorasauControls:CorasauLayoutGroup x:Name="grpDetails" View="GroupBox" Header="Ítarupplýsingar" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="400">
+                        <CorasauControls:CorasauLayoutItem x:Name="liCustmerNumber" FieldName="CustmerNumber" >
+                            <CorasauControls:LookupEditor x:Name="leCustomerNumber" Text="{Binding CustmerNumber, Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liCategoryCode" FieldName="CategoryCode" >
+                            <CorasauControls:TextEditor Text="{Binding CategoryCode, Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liBillNumber" FieldName="BillNumber" >
+                            <CorasauControls:TextEditor Text="{Binding BillNumber, Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liTransactionDate" FieldName="TransactionDate" >
+                            <CorasauControls:DateEditor EditValue="{Binding TransactionDate, Mode=TwoWay}" IsReadOnly="False" Mask="g" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liBookingDate" FieldName="BookingDate" >
+                            <CorasauControls:DateEditor EditValue="{Binding BookingDate, Mode=TwoWay}" IsReadOnly="False" Mask="g" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liFinalDueDate" FieldName="FinalDueDate" >
+                            <CorasauControls:DateEditor EditValue="{Binding FinalDueDate, Mode=TwoWay}" IsReadOnly="False" Mask="g" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liPaymentType" FieldName="PaymentType" >
+                            <CorasauControls:TextEditor Text="{Binding PaymentType, Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liRedeemingBank" FieldName="RedeemingBank" >
+                            <CorasauControls:TextEditor Text="{Binding RedeemingBank, Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liValueDate" FieldName="ValueDate" >
+                            <CorasauControls:DateEditor EditValue="{Binding ValueDate, Mode=TwoWay}" IsReadOnly="False" Mask="g" />
+                        </CorasauControls:CorasauLayoutItem>
+                    </CorasauControls:CorasauLayoutGroup>
+                    <CorasauControls:CorasauLayoutGroup x:Name="grpPayment" View="GroupBox" Header="Greiðsla" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="400">
+                        <CorasauControls:CorasauLayoutItem x:Name="liAmount" FieldName="Amount" >
+                            <CorasauControls:DoubleEditor FieldName="Amount" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liAmountDeposited" FieldName="AmountDeposited" >
+                            <CorasauControls:DoubleEditor FieldName="AmountDeposited" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liCapitalGainsTax" FieldName="CapitalGainsTax" >
+                            <CorasauControls:DoubleEditor FieldName="CapitalGainsTax" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liNoticeChargeAmount" FieldName="NoticeChargeAmount" >
+                            <CorasauControls:DoubleEditor FieldName="NoticeChargeAmount" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liDefaultChargeAmount" FieldName="DefaultChargeAmount" >
+                            <CorasauControls:DoubleEditor FieldName="DefaultChargeAmount" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liOtherDefaultCostAmount" FieldName="OtherDefaultCostAmount" >
+                            <CorasauControls:DoubleEditor FieldName="OtherDefaultCostAmount" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liDefautInterestAmount" FieldName="DefautInterestAmount" >
+                            <CorasauControls:DoubleEditor FieldName="DefautInterestAmount" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liDiscountAmount" FieldName="DiscountAmount" >
+                            <CorasauControls:DoubleEditor FieldName="DiscountAmount" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liTotalAmount" FieldName="TotalAmount" >
+                            <CorasauControls:DoubleEditor FieldName="TotalAmount" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liCurrency" FieldName="Currency" >
+                            <CorasauControls:ComboBoxEditor SelectedItem="{Binding Currency,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                    </CorasauControls:CorasauLayoutGroup>
                 </CorasauControls:CorasauLayoutGroup>
             </CorasauControls:CorasauLayoutControl>
         </Grid>

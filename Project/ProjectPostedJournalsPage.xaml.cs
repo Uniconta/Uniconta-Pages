@@ -76,7 +76,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "InvPostedTransaction":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.ProjectTransactionPage, dgProjectPostedJournal.syncEntity, string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("PostedTransactions"), selectedItem.RowId));
+                        AddDockItem(TabControls.ProjectTransactionPage, dgProjectPostedJournal.syncEntity, string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("PrTransaction"), selectedItem.RowId));
                     break;
                 case "Delete":
                     if (selectedItem != null)

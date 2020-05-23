@@ -20,48 +20,50 @@ x:Class="UnicontaClient.Pages.CustomPage.UserDocsPage2"
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <CorasauControls:CorasauRibbonControl x:Name="frmRibbon" XMLSourcePath=";component/Assets/FormRibbonNoLayout.xml" Grid.Row="0"/>
-            <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Vertical" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
-                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpDescription" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Description}" Orientation="Vertical" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                    <CorasauControls:CorasauLayoutItem FieldName="UserDocument" x:Name="browseCtrlColumn" VerticalAlignment="Top" VerticalContentAlignment="Top" LabelVerticalAlignment="Top">
-                        <CorasauControls:FileBrowseControl x:Name="browseControl" FileSelected="browseControl_FileSelected" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="layoutIncludeOnlyReference" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OnlyPointToReference}">
-                        <CorasauControls:CheckEditor x:Name="chkIncludeOnlyReference" EditValueChanged="chkIncludeOnlyReference_EditValueChanged"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="Url" x:Name="liUrl">
-                        <CorasauControls:TextEditor x:Name="txtUrl" Text="{Binding Url,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="Text" x:Name="liText" VerticalAlignment="Top" VerticalContentAlignment="Top" LabelVerticalAlignment="Top">
-                        <CorasauControls:TextEditor x:Name="txedUserDocNotes" Text="{Binding Text,Mode=TwoWay}" AcceptsReturn="True" TextWrapping="Wrap" HorizontalContentAlignment="Left" 
+            <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
+                <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="grpFirst">
+                    <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpDescription" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Description}" Orientation="Vertical" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                        <CorasauControls:CorasauLayoutItem FieldName="UserDocument" x:Name="browseCtrlColumn" VerticalAlignment="Top" VerticalContentAlignment="Top" LabelVerticalAlignment="Top">
+                            <CorasauControls:FileBrowseControl x:Name="browseControl" FileSelected="browseControl_FileSelected" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="layoutIncludeOnlyReference" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OnlyPointToReference}">
+                            <CorasauControls:CheckEditor x:Name="chkIncludeOnlyReference" EditValueChanged="chkIncludeOnlyReference_EditValueChanged"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="Url" x:Name="liUrl">
+                            <CorasauControls:TextEditor x:Name="txtUrl" Text="{Binding Url,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="Text" x:Name="liText" VerticalAlignment="Top" VerticalContentAlignment="Top" LabelVerticalAlignment="Top">
+                            <CorasauControls:TextEditor x:Name="txedUserDocNotes" Text="{Binding Text,Mode=TwoWay}" AcceptsReturn="True" TextWrapping="Wrap" HorizontalContentAlignment="Left" 
                                                 MinHeight="100"  VerticalContentAlignment="Top" MaxHeight="120" />
-                    </CorasauControls:CorasauLayoutItem>
-                   
-                    <CorasauControls:CorasauLayoutItem FieldName="Group" x:Name="liGroup">
-                        <CorasauControls:LookupEditor x:Name="leGroup" Text="{Binding Group,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="GroupName" x:Name="liGroupName">
-                        <CorasauControls:TextEditor Text="{Binding GroupName,Mode=OneWay}" IsReadOnly="True"/>
-                    </CorasauControls:CorasauLayoutItem>
-                </CorasauControls:CorasauLayoutGroup>
-                <CorasauControls:CorasauLayoutGroup View="GroupBox"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=IncludeInEmail}" Orientation="Vertical" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" x:Name="groupInclude">
+                        </CorasauControls:CorasauLayoutItem>
+
+                        <CorasauControls:CorasauLayoutItem FieldName="Group" x:Name="liGroup">
+                            <CorasauControls:LookupEditor x:Name="leGroup" Text="{Binding Group,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="GroupName" x:Name="liGroupName">
+                            <CorasauControls:TextEditor Text="{Binding GroupName,Mode=OneWay}" IsReadOnly="True"/>
+                        </CorasauControls:CorasauLayoutItem>
+                    </CorasauControls:CorasauLayoutGroup>
+                    <CorasauControls:CorasauLayoutGroup View="GroupBox"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=IncludeInEmail}" Orientation="Vertical" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" x:Name="groupInclude">
                         <CorasauControls:CorasauLayoutItem FieldName="Invoice" x:Name="layoutInvoice">
-                        <CorasauControls:CheckEditor IsChecked="{Binding Invoice,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="Offer" x:Name="layoutOffer">
-                        <CorasauControls:CheckEditor IsChecked="{Binding Offer,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="Confirmation" x:Name="layoutConfirmation">
-                        <CorasauControls:CheckEditor IsChecked="{Binding Confirmation,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="PackNote" x:Name="layoutPacknote">
-                        <CorasauControls:CheckEditor IsChecked="{Binding PackNote,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="Requisition" x:Name="layoutRequisition">
-                        <CorasauControls:CheckEditor IsChecked="{Binding Requisition,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="SaveOnInvoice" x:Name="layoutSaveOnInvoice">
-                        <CorasauControls:CheckEditor IsChecked="{Binding SaveOnInvoice,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
+                            <CorasauControls:CheckEditor IsChecked="{Binding Invoice,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="Offer" x:Name="layoutOffer">
+                            <CorasauControls:CheckEditor IsChecked="{Binding Offer,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="Confirmation" x:Name="layoutConfirmation">
+                            <CorasauControls:CheckEditor IsChecked="{Binding Confirmation,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="PackNote" x:Name="layoutPacknote">
+                            <CorasauControls:CheckEditor IsChecked="{Binding PackNote,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="Requisition" x:Name="layoutRequisition">
+                            <CorasauControls:CheckEditor IsChecked="{Binding Requisition,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="SaveOnInvoice" x:Name="layoutSaveOnInvoice">
+                            <CorasauControls:CheckEditor IsChecked="{Binding SaveOnInvoice,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                    </CorasauControls:CorasauLayoutGroup>
                 </CorasauControls:CorasauLayoutGroup>
             </CorasauControls:CorasauLayoutControl>
         </Grid>

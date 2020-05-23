@@ -237,12 +237,11 @@ namespace UnicontaISO20022CreditTransfer
         /// In Norway it will be: Reg. no. + Account no. 11 char (4+7)
         /// BBAN will be retrieved from Creditor because PaymentId will KidNo
         /// </summary>
-        public override string CreditorBBAN(String recBBAN, String credBBAN)
+        public override string CreditorBBAN(string recBBAN, string credBBAN, string bic)
         {
-            var bban = string.Empty;
             var regNum = string.Empty;
 
-            bban = credBBAN ?? string.Empty;
+            var bban = credBBAN ?? string.Empty;
 
             bban = Regex.Replace(bban, "[^0-9]", "");
 

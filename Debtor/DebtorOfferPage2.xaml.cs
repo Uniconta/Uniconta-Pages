@@ -39,6 +39,7 @@ namespace UnicontaClient.Pages.CustomPage
         public override Type TableType { get { return typeof(DebtorOfferClient); } }
         public override UnicontaBaseEntity ModifiedRow { get { return editrow; } set { editrow = (DebtorOfferClient)value; } }
 
+        bool lookupZipCode = true;
         public DebtorOfferPage2(UnicontaBaseEntity sourcedata, UnicontaBaseEntity master) /* called for edit from particular account */
             : base(sourcedata, true)
         {
@@ -104,9 +105,9 @@ namespace UnicontaClient.Pages.CustomPage
             if (editrow == null)
             {
                 frmRibbon.DisableButtons("Delete");
+                liCreatedTime.Visibility = Visibility.Collapsed;
                 editrow = CreateNew() as DebtorOfferClient;
                 editrow._Created = DateTime.MinValue;
-                liCreatedTime.Visibility = Visibility.Collapsed;
                 if (Debtor != null)
                 {
                     editrow.SetMaster(Debtor);
@@ -166,6 +167,13 @@ namespace UnicontaClient.Pages.CustomPage
             UtilDisplay.RemoveMenuCommand(rb, "PhysicalVou");
         }
 
+        protected override void AfterTemplateSet(UnicontaBaseEntity row)
+        {
+            base.AfterTemplateSet(row);
+            if (this.Debtor != null)
+                (row as DebtorOfferClient).Account = Debtor.Account;
+        }
+
         protected override void OnLayoutCtrlLoaded()
         {
               AdjustLayout();
@@ -185,6 +193,8 @@ namespace UnicontaClient.Pages.CustomPage
                 projectItem.Visibility = Visibility.Collapsed;
                 prCategoryItem.Visibility = Visibility.Collapsed;
             }
+            if (!Comp.SetupSizes)
+                grpSize.Visibility = Visibility.Collapsed;
         }
         public override bool BeforeSetUserField(ref CorasauLayoutGroup parentGroup)
         {
@@ -192,12 +202,11 @@ namespace UnicontaClient.Pages.CustomPage
             return true;
         }
 
-        string zip;
         private async void Editrow_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == "DeliveryZipCode")
             {
-                if (zip == null)
+                if (lookupZipCode)
                 {
                     var deliveryCountry = editrow.DeliveryCountry ?? editrow.Country;
                     var city = await UtilDisplay.GetCityAndAddress(editrow.DeliveryZipCode, deliveryCountry);
@@ -207,13 +216,16 @@ namespace UnicontaClient.Pages.CustomPage
                         var add1 = city[1];
                         if (!string.IsNullOrEmpty(add1))
                             editrow.DeliveryAddress1 = add1;
-                        zip = city[2];
-                        if (!string.IsNullOrEmpty(zip))
+                        var zip = city[2];
+                        if (!string.IsNullOrEmpty(zip) && editrow.DeliveryZipCode != zip)
+                        {
+                            lookupZipCode = false;
                             editrow.DeliveryZipCode = zip;
+                        }
                     }
                 }
                 else
-                    zip = null;
+                    lookupZipCode = true;
             }
         }
 
@@ -310,7 +322,11 @@ namespace UnicontaClient.Pages.CustomPage
                 editrow.DeliveryAddress2 = debtor._DeliveryAddress2;
                 editrow.DeliveryAddress3 = debtor._DeliveryAddress3;
                 editrow.DeliveryCity = debtor._DeliveryCity;
-                editrow.DeliveryZipCode = debtor._DeliveryZipCode;
+                if (editrow.DeliveryZipCode != debtor._DeliveryZipCode)
+                {
+                    lookupZipCode = false;
+                    editrow.DeliveryZipCode = debtor._DeliveryZipCode;
+                }
                 if (debtor._DeliveryCountry != 0)
                     editrow.DeliveryCountry = debtor._DeliveryCountry;
                 else
@@ -415,8 +431,34 @@ namespace UnicontaClient.Pages.CustomPage
 #if !SILVERLIGHT
         private void LiDeliveryZipCode_OnButtonClicked(object sender)
         {
-            var location = editrow.DeliveryAddress1 + "+" + editrow.DeliveryAddress2 + "+" + editrow.DeliveryAddress3 + "+" + editrow.DeliveryZipCode + "+" + editrow.DeliveryCity + "+" + editrow.DeliveryCountry;
+            var location = editrow._DeliveryAddress1 + "+" + editrow._DeliveryAddress2 + "+" + editrow._DeliveryAddress3 + "+" + editrow._DeliveryZipCode + "+" + editrow._DeliveryCity + "+" + editrow._DeliveryCountry;
             Utility.OpenGoogleMap(location);
+        }
+
+        private void lblDeliveryAddress_ButtonClicked(object sender)
+        {
+            var selectedInstallation = leDeliveryAddress.SelectedItem as WorkInstallationClient;
+            if (selectedInstallation != null)
+            {
+                CopyAddressToRow(selectedInstallation._Name, selectedInstallation._Address1, selectedInstallation._Address2, selectedInstallation._Address3, selectedInstallation._ZipCode, selectedInstallation._City, selectedInstallation._Country);
+                if (selectedInstallation._DeliveryTerm != null)
+                    editrow.DeliveryTerm = selectedInstallation._DeliveryTerm;
+            }
+        }
+
+        private void CopyAddressToRow(string name, string address1, string address2, string address3, string zipCode, string city, CountryCode? country)
+        {
+            editrow.DeliveryName = name;
+            editrow.DeliveryAddress1 = address1;
+            editrow.DeliveryAddress2 = address2;
+            editrow.DeliveryAddress3 = address3;
+            editrow.DeliveryCity = city;
+            if (editrow.DeliveryZipCode != zipCode)
+            {
+                lookupZipCode = false;
+                editrow.DeliveryZipCode = zipCode;
+            }
+            editrow.DeliveryCountry = country;
         }
 #endif
         SQLCache installationCache;

@@ -471,7 +471,8 @@ namespace UnicontaClient.Pages.CustomPage
 
         async void AddAttachment(string actionType, ProductionOrderLineClient productionOrderLineClient)
         {
-            var invBomResult = await api.Query<InvBOMClient>(productionOrderLineClient);
+            var filter = new[] { PropValuePair.GenereteParameter("ItemPart", typeof(string), "1") };
+            var invBomResult = await api.Query<InvBOMClient>(productionOrderLineClient, filter);
             if (invBomResult != null && invBomResult.Length > 0)
             {
                 var invBom = invBomResult.FirstOrDefault();

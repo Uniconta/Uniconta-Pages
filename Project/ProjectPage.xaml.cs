@@ -233,10 +233,6 @@ namespace UnicontaClient.Pages.CustomPage
                         AddDockItem(TabControls.DebtorOffers, dgProjectGrid.syncEntity, salesHeader);
                     }
                     break;
-                case "Register":
-                    if (selectedItem != null)
-                        WorkOrderInput(selectedItem);
-                    break;
                 case "ChartView":
 #if SILVERLIGHT
                     UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("SilverlightSupport"), Uniconta.ClientTools.Localization.lookup("Message"), MessageBoxButton.OK);
@@ -304,8 +300,7 @@ namespace UnicontaClient.Pages.CustomPage
                      busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("LoadingMsg");
                      busyIndicator.IsBusy = true;
 
-                     var debtorOrderType = api.CompanyEntity.GetUserType(typeof(DebtorOrderClient)) ?? typeof(DebtorOrderClient);
-                     var debtorOrderInstance = Activator.CreateInstance(debtorOrderType) as DebtorOrderClient;
+                     var debtorOrderInstance = Activator.CreateInstance(api.CompanyEntity.GetUserTypeNotNull(typeof(DebtorOrderClient))) as DebtorOrderClient;
                      var invoiceApi = new Uniconta.API.Project.InvoiceAPI(api);
                      var result = await invoiceApi.CreateOrderFromProject(debtorOrderInstance, selectedItem._Number, CWCreateOrderFromProject.InvoiceCategory, CWCreateOrderFromProject.GenrateDate,
                          CWCreateOrderFromProject.FromDate, CWCreateOrderFromProject.ToDate);
@@ -390,36 +385,25 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
                     busyIndicator.IsBusy = true;
+                    var isSimulated = generateInvoiceDialog.IsSimulation;
 #if !SILVERLIGHT
                     var invoicePostingResult = new UnicontaClient.Pages.InvoicePostingPrintGenerator(
 #elif SILVERLIGHT
                     var invoicePostingResult = new InvoicePostingPrintGenerator(
 #endif
-                    api, this, selectedItem, null, generateInvoiceDialog.GenrateDate, generateInvoiceDialog.IsSimulation, CompanyLayoutType.Invoice, (generateInvoiceDialog.ShowInvoice || generateInvoiceDialog.InvoiceQuickPrint), generateInvoiceDialog.InvoiceQuickPrint,
-                    generateInvoiceDialog.NumberOfPages, generateInvoiceDialog.SendByEmail, generateInvoiceDialog.EmailList, generateInvoiceDialog.SendOnlyEmail, generateInvoiceDialog.FromDate, generateInvoiceDialog.ToDate,
-                    generateInvoiceDialog.InvoiceCategory, null);
-
+                    api, this);
+                    invoicePostingResult.SetUpInvoicePosting(selectedItem, null, generateInvoiceDialog.GenrateDate, isSimulated, CompanyLayoutType.Invoice, generateInvoiceDialog.ShowInvoice, generateInvoiceDialog.InvoiceQuickPrint,
+                        generateInvoiceDialog.NumberOfPages, generateInvoiceDialog.SendByEmail, generateInvoiceDialog.EmailList, generateInvoiceDialog.SendOnlyEmail, generateInvoiceDialog.FromDate, generateInvoiceDialog.ToDate,
+                        generateInvoiceDialog.InvoiceCategory, generateInvoiceDialog.GenerateOIOUBLClicked, null);
+                    
                     var result = await invoicePostingResult.Execute();
                     busyIndicator.IsBusy = false;
 
                     if (result)
                     {
                         Task reloadTask = null;
-                        if (!generateInvoiceDialog.IsSimulation)
+                        if (!isSimulated)
                             reloadTask = Filter();
-
-                        string msg = Uniconta.ClientTools.Localization.lookup("InvoiceProposal");
-                        if (invoicePostingResult.PostingResult.Header._InvoiceNumber != 0)
-                        {
-                            msg = string.Format(Uniconta.ClientTools.Localization.lookup("InvoiceHasBeenGenerated"), invoicePostingResult.PostingResult.Header.InvoiceNum);
-                            msg = string.Format("{0}{1}{2} {3}", msg, Environment.NewLine, Uniconta.ClientTools.Localization.lookup("LedgerVoucher"), invoicePostingResult.PostingResult.Header._Voucher);
-
-#if !SILVERLIGHT
-                            if (generateInvoiceDialog.GenerateOIOUBLClicked)
-                                DebtorOrders.GenerateOIOXml(api, invoicePostingResult.PostingResult);
-#endif
-                        }
-                        UnicontaMessageBox.Show(msg, Uniconta.ClientTools.Localization.lookup("Message"), MessageBoxButton.OK);
                     }
                     else
                         Utility.ShowJournalError(invoicePostingResult.PostingResult.ledgerRes, dgProjectGrid);
@@ -436,37 +420,6 @@ namespace UnicontaClient.Pages.CustomPage
             StreamingManager.Copy(selectedItem, project);
             var parms = new object[2] { project, false };
             AddDockItem(TabControls.ProjectPage2, parms, Uniconta.ClientTools.Localization.lookup("Project"), "Add_16x16.png");
-        }
-
-        async void WorkOrderInput(ProjectClient project)
-        {
-            var journals = await api.Query<ProjectJournalClient>(api.session.User);
-            ProjectJournalClient journal;
-            if (journals != null && journals.Length > 0)
-                journal = journals[0];
-            else
-            {
-                var employeeCache = api.GetCache(typeof(Uniconta.DataModel.Employee)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Employee));
-                var employee = ((Uniconta.DataModel.Employee[])employeeCache.GetNotNullArray).Where(e => e._Uid == api.session.Uid).FirstOrDefault();
-                if (employee == null)
-                {
-                    var msg = string.Format(Uniconta.ClientTools.Localization.lookup("UserNotEmployee"), api.session.User._LoginId);
-                    UnicontaMessageBox.Show(msg, Uniconta.ClientTools.Localization.lookup("Warning"), MessageBoxButton.OK);
-                    return;
-                }
-                journal = new ProjectJournalClient();
-                journal._Journal = Uniconta.ClientTools.Localization.lookup("Default");
-                journal._Employee = employee.KeyStr;
-                var err = await api.Insert(journal);
-                if (err != ErrorCodes.Succes)
-                {
-                    UtilDisplay.ShowErrorCode(err);
-                    return;
-                }
-            }
-            var header = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Journal"), journal._Journal);
-            var param = new object[2] { journal, project };
-            AddDockItem(TabControls.WorkOrderInput, param, header);
         }
 
         bool copyRowIsEnabled = false;

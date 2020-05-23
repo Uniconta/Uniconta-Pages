@@ -28,7 +28,7 @@
     <RibbonItem Action="ClearProjectTransFilter" LocalizedNameKey="ClearFilter" Glyph="Filter_Clear_32x32.png" LargeGlyph="Filter_Clear_32x32.png" ShortcutKey="CTRL+K"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="InclSubProjects" LocalizedNameKey="InclSubProjects" IsCheckBox="True" />
-   <RibbonItem Action="InvoicedTrans" LocalizedNameKey="InvoicedTrans" IsComboBox="True" />
+    <RibbonItem Action="InclSubProjects" LocalizedNameKey="InclSubProjects" ButtonType="CheckBox" />
+   <RibbonItem Action="InvoicedTrans" LocalizedNameKey="InvoicedTrans" ButtonType="ComboBox" />
   </RibbonItem>
 </root>

@@ -224,8 +224,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void liWww_ButtonClicked(object sender)
         {
-            if (!string.IsNullOrWhiteSpace(editrow.Www))
-                Utility.OpenWebSite(editrow.Www);
+            Utility.OpenWebSite(editrow.Www);
         }
 #endif
     }

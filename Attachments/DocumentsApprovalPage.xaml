@@ -25,57 +25,57 @@ x:Class="UnicontaClient.Pages.CustomPage.DocumentsApprovalPage"
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <localPage:DocumentsApprovalPageGrid x:Name="dgVoucherApproveGrid" AutoGenerateColumns="None">
                 <localPage:DocumentsApprovalPageGrid.Columns>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PrimaryKeyId" Width="70" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PrimaryKeyId" Width="70"  />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Created" ShowTime="True"  Width="110"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="UserName" Visible="False" Width="100" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Fileextension"  Width="55" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PostingDate" AllowEditing="True" Width="85" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Invoice" AllowEditing="True" Width="70" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Voucher" AllowEditing="True" Width="70" Visible="False" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Amount" AllowEditing="True" Width="85" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Debit" AllowEditing="True" Width="85" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Credit" AllowEditing="True" Width="85" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Currency" Width="35"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CostAccount" Width="80"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PayAccount" Width="80" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CreditorAccount" Width="80"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CreditorName" Visible="true"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Vat" Width="60" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Project" Visible="False" Width="90"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Visible="False" Width="90"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PaymentMethod" Width="80" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PaymentId" AllowEditing="True" MinWidth="100" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Approver1" Visible="False" Width="80"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Approver2" Visible="False" Width="80"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DocumentDate" Visible="False" AllowEditing="True" Width="85"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Url" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Text" Width="200" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PostingInstruction" MinWidth="500" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Approved" Width="70"  Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Approved2" Width="70"  Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="SentToBilagscan" Width="70"  Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Fileextension" AllowEditing="False" Width="55" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PostingDate" AllowEditing="False" Width="85" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Invoice" AllowEditing="False" Width="70" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Voucher" AllowEditing="False" Width="70" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Amount" AllowEditing="False" Width="85" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Debit" AllowEditing="False" Width="85" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Credit" AllowEditing="False" Width="85" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Currency" AllowEditing="False" Width="35"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CostAccount" AllowEditing="False" Width="80"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PayAccount" AllowEditing="False" Width="80" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CreditorAccount" AllowEditing="False" Width="80"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CreditorName" AllowEditing="False" Visible="true"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Vat" AllowEditing="False" Width="60" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Project" AllowEditing="True"  Width="90"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PrCategory" AllowEditing="True"  Width="90"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PaymentMethod" AllowEditing="False" Width="80" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PaymentId" AllowEditing="False" MinWidth="100" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Approver1" AllowEditing="False" Visible="False" Width="80"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Approver2" AllowEditing="False" Visible="False" Width="80"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DocumentDate"   Visible="False" AllowEditing="False" Width="85"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Url" AllowEditing="False" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Text" AllowEditing="True" Width="200" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PostingInstruction" AllowEditing="False" MinWidth="500" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Approved" AllowEditing="False" Width="70"  Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Approved2" AllowEditing="False" Width="70"  Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="SentToBilagscan" AllowEditing="False" Width="70"  Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="UserLogidId" Width="100"  Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Envelope"  Visible="False" Width="55" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PayDate"  Width="85" Visible="False" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="VatOperation"  Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="TransType"  Visible="False" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PurchaseNumber" Width="85" Visible="False" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="clDim1" Width="70" FieldName="Dimension1" Visible="False" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="clDim2" Width="70" FieldName="Dimension2" Visible="False" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="clDim3" Width="70" FieldName="Dimension3" Visible="False" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="clDim4" Width="70" FieldName="Dimension4" Visible="False" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="clDim5" Width="70" FieldName="Dimension5" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PayDate" AllowEditing="False" Width="85" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="VatOperation" AllowEditing="False" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="TransType" AllowEditing="False"  Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PurchaseNumber" AllowEditing="False" Width="85" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="clDim1" AllowEditing="True" Width="70" FieldName="Dimension1" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="clDim2" AllowEditing="True" Width="70" FieldName="Dimension2" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="clDim3" AllowEditing="True" Width="70" FieldName="Dimension3" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="clDim4" AllowEditing="True" Width="70" FieldName="Dimension4" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="clDim5" AllowEditing="True" Width="70" FieldName="Dimension5" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CostAccountName" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PayAccountName" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Approver1Name" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Approver2Name" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ProjectName" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CategoryName" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Qty" Visible="False" AllowThousandMask="True" Mask="N2"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Qty" AllowEditing="False" Visible="False" AllowThousandMask="True" Mask="N2"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="SizeKB" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="OnHold" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Reference" Visible="False" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ViewInFolder" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="OnHold" AllowEditing="False"   Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Reference" AllowEditing="False" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ViewInFolder" AllowEditing="False" Visible="False" />
                 </localPage:DocumentsApprovalPageGrid.Columns>
             </localPage:DocumentsApprovalPageGrid>
         </CorasauControls:BusyIndicator>

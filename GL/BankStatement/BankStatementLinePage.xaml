@@ -102,6 +102,7 @@ x:Class="UnicontaClient.Pages.CustomPage.BankStatementLinePage"
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="VatOperation" Width="35"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="IBAN" Width="100" Visible="False"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="TransType" Width="100" Visible="False"/>
+                                <localPage:ComboBoxColumnClient x:Name="SettleValue" Width="80" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Settlement"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="JournalPostedId" Width="60" Visible="False" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Voucher" Width="80" Visible="False" />
@@ -119,6 +120,9 @@ x:Class="UnicontaClient.Pages.CustomPage.BankStatementLinePage"
                                     </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                                 </localPage:CorasauDataGridTemplateColumnClient>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="AccountName" ReadOnly="True" Visible="False" />
+                                <localPage:CorasauDataGridTemplateColumnClient FieldName="AmountCur" x:Name="colAmountCur" Visible="False" Width="90" />
+                                <localPage:ComboBoxColumnClient FieldName="Currency" x:Name="colCurrency" Visible="False" Width="100"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Info" Visible="False" Width="150"/>
                                 <localPage:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension1" x:Name="coldim1"/>
                                 <localPage:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension2" x:Name="coldim2"/>
                                 <localPage:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension3" x:Name="coldim3"/>
@@ -128,7 +132,7 @@ x:Class="UnicontaClient.Pages.CustomPage.BankStatementLinePage"
                                     <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                         <DataTemplate>
                                             <CorasauControls:MemoEditor Name="PART_Editor" EditMode="InplaceActive"
-                                               IsReadOnly="{Binding DataContext.RowData.Row.IsNoteReadonly, RelativeSource={RelativeSource TemplatedParent}}"  ShowIcon="{Binding DataContext.RowData.Row.HasNote, RelativeSource={RelativeSource TemplatedParent}}"
+                                               ShowIcon="{Binding DataContext.RowData.Row.HasNote, RelativeSource={RelativeSource TemplatedParent}}"
                                                MaxLength="1000" ShowEditorButtons="{Binding IsFocusedCell}" EditValue="{Binding DataContext.RowData.Row.Note, RelativeSource={RelativeSource TemplatedParent}}"/>
                                         </DataTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>

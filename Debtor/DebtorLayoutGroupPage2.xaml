@@ -14,119 +14,121 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorLayoutGroupPage2"
         </Grid.RowDefinitions>
 
             <CorasauControls:CorasauRibbonControl x:Name="frmRibbon" XMLSourcePath=";component/Pages/Debtor/DebtorLayoutGroupPage2Ribbon.xml" Grid.Row="0"/>
-            <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Vertical" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
-                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpDesctription" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Description}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                    <CorasauControls:CorasauLayoutItem FieldName="Name" x:Name="liName">
-                        <CorasauControls:TextEditor x:Name="txtName" Text="{Binding Name,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="IsDefault" x:Name="liIsdefault">
-                        <CorasauControls:CheckEditor x:Name="chkIsDefault" IsChecked="{Binding IsDefault}" />
-                    </CorasauControls:CorasauLayoutItem>
-                </CorasauControls:CorasauLayoutGroup>
+            <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
+                <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="grpFirst">
+                    <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpDesctription" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Description}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                        <CorasauControls:CorasauLayoutItem FieldName="Name" x:Name="liName">
+                            <CorasauControls:TextEditor x:Name="txtName" Text="{Binding Name,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="IsDefault" x:Name="liIsdefault">
+                            <CorasauControls:CheckEditor x:Name="chkIsDefault" IsChecked="{Binding IsDefault}" />
+                        </CorasauControls:CorasauLayoutItem>
+                    </CorasauControls:CorasauLayoutGroup>
 
-                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpCompanyDocuments" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CompanyDocuments}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                    <CorasauControls:CorasauLayoutItem FieldName="Invoice" x:Name="liInvoice">
-                        <CorasauControls:LookupEditor x:Name="txtInvoice" Text="{Binding Invoice,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="Creditnote" x:Name="liCreditNote">
-                        <CorasauControls:LookupEditor x:Name="txtCreditNote" Text="{Binding Creditnote,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="Packnote" x:Name="liPackNote">
-                        <CorasauControls:LookupEditor x:Name="txtPackNote" Text="{Binding Packnote,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="OrderConfirmation" x:Name="liOrderConfirmation">
-                        <CorasauControls:LookupEditor x:Name="txtOrderConfirmation" Text="{Binding OrderConfirmation,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="Offer" x:Name="liOffer">
-                        <CorasauControls:LookupEditor x:Name="txtOffer" Text="{Binding Offer,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpCompanyDocuments" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CompanyDocuments}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                        <CorasauControls:CorasauLayoutItem FieldName="Invoice" x:Name="liInvoice">
+                            <CorasauControls:LookupEditor x:Name="txtInvoice" Text="{Binding Invoice,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="Creditnote" x:Name="liCreditNote">
+                            <CorasauControls:LookupEditor x:Name="txtCreditNote" Text="{Binding Creditnote,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="Packnote" x:Name="liPackNote">
+                            <CorasauControls:LookupEditor x:Name="txtPackNote" Text="{Binding Packnote,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="OrderConfirmation" x:Name="liOrderConfirmation">
+                            <CorasauControls:LookupEditor x:Name="txtOrderConfirmation" Text="{Binding OrderConfirmation,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="Offer" x:Name="liOffer">
+                            <CorasauControls:LookupEditor x:Name="txtOffer" Text="{Binding Offer,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
 
-                </CorasauControls:CorasauLayoutGroup>
+                    </CorasauControls:CorasauLayoutGroup>
 
-                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpReports" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Reports}" Orientation="Vertical" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                    <CorasauControls:CorasauLayoutItem FieldName="InvoiceRep" x:Name="liInvoiceRep">
-                        <CorasauControls:ComboBoxEditor x:Name="cmbInvRep" AutoComplete="True" IsEditable="True" SelectedItem="{Binding InvoiceRep}" MinWidth="170" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="CreditnoteRep" x:Name="liCreditNoteRep">
-                        <CorasauControls:ComboBoxEditor x:Name="cmbCrdNoteRep" AutoComplete="True" SelectedItem="{Binding CreditnoteRep}" MinWidth="170"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="PacknoteRep" x:Name="liPackNoterep">
-                        <CorasauControls:ComboBoxEditor x:Name="cmbPckNoteRep" AutoComplete="True" SelectedItem="{Binding PacknoteRep}" MinWidth="170"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="OrderConfirmationRep" x:Name="liOrderConfirmationRep">
-                        <CorasauControls:ComboBoxEditor x:Name="cmbOrdConfRep" AutoComplete="True" SelectedItem="{Binding OrderConfirmationRep}" MinWidth="170"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="OfferRep" x:Name="liOfferRep">
-                        <CorasauControls:ComboBoxEditor x:Name="cmbOfferRep" AutoComplete="True" SelectedItem="{Binding OfferRep}" MinWidth="170"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="StatementRep" x:Name="liStatementRep">
-                        <CorasauControls:ComboBoxEditor x:Name="cmbStRep" AutoComplete="True" IsEditable="True" SelectedItem="{Binding StatementRep}" MinWidth="170" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="StatementCurRep" x:Name="liStatementCurRep">
-                        <CorasauControls:ComboBoxEditor x:Name="cmbStCurRep" AutoComplete="True" IsEditable="True" SelectedItem="{Binding StatementCurRep}" MinWidth="170" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="CollectionRep" x:Name="liCollectionRep">
-                        <CorasauControls:ComboBoxEditor x:Name="cmbColRep" AutoComplete="True" IsEditable="True" SelectedItem="{Binding CollectionRep}" MinWidth="170" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="CollectionCurRep" x:Name="liCollectionCurRep">
-                        <CorasauControls:ComboBoxEditor x:Name="cmbColCurRep" AutoComplete="True" IsEditable="True" SelectedItem="{Binding CollectionCurRep}" MinWidth="170" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="InterestNoteRep" x:Name="liInterestRep">
-                        <CorasauControls:ComboBoxEditor x:Name="cmbIntNoteRep" AutoComplete="True" IsEditable="True" SelectedItem="{Binding InterestNoteRep}" MinWidth="170" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="InterestNoteCurRep" x:Name="liInterestNoteCurRep">
-                        <CorasauControls:ComboBoxEditor x:Name="cmbIntNoteCurRep" AutoComplete="True" IsEditable="True" SelectedItem="{Binding InterestNoteCurRep}" MinWidth="170" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="PickingListRep" x:Name="liPickingListRep">
-                        <CorasauControls:ComboBoxEditor x:Name="cmbPickingListRep" AutoComplete="True" IsEditable="True" SelectedItem="{Binding PickingListRep}" MinWidth="170" />
-                    </CorasauControls:CorasauLayoutItem>
-                </CorasauControls:CorasauLayoutGroup>
+                    <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpReports" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Reports}" Orientation="Vertical" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                        <CorasauControls:CorasauLayoutItem FieldName="InvoiceRep" x:Name="liInvoiceRep">
+                            <CorasauControls:ComboBoxEditor x:Name="cmbInvRep" AutoComplete="True" IsEditable="True" SelectedItem="{Binding InvoiceRep}" MinWidth="170" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="CreditnoteRep" x:Name="liCreditNoteRep">
+                            <CorasauControls:ComboBoxEditor x:Name="cmbCrdNoteRep" AutoComplete="True" SelectedItem="{Binding CreditnoteRep}" MinWidth="170"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="PacknoteRep" x:Name="liPackNoterep">
+                            <CorasauControls:ComboBoxEditor x:Name="cmbPckNoteRep" AutoComplete="True" SelectedItem="{Binding PacknoteRep}" MinWidth="170"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="OrderConfirmationRep" x:Name="liOrderConfirmationRep">
+                            <CorasauControls:ComboBoxEditor x:Name="cmbOrdConfRep" AutoComplete="True" SelectedItem="{Binding OrderConfirmationRep}" MinWidth="170"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="OfferRep" x:Name="liOfferRep">
+                            <CorasauControls:ComboBoxEditor x:Name="cmbOfferRep" AutoComplete="True" SelectedItem="{Binding OfferRep}" MinWidth="170"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="StatementRep" x:Name="liStatementRep">
+                            <CorasauControls:ComboBoxEditor x:Name="cmbStRep" AutoComplete="True" IsEditable="True" SelectedItem="{Binding StatementRep}" MinWidth="170" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="StatementCurRep" x:Name="liStatementCurRep">
+                            <CorasauControls:ComboBoxEditor x:Name="cmbStCurRep" AutoComplete="True" IsEditable="True" SelectedItem="{Binding StatementCurRep}" MinWidth="170" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="CollectionRep" x:Name="liCollectionRep">
+                            <CorasauControls:ComboBoxEditor x:Name="cmbColRep" AutoComplete="True" IsEditable="True" SelectedItem="{Binding CollectionRep}" MinWidth="170" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="CollectionCurRep" x:Name="liCollectionCurRep">
+                            <CorasauControls:ComboBoxEditor x:Name="cmbColCurRep" AutoComplete="True" IsEditable="True" SelectedItem="{Binding CollectionCurRep}" MinWidth="170" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="InterestNoteRep" x:Name="liInterestRep">
+                            <CorasauControls:ComboBoxEditor x:Name="cmbIntNoteRep" AutoComplete="True" IsEditable="True" SelectedItem="{Binding InterestNoteRep}" MinWidth="170" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="InterestNoteCurRep" x:Name="liInterestNoteCurRep">
+                            <CorasauControls:ComboBoxEditor x:Name="cmbIntNoteCurRep" AutoComplete="True" IsEditable="True" SelectedItem="{Binding InterestNoteCurRep}" MinWidth="170" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="PickingListRep" x:Name="liPickingListRep">
+                            <CorasauControls:ComboBoxEditor x:Name="cmbPickingListRep" AutoComplete="True" IsEditable="True" SelectedItem="{Binding PickingListRep}" MinWidth="170" />
+                        </CorasauControls:CorasauLayoutItem>
+                    </CorasauControls:CorasauLayoutGroup>
 
-                <CorasauControls:CorasauLayoutGroup x:Name="grpBankAccount" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BankAccounts}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                    <CorasauControls:CorasauLayoutItem FieldName="NationalBank" x:Name="liNationalbank">
-                        <CorasauControls:TextEditor Text="{Binding NationalBank,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="BankName" x:Name="liBankName">
-                        <CorasauControls:TextEditor Text="{Binding BankName,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="SWIFT" x:Name="liSWIFT">
-                        <CorasauControls:TextEditor Text="{Binding SWIFT,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="IBAN" x:Name="liIBAN">
-                        <CorasauControls:TextEditor Text="{Binding IBAN,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="FIK" x:Name="liFIK">
-                        <CorasauControls:TextEditor Text="{Binding FIK,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                </CorasauControls:CorasauLayoutGroup>
-                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpEmailMessages" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=EmailMessages}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" >
-                    <CorasauControls:CorasauLayoutItem FieldName="InvoiceEmail" x:Name="liInvoiceEmail">
-                        <CorasauControls:ComboBoxEditor x:Name="cmbInvoiceEmail" MinWidth="180" SelectedItem="{Binding InvoiceEmail,Mode=TwoWay}" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="CreditnoteEmail" x:Name="liCreditnoteEmail">
-                        <CorasauControls:ComboBoxEditor x:Name="cmbCreditnoteEmail" MinWidth="180" SelectedItem="{Binding CreditnoteEmail,Mode=TwoWay}" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="PacknoteEmail" x:Name="liPacknoteEmail">
-                        <CorasauControls:ComboBoxEditor x:Name="cmbPacknoteEmail" MinWidth="180" SelectedItem="{Binding PacknoteEmail,Mode=TwoWay}" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="OrderConfirmationEmail" x:Name="liOrderConfirmationEmail">
-                        <CorasauControls:ComboBoxEditor x:Name="cmbOrderConfirmationEmail" MinWidth="180" SelectedItem="{Binding OrderConfirmationEmail,Mode=TwoWay}" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="OfferEmail" x:Name="liOfferEmail">
-                        <CorasauControls:ComboBoxEditor x:Name="cmbOfferEmail" MinWidth="180" SelectedItem="{Binding OfferEmail,Mode=TwoWay}"  />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="StatementEmail" x:Name="liStatementEmail">
-                        <CorasauControls:ComboBoxEditor x:Name="cmbStatementEmail"  MinWidth="180" SelectedItem="{Binding StatementEmail,Mode=TwoWay}"  />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="StatementCurEmail" x:Name="liStatementCurEmail">
-                        <CorasauControls:ComboBoxEditor x:Name="cmbStatementCurEmail" MinWidth="180" SelectedItem="{Binding StatementCurEmail,Mode=TwoWay}"  />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="CollectionEmail" x:Name="liCollectionEmail">
-                        <CorasauControls:ComboBoxEditor x:Name="cmbCollectionEmail" MinWidth="180" SelectedItem="{Binding CollectionEmail,Mode=TwoWay}" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="InterestNoteEmail" x:Name="liInterestNoteEmail">
-                        <CorasauControls:ComboBoxEditor x:Name="cmbInterestNoteEmail" MinWidth="180" SelectedItem="{Binding InterestNoteEmail,Mode=TwoWay}"  />
-                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutGroup x:Name="grpBankAccount" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BankAccounts}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                        <CorasauControls:CorasauLayoutItem FieldName="NationalBank" x:Name="liNationalbank">
+                            <CorasauControls:TextEditor Text="{Binding NationalBank,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="BankName" x:Name="liBankName">
+                            <CorasauControls:TextEditor Text="{Binding BankName,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="SWIFT" x:Name="liSWIFT">
+                            <CorasauControls:TextEditor Text="{Binding SWIFT,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="IBAN" x:Name="liIBAN">
+                            <CorasauControls:TextEditor Text="{Binding IBAN,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="FIK" x:Name="liFIK">
+                            <CorasauControls:TextEditor Text="{Binding FIK,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                    </CorasauControls:CorasauLayoutGroup>
+                    <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpEmailMessages" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=EmailMessages}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" >
+                        <CorasauControls:CorasauLayoutItem FieldName="InvoiceEmail" x:Name="liInvoiceEmail">
+                            <CorasauControls:ComboBoxEditor x:Name="cmbInvoiceEmail" MinWidth="180" SelectedItem="{Binding InvoiceEmail,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="CreditnoteEmail" x:Name="liCreditnoteEmail">
+                            <CorasauControls:ComboBoxEditor x:Name="cmbCreditnoteEmail" MinWidth="180" SelectedItem="{Binding CreditnoteEmail,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="PacknoteEmail" x:Name="liPacknoteEmail">
+                            <CorasauControls:ComboBoxEditor x:Name="cmbPacknoteEmail" MinWidth="180" SelectedItem="{Binding PacknoteEmail,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="OrderConfirmationEmail" x:Name="liOrderConfirmationEmail">
+                            <CorasauControls:ComboBoxEditor x:Name="cmbOrderConfirmationEmail" MinWidth="180" SelectedItem="{Binding OrderConfirmationEmail,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="OfferEmail" x:Name="liOfferEmail">
+                            <CorasauControls:ComboBoxEditor x:Name="cmbOfferEmail" MinWidth="180" SelectedItem="{Binding OfferEmail,Mode=TwoWay}"  />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="StatementEmail" x:Name="liStatementEmail">
+                            <CorasauControls:ComboBoxEditor x:Name="cmbStatementEmail"  MinWidth="180" SelectedItem="{Binding StatementEmail,Mode=TwoWay}"  />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="StatementCurEmail" x:Name="liStatementCurEmail">
+                            <CorasauControls:ComboBoxEditor x:Name="cmbStatementCurEmail" MinWidth="180" SelectedItem="{Binding StatementCurEmail,Mode=TwoWay}"  />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="CollectionEmail" x:Name="liCollectionEmail">
+                            <CorasauControls:ComboBoxEditor x:Name="cmbCollectionEmail" MinWidth="180" SelectedItem="{Binding CollectionEmail,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="InterestNoteEmail" x:Name="liInterestNoteEmail">
+                            <CorasauControls:ComboBoxEditor x:Name="cmbInterestNoteEmail" MinWidth="180" SelectedItem="{Binding InterestNoteEmail,Mode=TwoWay}"  />
+                        </CorasauControls:CorasauLayoutItem>
+                    </CorasauControls:CorasauLayoutGroup>
                 </CorasauControls:CorasauLayoutGroup>
             </CorasauControls:CorasauLayoutControl>
         </Grid>

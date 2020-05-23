@@ -33,6 +33,7 @@ using System.Globalization;
 using Uniconta.ClientTools.Util;
 using DevExpress.Xpf.Grid;
 using Uniconta.Common.Utility;
+using Uniconta.API.Service;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -76,12 +77,18 @@ namespace UnicontaClient.Pages.CustomPage
 
         public override void SetDefaultValues(UnicontaBaseEntity dataEntity, int selectedIndex)
         {
+            var newRow = (JournalLineGridClient)dataEntity;
+            var GridBase = this.GridBase;
+            if (GridBase == null)
+            {
+                newRow._Date = BasePage.GetSystemDefaultDate();
+                return;
+            }
+
             var header = (Uniconta.DataModel.GLDailyJournal)this.masterRecord;
             var TakeVoucher = !header._GenerateVoucher && !header._ManualAllocation;
-
-            var newRow = (JournalLineGridClient)dataEntity;
-            var lst = (ICollection<JournalLineGridClient>)this.ItemsSource;
-            if (lst == null || lst.Count == 0)
+            var lst = (IEnumerable<JournalLineGridClient>)this.ItemsSource;
+            if (lst == null)
             {
                 newRow._Date = BasePage.GetSystemDefaultDate();
             }
@@ -106,7 +113,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (Cur != null)
                     newRow.SetTraceSum(Cur._TraceSum);
 
-                if (Math.Abs(GridBase.LineTotal) > 0.005d)
+                if (Cur != null && Math.Abs(GridBase.LineTotal) > 0.005d)
                 {
                     newRow._Voucher = Cur._Voucher;
                     newRow._Text = Cur._Text;
@@ -282,45 +289,25 @@ namespace UnicontaClient.Pages.CustomPage
         internal string[] TraceAccount;
         bool RoundTo100, anyChange;
 
+        public GLDailyJournalLine(BaseAPI API)
+            : base(API, string.Empty)
+        {
+            Init();
+        }
+
         public GLDailyJournalLine(UnicontaBaseEntity master)
             : base(master)
         {
+            Init();
+            SetJournal(master as Uniconta.DataModel.GLDailyJournal);
+        }
+
+        void Init()
+        {
             InitializeComponent();
-
-            var masterRecord = master as Uniconta.DataModel.GLDailyJournal;
-            if (masterRecord == null)
-                throw new Exception("This page only supports master GLDailyJournal");
-
-            this.masterRecord = masterRecord;
             dgGLDailyJournalLine.api = api;
             dgGLDailyJournalLine.GridBase = this;
-            dgGLDailyJournalLine._AutoSave = masterRecord._AutoSave;
-            dgGLDailyJournalLine.Blocked = masterRecord._Blocked;
-            dgGLDailyJournalLine.UpdateMaster(master);
-            if (masterRecord._Journal != null)
-                Layout._SubId = masterRecord._Journal.GetHashCode();  // this way we have the same layout across companies if the journal has the same name.
-            UseDCVat = masterRecord._UseDCVat;
 
-            if (masterRecord._TraceAccount != null || masterRecord._TraceAccount2 != null)
-            {
-                TraceAccount = new string[MaxTraceAccount];
-                TraceAccount[0] = masterRecord._TraceAccount;
-                TraceAccount[1] = masterRecord._TraceAccount2;
-                TraceAccount[2] = masterRecord._TraceAccount3;
-                TraceAccount[3] = masterRecord._TraceAccount4;
-                TraceAccount[4] = masterRecord._TraceAccount5;
-                TraceAccount[5] = masterRecord._TraceAccount6;
-
-                ActiveTraceAccount = MaxTraceAccount;
-                while (TraceAccount[ActiveTraceAccount - 1] == null)
-                {
-                    ActiveTraceAccount--;
-                    if (ActiveTraceAccount == 0)
-                        break;
-                }
-            }
-
-            this.NoVATCalculation = masterRecord._NoVATCalculation;
             api.AllowBackgroundCrud = true;
             var Comp = api.CompanyEntity;
             RoundTo100 = Comp.RoundTo100;
@@ -337,20 +324,17 @@ namespace UnicontaClient.Pages.CustomPage
             else
                 VatOffsetOperation.Visible = true;
 
-            if (!masterRecord._TwoVatCodes)
-                OffsetVat.Visible = VatOffsetOperation.Visible = VatAmountOffset.Visible = false;
-            else
-                TwoVatCodes = true;
-
             if (!Comp.Project)
             {
                 colPrCategory.Visible = colPrCategory.ShowInColumnChooser = false;
                 colProject.Visible = colProject.ShowInColumnChooser = false;
+                colProjectText.Visible = colProjectText.ShowInColumnChooser = false;
             }
             else
             {
                 colPrCategory.ShowInColumnChooser = true;
                 colProject.ShowInColumnChooser = true;
+                colProjectText.ShowInColumnChooser = true;
             }
 
             if (!Comp.ProjectTask)
@@ -380,7 +364,57 @@ namespace UnicontaClient.Pages.CustomPage
             this.PreviewKeyDown += RootVisual_KeyDown;
 #endif
             this.BeforeClose += GLDailyJournalLine_BeforeClose;
+        }
 
+        void SetJournal(Uniconta.DataModel.GLDailyJournal masterRecord)
+        {
+            if (masterRecord == null)
+                return;
+            this.masterRecord = masterRecord;
+            dgGLDailyJournalLine._AutoSave = masterRecord._AutoSave;
+            dgGLDailyJournalLine.Blocked = masterRecord._Blocked;
+            dgGLDailyJournalLine.UpdateMaster(masterRecord);
+            if (masterRecord._Journal != null)
+                Layout._SubId = masterRecord._Journal.GetHashCode();  // this way we have the same layout across companies if the journal has the same name.
+            UseDCVat = masterRecord._UseDCVat;
+
+            if (masterRecord._TraceAccount != null || masterRecord._TraceAccount2 != null)
+            {
+                TraceAccount = new string[MaxTraceAccount];
+                TraceAccount[0] = masterRecord._TraceAccount;
+                TraceAccount[1] = masterRecord._TraceAccount2;
+                TraceAccount[2] = masterRecord._TraceAccount3;
+                TraceAccount[3] = masterRecord._TraceAccount4;
+                TraceAccount[4] = masterRecord._TraceAccount5;
+                TraceAccount[5] = masterRecord._TraceAccount6;
+
+                ActiveTraceAccount = MaxTraceAccount;
+                while (TraceAccount[ActiveTraceAccount - 1] == null)
+                {
+                    ActiveTraceAccount--;
+                    if (ActiveTraceAccount == 0)
+                        break;
+                }
+            }
+
+            this.NoVATCalculation = masterRecord._NoVATCalculation;
+            if (!masterRecord._TwoVatCodes)
+                OffsetVat.Visible = VatOffsetOperation.Visible = VatAmountOffset.Visible = false;
+            else
+                TwoVatCodes = true;
+        }
+
+        public override void SetParameter(IEnumerable<ValuePair> Parameters)
+        {
+            foreach (var rec in Parameters)
+            {
+                if (string.Compare(rec.Name, "Journal", StringComparison.CurrentCultureIgnoreCase) == 0)
+                {
+                    var cache = api.GetCache(typeof(Uniconta.DataModel.GLDailyJournal)) ?? api.LoadCache(typeof(Uniconta.DataModel.GLDailyJournal)).GetAwaiter().GetResult();
+                    SetJournal((Uniconta.DataModel.GLDailyJournal)cache.Get(rec.Value));
+                }
+            }
+            base.SetParameter(Parameters);
         }
 
         public override void Utility_Refresh(string screenName, object argument = null)
@@ -987,7 +1021,7 @@ namespace UnicontaClient.Pages.CustomPage
                 else
                     settleType = SettleValueType.Invoice;
 
-                if (settleType == SettleValueType.Invoice && !settle.Contains(';'))
+                if (settleType == SettleValueType.Invoice && settle.IndexOf(';') < 0)
                 {
                     selectedItem.Invoice = settle;
                     selectedItem.Settlements = null;

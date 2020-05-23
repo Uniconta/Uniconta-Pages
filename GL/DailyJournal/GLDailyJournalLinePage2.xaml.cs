@@ -68,7 +68,7 @@ namespace UnicontaClient.Pages.CustomPage
         void InitPage(CrudAPI crudapi)
         {
             leAccount.api = leOffsetAccount.api = lePayment.api = leSplit.api = leTransType.api = leVat.api = leOffsetVat.api = leVatOffsetOperation.api = leVatOperation.api = leWithholding.api =
-            leDim1.api = leDim2.api = leDim3.api = leDim4.api = leDim5.api = leProject.api = lePrCaegory.api = crudapi;
+            leDim1.api = leDim2.api = leDim3.api = leDim4.api = leDim5.api = leProject.api = lePrCaegory.api = leTask.api = leAsset.api = crudapi;
             BusyIndicator = busyIndicator;
             layoutControl = layoutItems;
             var comp = api.CompanyEntity;
@@ -77,7 +77,9 @@ namespace UnicontaClient.Pages.CustomPage
             else
                 Utility.SetDimensions(crudapi, lbldim1, lbldim2, lbldim3, lbldim4, lbldim5, leDim1, leDim2, leDim3, leDim4, leDim5, usedim);
             if (!comp.Project)
-                useProject.Visibility = Visibility.Collapsed;
+                lblProject.Visibility = lblPrCategory.Visibility = lblProjectText.Visibility = lblTask.Visibility = Visibility.Collapsed;
+            if(!comp.FixedAsset)
+                lblAsset.Visibility = lblAssetPostType.Visibility = Visibility.Collapsed;
             layoutItems.DataContext = editrow;
             frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
         }

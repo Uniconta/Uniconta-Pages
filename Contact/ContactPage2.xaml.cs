@@ -65,8 +65,14 @@ namespace UnicontaClient.Pages.CustomPage
                     editrow.SetMaster(master != null ? master : api.CompanyEntity);
                 }
                 else
+                {
+                    var dct = editrow._DCType;
+                    var dca = editrow._DCAccount;
                     SetTemplate();
-                frmRibbon.DisableButtons(new string[] { "Delete" });
+                    editrow._DCType = dct;
+                    editrow._DCAccount = dca;
+                }
+                frmRibbon.DisableButtons("Delete");
             }
             lookupDCAccount.api = crudapi;
             layoutItems.DataContext = editrow;
@@ -86,14 +92,13 @@ namespace UnicontaClient.Pages.CustomPage
         async void GetInterestAndProduct()
         {
             var api = this.api;
-            var Comp = api.CompanyEntity;
-            crmInterestCache = Comp.GetCache(typeof(Uniconta.DataModel.CrmInterest));
+            crmInterestCache = api.GetCache(typeof(Uniconta.DataModel.CrmInterest));
             if (crmInterestCache == null)
-                crmInterestCache = await Comp.LoadCache(typeof(Uniconta.DataModel.CrmInterest), api);
+                crmInterestCache = await api.LoadCache(typeof(Uniconta.DataModel.CrmInterest));
 
-            crmProductCache = Comp.GetCache(typeof(Uniconta.DataModel.CrmProduct));
+            crmProductCache = api.GetCache(typeof(Uniconta.DataModel.CrmProduct));
             if (crmProductCache == null)
-                crmProductCache = await Comp.LoadCache(typeof(Uniconta.DataModel.CrmProduct), api);
+                crmProductCache = await api.LoadCache(typeof(Uniconta.DataModel.CrmProduct));
 
             cmbInterests.ItemsSource = crmInterestCache.GetKeyList();
             cmbProducts.ItemsSource = crmProductCache.GetKeyList();
@@ -103,18 +108,9 @@ namespace UnicontaClient.Pages.CustomPage
         protected override async void LoadCacheInBackGround()
         {
             var api = this.api;
-            var Comp = api.CompanyEntity;
-            DebtorCache = Comp.GetCache(typeof(Uniconta.DataModel.Debtor));
-            if (DebtorCache == null)
-                DebtorCache = await Comp.LoadCache(typeof(Uniconta.DataModel.Debtor), api).ConfigureAwait(false);
-
-            CreditorCache = Comp.GetCache(typeof(Uniconta.DataModel.Creditor));
-            if (CreditorCache == null)
-                CreditorCache = await Comp.LoadCache(typeof(Uniconta.DataModel.Creditor), api).ConfigureAwait(false);
-
-            CrmProspectCache = Comp.GetCache(typeof(Uniconta.DataModel.CrmProspect));
-            if (CrmProspectCache == null)
-                CrmProspectCache = await Comp.LoadCache(typeof(Uniconta.DataModel.CrmProspect), api).ConfigureAwait(false);
+            DebtorCache = api.GetCache(typeof(Uniconta.DataModel.Debtor)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Debtor)).ConfigureAwait(false);
+            CreditorCache = api.GetCache(typeof(Uniconta.DataModel.Creditor)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Creditor)).ConfigureAwait(false);
+            CrmProspectCache = api.GetCache(typeof(Uniconta.DataModel.CrmProspect)) ?? await api.LoadCache(typeof(Uniconta.DataModel.CrmProspect)).ConfigureAwait(false);
 
             Dispatcher.BeginInvoke(new Action(() => SetAccountSource()));
         }

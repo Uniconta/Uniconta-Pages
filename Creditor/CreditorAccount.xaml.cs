@@ -384,8 +384,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void HasWebsite_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             var creditorAccount = (sender as TextBlock).Tag as CreditorClient;
-            if (creditorAccount != null)
-                Utility.OpenWebSite(creditorAccount.Www);
+            Utility.OpenWebSite(creditorAccount?._Www);
         }
 #endif
     }

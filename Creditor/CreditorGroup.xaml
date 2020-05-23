@@ -50,6 +50,8 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorGroup"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CurrencyAdjustment" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ExemptDuty" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="MandatoryItem" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DiscountAccount" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DiscountAccountOffset" Visible="False" />
                 </localPage:CreditorGroupGrid.Columns>
             </localPage:CreditorGroupGrid>
         </CorasauControls:BusyIndicator>

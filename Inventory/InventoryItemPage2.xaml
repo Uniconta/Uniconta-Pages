@@ -219,25 +219,15 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryItemPage2"
 
                     </CorasauControls:CorasauLayoutGroup>
                     <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpSize" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Size}"  Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-
                         <CorasauControls:CorasauLayoutItem FieldName="Weight" x:Name="liWeigt">
-                            <StackPanel Orientation="Horizontal">
-                                <CorasauControls:DoubleEditor EditValue="{Binding Weight, Mode=TwoWay}" Mask="n3" MaskType="Numeric" MaskUseAsDisplayFormat="True" BindningIsSet="True"  />
-                            </StackPanel>
+                            <CorasauControls:DoubleEditor FieldName="Weight" ApplyMask="false" />
                         </CorasauControls:CorasauLayoutItem>
-
                         <CorasauControls:CorasauLayoutItem FieldName="Volume" x:Name="liVolume">
-                            <StackPanel Orientation="Horizontal">
-                                <CorasauControls:DoubleEditor FieldName="Volume" />
-                            </StackPanel>
+                            <CorasauControls:DoubleEditor FieldName="Volume" ApplyMask="false" />
                         </CorasauControls:CorasauLayoutItem>
-
                         <CorasauControls:CorasauLayoutItem FieldName="Cartons" x:Name="liCartons">
-                            <StackPanel Orientation="Horizontal">
-                                <CorasauControls:DoubleEditor FieldName="Cartons"/>
-                            </StackPanel>
+                            <CorasauControls:DoubleEditor FieldName="Cartons"  ApplyMask="false"/>
                         </CorasauControls:CorasauLayoutItem>
-
                     </CorasauControls:CorasauLayoutGroup>
                   
                     <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpBrand" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Brand}"  Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">

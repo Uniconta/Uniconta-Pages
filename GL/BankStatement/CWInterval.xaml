@@ -8,13 +8,14 @@ x:Class="UnicontaClient.Pages.CustomPage.CWInterval"
            xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
            xmlns:ClientToolsControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
            xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
-           Width="380" Height="230"  KeyDown="ChildWindow_KeyDown" SizeToContent="WidthAndHeight"> 
+           Width="380" Height="260"  KeyDown="ChildWindow_KeyDown" SizeToContent="WidthAndHeight"> 
     <Grid x:Name="LayoutRoot" Margin="2">
         <Grid.RowDefinitions>
             <RowDefinition Height="30"/>
             <RowDefinition Height="30"/>
             <RowDefinition Height="30" x:Name="RowVarDays"/>
             <RowDefinition Height="30" x:Name="RowJrPostdId"/>
+            <RowDefinition Height="30"/>
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -30,7 +31,9 @@ x:Class="UnicontaClient.Pages.CustomPage.CWInterval"
         <ClientToolsControls:IntegerEditor Width="180" Text="{Binding VarianceDays,Mode=TwoWay}" Height="25" x:Name="intVarDays" Grid.Row="2" Grid.Column="3" HorizontalAlignment="Left"/>
         <TextBlock Grid.Row="3" x:Name="txtJrPostdId" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=JournalPostedId}" VerticalAlignment="Center"></TextBlock>
         <ClientToolsControls:IntegerEditor Width="180" Text="{Binding JournalPostedId,Mode=TwoWay}" Height="25" x:Name="intJrPostdId" Grid.Row="3" Grid.Column="3" HorizontalAlignment="Left"/>
-        <StackPanel x:Name="actionButton" HorizontalAlignment="Right" Grid.Row="4"  Grid.ColumnSpan="2" Grid.Column="2" Orientation="Horizontal" Margin="0 10 0 0" >
+        <TextBlock Grid.Row="4" x:Name="tbVoucher" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Voucher}" VerticalAlignment="Center"></TextBlock>
+        <ClientToolsControls:IntegerEditor Width="180" Text="{Binding Voucher,Mode=TwoWay}" Height="25" x:Name="txtVoucher" Grid.Row="4" Grid.Column="3" HorizontalAlignment="Left"/>
+        <StackPanel x:Name="actionButton" HorizontalAlignment="Right" Grid.Row="5"  Grid.ColumnSpan="2" Grid.Column="2" Orientation="Horizontal" Margin="0 10 0 0" >
             <Button x:Name="OKButton" IsDefault="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OK}" Click="OKButton_Click" MinWidth="75" Height="23" 
                     HorizontalAlignment="Right" Margin="0 0 3 0"  />
             <Button x:Name="CancelButton" IsCancel="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Cancel}" Click="CancelButton_Click" MinWidth="75" 

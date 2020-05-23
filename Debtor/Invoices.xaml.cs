@@ -43,23 +43,9 @@ using UnicontaClient.Pages;
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
-
-    public class DebtorInvoiceLocal : DebtorInvoiceClient
-    {
-        [Display(Name = "System Info")]
-        public string SystemInfo { get { return _SystemInfo; } }
-        public string _SystemInfo;
-
-        public void NotifySystemInfoSet()
-        {
-            NotifyPropertyChanged("SystemInfo");
-        }
-    }
-
-
     public class InvoicesGrid : CorasauDataGridClient
     {
-        public override Type TableType { get { return typeof(DebtorInvoiceLocal); } }
+        public override Type TableType { get { return typeof(DebtorInvoiceClient); } }
         public override IComparer GridSorting { get { return new DCInvoiceSort(); } }
     }
 
@@ -233,7 +219,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void localMenu_OnItemClicked(string ActionType)
         {
-            var selectedItem = dgInvoicesGrid.SelectedItem as DebtorInvoiceLocal;
+            var selectedItem = dgInvoicesGrid.SelectedItem as DebtorInvoiceClient;
             string salesHeader = string.Empty;
             if (selectedItem != null)
                 salesHeader = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Orders"), selectedItem._OrderNumber);
@@ -255,7 +241,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "ShowPackNote":
                     if (dgInvoicesGrid.SelectedItem == null || dgInvoicesGrid.SelectedItems == null)
                         return;
-                    var selectedItems = dgInvoicesGrid.SelectedItems.Cast<DebtorInvoiceLocal>();
+                    var selectedItems = dgInvoicesGrid.SelectedItems.Cast<DebtorInvoiceClient>();
 
                     if (ActionType == "ShowInvoice")
                         ShowDocument(selectedItems, true);
@@ -270,7 +256,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "SendInvoice":
                     if (dgInvoicesGrid.SelectedItem == null || dgInvoicesGrid.SelectedItems == null)
                         return;
-                    var selectedInvoiceEmails = dgInvoicesGrid.SelectedItems.Cast<DebtorInvoiceLocal>();
+                    var selectedInvoiceEmails = dgInvoicesGrid.SelectedItems.Cast<DebtorInvoiceClient>();
                     SendInvoice(selectedInvoiceEmails);
                     break;
                 case "AddDoc":
@@ -313,7 +299,7 @@ namespace UnicontaClient.Pages.CustomPage
 #if !SILVERLIGHT
                 case "GenerateOioXml":
                     if (selectedItem != null)
-                        GenerateOIOXmlForAll(new List<DebtorInvoiceLocal>() { selectedItem });
+                        GenerateOIOXmlForAll(new List<DebtorInvoiceClient>() { selectedItem });
                     break;
                 case "GenerateMarkedOioXml":
                     var selected = dgInvoicesGrid.SelectedItems;
@@ -322,7 +308,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "GenerateAllOioXml":
                     var filteredRows = dgInvoicesGrid.GetVisibleRows();
-                    GenerateOIOXmlForAll(filteredRows);
+                        GenerateOIOXmlForAll(filteredRows);
                     break;
                 case "SendAsOutlook":
                     if (selectedItem != null)
@@ -346,7 +332,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        async private void JournalPosted(DebtorInvoiceLocal selectedItem)
+        async private void JournalPosted(DebtorInvoiceClient selectedItem)
         {
             var result = await api.Query(new GLDailyJournalPostedClient(), new UnicontaBaseEntity[] { selectedItem }, null);
             if (result != null && result.Length == 1)
@@ -361,7 +347,7 @@ namespace UnicontaClient.Pages.CustomPage
         bool IsGeneratingDocument;
 
 #endif
-        async private void ShowDocument(IEnumerable<DebtorInvoiceLocal> debtorInvoices, bool isInvoice)
+        async private void ShowDocument(IEnumerable<DebtorInvoiceClient> debtorInvoices, bool isInvoice)
         {
             busyIndicator.IsBusy = true;
             busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
@@ -454,7 +440,7 @@ namespace UnicontaClient.Pages.CustomPage
 
 #if !SILVERLIGHT
 
-        async private void OpenOutLook(DebtorInvoiceLocal invClient)
+        async private void OpenOutLook(DebtorInvoiceClient invClient)
         {
             try
             {
@@ -463,71 +449,62 @@ namespace UnicontaClient.Pages.CustomPage
                 var debtor = invClient.Debtor;
                 var invoiceReport = await PrintInvoice(invClient);
                 var documentType = invClient._LineTotal >= -0.0001d ? CompanyLayoutType.Invoice : CompanyLayoutType.Creditnote;
+                invClient._SendTime = DateTime.MinValue; // this will for outlook function to update server
                 InvoicePostingPrintGenerator.OpenReportInOutlook(api, invoiceReport, invClient, debtor, documentType);
             }
             catch (Exception ex)
             {
-                UnicontaMessageBox.Show(ex.Message, Uniconta.ClientTools.Localization.lookup("Exception"));
+                UnicontaMessageBox.Show(ex);
             }
             finally { busyIndicator.IsBusy = false; }
         }
 
-        private async Task<IPrintReport> PrintInvoice(DebtorInvoiceLocal debtorInvoice)
+        private async Task<IPrintReport> PrintInvoice(DebtorInvoiceClient debtorInvoice)
         {
-            IPrintReport iprintReport = null;
-
             var debtorInvoicePrint = new DebtorInvoicePrintReport(debtorInvoice, api);
             var isInitializedSuccess = await debtorInvoicePrint.InstantiateFields();
-
             if (isInitializedSuccess)
             {
                 var standardDebtorInvoice = new DebtorInvoiceReportClient(debtorInvoicePrint.Company, debtorInvoicePrint.Debtor, debtorInvoicePrint.DebtorInvoice, debtorInvoicePrint.InvTransInvoiceLines, debtorInvoicePrint.DebtorOrder,
                     debtorInvoicePrint.CompanyLogo, debtorInvoicePrint.ReportName, isCreditNote: debtorInvoicePrint.IsCreditNote, messageClient: debtorInvoicePrint.MessageClient);
 
                 var standardReports = new[] { standardDebtorInvoice };
-                iprintReport = new StandardPrintReport(api, standardReports, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.Invoice);
+                IPrintReport iprintReport = new StandardPrintReport(api, standardReports, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.Invoice);
                 await iprintReport.InitializePrint();
 
-
-                if (iprintReport?.Report == null)
+                if (iprintReport.Report == null)
                 {
                     iprintReport = new LayoutPrintReport(api, debtorInvoice, debtorInvoicePrint.IsCreditNote ? CompanyLayoutType.Creditnote : CompanyLayoutType.Invoice);
                     await iprintReport.InitializePrint();
                 }
+                return iprintReport;
             }
-
-            return iprintReport;
+            return null;
         }
 
-        private async Task<IPrintReport> PrintPackNote(DebtorInvoiceLocal debtorInvoice)
+        private async Task<IPrintReport> PrintPackNote(DebtorInvoiceClient debtorInvoice)
         {
-            IPrintReport iprintReport = null;
-
             var packnote = Uniconta.ClientTools.Controls.Reporting.StandardReports.PackNote;
-
             var debtorInvoicePrint = new DebtorInvoicePrintReport(debtorInvoice, api, CompanyLayoutType.Packnote);
             var isInitializedSuccess = await debtorInvoicePrint.InstantiateFields();
-
             if (isInitializedSuccess)
             {
                 var standardDebtorInvoice = new DebtorQCPReportClient(debtorInvoicePrint.Company, debtorInvoicePrint.Debtor, debtorInvoicePrint.DebtorInvoice, debtorInvoicePrint.InvTransInvoiceLines, null,
                     debtorInvoicePrint.CompanyLogo, debtorInvoicePrint.ReportName, (int)packnote, messageClient: debtorInvoicePrint.MessageClient);
 
                 var standardReports = new[] { standardDebtorInvoice };
-                iprintReport = new StandardPrintReport(api, standardReports, (byte)packnote);
+                IPrintReport iprintReport = new StandardPrintReport(api, standardReports, (byte)packnote);
                 await iprintReport.InitializePrint();
 
-
-                if (iprintReport?.Report == null)
+                if (iprintReport.Report == null)
                 {
                     iprintReport = new LayoutPrintReport(api, debtorInvoice, CompanyLayoutType.Packnote);
                     await iprintReport.InitializePrint();
                 }
+                return iprintReport;
             }
-
-            return iprintReport;
+            return null;
         }
-
 
         private async void GenerateOIOXmlForAll(IList lstInvClient, bool selectedrows = false)
         {
@@ -548,7 +525,7 @@ namespace UnicontaClient.Pages.CustomPage
             InvoiceAPI Invapi = new InvoiceAPI(api);
             foreach (var inv in lstInvClient)
             {
-                var invClient = inv as DebtorInvoiceLocal;
+                var invClient = inv as DebtorInvoiceClient;
                 if (invClient == null)
                     continue;
 
@@ -561,6 +538,8 @@ namespace UnicontaClient.Pages.CustomPage
 
                 var Invoicemasters = new UnicontaBaseEntity[] { invClient };
                 var invoiceLines = await api.Query<InvTransClient>(Invoicemasters, null);
+
+                LayoutGroupCache = api.GetCache(typeof(DebtorLayoutGroup)) ?? await api.LoadCache(typeof(DebtorLayoutGroup));
 
                 InvItemText[] invItemText = null;
                 if (debtor._ItemNameGroup != null)
@@ -601,7 +580,7 @@ namespace UnicontaClient.Pages.CustomPage
                 else
                 {
                     TableAddOnData[] attachments = await FromXSDFile.OIOUBL.ExportImport.Attachments.CollectInvoiceAttachments(invClient, api);
-                    result = Uniconta.API.DebtorCreditor.OIOUBL.GenerateOioXML(Comp, debtor, deliveryAccount, invClient, invoiceLines, InvCache, VatCache, invItemText, contactPerson, attachments);
+                    result = Uniconta.API.DebtorCreditor.OIOUBL.GenerateOioXML(Comp, debtor, deliveryAccount, invClient, invoiceLines, InvCache, VatCache, invItemText, contactPerson, attachments, LayoutGroupCache);
                 }
 
                 bool createXmlFile = true;
@@ -634,7 +613,7 @@ namespace UnicontaClient.Pages.CustomPage
                         }
                         catch (Exception ex)
                         {
-                            UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"));
+                            UnicontaMessageBox.Show(ex);
                         }
                     }
                     else
@@ -675,7 +654,7 @@ namespace UnicontaClient.Pages.CustomPage
                     invClient._SystemInfo = "File created";
                 }
 
-                invClient.NotifySystemInfoSet();
+                invClient.NotifyPropertyChanged("SystemInfo");
             }
 
             if (countErr != 0)
@@ -714,7 +693,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
 #elif SILVERLIGHT
-        private void DefaultPrint(DebtorInvoiceLocal debtorInvoice, bool isPackNote = false)
+        private void DefaultPrint(DebtorInvoiceClient debtorInvoice, bool isPackNote = false)
         {
             object[] ob = new object[2];
             ob[0] = debtorInvoice;
@@ -723,7 +702,7 @@ namespace UnicontaClient.Pages.CustomPage
             AddDockItem(TabControls.ProformaInvoice, ob, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup(headerName), debtorInvoice.InvoiceNum));
         }
 
-        private void DefaultPrint(DebtorInvoiceLocal debtorInvoice, bool isFloat, Point position, bool isPackNote = false)
+        private void DefaultPrint(DebtorInvoiceClient debtorInvoice, bool isFloat, Point position, bool isPackNote = false)
         {
             object[] ob = new object[2];
             ob[0] = debtorInvoice;
@@ -757,7 +736,7 @@ namespace UnicontaClient.Pages.CustomPage
             confirmationBox.Show();
 
         }
-        void SendInvoice(IEnumerable<DebtorInvoiceLocal> invoiceEmails)
+        void SendInvoice(IEnumerable<DebtorInvoiceClient> invoiceEmails)
         {
             int icount = invoiceEmails.Count();
             UnicontaClient.Pages.CWSendInvoice cwSendInvoice = new UnicontaClient.Pages.CWSendInvoice();
@@ -773,7 +752,7 @@ namespace UnicontaClient.Pages.CustomPage
                      InvoiceAPI Invapi = new InvoiceAPI(api);
                      List<string> errors = new List<string>();
 
-                     foreach (var inv in invoiceEmails)
+                     foreach (var inv in invoiceEmails.ToList()) // we take a copy, since user could do a refresh
                      {
                          var errorCode = await Invapi.SendInvoice(inv, cwSendInvoice.Emails, cwSendInvoice.sendOnlyToThisEmail, CWSendInvoice.sendInBackgroundOnly);
                          if (errorCode != ErrorCodes.Succes)
@@ -806,7 +785,7 @@ namespace UnicontaClient.Pages.CustomPage
             var api = this.api;
             if (api.CompanyEntity.DeliveryAddress)
             {
-                var lst = dgInvoicesGrid.ItemsSource as IEnumerable<DebtorInvoiceLocal>;
+                var lst = dgInvoicesGrid.ItemsSource as IEnumerable<DebtorInvoiceClient>;
                 if (lst != null)
                 {
                     foreach (var rec in lst)

@@ -31,6 +31,7 @@ using DevExpress.Xpf.Grid;
 using System.ComponentModel;
 using UnicontaClient.Pages;
 using Uniconta.Common.Utility;
+using Uniconta.API.Service;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -83,7 +84,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         Uniconta.API.GeneralLedger.ReportAPI tranApi;
         BankStatementAPI bankTransApi;
-        readonly bool ShowCurrency;
+        bool ShowCurrency;
         Uniconta.DataModel.BankStatement master;
         int DaysSlip;
         string showAmountType;
@@ -95,14 +96,25 @@ namespace UnicontaClient.Pages.CustomPage
         string bankStatCaption;
         string transactionCaption;
 
+        public BankStatementLinePage(BaseAPI API)
+            : base(API, string.Empty)
+        {
+            Init();
+        }
+
         public BankStatementLinePage(UnicontaBaseEntity sourceData)
             : base(sourceData)
+        {
+            Init();
+            master = sourceData as Uniconta.DataModel.BankStatement;
+            UpdateMaster();
+        }
+
+        void Init()
         {
             InitializeComponent();
             bankStatCaption = Uniconta.ClientTools.Localization.lookup("BankStatement");
             transactionCaption = Uniconta.ClientTools.Localization.lookup("Transactions");
-            master = sourceData as Uniconta.DataModel.BankStatement;
-            DaysSlip = master._DaysSlip;
 
             if (fromDate == DateTime.MinValue)
             {
@@ -111,24 +123,6 @@ namespace UnicontaClient.Pages.CustomPage
                 toDate = firstDayOfMonth.AddMonths(1).AddDays(-1);
                 fromDate = firstDayOfMonth.AddMonths(-2);
             }
-
-            bool RoundTo100;
-            var Comp = api.CompanyEntity;
-            if (Comp.SameCurrency(master._Currency))
-                RoundTo100 = Comp.RoundTo100;
-            else
-            {
-                ShowCurrency = true;
-                RoundTo100 = !CurrencyUtil.HasDecimals(master._Currency);
-            }
-            if (RoundTo100)
-            {
-                Debit.HasDecimals = Credit.HasDecimals = Amount.HasDecimals = Total.HasDecimals = false;
-                Debitcol.HasDecimals = Creditcol.HasDecimals = Amountcol.HasDecimals = Totalcol.HasDecimals = false;
-            }
-
-            if (!Comp._UseVatOperation)
-                VatOperation.Visible = false;
 
             dgBankStatementLine.api = api;
             tranApi = new Uniconta.API.GeneralLedger.ReportAPI(api);
@@ -164,6 +158,43 @@ namespace UnicontaClient.Pages.CustomPage
             this.BeforeClose += BankStatementLinePage_BeforeClose;
         }
 
+        void UpdateMaster()
+        {
+            bool RoundTo100;
+            var Comp = api.CompanyEntity;
+            DaysSlip = master._DaysSlip;
+            if (Comp.SameCurrency(master._Currency))
+                RoundTo100 = Comp.RoundTo100;
+            else
+            {
+                ShowCurrency = true;
+                RoundTo100 = !CurrencyUtil.HasDecimals(master._Currency);
+            }
+            if (RoundTo100)
+            {
+                Debit.HasDecimals = Credit.HasDecimals = Amount.HasDecimals = Total.HasDecimals = false;
+                Debitcol.HasDecimals = Creditcol.HasDecimals = Amountcol.HasDecimals = Totalcol.HasDecimals = false;
+            }
+
+            if (!Comp._UseVatOperation)
+                VatOperation.Visible = false;
+        }
+
+        public override void SetParameter(IEnumerable<ValuePair> Parameters)
+        {
+            foreach (var rec in Parameters)
+            {
+                if (string.Compare(rec.Name, "Bank", StringComparison.CurrentCultureIgnoreCase) == 0)
+                {
+                    var cache = api.GetCache(typeof(Uniconta.DataModel.BankStatement)) ?? api.LoadCache(typeof(Uniconta.DataModel.BankStatement)).GetAwaiter().GetResult();
+                    master = (Uniconta.DataModel.BankStatement)cache.Get(rec.Value);
+                    if (master != null)
+                        UpdateMaster();
+                }
+            }
+            base.SetParameter(Parameters);
+        }
+
         public override void PageClosing()
         {
             if (dgBankStatementLine.IsAutoSave && IsDataChaged)
@@ -193,6 +224,11 @@ namespace UnicontaClient.Pages.CustomPage
                 }
             }
 #endif
+
+            if (e.Key == Key.F8)
+            {
+                localMenu_OnItemClicked("OpenTran");
+            }
         }
 
         private void DataControl_CurrentItemChanged1(object sender, CurrentItemChangedEventArgs e)
@@ -740,12 +776,10 @@ namespace UnicontaClient.Pages.CustomPage
             if (screenName == TabControls.AttachVoucherGridPage && argument != null)
             {
                 var voucherObj = argument as object[];
-
-                if (voucherObj[0] is VouchersClient)
+                var voucher = voucherObj[0] as VouchersClient;
+                if (voucher != null)
                 {
-                    var voucher = voucherObj[0] as VouchersClient;
                     var selectedItem = dgBankStatementLine.SelectedItem as BankStatementLineGridClient;
-
                     if (selectedItem != null && voucher.RowId != 0)
                     {
                         dgBankStatementLine.SetLoadedRow(selectedItem);
@@ -769,15 +803,38 @@ namespace UnicontaClient.Pages.CustomPage
             if (bankStatementLine == null) return;
 
             dgBankStatementLine.SetLoadedRow(bankStatementLine);
-            var settleValues = settlementStr.Split(':');
-            if (!settleValues[1].Contains(';'))
+            if (!string.IsNullOrEmpty(settlementStr))
             {
-                bankStatementLine.Invoice = settlementStr;
-                bankStatementLine.Settlement = null;
+                string[] stlSplit = settlementStr.Split(':');
+                var settle = stlSplit[1];
+                var settleTypeStr = stlSplit[0];
+                SettleValueType settleType;
+                if (settleTypeStr == "V")
+                    settleType = SettleValueType.Voucher;
+                else if (settleTypeStr == "R")
+                    settleType = SettleValueType.RowId;
+                else
+                    settleType = SettleValueType.Invoice;
+
+                if (settleType == SettleValueType.Invoice && settle.IndexOf(';') < 0)
+                {
+                    bankStatementLine.Invoice = settle;
+                    bankStatementLine.Settlement = null;
+                }
+                else
+                {
+                    if(settleType!= bankStatementLine._SettleValue)
+                    {
+                        bankStatementLine._SettleValue = settleType;
+                        bankStatementLine.NotifyPropertyChanged("SettleValue");
+                    }
+                    bankStatementLine.Settlement = settle;
+                    bankStatementLine.Invoice = null;
+                }
             }
             else
             {
-                bankStatementLine.Settlement = settleValues[1];
+                bankStatementLine.Settlement = null;
                 bankStatementLine.Invoice = null;
             }
             dgBankStatementLine.SetModifiedRow(bankStatementLine);
@@ -849,16 +906,12 @@ namespace UnicontaClient.Pages.CustomPage
                     if (res == ErrorCodes.Succes)
                     {
                         string strmsg = string.Format("{0}; {1}! {2} ?", Uniconta.ClientTools.Localization.lookup("GenerateJournalLines"), Uniconta.ClientTools.Localization.lookup("Completed"),
-                            string.Format(Uniconta.ClientTools.Localization.lookup("GoTo"), Uniconta.ClientTools.Localization.lookup("JournalLines"))
-                            );
+                            string.Format(Uniconta.ClientTools.Localization.lookup("GoTo"), Uniconta.ClientTools.Localization.lookup("JournalLines")));
                         var select = UnicontaMessageBox.Show(strmsg, Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OKCancel);
                         if (select == MessageBoxResult.OK)
                         {
-                            var jour = new GLDailyJournalClient();
-                            jour._Journal = winTransfer.Journal;
-                            var err = await api.Read(jour);
-                            if (err == ErrorCodes.Succes)
-                                AddDockItem(TabControls.GL_DailyJournalLine, jour, null, null, true);
+                            var parms = new[] { new BasePage.ValuePair("Journal", winTransfer.Journal) };
+                            AddDockItem(TabControls.GL_DailyJournalLine, null, null, null, true, null, parms);
                         }
                     }
                     else
@@ -1248,7 +1301,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (bt._Trans != null && bt._Trans.Count == 1)
                 {
                     var ac = bt._Trans[0];
-                    if (ac.StatementLines.Count > 1)
+                    if (ac.StatementLines != null && ac.StatementLines.Count > 1)
                     {
                         ac.IsCleared = true;
                         markedbstList = ac.StatementLines;
@@ -1599,7 +1652,7 @@ namespace UnicontaClient.Pages.CustomPage
         internal object accntSource;
         public object AccountSource { get { return accntSource; } }
 
-         internal List<GLTransClientTotalBank> _Trans;
+        internal List<GLTransClientTotalBank> _Trans;
         internal List<GLTransClientTotalBank> Trans { get { return _Trans; } set { _Trans = value; NotifyPropertyChanged("State"); } }
 
         internal bool Updated;
@@ -1636,7 +1689,7 @@ namespace UnicontaClient.Pages.CustomPage
         public bool Mark { get { return _Mark; } set { if (_Mark == value) return; _Mark = value; NotifyPropertyChanged("Mark"); } }
         internal bool IsCleared;
 
-       
+
 
         public void UpdateState()
         {

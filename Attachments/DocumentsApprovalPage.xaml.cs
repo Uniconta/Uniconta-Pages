@@ -29,7 +29,9 @@ namespace UnicontaClient.Pages.CustomPage
     {
         public override Type TableType { get { return typeof(VouchersClient); } }
         public override IComparer GridSorting { get { return new SortDocAttached(); } }
+        public override bool SingleBufferUpdate { get { return false; } }
         public IList ToListLocal(VouchersClient[] Arr) { return this.ToList(Arr); }
+        public override bool Readonly { get { return false; } }
     }
     public partial class DocumentsApprovalPage : GridBasePage
     {
@@ -55,9 +57,15 @@ namespace UnicontaClient.Pages.CustomPage
             SetRibbonControl(localMenu, dgVoucherApproveGrid);
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             docApi = new DocumentAPI(api);
+            if (!api.CompanyEntity.Project)
+            {
+                Project.Visible = Project.ShowInColumnChooser = false;
+                PrCategory.Visible = PrCategory.ShowInColumnChooser = false;
+            }
         }
 
         public override bool IsDataChaged { get { return false; } }
+
         DocumentAPI docApi;
         public async override Task InitQuery()
         {
@@ -83,30 +91,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "Reject":
                 case "Await":
                     if (selectedItem != null)
-                    {
-                        CWCommentsDialogBox commentsDialog = new CWCommentsDialogBox(Uniconta.ClientTools.Localization.lookup("Note"), false, DateTime.MinValue);
-#if !SILVERLIGHT
-                        commentsDialog.DialogTableId = 2000000068;
-#endif
-                        commentsDialog.Closing += async delegate
-                        {
-                            if (commentsDialog.DialogResult == true)
-                            {
-                                var result = ErrorCodes.NoSucces;
-                                if (ActionType == "ApproveWithComments")
-                                    result = await docApi.DocumentSetApprove(selectedItem, commentsDialog.Comments, employee);
-                                if (ActionType == "Reject")
-                                    result = await docApi.DocumentSetReject(selectedItem, commentsDialog.Comments, employee);
-                                if (ActionType == "Await")
-                                    result = await docApi.DocumentSetWait(selectedItem, commentsDialog.Comments, employee);
-                                if (result == ErrorCodes.Succes)
-                                    RemoveRow(selectedItem);
-                                else
-                                    UtilDisplay.ShowErrorCode(result);
-                            }
-                        };
-                        commentsDialog.Show();
-                    }
+                        ApproveComment(selectedItem, ActionType);
                     break;
                 case "ViewVoucher":
                     if (selectedItem != null)
@@ -144,8 +129,11 @@ namespace UnicontaClient.Pages.CustomPage
             };
             cwEmployee.Show();
         }
+
         async void ApproveDoc(VouchersClient selectedItem)
         {
+            if (dgVoucherApproveGrid.HasUnsavedData)
+                await dgVoucherApproveGrid.SaveData();
             var result = await docApi.DocumentSetApprove(selectedItem, null, employee);
             if (result == ErrorCodes.Succes)
                 RemoveRow(selectedItem);
@@ -153,10 +141,42 @@ namespace UnicontaClient.Pages.CustomPage
                 UtilDisplay.ShowErrorCode(result);
         }
 
+        void ApproveComment(VouchersClient selectedItem, string ActionType)
+        {
+            if (dgVoucherApproveGrid.HasUnsavedData)
+                dgVoucherApproveGrid.SaveData();
+
+            CWCommentsDialogBox commentsDialog = new CWCommentsDialogBox(Uniconta.ClientTools.Localization.lookup("Note"), false, DateTime.MinValue);
+#if !SILVERLIGHT
+            commentsDialog.DialogTableId = 2000000068;
+#endif
+            commentsDialog.Closing += async delegate
+            {
+                if (commentsDialog.DialogResult == true)
+                {
+                    ErrorCodes result;
+                    if (ActionType == "ApproveWithComments")
+                        result = await docApi.DocumentSetApprove(selectedItem, commentsDialog.Comments, employee);
+                    else if (ActionType == "Reject")
+                        result = await docApi.DocumentSetReject(selectedItem, commentsDialog.Comments, employee);
+                    else if (ActionType == "Await")
+                        result = await docApi.DocumentSetWait(selectedItem, commentsDialog.Comments, employee);
+                    else
+                        result = ErrorCodes.NoSucces;
+                    if (result == ErrorCodes.Succes)
+                        RemoveRow(selectedItem);
+                    else
+                        UtilDisplay.ShowErrorCode(result);
+                }
+            };
+            commentsDialog.Show();
+        }
+
         void RemoveRow(VouchersClient selectedItem)
         {
-            int selectedRowHandle = dgVoucherApproveGrid.GetSelectedRowHandles()[0];
-            dgVoucherApproveGrid.tableView.DeleteRow(selectedRowHandle);
+            var rows = dgVoucherApproveGrid.GetSelectedRowHandles();
+            if (rows != null && rows.Length > 0)
+                dgVoucherApproveGrid.tableView.DeleteRow(rows[0]);
         }
     }
 }

@@ -108,7 +108,6 @@ namespace UnicontaClient.Pages.CustomPage
             dgProjectTransCategorySum.api = api;
             dgProjectTransCategorySum.UpdateMaster(master);
             dgProjectTransCategorySum.BusyIndicator = busyIndicator;
-            localMenu.OnItemClicked += gridRibbon_BaseActions;
             dgProjectTransCategorySum.CustomSummary += dgProjectTransCategorySum_CustomSummary;
             dgProjectTransCategorySum.ShowTotalSummary();
             localMenu.OnItemClicked += LocalMenu_OnItemClicked;
@@ -118,7 +117,7 @@ namespace UnicontaClient.Pages.CustomPage
             ToDate.DateTime = toDate;
             RibbonBase rb = (RibbonBase)localMenu.DataContext;
             if (master == null)
-                UtilDisplay.RemoveMenuCommand(rb, new string[] { "InclSubProjects" });
+                UtilDisplay.RemoveMenuCommand(rb, "InclSubProjects");
         }
 
         public override Task InitQuery()

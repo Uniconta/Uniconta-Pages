@@ -32,10 +32,10 @@ namespace UnicontaClient.Pages.CustomPage
 {
     public class InvTransactionGrid : CorasauDataGridClient
     {
-        public override Type TableType { get { return IsProject == true ? typeof(InvTransProject) : typeof(InvTransClient); } }
-
-        public bool IsProject { get; set; }
+        public override Type TableType { get { return IsProject ? typeof(InvTransProject) : typeof(InvTransClient); } }
+        public bool IsProject;
     }
+
     public class SubTotalRowStyleConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
@@ -79,30 +79,20 @@ namespace UnicontaClient.Pages.CustomPage
             return base.DefaultSort();
         }
 
-        public InventoryTransactions(string args) : base(null)
-        {
-            InitializePage(null, args);
-        }
-        public InventoryTransactions(BaseAPI API, string args) : base(API, string.Empty)
-        {
-            InitializePage(null, args);
-        }
         public InventoryTransactions(BaseAPI API) : base(API, string.Empty)
         {
-            dgInvTransGrid.IsProject = false;
-            InitializePage(null, null);
+            InitializePage(null);
         }
         public InventoryTransactions(UnicontaBaseEntity master)
             : base(null)
         {
-            InitializePage(master, null);
+            InitializePage(master);
         }
         public InventoryTransactions(SynchronizeEntity syncEntity)
             : base(syncEntity, true)
         {
             this.syncEntity = syncEntity;
-
-            InitializePage(syncEntity.Row, null);
+            InitializePage(syncEntity.Row);
             SetHeader();
         }
         protected override void SyncEntityMasterRowChanged(UnicontaBaseEntity args)
@@ -144,22 +134,13 @@ namespace UnicontaClient.Pages.CustomPage
             string header = string.Format("{0}/{1}", Uniconta.ClientTools.Localization.lookup("InvTransactions"), id);
             SetHeader(header);
         }
-        private void InitializePage(UnicontaBaseEntity master, string args)
+        private void InitializePage(UnicontaBaseEntity master)
         {
             this.DataContext = this;
             AddFilterAndSort = !(master is InvTrans);
             InitializeComponent();
             dgInvTransGrid.UpdateMaster(master);
             ((TableView)dgInvTransGrid.View).RowStyle = this.Resources["SubTotalRowStyle"] as Style;
-            if (args == "Project")
-            {
-                dgInvTransGrid.IsProject = true;
-            }
-            else
-            {
-                Project.Visible = false;
-                ProjectName.Visible = false;
-            }
 
             var Comp = api.CompanyEntity;
 
@@ -184,6 +165,21 @@ namespace UnicontaClient.Pages.CustomPage
             LoadNow(typeof(Uniconta.DataModel.InvItem));
             if (Comp.RoundTo100)
                 CostValue.HasDecimals = NetAmount.HasDecimals = Total.HasDecimals = Margin.HasDecimals = false;
+        }
+
+        public override void SetParameter(IEnumerable<ValuePair> Parameters)
+        {
+            foreach (var rec in Parameters)
+            {
+                if (rec.Name == null || rec.Name == "Master")
+                {
+                    if (rec.Value == "Project")
+                    {
+                        dgInvTransGrid.IsProject = true;
+                    }
+                }
+            }
+            base.SetParameter(Parameters);
         }
 
         double sumMargin, sumSales, sumMarginRatio;
@@ -287,7 +283,10 @@ namespace UnicontaClient.Pages.CustomPage
             if (!company.Warehouse)
                 Warehouse.Visible = Warehouse.ShowInColumnChooser = false;
             if(!company.Project)
+            {
                 Project.Visible = Project.ShowInColumnChooser = false;
+                ProjectName.Visible = ProjectName.ShowInColumnChooser = false;
+            }
             if (!company.ProjectTask)
                 Task.Visible = Task.ShowInColumnChooser = false;
 

@@ -48,8 +48,14 @@ namespace UnicontaClient.Pages.CustomPage
             dgCrmProspectGrid.BusyIndicator = busyIndicator;
             SetRibbonControl(localMenu, dgCrmProspectGrid);
             localMenu.OnItemClicked += localMenu_OnItemClicked;
+            if (BasePage.session.User._Role == (byte)Uniconta.Common.User.UserRoles.Reseller)
+            {
+                Pid.Visible = Pid.ShowInColumnChooser = false;
+                ResellerName.Visible = ResellerName.ShowInColumnChooser = false;
+            }
+            ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "UndoDelete", "SaveGrid" });
         }
-       
+
         protected override void LoadCacheInBackGround()
         {
             LoadType(new Type[] { typeof(CrmInterest), typeof(CrmProduct) });
@@ -68,23 +74,27 @@ namespace UnicontaClient.Pages.CustomPage
             var selectedItem = dgCrmProspectGrid.SelectedItem as PartnerProspectClient;
             switch (ActionType)
             {
+                case "EditAll":
+                    if (dgCrmProspectGrid.Visibility == Visibility.Visible)
+                        EditAll();
+                    break;
                 case "AddRow":
                     object[] param = new object[2];
                     param[0] = api;
                     param[1] = null;
-                    AddDockItem(TabControls.PartnerProspectPage2, param, Uniconta.ClientTools.Localization.lookup("PartnerProspects"), "Add_16x16.png");
+                    AddDockItem(TabControls.PartnerProspectPage2, param, Uniconta.ClientTools.Localization.lookup("CRM"), "Add_16x16.png");
                     break;
                 case "EditRow":
                     if (selectedItem != null)
                     {
                         object[] Params = new object[2] { selectedItem, true };
-                        AddDockItem(TabControls.PartnerProspectPage2, Params, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("PartnerProspects"), selectedItem.Name));
+                        AddDockItem(TabControls.PartnerProspectPage2, Params, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("CRM"), selectedItem.Name));
                     }
                     break;
                 case "FollowUp":
                     if (selectedItem != null)
                     {
-                        var followUpHeader = string.Format("{0}:{2} {1}", Uniconta.ClientTools.Localization.lookup("FollowUp"), selectedItem._Name, Uniconta.ClientTools.Localization.lookup("PartnerProspects"));
+                        var followUpHeader = string.Format("{0}:{2} {1}", Uniconta.ClientTools.Localization.lookup("FollowUp"), selectedItem._Name, Uniconta.ClientTools.Localization.lookup("CRM"));
                         AddDockItem(TabControls.PartnerProspectFollowUpPage, dgCrmProspectGrid.syncEntity, followUpHeader);
                     }
                     break;
@@ -100,12 +110,15 @@ namespace UnicontaClient.Pages.CustomPage
                     if (gridControl.Visibility == Visibility.Visible)
                         gridRibbon_BaseActions(ActionType);
                     break;
-                case "AddLine":
-                    dgCrmProspectGrid.AddRow();
-                    break;
                 case "CopyRow":
                     if (selectedItem != null)
                         CopyRecord(selectedItem);
+                    break;
+                case "CopyRecord":
+                    CopyRecord(selectedItem);
+                    break;
+                case "AddLine":
+                    dgCrmProspectGrid.AddRow();
                     break;
                 case "DeleteRow":
                     dgCrmProspectGrid.DeleteRow();
@@ -113,12 +126,70 @@ namespace UnicontaClient.Pages.CustomPage
                 case "SaveGrid":
                     saveGrid();
                     break;
-                case "CopyRecord":
-                    CopyRecord(selectedItem);
+                case "UndoDelete":
+                    dgCrmProspectGrid.UndoDeleteRow();
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
+            }
+        }
+
+        bool editAllChecked;
+        private void EditAll()
+        {
+            RibbonBase rb = (RibbonBase)localMenu.DataContext;
+            var ibase = UtilDisplay.GetMenuCommandByName(rb, "EditAll");
+            if (ibase == null)
+                return;
+            if (dgCrmProspectGrid.Readonly)
+            {
+                api.AllowBackgroundCrud = false;
+                dgCrmProspectGrid.MakeEditable();
+                UserFieldControl.MakeEditable(dgCrmProspectGrid);
+                ibase.Caption = Uniconta.ClientTools.Localization.lookup("LeaveEditAll");
+                ribbonControl.EnableButtons(new string[] { "AddLine", "DeleteRow", "UndoDelete", "SaveGrid" });
+                editAllChecked = false;
+            }
+            else
+            {
+                if (IsDataChaged)
+                {
+                    string message = Uniconta.ClientTools.Localization.lookup("SaveChangesPrompt");
+                    CWConfirmationBox confirmationDialog = new CWConfirmationBox(message);
+                    confirmationDialog.Closing += async delegate
+                    {
+                        if (confirmationDialog.DialogResult == null)
+                            return;
+
+                        switch (confirmationDialog.ConfirmationResult)
+                        {
+                            case CWConfirmationBox.ConfirmationResultEnum.Yes:
+                                var err = await dgCrmProspectGrid.SaveData();
+                                if (err != 0)
+                                {
+                                    api.AllowBackgroundCrud = true;
+                                    return;
+                                }
+                                break;
+                            case CWConfirmationBox.ConfirmationResultEnum.No:
+                                break;
+                        }
+                        editAllChecked = true;
+                        dgCrmProspectGrid.Readonly = true;
+                        dgCrmProspectGrid.tableView.CloseEditor();
+                        ibase.Caption = Uniconta.ClientTools.Localization.lookup("EditAll");
+                        ribbonControl.DisableButtons(new string[] { "AddLine", "DeleteRow", "UndoDelete", "SaveGrid" });
+                    };
+                    confirmationDialog.Show();
+                }
+                else
+                {
+                    dgCrmProspectGrid.Readonly = true;
+                    dgCrmProspectGrid.tableView.CloseEditor();
+                    ibase.Caption = Uniconta.ClientTools.Localization.lookup("EditAll");
+                    ribbonControl.DisableButtons(new string[] { "AddLine", "DeleteRow", "UndoDelete", "SaveGrid" });
+                }
             }
         }
         void CopyRecord(PartnerProspectClient selectedItem)
@@ -159,9 +230,8 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void HasWebsite_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var prospectClient = (sender as TextBlock).Tag as PartnerProspectClient;
-            if (prospectClient != null)
-                Utility.OpenWebSite(prospectClient.Www);
+            var prospect = (sender as TextBlock).Tag as PartnerProspectClient;
+            Utility.OpenWebSite(prospect._Www);
         }
 #endif
     }

@@ -72,6 +72,8 @@ x:Class="UnicontaClient.Pages.CustomPage.PartnerProspectPage"
                             </ControlTemplate>
                         </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                     </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Pid"  Width="50"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ResellerName"  Width="150"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="SeqNumber" Width="50"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Name"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Address1"/>
@@ -98,6 +100,18 @@ x:Class="UnicontaClient.Pages.CustomPage.PartnerProspectPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="CreatedUid" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="UserName" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Created" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="FollowUpAction" Width="70"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="CloseReason" Width="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Probability" Width="70"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Sid" Width="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Ledger" Width="70"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Logistic" Width="70"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Production" Width="70"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Project" Width="70"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Time" Width="70"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Crm" Width="70"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Asset" Width="70"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Mobil" Width="120" />
                 </local:PartnerProspectGrid.Columns>
             </local:PartnerProspectGrid>
         </CorasauControls:BusyIndicator>

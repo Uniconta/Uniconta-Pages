@@ -296,7 +296,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
             catch (Exception ex)
             {
-                UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"));
+                UnicontaMessageBox.Show(ex);
             }
 
             return true;
@@ -312,12 +312,6 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     var debPaymentFormat = cwwin.PaymentFormat;
                     var schemeType = cwwin.directDebitScheme;
-
-                    if (debPaymentFormat._ExportFormat == (byte)Uniconta.DataModel.DebtorPaymFormatType.NetsLS)
-                    {
-                        UnicontaMessageBox.Show(string.Format("{0} '{1}'", "Denne funktion understøttes ikke længere Nets Leverandørservice", (Uniconta.DataModel.DebtorPaymFormatType)debPaymentFormat._ExportFormat), Uniconta.ClientTools.Localization.lookup("Register"));
-                        return;
-                    }
 
                     List<DebtorMandateDirectDebit> LstDebMandate = new List<DebtorMandateDirectDebit>();
                     foreach (var s in lstMandates.Cast<DebtorMandateDirectDebit>())
@@ -344,7 +338,7 @@ namespace UnicontaClient.Pages.CustomPage
                         }
                         catch (Exception ex)
                         {
-                            UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"));
+                            UnicontaMessageBox.Show(ex);
                         }
                     }
 
@@ -384,7 +378,7 @@ namespace UnicontaClient.Pages.CustomPage
                         }
                         catch (Exception ex)
                         {
-                            UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"));
+                            UnicontaMessageBox.Show(ex);
                         }
                     }
                 }
@@ -431,7 +425,7 @@ namespace UnicontaClient.Pages.CustomPage
                         }
                         catch (Exception ex)
                         {
-                            UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"));
+                            UnicontaMessageBox.Show(ex);
                         }
                     }
                 }
@@ -493,7 +487,7 @@ namespace UnicontaClient.Pages.CustomPage
                         }
                         catch (Exception ex)
                         {
-                            UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"));
+                            UnicontaMessageBox.Show(ex);
                         }
                     }
                 }

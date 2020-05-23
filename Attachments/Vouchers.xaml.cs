@@ -34,7 +34,6 @@ using UnicontaClient.Pages.Attachments;
 using Bilagscan;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using Newtonsoft.Json;
 using System.Configuration;
 using System.Text;
 #endif
@@ -47,9 +46,10 @@ namespace UnicontaClient.Pages.CustomPage
         public override Type TableType { get { return typeof(VouchersClient); } }
         public override bool Readonly { get { return false; } }
         public override bool SingleBufferUpdate { get { return false; } }
-        public override bool CanInsert { get { return false; } }
+        public override bool CanInsert { get { return _canInsert; } }
         public override IComparer GridSorting { get { return new SortDocAttached(); } }
 
+        private bool _canInsert;
         async public override Task<ErrorCodes> SaveData()
         {
             SelectedItem = null;
@@ -73,7 +73,6 @@ namespace UnicontaClient.Pages.CustomPage
                     vouchersClient[iCtr] = row.DataItem as VouchersClient;
                     if ((buffers[iCtr] = vouchersClient[iCtr]._Data) != null)
                     {
-                        vouchersClient[iCtr]._SizeKB = ((vouchersClient[iCtr]._Data.Length + 512) >> 10);
                         vouchersClient[iCtr]._Data = null;
                     }
                     iCtr++;
@@ -100,16 +99,53 @@ namespace UnicontaClient.Pages.CustomPage
             var tr = e.TargetRow as VouchersClient;
             foreach (var row in e.DraggedRows)
             {
-                var dr = row as VouchersClient;
-                if (tr != null && dr != null)
+                if (tr != null)
                 {
-                    this.SetLoadedRow(dr);
-                    dr._ViewInFolder = tr._ViewInFolder;
-                    this.SetModifiedRow(dr);
+                    if (row is VouchersClient)
+                    {
+                        var dr = row as VouchersClient;
+                        this.SetLoadedRow(dr);
+                        dr._ViewInFolder = tr._ViewInFolder;
+                        this.SetModifiedRow(dr);
+                    }
+                    else if (row is UserDocsClient)
+                    {
+                        var userDoc = row as UserDocsClient;
+                        var result = api.Read(userDoc).Result;
+                        if (result != ErrorCodes.Succes)
+                            continue;
+                        var userDocs = new List<UnicontaBaseEntity>() { userDoc };
+                        _canInsert = true;
+                        PasteRows(userDocs);
+                        _canInsert = false;
+                    }
                 }
             }
             return e.DraggedRows;
         }
+
+        public override IEnumerable<UnicontaBaseEntity> ConvertPastedRows(IEnumerable<UnicontaBaseEntity> copyFromRows)
+        {
+            if (copyFromRows.FirstOrDefault() is UserDocsClient)
+            {
+                var lst = new List<UnicontaBaseEntity>();
+                foreach (var row in copyFromRows)
+                {
+                    var doc = (UserDocsClient)row;
+                    var voucher = Activator.CreateInstance(api.CompanyEntity.GetUserTypeNotNull(typeof(VouchersClient))) as VouchersClient;
+                    voucher.SetMaster(api.CompanyEntity);
+
+                    voucher.Text = doc._Text;
+                    voucher.Fileextension = doc.DocumentType;
+                    voucher.VoucherAttachment = doc._Data;
+                    voucher.Url = doc._Url;
+                    lst.Add(voucher);
+                }
+                return lst;
+            }
+            return null;
+        }
+
 #endif
     }
 
@@ -143,7 +179,7 @@ namespace UnicontaClient.Pages.CustomPage
             this.CreditorCache = api.GetCache(typeof(Uniconta.DataModel.Creditor));
             this.PaymentCache = api.GetCache(typeof(Uniconta.DataModel.PaymentTerm));
             this.FolderCache = api.GetCache(typeof(Uniconta.DataModel.DocumentFolder));
-             
+
             dgVoucherGrid.api = api;
             dgVoucherGrid.BusyIndicator = busyIndicator;
             var masterrec = new List<UnicontaBaseEntity>() { new Uniconta.DataModel.DocumentNoRef() };
@@ -167,7 +203,7 @@ namespace UnicontaClient.Pages.CustomPage
             dgVoucherGrid.tableView.AllowDragDrop = true;
             dgVoucherGrid.tableView.DropRecord += dgVoucherGridView_DropRecord;
             dgVoucherGrid.tableView.DragRecordOver += dgVoucherGridView_DragRecordOver;
-           
+
             accordionView.MouseLeftButtonUp += AccordionView_MouseLeftButtonUp;
             dgVoucherGrid.ItemsSourceChanged += DgVoucherGrid_ItemsSourceChanged;
 #endif
@@ -195,9 +231,9 @@ namespace UnicontaClient.Pages.CustomPage
 #endif
             await t;
         }
-        
+
         List<string> Folders;
-        void BindFolders(string deletedItem=null)
+        void BindFolders(string deletedItem = null)
         {
             Folders = DocumentFolderClient.GetFolders(FolderCache);
             if (!string.IsNullOrEmpty(deletedItem) && Folders.Contains(deletedItem))
@@ -629,18 +665,8 @@ namespace UnicontaClient.Pages.CustomPage
                                 var select = UnicontaMessageBox.Show(text, Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OKCancel);
                                 if (select == MessageBoxResult.OK)
                                 {
-                                    Uniconta.DataModel.GLDailyJournal jour;
-
-                                    var cache = api.GetCache(typeof(Uniconta.DataModel.GLDailyJournal));
-                                    if (cache != null)
-                                        jour = (Uniconta.DataModel.GLDailyJournal)cache.Get(journalName);
-                                    else
-                                    {
-                                        jour = new Uniconta.DataModel.GLDailyJournal();
-                                        jour._Journal = journalName;
-                                        await api.Read(jour);
-                                    }
-                                    AddDockItem(TabControls.GL_DailyJournalLine, jour, null, null, true);
+                                    var parms = new[] { new BasePage.ValuePair("Journal", journalName) };
+                                    AddDockItem(TabControls.GL_DailyJournalLine, null, null, null, true, null, parms);
                                 }
                             }
                         }
@@ -719,6 +745,10 @@ namespace UnicontaClient.Pages.CustomPage
                         }
                     };
                     cw.Show();
+                    break;
+                case "PendingApproval":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.DocumentApproveAwaitPage, dgVoucherGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("PendingApproval"), selectedItem.RowId));
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);
@@ -1121,7 +1151,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 folderName = folderdialog.FolderName;
                 var action = folderdialog.Action;
-             //   FolderCache = api.GetCache(typeof(DocumentFolder));
+                //   FolderCache = api.GetCache(typeof(DocumentFolder));
                 if (action == 2)
                     BindFolders(selectedItem?.FilterName);
                 else
@@ -1144,7 +1174,7 @@ namespace UnicontaClient.Pages.CustomPage
             folderdialog.Show();
 #endif
         }
-        
+
         private void CallOffsetAccount(VouchersClient vouchersClientLine)
         {
             if (vouchersClientLine != null)
@@ -1270,7 +1300,7 @@ namespace UnicontaClient.Pages.CustomPage
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
                     var response = await client.GetAsync($"https://api.bilagscan.dk/v1/organizations/" + orgNo.ToString() + "/vouchers?seen=false&count=100&offset=0&sorts=-upload_date&status=successful");
                     var content = await response.Content.ReadAsStringAsync();
-                    var vouchers = JsonConvert.DeserializeObject<BilagscanVoucher.Processed>(content);
+                    var vouchers = Bilagscan.Voucher.GetVouchers(content);
 
                     var credCache = api.GetCache(typeof(Uniconta.DataModel.Creditor)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Creditor));
                     var offsetCache = api.GetCache(typeof(Uniconta.DataModel.GLAccount)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLAccount));
@@ -1286,7 +1316,7 @@ namespace UnicontaClient.Pages.CustomPage
                         foreach (var voucher in vouchers.data)
                         {
                             vouchersSeen.Add(NumberConvert.ToString(voucher.id));
-                            var hint = JsonConvert.DeserializeObject<BilagscanWrite.Hint>(voucher.note);
+                            var hint = Bilagscan.Voucher.GetHint(voucher.note);
                             if (hint != null)
                             {
                                 search._DocumentRef = hint.RowId;
@@ -1473,7 +1503,7 @@ namespace UnicontaClient.Pages.CustomPage
                                     }
                                     catch (Exception ex)
                                     {
-                                        UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"), MessageBoxButton.OK);
+                                        UnicontaMessageBox.Show(ex);
                                         return;
                                     }
 

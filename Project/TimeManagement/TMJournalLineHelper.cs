@@ -1,4 +1,3 @@
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -16,6 +15,7 @@ using Uniconta.Common;
 using Uniconta.DataModel;
 using UnicontaClient.Pages;
 using Uniconta.Common.Utility;
+using Uniconta.ClientTools.Util;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
@@ -508,6 +508,35 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
         }
         #endregion
 
+        #region SetEmplPrice
+
+        private List<EmpPayrollCategoryEmployeeClient> PriceMatrix(DateTime date, int dayIdx, string project, string payrollCat, SQLTableCache<Uniconta.ClientTools.DataModel.ProjectClient> projLst)
+        {
+            if (payrollCat == null)
+                return null;
+
+            List<EmpPayrollCategoryEmployeeClient> prices = null;
+            prices = empPriceLst.Where(s => s._DCAccount == null &&
+                                            s._PayrollCategory == payrollCat &&
+                                            s._Project == project &&
+                                            (s.ValidTo >= date.AddDays(dayIdx - 1) || s.ValidTo == DateTime.MinValue) && s.ValidFrom <= date.AddDays(dayIdx - 1)).ToList();
+
+            if (prices.Count == 0)
+                prices = empPriceLst.Where(s => s._Project == null &&
+                                                s._PayrollCategory == payrollCat &&
+                                                s._DCAccount == projLst?.Get(project)?._DCAccount &&
+                                               (s.ValidTo >= date.AddDays(dayIdx - 1) || s.ValidTo == DateTime.MinValue) && s.ValidFrom <= date.AddDays(dayIdx - 1)).ToList();
+
+            if (prices.Count == 0)
+                prices = empPriceLst.Where(s => s._DCAccount == null &&
+                                                s._Project == null &&
+                                                s._PayrollCategory == payrollCat &&
+                                                (s.ValidTo >= date.AddDays(dayIdx - 1) || s.ValidTo == DateTime.MinValue) && s.ValidFrom <= date.AddDays(dayIdx - 1)).ToList();
+
+            return prices;
+        }
+
+
         public void SetEmplPrice(IEnumerable<TMJournalLineClientLocal> lst,
                                  IList<EmpPayrollCategoryEmployeeClient> empPriceLst,
                                  SQLTableCache<Uniconta.DataModel.EmpPayrollCategory> empPayrollCatLst,
@@ -519,181 +548,154 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
         {
 #if !SILVERLIGHT
             bool foundErr;
-            try
+           
+            this.employee = employee;
+            this.empPriceLst = empPriceLst;
+            int dayOfWeekStart = startDate.DayOfWeek == DayOfWeek.Sunday ? 7 : (int)startDate.DayOfWeek;
+            int dayOfWeekEnd = endDate.DayOfWeek == DayOfWeek.Sunday ? 7 : (int)endDate.DayOfWeek;
+
+            var defaultPayrollCategory = empPayrollCatLst.Where(s => s._PrCategory == null && s.KeyStr == "Default").FirstOrDefault();
+
+            if (empPriceLst != null && empPriceLst.Any(s => s._Employee != employee._Number)) // it contains other employees, remove them
+                empPriceLst = empPriceLst.Where(s => s._Employee == employee._Number).ToList();
+
+            foreach (var trans in lst)
             {
-                this.employee = employee;
-                int dayOfWeekStart = startDate.DayOfWeek == DayOfWeek.Sunday ? 7 : (int)startDate.DayOfWeek;
-                int dayOfWeekEnd = endDate.DayOfWeek == DayOfWeek.Sunday ? 7 : (int)endDate.DayOfWeek;
-
-                var defaultPayrollCategory = empPayrollCatLst.Where(s => s._PrCategory == null && s.KeyStr == "Default").FirstOrDefault();
-
-                if (empPriceLst != null && empPriceLst.Any(s => s._Employee != employee._Number)) // it contains other employees, remove them
-                    empPriceLst = empPriceLst.Where(s => s._Employee == employee._Number).ToList();
-
-                foreach (var trans in lst)
+                var isMileageTrans = trans._RegistrationType == RegistrationType.Mileage ? true : false;
+                if (isMileageTrans)
                 {
-                    var isMileageTrans = trans._RegistrationType == RegistrationType.Mileage ? true : false;
-                    if (isMileageTrans)
+                    defaultPayrollCategory = null;
+                    var projGroup = projGroupList?.Get(trans.ProjectRef.Group);
+                    trans._Invoiceable = projGroup._Invoiceable;
+                }
+
+               var payrollCat = empPayrollCatLst?.Get(trans._PayrollCategory);
+
+                foundErr = false;
+                for (int x = dayOfWeekStart; x <= dayOfWeekEnd; x++)
+                {
+                    if (trans.GetHoursDayN(x) == 0)
+                        continue;
+
+                    double salesPrice = 0, costPrice = 0;
+
+                    List<EmpPayrollCategoryEmployeeClient> prices = null;
+                    if (empPriceLst != null && empPriceLst.Count > 0) 
                     {
-                        defaultPayrollCategory = null;
-                        var projGroup = projGroupList?.Get(trans.ProjectRef.Group);
-                        trans._Invoiceable = projGroup._Invoiceable;
+                        prices = PriceMatrix(startDate, x, trans._Project, trans._PayrollCategory, projLst);
+                        if (prices.Count == 0 && defaultPayrollCategory != null)
+                            prices = PriceMatrix(startDate, x, trans._Project, defaultPayrollCategory.KeyStr, projLst);
                     }
 
-                   var payrollCat = empPayrollCatLst?.Get(trans._PayrollCategory);
-
-                    foundErr = false;
-                    for (int x = dayOfWeekStart; x <= dayOfWeekEnd; x++)
+                    if (prices != null && prices.Count > 0)
                     {
-                        if (trans.GetHoursDayN(x) == 0)
-                            continue;
+                        salesPrice = trans._Invoiceable ? prices.FirstOrDefault().SalesPrice : 0; 
+                        costPrice = prices.FirstOrDefault().CostPrice;
 
-                        double salesPrice = 0, costPrice = 0;
-
-                        List<EmpPayrollCategoryEmployeeClient> prices = null;
-                        if (empPriceLst != null && empPriceLst.Count > 0) 
+                        trans.SetPricesDayN(x, salesPrice, costPrice);
+                    }
+                    else
+                    {
+                        if (isMileageTrans)
                         {
-                            prices = empPriceLst.Where(s => s._DCAccount == null && 
-                                                            (s._PayrollCategory == trans._PayrollCategory || (defaultPayrollCategory != null && s._PayrollCategory == defaultPayrollCategory.KeyStr)) &&
-                                                            s._Project == trans._Project &&
-                                                            (s.ValidTo >= startDate.AddDays(x - 1) || s.ValidTo == DateTime.MinValue) && s.ValidFrom <= startDate.AddDays(x - 1)).ToList();
+                            if (trans._Invoiceable)
+                                salesPrice = (payrollCat != null && payrollCat._SalesPrice != 0) ? payrollCat._SalesPrice : 0;
+                            else
+                                salesPrice = 0;
 
-                            if (prices.Count == 0)
-                                prices = empPriceLst.Where(s => s._Project == null && 
-                                                                (s._PayrollCategory == trans._PayrollCategory || (defaultPayrollCategory != null && s._PayrollCategory == defaultPayrollCategory.KeyStr)) &&
-                                                                s._DCAccount == projLst?.Get(trans._Project)?._DCAccount &&
-                                                               (s.ValidTo >= startDate.AddDays(x - 1) || s.ValidTo == DateTime.MinValue) && s.ValidFrom <= startDate.AddDays(x - 1)).ToList();
-
-                            if (prices.Count == 0)
-                                prices = empPriceLst.Where(s => s._DCAccount == null &&
-                                                                s._Project == null &&
-                                                                (s._PayrollCategory == trans._PayrollCategory || (defaultPayrollCategory != null && s._PayrollCategory == defaultPayrollCategory.KeyStr)) &&
-                                                                (s.ValidTo >= startDate.AddDays(x - 1) || s.ValidTo == DateTime.MinValue) && s.ValidFrom <= startDate.AddDays(x - 1)).ToList();
-                        }
-
-   
-                        if (prices != null && prices.Count != 0)
-                        {
-                            salesPrice = trans._Invoiceable ? prices.OrderByDescending(s => s.PrCategory).FirstOrDefault().SalesPrice : 0;
-                            costPrice = prices.OrderByDescending(s => s.PrCategory).FirstOrDefault().CostPrice;
-
-                            trans.SetPricesDayN(x, salesPrice, costPrice);
+                            costPrice = (payrollCat != null && payrollCat._Rate != 0) ? payrollCat._Rate : 0;
                         }
                         else
                         {
-                            if (isMileageTrans)
-                            {
-                                if (trans._Invoiceable)
-                                    salesPrice = (payrollCat != null && payrollCat._SalesPrice != 0) ? payrollCat._SalesPrice : 0;
-                                else
-                                    salesPrice = 0;
-
-                                costPrice = (payrollCat != null && payrollCat._Rate != 0) ? payrollCat._Rate : 0;
-                            }
+                            if (trans._Invoiceable)
+                                salesPrice = (payrollCat != null && payrollCat._SalesPrice != 0) ? payrollCat._SalesPrice : this.employee._SalesPrice;
                             else
-                            {
-                                if (trans._Invoiceable)
-                                    salesPrice = (payrollCat != null && payrollCat._SalesPrice != 0) ? payrollCat._SalesPrice : this.employee._SalesPrice;
-                                else
-                                    salesPrice = 0;
+                                salesPrice = 0;
 
-                                costPrice = this.employee._CostPrice;
-                            }
-
-                            trans.SetPricesDayN(x, salesPrice, costPrice);
+                            costPrice = this.employee._CostPrice;
                         }
 
-                        if (!isMileageTrans && costPrice == 0) //Always fallback to Employee for Costprice
+                        trans.SetPricesDayN(x, salesPrice, costPrice);
+                    }
+
+                    if (!isMileageTrans && costPrice == 0) //Always fallback to Employee for Costprice
+                    {
+                        costPrice = this.employee._CostPrice;
+                        if (costPrice != 0)
+                            trans.SetPricesDayN(x, salesPrice, costPrice);
+                    }
+                    else if (isMileageTrans) //Always fallback to Payroll category for Costprice
+                    {
+                        if (costPrice == 0)
                         {
-                            costPrice = this.employee._CostPrice;
+                            costPrice = (payrollCat != null && payrollCat._Rate != 0) ? payrollCat._Rate : 0;
                             if (costPrice != 0)
                                 trans.SetPricesDayN(x, salesPrice, costPrice);
                         }
-                        else if (isMileageTrans) //Always fallback to Payroll category for Costprice
+                    }
+
+                    if (validate && !foundErr)
+                    {
+                        if(salesPrice == 0 && costPrice == 0)
                         {
-                            if (costPrice == 0)
+                            if (startDate.AddDays(x - 1) >= employee._Hired)
                             {
-                                costPrice = (payrollCat != null && payrollCat._Rate != 0) ? payrollCat._Rate : 0;
-                                if (costPrice != 0)
-                                    trans.SetPricesDayN(x, salesPrice, costPrice);
+                                checkErrors.Add(new TMJournalLineError()
+                                {
+                                    Message = Uniconta.ClientTools.Localization.lookup("NoRatesEmployee"),
+                                    RowId = trans.RowId
+                                });
+
+                                trans.ErrorInfo = string.Empty;
+                                err = true;
+                                foundErr = true;
                             }
                         }
-
-                        if (validate && !foundErr)
+                        else
                         {
-                            if(salesPrice == 0 && costPrice == 0)
+                            if (prices != null && prices.Count > 1)
                             {
-                                if (startDate.AddDays(x - 1) >= employee._Hired)
+                                checkErrors.Add(new TMJournalLineError()
                                 {
-                                    checkErrors.Add(new TMJournalLineError()
-                                    {
-                                        Message = Uniconta.ClientTools.Localization.lookup("NoRatesEmployee"),
-                                        RowId = trans.RowId
-                                    });
+                                    Message = string.Format("{0} ({1}: {2})",
+                                    Uniconta.ClientTools.Localization.lookup("OverlappingPeriodPriceMatrix"),
+                                    Uniconta.ClientTools.Localization.lookup("Date"),
+                                    startDate.AddDays(x - 1).ToString("dd.MM.yyyy")),
+                                    RowId = trans.RowId
+                                });
 
-                                    trans.ErrorInfo = string.Empty;
-                                    err = true;
-                                    foundErr = true;
-                                }
+                                trans.ErrorInfo = string.Empty;
+                                err = true;
+                                foundErr = true;
                             }
-                            else
+
+                            if (!foundErr && salesPrice == 0 && trans._Invoiceable && !isMileageTrans)
                             {
-                                if (prices != null && prices.Where(s => defaultPayrollCategory == null || defaultPayrollCategory != null && s._PayrollCategory != defaultPayrollCategory.KeyStr).Count() > 1)
+                                checkErrors.Add(new TMJournalLineError()
                                 {
-                                    var emplPriceRecord = prices.Where(s => defaultPayrollCategory == null || defaultPayrollCategory != null && s._PayrollCategory != defaultPayrollCategory.KeyStr).FirstOrDefault();
+                                    Message = string.Format("{0} ({1}: {2})",
+                                    Uniconta.ClientTools.Localization.lookup("NoSalesPrice"),
+                                    Uniconta.ClientTools.Localization.lookup("Date"),
+                                    startDate.AddDays(x - 1).ToString("dd.MM.yyyy")),
+                                    RowId = trans.RowId
+                                });
 
-                                    checkErrors.Add(new TMJournalLineError()
-                                    {
-                                        Message = string.Format("{0} ({1}:{2}, {3}:{4}, {5}:{6}, {7}:{8}, {9}:{10})",
-                                        Uniconta.ClientTools.Localization.lookup("OverlappingPeriodPriceMatrix"),
-                                        Uniconta.ClientTools.Localization.lookup("Date"),
-                                        startDate.AddDays(x - 1).ToString("dd.MM.yyyy"),
-                                        Uniconta.ClientTools.Localization.lookup("Employee"),
-                                        emplPriceRecord._Employee,
-                                        Uniconta.ClientTools.Localization.lookup("PayrollCategory"),
-                                        emplPriceRecord._PayrollCategory,
-                                        Uniconta.ClientTools.Localization.lookup("Account"),
-                                        emplPriceRecord._DCAccount,
-                                        Uniconta.ClientTools.Localization.lookup("Project"),
-                                        emplPriceRecord._Project),
-                                        RowId = trans.RowId
-                                    });
-
-                                    trans.ErrorInfo = string.Empty;
-                                    err = true;
-                                    foundErr = true;
-                                }
-
-                                if (!foundErr && salesPrice == 0 && trans._Invoiceable && !isMileageTrans)
-                                {
-                                    checkErrors.Add(new TMJournalLineError()
-                                    {
-                                        Message = string.Format("{0} ({1}:{2})",
-                                        Uniconta.ClientTools.Localization.lookup("NoSalesPrice"),
-                                        Uniconta.ClientTools.Localization.lookup("Date"),
-                                        startDate.AddDays(x - 1).ToString("dd.MM.yyyy")),
-                                        RowId = trans.RowId
-                                    });
-
-                                    trans.ErrorInfo = string.Empty;
-                                    err = true;
-                                    foundErr = true;
-                                }
+                                trans.ErrorInfo = string.Empty;
+                                err = true;
+                                foundErr = true;
                             }
                         }
                     }
                 }
             }
-            catch (Exception ex)
-            {
-                Uniconta.ClientTools.Controls.UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"));
-            }
 #endif
         }
+        #endregion
 
+        #region GetEmplPrice
         public Tuple<double, double> GetEmplPrice(IList<EmpPayrollCategoryEmployeeClient> empPriceLst,
                                                   SQLTableCache<Uniconta.DataModel.EmpPayrollCategory> empPayrollCatLst,
-                                                  SQLTableCache<Uniconta.DataModel.Project> projLst,
+                                                  SQLTableCache<Uniconta.ClientTools.DataModel.ProjectClient> projLst,
                                                   SQLTableCache<Uniconta.DataModel.ProjectGroup> projGroupLst,
                                                   Uniconta.DataModel.Employee employee,
                                                   string projectNumber,
@@ -701,103 +703,83 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
                                                   string payrollCategory = null)
         {
 #if !SILVERLIGHT
-            try
+                       
+            this.empPriceLst = empPriceLst;
+            var defaultPayrollCategory = empPayrollCatLst.Where(s => s._PrCategory == null && s.KeyStr == "Default").FirstOrDefault();
+            var project = projLst?.Get(projectNumber);
+            var projGroup = projGroupLst?.Get(project._Group);
+
+            EmpPayrollCategory payrollCat = null;
+            bool isMileagePrice = false;
+            bool invoiceable;
+            if (payrollCategory == null)
             {
-                var defaultPayrollCategory = empPayrollCatLst.Where(s => s._PrCategory == null && s.KeyStr == "Default").FirstOrDefault();
-                var project = projLst?.Get(projectNumber);
-                var projGroup = projGroupLst?.Get(project._Group);
+                invoiceable = projGroup._Invoiceable;
+                payrollCategory = string.Empty;
+            }
+            else
+            {
+                payrollCat = empPayrollCatLst?.Get(payrollCategory);
+                isMileagePrice = payrollCat._InternalType == InternalType.Mileage;
+                invoiceable = projGroup._Invoiceable && payrollCat._Invoiceable;
+            }
 
-                EmpPayrollCategory payrollCat = null;
-                bool isMileagePrice = false;
-                bool invoiceable;
-                if (payrollCategory == null)
-                {
-                    invoiceable = projGroup._Invoiceable;
-                    payrollCategory = string.Empty;
-                }
-                else
-                {
-                    payrollCat = empPayrollCatLst?.Get(payrollCategory);
-                    isMileagePrice = payrollCat._InternalType == InternalType.Mileage;
-                    invoiceable = projGroup._Invoiceable && payrollCat._Invoiceable;
-                }
+            if (empPriceLst != null && empPriceLst.Any(s => s._Employee != employee._Number)) // it contains other employees, remove them
+                empPriceLst = empPriceLst.Where(s => s._Employee == employee._Number).ToList();
 
-                if (empPriceLst != null && empPriceLst.Any(s => s._Employee != employee._Number)) // it contains other employees, remove them
-                    empPriceLst = empPriceLst.Where(s => s._Employee == employee._Number).ToList();
+            if (isMileagePrice)
+            {
+                defaultPayrollCategory = null;
+                invoiceable = projGroup._Invoiceable;
+            }
 
+            double salesPrice = 0, costPrice = 0;
+
+            List<EmpPayrollCategoryEmployeeClient> prices = null;
+            if (empPriceLst != null && empPriceLst.Count > 0)
+            {
+                prices = PriceMatrix(priceDate, 1, projectNumber, payrollCategory, projLst);
+                if (prices.Count == 0 && defaultPayrollCategory != null)
+                    prices = PriceMatrix(priceDate, 1, projectNumber, defaultPayrollCategory.KeyStr, projLst);
+            }
+
+            if (prices != null && prices.Count != 0)
+            {
+                salesPrice = invoiceable ? prices.FirstOrDefault().SalesPrice : 0;
+                costPrice = prices.FirstOrDefault().CostPrice;
+            }
+            else
+            {
                 if (isMileagePrice)
                 {
-                    defaultPayrollCategory = null;
-                    invoiceable = projGroup._Invoiceable;
-                }
+                    if (invoiceable)
+                        salesPrice = (payrollCat != null && payrollCat._SalesPrice != 0) ? payrollCat._SalesPrice : 0;
+                    else
+                        salesPrice = 0;
 
-                double salesPrice = 0, costPrice = 0;
-
-                List<EmpPayrollCategoryEmployeeClient> prices = null;
-                if (empPriceLst != null && empPriceLst.Count > 0)
-                {
-                    prices = empPriceLst.Where(s => s._DCAccount == null &&
-                                                    (s._PayrollCategory == payrollCategory || (defaultPayrollCategory != null && s._PayrollCategory == defaultPayrollCategory.KeyStr)) &&
-                                                    s._Project == projectNumber &&
-                                                    (s.ValidTo >= priceDate || s.ValidTo == DateTime.MinValue) && s.ValidFrom <= priceDate).ToList();
-
-                    if (prices.Count == 0)
-                        prices = empPriceLst.Where(s => s._Project == null &&
-                                                        (s._PayrollCategory == payrollCategory || (defaultPayrollCategory != null && s._PayrollCategory == defaultPayrollCategory.KeyStr)) &&
-                                                        s._DCAccount == projLst?.Get(projectNumber)?._DCAccount &&
-                                                       (s.ValidTo >= priceDate || s.ValidTo == DateTime.MinValue) && s.ValidFrom <= priceDate).ToList();
-
-                    if (prices.Count == 0)
-                        prices = empPriceLst.Where(s => s._DCAccount == null &&
-                                                        s._Project == null &&
-                                                        (s._PayrollCategory == payrollCategory || (defaultPayrollCategory != null && s._PayrollCategory == defaultPayrollCategory.KeyStr)) &&
-                                                        (s.ValidTo >= priceDate || s.ValidTo == DateTime.MinValue) && s.ValidFrom <= priceDate).ToList();
-                }
-
-
-                if (prices != null && prices.Count != 0)
-                {
-                    salesPrice = invoiceable ? prices.OrderByDescending(s => s.PrCategory).FirstOrDefault().SalesPrice : 0;
-                    costPrice = prices.OrderByDescending(s => s.PrCategory).FirstOrDefault().CostPrice;
+                    costPrice = (payrollCat != null && payrollCat._Rate != 0) ? payrollCat._Rate : 0;
                 }
                 else
                 {
-                    if (isMileagePrice)
-                    {
-                        if (invoiceable)
-                            salesPrice = (payrollCat != null && payrollCat._SalesPrice != 0) ? payrollCat._SalesPrice : 0;
-                        else
-                            salesPrice = 0;
-
-                        costPrice = (payrollCat != null && payrollCat._Rate != 0) ? payrollCat._Rate : 0;
-                    }
+                    if (invoiceable)
+                        salesPrice = (payrollCat != null && payrollCat._SalesPrice != 0) ? payrollCat._SalesPrice : employee._SalesPrice;
                     else
-                    {
-                        if (invoiceable)
-                            salesPrice = (payrollCat != null && payrollCat._SalesPrice != 0) ? payrollCat._SalesPrice : employee._SalesPrice;
-                        else
-                            salesPrice = 0;
+                        salesPrice = 0;
 
-                        costPrice = employee._CostPrice;
-                    }
-                }
-
-                if (!isMileagePrice && costPrice == 0) //Always fallback to Employee for Costprice
                     costPrice = employee._CostPrice;
-                else if (isMileagePrice && costPrice == 0) //Always fallback to Payroll category for Costprice
-                    costPrice = (payrollCat != null && payrollCat._Rate != 0) ? payrollCat._Rate : 0;
+                }
+            }
 
-                return new Tuple<double, double>(costPrice, salesPrice);
-            }
-            catch (Exception ex)
-            {
-                return new Tuple<double, double>(0, 0);
-                //Uniconta.ClientTools.Controls.UnicontaMessageBox.Show(ex.Message, Uniconta.ClientTools.Localization.lookup("Exception"));
-            }
+            if (!isMileagePrice && costPrice == 0) //Always fallback to Employee for Costprice
+                costPrice = employee._CostPrice;
+            else if (isMileagePrice && costPrice == 0) //Always fallback to Payroll category for Costprice
+                costPrice = (payrollCat != null && payrollCat._Rate != 0) ? payrollCat._Rate : 0;
+
+            return new Tuple<double, double>(costPrice, salesPrice);
 #endif
             return new Tuple<double, double>(0, 0);
         }
-
+        #endregion
 
         public static string GetPeriod(DateTime Date)
         {
@@ -838,7 +820,10 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
 
             internal object _payrollSource;
             public object PayrollSource { get { return _payrollSource; } }
-            
+
+            internal object _projectTaskSource;
+            public object ProjectTaskSource { get { return _projectTaskSource; } }
+
             private string _ErrorInfo;
             [Display(Name = "SystemInfo", ResourceType = typeof(DCTransText))]
             public string ErrorInfo { get { return _ErrorInfo; } set { _ErrorInfo = value; NotifyPropertyChanged("ErrorInfo"); } }
@@ -1026,8 +1011,6 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
         #region Google Maps calculate distance
         public static double GetDistance(string fromAddress, string toAddress, bool avoidFerries = true, int decimals = 1)
         {
-            var distance = 0;
-
             string apiKey = "AIzaSyC1g0oHHskaL5_o059GBCNzKcvhJEsF-Dg";
             string googlemapURL = "https://maps.googleapis.com/maps/api/distancematrix/json?&origins=";
 
@@ -1040,16 +1023,7 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
             string requesturl = string.Format("{0}{1}&destinations={2}&mode=driving{3}&key={4}", googlemapURL, fromAddress, toAddress, avoidFerries ? "&avoid=ferries" : string.Empty, apiKey);
             string content = FileGetContents(requesturl);
 
-            JObject o = JObject.Parse(content);
-            try
-            {
-                distance = (int)o.SelectToken("rows[0].elements[0].distance.value");
-                return Math.Round((double)distance / 1000, decimals);
-            }
-            catch
-            {
-                return distance;
-            }
+            return UtilFunctions.GetDistance(content, decimals);
         }
 #if !SILVERLIGHT
         private static string FileGetContents(string fileName)

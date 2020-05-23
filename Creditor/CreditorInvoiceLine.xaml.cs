@@ -195,8 +195,14 @@ namespace UnicontaClient.Pages.CustomPage
             var inv = dg.SelectedItem as InvTransClient;
             if (inv == null)
                 return lookup;
-            if (dg.CurrentColumn?.Name == "Item")
-                lookup.TableType = typeof(Uniconta.DataModel.InvItem);
+            var currentCol = dg.CurrentColumn;
+            if (currentCol != null)
+            {
+                if (currentCol.FieldName == "Item")
+                    lookup.TableType = typeof(Uniconta.DataModel.InvItem);
+                else if (currentCol.FieldName == "DCAccount")
+                    lookup.TableType = typeof(Uniconta.DataModel.Creditor);
+            }
             return lookup;
         }
     }

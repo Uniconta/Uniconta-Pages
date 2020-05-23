@@ -44,6 +44,7 @@ namespace UnicontaClient.Pages.CustomPage
         public override string NameOfControl { get { return TabControls.CreditorAccountPage2.ToString(); } }
         public override UnicontaBaseEntity ModifiedRow { get { return editrow; } set { editrow = (CreditorClient)value; } }
         bool isCopiedRow = false;
+        bool lookupZipCode = true;
         public CreditorAccountPage2(UnicontaBaseEntity sourcedata, bool IsEdit) : base(sourcedata, IsEdit)
         {
             InitializeComponent();
@@ -145,12 +146,11 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
 
-        string zip;
         private async void Editrow_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == "ZipCode")
             {
-                if (zip == null)
+                if (lookupZipCode)
                 {
                     var city = await UtilDisplay.GetCityAndAddress(editrow.ZipCode, editrow.Country);
                     if (city != null)
@@ -159,17 +159,20 @@ namespace UnicontaClient.Pages.CustomPage
                         var add1 = city[1];
                         if (!string.IsNullOrEmpty(add1))
                             editrow.Address1 = add1;
-                        zip = city[2];
-                        if (!string.IsNullOrEmpty(zip))
+                        var zip = city[2];
+                        if (!string.IsNullOrEmpty(zip) && editrow.ZipCode != zip)
+                        {
+                            lookupZipCode = false;
                             editrow.ZipCode = zip;
+                        }
                     }
                 }
                 else
-                    zip = null;
+                    lookupZipCode = true;
             }
             else if (e.PropertyName == "DeliveryZipCode")
             {
-                if (zip == null)
+                if (lookupZipCode)
                 {
                     var deliveryCountry = editrow.DeliveryCountry ?? editrow.Country;
                     var city = await UtilDisplay.GetCityAndAddress(editrow.DeliveryZipCode, deliveryCountry);
@@ -179,13 +182,16 @@ namespace UnicontaClient.Pages.CustomPage
                         var add1 = city[1];
                         if (!string.IsNullOrEmpty(add1))
                             editrow.DeliveryAddress1 = add1;
-                        zip = city[2];
-                        if (!string.IsNullOrEmpty(zip))
+                        var zip = city[2];
+                        if (!string.IsNullOrEmpty(zip) && editrow.DeliveryZipCode != zip)
+                        {
+                            lookupZipCode = false;
                             editrow.DeliveryZipCode = zip;
+                        }
                     }
                 }
                 else
-                    zip = null;
+                    lookupZipCode = true;
             }
         }
 
@@ -250,7 +256,11 @@ namespace UnicontaClient.Pages.CustomPage
                             if (editrow._Address1 == null)
                             {
                                 editrow.Address1 = address.CompleteStreet;
-                                editrow.ZipCode = address.zipcode;
+                                if (editrow.ZipCode != address.zipcode)
+                                {
+                                    lookupZipCode = false;
+                                    editrow.ZipCode = address.zipcode;
+                                }
                                 editrow.City = address.cityname;
                                 editrow.Country = address.Country;
                             }
@@ -261,7 +271,11 @@ namespace UnicontaClient.Pages.CustomPage
                                     return;
                                 {
                                     editrow.Address1 = address.CompleteStreet;
-                                    editrow.ZipCode = address.zipcode;
+                                    if (editrow.ZipCode != address.zipcode)
+                                    {
+                                        lookupZipCode = false;
+                                        editrow.ZipCode = address.zipcode;
+                                    }
                                     editrow.City = address.cityname;
                                     editrow.Country = address.Country;
                                 }
@@ -311,8 +325,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void liWww_ButtonClicked(object sender)
         {
-            if (!string.IsNullOrWhiteSpace(editrow.Www))
-                Utility.OpenWebSite(editrow.Www);
+            Utility.OpenWebSite(editrow._Www);
         }
 
 #endif

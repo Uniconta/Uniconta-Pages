@@ -138,8 +138,9 @@ namespace UnicontaClient.Pages.CustomPage
                     if (savetask != null)
                         await savetask;
 
-                    var invoicePostingResult = new InvoicePostingPrintGenerator(api, this, dbProject, GenrateInvoiceDialog.InvoiceCategory, GenrateInvoiceDialog.GenrateDate, GenrateInvoiceDialog.IsSimulation,
-                        (GenrateInvoiceDialog.ShowInvoice || GenrateInvoiceDialog.InvoiceQuickPrint), GenrateInvoiceDialog.InvoiceQuickPrint,GenrateInvoiceDialog.NumberOfPages,GenrateInvoiceDialog.SendByEmail);
+                    var invoicePostingResult = new InvoicePostingPrintGenerator(api, this);
+                    invoicePostingResult.SetUpInvoicePosting(dbProject, GenrateInvoiceDialog.GenrateDate, GenrateInvoiceDialog.IsSimulation, GenrateInvoiceDialog.InvoiceCategory, GenrateInvoiceDialog.ShowInvoice,
+                        GenrateInvoiceDialog.InvoiceQuickPrint, GenrateInvoiceDialog.NumberOfPages, GenrateInvoiceDialog.SendByEmail, GenrateInvoiceDialog.GenerateOIOUBLClicked, null, false);
                     var result = await invoicePostingResult.Execute();
                     busyIndicator.IsBusy = false;
 
@@ -148,19 +149,6 @@ namespace UnicontaClient.Pages.CustomPage
                         Task reloadTask = null;
                         if (!GenrateInvoiceDialog.IsSimulation)
                             reloadTask = Filter(null);
-
-                        string msg = Uniconta.ClientTools.Localization.lookup("InvoiceProposal");
-                        if (invoicePostingResult.PostingResult.Header._InvoiceNumber != 0)
-                        {
-                            msg = string.Format(Uniconta.ClientTools.Localization.lookup("InvoiceHasBeenGenerated"), invoicePostingResult.PostingResult.Header.InvoiceNum);
-                            msg = string.Format("{0}{1}{2} {3}", msg, Environment.NewLine, Uniconta.ClientTools.Localization.lookup("LedgerVoucher"), invoicePostingResult.PostingResult.Header._Voucher);
-
-#if !SILVERLIGHT
-                            if (GenrateInvoiceDialog.GenerateOIOUBLClicked)
-                                GenerateOIOXml(invoicePostingResult.PostingResult.Header);
-#endif
-                        }
-                        UnicontaMessageBox.Show(msg, Uniconta.ClientTools.Localization.lookup("Message"), MessageBoxButton.OK);
                     }
                     else
                         Utility.ShowJournalError(invoicePostingResult.PostingResult.ledgerRes, dgProjectOnAccountInvoiceLineGrid);
@@ -174,10 +162,10 @@ namespace UnicontaClient.Pages.CustomPage
             return dgProjectOnAccountInvoiceLineGrid.Filter(propValuePair);
         }
 
+
 #if !SILVERLIGHT
-        private async void GenerateOIOXml(DCInvoice inv)
+        public static async void GenerateOIOXml(CrudAPI api, DCInvoice inv)
         {
-            var api = this.api;
             var Comp = api.CompanyEntity;
             var InvCache = api.GetCache(typeof(Uniconta.DataModel.InvItem)) ?? await api.LoadCache(typeof(Uniconta.DataModel.InvItem));
             var VatCache = api.GetCache(typeof(Uniconta.DataModel.GLVat)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLVat));
@@ -195,7 +183,7 @@ namespace UnicontaClient.Pages.CustomPage
                 PropValuePair.GenereteWhereElements("Date", inv._Date, CompareOperator.Equal)
             };
 
-            var FindDebInvLocal = await api.Query<DebtorInvoiceLocal>(listPropval);
+            var FindDebInvLocal = await api.Query<DebtorInvoiceClient>(listPropval);
             var invClient = FindDebInvLocal.FirstOrDefault();
             if (invClient == null)
                 return;
@@ -212,6 +200,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             var Invoicemasters = new UnicontaBaseEntity[] { invClient };
             var invoiceLines = await api.Query<InvTransClient>(Invoicemasters, null);
+            var layoutGroupCache = api.GetCache(typeof(DebtorLayoutGroup)) ?? await api.LoadCache(typeof(DebtorLayoutGroup));
 
             InvItemText[] invItemText = null;
             if (debtor._ItemNameGroup != null)
@@ -244,7 +233,7 @@ namespace UnicontaClient.Pages.CustomPage
             else
             {
                 TableAddOnData[] attachments = await FromXSDFile.OIOUBL.ExportImport.Attachments.CollectInvoiceAttachments(invClient, api);
-                result = Uniconta.API.DebtorCreditor.OIOUBL.GenerateOioXML(Comp, debtor, deliveryAccount, invClient, invoiceLines, InvCache, VatCache, invItemText, contactPerson, attachments);
+                result = Uniconta.API.DebtorCreditor.OIOUBL.GenerateOioXML(Comp, debtor, deliveryAccount, invClient, invoiceLines, InvCache, VatCache, invItemText, contactPerson, attachments, layoutGroupCache);
             }
 
             bool createXmlFile = true;

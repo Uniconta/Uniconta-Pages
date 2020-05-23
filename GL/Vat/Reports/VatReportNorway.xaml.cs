@@ -151,7 +151,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                 case "AltinnMvaReport":
                     var param = new object[] { api, FromDate, ToDate, VatSumOperationLst };
-                    AddDockItem(TabControls.AltinnMvaReport, param, "Mva-oppgaven", closeIfOpened: true); 
+                    AddDockItem(TabControls.AltinnMvaReport, param, "Mva-oppgaven", null, closeIfOpened: true); 
                     break;
 #endif
                 default:
@@ -222,7 +222,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
             catch (Exception ex)
             {
-                UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"));
+                UnicontaMessageBox.Show(ex);
             }
         }
 
@@ -239,7 +239,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
             catch (Exception ex)
             {
-                UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"));
+                UnicontaMessageBox.Show(ex);
             }
         }
 #endif

@@ -53,6 +53,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             BusyIndicator = busyIndicator;
             cbdefaultAccount.ItemsSource = cboffsetAccount.ItemsSource = AppEnums.GLAccountType.Values;
+            cbVATCalcMethod.ItemsSource = AppEnums.VATCalcMethod.Values;
             cbDateFunction.ItemsSource = AppEnums.GLJournalDate.Values;
             cbAssignVoucher.ItemsSource = AppEnums.AssignVoucher.Values;
             numSerielookupeditor.api = dim1lookupeditior.api = dim2lookupeditior.api = dim3lookupeditior.api = dim4lookupeditior.api = dim5lookupeditior.api =
@@ -137,7 +138,6 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override async void LoadCacheInBackGround()
         {
-            var api = this.api;
             var Cache = api.GetCache(typeof(Uniconta.DataModel.NumberSerie)) ?? await api.LoadCache(typeof(Uniconta.DataModel.NumberSerie)).ConfigureAwait(false);
             var numbers = new NumberSerieSQLCacheFilter(Cache, false);
             numSerielookupeditor.cacheFilter = numbers;

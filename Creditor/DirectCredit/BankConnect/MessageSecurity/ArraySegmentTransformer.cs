@@ -68,9 +68,7 @@ namespace SecuredClient.MessageSecurity
             xmlWriter.Flush();
             xmlWriter.Close();
 
-            var documentBytes = memoryStream.ToArray();
-            memoryStream.Release();
-            return documentBytes;
+            return memoryStream.ToArrayAndRelease();
         }
     }
 }

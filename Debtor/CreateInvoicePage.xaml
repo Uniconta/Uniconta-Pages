@@ -338,6 +338,8 @@ x:Class="UnicontaClient.Pages.CustomPage.CreateInvoicePage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DoInvoice" Width="50" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Currency" Width="35" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CostPrice" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Width="100" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CategoryName" Width="100" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Warehouse" Width="100"/>
                     <localPage:CorasauDataGridForeignKeyColumnClient x:Name="Location" Width="100">
                         <localPage:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>

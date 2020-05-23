@@ -17,6 +17,7 @@ using Uniconta.ClientTools;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.Common;
+using Uniconta.API.Service;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -30,7 +31,11 @@ namespace UnicontaClient.Pages.CustomPage
         protected override bool IsLayoutSaveRequired() { return false; }
 
         public override void OnClosePage(object[] refreshParams) { }
-
+        public CompanyPreferencePage(BaseAPI API)
+             : this(API.CompanyEntity)
+        {
+          
+        }
         public CompanyPreferencePage(UnicontaBaseEntity sourceData) : base(sourceData, true)
         {
             InitializeComponent();

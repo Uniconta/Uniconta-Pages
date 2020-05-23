@@ -40,12 +40,25 @@ namespace UnicontaClient.Pages.CustomPage
     public partial class DebtorPaymentFileReport : GridBasePage
     {
         SQLCache paymentFormatCache;
+        DateTime filterDate;
 
         public override string NameOfControl { get { return TabControls.DebtorPaymentFileReport.ToString(); } }
+
+        protected override Filter[] DefaultFilters()
+        {
+            if (filterDate != DateTime.MinValue)
+            {
+                Filter dateFilter = new Filter() { name = "Created", value = String.Format("{0:d}..", filterDate) };
+                return new Filter[] { dateFilter };
+            }
+            return base.DefaultFilters();
+        }
 
         public DebtorPaymentFileReport(BaseAPI API) : base(API, string.Empty)
         {
             InitializeComponent();
+
+            filterDate = BasePage.GetSystemDefaultDate().AddMonths(-2);
             localMenu.dataGrid = dgDebtorPaymentFileReportGrid;
             dgDebtorPaymentFileReportGrid.api = api;
             SetRibbonControl(localMenu, dgDebtorPaymentFileReportGrid);

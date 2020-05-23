@@ -136,6 +136,13 @@ namespace UnicontaClient.Pages.CustomPage
                     };
                     searchUserDialog.Show();
                     break;
+                case "EditRow":
+                    if (selectedItem != null)
+                    {
+                        var parms = new object[2] { selectedItem,true };
+                        AddDockItem(TabControls.EditCompanyUser, parms, string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("Edit"), selectedItem.UserName));
+                    }
+                    break;
                 case "DeleteRow":
                     if (selectedItem != null)
                         RemoveAccess(selectedItem);
@@ -217,9 +224,15 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
+        public override void Utility_Refresh(string screenName, object argument = null)
+        {
+            if (screenName == TabControls.EditCompanyUser)
+                dgCompanyUsersGrid.UpdateItemSource(argument);
+        }
+
         public async override Task InitQuery()
         {
-            var users = (CompanyUserAccessClient[]) await companyAPI.GetUserRights(new CompanyUserAccessClient());
+            var users = (CompanyUserAccessClient[])await companyAPI.GetUserRights(new CompanyUserAccessClient());
             dgCompanyUsersGrid.ItemsSource = null;
             dgCompanyUsersGrid.ItemsSource = users?.ToList();
             dgCompanyUsersGrid.Visibility = Visibility.Visible;

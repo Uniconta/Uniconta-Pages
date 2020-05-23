@@ -19,6 +19,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.Util;
+using Uniconta.DataModel;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -110,10 +111,54 @@ namespace UnicontaClient.Pages.CustomPage
                 case "SaveGrid":
                     saveGrid();
                     break;
+                case "SendAsEmail":
+                    if (selectedItem != null)
+                        SendEmail(selectedItem);
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
+        }
+
+        private void SendEmail(DebtorTransOpenClient debtorTransOpen)
+        {
+            var postType = debtorTransOpen.Trans._PostType;
+            DebtorEmailType emailType = DebtorEmailType.InterestNote;
+            bool isInterest = false;
+            if (postType != (byte)DCPostType.Collection || postType != (byte)DCPostType.CollectionLetter || postType != (byte)DCPostType.InterestFee || postType != (byte)DCPostType.PaymentCharge)
+                return;
+
+            if (postType == (byte)DCPostType.InterestFee)
+                isInterest = true;
+            if (postType == (byte)DCPostType.Collection)
+                emailType = DebtorEmailType.Collection;
+            else
+            {
+                CWCollectionLetter collectionLetterWin = new CWCollectionLetter();
+                collectionLetterWin.Closed += delegate
+                {
+                    if (collectionLetterWin.DialogResult == true)
+                        if (!Enum.TryParse(collectionLetterWin.Result, out emailType))
+                            return;
+                };
+                collectionLetterWin.Show();
+            }
+
+            var cwSendInvoice = new CWSendInvoice();
+#if !SILVERLIGHT
+            cwSendInvoice.DialogTableId = 2000000031;
+#endif
+            cwSendInvoice.Closed += delegate
+            {
+                var selectedRow = new DebtorTransOpenClient[] { debtorTransOpen };
+                var feelist = new [] { debtorTransOpen.Amount };
+
+                if (cwSendInvoice.DialogResult == true)
+                    DebtorPayments.ExecuteDebtorCollection(api, busyIndicator, selectedRow, feelist, null, false, emailType, cwSendInvoice.Emails,
+                        cwSendInvoice.sendOnlyToThisEmail, isInterest);
+            };
+            cwSendInvoice.Show();
         }
 
         bool copyRowIsEnabled;

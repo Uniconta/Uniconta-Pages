@@ -378,11 +378,10 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 if (GenrateOfferDialog.DialogResult == true)
                 {
-
-                    var showOrPrintOffer = GenrateOfferDialog.InvoiceQuickPrint || GenrateOfferDialog.ShowInvoice;
-                    var invoicePostingResult = new InvoicePostingPrintGenerator(api, this, dbOrder, null, GenrateOfferDialog.GenrateDate, 0, true, CompanyLayoutType.Offer, showOrPrintOffer, GenrateOfferDialog.InvoiceQuickPrint,
-                        GenrateOfferDialog.NumberOfPages, GenrateOfferDialog.SendByEmail, GenrateOfferDialog.Emails, GenrateOfferDialog.sendOnlyToThisEmail, false, GenrateOfferDialog.PostOnlyDelivered, null);
-                    invoicePostingResult.OpenAsOutlook = GenrateOfferDialog.SendByOutlook;
+                    var invoicePostingResult = new InvoicePostingPrintGenerator(api, this);
+                    invoicePostingResult.SetUpInvoicePosting(dbOrder, null, CompanyLayoutType.Offer, GenrateOfferDialog.GenrateDate, null, true, GenrateOfferDialog.ShowInvoice, GenrateOfferDialog.PostOnlyDelivered,
+                        GenrateOfferDialog.InvoiceQuickPrint, GenrateOfferDialog.NumberOfPages, GenrateOfferDialog.SendByEmail, GenrateOfferDialog.SendByOutlook, GenrateOfferDialog.sendOnlyToThisEmail,
+                        GenrateOfferDialog.Emails, false, null, false);
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
                     busyIndicator.IsBusy = true;
                     var result = await invoicePostingResult.Execute();

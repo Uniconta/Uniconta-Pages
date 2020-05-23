@@ -12,64 +12,66 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorGroupPostingPage2"
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <CorasauControls:CorasauRibbonControl x:Name="frmRibbon" XMLSourcePath=";component/Assets/FormRibbonNoLayout.xml" Grid.Row="0"/>
-            <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Vertical" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
-                <CorasauControls:CorasauLayoutGroup x:Name="grpInventoryGroup" View="GroupBox" Orientation="Vertical" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Description}"
+            <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
+                <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="grpFirst">
+                    <CorasauControls:CorasauLayoutGroup x:Name="grpInventoryGroup" View="GroupBox" Orientation="Vertical" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Description}"
                                                     CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                    <CorasauControls:CorasauLayoutItem FieldName="Group" x:Name="liGroup">
-                        <CorasauControls:LookupEditor x:Name="leGroup" Text="{Binding Group,Mode=TwoWay}" IsEnabled="False" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="InvGroup" x:Name="liInventoryGroup">
-                        <CorasauControls:LookupEditor x:Name="leInvGroup" Text="{Binding InvGroup,Mode=TwoWay}" IsEnabled="False" />
-                    </CorasauControls:CorasauLayoutItem>
-                </CorasauControls:CorasauLayoutGroup>
-                <CorasauControls:CorasauLayoutGroup x:Name="grpRevenueAccount" View="GroupBox" Orientation="Vertical" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=SalesAccount}" 
+                        <CorasauControls:CorasauLayoutItem FieldName="Group" x:Name="liGroup">
+                            <CorasauControls:LookupEditor x:Name="leGroup" Text="{Binding Group,Mode=TwoWay}" IsEnabled="False" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="InvGroup" x:Name="liInventoryGroup">
+                            <CorasauControls:LookupEditor x:Name="leInvGroup" Text="{Binding InvGroup,Mode=TwoWay}" IsEnabled="False" />
+                        </CorasauControls:CorasauLayoutItem>
+                    </CorasauControls:CorasauLayoutGroup>
+                    <CorasauControls:CorasauLayoutGroup x:Name="grpRevenueAccount" View="GroupBox" Orientation="Vertical" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=SalesAccount}" 
                                                     CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                    <CorasauControls:CorasauLayoutItem FieldName="RevenueAccount" x:Name="liRevenueAccount"  IsLabelSet="True">
-                        <CorasauControls:LookupEditor x:Name="leRevenueAccount" Text="{Binding RevenueAccount,Mode=TwoWay}">
-                        </CorasauControls:LookupEditor>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="RevenueAccount1" x:Name="liRevenueAccount1" IsLabelSet="True">
-                        <CorasauControls:LookupEditor x:Name="leRevenueAccount1" Text="{Binding RevenueAccount1,Mode=TwoWay}">
-                        </CorasauControls:LookupEditor>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="RevenueAccount2" x:Name="liRevenueAccount2"  IsLabelSet="True">
-                        <CorasauControls:LookupEditor x:Name="leRevenueAccount2" Text="{Binding RevenueAccount2,Mode=TwoWay}">
-                        </CorasauControls:LookupEditor>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="RevenueAccount3" x:Name="liRevenueAccount3"  IsLabelSet="True">
-                        <CorasauControls:LookupEditor x:Name="leRevenueAccount3" Text="{Binding RevenueAccount3,Mode=TwoWay}">
-                        </CorasauControls:LookupEditor>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="RevenueAccount4" x:Name="liRevenueAccount4"  IsLabelSet="True">
-                        <CorasauControls:LookupEditor x:Name="leRevenueAccount4" Text="{Binding RevenueAccount4,Mode=TwoWay}">
-                        </CorasauControls:LookupEditor>
-                    </CorasauControls:CorasauLayoutItem>
-                </CorasauControls:CorasauLayoutGroup>
+                        <CorasauControls:CorasauLayoutItem FieldName="RevenueAccount" x:Name="liRevenueAccount"  IsLabelSet="True">
+                            <CorasauControls:LookupEditor x:Name="leRevenueAccount" Text="{Binding RevenueAccount,Mode=TwoWay}">
+                            </CorasauControls:LookupEditor>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="RevenueAccount1" x:Name="liRevenueAccount1" IsLabelSet="True">
+                            <CorasauControls:LookupEditor x:Name="leRevenueAccount1" Text="{Binding RevenueAccount1,Mode=TwoWay}">
+                            </CorasauControls:LookupEditor>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="RevenueAccount2" x:Name="liRevenueAccount2"  IsLabelSet="True">
+                            <CorasauControls:LookupEditor x:Name="leRevenueAccount2" Text="{Binding RevenueAccount2,Mode=TwoWay}">
+                            </CorasauControls:LookupEditor>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="RevenueAccount3" x:Name="liRevenueAccount3"  IsLabelSet="True">
+                            <CorasauControls:LookupEditor x:Name="leRevenueAccount3" Text="{Binding RevenueAccount3,Mode=TwoWay}">
+                            </CorasauControls:LookupEditor>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="RevenueAccount4" x:Name="liRevenueAccount4"  IsLabelSet="True">
+                            <CorasauControls:LookupEditor x:Name="leRevenueAccount4" Text="{Binding RevenueAccount4,Mode=TwoWay}">
+                            </CorasauControls:LookupEditor>
+                        </CorasauControls:CorasauLayoutItem>
+                    </CorasauControls:CorasauLayoutGroup>
 
-                <CorasauControls:CorasauLayoutGroup x:Name="grpVat" View="GroupBox" Orientation="Vertical" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Vat}" 
+                    <CorasauControls:CorasauLayoutGroup x:Name="grpVat" View="GroupBox" Orientation="Vertical" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Vat}" 
                                                     CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                    <CorasauControls:CorasauLayoutItem FieldName="Vat" x:Name="liVat">
-                        <CorasauControls:LookupEditor x:Name="leVat" Text="{Binding Vat,Mode=TwoWay}">
-                        </CorasauControls:LookupEditor>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="Vat1" x:Name="liVat1">
-                        <CorasauControls:LookupEditor x:Name="leVat1" Text="{Binding Vat1,Mode=TwoWay}">
-                        </CorasauControls:LookupEditor>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="Vat2" x:Name="liVat2">
-                        <CorasauControls:LookupEditor x:Name="leVat2" Text="{Binding Vat2,Mode=TwoWay}">
-                        </CorasauControls:LookupEditor>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="Vat3" x:Name="liVat3">
-                        <CorasauControls:LookupEditor x:Name="leVat3" Text="{Binding Vat3,Mode=TwoWay}">
-                        </CorasauControls:LookupEditor>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="Vat4" x:Name="liVat4">
-                        <CorasauControls:LookupEditor x:Name="leVat4" Text="{Binding Vat4,Mode=TwoWay}">
-                        </CorasauControls:LookupEditor>
-                    </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="Vat" x:Name="liVat">
+                            <CorasauControls:LookupEditor x:Name="leVat" Text="{Binding Vat,Mode=TwoWay}">
+                            </CorasauControls:LookupEditor>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="Vat1" x:Name="liVat1">
+                            <CorasauControls:LookupEditor x:Name="leVat1" Text="{Binding Vat1,Mode=TwoWay}">
+                            </CorasauControls:LookupEditor>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="Vat2" x:Name="liVat2">
+                            <CorasauControls:LookupEditor x:Name="leVat2" Text="{Binding Vat2,Mode=TwoWay}">
+                            </CorasauControls:LookupEditor>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="Vat3" x:Name="liVat3">
+                            <CorasauControls:LookupEditor x:Name="leVat3" Text="{Binding Vat3,Mode=TwoWay}">
+                            </CorasauControls:LookupEditor>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="Vat4" x:Name="liVat4">
+                            <CorasauControls:LookupEditor x:Name="leVat4" Text="{Binding Vat4,Mode=TwoWay}">
+                            </CorasauControls:LookupEditor>
+                        </CorasauControls:CorasauLayoutItem>
+                    </CorasauControls:CorasauLayoutGroup>
+
                 </CorasauControls:CorasauLayoutGroup>
-                
             </CorasauControls:CorasauLayoutControl>
         </Grid>
     </CorasauControls:BusyIndicator>

@@ -26,6 +26,7 @@ namespace UnicontaClient.Pages.CustomPage
         [InputFieldData]
         [Display(Name = "Value", ResourceType = typeof(InputFieldDataText))]
         public double value { get; set; }
+
         public string CWName { get; set; }
 
         [InputFieldData]
@@ -42,6 +43,19 @@ namespace UnicontaClient.Pages.CustomPage
         [AppEnumAttribute(EnumName = "Currencies", Enumtype = typeof(Currencies))]
         [Display(Name = "Currency", ResourceType = typeof(InputFieldDataText))]
         public string FeeCurrency { get; set; }
+        
+        [InputFieldData]
+        [Display(Name = "Charge", ResourceType = typeof(InputFieldDataText))] 
+        public double Charge { get; set; }
+
+        [InputFieldData]
+        [AppEnumAttribute(EnumName = "Currencies", Enumtype = typeof(Currencies))]
+        [Display(Name = "Currency", ResourceType = typeof(InputFieldDataText))]
+        public string ChargeCurrency { get; set; }
+
+        [InputFieldData]
+        [Display(Name = "Date", ResourceType = typeof(InputFieldDataText))] 
+        public DateTime PrDate { get; set; }
 
 #if !SILVERLIGHT
 
@@ -63,6 +77,7 @@ namespace UnicontaClient.Pages.CustomPage
                 rowCollectionLetter.Height = new GridLength(0);
                 colFeeCurrency.Width = new GridLength(0);
                 colMarginFeeCurrency.Width = new GridLength(0);
+                rowFeeCharge.Height = new GridLength(0);
             }
             else
             {
@@ -73,7 +88,8 @@ namespace UnicontaClient.Pages.CustomPage
                 cmbCollections.ItemsSource = Utility.GetDebtorCollectionLetters().OrderBy(p => p);
                 cmbCollections.SelectedIndex = -1;
             }
-
+            dePrDate.DateTime = DateTime.Now;
+            
             this.Loaded += CW_Loaded;
         }
 

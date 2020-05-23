@@ -309,7 +309,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                  PropValuePair.GenereteWhereElements(nameof(ProjectTransClient.Employee), typeof(string), empDistinct),
                  PropValuePair.GenereteWhereElements(nameof(ProjectTransClient.Project), typeof(string), catPayProjDist),
-                 PropValuePair.GenereteWhereElements(nameof(ProjectTransClient.PayrollCategory), typeof(int), catPayDist),
+                 PropValuePair.GenereteWhereElements(nameof(ProjectTransClient.PayrollCategory), typeof(string), catPayDist),
             };
             var internalTransLst = await api.Query<ProjectTransClient>(pairInternalTrans);
 
@@ -320,7 +320,7 @@ namespace UnicontaClient.Pages.CustomPage
                 var pairmileageTrans = new PropValuePair[]
                 {
                     PropValuePair.GenereteWhereElements(nameof(ProjectTransClient.Employee), typeof(string), empDistinct),
-                    PropValuePair.GenereteWhereElements(nameof(ProjectTransClient.PayrollCategory), typeof(int), mileageCatDist),
+                    PropValuePair.GenereteWhereElements(nameof(ProjectTransClient.PayrollCategory), typeof(string), mileageCatDist),
                 };
                 var mileageTrans = await api.Query<ProjectTransClient>(pairmileageTrans);
                 if (mileageTrans != null && mileageTrans.Length > 0)
@@ -1120,6 +1120,7 @@ namespace UnicontaClient.Pages.CustomPage
             dgTimeSheetApprovalRpt.Columns.GetColumnByName("ErrorInfo").Visible = true;
             var cntJournals = journalList.Count;
             var cntOK = 0;
+            var comp = api.CompanyEntity;
 
             var pairTM = new PropValuePair[2];
 
@@ -1246,6 +1247,8 @@ namespace UnicontaClient.Pages.CustomPage
 
                 foreach (var line in tmLinesHours)
                 {
+                    var proj = line.ProjectRef;
+
                     for (int x = startDayOfWeek; x <= endDayOfWeek; x++) 
                     {
                         var qty = line.GetHoursDayN(x);
@@ -1273,11 +1276,24 @@ namespace UnicontaClient.Pages.CustomPage
 
                             lineclient._PrCategory = payrollCat._PrCategory;
                             lineclient._Employee = line._Employee;
-                            lineclient._Dim1 = emplApprove._Dim1;
-                            lineclient._Dim2 = emplApprove._Dim2;
-                            lineclient._Dim3 = emplApprove._Dim3;
-                            lineclient._Dim4 = emplApprove._Dim4;
-                            lineclient._Dim5 = emplApprove._Dim5;
+
+                            if (comp._DimFromProject)
+                            {
+                                lineclient._Dim1 = proj._Dim1;
+                                lineclient._Dim2 = proj._Dim2;
+                                lineclient._Dim3 = proj._Dim3;
+                                lineclient._Dim4 = proj._Dim4;
+                                lineclient._Dim5 = proj._Dim5;
+                            }
+                            else
+                            {
+                                lineclient._Dim1 = emplApprove._Dim1;
+                                lineclient._Dim2 = emplApprove._Dim2;
+                                lineclient._Dim3 = emplApprove._Dim3;
+                                lineclient._Dim4 = emplApprove._Dim4;
+                                lineclient._Dim5 = emplApprove._Dim5;
+                            }
+
                             lineclient._Invoiceable = line._Invoiceable;
 
                             lineclient._Date = line._Date.AddDays(x - 1);

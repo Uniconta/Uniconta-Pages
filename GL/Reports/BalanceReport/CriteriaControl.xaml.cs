@@ -84,14 +84,11 @@ namespace UnicontaClient.Pages.CustomPage
         public event PropertyChangedEventHandler PropertyChanged;
         public void NotifyPropertyChanged(string propertyName)
         {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
         private void SetAllJournal(string journal)
         {
-            AllJournals = (journal != null) && journal.Contains("*");
+            AllJournals = (journal != null) && journal.IndexOf('*') >= 0;
         }
     }
     public partial class CriteriaControl : UserControl
@@ -135,7 +132,6 @@ namespace UnicontaClient.Pages.CustomPage
         public void Unhighlight()
         {
             this.CriteriaBorder.BorderBrush = Application.Current.Resources["LightBoxBorderColor"] as SolidColorBrush;
-
         }
 
         async void SetSources()
@@ -153,28 +149,35 @@ namespace UnicontaClient.Pages.CustomPage
             company.Text = Uniconta.ClientTools.Localization.lookup("Company");
 
             List<Company> compList = new List<Company>();
-            var comp = new Company();
-            comp._Name = "";
-            compList.Add(comp);
             var companies = CWDefaultCompany.loadedCompanies;
-            compList.AddRange(companies.ToList());
-            cbCompany.ItemsSource = compList.OrderBy(x => x.CompanyId).ToList();
+            if (companies != null)
+            {
+                compList.Capacity = companies.Length + 1;
+                compList.Add(new Company() { _Name = "" });
+                compList.AddRange(companies);
+                compList.Sort(SQLCache.KeyStrSorter);
+            }
+            cbCompany.ItemsSource = compList;
 
             var journalSource = new List<string>();
-            var cache = Comp.GetCache(typeof(Uniconta.DataModel.GLDailyJournal)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.GLDailyJournal), api);
+            var cache = Comp.GetCache(typeof(Uniconta.DataModel.GLDailyJournal)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLDailyJournal));
             if (cache != null)
+            {
+                journalSource.Capacity = cache.Count;
                 foreach (var rec in cache.GetKeyStrRecords)
                     journalSource.Add(rec.KeyStr);
+            }
 
             cmbJournal.ItemsSource = journalSource;
 
-            cache = Comp.GetCache(typeof(Uniconta.DataModel.GLBudget)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.GLBudget), api);
-            
             var actSource = new List<string>();
-            cache = Comp.GetCache(typeof(Uniconta.DataModel.GLAccount)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.GLAccount), api);
+            cache = Comp.GetCache(typeof(Uniconta.DataModel.GLAccount)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLAccount));
             if (cache != null)
+            {
+                actSource.Capacity = cache.Count;
                 foreach (var rec in cache.GetKeyStrRecords)
                     actSource.Add(rec.KeyStr);
+            }
 
             cmbAccount100.ItemsSource = actSource;
 

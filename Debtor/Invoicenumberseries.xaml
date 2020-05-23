@@ -15,32 +15,34 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorInvoicenumberseries"
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <CorasauControls:CorasauRibbonControl x:Name="frmRibbon" XMLSourcePath=";component/Assets/SaveEditRibbon.xml" Grid.Row="0"/>
-        <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Vertical" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
-            <CorasauControls:CorasauLayoutGroup View="GroupBox"   x:Name="grpDebtorSerie" ItemLabelsAlignment="Default" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=NumberSerie}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                <CorasauControls:CorasauLayoutItem FieldName="SalesOrder" x:Name="liSalesOrder">
-                    <CorasauControls:IntegerEditor Text="{Binding SalesOrder,Mode=TwoWay}" SetMask="false" x:Name="txtSalesOrder"/>
-                </CorasauControls:CorasauLayoutItem>
-                <CorasauControls:CorasauLayoutItem FieldName="SalesOffer" x:Name="liSalesOffer">
-                    <CorasauControls:IntegerEditor Text="{Binding SalesOffer,Mode=TwoWay}" SetMask="false"/>
-                </CorasauControls:CorasauLayoutItem>
-                <CorasauControls:CorasauLayoutItem FieldName="PackNote" x:Name="liPackNote">
-                    <CorasauControls:IntegerEditor Text="{Binding PackNote,Mode=TwoWay}" SetMask="false"/>
-                </CorasauControls:CorasauLayoutItem>
-                <CorasauControls:CorasauLayoutItem FieldName="ProductionOrder" x:Name="liProductionOrder">
-                    <CorasauControls:IntegerEditor Text="{Binding ProductionOrder,Mode=TwoWay}" SetMask="false"/>
-                </CorasauControls:CorasauLayoutItem>
-                <CorasauControls:CorasauLayoutItem FieldName="SalesInvoice"  x:Name="liSalesInvoice">
-                    <CorasauControls:IntegerEditor  x:Name="cmbSalesInvoice" Text="{Binding SalesInvoice,Mode=TwoWay}" SetMask="false"/>
-                </CorasauControls:CorasauLayoutItem>
-                <CorasauControls:CorasauLayoutItem FieldName="UseVoucherAsInvoice" x:Name="liUseVocherAsInvoice">
-                    <CorasauControls:CheckEditor  IsChecked="{Binding UseVoucherAsInvoice,Mode=TwoWay}" Checked="CheckEditor_Checked" Unchecked="CheckEditor_Unchecked"/>
-                </CorasauControls:CorasauLayoutItem>
-                <CorasauControls:CorasauLayoutItem FieldName="DebtorVoucherSerie" x:Name="liDebtorVocherSerie">
-                    <CorasauControls:LookupEditor x:Name="cmbDebtorVoucherSerie" Text="{Binding DebtorVoucherSerie,Mode=TwoWay}"/>
-                </CorasauControls:CorasauLayoutItem>
-                <CorasauControls:CorasauLayoutItem FieldName="MaxPennyDif" x:Name="liMaxPennyDif">
-                    <CorasauControls:TextEditor Text="{Binding MaxPennyDif,Mode=TwoWay}" MaskType="Numeric" Mask="N2"/>
-                </CorasauControls:CorasauLayoutItem>
+        <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
+            <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="grpFirst">
+                <CorasauControls:CorasauLayoutGroup View="GroupBox"   x:Name="grpDebtorSerie" ItemLabelsAlignment="Default" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=NumberSerie}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                    <CorasauControls:CorasauLayoutItem FieldName="SalesOrder" x:Name="liSalesOrder">
+                        <CorasauControls:IntegerEditor Text="{Binding SalesOrder,Mode=TwoWay}" SetMask="false" x:Name="txtSalesOrder"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="SalesOffer" x:Name="liSalesOffer">
+                        <CorasauControls:IntegerEditor Text="{Binding SalesOffer,Mode=TwoWay}" SetMask="false"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="PackNote" x:Name="liPackNote">
+                        <CorasauControls:IntegerEditor Text="{Binding PackNote,Mode=TwoWay}" SetMask="false"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="ProductionOrder" x:Name="liProductionOrder">
+                        <CorasauControls:IntegerEditor Text="{Binding ProductionOrder,Mode=TwoWay}" SetMask="false"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="SalesInvoice"  x:Name="liSalesInvoice">
+                        <CorasauControls:IntegerEditor  x:Name="cmbSalesInvoice" Text="{Binding SalesInvoice,Mode=TwoWay}" SetMask="false"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="UseVoucherAsInvoice" x:Name="liUseVocherAsInvoice">
+                        <CorasauControls:CheckEditor  IsChecked="{Binding UseVoucherAsInvoice,Mode=TwoWay}" Checked="CheckEditor_Checked" Unchecked="CheckEditor_Unchecked"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="DebtorVoucherSerie" x:Name="liDebtorVocherSerie">
+                        <CorasauControls:LookupEditor x:Name="cmbDebtorVoucherSerie" Text="{Binding DebtorVoucherSerie,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="MaxPennyDif" x:Name="liMaxPennyDif">
+                        <CorasauControls:TextEditor Text="{Binding MaxPennyDif,Mode=TwoWay}" MaskType="Numeric" Mask="N2"/>
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
             </CorasauControls:CorasauLayoutGroup>
         </CorasauControls:CorasauLayoutControl>       
     </Grid>

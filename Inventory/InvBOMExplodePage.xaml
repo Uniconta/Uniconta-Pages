@@ -1,0 +1,98 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
+             xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.InvBOMExplodePage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage"
+             xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"   
+             xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
+             xmlns:UtilClient="clr-namespace:UnicontaClient.Utilities"
+             xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid">
+    <UserControl.Resources>
+        <Style x:Key="MatchingRowStyle" TargetType="dxg:RowControl">
+            <Setter Property="Height" Value="25" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Path=Row.IsParent}" Value="True">
+                    <Setter Property="Background" Value="{StaticResource RowMatchColor}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Util:VisibilityBoolConverter x:Key="VisibilityBoolConverter" />
+        <Util:ImageNameToImagesourceConverter x:Key="ImageNameToImagesourceConverter"/>
+    </UserControl.Resources>
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Inventory/Report/InventoryHierarchicalBOMRibbon.xml" x:Name="localMenu"/>
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <localPage:InvBOMExplodeGrid x:Name="dgInvBomclientGrid" AutoGenerateColumns="None">
+                <localPage:InvBOMExplodeGrid.Columns>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Level" Width="50" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ItemMaster" Width="90" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient FieldName="HasNotes" Width="50" ReadOnly="True">
+                        <localPage:CorasauDataGridTemplateColumnClient.HeaderTemplate>
+                            <DataTemplate>
+                                <Image Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Note_16x16.png}" Width="16" Height="16" VerticalAlignment="Center"/>
+                            </DataTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.HeaderTemplate>
+                        <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <Image Margin="5" Tag="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Note_16x16.png}" MouseLeftButtonDown="HasNoteImage_MouseLeftButtonDown" Visibility="{Binding DataContext.RowData.Row.HasNotes,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource VisibilityBoolConverter}}" Stretch="Fill" Width="16" Height="16" RenderOptions.BitmapScalingMode="NearestNeighbor" RenderOptions.EdgeMode="Aliased" />
+                            </ControlTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:CorasauDataGridTemplateColumnClient FieldName="HasDocs" ReadOnly="True"  Width="50" >
+                        <localPage:CorasauDataGridTemplateColumnClient.HeaderTemplate>
+                            <DataTemplate>
+                                <Image Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Document_Attachment_16x16.png}" Width="16" Height="16" VerticalAlignment="Center"/>
+                            </DataTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.HeaderTemplate>
+                        <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <Image Margin="5" Tag="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Document_Attachment_16x16.png}" MouseLeftButtonDown="HasDocImage_MouseLeftButtonDown" Visibility="{Binding DataContext.RowData.Row.HasDocs,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource VisibilityBoolConverter}}" Stretch="Fill" Width="16" Height="16" RenderOptions.BitmapScalingMode="NearestNeighbor" RenderOptions.EdgeMode="Aliased" />
+                            </ControlTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ItemPart" Width="90" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" Width="100" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ItemType" Width="80"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant1" FieldName="Variant1" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant2" FieldName="Variant2" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant3" FieldName="Variant3" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant4" FieldName="Variant4" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant5" FieldName="Variant5" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Variant1Name" Width="100" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Variant2Name" Width="100" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Variant3Name" Width="100" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Variant4Name" Width="100" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Variant5Name" Width="100" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="UnfoldBOM" Width="120" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Qty" Width="90" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="UnitSize" Width="80" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CostPriceFactor" Width="80" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="QtyType" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="MoveType" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CostValue" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="SalesValue" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ShowOnInvoice" Visible="false" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ShowOnPacknote" Visible="false"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="InclValueOnInvoice" Visible="false"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ShowOnPicklist" Visible="false"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Cartons" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Weight" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Volume" Visible="False"/>
+                </localPage:InvBOMExplodeGrid.Columns>
+                <localPage:InvBOMExplodeGrid.TotalSummary>
+                    <localPage:SumColumn FieldName="Qty" SummaryType="Custom" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="CostValue" SummaryType="Custom" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="SalesValue" SummaryType="Custom" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="Cartons" SummaryType="Custom" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="Weight" SummaryType="Custom" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="Volume" SummaryType="Custom" DisplayFormat="{}{0:N2}"/>
+                </localPage:InvBOMExplodeGrid.TotalSummary>
+            </localPage:InvBOMExplodeGrid>
+        </CorasauControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

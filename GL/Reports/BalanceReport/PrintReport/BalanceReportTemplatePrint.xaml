@@ -73,7 +73,7 @@ x:Class="UnicontaClient.Pages.CustomPage.BalanceReportTemplatePrint"
                     <dxe:TextEdit IsPrintingMode="True" Text="{Binding Content.Dim3, Mode=OneWay}" FontSize="12" FontWeight="Bold" Grid.Column="3" Width="{Binding Content.Dim3Width, Mode=OneWay}" VerticalAlignment="Bottom"/>
                     <dxe:TextEdit IsPrintingMode="True" Text="{Binding Content.Dim4, Mode=OneWay}" FontSize="12" FontWeight="Bold" Grid.Column="4" Width="{Binding Content.Dim4Width, Mode=OneWay}" VerticalAlignment="Bottom"/>
                     <dxe:TextEdit IsPrintingMode="True" Text="{Binding Content.Dim5, Mode=OneWay}" FontSize="12" FontWeight="Bold" Grid.Column="5" Width="{Binding Content.Dim5Width, Mode=OneWay}" VerticalAlignment="Bottom"/>
-                    <Grid Grid.Column="6"  Visibility="{Binding Content.Col1Width, Mode=OneWay}"  VerticalAlignment="Top" Margin="3,0,0,0">
+                    <Grid Grid.Column="6"  Visibility="{Binding Content.Col1Width, Mode=OneWay}"  VerticalAlignment="Top">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="Auto"/>
@@ -82,12 +82,12 @@ x:Class="UnicontaClient.Pages.CustomPage.BalanceReportTemplatePrint"
                             <ColumnDefinition />
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
-                        <dxe:TextEdit HorizontalContentAlignment="Right" Text="{Binding Content.ColName1, Mode=OneWay}" Width="{Binding Path=Content.AmountSize,Mode=OneWay}" FontSize="12" FontWeight="Bold" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Right"/>
+                        <dxe:TextEdit HorizontalContentAlignment="Right" Text="{Binding Content.ColName1, Mode=OneWay}" FontSize="12" FontWeight="Bold" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Right"/>
                         <dxe:TextEdit HorizontalContentAlignment="Right"  Visibility="{Binding Content.ShowAmountCol1, Mode=OneWay}" Width="{Binding Path=Content.AmountSize,Mode=OneWay}"  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding Content.Col1AmountHeader, Mode=OneWay}"  FontSize="12" FontWeight="Bold" VerticalAlignment="Bottom"/>
                         <dxe:TextEdit HorizontalContentAlignment="Right" Visibility="{Binding Content.ShowDCCol1,Mode=OneWay}" Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Grid.Row="1" Grid.Column="0" Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Debit, Mode=OneWay}"  FontSize="12" FontWeight="Bold" VerticalAlignment="Bottom"/>
                         <dxe:TextEdit HorizontalContentAlignment="Right" Visibility="{Binding Content.ShowDCCol1,Mode=OneWay}" Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Grid.Row="1"  Grid.Column="1" Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Credit, Mode=OneWay}"  FontSize="12"  FontWeight="Bold" VerticalAlignment="Bottom"/>
                     </Grid>
-                    <Grid Grid.Column="7"  Visibility="{Binding Content.Col2Width, Mode=OneWay}"  VerticalAlignment="Top" Margin="3,0,0,0">
+                    <Grid Grid.Column="7"  Visibility="{Binding Content.Col2Width, Mode=OneWay}"  VerticalAlignment="Top">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="Auto"/>
@@ -96,12 +96,12 @@ x:Class="UnicontaClient.Pages.CustomPage.BalanceReportTemplatePrint"
                             <ColumnDefinition />
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
-                        <dxe:TextEdit HorizontalContentAlignment="Right" Text="{Binding Content.ColName2, Mode=OneWay}" Width="{Binding Path=Content.AmountSize,Mode=OneWay}" FontSize="12" FontWeight="Bold" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
+                        <dxe:TextEdit HorizontalContentAlignment="Right" Text="{Binding Content.ColName2, Mode=OneWay}" FontSize="12" FontWeight="Bold" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
                         <dxe:TextEdit HorizontalContentAlignment="Right"  Visibility="{Binding Content.ShowAmountCol2, Mode=OneWay}" Width="{Binding Path=Content.AmountSize,Mode=OneWay}"  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding Content.Col2AmountHeader, Mode=OneWay}"  FontSize="12" FontWeight="Bold" VerticalAlignment="Bottom"/>
                         <dxe:TextEdit HorizontalContentAlignment="Right" Visibility="{Binding Content.ShowDCCol2,Mode=OneWay}" Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Grid.Row="1" Grid.Column="0" Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Debit, Mode=OneWay}"  FontSize="12" FontWeight="Bold" VerticalAlignment="Bottom"/>
                         <dxe:TextEdit HorizontalContentAlignment="Right" Visibility="{Binding Content.ShowDCCol2,Mode=OneWay}" Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Grid.Row="1"  Grid.Column="1" Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Credit, Mode=OneWay}"  FontSize="12"  FontWeight="Bold" VerticalAlignment="Bottom"/>
                     </Grid>
-                    <Grid Grid.Column="8"  Visibility="{Binding Content.Col3Width, Mode=OneWay}"  VerticalAlignment="Top" Margin="3,0,0,0">
+                    <Grid Grid.Column="8"  Visibility="{Binding Content.Col3Width, Mode=OneWay}"  VerticalAlignment="Top">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="Auto"/>
@@ -110,12 +110,12 @@ x:Class="UnicontaClient.Pages.CustomPage.BalanceReportTemplatePrint"
                             <ColumnDefinition />
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
-                        <dxe:TextEdit HorizontalContentAlignment="Right" Text="{Binding Content.ColName3, Mode=OneWay}" Width="{Binding Path=Content.AmountSize,Mode=OneWay}" FontSize="12" FontWeight="Bold" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Right"/>
+                        <dxe:TextEdit HorizontalContentAlignment="Right" Text="{Binding Content.ColName3, Mode=OneWay}" FontSize="12" FontWeight="Bold" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Right"/>
                         <dxe:TextEdit HorizontalContentAlignment="Right"  Visibility="{Binding Content.ShowAmountCol3, Mode=OneWay}" Width="{Binding Path=Content.AmountSize,Mode=OneWay}"  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding Content.Col3AmountHeader, Mode=OneWay}"  FontSize="12" FontWeight="Bold" VerticalAlignment="Bottom"/>
                         <dxe:TextEdit HorizontalContentAlignment="Right" Visibility="{Binding Content.ShowDCCol3,Mode=OneWay}" Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Grid.Row="1" Grid.Column="0" Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Debit, Mode=OneWay}"  FontSize="12" FontWeight="Bold" VerticalAlignment="Bottom"/>
                         <dxe:TextEdit HorizontalContentAlignment="Right" Visibility="{Binding Content.ShowDCCol3,Mode=OneWay}" Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Grid.Row="1"  Grid.Column="1" Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Credit, Mode=OneWay}"  FontSize="12"  FontWeight="Bold" VerticalAlignment="Bottom"/>
                     </Grid>
-                    <Grid Grid.Column="9"  Visibility="{Binding Content.Col4Width, Mode=OneWay}"  VerticalAlignment="Top" Margin="3,0,0,0">
+                    <Grid Grid.Column="9"  Visibility="{Binding Content.Col4Width, Mode=OneWay}"  VerticalAlignment="Top">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="Auto"/>
@@ -124,13 +124,13 @@ x:Class="UnicontaClient.Pages.CustomPage.BalanceReportTemplatePrint"
                             <ColumnDefinition />
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
-                        <dxe:TextEdit HorizontalContentAlignment="Right" Text="{Binding Content.ColName4, Mode=OneWay}" Width="{Binding Path=Content.AmountSize,Mode=OneWay}" FontSize="12" FontWeight="Bold" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Right"/>
+                        <dxe:TextEdit HorizontalContentAlignment="Right" Text="{Binding Content.ColName4, Mode=OneWay}" FontSize="12" FontWeight="Bold" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Right"/>
                         <dxe:TextEdit HorizontalContentAlignment="Right"  Visibility="{Binding Content.ShowAmountCol4, Mode=OneWay}" Width="{Binding Path=Content.AmountSize,Mode=OneWay}"  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding Content.Col4AmountHeader, Mode=OneWay}"  FontSize="12" FontWeight="Bold" VerticalAlignment="Bottom"/>
                         <dxe:TextEdit HorizontalContentAlignment="Right" Visibility="{Binding Content.ShowDCCol4,Mode=OneWay}" Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Grid.Row="1" Grid.Column="0" Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Debit, Mode=OneWay}"  FontSize="12" FontWeight="Bold" VerticalAlignment="Bottom"/>
                         <dxe:TextEdit HorizontalContentAlignment="Right" Visibility="{Binding Content.ShowDCCol4,Mode=OneWay}" Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Grid.Row="1"  Grid.Column="1" Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Credit, Mode=OneWay}"  FontSize="12"  FontWeight="Bold" VerticalAlignment="Bottom"/>
                     </Grid>
 
-                    <Grid Grid.Column="10"  Visibility="{Binding Content.Col5Width, Mode=OneWay}"  VerticalAlignment="Top" Margin="3,0,0,0">
+                    <Grid Grid.Column="10"  Visibility="{Binding Content.Col5Width, Mode=OneWay}"  VerticalAlignment="Top">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="Auto"/>
@@ -139,12 +139,12 @@ x:Class="UnicontaClient.Pages.CustomPage.BalanceReportTemplatePrint"
                             <ColumnDefinition />
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
-                        <dxe:TextEdit Text="{Binding Content.ColName5, Mode=OneWay}" Width="{Binding Path=Content.AmountSize,Mode=OneWay}" FontSize="12" FontWeight="Bold" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Right"/>
+                        <dxe:TextEdit HorizontalContentAlignment="Right" Text="{Binding Content.ColName5, Mode=OneWay}" FontSize="12" FontWeight="Bold" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Right"/>
                         <dxe:TextEdit HorizontalContentAlignment="Right"  Visibility="{Binding Content.ShowAmountCol5, Mode=OneWay}" Width="{Binding Path=Content.AmountSize,Mode=OneWay}"  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding Content.Col5AmountHeader, Mode=OneWay}"  FontSize="12" FontWeight="Bold" VerticalAlignment="Bottom"/>
                         <dxe:TextEdit HorizontalContentAlignment="Right" Visibility="{Binding Content.ShowDCCol5,Mode=OneWay}" Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Grid.Row="1" Grid.Column="0" Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Debit, Mode=OneWay}"  FontSize="12" FontWeight="Bold" VerticalAlignment="Bottom"/>
                         <dxe:TextEdit HorizontalContentAlignment="Right" Visibility="{Binding Content.ShowDCCol5,Mode=OneWay}" Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Grid.Row="1"  Grid.Column="1" Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Credit, Mode=OneWay}"  FontSize="12"  FontWeight="Bold" VerticalAlignment="Bottom"/>
                     </Grid>
-                    <Grid Grid.Column="11"  Visibility="{Binding Content.Col6Width, Mode=OneWay}"  VerticalAlignment="Top" Margin="3,0,0,0">
+                    <Grid Grid.Column="11"  Visibility="{Binding Content.Col6Width, Mode=OneWay}"  VerticalAlignment="Top">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="Auto"/>
@@ -153,12 +153,12 @@ x:Class="UnicontaClient.Pages.CustomPage.BalanceReportTemplatePrint"
                             <ColumnDefinition />
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
-                        <dxe:TextEdit Text="{Binding Content.ColName6, Mode=OneWay}" Width="{Binding Path=Content.AmountSize,Mode=OneWay}" FontSize="12" FontWeight="Bold" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Right"/>
+                        <dxe:TextEdit HorizontalContentAlignment="Right" Text="{Binding Content.ColName6, Mode=OneWay}" FontSize="12" FontWeight="Bold" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Right"/>
                         <dxe:TextEdit HorizontalContentAlignment="Right"  Visibility="{Binding Content.ShowAmountCol6, Mode=OneWay}" Width="{Binding Path=Content.AmountSize,Mode=OneWay}"  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding Content.Col6AmountHeader, Mode=OneWay}"  FontSize="12" FontWeight="Bold" VerticalAlignment="Bottom"/>
                         <dxe:TextEdit HorizontalContentAlignment="Right" Visibility="{Binding Content.ShowDCCol6,Mode=OneWay}" Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Grid.Row="1" Grid.Column="0" Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Debit, Mode=OneWay}"  FontSize="12" FontWeight="Bold" VerticalAlignment="Bottom"/>
                         <dxe:TextEdit HorizontalContentAlignment="Right" Visibility="{Binding Content.ShowDCCol6,Mode=OneWay}" Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Grid.Row="1"  Grid.Column="1" Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Credit, Mode=OneWay}"  FontSize="12"  FontWeight="Bold" VerticalAlignment="Bottom"/>
                     </Grid>
-                    <Grid Grid.Column="12"  Visibility="{Binding Content.Col7Width, Mode=OneWay}"  VerticalAlignment="Top" Margin="3,0,0,0">
+                    <Grid Grid.Column="12"  Visibility="{Binding Content.Col7Width, Mode=OneWay}"  VerticalAlignment="Top">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="Auto"/>
@@ -167,12 +167,12 @@ x:Class="UnicontaClient.Pages.CustomPage.BalanceReportTemplatePrint"
                             <ColumnDefinition />
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
-                        <dxe:TextEdit Text="{Binding Content.ColName7, Mode=OneWay}" Width="{Binding Path=Content.AmountSize,Mode=OneWay}" FontSize="12" FontWeight="Bold" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Right"/>
+                        <dxe:TextEdit HorizontalContentAlignment="Right" Text="{Binding Content.ColName7, Mode=OneWay}" FontSize="12" FontWeight="Bold" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Right"/>
                         <dxe:TextEdit HorizontalContentAlignment="Right"  Visibility="{Binding Content.ShowAmountCol7, Mode=OneWay}" Width="{Binding Path=Content.AmountSize,Mode=OneWay}"  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding Content.Col7AmountHeader, Mode=OneWay}"  FontSize="12" FontWeight="Bold" VerticalAlignment="Bottom"/>
                         <dxe:TextEdit HorizontalContentAlignment="Right" Visibility="{Binding Content.ShowDCCol7,Mode=OneWay}" Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Grid.Row="1" Grid.Column="0" Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Debit, Mode=OneWay}"  FontSize="12" FontWeight="Bold" VerticalAlignment="Bottom"/>
                         <dxe:TextEdit HorizontalContentAlignment="Right" Visibility="{Binding Content.ShowDCCol7,Mode=OneWay}" Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Grid.Row="1"  Grid.Column="1" Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Credit, Mode=OneWay}"  FontSize="12"  FontWeight="Bold" VerticalAlignment="Bottom"/>
                     </Grid>
-                    <Grid Grid.Column="13"  Visibility="{Binding Content.Col8Width, Mode=OneWay}"  VerticalAlignment="Top" Margin="3,0,0,0">
+                    <Grid Grid.Column="13"  Visibility="{Binding Content.Col8Width, Mode=OneWay}"  VerticalAlignment="Top">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="Auto"/>
@@ -181,12 +181,12 @@ x:Class="UnicontaClient.Pages.CustomPage.BalanceReportTemplatePrint"
                             <ColumnDefinition />
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
-                        <dxe:TextEdit Text="{Binding Content.ColName8, Mode=OneWay}" Width="{Binding Path=Content.AmountSize,Mode=OneWay}" FontSize="12" FontWeight="Bold" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Right"/>
+                        <dxe:TextEdit HorizontalContentAlignment="Right" Text="{Binding Content.ColName8, Mode=OneWay}" FontSize="12" FontWeight="Bold" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Right"/>
                         <dxe:TextEdit HorizontalContentAlignment="Right"  Visibility="{Binding Content.ShowAmountCol8, Mode=OneWay}" Width="{Binding Path=Content.AmountSize,Mode=OneWay}"  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding Content.Col8AmountHeader, Mode=OneWay}"  FontSize="12" FontWeight="Bold" VerticalAlignment="Bottom"/>
                         <dxe:TextEdit HorizontalContentAlignment="Right" Visibility="{Binding Content.ShowDCCol8,Mode=OneWay}" Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Grid.Row="1" Grid.Column="0" Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Debit, Mode=OneWay}"  FontSize="12" FontWeight="Bold" VerticalAlignment="Bottom"/>
                         <dxe:TextEdit HorizontalContentAlignment="Right" Visibility="{Binding Content.ShowDCCol8,Mode=OneWay}" Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Grid.Row="1"  Grid.Column="1" Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Credit, Mode=OneWay}"  FontSize="12"  FontWeight="Bold" VerticalAlignment="Bottom"/>
                     </Grid>
-                    <Grid Grid.Column="14"  Visibility="{Binding Content.Col9Width, Mode=OneWay}"  VerticalAlignment="Top" Margin="3,0,0,0">
+                    <Grid Grid.Column="14"  Visibility="{Binding Content.Col9Width, Mode=OneWay}"  VerticalAlignment="Top">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="Auto"/>
@@ -195,12 +195,12 @@ x:Class="UnicontaClient.Pages.CustomPage.BalanceReportTemplatePrint"
                             <ColumnDefinition />
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
-                        <dxe:TextEdit Text="{Binding Content.ColName9, Mode=OneWay}" Width="{Binding Path=Content.AmountSize,Mode=OneWay}" FontSize="12" FontWeight="Bold" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Right"/>
+                        <dxe:TextEdit HorizontalContentAlignment="Right" Text="{Binding Content.ColName9, Mode=OneWay}" FontSize="12" FontWeight="Bold" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Right"/>
                         <dxe:TextEdit HorizontalContentAlignment="Right"  Visibility="{Binding Content.ShowAmountCol9, Mode=OneWay}" Width="{Binding Path=Content.AmountSize,Mode=OneWay}"  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding Content.Col9AmountHeader, Mode=OneWay}"  FontSize="12" FontWeight="Bold" VerticalAlignment="Bottom"/>
                         <dxe:TextEdit HorizontalContentAlignment="Right" Visibility="{Binding Content.ShowDCCol9,Mode=OneWay}" Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Grid.Row="1" Grid.Column="0" Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Debit, Mode=OneWay}"  FontSize="12" FontWeight="Bold" VerticalAlignment="Bottom"/>
                         <dxe:TextEdit HorizontalContentAlignment="Right" Visibility="{Binding Content.ShowDCCol9,Mode=OneWay}" Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Grid.Row="1"  Grid.Column="1" Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Credit, Mode=OneWay}"  FontSize="12"  FontWeight="Bold" VerticalAlignment="Bottom"/>
                     </Grid>
-                    <Grid Grid.Column="15"  Visibility="{Binding Content.Col10Width, Mode=OneWay}"  VerticalAlignment="Top" Margin="3,0,0,0">
+                    <Grid Grid.Column="15"  Visibility="{Binding Content.Col10Width, Mode=OneWay}"  VerticalAlignment="Top">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="Auto"/>
@@ -209,12 +209,12 @@ x:Class="UnicontaClient.Pages.CustomPage.BalanceReportTemplatePrint"
                             <ColumnDefinition />
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
-                        <dxe:TextEdit Text="{Binding Content.ColName10, Mode=OneWay}" Width="{Binding Path=Content.AmountSize,Mode=OneWay}" FontSize="12" FontWeight="Bold" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Right"/>
+                        <dxe:TextEdit HorizontalContentAlignment="Right" Text="{Binding Content.ColName10, Mode=OneWay}" FontSize="12" FontWeight="Bold" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Right"/>
                         <dxe:TextEdit HorizontalContentAlignment="Right"  Visibility="{Binding Content.ShowAmountCol10, Mode=OneWay}" Width="{Binding Path=Content.AmountSize,Mode=OneWay}"  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding Content.Col10AmountHeader, Mode=OneWay}"  FontSize="12" FontWeight="Bold" VerticalAlignment="Bottom"/>
                         <dxe:TextEdit HorizontalContentAlignment="Right" Visibility="{Binding Content.ShowDCCol10,Mode=OneWay}" Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Grid.Row="1" Grid.Column="0" Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Debit, Mode=OneWay}"  FontSize="12" FontWeight="Bold" VerticalAlignment="Bottom"/>
                         <dxe:TextEdit HorizontalContentAlignment="Right" Visibility="{Binding Content.ShowDCCol10,Mode=OneWay}" Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Grid.Row="1"  Grid.Column="1" Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Credit, Mode=OneWay}"  FontSize="12"  FontWeight="Bold" VerticalAlignment="Bottom"/>
                     </Grid>
-                    <Grid Grid.Column="16"  Visibility="{Binding Content.Col11Width, Mode=OneWay}"  VerticalAlignment="Top" Margin="3,0,0,0">
+                    <Grid Grid.Column="16"  Visibility="{Binding Content.Col11Width, Mode=OneWay}"  VerticalAlignment="Top">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="Auto"/>
@@ -223,12 +223,12 @@ x:Class="UnicontaClient.Pages.CustomPage.BalanceReportTemplatePrint"
                             <ColumnDefinition />
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
-                        <dxe:TextEdit Text="{Binding Content.ColName11, Mode=OneWay}" Width="{Binding Path=Content.AmountSize,Mode=OneWay}" FontSize="12" FontWeight="Bold" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Right"/>
+                        <dxe:TextEdit HorizontalContentAlignment="Right" Text="{Binding Content.ColName11, Mode=OneWay}" FontSize="12" FontWeight="Bold" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Right"/>
                         <dxe:TextEdit HorizontalContentAlignment="Right"  Visibility="{Binding Content.ShowAmountCol12, Mode=OneWay}" Width="{Binding Path=Content.AmountSize,Mode=OneWay}"  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding Content.Col11AmountHeader, Mode=OneWay}"  FontSize="12" FontWeight="Bold" VerticalAlignment="Bottom"/>
                         <dxe:TextEdit HorizontalContentAlignment="Right" Visibility="{Binding Content.ShowDCCol11,Mode=OneWay}" Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Grid.Row="1" Grid.Column="0" Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Debit, Mode=OneWay}"  FontSize="12" FontWeight="Bold" VerticalAlignment="Bottom"/>
                         <dxe:TextEdit HorizontalContentAlignment="Right" Visibility="{Binding Content.ShowDCCol11,Mode=OneWay}" Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Grid.Row="1"  Grid.Column="1" Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Credit, Mode=OneWay}"  FontSize="12"  FontWeight="Bold" VerticalAlignment="Bottom"/>
                     </Grid>
-                    <Grid Grid.Column="17"  Visibility="{Binding Content.Col12Width, Mode=OneWay}"  VerticalAlignment="Top" Margin="3,0,0,0">
+                    <Grid Grid.Column="17"  Visibility="{Binding Content.Col12Width, Mode=OneWay}"  VerticalAlignment="Top">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="Auto"/>
@@ -237,12 +237,12 @@ x:Class="UnicontaClient.Pages.CustomPage.BalanceReportTemplatePrint"
                             <ColumnDefinition />
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
-                        <dxe:TextEdit Text="{Binding Content.ColName12, Mode=OneWay}" Width="{Binding Path=Content.AmountSize,Mode=OneWay}" FontSize="12" FontWeight="Bold" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Right"/>
+                        <dxe:TextEdit HorizontalContentAlignment="Right" Text="{Binding Content.ColName12, Mode=OneWay}" FontSize="12" FontWeight="Bold" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Right"/>
                         <dxe:TextEdit HorizontalContentAlignment="Right"  Visibility="{Binding Content.ShowAmountCol1, Mode=OneWay}" Width="{Binding Path=Content.AmountSize,Mode=OneWay}"  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding Content.Col12AmountHeader, Mode=OneWay}"  FontSize="12" FontWeight="Bold" VerticalAlignment="Bottom"/>
                         <dxe:TextEdit HorizontalContentAlignment="Right" Visibility="{Binding Content.ShowDCCol12,Mode=OneWay}" Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Grid.Row="1" Grid.Column="0" Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Debit, Mode=OneWay}"  FontSize="12" FontWeight="Bold" VerticalAlignment="Bottom"/>
                         <dxe:TextEdit HorizontalContentAlignment="Right" Visibility="{Binding Content.ShowDCCol12,Mode=OneWay}" Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Grid.Row="1"  Grid.Column="1" Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Credit, Mode=OneWay}"  FontSize="12"  FontWeight="Bold" VerticalAlignment="Bottom"/>
                     </Grid>
-                    <Grid Grid.Column="18"  Visibility="{Binding Content.Col13Width, Mode=OneWay}"  VerticalAlignment="Top" Margin="3,0,0,0">
+                    <Grid Grid.Column="18"  Visibility="{Binding Content.Col13Width, Mode=OneWay}"  VerticalAlignment="Top">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="Auto"/>
@@ -251,7 +251,7 @@ x:Class="UnicontaClient.Pages.CustomPage.BalanceReportTemplatePrint"
                             <ColumnDefinition />
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
-                        <dxe:TextEdit Text="{Binding Content.ColName13, Mode=OneWay}" Width="{Binding Path=Content.AmountSize,Mode=OneWay}" FontSize="12" FontWeight="Bold" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Right"/>
+                        <dxe:TextEdit HorizontalContentAlignment="Right" Text="{Binding Content.ColName13, Mode=OneWay}" FontSize="12" FontWeight="Bold" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Right"/>
                         <dxe:TextEdit HorizontalContentAlignment="Right"  Visibility="{Binding Content.ShowAmountCol1, Mode=OneWay}" Width="{Binding Path=Content.AmountSize,Mode=OneWay}"  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding Content.Col13AmountHeader, Mode=OneWay}"  FontSize="12" FontWeight="Bold" VerticalAlignment="Bottom"/>
                         <dxe:TextEdit HorizontalContentAlignment="Right" Visibility="{Binding Content.ShowDCCol13,Mode=OneWay}" Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Grid.Row="1" Grid.Column="0" Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Debit, Mode=OneWay}"  FontSize="12" FontWeight="Bold" VerticalAlignment="Bottom"/>
                         <dxe:TextEdit HorizontalContentAlignment="Right" Visibility="{Binding Content.ShowDCCol13,Mode=OneWay}" Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Grid.Row="1"  Grid.Column="1" Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Credit, Mode=OneWay}"  FontSize="12"  FontWeight="Bold" VerticalAlignment="Bottom"/>
@@ -299,7 +299,7 @@ x:Class="UnicontaClient.Pages.CustomPage.BalanceReportTemplatePrint"
                     <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Text="{Binding Content.Dim3, Mode=OneWay}" FontSize="{Binding Content.FontSize, Mode=OneWay}" Visibility="{Binding Content.Hide, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}" Grid.Column="3" Width="{Binding Content.Dim3Width, Mode=OneWay}" Padding="2 0 0 0"/>
                     <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Text="{Binding Content.Dim4, Mode=OneWay}" FontSize="{Binding Content.FontSize, Mode=OneWay}" Visibility="{Binding Content.Hide, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}" Grid.Column="4" Width="{Binding Content.Dim4Width, Mode=OneWay}" Padding="2 0 0 0"/>
                     <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Text="{Binding Content.Dim5, Mode=OneWay}" FontSize="{Binding Content.FontSize, Mode=OneWay}" Visibility="{Binding Content.Hide, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}" Grid.Column="5" Width="{Binding Content.Dim5Width, Mode=OneWay}" Padding="2 0 0 0"/>
-                    <Grid Grid.Column="6"  Visibility="{Binding Content.Col1Width, Mode=OneWay}" Margin="3,0,0,0" >
+                    <Grid Grid.Column="6"  Visibility="{Binding Content.Col1Width, Mode=OneWay}" >
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition />
                             <ColumnDefinition />
@@ -308,7 +308,7 @@ x:Class="UnicontaClient.Pages.CustomPage.BalanceReportTemplatePrint"
                         <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col1.Debit, Mode=OneWay}" Visibility="{Binding Content.Col1.ShowDebitCredit,Mode=OneWay}" HorizontalContentAlignment="Right"  Grid.Row="1" Grid.Column="0"  Mask="{Binding Content.HeaderData.Col1Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}"/>
                         <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col1.Credit, Mode=OneWay}" Visibility="{Binding Content.Col1.ShowDebitCredit,Mode=OneWay}" HorizontalContentAlignment="Right" Grid.Row="1"  Grid.Column="1"  Mask="{Binding Content.HeaderData.Col1Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}"/>
                     </Grid>
-                    <Grid Grid.Column="7"  Visibility="{Binding Content.Col2Width, Mode=OneWay}" Margin="3,0,0,0" >
+                    <Grid Grid.Column="7"  Visibility="{Binding Content.Col2Width, Mode=OneWay}" >
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition />
                             <ColumnDefinition />
@@ -317,7 +317,7 @@ x:Class="UnicontaClient.Pages.CustomPage.BalanceReportTemplatePrint"
                         <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col2.Debit, Mode=OneWay}" Visibility="{Binding Content.Col2.ShowDebitCredit,Mode=OneWay}" HorizontalContentAlignment="Right"  Grid.Row="1" Grid.Column="0"  Mask="{Binding Content.HeaderData.Col2Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}"/>
                         <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col2.Credit, Mode=OneWay}" Visibility="{Binding Content.Col2.ShowDebitCredit,Mode=OneWay}" HorizontalContentAlignment="Right" Grid.Row="1"  Grid.Column="1"  Mask="{Binding Content.HeaderData.Col2Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}"/>
                     </Grid>
-                    <Grid Grid.Column="8"  Visibility="{Binding Content.Col3Width, Mode=OneWay}" Margin="3,0,0,0" >
+                    <Grid Grid.Column="8"  Visibility="{Binding Content.Col3Width, Mode=OneWay}" >
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition />
                             <ColumnDefinition />
@@ -326,7 +326,7 @@ x:Class="UnicontaClient.Pages.CustomPage.BalanceReportTemplatePrint"
                         <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col3.Debit, Mode=OneWay}" Visibility="{Binding Content.Col3.ShowDebitCredit,Mode=OneWay}" HorizontalContentAlignment="Right"  Grid.Row="1" Grid.Column="0"  Mask="{Binding Content.HeaderData.Col3Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}"/>
                         <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col3.Credit, Mode=OneWay}" Visibility="{Binding Content.Col3.ShowDebitCredit,Mode=OneWay}" HorizontalContentAlignment="Right" Grid.Row="1"  Grid.Column="1"  Mask="{Binding Content.HeaderData.Col3Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}"/>
                     </Grid>
-                    <Grid Grid.Column="9"  Visibility="{Binding Content.Col4Width, Mode=OneWay}" Margin="3,0,0,0" >
+                    <Grid Grid.Column="9"  Visibility="{Binding Content.Col4Width, Mode=OneWay}" >
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition />
                             <ColumnDefinition />
@@ -336,7 +336,7 @@ x:Class="UnicontaClient.Pages.CustomPage.BalanceReportTemplatePrint"
                         <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col4.Credit, Mode=OneWay}" Visibility="{Binding Content.Col4.ShowDebitCredit,Mode=OneWay}" HorizontalContentAlignment="Right" Grid.Row="1"  Grid.Column="1"  Mask="{Binding Content.HeaderData.Col4Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}"/>
                     </Grid>
 
-                    <Grid Grid.Column="10"  Visibility="{Binding Content.Col5Width, Mode=OneWay}" Margin="3,0,0,0" >
+                    <Grid Grid.Column="10"  Visibility="{Binding Content.Col5Width, Mode=OneWay}" >
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition />
                             <ColumnDefinition />
@@ -345,7 +345,7 @@ x:Class="UnicontaClient.Pages.CustomPage.BalanceReportTemplatePrint"
                         <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col5.Debit, Mode=OneWay}" Visibility="{Binding Content.Col5.ShowDebitCredit,Mode=OneWay}" HorizontalContentAlignment="Right"  Grid.Row="1" Grid.Column="0"  Mask="{Binding Content.HeaderData.Col5Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}"/>
                         <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col5.Credit, Mode=OneWay}" Visibility="{Binding Content.Col5.ShowDebitCredit,Mode=OneWay}" HorizontalContentAlignment="Right" Grid.Row="1"  Grid.Column="1"  Mask="{Binding Content.HeaderData.Col5Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}"/>
                     </Grid>
-                    <Grid Grid.Column="11"  Visibility="{Binding Content.Col6Width, Mode=OneWay}" Margin="3,0,0,0">
+                    <Grid Grid.Column="11"  Visibility="{Binding Content.Col6Width, Mode=OneWay}" >
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition />
                             <ColumnDefinition />
@@ -354,7 +354,7 @@ x:Class="UnicontaClient.Pages.CustomPage.BalanceReportTemplatePrint"
                         <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col6.Debit, Mode=OneWay}" Visibility="{Binding Content.Col6.ShowDebitCredit,Mode=OneWay}" HorizontalContentAlignment="Right"  Grid.Row="1" Grid.Column="0"  Mask="{Binding Content.HeaderData.Col6Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}"/>
                         <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col6.Credit, Mode=OneWay}" Visibility="{Binding Content.Col6.ShowDebitCredit,Mode=OneWay}" HorizontalContentAlignment="Right" Grid.Row="1"  Grid.Column="1"  Mask="{Binding Content.HeaderData.Col6Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}"/>
                     </Grid>
-                    <Grid Grid.Column="12"  Visibility="{Binding Content.Col7Width, Mode=OneWay}" Margin="3,0,0,0">
+                    <Grid Grid.Column="12"  Visibility="{Binding Content.Col7Width, Mode=OneWay}" >
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition />
                             <ColumnDefinition />
@@ -363,7 +363,7 @@ x:Class="UnicontaClient.Pages.CustomPage.BalanceReportTemplatePrint"
                         <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col7.Debit, Mode=OneWay}" Visibility="{Binding Content.Col7.ShowDebitCredit,Mode=OneWay}" HorizontalContentAlignment="Right"  Grid.Row="1" Grid.Column="0"  Mask="{Binding Content.HeaderData.Col7Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}"/>
                         <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col7.Credit, Mode=OneWay}" Visibility="{Binding Content.Col7.ShowDebitCredit,Mode=OneWay}" HorizontalContentAlignment="Right" Grid.Row="1"  Grid.Column="1"  Mask="{Binding Content.HeaderData.Col7Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}"/>
                     </Grid>
-                    <Grid Grid.Column="13"  Visibility="{Binding Content.Col8Width, Mode=OneWay}" Margin="3,0,0,0">
+                    <Grid Grid.Column="13"  Visibility="{Binding Content.Col8Width, Mode=OneWay}" >
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition />
                             <ColumnDefinition />
@@ -372,7 +372,7 @@ x:Class="UnicontaClient.Pages.CustomPage.BalanceReportTemplatePrint"
                         <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col8.Debit, Mode=OneWay}" Visibility="{Binding Content.Col8.ShowDebitCredit,Mode=OneWay}" HorizontalContentAlignment="Right"  Grid.Row="1" Grid.Column="0"  Mask="{Binding Content.HeaderData.Col8Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}"/>
                         <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col8.Credit, Mode=OneWay}" Visibility="{Binding Content.Col8.ShowDebitCredit,Mode=OneWay}" HorizontalContentAlignment="Right" Grid.Row="1"  Grid.Column="1"  Mask="{Binding Content.HeaderData.Col8Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}"/>
                     </Grid>
-                    <Grid Grid.Column="14"  Visibility="{Binding Content.Col9Width, Mode=OneWay}" Margin="3,0,0,0">
+                    <Grid Grid.Column="14"  Visibility="{Binding Content.Col9Width, Mode=OneWay}" >
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition />
                             <ColumnDefinition />
@@ -381,7 +381,7 @@ x:Class="UnicontaClient.Pages.CustomPage.BalanceReportTemplatePrint"
                         <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col9.Debit, Mode=OneWay}" Visibility="{Binding Content.Col9.ShowDebitCredit,Mode=OneWay}" HorizontalContentAlignment="Right"  Grid.Row="1" Grid.Column="0"  Mask="{Binding Content.HeaderData.Col9Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}"/>
                         <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col9.Credit, Mode=OneWay}" Visibility="{Binding Content.Col9.ShowDebitCredit,Mode=OneWay}" HorizontalContentAlignment="Right" Grid.Row="1"  Grid.Column="1"  Mask="{Binding Content.HeaderData.Col9Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}"/>
                     </Grid>
-                    <Grid Grid.Column="15"  Visibility="{Binding Content.Col10Width, Mode=OneWay}" Margin="3,0,0,0">
+                    <Grid Grid.Column="15"  Visibility="{Binding Content.Col10Width, Mode=OneWay}" >
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition />
                             <ColumnDefinition />
@@ -390,7 +390,7 @@ x:Class="UnicontaClient.Pages.CustomPage.BalanceReportTemplatePrint"
                         <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col10.Debit, Mode=OneWay}" Visibility="{Binding Content.Col10.ShowDebitCredit,Mode=OneWay}" HorizontalContentAlignment="Right"  Grid.Row="1" Grid.Column="0"  Mask="{Binding Content.HeaderData.Col10Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}"/>
                         <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col10.Credit, Mode=OneWay}" Visibility="{Binding Content.Col10.ShowDebitCredit,Mode=OneWay}" HorizontalContentAlignment="Right" Grid.Row="1"  Grid.Column="1"  Mask="{Binding Content.HeaderData.Col10Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}"/>
                     </Grid>
-                    <Grid Grid.Column="16"  Visibility="{Binding Content.Col11Width, Mode=OneWay}" Margin="3,0,0,0">
+                    <Grid Grid.Column="16"  Visibility="{Binding Content.Col11Width, Mode=OneWay}" >
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition />
                             <ColumnDefinition />
@@ -399,7 +399,7 @@ x:Class="UnicontaClient.Pages.CustomPage.BalanceReportTemplatePrint"
                         <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col11.Debit, Mode=OneWay}" Visibility="{Binding Content.Col11.ShowDebitCredit,Mode=OneWay}" HorizontalContentAlignment="Right"  Grid.Row="1" Grid.Column="0"  Mask="{Binding Content.HeaderData.Col11Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}"/>
                         <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col11.Credit, Mode=OneWay}" Visibility="{Binding Content.Col11.ShowDebitCredit,Mode=OneWay}" HorizontalContentAlignment="Right" Grid.Row="1"  Grid.Column="1"  Mask="{Binding Content.HeaderData.Col11Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}"/>
                     </Grid>
-                    <Grid Grid.Column="17"  Visibility="{Binding Content.Col12Width, Mode=OneWay}" Margin="3,0,0,0">
+                    <Grid Grid.Column="17"  Visibility="{Binding Content.Col12Width, Mode=OneWay}" >
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition />
                             <ColumnDefinition />
@@ -408,7 +408,7 @@ x:Class="UnicontaClient.Pages.CustomPage.BalanceReportTemplatePrint"
                         <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col12.Debit, Mode=OneWay}" Visibility="{Binding Content.Col12.ShowDebitCredit,Mode=OneWay}" HorizontalContentAlignment="Right"  Grid.Row="1" Grid.Column="0"  Mask="{Binding Content.HeaderData.Col12Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}"/>
                         <dxe:TextEdit VerticalAlignment="Top" IsPrintingMode="True"  Width="{Binding Path=Content.AmountSize, Mode=OneWay}" Text="{Binding Content.Col12.Credit, Mode=OneWay}" Visibility="{Binding Content.Col12.ShowDebitCredit,Mode=OneWay}" HorizontalContentAlignment="Right" Grid.Row="1"  Grid.Column="1"  Mask="{Binding Content.HeaderData.Col12Format, Mode=OneWay}"  MaskType="Numeric" AllowNullInput="True" MaskUseAsDisplayFormat="True" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="{Binding Content.IsBold, Mode=OneWay}" FontStyle="{Binding Content.IsItalic, Mode=OneWay}"/>
                     </Grid>
-                    <Grid Grid.Column="18"  Visibility="{Binding Content.Col13Width, Mode=OneWay}" Margin="3,0,0,0">
+                    <Grid Grid.Column="18"  Visibility="{Binding Content.Col13Width, Mode=OneWay}" >
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition />
                             <ColumnDefinition />

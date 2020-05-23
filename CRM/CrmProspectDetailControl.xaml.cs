@@ -79,8 +79,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void liWww_ButtonClicked(object sender)
         {
             var prospect = layoutItems.DataContext as CrmProspectClient;
-            if (!string.IsNullOrWhiteSpace(prospect.Www))
-                Utility.OpenWebSite(prospect.Www);
+            Utility.OpenWebSite(prospect._Www);
         }
 #endif
     }

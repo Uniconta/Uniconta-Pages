@@ -154,7 +154,9 @@ namespace UnicontaClient.Pages.CustomPage
                 foreach (var bal in balance)
                 {
                     var ac = (GLAccount)LedgerCache.Get(bal.AccountRowId);
-                    var name = string.Format("{0}, {1}", ac._Account, ac._Name);
+                    if (ac == null)
+                        continue;
+                    var name = string.Concat(ac._Account, ", ", ac._Name);
                     var InitialSum = bal.BalanceBefore;
                     var TraceSum = InitialSum + bal.PostingAmount;
 

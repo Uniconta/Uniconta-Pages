@@ -126,7 +126,7 @@ namespace UnicontaClient.Pages.CustomPage
             var debtor = layoutItems.DataContext as DebtorClient;
             if (debtor != null)
             {
-                var location = debtor.DeliveryAddress1 + "+" + debtor.DeliveryAddress2 + "+" + debtor.DeliveryAddress3 + "+" + debtor.DeliveryZipCode + "+" + debtor.DeliveryCity + "+" + debtor.DeliveryCountry;
+                var location = debtor._DeliveryAddress1 + "+" + debtor._DeliveryAddress2 + "+" + debtor._DeliveryAddress3 + "+" + debtor._DeliveryZipCode + "+" + debtor._DeliveryCity + "+" + debtor.DeliveryCountry;
                 Utility.OpenGoogleMap(location);
             }
         }
@@ -134,8 +134,7 @@ namespace UnicontaClient.Pages.CustomPage
          private void liWww_ButtonClicked(object sender)
         {
             var debtor = layoutItems.DataContext as DebtorClient;
-            if (!string.IsNullOrWhiteSpace(debtor.Www))
-                Utility.OpenWebSite(debtor.Www);
+            Utility.OpenWebSite(debtor._Www);
         }
 #endif
     }

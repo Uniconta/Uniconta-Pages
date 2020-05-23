@@ -77,6 +77,9 @@ x:Class="UnicontaClient.Pages.CustomPage.BankStLines"
                             </DataTemplate>
                         </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                     </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:CorasauDataGridTemplateColumnClient  x:Name="AmountCur" Visible="False" Width="90" />
+                    <localPage:ComboBoxColumnClient  x:Name="Currency" Visible="False" Width="100"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Info" Visible="False" Width="150"/>
                 </localPage:BankStLineGrid.Columns>
                 </localPage:BankStLineGrid>       
         </CorasauControls:BusyIndicator>

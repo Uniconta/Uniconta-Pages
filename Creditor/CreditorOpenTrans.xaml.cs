@@ -74,6 +74,8 @@ namespace UnicontaClient.Pages.CustomPage
             var Comp = api.CompanyEntity;
             if (Comp.RoundTo100)
                 Amount.HasDecimals = AmountOpen.HasDecimals = Debit.HasDecimals = Credit.HasDecimals = false;
+
+            HideMenuItems();
         }
 
         private void CreditorOpenTrans_KeyDown(object sender, KeyEventArgs e)
@@ -89,6 +91,13 @@ namespace UnicontaClient.Pages.CustomPage
                 return;
             selRow.IsSettled = !selRow.IsSettled;
             CheckBoxClick(selRow);
+        }
+
+        private void HideMenuItems()
+        {
+            RibbonBase rb = (RibbonBase)localMenu.DataContext;
+            if (rb != null)
+                UtilDisplay.RemoveMenuCommand(rb, "SendAsEmail");
         }
 
         public override void Utility_Refresh(string screenName, object argument = null)

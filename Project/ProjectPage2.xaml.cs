@@ -100,31 +100,32 @@ namespace UnicontaClient.Pages.CustomPage
             StartLoadCache();
         }
 
+        protected override void AfterTemplateSet(UnicontaBaseEntity row)
+        {
+            base.AfterTemplateSet(row);
+            if (this.Debtor != null)
+                (row as ProjectClient).Account = Debtor._Account;
+        }
+
         private void frmRibbon_OnItemClicked(string ActionType)
         {
             frmRibbon_BaseActions(ActionType);
         }
-        string zip;
         private async void Editrow_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == "ZipCode")
             {
-                if (zip == null)
+                var city = await UtilDisplay.GetCityAndAddress(editrow.ZipCode, editrow._WorkCountry != 0 ? editrow._WorkCountry : api.CompanyEntity._CountryId);
+                if (city != null)
                 {
-                    var city = await UtilDisplay.GetCityAndAddress(editrow.ZipCode, editrow._WorkCountry != 0 ? editrow._WorkCountry : api.CompanyEntity._CountryId);
-                    if (city != null)
-                    {
-                        editrow.City = city[0];
-                        var add1 = city[1];
-                        if (!string.IsNullOrEmpty(add1))
-                            editrow.WorkAddress1 = add1;
-                        zip = city[2];
-                        if (!string.IsNullOrEmpty(zip))
-                            editrow.ZipCode = zip;
-                    }
+                    editrow.City = city[0];
+                    var add1 = city[1];
+                    if (!string.IsNullOrEmpty(add1))
+                        editrow.WorkAddress1 = add1;
+                    var zip = city[2];
+                    if (!string.IsNullOrEmpty(zip))
+                        editrow.ZipCode = zip;
                 }
-                else
-                    zip = null;
             }
         }
         
@@ -139,7 +140,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void LiZipCode_OnButtonClicked(object sender)
         {
-            var location = editrow.WorkAddress1 + "+" + editrow.WorkAddress2 + "+" + editrow.WorkAddress3 + "+" + editrow.ZipCode + "+" + editrow.City + "+" + editrow.WorkCountry;
+            var location = editrow._WorkAddress1 + "+" + editrow._WorkAddress2 + "+" + editrow._WorkAddress3 + "+" + editrow._ZipCode + "+" + editrow._City + "+" + editrow.WorkCountry;
             Utility.OpenGoogleMap(location);
         }
 #endif

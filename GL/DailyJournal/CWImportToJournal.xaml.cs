@@ -108,7 +108,7 @@ namespace UnicontaClient.Pages.CustomPage
             catch (Exception ex)
             {
                 stream?.Dispose();
-                UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"));
+                UnicontaMessageBox.Show(ex);
                 DialogResult = false;
             }
         }

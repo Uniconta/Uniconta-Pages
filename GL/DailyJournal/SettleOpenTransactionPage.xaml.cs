@@ -141,9 +141,9 @@ namespace UnicontaClient.Pages.CustomPage
             }
             else
             {
-                if (SelectedJournalLine?._Invoice != null)
+                if (!string.IsNullOrEmpty(SelectedJournalLine?._Invoice))
                     selectedInvoices.Add(SelectedJournalLine._Invoice);
-                else if (SelectedBankStatemenLine?._Invoice != null)
+                else if (!string.IsNullOrEmpty(SelectedBankStatemenLine?._Invoice))
                     selectedInvoices.Add(SelectedBankStatemenLine._Invoice);
             }
 
@@ -397,7 +397,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 if (!selectedVouchers.Contains(voucher))
                     selectedVouchers.Insert(0, voucher);
-                if (!selectedInvoices.Contains(invoice))
+                if (!string.IsNullOrEmpty(invoice) && !selectedInvoices.Contains(invoice))
                     selectedInvoices.Insert(0, invoice);
                 if (!selectedRowIds.Contains(rowId))
                     selectedRowIds.Insert(0, rowId);
@@ -406,7 +406,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 if (!selectedVouchers.Contains(voucher))
                     selectedVouchers.Add(voucher);
-                if (!selectedInvoices.Contains(invoice))
+                if (!string.IsNullOrEmpty(invoice) && !selectedInvoices.Contains(invoice))
                     selectedInvoices.Add(invoice);
                 if (!selectedRowIds.Contains(rowId))
                     selectedRowIds.Insert(0, rowId);

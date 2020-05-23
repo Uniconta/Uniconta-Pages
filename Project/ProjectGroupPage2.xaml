@@ -20,61 +20,63 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectGroupPage2"
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <CorasauControls:CorasauRibbonControl x:Name="frmRibbon" XMLSourcePath=";component/Assets/FormRibbonNoLayout.xml" Grid.Row="0"/>
-            <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Vertical" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
-                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpDescription" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Description}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                    <CorasauControls:CorasauLayoutItem x:Name="liGroup" FieldName="Group">
-                        <CorasauControls:TextEditor Text="{Binding Group,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liName" FieldName="Name">
-                        <CorasauControls:TextEditor Text="{Binding Name,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liIsDefault" FieldName="IsDefault">
-                        <CheckBox IsChecked="{Binding IsDefault,Mode=TwoWay}" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liInvoiceable" FieldName="Invoiceable">
-                        <CheckBox IsChecked="{Binding Invoiceable,Mode=TwoWay}" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="AutoNumber" x:Name="liAutoNumber">
-                        <CorasauControls:LookupEditor x:Name="leAutoNumber" Text="{Binding AutoNumber,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                </CorasauControls:CorasauLayoutGroup>
-                <CorasauControls:CorasauLayoutGroup x:Name="grpAccounts" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Accounts}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                    <CorasauControls:CorasauLayoutItem FieldName="UseCostInWIP" x:Name="liUseCostInWIP">
-                        <CorasauControls:ComboBoxEditor x:Name="cbUseCostInWIP" SelectedItem="{Binding UseCostInWIP,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liAutoWIP" FieldName="AutoWIP">
-                        <CheckBox IsChecked="{Binding AutoWIP,Mode=TwoWay}" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liWorkInProgress" FieldName="WorkInProgress">
-                        <CorasauControls:LookupEditor x:Name="leWorkInProgress" Text="{Binding WorkInProgress,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liWorkInProgressOffset" FieldName="WorkInProgressOffset">
-                        <CorasauControls:LookupEditor x:Name="leWorkInProgressOffset" Text="{Binding WorkInProgressOffset,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liOutlay" FieldName="Outlay">
-                        <CorasauControls:LookupEditor x:Name="leOutlay" Text="{Binding Outlay,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liOutlayOffset" FieldName="OutlayOffset">
-                        <CorasauControls:LookupEditor x:Name="leOutlayOffset" Text="{Binding OutlayOffset,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liMaterials" FieldName="Materials">
-                        <CorasauControls:LookupEditor x:Name="leMaterials" Text="{Binding Materials,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liMaterialsOffset" FieldName="MaterialsOffset">
-                        <CorasauControls:LookupEditor x:Name="leMaterialsOffset" Text="{Binding MaterialsOffset,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liAdjustment" FieldName="Adjustment">
-                        <CorasauControls:LookupEditor x:Name="leAdjustment" Text="{Binding Adjustment,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liAdjustmentOffset" FieldName="AdjustmentOffset">
-                        <CorasauControls:LookupEditor x:Name="leAdjustmentOffset" Text="{Binding AdjustmentOffset,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liInvoiceAdjustment" FieldName="InvoiceAdjustment">
-                        <CorasauControls:LookupEditor x:Name="leInvoiceAdjustment" Text="{Binding InvoiceAdjustment,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liInvoiceAdjustmentOffset" FieldName="InvoiceAdjustmentOffset">
-                        <CorasauControls:LookupEditor x:Name="leInvoiceAdjustmentOffset" Text="{Binding InvoiceAdjustmentOffset,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
+            <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
+                <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="grpFirst">
+                    <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpDescription" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Description}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                        <CorasauControls:CorasauLayoutItem x:Name="liGroup" FieldName="Group">
+                            <CorasauControls:TextEditor Text="{Binding Group,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liName" FieldName="Name">
+                            <CorasauControls:TextEditor Text="{Binding Name,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liIsDefault" FieldName="IsDefault">
+                            <CheckBox IsChecked="{Binding IsDefault,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liInvoiceable" FieldName="Invoiceable">
+                            <CheckBox IsChecked="{Binding Invoiceable,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="AutoNumber" x:Name="liAutoNumber">
+                            <CorasauControls:LookupEditor x:Name="leAutoNumber" Text="{Binding AutoNumber,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                    </CorasauControls:CorasauLayoutGroup>
+                    <CorasauControls:CorasauLayoutGroup x:Name="grpAccounts" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Accounts}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                        <CorasauControls:CorasauLayoutItem FieldName="UseCostInWIP" x:Name="liUseCostInWIP">
+                            <CorasauControls:ComboBoxEditor x:Name="cbUseCostInWIP" SelectedItem="{Binding UseCostInWIP,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liAutoWIP" FieldName="AutoWIP">
+                            <CheckBox IsChecked="{Binding AutoWIP,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liWorkInProgress" FieldName="WorkInProgress">
+                            <CorasauControls:LookupEditor x:Name="leWorkInProgress" Text="{Binding WorkInProgress,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liWorkInProgressOffset" FieldName="WorkInProgressOffset">
+                            <CorasauControls:LookupEditor x:Name="leWorkInProgressOffset" Text="{Binding WorkInProgressOffset,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liOutlay" FieldName="Outlay">
+                            <CorasauControls:LookupEditor x:Name="leOutlay" Text="{Binding Outlay,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liOutlayOffset" FieldName="OutlayOffset">
+                            <CorasauControls:LookupEditor x:Name="leOutlayOffset" Text="{Binding OutlayOffset,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liMaterials" FieldName="Materials">
+                            <CorasauControls:LookupEditor x:Name="leMaterials" Text="{Binding Materials,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liMaterialsOffset" FieldName="MaterialsOffset">
+                            <CorasauControls:LookupEditor x:Name="leMaterialsOffset" Text="{Binding MaterialsOffset,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liAdjustment" FieldName="Adjustment">
+                            <CorasauControls:LookupEditor x:Name="leAdjustment" Text="{Binding Adjustment,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liAdjustmentOffset" FieldName="AdjustmentOffset">
+                            <CorasauControls:LookupEditor x:Name="leAdjustmentOffset" Text="{Binding AdjustmentOffset,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liInvoiceAdjustment" FieldName="InvoiceAdjustment">
+                            <CorasauControls:LookupEditor x:Name="leInvoiceAdjustment" Text="{Binding InvoiceAdjustment,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liInvoiceAdjustmentOffset" FieldName="InvoiceAdjustmentOffset">
+                            <CorasauControls:LookupEditor x:Name="leInvoiceAdjustmentOffset" Text="{Binding InvoiceAdjustmentOffset,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                    </CorasauControls:CorasauLayoutGroup>
                 </CorasauControls:CorasauLayoutGroup>
             </CorasauControls:CorasauLayoutControl>
         </Grid>

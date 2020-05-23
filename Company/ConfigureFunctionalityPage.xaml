@@ -145,7 +145,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ConfigureFunctionalityPage"
                 </CorasauControls:CorasauLayoutGroup>
 
                 <CorasauControls:CorasauLayoutGroup View="GroupBox" Orientation="Vertical" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Addins}"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                    <CorasauControls:CorasauLayoutItem x:Name="cbDirectDebit" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DirectDebit}">
+                    <CorasauControls:CorasauLayoutItem x:Name="cbDirectDebit" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=AutoBanking}">
                         <CorasauControls:CheckEditor IsChecked="{Binding _DirectDebit,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem x:Name="cbTraceFieldChanges" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FieldChangeLog}">

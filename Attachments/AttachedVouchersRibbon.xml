@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <root>
   <RibbonItem TabId="0" LocalizedNameKey="Home">
+    <RibbonItem Action="EditRow" ShortcutKey="Ctrl+E" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>
+    <RibbonItem Action="UpdateRow" LocalizedNameKey="UpdateOBJ" Parameter="Content" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey="Ctrl+E"/>
+    <RibbonItem Action="ShowInInbox" LocalizedNameKey="ShowInInbox" LargeGlyph="Allow_32x32.png" />
+  </RibbonItem>
+  <RibbonItem>
     <RibbonItem Action="Filter" ShortcutKey="Ctrl+I" LocalizedNameKey="Filter" Glyph="Filter_16x16.png" LargeGlyph="Filter_32x32.png"/>
     <RibbonItem Action="ClearFilter" ShortcutKey="Ctrl+K" LocalizedNameKey="ClearFilter" Glyph="Filter_Clear_32x32.png" LargeGlyph="Filter_Clear_32x32.png"/>
   </RibbonItem>
@@ -19,18 +24,11 @@
     </RibbonItem>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="UpdateRow" LocalizedNameKey="UpdateOBJ" Parameter="Content" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey="Ctrl+E"/>
-  </RibbonItem>
-  <RibbonItem>
     <RibbonItem Action="ExportVouchers" LocalizedNameKey="ExportVouchers" LargeGlyph="Upload_32x32.png" />
   </RibbonItem>
   <RibbonItem>
-      <RibbonItem Action="ViewDownloadRow" ShortcutKey="Alt+V" LocalizedNameKey="View" LargeGlyph="View_Highlighted_32x32.png" />
-  </RibbonItem>
-  <RibbonItem>
+    <RibbonItem Action="ViewDownloadRow" ShortcutKey="Alt+V" LocalizedNameKey="View" LargeGlyph="View_Highlighted_32x32.png" />
     <RibbonItem Action="ViewTransactions" LocalizedNameKey="Transactions" LargeGlyph="Account-statement_32x32.png" />
-  </RibbonItem>
-  <RibbonItem>
-    <RibbonItem Action="ShowInInbox" LocalizedNameKey="ShowInInbox" LargeGlyph="Allow_32x32.png" />
+    <RibbonItem Action="PendingApproval" LocalizedNameKey="PendingApproval" LargeGlyph="Validate_32x32.png" />
   </RibbonItem>
 </root>

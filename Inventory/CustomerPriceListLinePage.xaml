@@ -59,6 +59,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CustomerPriceListLinePage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ValidFrom" ShowTime="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ValidTo" ShowTime="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="EAN" Width="100"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="RowNumber" Width="70" Visible="False"/>
                 </localPage:InvPriceListLineClientGrid.Columns>
             </localPage:InvPriceListLineClientGrid>
         </CorasauControls:BusyIndicator>

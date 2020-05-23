@@ -30,7 +30,6 @@ using Uniconta.Common.Utility;
 #if !SILVERLIGHT
 using Bilagscan;
 using System.Net.Http;
-using Newtonsoft.Json;
 using System.Configuration;
 using System.Net.Http.Headers;
 #endif
@@ -229,7 +228,7 @@ namespace UnicontaClient.Pages.CustomPage
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
                     var response = await client.GetAsync($"https://api.bilagscan.dk/v1/organizations/" + orgNo.ToString() + "/vouchers?seen=false&count=100&offset=0&sorts=-upload_date&status=successful");
                     var content = await response.Content.ReadAsStringAsync();
-                    var vouchers = JsonConvert.DeserializeObject<BilagscanVoucher.Processed>(content);
+                    var vouchers = Bilagscan.Voucher.GetVouchers(content);
 
                     var credCache = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.Creditor)) ?? await api.CompanyEntity.LoadCache(typeof(Uniconta.DataModel.Creditor), api);
                     var offsetCache = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.GLAccount)) ?? await api.CompanyEntity.LoadCache(typeof(Uniconta.DataModel.GLAccount), api);
@@ -258,7 +257,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                             var postingType = BilagscanVoucherType.Invoice;
 
-                            var hint = JsonConvert.DeserializeObject<BilagscanWrite.Hint>(voucher.note);
+                            var hint = Bilagscan.Voucher.GetHint(voucher.note);
 
                             var bilagscanRefID = voucher.id;
                             journalLine.ReferenceNumber = bilagscanRefID != 0 ? NumberConvert.ToString(bilagscanRefID) : null;
@@ -439,7 +438,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 }
                                 catch (Exception ex)
                                 {
-                                    UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"), MessageBoxButton.OK);
+                                    UnicontaMessageBox.Show(ex);
                                     return;
                                 }
 

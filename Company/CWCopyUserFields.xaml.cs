@@ -178,7 +178,7 @@ namespace UnicontaClient.Pages.CustomPage
                         if (master != null)
                             cbtable.SelectedItem = arrytbl?.Where(t => t.Name == (master as TableHeaderClient)?.Name).FirstOrDefault();
                         else
-                            cbtable.SelectedIndex = 0;
+                            cbtable.SelectedIndex = -1;
                     }
                 }
                 setGridItemsSource();

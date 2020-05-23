@@ -28,7 +28,7 @@
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="AddInterest" LocalizedNameKey="AddInterest" LargeGlyph="Offer_32x32.png"/>
-    <RibbonItem Action="AddCollection" LocalizedNameKey="AddCollection" LargeGlyph="Budget_32x32.png" />
+    <RibbonItem Action="AddCollection" LocalizedNameKey="CreateCollectionLetter" LargeGlyph="Budget_32x32.png" />
     <RibbonItem Action="GenerateJournalLines" LocalizedNameKey="GenerateJournalLines" LargeGlyph="Generate_32x32.png" ShortcutKey="Ctrl+G" />
   </RibbonItem>
   <RibbonItem>

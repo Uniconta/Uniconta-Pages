@@ -199,6 +199,7 @@ namespace UnicontaClient.Pages.CustomPage
             ShowOnInvoice.Visible = showFields;
             ShowOnPacknote.Visible = showFields;
             InclValueOnInvoice.Visible = showFields;
+            ShowOnPicklist.Visible = showFields;
 
             Utility.SetupVariants(api, colVariant, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
         }
@@ -289,6 +290,10 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         AddDockItem(TabControls.UserDocsPage, dgPartInvItemsGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("HierarchicalBOM"), selectedItem.RowId));
                     }
+                    break;
+                case "InvExplodeBOM":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.InvBOMExplodePage, Invitem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ExplodedBOM"), Invitem._Item));
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);

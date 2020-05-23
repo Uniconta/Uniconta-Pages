@@ -21,6 +21,7 @@ using Uniconta.Common;
 using UnicontaClient.Utilities;
 using System.Xml;
 using System.ComponentModel;
+using Uniconta.ClientTools.DataModel;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -30,14 +31,14 @@ namespace UnicontaClient.Pages.CustomPage
     /// </summary>
     public partial class OIORASPTrackPage : FormBasePage
     {
-        DebtorInvoiceLocal _debInvoice;
+        DebtorInvoiceClient _debInvoice;
         private ImportLogOIORASP _logs;
         public bool Terminate { get; set; }
 
         public override UnicontaBaseEntity ModifiedRow
         {
             get { return _debInvoice; }
-            set { _debInvoice = (DebtorInvoiceLocal)value; }
+            set { _debInvoice = (DebtorInvoiceClient)value; }
         }
 
         public override string NameOfControl => TabControls.ImportPhysicalVouchersPage;

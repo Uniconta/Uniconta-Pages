@@ -114,7 +114,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 default: return;
             }
-            rec.accntSource = cache.GetNotNullArray;
+            rec.accntSource = cache?.GetNotNullArray;
             rec.NotifyPropertyChanged("AccountSource");
         }
 

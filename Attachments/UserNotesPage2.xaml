@@ -20,12 +20,14 @@ x:Class="UnicontaClient.Pages.CustomPage.UserNotesPage2"
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <CorasauControls:CorasauRibbonControl x:Name="frmRibbon" XMLSourcePath=";component/Assets/FormRibbonNoLayout.xml" Grid.Row="0"/>
-            <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Vertical" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
-                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpDescription" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Description}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                    <CorasauControls:CorasauLayoutItem FieldName="Text" x:Name="liText" LabelVerticalAlignment="Top">
-                        <CorasauControls:TextEditor x:Name="txedUserNotes" Text="{Binding Text,Mode=TwoWay}" AcceptsReturn="True" TextWrapping="Wrap" HorizontalContentAlignment="Left" 
+            <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
+                <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="grpFirst">
+                    <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpDescription" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Description}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                        <CorasauControls:CorasauLayoutItem FieldName="Text" x:Name="liText" LabelVerticalAlignment="Top">
+                            <CorasauControls:TextEditor x:Name="txedUserNotes" Text="{Binding Text,Mode=TwoWay}" AcceptsReturn="True" TextWrapping="Wrap" HorizontalContentAlignment="Left" 
                                                 MinHeight="100" VerticalContentAlignment="Top" MaxHeight="120" />
-                    </CorasauControls:CorasauLayoutItem>
+                        </CorasauControls:CorasauLayoutItem>
+                    </CorasauControls:CorasauLayoutGroup>
                 </CorasauControls:CorasauLayoutGroup>
             </CorasauControls:CorasauLayoutControl>
         </Grid>

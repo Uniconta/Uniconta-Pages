@@ -27,7 +27,6 @@ using UnicontaClient.Controls.Dialogs;
 using Uniconta.ClientTools.Util;
 #if !SILVERLIGHT
 using Microsoft.Win32;
-
 #endif
 
 using UnicontaClient.Pages;
@@ -90,8 +89,13 @@ namespace UnicontaClient.Pages.CustomPage
                     //Getting Contents for the Document Viewer
                     busyIndicator.IsBusy = true;
                     var res = await api.Read(selectedItem);
-                    if (res == ErrorCodes.Succes)
-                        VoucherCache.SetGlobalVoucherCache(selectedItem);
+                    if (res != ErrorCodes.Succes)
+                    {
+                        busyIndicator.IsBusy = false;
+                        UtilDisplay.ShowErrorCode(res);
+                        return;
+                    }
+                    VoucherCache.SetGlobalVoucherCache(selectedItem);
                 }
             }
 
@@ -107,7 +111,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 case "UpdateRow":
                     if (selectedItem != null)
-                        UploadData(selectedItem);
+                        UploadData(selectedItem);   
                     break;
                 case "ViewDownloadRow":
                     if (selectedItem != null)
@@ -126,6 +130,18 @@ namespace UnicontaClient.Pages.CustomPage
                 case "ShowInInbox":
                     if (selectedItem != null)
                         UpdateInBox(selectedItem);
+                    break;
+                case "EditRow":
+                    if (selectedItem == null)
+                        return;
+                    object[] EditParam = new object[2];
+                    EditParam[0] = selectedItem;
+                    EditParam[1] = true;
+                    AddDockItem(TabControls.AttachedVouchersPage2, EditParam, string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("Voucher"), selectedItem.RowId));
+                    break;
+                case "PendingApproval":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.DocumentApproveAwaitPage, dgAttachedVoucherGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("PendingApproval"), selectedItem.RowId));
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);
@@ -194,13 +210,13 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         compressedResult = await CreateZip(vouchers);
                         stream.Write(compressedResult, 0, compressedResult.Length);
+                        stream.Flush();
                         stream.Close();
                     }
                 }
                 catch (Exception ex)
                 {
-                    UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"), MessageBoxButton.OK);
-                    return;
+                    UnicontaMessageBox.Show(ex);
                 }
             }
         }
@@ -248,6 +264,14 @@ namespace UnicontaClient.Pages.CustomPage
             dateFilter.name = "Created";
             dateFilter.value = String.Format("{0:d}..", BasePage.GetSystemDefaultDate().AddYears(-1).Date);
             return new Filter[] { dateFilter };
+        }
+
+        public override void Utility_Refresh(string screenName, object argument = null)
+        {
+            if (screenName == TabControls.AttachedVouchersPage2)
+            {
+                dgAttachedVoucherGrid.UpdateItemSource(argument);
+            }
         }
     }
 }

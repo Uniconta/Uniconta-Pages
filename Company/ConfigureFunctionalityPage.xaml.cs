@@ -25,6 +25,7 @@ using System.Threading.Tasks;
 using Uniconta.DataModel;
 using Uniconta.ClientTools.Controls;
 using Uniconta.Common.User;
+using Uniconta.API.Service;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -32,6 +33,11 @@ namespace UnicontaClient.Pages.CustomPage
     public partial class ConfigureFunctionalityPage : FormBasePage
     {
         Company editrow;
+
+        public ConfigureFunctionalityPage(BaseAPI API)
+            : this(API.CompanyEntity)
+        {
+        }
         public ConfigureFunctionalityPage(UnicontaBaseEntity sourceData)
             : base(sourceData, true)
         {

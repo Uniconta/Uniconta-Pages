@@ -876,9 +876,6 @@ namespace UnicontaClient.Pages.CustomPage
                     Header = AmountHeader;
 
                 col++;
-                if (col == 13) // max 13 columns
-                    break;
-
                 AddGridBandColumn(NumberConvert.ToString(col), Header, str, ShowAmount, ShowDebitCredit, formatter, Crit.frmdateval, Crit.todateval, Crit.colNameNumber);
                 var dccol = ShowDebitCredit == true ? Visibility.Visible : Visibility.Collapsed;
                 switch (col)

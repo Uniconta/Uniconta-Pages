@@ -667,7 +667,8 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 if (UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("ConfirmDeleteOBJ"), string.Format("'{0}'", objBalance._Name)), Uniconta.ClientTools.Localization.lookup("Confirmation"), MessageBoxButton.OKCancel) == MessageBoxResult.OK)
                 {
-                    api.DeleteNoResponse(objBalance);
+                    if (objBalance.CompanyId == api.CompanyId)/* In case user copied fom other company but not saved it */
+                        api.DeleteNoResponse(objBalance);
                     itemsBalance.Remove(objBalance);
                     UpdateBalancelist(0);
                 }

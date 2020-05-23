@@ -19,55 +19,56 @@ x:Class="UnicontaClient.Pages.CustomPage.CrmCampaignPage2"
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <CorasauControls:CorasauRibbonControl x:Name="frmRibbon" XMLSourcePath=";component/Assets/FormRibbon.xml" Grid.Row="0"/>
-            <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Vertical" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
+            <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
+                <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="grpFirst">
 
-                <CorasauControls:CorasauLayoutGroup x:Name="grpDescription" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Description}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="350">
-                    <CorasauControls:CorasauLayoutItem x:Name="liCreated" FieldName="Created" >
-                        <CorasauControls:DateEditor EditValue="{Binding Created, Mode=TwoWay}" IsReadOnly="False" Mask="g" x:Name="txtCreated"/>
-                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutGroup x:Name="grpDescription" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Description}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="350">
+                        <CorasauControls:CorasauLayoutItem x:Name="liCreated" FieldName="Created" >
+                            <CorasauControls:DateEditor EditValue="{Binding Created, Mode=TwoWay}" IsReadOnly="False" Mask="g" x:Name="txtCreated"/>
+                        </CorasauControls:CorasauLayoutItem>
 
-                    <CorasauControls:CorasauLayoutItem x:Name="liName" FieldName="Name" >
-                        <CorasauControls:TextEditor Text="{Binding Name, Mode=TwoWay}" />
-                    </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liName" FieldName="Name" >
+                            <CorasauControls:TextEditor Text="{Binding Name, Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
 
-                    <CorasauControls:CorasauLayoutItem x:Name="liText" FieldName="Text" VerticalAlignment="Top" VerticalContentAlignment="Top" LabelVerticalAlignment="Top">
-                        <CorasauControls:TextEditor Text="{Binding Text}" TextWrapping="Wrap" AcceptsReturn="True"  MinHeight="60" VerticalContentAlignment="Top"/>
-                    </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liText" FieldName="Text" VerticalAlignment="Top" VerticalContentAlignment="Top" LabelVerticalAlignment="Top">
+                            <CorasauControls:TextEditor Text="{Binding Text}" TextWrapping="Wrap" AcceptsReturn="True"  MinHeight="60" VerticalContentAlignment="Top"/>
+                        </CorasauControls:CorasauLayoutItem>
 
+                    </CorasauControls:CorasauLayoutGroup>
+
+                    <CorasauControls:CorasauLayoutGroup x:Name="grpGroup" View="GroupBox"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Group}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="350">
+
+                        <CorasauControls:CorasauLayoutItem x:Name="liGroup" FieldName="Group">
+                            <CorasauControls:LookupEditor x:Name="leGroup" Text="{Binding Group,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+
+                        <CorasauControls:CorasauLayoutItem x:Name="liEmployee" FieldName="Employee">
+                            <CorasauControls:LookupEditor x:Name="leEmployee" Text="{Binding Employee,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+
+                    </CorasauControls:CorasauLayoutGroup>
+
+                    <CorasauControls:CorasauLayoutGroup x:Name="grpCampaign" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Campaign}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="350">
+
+                        <CorasauControls:CorasauLayoutItem x:Name="liStartDate" FieldName="StartDate">
+                            <CorasauControls:DateEditor EditValue="{Binding StartDate, Mode=TwoWay}" IsReadOnly="False" />
+                        </CorasauControls:CorasauLayoutItem>
+
+                        <CorasauControls:CorasauLayoutItem x:Name="liStatus" FieldName="Status">
+                            <CorasauControls:ComboBoxEditor SelectedItem="{Binding Status, Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+
+                        <CorasauControls:CorasauLayoutItem x:Name="liCampignType" FieldName="CampaignType">
+                            <CorasauControls:ComboBoxEditor SelectedItem="{Binding CampaignType, Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+
+                        <CorasauControls:CorasauLayoutItem x:Name="liEnded" FieldName="Ended">
+                            <CorasauControls:DateEditor EditValue="{Binding Ended, Mode=TwoWay}" IsReadOnly="False"/>
+                        </CorasauControls:CorasauLayoutItem>
+
+                    </CorasauControls:CorasauLayoutGroup>
                 </CorasauControls:CorasauLayoutGroup>
-
-                <CorasauControls:CorasauLayoutGroup x:Name="grpGroup" View="GroupBox"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Group}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="350">
-
-                    <CorasauControls:CorasauLayoutItem x:Name="liGroup" FieldName="Group">
-                        <CorasauControls:LookupEditor x:Name="leGroup" Text="{Binding Group,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-
-                    <CorasauControls:CorasauLayoutItem x:Name="liEmployee" FieldName="Employee">
-                        <CorasauControls:LookupEditor x:Name="leEmployee" Text="{Binding Employee,Mode=TwoWay}" />
-                    </CorasauControls:CorasauLayoutItem>
-
-                </CorasauControls:CorasauLayoutGroup>
-
-                <CorasauControls:CorasauLayoutGroup x:Name="grpCampaign" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Campaign}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="350">
-
-                    <CorasauControls:CorasauLayoutItem x:Name="liStartDate" FieldName="StartDate">
-                        <CorasauControls:DateEditor EditValue="{Binding StartDate, Mode=TwoWay}" IsReadOnly="False" />
-                    </CorasauControls:CorasauLayoutItem>
-
-                    <CorasauControls:CorasauLayoutItem x:Name="liStatus" FieldName="Status">
-                        <CorasauControls:ComboBoxEditor SelectedItem="{Binding Status, Mode=TwoWay}" />
-                    </CorasauControls:CorasauLayoutItem>
-
-                    <CorasauControls:CorasauLayoutItem x:Name="liCampignType" FieldName="CampaignType">
-                        <CorasauControls:ComboBoxEditor SelectedItem="{Binding CampaignType, Mode=TwoWay}" />
-                    </CorasauControls:CorasauLayoutItem>
-
-                    <CorasauControls:CorasauLayoutItem x:Name="liEnded" FieldName="Ended">
-                        <CorasauControls:DateEditor EditValue="{Binding Ended, Mode=TwoWay}" IsReadOnly="False"/>
-                    </CorasauControls:CorasauLayoutItem>
-
-                </CorasauControls:CorasauLayoutGroup>
-
             </CorasauControls:CorasauLayoutControl>
 
         </Grid>

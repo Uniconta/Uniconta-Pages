@@ -261,7 +261,15 @@ namespace ISO20022CreditTransfer
         {
             if (exportFormat == ExportFormatType.DanskeBank_CSV && PaymentTypes.VendorBankAccount == paymentType)
             {
-                if (paymentCcy != BaseDocument.CCYDKK && paymentCcy != BaseDocument.CCYEUR)
+                var countryId = string.Empty;
+                if (!string.IsNullOrEmpty(swift))
+                {
+                    swift = Regex.Replace(swift, "[^\\w\\d]", "");
+                    if (swift.Length > 6)
+                        countryId = countryId == string.Empty ? swift.Substring(4, 2).ToUpper() : countryId;
+                }
+
+                if (paymentCcy != BaseDocument.CCYDKK && paymentCcy != BaseDocument.CCYEUR && (countryId == string.Empty || countryId == BaseDocument.COUNTRY_DK))
                     checkErrors.Add(new CheckError(String.Format("Only currency DKK and EUR is allowed for domestic payments")));
             }
 

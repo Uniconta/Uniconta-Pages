@@ -16,23 +16,25 @@ x:Class="UnicontaClient.Pages.CustomPage.GLBudgetPage2"
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <UnicontaControls:CorasauRibbonControl x:Name="frmRibbon" XMLSourcePath=";component/Assets/FormRibbon.xml" Grid.Row="0"/>
-            <UnicontaControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Vertical" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
-                <UnicontaControls:CorasauLayoutGroup x:Name="grpDescription" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Description}" Orientation="Vertical" UnicontaControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                    <UnicontaControls:CorasauLayoutItem FieldName="Name" x:Name="liName">
-                        <UnicontaControls:TextEditor Text="{Binding Name,Mode=TwoWay}" x:Name="txtName"/>
-                    </UnicontaControls:CorasauLayoutItem>
-                    <UnicontaControls:CorasauLayoutItem  FieldName="FromDate" x:Name="lifromDate">
-                        <UnicontaControls:DateEditor EditValue="{Binding FromDate,Mode=TwoWay}" />
-                    </UnicontaControls:CorasauLayoutItem>
-                    <UnicontaControls:CorasauLayoutItem  FieldName="ToDate" x:Name="liToDate">
-                        <UnicontaControls:DateEditor EditValue="{Binding ToDate,Mode=TwoWay}" />
-                    </UnicontaControls:CorasauLayoutItem>
-                    <UnicontaControls:CorasauLayoutItem FieldName="Comment" x:Name="liComment">
-                        <UnicontaControls:TextEditor Text="{Binding Comment,Mode=TwoWay}"/>
-                    </UnicontaControls:CorasauLayoutItem>
-                    <UnicontaControls:CorasauLayoutItem FieldName="BaseBudget" x:Name="liBaseBudget">
-                        <UnicontaControls:LookupEditor x:Name="leBaseBudget" Text="{Binding BaseBudget,Mode=TwoWay}"/>
-                    </UnicontaControls:CorasauLayoutItem>
+            <UnicontaControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
+                <UnicontaControls:CorasauLayoutGroup Orientation="Vertical" x:Name="grpFirst">
+                    <UnicontaControls:CorasauLayoutGroup x:Name="grpDescription" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Description}" Orientation="Vertical" UnicontaControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                        <UnicontaControls:CorasauLayoutItem FieldName="Name" x:Name="liName">
+                            <UnicontaControls:TextEditor Text="{Binding Name,Mode=TwoWay}" x:Name="txtName"/>
+                        </UnicontaControls:CorasauLayoutItem>
+                        <UnicontaControls:CorasauLayoutItem  FieldName="FromDate" x:Name="lifromDate">
+                            <UnicontaControls:DateEditor EditValue="{Binding FromDate,Mode=TwoWay}" />
+                        </UnicontaControls:CorasauLayoutItem>
+                        <UnicontaControls:CorasauLayoutItem  FieldName="ToDate" x:Name="liToDate">
+                            <UnicontaControls:DateEditor EditValue="{Binding ToDate,Mode=TwoWay}" />
+                        </UnicontaControls:CorasauLayoutItem>
+                        <UnicontaControls:CorasauLayoutItem FieldName="Comment" x:Name="liComment">
+                            <UnicontaControls:TextEditor Text="{Binding Comment,Mode=TwoWay}"/>
+                        </UnicontaControls:CorasauLayoutItem>
+                        <UnicontaControls:CorasauLayoutItem FieldName="BaseBudget" x:Name="liBaseBudget">
+                            <UnicontaControls:LookupEditor x:Name="leBaseBudget" Text="{Binding BaseBudget,Mode=TwoWay}"/>
+                        </UnicontaControls:CorasauLayoutItem>
+                    </UnicontaControls:CorasauLayoutGroup>
                 </UnicontaControls:CorasauLayoutGroup>
             </UnicontaControls:CorasauLayoutControl>
        </Grid>

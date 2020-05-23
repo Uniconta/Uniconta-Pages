@@ -29,6 +29,7 @@ using System.ComponentModel.DataAnnotations;
 using UnicontaClient.Controls.Dialogs;
 using DevExpress.Xpf.Grid;
 using System.ComponentModel;
+using Uniconta.API.Service;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -42,13 +43,24 @@ namespace UnicontaClient.Pages.CustomPage
         public override string NameOfControl { get { return TabControls.StatementLineTransPage; } }
         static public DateTime fromDate { get; set; }
         static public DateTime toDate { get; set; }
-        readonly BankStatement master;
-        readonly bool ShowCurrency;
+        BankStatement master;
+        bool ShowCurrency;
 
+        public BankStGLTransPage(BaseAPI API)
+            : base(API, string.Empty)
+        {
+            Init();
+        }
         public BankStGLTransPage(UnicontaBaseEntity sourceData)
             : base(sourceData)
         {
+            Init();
             master = sourceData as BankStatement;
+            UpdateMaster();
+        }
+
+        void Init()
+        {
             if (fromDate == DateTime.MinValue)
             {
                 DateTime date = DateTime.Today;
@@ -60,6 +72,18 @@ namespace UnicontaClient.Pages.CustomPage
             InitializeComponent();
             this.DataContext = this;
 
+            dgAccountsTransGrid.api = api;
+            SetRibbonControl(localMenu, dgAccountsTransGrid);
+            dgAccountsTransGrid.BusyIndicator = busyIndicator;
+            localMenu.OnItemClicked += localMenu_OnItemClicked;
+
+            RibbonBase rb = (RibbonBase)localMenu.DataContext;
+            ibase = UtilDisplay.GetMenuCommandByName(rb, "ShowHideGreenLines");
+        }
+
+        void UpdateMaster()
+        {
+            dgAccountsTransGrid.UpdateMaster(master);
             bool RoundTo100;
             var Comp = api.CompanyEntity;
             if (Comp.SameCurrency(master._Currency))
@@ -74,15 +98,21 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (!Comp._UseVatOperation)
                 VatOperation.Visible = false;
+        }
 
-            dgAccountsTransGrid.api = api;
-            SetRibbonControl(localMenu, dgAccountsTransGrid);
-            dgAccountsTransGrid.UpdateMaster(master);
-            dgAccountsTransGrid.BusyIndicator = busyIndicator;
-            localMenu.OnItemClicked += localMenu_OnItemClicked;
-
-            RibbonBase rb = (RibbonBase)localMenu.DataContext;
-            ibase = UtilDisplay.GetMenuCommandByName(rb, "ShowHideGreenLines");
+        public override void SetParameter(IEnumerable<ValuePair> Parameters)
+        {
+            foreach (var rec in Parameters)
+            {
+                if (string.Compare(rec.Name, "Bank", StringComparison.CurrentCultureIgnoreCase) == 0)
+                {
+                    var cache = api.GetCache(typeof(Uniconta.DataModel.BankStatement)) ?? api.LoadCache(typeof(Uniconta.DataModel.BankStatement)).GetAwaiter().GetResult();
+                    master = (Uniconta.DataModel.BankStatement)cache.Get(rec.Value);
+                    if (master != null)
+                        UpdateMaster();
+                }
+            }
+            base.SetParameter(Parameters);
         }
 
         protected override Filter[] DefaultFilters()
@@ -97,6 +127,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             LoadType(new Type[] { typeof(Uniconta.DataModel.Debtor), typeof(Uniconta.DataModel.Creditor) });
         }
+
         protected override void OnLayoutLoaded()
         {
             base.OnLayoutLoaded();

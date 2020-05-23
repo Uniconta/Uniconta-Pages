@@ -115,30 +115,29 @@ namespace UnicontaClient.Pages.CustomPage
                 InitQuery();
             }
         }
-       
+
         private void localMenu_OnItemClicked(string ActionType)
         {
             var selectedItem = dgDebtorTransOpen.SelectedItem as DebtorTransOpenClient;
             switch (ActionType)
             {
                 case "EditRow":
-                    if (selectedItem == null)
-                        return;
-                    AddDockItem(TabControls.DebtorTranPage2, selectedItem, Uniconta.ClientTools.Localization.lookup("TransactionOutstanding"), "Edit_16x16.png");
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.DebtorTranPage2, selectedItem, Uniconta.ClientTools.Localization.lookup("TransactionOutstanding"), "Edit_16x16.png");
                     break;
                 case "SettleTran":
                     Settle();
                     break;
                 case "Settlements":
-                    if (selectedItem == null)
-                        return;
-                    string header = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("Settlements"), selectedItem.Voucher);
-                    AddDockItem(TabControls.DebtorSettlements, selectedItem.Trans, header);
+                    if (selectedItem != null)
+                    {
+                        string header = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("Settlements"), selectedItem.Voucher);
+                        AddDockItem(TabControls.DebtorSettlements, selectedItem.Trans, header);
+                    }
                     break;
                 case "ViewDownloadRow":
-                    if (selectedItem == null)
-                        return;
-                    DebtorTransactions.ShowVoucher(dgDebtorTransOpen.syncEntity, api,busyIndicator);
+                    if (selectedItem != null)
+                        DebtorTransactions.ShowVoucher(dgDebtorTransOpen.syncEntity, api, busyIndicator);
                     break;
                 case "SaveGrid":
                     dgDebtorTransOpen.SelectedItem = null;
@@ -157,19 +156,64 @@ namespace UnicontaClient.Pages.CustomPage
                         AddDockItem(TabControls.AccountsTransaction, dgDebtorTransOpen.syncEntity, vheader);
                     }
                     break;
+                case "SendAsEmail":
+                    if (selectedItem != null)
+                        SendEmail(selectedItem);
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
         }
 
+        private void SendEmail(DebtorTransOpenClient debtorTransOpen)
+        {
+            var postType = debtorTransOpen.Trans._PostType;
+            DebtorEmailType emailType = DebtorEmailType.InterestNote;
+            bool isInterest = false;
+            if (postType != (byte)DCPostType.Collection || postType != (byte)DCPostType.CollectionLetter || postType != (byte)DCPostType.InterestFee || postType != (byte)DCPostType.PaymentCharge)
+                return;
+
+            if (postType == (byte)DCPostType.InterestFee)
+                isInterest = true;
+            if (postType == (byte)DCPostType.Collection)
+                emailType = DebtorEmailType.Collection;
+            else
+            {
+                CWCollectionLetter collectionLetterWin = new CWCollectionLetter();
+                collectionLetterWin.Closed += delegate
+                {
+                    if (collectionLetterWin.DialogResult == true)
+                        if (!Enum.TryParse(collectionLetterWin.Result, out emailType))
+                            return;
+                };
+                collectionLetterWin.Show();
+            }
+
+
+            var cwSendInvoice = new CWSendInvoice();
+#if !SILVERLIGHT
+            cwSendInvoice.DialogTableId = 2000000031;
+#endif
+            cwSendInvoice.Closed += delegate
+            {
+                var selectedRow = new DebtorTransOpenClient[] { debtorTransOpen };
+                var feelist = new [] { debtorTransOpen.Amount };
+
+                if (cwSendInvoice.DialogResult == true)
+                    DebtorPayments.ExecuteDebtorCollection(api, busyIndicator, selectedRow, feelist, null, false, emailType, cwSendInvoice.Emails,
+                        cwSendInvoice.sendOnlyToThisEmail, isInterest);
+
+            };
+            cwSendInvoice.Show();
+        }
         private void ReOpenAllTrans()
         {
             CWConfirmationBox dialog = new CWConfirmationBox(Uniconta.ClientTools.Localization.lookup("AreYouSureToContinue"), Uniconta.ClientTools.Localization.lookup("Confirmation"), false);
             dialog.Closing += async delegate
             {
                 if (dialog.ConfirmationResult == CWConfirmationBox.ConfirmationResultEnum.Yes)
-                {                  
+                {
                     TransactionAPI transApi = new TransactionAPI(this.api);
                     var masterAccount = dgDebtorTransOpen.masterRecord as DCAccount;
                     if (masterAccount != null)
@@ -180,7 +224,7 @@ namespace UnicontaClient.Pages.CustomPage
                         UtilDisplay.ShowErrorCode(errorCodes);
                         if (errorCodes == ErrorCodes.Succes)
                             InitQuery();
-                    }                   
+                    }
                 }
             };
             dialog.Show();
@@ -248,18 +292,18 @@ namespace UnicontaClient.Pages.CustomPage
             RibbonBase rb = (RibbonBase)localMenu.DataContext;
             var groups = UtilDisplay.GetMenuCommandsByStatus(rb, true);
             double payment = 0d, invoice = 0d;
-            double? paymentCur =0d, invoiceCur=0d;
+            double? paymentCur = 0d, invoiceCur = 0d;
             if (tranOpenMaster != null)
             {
                 payment = tranOpenMaster.AmountOpen;
-                paymentCur = tranOpenMaster.AmountOpenCur.HasValue ? tranOpenMaster.AmountOpenCur.Value: 0d;
+                paymentCur = tranOpenMaster.AmountOpenCur.HasValue ? tranOpenMaster.AmountOpenCur.Value : 0d;
                 if ((settles != null && settles.Count != 0))
                 {
                     invoice = settles.Sum(s => s.AmountOpen);
-                    invoiceCur= settles.Sum(s => s.AmountOpenCur);
+                    invoiceCur = settles.Sum(s => s.AmountOpenCur);
                 }
             }
-            
+
             foreach (var grp in groups)
             {
                 if (tranOpenMaster == null)
@@ -309,7 +353,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override void LoadCacheInBackGround()
         {
-            LoadType(new List<Type>(2) { typeof(Uniconta.DataModel.GLVat), typeof(Uniconta.DataModel.PaymentTerm) });
+            LoadType(new [] { typeof(Uniconta.DataModel.GLVat), typeof(Uniconta.DataModel.PaymentTerm) });
         }
     }
 }

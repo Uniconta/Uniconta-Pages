@@ -235,6 +235,13 @@ namespace UnicontaClient.Pages.CustomPage
             SetHeader();
         }
 
+        protected override void SyncEntityMasterRowChanged(UnicontaBaseEntity args)
+        {
+            dgDocsGrid.UpdateMaster(args);
+            SetHeader();
+            InitQuery();
+        }
+
         private void SetHeader()
         {
             string headerStr = Utility.GetHeaderString(dgDocsGrid.masterRecord);
@@ -329,6 +336,8 @@ namespace UnicontaClient.Pages.CustomPage
                 SetColumn();
             }
         }
+
+        public override bool IsDataChaged { get { return dgDocsGrid.dragStarted ? false : base.IsDataChaged; } }
 
         public override string NameOfControl
         {

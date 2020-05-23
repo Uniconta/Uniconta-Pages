@@ -41,7 +41,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
         private void bindTablelist()
         {
-            var xlist = new List<TableList>();
+            var xlist = new List<TableList>(100);
             List<Type> tablestype = Global.GetTables(api.CompanyEntity);
             foreach (var type in tablestype)
             {
@@ -50,17 +50,18 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     var attr = (ClientTableAttribute)clientTableAttr[0];
                     if (attr.CanUpdate)
-                        xlist.Add(new TableList() { Name = string.Format("{0} ({1})", type.Name, Uniconta.ClientTools.Localization.lookup(attr.LabelKey)), Type = type });
+                        xlist.Add(new TableList(type , string.Format("{0} ({1})", type.Name, Uniconta.ClientTools.Localization.lookup(attr.LabelKey))));
                 }
                 else
-                    xlist.Add(new TableList() { Name = type.Name, Type = type });
+                    xlist.Add(new TableList(type, type.Name));
             }
-            cmbStdTables.ItemsSource = xlist.OrderBy(x => x.Name).ToList();
+            xlist.Sort(new TableList.Sort());
+            cmbStdTables.ItemsSource = xlist;
             cmbStdTables.SelectedIndex = 0;
         }
         private void bindRefTable()
         {
-            var xlist = new List<TableList>();
+            var xlist = new List<TableList>(100);
             foreach (var type in Global.GetStandardUserRefTables())
             {
                 var clientTableAttr = type.GetCustomAttributes(typeof(ClientTableAttribute), true);
@@ -70,14 +71,15 @@ namespace UnicontaClient.Pages.CustomPage
                         continue;
                     var attr = (ClientTableAttribute)clientTableAttr[0];
                     if (attr.CanUpdate)
-                        xlist.Add(new TableList() { Name = string.Format("{0} ({1})", type.Name, Uniconta.ClientTools.Localization.lookup(attr.LabelKey)), Type = type });
+                        xlist.Add(new TableList(type, string.Format("{0} ({1})", type.Name, Uniconta.ClientTools.Localization.lookup(attr.LabelKey))));
                 }
                 else
-                    xlist.Add(new TableList() { Name = type.Name, Type = type });
+                    xlist.Add(new TableList(type, type.Name));
             }
             if (defaultAll)
-                xlist.Add(new TableList());
-            cmbStdTables.ItemsSource = xlist.OrderBy(x => x.Name).ToList();
+                xlist.Add(new TableList(null, null));
+            xlist.Sort(new TableList.Sort());
+            cmbStdTables.ItemsSource = xlist;
             cmbStdTables.SelectedIndex = 0;
         }
         private void OKButton_Click(object sender, RoutedEventArgs e)
@@ -98,7 +100,13 @@ namespace UnicontaClient.Pages.CustomPage
 
     public class TableList
     {
+        public TableList(Type t, string Name) { this.Name = Name;  this.Type = t; }
         public Type Type { get; set; }
         public string Name { get; set; }
+
+        public class Sort : IComparer<TableList>
+        {
+            public int Compare(TableList x, TableList y) { return string.Compare(x.Name, y.Name); }
+        }
     }
 }

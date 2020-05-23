@@ -177,6 +177,9 @@ namespace UnicontaClient.Pages.CustomPage
                 case "UpdateDeliveryNote":
                     UpdateDocument(CompanyLayoutType.PurchasePacknote);
                     break;
+                case "RecalculateOrderPrices":
+                    RecalculateOrderPrices();
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -204,13 +207,11 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void GenerateInvoice()
         {
-            UnicontaClient.Pages.CWGenerateInvoice GenrateInvoiceDialog = new UnicontaClient.Pages.CWGenerateInvoice(true, string.Empty, false, true, true, isQuickPrintVisible: false);
+            UnicontaClient.Pages.CWGenerateInvoice GenrateInvoiceDialog = new UnicontaClient.Pages.CWGenerateInvoice(true, string.Empty, false, true, true, false, isQuickPrintVisible: false);
 #if !SILVERLIGHT
             GenrateInvoiceDialog.DialogTableId = 2000000000;
             GenrateInvoiceDialog.HideOutlookOption(true);
 #endif
-            GenrateInvoiceDialog.tbShowInv.Visibility = Visibility.Collapsed;
-            GenrateInvoiceDialog.chkShowInvoice.Visibility = Visibility.Collapsed;
             GenrateInvoiceDialog.Closed += async delegate
             {
                 if (GenrateInvoiceDialog.DialogResult == true)
@@ -218,36 +219,14 @@ namespace UnicontaClient.Pages.CustomPage
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
                     busyIndicator.IsBusy = true;
 
-                    InvoiceAPI Invapi = new InvoiceAPI(api);
-                    int cnt = 0;
-                    List<string> errorList = new List<string>();
                     var crVisibleOrders = dgMultiInvGrid.GetVisibleRows() as IEnumerable<CreditorOrderClient>;
-                    foreach (var crOrder in crVisibleOrders)
-                    {
-                        var result = await Invapi.PostInvoice(crOrder, null, GenrateInvoiceDialog.GenrateDate, null,
-                            GenrateInvoiceDialog.IsSimulation, new CreditorInvoiceClient(),
-                            new CreditorInvoiceLines(),
-                            GenrateInvoiceDialog.SendByEmail, false, Emails: GenrateInvoiceDialog.Emails, OnlyToThisEmail: GenrateInvoiceDialog.sendOnlyToThisEmail);
-                        if (result != null && result.Err == 0)
-                            cnt++;
-                        else
-                        {
-                            string error = string.Format("{0}:{1}", crOrder.OrderNumber, Uniconta.ClientTools.Localization.lookup(result.Err.ToString()));
-                            errorList.Add(error);
-                        }
-                    }
+
+                    var postingprintGenerator = new InvoicePostingPrintGenerator(api, this);
+                    postingprintGenerator.SetUpInvoicePosting(crVisibleOrders, GenrateInvoiceDialog.GenrateDate, GenrateInvoiceDialog.IsSimulation, CompanyLayoutType.PurchaseInvoice, false, false, false,
+                        GenrateInvoiceDialog.SendByEmail, GenrateInvoiceDialog.sendOnlyToThisEmail, GenrateInvoiceDialog.Emails, false);
+
+                    await postingprintGenerator.Execute();
                     busyIndicator.IsBusy = false;
-                    string updatedMsg = Uniconta.ClientTools.Localization.lookup("Succes");
-                    if (!GenrateInvoiceDialog.IsSimulation)
-                        updatedMsg = string.Format(Uniconta.ClientTools.Localization.lookup("RecordsUpdated"), cnt, Uniconta.ClientTools.Localization.lookup("CreditorOrders"));
-                    if (errorList.Count == 0)
-                        UnicontaMessageBox.Show(updatedMsg, Uniconta.ClientTools.Localization.lookup("Message"), MessageBoxButton.OK);
-                    else
-                    {
-                        errorList[0] = string.Format("{0}/r/n{1}", updatedMsg, errorList[0]);
-                        CWErrorBox errorDialog = new CWErrorBox(errorList.ToArray(), true);
-                        errorDialog.Show();
-                    }
                 }
             };
             GenrateInvoiceDialog.Show();
@@ -256,13 +235,11 @@ namespace UnicontaClient.Pages.CustomPage
         private void UpdateDocument(CompanyLayoutType documentType)
         {
             bool showUpdateInv = api.CompanyEntity.Storage;
-            var generateDoc = new CWGenerateInvoice(false, documentType.ToString(), false, true, true, isQuickPrintVisible:false ,isShowUpdateInv: showUpdateInv);
+            var generateDoc = new CWGenerateInvoice(false, documentType.ToString(), false, true, true, false, isQuickPrintVisible: false, isShowUpdateInv: showUpdateInv);
 #if !SILVERLIGHT
             generateDoc.DialogTableId = 2000000000;
             generateDoc.HideOutlookOption(true);
 #endif
-            generateDoc.tbShowInv.Visibility = Visibility.Collapsed;
-            generateDoc.chkShowInvoice.Visibility = Visibility.Collapsed;
             generateDoc.Closed += async delegate
              {
                  if (generateDoc.DialogResult == true)
@@ -270,33 +247,14 @@ namespace UnicontaClient.Pages.CustomPage
                      busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
                      busyIndicator.IsBusy = true;
 
-                     InvoiceAPI Invapi = new InvoiceAPI(api);
-                     int cnt = 0;
-                     List<string> errorList = new List<string>();
                      var crVisibleOrders = dgMultiInvGrid.GetVisibleRows() as IEnumerable<CreditorOrderClient>;
-                     foreach (var crOrder in crVisibleOrders)
-                     {
-                         var result = await Invapi.PostInvoice(crOrder, null, generateDoc.GenrateDate, null, !generateDoc.UpdateInventory, new CreditorInvoiceClient(), new CreditorInvoiceLines(),
-                             generateDoc.SendByEmail, false, Emails: generateDoc.Emails, OnlyToThisEmail: generateDoc.sendOnlyToThisEmail);
-                         if (result != null && result.Err == 0)
-                             cnt++;
-                         else
-                         {
-                             string error = string.Format("{0}:{1}", crOrder.OrderNumber, Uniconta.ClientTools.Localization.lookup(result.Err.ToString()));
-                             errorList.Add(error);
-                         }
-                     }
-                     busyIndicator.IsBusy = false;
-                     string updatedMsg = string.Format(Uniconta.ClientTools.Localization.lookup("RecordsUpdated"), cnt, Uniconta.ClientTools.Localization.lookup("CreditorOrders"));
 
-                     if (errorList.Count == 0)
-                         UnicontaMessageBox.Show(updatedMsg, Uniconta.ClientTools.Localization.lookup("Message"), MessageBoxButton.OK);
-                     else
-                     {
-                         errorList[0] = string.Format("{0}/r/n{1}", updatedMsg, errorList[0]);
-                         CWErrorBox errorDialog = new CWErrorBox(errorList.ToArray(), true);
-                         errorDialog.Show();
-                     }
+                     var invoicePostingPrintGenerator = new InvoicePostingPrintGenerator(api, this);
+                     invoicePostingPrintGenerator.SetUpInvoicePosting(crVisibleOrders, generateDoc.GenrateDate, !generateDoc.UpdateInventory, documentType, false, false, false,
+                         generateDoc.SendByEmail, generateDoc.sendOnlyToThisEmail, generateDoc.Emails, false);
+
+                     await invoicePostingPrintGenerator.Execute();
+                     busyIndicator.IsBusy = false;
                  }
              };
             generateDoc.Show();
@@ -329,6 +287,26 @@ namespace UnicontaClient.Pages.CustomPage
                     UpdateVoucher(selectedItem);
                 }
             }
+        }
+
+        private void RecalculateOrderPrices()
+        {
+            var orderLst = dgMultiInvGrid.GetVisibleRows() as IEnumerable<CreditorOrderClient>;
+            if (orderLst == null || orderLst.Count() == 0)
+                return;
+            CWConfirmationBox dialog = new CWConfirmationBox(Uniconta.ClientTools.Localization.lookup("AreYouSureToContinue"), Uniconta.ClientTools.Localization.lookup("Confirmation"), false);
+            dialog.Closing += async delegate
+            {
+                if (dialog.ConfirmationResult == CWConfirmationBox.ConfirmationResultEnum.Yes)
+                {
+                    busyIndicator.IsBusy = true;
+                    OrderAPI orderApi = new OrderAPI(this.api);
+                    var err = await orderApi.RecalcOrderPrices(orderLst);
+                    busyIndicator.IsBusy = false;
+                    UtilDisplay.ShowErrorCode(err);
+                }
+            };
+            dialog.Show();
         }
     }
 }

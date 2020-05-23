@@ -56,7 +56,7 @@ namespace UnicontaClient.Pages.CustomPage
             else if (LoadedRow.CompanyId == -1)
             {
                 isReadOnly = true;
-                _bankImportFormatClient =CreateNew() as BankImportFormatClient;
+                _bankImportFormatClient = CreateNew() as BankImportFormatClient;
                 StreamingManager.Copy(LoadedRow, _bankImportFormatClient);
                 _bankImportFormatClient.ClearCompany();
             }
@@ -67,12 +67,36 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void frmRibbon_OnItemClicked(string ActionType)
         {
-            if (ActionType == "Save" && isReadOnly)
+            switch (ActionType)
             {
-                LoadedRow = null;
-                // will make an insert
+                case "ViewBankstatement":
+                    ViewBankStatemnt(_bankImportFormatClient);
+                    break;
+                default:
+                    if (ActionType == "Save" && isReadOnly)
+                    {
+                        LoadedRow = null;
+                        // will make an insert
+                    }
+                    frmRibbon_BaseActions(ActionType);
+                    break;
             }
-            frmRibbon_BaseActions(ActionType);
+        }
+
+        void ViewBankStatemnt(BankImportFormatClient selectedBankFormat)
+        {
+#if !SILVERLIGHT
+            var objCw = new CwViewBankStatementData(string.Empty, selectedBankFormat);
+            objCw.Closed += delegate
+            {
+                if (objCw.DialogResult == true)
+                {
+                    api.Update(selectedBankFormat);
+                    Uniconta.ClientTools.Controls.UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("PositionUpdateMsg"), Uniconta.ClientTools.Localization.lookup("Message"));
+                }
+            };
+            objCw.Show();
+#endif
         }
 
         public override UnicontaBaseEntity ModifiedRow { get { return _bankImportFormatClient; } set { _bankImportFormatClient = (BankImportFormatClient)value; } }

@@ -78,27 +78,21 @@ namespace UnicontaClient.Pages.CustomPage
             frmRibbon_BaseActions(ActionType);
         }
 
-        string zip;
         private async void Editrow_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == "ZipCode")
             {
-                if (zip == null)
+                var city = await UtilDisplay.GetCityAndAddress(editrow.ZipCode, api.CompanyEntity._CountryId);
+                if (city != null)
                 {
-                    var city = await UtilDisplay.GetCityAndAddress(editrow.ZipCode, api.CompanyEntity._CountryId);
-                    if (city != null)
-                    {
-                        editrow.City = city[0];
-                        var add1 = city[1];
-                        if (!string.IsNullOrEmpty(add1))
-                            editrow.Address1 = add1;
-                        zip = city[2];
-                        if (!string.IsNullOrEmpty(zip))
-                            editrow.ZipCode = zip;
-                    }
+                    editrow.City = city[0];
+                    var add1 = city[1];
+                    if (!string.IsNullOrEmpty(add1))
+                        editrow.Address1 = add1;
+                    var zip = city[2];
+                    if (!string.IsNullOrEmpty(zip))
+                        editrow.ZipCode = zip;
                 }
-                else
-                    zip = null;
             }
         }
 

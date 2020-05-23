@@ -42,6 +42,7 @@
       <RibbonItem Action="InvBOMPartOfWhereUsed" LocalizedNameKey="WhereUsed" ControlName="InvBOMPartOfPage" Glyph="Single_16x16.png"/>
       <RibbonItem Action="InvBOMProductionPosted" LocalizedNameKey="ProductionPosted" ControlName="ProductionPostedGridPage" Glyph="Tick_16x16.png"/>
       <RibbonItem Action="InvHierarichalBOM" LocalizedNameKey="HierarchicalBOM" ControlName="InventoryHierarchicalBOMStatement" Glyph="Distributor_16x16.png"/>
+      <RibbonItem Action="InvExplodeBOM" LocalizedNameKey="ExplodedBOM" ControlName="InvBOMExplodePage" Glyph="Customer_Group_16x16.png"/>
     </RibbonItem>
   </RibbonItem>
   <RibbonItem LocalizedNameKey="Reports">

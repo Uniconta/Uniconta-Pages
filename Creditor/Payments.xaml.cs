@@ -667,7 +667,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         public void ExportDataGrid(StreamWriter writer, char seperator)
         {
-            System.Collections.IList source = (dgCreditorTranOpenGrid.ItemsSource as System.Collections.IList);
+            var source = dgCreditorTranOpenGrid.GetVisibleRows();
             if (source == null || source.Count == 0)
                 return;
             List<string> Headers = new List<string>(15);
@@ -686,7 +686,7 @@ namespace UnicontaClient.Pages.CustomPage
                 }
             }
 
-            char[] specialChar = new char[] { '"', seperator };
+            char[] specialChar = new char[] { '"', seperator, '\n' };
             CreateHeaderRow(writer, Headers, seperator, specialChar);
             //create row
             foreach (CreditorTransOpenClient data in source)
@@ -870,6 +870,8 @@ namespace UnicontaClient.Pages.CustomPage
                                                     UtilDisplay.ShowErrorCode(err);
                                                 break;
                                         }
+
+                                        writer.Flush();
                                     }
                                 }
                             }
@@ -906,7 +908,7 @@ namespace UnicontaClient.Pages.CustomPage
                         }
                         catch (Exception ex)
                         {
-                            UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"));
+                            UnicontaMessageBox.Show(ex);
                         }
                     }
                     else
@@ -1044,17 +1046,18 @@ namespace UnicontaClient.Pages.CustomPage
 #endif
                     {
                         var errorCode = paymentPluginObj.Generate(Trans, PaymentSetup, stream);
+                        stream.Flush();
+                        stream.Close();
                         if (errorCode != ErrorCodes.Succes)
                         {
                             var err = paymentPluginObj.GetErrorDescription();
                             UnicontaMessageBox.Show(err, Uniconta.ClientTools.Localization.lookup("Information"));
                         }
-                        stream.Close();
                     }
                 }
                 catch (Exception ex)
                 {
-                    UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"), MessageBoxButton.OK);
+                    UnicontaMessageBox.Show(ex);
                     return;
                 }
             }
@@ -1168,9 +1171,9 @@ namespace UnicontaClient.Pages.CustomPage
                 if (validateOnly)
                 {
                     if (countErr == 0)
-                        UnicontaMessageBox.Show(Localization.lookup("ValidateNoError"), Uniconta.ClientTools.Localization.lookup("Validation"), MessageBoxButton.OK, MessageBoxImage.Information);
+                        UnicontaMessageBox.Show(Localization.lookup("ValidateNoError"), Localization.lookup("Validate"), MessageBoxButton.OK, MessageBoxImage.Information);
                     else
-                        UnicontaMessageBox.Show(string.Format(Localization.lookup("ValidateFailInLines"), countErr), Uniconta.ClientTools.Localization.lookup("Validation"), MessageBoxButton.OK, MessageBoxImage.Warning);
+                        UnicontaMessageBox.Show(string.Format("{0} {1}", countErr, Localization.lookup("JournalFailedValidation")), Localization.lookup("Validate"), MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
             }
 

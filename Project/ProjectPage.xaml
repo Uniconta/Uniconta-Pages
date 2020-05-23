@@ -120,6 +120,8 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="MiscellaneousSales" Width="100" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="OtherCost" Width="100" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="OtherSales" Width="100" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="AdjustmentCost" Width="100" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="AdjustmentSales" Width="100" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Revenue"  Width="100" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="OnAccountSales" Width="100" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="WIP" Width="100" Visible="True"/>
@@ -135,12 +137,14 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectPage"
                     <local:SumColumn FieldName="ExpensesCost" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                     <local:SumColumn FieldName="MiscellaneousCost" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                     <local:SumColumn FieldName="OtherCost" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <local:SumColumn FieldName="AdjustmentCost" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                     <local:SumColumn FieldName="MaterialsSales" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                     <local:SumColumn FieldName="ExternalWorkSales" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                     <local:SumColumn FieldName="LabourSales" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                     <local:SumColumn FieldName="ExpensesSales" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                     <local:SumColumn FieldName="MiscellaneousSales" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                     <local:SumColumn FieldName="OtherSales" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <local:SumColumn FieldName="AdjustmentSales" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                     <local:SumColumn FieldName="CostValue" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                     <local:SumColumn FieldName="SalesValue" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                     <local:SumColumn FieldName="WIP" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>

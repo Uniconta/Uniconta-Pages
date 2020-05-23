@@ -70,7 +70,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (dc != null)
                     editrow._Country = dc._Country;
             }
-            leWorkStationGroup.api = crudapi;
+            leWorkStationGroup.api = leDeliveryTerm.api = crudapi;
             leDCAccount.api = crudapi;
             cbCountry.ItemsSource= Enum.GetValues(typeof(Uniconta.Common.CountryCode));
             layoutItems.DataContext = editrow;
@@ -102,27 +102,21 @@ namespace UnicontaClient.Pages.CustomPage
             else
             frmRibbon_BaseActions(ActionType);
         }
-        string zip;
         private async void Editrow_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == "ZipCode")
             {
-                if (zip == null)
+                var city = await UtilDisplay.GetCityAndAddress(editrow.ZipCode, editrow.Country);
+                if (city != null)
                 {
-                    var city = await UtilDisplay.GetCityAndAddress(editrow.ZipCode, editrow.Country);
-                    if (city != null)
-                    {
-                        editrow.City = city[0];
-                        var add1 = city[1];
-                        if (!string.IsNullOrEmpty(add1))
-                            editrow.Address1 = add1;
-                        zip = city[2];
-                        if (!string.IsNullOrEmpty(zip))
-                            editrow.ZipCode = zip;
-                    }
+                    editrow.City = city[0];
+                    var add1 = city[1];
+                    if (!string.IsNullOrEmpty(add1))
+                        editrow.Address1 = add1;
+                    var zip = city[2];
+                    if (!string.IsNullOrEmpty(zip))
+                        editrow.ZipCode = zip;
                 }
-                else
-                    zip = null;
             }
         }
 
@@ -152,7 +146,7 @@ namespace UnicontaClient.Pages.CustomPage
                 }
                 catch (Exception ex)
                 {
-                    UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"), MessageBoxButton.OK);
+                    UnicontaMessageBox.Show(ex);
                     return;
                 }
                 if (!onlyRunOnce)
@@ -221,7 +215,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void LiZipCode_OnButtonClicked(object sender)
         {
-            var location = string.Format("{0}+{1}+{2}+{3}+{4}+{5}", editrow._Address1, editrow._Address2, editrow._Address3, editrow._ZipCode, editrow._City, editrow.Country);
+            var location = editrow._Address1 + "+" + editrow._Address2 + "+" + editrow._Address3 + "+" + editrow._ZipCode + "+" + editrow._City + "+" + editrow.Country;
             Utility.OpenGoogleMap(location);
         }
 #endif

@@ -104,7 +104,7 @@ namespace UnicontaClient.Pages.CustomPage
                 layoutRefTable.Visibility = Visibility.Visible;
                 liMultiline.Visibility = Visibility.Visible;
             }
-            else if ((_FieldType == CustomTypeCode.Double) || (_FieldType == CustomTypeCode.Single))
+            else if ((_FieldType == CustomTypeCode.Double) || (_FieldType == CustomTypeCode.Single) || (_FieldType == CustomTypeCode.Money))
             {
                 liMath.Visibility = Visibility.Visible;
                 layoutRefTable.Visibility = Visibility.Collapsed;

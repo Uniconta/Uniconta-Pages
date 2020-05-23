@@ -406,6 +406,9 @@ namespace UnicontaClient.Pages.CustomPage
                     };
                     cwJournal.Show();
                     break;
+                case "Storage":
+                    AddDockItem(TabControls.InvItemStoragePage, dgReOrderList.syncEntity, true);
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -603,13 +606,25 @@ namespace UnicontaClient.Pages.CustomPage
             if (Available < MinStockLevel)
             {
                 var PurchaseQty = rec._PurchaseQty;
-                if (PurchaseQty != 0d && PurchaseQty != 1d)
+                if (PurchaseQty > 0d && PurchaseQty != 1d)
                 {
                     rec._Quantity = Math.Max(PurchaseQty, rec._PurchaseMin);
-                    while (rec._Quantity + Available < MinStockLevel)
-                        rec._Quantity += PurchaseQty;
-                    while (rec._Quantity + PurchaseQty + Available < MaxStockLevel)
-                        rec._Quantity += PurchaseQty;
+
+                    var dif = MinStockLevel - (rec._Quantity + Available);
+                    if (dif > 0)
+                    {
+                        rec._Quantity += Math.Round(dif / PurchaseQty) * PurchaseQty;
+                        if (rec._Quantity + Available < MinStockLevel)
+                            rec._Quantity += PurchaseQty;
+                    }
+
+                    dif = MaxStockLevel - (rec._Quantity + PurchaseQty + Available);
+                    if (dif > 0)
+                    {
+                        rec._Quantity += Math.Round(dif / PurchaseQty) * PurchaseQty;
+                        if (rec._Quantity + PurchaseQty + Available < MaxStockLevel)
+                            rec._Quantity += PurchaseQty;
+                    }
                 }
                 else
                     rec._Quantity = Math.Max(rec._PurchaseMin, MaxStockLevel - Available);

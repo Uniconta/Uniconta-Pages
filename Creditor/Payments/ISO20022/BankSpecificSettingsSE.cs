@@ -122,12 +122,11 @@ namespace UnicontaISO20022CreditTransfer
         /// Unambiguous identification of the BBAN account of the creditor (domestic account number).
         /// In Denmark it will be: Reg. no. + Account no. 14 char (4+10)
         /// </summary>
-        public override string CreditorBBAN(String recBBAN, String credBBAN)
+        public override string CreditorBBAN(string recBBAN, string credBBAN, string bic)
         {
-            var bban = string.Empty;
             var regNum = string.Empty;
 
-            bban = recBBAN ?? string.Empty;
+            var bban = recBBAN ?? string.Empty;
 
             bban = Regex.Replace(bban, "[^0-9]", "");
 

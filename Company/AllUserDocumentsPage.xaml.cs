@@ -89,29 +89,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var doc = dg.SelectedItem as UserDocsClient;
             if (doc != null && dg.CurrentColumn?.Name == "KeyStr")
-            {
-                switch (doc._TableId)
-                {
-                    case Uniconta.DataModel.Debtor.CLASSID://50
-                        lookup.TableType = typeof(Uniconta.DataModel.Debtor);
-                        break;
-                    case Uniconta.DataModel.Creditor.CLASSID://51
-                        lookup.TableType = typeof(Uniconta.DataModel.Creditor);
-                        break;
-                    case Uniconta.DataModel.Subscription.CLASSID://308
-                        lookup.TableType = typeof(Uniconta.DataModel.Subscription);
-                        break;
-                    case Uniconta.DataModel.DebtorOrder.CLASSID://71
-                        lookup.TableType = typeof(Uniconta.DataModel.DebtorOrder);
-                        break;
-                    case Uniconta.DataModel.CreditorOrder.CLASSID://72
-                        lookup.TableType = typeof(Uniconta.DataModel.CreditorOrder);
-                        break;
-                    case Uniconta.DataModel.InvItem.CLASSID://23
-                        lookup.TableType = typeof(Uniconta.DataModel.InvItem);
-                        break;
-                }
-            }
+                lookup.TableType = doc.RefType;
             return lookup;
         }
 

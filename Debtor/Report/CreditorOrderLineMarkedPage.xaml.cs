@@ -29,13 +29,13 @@ namespace UnicontaClient.Pages.CustomPage
     public partial class CreditorOrderLineMarkedPage : GridBasePage
     {
         public override string NameOfControl { get { return TabControls.CreditorOrderLineMarkedPage; } }
-        DebtorOrderLineClient debtorOrderLine;
+        DCOrderLineClient debtorOrderLine;
         long orderRefLine;
         public CreditorOrderLineMarkedPage(UnicontaBaseEntity orderLine) : base(null)
         {
             InitializeComponent();
             ((TableView)dgCreditorOrderLineGrid.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
-            debtorOrderLine = orderLine as DebtorOrderLineClient;
+            debtorOrderLine = orderLine as DCOrderLineClient;
             orderRefLine = debtorOrderLine.OrderRefLine;
             SetHeader();
             dgCreditorOrderLineGrid.api = api;

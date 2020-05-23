@@ -28,10 +28,10 @@
     <RibbonItem Action="LoadSerieBatch" LocalizedNameKey="ShowOBJ" Parameter="SerialBatchNumber" Module="SerialBatchNumbers" LargeGlyph="Inventory_Trans_32x32.png"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="PostJournal" LocalizedNameKey="GenerateJournalLines" Glyph="Delete_16x16.png" LargeGlyph="Orders_32x32.png" />
+    <RibbonItem Action="PostJournal" LocalizedNameKey="GenerateJournalLines"  LargeGlyph="Generate_32x32.png" />
   </RibbonItem>
  <RibbonItem>
-    <RibbonItem Action="Export" LocalizedNameKey="Export"  LargeGlyph="Export_32x32.png"/>
-    <RibbonItem Action="Import" LocalizedNameKey="Import"  Module="SerialBatchNumbers" LargeGlyph="Import_32x32.png"/>
+    <RibbonItem Action="Export" LocalizedNameKey="Export" LargeGlyph="Export_32x32.png"/>
+    <RibbonItem Action="Import" LocalizedNameKey="Import" LargeGlyph="Import_32x32.png"/>
   </RibbonItem>
 </root>

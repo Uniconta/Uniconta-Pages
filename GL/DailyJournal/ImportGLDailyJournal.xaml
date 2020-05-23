@@ -18,74 +18,76 @@ x:Class="UnicontaClient.Pages.CustomPage.ImportGLDailyJournal"
         </Grid.RowDefinitions>
         <CorasauControls:CorasauRibbonControl x:Name="frmRibbon" XMLSourcePath=";component/Pages/GL/DailyJournal/ImportGLDailyJournalRibbon.xml" Grid.Row="0"/>
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
-            <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Vertical" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
-                <CorasauControls:CorasauLayoutGroup x:Name="grpDescription" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Description}" Orientation="Vertical" MinWidth="350" 
+            <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Horizontal" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
+                <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="grpFirst">
+                    <CorasauControls:CorasauLayoutGroup x:Name="grpDescription" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Description}" Orientation="Vertical" MinWidth="350" 
                                                 CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                    <CorasauControls:CorasauLayoutItem FieldName="FormatName"  x:Name="liFormatName">
-                        <CorasauControls:ComboBoxEditor x:Name="cmdBankFormats"  DisplayMember="FormatName" SelectedIndexChanged="cmdBankFormats_SelectedIndexChanged"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="BankAccount" x:Name="liBankAccount">
-                        <CorasauControls:LookupEditor   x:Name="BankAccountLookupEditor" Text="{Binding BankAccount,Mode=TwoWay}" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="BankAccountPos" x:Name="liBankAccountPos">
-                        <CorasauControls:ComboBoxEditor x:Name="cbBankAccountPos" SelectedItem="{Binding BankAccountPos,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="Reverse" x:Name="liReverse">
-                        <CorasauControls:CheckEditor x:Name="chkReverse" IsChecked="{Binding Reverse,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="PutLinesOnHold" x:Name="liPutLinesOnHold">
-                        <CorasauControls:CheckEditor x:Name="chkPutLinesOnHold" IsChecked="{Binding PutLinesOnHold,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="AddVoucherNumber" x:Name="liAddVoucherNumber">
-                        <CorasauControls:CheckEditor x:Name="chkAddVoucherNumber" IsChecked="{Binding AddVoucherNumber,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="LastImport"  x:Name="liLastImport">
-                        <CorasauControls:DateEditor EditValue="{Binding LastImport,Mode=OneWay}" AllowDefaultButton="False" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem  x:Name="liUserDocFile" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=UserDocFile}" LabelVerticalAlignment="Top">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="20" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
-                            <CorasauControls:FileBrowseControl x:Name="ctrlBrowseFile" Grid.Row="0" IsMultiSelect="True" />
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OR}" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                            <Grid Grid.Row="2">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition />
-                                </Grid.ColumnDefinitions>
-                                <Button Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Attach}" Height="23" VerticalAlignment="Top" x:Name="btnAttach" Click="btnAttach_Click"  />
-                                <TextBlock x:Name="txtAttachedFile"  Margin="3,0,0,0"  Grid.Column="1" VerticalAlignment="Top" />
+                        <CorasauControls:CorasauLayoutItem FieldName="FormatName"  x:Name="liFormatName">
+                            <CorasauControls:ComboBoxEditor x:Name="cmdBankFormats"  DisplayMember="FormatName" SelectedIndexChanged="cmdBankFormats_SelectedIndexChanged"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="BankAccount" x:Name="liBankAccount">
+                            <CorasauControls:LookupEditor   x:Name="BankAccountLookupEditor" Text="{Binding BankAccount,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="BankAccountPos" x:Name="liBankAccountPos">
+                            <CorasauControls:ComboBoxEditor x:Name="cbBankAccountPos" SelectedItem="{Binding BankAccountPos,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="Reverse" x:Name="liReverse">
+                            <CorasauControls:CheckEditor x:Name="chkReverse" IsChecked="{Binding Reverse,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="PutLinesOnHold" x:Name="liPutLinesOnHold">
+                            <CorasauControls:CheckEditor x:Name="chkPutLinesOnHold" IsChecked="{Binding PutLinesOnHold,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="AddVoucherNumber" x:Name="liAddVoucherNumber">
+                            <CorasauControls:CheckEditor x:Name="chkAddVoucherNumber" IsChecked="{Binding AddVoucherNumber,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="LastImport"  x:Name="liLastImport">
+                            <CorasauControls:DateEditor EditValue="{Binding LastImport,Mode=OneWay}" AllowDefaultButton="False" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem  x:Name="liUserDocFile" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=UserDocFile}" LabelVerticalAlignment="Top">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="20" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <CorasauControls:FileBrowseControl x:Name="ctrlBrowseFile" Grid.Row="0" IsMultiSelect="True" />
+                                <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OR}" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                <Grid Grid.Row="2">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition />
+                                    </Grid.ColumnDefinitions>
+                                    <Button Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Attach}" Height="23" VerticalAlignment="Top" x:Name="btnAttach" Click="btnAttach_Click"  />
+                                    <TextBlock x:Name="txtAttachedFile"  Margin="3,0,0,0"  Grid.Column="1" VerticalAlignment="Top" />
+                                </Grid>
                             </Grid>
-                        </Grid>
-                    </CorasauControls:CorasauLayoutItem>
-                </CorasauControls:CorasauLayoutGroup>
+                        </CorasauControls:CorasauLayoutItem>
+                    </CorasauControls:CorasauLayoutGroup>
 
-                <CorasauControls:CorasauLayoutGroup x:Name="grpInterval"  View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Interval}" Orientation="Vertical" MinWidth="350" 
+                    <CorasauControls:CorasauLayoutGroup x:Name="grpInterval"  View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Interval}" Orientation="Vertical" MinWidth="350" 
                                                 CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                    <CorasauControls:CorasauLayoutItem   x:Name="liFromDate" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FromDate}">
-                        <CorasauControls:DateEditor x:Name="txtFromDate"  />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem   x:Name="liToDate" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ToDate}">
-                        <CorasauControls:DateEditor x:Name="txtToDate"  />
-                    </CorasauControls:CorasauLayoutItem>
-                </CorasauControls:CorasauLayoutGroup>
-                
-                <CorasauControls:CorasauLayoutGroup x:Name="grpUserLogin" Visibility="Collapsed" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Login}" Orientation="Vertical" MinWidth="350" 
-                                                CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                    <CorasauControls:CorasauLayoutItem FieldName="LoginId"  x:Name="liLoginId">
-                        <CorasauControls:TextEditor x:Name="txtLoginId" Text="{Binding LoginId,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="Passowrd"  x:Name="liPassword">
-                        <CorasauControls:PasswordBoxEditor x:Name="txtPassowrd" Text="{Binding Password,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BankAccount}"  x:Name="liBankAcc">
-                        <CorasauControls:TextEditor x:Name="txtBankAccount" />
-                    </CorasauControls:CorasauLayoutItem>
-                </CorasauControls:CorasauLayoutGroup>
+                        <CorasauControls:CorasauLayoutItem   x:Name="liFromDate" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FromDate}">
+                            <CorasauControls:DateEditor x:Name="txtFromDate"  />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem   x:Name="liToDate" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ToDate}">
+                            <CorasauControls:DateEditor x:Name="txtToDate"  />
+                        </CorasauControls:CorasauLayoutItem>
+                    </CorasauControls:CorasauLayoutGroup>
 
+                    <CorasauControls:CorasauLayoutGroup x:Name="grpUserLogin" Visibility="Collapsed" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Login}" Orientation="Vertical" MinWidth="350" 
+                                                CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                        <CorasauControls:CorasauLayoutItem FieldName="LoginId"  x:Name="liLoginId">
+                            <CorasauControls:TextEditor x:Name="txtLoginId" Text="{Binding LoginId,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="Password"  x:Name="liPassword">
+                            <CorasauControls:PasswordBoxEditor x:Name="txtPassowrd" Text="{Binding Password,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BankAccount}"  x:Name="liBankAcc">
+                            <CorasauControls:TextEditor x:Name="txtBankAccount" />
+                        </CorasauControls:CorasauLayoutItem>
+                    </CorasauControls:CorasauLayoutGroup>
+
+                </CorasauControls:CorasauLayoutGroup>
             </CorasauControls:CorasauLayoutControl>
         </CorasauControls:BusyIndicator>
     </Grid>

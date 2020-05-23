@@ -77,13 +77,12 @@ namespace UnicontaClient.Pages.CustomPage
                         CreateAndStreamFirstAndLast(result, sw, true, companyRegNo);
                         var sumOfAmount = StreamToFile(result, sw);
                         CreateAndStreamFirstAndLast(result, sw, false, companyRegNo, result.Count, sumOfAmount);
-                        stream.Flush();
-                        stream.Close();
+                        sw.Flush();
                     }
                 }
                 catch (Exception ex)
                 {
-                    UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"));
+                    UnicontaMessageBox.Show(ex);
                     return false;
                 }
             }

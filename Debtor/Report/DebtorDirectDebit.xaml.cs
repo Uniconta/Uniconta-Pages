@@ -129,6 +129,33 @@ namespace UnicontaClient.Pages.CustomPage
             GetShowHideTextSection();
             SetShowHideStatusInfoSection(true);
             SetShowHideTextSection();
+#if SILVERLIGHT
+            Application.Current.RootVisual.KeyDown += RootVisual_KeyDown;
+#else
+            this.PreviewKeyDown += RootVisual_KeyDown;
+#endif
+            this.BeforeClose += DebtorDirectDebit_BeforeClose;
+        }
+
+        private void DebtorDirectDebit_BeforeClose()
+        {
+#if SILVERLIGHT
+            Application.Current.RootVisual.KeyDown -= RootVisual_KeyDown;
+#else
+            this.PreviewKeyDown -= RootVisual_KeyDown;
+#endif
+        }
+
+        private void RootVisual_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.R && Keyboard.Modifiers.HasFlag(ModifierKeys.Alt))
+            {
+                localMenu_OnItemClicked("StatusResend");
+            }
+            else if (e.Key == Key.S && Keyboard.Modifiers.HasFlag(ModifierKeys.Alt))
+            {
+                localMenu_OnItemClicked("StatusStopPayment");
+            }
         }
 
         private void Table_ShowingEditor(object sender, DevExpress.Xpf.Grid.ShowingEditorEventArgs e)
@@ -448,9 +475,9 @@ namespace UnicontaClient.Pages.CustomPage
                 var countErr = queryPaymentTrans.Where(s => (s.ErrorInfo != Common.VALIDATE_OK) && (s.ErrorInfo != null)).Count();
 
                 if (countErr == 0)
-                    UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("ValidateNoError"),  Uniconta.ClientTools.Localization.lookup("Validation"), MessageBoxButton.OK, MessageBoxImage.Information);
+                    UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("ValidateNoError"),  Uniconta.ClientTools.Localization.lookup("Validate"), MessageBoxButton.OK, MessageBoxImage.Information);
                 else
-                    UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("ValidateFailInLines"), countErr), Uniconta.ClientTools.Localization.lookup("Validation"), MessageBoxButton.OK, MessageBoxImage.Warning);
+                    UnicontaMessageBox.Show(string.Format("{0} {1}", countErr, Uniconta.ClientTools.Localization.lookup("JournalFailedValidation")), Uniconta.ClientTools.Localization.lookup("Validate"), MessageBoxButton.OK, MessageBoxImage.Warning);
             }
 
             return true;
@@ -516,10 +543,11 @@ namespace UnicontaClient.Pages.CustomPage
 
                         IEnumerable<DebtorTransDirectDebit> queryPaymentTrans = ListDebTransPaym.AsEnumerable();
 
+                        Common.MergePayment(api.CompanyEntity, queryPaymentTrans);
+
                         ValidatePayments(queryPaymentTrans, false, debPaymentFormat, false, false, true);
 
-                        if (Common.MergePayment(api.CompanyEntity, queryPaymentTrans))
-                            setMergeUnMergePaym(doMergePaym);
+                        setMergeUnMergePaym(doMergePaym);
                     }
                     else
                     {
@@ -704,7 +732,7 @@ namespace UnicontaClient.Pages.CustomPage
                         }
                         catch (Exception ex)
                         {
-                            UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"));
+                            UnicontaMessageBox.Show(ex);
                         }
                     }
                 }
@@ -796,7 +824,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (changeToStatus == PaymentStatusLevel.StopPayment)
             {
-                foreach (var rec in (IEnumerable<DebtorTransDirectDebit>)dgDebtorTranOpenGrid.ItemsSource)
+                foreach (var rec in (IEnumerable<DebtorTransDirectDebit>)dgDebtorTranOpenGrid.GetVisibleRows())
                 {
                     if (rec._PaymentStatus == PaymentStatusLevel.StopPayment || rec._PaymentStatus == PaymentStatusLevel.OnHold || rec._PaymentStatus == PaymentStatusLevel.None || rec._PaymentStatus == PaymentStatusLevel.PaymentReceived || rec._PaymentStatus == PaymentStatusLevel.PaymentReceivedDiff)
                         continue;
@@ -1035,7 +1063,11 @@ namespace UnicontaClient.Pages.CustomPage
             int idx = 0;
             foreach (var rec in lst)
             {
-                rec.TransactionText = lstInvoiceTxt[idx];
+                var invText = lstInvoiceTxt[idx];
+                if (invText == "NoInvoiceTransaction")
+                    invText = Uniconta.ClientTools.Localization.lookup("NoInvoiceTransaction");
+
+                rec.TransactionText = invText;
                 idx++;
             }
         }

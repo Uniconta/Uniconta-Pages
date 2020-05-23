@@ -28,6 +28,7 @@ using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.DataModel.System;
 using Uniconta.DataModel;
 using UnicontaClient.Pages;
+using Uniconta.Common.User;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -80,6 +81,9 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (country != CountryCode.Denmark && country != CountryCode.FaroeIslands && country != CountryCode.Greenland)
                 liPymtCodeOpt.Visibility = Visibility.Collapsed;
+
+            if (BasePage.session.User._Role < (byte)UserRoles.Admin)
+                liOIOUBLSendOnServer.Visibility = Visibility.Collapsed;
         }
 
         private bool onlyRunOnce;
@@ -110,7 +114,7 @@ namespace UnicontaClient.Pages.CustomPage
                 }
                 catch (Exception ex)
                 {
-                    UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"), MessageBoxButton.OK);
+                    UnicontaMessageBox.Show(ex);
                     return;
                 }
 

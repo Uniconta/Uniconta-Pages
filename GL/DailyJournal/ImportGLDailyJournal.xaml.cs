@@ -72,10 +72,14 @@ namespace UnicontaClient.Pages.CustomPage
         public override void Utility_Refresh(string screenName, object argument = null)
         {
             if (screenName == TabControls.ImportGLDailyJournalPage2)
-                Dispatcher.BeginInvoke(new Action(() => { SetBankFormats(false); })); 
+            {
+                var arg = argument as object[];
+                var bankFormat = arg[1] as BankImportFormatClient;
+                Dispatcher.BeginInvoke(new Action(() => { SetBankFormats(false, bankFormat.RowId); }));
+            }
         }
 
-        async void SetBankFormats(bool initial)
+        async void SetBankFormats(bool initial, int bankImportid = 0)
         {
             var bsClient = importMaster as Uniconta.DataModel.BankStatement;
             BankAccount = bsClient?._Account;
@@ -87,10 +91,11 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (bankFormats != null && bankFormats.Length > 0)
             {
-                if (initial && bsClient != null && bsClient._BankImportId != 0)
+                if ((initial && bsClient != null && bsClient._BankImportId != 0) || (!initial && bankImportid > 0))
                 {
+                    int bankImportRowId = bankImportid > 0 ? bankImportid : bsClient._BankImportId;
                     for (int i = bankFormats.Length; (--i >= 0);)
-                        if (bankFormats[i].RowId == bsClient._BankImportId)
+                        if (bankFormats[i].RowId == bankImportRowId)
                         {
                             selectedFormatIndex = i;
                             break;
@@ -101,7 +106,7 @@ namespace UnicontaClient.Pages.CustomPage
             else
                 cmdBankFormats.SelectedIndex = -1;
 
-            if(!initial)
+            if (!initial)
                 SetValuesForSelectedBankImport();
         }
 
@@ -200,15 +205,13 @@ namespace UnicontaClient.Pages.CustomPage
                     !string.IsNullOrEmpty(journal) ? Uniconta.ClientTools.Localization.lookup("Journallines") : Uniconta.ClientTools.Localization.lookup("BankStatement")), " ?");
 
                 var select = UnicontaMessageBox.Show(text, Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OKCancel);
-
                 if (select == MessageBoxResult.OK)
                 {
-                    errt = selectedbankFormat._BankReconciliation ? ShowBankStatementLines(selectedbankFormat.BankAccount) : ShowGlDailyJournalLines(journal);
-                    err = await errt;
+                    if (selectedbankFormat._BankReconciliation)
+                        ShowBankStatementLines(selectedbankFormat.BankAccount);
+                    else
+                        ShowGlDailyJournalLines(journal);
                 }
-
-                if (err != ErrorCodes.Succes)
-                    UtilDisplay.ShowErrorCode(err);
             }
         }
 
@@ -236,36 +239,19 @@ namespace UnicontaClient.Pages.CustomPage
             return importZipResult;
         }
 
-        private async Task<ErrorCodes> ShowGlDailyJournalLines(string journal)
+        private void ShowGlDailyJournalLines(string journal)
         {
-            ErrorCodes err = ErrorCodes.Succes;
-            var jour = importMaster as GLDailyJournalClient;
-            if (jour == null)
-            {
-                jour = new GLDailyJournalClient();
-                jour._Journal = journal;
-                err = await api.Read(jour);
-            }
-            if (err == ErrorCodes.Succes)
-                AddDockItem(TabControls.GL_DailyJournalLine, jour, null, null, true);
-
-            return err;
+            var parms = new[] { new BasePage.ValuePair("Journal", journal) };
+            AddDockItem(TabControls.GL_DailyJournalLine, null, null, null, true, null, parms);
         }
 
-        private async Task<ErrorCodes> ShowBankStatementLines(string bankAccount)
+        private void ShowBankStatementLines(string bankAccount)
         {
-            ErrorCodes err = ErrorCodes.Succes;
             var bankStatement = importMaster as BankStatementClient;
-            if (bankStatement == null)
-            {
-                bankStatement = new BankStatementClient();
-                bankStatement._Account = bankAccount;
-                err = await api.Read(bankStatement);
-            }
-            if (err == ErrorCodes.Succes)
-                AddDockItem(TabControls.BankStatementLinePage, bankStatement, null, null, true);
-
-            return err;
+            if (bankStatement != null)
+                bankAccount = bankStatement._Account;
+            var parms = new[] { new BasePage.ValuePair("Bank", bankAccount) };
+            AddDockItem(TabControls.BankStatementLinePage, null, null, null, true, null, parms);
         }
 
         void frmRibbon_OnItemClicked(string ActionType)
@@ -279,7 +265,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "Import":
                     if (selectedbankFormat != null)
                     {
-                        if(selectedbankFormat.Format == BankImportFormatType.LANDSBANKINN || selectedbankFormat.Format == BankImportFormatType.ISLANDSBANKI || selectedbankFormat.Format == BankImportFormatType.ARION)
+                        if (selectedbankFormat.Format == BankImportFormatType.LANDSBANKINN || selectedbankFormat.Format == BankImportFormatType.ISLANDSBANKI || selectedbankFormat.Format == BankImportFormatType.ARION)
                         {
                             if (string.IsNullOrWhiteSpace(txtLoginId.Text) || string.IsNullOrEmpty(txtPassowrd.Text) || string.IsNullOrWhiteSpace(txtBankAccount.Text))
                             {
@@ -288,7 +274,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 return;
                             }
                             else
-                                this.BankAccount = selectedbankFormat._BankAccount;  
+                                this.BankAccount = selectedbankFormat._BankAccount;
                         }
                         selectedbankFormat._BankReconciliation = ImportToBankStatement;
                         if (!ImportToBankStatement) //Importing to Journal Lines
@@ -318,15 +304,25 @@ namespace UnicontaClient.Pages.CustomPage
                     CopyBankFormat(selectedbankFormat);
                     break;
                 case "ViewBankstatement":
-                    ViewBankStatemnt();
+                    if (selectedbankFormat == null)
+                        return;
+                    ViewBankStatemnt(selectedbankFormat);
                     break;
             }
         }
 
-        void ViewBankStatemnt()
+        void ViewBankStatemnt(BankImportFormatClient selectedBankFormat)
         {
 #if !SILVERLIGHT
-            var objCw = new CwViewBankStatementData(ctrlBrowseFile.FilePath);
+            var objCw = new CwViewBankStatementData(ctrlBrowseFile.FilePath, selectedBankFormat);
+            objCw.Closed += delegate
+                {
+                    if (objCw.DialogResult == true)
+                    {
+                        api.Update(selectedBankFormat);
+                        UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("PositionUpdateMsg"), Uniconta.ClientTools.Localization.lookup("Message"));
+                    }
+                };
             objCw.Show();
 #endif
         }

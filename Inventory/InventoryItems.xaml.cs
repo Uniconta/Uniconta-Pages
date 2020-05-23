@@ -342,6 +342,10 @@ namespace UnicontaClient.Pages.CustomPage
                 case "UndoDelete":
                     dgInventoryItemsGrid.UndoDeleteRow();
                     break;
+                case "InvExplodeBOM":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.InvBOMExplodePage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ExplodedBOM"), selectedItem._Item));
+                    break;
 #if !SILVERLIGHT
                 case "InvTransPivot":
                     if (selectedItem != null)

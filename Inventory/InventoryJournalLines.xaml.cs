@@ -70,43 +70,35 @@ namespace UnicontaClient.Pages.CustomPage
     {
         SQLCache items, warehouse, debtors, creditors, standardVariants, variants1, variants2;
         public override string NameOfControl { get { return TabControls.InventoryJournalLines; } }
-
-        public InventoryJournalLines(UnicontaBaseEntity master) : base(master)
-        {
-            InitPage(master);
-        }
+        InvJournal journal;
 
         public InventoryJournalLines(BaseAPI API) : base(API, string.Empty)
         {
-            InitPage(null);
+            InitPage();
         }
 
-        InvJournal journal;
+        public InventoryJournalLines(UnicontaBaseEntity master) : base(master)
+        {
+            InitPage();
+            journal = master as InvJournal;
+            if (journal != null)
+            {
+                dgInvJournalLine._AutoSave = journal._AutoSave;
+                dgInvJournalLine.UpdateMaster(master);
+            }
+        }
 
-        private void InitPage(UnicontaBaseEntity master)
+        private void InitPage()
         {
             this.DataContext = this;
             InitializeComponent();
             SetRibbonControl(localMenu, dgInvJournalLine);
             dgInvJournalLine.api = api;
             dgInvJournalLine.BusyIndicator = busyIndicator;
-            if (master != null)
-            {
-                journal = master as InvJournal;
-                if (journal == null)
-                    throw new Exception("This page only supports master InvJournalLine");
-
-                dgInvJournalLine._AutoSave = journal._AutoSave;
-                dgInvJournalLine.UpdateMaster(master);
-            }
 
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgInvJournalLine.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;
-            var company = api.CompanyEntity;
-            if (!company.Location || !company.Warehouse)
-                LocationTo.Visible = LocationTo.ShowInColumnChooser = Location.Visible = Location.ShowInColumnChooser = false;
-            if (!company.Warehouse)
-                WarehouseTo.Visible = WarehouseTo.ShowInColumnChooser = Warehouse.Visible = Warehouse.ShowInColumnChooser = false;
+
             var Comp = api.CompanyEntity;
             this.items = Comp.GetCache(typeof(InvItem));
             this.warehouse = Comp.GetCache(typeof(InvWarehouse));
@@ -121,6 +113,24 @@ namespace UnicontaClient.Pages.CustomPage
                 dgInvJournalLine.ClearSorting();
                 dgInvJournalLine.IsLoadedFromLayoutSaved = false;
             }
+        }
+
+        public override void SetParameter(IEnumerable<ValuePair> Parameters)
+        {
+            foreach (var rec in Parameters)
+            {
+                if (string.Compare(rec.Name, "Journal", StringComparison.CurrentCultureIgnoreCase) == 0)
+                {
+                    var cache = api.GetCache(typeof(Uniconta.DataModel.InvJournal)) ?? api.LoadCache(typeof(Uniconta.DataModel.InvJournal)).GetAwaiter().GetResult();
+                    journal = (Uniconta.DataModel.InvJournal)cache.Get(rec.Value);
+                    if (journal != null)
+                    {
+                        dgInvJournalLine._AutoSave = journal._AutoSave;
+                        dgInvJournalLine.UpdateMaster(journal);
+                    }
+                }
+            }
+            base.SetParameter(Parameters);
         }
 
         protected override void OnLayoutLoaded()
@@ -151,19 +161,20 @@ namespace UnicontaClient.Pages.CustomPage
         {
             get
             {
-                if (DataChanged)
-                    return true;
-                return base.IsDataChaged;
+                return DataChanged || base.IsDataChaged;
             }
         }
 
         public override void Utility_Refresh(string screenName, object argument)
         {
+            var param = argument as object[];
+            if (param == null)
+                return;
+
             if (screenName == TabControls.ItemVariantAddPage)
             {
-                var param = argument as object[];
-                var Journal = (string)param[1];
-                if (param != null && Journal == journal._Journal)
+                var Journal = Convert.ToString(param[1]);
+                if (Journal == journal._Journal)
                 {
                     var invItems = param[0] as List<UnicontaBaseEntity>;
                     dgInvJournalLine.PasteRows(invItems);

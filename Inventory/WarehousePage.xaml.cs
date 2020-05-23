@@ -18,6 +18,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using Uniconta.API.Service;
+using Uniconta.ClientTools.Util;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -66,6 +67,36 @@ namespace UnicontaClient.Pages.CustomPage
                 case "Location":
                     if (selectedItem == null) return;
                     AddDockItem(TabControls.LocationPage, selectedItem, string.Format("{0}:{1},{2}", Uniconta.ClientTools.Localization.lookup("Location"), selectedItem.Warehouse, selectedItem.Name));
+                    break;
+                case "JoinWarehouse":
+                    if (selectedItem == null)
+                        return;
+                    var cwJoinTwoWareHouse = new CwJoinTwoWarehouseLocation(api, selectedItem);
+                    cwJoinTwoWareHouse.Closed += async delegate
+                    {
+                        if (cwJoinTwoWareHouse.DialogResult == true)
+                        {
+                            var ret = await cwJoinTwoWareHouse.JoinResult;
+                            UtilDisplay.ShowErrorCode(ret);
+                            if (ret == ErrorCodes.Succes)
+                                dgWarehouseClientGrid.Refresh();
+                        }
+                    };
+                    cwJoinTwoWareHouse.Show();
+                    break;
+                case "JoinLocation":
+                    if (selectedItem == null)
+                        return;
+                    var cwJoinTwoLocation = new CwJoinTwoWarehouseLocation(api, selectedItem,joinWareHouse: false);
+                    cwJoinTwoLocation.Closed += async delegate
+                    {
+                        if (cwJoinTwoLocation.DialogResult == true)
+                        {
+                            var ret = await cwJoinTwoLocation.JoinResult;
+                            UtilDisplay.ShowErrorCode(ret);
+                        }
+                    };
+                    cwJoinTwoLocation.Show();
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);

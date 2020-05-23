@@ -21,64 +21,66 @@ x:Class="UnicontaClient.Pages.CustomPage.AddUserFieldsPage2"
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <CorasauControls:CorasauRibbonControl x:Name="frmRibbon" XMLSourcePath=";component/Pages/Company/AddUserFieldsPage2Ribbon.xml" Grid.Row="0"/>
-            <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Vertical" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
-                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpUserFields" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=UserFields}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                    <CorasauControls:CorasauLayoutItem FieldName="Name" x:Name="liName">
-                        <CorasauControls:TextEditor Text="{Binding Name,Mode=TwoWay}" Mask="[a-zA-Z][a-zA-Z0-9]+" MaskType="RegEx" x:Name="txtName"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="Prompt" x:Name="liPrompt">
-                        <CorasauControls:TextEditor Text="{Binding Prompt,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="Format" x:Name="liFormat">
-                        <CorasauControls:TextEditor Text="{Binding Format,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="GroupName" x:Name="liGroupName">
-                        <CorasauControls:TextEditor Text="{Binding GroupName,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="Type" x:Name="liType">
-                        <CorasauControls:ComboBoxEditor x:Name="cbType" SelectedItem="{Binding Type,Mode=TwoWay}" SelectedIndexChanged="cbType_SelectedIndexChanged"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="RefTable" x:Name="layoutRefTable">
-                        <CorasauControls:ComboBoxEditor x:Name="cbRefTable" SelectedItem="{Binding RefTable,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="Math" x:Name="liMath">
-                        <CorasauControls:CheckEditor IsChecked="{Binding Math,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="ReadOnly" x:Name="liReadOnly">
-                        <CorasauControls:CheckEditor IsChecked="{Binding ReadOnly,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="Delete" x:Name="liDelete">
-                        <CorasauControls:CheckEditor IsChecked="{Binding Delete,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="Mandatory" x:Name="liMandatory">
-                        <CorasauControls:CheckEditor IsChecked="{Binding Mandatory,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="Hide" x:Name="liHide">
-                        <CorasauControls:CheckEditor IsChecked="{Binding Hide,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="MultiLine" x:Name="liMultiline">
-                        <CorasauControls:CheckEditor IsChecked="{Binding MultiLine,Mode=TwoWay}" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="MaxWidth" x:Name="liMaxWidth">
-                        <CorasauControls:IntegerEditor Text="{Binding MaxWidth,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                </CorasauControls:CorasauLayoutGroup>
-                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpSql" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=SQL}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                    <CorasauControls:CorasauLayoutItem FieldName="Length" x:Name="liLength">
-                        <CorasauControls:TextEditor Text="{Binding Length,Mode=TwoWay}" x:Name="txtLength"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="Unicode" x:Name="liUnicode">
-                        <CorasauControls:CheckEditor IsChecked="{Binding Unicode,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="NullValues" x:Name="liNullValues">
-                        <CorasauControls:CheckEditor IsChecked="{Binding NullValues,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="IntSize" x:Name="liIntSize">
-                        <CorasauControls:ComboBoxEditor x:Name="cbIntSize" SelectedItem="{Binding IntSize,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="DateType" x:Name="liDateType">
-                        <CorasauControls:ComboBoxEditor SelectedItem="{Binding DateType,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
+            <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
+                <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="grpFirst">
+                    <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpUserFields" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=UserFields}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                        <CorasauControls:CorasauLayoutItem FieldName="Name" x:Name="liName">
+                            <CorasauControls:TextEditor Text="{Binding Name,Mode=TwoWay}" Mask="[a-zA-Z][a-zA-Z0-9]+" MaskType="RegEx" x:Name="txtName"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="Prompt" x:Name="liPrompt">
+                            <CorasauControls:TextEditor Text="{Binding Prompt,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="Format" x:Name="liFormat">
+                            <CorasauControls:TextEditor Text="{Binding Format,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="GroupName" x:Name="liGroupName">
+                            <CorasauControls:TextEditor Text="{Binding GroupName,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="Type" x:Name="liType">
+                            <CorasauControls:ComboBoxEditor x:Name="cbType" SelectedItem="{Binding Type,Mode=TwoWay}" SelectedIndexChanged="cbType_SelectedIndexChanged"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="RefTable" x:Name="layoutRefTable">
+                            <CorasauControls:ComboBoxEditor x:Name="cbRefTable" SelectedItem="{Binding RefTable,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="Math" x:Name="liMath">
+                            <CorasauControls:CheckEditor IsChecked="{Binding Math,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="ReadOnly" x:Name="liReadOnly">
+                            <CorasauControls:CheckEditor IsChecked="{Binding ReadOnly,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="Delete" x:Name="liDelete">
+                            <CorasauControls:CheckEditor IsChecked="{Binding Delete,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="Mandatory" x:Name="liMandatory">
+                            <CorasauControls:CheckEditor IsChecked="{Binding Mandatory,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="Hide" x:Name="liHide">
+                            <CorasauControls:CheckEditor IsChecked="{Binding Hide,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="MultiLine" x:Name="liMultiline">
+                            <CorasauControls:CheckEditor IsChecked="{Binding MultiLine,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="MaxWidth" x:Name="liMaxWidth">
+                            <CorasauControls:IntegerEditor Text="{Binding MaxWidth,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                    </CorasauControls:CorasauLayoutGroup>
+                    <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpSql" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=SQL}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                        <CorasauControls:CorasauLayoutItem FieldName="Length" x:Name="liLength">
+                            <CorasauControls:TextEditor Text="{Binding Length,Mode=TwoWay}" x:Name="txtLength"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="Unicode" x:Name="liUnicode">
+                            <CorasauControls:CheckEditor IsChecked="{Binding Unicode,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="NullValues" x:Name="liNullValues">
+                            <CorasauControls:CheckEditor IsChecked="{Binding NullValues,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="IntSize" x:Name="liIntSize">
+                            <CorasauControls:ComboBoxEditor x:Name="cbIntSize" SelectedItem="{Binding IntSize,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="DateType" x:Name="liDateType">
+                            <CorasauControls:ComboBoxEditor SelectedItem="{Binding DateType,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                    </CorasauControls:CorasauLayoutGroup>
                 </CorasauControls:CorasauLayoutGroup>
             </CorasauControls:CorasauLayoutControl>
         </Grid>

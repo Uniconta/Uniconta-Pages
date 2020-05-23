@@ -3,98 +3,105 @@ x:Class="UnicontaClient.Pages.CustomPage.CWGenerateInvoice"
            xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
            xmlns:cw="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
-           xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+           xmlns:converter="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
            xmlns:ClientToolsControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
-           Width="{StaticResource Width33}" Height="{StaticResource Height33}" KeyDown="ChildWindow_KeyDown" IsTabStop="True" SizeToContent="WidthAndHeight">
-
+           Height="{StaticResource Height39}" Width="{StaticResource Width39}" KeyDown="ChildWindow_KeyDown" SizeToContent="Height" IsTabStop="True">
     <Grid x:Name="LayoutRoot" Margin="2" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
             <RowDefinition />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="30" x:Name="RowAccount" />
-                <RowDefinition Height="30" x:Name="RowChk"/>
-                <RowDefinition Height="Auto" x:Name="RowUpdateInv"/>
-                <RowDefinition Height="Auto"/>
-                <!--<RowDefinition Height="30" x:Name="RowDocType"/>-->
-                <RowDefinition Height="Auto" x:Name="RowDocType"/>
-                <!-- This row not required anymore-->
-                <RowDefinition Height="Auto" x:Name="RowInvNo"/>
-                <RowDefinition Height="Auto" x:Name="RowInvoice"/>
-                <RowDefinition Height="Auto" x:Name="RowSendByOutlook"/>
-                <RowDefinition Height="Auto" x:Name="RowSendByEmail"/>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" x:Name="RowNoMailMsg"/>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" x:Name="RowPostOnDel"/>
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="5"/>
-                <ColumnDefinition/>
-            </Grid.ColumnDefinitions>
-            <TextBlock x:Name="txtAccountLabel" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Account}" VerticalAlignment="Center" />
-            <TextBlock x:Name="txtAccountName" VerticalAlignment="Center" Grid.Column="2" />
-
-            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Simulation}" Grid.Row="1" VerticalAlignment="Center"></TextBlock>
-            <CheckBox x:Name="chkSimulation" VerticalAlignment="Center" Grid.Column="2" Grid.Row="1" IsChecked="{Binding IsSimulation, Mode=TwoWay}"></CheckBox>
-
-            <TextBlock Grid.Row="2" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=UpdateInventory}" VerticalAlignment="Center" Margin="0 0 0 10"></TextBlock>
-            <CheckBox x:Name="chkUpdateInv" Grid.Row="2" VerticalAlignment="Center" Grid.Column="2" Margin="0 0 0 10" IsChecked="{Binding UpdateInventory, Mode=TwoWay}"></CheckBox>
-
-            <TextBlock Grid.Row="3" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Date,Mode=OneWay}" VerticalAlignment="Center" Margin="0 0 0 10"></TextBlock>
-            <ClientToolsControls:DateEditor  Width="200" Height="25" x:Name="dpDate" Grid.Row="3" Grid.Column="2" HorizontalAlignment="Left" Margin="0 0 0 10" EditValue="{Binding GenrateDate, Mode=TwoWay}"/>
-
-            <!-- Not in use -->
-            <!--<TextBlock Grid.Row="3" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CompanyDocumentUse,Mode=OneWay}" VerticalAlignment="Center"></TextBlock>
-            <ClientToolsControls:ComboBoxEditor  Width="200" Height="25" x:Name="cmbDocType" Grid.Row="3" Grid.Column="2" HorizontalAlignment="Left"/>-->
-
-            <TextBlock Grid.Row="5" x:Name="txtInvNumberLabel"  VerticalAlignment="Center" Margin="0 0 0 10"></TextBlock>
-            <ClientToolsControls:IntegerEditor Text="{Binding InvoiceNumber,Mode=TwoWay}" SetMask="false"  Width="200" Height="25" x:Name="txtInvNumber" Grid.Row="5" Grid.Column="2" HorizontalAlignment="Left" Margin="0 0 0 10"/>
-
-            <TextBlock Grid.Row="6" x:Name="tbShowInv" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Print,Mode=OneWay}" VerticalAlignment="Center" Margin="0 0 0 10"></TextBlock>
-            <Grid HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="0 0 0 10" Grid.Row="6" Grid.Column="2">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-                <CheckBox x:Name="chkShowInvoice" Grid.Row="0" Grid.Column="0" IsChecked="{Binding ShowInvoice, Mode=TwoWay}" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Preview,Mode=OneWay}" Margin="0 0 5 0" Checked="chkShowInvoice_Checked" />
-                <CheckBox x:Name="chkPrintInvoice" Grid.Row="0" Grid.Column="1" IsChecked="{Binding InvoiceQuickPrint, Mode=TwoWay}"  Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=PrintImmediately,Mode=OneWay}" Checked="chkPrintInvoice_Checked" />
-                <StackPanel x:Name="stkPageNumberCount" Orientation="Vertical" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" IsEnabled="{Binding IsChecked,ElementName=chkPrintInvoice}">
-                    <ClientToolsControls:TextEditor  x:Name="txtPageCount" MaskType="RegEx" Mask="{StaticResource NumberGreaterThanZeroRegx}" Text="{Binding NumberOfPages}" HorizontalContentAlignment="Right" />
-                    <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=NumberOfCopies,Mode=OneWay}" FontStyle="Italic" FontSize="10" />
-                </StackPanel>
-            </Grid>
-
-            <TextBlock Grid.Row="7" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=SendInvoiceInOutLook}" VerticalAlignment="Center" Margin="0 0 0 10" />
-            <CheckBox x:Name="chkSendOutlook" IsChecked="{Binding SendByOutlook, Mode=TwoWay}" Grid.Row="7" VerticalAlignment="Center" Grid.Column="2" Margin="0 0 0 10" Checked="chkSendOutlook_Checked"/>
-
-            <TextBlock Grid.Row="8" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=SendInvoiceByEmail}" VerticalAlignment="Center" Margin="0 0 0 10" />
-            <CheckBox x:Name="chkSendEmail" IsChecked="{Binding SendByEmail, Mode=TwoWay}" Grid.Row="8" VerticalAlignment="Center" Grid.Column="2" Margin="0 0 0 10" Checked="chkSendEmail_Checked" />
-            
-            <TextBlock Grid.Row="9" x:Name="tbShEmail" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Email,Mode=OneWay}" VerticalAlignment="Center" Margin="0 0 0 10"></TextBlock>
-            <ClientToolsControls:TextEditor x:Name="txtEmail" Text="{Binding Emails, Mode=TwoWay}" HandleKeyDown="False" MaskType="RegEx" Mask="{StaticResource EmailValidationRegx}" Grid.Row="9" Grid.Column="2" Width="200" Height="25"  VerticalAlignment="Center" HorizontalAlignment="Left" Margin="0 0 0 10"/>
-
-            <TextBlock Grid.Row="10" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=SendOnlyToThisEmail}" VerticalAlignment="Center" Margin="0 0 0 10"></TextBlock>
-            <CheckBox x:Name="chkSendOnlyEmail" Grid.Row="10" IsChecked="{Binding sendOnlyToThisEmail, Mode=TwoWay}" VerticalAlignment="Center" Grid.Column="2" Margin="0 0 0 10"></CheckBox>
-
-            <TextBlock Grid.Row="11" x:Name="txtNoMailMsg" VerticalAlignment="Center" Grid.ColumnSpan="3" HorizontalAlignment="Left" Margin="0 0 0 10"></TextBlock>
-
-            <TextBlock Grid.Row="12" x:Name="tbOIOUBL" Visibility="Collapsed" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=GenerateInvoiceOIOUBL,Mode=OneWay}" VerticalAlignment="Center" Margin="0 0 0 10"></TextBlock>
-            <CheckBox x:Name="chkOIOUBL" IsChecked="{Binding GenerateOIOUBLClicked, Mode=TwoWay}" Grid.Row="12" Visibility="Collapsed" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="0 0 0 10"/>
-
-            <TextBlock Grid.Row="13" x:Name="tbPostOnlyDelL" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=PostOnlyDelivered,Mode=OneWay}" VerticalAlignment="Center" Margin="0 0 0 10"></TextBlock>
-            <CheckBox x:Name="chkPostOnlyDel" IsChecked="{Binding PostOnlyDelivered, Mode=TwoWay}" Grid.Row="13"  Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="0 0 0 10"/>
-
+        <Grid x:Name="gridLayout" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+            <ClientToolsControls:CorasauLayoutControl Orientation="Horizontal" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
+                <ClientToolsControls:CorasauLayoutGroup x:Name="lgPrimary"  Orientation="Vertical"  Header="" HorizontalAlignment="Stretch">
+                    <ClientToolsControls:CorasauLayoutGroup x:Name="lgAccount"  View="GroupBox" GroupBoxDisplayMode="Light" IsCollapsible="False" HorizontalAlignment="Stretch" ClientToolsControls:CorasauLayoutControl.AllowHorizontalSizing="True">
+                        <ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
+                            <DataTemplate>
+                                <Image Source="/UnicontaPages;component/Assets/img/group-user_16x16.png" Width="16" Height="16" Stretch="UniformToFill" HorizontalAlignment="Left" />
+                            </DataTemplate>
+                        </ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
+                        <ClientToolsControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Account}">
+                            <TextBlock x:Name="txtAccountName"  />
+                        </ClientToolsControls:CorasauLayoutItem>
+                    </ClientToolsControls:CorasauLayoutGroup>
+                    <ClientToolsControls:CorasauLayoutGroup x:Name="lgImportant" IsCollapsible="False" GroupBoxDisplayMode="Light"  View="GroupBox" Orientation="Vertical" ClientToolsControls:CorasauLayoutControl.AllowHorizontalSizing="True"  Header="QuestionMark" HorizontalAlignment="Stretch">
+                        <ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
+                            <DataTemplate>
+                                <Image Source="/UnicontaPages;component/Assets/img/group-questiont_16x16.png" Width="16" Height="16" Stretch="UniformToFill" HorizontalAlignment="Left" />
+                            </DataTemplate>
+                        </ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
+                        <ClientToolsControls:CorasauLayoutItem FieldName="GenrateDate" x:Name="liGenrateDate">
+                            <ClientToolsControls:DateEditor x:Name="dpDate" EditValue="{Binding GenrateDate,Mode=TwoWay}"/>
+                        </ClientToolsControls:CorasauLayoutItem>
+                        <ClientToolsControls:CorasauLayoutItem x:Name="liInvoiceNumber">
+                            <ClientToolsControls:TextEditor x:Name="txtInvNumber" Text="{Binding InvoiceNumber,Mode=TwoWay}" MaxLength="17"/>
+                        </ClientToolsControls:CorasauLayoutItem>
+                        <ClientToolsControls:CorasauLayoutItem FieldName="IsSimulation" x:Name="liIsSimulation">
+                            <ClientToolsControls:CheckEditor x:Name="chkSimulation" IsChecked="{Binding IsSimulation,Mode=TwoWay}"/>
+                        </ClientToolsControls:CorasauLayoutItem>
+                        <ClientToolsControls:CorasauLayoutItem FieldName="UpdateInventory" x:Name="liUpdateInventory">
+                            <ClientToolsControls:CheckEditor x:Name="chkUpdateInv" IsChecked="{Binding UpdateInventory,Mode=TwoWay}"/>
+                        </ClientToolsControls:CorasauLayoutItem>
+                        <ClientToolsControls:CorasauLayoutItem FieldName="ShowInvoice" x:Name="liShowInvoice">
+                            <ClientToolsControls:CheckEditor x:Name="chkShowInvoice" IsChecked="{Binding ShowInvoice,Mode=TwoWay}" Checked="chkShowInvoice_Checked"/>
+                        </ClientToolsControls:CorasauLayoutItem>
+                        <ClientToolsControls:CorasauLayoutItem FieldName="PostOnlyDelivered" x:Name="liPostOnlyDelivered">
+                            <ClientToolsControls:CheckEditor x:Name="chkPostOnlyDel" IsChecked="{Binding PostOnlyDelivered,Mode=TwoWay}"/>
+                        </ClientToolsControls:CorasauLayoutItem>
+                    </ClientToolsControls:CorasauLayoutGroup>
+                </ClientToolsControls:CorasauLayoutGroup>
+                <ClientToolsControls:CorasauLayoutGroup x:Name="lgSecondary" Orientation="Vertical"  Header="" HorizontalAlignment="Stretch">
+                    <ClientToolsControls:CorasauLayoutGroup x:Name="lgPrint" IsCollapsible="False" GroupBoxDisplayMode="Light" View="GroupBox" Orientation="Vertical" HorizontalAlignment="Stretch" ClientToolsControls:CorasauLayoutControl.AllowHorizontalSizing="True">
+                        <ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
+                            <DataTemplate>
+                                <Image Source="/UnicontaPages;component/Assets/img/group-print_16x16.png" Width="16" Height="16" Stretch="Fill" HorizontalAlignment="Left" />
+                            </DataTemplate>
+                        </ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
+                        <ClientToolsControls:CorasauLayoutItem FieldName="InvoiceQuickPrint" x:Name="liInvoiceQuickPrint">
+                            <ClientToolsControls:CheckEditor x:Name="chkPrintInvoice" IsChecked="{Binding InvoiceQuickPrint,Mode=TwoWay}" Checked="chkPrintInvoice_Checked" />
+                        </ClientToolsControls:CorasauLayoutItem>
+                        <ClientToolsControls:CorasauLayoutItem FieldName="NumberOfPages" x:Name="liNumberOfPages">
+                            <ClientToolsControls:TextEditor   MaskType="RegEx" Mask="{StaticResource NumberGreaterThanZeroRegx}" IsEnabled="{Binding IsChecked,ElementName=chkPrintInvoice}" 
+                                                                     Text="{Binding NumberOfPages}" HorizontalContentAlignment="Right" />
+                        </ClientToolsControls:CorasauLayoutItem>
+                    </ClientToolsControls:CorasauLayoutGroup>
+                    <ClientToolsControls:CorasauLayoutGroup x:Name="lgEmail" IsCollapsible="False" GroupBoxDisplayMode="Light" View="GroupBox" Orientation="Vertical" HorizontalAlignment="Stretch" ClientToolsControls:CorasauLayoutControl.AllowHorizontalSizing="True">
+                        <ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
+                            <DataTemplate>
+                                <Image Source="/UnicontaPages;component/Assets/img/group-envelope_16x16.png" Width="16" Height="16" Stretch="Fill" HorizontalAlignment="Left"/>
+                            </DataTemplate>
+                        </ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
+                        <ClientToolsControls:CorasauLayoutItem FieldName="SendByOutlook" x:Name="liSendByOutlook">
+                            <ClientToolsControls:CheckEditor x:Name="chkSendOutlook" IsChecked="{Binding SendByOutlook,Mode=TwoWay}" Checked="chkSendOutlook_Checked" />
+                        </ClientToolsControls:CorasauLayoutItem>
+                        <ClientToolsControls:CorasauLayoutItem FieldName="SendByEmail" x:Name="liSendByEmail">
+                            <ClientToolsControls:CheckEditor x:Name="chkSendEmail" IsChecked="{Binding SendByEmail,Mode=TwoWay}" Checked="chkSendEmail_Checked" />
+                        </ClientToolsControls:CorasauLayoutItem>
+                        <ClientToolsControls:CorasauLayoutItem FieldName="sendOnlyToThisEmail" x:Name="lisendOnlyToThisEmail">
+                            <ClientToolsControls:CheckEditor x:Name="chkSendOnlyEmail" IsChecked="{Binding sendOnlyToThisEmail,Mode=TwoWay}" />
+                        </ClientToolsControls:CorasauLayoutItem>
+                        <ClientToolsControls:CorasauLayoutItem FieldName="Emails" x:Name="liEmails">
+                            <ClientToolsControls:TextEditor x:Name="txtEmail" Text="{Binding Emails, Mode=TwoWay}" HandleKeyDown="False" MaskType="RegEx" Mask="{StaticResource EmailValidationRegx}" Height="25" 
+                                                            IsEnabled="{Binding IsChecked,ElementName=chksendOnlyToThisEmail}" />
+                        </ClientToolsControls:CorasauLayoutItem>
+                        <ClientToolsControls:CorasauLayoutItem x:Name="liNoEmailMsg">
+                            <TextBlock x:Name="txtNoMailMsg" />
+                        </ClientToolsControls:CorasauLayoutItem>
+                    </ClientToolsControls:CorasauLayoutGroup>
+                    <ClientToolsControls:CorasauLayoutGroup x:Name="lgUBL" IsCollapsible="False" GroupBoxDisplayMode="Light" View="GroupBox" Visibility="Collapsed" HorizontalAlignment="Stretch" ClientToolsControls:CorasauLayoutControl.AllowHorizontalSizing="True">
+                        <ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
+                            <DataTemplate>
+                                <Image Source="/UnicontaPages;component/Assets/img/group-file_16x16.png" Width="16" Height="16" Stretch="Fill" HorizontalAlignment="Left"/>
+                            </DataTemplate>
+                        </ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
+                        <ClientToolsControls:CorasauLayoutItem FieldName="GenerateOIOUBLClicked" x:Name="liGenerateOIOUBLClicked">
+                            <ClientToolsControls:CheckEditor x:Name="chkOIOUBL" IsChecked="{Binding GenerateOIOUBLClicked,Mode=TwoWay}"/>
+                        </ClientToolsControls:CorasauLayoutItem>
+                    </ClientToolsControls:CorasauLayoutGroup>
+                </ClientToolsControls:CorasauLayoutGroup>
+            </ClientToolsControls:CorasauLayoutControl>
         </Grid>
-        <StackPanel x:Name="actionButton" HorizontalAlignment="Right" Grid.Row="1" Orientation="Horizontal" Margin="0 10 0 0">
+        <StackPanel x:Name="actionButton" HorizontalAlignment="Center" Grid.Row="1" Orientation="Horizontal" Margin="0 10 0 10">
             <Button x:Name="OKButton" IsDefault="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Generate}" Click="OKButton_Click" MinWidth="75" 
                     Height="23" HorizontalAlignment="Right" Margin="0 0 3 0" />
             <Button x:Name="CancelButton" IsCancel="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Cancel}" Click="CancelButton_Click" MinWidth="75" 

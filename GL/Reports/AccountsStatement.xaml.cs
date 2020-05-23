@@ -134,7 +134,7 @@ namespace UnicontaClient.Pages.CustomPage
         List<AccountStatementList> statementList;
         ReportAPI transApi;
         Uniconta.DataModel.GLAccount _master;
-
+        static bool pageBreak, setShowDimOnPrimo = true; 
         static public DateTime DefaultFromDate, DefaultToDate;
         static bool IsCollapsed = true;
         public static void SetDateTime(DateEditor frmDateeditor, DateEditor todateeditor)
@@ -223,6 +223,10 @@ namespace UnicontaClient.Pages.CustomPage
             var Pref = api.session.Preference;
             cbxAscending.IsChecked = Pref.Debtor_isAscending;
             cbxSkipBlank.IsChecked = Pref.Debtor_skipBlank;
+#if !SILVERLIGHT
+            cbxPageBreak.IsChecked = pageBreak;
+#endif
+            cbxShowDimOnPrimo.IsChecked = setShowDimOnPrimo;
 
             txtDateTo.DateTime = AccountStatement.DefaultToDate;
             txtDateFrm.DateTime = AccountStatement.DefaultFromDate;
@@ -538,6 +542,10 @@ namespace UnicontaClient.Pages.CustomPage
             var Pref = api.session.Preference;
             Pref.TransactionReport_isAscending = isAscending;
             Pref.TransactionReport_skipBlank = skipBlank;
+#if !SILVERLIGHT
+            pageBreak = cbxPageBreak.IsChecked.Value;
+#endif
+            setShowDimOnPrimo = showDimOnPrimo;
 
             string fromAccount = null, toAccount = null;
             var accountObj = cmbFromAccount.EditValue;
@@ -634,10 +642,7 @@ namespace UnicontaClient.Pages.CustomPage
 #if !SILVERLIGHT
         private void cbxPageBreak_Click(object sender, RoutedEventArgs e)
         {
-            if (cbxPageBreak.IsChecked == true)
-                dgGLTrans.PageBreak = true;
-            else
-                dgGLTrans.PageBreak = false;
+            dgGLTrans.PageBreak = (cbxPageBreak.IsChecked == true);
         }
 #endif
         public override object GetPrintParameter()

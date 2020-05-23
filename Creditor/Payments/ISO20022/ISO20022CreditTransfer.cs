@@ -195,7 +195,7 @@ namespace ISO20022CreditTransfer
                 switch (rec._PaymentMethod)
                 {
                     case PaymentTypes.VendorBankAccount:
-                        creditorAcc = bankSpecific.CreditorBBAN(rec._PaymentId, creditor._PaymentId);
+                        creditorAcc = bankSpecific.CreditorBBAN(rec._PaymentId, creditor._PaymentId, rec._SWIFT);
                         creditorOCRPaymentId = bankSpecific.CreditorRefNumber(rec._PaymentId); 
 
                         creditorBIC = bankSpecific.CreditorBIC(rec._SWIFT);

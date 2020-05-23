@@ -24,6 +24,7 @@ using System.Windows;
 using UnicontaClient.Pages.GL.ChartOfAccount.Reports;
 using Uniconta.API.GeneralLedger;
 using Uniconta.API.Project;
+using Uniconta.API.Service;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -129,21 +130,46 @@ namespace UnicontaClient.Pages.CustomPage
         Uniconta.DataModel.PrJournal masterJournal;
         Dictionary<string, Uniconta.API.DebtorCreditor.FindPrices> dictPriceLookup;
 
+        public ProjectJournalLinePage(BaseAPI API)
+            : base(API, string.Empty)
+        {
+            Init();
+        }
         public ProjectJournalLinePage(UnicontaBaseEntity master)
             : base(master)
         {
-            InitializeComponent();
+            Init();
             masterJournal = (Uniconta.DataModel.PrJournal)master;
+            dgProjectJournalLinePageGrid.UpdateMaster(master);
+        }
+
+        void Init()
+        {
+            InitializeComponent();
             localMenu.dataGrid = dgProjectJournalLinePageGrid;
             SetRibbonControl(localMenu, dgProjectJournalLinePageGrid);
             dgProjectJournalLinePageGrid.api = api;
-            dgProjectJournalLinePageGrid.UpdateMaster(masterJournal);
             dgProjectJournalLinePageGrid.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgProjectJournalLinePageGrid.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;
             postingApi = new UnicontaAPI.Project.API.PostingAPI(api);
             dictPriceLookup = new Dictionary<string, Uniconta.API.DebtorCreditor.FindPrices>();
             this.BeforeClose += JournalLine_BeforeClose;
+        }
+
+        public override void SetParameter(IEnumerable<ValuePair> Parameters)
+        {
+            foreach(var rec in Parameters)
+            {
+                if (string.Compare(rec.Name, "Journal", StringComparison.CurrentCultureIgnoreCase) == 0)
+                {
+                    var cache = api.GetCache(typeof(Uniconta.DataModel.PrJournal)) ?? api.LoadCache(typeof(Uniconta.DataModel.PrJournal)).GetAwaiter().GetResult();
+                    masterJournal = (Uniconta.DataModel.PrJournal)cache.Get(rec.Value);
+                    if (masterJournal != null)
+                        dgProjectJournalLinePageGrid.UpdateMaster(masterJournal);
+                }
+            }
+            base.SetParameter(Parameters);
         }
 
         public override bool CheckIfBindWithUserfield(out bool isReadOnly, out bool useBinding)

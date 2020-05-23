@@ -85,7 +85,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (!string.IsNullOrEmpty(Group))
             {
-                var debtorType = crudApi.CompanyEntity.GetUserType(typeof(DebtorClient)) ?? typeof(DebtorClient);
+                var debtorType = crudApi.CompanyEntity.GetUserTypeNotNull(typeof(DebtorClient));
                 var debtor = Activator.CreateInstance(debtorType) as DebtorClient;
                 debtor.Account = AccountNumber;
                 debtor.Group = Group;

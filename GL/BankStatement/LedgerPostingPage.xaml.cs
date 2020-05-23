@@ -335,10 +335,9 @@ namespace UnicontaClient.Pages.CustomPage
             if (screenName == TabControls.AttachVoucherGridPage && argument != null)
             {
                 var voucherObj = argument as object[];
-                
-                if(voucherObj[0] is VouchersClient)
+                var voucher = voucherObj[0] as VouchersClient;
+                if (voucher != null)
                 {
-                    var voucher = voucherObj[0] as VouchersClient;
                     var selectedItem = dgBankStatementLine.SelectedItem as BankStatementLineGridClient;
                     if (selectedItem != null && voucher.RowId != 0)
                     {

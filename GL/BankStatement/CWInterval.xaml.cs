@@ -21,6 +21,7 @@ namespace UnicontaClient.Pages.CustomPage
         public DateTime ToDate { get; set; }
         public int VarianceDays { get; set; }
         public int JournalPostedId { get; set; }
+        public int Voucher { get; set; }
 
         public CWInterval(DateTime fromdate, DateTime todate, int variantdays = 0, bool isShowVarDays = false, bool showJrPostId = false)
         {

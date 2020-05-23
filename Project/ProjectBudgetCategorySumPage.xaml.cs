@@ -42,7 +42,6 @@ namespace UnicontaClient.Pages.CustomPage
             dgProjectBudgetCategorySum.api = api;
             dgProjectBudgetCategorySum.UpdateMaster(master);
             dgProjectBudgetCategorySum.BusyIndicator = busyIndicator;
-            localMenu.OnItemClicked += gridRibbon_BaseActions;
 
             var Comp = api.CompanyEntity;
             if (Comp.GetCache(typeof(Uniconta.DataModel.PrCategory)) == null)

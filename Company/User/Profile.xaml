@@ -26,91 +26,93 @@ x:Class="UnicontaClient.Pages.CustomPage.Profile"
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <CorasauControls:CorasauRibbonControl x:Name="frmRibbon" XMLSourcePath=";component/Pages/Company/User/ProfileRibbon.xml" Grid.Row="0"/>
-        <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Vertical" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
-            <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpUserInfo" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=UserInfo}" Orientation="Vertical" Width="500" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                <CorasauControls:CorasauLayoutItem FieldName="Name" x:Name="liName">
-                    <CorasauControls:TextEditor Text="{Binding Name,Mode=TwoWay}"/>
-                </CorasauControls:CorasauLayoutItem>
-                <CorasauControls:CorasauLayoutItem FieldName="LoginId" x:Name="liLoginId">
-                    <CorasauControls:TextEditor Text="{Binding LoginId,Mode=TwoWay}"/>
-                </CorasauControls:CorasauLayoutItem>
-                <CorasauControls:CorasauLayoutItem FieldName="Email" x:Name="liEmail" Style="{StaticResource LayoutItemsstyle}" ButtonClicked="Email_ButtonClicked" ButtonContent="&#x2709;" Padding="0">
-                    <CorasauControls:TextEditor x:Name="txtEmail" Text="{Binding Email,Mode=TwoWay}"/>
-                </CorasauControls:CorasauLayoutItem>
-                <CorasauControls:CorasauLayoutItem FieldName="Nationality" x:Name="liNationality">
-                    <CorasauControls:ComboBoxEditor x:Name="cbUserNationality" EditValue="{Binding Nationality,Mode=TwoWay}">
-                        <dxinteraction:Interaction.Behaviors>
-                            <dxinteraction:EnumItemsSourceBehavior EnumType="{x:Type enumType:CountryCode}" />
-                        </dxinteraction:Interaction.Behaviors>
-                    </CorasauControls:ComboBoxEditor>
-                </CorasauControls:CorasauLayoutItem>
-                <CorasauControls:CorasauLayoutItem FieldName="CountryCode" x:Name="liCountryCode">
-                    <CorasauControls:TextEditor  Text="{Binding CountryCode,Mode=TwoWay}" MaxLength="3"/>
-                </CorasauControls:CorasauLayoutItem>
-                <CorasauControls:CorasauLayoutItem FieldName="Phone" x:Name="liPhone">
-                    <CorasauControls:TextEditor Text="{Binding Phone,Mode=TwoWay}"/>
-                </CorasauControls:CorasauLayoutItem>
-            </CorasauControls:CorasauLayoutGroup>
-            <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpChangePassword" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ChangePassword}" Orientation="Vertical" Width="500" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                <CorasauControls:CorasauLayoutItem x:Name="liOldPassword" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OldPassword}">
-                    <CorasauControls:PasswordBoxEditor x:Name="txtOldPassword" />
-                </CorasauControls:CorasauLayoutItem>
-                <CorasauControls:CorasauLayoutItem x:Name="liPassowrd" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Password}">
-                    <CorasauControls:PasswordBoxEditor x:Name="txtPassword"/>
-                </CorasauControls:CorasauLayoutItem>
-                <CorasauControls:CorasauLayoutItem x:Name="liConfirmPassword" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ConfirmPassword}">
-                    <CorasauControls:PasswordBoxEditor x:Name="txtConfirmPassword"/>
-                </CorasauControls:CorasauLayoutItem>
-            </CorasauControls:CorasauLayoutGroup>
+        <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
+            <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="grpFirst">
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpUserInfo" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=UserInfo}" Orientation="Vertical" Width="500" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                    <CorasauControls:CorasauLayoutItem FieldName="Name" x:Name="liName">
+                        <CorasauControls:TextEditor Text="{Binding Name,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="LoginId" x:Name="liLoginId">
+                        <CorasauControls:TextEditor Text="{Binding LoginId,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Email" x:Name="liEmail" Style="{StaticResource LayoutItemsstyle}" ButtonClicked="Email_ButtonClicked" ButtonContent="&#x2709;" Padding="0">
+                        <CorasauControls:TextEditor x:Name="txtEmail" Text="{Binding Email,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Nationality" x:Name="liNationality">
+                        <CorasauControls:ComboBoxEditor x:Name="cbUserNationality" EditValue="{Binding Nationality,Mode=TwoWay}">
+                            <dxinteraction:Interaction.Behaviors>
+                                <dxinteraction:EnumItemsSourceBehavior EnumType="{x:Type enumType:CountryCode}" />
+                            </dxinteraction:Interaction.Behaviors>
+                        </CorasauControls:ComboBoxEditor>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="CountryCode" x:Name="liCountryCode">
+                        <CorasauControls:TextEditor  Text="{Binding CountryCode,Mode=TwoWay}" MaxLength="3"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Phone" x:Name="liPhone">
+                        <CorasauControls:TextEditor Text="{Binding Phone,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpChangePassword" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ChangePassword}" Orientation="Vertical" Width="500" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                    <CorasauControls:CorasauLayoutItem x:Name="liOldPassword" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OldPassword}">
+                        <CorasauControls:PasswordBoxEditor x:Name="txtOldPassword" />
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="liPassowrd" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Password}">
+                        <CorasauControls:PasswordBoxEditor x:Name="txtPassword"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="liConfirmPassword" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ConfirmPassword}">
+                        <CorasauControls:PasswordBoxEditor x:Name="txtConfirmPassword"/>
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
 
-            <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpPreference" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Preference}" Orientation="Vertical" Width="500" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                <CorasauControls:CorasauLayoutItem FieldName="UserLanguage" x:Name="liUserLanguage">
-                    <CorasauControls:ComboBoxEditor x:Name="cbLanguage" SelectedItem="{Binding UserLanguage,Mode=TwoWay}"/>
-                </CorasauControls:CorasauLayoutItem>
-                <CorasauControls:CorasauLayoutItem FieldName="Theme" x:Name="liTheme">
-                    <CorasauControls:ComboBoxEditor x:Name="cbTheme" SelectedItem="{Binding Theme,Mode=TwoWay}" />
-                </CorasauControls:CorasauLayoutItem>
-                <CorasauControls:CorasauLayoutItem FieldName="ShowGridLines" x:Name="liShowGridLines">
-                    <CorasauControls:CheckEditor IsChecked="{Binding ShowGridLines,Mode=TwoWay}"/>
-                </CorasauControls:CorasauLayoutItem>
-                <CorasauControls:CorasauLayoutItem FieldName="Printer" x:Name="liDefaultPrinter">
-                    <CorasauControls:ComboBoxEditor x:Name="cbDefaultPrinter" SelectedItem="{Binding Printer,Mode=TwoWay}"/>
-                </CorasauControls:CorasauLayoutItem>
-                <CorasauControls:CorasauLayoutItem FieldName="StoragePath" x:Name="liStoragePath">
-                    <CorasauControls:FolderBrowserControl x:Name="folderBrowserCtrl" SelectedPath="{Binding StoragePath,Mode=TwoWay}" />
-                </CorasauControls:CorasauLayoutItem>
-                <CorasauControls:CorasauLayoutItem FieldName="AppDocPath" x:Name="liAppDocPath">
-                    <CorasauControls:FolderBrowserControl x:Name="folderBrowserCtrlAppDoc" SelectedPath="{Binding AppDocPath,Mode=TwoWay}" />
-                </CorasauControls:CorasauLayoutItem>
-                <CorasauControls:CorasauLayoutItem FieldName="AutoDropDown" x:Name="liAutoDropDown">
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpPreference" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Preference}" Orientation="Vertical" Width="500" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                    <CorasauControls:CorasauLayoutItem FieldName="UserLanguage" x:Name="liUserLanguage">
+                        <CorasauControls:ComboBoxEditor x:Name="cbLanguage" SelectedItem="{Binding UserLanguage,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Theme" x:Name="liTheme">
+                        <CorasauControls:ComboBoxEditor x:Name="cbTheme" SelectedItem="{Binding Theme,Mode=TwoWay}" />
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="ShowGridLines" x:Name="liShowGridLines">
+                        <CorasauControls:CheckEditor IsChecked="{Binding ShowGridLines,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Printer" x:Name="liDefaultPrinter">
+                        <CorasauControls:ComboBoxEditor x:Name="cbDefaultPrinter" SelectedItem="{Binding Printer,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="StoragePath" x:Name="liStoragePath">
+                        <CorasauControls:FolderBrowserControl x:Name="folderBrowserCtrl" SelectedPath="{Binding StoragePath,Mode=TwoWay}" />
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="AppDocPath" x:Name="liAppDocPath">
+                        <CorasauControls:FolderBrowserControl x:Name="folderBrowserCtrlAppDoc" SelectedPath="{Binding AppDocPath,Mode=TwoWay}" />
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="AutoDropDown" x:Name="liAutoDropDown">
                         <CorasauControls:CheckEditor IsChecked="{Binding AutoDropDown,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
-                <CorasauControls:CorasauLayoutItem FieldName="ClosePageOnEsc" x:Name="liClosePageOnEsc">
-                    <CorasauControls:CheckEditor IsChecked="{Binding ClosePageOnEsc,Mode=TwoWay}"/>
-                </CorasauControls:CorasauLayoutItem>
-                <CorasauControls:CorasauLayoutItem FieldName="AllowMathExpression" x:Name="liAllowMathExpression">
-                    <CorasauControls:CheckEditor IsChecked="{Binding AllowMathExpression,Mode=TwoWay}"/>
-                </CorasauControls:CorasauLayoutItem>
-                <CorasauControls:CorasauLayoutItem FieldName="AutoSave" x:Name="liAutoSave">
-                    <CorasauControls:CheckEditor IsChecked="{Binding AutoSave,Mode=TwoWay}"/>
-                </CorasauControls:CorasauLayoutItem>
-                <CorasauControls:CorasauLayoutItem FieldName="ColumnFilter" x:Name="liColumnFilter">
-                    <CorasauControls:CheckEditor IsChecked="{Binding ColumnFilter,Mode=TwoWay}"/>
-                </CorasauControls:CorasauLayoutItem>
-                <CorasauControls:CorasauLayoutItem FieldName="ConfirmDelete" x:Name="liConfirmDelete">
-                    <CorasauControls:CheckEditor IsChecked="{Binding ConfirmDelete,Mode=TwoWay}"/>
-                </CorasauControls:CorasauLayoutItem>
-            </CorasauControls:CorasauLayoutGroup>
-            <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpInformation" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Information}" Orientation="Vertical" Width="500" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                <CorasauControls:CorasauLayoutItem x:Name="liXapBuildDate" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter= XapBuildDate,StringFormat=\{0\}:}">
-                    <TextBlock x:Name="txtXapBuildDate" TextWrapping="Wrap"></TextBlock>
-                 </CorasauControls:CorasauLayoutItem>
-                <CorasauControls:CorasauLayoutItem x:Name="liClientAPIVersion" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter= ClientAPIVersion,StringFormat=\{0\}:}">
-                    <TextBlock x:Name="txtAPIVersion" TextWrapping="Wrap"></TextBlock>
-                </CorasauControls:CorasauLayoutItem>
-                <CorasauControls:CorasauLayoutItem x:Name="liDotnetVersion" Label=".NET Version:">
-                    <TextBlock x:Name="txtDotnetVersion" TextWrapping="Wrap"></TextBlock>
-                </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="ClosePageOnEsc" x:Name="liClosePageOnEsc">
+                        <CorasauControls:CheckEditor IsChecked="{Binding ClosePageOnEsc,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="AllowMathExpression" x:Name="liAllowMathExpression">
+                        <CorasauControls:CheckEditor IsChecked="{Binding AllowMathExpression,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="AutoSave" x:Name="liAutoSave">
+                        <CorasauControls:CheckEditor IsChecked="{Binding AutoSave,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="ColumnFilter" x:Name="liColumnFilter">
+                        <CorasauControls:CheckEditor IsChecked="{Binding ColumnFilter,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="ConfirmDelete" x:Name="liConfirmDelete">
+                        <CorasauControls:CheckEditor IsChecked="{Binding ConfirmDelete,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpInformation" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Information}" Orientation="Vertical" Width="500" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                    <CorasauControls:CorasauLayoutItem x:Name="liXapBuildDate" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter= XapBuildDate,StringFormat=\{0\}:}">
+                        <TextBlock x:Name="txtXapBuildDate" TextWrapping="Wrap"></TextBlock>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="liClientAPIVersion" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter= ClientAPIVersion,StringFormat=\{0\}:}">
+                        <TextBlock x:Name="txtAPIVersion" TextWrapping="Wrap"></TextBlock>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="liDotnetVersion" Label=".NET Version:">
+                        <TextBlock x:Name="txtDotnetVersion" TextWrapping="Wrap"></TextBlock>
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
             </CorasauControls:CorasauLayoutGroup>
         </CorasauControls:CorasauLayoutControl>
     </Grid>

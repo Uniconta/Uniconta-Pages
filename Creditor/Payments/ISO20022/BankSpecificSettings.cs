@@ -508,12 +508,9 @@ namespace UnicontaISO20022CreditTransfer
         /// <summary>
         /// Unambiguous identification of the BBAN account of the creditor (domestic account number).
         /// </summary>
-        public virtual string CreditorBBAN(String recBBAN, String credBBAN)
+        public virtual string CreditorBBAN(string recBBAN, string credBBAN, string bic)
         {
-            var bban = string.Empty;
-            var regNum = string.Empty;
-
-            bban = recBBAN ?? string.Empty;
+            var bban = recBBAN ?? string.Empty;
 
             bban = Regex.Replace(bban, "[^0-9]", "");
 
@@ -718,7 +715,7 @@ namespace UnicontaISO20022CreditTransfer
                 case "DOMESTIC":
                     return BaseDocument.CHRGBR_SHAR;
                 case "CROSSBORDER":
-                    return BaseDocument.CHRGBR_DEBT;
+                    return BaseDocument.CHRGBR_SHAR;
                 case "SEPA":
                     return BaseDocument.CHRGBR_SLEV;
                 default:

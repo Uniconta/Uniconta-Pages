@@ -62,11 +62,9 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
                     using (var stream = sfd.OpenFile())
 #endif
                     {
-                        using (var sw = new StreamWriter(stream, Encoding.ASCII))
-                        {
-                            fileFormat.StreamToFile(listofNordeaProperties, sw);
-                        }
-                        stream.Close();
+                        var sw = new StreamWriter(stream, Encoding.ASCII);
+                        fileFormat.StreamToFile(listofNordeaProperties, sw);
+                        sw.Flush();
                     }
 
                     paymentReference.InsertPaymentReferenceTask(paymentList.Where(s => s._ErrorInfo == BaseDocument.VALIDATE_OK).ToList(),
@@ -74,7 +72,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
                 }
                 catch (Exception ex)
                 {
-                    UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"));
+                    UnicontaMessageBox.Show(ex);
                 }
             }
             else

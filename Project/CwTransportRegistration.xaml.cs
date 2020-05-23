@@ -57,7 +57,8 @@ namespace UnicontaClient.Pages.CustomPage
         CrudAPI crudApi;
         bool addMileage = false;
         double mileageTotal;
-       
+        private string EMPTYADDRESS = string.Concat("<", Uniconta.ClientTools.Localization.lookup("address")+">");
+
         public CwTransportRegistration(TMJournalLineClientLocal tmJournalLine, CrudAPI _crudApi, double mileageTotal, bool returning, bool _addMileage = false)
         {
             crudApi = _crudApi;
@@ -126,6 +127,8 @@ namespace UnicontaClient.Pages.CustomPage
                 addressList.Add(emptyAddress);
             }
 
+            addressList.Add(new Address { Name = Uniconta.ClientTools.Localization.lookup("Other"), ContactAddress = EMPTYADDRESS }); ;
+
             cmbFromAdd.ItemsSource = addressList;
             cmbToAdd.ItemsSource = addressList;
             if (journalline.RowId != 0 && journalline._RegistrationType == RegistrationType.Mileage && addEmptyAddress)
@@ -139,8 +142,19 @@ namespace UnicontaClient.Pages.CustomPage
                 cmbFromAdd.SelectedIndex = 0;
                 cmbToAdd.SelectedIndex = 1;
                 txtFromAdd.Text = addressList.Count >= 1 ? addressList[0]?.ContactAddress : string.Empty;
-                txtToAdd.Text = addressList.Count == 2 ? addressList[1]?.ContactAddress : string.Empty;
+
+                if (addressList.Count == 4)
+                {
+                    cmbToAdd.SelectedIndex = 2;
+                    txtToAdd.Text = addressList[2]?.ContactAddress;
+                }
+                else 
+                {
+                    cmbToAdd.SelectedIndex = 3;
+                    txtToAdd.Text = addressList[3]?.ContactAddress;
+                }
             }
+
 
             if (string.IsNullOrEmpty(txtFromAdd.Text))
                 txtFromAdd.Text = journalline.AddressFrom;
@@ -270,9 +284,11 @@ namespace UnicontaClient.Pages.CustomPage
         void CalulateMileage()
         {
             double distance = 0d;
-            if (string.IsNullOrWhiteSpace(txtFromAdd.Text) || string.IsNullOrWhiteSpace(txtToAdd.Text))
-                return;
-            distance = TMJournalLineHelper.GetDistance(txtFromAdd.Text, txtToAdd.Text, (bool)chkAvdFerr.IsChecked);
+            if (string.IsNullOrWhiteSpace(txtFromAdd.Text) || string.IsNullOrWhiteSpace(txtToAdd.Text) || txtFromAdd.Text == EMPTYADDRESS || txtToAdd.Text == EMPTYADDRESS)
+                distance = 0;
+            else
+                distance = TMJournalLineHelper.GetDistance(txtFromAdd.Text, txtToAdd.Text, (bool)chkAvdFerr.IsChecked);
+    
             if (!addMileage)
             {
                 if (!txtMonHrs.IsReadOnly)

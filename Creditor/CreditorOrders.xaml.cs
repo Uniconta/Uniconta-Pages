@@ -374,10 +374,11 @@ namespace UnicontaClient.Pages.CustomPage
                 if (GenrateInvoiceDialog.DialogResult == true)
                 {
 
-                    var showOrPrint = GenrateInvoiceDialog.ShowInvoice || GenrateInvoiceDialog.InvoiceQuickPrint;
-                    var invoicePostingResult = new InvoicePostingPrintGenerator(api, this, creditorOrderClient, null, GenrateInvoiceDialog.GenrateDate, GenrateInvoiceDialog.InvoiceNumber, GenrateInvoiceDialog.IsSimulation,
-                        CompanyLayoutType.PurchaseInvoice, showOrPrint, GenrateInvoiceDialog.InvoiceQuickPrint, GenrateInvoiceDialog.NumberOfPages, false, GenrateInvoiceDialog.Emails, GenrateInvoiceDialog.sendOnlyToThisEmail);
-                    invoicePostingResult.OpenAsOutlook = !GenrateInvoiceDialog.IsSimulation && GenrateInvoiceDialog.SendByOutlook;
+                    var isSimulated = GenrateInvoiceDialog.IsSimulation;
+                    var invoicePostingResult = new InvoicePostingPrintGenerator(api, this);
+                    invoicePostingResult.SetUpInvoicePosting(creditorOrderClient, null, CompanyLayoutType.PurchaseInvoice, GenrateInvoiceDialog.GenrateDate, GenrateInvoiceDialog.InvoiceNumber, isSimulated,
+                        GenrateInvoiceDialog.ShowInvoice, false, GenrateInvoiceDialog.InvoiceQuickPrint, GenrateInvoiceDialog.NumberOfPages, false, !isSimulated && GenrateInvoiceDialog.SendByOutlook,
+                        GenrateInvoiceDialog.sendOnlyToThisEmail, GenrateInvoiceDialog.Emails, false, null, false);
 
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
                     busyIndicator.IsBusy = true;
@@ -388,14 +389,6 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         if (invoicePostingResult.PostingResult.OrderDeleted)
                             dgCreditorOrdersGrid.UpdateItemSource(3, dgCreditorOrdersGrid.SelectedItem as CreditorOrderClient);
-
-                        string msg;
-                        if (invoicePostingResult.PostingResult.Header._InvoiceNumber != 0)
-                        {
-                            msg = string.Format(Uniconta.ClientTools.Localization.lookup("InvoiceHasBeenGenerated"), invoicePostingResult.PostingResult.Header.InvoiceNum);
-                            msg = string.Format("{0}{1}{2} {3}", msg, Environment.NewLine, Uniconta.ClientTools.Localization.lookup("LedgerVoucher"), invoicePostingResult.PostingResult.Header._Voucher);
-                            UnicontaMessageBox.Show(msg, Uniconta.ClientTools.Localization.lookup("Message"), MessageBoxButton.OK);
-                        }
                     }
                     else
                         Utility.ShowJournalError(invoicePostingResult.PostingResult.ledgerRes, dgCreditorOrdersGrid);
@@ -746,27 +739,26 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 if (GenrateOfferDialog.DialogResult == true)
                 {
-                    showInvPrintPreview = GenrateOfferDialog.ShowInvoice || GenrateOfferDialog.InvoiceQuickPrint;
+                    showInvPrintPreview = GenrateOfferDialog.ShowInvoice || GenrateOfferDialog.InvoiceQuickPrint || GenrateOfferDialog.SendByOutlook;
                     string documentNumber = null;
                     if (doctype == CompanyLayoutType.PurchasePacknote)
                     {
                         documentNumber = GenrateOfferDialog.InvoiceNumber;
                         dbOrder._InvoiceNumber = documentNumber;
                     }
-                    var invoicePostingResult = new InvoicePostingPrintGenerator(api, this, dbOrder, null, GenrateOfferDialog.GenrateDate, documentNumber, !GenrateOfferDialog.UpdateInventory, doctype,
-                        showInvPrintPreview, GenrateOfferDialog.InvoiceQuickPrint, GenrateOfferDialog.NumberOfPages, GenrateOfferDialog.SendByEmail, GenrateOfferDialog.Emails, GenrateOfferDialog.sendOnlyToThisEmail);
-                    invoicePostingResult.OpenAsOutlook = GenrateOfferDialog.UpdateInventory && GenrateOfferDialog.SendByOutlook;
-
+                    var openOutlook = doctype == CompanyLayoutType.PurchasePacknote ? GenrateOfferDialog.UpdateInventory && GenrateOfferDialog.SendByOutlook : GenrateOfferDialog.SendByOutlook;
+                    var invoicePostingResult = new InvoicePostingPrintGenerator(api, this);
+                    invoicePostingResult.SetUpInvoicePosting(dbOrder, null, doctype, GenrateOfferDialog.GenrateDate, documentNumber, !GenrateOfferDialog.UpdateInventory, GenrateOfferDialog.ShowInvoice, false,
+                        GenrateOfferDialog.InvoiceQuickPrint, GenrateOfferDialog.NumberOfPages, GenrateOfferDialog.SendByEmail, openOutlook, GenrateOfferDialog.sendOnlyToThisEmail, GenrateOfferDialog.Emails,
+                        false, null, false);
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
                     busyIndicator.IsBusy = true;
                     var result = await invoicePostingResult.Execute();
                     busyIndicator.IsBusy = false;
 
                     if (result)
-                    {
                         DebtorOrders.Updatedata(dbOrder, doctype);
-                        UtilDisplay.ShowErrorCode(ErrorCodes.Succes);
-                    }
+                    
                     else
                         Utility.ShowJournalError(invoicePostingResult.PostingResult.ledgerRes, dgCreditorOrdersGrid);
                 }

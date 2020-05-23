@@ -18,177 +18,179 @@ x:Class="UnicontaClient.Pages.CustomPage.CreateCompany"
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <CorasauControls:CorasauRibbonControl x:Name="frmRibbon" XMLSourcePath=";component/Pages/Company/CreateCompanyGridRibbon.xml" Grid.Row="0"/>
-            <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Vertical"  Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
-                <CorasauControls:CorasauLayoutGroup View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Setup}" Orientation="Vertical" HorizontalAlignment="Left">
-                    <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Setup}">
-                        <CorasauControls:ListBoxEditor x:Name="lstSetupType">
-                            <CorasauControls:ListBoxEditor.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <StackPanel Orientation="Vertical" Background="Transparent"/>
-                                </ItemsPanelTemplate>
-                            </CorasauControls:ListBoxEditor.ItemsPanel>
-                            <CorasauControls:ListBoxEditor.StyleSettings>
-                                <CorasauControls:RadioBoxListStyle/>
-                            </CorasauControls:ListBoxEditor.StyleSettings>
-                        </CorasauControls:ListBoxEditor>
-                    </CorasauControls:CorasauLayoutItem>
-                </CorasauControls:CorasauLayoutGroup>
-                <CorasauControls:CorasauLayoutGroup Orientation="Horizontal" HorizontalAlignment="Left">
-                    <CorasauControls:CorasauLayoutGroup Orientation="Vertical" >
-                        <CorasauControls:CorasauLayoutGroup View="GroupBox" ItemLabelsAlignment="Default" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Description}" Orientation="Vertical" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                            <CorasauControls:CorasauLayoutItem FieldName="Id">
-                                <CorasauControls:TextEditor Text="{Binding Id,Mode=TwoWay}" EditValueChanged="txtCVR_OnEditValueChanged" x:Name="txtCompanyRegNo"/>
-                            </CorasauControls:CorasauLayoutItem>
-                            <CorasauControls:CorasauLayoutItem FieldName="CompanyName">
-                                <CorasauControls:TextEditor Text="{Binding CompanyName,Mode=TwoWay}"/>
-                            </CorasauControls:CorasauLayoutItem>
-                            <CorasauControls:CorasauLayoutItem FieldName="Country" >
-                                <CorasauControls:ComboBoxEditor x:Name="cmbCountry" SelectedItem="{Binding CountryName,Mode=TwoWay}" EditValueChanged="cmbCountry_EditValueChanged"/>
-                            </CorasauControls:CorasauLayoutItem>
-                            <CorasauControls:CorasauLayoutItem FieldName="Currency" >
-                                <CorasauControls:ComboBoxEditor x:Name="cmbCurrency" SelectedItem="{Binding Currency,Mode=TwoWay}"/>
-                            </CorasauControls:CorasauLayoutItem>
-                            <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TopLogo}" >
-                                <CorasauControls:FileBrowseControl x:Name="browseTopLogo" />
-                            </CorasauControls:CorasauLayoutItem>
-                            <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CompanyLogo}" >
-                                <CorasauControls:FileBrowseControl x:Name="browseInvoiceLogo" />
-                            </CorasauControls:CorasauLayoutItem>
-                        </CorasauControls:CorasauLayoutGroup>
-                        <CorasauControls:CorasauLayoutGroup View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Address}" Orientation="Vertical" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                            <CorasauControls:CorasauLayoutItem FieldName="Address1">
-                                <CorasauControls:TextEditor Text="{Binding Address1,Mode=TwoWay}"/>
-                            </CorasauControls:CorasauLayoutItem>
-                            <CorasauControls:CorasauLayoutItem FieldName="Address2">
-                                <CorasauControls:TextEditor Text="{Binding Address2,Mode=TwoWay}"/>
-                            </CorasauControls:CorasauLayoutItem>
-                            <CorasauControls:CorasauLayoutItem FieldName="Address3" Style="{StaticResource LayoutItemsstyle}" ButtonClicked="CorasauLayoutItem_OnButtonClicked"  ButtonContent="&#x26EF;" Padding="0">
-                                <CorasauControls:TextEditor Text="{Binding Address3,Mode=TwoWay}"/>
-                            </CorasauControls:CorasauLayoutItem>
-                        </CorasauControls:CorasauLayoutGroup>
-                        <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpFinancialYear" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FinancialYear}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                            <CorasauControls:CorasauLayoutItem x:Name="layoutStDate" Label="StartDate">
-                                <CorasauControls:DateEditor x:Name="dateFrm" />
-                            </CorasauControls:CorasauLayoutItem>
-                            <CorasauControls:CorasauLayoutItem x:Name="layoutEndDate" Label="EndDate">
-                                <CorasauControls:DateEditor x:Name="dateTo" />
-                            </CorasauControls:CorasauLayoutItem>
-                        </CorasauControls:CorasauLayoutGroup>
-                    </CorasauControls:CorasauLayoutGroup>
-                    <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpImportSetup" ItemLabelsAlignment="Default" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Import}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                        <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ImportFrom}">
-                            <CorasauControls:ComboBoxEditor x:Name="cmbImportFrom" />
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Set0InAccount}">
-                            <CorasauControls:CheckEditor x:Name="chkSet0InAct" IsChecked="True" />
-                        </CorasauControls:CorasauLayoutItem>
-
-                        <CorasauControls:CorasauLayoutItem x:Name="lblSet0InCustAcc" Visibility="Collapsed" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Set0InCustAccount}">
-                            <CorasauControls:CheckEditor x:Name="chkSet0InCustAcc" Visibility="Collapsed" IsChecked="False" />
-                        </CorasauControls:CorasauLayoutItem>
-
-                        <CorasauControls:CorasauLayoutItem x:Name="lblSet0InVendAcc" Visibility="Collapsed" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Set0InVendAccount}">
-                            <CorasauControls:CheckEditor x:Name="chkSet0InVendAcc" Visibility="Collapsed" IsChecked="False" />
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=InclVat}">
-                            <CorasauControls:CheckEditor x:Name="chkInvoiceVatPriceCheck"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem x:Name="lblConcatC5ItemNames" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ConcatC5ItemNames}">
-                            <CorasauControls:CheckEditor x:Name="chkConcatC5ItemNames" IsChecked="False" />
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LedgerTransactions}">
-                            <CorasauControls:CheckEditor x:Name="chkLedgerTransactions" IsChecked="True" Checked="ChkLedgerTransactions_OnChecked" Unchecked="ChkLedgerTransactions_OnUnchecked"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CreditorTransactions}" x:Name="lblCredTrans">
-                            <CorasauControls:CheckEditor x:Name="chkCreditorTransactions" IsChecked="True"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DebtorTransactions}" x:Name="lblDebTrans">
-                            <CorasauControls:CheckEditor x:Name="chkDebtorTransactions" IsChecked="True"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem x:Name="lblImportInvoice">
-                            <StackPanel Orientation="Horizontal">
-                                <CorasauControls:CheckEditor x:Name="chkImportInvoice" IsChecked="True" />
-                                <TextBlock Margin="5,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ImportFrom}"/>
-                                <CorasauControls:IntegerEditor Margin="5,0,0,0" SetMask="False" MaskType="RegEx"  Mask="\d+"  x:Name="invoiceDateCounter" Width="35" SetMinWidth="False" HorizontalContentAlignment="Right" />
-                                <TextBlock Margin="3,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Years}"/>
-                            </StackPanel>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem x:Name="lblDimC5" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Dimensions}">
-                            <CorasauControls:ComboBoxEditor x:Name="cmbImportDimension" />
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem x:Name="lblDim1" Visibility="Collapsed">
-                            <CorasauControls:TextEditor x:Name="txtNavDim1" Visibility="Collapsed" FontWeight="UltraLight" GotFocus="TxtNavDim1_OnGotFocus"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem x:Name="lblDim2" Visibility="Collapsed">
-                            <CorasauControls:TextEditor x:Name="txtNavDim2" Visibility="Collapsed" FontWeight="UltraLight" GotFocus="TxtNavDim2_OnGotFocus"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem x:Name="lblDim3" Visibility="Collapsed">
-                            <CorasauControls:TextEditor x:Name="txtNavDim3" Visibility="Collapsed" FontWeight="UltraLight" GotFocus="TxtNavDim3_OnGotFocus"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem x:Name="lblDim4" Visibility="Collapsed" LabelVerticalAlignment="Top">
-                            <CorasauControls:TextEditor x:Name="txtNavDim4" Visibility="Collapsed" FontWeight="UltraLight" GotFocus="TxtNavDim4_OnGotFocus"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem x:Name="lblDim5" Visibility="Collapsed" LabelVerticalAlignment="Top">
-                            <CorasauControls:TextEditor x:Name="txtNavDim5" Visibility="Collapsed" FontWeight="UltraLight" GotFocus="TxtNavDim5_OnGotFocus"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem x:Name="lblInvConEmail" Visibility="Collapsed" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=EmailReadAs}">
-                            <CorasauControls:ComboBoxEditor Visibility="Collapsed" x:Name="cmbInvoiceOrContactMail">
-                            </CorasauControls:ComboBoxEditor>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem x:Name="lblerrorAccount" Visibility="Collapsed" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CreateOrFindErrorAccount}" LabelVerticalAlignment="Top">
-                            <CorasauControls:TextEditor x:Name="txtNavErrorAccount" Visibility="Collapsed" FontWeight="UltraLight" GotFocus="TxtNavErrorAccount_OnGotFocus"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem x:Name="lblAccountForPrimo" Visibility="Collapsed" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=AccountTypeYearResultTransfer}" LabelVerticalAlignment="Top">
-                            <CorasauControls:TextEditor x:Name="txtAccountForPrimo" Visibility="Collapsed" FontWeight="UltraLight" GotFocus="TxtAccountForPrimo_OnGotFocus"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=SelectDirectory}" LabelVerticalAlignment="Top" Style="{StaticResource LayoutItemsstyle}" ButtonClicked="FileBrowse_ButtonClicked" ButtonContent="&#128194;" Padding="0">
-                            <CorasauControls:TextEditor x:Name="txtImportFromDirectory" />
+            <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Horizontal"  Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
+                <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="grpFirst">
+                    <CorasauControls:CorasauLayoutGroup View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Setup}" Orientation="Vertical" HorizontalAlignment="Left">
+                        <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Setup}">
+                            <CorasauControls:ListBoxEditor x:Name="lstSetupType">
+                                <CorasauControls:ListBoxEditor.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Vertical" Background="Transparent"/>
+                                    </ItemsPanelTemplate>
+                                </CorasauControls:ListBoxEditor.ItemsPanel>
+                                <CorasauControls:ListBoxEditor.StyleSettings>
+                                    <CorasauControls:RadioBoxListStyle/>
+                                </CorasauControls:ListBoxEditor.StyleSettings>
+                            </CorasauControls:ListBoxEditor>
                         </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
+                    <CorasauControls:CorasauLayoutGroup Orientation="Horizontal" HorizontalAlignment="Left">
+                        <CorasauControls:CorasauLayoutGroup Orientation="Vertical" >
+                            <CorasauControls:CorasauLayoutGroup View="GroupBox" ItemLabelsAlignment="Default" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Description}" Orientation="Vertical" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                                <CorasauControls:CorasauLayoutItem FieldName="Id">
+                                    <CorasauControls:TextEditor Text="{Binding Id,Mode=TwoWay}" EditValueChanged="txtCVR_OnEditValueChanged" x:Name="txtCompanyRegNo"/>
+                                </CorasauControls:CorasauLayoutItem>
+                                <CorasauControls:CorasauLayoutItem FieldName="CompanyName">
+                                    <CorasauControls:TextEditor Text="{Binding CompanyName,Mode=TwoWay}"/>
+                                </CorasauControls:CorasauLayoutItem>
+                                <CorasauControls:CorasauLayoutItem FieldName="Country" >
+                                    <CorasauControls:ComboBoxEditor x:Name="cmbCountry" SelectedItem="{Binding CountryName,Mode=TwoWay}" EditValueChanged="cmbCountry_EditValueChanged"/>
+                                </CorasauControls:CorasauLayoutItem>
+                                <CorasauControls:CorasauLayoutItem FieldName="Currency" >
+                                    <CorasauControls:ComboBoxEditor x:Name="cmbCurrency" SelectedItem="{Binding Currency,Mode=TwoWay}"/>
+                                </CorasauControls:CorasauLayoutItem>
+                                <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TopLogo}" >
+                                    <CorasauControls:FileBrowseControl x:Name="browseTopLogo" />
+                                </CorasauControls:CorasauLayoutItem>
+                                <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CompanyLogo}" >
+                                    <CorasauControls:FileBrowseControl x:Name="browseInvoiceLogo" />
+                                </CorasauControls:CorasauLayoutItem>
+                            </CorasauControls:CorasauLayoutGroup>
+                            <CorasauControls:CorasauLayoutGroup View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Address}" Orientation="Vertical" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                                <CorasauControls:CorasauLayoutItem FieldName="Address1">
+                                    <CorasauControls:TextEditor Text="{Binding Address1,Mode=TwoWay}"/>
+                                </CorasauControls:CorasauLayoutItem>
+                                <CorasauControls:CorasauLayoutItem FieldName="Address2">
+                                    <CorasauControls:TextEditor Text="{Binding Address2,Mode=TwoWay}"/>
+                                </CorasauControls:CorasauLayoutItem>
+                                <CorasauControls:CorasauLayoutItem FieldName="Address3" Style="{StaticResource LayoutItemsstyle}" ButtonClicked="CorasauLayoutItem_OnButtonClicked"  ButtonContent="&#x26EF;" Padding="0">
+                                    <CorasauControls:TextEditor Text="{Binding Address3,Mode=TwoWay}"/>
+                                </CorasauControls:CorasauLayoutItem>
+                            </CorasauControls:CorasauLayoutGroup>
+                            <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpFinancialYear" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FinancialYear}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                                <CorasauControls:CorasauLayoutItem x:Name="layoutStDate" Label="StartDate">
+                                    <CorasauControls:DateEditor x:Name="dateFrm" />
+                                </CorasauControls:CorasauLayoutItem>
+                                <CorasauControls:CorasauLayoutItem x:Name="layoutEndDate" Label="EndDate">
+                                    <CorasauControls:DateEditor x:Name="dateTo" />
+                                </CorasauControls:CorasauLayoutItem>
+                            </CorasauControls:CorasauLayoutGroup>
+                        </CorasauControls:CorasauLayoutGroup>
+                        <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpImportSetup" ItemLabelsAlignment="Default" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Import}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                            <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ImportFrom}">
+                                <CorasauControls:ComboBoxEditor x:Name="cmbImportFrom" />
+                            </CorasauControls:CorasauLayoutItem>
+                            <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Set0InAccount}">
+                                <CorasauControls:CheckEditor x:Name="chkSet0InAct" IsChecked="True" />
+                            </CorasauControls:CorasauLayoutItem>
 
-                    <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpCopySetup" ItemLabelsAlignment="Default" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CopySetup}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                        <CorasauControls:CorasauLayoutItem>
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CopyFromCompany}" TextWrapping="Wrap"></TextBlock>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem x:Name="itemOwncmp" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=YourCompany}">
-                            <CorasauControls:ComboBoxEditor x:Name="cmbOwnCompany" DisplayMember="Name" SelectedIndexChanged="cmbOwnCompany_SelectedIndexChanged"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem x:Name="itmlblOR">
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OR}" HorizontalAlignment="Center" TextWrapping="Wrap"></TextBlock>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Standard}">
-                            <StackPanel Orientation="Horizontal">
-                                <CorasauControls:ComboBoxEditor x:Name="cmbStandardCompany" DisplayMember="Name" SelectedIndexChanged="cmbStandardCompany_SelectedIndexChanged"/>
-                                <Button Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ViewAccounts}" Margin="5,0,0,0" Height="23" Click="Account_Click"/>
-                            </StackPanel>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Chartofaccount}">
-                            <CorasauControls:CheckEditor x:Name="chkGlAccount" IsChecked="true"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Vat}">
-                            <CorasauControls:CheckEditor x:Name="chkVat" IsChecked="true"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Dimensions}">
-                            <CorasauControls:CheckEditor x:Name="chkDimensions" IsChecked="true"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TransTypes}">
-                            <CorasauControls:CheckEditor x:Name="chkTransType" IsChecked="true"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=JournalEntry}">
-                            <CorasauControls:CheckEditor x:Name="chkJournal" IsChecked="true"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=NumberSeries}">
-                            <CorasauControls:CheckEditor x:Name="chkNumberSerei" IsChecked="true"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Payment}">
-                            <CorasauControls:CheckEditor x:Name="chkPayments" IsChecked="true"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Groups}">
-                            <CorasauControls:CheckEditor x:Name="chkGroups" IsChecked="true"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Project}">
-                            <CorasauControls:CheckEditor x:Name="chkProject" IsChecked="true"/>
-                        </CorasauControls:CorasauLayoutItem>
+                            <CorasauControls:CorasauLayoutItem x:Name="lblSet0InCustAcc" Visibility="Collapsed" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Set0InCustAccount}">
+                                <CorasauControls:CheckEditor x:Name="chkSet0InCustAcc" Visibility="Collapsed" IsChecked="False" />
+                            </CorasauControls:CorasauLayoutItem>
+
+                            <CorasauControls:CorasauLayoutItem x:Name="lblSet0InVendAcc" Visibility="Collapsed" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Set0InVendAccount}">
+                                <CorasauControls:CheckEditor x:Name="chkSet0InVendAcc" Visibility="Collapsed" IsChecked="False" />
+                            </CorasauControls:CorasauLayoutItem>
+                            <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=InclVat}">
+                                <CorasauControls:CheckEditor x:Name="chkInvoiceVatPriceCheck"/>
+                            </CorasauControls:CorasauLayoutItem>
+                            <CorasauControls:CorasauLayoutItem x:Name="lblConcatC5ItemNames" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ConcatC5ItemNames}">
+                                <CorasauControls:CheckEditor x:Name="chkConcatC5ItemNames" IsChecked="False" />
+                            </CorasauControls:CorasauLayoutItem>
+                            <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LedgerTransactions}">
+                                <CorasauControls:CheckEditor x:Name="chkLedgerTransactions" IsChecked="True" Checked="ChkLedgerTransactions_OnChecked" Unchecked="ChkLedgerTransactions_OnUnchecked"/>
+                            </CorasauControls:CorasauLayoutItem>
+                            <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CreditorTransactions}" x:Name="lblCredTrans">
+                                <CorasauControls:CheckEditor x:Name="chkCreditorTransactions" IsChecked="True"/>
+                            </CorasauControls:CorasauLayoutItem>
+                            <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DebtorTransactions}" x:Name="lblDebTrans">
+                                <CorasauControls:CheckEditor x:Name="chkDebtorTransactions" IsChecked="True"/>
+                            </CorasauControls:CorasauLayoutItem>
+                            <CorasauControls:CorasauLayoutItem x:Name="lblImportInvoice">
+                                <StackPanel Orientation="Horizontal">
+                                    <CorasauControls:CheckEditor x:Name="chkImportInvoice" IsChecked="True" />
+                                    <TextBlock Margin="5,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ImportFrom}"/>
+                                    <CorasauControls:IntegerEditor Margin="5,0,0,0" SetMask="False" MaskType="RegEx"  Mask="\d+"  x:Name="invoiceDateCounter" Width="35" SetMinWidth="False" HorizontalContentAlignment="Right" />
+                                    <TextBlock Margin="3,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Years}"/>
+                                </StackPanel>
+                            </CorasauControls:CorasauLayoutItem>
+                            <CorasauControls:CorasauLayoutItem x:Name="lblDimC5" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Dimensions}">
+                                <CorasauControls:ComboBoxEditor x:Name="cmbImportDimension" />
+                            </CorasauControls:CorasauLayoutItem>
+                            <CorasauControls:CorasauLayoutItem x:Name="lblDim1" Visibility="Collapsed">
+                                <CorasauControls:TextEditor x:Name="txtNavDim1" Visibility="Collapsed" FontWeight="UltraLight" GotFocus="TxtNavDim1_OnGotFocus"/>
+                            </CorasauControls:CorasauLayoutItem>
+                            <CorasauControls:CorasauLayoutItem x:Name="lblDim2" Visibility="Collapsed">
+                                <CorasauControls:TextEditor x:Name="txtNavDim2" Visibility="Collapsed" FontWeight="UltraLight" GotFocus="TxtNavDim2_OnGotFocus"/>
+                            </CorasauControls:CorasauLayoutItem>
+                            <CorasauControls:CorasauLayoutItem x:Name="lblDim3" Visibility="Collapsed">
+                                <CorasauControls:TextEditor x:Name="txtNavDim3" Visibility="Collapsed" FontWeight="UltraLight" GotFocus="TxtNavDim3_OnGotFocus"/>
+                            </CorasauControls:CorasauLayoutItem>
+                            <CorasauControls:CorasauLayoutItem x:Name="lblDim4" Visibility="Collapsed" LabelVerticalAlignment="Top">
+                                <CorasauControls:TextEditor x:Name="txtNavDim4" Visibility="Collapsed" FontWeight="UltraLight" GotFocus="TxtNavDim4_OnGotFocus"/>
+                            </CorasauControls:CorasauLayoutItem>
+                            <CorasauControls:CorasauLayoutItem x:Name="lblDim5" Visibility="Collapsed" LabelVerticalAlignment="Top">
+                                <CorasauControls:TextEditor x:Name="txtNavDim5" Visibility="Collapsed" FontWeight="UltraLight" GotFocus="TxtNavDim5_OnGotFocus"/>
+                            </CorasauControls:CorasauLayoutItem>
+                            <CorasauControls:CorasauLayoutItem x:Name="lblInvConEmail" Visibility="Collapsed" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=EmailReadAs}">
+                                <CorasauControls:ComboBoxEditor Visibility="Collapsed" x:Name="cmbInvoiceOrContactMail">
+                                </CorasauControls:ComboBoxEditor>
+                            </CorasauControls:CorasauLayoutItem>
+                            <CorasauControls:CorasauLayoutItem x:Name="lblerrorAccount" Visibility="Collapsed" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CreateOrFindErrorAccount}" LabelVerticalAlignment="Top">
+                                <CorasauControls:TextEditor x:Name="txtNavErrorAccount" Visibility="Collapsed" FontWeight="UltraLight" GotFocus="TxtNavErrorAccount_OnGotFocus"/>
+                            </CorasauControls:CorasauLayoutItem>
+                            <CorasauControls:CorasauLayoutItem x:Name="lblAccountForPrimo" Visibility="Collapsed" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=AccountTypeYearResultTransfer}" LabelVerticalAlignment="Top">
+                                <CorasauControls:TextEditor x:Name="txtAccountForPrimo" Visibility="Collapsed" FontWeight="UltraLight" GotFocus="TxtAccountForPrimo_OnGotFocus"/>
+                            </CorasauControls:CorasauLayoutItem>
+                            <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=SelectDirectory}" LabelVerticalAlignment="Top" Style="{StaticResource LayoutItemsstyle}" ButtonClicked="FileBrowse_ButtonClicked" ButtonContent="&#128194;" Padding="0">
+                                <CorasauControls:TextEditor x:Name="txtImportFromDirectory" />
+                            </CorasauControls:CorasauLayoutItem>
+                        </CorasauControls:CorasauLayoutGroup>
+
+                        <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpCopySetup" ItemLabelsAlignment="Default" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CopySetup}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                            <CorasauControls:CorasauLayoutItem>
+                                <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CopyFromCompany}" TextWrapping="Wrap"></TextBlock>
+                            </CorasauControls:CorasauLayoutItem>
+                            <CorasauControls:CorasauLayoutItem x:Name="itemOwncmp" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=YourCompany}">
+                                <CorasauControls:ComboBoxEditor x:Name="cmbOwnCompany" DisplayMember="Name" SelectedIndexChanged="cmbOwnCompany_SelectedIndexChanged"/>
+                            </CorasauControls:CorasauLayoutItem>
+                            <CorasauControls:CorasauLayoutItem x:Name="itmlblOR">
+                                <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OR}" HorizontalAlignment="Center" TextWrapping="Wrap"></TextBlock>
+                            </CorasauControls:CorasauLayoutItem>
+                            <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Standard}">
+                                <StackPanel Orientation="Horizontal">
+                                    <CorasauControls:ComboBoxEditor x:Name="cmbStandardCompany" DisplayMember="Name" SelectedIndexChanged="cmbStandardCompany_SelectedIndexChanged"/>
+                                    <Button Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ViewAccounts}" Margin="5,0,0,0" Height="23" Click="Account_Click"/>
+                                </StackPanel>
+                            </CorasauControls:CorasauLayoutItem>
+                            <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Chartofaccount}">
+                                <CorasauControls:CheckEditor x:Name="chkGlAccount" IsChecked="true"/>
+                            </CorasauControls:CorasauLayoutItem>
+                            <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Vat}">
+                                <CorasauControls:CheckEditor x:Name="chkVat" IsChecked="true"/>
+                            </CorasauControls:CorasauLayoutItem>
+                            <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Dimensions}">
+                                <CorasauControls:CheckEditor x:Name="chkDimensions" IsChecked="true"/>
+                            </CorasauControls:CorasauLayoutItem>
+                            <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TransTypes}">
+                                <CorasauControls:CheckEditor x:Name="chkTransType" IsChecked="true"/>
+                            </CorasauControls:CorasauLayoutItem>
+                            <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=JournalEntry}">
+                                <CorasauControls:CheckEditor x:Name="chkJournal" IsChecked="true"/>
+                            </CorasauControls:CorasauLayoutItem>
+                            <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=NumberSeries}">
+                                <CorasauControls:CheckEditor x:Name="chkNumberSerei" IsChecked="true"/>
+                            </CorasauControls:CorasauLayoutItem>
+                            <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Payment}">
+                                <CorasauControls:CheckEditor x:Name="chkPayments" IsChecked="true"/>
+                            </CorasauControls:CorasauLayoutItem>
+                            <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Groups}">
+                                <CorasauControls:CheckEditor x:Name="chkGroups" IsChecked="true"/>
+                            </CorasauControls:CorasauLayoutItem>
+                            <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Project}">
+                                <CorasauControls:CheckEditor x:Name="chkProject" IsChecked="true"/>
+                            </CorasauControls:CorasauLayoutItem>
+                        </CorasauControls:CorasauLayoutGroup>
                     </CorasauControls:CorasauLayoutGroup>
                 </CorasauControls:CorasauLayoutGroup>
             </CorasauControls:CorasauLayoutControl>

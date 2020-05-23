@@ -113,9 +113,8 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void liWww_ButtonClicked(object sender)
         {
-          var creditor = layoutItems.DataContext as CreditorClient;
-            if (!string.IsNullOrWhiteSpace(creditor.Www))
-                Utility.OpenWebSite(creditor.Www);
+            var creditor = layoutItems.DataContext as CreditorClient;
+            Utility.OpenWebSite(creditor._Www);
         }
 #endif
     }

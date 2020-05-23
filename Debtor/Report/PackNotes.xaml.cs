@@ -57,7 +57,6 @@ namespace UnicontaClient.Pages.CustomPage
 
     public partial class PackNotes : GridBasePage
     {
-        SQLCache Debcache;
         public PackNotes(BaseAPI API) : base(API, string.Empty)
         {
             InitPage();
@@ -101,17 +100,10 @@ namespace UnicontaClient.Pages.CustomPage
             RibbonBase rb = (RibbonBase)localMenu.DataContext;
             UtilDisplay.RemoveMenuCommand(rb, "GenerateOioXml");
 #endif
-            initialLoad();
             dgPackNotesGrid.ShowTotalSummary();
             var Comp = api.CompanyEntity;
             if (Comp.RoundTo100)
                 CostValue.HasDecimals = NetAmount.HasDecimals = TotalAmount.HasDecimals = Margin.HasDecimals = SalesValue.HasDecimals = false;
-        }
-
-        async void initialLoad()
-        {
-            var Comp = api.CompanyEntity;
-            Debcache = Comp.GetCache(typeof(Debtor)) ?? await Comp.LoadCache(typeof(Debtor), api);
         }
 
         protected override void OnLayoutLoaded()
@@ -165,7 +157,7 @@ namespace UnicontaClient.Pages.CustomPage
                     object[] EditParam = new object[2];
                     EditParam[0] = selectedItem as DebtorInvoiceClient;
                     EditParam[1] = true;
-                    AddDockItem(TabControls.InvoicePage2, EditParam, string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("PackNote"), selectedItem.Name));
+                    AddDockItem(TabControls.InvoicePage2, EditParam, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("PackNote"), selectedItem.Name));
                     break;
                 case "DeliveryNoteLine":
                     if (selectedItem != null)
@@ -207,6 +199,8 @@ namespace UnicontaClient.Pages.CustomPage
 
             try
             {
+                ribbonControl.DisableButtons("ShowDeliveryNote");
+
                 var invoicesList = debtorInvoices.ToList();
 #if !SILVERLIGHT
                 var failedPrints = new List<long>();
@@ -234,7 +228,6 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         if (count > 1 && isGeneratingPacknote)
                         {
-                            ribbonControl.DisableButtons(new string[] { "ShowDeliveryNote" });
                             if (standardViewerPrintPage == null)
                                 standardViewerPrintPage = dockCtrl.AddDockItem(api?.CompanyEntity, TabControls.StandardPrintReportPage, ParentControl, new object[] { printReport }, dockName) as StandardPrintReportPage;
                             else
@@ -255,7 +248,6 @@ namespace UnicontaClient.Pages.CustomPage
                 }
 
                 isGeneratingPacknote = false;
-                ribbonControl.EnableButtons(new string[] { "ShowDeliveryNote" });
 
                 if (failedPrints.Count > 0)
                 {
@@ -274,10 +266,13 @@ namespace UnicontaClient.Pages.CustomPage
             }
             catch (Exception ex)
             {
-                busyIndicator.IsBusy = false;
                 api.ReportException(ex, string.Format("PackNotes.ShowInvoice(), CompanyId={0}", api.CompanyId));
             }
-            finally { busyIndicator.IsBusy = false; }
+            finally 
+            {
+                ribbonControl?.EnableButtons("ShowDeliveryNote");
+                busyIndicator.IsBusy = false;
+            }
         }
 
 #if !SILVERLIGHT
@@ -303,8 +298,6 @@ namespace UnicontaClient.Pages.CustomPage
         StandardPrintReportPage standardViewerPrintPage;
         private async Task<IPrintReport> PrintPacknote(DebtorInvoiceClient debtorInvoice)
         {
-            IPrintReport iprintReport = null;
-
             var debtorQcpPrint = new UnicontaClient.Pages.DebtorInvoicePrintReport(debtorInvoice, api, CompanyLayoutType.Packnote);
             var isInitializedSuccess = await debtorQcpPrint.InstantiateFields();
             if (isInitializedSuccess)
@@ -313,16 +306,17 @@ namespace UnicontaClient.Pages.CustomPage
                     debtorQcpPrint.CompanyLogo, debtorQcpPrint.ReportName, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.PackNote, messageClient: debtorQcpPrint.MessageClient);
 
                 var standardReports = new[] { standardDebtorPackNote };
-                iprintReport = new StandardPrintReport(api, standardReports, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.PackNote);
+                IPrintReport iprintReport = new StandardPrintReport(api, standardReports, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.PackNote);
                 await iprintReport.InitializePrint();
 
-                if (iprintReport?.Report == null)
+                if (iprintReport.Report == null)
                 {
                     iprintReport = new LayoutPrintReport(api, debtorInvoice, CompanyLayoutType.Packnote);
                     await iprintReport.InitializePrint();
                 }
+                return iprintReport;
             }
-            return iprintReport;
+            return null;
         }
 
         public override bool IsDataChaged => isGeneratingPacknote;
@@ -399,7 +393,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var Comp = api.CompanyEntity;
 
-            var lst = new List<Type>() { typeof(Uniconta.DataModel.InvItem), typeof(Uniconta.DataModel.PaymentTerm) };
+            var lst = new List<Type>(12) { typeof(Uniconta.DataModel.InvItem), typeof(Uniconta.DataModel.PaymentTerm) };
             if (Comp.ItemVariants)
             {
                 lst.Add(typeof(Uniconta.DataModel.InvVariant1));

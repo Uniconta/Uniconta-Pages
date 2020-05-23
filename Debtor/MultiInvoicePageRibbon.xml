@@ -33,15 +33,14 @@
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="EditRow" ShortcutKey="Ctrl+E" LocalizedNameKey="EditOBJ" Parameter="Order" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>
-    <RibbonItem Action="OrderLine" LocalizedNameKey="OrdersLine" LargeGlyph="Order_Lines_Highlighted_32x32.png" ShortcutKey="ALT+L">
-    </RibbonItem>
+    <RibbonItem Action="OrderLine" LocalizedNameKey="OrdersLine" LargeGlyph="Order_Lines_Highlighted_32x32.png" ShortcutKey="ALT+L"></RibbonItem>
     <RibbonItem LocalizedNameKey="GenerateOBJ" Parameter="Invoices" Action="GenerateInvoice" LargeGlyph="Generate_32x32.png" ShortcutKey="Ctrl+O"></RibbonItem>
-   
     <RibbonItem LocalizedNameKey="GenerateInvoiceCurrentLine" Action="GenerateInvoice2" LargeGlyph="Invoice_32x32.png" ShortcutKey="Ctrl+M"></RibbonItem>
+    <RibbonItem LocalizedNameKey="RecalculatePrices" Action="RecalculateOrderPrices" LargeGlyph="Calculator_32x32.png"></RibbonItem>
   </RibbonItem>
  <RibbonItem>
     <RibbonItem LocalizedNameKey="OrderConfirmation" Action="OrderConfirmation" LargeGlyph="Order_Confirmation_32x32.png" ShortcutKey="Ctrl+Q"></RibbonItem>
     <RibbonItem LocalizedNameKey="Packnote" Action="PackNote" LargeGlyph="Pack_Note_32x32.png" ShortcutKey="Ctrl+K"></RibbonItem>
-   <RibbonItem LocalizedNameKey="PickingList" Action="PickList" LargeGlyph="Account-statement_32x32.png" ShortcutKey="Ctrl+H"></RibbonItem>
-  </RibbonItem>
+    <RibbonItem LocalizedNameKey="PickingList" Action="PickList" LargeGlyph="Account-statement_32x32.png" ShortcutKey="Ctrl+H"></RibbonItem>
+ </RibbonItem>
 </root>

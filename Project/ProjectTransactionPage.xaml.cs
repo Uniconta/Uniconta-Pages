@@ -49,33 +49,35 @@ namespace UnicontaClient.Pages.CustomPage
 
         public ProjectTransactionPage(BaseAPI API) : base(API, string.Empty)
         {
-            InitializeComponent();
             InitializePage(null);
         }
 
         public ProjectTransactionPage(UnicontaBaseEntity master) : base(master)
         {
-            InitializeComponent();
             InitializePage(master);
         }
 
         public ProjectTransactionPage(SynchronizeEntity syncEntity) : base(syncEntity, true)
         {
-            InitializeComponent();
-            
             UnicontaBaseEntity master = syncEntity.Row;
             UnicontaBaseEntity argsProj = null;
             var proj = master as Uniconta.DataModel.Project;
             if (proj != null)
                 argsProj = proj;
-#if !SILVERLIGHT
             else
             {
-                var WIPreport = master as UnicontaClient.Pages.ProjectTransLocalClient;
-                if (WIPreport != null)
-                    argsProj = WIPreport.ProjectRef;
-            }
+                var projectPosted = master as ProjectJournalPostedClient;
+                if (projectPosted != null)
+                    argsProj = projectPosted;
+#if !SILVERLIGHT
+                else
+                {
+                    var WIPreport = master as UnicontaClient.Pages.ProjectTransLocalClient;
+                    if (WIPreport != null)
+                        argsProj = WIPreport.ProjectRef;
+                }
 #endif
+            }
             InitializePage(argsProj);
             SetHeader();
         }
@@ -85,15 +87,21 @@ namespace UnicontaClient.Pages.CustomPage
             var proj = args as Uniconta.DataModel.Project;
             if (proj != null)
                 argsProj = proj;
-#if !SILVERLIGHT
             else
             {
-                var WIPreport = args as UnicontaClient.Pages.ProjectTransLocalClient;
-                if (WIPreport != null)
-                    argsProj = WIPreport.ProjectRef;
-            }
+                var projectPosted = args as ProjectJournalPostedClient;
+                if (projectPosted != null)
+                    argsProj = projectPosted;
+#if !SILVERLIGHT
+                else
+                {
+                    var WIPreport = args as UnicontaClient.Pages.ProjectTransLocalClient;
+                    if (WIPreport != null)
+                        argsProj = WIPreport.ProjectRef;
+                }
 #endif
-            
+            }
+
             dgProjectTransaction.UpdateMaster(argsProj);
             SetHeader();
             InitQuery();
@@ -109,7 +117,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 var syncMaster2 = dgProjectTransaction.masterRecord as Uniconta.DataModel.PrJournalPosted;
                 if (syncMaster2 != null)
-                    header = string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("PostedTransactions"), syncMaster2.RowId);
+                    header = string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("PrTransaction"), syncMaster2.RowId);
                 else
                     return;
             }
@@ -119,6 +127,7 @@ namespace UnicontaClient.Pages.CustomPage
         void InitializePage(UnicontaBaseEntity _master)
         {
             this.DataContext = this;
+            InitializeComponent();
             master = _master;
             SetRibbonControl(localMenu, dgProjectTransaction);
             RibbonBase rb = (RibbonBase)localMenu.DataContext;

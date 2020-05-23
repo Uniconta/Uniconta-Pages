@@ -7,8 +7,8 @@
   <RibbonItem >
     <RibbonItem Action="Filter" ShortcutKey="Ctrl+I" LocalizedNameKey="Filter" Glyph="Filter_16x16.png" LargeGlyph="Filter_32x32.png"/>
     <RibbonItem Action="ClearFilter" ShortcutKey="Ctrl+K" LocalizedNameKey="ClearFilter" Glyph="Filter_Clear_32x32.png" LargeGlyph="Filter_Clear_32x32.png"/>
-    <RibbonItem Action="PerWarehouse" LocalizedNameKey="PerOBJ" Parameter="Warehouse" IsCheckBox="True" />
-    <RibbonItem Action="PerLocation" LocalizedNameKey="PerOBJ" Parameter="Location" IsCheckBox="True" />
+    <RibbonItem Action="PerWarehouse" LocalizedNameKey="PerOBJ" Parameter="Warehouse" ButtonType="CheckBox" />
+    <RibbonItem Action="PerLocation" LocalizedNameKey="PerOBJ" Parameter="Location" ButtonType="CheckBox" />
   </RibbonItem>
   <RibbonItem>
     <!---next group in same Tab-->
@@ -37,5 +37,6 @@
     <RibbonItem Action="CreateProductionOrder" LocalizedNameKey="CreateOBJ" Parameter="ProductionOrder" LargeGlyph="Pack_Note_32x32.png" />
     <RibbonItem Action="ReportAsFinished" LocalizedNameKey="ReportAsFinished" LargeGlyph="Order_Lines_Highlighted_32x32.png" />
     <RibbonItem Action="MoveFromWarehouse" LocalizedNameKey="MoveFromWarehouse" LargeGlyph="Journal_Lines_Highlighted_32x32.png" />
+    <RibbonItem Action="Storage" LocalizedNameKey="OnHand" LargeGlyph="Storage_32x32.png"/>
   </RibbonItem>
 </root>

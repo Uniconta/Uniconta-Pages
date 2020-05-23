@@ -344,9 +344,8 @@ namespace UnicontaClient.Pages.CustomPage
                     deleteDialog.Show();
                     break;
                 case "InvertSign":
-                    if (selectedItem == null)
-                        return;
-                    InvertSign(selectedItem);
+                    if (selectedItem != null)
+                        InvertSign(selectedItem);
                     break;
                 case "RefVoucher":
                     if (selectedItem == null)
@@ -381,46 +380,57 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                     break;
                 case "ChangeDimension":
-                    CWChangeDimension ChangeDimensionDialog = new CWChangeDimension(api, isChangeText: false);
-                    ChangeDimensionDialog.Closing += delegate
+                    if (selectedItem != null)
                     {
-                        if (ChangeDimensionDialog.DialogResult == true)
-                            SetNewDim(selectedItem, ChangeDimensionDialog);
-                    };
-                    ChangeDimensionDialog.Show();
+                        CWChangeDimension ChangeDimensionDialog = new CWChangeDimension(api, isChangeText: false);
+                        ChangeDimensionDialog.Closing += delegate
+                        {
+                            if (ChangeDimensionDialog.DialogResult == true)
+                                SetNewDim(selectedItem, ChangeDimensionDialog);
+                        };
+                        ChangeDimensionDialog.Show();
+                    }
                     break;
                 case "ChangeText":
-                    CWChangeDimension ChangeTextDialog = new CWChangeDimension(api, isChangeDimension: false);
-                    ChangeTextDialog.Closing += delegate
+                    if (selectedItem != null)
                     {
-                        if (ChangeTextDialog.DialogResult == true)
-                            SetChangeText(selectedItem, ChangeTextDialog);
-                    };
-                    ChangeTextDialog.Show();
+                        CWChangeDimension ChangeTextDialog = new CWChangeDimension(api, isChangeDimension: false);
+                        ChangeTextDialog.Closing += delegate
+                        {
+                            if (ChangeTextDialog.DialogResult == true)
+                                SetChangeText(selectedItem, ChangeTextDialog);
+                        };
+                        ChangeTextDialog.Show();
+                    }
                     break;
                 case "ChangeQuantity":
-                    CWChangeDimension ChangeQtyDialog = new CWChangeDimension(api, isChangeDimension: false, isChangeText: false);
-                    ChangeQtyDialog.Closing += delegate
+                    if (selectedItem != null)
                     {
-                        if (ChangeQtyDialog.DialogResult == true)
-                            SetChangeQuantity(selectedItem, ChangeQtyDialog);
-                    };
-                    ChangeQtyDialog.Show();
+                        CWChangeDimension ChangeQtyDialog = new CWChangeDimension(api, isChangeDimension: false, isChangeText: false);
+                        ChangeQtyDialog.Closing += delegate
+                        {
+                            if (ChangeQtyDialog.DialogResult == true)
+                                SetChangeQuantity(selectedItem, ChangeQtyDialog);
+                        };
+                        ChangeQtyDialog.Show();
+                    }
                     break;
                 case "AddEditNote":
-                    if (selectedItem == null) return;
-                    CWAddEditNote cwAddEditNote = new CWAddEditNote(api, null, selectedItem);
-                    cwAddEditNote.Closed += delegate
+                    if (selectedItem != null)
                     {
-                        if (cwAddEditNote.DialogResult == true)
+                        CWAddEditNote cwAddEditNote = new CWAddEditNote(api, null, selectedItem);
+                        cwAddEditNote.Closed += delegate
                         {
-                            if (cwAddEditNote.result == ErrorCodes.Succes)
+                            if (cwAddEditNote.DialogResult == true)
                             {
-                                BindGrid();
+                                if (cwAddEditNote.result == ErrorCodes.Succes)
+                                {
+                                    BindGrid();
+                                }
                             }
-                        }
-                    };
-                    cwAddEditNote.Show();
+                        };
+                        cwAddEditNote.Show();
+                    }
                     break;
                 case "PostedBy":
                     if (selectedItem != null)

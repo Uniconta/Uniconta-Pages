@@ -330,6 +330,7 @@ namespace UnicontaClient.Pages.CustomPage
             DoubleTypeTemplate.DataType = doubleTypeProperty;
             var doubleEdit = new FrameworkElementFactory(typeof(DoubleEditor));
             doubleEdit.Name = "PART_Editor";
+            doubleEdit.SetValue(DoubleEditor.MarginProperty , new Thickness(-20,0,0,0));
             DoubleTypeTemplate.VisualTree = doubleEdit;
             return DoubleTypeTemplate;
 #else

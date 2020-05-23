@@ -25,7 +25,7 @@ namespace UnicontaClient.Pages.CustomPage
 {
     public class DebtCollectionGrid : CorasauDataGridClient
     {
-        public override Type TableType { get { return typeof(DebtorInvoiceLocal); } }
+        public override Type TableType { get { return typeof(DebtorInvoiceClient); } }
         public override IComparer GridSorting { get { return new DCInvoiceSort(); } }
     }
 

@@ -72,7 +72,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 var syncMaster2 = dgContactGrid.masterRecord as CrmProspect;
                 if (syncMaster2 != null)
-                    header = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Contacts"), syncMaster2._Name);
+                    header = string.Concat(Uniconta.ClientTools.Localization.lookup("Contacts"), ": ", syncMaster2._Name);
                 else
                     return;
             }
@@ -118,6 +118,29 @@ namespace UnicontaClient.Pages.CustomPage
             this.PreviewKeyDown += RootVisual_KeyDown;
 #endif
             this.BeforeClose += ContactPage_BeforeClose;
+        }
+
+        public override void SetParameter(IEnumerable<ValuePair> Parameters)
+        {
+            foreach (var rec in Parameters)
+            {
+                if (rec.Name == null || rec.Name == "Master")
+                {
+                    DCAccount master;
+                    if (rec.Value == "Debtor")
+                        master = new Uniconta.DataModel.Debtor();
+                    else if (rec.Value == "Creditor")
+                        master = new Uniconta.DataModel.Creditor();
+                    else
+                        continue;
+
+                    master.SetMaster(api.CompanyEntity);
+                    dgContactGrid.UpdateMaster(master as UnicontaBaseEntity);
+                    var header = string.Concat(Uniconta.ClientTools.Localization.lookup("Contacts"), ": ", Uniconta.ClientTools.Localization.lookup(master.GetType().Name));
+                    SetHeader(header);
+                }
+            }
+            base.SetParameter(Parameters);
         }
 
         private void DataControl_CurrentItemChanged(object sender, DevExpress.Xpf.Grid.CurrentItemChangedEventArgs e)

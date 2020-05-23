@@ -21,4 +21,11 @@
       <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16.png" ShortcutKey=""/>
     </RibbonItem>
   </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="PartInvItems" LocalizedNameKey="BOM" LargeGlyph="Order_Lines_Highlighted_32x32.png">
+      <RibbonItem Action="InvBOMPartOfContains" LocalizedNameKey="Contains" LargeGlyph="Multiple_16x16.png"/>
+      <RibbonItem Action="InvBOMPartOfWhereUsed" LocalizedNameKey="WhereUsed" LargeGlyph="Single_16x16.png"/>
+      <RibbonItem Action="InvBOMProductionPosted" LocalizedNameKey="ProductionPosted" LargeGlyph="Offset_Account_16x16.png"/>
+    </RibbonItem>
+  </RibbonItem>
 </root>

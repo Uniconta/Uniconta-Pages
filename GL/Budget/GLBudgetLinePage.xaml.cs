@@ -25,6 +25,7 @@ using Uniconta.Common.Utility;
 using Uniconta.API.System;
 using Uniconta.ClientTools;
 using UnicontaClient.Utilities;
+using Uniconta.API.Service;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -34,29 +35,27 @@ namespace UnicontaClient.Pages.CustomPage
         public override Type TableType { get { return typeof(GLBudgetLineClient); } }
         public override bool Readonly { get { return false; } }
         public override IComparer GridSorting { get { return new GLBudgetLineSort(); } }
-        protected override List<string> GridSkipFields
-        {
-            get
-            {
-                return new List<string>() { "AccountName", "AccountType" };
-            }
-        }
+        protected override List<string> GridSkipFields { get { return new List<string>(2) { "AccountName", "AccountType" }; } }
     }
     public partial class GLBudgetLinePage : GridBasePage
     {
         public override string NameOfControl { get { return TabControls.GLBudgetLinePage; } }
         UnicontaBaseEntity master;
         string budgetName;
+
+        public GLBudgetLinePage(BaseAPI API)
+            : base(API, string.Empty)
+        {
+            InitPage(null);
+        }
         public GLBudgetLinePage(UnicontaBaseEntity master)
             : base(master)
         {
-            InitializeComponent();
             InitPage(master);
         }
 
         public GLBudgetLinePage(SynchronizeEntity syncEntity): base(syncEntity,true)
         {
-            InitializeComponent();
             InitPage(syncEntity.Row);
             SetHeader();
         }
@@ -71,15 +70,15 @@ namespace UnicontaClient.Pages.CustomPage
         private void SetHeader()
         {
             string key = Utility.GetHeaderString(dgGLBudgetLine.masterRecord);
-
-            if (string.IsNullOrEmpty(key)) return;
-
-            string header = string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("BudgetLines"), key);
+            if (string.IsNullOrEmpty(key))
+                return;
+            string header = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("BudgetLines"), key);
             SetHeader(header);
         }
 
         void InitPage(UnicontaBaseEntity masterRecord)
         {
+            InitializeComponent();
             this.master = masterRecord;
             dgGLBudgetLine.UpdateMaster(master);
             dgGLBudgetLine.api = api;
@@ -88,6 +87,29 @@ namespace UnicontaClient.Pages.CustomPage
             dgGLBudgetLine.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             //dgGLBudgetLine.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;
+        }
+
+        public override void SetParameter(IEnumerable<ValuePair> Parameters)
+        {
+            foreach (var rec in Parameters)
+            {
+                if (string.Compare(rec.Name, "Budget", StringComparison.CurrentCultureIgnoreCase) == 0)
+                {
+                    var cache = api.GetCache(typeof(Uniconta.DataModel.GLBudget)) ?? api.LoadCache(typeof(Uniconta.DataModel.GLBudget)).GetAwaiter().GetResult();
+                    master = (Uniconta.DataModel.GLBudget)cache.Get(rec.Value);
+                }
+                else if (string.Compare(rec.Name, "Account", StringComparison.CurrentCultureIgnoreCase) == 0)
+                {
+                    var cache = api.GetCache(typeof(Uniconta.DataModel.GLAccount)) ?? api.LoadCache(typeof(Uniconta.DataModel.GLAccount)).GetAwaiter().GetResult();
+                    master = (Uniconta.DataModel.GLAccount)cache.Get(rec.Value);
+                }
+                else
+                    continue;
+
+                dgGLBudgetLine.UpdateMaster(master);
+                SetHeader();
+            }
+            base.SetParameter(Parameters);
         }
 
         protected override void OnLayoutLoaded()

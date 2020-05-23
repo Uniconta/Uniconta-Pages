@@ -220,6 +220,7 @@ x:Class="UnicontaClient.Pages.CustomPage.GLDailyJournalLine"
                             </DataTemplate>
                         </localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
                     </localPage:CorasauDataGridForeignKeyColumnClient>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colProjectText" FieldName="ProjectText" Width="150" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="LineNumber" Width="70" Visible="False"/>
                 </localPage:GLDailyJournalLineGrid.Columns>
             </localPage:GLDailyJournalLineGrid>

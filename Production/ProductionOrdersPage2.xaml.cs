@@ -29,6 +29,8 @@ namespace UnicontaClient.Pages.CustomPage
     {
         ProductionOrderClient editrow;
         SQLCache warehouse;
+        int rowId;
+        double prodQty;
         public override void OnClosePage(object[] RefreshParams)
         {
             object[] argsArray = new object[4];
@@ -44,7 +46,7 @@ namespace UnicontaClient.Pages.CustomPage
         public override UnicontaBaseEntity ModifiedRow { get { return editrow; } set { editrow = (ProductionOrderClient)value; } }
 
         public ProductionOrdersPage2(CrudAPI crudApi, UnicontaBaseEntity sourcedata)
-           : base(crudApi,string.Empty)
+           : base(crudApi, string.Empty)
         {
             InitializeComponent();
             InitPage(api, sourcedata);
@@ -76,11 +78,12 @@ namespace UnicontaClient.Pages.CustomPage
         {
             BusyIndicator = busyIndicator;
             layoutControl = layoutItems;
-             cmbDim1.api = cmbDim2.api = cmbDim3.api = cmbDim4.api = cmbDim5.api = leGroup.api = leProject.api= lePrCategory.api = leEmployee.api
-            = leRelatedOrder.api = leProdItem.api = leGroup.api = leAccount.api = cmbWarehouse.api= cmbLocation.api= crudapi;
+            cmbDim1.api = cmbDim2.api = cmbDim3.api = cmbDim4.api = cmbDim5.api = leGroup.api = leProject.api = lePrCategory.api = leEmployee.api
+           = leRelatedOrder.api = leProdItem.api = leGroup.api = leAccount.api = cmbWarehouse.api = cmbLocation.api = crudapi;
+
             if (editrow == null)
             {
-                frmRibbon.DisableButtons( "Delete" );
+                frmRibbon.DisableButtons("Delete");
                 liCreatedTime.Visibility = Visibility.Collapsed;
                 editrow = CreateNew() as ProductionOrderClient;
                 editrow._Created = DateTime.MinValue;
@@ -92,6 +95,9 @@ namespace UnicontaClient.Pages.CustomPage
                     editrow._Storage = crudapi.CompanyEntity._PurchaseLineStorage;
                 }
             }
+
+            rowId = editrow.RowId;
+            prodQty = editrow._ProdQty;
 
             layoutItems.DataContext = editrow;
             frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
@@ -128,10 +134,10 @@ namespace UnicontaClient.Pages.CustomPage
             parentGroup = lastGroup;
             return true;
         }
-        
+
         public class BOMCacheFilter : SQLCacheFilter
         {
-            public BOMCacheFilter(SQLCache cache) : base(cache) {  }
+            public BOMCacheFilter(SQLCache cache) : base(cache) { }
             public override bool IsValid(object rec) { return ((InvItem)rec)._ItemType == (byte)ItemType.ProductionBOM; }
         }
 
@@ -150,43 +156,84 @@ namespace UnicontaClient.Pages.CustomPage
             switch (ActionType)
             {
                 case "SaveAndCreateLines":
-                    SaveAndCreateLine();
+                    SaveAndCreateLine(true);
                     break;
+                /*
+                case "Save":
+                    SaveAndCreateLine(false);
+                    break;
+                */
                 default:
                     frmRibbon_BaseActions(ActionType);
                     break;
             }
         }
 
-        public async void SaveAndCreateLine()
+        public async void SaveAndCreateLine(bool goToLines)
         {
             closePageOnSave = false;
             var res = await saveForm(false);
             closePageOnSave = true;
-            if (res)
-                CreateOrderLines(editrow);
+
+            if (!res) return;
+
+            if (rowId == 0 || (editrow._ProdQty != prodQty))
+            {
+                if (goToLines)
+                    CreateOrderLines(editrow);
+                else
+                    UpdateLines(editrow, editrow._Storage, false, false);
+            }
+            else
+            {
+                prodQty = editrow._ProdQty;
+                if (goToLines)
+                    GoToLines(editrow);
+            }
+        }
+
+        async void UpdateLines(ProductionOrderClient productionOrder, StorageRegister Storage, bool OverwriteLines, bool goToLines)
+        {
+            var prodAPI = new ProductionAPI(api);
+            var result = await prodAPI.CreateProductionLines(productionOrder, Storage, OverwriteLines);
+            if (result == ErrorCodes.Succes)
+            {
+                prodQty = productionOrder._ProdQty;
+                if (goToLines)
+                    GoToLines(productionOrder);
+            }
+            else
+            {
+                if (productionOrder.RowId != 0)
+                {
+                    productionOrder.ProdQty = prodQty;
+                    api.UpdateNoResponse(productionOrder);
+                }
+                UtilDisplay.ShowErrorCode(result);
+            }
         }
 
         void CreateOrderLines(ProductionOrderClient productionOrder)
         {
-            CWProductionOrderLine dialog = new CWProductionOrderLine(api);
-            dialog.Closing += async delegate
+            CWProductionOrderLine dialog = new CWProductionOrderLine(api, rowId == 0);
+#if !SILVERLIGHT
+            dialog.DialogTableId = 2000000077;
+#endif
+            dialog.Closing += delegate
             {
                 if (dialog.DialogResult == true)
                 {
-                    var prodAPI = new ProductionAPI(api);
-                    var result = await prodAPI.CreateProductionLines(productionOrder, (StorageRegister)dialog.storage);
-                    if (result == ErrorCodes.Succes)
-                    {
-                        var olheader = string.Format("{0}: {1}, {2}", Uniconta.ClientTools.Localization.lookup("ProductionLines"), productionOrder._OrderNumber, productionOrder._DCAccount);
-                        AddDockItem(TabControls.ProductionOrderLines, productionOrder, olheader);
-                        dockCtrl?.JustClosePanel(this.ParentControl);
-                    }
-                    else
-                        UtilDisplay.ShowErrorCode(result);
+                    UpdateLines(productionOrder, (StorageRegister)dialog.storage, dialog.Force, true);
                 }
             };
             dialog.Show();
+        }
+
+        private void GoToLines(ProductionOrderClient productionOrder)
+        {
+            var olheader = string.Format("{0}: {1}, {2}", Uniconta.ClientTools.Localization.lookup("ProductionLines"), productionOrder._OrderNumber, productionOrder._DCAccount);
+            AddDockItem(TabControls.ProductionOrderLines, productionOrder, olheader);
+            dockCtrl?.JustClosePanel(this.ParentControl);
         }
 
         void AdjustLayout()
@@ -233,7 +280,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (master != null)
                     editrow.locationSource = master.Locations ?? await master.LoadLocations(api);
                 else
-                    editrow.locationSource = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.InvLocation));
+                    editrow.locationSource = api.GetCache(typeof(Uniconta.DataModel.InvLocation));
 
                 cmbLocation.ItemsSource = editrow.LocationSource;
             }

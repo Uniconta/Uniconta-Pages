@@ -436,8 +436,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void HasWebsite_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             var crmFollowUp = (sender as TextBlock).Tag as CrmFollowUpClient;
-            if (crmFollowUp != null)
-                Utility.OpenWebSite(crmFollowUp.Www);
+            Utility.OpenWebSite(crmFollowUp.Www);
         }
 #endif
     }

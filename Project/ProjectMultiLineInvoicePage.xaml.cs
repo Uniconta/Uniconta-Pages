@@ -127,7 +127,7 @@ namespace UnicontaClient.Pages.CustomPage
                         projectList = dgProjectMultiLineGrid.GetVisibleRows();
 
                     var invoiceApi = new Uniconta.API.Project.InvoiceAPI(api);
-                    var debtorOrderType = api.CompanyEntity.GetUserType(typeof(DebtorOrderClient)) ?? typeof(DebtorOrderClient);
+                    var debtorOrderType = api.CompanyEntity.GetUserTypeNotNull(typeof(DebtorOrderClient));
                     var errorlist = new List<string>();
                     DebtorOrderClient debtorOrderInstance = null;
                     foreach (var proj in projectList)
@@ -226,7 +226,7 @@ namespace UnicontaClient.Pages.CustomPage
                             msg = string.Format("{0}{1}{2} {3}", msg, Environment.NewLine, Uniconta.ClientTools.Localization.lookup("LedgerVoucher"), invoicePostingResult.PostingResult.Header._Voucher);
 
 #if !SILVERLIGHT
-                            if (generateInvoiceDialog.GenerateOIOUBLClicked)
+                            if (generateInvoiceDialog.GenerateOIOUBLClicked && api.CompanyEntity._OIOUBLSendOnServer == false)
                                 DebtorOrders.GenerateOIOXml(api, invoicePostingResult.PostingResult);
 #endif
                         }
@@ -383,7 +383,7 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     var standardDebtorInvoice = new DebtorInvoiceReportClient(debtorInvoicePrint.Company, debtorInvoicePrint.Debtor, debtorInvoicePrint.DebtorInvoice, debtorInvoicePrint.InvTransInvoiceLines, debtorInvoicePrint.DebtorOrder,
                         debtorInvoicePrint.CompanyLogo, debtorInvoicePrint.ReportName, isCreditNote: debtorInvoicePrint.IsCreditNote, messageClient: debtorInvoicePrint.MessageClient);
-                    standardPrint = new StandardPrintReport(api, new [] { standardDebtorInvoice }, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.Invoice);
+                    standardPrint = new StandardPrintReport(api, new[] { standardDebtorInvoice }, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.Invoice);
                     standardPrint = new LayoutPrintReport(api, invoicePostingResult, layoutType);
                 }
                 await standardPrint.InitializePrint();

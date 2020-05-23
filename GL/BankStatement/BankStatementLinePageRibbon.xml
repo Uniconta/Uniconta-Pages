@@ -44,7 +44,7 @@
     <RibbonItem Action="OpenTran" LocalizedNameKey="OpenTrans" ShortcutKey="F8" LargeGlyph="Open_Transaction_32x32.png" />
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="TransferBankStatement" LocalizedNameKey="GenerateJournalLines" LargeGlyph="Transfer_32x32.png" />
+    <RibbonItem Action="TransferBankStatement" LocalizedNameKey="GenerateJournalLines" LargeGlyph="Generate_32x32.png" />
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="ChangeOrientation" LocalizedNameKey="ChangeOrientation" LargeGlyph="Dimension_Setup_32x32.png" />

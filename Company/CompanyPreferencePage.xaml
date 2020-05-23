@@ -15,70 +15,79 @@ x:Class="UnicontaClient.Pages.CustomPage.CompanyPreferencePage"
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <CorasauControls:CorasauRibbonControl x:Name="frmRibbon" XMLSourcePath=";component/Pages/Company/ConfigureFunctionalityPageRibbon.xml" Grid.Row="0"/>
-            <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Vertical" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
-                <CorasauControls:CorasauLayoutGroup View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DebtorOrders}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" MinWidth="420">
-                    <CorasauControls:CorasauLayoutItem FieldName="OrderLineStorage">
-                        <CorasauControls:ComboBoxEditor x:Name="cmbOrdLineStorageReg" SelectedItem="{Binding OrderLineStorage,Mode=TwoWay}"  />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="OrderLineOne">
-                        <CorasauControls:CheckEditor IsChecked="{Binding OrderLineOne,Mode=TwoWay}" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="OrderLineEditDelivered">
-                        <CorasauControls:CheckEditor IsChecked="{Binding OrderLineEditDelivered,Mode=TwoWay}" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="Checkean">
-                        <CorasauControls:CheckEditor IsChecked="{Binding Checkean,Mode=TwoWay}" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="OnHandScreenInOrder">
-                        <CorasauControls:CheckEditor IsChecked="{Binding OnHandScreenInOrder,Mode=TwoWay}" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="InvoiceUseQtyNow">
-                        <CorasauControls:CheckEditor IsChecked="{Binding InvoiceUseQtyNow,Mode=TwoWay}" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="InvoiceShowEmptyLines">
-                        <CorasauControls:CheckEditor IsChecked="{Binding InvoiceShowEmptyLines,Mode=TwoWay}" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="UseActualCostPrice">
-                        <CorasauControls:CheckEditor IsChecked="{Binding UseActualCostPrice,Mode=TwoWay}" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="AprvSalesOrders">
-                        <CorasauControls:CheckEditor IsChecked="{Binding AprvSalesOrders,Mode=TwoWay}" />
-                    </CorasauControls:CorasauLayoutItem>
+            <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
+                <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="grpFirst">
+                    <CorasauControls:CorasauLayoutGroup View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DebtorOrders}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" MinWidth="420">
+                        <CorasauControls:CorasauLayoutItem FieldName="OrderLineStorage">
+                            <CorasauControls:ComboBoxEditor x:Name="cmbOrdLineStorageReg" SelectedItem="{Binding OrderLineStorage,Mode=TwoWay}"  />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="OrderLineOne">
+                            <CorasauControls:CheckEditor IsChecked="{Binding OrderLineOne,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="OrderLineEditDelivered">
+                            <CorasauControls:CheckEditor IsChecked="{Binding OrderLineEditDelivered,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="Checkean">
+                            <CorasauControls:CheckEditor IsChecked="{Binding Checkean,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="OnHandScreenInOrder">
+                            <CorasauControls:CheckEditor IsChecked="{Binding OnHandScreenInOrder,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="InvoiceUseQtyNow">
+                            <CorasauControls:CheckEditor IsChecked="{Binding InvoiceUseQtyNow,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="InvoiceShowEmptyLines">
+                            <CorasauControls:CheckEditor IsChecked="{Binding InvoiceShowEmptyLines,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="UseActualCostPrice">
+                            <CorasauControls:CheckEditor IsChecked="{Binding UseActualCostPrice,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="AprvSalesOrders">
+                            <CorasauControls:CheckEditor IsChecked="{Binding AprvSalesOrders,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                    </CorasauControls:CorasauLayoutGroup>
+                    <CorasauControls:CorasauLayoutGroup View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CreditorOrders}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" MinWidth="420">
+                        <CorasauControls:CorasauLayoutItem FieldName="PurchaseLineStorage">
+                            <CorasauControls:ComboBoxEditor x:Name="cmbPurLineStorageReg" SelectedItem="{Binding PurchaseLineStorage,Mode=TwoWay}"  />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="PurchaseLineOne">
+                            <CorasauControls:CheckEditor IsChecked="{Binding PurchaseLineOne,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="PurchaseLineEditDelivered">
+                            <CorasauControls:CheckEditor IsChecked="{Binding PurchaseLineEditDelivered,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="InvoiceUseQtyNowCre">
+                            <CorasauControls:CheckEditor IsChecked="{Binding InvoiceUseQtyNowCre,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="AprvePurchaseOrders">
+                            <CorasauControls:CheckEditor IsChecked="{Binding AprvePurchaseOrders,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                    </CorasauControls:CorasauLayoutGroup>
                 </CorasauControls:CorasauLayoutGroup>
-                <CorasauControls:CorasauLayoutGroup View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CreditorOrders}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" MinWidth="420">
-                    <CorasauControls:CorasauLayoutItem FieldName="PurchaseLineStorage">
-                        <CorasauControls:ComboBoxEditor x:Name="cmbPurLineStorageReg" SelectedItem="{Binding PurchaseLineStorage,Mode=TwoWay}"  />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="PurchaseLineOne">
-                        <CorasauControls:CheckEditor IsChecked="{Binding PurchaseLineOne,Mode=TwoWay}" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="PurchaseLineEditDelivered">
-                        <CorasauControls:CheckEditor IsChecked="{Binding PurchaseLineEditDelivered,Mode=TwoWay}" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="InvoiceUseQtyNowCre">
-                        <CorasauControls:CheckEditor IsChecked="{Binding InvoiceUseQtyNowCre,Mode=TwoWay}" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="AprvePurchaseOrders">
-                        <CorasauControls:CheckEditor IsChecked="{Binding AprvePurchaseOrders,Mode=TwoWay}" />
-                    </CorasauControls:CorasauLayoutItem>
-                </CorasauControls:CorasauLayoutGroup>
-                <CorasauControls:CorasauLayoutGroup View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Inventory}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" MinWidth="420">
-                    <CorasauControls:CorasauLayoutItem FieldName="InvoiceAccountOnInvTrans">
-                        <CorasauControls:ComboBoxEditor x:Name="cmbAccOnInvTrans" SelectedIndexChanged="cmbAccOnInvTrans_SelectedIndexChanged" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="AllowNegativStock">
-                        <CorasauControls:CheckEditor IsChecked="{Binding AllowNegativStock,Mode=TwoWay}" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="UpdateCostOnPurchase">
-                        <CorasauControls:CheckEditor IsChecked="{Binding UpdateCostOnPurchase,Mode=TwoWay}" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="SetupSizesInvGrp">
-                        <CorasauControls:CheckEditor IsChecked="{Binding SetupSizesInvGrp,Mode=TwoWay}" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="LoadVariantsInCounting">
-                        <CorasauControls:CheckEditor IsChecked="{Binding LoadVariantsInCounting,Mode=TwoWay}" />
-                    </CorasauControls:CorasauLayoutItem>
-                </CorasauControls:CorasauLayoutGroup>
+                <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="lastGroup">
+                    <CorasauControls:CorasauLayoutGroup View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Inventory}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" MinWidth="420">
+                        <CorasauControls:CorasauLayoutItem FieldName="InvoiceAccountOnInvTrans">
+                            <CorasauControls:ComboBoxEditor x:Name="cmbAccOnInvTrans" SelectedIndexChanged="cmbAccOnInvTrans_SelectedIndexChanged" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="AllowNegativStock">
+                            <CorasauControls:CheckEditor IsChecked="{Binding AllowNegativStock,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="UpdateCostOnPurchase">
+                            <CorasauControls:CheckEditor IsChecked="{Binding UpdateCostOnPurchase,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="SetupSizesInvGrp">
+                            <CorasauControls:CheckEditor IsChecked="{Binding SetupSizesInvGrp,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="LoadVariantsInCounting">
+                            <CorasauControls:CheckEditor IsChecked="{Binding LoadVariantsInCounting,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                    </CorasauControls:CorasauLayoutGroup>
+                    <CorasauControls:CorasauLayoutGroup View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Project}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" MinWidth="420">
+                        <CorasauControls:CorasauLayoutItem FieldName="DimFromProject">
+                            <CorasauControls:CheckEditor IsChecked="{Binding DimFromProject,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                    </CorasauControls:CorasauLayoutGroup>
+                    </CorasauControls:CorasauLayoutGroup>
             </CorasauControls:CorasauLayoutControl>
         </Grid>
     </CorasauControls:BusyIndicator>

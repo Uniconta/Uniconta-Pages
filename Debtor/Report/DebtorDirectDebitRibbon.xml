@@ -40,8 +40,8 @@
     <RibbonItem LocalizedNameKey="ChangeOBJ" Parameter="Status" LargeGlyph="Default_Values_32x32.png">
       <RibbonItem Action="StatusNone" LocalizedNameKey="None" Glyph="Attachments_16x16.png"/>
       <RibbonItem Action="StatusOnhold" LocalizedNameKey="Onhold" Glyph="Attachments_16x16.png"/>
-      <RibbonItem Action="StatusResend" LocalizedNameKey="Resend" Glyph="Attachments_16x16.png"/>
-      <RibbonItem Action="StatusStopPayment" LocalizedNameKey="Stop" Glyph="Attachments_16x16.png"/>
+      <RibbonItem Action="StatusResend" LocalizedNameKey="Resend" ShortcutKey="Alt+R" Glyph="Attachments_16x16.png"/>
+      <RibbonItem Action="StatusStopPayment" LocalizedNameKey="Stop" ShortcutKey="Alt+S" Glyph="Attachments_16x16.png"/>
     </RibbonItem>
   </RibbonItem>
  <RibbonItem>

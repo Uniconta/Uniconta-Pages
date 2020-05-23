@@ -88,12 +88,12 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void DgCreateOrderGrid_SelectedItemChanged(object sender, DevExpress.Xpf.Grid.SelectedItemChangedEventArgs e)
         {
-            var selectedItem = e.NewItem as DebtorInvoiceLocal;
+            var selectedItem = e.NewItem as DebtorInvoiceClient;
             if (selectedItem != null && !disableOrderLineGrid)
                 LoadOrderlines(selectedItem);
         }
 
-        async void LoadOrderlines(DebtorInvoiceLocal selectedItem)
+        async void LoadOrderlines(DebtorInvoiceClient selectedItem)
         {
             busyIndicator.IsBusy = true;
             if (isOrder)
@@ -152,7 +152,7 @@ namespace UnicontaClient.Pages.CustomPage
             var t = Filter(null);
         }
 
-        async Task CreateOfferLinesFromInvoice(DebtorOfferClient order, DebtorInvoiceLocal invoice, bool checkIfCreditNote)
+        async Task CreateOfferLinesFromInvoice(DebtorOfferClient order, DebtorInvoiceClient invoice, bool checkIfCreditNote)
         {
             var offerlines = new List<DebtorOfferLineClient>();
             order.OfferLines = offerlines;
@@ -211,7 +211,7 @@ namespace UnicontaClient.Pages.CustomPage
             dcOrderlineGrid.Visibility = Visibility.Visible;
         }
 
-        async Task CreateOrderLinesFromInvoice(DebtorOrderClient order, DebtorInvoiceLocal invoice, bool checkIfCreditNote)
+        async Task CreateOrderLinesFromInvoice(DebtorOrderClient order, DebtorInvoiceClient invoice, bool checkIfCreditNote)
         {
             var orderlines = new List<DebtorOrderLineClient>();
             order.Lines = orderlines;
@@ -274,7 +274,7 @@ namespace UnicontaClient.Pages.CustomPage
        
         private void chkIfCreditNote_Checked(object sender, RoutedEventArgs e)
         {
-            var selectedItem = dgCreateOrderGrid.SelectedItem as DebtorInvoiceLocal;
+            var selectedItem = dgCreateOrderGrid.SelectedItem as DebtorInvoiceClient;
             if (selectedItem != null && !disableOrderLineGrid)
             {
                 double sign = (bool)chkIfCreditNote.IsChecked ? -1d : 1d;

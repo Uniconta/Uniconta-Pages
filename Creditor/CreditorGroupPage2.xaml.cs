@@ -70,7 +70,8 @@ namespace UnicontaClient.Pages.CustomPage
             SummeryAccountlookupeditior.api = lookupEndDiscountAccount.api = lookupSettlementDiscountAccount.api =
             lePurchaseAccount.api = lePurchaseAccount1.api = lePurchaseAccount2.api = lePurchaseAccount3.api = lePurchaseAccount4.api =
             lePurchaseVat.api = lePurchaseVat1.api = lePurchaseVat2.api = lePurchaseVat3.api = lePurchaseVat4.api = crudapi;
-            lePurchaseVatOpr.api = lePurchaseVatOpr1.api = lePurchaseVatOpr2.api = lePurchaseVatOpr3.api = lePurchaseVatOpr4.api = leAutoNumber.api= lookupCurrencyAdjustment.api = crudapi;
+            lePurchaseVatOpr.api = lePurchaseVatOpr1.api = lePurchaseVatOpr2.api = lePurchaseVatOpr3.api = lePurchaseVatOpr4.api =
+            leAutoNumber.api= lookupCurrencyAdjustment.api = lookupDiscountAccount.api= lookupDiscountAccountOffset.api = crudapi;
 
             if (!crudapi.CompanyEntity._UseVatOperation)
             {

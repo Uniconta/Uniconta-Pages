@@ -50,8 +50,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         async public Task<List<GLDailyJournalLineClient>> CreateJournalLines(FileStream fileStream)
         {
-            var encoding = Uniconta.ClientTools.Util.UtilFunctions.FindEncoding(fileStream);
-            var reader = new StreamReader(fileStream, encoding);
+            var reader = Uniconta.ClientTools.Util.UtilFunctions.CreateStreamReader(fileStream);
 
             var sp = new StringSplit(';');
             var line = new List<string>();
@@ -100,6 +99,7 @@ namespace UnicontaClient.Pages.CustomPage
                 journalLine.SetMaster(GLDailyJournal);
                 _journalLines.Add(journalLine);
             }
+            reader.Dispose();
 
             return _journalLines;
         }

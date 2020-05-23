@@ -32,7 +32,7 @@
     </RibbonItem>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="TransferBankStatement" LocalizedNameKey="GenerateJournalLines" LargeGlyph="Transfer_32x32.png" />
+    <RibbonItem Action="TransferBankStatement" LocalizedNameKey="GenerateJournalLines" LargeGlyph="Generate_32x32.png" />
   </RibbonItem>
   <RibbonItem>
      <RibbonItem Action="ShowHideGreenLines" LocalizedNameKey="HideOBJ" Parameter="Green" LargeGlyph="HideGreen_32x32.png" />

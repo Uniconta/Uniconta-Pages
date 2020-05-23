@@ -50,16 +50,17 @@ x:Class="UnicontaClient.Pages.CustomPage.CustomerPriceListsPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ValidFrom" ShowTime="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ValidTo" ShowTime="True"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="UseDeliveryDate" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="UseDeliveryDate" HideHeaderCheck="True" />
                     <localPage:CorasauDataGridTemplateColumnClient FieldName="LinkToPricelist"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="FirstMatch" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="FirstMatch" HideHeaderCheck="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PriceAndDiscount" HideHeaderCheck="True"/>
                     <localPage:ComboBoxColumnClient x:Name="Currency" Width="50" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="MarginRatio" Width="70"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="RoundMargin" Width="50"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="RoundMargin" Width="50" HideHeaderCheck="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="SalesCharge" Width="80"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Active" Width="70"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="InclVat" Width="70"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PriceUpdate" Width="70" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Active" Width="70" HideHeaderCheck="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="InclVat" Width="70" HideHeaderCheck="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PriceUpdate" Width="70" Visible="False" HideHeaderCheck="True"/>
                 </localPage:InvPriceListGrid.Columns>
             </localPage:InvPriceListGrid>
         </CorasauControls:BusyIndicator>

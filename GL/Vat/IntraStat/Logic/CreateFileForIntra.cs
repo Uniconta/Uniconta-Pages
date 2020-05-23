@@ -186,23 +186,21 @@ namespace UnicontaClient.Pages.CustomPage
 #endif
                 {
 #if !SILVERLIGHT
-                    using (var sw = new StreamWriter(stream, Encoding.Default))
+                    var sw = new StreamWriter(stream, Encoding.Default);
 #else
-                    using (var sw = new StreamWriter(stream))
+                    var sw = new StreamWriter(stream);
 #endif
-                    {
-                        CreateAndStreamFirstAndLast(listOfImport, sw, true, api);
-                        listOfImport.AddRange(listOfExport);
-                        StreamToFile(listOfImport, sw);
-                        CreateAndStreamFirstAndLast(listOfImport, sw, false, api);
-                    }
-                    stream.Close();
+                    CreateAndStreamFirstAndLast(listOfImport, sw, true, api);
+                    listOfImport.AddRange(listOfExport);
+                    StreamToFile(listOfImport, sw);
+                    CreateAndStreamFirstAndLast(listOfImport, sw, false, api);
+                    sw.Flush();
                 }
                
             }
             catch (Exception ex)
             {
-                UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"));
+                UnicontaMessageBox.Show(ex);
                 return null;
             }
 

@@ -14,7 +14,6 @@ namespace UnicontaClient.Pages.CustomPage
     {
         public override Type TableType { get { return typeof(GLTransSumClient); } }
         public override IComparer GridSorting { get { return new GLTransSumSort(); } }
-
         public override bool Readonly { get { return true; } }
     }
     /// <summary>
@@ -22,8 +21,6 @@ namespace UnicontaClient.Pages.CustomPage
     /// </summary>
     public partial class GLTransSumClientPage : GridBasePage
     {
-        public override string NameOfControl { get { return TabControls.AccountantClientPage; } }
-
         public GLTransSumClientPage(UnicontaBaseEntity sourceData) : base(sourceData)
         {
             InitPage(sourceData);
@@ -55,7 +52,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (args != null)
             {
                 var masterClient = args as GLAccountClient;
-                var header = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("AccountsTotal"), masterClient?._Account);
+                var header = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("AccountTotals"), masterClient?._Account);
                 SetHeader(header);
             }
             InitQuery();

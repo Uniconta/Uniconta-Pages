@@ -129,24 +129,20 @@ namespace UnicontaClient.Pages.CustomPage
                     dgGLTable.SaveData();
                     break;
                 case "AllocationAccounts":
-                    if (selectedItem == null)
-                        return;
-                    AddDockItem(TabControls.GLAllocationAccounts, dgGLTable.syncEntity);
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.GLAllocationAccounts, dgGLTable.syncEntity);
                     break;
                 case "GLTran":
-                    if (selectedItem == null)
-                        return;
-                    AddDockItem(TabControls.TransactionReport, dgGLTable.syncEntity);
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.TransactionReport, dgGLTable.syncEntity);
                     break;
                 case "Trans":
-                    if (selectedItem == null)
-                        return;
-                    AddDockItem(TabControls.AccountsTransaction, dgGLTable.syncEntity, string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("AccountsTransaction"), selectedItem._Name));
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.AccountsTransaction, dgGLTable.syncEntity, string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("AccountsTransaction"), selectedItem._Name));
                     break;
                 case "Budget":
-                    if (selectedItem == null)
-                        return;
-                    AddDockItem(TabControls.GLBudgetLinePage, dgGLTable.syncEntity);
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.GLBudgetLinePage, dgGLTable.syncEntity);
                     break;
                 case "AddNote":
                     if (selectedItem != null)
@@ -157,16 +153,16 @@ namespace UnicontaClient.Pages.CustomPage
                         AddDockItem(TabControls.UserDocsPage, dgGLTable.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Documents"), selectedItem._Name));
                     break;
                 case "VatOnClient":
-                    if (selectedItem == null) return;
-                    AddDockItem(TabControls.VatOnClientsReport, selectedItem, string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("VATprDC"), selectedItem._Name));
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.VatOnClientsReport, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("VATprDC"), selectedItem._Name));
                     break;
                 case "GLTransSum":
-                    if (selectedItem == null) return;
-                    AddDockItem(TabControls.GLTransSumClientPage, dgGLTable.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("AccountTotals"), selectedItem._Account));
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.GLTransSumClientPage, dgGLTable.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("AccountTotals"), selectedItem._Account));
                     break;
                 case "CopyRecord":
                     CopyRecord(selectedItem);
-                        break;
+                    break;
                 case "UndoDelete":
                     dgGLTable.UndoDeleteRow();
                     break;

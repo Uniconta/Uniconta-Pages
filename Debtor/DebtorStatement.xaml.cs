@@ -136,6 +136,8 @@ namespace UnicontaClient.Pages.CustomPage
 
         static public DateTime DefaultFromDate, DefaultToDate;
         static bool IsCollapsed = true;
+        static bool pageBreak, showCurrency = false;
+        static int printIntPreview;
         public static void SetDateTime(DateEditor frmDateeditor, DateEditor todateeditor)
         {
             if (frmDateeditor.Text == string.Empty)
@@ -209,11 +211,15 @@ namespace UnicontaClient.Pages.CustomPage
             cbxAscending.IsChecked = Pref.Debtor_isAscending;
             cbxSkipBlank.IsChecked = Pref.Debtor_skipBlank;
             cbxOnlyOpen.IsChecked = Pref.Debtor_OnlyOpen;
+#if !SILVERLIGHT
+            cbxPageBreak.IsChecked = pageBreak;
+#endif
+            chkShowCurrency.IsChecked = showCurrency;
 
             txtDateTo.DateTime = DebtorStatement.DefaultToDate;
             txtDateFrm.DateTime = DebtorStatement.DefaultFromDate;
             cmbPrintintPreview.ItemsSource = new string[] { Uniconta.ClientTools.Localization.lookup("Internal"), Uniconta.ClientTools.Localization.lookup("External") };
-            cmbPrintintPreview.SelectedIndex = 0;
+            cmbPrintintPreview.SelectedIndex = printIntPreview;
             GetMenuItem();
             var Comp = api.CompanyEntity;
             accountCache = Comp.GetCache(typeof(Uniconta.DataModel.Debtor));
@@ -476,7 +482,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 busyIndicator.IsBusy = false;
                 api.ReportException(ex, string.Format("DebtorStatement.PrintData(), CompanyId={0}", api.CompanyId));
-                UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"), MessageBoxButton.OK);
+                UnicontaMessageBox.Show(ex);
             }
             finally { busyIndicator.IsBusy = false; }
         }
@@ -559,6 +565,11 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
 #if !SILVERLIGHT
                 case "SendAsOutlook":
+                    if (dgDebtorTrans.ItemsSource == null)
+                    {
+                        UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("zeroRecords"), Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OK);
+                        return;
+                    }
                     OpenOutlook();
                     break;
 #endif
@@ -851,6 +862,11 @@ namespace UnicontaClient.Pages.CustomPage
             var isAscending = cbxAscending.IsChecked.Value;
             var skipBlank = cbxSkipBlank.IsChecked.Value;
             var OnlyOpen = cbxOnlyOpen.IsChecked.Value;
+#if !SILVERLIGHT
+            pageBreak = cbxPageBreak.IsChecked.Value;
+#endif
+            showCurrency = chkShowCurrency.IsChecked.Value;
+            printIntPreview = cmbPrintintPreview.SelectedIndex;
 
             var Pref = api.session.Preference;
             Pref.Debtor_isAscending = isAscending;
@@ -939,6 +955,9 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (statementList.Count > 0)
             {
+                if (statementList.Count == 1)
+                    statementList[0].Mark = true;
+
                 dgDebtorTrans.ItemsSource = null;
                 dgDebtorTrans.ItemsSource = statementList;
             }

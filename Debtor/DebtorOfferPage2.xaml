@@ -90,11 +90,22 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOfferPage2"
                             <CorasauControls:ComboBoxEditor x:Name="cmbCurrency" SelectedItem="{Binding Currency,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
-
                 </CorasauControls:CorasauLayoutGroup>
-
                 <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="lastGroup">
-                    <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="dAddress" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="400">
+
+                    <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpSize" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Size}"  Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="450">
+                        <CorasauControls:CorasauLayoutItem FieldName="Weight" x:Name="liWeigt">
+                            <CorasauControls:DoubleEditor FieldName="Weight" ApplyMask="False"  />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="Volume" x:Name="liVolume" >
+                            <CorasauControls:DoubleEditor FieldName="Volume" ApplyMask="False" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="Cartons" x:Name="liCartons">
+                            <CorasauControls:DoubleEditor FieldName="Cartons" ApplyMask="False" />
+                        </CorasauControls:CorasauLayoutItem>
+                    </CorasauControls:CorasauLayoutGroup>
+                    
+                    <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="dAddress" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="450">
                         <CorasauControls:CorasauLayoutItem FieldName="DeliveryName" x:Name="liDeliveryname">
                             <CorasauControls:TextEditor Text="{Binding DeliveryName,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
@@ -112,18 +123,18 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOfferPage2"
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="DeliveryCity" x:Name="liDeliveryCity">
                             <CorasauControls:TextEditor Text="{Binding DeliveryCity,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
+                        </CorasauControls:CorasauLayoutItem>    
                         <CorasauControls:CorasauLayoutItem FieldName="DeliveryCountry" x:Name="liDeliveryCountry">
                             <CorasauControls:ComboBoxEditor x:Name="cbDeliveryCountry" SelectedItem="{Binding DeliveryCountry,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="Installation" x:Name="lblDeliveryAddress">
+                        <CorasauControls:CorasauLayoutItem FieldName="Installation" x:Name="lblDeliveryAddress" Style="{StaticResource LayoutItemsstyle}" ButtonContent="&#x2B9D;" ButtonClicked="lblDeliveryAddress_ButtonClicked">
                             <CorasauControls:LookupEditor x:Name="leDeliveryAddress" EditValue="{Binding Installation,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="DeliveryIsInvoiceAddress" x:Name="liDeliveryIsInvoiceAddress">
                             <CorasauControls:CheckEditor x:Name="chkDeliveryIsInvoiceAddress" IsChecked="{Binding DeliveryIsInvoiceAddress, Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
-                    <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="usedim"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Dimensions}" Orientation="Vertical" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="400">
+                    <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="usedim"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Dimensions}" Orientation="Vertical" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="450">
                         <CorasauControls:CorasauLayoutItem x:Name="lbldim1">
                             <CorasauControls:LookupEditor x:Name="cmbDim1" Text="{Binding Dimension1,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
@@ -140,7 +151,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOfferPage2"
                             <CorasauControls:LookupEditor x:Name="cmbDim5" Text="{Binding Dimension5,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
-                    <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="useInvoice"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=invoice}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="400">
+                    <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="useInvoice"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=invoice}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="450">
                         <CorasauControls:CorasauLayoutItem FieldName="InvoiceAccount" x:Name="liInvoiceAccount">
                             <CorasauControls:LookupEditor x:Name="leInvoiceAccount" EditValue="{Binding InvoiceAccount,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>

@@ -20,43 +20,45 @@ x:Class="UnicontaClient.Pages.CustomPage.FinanceYearPage2"
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <CorasauControls:CorasauRibbonControl x:Name="frmRibbon" XMLSourcePath=";component/Assets/FormRibbonNoLayout.xml" Grid.Row="0"/>
-            <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Vertical" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
-                <CorasauControls:CorasauLayoutGroup x:Name="grpFinancialYear" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FinancialYear}" Orientation="Vertical" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                    <CorasauControls:CorasauLayoutItem FieldName="FromDate" x:Name="liFromDate">
-                        <CorasauControls:DateEditor EditValue="{Binding FromDate,Mode=TwoWay}" x:Name="txtDateFrom"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="ToDate" x:Name="liToDate">
-                        <CorasauControls:DateEditor EditValue="{Binding ToDate,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                </CorasauControls:CorasauLayoutGroup>
-                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpOptions" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Options}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                    <CorasauControls:CorasauLayoutItem FieldName="PeriodState" x:Name="liPeriodState">
-                        <CorasauControls:ComboBoxEditor x:Name="cmbPeriodState" SelectedItem="{Binding PeriodState,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <!--CorasauControls:CorasauLayoutItem FieldName="PeriodStateMonth" x:Name="lePeriodStateMonth" Visibility="Collapsed">
+            <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
+                <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="grpFirst">
+                    <CorasauControls:CorasauLayoutGroup x:Name="grpFinancialYear" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FinancialYear}" Orientation="Vertical" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                        <CorasauControls:CorasauLayoutItem FieldName="FromDate" x:Name="liFromDate">
+                            <CorasauControls:DateEditor EditValue="{Binding FromDate,Mode=TwoWay}" x:Name="txtDateFrom"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="ToDate" x:Name="liToDate">
+                            <CorasauControls:DateEditor EditValue="{Binding ToDate,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                    </CorasauControls:CorasauLayoutGroup>
+                    <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpOptions" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Options}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                        <CorasauControls:CorasauLayoutItem FieldName="PeriodState" x:Name="liPeriodState">
+                            <CorasauControls:ComboBoxEditor x:Name="cmbPeriodState" SelectedItem="{Binding PeriodState,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <!--CorasauControls:CorasauLayoutItem FieldName="PeriodStateMonth" x:Name="lePeriodStateMonth" Visibility="Collapsed">
                         <CorasauControls:ComboBoxEditor x:Name="cmbPeriodStateMonth" SelectedItem="{Binding PeriodStateMonth,Mode=TwoWay}"/>
                     </-->
-                    <CorasauControls:CorasauLayoutItem FieldName="Current" x:Name="liCurrent">
-                        <CorasauControls:CheckEditor IsChecked="{Binding Current,Mode=TwoWay}" Checked="CheckEdit_OnChecked" Unchecked="CheckEdit_OnUnchecked"/>
-                    </CorasauControls:CorasauLayoutItem>
-                </CorasauControls:CorasauLayoutGroup>
-                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpPrimo" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Primo}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                    <CorasauControls:CorasauLayoutItem FieldName="Balance" x:Name="liBalance">
-                        <CorasauControls:TextEditor x:Name="txtBalance" Text="{Binding BalanceName, Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="Current" x:Name="liCurrent">
+                            <CorasauControls:CheckEditor IsChecked="{Binding Current,Mode=TwoWay}" Checked="CheckEdit_OnChecked" Unchecked="CheckEdit_OnUnchecked"/>
+                        </CorasauControls:CorasauLayoutItem>
+                    </CorasauControls:CorasauLayoutGroup>
+                    <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpPrimo" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Primo}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                        <CorasauControls:CorasauLayoutItem FieldName="Balance" x:Name="liBalance">
+                            <CorasauControls:TextEditor x:Name="txtBalance" Text="{Binding BalanceName, Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
 
-                    <CorasauControls:CorasauLayoutItem FieldName="PLText" x:Name="liPLText">
-                        <CorasauControls:TextEditor x:Name="txtPLText" Text="{Binding PLText, Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="PLText" x:Name="liPLText">
+                            <CorasauControls:TextEditor x:Name="txtPLText" Text="{Binding PLText, Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
 
-                    <CorasauControls:CorasauLayoutItem FieldName="Voucher" x:Name="liVoucher">
-                        <CorasauControls:IntegerEditor SetMask="False" x:Name="txtVoucher"  Text="{Binding Voucher, Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="Voucher" x:Name="liVoucher">
+                            <CorasauControls:IntegerEditor SetMask="False" x:Name="txtVoucher"  Text="{Binding Voucher, Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
 
-                    <CorasauControls:CorasauLayoutItem FieldName="NumberserieText" x:Name="liNumberSerieText">
-                        <CorasauControls:LookupEditor x:Name="lookupNumberserie" Text="{Binding NumberserieText,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    
+                        <CorasauControls:CorasauLayoutItem FieldName="NumberserieText" x:Name="liNumberSerieText">
+                            <CorasauControls:LookupEditor x:Name="lookupNumberserie" Text="{Binding NumberserieText,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+
+                    </CorasauControls:CorasauLayoutGroup>
                 </CorasauControls:CorasauLayoutGroup>
             </CorasauControls:CorasauLayoutControl>
         </Grid>

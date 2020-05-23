@@ -182,6 +182,7 @@ namespace UnicontaClient.Pages.CustomPage
             dgInvStockStatus.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgInvStockStatus.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;
+            this.BeforeClose += InvStockCountingReport_BeforeClose;
             this.items = api.GetCache(typeof(Uniconta.DataModel.InvItem));
             this.warehouse = api.GetCache(typeof(Uniconta.DataModel.InvWarehouse));
         }
@@ -355,12 +356,13 @@ namespace UnicontaClient.Pages.CustomPage
                 using (var sr = new StreamReader(File.OpenRead(openFileDailog.FileName), Encoding.Default))
                 {
                     dgInvStockStatus.ItemsSource = null;
-                    dgInvStockStatus.CopyFromExcel(sr, ';', true, true, false);
+                    var delim = UtilFunctions.GetDefaultDeLimiter();
+                    dgInvStockStatus.CopyFromExcel(sr, delim , true, true, false);
                 }
             }
             catch (Exception ex)
             {
-                UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"), MessageBoxButton.OK);
+                UnicontaMessageBox.Show(ex);
                 return;
             }
 #endif
@@ -563,15 +565,27 @@ namespace UnicontaClient.Pages.CustomPage
             if (result == ErrorCodes.Succes)
                 isTransToJrnl = true;
         }
-
+        
         bool isTransToJrnl;
+
+        private void InvStockCountingReport_BeforeClose()
+        {
+            if (dock != null)
+            {
+                dock.ClosingCancelled -= DockCtrl_ClosingCancelled;
+                dock = null;
+            }
+        }
+
         private void DockCtrl_ClosingCancelled(object sender)
         {
-            dockCtrl.ClosingCancelled -= DockCtrl_ClosingCancelled;
+            InvStockCountingReport_BeforeClose();
             PostInvJournal();
             checkDiff = null;
         }
+
         bool? checkDiff;
+        DockControl dock;
         public override bool IsDataChaged
         {
             get
@@ -594,7 +608,10 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 ShowCustomSaveCloseMessage = true;
                 if (checkDiff == null)
-                    dockCtrl.ClosingCancelled += DockCtrl_ClosingCancelled;
+                {
+                    dock = dockCtrl;
+                    dock.ClosingCancelled += DockCtrl_ClosingCancelled;
+                }
                 return true;
             }
             return false;

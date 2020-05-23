@@ -18,6 +18,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using UnicontaClient.Controls.Dialogs;
+using Uniconta.API.Service;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -30,10 +31,21 @@ namespace UnicontaClient.Pages.CustomPage
     public partial class AddUserFields : GridBasePage
     {
         UnicontaBaseEntity master;
+
+        public AddUserFields(BaseAPI API) : base(API, string.Empty)
+        {
+            InitPage();
+        }
+
         public AddUserFields(UnicontaBaseEntity sourcedata)
             : base(null)
         {
             master = sourcedata;
+            InitPage();
+        }
+
+        void InitPage()
+        {
             InitializeComponent();
             localMenu.dataGrid = dgUserField;
             SetRibbonControl(localMenu, dgUserField);
@@ -43,25 +55,49 @@ namespace UnicontaClient.Pages.CustomPage
             localMenu.OnItemClicked += localMenu_OnItemClicked;
         }
 
+        public override void SetParameter(IEnumerable<ValuePair> Parameters)
+        {
+            foreach (var rec in Parameters)
+            {
+                if (rec.Name == null || rec.Name == "Master")
+                {
+                    var t = Global.GetTableType(rec.Value) ?? Global.GetClientTableType(rec.Value);
+                    if (t != null)
+                    {
+                        var row = Activator.CreateInstance(t);
+                        if (row is Uniconta.DataModel.ITableFieldData)
+                        {
+                            master = row as UnicontaBaseEntity;
+                            dgUserField.UpdateMaster(master);
+                            var header = string.Concat( Localization.lookup("UserFields"), ": ", Localization.lookup(rec.Value));
+                            SetHeader(header);
+                        }
+                    }
+                }
+            }
+            base.SetParameter(Parameters);
+        }
+
         public override void Utility_Refresh(string screenName, object argument = null)
         {
             if (screenName == TabControls.AddUserFieldsPage2)
             {
                 object[] argumentParams = (object[])argument;
                 var Row = argumentParams[1] as TableFieldsClient;
+                if (Row == null)
+                    return;
 
-                if (Row == null) return;
                 var rowType = Row.master.GetType();
                 var pageMasterType = master.GetType();
-                if (rowType == typeof(TableHeaderClient))
+
+                var rowMaster = Row.master as Uniconta.DataModel.TableHeader;
+                if (rowMaster != null)
                 {
-                    int argumentMasterTableId = 0, pageMasterTableId = 0;
+                    int pageMasterTableId = 0;
+                    var argumentMasterTableId = rowMaster.RowId;
 
-                    if (Row.master is TableHeaderClient)
-                        argumentMasterTableId = ((TableHeaderClient)Row.master).TableId;
-
-                    if (master is TableHeaderClient)
-                        pageMasterTableId = ((TableHeaderClient)master).TableId;
+                    if (master is Uniconta.DataModel.TableHeader)
+                        pageMasterTableId = ((Uniconta.DataModel.TableHeader)master).RowId;
 
                     if (rowType == pageMasterType && argumentMasterTableId == pageMasterTableId)
                         dgUserField.UpdateItemSource(argument);
@@ -93,7 +129,7 @@ namespace UnicontaClient.Pages.CustomPage
                     var fields = ((IList)dgUserField.ItemsSource);
                     var lastItem = fields[fields.Count - 1];
                     paramEdit[2] = selectedItem == lastItem;
-                    AddDockItem(TabControls.AddUserFieldsPage2, paramEdit, string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("UserFields"), selectedItem.Name));
+                    AddDockItem(TabControls.AddUserFieldsPage2, paramEdit, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("UserFields"), selectedItem._Name));
                     break;
                 case "CopyUserfields":
                     CWCopyUserFields winUserFields = new CWCopyUserFields(master, api);
@@ -101,8 +137,8 @@ namespace UnicontaClient.Pages.CustomPage
                      {
                          if (winUserFields.DialogResult == true)
                          {
-                             await session.OpenCompany(api.CompanyEntity.CompanyId, false);
-                             await InitQuery();
+                             await session.OpenCompany(api.CompanyId, false);
+                             InitQuery();
                          }
                      };
                     winUserFields.Show();

@@ -170,14 +170,14 @@ namespace UnicontaClient.Pages.CustomPage
                     parmas[1] = true;
                     if (selectedItem is CrmProspectView)
                     {
-                        var crmProspectUser = Activator.CreateInstance(api.CompanyEntity.GetUserType(typeof(CrmProspectClient)) ?? typeof(CrmProspectClient)) as UnicontaBaseEntity;
+                        var crmProspectUser = Activator.CreateInstance(api.CompanyEntity.GetUserTypeNotNull(typeof(CrmProspectClient))) as CrmProspectClient;
                         StreamingManager.Copy(selectedItem as CrmProspectClient, crmProspectUser);
                         parmas[0] = crmProspectUser;
                         AddDockItem(TabControls.CrmProspectPage2, parmas, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Prospects"), selectedItem.Name));
                     }
                     else if (selectedItem is CrmDebtorView)
                     {
-                        var debtorUser = Activator.CreateInstance(api.CompanyEntity.GetUserType(typeof(DebtorClient)) ?? typeof(DebtorClient)) as UnicontaBaseEntity;
+                        var debtorUser = Activator.CreateInstance(api.CompanyEntity.GetUserTypeNotNull(typeof(DebtorClient))) as DebtorClient;
                         StreamingManager.Copy(selectedItem as DebtorClient, debtorUser);
                         parmas[0] = debtorUser;
                         AddDockItem(TabControls.DebtorAccountPage2, parmas, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("DebtorAccount"), selectedItem.Name));

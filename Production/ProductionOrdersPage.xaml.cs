@@ -68,13 +68,11 @@ namespace UnicontaClient.Pages.CustomPage
 #endif
         }
 
-        
-
         private void HideMenuItems()
         {
             RibbonBase rb = (RibbonBase)localMenu.DataContext;
             if (rb != null)
-                UtilDisplay.RemoveMenuCommand(rb, "ProductionReport" );
+                UtilDisplay.RemoveMenuCommand(rb, "ProductionReport");
         }
         private void DgProductionOrders_RowDoubleClick()
         {
@@ -180,7 +178,7 @@ namespace UnicontaClient.Pages.CustomPage
                     Save();
                     break;
                 case "ViewPhoto":
-                    if (selectedItem != null && selectedItem?.ProdItemRef!= null)
+                    if (selectedItem != null && selectedItem?.ProdItemRef != null)
                         AddDockItem(TabControls.UserDocsPage, selectedItem.ProdItemRef, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Documents"), selectedItem?.ProdItemRef?._Name));
                     break;
                 case "DeleteRow":
@@ -286,11 +284,14 @@ namespace UnicontaClient.Pages.CustomPage
             var companyClient = Utility.GetCompanyClientUserInstance(api.CompanyEntity);
             var getLogo = await UtilDisplay.GetLogo(api);
 
-            var productionOrderLines = await api.Query<ProductionOrderLineClient>(productionOrder);
+            var productionOrderLineUserType = api.CompanyEntity.GetUserTypeNotNull(typeof(ProductionOrderLineClient));
+            var productionOrderLineInstance = Activator.CreateInstance(productionOrderLineUserType) as ProductionOrderLineClient;
+            var productionOrderLines = await api.Query(productionOrderLineInstance, new UnicontaBaseEntity[] { productionOrder }, null);
+
             if (productionOrderLines != null && productionOrderLines.Length > 0)
             {
                 var productionReportSource = new ProductionStandardReportClient(companyClient, productionOrder, productionOrderLines, getLogo, Uniconta.ClientTools.Localization.lookup("ProductionOrder"));
-                var standardReportSrc = new [] { productionReportSource };
+                var standardReportSrc = new[] { productionReportSource };
                 var standardPrint = new StandardPrintReport(api, standardReportSrc, (int)StandardReports.ProductionOrder);
                 standardPrint.UseReportCache = true;
                 await standardPrint.InitializePrint();
@@ -323,7 +324,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (postingResult == null)
                         return;
                     if (postingResult.Err != ErrorCodes.Succes)
-                        Utility.ShowJournalError(postingResult, dgProductionOrders, goToLinesMsg:false);
+                        Utility.ShowJournalError(postingResult, dgProductionOrders, goToLinesMsg: false);
                     else if (invpostingDialog.Simulation)
                     {
                         if (postingResult.SimulatedTrans != null)
@@ -354,12 +355,15 @@ namespace UnicontaClient.Pages.CustomPage
         void CreateOrderLines(ProductionOrderClient productionOrder)
         {
             CWProductionOrderLine dialog = new CWProductionOrderLine(api);
+#if !SILVERLIGHT
+            dialog.DialogTableId = 2000000078;
+#endif
             dialog.Closing += async delegate
             {
                 if (dialog.DialogResult == true)
                 {
                     var prodAPI = new ProductionAPI(api);
-                    var result = await prodAPI.CreateProductionLines(productionOrder, (StorageRegister)dialog.storage);
+                    var result = await prodAPI.CreateProductionLines(productionOrder, (StorageRegister)dialog.storage, dialog.Force);
                     UtilDisplay.ShowErrorCode(result);
                     //else
                     //    CreditorOrders.ShowOrderLines(4, productionOrder, this, dgProductionOrders);

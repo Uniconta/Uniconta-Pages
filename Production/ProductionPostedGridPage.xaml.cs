@@ -135,6 +135,9 @@ namespace UnicontaClient.Pages.CustomPage
         private void CreateProdcution(ProductionPostedClient fromProductionPosted)
         {
             var cwProductionOrderLine = new CWProductionOrderLine(api, true,Uniconta.ClientTools.Localization.lookup("ProductionOrder"),Decimal: fromProductionPosted.Decimals);
+#if !SILVERLIGHT
+            cwProductionOrderLine.DialogTableId = 2000000079;
+#endif
             cwProductionOrderLine.Closed += async delegate
             {
                 if (cwProductionOrderLine.DialogResult == true)

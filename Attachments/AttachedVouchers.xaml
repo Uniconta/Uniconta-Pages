@@ -35,7 +35,7 @@ x:Class="UnicontaClient.Pages.CustomPage.AttachedVouchers"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Approved1Date" ShowTime="True"  Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Approver2" Width="80" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Approved2Date" ShowTime="True"  Visible="False" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Approved" Width="60" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Approved" Width="60" HideHeaderCheck="True" ShowCheckBoxInHeader="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Approved2" Width="70" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Fileextension" Width="55" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Content" />

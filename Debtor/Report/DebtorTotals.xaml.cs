@@ -187,14 +187,16 @@ namespace UnicontaClient.Pages.CustomPage
         List<PropValuePair> inputs;
         private async void LoadData()
         {
+            balDate = BalanceDate.DateTime;
+            if (balDate == DateTime.MinValue)
+                balDate = DateTime.Today;
             string reportTypeContent = ((ComboBoxItem)cmbReportType.SelectedItem).Content.ToString();
             if (cmbReportType.SelectedIndex == 0)
-                reportTypeContent = String.Format("{0} {1:d}", reportTypeContent, BalanceDate.DateTime);
+                reportTypeContent = String.Format("{0} {1:d}", reportTypeContent, balDate);
             if (cmbCurrency.SelectedIndex > 0)
                 reportTypeContent = String.Format("{0} {1}", reportTypeContent, cmbCurrency.SelectedItem.ToString());
             dgDebtorTotalsGrid.PrintReportName = string.Format("{0} {1} ({2})", Uniconta.ClientTools.Localization.lookup("Debtor"), Uniconta.ClientTools.Localization.lookup("AgeingReport"), reportTypeContent);
             reportType = cmbReportType.SelectedIndex;
-            balDate = BalanceDate.DateTime;
             interval = (int)NumberConvert.ToInt(intervalEdit.Text);
             count = (int)NumberConvert.ToInt(countEdit.Text);
             for (int i = 0; i < 10; i++)
@@ -241,8 +243,7 @@ namespace UnicontaClient.Pages.CustomPage
             SetHeader();
             await t;
 
-            var Comp = api.CompanyEntity;
-            var Debs = Comp.GetCache(typeof(Uniconta.DataModel.Debtor));
+            var Debs = api.GetCache(typeof(Uniconta.DataModel.Debtor));
             var lst = (IEnumerable<DebtorTotalClient>)dgDebtorTotalsGrid.ItemsSource;
             if (lst != null)
             {
@@ -302,6 +303,8 @@ namespace UnicontaClient.Pages.CustomPage
             int count = (int)NumberConvert.ToInt(countEdit.Text);
             int interval = (int)NumberConvert.ToInt(intervalEdit.Text);
             var date = BalanceDate.DateTime;
+            if (date == DateTime.MinValue)
+                date = DateTime.Today;
             bool MonthStep = (interval == 31);
             if (MonthStep)
                 interval = DateTime.DaysInMonth(date.Year, date.Month);

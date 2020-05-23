@@ -314,15 +314,16 @@ namespace UnicontaClient.Pages.CustomPage
 
         public static async Task SetDimValues(Type tp, DimComboBoxEditor cb, CrudAPI api, bool showNoChnage = false)
         {
-            List<IdKey> lst = new List<IdKey>();
+            var cache = api.GetCache(tp) ?? await api.LoadCache(tp);
+
+            List<IdKey> lst = new List<IdKey>((cache != null) ? cache.Count + 2 : 2);
             if (showNoChnage)
                 lst.Add(new KeyNamePair() { _RowId = -1, _KeyStr = Uniconta.ClientTools.Localization.lookup("NoChange") });
             else
                 lst.Add(new KeyNamePair() { _RowId = -2, _KeyStr = Uniconta.ClientTools.Localization.lookup("Values") });
             lst.Add(new KeyNamePair() { _RowId = 0, _KeyStr = Uniconta.ClientTools.Localization.lookup("Blank") });
 
-            var cache = api.CompanyEntity.GetCache(tp)?? await api.CompanyEntity.LoadCache(tp, api);
-            if (cache != null)
+            if (cache != null && cache.Count > 0)
             {
                 foreach (GLDimType dim in cache.GetKeyStrRecords)
                     lst.Add(new KeyNamePair() { _RowId = dim.RowId, _KeyStr = string.Format("{0} ({1})", dim.KeyStr, dim.KeyName) });
@@ -337,13 +338,14 @@ namespace UnicontaClient.Pages.CustomPage
 
         static public async Task SetDailyJournal(ComboBoxEditor cmbJournal, CrudAPI api)
         {
-            var Comp = api.CompanyEntity;
-
             var journalSource = new List<string>();
-            var cache = Comp.GetCache(typeof(Uniconta.DataModel.GLDailyJournal)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.GLDailyJournal), api);
-            foreach (var rec in cache.GetKeyStrRecords)
-                journalSource.Add(rec.KeyStr);
-
+            var cache = api.GetCache(typeof(Uniconta.DataModel.GLDailyJournal)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLDailyJournal));
+            if (cache != null)
+            {
+                journalSource.Capacity = cache.Count;
+                foreach (var rec in cache.GetKeyStrRecords)
+                    journalSource.Add(rec.KeyStr);
+            }
             cmbJournal.ItemsSource = journalSource;
         }
 

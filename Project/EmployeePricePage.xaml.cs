@@ -82,34 +82,34 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override void OnLayoutLoaded()
         {
+            base.OnLayoutLoaded();
             setDim();
-
             var master = dgEmpPayCatGrid.masterRecords?.First();
             if (master is Uniconta.DataModel.EmpPayrollCategory)
             {
-                colPayrolCat.Visible = false;
-                colPayrolCatName.Visible = false;
+                colPayrolCat.Visible= colPayrolCat.ShowInColumnChooser = false;
+                colPayrolCatName.Visible = colPayrolCatName.ShowInColumnChooser = false;
             }
 
             if (master is Uniconta.DataModel.Employee)
             {
-                colEmployee.Visible = false;
-                colEmployeeName.Visible = false;
+                colEmployee.Visible = colEmployee.ShowInColumnChooser = false;
+                colEmployeeName.Visible= colEmployeeName.ShowInColumnChooser = false;
             }
 
             var Comp = api.CompanyEntity;
             if (Comp.TimeManagement)
             {
-                colItem.Visible = false;
-                colItemName.Visible = false;
+                colItem.Visible= colItem.ShowInColumnChooser = false;
+                colItemName.Visible = colItem.ShowInColumnChooser = false;
                 ValidFrom.Visible = true;
                 ValidTo.Visible = true;
                 colProject.Visible = true;
                 colProjectName.Visible = true;
                 colAccount.Visible = true;
                 colAccountName.Visible = true;
-                colPrCategory.Visible = false;
-                colCategoryName.Visible = false;
+                colPrCategory.Visible = colItem.ShowInColumnChooser = false;
+                colCategoryName.Visible= colItem.ShowInColumnChooser = false;
             }
         }
 

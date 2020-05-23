@@ -89,7 +89,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
                     switch (rec._PaymentMethod)
                     {
                         case PaymentTypes.VendorBankAccount:
-                            creditorAcc = bankSpecific.CreditorBBAN(rec._PaymentId, creditor._PaymentId);
+                            creditorAcc = bankSpecific.CreditorBBAN(rec._PaymentId, creditor._PaymentId, rec._SWIFT);
                             creditorOCRPaymentId = bankSpecific.CreditorRefNumber(rec._PaymentId);
                             creditorBIC = bankSpecific.CreditorBIC(rec._SWIFT);
                             if (creditorOCRPaymentId != string.Empty && creditorBIC != string.Empty)

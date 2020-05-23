@@ -68,6 +68,7 @@ namespace UnicontaClient.Pages.CustomPage
             cbCurrentERP.ItemsSource= Enum.GetValues(typeof(Uniconta.Common.ERPSystem));
             cbCompanyType.ItemsSource= Enum.GetValues(typeof(Uniconta.Common.CompanyType));
             cbCommingFrom.ItemsSource= Enum.GetValues(typeof(Uniconta.Common.ContactFrom));
+            cbCloseReason.ItemsSource = Enum.GetValues(typeof(Uniconta.DataModel.CloseReasonType));
             var Comp = crudapi.CompanyEntity;
             if (LoadedRow == null)
             {
@@ -82,6 +83,12 @@ namespace UnicontaClient.Pages.CustomPage
             frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
             editrow.PropertyChanged += Editrow_PropertyChanged;
             txtCompanyRegNo.EditValueChanged += TxtCVR_EditValueChanged;
+            lePid.api = api;
+            if (BasePage.session.User._Role == (byte)Uniconta.Common.User.UserRoles.Reseller)
+            {
+                this.liPid.Visibility = Visibility.Collapsed;
+                this.liResellerName.Visibility = Visibility.Collapsed;
+            }
         }
 
         private void frmRibbon_OnItemClicked(string ActionType)
@@ -103,27 +110,21 @@ namespace UnicontaClient.Pages.CustomPage
             return true;
         }
 
-        string zip;
         private async void Editrow_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == "ZipCode")
             {
-                if (zip == null)
+                var city = await UtilDisplay.GetCityAndAddress(editrow.ZipCode, editrow.Country);
+                if (city != null)
                 {
-                    var city = await UtilDisplay.GetCityAndAddress(editrow.ZipCode, editrow.Country);
-                    if (city != null)
-                    {
-                        editrow.City = city[0];
-                        var add1 = city[1];
-                        if (!string.IsNullOrEmpty(add1))
-                            editrow.Address1 = add1;
-                        zip = city[2];
-                        if (!string.IsNullOrEmpty(zip))
-                            editrow.ZipCode = zip;
-                    }
+                    editrow.City = city[0];
+                    var add1 = city[1];
+                    if (!string.IsNullOrEmpty(add1))
+                        editrow.Address1 = add1;
+                    var zip = city[2];
+                    if (!string.IsNullOrEmpty(zip))
+                        editrow.ZipCode = zip;
                 }
-                else
-                    zip = null;
             }
         }
 
@@ -153,7 +154,7 @@ namespace UnicontaClient.Pages.CustomPage
                 }
                 catch (Exception ex)
                 {
-                    UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"), MessageBoxButton.OK);
+                    UnicontaMessageBox.Show(ex);
                     return;
                 }
                 if (!onlyRunOnce)
@@ -230,8 +231,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void liWww_ButtonClicked(object sender)
         {
-            if (!string.IsNullOrWhiteSpace(editrow.Www))
-                Utility.OpenWebSite(editrow.Www);
+            Utility.OpenWebSite(editrow._Www);
         }
 #endif
     }

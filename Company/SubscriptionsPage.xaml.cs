@@ -49,7 +49,6 @@ namespace UnicontaClient.Pages.CustomPage
             int uid = 0;
             if (!string.IsNullOrEmpty(UidStr))
                 int.TryParse(UidStr, out uid);
-
             InitializeComponent();
             InitPage(uid);
             //FocusManager.SetFocusedElement(txtCompanyRegNo, txtCompanyRegNo);
@@ -70,7 +69,7 @@ namespace UnicontaClient.Pages.CustomPage
                 editrow.Currency = AppEnums.Currencies.ToString((int)api.CompanyEntity._CurrencyId);
                 editrow.LegalIdent = api.CompanyEntity._Id;
                 editrow.Phone = api.CompanyEntity._Phone;
-
+                editrow.Start = DateTime.Today.Date;
             }
             else
                 txtOwnerUid.IsReadOnly = true;
@@ -131,27 +130,21 @@ namespace UnicontaClient.Pages.CustomPage
             get { return TabControls.SubscriptionsPage; }
         }
 
-        string zip;
         private async void Editrow_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == "ZipCode")
             {
-                if (zip == null)
+                var city = await UtilDisplay.GetCityAndAddress(editrow.ZipCode, editrow.Country);
+                if (city != null)
                 {
-                    var city = await UtilDisplay.GetCityAndAddress(editrow.ZipCode, editrow.Country);
-                    if (city != null)
-                    {
-                        editrow.City = city[0];
-                        var add1 = city[1];
-                        if (!string.IsNullOrEmpty(add1))
-                            editrow.Address1 = add1;
-                        zip = city[2];
-                        if (!string.IsNullOrEmpty(zip))
-                            editrow.ZipCode = zip;
-                    }
+                    editrow.City = city[0];
+                    var add1 = city[1];
+                    if (!string.IsNullOrEmpty(add1))
+                        editrow.Address1 = add1;
+                    var zip = city[2];
+                    if (!string.IsNullOrEmpty(zip))
+                        editrow.ZipCode = zip;
                 }
-                else
-                    zip = null;
             }
         }
 
@@ -183,7 +176,7 @@ namespace UnicontaClient.Pages.CustomPage
                 }
                 catch (Exception ex)
                 {
-                    UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"), MessageBoxButton.OK);
+                    UnicontaMessageBox.Show(ex);
                     return;
                 }
 

@@ -125,7 +125,7 @@ namespace UnicontaClient.Pages.CustomPage
                             return;
                         var array = UnicontaClient.Pages.GL.Reports.VatSpain.calc(lst.ToArray());
                         param = new object[] { api, array };
-                        AddDockItem(TabControls.VatReportSpain, param, "Modelo 303", closeIfOpened: true);
+                        AddDockItem(TabControls.VatReportSpain, param, "Modelo 303", null, closeIfOpened: true);
                         break;
                     }
                 case "VatReportNorway":
@@ -133,7 +133,7 @@ namespace UnicontaClient.Pages.CustomPage
                         if (vatReportSum == null)
                             return;
                         param = new object[] { vatReportSum, fromDate, toDate };
-                        AddDockItem(TabControls.VatReportNorway, param, "Mva skattemeldingen", closeIfOpened: true);
+                        AddDockItem(TabControls.VatReportNorway, param, "Mva skattemeldingen", null, closeIfOpened: true);
                         break;
                     }
                 case "VatReportDenmark":
@@ -141,7 +141,7 @@ namespace UnicontaClient.Pages.CustomPage
                         if (vatReportSum == null)
                             return;
                         param = new object[] { api, this.vatReportSum, fromDate, toDate };
-                        AddDockItem(TabControls.VatReportDenmark, param, "Momsopgørelse", closeIfOpened: true);
+                        AddDockItem(TabControls.VatReportDenmark, param, "Momsopgørelse", null, closeIfOpened: true);
                         break;
                     }
                 case "VatReportHolland":
@@ -149,7 +149,7 @@ namespace UnicontaClient.Pages.CustomPage
                         if (vatReportSum == null)
                             return;
                         param = new object[] { vatReportSum, fromDate, toDate };
-                        AddDockItem(TabControls.VatReportHolland, param, "BTW Aangifte", closeIfOpened: true);
+                        AddDockItem(TabControls.VatReportHolland, param, "BTW Aangifte", null, closeIfOpened: true);
                         break;
                     }
                 case "VatReportEstonia":
@@ -157,7 +157,7 @@ namespace UnicontaClient.Pages.CustomPage
                         if (vatReportSum == null)
                             return;
                         param = new object[] { vatReportSum, fromDate, toDate };
-                        AddDockItem(TabControls.VatReportEstonia, param, "KM avaldus", closeIfOpened: true);
+                        AddDockItem(TabControls.VatReportEstonia, param, "KM avaldus", null, closeIfOpened: true);
                         break;
                     }
                 case "VatReportUnitedKingdom":
@@ -165,7 +165,7 @@ namespace UnicontaClient.Pages.CustomPage
                         if (vatReportSum == null)
                             return;
                         param = new object[] { vatReportSum, fromDate, toDate };
-                        AddDockItem(TabControls.VatReportUnitedKingdom, param, "VAT statement", closeIfOpened: true);
+                        AddDockItem(TabControls.VatReportUnitedKingdom, param, "VAT statement", null, closeIfOpened: true);
                         break;
                     }
                 case "Transactions":
@@ -187,7 +187,7 @@ namespace UnicontaClient.Pages.CustomPage
                         if (vatReportSum == null)
                             return;
                         param = new object[] { vatReportSum, fromDate, toDate };
-                        AddDockItem(TabControls.VatReportIceland, param, "VAT statement", closeIfOpened: true);
+                        AddDockItem(TabControls.VatReportIceland, param, "VAT statement", null, closeIfOpened: true);
                         break;
                     }
                 default:

@@ -82,8 +82,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void liWww_ButtonClicked(object sender)
         {
             var followUp = layoutItems.DataContext as CrmFollowUpClient;
-            if (!string.IsNullOrWhiteSpace(followUp.Www))
-                Utility.OpenWebSite(followUp.Www);
+            Utility.OpenWebSite(followUp.Www);
         }
 #endif
     }

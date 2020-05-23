@@ -23,6 +23,7 @@ using System.Threading;
 using System.Windows.Data;
 using System.Collections;
 using Uniconta.API.System;
+using Uniconta.API.Service;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -48,19 +49,23 @@ namespace UnicontaClient.Pages.CustomPage
         public UserTableData(TableHeader thMaster, string layoutname, UnicontaBaseEntity masterRecord)
             : base(thMaster)
         {
+            Init(thMaster, layoutname, masterRecord);
+        }
+
+        void Init(TableHeader thMaster, string layoutname, UnicontaBaseEntity masterRecord)
+        {
             this.thMaster = thMaster;
             Layout._SubId = api.CompanyId;
-            if (layoutname.Contains(';'))
+            if (layoutname.IndexOf(';') >= 0)
             {
                 var param = layoutname.Split(';');
                 mastertabName = param[1];
                 layoutname = param[0];
             }
             this.layoutname = layoutname;
+            InitializeComponent();
             Initialize(thMaster, masterRecord);
         }
-
-
         public UserTableData(TableHeader thMaster, string layoutname)
             : this(thMaster, layoutname, null as UnicontaBaseEntity)
         {
@@ -70,34 +75,67 @@ namespace UnicontaClient.Pages.CustomPage
         {
             this.thMaster = master;
             Layout._SubId = api.CompanyId;
+            InitializeComponent();
             Initialize(master, null);
         }
         public UserTableData(string lookupKey, TableHeader master) : base(master)
         {
             this.thMaster = master;
             Layout._SubId = api.CompanyId;
+            InitializeComponent();
             Initialize(master, null, lookupKey);
         }
         public UserTableData(TableHeader thMaster, string layoutname, SynchronizeEntity syncEntity)
          : base(syncEntity, true)
         {
-            this.thMaster = thMaster;
-            Layout._SubId = api.CompanyId;
-            if (layoutname.Contains(';'))
-            {
-                var param = layoutname.Split(';');
-                mastertabName = param[1];
-                layoutname = param[0];
-            }
-            this.layoutname = layoutname;
-            Initialize(thMaster, syncEntity?.Row);
+            Init(thMaster, layoutname, syncEntity?.Row);
         }
+
+        public UserTableData(BaseAPI API) : base(API, string.Empty)
+        {
+            InitializeComponent();
+        }
+        public override void SetParameter(IEnumerable<ValuePair> Parameters)
+        {
+            string tablename = null;
+            foreach (var param in Parameters)
+            {
+                var paramName = param.Name;
+                var paramValue = param.Value;
+                if (string.IsNullOrEmpty(paramName) || string.Compare(param.Name, "table", StringComparison.OrdinalIgnoreCase) == 0)
+                {
+                    tablename = paramValue;
+                    break;
+                }
+            }
+            if (tablename != null)
+            {
+                foreach (var master in api.CompanyEntity.UserTables)
+                {
+                    if (master._Name == tablename)
+                    {
+                        var tableHeaderClient = new TableHeaderClient();
+                        StreamingManager.Copy(master, tableHeaderClient);
+                        string header = master._Prompt == null ? master._Name : master._Prompt;
+                        this.SetHeader(header);
+                        this.thMaster = tableHeaderClient;
+                        Layout._SubId = api.CompanyId;
+                        this.layoutname = header;
+                        Initialize(thMaster, null);
+                        break;
+                    }
+                }
+            }
+            base.SetParameter(Parameters);
+        }
+
         protected override void SyncEntityMasterRowChanged(UnicontaBaseEntity args)
         {
             dgTabledataGrid.UpdateMaster(args);
             SetHeader(args);
             InitQuery();
         }
+
         void SetHeader(UnicontaBaseEntity args)
         {
             var syncMaster = args;
@@ -115,7 +153,6 @@ namespace UnicontaClient.Pages.CustomPage
         }
         private void Initialize(TableHeader thMaster, UnicontaBaseEntity masterRecord, string lookupkey=null)
         {
-            InitializeComponent();
             if (lookupkey != null)
                 this.LookupKey = lookupkey;
             master = masterRecord;

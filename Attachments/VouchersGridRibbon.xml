@@ -4,6 +4,7 @@
     <!---When we create a new TabPage -->
     <RibbonItem Action="AddRow" LocalizedNameKey="Add" LargeGlyph="Add_32x32.png"/>
     <RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="Delete" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png"/>
+    <RibbonItem Action="RemoveFromInbox" LocalizedNameKey="RemoveFromInbox" LargeGlyph="Clear_32x32.png" />
     <RibbonItem Action="Save" LocalizedNameKey="Save" LargeGlyph="save-32x32.png" ShortcutKey=""/>
   </RibbonItem>
   <RibbonItem>
@@ -47,13 +48,11 @@
     <RibbonItem Action="EnvelopeWizard" LocalizedNameKey="CreateOBJ" Parameter="Envelope" Glyph="Folder_32x32.png" LargeGlyph="Folder_32x32.png"/>
   </RibbonItem>
   <RibbonItem>
-  <RibbonItem Action="CopyOrMoveVoucher" LocalizedNameKey="CopyOrMoveOBJ" Parameter="Attachments" LargeGlyph="Job_Change_32x32.png" />
-  </RibbonItem>
-  <RibbonItem>
-    <RibbonItem Action="RemoveFromInbox" LocalizedNameKey="RemoveFromInbox" LargeGlyph="Clear_32x32.png" />
+    <RibbonItem Action="CopyOrMoveVoucher" LocalizedNameKey="CopyOrMoveOBJ" Parameter="Attachments" LargeGlyph="Job_Change_32x32.png" />
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="ResendToApprover" LocalizedNameKey="ResendToApprover" LargeGlyph="Email_Add_32x32.png" />
+    <RibbonItem Action="PendingApproval" LocalizedNameKey="PendingApproval" LargeGlyph="Validate_32x32.png" />
   </RibbonItem>
   <RibbonItem TabId="1" LocalizedNameKey="Envelopes">
     <RibbonItem Action="AddEnvelope" LocalizedNameKey="Add" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png"/>

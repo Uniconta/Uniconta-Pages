@@ -149,6 +149,9 @@ namespace UnicontaClient.Pages.CustomPage
                     StreamingManager.Copy(api.CompanyEntity, compnClient);
                     AddDockItem(TabControls.InvVaraintSetupPage, compnClient, string.Format(Uniconta.ClientTools.Localization.lookup("SetupOBJ"), Uniconta.ClientTools.Localization.lookup("Variants")) , "Add_16x16.png");
                     break;
+                default:
+                    gridRibbon_BaseActions(ActionType);
+                    break;
             }
         }
 

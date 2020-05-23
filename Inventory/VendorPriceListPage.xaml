@@ -49,12 +49,13 @@ x:Class="UnicontaClient.Pages.CustomPage.VendorPriceListPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ValidFrom" ShowTime="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ValidTo" ShowTime="True"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="UseDeliveryDate" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="UseDeliveryDate" HideHeaderCheck="True" />
                     <localPage:CorasauDataGridTemplateColumnClient FieldName="LinkToPricelist"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="FirstMatch" Width="70" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="FirstMatch" Width="70" HideHeaderCheck="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PriceAndDiscount" HideHeaderCheck="True"  />
                     <localPage:ComboBoxColumnClient x:Name="Currency" Width="50" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Active" Width="70" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PriceUpdate" Width="70" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Active" Width="70" HideHeaderCheck="True" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PriceUpdate" Width="70" Visible="False" HideHeaderCheck="True"/>
                 </localPage:CreditorPriceListGrid.Columns>
             </localPage:CreditorPriceListGrid>
 

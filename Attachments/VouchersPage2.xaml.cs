@@ -180,7 +180,6 @@ namespace UnicontaClient.Pages.CustomPage
                         if (voucher._Data != null)
                         {
                             buffers[i] = voucher._Data;
-                            voucher._SizeKB = ((voucher._Data.Length + 512) >> 10);
                             voucher._Data = null;
                         }
                     }
@@ -277,6 +276,7 @@ namespace UnicontaClient.Pages.CustomPage
                         if (fileInfo == null)
                             continue;
                         var vc = Activator.CreateInstance(voucherClientRow?.GetType()) as VouchersClient;
+                        vc.SetMaster(api.CompanyEntity);
                         multiVouchers[iCtr++] = vc;
                         vc._Fileextension = DocumentConvert.GetDocumentType(fileInfo.FileExtension);
 #if !SILVERLIGHT

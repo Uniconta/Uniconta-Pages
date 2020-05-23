@@ -1,0 +1,42 @@
+<Pages:GridBasePage xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.FAMTransSumClientGridPage"
+             xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+             xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid  x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="10"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="2"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/FAM/FAMTransSumClientGridRibbon.xml" x:Name="localMenu"/>
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Row="2" Margin="0,12,0,10">
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FromDate}"  Margin="10 0 0 0"/>
+            <CorasauControls:DateEditor x:Name="FromDate"  Margin="10 0 0 0" ShowToday="True"/>
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ToDate}"  Margin="10 0 0 0"/>
+            <CorasauControls:DateEditor x:Name="ToDate"  Margin="10 0 0 0" ShowToday="True"/>
+        </StackPanel>
+        <GridSplitter Grid.Row="3" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{StaticResource WindowHeaderGradient}" />
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="4" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <localPage:FAMTransSumClientGrid x:Name="dgFAMTransSumGrid" AutoGenerateColumns="None">
+                <localPage:FAMTransSumClientGrid.Columns>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Asset" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="AssetName" Width="200" ReadOnly="True" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="AssetPostType" Width="150" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Primo" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Amount" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Sum" ReadOnly="True"/>
+                </localPage:FAMTransSumClientGrid.Columns>
+                <localPage:FAMTransSumClientGrid.TotalSummary>
+                    <localPage:SumColumn FieldName="Primo" SummaryType="Sum" DisplayFormat="{}{0:N2}" />
+                    <localPage:SumColumn FieldName="Amount" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="Sum" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                </localPage:FAMTransSumClientGrid.TotalSummary>
+            </localPage:FAMTransSumClientGrid>
+        </CorasauControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

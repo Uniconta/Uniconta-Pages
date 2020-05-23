@@ -25,7 +25,7 @@
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="MatchLines" LocalizedNameKey="MatchLines" ControlName="BankStatementLinePage" Glyph="Match_Lines_32x32.png" LargeGlyph="Match_Lines_32x32.png"/>
-    <RibbonItem Action="RemoveSettlements" LocalizedNameKey="RemoveOBJ" Parameter="Settlements" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png" />
+    <RibbonItem Action="RemoveSettlements" LocalizedNameKey="RemoveOBJ" Parameter="Reconciliation" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png" />
   </RibbonItem>
   <RibbonItem LocalizedNameKey="Reports">
     <RibbonItem Action="StLines" LocalizedNameKey="BankStatement" ControName="StatementLine" Glyph="Bank_Statement_32x32.png" LargeGlyph="Bank_Statement_32x32.png"/>
@@ -34,5 +34,8 @@
   <RibbonItem  LocalizedNameKey="BankStatement">
     <RibbonItem Action="ImportBankStatement" LocalizedNameKey="LoadFile" ControlName="ImportGLDailyJournal"  LargeGlyph="Import_32x32.png"/>
     <RibbonItem Action="DeleteStatement" LocalizedNameKey="DeleteOBJ" Parameter="Imported" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png" />
+  </RibbonItem>
+  <RibbonItem >
+    <RibbonItem Action="ConnectToBank" LocalizedNameKey="ConnectToBank" Module="_DirectDebit" LargeGlyph="Bank_Connect_32x32.png"/> 
   </RibbonItem>
 </root>

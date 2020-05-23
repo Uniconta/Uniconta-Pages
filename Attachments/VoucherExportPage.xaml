@@ -15,12 +15,14 @@ x:Class="UnicontaClient.Pages.CustomPage.VoucherExportPage"
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <CorasauControls:CorasauRibbonControl x:Name="localMenu" XMLSourcePath=";component/Pages/Tools/LocalBackupRibbon.xml"/>
-            <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Vertical" Grid.Row="2" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
-                <CorasauControls:CorasauLayoutGroup x:Name="grpDescription" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Description}"
+            <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Horizontal" Grid.Row="2" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
+                <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="grpFirst">
+                    <CorasauControls:CorasauLayoutGroup x:Name="grpDescription" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Description}"
                                                 Orientation="Vertical" MinWidth="300" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                    <CorasauControls:CorasauLayoutItem x:Name="leLog" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ExportLog}" LabelVerticalAlignment="Top" Visibility="Collapsed">
-                        <CorasauControls:TextEditor x:Name="txeLog" Text="{Binding LogMsg,UpdateSourceTrigger=PropertyChanged}" Height="400" VerticalContentAlignment="Top" Width="300" IsReadOnly="True" ScrollViewer.VerticalScrollBarVisibility="Auto" />
-                    </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="leLog" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ExportLog}" LabelVerticalAlignment="Top" Visibility="Collapsed">
+                            <CorasauControls:TextEditor x:Name="txeLog" Text="{Binding LogMsg,UpdateSourceTrigger=PropertyChanged}" Height="400" VerticalContentAlignment="Top" Width="300" IsReadOnly="True" ScrollViewer.VerticalScrollBarVisibility="Auto" />
+                        </CorasauControls:CorasauLayoutItem>
+                    </CorasauControls:CorasauLayoutGroup>
                 </CorasauControls:CorasauLayoutGroup>
             </CorasauControls:CorasauLayoutControl>
         </Grid>

@@ -26,17 +26,15 @@ using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
     /// <summary>
-    /// Interaction logic for InventoryHierarichalBOMStatement.xaml
+    /// Interaction logic for InventoryInvBOMClient.xaml
     /// </summary>
     public partial class InventoryHierarchicalBOMStatement : GridBasePage
     {
         public override string NameOfControl { get { return TabControls.InventoryHierarchicalBOMStatement; } }
 
-        List<HierarichalBOMStatement> listInvBomClient;
-        InvBOM invBom;
+        InvBOMClient invBom;
         InvItem invClient;
-        int Id;
-        SQLCache invItemCache;
+        double Quantity;
         CWServerFilter filterDialog;
         SortingProperties[] defaultSort;
         Filter[] defaultFilters;
@@ -44,23 +42,27 @@ namespace UnicontaClient.Pages.CustomPage
         IEnumerable<PropValuePair> filters;
         FilterSorter sort;
         ItemBase ibase;
+        LoadInvBOMDeep LoadBOM;
 
         // we support two different masters. InvItem or InvBOM
         public InventoryHierarchicalBOMStatement(UnicontaBaseEntity baseEntity) : base(null)
         {
             InitializeComponent();
             BusyIndicator = busyIndicator;
+            Quantity = 1d;
             invClient = baseEntity as InvItem;
             if (invClient == null)
-                invBom = baseEntity as InvBOM;
+            {
+                invBom = baseEntity as InvBOMClient;
+                if (invBom != null)
+                    Quantity = invBom._Qty;
+            }
             baseRibbon = localMenu;
             localMenu.OnItemClicked += LocalMenu_OnItemClicked;
-            invItemCache = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.InvItem));
+            LoadBOM = new LoadInvBOMDeep(api);
             SetDefaultFilterValues();
             Utility.SetupVariants(api, null, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
             GetMenuItem();
-            if (invClient is InvItem && invClient._ItemType == (byte)Uniconta.DataModel.ItemType.ProductionBOM)
-                this.colUnfoldBom.Visible = true;
             SetTreeListViewStyle();
             dgInvBomclientGrid.View.ShownColumnChooser += View_ShownColumnChooser;
 #if SILVERLIGHT
@@ -69,6 +71,34 @@ namespace UnicontaClient.Pages.CustomPage
             this.PreviewKeyDown += RootVisual_KeyDown;
 #endif
             this.BeforeClose += InventoryHierarchicalBOMStatement_BeforeClose;
+            HideMenuItems();
+        }
+
+        private void HideMenuItems()
+        {
+            RibbonBase rb = (RibbonBase)localMenu.DataContext;
+            if (rb != null)
+            {
+                UtilDisplay.RemoveMenuCommand(rb, "SaveGrid");
+                UtilDisplay.RemoveMenuCommand(rb, "Layout");
+                UtilDisplay.RemoveMenuCommand(rb, "SetQuantity");
+                UtilDisplay.RemoveMenuCommand(rb, "Storage");
+            }
+        }
+
+        public override void SetParameter(IEnumerable<ValuePair> Parameters)
+        {
+            foreach (var rec in Parameters)
+            {
+                if (string.Compare(rec.Name, "Item", StringComparison.CurrentCultureIgnoreCase) == 0)
+                {
+                    var cache = api.GetCache(typeof(Uniconta.DataModel.InvItem)) ?? api.LoadCache(typeof(Uniconta.DataModel.InvItem)).GetAwaiter().GetResult();
+                    invClient = (Uniconta.DataModel.InvItem)cache.Get(rec.Value);
+                }
+                else if (string.Compare(rec.Name, "Quantity", StringComparison.CurrentCultureIgnoreCase) == 0)
+                    Quantity = Uniconta.Common.Utility.NumberConvert.ToDoubleNoThousandSeperator(rec.Value);
+            }
+            base.SetParameter(Parameters);
         }
 
         private void InventoryHierarchicalBOMStatement_BeforeClose()
@@ -142,12 +172,26 @@ namespace UnicontaClient.Pages.CustomPage
                     defaultFilterCleared = true;
                     break;
                 case "ExpandAndCollapse":
-                    if (dgInvBomclientGrid.ItemsSource == null) return;
-                    SetExpandCollapse();
+                    if (dgInvBomclientGrid.ItemsSource != null)
+                        SetExpandCollapse();
                     break;
                 case "ExpandRow":
-                    if (dgInvBomclientGrid.SelectedItem == null) return;
-                    SetExpandRows();
+                    if (dgInvBomclientGrid.SelectedItem != null)
+                        SetExpandRows();
+                    break;
+                case "AddNote":
+                    if (dgInvBomclientGrid.SelectedItem != null)
+                    {
+                        var selectedItem = dgInvBomclientGrid.SelectedItem as InvBOMClient;
+                        AddDockItem(TabControls.UserNotesPage, dgInvBomclientGrid.SelectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Note"), selectedItem._ItemPart));
+                    }
+                    break;
+                case "AddDoc":
+                    if (dgInvBomclientGrid.SelectedItem != null)
+                    {
+                        var selectedItem = dgInvBomclientGrid.SelectedItem as InvBOMClient;
+                        AddDockItem(TabControls.UserDocsPage, dgInvBomclientGrid.SelectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Document"), selectedItem._ItemPart));
+                    }
                     break;
             }
         }
@@ -196,54 +240,20 @@ namespace UnicontaClient.Pages.CustomPage
 #endif
         }
 
-        public override Task InitQuery()
+        public override async Task InitQuery()
         {
-            return BindGrid();
-        }
-
-        async private Task BindGrid()
-        {
-            listInvBomClient = new List<HierarichalBOMStatement>();
             busyIndicator.IsBusy = true;
-            if (invItemCache == null)
-                invItemCache = await api.CompanyEntity.LoadCache(typeof(Uniconta.DataModel.InvItem), api);
-            if (invClient == null)
-                invClient = (InvItem)invItemCache.Get(invBom._ItemMaster);
-            if (invClient._ItemType >= (byte)Uniconta.DataModel.ItemType.BOM)
-            {
-                // lets create the topnode
-                Id = 0;
-                var hierarichalInvBom = new HierarichalBOMStatement() { _ItemPart = invClient._Item, _Qty = 1, ID = ++Id };
-                listInvBomClient.Add(hierarichalInvBom);
-
-                await CreateHierarichalInvBomStatement(invClient, 1, hierarichalInvBom.ID);
-            }
-            dgInvBomclientGrid.ItemsSource = listInvBomClient;
+            LoadBOM.Sorter = sort;
+            LoadBOM.Filters = filters;
+            Task<List<InvBOMClient>> tsk;
+            if (invClient != null)
+                tsk = LoadBOM.Load(invClient, Quantity);
+            else
+                tsk = LoadBOM.Load(invBom, Quantity);
+            if (tsk != null)
+                dgInvBomclientGrid.ItemsSource = await tsk;
+            dgInvBomclientGrid.Visibility = Visibility.Visible;
             busyIndicator.IsBusy = false;
-        }
-
-        async private Task CreateHierarichalInvBomStatement(InvItem Item, int level, int ParentID)
-        {
-            var subInvBoms = await api.Query<HierarichalBOMStatement>(Item, filters); // Applying Filters
-            if (subInvBoms != null && subInvBoms.Length > 0)
-            {
-                SortInvBom(subInvBoms);
-                foreach (var sub in subInvBoms)
-                {
-                    sub.ParentID = ParentID;
-                    sub.ID = ++Id;
-                    listInvBomClient.Add(sub);
-
-                    if (level < 25)
-                    {
-                        var invClient = (InvItem)invItemCache.Get(sub.ItemPart);
-                        if (invClient != null && invClient._ItemType >= (byte)Uniconta.DataModel.ItemType.BOM)
-                        {
-                            await CreateHierarichalInvBomStatement(invClient, level + 1, sub.ID);
-                        }
-                    }
-                }
-            }
         }
 
         private void SetTreeListViewStyle()
@@ -263,22 +273,24 @@ namespace UnicontaClient.Pages.CustomPage
 #endif
             treeListView.RowStyle = rowStyle;
 #if !SILVERLIGHT
-            if(!System.Windows.Forms.SystemInformation.TerminalServerSession)
+            if (!System.Windows.Forms.SystemInformation.TerminalServerSession)
 #endif
-            if (!session.User._ShowGridLines)
-                treeListView.AlternateRowBackground = Application.Current.Resources["AlternateGridRowColor"] as SolidColorBrush;
+                if (!session.User._ShowGridLines)
+                    treeListView.AlternateRowBackground = Application.Current.Resources["AlternateGridRowColor"] as SolidColorBrush;
         }
 
-        private void SortInvBom(HierarichalBOMStatement[] invBoms)
+        private void HasDocImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (sort != null)
-                Array.Sort(invBoms, sort);
+            var invBomItem = (sender as Image).Tag as InvBOMClient;
+            if (invBomItem != null)
+                AddDockItem(TabControls.UserDocsPage, invBomItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Note"), invBomItem._ItemPart));
         }
-    }
 
-    public class HierarichalBOMStatement : InvBOMClient
-    {
-        public int ID { get; set; }
-        public int ParentID { get; set; }
+        private void HasNoteImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            var invBomItem = (sender as Image).Tag as InvBOMClient;
+            if (invBomItem != null)
+                AddDockItem(TabControls.UserNotesPage, invBomItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Document"), invBomItem._ItemPart));
+        }
     }
 }

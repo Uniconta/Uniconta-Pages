@@ -280,9 +280,8 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void HasWebsite_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var prospectClient = (sender as TextBlock).Tag as CrmProspectClient;
-            if (prospectClient != null)
-                Utility.OpenWebSite(prospectClient.Www);
+            var prospect = (sender as TextBlock).Tag as CrmProspectClient;
+            Utility.OpenWebSite(prospect._Www);
         }
 #endif
     }

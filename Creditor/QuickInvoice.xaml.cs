@@ -141,28 +141,22 @@ namespace UnicontaClient.Pages.CustomPage
 
         public override Task InitQuery() { return null; }
 
-        string zip;
         private async void Editrow_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == "DeliveryZipCode")
             {
-                if (zip == null)
+                var deliveryCountry = Order.DeliveryCountry ?? api.CompanyEntity._CountryId;
+                var city = await UtilDisplay.GetCityAndAddress(Order.DeliveryZipCode, deliveryCountry);
+                if (city != null)
                 {
-                    var deliveryCountry = Order.DeliveryCountry ?? api.CompanyEntity._CountryId;
-                    var city = await UtilDisplay.GetCityAndAddress(Order.DeliveryZipCode, deliveryCountry);
-                    if (city != null)
-                    {
-                        Order.DeliveryCity = city[0];
-                        var add1 = city[1];
-                        if (!string.IsNullOrEmpty(add1))
-                            Order.DeliveryAddress1 = add1;
-                        zip = city[2];
-                        if (!string.IsNullOrEmpty(zip))
-                            Order.DeliveryZipCode = zip;
-                    }
+                    Order.DeliveryCity = city[0];
+                    var add1 = city[1];
+                    if (!string.IsNullOrEmpty(add1))
+                        Order.DeliveryAddress1 = add1;
+                    var zip = city[2];
+                    if (!string.IsNullOrEmpty(zip))
+                        Order.DeliveryZipCode = zip;
                 }
-                else
-                    zip = null;
             }
         }
 
@@ -240,6 +234,17 @@ namespace UnicontaClient.Pages.CustomPage
                 var voucher = voucherObj[0] as VouchersClient;
                 if (voucher != null)
                     Order.DocumentRef = voucher.RowId;
+            }
+
+            if (screenName == TabControls.ItemVariantAddPage && argument != null)
+            {
+                var param = argument as object[];
+                var orderNumber = Convert.ToInt32(param[1]);
+                if (orderNumber == Order._OrderNumber)
+                {
+                    var invItems = param[0] as List<UnicontaBaseEntity>;
+                    dgCreditorOrderLineGrid.PasteRows(invItems);
+                }
             }
         }
 
@@ -579,6 +584,18 @@ namespace UnicontaClient.Pages.CustomPage
                     AddDockItem(TabControls.AddMultipleInventoryItem, paramArray, true,
                         string.Format(Uniconta.ClientTools.Localization.lookup("AddOBJ"), Uniconta.ClientTools.Localization.lookup("InventoryItems")), null, floatingLoc: Utility.GetDefaultLocation());
                     break;
+                case "AddVariants":
+                    if (dgCreditorOrderLineGrid.SelectedItem == null) return;
+                    var orderLine = dgCreditorOrderLineGrid.SelectedItem as CreditorOrderLineClient;
+                    var itm = orderLine?.InvItem;
+                    if (itm?._StandardVariant != null)
+                    {
+                        var paramItem = new object[] { orderLine, Order };
+                        dgCreditorOrderLineGrid.SetLoadedRow(orderLine);
+                        AddDockItem(TabControls.ItemVariantAddPage, paramItem, true,
+                        string.Format(Uniconta.ClientTools.Localization.lookup("AddOBJ"), Uniconta.ClientTools.Localization.lookup("Variants")), null, floatingLoc: Utility.GetDefaultLocation());
+                    }
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -654,17 +671,18 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 if (GenrateInvoiceDialog.DialogResult == true)
                 {
-                    showInvoice = GenrateInvoiceDialog.ShowInvoice || GenrateInvoiceDialog.InvoiceQuickPrint;
-                    if (!GenrateInvoiceDialog.IsSimulation && GenrateInvoiceDialog.InvoiceNumber == null)
+                    var isSimulated = GenrateInvoiceDialog.IsSimulation;
+                    showInvoice = GenrateInvoiceDialog.ShowInvoice || GenrateInvoiceDialog.InvoiceQuickPrint || GenrateInvoiceDialog.SendByOutlook;
+                    if (!isSimulated && GenrateInvoiceDialog.InvoiceNumber == null)
                     {
                         UtilDisplay.ShowErrorCode(ErrorCodes.InvoiceNumberMissing);
                         return;
                     }
 
-                    var invoicePostingResult = new InvoicePostingPrintGenerator(api, this, dbOrder, lines, GenrateInvoiceDialog.GenrateDate, GenrateInvoiceDialog.InvoiceNumber, GenrateInvoiceDialog.IsSimulation,
-                        CompanyLayoutType.PurchaseInvoice, showInvoice, GenrateInvoiceDialog.InvoiceQuickPrint, GenrateInvoiceDialog.NumberOfPages, false, GenrateInvoiceDialog.Emails, GenrateInvoiceDialog.sendOnlyToThisEmail,
-                        false, false, documents);
-                    invoicePostingResult.OpenAsOutlook =!GenrateInvoiceDialog.IsSimulation && GenrateInvoiceDialog.SendByOutlook;
+                    var invoicePostingResult = new InvoicePostingPrintGenerator(api, this);
+                    invoicePostingResult.SetUpInvoicePosting(dbOrder, lines, CompanyLayoutType.PurchaseInvoice, GenrateInvoiceDialog.GenrateDate, GenrateInvoiceDialog.InvoiceNumber, isSimulated, GenrateInvoiceDialog.ShowInvoice,
+                        GenrateInvoiceDialog.PostOnlyDelivered, GenrateInvoiceDialog.InvoiceQuickPrint, GenrateInvoiceDialog.NumberOfPages, false, !isSimulated && GenrateInvoiceDialog.SendByOutlook,
+                        GenrateInvoiceDialog.sendOnlyToThisEmail, GenrateInvoiceDialog.Emails, false, documents, false);
 
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
                     busyIndicator.IsBusy = true;
@@ -673,7 +691,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                     if (result)
                     {
-                        if (!GenrateInvoiceDialog.IsSimulation)
+                        if (!isSimulated)
                         {
                             dgCreditorOrderLineGrid.ItemsSource = new List<CreditorOrderLineClient>();
                             documents = null;
@@ -682,12 +700,8 @@ namespace UnicontaClient.Pages.CustomPage
 
                         }
 
-                        if (invoicePostingResult.PostingResult.Header._InvoiceNumber != 0)
+                        if (invoicePostingResult.IsInvoiceGenerated)
                         {
-                            var msg = string.Format(Uniconta.ClientTools.Localization.lookup("InvoiceHasBeenGenerated"), invoicePostingResult.PostingResult.Header.InvoiceNum);
-                            msg = string.Format("{0}{1}{2} {3}", msg, Environment.NewLine, Uniconta.ClientTools.Localization.lookup("LedgerVoucher"), invoicePostingResult.PostingResult.Header._Voucher);
-                            UnicontaMessageBox.Show(msg, Uniconta.ClientTools.Localization.lookup("Message"), MessageBoxButton.OK);
-
                             if (attachedVoucher != null)
                             {
                                 attachedVoucher.PurchaseNumber = Order._OrderNumber;

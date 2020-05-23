@@ -114,9 +114,11 @@ namespace UnicontaClient.Pages.CustomPage
         private void LocalMenu_OnItemClicked(string ActionType)
         {
             var selectedItem = dgCreditorDeliveryNoteGrid.SelectedItem as CreditorDeliveryNoteLocal;
-            string purchaseHeader = string.Empty;
-            if (selectedItem == null)
-                purchaseHeader = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Orders"), selectedItem._OrderNumber);
+            string purchaseHeader;
+            if (selectedItem != null)
+                purchaseHeader = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Order"), selectedItem._OrderNumber);
+            else
+                purchaseHeader = string.Empty;
 
             switch (ActionType)
             {
@@ -126,7 +128,7 @@ namespace UnicontaClient.Pages.CustomPage
                     object[] EditParam = new object[2];
                     EditParam[0] = selectedItem as CreditorInvoiceClient;
                     EditParam[1] = true;
-                    AddDockItem(TabControls.CreditorInvoicePage2, EditParam, string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("CreditorPackNote"), selectedItem.Name));
+                    AddDockItem(TabControls.CreditorInvoicePage2, EditParam, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("CreditorPackNote"), selectedItem.Name));
                     break;
                 case "DeliveryNoteLine":
                     if (selectedItem != null)

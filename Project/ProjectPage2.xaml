@@ -242,7 +242,15 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectPage2"
                             <CorasauControls:DoubleEditor  FieldName="OtherSales" MarkReadOnly="True"/>
                         </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
-               </CorasauControls:CorasauLayoutGroup>
+                    <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="Adjustment"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Adjustment}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                        <CorasauControls:CorasauLayoutItem x:Name="liAdjustmentCost" FieldName="AdjustmentCost">
+                            <CorasauControls:DoubleEditor  FieldName="AdjustmentCost" MarkReadOnly="True"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liAdjustmentSales" FieldName="AdjustmentSales">
+                            <CorasauControls:DoubleEditor  FieldName="AdjustmentSales" MarkReadOnly="True"/>
+                        </CorasauControls:CorasauLayoutItem>
+                    </CorasauControls:CorasauLayoutGroup>
+                </CorasauControls:CorasauLayoutGroup>
             </CorasauControls:CorasauLayoutControl>
         </Grid>
     </CorasauControls:BusyIndicator>

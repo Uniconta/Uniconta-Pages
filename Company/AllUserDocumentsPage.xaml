@@ -27,16 +27,17 @@ x:Class="UnicontaClient.Pages.CustomPage.AllUserDocumentsPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="DocumentType" Width="55"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Url" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="UserId" Visible="False"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Text" Width="400" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Text" Width="300" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="KeyStr" Width="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="KeyName" Width="150"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Group" Width="80"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="KeyStr" Width="80"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="KeyName" Width="120"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="GroupName" Visible="False"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Invoice" Width="80"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Offer" Width="80"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Confirmation" Width="80"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="PackNote" Width="80"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Requisition" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="GroupName" Width="100" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="TableReference" Width="120"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Invoice" Width="80" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Offer" Width="80" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Confirmation" Width="80" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PackNote" Width="80" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Requisition" Width="80" Visible="False"/>
                 </local:AllUserDocumentsPageGrid.Columns>
             </local:AllUserDocumentsPageGrid>
         </UnicontaControls:BusyIndicator>

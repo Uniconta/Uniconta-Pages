@@ -255,29 +255,28 @@ namespace UnicontaClient.Pages.CustomPage
         }
         private void cmbExternType_SelectedIndexChanged(object sender, RoutedEventArgs e)
         {
-            Type type = null;
-            var comp = api?.CompanyEntity;
-
+            Type type;
             switch (cmbExternType.SelectedIndex)
             {
                 case 0:
-                    type = comp?.GetUserType(typeof(DebtorClient)) ?? typeof(DebtorClient);
+                    type = typeof(DebtorClient);
                     break;
                 case 1:
-                    type = comp?.GetUserType(typeof(DebtorInvoiceClient)) ?? typeof(DebtorInvoiceClient);
+                    type = typeof(DebtorInvoiceClient);
                     break;
                 case 2:
-                    type = comp?.GetUserType(typeof(CreditorClient)) ?? typeof(CreditorClient);
+                    type = typeof(CreditorClient);
                     break;
                 case 3:
-                    type = comp?.GetUserType(typeof(CreditorInvoiceClient)) ?? typeof(CreditorInvoiceClient);
+                    type = typeof(CreditorInvoiceClient);
                     break;
+                default: return;
             }
 
+            type = api?.CompanyEntity.GetUserTypeNotNull(type);
             if (type != null)
             {
-                List<string> propertyNames = UtilFunctions.GetAllDisplayPropertyNames(type, api.CompanyEntity, false, false);
-                cmbProperties.ItemsSource = propertyNames;
+                cmbProperties.ItemsSource = UtilFunctions.GetAllDisplayPropertyNames(type, api.CompanyEntity, false, false);
                 cmbProperties.SelectedIndex = 0;
             }
         }

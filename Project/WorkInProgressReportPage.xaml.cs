@@ -768,8 +768,7 @@ namespace UnicontaClient.Pages.CustomPage
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("LoadingMsg");
                     busyIndicator.IsBusy = true;
 
-                    var debtorOrderType = api.CompanyEntity.GetUserType(typeof(DebtorOrderClient)) ?? typeof(DebtorOrderClient);
-                    var debtorOrderInstance = Activator.CreateInstance(debtorOrderType) as DebtorOrderClient;
+                    var debtorOrderInstance = Activator.CreateInstance(api.CompanyEntity.GetUserTypeNotNull(typeof(DebtorOrderClient))) as DebtorOrderClient;
                     var invoiceApi = new Uniconta.API.Project.InvoiceAPI(api);
                     var result = await invoiceApi.CreateOrderFromProject(debtorOrderInstance, selectedItem.Project, CWCreateOrderFromProject.InvoiceCategory, CWCreateOrderFromProject.GenrateDate,
                         CWCreateOrderFromProject.FromDate, CWCreateOrderFromProject.ToDate);

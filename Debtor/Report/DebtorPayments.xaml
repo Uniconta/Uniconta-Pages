@@ -9,7 +9,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorPayments"
         mc:Ignorable="d"   xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
         xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
         d:DesignHeight="300" d:DesignWidth="400">
-    
+
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
@@ -20,6 +20,8 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorPayments"
         <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Debtor/Report/DebtorPaymentsRibbon.xml" x:Name="localMenu"/>
         <Grid Grid.Row="1" Margin="5">
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="3"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
@@ -36,21 +38,24 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorPayments"
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="3"/>
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="10"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="3"/>
-                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DueDate}" Grid.Column="0" Grid.Row="0" VerticalAlignment="Center"/>
+            <!-- Row 1 -->
+            <TextBlock x:Name="tbDateFrom"  Grid.Column="0" Grid.Row="0" VerticalAlignment="Center"/>
             <CorasauControls:DateEditor x:Name="txtDateFrm" Grid.Column="2" Grid.Row="0" Height="23"/>
-            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DueDate}" Grid.Column="4" Grid.Row="0" VerticalAlignment="Center"/>
+            <TextBlock x:Name="tbDateTo"  Grid.Column="4" Grid.Row="0" VerticalAlignment="Center"/>
             <CorasauControls:DateEditor x:Name="txtDateTo" Grid.Column="6" Grid.Row="0" Height="23"/>
             <Button x:Name="btnSerach" Grid.Column="8" Grid.Row="0" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Search}" Height="23" Width="80" Click="btnSerach_Click"/>
-            <Border VerticalAlignment="Stretch"  Width="1" HorizontalAlignment="Center" Grid.Row="0" Grid.Column="9" BorderBrush="{StaticResource WindowHeaderBorderBrush}" BorderThickness="1" Background="{StaticResource WindowHeaderGradient}"  />
+            <Border VerticalAlignment="Stretch"  Width="1" HorizontalAlignment="Center" Grid.Row="0" Grid.RowSpan="3" Grid.Column="9" BorderBrush="{StaticResource WindowHeaderBorderBrush}" BorderThickness="1" Background="{StaticResource WindowHeaderGradient}"  />
             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=PrintPreview}" Grid.Column="10" Grid.Row="0" VerticalAlignment="Center"/>
             <CorasauControls:DimComboBoxEditor x:Name="cmbPrintintPreview" Grid.Column="12" Grid.Row="0"  SelectedIndexChanged="cmbPrintintPreview_SelectedIndexChanged" IsTextEditable="False"  />
-            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ShowCurrency}" TextWrapping="Wrap" Grid.Column="14" Grid.Row="1" VerticalAlignment="Center" />
-            <CorasauControls:CheckEditor x:Name="chkShowCurrency" Grid.Column="16" Grid.Row="1" />
+            
+
+            <!-- Row 2 -->
+            <TextBlock Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="2" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DaysSinceLastDunning}" VerticalAlignment="Center" />
+            <CorasauControls:NumericUpDownEditor Grid.Column="6" Grid.Row="2" x:Name="neDunningDays" NullValue="0" NullText="0" Height="23" VerticalAlignment="Center" HorizontalAlignment="Stretch" />
+
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ShowCurrency}" TextWrapping="Wrap" Grid.Column="10" Grid.Row="2" VerticalAlignment="Center" />
+            <CorasauControls:CheckEditor x:Name="chkShowCurrency" Grid.Column="12" Grid.Row="2" />
         </Grid>
         <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{StaticResource WindowHeaderGradient}" />
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="3" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
@@ -65,9 +70,10 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorPayments"
                     <local:CorasauDataGridTemplateColumnClient x:Name="CollectionsLetters" ReadOnly="True" Width="50"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Text" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Invoice" AllowThousandMask="false" Width="60"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Amount"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="AmountOpen" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="FeeAmount" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Amount" Width="90"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="AmountOpen" Width="90" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="FeeAmount" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PaymentCharge" Width="80" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="TransType" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="NumberSerie" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="VoucherX"  Visible="False" />
@@ -95,8 +101,9 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorPayments"
                     <local:SumColumn FieldName="Amount" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                     <local:SumColumn FieldName="AmountOpen" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                     <local:SumColumn FieldName="FeeAmount" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <local:SumColumn FieldName="PaymentCharge" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                 </local:DebtorPaymentsGrid.TotalSummary>
             </local:DebtorPaymentsGrid>
         </CorasauControls:BusyIndicator>
-        </Grid>
+    </Grid>
 </Pages:GridBasePage>

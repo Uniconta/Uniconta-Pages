@@ -13,7 +13,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DashBoardViewerPage"
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
         <StackPanel Orientation="Horizontal" Grid.Row="0">
-            <!--<Button Height="30" Width="30" HorizontalAlignment="Left"  x:Name="btnFilter" Cursor="Hand" Click="Button_Click" Margin="5,2,0,0" >
+            <Button Height="30" Width="30" HorizontalAlignment="Left"  x:Name="btnFilter" Cursor="Hand" Click="Button_Click" Margin="5,2,0,0" >
                 <Button.Template>
                     <ControlTemplate>
                         <Image x:Name="image" Source="{Binding FilterImage}"  Stretch="UniformToFill" >
@@ -34,7 +34,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DashBoardViewerPage"
                         </Image>
                     </ControlTemplate>
                 </Button.Template>
-            </Button>-->
+            </Button>
             <Button Height="30" Width="30" HorizontalAlignment="Left"  x:Name="btnRefresh" Cursor="Hand" Click="btnClearFilter_Click" Margin="5,2,0,0" >
                 <Button.Template>
                     <ControlTemplate>
@@ -49,7 +49,13 @@ x:Class="UnicontaClient.Pages.CustomPage.DashBoardViewerPage"
         </StackPanel>
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BusyMessage}">
             <CorasauControls:UnicontaDashboardControl x:Name="dashboardViewerUniconta" AllowPrintDashboardItems="True" 
-                      Dashboard="{Binding UnicontaDashboard, Mode=TwoWay}" AsyncDataLoading="dashboardViewerUniconta_AsyncDataLoading" />
+            Dashboard="{Binding UnicontaDashboard, Mode=TwoWay}" AsyncDataLoading="dashboardViewerUniconta_AsyncDataLoading">
+                <CorasauControls:UnicontaDashboardControl.DashboardItemStyle>
+                    <Style TargetType="dxdash:DashboardLayoutItem">
+                        <EventSetter  Event="MouseUp" Handler="DashboardLayoutItem_MouseUp" />
+                    </Style>
+                </CorasauControls:UnicontaDashboardControl.DashboardItemStyle>
+            </CorasauControls:UnicontaDashboardControl>
         </CorasauControls:BusyIndicator>
     </Grid>
 </Pages:ControlBasePage>

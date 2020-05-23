@@ -40,6 +40,7 @@ namespace UnicontaClient.Pages.CustomPage
         public override UnicontaBaseEntity ModifiedRow { get { return editrow; } set { editrow = (CreditorOrderClient)value; } }
         CreditorClient Creditor;
         ContactClient Contact;
+        bool lookupZipCode = true;
         public CreditorOrdersPage2(UnicontaBaseEntity sourcedata, UnicontaBaseEntity master) /* called for edit from particular account */
             : base(sourcedata, true)
         {
@@ -99,9 +100,9 @@ namespace UnicontaClient.Pages.CustomPage
             if (editrow == null)
             {
                 frmRibbon.DisableButtons("Delete");
+                liCreatedTime.Visibility = Visibility.Collapsed;
                 editrow = CreateNew() as CreditorOrderClient;
                 editrow._Created = DateTime.MinValue;
-                liCreatedTime.Visibility = Visibility.Collapsed;
                 if (Creditor != null)
                 {
                     editrow.SetMaster(this.Creditor);
@@ -153,12 +154,11 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        string zip;
         private async void Editrow_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == "DeliveryZipCode")
             {
-                if (zip == null)
+                if (lookupZipCode)
                 {
                     var deliveryCountry = editrow.DeliveryCountry ?? editrow.Country;
                     var city = await UtilDisplay.GetCityAndAddress(editrow.DeliveryZipCode, deliveryCountry);
@@ -168,14 +168,23 @@ namespace UnicontaClient.Pages.CustomPage
                         var add1 = city[1];
                         if (!string.IsNullOrEmpty(add1))
                             editrow.DeliveryAddress1 = add1;
-                        zip = city[2];
-                        if (!string.IsNullOrEmpty(zip))
+                        var zip = city[2];
+                        if (!string.IsNullOrEmpty(zip) && editrow.DeliveryZipCode != zip)
+                        {
+                            lookupZipCode = false;
                             editrow.DeliveryZipCode = zip;
+                        }
                     }
                 }
                 else
-                    zip = null;
+                    lookupZipCode = true;
             }
+        }
+        protected override void AfterTemplateSet(UnicontaBaseEntity row)
+        {
+            base.AfterTemplateSet(row);
+            if (this.Creditor != null)
+                (row as CreditorOrderClient).Account = Creditor.Account;
         }
         protected override void OnLayoutCtrlLoaded()
         {
@@ -348,7 +357,11 @@ namespace UnicontaClient.Pages.CustomPage
                 editrow.DeliveryAddress2 = creditor._DeliveryAddress2;
                 editrow.DeliveryAddress3 = creditor._DeliveryAddress3;
                 editrow.DeliveryCity = creditor._DeliveryCity;
-                editrow.DeliveryZipCode = creditor._DeliveryZipCode;
+                if (editrow.DeliveryZipCode != creditor._DeliveryZipCode)
+                {
+                    lookupZipCode = false;
+                    editrow.DeliveryZipCode = creditor._DeliveryZipCode;
+                }
                 if (creditor._DeliveryCountry != 0)
                     editrow.DeliveryCountry = creditor._DeliveryCountry;
                 else

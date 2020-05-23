@@ -3,11 +3,7 @@
 x:Class="UnicontaClient.Pages.CustomPage.PartInvItemsPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage"
-    xmlns:toolkit="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Toolkit" 
-    xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
     xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"   
     xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
     xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid">
@@ -89,6 +85,7 @@ x:Class="UnicontaClient.Pages.CustomPage.PartInvItemsPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="SalesValue" Width="80"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ShowOnInvoice" Width="60"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ShowOnPacknote" Width="60"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ShowOnPicklist" Width="60"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="InclValueOnInvoice" Width="60"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="UnfoldBOM" Visible="False"  Width="100"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Warehouse" Width="100"/>
@@ -104,6 +101,9 @@ x:Class="UnicontaClient.Pages.CustomPage.PartInvItemsPage"
                             </DataTemplate>
                         </localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
                     </localPage:CorasauDataGridForeignKeyColumnClient>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Weight" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Volume" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Cartons" Visible="False" />
                 </localPage:PartInvItemsGrid.Columns>
                 <localPage:PartInvItemsGrid.TotalSummary >
                     <localPage:SumColumn FieldName="Qty" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>

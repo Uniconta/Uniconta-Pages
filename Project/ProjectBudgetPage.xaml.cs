@@ -40,7 +40,7 @@ namespace UnicontaClient.Pages.CustomPage
     public partial class ProjectBudgetPage : GridBasePage
     {
         SQLTableCache<Uniconta.DataModel.EmpPayrollCategory> payrollCache;
-        SQLTableCache<Uniconta.DataModel.Project> projectCache;
+        SQLTableCache<Uniconta.ClientTools.DataModel.ProjectClient> projectCache;
         SQLTableCache<Uniconta.DataModel.Employee> employeeCache;
         SQLTableCache<Uniconta.DataModel.ProjectGroup> projGroupCache;
         SQLTableCache<Uniconta.DataModel.ProjectBudgetGroup> budgetGroupCache;
@@ -97,7 +97,7 @@ namespace UnicontaClient.Pages.CustomPage
             dgProjectBudgetGrid.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
 
-            projectCache = api.GetCache<Uniconta.DataModel.Project>();
+            projectCache = api.GetCache<Uniconta.ClientTools.DataModel.ProjectClient>();
             payrollCache = api.GetCache<Uniconta.DataModel.EmpPayrollCategory>();
             prCategoryCache = api.GetCache<Uniconta.DataModel.PrCategory>();
             projGroupCache = api.GetCache<Uniconta.DataModel.ProjectGroup>();
@@ -141,7 +141,7 @@ namespace UnicontaClient.Pages.CustomPage
                     saveGrid(selectedItem);
                     break;
                 case "DeleteRow":
-                    if (UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("ConfirmDeleteOBJ"), selectedItem._Name), Uniconta.ClientTools.Localization.lookup("Confirmation"),
+                    if (selectedItem != null && UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("ConfirmDeleteOBJ"), selectedItem._Name), Uniconta.ClientTools.Localization.lookup("Confirmation"),
 #if !SILVERLIGHT
                         MessageBoxButton.YesNo) == MessageBoxResult.Yes)
 #else
@@ -161,7 +161,7 @@ namespace UnicontaClient.Pages.CustomPage
                     CreateBudget();
                     break;
                 case "UpdatePrices":
-                    if (dgProjectBudgetGrid.ItemsSource == null) return;
+                    if (dgProjectBudgetGrid.ItemsSource != null)
                         UpdatePrices();
                     break;
                 case "RefreshGrid":
@@ -363,6 +363,8 @@ namespace UnicontaClient.Pages.CustomPage
                     string dProjectNumber = CwCreateUpdateBudget.Project;
                     string dBudgetGroup = CwCreateUpdateBudget.Group;
                     string dBudgetComment = CwCreateUpdateBudget.Comment;
+
+                    dBudgetComment =  string.IsNullOrEmpty(dBudgetComment) ? Uniconta.ClientTools.Localization.lookup("Budget") : dBudgetComment; //
 
                     if (string.IsNullOrEmpty(CwCreateUpdateBudget.Group))
                     {
@@ -571,7 +573,7 @@ namespace UnicontaClient.Pages.CustomPage
             var api = this.api;
 
             if (projectCache == null)
-                projectCache = await api.LoadCache<Uniconta.DataModel.Project>().ConfigureAwait(false);
+                projectCache = await api.LoadCache<Uniconta.ClientTools.DataModel.ProjectClient>().ConfigureAwait(false);
             if (payrollCache == null)
                 payrollCache = await api.LoadCache<Uniconta.DataModel.EmpPayrollCategory>().ConfigureAwait(false);
             if (prCategoryCache == null)

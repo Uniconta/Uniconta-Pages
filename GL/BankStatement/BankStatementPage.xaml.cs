@@ -114,12 +114,88 @@ namespace UnicontaClient.Pages.CustomPage
 
                     RemoveBankStatmentOrSettelements(ActionType, selectedItem);
                     break;
+#if WPF
+                case "ConnectToBank":
+                    if (selectedItem == null) return;
+                  
+                    CWBankAPI cwBank = new CWBankAPI(api);
+                    cwBank.Closing += async delegate
+                    {
+                        if(cwBank.DialogResult== true)
+                            await BankAPI(CWBankAPI.Type, cwBank.CustomerNo, cwBank.bank, cwBank.ActivationCode);
+                    };
+                    cwBank.Show();
+                    break;
+#endif
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
         }
 
+        #if WPF
+        async Task BankAPI(int type, string functionId, Bank bank, string activationCode)
+        {
+            busyIndicator.IsBusy = true;
+            BankStatementAPI bankApi = new BankStatementAPI(api);
+
+            string dialogText = null;
+            string logText = null;
+            ErrorCodes err;
+            switch (type)
+            {
+                case 0:
+                    err = await bankApi.ActivateBankConnect(functionId, (byte)bank, activationCode);
+                    switch (err)
+                    {
+                        case ErrorCodes.Succes:
+                            dialogText = string.Concat(Uniconta.ClientTools.Localization.lookup("ConnectedTo"), " Bank Connect");
+                            break;
+                        case ErrorCodes.IgnoreUpdate: //Only allowed from production-environment
+                        case ErrorCodes.CouldNotCreate:
+                        case ErrorCodes.NoSucces:
+                            dialogText = string.Concat(Uniconta.ClientTools.Localization.lookup("UnableToConnectTo"), " Bank Connect");
+                            break;
+                        case ErrorCodes.KeyExists:
+                        case ErrorCodes.RecordExists:
+                            dialogText = string.Concat(Uniconta.ClientTools.Localization.lookup("AlreadyConnectedTo"), " Bank Connect");
+                            break;
+                        default:
+                            dialogText = Uniconta.ClientTools.Localization.lookup(err.ToString()); 
+                            break;
+                    }
+                    break;
+                case 1:
+                    logText = await bankApi.ShowBankConnect(functionId);
+
+                    if (logText == ErrorCodes.IgnoreUpdate.ToString())
+                    {
+                        dialogText = string.Concat(Uniconta.ClientTools.Localization.lookup("UnableToConnectTo"), " Bank Connect"); //Only allowed from production-environment
+                        logText = null;
+                    }
+                    else if (logText == ErrorCodes.FileDoesNotExist.ToString())
+                    {
+                        dialogText = string.Concat(Uniconta.ClientTools.Localization.lookup("NoDataCollected"),". ",
+                                     Uniconta.ClientTools.Localization.lookup("CustomerNo"),": ", functionId);
+                        logText = null;
+                    }
+                    break;
+
+                  
+            }
+            busyIndicator.IsBusy = false;
+
+            if (logText != null)
+            {
+                CWShowBankAPILog cwLog = new CWShowBankAPILog(logText);
+                cwLog.Show();
+            }
+            else if (dialogText != null)
+            {
+                UnicontaMessageBox.Show(dialogText, Uniconta.ClientTools.Localization.lookup("Information"));
+            }
+        }
+#endif
         private void RemoveBankStatmentOrSettelements(string ActionType, BankStatementClient selectedItem)
         {
             var text = string.Format("{0}: {1}, {2}", Uniconta.ClientTools.Localization.lookup("BankStatement"), selectedItem._Account, selectedItem._Name);
@@ -140,7 +216,7 @@ namespace UnicontaClient.Pages.CustomPage
                             if (ActionType == "DeleteStatement")
                                 result = await bkapi.DeleteLines(selectedItem, Wininterval.FromDate, Wininterval.ToDate);
                             else if (ActionType == "RemoveSettlements")
-                                result = await bkapi.RemoveSettlements(selectedItem, Wininterval.FromDate, Wininterval.ToDate, Wininterval.JournalPostedId);
+                                result = await bkapi.RemoveSettlements(selectedItem, Wininterval.FromDate, Wininterval.ToDate, Wininterval.JournalPostedId, Wininterval.Voucher);
 
                             if (result != ErrorCodes.Succes)
                                 UtilDisplay.ShowErrorCode(result);

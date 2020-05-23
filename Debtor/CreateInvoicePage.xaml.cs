@@ -76,8 +76,7 @@ namespace UnicontaClient.Pages.CustomPage
             var Comp = api.CompanyEntity;
             ((TableView)dgDebtorOrderLineGrid.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
             ledim1.api = ledim2.api = ledim3.api = ledim4.api = ledim5.api = LeAccount.api = lePayment.api = leTransType.api = LePostingAccount.api = leShipment.api = leDeliveryTerm.api = Projectlookupeditor.api = PrCategorylookupeditor.api = leLayoutGroup.api = employeelookupeditor.api = leInvAccount.api = leDeliveryAddress.api = lePriceList.api = api;
-            var orderType = Comp.GetUserType(typeof(DebtorOrder));
-            initialOrder = Activator.CreateInstance(orderType ?? typeof(DebtorOrderClient)) as DebtorOrderClient;
+            initialOrder = Activator.CreateInstance(Comp.GetUserTypeNotNull(typeof(DebtorOrderClient))) as DebtorOrderClient;
             initialOrder._DeliveryCountry = Comp._CountryId;
             if (master != null)
             {
@@ -183,28 +182,22 @@ namespace UnicontaClient.Pages.CustomPage
             Utility.SetupVariants(api, colVariant, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
             Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
         }
-        string zip;
         private async void Editrow_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == "DeliveryZipCode")
             {
-                if (zip == null)
+                var deliveryCountry = Order.DeliveryCountry ?? api.CompanyEntity._CountryId;
+                var city = await UtilDisplay.GetCityAndAddress(Order.DeliveryZipCode, deliveryCountry);
+                if (city != null)
                 {
-                    var deliveryCountry = Order.DeliveryCountry ?? api.CompanyEntity._CountryId;
-                    var city = await UtilDisplay.GetCityAndAddress(Order.DeliveryZipCode, deliveryCountry);
-                    if (city != null)
-                    {
-                        Order.DeliveryCity = city[0];
-                        var add1 = city[1];
-                        if (!string.IsNullOrEmpty(add1))
-                            Order.DeliveryAddress1 = add1;
-                        zip = city[2];
-                        if (!string.IsNullOrEmpty(zip))
-                            Order.DeliveryZipCode = zip;
-                    }
+                    Order.DeliveryCity = city[0];
+                    var add1 = city[1];
+                    if (!string.IsNullOrEmpty(add1))
+                        Order.DeliveryAddress1 = add1;
+                    var zip = city[2];
+                    if (!string.IsNullOrEmpty(zip))
+                        Order.DeliveryZipCode = zip;
                 }
-                else
-                    zip = null;
             }
         }
 
@@ -300,6 +293,17 @@ namespace UnicontaClient.Pages.CustomPage
                 var voucher = voucherObj[0] as VouchersClient;
                 if (voucher != null)
                     Order.DocumentRef = voucher.RowId;
+            }
+
+            if (screenName == TabControls.ItemVariantAddPage && argument != null)
+            {
+                var param = argument as object[];
+                var orderNumber = Convert.ToInt32(param[1]);
+                if (orderNumber == Order._OrderNumber)
+                {
+                    var invItems = param[0] as List<UnicontaBaseEntity>;
+                    dgDebtorOrderLineGrid.PasteRows(invItems);
+                }
             }
         }
         public override bool IsDataChaged
@@ -532,7 +536,7 @@ namespace UnicontaClient.Pages.CustomPage
                             {
                                 var orderApi = new OrderAPI(api);
                                 var checkIfCreditNote = createOrderCW.chkIfCreditNote.IsChecked.HasValue ? createOrderCW.chkIfCreditNote.IsChecked.Value : false;
-                                var selectedItem = createOrderCW.dgCreateOrderGrid.SelectedItem as DebtorInvoiceLocal;
+                                var selectedItem = createOrderCW.dgCreateOrderGrid.SelectedItem as DebtorInvoiceClient;
 
                                 await CreateOrderFromInvoice(Order, selectedItem, checkIfCreditNote);
                                 dgDebtorOrderLineGrid.ItemsSource = Order.Lines;
@@ -543,7 +547,7 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                     catch (Exception ex)
                     {
-                        UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"));
+                        UnicontaMessageBox.Show(ex);
                     }
                     break;
                 case "StockLines":
@@ -569,6 +573,18 @@ namespace UnicontaClient.Pages.CustomPage
                         _refferedVouchers.Add(Order._DocumentRef);
 
                     AddDockItem(TabControls.AttachVoucherGridPage, new object[1] { _refferedVouchers }, true);
+                    break;
+                case "AddVariants":
+                    if (dgDebtorOrderLineGrid.SelectedItem == null) return;
+                    var orderLine = dgDebtorOrderLineGrid.SelectedItem as DebtorOrderLineClient;
+                    var itm = orderLine?.InvItem;
+                    if (itm?._StandardVariant != null)  
+                    {
+                        var paramItem = new object[] { orderLine, Order };
+                        dgDebtorOrderLineGrid.SetLoadedRow(orderLine);
+                        AddDockItem(TabControls.ItemVariantAddPage, paramItem, true,
+                        string.Format(Uniconta.ClientTools.Localization.lookup("AddOBJ"), Uniconta.ClientTools.Localization.lookup("Variants")), null, floatingLoc: Utility.GetDefaultLocation());
+                    }
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);
@@ -596,7 +612,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        async Task CreateOrderFromInvoice(DebtorOrderClient order, DebtorInvoiceLocal invoice, bool checkIfCreditNote)
+        async Task CreateOrderFromInvoice(DebtorOrderClient order, DebtorInvoiceClient invoice, bool checkIfCreditNote)
         {
             order.OrderNumber = invoice._OrderNumber;
             order.Account = invoice._DCAccount;
@@ -736,12 +752,12 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     showInvPrintPrv = GenrateInvoiceDialog.ShowInvoice;
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
-                    var showOrPrintInvoice = GenrateInvoiceDialog.InvoiceQuickPrint || GenrateInvoiceDialog.ShowInvoice;
-
-                    var invoicePostingResult = new InvoicePostingPrintGenerator(api, this, dbOrder, lines, GenrateInvoiceDialog.GenrateDate, 0, GenrateInvoiceDialog.IsSimulation, CompanyLayoutType.Invoice, showOrPrintInvoice,
-                        GenrateInvoiceDialog.InvoiceQuickPrint, GenrateInvoiceDialog.NumberOfPages, GenrateInvoiceDialog.SendByEmail, GenrateInvoiceDialog.Emails, GenrateInvoiceDialog.sendOnlyToThisEmail, GenrateInvoiceDialog.GenerateOIOUBLClicked,
-                        GenrateInvoiceDialog.PostOnlyDelivered, documents);
-                    invoicePostingResult.OpenAsOutlook = !GenrateInvoiceDialog.IsSimulation && GenrateInvoiceDialog.SendByOutlook;
+                    var isSimulated = GenrateInvoiceDialog.IsSimulation;
+                    var invoicePostingResult = new InvoicePostingPrintGenerator(api, this);
+                    invoicePostingResult.SetUpInvoicePosting(dbOrder, lines, CompanyLayoutType.Invoice, GenrateInvoiceDialog.GenrateDate, null, isSimulated, GenrateInvoiceDialog.ShowInvoice,
+                        GenrateInvoiceDialog.PostOnlyDelivered, GenrateInvoiceDialog.InvoiceQuickPrint, GenrateInvoiceDialog.NumberOfPages, GenrateInvoiceDialog.SendByEmail,
+                        !isSimulated && GenrateInvoiceDialog.SendByOutlook, GenrateInvoiceDialog.sendOnlyToThisEmail, GenrateInvoiceDialog.Emails, GenrateInvoiceDialog.GenerateOIOUBLClicked,
+                        documents, false);
                     busyIndicator.IsBusy = true;
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
                     var result = await invoicePostingResult.Execute();
@@ -749,24 +765,15 @@ namespace UnicontaClient.Pages.CustomPage
 
                     if (result)
                     {
-                        if (!GenrateInvoiceDialog.IsSimulation)
+                        if (!isSimulated)
                         {
                             documents = null;
                             if (attachDocMenu != null)
                                 attachDocMenu.Caption = string.Format(Uniconta.ClientTools.Localization.lookup("AttachOBJ"), Uniconta.ClientTools.Localization.lookup("Documents"));
                         }
 
-                        if (invoicePostingResult.PostingResult.Header._InvoiceNumber != 0)
-                        {
-                            var msg = string.Format(Uniconta.ClientTools.Localization.lookup("InvoiceHasBeenGenerated"), invoicePostingResult.PostingResult.Header.InvoiceNum);
-                            msg = string.Format("{0}{1}{2} {3}", msg, Environment.NewLine, Uniconta.ClientTools.Localization.lookup("LedgerVoucher"), invoicePostingResult.PostingResult.Header._Voucher);
-                            var resultMessage = UnicontaMessageBox.Show(msg, Uniconta.ClientTools.Localization.lookup("Message"));
-#if !SILVERLIGHT
-                            if (GenrateInvoiceDialog.GenerateOIOUBLClicked)
-                                DebtorOrders.GenerateOIOXml(api, invoicePostingResult.PostingResult);
-#endif
+                        if (invoicePostingResult.IsInvoiceGenerated)
                             ClearFields();
-                        }
                     }
                     else
                         Utility.ShowJournalError(invoicePostingResult.PostingResult.ledgerRes, dgDebtorOrderLineGrid);

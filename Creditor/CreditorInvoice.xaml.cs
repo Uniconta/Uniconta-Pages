@@ -367,7 +367,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                         else
                         {
-                            var docNumber = selected._InvoiceNumber;
+                            var docNumber = selected.InvoiceNum;
                             reportName = string.Format("{0}_{1}", isInvoice ? Uniconta.ClientTools.Localization.lookup("Invoice") : Uniconta.ClientTools.Localization.lookup("CreditorPackNote"), docNumber);
                             dockName = string.Format("{0} {1}", Uniconta.ClientTools.Localization.lookup("Preview"), string.Format("{0}: {1}", isInvoice ?
                                 Uniconta.ClientTools.Localization.lookup("Invoice") : Uniconta.ClientTools.Localization.lookup("CreditorPackNote"), docNumber));

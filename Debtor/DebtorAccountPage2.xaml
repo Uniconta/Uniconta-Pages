@@ -152,6 +152,9 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorAccountPage2"
                         <CorasauControls:CorasauLayoutItem FieldName="InvoiceInXML" x:Name="liInvoiceInXML">
                             <CorasauControls:CheckEditor IsChecked="{Binding InvoiceInXML,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="BalanceMethod" x:Name="liBalanceMethod">
+                            <CorasauControls:ComboBoxEditor SelectedItem="{Binding BalanceMethod,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="EAN" x:Name="liEAN">
                             <CorasauControls:TextEditor x:Name="txtEAN" Text="{Binding EAN,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                         </CorasauControls:CorasauLayoutItem>
