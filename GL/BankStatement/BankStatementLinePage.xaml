@@ -42,6 +42,14 @@ x:Class="UnicontaClient.Pages.CustomPage.BankStatementLinePage"
                 <docking:LayoutGroup x:Name="lGroup" AllowDrag="False" AllowDock="False" AllowFloat="False" Orientation="Vertical" AllowContextMenu="False" >
                     <!--<docking:LayoutGroup>-->
                     <docking:LayoutPanel x:Name="layOutBankStat" FloatOnDoubleClick="False" AllowDrag="False" AllowDock="False" AllowClose="False" AllowContextMenu="False" AllowMaximize="False" AllowDockToDocumentGroup="False" ShowCloseButton="False"  ShowPinButton="False">
+                        <docking:LayoutPanel.CaptionTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BankStatement}" />
+                                    <TextBlock Margin="5,0,0,0" Text="{Binding}" FontWeight="Bold" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </docking:LayoutPanel.CaptionTemplate>
                         <localPage:BankStatementLineGrid  x:Name="dgBankStatementLine" AutoGenerateColumns="None" HorizontalAlignment="Stretch" Grid.Row="1" SelectedItemChanged="dgBankStatementLine_SelectedItemChanged">
                             <localPage:BankStatementLineGrid.Columns>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Mark" ShowInColumnChooser="False" Header=""  Width="30"  ReadOnly="False" AllowEditing="True" AllowSorting="False" AllowColumnFiltering="False">
@@ -108,7 +116,7 @@ x:Class="UnicontaClient.Pages.CustomPage.BankStatementLinePage"
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Voucher" Width="80" Visible="False" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="VoucherLine" Width="50" Visible="False" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="OnHold" Width="60"/>
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="VoidLine" Width="60"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="VoidLine" Width="60" HideHeaderCheck="True"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Reconciled" Width="60" Visible="False"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="MultiLine" Width="60" Visible="False"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="VoucherReference" Width="85"/>
@@ -141,6 +149,14 @@ x:Class="UnicontaClient.Pages.CustomPage.BankStatementLinePage"
                         </localPage:BankStatementLineGrid>
                     </docking:LayoutPanel>
                     <docking:LayoutPanel x:Name="layOutTrans" FloatOnDoubleClick="False" AllowDrag="False" AllowDock="False" AllowClose="False" AllowContextMenu="False" AllowMaximize="False" AllowDockToDocumentGroup="False" ShowCloseButton="False"  ShowPinButton="False">
+                        <docking:LayoutPanel.CaptionTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Transactions}" />
+                                    <TextBlock Margin="5,0,0,0" Text="{Binding}" FontWeight="Bold" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </docking:LayoutPanel.CaptionTemplate>
                         <localPage:TransGrid  x:Name="dgAccountsTransGrid" AutoGenerateColumns="None" Grid.Row="4" SelectedItemChanged="dgAccountsTransGrid_SelectedItemChanged">
                             <localPage:TransGrid.Columns>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="MarkCol"  Header="" FieldName="Mark" ShowInColumnChooser="False"  ReadOnly="False" AllowEditing="True"  Width="30" AllowSorting="False" AllowColumnFiltering="False">

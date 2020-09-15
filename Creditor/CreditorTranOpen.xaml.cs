@@ -115,9 +115,30 @@ namespace UnicontaClient.Pages.CustomPage
                 case "SaveGrid":
                     saveGrid();
                     break;
+                case "Invoices":
+                    if (selectedItem != null)
+                    {
+                        string header = string.Format("{0}/{1}", Uniconta.ClientTools.Localization.lookup("CreditorInvoice"), selectedItem.Account);
+                        AddDockItem(TabControls.CreditorInvoice, dgCreditorTranOpenGrid.syncEntity, header);
+                    }
+                    break;
+                case "InvoiceLine":
+                    if (selectedItem != null)
+                        ShowInvoiceLines(selectedItem);
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
+            }
+        }
+
+        async void ShowInvoiceLines(CreditorTransOpenClient creditorTrans)
+        {
+            var creditorInvoice = await api.Query<CreditorInvoiceClient>(new UnicontaBaseEntity[] { creditorTrans }, null);
+            if (creditorInvoice != null && creditorInvoice.Length > 0)
+            {
+                var credInv = creditorInvoice[0];
+                AddDockItem(TabControls.CreditorInvoiceLine, credInv, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("InvoiceNumber"), credInv.InvoiceNum));
             }
         }
 
@@ -138,9 +159,15 @@ namespace UnicontaClient.Pages.CustomPage
                 ribbonControl.EnableButtons( "SaveGrid" );
                 copyRowIsEnabled = true;
                 editAllChecked = false;
+#if !SILVERLIGHT
+                OnHold.ShowCheckBoxInHeader = Paid.ShowCheckBoxInHeader = true;
+#endif
             }
             else
             {
+#if !SILVERLIGHT
+                OnHold.ShowCheckBoxInHeader = Paid.ShowCheckBoxInHeader = false;
+#endif
                 if (IsDataChaged)
                 {
                     string message = Uniconta.ClientTools.Localization.lookup("SaveChangesPrompt");

@@ -1,0 +1,35 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
+        xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.ProdItemPage"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+        xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage">
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Inventory/ProductCatalog/ProdItemPageGridRibbon.xml" x:Name="localMenu"/>
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <local:ProdItemPageGrid x:Name="dgProdItem" AutoGenerateColumns="None">
+                <local:ProdItemPageGrid.Columns>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Name" Width="120" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Item" Width="100" />
+                    <local:ComboBoxColumnClient x:Name="Unit" Width="100" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="AlternativeItem" Width="100" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="EAN" Width="50" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="SupplierItemId" Width="100" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Supplier" Width="100" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ItemGroup" Width="100" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DiscountGroup" Width="100" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="SalesPrice" Width="100" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="WeblinkId" Width="70" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="WebArg" Width="120" />
+                </local:ProdItemPageGrid.Columns>
+            </local:ProdItemPageGrid>
+        </CorasauControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

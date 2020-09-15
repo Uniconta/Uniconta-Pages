@@ -49,8 +49,15 @@
     <RibbonItem>
       <RibbonItem Action="Storage" LocalizedNameKey="OnHand" Module="Storage" LargeGlyph="Storage_32x32.png"/>
     <RibbonItem Action="Serial" LocalizedNameKey="SerialBatchNumbers" Module="SerialBatchNumbers" LargeGlyph="Account-statement_32x32.png"/>
-    <RibbonItem Action="StockLines" LocalizedNameKey="InvTransactions" LargeGlyph="Inventory_Trans_32x32.png"/>
-    <RibbonItem Action="MarkSales" LocalizedNameKey="MarkSales" Module="Storage" LargeGlyph="Check_Journal_32x32.png">
+    <RibbonItem Action="ItemReference" LocalizedNameKey="ItemReference" LargeGlyph="Inventory_Trans_32x32.png">
+       <RibbonItem Action="StockLines" LocalizedNameKey="InvTransactions" LargeGlyph="Inventory_Trans_32x32.png" Glyph="Marked_Inventory_from_Inventory_16x16.png"/>
+       <RibbonItem Action="DebtorOrderLines" LocalizedNameKey="ShowOBJ" Parameter="OrdersLine" Module="Order" Glyph="Nested_16x16.png"/>
+       <RibbonItem Action="DebtorOfferLines" LocalizedNameKey="ShowOBJ" Parameter="OfferLine" Module="Order" Glyph="Offer_Lines_16x16.png"/>
+       <RibbonItem Action="PurchaseOrderLines" LocalizedNameKey="ShowOBJ" Parameter="PurchaseLines" Module="Purchase" Glyph="Purchase_Lines_16x16.png"/>
+       <RibbonItem Action="ProductionOrderLines" LocalizedNameKey="ShowOBJ" Parameter="ProductionLines" Module="Production" Glyph="Production_Lines_16x16.png"/>
+    </RibbonItem>
+   
+     <RibbonItem Action="MarkSales" LocalizedNameKey="MarkSales" Module="Storage" LargeGlyph="Check_Journal_32x32.png">
       <RibbonItem Action="MarkOrderLine" LocalizedNameKey="PurchaseLines" Glyph="Marked_OrderLine_16x16.png" LargeGlyph="Marked_OrderLine_16x16.png"/>
       <RibbonItem Action="MarkInvTrans" LocalizedNameKey="InvTransactions"  Glyph="Marked_Inventory_16x16.png" LargeGlyph="Marked_Inventory_16x16.png" />
       <RibbonItem Action="MarkOrderLineAgnstOL" LocalizedNameKey="MarkOBJ" Parameter="PurchaseLines"  Glyph="Marked_OrderLine_from_OrderLine_16x16.png" LargeGlyph="Marked_OrderLine_from_OrderLine_16x16.png"/>

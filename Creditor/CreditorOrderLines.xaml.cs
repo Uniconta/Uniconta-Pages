@@ -560,7 +560,9 @@ namespace UnicontaClient.Pages.CustomPage
                     row._ExchangeRate = this.exchangeRate;
                     break;
                 case "CopyRow":
-                    dgCreditorOrderLineGrid.CopyRow();
+                    var copRow = dgCreditorOrderLineGrid.CopyRow() as CreditorOrderLineClient;
+                    copRow._QtyDelivered = 0;
+                    copRow._QtyInvoiced = 0;
                     break;
                 case "SaveGrid":
                     saveGridLocal();
@@ -589,8 +591,8 @@ namespace UnicontaClient.Pages.CustomPage
                     row.Subtotal = true;
                     break;
                 case "StockLines":
-                    if (selectedItem != null)
-                        AddDockItem(TabControls.CreditorInvoiceLine, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("InvTransaction"), selectedItem._Item));
+                    if (selectedItem?._Item != null)
+                        AddDockItem(TabControls.CreditorInvoiceLine, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("InvTransactions"), selectedItem._Item));
                     break;
                 case "AddItems":
                     if (this.items == null)
@@ -662,6 +664,22 @@ namespace UnicontaClient.Pages.CustomPage
                         string.Format(Uniconta.ClientTools.Localization.lookup("AddOBJ"), Uniconta.ClientTools.Localization.lookup("Variants")), null, floatingLoc: Utility.GetDefaultLocation());
                     }
                     break;
+                case "DebtorOrderLines":
+                    if (selectedItem?.InvItem != null)
+                        AddDockItem(TabControls.DebtorOrderLineReport, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("OrdersLine"), selectedItem._Item));
+                    break;
+                case "DebtorOfferLines":
+                    if (selectedItem?.InvItem != null)
+                        AddDockItem(TabControls.DebtorOfferLineReport, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("OfferLine"), selectedItem._Item));
+                    break;
+                case "PurchaseOrderLines":
+                    if (selectedItem?.InvItem != null)
+                        AddDockItem(TabControls.PurchaseLines, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("PurchaseLines"), selectedItem._Item));
+                    break;
+                case "ProductionOrderLines":
+                    if (selectedItem?.InvItem != null)
+                        AddDockItem(TabControls.ProductionOrderLineReport, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ProductionLines"), selectedItem._Item));
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -705,13 +723,18 @@ namespace UnicontaClient.Pages.CustomPage
                     invJournalLine._Variant4 = bom._Variant4;
                     invJournalLine._Variant5 = bom._Variant5;
                     item = (InvItem)items.Get(bom._ItemPart);
-                    invJournalLine._Warehouse = bom._Warehouse ?? item._Warehouse ?? selectedItem._Warehouse;
-                    invJournalLine._Location = bom._Location ?? item._Location ?? selectedItem._Location;
-                    invJournalLine._CostPriceLine = item._CostPrice;
-                    invJournalLine.SetItemValues(item, selectedItem._Storage);
-                    invJournalLine._Qty = Math.Round(bom.GetBOMQty(Qty), item._Decimals);
+                    if (item != null)
+                    {
+                        invJournalLine._Warehouse = bom._Warehouse ?? item._Warehouse ?? selectedItem._Warehouse;
+                        invJournalLine._Location = bom._Location ?? item._Location ?? selectedItem._Location;
+                        invJournalLine._CostPriceLine = item._CostPrice;
+                        invJournalLine.SetItemValues(item, selectedItem._Storage);
+                        invJournalLine._Qty = Math.Round(bom.GetBOMQty(Qty), item._Decimals);
+                        TableField.SetUserFieldsFromRecord(item, invJournalLine);
+                    }
+                    else
+                        invJournalLine._Qty = Math.Round(bom.GetBOMQty(Qty), 2);
                     invJournalLine._Price = 0d;
-                    TableField.SetUserFieldsFromRecord(item, invJournalLine);
                     TableField.SetUserFieldsFromRecord(bom, invJournalLine);
                     lst.Add(invJournalLine);
                 }
@@ -874,6 +897,9 @@ namespace UnicontaClient.Pages.CustomPage
             GenrateInvoiceDialog.SetInvoiceNumber(dbOrder._InvoiceNumber);
             if (dbOrder._InvoiceDate != DateTime.MinValue)
                 GenrateInvoiceDialog.SetInvoiceDate(dbOrder._InvoiceDate);
+            var additionalOrdersList = Utility.GetAdditionalOrders(api, dbOrder);
+            if (additionalOrdersList != null)
+                GenrateInvoiceDialog.SetAdditionalOrders(additionalOrdersList);
 
             GenrateInvoiceDialog.Closed += async delegate
             {
@@ -891,6 +917,7 @@ namespace UnicontaClient.Pages.CustomPage
                     invoicePostingResult.SetUpInvoicePosting(dbOrder, null, CompanyLayoutType.PurchaseInvoice, GenrateInvoiceDialog.GenrateDate, GenrateInvoiceDialog.InvoiceNumber, isSimulated, GenrateInvoiceDialog.ShowInvoice,
                         false, GenrateInvoiceDialog.InvoiceQuickPrint, GenrateInvoiceDialog.NumberOfPages, false, !isSimulated && GenrateInvoiceDialog.SendByOutlook, GenrateInvoiceDialog.sendOnlyToThisEmail, GenrateInvoiceDialog.Emails,
                         false, null, false);
+                    invoicePostingResult.SetAdditionalOrders(GenrateInvoiceDialog.AdditionalOrders?.Cast<DCOrder>().ToList());
 
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
                     busyIndicator.IsBusy = true;

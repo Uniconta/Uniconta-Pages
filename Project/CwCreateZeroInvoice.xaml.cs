@@ -43,6 +43,14 @@ namespace UnicontaClient.Pages.CustomPage
         [Display(Name = "ToDate", ResourceType = typeof(InputFieldDataText))]
          public DateTime ToDate { get; set; }
 
+        [Display(Name = "AdjustmentCategory", ResourceType = typeof(InputFieldDataText))]
+        public string AdjustmentCategory { get; set; }
+
+        [InputFieldData]
+        [ForeignKeyAttribute(ForeignKeyTable = typeof(Uniconta.DataModel.Employee))]
+        [Display(Name = "Employee", ResourceType = typeof(InputFieldDataText))]
+        public string Employee { get; set; }
+
         CrudAPI api;
 #if !SILVERLIGHT
         public int DialogTableId;
@@ -57,12 +65,14 @@ namespace UnicontaClient.Pages.CustomPage
             this.Title = string.Format(Uniconta.ClientTools.Localization.lookup("CreateOBJ"), Uniconta.ClientTools.Localization.lookup("ZeroInvoice"));
             invoiceDate.DateTime = InvoiceDate;
             api = crudApi;
-            cmbCategory.api = crudApi;
+            cmbCategory.api = cmbEmployee.api = crudApi;
+            SetItemSource(api);
         }
         async void SetItemSource(QueryAPI api)
         {
             var prCache = api.GetCache(typeof(Uniconta.DataModel.PrCategory)) ?? await api.LoadCache(typeof(Uniconta.DataModel.PrCategory));
-            cmbCategory.ItemsSource = new PrCategoryRevenueFilter(prCache);
+            //  cmbCategory.ItemsSource = new PrCategoryRevenueFilter(prCache);
+            cmbRegCategory.ItemsSource = new PrCategoryRegulationFilter(prCache);
         }
 
         private void ChildWindow_KeyDown(object sender, KeyEventArgs e)

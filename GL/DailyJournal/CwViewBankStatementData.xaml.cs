@@ -25,6 +25,7 @@ using System.Xml.Linq;
 using System.Globalization;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.Common;
+using Uniconta.Common.Utility;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -32,6 +33,9 @@ namespace UnicontaClient.Pages.CustomPage
     public partial class CwViewBankStatementData : ChildWindow
     {
         string file;
+        char fileDelimiter;
+        bool updateDelimiter;
+
         List<CustomDataColumn> customDataColumnSource;
         BankImportFormatClient bankImportFormat;
         public CwViewBankStatementData(string filePath, BankImportFormatClient bankImportFormatClient) : this(filePath)
@@ -107,6 +111,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (fileExtension == ".csv")
                 {
                     hasType = false;
+                    updateDelimiter = true;
                     DataTable = FromCsv(file);
                 }
                 else if (fileExtension == ".xls" || fileExtension == ".xlsx")
@@ -181,7 +186,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         public DataTable FromCsv(string strFilePath)
         {
-            const char delimiter = ';';
+            fileDelimiter = GetDelimiter(strFilePath);
             DataSet oDS = new DataSet();
             oDS.Tables.Add("Property");
             var oTable = oDS.Tables[0];
@@ -190,9 +195,12 @@ namespace UnicontaClient.Pages.CustomPage
                 var oSR = UtilFunctions.CreateStreamReader(stream);
                 string line;
                 int cellCount = 0;
+                var stringSplit = new StringSplit(fileDelimiter);
+                var lineValues = new List<string>(10);
+
                 while ((line = oSR.ReadLine()) != null)
                 {
-                    var lineValues = line.Split(delimiter);
+                    stringSplit.Split(line, lineValues);
 
                     bool skipRow = false;
                     if (!hasHeaderColumnGenerated)
@@ -228,7 +236,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         bool hasHeaderColumnGenerated;
-        private DataColumn[] GenerateColumnHeader(string[] firstLineValues, out bool showColumnHeaders)
+        private DataColumn[] GenerateColumnHeader(List<string> firstLineValues, out bool showColumnHeaders)
         {
             DataColumn[] dataColumns;
             showColumnHeaders = ValidateColumnHeaderValues(firstLineValues);
@@ -237,22 +245,22 @@ namespace UnicontaClient.Pages.CustomPage
                 int maxIndex = 20;
                 dataColumns = new DataColumn[maxIndex];
                 for (int icol = 0; icol < maxIndex; icol++)
-                    dataColumns[icol] = new DataColumn(string.Concat("Column ", icol + 1));
+                    dataColumns[icol] = new DataColumn(string.Concat("Column ", NumberConvert.ToString(icol + 1)));
 
                 dgBankStmt.View.ShowColumnHeaders = showColumnHeaders;
             }
             else
             {
-                int maxIndex = firstLineValues.Length;
+                int maxIndex = firstLineValues.Count;
                 dataColumns = new DataColumn[maxIndex];
                 string[] tempValues = new string[maxIndex];
                 for (int icol = 0; icol < maxIndex; icol++)
                 {
                     var col = firstLineValues[icol];
-                    tempValues[icol]= col;
+                    tempValues[icol] = col;
 
                     if (tempValues.Where(c => c == col).Count() > 1)
-                        col = string.Concat(col, "_", icol);
+                        col = string.Concat(col, "_", NumberConvert.ToString(icol));
 
                     dataColumns[icol] = new DataColumn(col);
                 }
@@ -263,7 +271,7 @@ namespace UnicontaClient.Pages.CustomPage
             return dataColumns;
         }
 
-        private bool ValidateColumnHeaderValues(string[] firstLineValues)
+        private bool ValidateColumnHeaderValues(List<string> firstLineValues)
         {
             bool isValid = true;
             DateTime dt;
@@ -287,6 +295,16 @@ namespace UnicontaClient.Pages.CustomPage
             }
 
             return isValid;
+        }
+
+        private char GetDelimiter(string filePath)
+        {
+            char delimiter = '\0';
+            var rowCount = System.IO.File.ReadAllLines(filePath).Length;
+            using (var reader = new StreamReader(filePath))
+                delimiter = CSVHelper.DetectDelimiter(reader, rowCount);
+
+            return delimiter;
         }
 
         private void CW_Loaded(object sender, RoutedEventArgs e)
@@ -316,6 +334,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
             var bankformatPositionProps = UtilFunctions.GetDisplayAttributeNonReadOnlyPropertiesFromType(bankImportFormat.GetType(), true);
 
+            var strSplit = new StringSplit('(');
             foreach (var propInfo in bankformatPositionProps)
             {
                 if (propInfo.PropertyType == typeof(byte))
@@ -338,7 +357,6 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedCustomCol != null)
                     {
                         var selectedItem = selectedCustomCol.ActualDataColumnName;
-                        var strSplit = new StringSplit('(');
                         var propertyName = strSplit.Split(selectedItem).First();
 
                         var prop = bankImportFormat.GetType().GetProperty(propertyName);
@@ -349,6 +367,20 @@ namespace UnicontaClient.Pages.CustomPage
                         propInfo.SetValue(bankImportFormat, (byte)0, null); // reset the value
                 }
             }
+
+            //Setting the delimiter value from the file to the bankformat
+            if (updateDelimiter)
+            {
+                var seperatorProp = bankImportFormat.GetType().GetProperty("Seperator");
+                if (seperatorProp != null)
+                {
+                    var sepValue = (char)seperatorProp.GetValue(bankImportFormat);
+                    if (sepValue.CompareTo(fileDelimiter) != 0)
+                        seperatorProp.SetValue(bankImportFormat, fileDelimiter, null);
+
+                }
+            }
+
             DialogResult = true;
         }
 

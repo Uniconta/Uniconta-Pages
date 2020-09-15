@@ -99,7 +99,50 @@ namespace UnicontaClient.Pages.CustomPage
 
             txtCompanyRegNo.EditValueChanged += TxtCVR_EditValueChanged;
             editrow.PropertyChanged += Editrow_PropertyChanged;
+#if !SILVERLIGHT
+            txtCompanyRegNo.LostFocus += TxtCompanyRegNo_LostFocus;
         }
+
+        private async void TxtCompanyRegNo_LostFocus(object sender, RoutedEventArgs e)
+        {
+            var countryCode = CheckEuropeanVatInformation(editrow._LegalIdent, editrow._Country, cvrFound);
+            if (countryCode != null && editrow._Country != countryCode)
+                editrow.Country = countryCode.Value;
+        }
+
+        public static CountryCode? CheckEuropeanVatInformation(string cvr, CountryCode country, bool cvrFound)
+        {
+            if (string.IsNullOrEmpty(cvr))
+                return null;
+            int countryCode = (int)country;
+            string twolettercode = null;
+            if (Char.IsLetter(cvr.FirstOrDefault()) && cvr.Length > 3)
+            {
+                var cCode = cvr.Substring(0, 2);
+                cvr = cvr.Substring(2, cvr.Length - 2);
+                CountryISOCode isoCode;
+                if (Enum.TryParse(cCode, out isoCode))
+                {
+                    twolettercode = cCode;
+                    countryCode = (int)isoCode;
+                }
+            }
+            else
+                twolettercode = Enum.GetName(typeof(CountryISOCode), countryCode);
+            if (twolettercode != null && !cvrFound)
+            {
+                var vatInfo = EuropeanVatInformation.Get(twolettercode, cvr);
+                if (vatInfo == null)
+                {
+                    UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("NotValidVatNo"), Uniconta.ClientTools.Localization.lookup("Warning"));
+                    return null;
+                }
+            }
+            return (CountryCode)countryCode;
+        }
+#else
+        }
+#endif
 
         private async void Editrow_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
@@ -149,7 +192,7 @@ namespace UnicontaClient.Pages.CustomPage
                     lookupZipCode = true;
             }
         }
-        
+
         async Task GetInterestAndProduct()
         {
             var api = this.api;
@@ -254,7 +297,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         private bool onlyRunOnce = false;
-
+        bool cvrFound = false;
         private async void TxtCVR_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
         {
             var s = sender as TextEditor;
@@ -285,10 +328,14 @@ namespace UnicontaClient.Pages.CustomPage
                 if (!onlyRunOnce)
                 {
                     if (ci == null)
+                    {
+                        cvrFound = false;
                         return;
+                    }
 
                     if (!string.IsNullOrWhiteSpace(ci?.life?.name))
                     {
+                        cvrFound = true;
                         var address = ci.address;
                         if (address != null)
                         {

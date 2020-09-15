@@ -47,9 +47,12 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorTranOpen"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="OverdueCur" Width="90" ReadOnly="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CashDiscount" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CashDiscountDate" Width="90"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="LastInterest" Visible="False" ReadOnly="True"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="LastCollectionLetter" Visible="False" ReadOnly="True"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CollectionsLetters" Visible="False" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Vat" Width="60" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="VatAmount" Width="90" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="VatOfCashDiscount" Width="90" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="LastInterest" Visible="False" Width="50" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="LastCollectionLetter" Visible="False" Width="50"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CollectionsLetters" Visible="False" Width="50"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Debit" Visible="False" ReadOnly="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Credit" Visible="False" ReadOnly="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DebitCur" Visible="False" ReadOnly="True"/>
@@ -57,6 +60,8 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorTranOpen"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="JournalPostedId" Visible="False" ReadOnly="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryAccount" Visible="False" ReadOnly="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="YourRef" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Message" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DocumentRef" Visible="False"/>
                 </localPage:DebtorTransOpenGrid.Columns>
                 <localPage:DebtorTransOpenGrid.TotalSummary>
                     <localPage:SumColumn FieldName="Amount" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>

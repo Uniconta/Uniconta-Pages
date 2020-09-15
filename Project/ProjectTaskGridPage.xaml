@@ -6,8 +6,17 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectTaskGridPage"
               xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
               xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
               xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
+              xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+              xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+              xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
               xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
-    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+    <UserControl.Resources>
+        <Style x:Key="StyleRow" TargetType="dxg:RowControl">
+            <Setter Property="Height" Value="Auto"/>
+        </Style>
+        <Util:RowIndexConverter x:Key="RowIndexConverter" />
+    </UserControl.Resources>
+        <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -35,6 +44,11 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectTaskGridPage"
                     </local:CorasauDataGridForeignKeyColumnClient>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Employee" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="EmployeeName" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Description" Width="250">
+                        <local:CorasauDataGridTemplateColumnClient.EditSettings>
+                            <editor:TextEditSettings TextWrapping="Wrap" AcceptsReturn="True"/>
+                        </local:CorasauDataGridTemplateColumnClient.EditSettings>
+                    </local:CorasauDataGridTemplateColumnClient>
                 </local:ProjectTaskGridClient.Columns>
             </local:ProjectTaskGridClient>
         </CorasauControls:BusyIndicator>

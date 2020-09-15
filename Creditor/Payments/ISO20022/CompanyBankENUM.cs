@@ -22,6 +22,7 @@ namespace UnicontaISO20022CreditTransfer
         Volks_Raiffeisenbanken,
         Luminor,
         Standard,
-        Handelsbanken
+        Handelsbanken,
+        Commerzbank
     }
 }

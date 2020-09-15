@@ -91,6 +91,15 @@ x:Class="UnicontaClient.Pages.CustomPage.SimulatedTransactions"
 					<localPage:CorasauDataGridTemplateColumnClient x:Name="Text" Width="200" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Debit" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Credit" Width="90"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="VoucherTotal" Width="90" Visible="False">
+                        <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <TextBlock Margin="2" HorizontalAlignment="Right"
+                                           Text="{Binding DataContext.RowData.Row.VoucherTotal,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}"
+                                           Foreground="Red"/>
+                            </ControlTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Total" Width="90" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Amount" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Correction" Width="50" Visible="False" />

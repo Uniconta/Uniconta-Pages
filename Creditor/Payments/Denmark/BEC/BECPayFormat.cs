@@ -17,14 +17,14 @@ using Uniconta.ClientTools.Controls;
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
 {
-    class BECPayFormat
+    public class BECPayFormat
     {
-        internal const string TRANSTYPE_ERH356 = "ERH356"; //Domestic Transaction
-        internal const string TRANSTYPE_ERH351 = "ERH351"; //FIK71
-        internal const string TRANSTYPE_ERH352 = "ERH352"; //FIK04
-        internal const string TRANSTYPE_ERH357 = "ERH357"; //FIK73
-        internal const string TRANSTYPE_ERH358 = "ERH358"; //FIK75
-        internal const string TRANSTYPE_ERH400 = "ERH400"; //Foreign Transaction
+        public const string TRANSTYPE_ERH356 = "ERH356"; //Domestic Transaction
+        public const string TRANSTYPE_ERH351 = "ERH351"; //FIK71
+        public const string TRANSTYPE_ERH352 = "ERH352"; //FIK04
+        public const string TRANSTYPE_ERH357 = "ERH357"; //FIK73
+        public const string TRANSTYPE_ERH358 = "ERH358"; //FIK75
+        public const string TRANSTYPE_ERH400 = "ERH400"; //Foreign Transaction
 
 
         public static void GenerateFile(IEnumerable<CreditorTransPayment> paymentList, IEnumerable<CreditorTransPayment> paymentListTotal, CrudAPI api, CreditorPaymentFormat paymentFormat, PaymentReference paymReference, SQLCache bankAccountCache, SQLCache creditorCache, bool glJournalGenerated = false)

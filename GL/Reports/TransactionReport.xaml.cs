@@ -57,6 +57,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         static public DateTime DefaultFromDate, DefaultToDate;
         bool LateLoading, NoPrimo;
+        static int setShowDimOnPrimoIndex = 0;
 
         public TransactionReport(SynchronizeEntity master)
             : base(master, true)
@@ -108,6 +109,8 @@ namespace UnicontaClient.Pages.CustomPage
                 Debit.HasDecimals = Credit.HasDecimals = Amount.HasDecimals = AmountBase.HasDecimals = AmountVat.HasDecimals = false;
             SetRibbonControl(localMenu, dgGLTran);
             gridControl.BusyIndicator = busyIndicator;
+            cmbShowDimOnPrimo.ItemsSource = new string[] { Uniconta.ClientTools.Localization.lookup("OnePrimo"), Uniconta.ClientTools.Localization.lookup("PrimoPerDim"), Uniconta.ClientTools.Localization.lookup("NoPrimo") };
+            cmbShowDimOnPrimo.SelectedIndex = setShowDimOnPrimoIndex;
             if (DefaultFromDate == DateTime.MinValue)
             {
                 var Now = BasePage.GetSystemDefaultDate();
@@ -372,14 +375,16 @@ namespace UnicontaClient.Pages.CustomPage
 
             var isAscending = cbxAscending.IsChecked.Value;
             api.session.Preference.TransactionReport_isAscending = isAscending;
-            var showDimOnPrimo = cbxShowDimOnPrimo.IsChecked.Value;
+
+            var showDimOnPrimo = cmbShowDimOnPrimo.SelectedIndex;
+            setShowDimOnPrimoIndex = showDimOnPrimo;
 
             setDateTime(txtDateFrm, txtDateTo);
             busyIndicator.IsBusy = true;
 
             string journal = cmbJournal.Text;
             var dimensionParams = BalanceReport.SetDimensionParameters(dim1, dim2, dim3, dim4, dim5, true, true, true, true, true);
-            var listtran = (GLTransClientTotal[])await tranApi.GetTransactions(new GLTransClientTotal(), journal, masterClient._Account, masterClient._Account, DefaultFromDate, DefaultToDate, dimensionParams, NoPrimo ? ReportAPI.NoPrimo : (showDimOnPrimo ? ReportAPI.PrimoPrDimension : ReportAPI.SimplePrimo));
+            var listtran = (GLTransClientTotal[])await tranApi.GetTransactions(new GLTransClientTotal(), journal, masterClient._Account, masterClient._Account, DefaultFromDate, DefaultToDate, dimensionParams, showDimOnPrimo);
             if (listtran != null)
             {
                 long Total = 0, TotalCur = 0;

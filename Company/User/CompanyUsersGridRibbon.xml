@@ -3,18 +3,22 @@
   <RibbonItem TabId="0" LocalizedNameKey="Home">
     <!---When we create a new TabPage -->
     <RibbonItem Action="AddRow" LocalizedNameKey="AddOBJ" Parameter="User" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png"/>
-    <RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="DeleteOBJ" Parameter="User" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png"/>
+    <RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="RemoveOBJ" Parameter="User" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png"/>
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh.png" LargeGlyph="refresh.png"/>
+  </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="SetPermissions" LocalizedNameKey="SetPermissions" Glyph="User_Rights_32x32.png" LargeGlyph="User_Rights_32x32.png"/>
+    <RibbonItem Action="EditRow" ShortcutKey="Ctrl+E" LocalizedNameKey="MenuLayout" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>
+    <RibbonItem Action="ChangeOwnership" LocalizedNameKey="ChangeOwnership" Glyph="Change_Ownership_32x32.png" LargeGlyph="Change_Ownership_32x32.png"/>
   </RibbonItem>
   <RibbonItem>    
     <RibbonItem Action="OwnerOf" LocalizedNameKey="OwnerOf" LargeGlyph="Owner_32x32.png"/>
     <RibbonItem Action="UserOf" LocalizedNameKey="UserOf" LargeGlyph="UsresOf_32x32.png"/>
   </RibbonItem>
-  <RibbonItem> <!---next group in same Tab-->   
-    <RibbonItem Action="SetPermissions" LocalizedNameKey="SetPermissions" Glyph="User_Rights_32x32.png" LargeGlyph="User_Rights_32x32.png"/>
-    <RibbonItem Action="EditRow" ShortcutKey="Ctrl+E" LocalizedNameKey="MenuLayout" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>
-    <RibbonItem Action="ChangeOwnership" LocalizedNameKey="ChangeOwnership" Glyph="Change_Ownership_32x32.png" LargeGlyph="Change_Ownership_32x32.png"/>
-  </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="UserLoginHistory" LocalizedNameKey="UserLoginHistory" LargeGlyph="History_32x32.png"/>
+    <RibbonItem Action="UserOperations" LocalizedNameKey="UserOperations" LargeGlyph="User_Operations_32x32.png"/>
+</RibbonItem>
 </root>

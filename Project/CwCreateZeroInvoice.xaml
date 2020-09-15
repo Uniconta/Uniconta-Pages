@@ -18,6 +18,8 @@ x:Class="UnicontaClient.Pages.CustomPage.CwCreateZeroInvoice"
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
@@ -35,6 +37,13 @@ x:Class="UnicontaClient.Pages.CustomPage.CwCreateZeroInvoice"
           
             <TextBlock Grid.Row="3" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Category,Mode=OneWay}" VerticalAlignment="Center"  />
             <ClientToolsControls:LookupEditor x:Name="cmbCategory" Text="{Binding InvoiceCategory, Mode=TwoWay}" Grid.Column="3" Grid.Row="3" HorizontalAlignment="Stretch" Margin="5,5,0,0" Height="25" />
+
+            <TextBlock Grid.Row="4" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=AdjustmentCategory,Mode=OneWay}" VerticalAlignment="Center"  />
+            <ClientToolsControls:LookupEditor x:Name="cmbRegCategory" Text="{Binding AdjustmentCategory, Mode=TwoWay}" Grid.Column="3" Grid.Row="4" HorizontalAlignment="Stretch" Margin="5,5,0,0" Height="25" />
+
+            <TextBlock Grid.Row="5" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Employee,Mode=OneWay}" VerticalAlignment="Center"  />
+            <ClientToolsControls:LookupEditor x:Name="cmbEmployee" Text="{Binding Employee, Mode=TwoWay}" Grid.Column="3" Grid.Row="5" HorizontalAlignment="Stretch" Margin="5,5,0,0" Height="25" />
+
         </Grid>
         <StackPanel x:Name="actionButton" HorizontalAlignment="Right" Grid.Row="1" Orientation="Horizontal" Margin="0 10 0 0">
             <Button x:Name="OKButton" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Create}" Click="OKButton_Click" MinWidth="75" Height="23"

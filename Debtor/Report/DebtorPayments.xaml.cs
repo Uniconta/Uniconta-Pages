@@ -32,6 +32,7 @@ using Uniconta.API.DebtorCreditor;
 using Uniconta.ClientTools;
 using UnicontaClient.Utilities;
 using Uniconta.API.System;
+using Uniconta.Common.Utility;
 #if !SILVERLIGHT
 using UnicontaClient.Pages;
 using Microsoft.Win32;
@@ -133,7 +134,7 @@ namespace UnicontaClient.Pages.CustomPage
                 toDate = txtDateTo.DateTime.Date;
             txtDateTo.DateTime = toDate;
             txtDateFrm.DateTime = fromDate;
-            neDunningDays.Text = noDaysSinceLastDunning;
+            neDunningDays.Text = NumberConvert.ToStringNull(noDaysSinceLastDunning);
             dgDebtorTranOpenGrid.ShowTotalSummary();
             cmbPrintintPreview.ItemsSource = new string[] { Uniconta.ClientTools.Localization.lookup("Internal"), Uniconta.ClientTools.Localization.lookup("External") };
             cmbPrintintPreview.SelectedIndex = 0;
@@ -171,7 +172,7 @@ namespace UnicontaClient.Pages.CustomPage
                 byte[] logo = await UtilDisplay.GetLogo(api);
                 var Comp = api.CompanyEntity;
 
-                var companyClient = Activator.CreateInstance(Comp.GetUserTypeNotNull(typeof(CompanyClient))) as CompanyClient;
+                var companyClient = Comp.CreateUserType<CompanyClient>();
                 StreamingManager.Copy(Comp, companyClient);
 
                 lastMessage = null; // just to reload message in case it has changed
@@ -244,8 +245,7 @@ namespace UnicontaClient.Pages.CustomPage
                 byte[] logo = await UtilDisplay.GetLogo(api);
                 var Comp = api.CompanyEntity;
 
-                var companyUserType = Comp.GetUserTypeNotNull(typeof(CompanyClient));
-                var companyClient = Activator.CreateInstance(companyUserType) as CompanyClient;
+                var companyClient = Comp.CreateUserType<CompanyClient>();
                 StreamingManager.Copy(Comp, companyClient);
 
                 lastMessage = null; // just to reload message in case it has changed
@@ -369,17 +369,18 @@ namespace UnicontaClient.Pages.CustomPage
 
         static DateTime fromDate;
         static DateTime toDate;
-        static string noDaysSinceLastDunning;
+        static int noDaysSinceLastDunning;
 
         protected override Filter[] DefaultFilters()
         {
-            Filter[] filters;
+            var filters = new List<Filter>()
+            {
+                new Filter() { name = "OnHold", value = "0" },
+                new Filter() { name = "Paid", value = "0" }
+            };
+
             if (fromDate != DateTime.MinValue || toDate != DateTime.MinValue)
             {
-                filters = new Filter[3];
-                var dateFilter = new Filter() { name = "DueDate" };
-                filters[2] = dateFilter;
-
                 string filter;
                 if (fromDate != DateTime.MinValue)
                     filter = String.Format("{0:d}..", fromDate);
@@ -387,14 +388,17 @@ namespace UnicontaClient.Pages.CustomPage
                     filter = "..";
                 if (toDate != DateTime.MinValue)
                     filter += String.Format("{0:d}", toDate);
-                dateFilter.value = filter;
-            }
-            else
-                filters = new Filter[2];
 
-            filters[0] = new Filter() { name = "OnHold", value = "0" };
-            filters[1] = new Filter() { name = "Paid", value = "0" };
-            return filters;
+                filters.Add(new Filter() { name = "DueDate", value = filter } );
+            }
+
+            if (noDaysSinceLastDunning != 0)
+            {
+                var dayValid = BasePage.GetSystemDefaultDate().AddDays(-noDaysSinceLastDunning);
+                filters.Add(new Filter() { name = "LastCollectionLetter", value = String.Format("..{0:d};null", dayValid) });
+            }
+
+            return filters.ToArray();
         }
 
         protected override SortingProperties[] DefaultSort()
@@ -772,7 +776,10 @@ namespace UnicontaClient.Pages.CustomPage
         {
             foreach (var rec in debtorPayments)
             {
-                if (rec != null && !rec._OnHold)
+                if (rec == null)
+                    continue;
+
+                if (!rec._OnHold)
                 {
                     if (rec.Currency == feeCurrency || (!rec.Currency.HasValue && feeCurrency == Currencies.XXX))
                         rec.FeeAmount = feeAmount;
@@ -804,10 +811,7 @@ namespace UnicontaClient.Pages.CustomPage
             else
                 toDate = txtDateTo.DateTime.Date;
 
-            if (string.IsNullOrEmpty(neDunningDays.Text))
-                noDaysSinceLastDunning = null;
-            else
-                noDaysSinceLastDunning = neDunningDays.Text;
+            noDaysSinceLastDunning = (int)NumberConvert.ToInt(neDunningDays.Text);
 
             Filter();
         }

@@ -23,6 +23,7 @@ x:Class="UnicontaClient.Pages.CustomPage.InvVariantDetailPage"
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
         <local:InvVariantDetailGrid x:Name="dgInvVariantDetailGrid" AutoGenerateColumns="None">
             <local:InvVariantDetailGrid.Columns>
+                    <local:CorasauDataGridTemplateColumnClient FieldName="Image" Width="60" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Item" Width="100"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="colVariant" FieldName="Variant">
                         <local:CorasauDataGridTemplateColumnClient.CellTemplate>

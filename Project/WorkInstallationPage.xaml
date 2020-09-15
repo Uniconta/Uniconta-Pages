@@ -65,6 +65,7 @@ x:Class="UnicontaClient.Pages.CustomPage.WorkInstallationPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="Group" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Blocked" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="DeliveryTerm" Visible="false" Width="100" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DeliveryId" Visible="false" />
                 </local:WorkInstallationGrid.Columns>
             </local:WorkInstallationGrid>
         </CorasauControls:BusyIndicator>

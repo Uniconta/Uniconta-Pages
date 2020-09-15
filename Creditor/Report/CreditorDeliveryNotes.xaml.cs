@@ -234,7 +234,7 @@ namespace UnicontaClient.Pages.CustomPage
                         else
                         {
                             var pckNumber = pckNote.InvoiceNumber;
-                            reportName = string.Format("{0}_{1}", Uniconta.ClientTools.Localization.lookup("CreditorPackNote"), pckNumber);
+                            reportName = await Utilities.Utility.GetLocalizedReportName(api, pckNote, Uniconta.DataModel.CompanyLayoutType.PurchasePacknote);
                             dockName = string.Format("{0} {1}", Uniconta.ClientTools.Localization.lookup("Preview"), string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("CreditorPackNote"), pckNumber));
 
                             AddDockItem(TabControls.StandardPrintReportPage, new object[] { new List<IPrintReport> { printreport }, reportName }, dockName);

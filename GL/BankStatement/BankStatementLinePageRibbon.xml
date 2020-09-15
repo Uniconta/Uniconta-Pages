@@ -3,11 +3,13 @@
   <RibbonItem TabId="0" LocalizedNameKey="Home">
     <!---When we create new TabPage -->
     <RibbonItem Action="Save" ShortcutKey="Ctrl+S" LocalizedNameKey="Save" Glyph="save-16x16.png" LargeGlyph="save-32x32.png"/>
+    <RibbonItem Action="EditJournalLine"  LocalizedNameKey="EditOBJ" Parameter="Journalline"  LargeGlyph="Edit_32x32.png"/>
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="Pre" LocalizedNameKey="PrevMonth" Glyph="Previous_32x32.png" LargeGlyph="Previous_32x32.png"/>
     <RibbonItem Action="Next" LocalizedNameKey="NextMonth" Glyph="Next_32x32.png" LargeGlyph="Next_32x32.png"/>
     <RibbonItem Action="Interval" LocalizedNameKey="Period" Glyph="Interval_32x32.png" LargeGlyph="Interval_32x32.png"/>
+    <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" LargeGlyph="refresh.png"/>
   </RibbonItem>
   <RibbonItem>
     <!---next group-->
@@ -29,13 +31,13 @@
       <RibbonItem Action="RefVoucher" LocalizedNameKey="Attach" Glyph="Attachments_16x16.png" LargeGlyph="Attachments_32x32.png" />
       <RibbonItem Action="ImportVoucher" LocalizedNameKey="ImportFile" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png" />
       <RibbonItem Action="RemoveVoucher" LocalizedNameKey="Remove" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png" />
+     <RibbonItem Action="DragDrop" LocalizedNameKey="DragAndDrop" Glyph="DragDrop_File_16x16.png" />
     </RibbonItem>
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="VoucherTransactions" ShortcutKey="Alt+T" LocalizedNameKey="VoucherTransactions" Glyph="Voucher_Transactions_32x32.png" LargeGlyph="Voucher_Transactions_32x32.png" />
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="MarkForMatch" LocalizedNameKey="MarkForMatch" Glyph="Match_32x32.png" LargeGlyph="Match_32x32.png"/>
     <RibbonItem Action="AddMatch" LocalizedNameKey="AddOBJ" Parameter="Match" Glyph="Match_Add_32x32.png" LargeGlyph="Match_Add_32x32.png"/>
     <RibbonItem Action="RemoveMatch" LocalizedNameKey="RemoveOBJ" Parameter="Match" Glyph="Match_Remove_32x32.png" LargeGlyph="Match_Remove_32x32.png" />
     <RibbonItem Action="AutoMatch" LocalizedNameKey="AutoMatch" Glyph="Match_Lines_32x32.png" LargeGlyph="Match_Lines_32x32.png" />
@@ -54,7 +56,7 @@
     <RibbonItem Action="OffSetAccount" LocalizedNameKey="OffSetAccount"  LargeGlyph="Offset_Account_32x32.png"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem LocalizedNameKey="ShowAmount" Action="ShowAmount" LargeGlyph="Budget_32x32.png"/>
+    <!--RibbonItem LocalizedNameKey="ShowAmount" Action="ShowAmount" LargeGlyph="Budget_32x32.png"/-->
     <RibbonItem LocalizedNameKey="FromDate" StatusValue="a"></RibbonItem>
     <RibbonItem LocalizedNameKey="ToDate" StatusValue="b" />
   </RibbonItem>

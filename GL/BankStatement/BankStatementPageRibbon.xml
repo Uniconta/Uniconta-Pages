@@ -24,7 +24,7 @@
     </RibbonItem>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="MatchLines" LocalizedNameKey="MatchLines" ControlName="BankStatementLinePage" Glyph="Match_Lines_32x32.png" LargeGlyph="Match_Lines_32x32.png"/>
+    <RibbonItem Action="MatchLines" LocalizedNameKey="MatchLines" ControlName="BankStatementLinePage" Glyph="Match_Lines_Highlighted_32x32.png" LargeGlyph="Match_Lines_Highlighted_32x32.png"/>
     <RibbonItem Action="RemoveSettlements" LocalizedNameKey="RemoveOBJ" Parameter="Reconciliation" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png" />
   </RibbonItem>
   <RibbonItem LocalizedNameKey="Reports">

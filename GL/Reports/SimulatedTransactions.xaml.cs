@@ -49,7 +49,7 @@ namespace UnicontaClient.Pages.CustomPage
             Initialize(simulatedTransactions);
             RemoveMenuItem();
         }
-        bool ShowTotal;
+        bool ShowTotal, ShowVoucherTotal;
 
         AccountPostingBalance[] balance;
         public SimulatedTransactions(AccountPostingBalance[] balance, UnicontaBaseEntity[] simulatedTransactions)
@@ -70,13 +70,30 @@ namespace UnicontaClient.Pages.CustomPage
             if (simulatedTransactions != null && simulatedTransactions.Length > 0)
             {
                 var lst = new GLTransClientTotal[simulatedTransactions.Length];
-                long total = 0;
+                long total = 0, vouchertotal = 0;
                 int i = 0;
+                int voucher = 0;
                 foreach (var t in (IEnumerable<GLTransClientTotal>)simulatedTransactions)
                 {
+                    if (t._Voucher != voucher)
+                    {
+                        voucher = t._Voucher;
+                        if (vouchertotal != 0)
+                        {
+                            lst[i - 1]._VoucherTotal = vouchertotal;
+                            vouchertotal = 0;
+                            ShowVoucherTotal = true;
+                        }
+                    }
+                    vouchertotal += t._AmountCent;
                     total += t._AmountCent;
                     t._Total = total;
                     lst[i++] = t;
+                }
+                if (vouchertotal != 0)
+                {
+                    lst[i - 1]._VoucherTotal = vouchertotal;
+                    ShowVoucherTotal = true;
                 }
                 ShowTotal = (total != 0);
                 dgSimulatedTran.ClearSorting();
@@ -126,6 +143,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             base.OnLayoutLoaded();
             Total.Visible = ShowTotal;
+            VoucherTotal.Visible = ShowVoucherTotal;
             UnicontaClient.Utilities.Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
             var Comp = api.CompanyEntity;
             if (!Comp._UseVatOperation)

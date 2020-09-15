@@ -85,7 +85,7 @@ namespace UnicontaClient.Pages.CustomPage
                 var debtorInvoiceLineUserType = ReportUtil.GetUserType(typeof(DebtorInvoiceLines), Comp);
                 var debtorInvoiceClientUserType = ReportUtil.GetUserType(typeof(DebtorInvoiceClient), Comp);
                 DCPreviousAddressClient previousAddressClient = null;
-                DCInvoiceClient dcInv;
+                DCInvoice dcInv;
 
                 if (!isRePrint)
                 {
@@ -97,7 +97,7 @@ namespace UnicontaClient.Pages.CustomPage
                 }
                 else
                 {
-                    dcInv = (DCInvoiceClient)invoicePostingResult.Header;
+                    dcInv = invoicePostingResult.Header;
 
                     var linesCount = invoicePostingResult.Lines.Count();
                     if (linesCount > 0)

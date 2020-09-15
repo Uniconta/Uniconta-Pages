@@ -28,9 +28,14 @@ x:Class="UnicontaClient.Pages.CustomPage.InvItemDetailControl"
                     <CorasauControls:CorasauLayoutItem FieldName="ItemType" x:Name="liItemType">
                         <CorasauControls:TextEditor Text="{Binding ItemType}" IsReadOnly="True"/>
                     </CorasauControls:CorasauLayoutItem>
-
                     <CorasauControls:CorasauLayoutItem FieldName="Blocked" x:Name="liBlocked">
                         <CorasauControls:CheckEditor x:Name="Blocked" IsChecked="{Binding Blocked}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Photo" x:Name="liPhoto" Style="{StaticResource LayoutItemsstyle}"  ButtonContent="&#x1f441;" ButtonClicked="liPhoto_ButtonClicked">
+                        <CorasauControls:IntegerEditor Text="{Binding Photo}" IsReadOnly="True" />
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="URL" x:Name="liURL" Style="{StaticResource LayoutItemsstyle}" ButtonContent="&#x1f441;" ButtonClicked="liURL_ButtonClicked">
+                        <CorasauControls:IntegerEditor Text="{Binding URL}" IsReadOnly="True" />
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
 
@@ -87,7 +92,7 @@ x:Class="UnicontaClient.Pages.CustomPage.InvItemDetailControl"
                         <CorasauControls:TextEditor x:Name="leUnitGroup" Text="{Binding UnitGroup}" IsReadOnly="True" />
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="Decimals" x:Name="liDecimals">
-                        <CorasauControls:IntegerEditor Text="{Binding Decimals,Mode=TwoWay}" SetMask="false" IsReadOnly="True"/>
+                        <CorasauControls:IntegerEditor EditValue="{Binding Decimals,Mode=TwoWay}" SetMask="false" IsReadOnly="True"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="PurchaseAccount" x:Name="liPurchaseAccount">
                         <CorasauControls:TextEditor Text="{Binding PurchaseAccount,Mode=TwoWay}" IsReadOnly="True" />
@@ -237,7 +242,7 @@ x:Class="UnicontaClient.Pages.CustomPage.InvItemDetailControl"
                     </CorasauControls:CorasauLayoutItem>
 
                     <CorasauControls:CorasauLayoutItem FieldName="DeliveryTime" x:Name="liDeliveryTime">
-                        <CorasauControls:IntegerEditor Text="{Binding DeliveryTime}" IsReadOnly="True" />
+                        <CorasauControls:IntegerEditor EditValue="{Binding DeliveryTime}" IsReadOnly="True" />
                     </CorasauControls:CorasauLayoutItem>
                     
                     <CorasauControls:CorasauLayoutItem FieldName="SalesQty" x:Name="liSalesQty">

@@ -89,7 +89,6 @@ namespace UnicontaClient.Pages.CustomPage
             return lookup;
         }
 
-        VouchersClient attachedVoucher;
         private void LocalMenu_OnItemClicked(string ActionType)
         {
             var selectedItem = dgMultiInvGrid.SelectedItem as CreditorOrderClient;
@@ -146,27 +145,22 @@ namespace UnicontaClient.Pages.CustomPage
                         return;
                     var voucher = new VouchersClient();
                     voucher._Content = ContentTypes.PurchaseInvoice;
+                    voucher._PurchaseNumber = selectedItem._OrderNumber;
+                    voucher._CreditorAccount = selectedItem._InvoiceAccount ?? selectedItem._DCAccount;
                     CWAddVouchers addVouvhersDialog = new CWAddVouchers(api, false, voucher);
                     addVouvhersDialog.Closed += delegate
                     {
                         if (addVouvhersDialog.DialogResult == true)
                         {
-                            var propertyInfo = selectedItem.GetType().GetProperty("DocumentRef");
-                            if (propertyInfo != null && addVouvhersDialog.VoucherRowIds.Length > 0)
-                            {
-                                propertyInfo.SetValue(selectedItem, addVouvhersDialog.VoucherRowIds[0], null);
-                                UpdateVoucher(selectedItem);
-                            }
+                            if (addVouvhersDialog.VoucherRowIds.Length > 0)
+                                selectedItem._DocumentRef = addVouvhersDialog.VoucherRowIds[0];
                         }
                     };
                     addVouvhersDialog.Show();
-                    UpdateVoucher(selectedItem);
                     break;
                 case "RemoveVoucher":
-                    if (selectedItem == null)
-                        return;
-                    RemoveVoucher(selectedItem);
-                    UpdateVoucher(selectedItem);
+                    if (selectedItem != null)
+                        RemoveVoucher(selectedItem);
                     break;
                 case "UpdateRequisition":
                     UpdateDocument(CompanyLayoutType.Requisition);
@@ -186,23 +180,18 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        async void UpdateVoucher(CreditorOrderClient selectedItem)
+        void UpdateVoucher(VouchersClient attachedVoucher, CreditorOrderClient editrow)
         {
-            busyIndicator.IsBusy = true;
-            var err = await api.Update(selectedItem);
-            busyIndicator.IsBusy = false;
-            if (err != ErrorCodes.Succes)
-                UtilDisplay.ShowErrorCode(err);
-        }
-
-        async void UpdateAttachedVoucher(int orderNumber)
-        {
-            busyIndicator.IsBusy = true;
-            attachedVoucher.PurchaseNumber = orderNumber;
-            var err = await api.Update(attachedVoucher);
-            busyIndicator.IsBusy = false;
-            if (err != ErrorCodes.Succes)
-                UtilDisplay.ShowErrorCode(err);
+            if (attachedVoucher == null)
+                return;
+            var buf = attachedVoucher._Data;
+            attachedVoucher._Data = null;
+            var org = StreamingManager.Clone(attachedVoucher);
+            attachedVoucher._Content = ContentTypes.PurchaseInvoice;
+            attachedVoucher._PurchaseNumber = editrow._OrderNumber;
+            attachedVoucher._CreditorAccount = editrow._InvoiceAccount ?? editrow._DCAccount;
+            api.UpdateNoResponse(org, attachedVoucher);
+            attachedVoucher._Data = buf;
         }
 
         private void GenerateInvoice()
@@ -277,14 +266,18 @@ namespace UnicontaClient.Pages.CustomPage
             if (screenName == TabControls.AttachVoucherGridPage && argument != null)
             {
                 var voucherObj = argument as object[];
-
-                if (voucherObj[0] is VouchersClient)
+                if (voucherObj != null && voucherObj.Length > 0)
                 {
-                    var selectedItem = dgMultiInvGrid.SelectedItem as CreditorOrderClient;
-                    attachedVoucher = voucherObj[0] as VouchersClient;
-                    selectedItem.DocumentRef = attachedVoucher.RowId;
-                    UpdateAttachedVoucher(selectedItem._OrderNumber);
-                    UpdateVoucher(selectedItem);
+                    var attachedVoucher = voucherObj[0] as VouchersClient;
+                    if (attachedVoucher != null)
+                    {
+                        var selectedItem = dgMultiInvGrid.SelectedItem as CreditorOrderClient;
+                        if (selectedItem != null)
+                        {
+                            selectedItem.DocumentRef = attachedVoucher.RowId;
+                            UpdateVoucher(attachedVoucher, selectedItem);
+                        }
+                    }
                 }
             }
         }

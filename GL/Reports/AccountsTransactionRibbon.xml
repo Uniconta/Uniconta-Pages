@@ -33,12 +33,13 @@
       <RibbonItem Action="RefVoucher" LocalizedNameKey="Attach" Glyph="Attachments_16x16.png" LargeGlyph="Attachments_32x32.png" />
       <RibbonItem Action="ImportVoucher" LocalizedNameKey="ImportFile" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png" />
       <RibbonItem Action="RemoveVoucher" LocalizedNameKey="Remove" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png" />
+      <RibbonItem Action="DragDrop" LocalizedNameKey="DragAndDrop" Glyph="DragDrop_File_16x16.png" />
     </RibbonItem>
     <RibbonItem Action="ChangeDimension" LocalizedNameKey="ChangeDimension" LargeGlyph="Default_Values_32x32.png" />
     <RibbonItem Action="ChangeText" LocalizedNameKey="ChangeText" LargeGlyph="Transfer_32x32.png" />
     <RibbonItem Action="ChangeQuantity" LocalizedNameKey="ChangeOBJ" Parameter="Qty" LargeGlyph="ImportExport_32x32.png" />
     <RibbonItem Action="ChangeDate" LocalizedNameKey="ChangeOBJ" Parameter="Date" LargeGlyph="Month_View_32x32.png" />
-  </RibbonItem>    
+  </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="AddEditNote" LocalizedNameKey="AddEditOBJ" Parameter="Note" LargeGlyph="AddUpdate_32x32.png"/>
   </RibbonItem>

@@ -226,14 +226,21 @@ namespace UnicontaClient.Pages.CustomPage
             else
                 deliveryAccount = null;
 
+            WorkInstallation workInstallation = null;
+            if (invClient._Installation != null)
+            {
+                var workInstallCache = api.GetCache(typeof(Uniconta.DataModel.WorkInstallation)) ?? await api.LoadCache(typeof(Uniconta.DataModel.WorkInstallation));
+                workInstallation = (WorkInstallation)workInstallCache.Get(invClient._Installation);
+            }
+
             CreationResult result;
 
             if (Comp._CountryId == CountryCode.Norway || Comp._CountryId == CountryCode.Netherlands)
                 result = EHF.GenerateEHFXML(Comp, debtor, deliveryAccount, invClient, invoiceLines, InvCache, VatCache, invItemText, contactPerson);
             else
             {
-                TableAddOnData[] attachments = await FromXSDFile.OIOUBL.ExportImport.Attachments.CollectInvoiceAttachments(invClient, api);
-                result = Uniconta.API.DebtorCreditor.OIOUBL.GenerateOioXML(Comp, debtor, deliveryAccount, invClient, invoiceLines, InvCache, VatCache, invItemText, contactPerson, attachments, layoutGroupCache);
+                var attachments = await FromXSDFile.OIOUBL.ExportImport.Attachments.CollectInvoiceAttachments(invClient, api);
+                result = Uniconta.API.DebtorCreditor.OIOUBL.GenerateOioXML(Comp, debtor, deliveryAccount, invClient, invoiceLines, InvCache, VatCache, invItemText, contactPerson, attachments, layoutGroupCache, workInstallation);
             }
 
             bool createXmlFile = true;

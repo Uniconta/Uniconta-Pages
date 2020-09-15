@@ -284,10 +284,8 @@ namespace UnicontaClient.Pages.CustomPage
             var companyClient = Utility.GetCompanyClientUserInstance(api.CompanyEntity);
             var getLogo = await UtilDisplay.GetLogo(api);
 
-            var productionOrderLineUserType = api.CompanyEntity.GetUserTypeNotNull(typeof(ProductionOrderLineClient));
-            var productionOrderLineInstance = Activator.CreateInstance(productionOrderLineUserType) as ProductionOrderLineClient;
+            var productionOrderLineInstance = api.CompanyEntity.CreateUserType<ProductionOrderLineClient>();
             var productionOrderLines = await api.Query(productionOrderLineInstance, new UnicontaBaseEntity[] { productionOrder }, null);
-
             if (productionOrderLines != null && productionOrderLines.Length > 0)
             {
                 var productionReportSource = new ProductionStandardReportClient(companyClient, productionOrder, productionOrderLines, getLogo, Uniconta.ClientTools.Localization.lookup("ProductionOrder"));

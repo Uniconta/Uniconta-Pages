@@ -75,6 +75,12 @@ namespace UnicontaClient.Pages.CustomPage
             LoadType(typeof(Uniconta.DataModel.PrCategory));
             if (master == null)
                 Project.Visible = true;
+            else
+            {
+                var proj = (master as Uniconta.DataModel.Project);
+                if (proj != null)
+                    proj.Categories = null;
+            }
         }
 
         private void LocalMenu_OnItemClicked(string ActionType)

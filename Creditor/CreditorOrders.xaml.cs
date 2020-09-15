@@ -154,7 +154,6 @@ namespace UnicontaClient.Pages.CustomPage
             localMenu_OnItemClicked("OrderLine");
         }
 
-        VouchersClient attachedVoucher;
         private void localMenu_OnItemClicked(string ActionType)
         {
             var dgCreditorOrdersGrid = this.dgCreditorOrdersGrid;
@@ -272,33 +271,15 @@ namespace UnicontaClient.Pages.CustomPage
                         return;
                     ViewVoucher(TabControls.VouchersPage3, dgCreditorOrdersGrid.syncEntity);
                     break;
-
+                case "DragDrop":
                 case "ImportVoucher":
-                    if (selectedItem == null)
-                        return;
-                    var voucher = new VouchersClient();
-                    voucher._Content = ContentTypes.PurchaseInvoice;
-                    voucher.PurchaseNumber = selectedItem._OrderNumber;
-                    CWAddVouchers addVouvhersDialog = new CWAddVouchers(api, false, voucher);
-                    addVouvhersDialog.Closed += delegate
-                    {
-                        if (addVouvhersDialog.DialogResult == true)
-                        {
-                            var propertyInfo = selectedItem.GetType().GetProperty("DocumentRef");
-                            if (addVouvhersDialog.VoucherRowIds.Length > 0 && propertyInfo != null)
-                            {
-                                propertyInfo.SetValue(selectedItem, addVouvhersDialog.VoucherRowIds[0], null);
-                                UpdateVoucher(selectedItem);
-                            }
-                        }
-                    };
-                    addVouvhersDialog.Show();
+                    if (selectedItem != null)
+                        AddVoucher(selectedItem, ActionType);
                     break;
                 case "RemoveVoucher":
                     if (selectedItem == null)
                         return;
                     RemoveVoucher(selectedItem);
-                    UpdateVoucher(selectedItem);
                     break;
                 case "EditAll":
                     if (dgCreditorOrdersGrid.Visibility == Visibility.Visible)
@@ -327,7 +308,12 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "CreateInvoice":
                     if (selectedItem != null)
-                        GenerateInvoice(selectedItem);
+                    {
+                        if (Utility.HasControlRights("GenerateInvoice", api.CompanyEntity))
+                            GenerateInvoice(selectedItem);
+                        else
+                            UtilDisplay.ShowControlAccessMsg("GenerateInvoice");
+                    }
                     break;
                 case "RefreshGrid":
                     TestCreditorReload(true, dgCreditorOrdersGrid.ItemsSource as IEnumerable<CreditorOrder>);
@@ -358,6 +344,39 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
+        private void AddVoucher(CreditorOrderClient selectedItem, string actionType)
+        {
+            var voucher = new VouchersClient();
+            voucher._Content = ContentTypes.PurchaseInvoice;
+            voucher._PurchaseNumber = selectedItem._OrderNumber;
+            voucher._Project = selectedItem._Project;
+            voucher._Approver1 = selectedItem._Approver;
+            voucher._CreditorAccount = selectedItem._InvoiceAccount ?? selectedItem._DCAccount;
+#if !SILVERLIGHT
+            if (actionType == "DragDrop")
+            {
+                var dragDropWindow = new UnicontaDragDropWindow(false);
+                dragDropWindow.Closed += delegate
+                {
+                    if (dragDropWindow.DialogResult == true)
+                    {
+                        var fileInfo = dragDropWindow.FileInfoList?.SingleOrDefault();
+                        if (fileInfo != null)
+                        {
+                            voucher._Data = fileInfo.FileBytes;
+                            voucher._Text = fileInfo.FileName;
+                            voucher._Fileextension = DocumentConvert.GetDocumentType(fileInfo.FileExtension);
+                        }
+                        Utility.ImportVoucher(selectedItem, api, voucher, true);
+                    }
+                };
+                dragDropWindow.Show();
+            }
+            else
+#endif
+                Utility.ImportVoucher(selectedItem, api, voucher, false);
+        }
+
         private void GenerateInvoice(CreditorOrderClient creditorOrderClient)
         {
             var accountName = string.Format("{0} ({1})", creditorOrderClient._DCAccount, creditorOrderClient.Name);
@@ -368,6 +387,9 @@ namespace UnicontaClient.Pages.CustomPage
             GenrateInvoiceDialog.SetInvoiceNumber(creditorOrderClient._InvoiceNumber);
             if (creditorOrderClient._InvoiceDate != DateTime.MinValue)
                 GenrateInvoiceDialog.SetInvoiceDate(creditorOrderClient._InvoiceDate);
+            var additionalOrdersList = Utility.GetAdditionalOrders(api, creditorOrderClient);
+            if (additionalOrdersList != null)
+                GenrateInvoiceDialog.SetAdditionalOrders(additionalOrdersList);
 
             GenrateInvoiceDialog.Closed += async delegate
             {
@@ -379,7 +401,7 @@ namespace UnicontaClient.Pages.CustomPage
                     invoicePostingResult.SetUpInvoicePosting(creditorOrderClient, null, CompanyLayoutType.PurchaseInvoice, GenrateInvoiceDialog.GenrateDate, GenrateInvoiceDialog.InvoiceNumber, isSimulated,
                         GenrateInvoiceDialog.ShowInvoice, false, GenrateInvoiceDialog.InvoiceQuickPrint, GenrateInvoiceDialog.NumberOfPages, false, !isSimulated && GenrateInvoiceDialog.SendByOutlook,
                         GenrateInvoiceDialog.sendOnlyToThisEmail, GenrateInvoiceDialog.Emails, false, null, false);
-
+                    invoicePostingResult.SetAdditionalOrders(GenrateInvoiceDialog.AdditionalOrders?.Cast<DCOrder>().ToList());
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
                     busyIndicator.IsBusy = true;
                     var result = await invoicePostingResult.Execute();
@@ -510,7 +532,6 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         var xmlText = File.ReadAllText(file);
                         var order = await OIOUBL.ReadInvoiceCreditNoteOrOrder(xmlText, creditorCache, api, oneOrMultiple);
-
                         if (order == null)
                         {
                             listOfFailedFiles += string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ViewerFailed"), file + Environment.NewLine);
@@ -541,14 +562,11 @@ namespace UnicontaClient.Pages.CustomPage
                             continue;
                         }
 
-                        if (order.DocumentRef != 0)
-                            UpdateVoucher(order);
-
                         order.Lines = orderlines;
                         orderlistToAddToGrid.Add(order);
                     }
 
-                    if (orderlist == null || orderlist.Count() <= 0)
+                    if (orderlist == null || orderlist.Count == 0)
                         orderlist = orderlistToAddToGrid;
                     else
                         orderlist.AddRange(orderlistToAddToGrid);
@@ -570,57 +588,52 @@ namespace UnicontaClient.Pages.CustomPage
                     if (userClickedSave != true)
                         return;
 
-                    using (var stream = File.Open(sfd.FileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                    using (var stream = File.Open(sfd.FileName, FileMode.Open, FileAccess.Read, FileShare.Read))
                     {
-                        using (var sr = new StreamReader(stream))
-                        {
-                            var oioublText = await sr.ReadToEndAsync();
-                            var order = await OIOUBL.ReadInvoiceCreditNoteOrOrder(oioublText, creditorCache, api, oneOrMultiple);
-
-                            if (order == null)
-                                return;
-
-                            var orderlines = order.Lines;
-                            order.Lines = null;
-
-                            var err = await api.Insert(order);
-                            if (err != ErrorCodes.Succes)
-                            {
-                                UnicontaMessageBox.Show(err.ToString(), Uniconta.ClientTools.Localization.lookup("Error"));
-                                return;
-                            }
-
-                            int countLine = 0;
-                            foreach (var line in orderlines)
-                            {
-                                line.SetMaster(order);
-                                line._LineNumber = ++countLine;
-                            }
-
-                            var err2 = await api.Insert(orderlines);
-                            if (err2 != ErrorCodes.Succes)
-                            {
-                                UnicontaMessageBox.Show(err2.ToString(), Uniconta.ClientTools.Localization.lookup("Error"));
-                                return;
-                            }
-
-                            if (order.DocumentRef != 0)
-                                UpdateVoucher(order);
-
-                            if (orderlist == null || orderlist.Count <= 0)
-                                orderlist = new List<CreditorOrderClient>();
-
-                            orderlist.Add(order);
-
-                            dgCreditorOrdersGrid.ItemsSource = orderlist;
-                        }
+                        var sr = new StreamReader(stream);
+                        var oioublText = await sr.ReadToEndAsync();
                         stream.Close();
+
+                        var order = await OIOUBL.ReadInvoiceCreditNoteOrOrder(oioublText, creditorCache, api, oneOrMultiple);
+                        if (order == null)
+                            return;
+
+                        var orderlines = order.Lines;
+                        order.Lines = null;
+
+                        var err = await api.Insert(order);
+                        if (err != ErrorCodes.Succes)
+                        {
+                            UtilDisplay.ShowErrorCode(err);
+                            return;
+                        }
+
+                        int countLine = 0;
+                        foreach (var line in orderlines)
+                        {
+                            line.SetMaster(order);
+                            line._LineNumber = ++countLine;
+                        }
+
+                        err = await api.Insert(orderlines);
+                        if (err != ErrorCodes.Succes)
+                        {
+                            UtilDisplay.ShowErrorCode(err);
+                            return;
+                        }
+
+                        if (orderlist == null || orderlist.Count == 0)
+                            orderlist = new List<CreditorOrderClient>();
+
+                        orderlist.Add(order);
+
+                        dgCreditorOrdersGrid.ItemsSource = orderlist;
                     }
                 }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                UnicontaMessageBox.Show(e, Uniconta.ClientTools.Localization.lookup("Exception"));
+                UnicontaMessageBox.Show(ex);
             }
 #endif
         }
@@ -645,23 +658,18 @@ namespace UnicontaClient.Pages.CustomPage
                 return;
         }
 
-        async void UpdateVoucher(CreditorOrderClient selectedItem)
+        void UpdateVoucher(VouchersClient attachedVoucher, CreditorOrderClient editrow)
         {
-            busyIndicator.IsBusy = true;
-            var err = await api.Update(selectedItem);
-            busyIndicator.IsBusy = false;
-            if (err != ErrorCodes.Succes)
-                UtilDisplay.ShowErrorCode(err);
-        }
-
-        async void UpdateAttachedVoucher(int orderNumber)
-        {
-            busyIndicator.IsBusy = true;
-            attachedVoucher.PurchaseNumber = orderNumber;
-            var err = await api.Update(attachedVoucher);
-            busyIndicator.IsBusy = false;
-            if (err != ErrorCodes.Succes)
-                UtilDisplay.ShowErrorCode(err);
+            if (attachedVoucher == null)
+                return;
+            var buf = attachedVoucher._Data;
+            attachedVoucher._Data = null;
+            var org = StreamingManager.Clone(attachedVoucher);
+            attachedVoucher._Content = ContentTypes.PurchaseInvoice;
+            attachedVoucher._PurchaseNumber = editrow._OrderNumber;
+            attachedVoucher._CreditorAccount = editrow._InvoiceAccount ?? editrow._DCAccount;
+            api.UpdateNoResponse(org, attachedVoucher);
+            attachedVoucher._Data = buf;
         }
 
         static public void ShowOrderLines(byte thisDCType, DCOrder order, GridBasePage page, CorasauDataGrid grid)
@@ -758,7 +766,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                     if (result)
                         DebtorOrders.Updatedata(dbOrder, doctype);
-                    
+
                     else
                         Utility.ShowJournalError(invoicePostingResult.PostingResult.ledgerRes, dgCreditorOrdersGrid);
                 }
@@ -784,15 +792,17 @@ namespace UnicontaClient.Pages.CustomPage
             else if (screenName == TabControls.AttachVoucherGridPage)
             {
                 var voucherObj = argument as object[];
-                attachedVoucher = voucherObj?.FirstOrDefault() as VouchersClient;
-                if (attachedVoucher != null)
+                if (voucherObj != null && voucherObj.Length > 0)
                 {
-                    var selectedItem = dgCreditorOrdersGrid.SelectedItem as CreditorOrderClient;
-                    if (selectedItem != null)
+                    var attachedVoucher = voucherObj[0] as VouchersClient;
+                    if (attachedVoucher != null)
                     {
-                        selectedItem.DocumentRef = attachedVoucher.RowId;
-                        UpdateAttachedVoucher(selectedItem._OrderNumber);
-                        UpdateVoucher(selectedItem);
+                        var selectedItem = dgCreditorOrdersGrid.SelectedItem as CreditorOrderClient;
+                        if (selectedItem != null)
+                        {
+                            selectedItem.DocumentRef = attachedVoucher.RowId;
+                            UpdateVoucher(attachedVoucher, selectedItem);
+                        }
                     }
                 }
             }

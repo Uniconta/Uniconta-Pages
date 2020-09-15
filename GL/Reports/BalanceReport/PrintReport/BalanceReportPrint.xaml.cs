@@ -102,9 +102,8 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 if (frontPageReport is DevExpress.XtraReports.UI.XtraReport)
                 {
-                    var balanceFrontPageReport = frontPageReport as DevExpress.XtraReports.UI.XtraReport;
-                    balanceFrontPageReport.CreateDocument(false);
-                    ps.Pages.AddRange(balanceFrontPageReport.Pages);
+                    var balanceFrontPageList = StandardPrintReportPage.AssignWatermark(frontPageReport as DevExpress.XtraReports.UI.XtraReport);
+                    ps.Pages.AddRange(balanceFrontPageList);
                 }
                 else
                 {

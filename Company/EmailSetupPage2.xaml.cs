@@ -65,6 +65,11 @@ namespace UnicontaClient.Pages.CustomPage
             frmRibbon.OnItemClicked += FrmRibbon_OnItemClicked;
 
 #if !SILVERLIGHT
+            cmbExternType.ItemsSource = new List<string> { "Debtor", "DebtorInvoice", "Creditor", "CreditorInvoice", "Employee", "Contact", "CRMCampainMember", "CRMProspect" };
+            cmbExternType.SelectedIndex = 0;
+            layoutProp.Label = string.Format(Uniconta.ClientTools.Localization.lookup("AddOBJ"), Uniconta.ClientTools.Localization.lookup("Properties"));
+#endif
+#if !SILVERLIGHT
             liTextinHtml.Label = Uniconta.ClientTools.Localization.lookup("TextInHtml");
 #endif
             txtSmptPwd.Text = editrow._SmtpPsw;
@@ -122,7 +127,7 @@ namespace UnicontaClient.Pages.CustomPage
                                     itemUseSSL.IsEnabled = false;
                                 }
                                 else
-                                    UtilDisplay.ShowErrorCode(err);
+                                    DebtorEmailSetupPage2.ShowErrorMsg(err, editrow._Host);
                                 busyIndicator.IsBusy = false;
                             }
                             else
@@ -187,7 +192,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             object element;
 #if !SILVERLIGHT
-            element = FocusManager.GetFocusedElement(Application.Current.Windows[0]);
+            element = FocusManager.GetFocusedElement(UtilDisplay.GetCurentWindow());
             if (element is Control)
             {
                 var ctrl = element as Control;
@@ -222,9 +227,20 @@ namespace UnicontaClient.Pages.CustomPage
                 isSMTPValidated = false;
             if (isSMTPValidated == false)
             {
-                UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("SMTPVerifyMsg"), Uniconta.ClientTools.Localization.lookup("Warning"));
-                isSMTPValidated = null;
-                return false;
+#if !SILVERLIGHT
+                if (UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("SMTPVerifyMsg"), Uniconta.ClientTools.Localization.lookup("Warning"), MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+#else
+                if( UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("SMTPVerifyMsg"), Uniconta.ClientTools.Localization.lookup("Warning"), MessageBoxButton.OKCancel) == MessageBoxResult.OK)
+#endif
+                {
+                    FrmRibbon_OnItemClicked("TestMail");
+                    return false;
+                }
+                else
+                {
+                    isSMTPValidated = null;
+                    return false;
+                }
             }
             return true;
         }
@@ -245,6 +261,61 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
 #if !SILVERLIGHT
+
+        private void InsertProperty_ButtonClicked(object sender, RoutedEventArgs e)
+        {
+            var olSelectionStart = txtEmailBody.SelectionStart;
+            var selectedText = Convert.ToString(cmbProperties.SelectedItem);
+            string propName = string.Concat("{", cmbExternType.SelectedItem, ".", selectedText, "}");
+            if (string.IsNullOrEmpty(txtEmailBody.Text))
+                txtEmailBody.Text = propName;
+            else
+                txtEmailBody.Text = txtEmailBody.Text.Insert(txtEmailBody.SelectionStart, propName);
+            txtEmailBody.Focus();
+            txtEmailBody.SelectionStart = olSelectionStart + propName.Length;
+            txtEmailBody.Select(txtEmailBody.SelectionStart, 0);
+            txtEmailBody.Focus();
+        }
+
+        private void cmbExternType_SelectedIndexChanged(object sender, RoutedEventArgs e)
+        {
+            Type type;
+            switch (cmbExternType.SelectedIndex)
+            {
+                case 0:
+                    type = typeof(DebtorClient);
+                    break;
+                case 1:
+                    type = typeof(DebtorInvoiceClient);
+                    break;
+                case 2:
+                    type = typeof(CreditorClient);
+                    break;
+                case 3:
+                    type = typeof(CreditorInvoiceClient);
+                    break;
+                case 4:
+                    type = typeof(EmployeeClient);
+                    break;
+                case 5:
+                    type = typeof(ContactClient);
+                    break;
+                case 6:
+                    type = typeof(CrmCampaignMemberClient);
+                    break;
+                case 7:
+                    type = typeof(CrmProspectClient);
+                    break;
+                default: return;
+            }
+
+            type = api?.CompanyEntity.GetUserTypeNotNull(type);
+            if (type != null)
+            {
+                cmbProperties.ItemsSource = UtilFunctions.GetAllDisplayPropertyNames(type, api.CompanyEntity, false, false);
+                cmbProperties.SelectedIndex = 0;
+            }
+        }
 
         private void Email_ButtonClicked(object sender)
         {

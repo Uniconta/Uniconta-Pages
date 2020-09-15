@@ -38,5 +38,6 @@
   </RibbonItem>
 	<RibbonItem>
 		<RibbonItem Action="Search" LocalizedNameKey="Search" LargeGlyph="Validate_32x32.png" ShortcutKey="Ctrl+H" />
+    <RibbonItem Action="SendEmail" LocalizedNameKey="EmailDocuments" LargeGlyph="Email_32x32.png"/>
 	</RibbonItem>
 </root>

@@ -25,7 +25,7 @@ using System.Windows.Shapes;
 using System.Threading.Tasks;
 using DevExpress.Xpf.Editors;
 using Uniconta.ClientTools.Controls;
-using Uniconta.ClientTools.DataModel.System;
+using Uniconta.ClientTools.DataModel;
 using Uniconta.DataModel;
 using UnicontaClient.Pages;
 using Uniconta.Common.User;
@@ -57,7 +57,7 @@ namespace UnicontaClient.Pages.CustomPage
             ribbonControl = frmRibbon;
             layoutItems.DataContext = editrow;
             frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
-            txtCulture.Text = string.Format("({0})", Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName);
+            txtCulture.Text = string.Concat("(", Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName, ")");
             this.SaveComplete += EditCompany_SaveComplete;
             if (editrow.Deactive)
             {
@@ -80,10 +80,14 @@ namespace UnicontaClient.Pages.CustomPage
                 liPymtCodeOpt.Visibility = Visibility.Collapsed;
 
             if (country != CountryCode.Denmark && country != CountryCode.FaroeIslands && country != CountryCode.Greenland)
+            {
                 liPymtCodeOpt.Visibility = Visibility.Collapsed;
-
-            if (BasePage.session.User._Role < (byte)UserRoles.Admin)
                 liOIOUBLSendOnServer.Visibility = Visibility.Collapsed;
+            }
+
+#if !SILVERLIGHT
+            cmbSendAppRemdr.ItemsSource = AppEnums.Weekdays.Values.ToList();
+#endif
         }
 
         private bool onlyRunOnce;

@@ -74,9 +74,16 @@ namespace UnicontaClient.Pages.CustomPage
                     using (var stream = File.Create(sfd.FileName))
                     {
                         var sw = new StreamWriter(stream, Encoding.Default);
-                        CreateAndStreamFirstAndLast(result, sw, true, companyRegNo);
-                        var sumOfAmount = StreamToFile(result, sw);
-                        CreateAndStreamFirstAndLast(result, sw, false, companyRegNo, result.Count, sumOfAmount);
+                        if (api.CompanyEntity._CountryId == CountryCode.Germany) //Erik
+                        {
+                            StreamToFileDE(result, sw);
+                        }
+                        else
+                        {
+                            CreateAndStreamFirstAndLast(result, sw, true, companyRegNo);
+                            var sumOfAmount = StreamToFile(result, sw);
+                            CreateAndStreamFirstAndLast(result, sw, false, companyRegNo, result.Count, sumOfAmount);
+                        }
                         sw.Flush();
                     }
                 }
@@ -101,9 +108,21 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
+        public class EUSaleWithoutVATSortDE : IEqualityComparer<EUSaleWithoutVAT>
+        {
+            public bool Equals(EUSaleWithoutVAT x, EUSaleWithoutVAT y)
+            {
+                return (x.Country == y.Country) && (x.DeType == y.DeType) && (x._DebtorRegNoFile == y._DebtorRegNoFile);
+            }
+            public int GetHashCode(EUSaleWithoutVAT obj)
+            {
+                return ((int)obj.Country + 1) * (obj.DeType +1) * (obj._DebtorRegNoFile != null ? obj._DebtorRegNoFile.GetHashCode() : 1);
+            }
+        }
+
         public List<EUSaleWithoutVAT> CompressEUsale(IEnumerable<EUSaleWithoutVAT> listOfEU)
         {
-            var dictEUSale = new Dictionary<EUSaleWithoutVAT, EUSaleWithoutVAT>(new EUSaleWithoutVATSort());
+            var dictEUSale = api.CompanyEntity._CountryId == CountryCode.Germany ? new Dictionary<EUSaleWithoutVAT, EUSaleWithoutVAT>(new EUSaleWithoutVATSortDE()) : new Dictionary<EUSaleWithoutVAT, EUSaleWithoutVAT>(new EUSaleWithoutVATSort());
             
             foreach (var euSale in listOfEU)
             {
@@ -225,7 +244,7 @@ namespace UnicontaClient.Pages.CustomPage
                     countErr++;
             }
 
-            if (compressed)
+            if (compressed && api.CompanyEntity._CountryId != CountryCode.Germany)
             {
                 listOfEU = listOfEU.Where(s => s.SystemInfo == VALIDATE_OK).ToList();
                 var validateMulti = listOfEU.GroupBy(x => new { x._DebtorRegNoFile }).Where(grp => grp.Count() > 1).SelectMany(x => x);
@@ -272,6 +291,51 @@ namespace UnicontaClient.Pages.CustomPage
             sw.Write(sbEUList);
 
             return sumOfAmount;
+        }
+
+        private void StreamToFileDE(List<EUSaleWithoutVAT> listOfImportExport, StreamWriter sw)
+        {
+            sw.Write("Laenderkennzeichen"); sw.Write(';');
+            sw.Write("USt-IdNr."); sw.Write(';');
+            sw.Write("Betrag(EUR)"); sw.Write(';');
+            sw.Write("Art der Leistung"); sw.Write(Environment.NewLine);
+
+            long sumOfAmount = 0;
+            var exp = Localization.lookup("Exported");
+            foreach (var rec in listOfImportExport)
+            {
+                string countryStr;
+                if (rec.Country == CountryCode.Greece)
+                    countryStr = "EL";
+                else
+                    countryStr = ((CountryISOCode)rec.Country).ToString();
+
+                sw.Write(countryStr); sw.Write(';');
+                sw.Write(rec._DebtorRegNoFile); sw.Write(';');
+
+                var itemAmount = NumberConvert.ToLong(rec.ItemAmount);
+                var serviceAmount = NumberConvert.ToLong(rec.ServiceAmount);
+                var triangularTradeAmount = NumberConvert.ToLong(rec.TriangularTradeAmount);
+                sumOfAmount += itemAmount + serviceAmount + triangularTradeAmount;
+                string type = null;
+                if (itemAmount > 0)
+                {
+                    type = "L";
+                }
+                if (serviceAmount > 0)
+                {
+                    type = "S";
+                }
+                if (triangularTradeAmount > 0)
+                {
+                    type = "D";
+                }
+
+                NumberConvert.ToStream(sw, sumOfAmount); sw.Write(';');
+                sw.Write(type); sw.Write(Environment.NewLine);
+
+                rec.SystemInfo = exp;
+            }
         }
 
         private void CreateAndStreamFirstAndLast(List<EUSaleWithoutVAT> listOfEUSale, StreamWriter sw, bool firstOrLast, string companyRegNo, int countRec = 0, long sumOfAmount = 0)
@@ -439,6 +503,16 @@ namespace UnicontaClient.Pages.CustomPage
         private long _InvoiceNumber;
         [Display(Name = "InvoiceNumber", ResourceType = typeof(DCInvoiceText))]
         public long InvoiceNumber { get { return _InvoiceNumber; } set { _InvoiceNumber = value; NotifyPropertyChanged("InvoiceNumber"); } }
+
+        public int DeType 
+        { 
+            get 
+            {
+                return ItemAmount > 0 ? 1 :
+                       ServiceAmount > 0 ? 2 :
+                       TriangularTradeAmount > 0 ? 3 : 0;
+            } 
+        }
 
         private double _ItemAmount;
         [Price]

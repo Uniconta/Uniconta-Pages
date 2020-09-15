@@ -134,11 +134,10 @@ namespace UnicontaClient.Pages.CustomPage
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgBankStatementLine.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;
             dgAccountsTransGrid.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged1;
-            State.Header = Uniconta.ClientTools.Localization.lookup("Status");
+            State.Header = 
             StateCol.Header = Uniconta.ClientTools.Localization.lookup("Status");
             SetStatusText();
-            Mark.Visible = false;
-            MarkCol.Visible = false;
+            Mark.Visible = MarkCol.Visible = true;
             GetShowHideGreenMenuItem();
 
             orient = api.session.Preference.BankStatementHorisontal ? Orientation.Horizontal : Orientation.Vertical;
@@ -156,6 +155,8 @@ namespace UnicontaClient.Pages.CustomPage
             this.PreviewKeyDown += RootVisual_KeyDown;
 #endif
             this.BeforeClose += BankStatementLinePage_BeforeClose;
+            this.layOutTrans.Caption = string.Empty;
+            this.layOutBankStat.Caption = string.Empty;
         }
 
         void UpdateMaster()
@@ -353,6 +354,7 @@ namespace UnicontaClient.Pages.CustomPage
                 line.Account = strAccount;
         }
 
+        double transAmt = 0d;
         void selectedItem_PropertyChanged1(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             switch (e.PropertyName)
@@ -364,11 +366,14 @@ namespace UnicontaClient.Pages.CustomPage
                         val = (from t in lstAct where t._Mark select t._AmountCurCent).Sum();
                     else
                         val = (from t in lstAct where t._Mark select t._AmountCent).Sum();
-                    this.layOutTrans.Caption = string.Format("{0}  '{1:N2}'", transactionCaption, (val / 100d));
+                    transAmt = (val / 100d);
+                    this.layOutTrans.Caption = string.Format("'{0:N2}'    '({1:N2})'", transAmt, bankStatAmt - transAmt);
+                   
                     break;
             }
         }
 
+        double bankStatAmt = 0d;
         void selectedItem_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             var rec = sender as BankStatementLineGridClient;
@@ -416,7 +421,9 @@ namespace UnicontaClient.Pages.CustomPage
                 case "Mark":
                     var lstBst = ((IEnumerable<BankStatementLineGridClient>)dgBankStatementLine.ItemsSource);
                     var val = (from t in lstBst where t._Mark select t._AmountCent).Sum();
-                    this.layOutBankStat.Caption = string.Format("{0}  '{1:N2}'", bankStatCaption, (val / 100d));
+                    bankStatAmt = (val / 100d);
+                    this.layOutBankStat.Caption = string.Format("'{0:N2}'", bankStatAmt);
+                    this.layOutTrans.Caption = string.Format("'{0:N2}'    '({1:N2})'", transAmt , bankStatAmt - transAmt);
                     break;
             }
         }
@@ -448,9 +455,6 @@ namespace UnicontaClient.Pages.CustomPage
                 var stmtLines = bankStmtLines.Where(x => x._AmountCent <= 0).ToArray();
                 bankStmtLines = stmtLines;
             }
-
-            this.layOutBankStat.Caption = bankStatCaption;
-            this.layOutTrans.Caption = transactionCaption;
 
             var listtran = (GLTransClientTotalBank[])await glTransTask;  // wait for gltrans
             int llisttranLen = 0;
@@ -531,7 +535,7 @@ namespace UnicontaClient.Pages.CustomPage
                                                 {
                                                     if ((t._Voucher == mark.Voucher && t._VoucherLine == mark.VoucherLine && t._JournalPostedId == mark.JournalPostedId
                                                         && (ShowCurrency ? t._AmountCur : t._Amount) == mark.Amount) ||
-                                                        (t.JournalId == mark.JournalId && t.JourRowId == mark.JourRowId))
+                                                        (t.JournalId != 0 && t.JournalId == mark.JournalId && t.JourRowId != 0 && t.JourRowId == mark.JourRowId))
                                                     {
                                                         p._Trans.Add(t);
                                                         if (t._StatementLines == null)
@@ -549,6 +553,35 @@ namespace UnicontaClient.Pages.CustomPage
                                         }
                                     }
                                     break;
+                                }
+                                else if (p.MultiMark != null && t._JournalPostedId == 0 && t.JournalId != 0)
+                                {
+                                    foreach (var mark in p.MultiMark)
+                                    {
+                                        PostedDate = mark.Date;
+                                        int cnt = startGLSearch;
+                                        while (cnt < llisttranLen)
+                                        {
+                                            t = listtran[cnt++];
+                                            if (t._Date == PostedDate)
+                                            {
+                                                if (t.JournalId == mark.JournalId && t.JourRowId != 0 && t.JourRowId == mark.JourRowId)
+                                                {
+                                                    if (p._Trans == null)
+                                                        p._Trans = new List<GLTransClientTotalBank>(1);
+                                                    p._Trans.Add(t);
+                                                    if (t._StatementLines == null)
+                                                        t._StatementLines = new List<BankStatementLineGridClient>(1);
+                                                    t._StatementLines.Add(p);
+                                                    t._Reconciled = true;
+                                                    p._InJournal = true;
+                                                    break;
+                                                }
+                                            }
+                                            else if (t._Date > PostedDate)
+                                                break;
+                                        }
+                                    }
                                 }
                             }
                             else
@@ -630,24 +663,13 @@ namespace UnicontaClient.Pages.CustomPage
                         busyIndicator.IsBusy = false;
                     }
                     break;
-
+                case "DragDrop":
                 case "ImportVoucher":
-                    CWAddVouchers addVouvhersDialog = new CWAddVouchers(api, true);
-                    addVouvhersDialog.Closing += delegate
-                     {
-                         if (addVouvhersDialog.DialogResult == true)
-                         {
-                             if (selectedItem == null) return;
-
-                             if (addVouvhersDialog.VoucherRowIds != null && addVouvhersDialog.VoucherRowIds.Length > 0)
-                             {
-                                 dgBankStatementLine.SetLoadedRow(dgBankStatementLine.SelectedItem);
-                                 selectedItem.VoucherReference = addVouvhersDialog.VoucherRowIds[0];
-                                 dgBankStatementLine.SetLoadedRow(dgBankStatementLine.SelectedItem);
-                             }
-                         }
-                     };
-                    addVouvhersDialog.Show();
+                    if (selectedItem != null)
+                    {
+                        dgBankStatementLine.SetLoadedRow(selectedItem);
+                        AddVoucher(selectedItem, ActionType);
+                    }
                     break;
 
                 case "RemoveVoucher":
@@ -680,10 +702,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedTrans != null)
                         ChangeVoidState(selectedTrans);
                     break;
-                case "MarkForMatch":
-                    Mark.Visible = MarkCol.Visible = !Mark.Visible;
-                    break;
-                case "ChangeOrientation":
+                 case "ChangeOrientation":
                     orient = 1 - orient;
                     lGroup.Orientation = orient;
                     api.session.Preference.BankStatementHorisontal = (orient == Orientation.Horizontal);
@@ -719,10 +738,58 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem == null) return;
                     SettleOpenTransactionPage(selectedItem);
                     break;
+                case "EditJournalLine":
+                    var selectedGlTrans = dgAccountsTransGrid.SelectedItem as GLTransClientTotal;
+                    if (selectedGlTrans != null)
+                        EditGLDailyJournalLine(selectedGlTrans);
+                    break;
+                case "RefreshGrid":
+                    SetStatusText();
+                    saveGrid(true);
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
+        }
+
+        async void EditGLDailyJournalLine(GLTransClientTotal selectedGlTrans)
+        {
+            if (selectedGlTrans.JournalId != 0 && selectedGlTrans.JourRowId != 0)
+            {
+                var glDlyJournalLine = new GLDailyJournalLineClient();
+                glDlyJournalLine.RowId = selectedGlTrans.JourRowId;
+                glDlyJournalLine.Journal = NumberConvert.ToString(selectedGlTrans.JournalId);
+                var err = await api.Read(glDlyJournalLine);
+                if (err == ErrorCodes.Succes)
+                    AddDockItem(TabControls.GLDailyJournalLinePage2, glDlyJournalLine, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Journalline"), selectedGlTrans.JournalId));
+            }
+        }
+
+        private void AddVoucher(BankStatementLineGridClient bankStatementLine, string actionType)
+        {
+#if !SILVERLIGHT
+            if (actionType == "DragDrop")
+            {
+                var dragDropWindow = new UnicontaDragDropWindow(false);
+                dragDropWindow.Closed += delegate
+                {
+                    if (dragDropWindow.DialogResult == true)
+                    {
+                        var fileInfo = dragDropWindow.FileInfoList?.SingleOrDefault();
+                        var voucher = new VouchersClient();
+                        voucher._Data = fileInfo.FileBytes;
+                        voucher._Text = fileInfo.FileName;
+                        voucher._Fileextension = DocumentConvert.GetDocumentType(fileInfo.FileExtension);
+
+                        Utility.ImportVoucher(bankStatementLine, api, voucher, true);
+                    }
+                };
+                dragDropWindow.Show();
+            }
+            else
+#endif
+                Utility.ImportVoucher(bankStatementLine, api, null, false);
         }
 
         private void SettleOpenTransactionPage(BankStatementLineGridClient selectedItem)
@@ -1254,6 +1321,7 @@ namespace UnicontaClient.Pages.CustomPage
                     act.StatementLines = markedbstList;
                     foreach (var bst in markedbstList)
                     {
+                        bst._InJournal = (act.JournalId != 0);
                         Join(bst, act, true);
                         bst.Trans = markedactList;
                     }
@@ -1353,7 +1421,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         void setInterval()
         {
-            CWInterval winInterval = new CWInterval(fromDate, toDate, DaysSlip);
+            CWInterval winInterval = new CWInterval(fromDate, toDate, DaysSlip,hideVoucher:true);
             winInterval.Closed += delegate
             {
                 if (winInterval.DialogResult == true)
@@ -1536,7 +1604,7 @@ namespace UnicontaClient.Pages.CustomPage
             dgBankStatementLine.Readonly = !selectedbsl.AllowEditing;
             MarkCol.ReadOnly = false;
             //  MarkCol.AllowEditing = true;
-            var ae = dgBankStatementLine.tableView.ActiveEditor;
+            var ae = dgBankStatementLine.tableView?.ActiveEditor;
             if (ae != null)
                 ae.IsEnabled = selectedbsl.AllowEditing;
         }
@@ -1561,7 +1629,9 @@ namespace UnicontaClient.Pages.CustomPage
                 row.Mark = value;
             }
             var val = (from t in visibleRows where t._Mark select t._AmountCent).Sum();
-            this.layOutBankStat.Caption = string.Format("{0}  '{1:N2}'", bankStatCaption, (val / 100d));
+            bankStatAmt = (val / 100d);
+            this.layOutBankStat.Caption = string.Format("'{0:N2}'", bankStatAmt);
+            this.layOutTrans.Caption = string.Format("'{0:N2}'    '( {1:N2} )'", transAmt, bankStatAmt - transAmt);
         }
 
         private void CheckEditor_Checked_1(object sender, RoutedEventArgs e)
@@ -1584,8 +1654,8 @@ namespace UnicontaClient.Pages.CustomPage
                 val = (from t in visibleRows where t._Mark select t._AmountCurCent).Sum();
             else
                 val = (from t in visibleRows where t._Mark select t._AmountCent).Sum();
-            this.layOutTrans.Caption = string.Format("{0}  '{1:N2}'", transactionCaption, (val / 100d));
-
+            transAmt = (val / 100d);
+            this.layOutTrans.Caption = string.Format("'{0:N2}'    '({1:N2})'", transAmt, bankStatAmt - transAmt);
         }
 
         private void dgAccountsTransGrid_SelectedItemChanged(object sender, SelectedItemChangedEventArgs e)

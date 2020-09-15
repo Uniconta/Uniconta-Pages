@@ -11,7 +11,7 @@ using UnicontaClient.Pages.Creditor.Payments;
 
 namespace UnicontaISO20022CreditTransfer
 {
-    class BankSpecificSettingsLT : BankSpecificSettings
+    public class BankSpecificSettingsLT : BankSpecificSettings
     {
         #region Properties
         private CreditorPaymentFormatClientISOLT CredPaymFormat { get; set; }

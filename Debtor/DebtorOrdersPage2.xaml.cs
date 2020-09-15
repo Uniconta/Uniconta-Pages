@@ -108,7 +108,7 @@ namespace UnicontaClient.Pages.CustomPage
             Employeelookupeditor.api = leAccount.api = lePayment.api = cmbDim1.api = cmbDim2.api =
             cmbDim3.api = cmbDim4.api = cmbDim5.api = leTransType.api = leGroup.api = lePostingAccount.api
             = leShipment.api = leLayoutGroup.api = leDeliveryTerm.api = leInvoiceAccount.api = PriceListlookupeditior.api =
-            leRelatedOrder.api = leDeliveryAddress.api = leApprover.api = leSplit.api = crudapi;
+            leRelatedOrder.api = leDeliveryAddress.api = leApprover.api = leSplit.api = leVat.api= crudapi;
             cbDeliveryCountry.ItemsSource = Enum.GetValues(typeof(Uniconta.Common.CountryCode));
             AdjustLayout();
             if (editrow == null)

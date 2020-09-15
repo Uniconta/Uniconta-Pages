@@ -56,6 +56,7 @@ x:Class="UnicontaClient.Pages.CustomPage.VendorPriceListPage"
                     <localPage:ComboBoxColumnClient x:Name="Currency" Width="50" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Active" Width="70" HideHeaderCheck="True" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PriceUpdate" Width="70" Visible="False" HideHeaderCheck="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DiscountGroupFirst" Width="70"  HideHeaderCheck="True"/>
                 </localPage:CreditorPriceListGrid.Columns>
             </localPage:CreditorPriceListGrid>
 

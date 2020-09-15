@@ -76,18 +76,15 @@ namespace UnicontaClient.Pages.CustomPage
             var Comp = api.CompanyEntity;
             ((TableView)dgDebtorOrderLineGrid.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
             ledim1.api = ledim2.api = ledim3.api = ledim4.api = ledim5.api = LeAccount.api = lePayment.api = leTransType.api = LePostingAccount.api = leShipment.api = leDeliveryTerm.api = Projectlookupeditor.api = PrCategorylookupeditor.api = leLayoutGroup.api = employeelookupeditor.api = leInvAccount.api = leDeliveryAddress.api = lePriceList.api = api;
-            initialOrder = Activator.CreateInstance(Comp.GetUserTypeNotNull(typeof(DebtorOrderClient))) as DebtorOrderClient;
+            initialOrder = Comp.CreateUserType<DebtorOrderClient>();
+
             initialOrder._DeliveryCountry = Comp._CountryId;
             if (master != null)
             {
                 if (master is DebtorOrder)
                     StreamingManager.Copy(master, initialOrder);
                 else
-                {
                     initialOrder.SetMaster(master);
-                    if (master is Uniconta.DataModel.Project)
-                        SetPrCategory();
-                }
                 LeAccount.IsEnabled = false;
                 lePrCategory.api = api;
                 InputWindowOrder1.ActiveGroup = navGroupOrders;
@@ -178,6 +175,10 @@ namespace UnicontaClient.Pages.CustomPage
                 SerieBatch.Visible = SerieBatch.ShowInColumnChooser = false;
             if (!company.DeliveryAddress)
                 delAddNavBar.IsVisible = false;
+            if (!company.Project)
+                tbProject.Visibility = tbPrCategory.Visibility = Projectlookupeditor.Visibility= PrCategorylookupeditor.Visibility =  Visibility.Collapsed;
+            if (company.NumberOfDimensions == 0)
+                barGrpDimension.IsVisible = false;
 
             Utility.SetupVariants(api, colVariant, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
             Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
@@ -578,7 +579,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (dgDebtorOrderLineGrid.SelectedItem == null) return;
                     var orderLine = dgDebtorOrderLineGrid.SelectedItem as DebtorOrderLineClient;
                     var itm = orderLine?.InvItem;
-                    if (itm?._StandardVariant != null)  
+                    if (itm?._StandardVariant != null)
                     {
                         var paramItem = new object[] { orderLine, Order };
                         dgDebtorOrderLineGrid.SetLoadedRow(orderLine);
@@ -746,6 +747,8 @@ namespace UnicontaClient.Pages.CustomPage
             GenrateInvoiceDialog.SetInvPrintPreview(showInvPrintPrv);
             if (dbOrder._InvoiceDate != DateTime.MinValue)
                 GenrateInvoiceDialog.SetInvoiceDate(dbOrder._InvoiceDate);
+            GenrateInvoiceDialog.SetOIOUBLLabelText(api.CompanyEntity._OIOUBLSendOnServer);
+
             GenrateInvoiceDialog.Closed += async delegate
             {
                 if (GenrateInvoiceDialog.DialogResult == true)
@@ -758,6 +761,7 @@ namespace UnicontaClient.Pages.CustomPage
                         GenrateInvoiceDialog.PostOnlyDelivered, GenrateInvoiceDialog.InvoiceQuickPrint, GenrateInvoiceDialog.NumberOfPages, GenrateInvoiceDialog.SendByEmail,
                         !isSimulated && GenrateInvoiceDialog.SendByOutlook, GenrateInvoiceDialog.sendOnlyToThisEmail, GenrateInvoiceDialog.Emails, GenrateInvoiceDialog.GenerateOIOUBLClicked,
                         documents, false);
+
                     busyIndicator.IsBusy = true;
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
                     var result = await invoicePostingResult.Execute();
@@ -1101,20 +1105,6 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     Order._ContactRef = 0;
                     Order.ContactName = null;
-                }
-            }
-        }
-
-        async void SetPrCategory()
-        {
-            var cats = api.GetCache(typeof(Uniconta.DataModel.PrCategory)) ?? await api.LoadCache(typeof(Uniconta.DataModel.PrCategory));
-            foreach (var rec in (Uniconta.DataModel.PrCategory[])cats.GetNotNullArray)
-            {
-                if (rec._CatType == CategoryType.OnAccountInvoicing)
-                {
-                    initialOrder.PrCategory = rec._Number;
-                    if (rec._Default)
-                        break;
                 }
             }
         }

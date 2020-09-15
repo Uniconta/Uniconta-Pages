@@ -35,7 +35,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DashBoardViewerPage"
                     </ControlTemplate>
                 </Button.Template>
             </Button>
-            <Button Height="30" Width="30" HorizontalAlignment="Left"  x:Name="btnRefresh" Cursor="Hand" Click="btnClearFilter_Click" Margin="5,2,0,0" >
+            <Button Height="30" Width="30" HorizontalAlignment="Left"  x:Name="btnRefresh" Cursor="Hand" Click="btnRefresh_Click" Margin="5,2,0,0" >
                 <Button.Template>
                     <ControlTemplate>
                         <Image x:Name="image" Source="{Binding RefreshImage}"  Stretch="UniformToFill" >
@@ -48,7 +48,8 @@ x:Class="UnicontaClient.Pages.CustomPage.DashBoardViewerPage"
             </Button> 
         </StackPanel>
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BusyMessage}">
-            <CorasauControls:UnicontaDashboardControl x:Name="dashboardViewerUniconta" AllowPrintDashboardItems="True" 
+            <CorasauControls:UnicontaDashboardControl Grid.Row="1" x:Name="dashboardViewerUniconta" AllowInspectAggregatedData="True"
+                             AllowInspectRawData="True" UseNeutralFilterMode="True" AllowPrintDashboardItems="True" 
             Dashboard="{Binding UnicontaDashboard, Mode=TwoWay}" AsyncDataLoading="dashboardViewerUniconta_AsyncDataLoading">
                 <CorasauControls:UnicontaDashboardControl.DashboardItemStyle>
                     <Style TargetType="dxdash:DashboardLayoutItem">

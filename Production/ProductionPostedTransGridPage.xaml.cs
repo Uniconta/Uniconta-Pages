@@ -47,6 +47,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void InitPage(UnicontaBaseEntity master)
         {
             InitializeComponent();
+            dgProductionPostedTrans.UpdateMaster(master);
             SetRibbonControl(localMenu, dgProductionPostedTrans);
             localMenu.OnItemClicked += LocalMenu_OnItemClicked;
             dgProductionPostedTrans.api = api;

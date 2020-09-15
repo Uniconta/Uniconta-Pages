@@ -11,7 +11,7 @@ using UnicontaClient.Pages.Creditor.Payments;
 
 namespace UnicontaISO20022CreditTransfer
 {
-    class BankSpecificSettingsDE : BankSpecificSettings
+    public class BankSpecificSettingsDE : BankSpecificSettings
     {
         #region Properties
         private CreditorPaymentFormatClientISODE CredPaymFormat { get; set; }
@@ -40,6 +40,9 @@ namespace UnicontaISO20022CreditTransfer
                 case deBank.Volks_Raiffeisenbanken:
                     companyBankEnum = CompanyBankENUM.Volks_Raiffeisenbanken;
                     return companyBankEnum;
+                case deBank.Commerzbank:
+                    companyBankEnum = CompanyBankENUM.Commerzbank;
+                    return companyBankEnum;
                 default:
                     return CompanyBankENUM.None;
             }
@@ -56,6 +59,7 @@ namespace UnicontaISO20022CreditTransfer
                     return "StarMoney/SFirm";
                 case CompanyBankENUM.Deutsche_Kreditwirtschaft:
                 case CompanyBankENUM.Volks_Raiffeisenbanken:
+                case CompanyBankENUM.Commerzbank:
                     return String.Empty;
                 default:
                     return string.Empty;
@@ -78,6 +82,7 @@ namespace UnicontaISO20022CreditTransfer
             switch (companyBankEnum)
             {
                 case CompanyBankENUM.Volks_Raiffeisenbanken:
+                case CompanyBankENUM.Commerzbank:
                     return Encoding.UTF8;
                 default:
                     return Encoding.GetEncoding("ISO-8859-1"); ;
@@ -114,6 +119,23 @@ namespace UnicontaISO20022CreditTransfer
             return replaceCharactersRegEx;
         }
 
+
+        /// <summary>
+        /// Identifies whether a single entry per individual transaction or a batch entry for the sum of the amounts of all transactions 
+        /// in the message is requested 
+        /// </summary>
+        public override string BatchBooking()
+        {
+            switch (companyBankEnum)
+            {
+                case CompanyBankENUM.Commerzbank:
+                    return CredPaymFormat.BatchBooking ? TRUE_VALUE : FALSE_VALUE;
+                default:
+                    return string.Empty;
+            }
+        }
+
+
         /// <summary>
         /// Identification assigned by an institution.
         /// Max. 35 characters.
@@ -142,6 +164,7 @@ namespace UnicontaISO20022CreditTransfer
             switch (companyBankEnum)
             {
                 case CompanyBankENUM.Volks_Raiffeisenbanken:
+                case CompanyBankENUM.Commerzbank:
                     return null;
                 default:
                     return "BANK";
@@ -157,6 +180,7 @@ namespace UnicontaISO20022CreditTransfer
             {
                 case CompanyBankENUM.Deutsche_Kreditwirtschaft:
                 case CompanyBankENUM.Volks_Raiffeisenbanken:
+                case CompanyBankENUM.Commerzbank:
                     return amount;
                 default:
                     return 0;
@@ -172,6 +196,7 @@ namespace UnicontaISO20022CreditTransfer
             {
                 case CompanyBankENUM.Deutsche_Kreditwirtschaft:
                 case CompanyBankENUM.Volks_Raiffeisenbanken:
+                case CompanyBankENUM.Commerzbank:
                     return true;
                 default:
                     return false;
@@ -187,6 +212,7 @@ namespace UnicontaISO20022CreditTransfer
             {
                 case CompanyBankENUM.Deutsche_Kreditwirtschaft:
                 case CompanyBankENUM.Volks_Raiffeisenbanken:
+                case CompanyBankENUM.Commerzbank:
                     return true;
                 default:
                     return false;
@@ -209,6 +235,9 @@ namespace UnicontaISO20022CreditTransfer
                     break;
                 case CompanyBankENUM.Volks_Raiffeisenbanken:
                     bankName = "VolksRaiffeisen";
+                    break;
+                case CompanyBankENUM.Commerzbank:
+                    bankName = "Commerzbank";
                     break;
                 default:
                     bankName = null;
@@ -235,6 +264,7 @@ namespace UnicontaISO20022CreditTransfer
             switch (companyBankEnum)
             {
                 case CompanyBankENUM.Volks_Raiffeisenbanken:
+                case CompanyBankENUM.Commerzbank:
                     return string.Empty;
                 default:
                     switch (ISOPaymType)
@@ -266,6 +296,7 @@ namespace UnicontaISO20022CreditTransfer
             switch (companyBankEnum)
             {
                 case CompanyBankENUM.Volks_Raiffeisenbanken:
+                case CompanyBankENUM.Commerzbank:
                     return BaseDocument.CHRGBR_SLEV;
                 default:
                     return string.Empty;
@@ -279,6 +310,7 @@ namespace UnicontaISO20022CreditTransfer
             {
                 case CompanyBankENUM.Deutsche_Kreditwirtschaft:
                 case CompanyBankENUM.Volks_Raiffeisenbanken:
+                case CompanyBankENUM.Commerzbank:
                     return null;
                 default:
                     return base.CreditorAddress(creditor, creditorAddress);
@@ -304,6 +336,7 @@ namespace UnicontaISO20022CreditTransfer
             switch (companyBankEnum)
             {
                 case CompanyBankENUM.Volks_Raiffeisenbanken:
+                case CompanyBankENUM.Commerzbank:
                     debtorAddress = null;
                     break;
                 case CompanyBankENUM.Deutsche_Kreditwirtschaft:
@@ -325,6 +358,7 @@ namespace UnicontaISO20022CreditTransfer
             {
                 case CompanyBankENUM.Deutsche_Kreditwirtschaft:
                 case CompanyBankENUM.Volks_Raiffeisenbanken:
+                case CompanyBankENUM.Commerzbank:
                     return string.Empty;
                 default:
                     return countryId;
@@ -346,6 +380,7 @@ namespace UnicontaISO20022CreditTransfer
             {
                 case CompanyBankENUM.Deutsche_Kreditwirtschaft:
                 case CompanyBankENUM.Volks_Raiffeisenbanken:
+                case CompanyBankENUM.Commerzbank:
                     return string.Empty;
                 default:
                     return string.Empty;

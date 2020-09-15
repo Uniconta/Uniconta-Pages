@@ -17,11 +17,12 @@ x:Class="UnicontaClient.Pages.CustomPage.CompanyUsers"
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <localPage:CompanyUsersGrid  x:Name="dgCompanyUsersGrid" AutoGenerateColumns="None">
                 <localPage:CompanyUsersGrid.Columns>
-                    <localPage:CorasauDataGridTemplateColumnClient FieldName="Userid" Width="50" FixedWidth="True" IsSmart="True" />
-                    <localPage:CorasauDataGridTemplateColumnClient FieldName="UserName" Width="100" FixedWidth="True" IsSmart="True" ReadOnly="True" />
-                    <localPage:CorasauDataGridTemplateColumnClient FieldName="UserLoginId" Width="100" FixedWidth="True" IsSmart="True" ReadOnly="True"/>
-                    <localPage:CorasauDataGridTemplateColumnClient FieldName="UserTasks" IsSmart="True"/>
-                    <localPage:CorasauDataGridTemplateColumnClient FieldName="FixedProfile" IsSmart="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Userid" Width="70" FixedWidth="True"  />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="UserName" Width="120" ReadOnly="True" FixedWidth="True" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="UserLoginId" Width="120" FixedWidth="True" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Role" Width="100" FixedWidth="True" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="UserTasks" IsSmart="True" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="FixedProfile" Width="100" FixedWidth="True" />
                 </localPage:CompanyUsersGrid.Columns>
             </localPage:CompanyUsersGrid>
         </CorasauControls:BusyIndicator>

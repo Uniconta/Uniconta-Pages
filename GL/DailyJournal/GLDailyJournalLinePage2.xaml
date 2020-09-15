@@ -26,7 +26,7 @@ x:Class="UnicontaClient.Pages.CustomPage.GLDailyJournalLinePage2"
                             <CorasauControls:DateEditor EditValue="{Binding Date,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="Voucher" x:Name="liVoucher">
-                            <CorasauControls:IntegerEditor Text="{Binding Voucher,Mode=TwoWay}" SetMask="False"/>
+                            <CorasauControls:IntegerEditor EditValue="{Binding Voucher,Mode=TwoWay}" SetMask="False"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="AccountType" x:Name="liAccountType">
                             <CorasauControls:ComboBoxEditor x:Name="cboAccounttype" SelectedItem="{Binding AccountType,Mode=TwoWay}" SelectedIndexChanged="cboAccounttype_SelectedIndexChanged"/>
@@ -96,7 +96,7 @@ x:Class="UnicontaClient.Pages.CustomPage.GLDailyJournalLinePage2"
                             <CorasauControls:DateEditor EditValue="{Binding DocumentDate,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="Invoice" x:Name="liInvoice">
-                            <CorasauControls:IntegerEditor Text="{Binding Invoice,Mode=TwoWay}" SetMask="False"/>
+                            <CorasauControls:IntegerEditor EditValue="{Binding Invoice,Mode=TwoWay}" SetMask="False"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem  FieldName="DCPostType" x:Name="liDcPostType">
                             <CorasauControls:ComboBoxEditor  SelectedItem="{Binding DCPostType,Mode=TwoWay}"/>

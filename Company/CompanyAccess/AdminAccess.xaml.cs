@@ -17,7 +17,6 @@ using System.Collections;
 using UnicontaClient.Utilities;
 using System.Threading.Tasks;
 using Uniconta.ClientTools.DataModel;
-using Uniconta.ClientTools.DataModel.System;
 using Uniconta.API.System;
 using Uniconta.ClientTools.Util;
 using UnicontaClient.Controls.Dialogs;

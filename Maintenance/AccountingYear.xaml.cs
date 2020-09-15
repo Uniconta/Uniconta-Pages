@@ -52,7 +52,9 @@ namespace UnicontaClient.Pages.CustomPage
             dgFinanceYearGrid.BusyIndicator = busyIndicatorFinanceYearGrid;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             FiApi = new FinancialYearAPI(api);
+            ShowHideMenu();
         }
+
         public override void Utility_Refresh(string screenName, object argument = null)
         {
             if (screenName == TabControls.FinanceYearPage2)
@@ -272,6 +274,12 @@ namespace UnicontaClient.Pages.CustomPage
                 ribbonControl.DisableButtons("ResetFiscalYear" );
             }
         }
- 
+
+        void ShowHideMenu()
+        {
+            RibbonBase rb = (RibbonBase)localMenu.DataContext;
+            if (api.session.User._Role < (byte)Uniconta.Common.User.UserRoles.Reseller)
+                UtilDisplay.RemoveMenuCommand(rb, new string[] { "RecalcPeriodSum" });
+        }
     }
 }

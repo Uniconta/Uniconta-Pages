@@ -95,13 +95,13 @@ x:Class="UnicontaClient.Pages.CustomPage.PartnerProspectPage2"
                             <CorasauControls:ComboBoxEditor x:Name="cbCommingFrom" SelectedItem="{Binding CommingFrom,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="NumberOfUsers" x:Name="liNumberOfUsers">
-                            <CorasauControls:IntegerEditor Text="{Binding NumberOfUsers,Mode=TwoWay}"/>
+                            <CorasauControls:IntegerEditor EditValue="{Binding NumberOfUsers,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="LinkedToUid" x:Name="liLinkedToUid">
-                            <CorasauControls:IntegerEditor Text="{Binding LinkedToUid,Mode=TwoWay}"/>
+                            <CorasauControls:IntegerEditor EditValue="{Binding LinkedToUid,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="CreatedUid" x:Name="liCreatedUid">
-                            <CorasauControls:IntegerEditor Text="{Binding CreatedUid,Mode=TwoWay}"/>
+                            <CorasauControls:IntegerEditor EditValue="{Binding CreatedUid,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="Created" x:Name="liCreated">
                             <CorasauControls:DateEditor DateTime="{Binding Created, Mode=TwoWay}" />
@@ -115,10 +115,10 @@ x:Class="UnicontaClient.Pages.CustomPage.PartnerProspectPage2"
                             <CorasauControls:ComboBoxEditor x:Name="cbCloseReason" SelectedItem="{Binding CloseReason,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="Probability" x:Name="liProbability">
-                            <CorasauControls:IntegerEditor Text="{Binding Probability,Mode=TwoWay}"/>
+                            <CorasauControls:IntegerEditor EditValue="{Binding Probability,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="Subscriptionid" x:Name="liSubscriptionid">
-                            <CorasauControls:IntegerEditor Text="{Binding Subscriptionid,Mode=TwoWay}"/>
+                            <CorasauControls:IntegerEditor EditValue="{Binding Subscriptionid,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="Ledger" x:Name="liLedger" >
                             <CorasauControls:CheckEditor  IsChecked="{Binding Ledger,Mode=TwoWay}"/>

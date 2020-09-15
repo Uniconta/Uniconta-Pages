@@ -34,14 +34,9 @@ namespace UnicontaClient.Pages.CustomPage
         public override Type TableType { get { return typeof(InvPriceListLineClient); } }
         public override IComparer GridSorting { get { return new InvPristListLineSort(); } }
         public override bool Readonly { get { return false; } }
-        protected override List<string> GridSkipFields
-        {
-            get
-            {
-                return new List<string>() { "Name", "ItemGroupName" };
-            }
-        }
+        protected override List<string> GridSkipFields { get { return new List<string>(2) { "Name", "ItemGroupName" }; } }
         protected override bool SetValuesOnPaste { get { return true; } }
+        public override bool SingleBufferUpdate { get { return false; } }
 
         internal byte FixedDCType;
         public override void SetDefaultValues(UnicontaBaseEntity dataEntity, int selectedIndex)
@@ -292,7 +287,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override void LoadCacheInBackGround()
         {
-            LoadType(new Type[] { typeof(Uniconta.DataModel.InvItem), typeof(Uniconta.DataModel.InvGroup), typeof(Uniconta.DataModel.InvDiscountGroup) });
+            LoadType(new Type[] { typeof(Uniconta.DataModel.InvGroup), typeof(Uniconta.DataModel.InvDiscountGroup), typeof(Uniconta.DataModel.InvItem) });
         }
     }
 }

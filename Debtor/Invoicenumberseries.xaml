@@ -19,16 +19,16 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorInvoicenumberseries"
             <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="grpFirst">
                 <CorasauControls:CorasauLayoutGroup View="GroupBox"   x:Name="grpDebtorSerie" ItemLabelsAlignment="Default" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=NumberSerie}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                     <CorasauControls:CorasauLayoutItem FieldName="SalesOrder" x:Name="liSalesOrder">
-                        <CorasauControls:IntegerEditor Text="{Binding SalesOrder,Mode=TwoWay}" SetMask="false" x:Name="txtSalesOrder"/>
+                        <CorasauControls:IntegerEditor EditValue="{Binding SalesOrder,Mode=TwoWay}" SetMask="false" x:Name="txtSalesOrder"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="SalesOffer" x:Name="liSalesOffer">
-                        <CorasauControls:IntegerEditor Text="{Binding SalesOffer,Mode=TwoWay}" SetMask="false"/>
+                        <CorasauControls:IntegerEditor EditValue="{Binding SalesOffer,Mode=TwoWay}" SetMask="false"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="PackNote" x:Name="liPackNote">
-                        <CorasauControls:IntegerEditor Text="{Binding PackNote,Mode=TwoWay}" SetMask="false"/>
+                        <CorasauControls:IntegerEditor EditValue="{Binding PackNote,Mode=TwoWay}" SetMask="false"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="ProductionOrder" x:Name="liProductionOrder">
-                        <CorasauControls:IntegerEditor Text="{Binding ProductionOrder,Mode=TwoWay}" SetMask="false"/>
+                        <CorasauControls:IntegerEditor EditValue="{Binding ProductionOrder,Mode=TwoWay}" SetMask="false"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="SalesInvoice"  x:Name="liSalesInvoice">
                         <CorasauControls:IntegerEditor  x:Name="cmbSalesInvoice" Text="{Binding SalesInvoice,Mode=TwoWay}" SetMask="false"/>

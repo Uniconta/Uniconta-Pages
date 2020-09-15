@@ -749,7 +749,6 @@ namespace UnicontaClient.Pages.CustomPage
         public static string Zeroes { get { return Uniconta.ClientTools.Localization.lookup("ContainZero"); } }
         public static string ItemCode { get { return Uniconta.ClientTools.Localization.lookup("CommodityCode"); } }
         public static string WeightPerPCS { get { return Uniconta.ClientTools.Localization.lookup("Weight") + "/" + Uniconta.ClientTools.Localization.lookup("Pcs"); } }
-        public static string InvoiceQuantity { get { return Uniconta.ClientTools.Localization.lookup("Pcs"); } }
         public static string NetWeight { get { return Uniconta.ClientTools.Localization.lookup("Weight"); } }
         public static string AdditionalAmount { get { return Uniconta.ClientTools.Localization.lookup("SupplementaryUnits"); } }
         public static string InvoiceAmount { get { return Uniconta.ClientTools.Localization.lookup("InvoiceAmount"); } }
@@ -807,18 +806,16 @@ namespace UnicontaClient.Pages.CustomPage
         public double WeightPerPCS { get { return weightPerPcs; } set { weightPerPcs = value; NotifyPropertyChanged("WeightPerPCS"); } }
 
         [Price]
-        [Display(Name = "InvoiceQuantity", ResourceType = typeof(IntrastatClassText))]
+        [Display(Name = "Qty", ResourceType = typeof(DCOrderText))]
         public double InvoiceQuantity { get { return invoiceQuantity; } set { invoiceQuantity = value; NotifyPropertyChanged("InvoiceQuantity"); } }
 
         [Price]
         [Display(Name = "NetWeight", ResourceType = typeof(IntrastatClassText))]
         public double NetWeight { get { return netWeight; } set { netWeight = value; NotifyPropertyChanged("NetWeight"); } }
 
-        [Price]
         [Display(Name = "AdditionalAmount", ResourceType = typeof(IntrastatClassText))]
         public double AdditionalAmount { get { return additionalAmount; } set { additionalAmount = value; NotifyPropertyChanged("AdditionalAmount"); } }
 
-        [Price]
         [Display(Name = "InvoiceAmount", ResourceType = typeof(IntrastatClassText))]
         public double InvoiceAmount { get { return invoiceAmount; } set { invoiceAmount = value; NotifyPropertyChanged("InvoiceAmount"); } }
 

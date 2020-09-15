@@ -28,6 +28,8 @@ x:Class="UnicontaClient.Pages.CustomPage.CWISONL_PaymentSetup"
             </Grid.ColumnDefinitions>
             <TextBlock Text="{Binding Converter={StaticResource  GlobalLocalizationValueConverter},ConverterParameter=Bank,Mode=OneWay}" Margin="5,0,0,0" Grid.Column="0" Grid.Row="0" VerticalAlignment="Center"/>
             <CorasauControls:ComboBoxEditor x:Name="cmbBank" SelectedItem="{Binding Bank,Mode=TwoWay}" Grid.Column="2"  Grid.Row="0" />
+            <TextBlock x:Name="lblBatchBook" Text="{Binding Converter={StaticResource  GlobalLocalizationValueConverter},ConverterParameter=BatchBooking,Mode=OneWay}" Margin="5,0,0,0" Grid.Column="0" Grid.Row="1" VerticalAlignment="Center"/>
+            <CorasauControls:CheckEditor x:Name="ceBatchBooking" IsChecked="{Binding BatchBooking,Mode=TwoWay}" Grid.Column="2" Grid.Row="1" Height="25"/>
         </Grid>
         <StackPanel x:Name="actionButton" HorizontalAlignment="Right" Grid.Row="1" Orientation="Horizontal" Margin="0 10 0 0">
             <Button x:Name="OKButton" IsDefault="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OK,Mode=OneWay}" Click="OKButton_Click" MinWidth="75" 

@@ -122,6 +122,36 @@ namespace UnicontaClient.Pages.CustomPage
                     fuParam[1] = selectedItem;
                     AddDockItem(TabControls.CrmCampaignFollowUp, fuParam, true, String.Format(Uniconta.ClientTools.Localization.lookup("AddOBJ"), Uniconta.ClientTools.Localization.lookup("FollowUp")), "Add_16x16.png");
                     break;
+                case "SendEmail":
+                    if (selectedItem == null) return;
+                    var cwSendEmail = new CwSendEmail(api);
+                    cwSendEmail.Closed += async delegate
+                    {
+                        if (cwSendEmail.DialogResult == true && cwSendEmail.CompanySMTP != null)
+                        {
+                            var crmAPI = new CrmAPI(api);
+                            ErrorCodes res;
+                            if (cwSendEmail.SendTestEmail)
+                                res = await crmAPI.SendMailTest(cwSendEmail.CompanySMTP, cwSendEmail.Email, cwSendEmail.Name);
+                            else
+                            {
+                                var followUp = cwSendEmail.FollowUp;
+                                if (followUp != null)
+                                {
+                                    var result = await api.Insert(cwSendEmail.FollowUp);
+                                    if (result != ErrorCodes.Succes)
+                                        followUp = null;
+                                }
+                                res = await crmAPI.SendMail(cwSendEmail.CompanySMTP, selectedItem, followUp);
+                            }
+                            if (res != ErrorCodes.Succes)
+                                UtilDisplay.ShowErrorCode(res);
+                            else
+                                UtilDisplay.ShowErrorCode(res);
+                        }
+                    };
+                    cwSendEmail.Show();
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;

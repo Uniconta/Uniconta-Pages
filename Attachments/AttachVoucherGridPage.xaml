@@ -30,6 +30,7 @@ x:Class="UnicontaClient.Pages.CustomPage.AttachVoucherGridPage"
                                 <editor:CheckEditSettings />
                             </local:CorasauDataGridTemplateColumnClient.EditSettings>
                         </local:CorasauDataGridTemplateColumnClient>
+                        <local:CorasauDataGridTemplateColumnClient x:Name="PrimaryKeyId" Width="70" />
                         <local:CorasauDataGridTemplateColumnClient x:Name="colCreated" FieldName="Created" IsSmart="True" >
                             <local:CorasauDataGridTemplateColumnClient.EditSettings>
                                 <editor:TextEditSettings DisplayFormat="g" MaskType="DateTime" />

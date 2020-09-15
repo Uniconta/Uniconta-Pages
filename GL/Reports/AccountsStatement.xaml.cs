@@ -134,8 +134,9 @@ namespace UnicontaClient.Pages.CustomPage
         List<AccountStatementList> statementList;
         ReportAPI transApi;
         Uniconta.DataModel.GLAccount _master;
-        static bool pageBreak, setShowDimOnPrimo = true; 
+        static bool pageBreak; 
         static public DateTime DefaultFromDate, DefaultToDate;
+        static int setShowDimOnPrimoIndex = 0;
         static bool IsCollapsed = true;
         public static void SetDateTime(DateEditor frmDateeditor, DateEditor todateeditor)
         {
@@ -226,8 +227,8 @@ namespace UnicontaClient.Pages.CustomPage
 #if !SILVERLIGHT
             cbxPageBreak.IsChecked = pageBreak;
 #endif
-            cbxShowDimOnPrimo.IsChecked = setShowDimOnPrimo;
-
+            cmbShowDimOnPrimo.ItemsSource = new string[] { Uniconta.ClientTools.Localization.lookup("OnePrimo"), Uniconta.ClientTools.Localization.lookup("PrimoPerDim"), Uniconta.ClientTools.Localization.lookup("NoPrimo") };
+            cmbShowDimOnPrimo.SelectedIndex = setShowDimOnPrimoIndex;
             txtDateTo.DateTime = AccountStatement.DefaultToDate;
             txtDateFrm.DateTime = AccountStatement.DefaultFromDate;
             GetMenuItem();
@@ -537,7 +538,8 @@ namespace UnicontaClient.Pages.CustomPage
 
             var isAscending = cbxAscending.IsChecked.Value;
             var skipBlank = cbxSkipBlank.IsChecked.Value;
-            var showDimOnPrimo = cbxShowDimOnPrimo.IsChecked.Value;
+
+            var showDimOnPrimo = cmbShowDimOnPrimo.SelectedIndex;
 
             var Pref = api.session.Preference;
             Pref.TransactionReport_isAscending = isAscending;
@@ -545,7 +547,7 @@ namespace UnicontaClient.Pages.CustomPage
 #if !SILVERLIGHT
             pageBreak = cbxPageBreak.IsChecked.Value;
 #endif
-            setShowDimOnPrimo = showDimOnPrimo;
+            setShowDimOnPrimoIndex = showDimOnPrimo;
 
             string fromAccount = null, toAccount = null;
             var accountObj = cmbFromAccount.EditValue;
@@ -564,7 +566,7 @@ namespace UnicontaClient.Pages.CustomPage
             Simulated.Visible = SimulatedVisible && !string.IsNullOrWhiteSpace(journal);
 
             var dimensionParams = BalanceReport.SetDimensionParameters(dim1, dim2, dim3, dim4, dim5, true, true, true, true, true);
-            var listTrans = (GLTransClientTotal[])await transApi.GetTransactions(new GLTransClientTotal(), journal, fromAccount, toAccount, fromDate, toDate, dimensionParams, (showDimOnPrimo ? ReportAPI.PrimoPrDimension : ReportAPI.SimplePrimo));
+            var listTrans = (GLTransClientTotal[])await transApi.GetTransactions(new GLTransClientTotal(), journal, fromAccount, toAccount, fromDate, toDate, dimensionParams, showDimOnPrimo);
             if (listTrans != null)
             {
                 string currentItem = string.Empty;

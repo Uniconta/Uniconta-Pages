@@ -30,16 +30,16 @@ x:Class="UnicontaClient.Pages.CustomPage.GLReportTemplatePage2"
                             <CorasauControls:TextEditor Text="{Binding Font,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="FontSize" x:Name="liFontSize">
-                            <CorasauControls:IntegerEditor Text="{Binding FontSize,Mode=TwoWay}" SetMask="False"/>
+                            <CorasauControls:IntegerEditor EditValue="{Binding FontSize,Mode=TwoWay}" SetMask="False"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="LineSpace" x:Name="liLineSpace">
-                            <CorasauControls:IntegerEditor Text="{Binding LineSpace,Mode=TwoWay}" SetMask="False"/>
+                            <CorasauControls:IntegerEditor EditValue="{Binding LineSpace,Mode=TwoWay}" SetMask="False"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="TextSize" x:Name="liTextSize">
-                            <CorasauControls:IntegerEditor Text="{Binding TextSize,Mode=TwoWay}" SetMask="False"/>
+                            <CorasauControls:IntegerEditor EditValue="{Binding TextSize,Mode=TwoWay}" SetMask="False"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="AmountSize" x:Name="liAmountSize">
-                            <CorasauControls:IntegerEditor Text="{Binding AmountSize,Mode=TwoWay}" SetMask="False"/>
+                            <CorasauControls:IntegerEditor EditValue="{Binding AmountSize,Mode=TwoWay}" SetMask="False"/>
                         </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
                 </CorasauControls:CorasauLayoutGroup>

@@ -488,7 +488,7 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     showPrintPreview = GenrateOfferDialog.ShowInvoice || GenrateOfferDialog.InvoiceQuickPrint || GenrateOfferDialog.SendByOutlook;
                     var invoicePostingResult = new InvoicePostingPrintGenerator(api, this);
-                    var openOutlook = doctype == CompanyLayoutType.Packnote ? GenrateOfferDialog.UpdateInventory && GenrateOfferDialog.SendByOutlook : GenrateOfferDialog.SendByOutlook;   
+                    var openOutlook = doctype == CompanyLayoutType.Packnote ? GenrateOfferDialog.UpdateInventory && GenrateOfferDialog.SendByOutlook : GenrateOfferDialog.SendByOutlook;
                     invoicePostingResult.SetUpInvoicePosting(dbOrder, null, doctype, GenrateOfferDialog.GenrateDate, null, !GenrateOfferDialog.UpdateInventory, GenrateOfferDialog.ShowInvoice, GenrateOfferDialog.PostOnlyDelivered,
                         GenrateOfferDialog.InvoiceQuickPrint, GenrateOfferDialog.NumberOfPages, GenrateOfferDialog.SendByEmail, openOutlook, GenrateOfferDialog.sendOnlyToThisEmail, GenrateOfferDialog.Emails,
                         false, null, false);
@@ -707,6 +707,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             InvoiceAPI Invapi = new InvoiceAPI(api);
             bool showSendByMail = false;
+
             var debtor = ClientHelper.GetRef(dbOrder.CompanyId, typeof(Debtor), dbOrder._DCAccount) as Debtor;
             if (debtor != null)
             {
@@ -745,6 +746,10 @@ namespace UnicontaClient.Pages.CustomPage
 #endif
             if (dbOrder._InvoiceDate != DateTime.MinValue)
                 GenrateInvoiceDialog.SetInvoiceDate(dbOrder._InvoiceDate);
+            var additionalOrdersList = Utility.GetAdditionalOrders(api, dbOrder);
+            if (additionalOrdersList != null)
+                GenrateInvoiceDialog.SetAdditionalOrders(additionalOrdersList);
+            GenrateInvoiceDialog.SetOIOUBLLabelText(api.CompanyEntity._OIOUBLSendOnServer);
 
             GenrateInvoiceDialog.Closed += async delegate
             {
@@ -757,6 +762,7 @@ namespace UnicontaClient.Pages.CustomPage
                     invoicePostingResult.SetUpInvoicePosting(dbOrder, null, CompanyLayoutType.Invoice, GenrateInvoiceDialog.GenrateDate, null, isSimulated, GenrateInvoiceDialog.ShowInvoice, GenrateInvoiceDialog.PostOnlyDelivered,
                         GenrateInvoiceDialog.InvoiceQuickPrint, GenrateInvoiceDialog.NumberOfPages, GenrateInvoiceDialog.SendByEmail, !isSimulated && GenrateInvoiceDialog.SendByOutlook, GenrateInvoiceDialog.sendOnlyToThisEmail,
                         GenrateInvoiceDialog.Emails, GenrateInvoiceDialog.GenerateOIOUBLClicked, null, false);
+                    invoicePostingResult.SetAdditionalOrders(GenrateInvoiceDialog.AdditionalOrders?.Cast<DCOrder>().ToList());
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
                     busyIndicator.IsBusy = true;
                     var result = await invoicePostingResult.Execute();
@@ -831,6 +837,13 @@ namespace UnicontaClient.Pages.CustomPage
             else
                 deliveryAccount = null;
 
+            WorkInstallation workInstallation = null;
+            if (invClient._Installation != null)
+            {
+                var workInstallCache = api.GetCache(typeof(Uniconta.DataModel.WorkInstallation)) ?? await api.LoadCache(typeof(Uniconta.DataModel.WorkInstallation));
+                workInstallation = (WorkInstallation)workInstallCache.Get(invClient._Installation);
+            }
+
             CreationResult result;
 
             if (Comp._CountryId == CountryCode.Norway || Comp._CountryId == CountryCode.Netherlands)
@@ -843,8 +856,8 @@ namespace UnicontaClient.Pages.CustomPage
             }
             else
             {
-                TableAddOnData[] attachments = await FromXSDFile.OIOUBL.ExportImport.Attachments.CollectInvoiceAttachments(invClient, api);
-                result = Uniconta.API.DebtorCreditor.OIOUBL.GenerateOioXML(Comp, debtor, deliveryAccount, invClient, invoiceLines, InvCache, VatCache, null, contactPerson, attachments, layoutGroupCache);
+                var attachments = await FromXSDFile.OIOUBL.ExportImport.Attachments.CollectInvoiceAttachments(invClient, api);
+                result = Uniconta.API.DebtorCreditor.OIOUBL.GenerateOioXML(Comp, debtor, deliveryAccount, invClient, invoiceLines, InvCache, VatCache, null, contactPerson, attachments, layoutGroupCache, workInstallation);
             }
 
             bool createXmlFile = true;

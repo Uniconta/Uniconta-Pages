@@ -16,7 +16,6 @@ using System.Windows.Shapes;
 using Uniconta.API.System;
 using Uniconta.ClientTools;
 using Uniconta.ClientTools.DataModel;
-using Uniconta.ClientTools.DataModel.System;
 using Uniconta.ClientTools.Page;
 using Uniconta.Common;
 using Uniconta.DataModel;

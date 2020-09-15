@@ -5,11 +5,11 @@ using System.Windows;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.Common;
+using DevExpress.Xpf.Grid;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
-
     public class ProjectTaskClientLocal : ProjectTaskClient
     {
         internal object taskSource;
@@ -29,11 +29,22 @@ namespace UnicontaClient.Pages.CustomPage
         public ProjectTaskGridPage(UnicontaBaseEntity _master) : base(null)
         {
             InitializeComponent();
+            ((TableView)dgProjectTaskGrid.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
             SetRibbonControl(localMenu, dgProjectTaskGrid);
             dgProjectTaskGrid.api = api;
             dgProjectTaskGrid.BusyIndicator = busyIndicator;
             dgProjectTaskGrid.UpdateMaster(_master);
             localMenu.OnItemClicked += LocalMenu_OnItemClicked;
+            var proj = (_master as Uniconta.DataModel.Project);
+            if (proj != null)
+                proj.Tasks = null;
+        }
+
+        public override bool CheckIfBindWithUserfield(out bool isReadOnly, out bool useBinding)
+        {
+            isReadOnly = false;
+            useBinding = true;
+            return true;
         }
 
         private void LocalMenu_OnItemClicked(string ActionType)
@@ -94,6 +105,5 @@ namespace UnicontaClient.Pages.CustomPage
                 rec.NotifyPropertyChanged("TaskSource");
             }
         }
-
     }
 }

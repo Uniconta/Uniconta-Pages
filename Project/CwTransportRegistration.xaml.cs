@@ -99,9 +99,12 @@ namespace UnicontaClient.Pages.CustomPage
             addressList.Add(new Address { Name = Uniconta.ClientTools.Localization.lookup("Company"), ContactAddress = workAddress?.ToString() });
 
             var homeAddress = new StringBuilder();
-            homeAddress.AppendLine(employee._Name).AppendLine(employee._Address1).AppendLine(employee._Address2).Append(employee._ZipCode != null ? employee._ZipCode + " " : string.Empty).Append(employee._City);
-            homeAddress.Replace(Environment.NewLine + Environment.NewLine + Environment.NewLine, Environment.NewLine);
-            homeAddress.Replace(Environment.NewLine + Environment.NewLine, Environment.NewLine);
+            if (employee != null)
+            {
+                homeAddress.AppendLine(employee._Name).AppendLine(employee._Address1).AppendLine(employee._Address2).Append(employee._ZipCode != null ? employee._ZipCode + " " : string.Empty).Append(employee._City);
+                homeAddress.Replace(Environment.NewLine + Environment.NewLine + Environment.NewLine, Environment.NewLine);
+                homeAddress.Replace(Environment.NewLine + Environment.NewLine, Environment.NewLine);
+            }
             addressList.Add(new Address { Name = Uniconta.ClientTools.Localization.lookup("Private"), ContactAddress = homeAddress?.ToString() });
 
             var otherAddress = new StringBuilder();

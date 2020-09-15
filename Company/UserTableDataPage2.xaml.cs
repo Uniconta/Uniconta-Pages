@@ -28,17 +28,17 @@ namespace UnicontaClient.Pages.CustomPage
 {
     public partial class UserTableDataPage2 : FormBasePage
     {
-        TableData editrow;
+        BaseUserTable editrow;
         public override void OnClosePage(object[] RefreshParams)
         {
             globalEvents.OnRefresh(NameOfControl, RefreshParams);
         }
 
         public override Type TableType { get { return typeof(TableData); } }
-        public override string LayoutName { get { return string.Format("TableDataFrom_{0}", this.ParentControl.Caption.ToString()); } }
+        public override string LayoutName { get { return string.Concat("TableDataFrom_", this.ParentControl.Caption.ToString()); } }
 
         public override string NameOfControl { get { return TabControls.UserTableDataPage2; } }
-        public override UnicontaBaseEntity ModifiedRow { get { return editrow; } set { editrow = (TableData)value; } }
+        public override UnicontaBaseEntity ModifiedRow { get { return (UnicontaBaseEntity)editrow; } set { editrow = (BaseUserTable)value; } }
         UnicontaBaseEntity sourcdata;
         TableHeader tableheadermaster;
         public UserTableDataPage2(UnicontaBaseEntity sourcedata, TableHeaderClient master = null)
@@ -69,7 +69,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (LoadedRow == null)
             {
                 frmRibbon.DisableButtons("Delete");
-                editrow = Activator.CreateInstance(tableheadermaster.UserType) as TableData;
+                editrow = Activator.CreateInstance(tableheadermaster.UserType) as BaseUserTable;
                 if (sourcdata != null)
                     editrow.SetMaster(sourcdata);
             }
@@ -86,6 +86,8 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (tableheadermaster._HasPrimaryKey)
                 UserFieldControl.CreateKeyFieldsGroupOnPage2(layoutItems, tableheadermaster._PKprompt);
+            if(tableheadermaster._TableType == TableBaseType.Transaction)
+                UserFieldControl.CreateDateFieldGroupOnPage2(layoutItems);
             var UserFieldDef = editrow.UserFieldDef();
             if (UserFieldDef != null)
                 UserFieldControl.CreateUserFieldOnPage2(layoutItems, UserFieldDef, (RowIndexConverter)this.Resources["RowIndexConverter"], this.api, this);

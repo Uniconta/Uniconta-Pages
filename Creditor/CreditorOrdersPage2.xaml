@@ -31,6 +31,15 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOrdersPage2"
                         <CorasauControls:CorasauLayoutItem FieldName="Name" x:Name="liName">
                             <CorasauControls:TextEditor x:Name="txtName" Text="{Binding Name, Mode=OneWay}"/>
                         </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="CurBalance" x:Name="liCurbalance">
+                            <CorasauControls:TextEditor x:Name="txtCurBalance"  Text="{Binding CurBalance,Mode=OneWay}" IsReadOnly="True" Mask="N2" MaskType="Numeric" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="Overdue" x:Name="liOverDue">
+                            <CorasauControls:TextEditor x:Name="txtOverdue"  Text="{Binding Overdue,Mode=OneWay}" IsReadOnly="True"  Mask="N2" MaskType="Numeric"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="CreditMax" x:Name="liCreditMax">
+                            <CorasauControls:TextEditor x:Name="txtCreditMax"  Text="{Binding CreditMax,Mode=OneWay}" IsReadOnly="True"  Mask="N2" MaskType="Numeric"/>
+                        </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="ContactName" x:Name="liContactName">
                             <CorasauControls:ComboBoxEditor AllowNullInput="True" AssignNullValueOnClearingEditText="True" x:Name="cmbContactName"  EditValueChanged="cmbContactName_EditValueChanged"/>
                         </CorasauControls:CorasauLayoutItem>
@@ -69,7 +78,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOrdersPage2"
                             </CorasauControls:LookupEditor>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="OrderNumber" x:Name="liOrderNumber">
-                            <CorasauControls:IntegerEditor Text="{Binding OrderNumber,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SetMask="false"/>
+                            <CorasauControls:IntegerEditor EditValue="{Binding OrderNumber,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SetMask="false"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="DeliveryDate" x:Name="liDeliveryDate">
                             <CorasauControls:DateEditor x:Name="deDeLiveryDate" EditValue="{Binding DeliveryDate,Mode=TwoWay}"/>
@@ -103,7 +112,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOrdersPage2"
                             <CorasauControls:LookupEditor x:Name="PrCategorylookupeditor" EditValue="{Binding PrCategory,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="Settlements" x:Name="liSettlements">
-                            <CorasauControls:IntegerEditor Text="{Binding Settlements,Mode=TwoWay}" SetMask="False"/>
+                            <CorasauControls:IntegerEditor EditValue="{Binding Settlements,Mode=TwoWay}" SetMask="False"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="TransType" x:Name="liTransType">
                             <CorasauControls:LookupEditor x:Name="leTransType" EditValue="{Binding TransType,Mode=TwoWay}">
@@ -120,6 +129,10 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOrdersPage2"
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="DeleteLines" x:Name="liDeleteLines" >
                             <CorasauControls:CheckEditor  IsChecked="{Binding DeleteLines,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="Vat" x:Name="liVat">
+                            <CorasauControls:LookupEditor x:Name="leVat" EditValue="{Binding Vat,Mode=TwoWay}">
+                            </CorasauControls:LookupEditor>
                         </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
                     <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpSize" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Size}"  Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="475">

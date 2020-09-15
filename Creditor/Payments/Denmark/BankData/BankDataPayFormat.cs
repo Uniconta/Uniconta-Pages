@@ -20,7 +20,7 @@ using Uniconta.ClientTools.Controls;
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
 {
-    class BankDataPayFormat
+    public class BankDataPayFormat
     {
         internal const string INDEX01 = "0001";
         internal const string INDEX02 = "0002";

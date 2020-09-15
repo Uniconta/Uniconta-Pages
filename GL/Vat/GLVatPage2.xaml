@@ -106,7 +106,7 @@ x:Class="UnicontaClient.Pages.CustomPage.GLVatPage2"
                     </CorasauControls:CorasauLayoutGroup>
                     <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpVATBoxes" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=VATBoxes}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                         <CorasauControls:CorasauLayoutItem FieldName="ModelBoxId" x:Name="liModelBoxId">
-                            <CorasauControls:IntegerEditor Text="{Binding ModelBoxId,Mode=TwoWay}" SetMask="false"/>
+                            <CorasauControls:IntegerEditor EditValue="{Binding ModelBoxId,Mode=TwoWay}" SetMask="false"/>
                         </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
                 </CorasauControls:CorasauLayoutGroup>

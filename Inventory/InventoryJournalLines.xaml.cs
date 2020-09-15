@@ -108,11 +108,7 @@ namespace UnicontaClient.Pages.CustomPage
             this.debtors = Comp.GetCache(typeof(Debtor));
             this.creditors = Comp.GetCache(typeof(Uniconta.DataModel.Creditor));
 
-            if (dgInvJournalLine.IsLoadedFromLayoutSaved)
-            {
-                dgInvJournalLine.ClearSorting();
-                dgInvJournalLine.IsLoadedFromLayoutSaved = false;
-            }
+           
         }
 
         public override void SetParameter(IEnumerable<ValuePair> Parameters)
@@ -153,6 +149,13 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 ReportAsFinished.Visible = ReportAsFinished.ShowInColumnChooser = false;
                 ReportAsFinishedDeep.Visible = ReportAsFinishedDeep.ShowInColumnChooser = false;
+            }
+
+            if (dgInvJournalLine.IsLoadedFromLayoutSaved)
+            {
+                dgInvJournalLine.ClearSorting();
+                dgInvJournalLine.ClearFilter();
+                dgInvJournalLine.IsLoadedFromLayoutSaved = false;
             }
         }
 
@@ -540,8 +543,6 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     var invJournalLine = new InvJournalLineGridClient();
                     invJournalLine._Item = bom._ItemPart;
-                    item = (InvItem)items.Get(bom._ItemPart);
-                    invJournalLine.SetItemValues(item);
                     invJournalLine._Date = selectedItem._Date;
                     invJournalLine._Dim1 = selectedItem._Dim1;
                     invJournalLine._Dim2 = selectedItem._Dim2;
@@ -554,10 +555,17 @@ namespace UnicontaClient.Pages.CustomPage
                     invJournalLine._Variant3 = bom._Variant3;
                     invJournalLine._Variant4 = bom._Variant4;
                     invJournalLine._Variant5 = bom._Variant5;
-                    invJournalLine._Warehouse = bom._Warehouse ?? item._Warehouse ?? selectedItem._Warehouse;
-                    invJournalLine._Location = bom._Location ?? item._Location ?? selectedItem._Location;
-                    invJournalLine._CostPrice = item._CostPrice;
-                    invJournalLine._Qty = -Math.Round(bom.GetBOMQty(selectedItem._Qty), item._Decimals);
+                    item = (InvItem)items.Get(bom._ItemPart);
+                    if (item != null)
+                    {
+                        invJournalLine.SetItemValues(item);
+                        invJournalLine._Warehouse = bom._Warehouse ?? item._Warehouse ?? selectedItem._Warehouse;
+                        invJournalLine._Location = bom._Location ?? item._Location ?? selectedItem._Location;
+                        invJournalLine._CostPrice = item._CostPrice;
+                        invJournalLine._Qty = -Math.Round(bom.GetBOMQty(selectedItem._Qty), item._Decimals);
+                    }
+                    else
+                        invJournalLine._Qty = -Math.Round(bom.GetBOMQty(selectedItem._Qty), 2);
                     lst.Add(invJournalLine);
                 }
                 if (selectedItem._MovementType != InvMovementType.ReportAsFinished)

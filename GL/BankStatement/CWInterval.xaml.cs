@@ -22,6 +22,18 @@ namespace UnicontaClient.Pages.CustomPage
         public int VarianceDays { get; set; }
         public int JournalPostedId { get; set; }
         public int Voucher { get; set; }
+        public bool OnlyVoided { get; set; }
+
+        public CWInterval(DateTime fromdate, DateTime todate, int variantdays, bool hideVoucher = false) : this(fromdate, todate, variantdays: variantdays, isShowVarDays:false, showJrPostId:false)
+        {
+            if (hideVoucher)
+            {
+                RowVoucher.Height = new GridLength(0);
+                double h = this.Height - 30;
+                this.Height = h;
+                txtVoucher.Visibility = tbVoucher.Visibility = Visibility.Collapsed;
+            }
+        }
 
         public CWInterval(DateTime fromdate, DateTime todate, int variantdays = 0, bool isShowVarDays = false, bool showJrPostId = false)
         {
@@ -49,6 +61,11 @@ namespace UnicontaClient.Pages.CustomPage
                 double h = this.Height - 30;
                 this.Height = h;
                 txtJrPostdId.Visibility = intJrPostdId.Visibility = Visibility.Collapsed;
+
+                RowOnlyVoided.Height = new GridLength(0);
+                double h1 = this.Height - 30;
+                this.Height = h1;
+                tbOnlyVoided.Visibility = chkOnlyVoided.Visibility = Visibility.Collapsed;
             }
 
             this.Loaded += CW_Loaded;

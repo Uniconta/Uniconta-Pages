@@ -59,6 +59,7 @@ x:Class="UnicontaClient.Pages.CustomPage.PurchaseLinesPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="SerieBatch" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="EAN" Visible="False" Width="150"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Price" Width="90"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="SalesPrice" Width="90" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Discount" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DiscountPct" Width="50"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Total" Width="100"/>

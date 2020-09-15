@@ -303,7 +303,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "VariantDetails":
                     if (selectedItem != null && selectedItem._UseVariants)
-                        AddDockItem(TabControls.InvVariantDetailPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ItemVariants"), selectedItem._Name));
+                        AddDockItem(TabControls.InvVariantDetailPage, dgInventoryItemsGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ItemVariants"), selectedItem._Name));
                     break;
                 case "LanguageItemText":
                     if (selectedItem != null)
@@ -351,12 +351,32 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         AddDockItem(TabControls.InvTransPivotPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Pivot"), selectedItem._Name));
                     break;
+                case "ViewWeb":
+                    if (selectedItem != null)
+                        ViewWeb(selectedItem);
+                    break;
 #endif
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
         }
+
+#if !SILVERLIGHT
+
+        async void ViewWeb(InvItemClient selectedItem)
+        {
+            var userDocsClient = new UserDocsClient();
+            userDocsClient.SetMaster(selectedItem);
+            userDocsClient._RowId = selectedItem._URL;
+            await api.Read(userDocsClient);
+
+            if (session.User._UseDefaultBrowser)
+                Utility.OpenWebSite(userDocsClient.Url);
+            else
+                ViewDocument(TabControls.UserDocsPage3, userDocsClient);
+        }
+#endif
 
         void CopyRecord(InvItemClient selectedItem)
         {

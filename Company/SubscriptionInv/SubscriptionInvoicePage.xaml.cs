@@ -32,7 +32,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         public SubscriptionInvoicePage(UnicontaBaseEntity sourcedata, ResellerClient reseller) : base(sourcedata)
         {
-            invoicePartner = reseller;           
+            invoicePartner = reseller;
             InitPage(sourcedata);
         }
 
@@ -151,7 +151,7 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                     else
                     {
-                        SendMail(selectedItem, selectedItem._Date);
+                            SendMail(selectedItem, selectedItem._Date);
                     }
                     break;
 
@@ -161,7 +161,7 @@ namespace UnicontaClient.Pages.CustomPage
                         UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("zeroRecords"), Uniconta.ClientTools.Localization.lookup("Warning"), MessageBoxButton.OK);
                         return;
                     }
-                        CWDateSelector objdateSelector = new CWDateSelector(true);
+                    CWDateSelector objdateSelector = new CWDateSelector(true);
 #if !SILVERLIGHT
                     objdateSelector.DialogTableId = 2000000022;
 #endif
@@ -197,15 +197,14 @@ namespace UnicontaClient.Pages.CustomPage
                 case "PostInvoiceOnDate":
                     if (selectedItem == null)
                         return;
-                    var objCWPostInvoiceDailogue = new CWPostInvoice(api);                   
+                    var objCWPostInvoiceDailogue = new CWPostInvoice(api);
                     objCWPostInvoiceDailogue.Closed += async delegate
                     {
                         if (objCWPostInvoiceDailogue.DialogResult == true)
                         {
                             var sbsApi = new SubscriptionAPI(api);
                             var result = await sbsApi.PostInternalInvoice(invoicePartner, null, objCWPostInvoiceDailogue.InvoiceDate, objCWPostInvoiceDailogue.Journal);
-                            if (result != ErrorCodes.Succes)
-                                UtilDisplay.ShowErrorCode(result);
+                            UtilDisplay.ShowErrorCode(result);
                         }
                     };
                     objCWPostInvoiceDailogue.Show();
@@ -219,10 +218,10 @@ namespace UnicontaClient.Pages.CustomPage
                         {
                             if (dialog.ConfirmationResult == CWConfirmationBox.ConfirmationResultEnum.Yes)
                             {
-                               
+
                                 var res = await api.Delete(selectedItem);
                                 if (res != ErrorCodes.Succes)
-                                    UtilDisplay.ShowErrorCode(res);                             
+                                    UtilDisplay.ShowErrorCode(res);
 
                                 else
                                 {
@@ -232,7 +231,7 @@ namespace UnicontaClient.Pages.CustomPage
                         };
                         dialog.Show();
 
-                       
+
                     }
                     break;
 
@@ -246,31 +245,38 @@ namespace UnicontaClient.Pages.CustomPage
 
         async void SendMail(SubscriptionInvoice Invoice, DateTime selectedDate, bool SendALL = false)
         {
-            Task<ErrorCodes> task;
-            var subsApi = new SubscriptionAPI(api);
-            if (invoicePartner != null && SendALL && api.session.User._Role >= (byte)Uniconta.Common.User.UserRoles.Reseller)
-                task = subsApi.EmailSubscriptionInvoice(invoicePartner, masterSub as Subscription, selectedDate);
-            else
-                task = subsApi.EmailSubscriptionInvoice(Invoice, SendALL && api.session.User._Role >= (byte)Uniconta.Common.User.UserRoles.Reseller);
+            var subscriptionMsg = string.Format(Uniconta.ClientTools.Localization.lookup("SendInvoiceSubscriptionMsg"), Invoice._Sid);
+            if (UnicontaMessageBox.Show(subscriptionMsg, Uniconta.ClientTools.Localization.lookup("Message"), MessageBoxButton.OKCancel
+#if !SILVERLIGHT
+                , MessageBoxImage.Question
+#endif
+                ) == MessageBoxResult.OK)
+            {
+                Task<ErrorCodes> task;
+                var subsApi = new SubscriptionAPI(api);
+                if (invoicePartner != null && SendALL && api.session.User._Role >= (byte)Uniconta.Common.User.UserRoles.Reseller)
+                    task = subsApi.EmailSubscriptionInvoice(invoicePartner, masterSub as Subscription, selectedDate);
+                else
+                    task = subsApi.EmailSubscriptionInvoice(Invoice, SendALL && api.session.User._Role >= (byte)Uniconta.Common.User.UserRoles.Reseller);
 
-            busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
-            busyIndicator.IsBusy = true;
-            var result = await task;
-            busyIndicator.IsBusy = false;
-            UtilDisplay.ShowErrorCode(result);
+                busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
+                busyIndicator.IsBusy = true;
+                var result = await task;
+                busyIndicator.IsBusy = false;
+                UtilDisplay.ShowErrorCode(result);
+            }
         }
+
 #if !SILVERLIGHT
         async private void ShowInvoice(SubscriptionInvoiceClient selectedItem)
         {
-            var res = await getInvData(selectedItem);
-            if (res.invLines != null && ((SubscriptionInvoiceLineClient[])res.invLines).Length > 0)
+            var subsApi = new SubscriptionAPI(api);
+            var invoicePdf = await subsApi.SubscriptionInvoicePDF(selectedItem);
+            if (invoicePdf != null)
             {
-                var obj = new object[1];
-                obj[0] = res;
-                AddDockItem(TabControls.InvoiceSubscriptionPage, obj, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("InvoiceNumber"), selectedItem._Invoice));
+                var viewer = new CWDocumentViewer(invoicePdf, FileextensionsTypes.PDF);
+                viewer.Show();
             }
-            else
-                return;
         }
 
         async Task<SubscriptionInvDetails> getInvData(SubscriptionInvoiceClient selecteditem)

@@ -89,7 +89,19 @@ namespace UnicontaClient.Pages.CustomPage
 
             editrow.PropertyChanged += Editrow_PropertyChanged;
             txtCompanyRegNo.EditValueChanged += TxtCVR_EditValueChanged;
+#if !SILVERLIGHT
+            txtCompanyRegNo.LostFocus += TxtCompanyRegNo_LostFocus;
         }
+
+        private async void TxtCompanyRegNo_LostFocus(object sender, RoutedEventArgs e)
+        {
+            var countryCode = DebtorAccountPage2.CheckEuropeanVatInformation(editrow._LegalIdent, editrow._Country, cvrFound);
+            if (countryCode != null && editrow._Country != countryCode)
+                editrow.Country = countryCode.Value;
+        }
+#else
+        }
+#endif
 
         protected override void OnLayoutCtrlLoaded()
         {
@@ -208,7 +220,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         private bool onlyRunOnce;
-
+        bool cvrFound = false;
         private async void TxtCVR_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
         {
             var s = sender as TextEditor;
@@ -240,10 +252,13 @@ namespace UnicontaClient.Pages.CustomPage
                 if (!onlyRunOnce)
                 {
                     if (ci == null)
+                    {
+                        cvrFound = false;
                         return;
-
+                    }
                     if (!string.IsNullOrWhiteSpace(ci?.life?.name))
                     {
+                        cvrFound = true;
                         var address = ci.address;
                         if (address != null)
                         {

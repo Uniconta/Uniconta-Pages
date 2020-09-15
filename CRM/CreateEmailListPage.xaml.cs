@@ -24,6 +24,8 @@ using Uniconta.ClientTools.Util;
 using UnicontaClient;
 using UnicontaClient.Models;
 using Uniconta.API.Service;
+using Uniconta.API.Crm;
+using Uniconta.API.System;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -250,13 +252,49 @@ namespace UnicontaClient.Pages.CustomPage
                 case "SaveAndExit":
                     SaveEmailList();
                     break;
+                case "SendEmail":
+                    SendEmail();
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
         }
 
-       
+        void SendEmail()
+        {
+            var rows = (ICollection<CrmCampaignMemberClient>)dgCreateEmailList.GetVisibleRows();
+            if (rows.Count == 0)
+                return;
+
+            var cwSendEmail = new CwSendEmail(api);
+            cwSendEmail.Closed += async delegate
+            {
+                if (cwSendEmail.DialogResult == true && cwSendEmail.CompanySMTP != null)
+                {
+                    var crmAPI = new CrmAPI(api);
+                    ErrorCodes res;
+                    if (cwSendEmail.SendTestEmail)
+                        res = await crmAPI.SendMailTest(cwSendEmail.CompanySMTP, cwSendEmail.Email, cwSendEmail.Name);
+                    else
+                    {
+                        var followUp = cwSendEmail.FollowUp;
+                        if (followUp != null)
+                        {
+                            var result = await api.Insert(cwSendEmail.FollowUp);
+                            if (result != ErrorCodes.Succes)
+                                followUp = null;
+                        }
+                        res = await crmAPI.SendMail(cwSendEmail.CompanySMTP, rows, followUp);
+                    }
+                    if (res != ErrorCodes.Succes)
+                        UtilDisplay.ShowErrorCode(res);
+                    else
+                        UtilDisplay.ShowErrorCode(res);
+                }
+            };
+            cwSendEmail.Show();
+        }
 
         async void SaveEmailList()
         {

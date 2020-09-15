@@ -26,10 +26,10 @@ namespace UnicontaISO20022CreditTransfer
 
         protected const string XMLNS_CAC = "xmlns:cac";
         protected const string XMLNS_CBC = "xmlns:cbc";
-        internal const string XMLNS_XSI = "xmlns:xsi";
+        public const string XMLNS_XSI = "xmlns:xsi";
         protected const string XMLNS_UDT = "xmlns:udt";
         protected const string XMLNS_CCTS = "xmlns:ccts";
-        internal const string XMLNS_XSI_VALUE = "http://www.w3.org/2001/XMLSchema-instance";
+        public const string XMLNS_XSI_VALUE = "http://www.w3.org/2001/XMLSchema-instance";
         protected const string CAC = "cac";
         protected const string CBC = "cbc";
 
@@ -39,19 +39,19 @@ namespace UnicontaISO20022CreditTransfer
         protected const string UBL_CUSTOM_KEY = "CustomizationID";
         protected const string UBL_CUSTOM_VAL = "OIOUBL-2.02";
 
-      //  internal const string PROFILE_ID_VAL = "ProfileID";
-        internal const string SCHEME_AGENCY_ID_KEY = "schemeAgencyID";
-        internal const string SCHEME_AGENCY_ID_VAL = "320";
+      //  public const string PROFILE_ID_VAL = "ProfileID";
+        public const string SCHEME_AGENCY_ID_KEY = "schemeAgencyID";
+        public const string SCHEME_AGENCY_ID_VAL = "320";
 
-        internal const string SCHEME_ID_KEY = "schemeID";
+        public const string SCHEME_ID_KEY = "schemeID";
         protected const string OIOUBL_PROFILEID = "urn:oioubl:id:profileid-1.2";
 
-        internal const string ID = "Id";
+        public const string ID = "Id";
         protected const string TRUE = "true";
         protected const string FALSE = "false";
 
-        internal const string LIST_AGENCY_ID = "listAgencyID";
-        internal const string LIST_ID = "listID";
+        public const string LIST_AGENCY_ID = "listAgencyID";
+        public const string LIST_ID = "listID";
 
         protected const string DOCUMENT_TYPE_CODE = "DocumentTypeCode";
         protected const string RESPONSE_DOC_LIST_ID = "urn:oioubl:codelist:responsedocumenttypecode-1.1";
@@ -69,60 +69,60 @@ namespace UnicontaISO20022CreditTransfer
         protected const string ENDPOINT_ID = "EndpointID";
         protected const string PARTY_NAME = "PartyName";
 
-        internal const string ADDRESS_LIST_ID = "urn:oioubl:codelist:addressformatcode-1.1";
-        internal const string ADDRESS_FORMAT_CODE = "AddressFormatCode";
-        internal const string STRUCTURED_LAX = "StructuredLax";
-        internal const string UNSTRUCTURED = "Unstructured";
-        internal const string POSTAL_ADDRESS = "PostalAddress";
-        internal const string ADDRESSLINE = "AdrLine";
-        internal const string STREET_NAME = "StrtNm";
+        public const string ADDRESS_LIST_ID = "urn:oioubl:codelist:addressformatcode-1.1";
+        public const string ADDRESS_FORMAT_CODE = "AddressFormatCode";
+        public const string STRUCTURED_LAX = "StructuredLax";
+        public const string UNSTRUCTURED = "Unstructured";
+        public const string POSTAL_ADDRESS = "PostalAddress";
+        public const string ADDRESSLINE = "AdrLine";
+        public const string STREET_NAME = "StrtNm";
         
-        internal const string TOWN_NAME = "TwnNm";
-        internal const string POSTAL_CODE = "PstCd";
-        internal const string COUNTRY = "Ctry";
-        internal const string IDENTIFICATION_CODE = "IdentificationCode";
-        internal const string PARTY_LEGAL_ENTITY = "PartyLegalEntity";
-        internal const string REGISTRATION_NAME = "RegistrationName";
-        internal const string COMPANY_ID = "CompanyID";
-        internal const string REGISTRATION_ADDRESS = "RegistrationAddress";
+        public const string TOWN_NAME = "TwnNm";
+        public const string POSTAL_CODE = "PstCd";
+        public const string COUNTRY = "Ctry";
+        public const string IDENTIFICATION_CODE = "IdentificationCode";
+        public const string PARTY_LEGAL_ENTITY = "PartyLegalEntity";
+        public const string REGISTRATION_NAME = "RegistrationName";
+        public const string COMPANY_ID = "CompanyID";
+        public const string REGISTRATION_ADDRESS = "RegistrationAddress";
         protected const string CONTACT_PERSON = "Contact";
         protected const string PHONE = "Telephone";
         protected const string EMAIL = "ElectronicMail";
-        internal const string CURRENCY_ID = "Ccy";
-        internal const string PERCENT = "Percent";
-        internal const string NOTE = "Note";
-        internal const string VALIDATE_OK = "Ok";
-        internal const string COUNTRY_DK = "DK";
+        public const string CURRENCY_ID = "Ccy";
+        public const string PERCENT = "Percent";
+        public const string NOTE = "Note";
+        public const string VALIDATE_OK = "Ok";
+        public const string COUNTRY_DK = "DK";
 
 
-        internal const string DUMMYITEM = "Item";
-        internal const string VALUE_NOT_AVAILABLE = "na";
-        internal const string PAYMENTMETHOD_TRF = "TRF";
-        internal const string CCYEUR = "EUR";
-        internal const string CCYDKK = "DKK";
-        internal const string CCYSEK = "SEK";
-        internal const string CCYNOK = "NOK";
-        internal const string CCYGBP = "GBP";
+        public const string DUMMYITEM = "Item";
+        public const string VALUE_NOT_AVAILABLE = "na";
+        public const string PAYMENTMETHOD_TRF = "TRF";
+        public const string CCYEUR = "EUR";
+        public const string CCYDKK = "DKK";
+        public const string CCYSEK = "SEK";
+        public const string CCYNOK = "NOK";
+        public const string CCYGBP = "GBP";
 
-        internal const string FIK71 = "71";
-        internal const string FIK73 = "73";
-        internal const string FIK75 = "75";
-        internal const string FIK04 = "04";
+        public const string FIK71 = "71";
+        public const string FIK73 = "73";
+        public const string FIK75 = "75";
+        public const string FIK04 = "04";
 
-        internal const int FIK71LENGTH = 15;
-        internal const int FIK75LENGTH = 16;
-        internal const int FIK04LENGTH = 16;
+        public const int FIK71LENGTH = 15;
+        public const int FIK75LENGTH = 16;
+        public const int FIK04LENGTH = 16;
 
-        internal const string EXTSERVICECODE_NURG = "NURG";
-        internal const string EXTSERVICECODE_SEPA = "SEPA";
+        public const string EXTSERVICECODE_NURG = "NURG";
+        public const string EXTSERVICECODE_SEPA = "SEPA";
 
-        internal const string INSTRUCTIONPRIORITY_NORM = "NORM";
-        internal const string EXTCATEGORYPURPOSE_SUPP = "SUPP";
+        public const string INSTRUCTIONPRIORITY_NORM = "NORM";
+        public const string EXTCATEGORYPURPOSE_SUPP = "SUPP";
    
-        internal const string CHRGBR_CRED = "CRED";
-        internal const string CHRGBR_DEBT = "DEBT";
-        internal const string CHRGBR_SHAR = "SHAR";
-        internal const string CHRGBR_SLEV = "SLEV";
+        public const string CHRGBR_CRED = "CRED";
+        public const string CHRGBR_DEBT = "DEBT";
+        public const string CHRGBR_SHAR = "SHAR";
+        public const string CHRGBR_SLEV = "SLEV";
 
 
         #endregion

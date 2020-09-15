@@ -236,7 +236,7 @@ namespace UnicontaClient.Pages.CustomPage
                         else
                         {
                             var pckNumber = debtInvoice.InvoiceNumber;
-                            reportName = string.Format("{0}_{1}", Uniconta.ClientTools.Localization.lookup("PackNote"), pckNumber);
+                            reportName = await Utilities.Utility.GetLocalizedReportName(api, debtInvoice, CompanyLayoutType.Packnote);
                             dockName = string.Format("{0} {1}", Uniconta.ClientTools.Localization.lookup("Preview"), string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("PackNote"), pckNumber));
 
                             AddDockItem(TabControls.StandardPrintReportPage, new object[] { new List<IPrintReport> { printReport }, reportName }, dockName);
@@ -302,7 +302,7 @@ namespace UnicontaClient.Pages.CustomPage
             var isInitializedSuccess = await debtorQcpPrint.InstantiateFields();
             if (isInitializedSuccess)
             {
-                var standardDebtorPackNote = new DebtorQCPReportClient(debtorQcpPrint.Company, debtorQcpPrint.Debtor, debtorQcpPrint.DebtorInvoice, debtorQcpPrint.InvTransInvoiceLines, null,
+                var standardDebtorPackNote = new DebtorQCPReportClient(debtorQcpPrint.Company, debtorQcpPrint.Debtor, debtorQcpPrint.DebtorInvoice, debtorQcpPrint.InvTransInvoiceLines, debtorQcpPrint.DebtorOrder,
                     debtorQcpPrint.CompanyLogo, debtorQcpPrint.ReportName, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.PackNote, messageClient: debtorQcpPrint.MessageClient);
 
                 var standardReports = new[] { standardDebtorPackNote };

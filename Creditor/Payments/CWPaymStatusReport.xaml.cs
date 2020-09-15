@@ -39,6 +39,7 @@ namespace UnicontaClient.Pages.CustomPage
             this.Loaded += CW_Loaded;
         }
        
+        public string FilePath { get { return browseFile.FilePath; } }
 
         private void CW_Loaded(object sender, RoutedEventArgs e)
         {

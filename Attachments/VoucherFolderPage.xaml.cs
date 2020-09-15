@@ -31,7 +31,7 @@ namespace UnicontaClient.Pages.CustomPage
     public class VouchersFolderGrid : CorasauDataGridClient
     {
         public override Type TableType { get { return typeof(VouchersClient); } }
-
+        public override bool SingleBufferUpdate { get { return false; } }
     }
 
     public class ExtendedVouchersGrid : CorasauDataGridClient

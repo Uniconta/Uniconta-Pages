@@ -32,7 +32,8 @@ namespace UnicontaClient.Pages.CustomPage
         public override IComparer GridSorting { get { return new InvItemTextSort(); } }
         public override bool AllowSort { get { return false; } }
         public override bool Readonly { get { return false; } }
-        protected override List<string> GridSkipFields { get { return new List<string>() { "ItemName" }; } }
+        public override bool SingleBufferUpdate { get { return false; } }
+        protected override List<string> GridSkipFields { get { return new List<string>(1) { "ItemName" }; } }
 
         public override bool AddRowOnPageDown()
         {

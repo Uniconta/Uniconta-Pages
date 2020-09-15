@@ -17,6 +17,8 @@ x:Class="UnicontaClient.Pages.CustomPage.CrmDebtorProspectReport"
         <Style x:Key="StyleRow" TargetType="dxg:RowControl">
             <Setter Property="Height" Value="Auto"/>
         </Style>
+        <Util:VisibilityTextConverter x:Key="VisibilityTextConverter" />
+        <Util:ImageNameToImagesourceConverter x:Key="ImageNameToImagesourceConverter"/>
     </UserControl.Resources>
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
@@ -65,6 +67,18 @@ x:Class="UnicontaClient.Pages.CustomPage.CrmDebtorProspectReport"
                                        VerticalAlignment="Center" Source="{Binding DataContext.RowData.Row.IsDebtor,
                                         RelativeSource ={RelativeSource TemplatedParent},Converter={StaticResource DebtorPropsectImageConverter}}" 
                                        Stretch="Fill" Width="16" Height="16" RenderOptions.BitmapScalingMode="NearestNeighbor" RenderOptions.EdgeMode="Aliased" />
+                            </ControlTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="HasContactEmail"  Width="30" Visible="False" >
+                        <local:CorasauDataGridTemplateColumnClient.HeaderTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="&#x2709;"  Width="16" Height="16" VerticalAlignment="Center"/>
+                            </DataTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.HeaderTemplate>
+                        <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <TextBlock Text="&#x2709;" Margin="5" Tag="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center"  MouseLeftButtonDown="HasEmailImage_MouseLeftButtonDown" Visibility="{Binding DataContext.RowData.Row.ContactEmail,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource VisibilityTextConverter}}"  Width="16" Height="16" RenderOptions.BitmapScalingMode="NearestNeighbor" RenderOptions.EdgeMode="Aliased" />
                             </ControlTemplate>
                         </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                     </local:CorasauDataGridTemplateColumnClient>

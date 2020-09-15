@@ -196,11 +196,18 @@ namespace UnicontaClient.Pages.CustomPage
 
         private async Task<bool> ValidateHeader(List<string> header)
         {
-            DateTime date, fromDate, toDate;
+            DateTime fromDate, toDate;
 
-            var x1 = DateTime.TryParseExact(header[5], "yyyyMMddhhmmssfff", CultureInfo.InvariantCulture, DateTimeStyles.None, out date);
+            //var x1 = DateTime.TryParseExact(header[5], "yyyyMMddhhmmssfff", CultureInfo.InvariantCulture, DateTimeStyles.None, out date);
             var x2 = DateTime.TryParseExact(header[12], "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None, out fromDate);
             var x3 = DateTime.TryParseExact(header[15], "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None, out toDate);
+
+            // Invalid File Format
+            if (!x2 || !x3)
+            {
+                UnicontaMessageBox.Show("Falsche DATEV Format.", "", MessageBoxButton.OK);
+                return false;
+            }
 
             var consultant = header[10];
             var client = header[11];
@@ -219,7 +226,7 @@ namespace UnicontaClient.Pages.CustomPage
                 return false;
             }
             // Invalid File Format
-            if (!x1 || !x2 || !x3)
+            if (!x2 || !x3)
             {
                 UnicontaMessageBox.Show("Falsche DATEV Format.", "", MessageBoxButton.OK);
                 return false;

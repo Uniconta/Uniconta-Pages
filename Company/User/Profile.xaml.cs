@@ -137,6 +137,7 @@ namespace UnicontaClient.Pages.CustomPage
                     user._AppDocPath = editrow._AppDocPath;
                     user._ShowGridLines = editrow._ShowGridLines;
                     user._ConfirmDelete = editrow._ConfirmDelete;
+                    user._AutoSave = editrow._AutoSave;
                     string msg;
                     if (Curlanguage != editrow._Language)
                         msg = string.Format(Uniconta.ClientTools.Localization.lookup("LanguageApplyMsg"), editrow.UserLanguage);

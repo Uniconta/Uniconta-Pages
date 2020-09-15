@@ -71,10 +71,10 @@ x:Class="UnicontaClient.Pages.CustomPage.CreateEmailListPage"
             <CorasauControls:ComboBoxEditor x:Name="cmbProductsMatch" Width="100" Grid.Column="10" Grid.Row="1" Margin="3,3,3,3" ></CorasauControls:ComboBoxEditor>
 
             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OnlyRecordsWithEmail}" Grid.Column="4" Grid.Row="2" Margin="3,3,3,3"/>
-            <CheckBox x:Name="cbxOnlyEmails" Grid.Column="6" Grid.Row="2" IsChecked="True" Margin="3,3,3,3"/>
-            <StackPanel Grid.Column="6" Grid.Row="2" Orientation="Horizontal" Margin="25,3,3,3">
-                <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=PhoneNo}"  Margin="3,3,3,3"/>
-                <CheckBox x:Name="cbxOnlyTelephone" IsChecked="True" Margin="8,3,3,3"/>
+            <StackPanel Grid.Column="6" Grid.Row="2" Orientation="Horizontal" Margin="3,2,3,3">
+                <CheckBox x:Name="cbxOnlyEmails" IsChecked="True"  />
+                <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=PhoneNo}"  Margin="10,0,0,0"/>
+                <CheckBox x:Name="cbxOnlyTelephone" IsChecked="True" Margin="15,0,0,0"/>
             </StackPanel>
           
         </Grid>

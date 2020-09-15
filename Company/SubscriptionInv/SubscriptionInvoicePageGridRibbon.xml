@@ -19,13 +19,13 @@
       <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16.png" ShortcutKey=""/>
     </RibbonItem>
   </RibbonItem>
-    <RibbonItem>
+  <RibbonItem LocalizedNameKey="CurrentRecord">
    <RibbonItem Action="InvoiceLine" LocalizedNameKey="InvoiceLines" LargeGlyph="Order_Lines_Highlighted_32x32.png" ShortcutKey="ALT+L"/>
    <RibbonItem Action="ShowInvoice" LocalizedNameKey="ShowInvoice" LargeGlyph="Show_Invoice_32x32.png" />   
    <RibbonItem Action="SendAsEmail" LocalizedNameKey="Sendinvoicebyemail" LargeGlyph="SendInvoiceMail_32x32.png" />
     <RibbonItem Action="PostInvoice" LocalizedNameKey="PostInvoice" LargeGlyph="Posted_Journal_32x32.png" />
   </RibbonItem>
-  <RibbonItem>    
+  <RibbonItem LocalizedNameKey="SendAll">    
     <RibbonItem Action="SendAsEmailOnDate" LocalizedNameKey="SendinvoicebyemailOnDate" LargeGlyph="SendInvoiceMail_32x32.png" />
     <RibbonItem Action="PostInvoiceOnDate" LocalizedNameKey="PostInvoiceOnDate" LargeGlyph="Posted_Journal_32x32.png" />
   </RibbonItem>

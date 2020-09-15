@@ -32,7 +32,7 @@
             <ClientToolsControls:LookupEditor x:Name="cmbCategory" HasCustomLookUp="True" Grid.Column="2" Grid.Row="2" HorizontalAlignment="Left" Width="200" Height="25" />
 
             <TextBlock Grid.Row="3" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=InvoiceNumber,Mode=OneWay}" VerticalAlignment="Center"></TextBlock>
-            <ClientToolsControls:IntegerEditor Text="{Binding InvoiceNumber,Mode=TwoWay}" SetMask="false"  Width="200" Height="25" x:Name="txtInvNumber" Grid.Row="3" Grid.Column="2" HorizontalAlignment="Left"/>
+            <ClientToolsControls:IntegerEditor EditValue="{Binding InvoiceNumber,Mode=TwoWay}" SetMask="false"  Width="200" Height="25" x:Name="txtInvNumber" Grid.Row="3" Grid.Column="2" HorizontalAlignment="Left"/>
 
 
             <TextBlock Grid.Row="4" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=SendInvoiceByEmail}" VerticalAlignment="Center"></TextBlock>

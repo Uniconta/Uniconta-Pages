@@ -19,7 +19,6 @@ using System.Windows;
 using Uniconta.API.Service;
 using Uniconta.DataModel;
 using Uniconta.ClientTools.DataModel;
-using Uniconta.ClientTools.DataModel.System;
 using UnicontaClient.Controls.Dialogs;
 using Uniconta.Common.User;
 

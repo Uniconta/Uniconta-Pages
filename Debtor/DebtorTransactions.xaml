@@ -46,6 +46,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorTransactions"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="HasVoucher" Visible="False" Width="50"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Project" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryAccount" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DocumentRef" Visible="False"/>
                 </localPage:GridDebtorTransaction.Columns>
                 <localPage:GridDebtorTransaction.TotalSummary>
                     <localPage:SumColumn FieldName="Debit" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>

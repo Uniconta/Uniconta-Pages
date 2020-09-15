@@ -239,6 +239,8 @@ namespace UnicontaClient.Pages.CustomPage
 
             var Debs = api.GetCache(typeof(Uniconta.DataModel.Creditor));
             var lst = (IEnumerable<CreditorTotalClient>)dgCreditorTotalsGrid.ItemsSource;
+            if (lst == null)
+                return;
             foreach (var rec in lst)
             {
                 rec.cre = (Uniconta.DataModel.Creditor)Debs.Get(rec._Account);

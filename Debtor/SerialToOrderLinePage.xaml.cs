@@ -186,10 +186,10 @@ namespace UnicontaClient.Pages.CustomPage
             UtilDisplay.RemoveMenuCommand(rb, new string[] { "AddRow", "CopyRow", "DeleteRow" });
         }
 
-        public  async override Task InitQuery()
+        public override Task InitQuery()
         {
             dgLinkedGrid.UpdateMaster(dcorderlineMaster as UnicontaBaseEntity);
-            await dgLinkedGrid.Filter(null);
+            var t1 = dgLinkedGrid.Filter(null);
             if (dcorderlineMaster._Qty < 0)
             {
                 // we select all, since it is a credit note.
@@ -200,11 +200,19 @@ namespace UnicontaClient.Pages.CustomPage
                 // We only select opens
                 var mast = new InvSerieBatchOpen();
                 mast.SetMaster(invItemMaster);
-                dgUnlinkedGrid.UpdateMaster(mast);
+                if (invItemMaster._UseBatch && api.CompanyEntity.Warehouse)
+                    dgUnlinkedGrid.masterRecords = new List<UnicontaBaseEntity>(2) { mast, new InvSerieBatchStorage() };
+                else
+                    dgUnlinkedGrid.UpdateMaster(mast);
             }
-            dgUnlinkedGrid.Filter(null);
+            var t2 = dgUnlinkedGrid.Filter(null);
+#if SILVERLIGHT
+            return t2;
+#else
+            return Task.WhenAll(t1, t2);
+#endif
         }
-
+        
         public override void AssignMultipleGrid(List<Uniconta.ClientTools.Controls.CorasauDataGrid> gridCtrls)
         {
             gridCtrls.Add(dgLinkedGrid);
@@ -350,7 +358,7 @@ namespace UnicontaClient.Pages.CustomPage
                 olSerieBatch.SetMaster(row);
                 olSerieBatch.SetMaster(dcorderlineMaster as UnicontaBaseEntity);
                 olSerieBatchList.Add(olSerieBatch);
-                if (row._Warehouse != null)
+                if (row._Warehouse != null && dcorderlineMaster._Warehouse == null)
                 {
                     dcorderlineMaster.Warehouse = row._Warehouse;
                     dcorderlineMaster.Location = row._Location;

@@ -100,6 +100,7 @@ namespace UnicontaClient.Pages.CustomPage
 #if !SILVERLIGHT
             browseControl.CompressVisibility = Visibility.Visible;
             browseControl.PDFSplitVisibility = Visibility.Visible;
+            txtPurchaseNumber.CrudApi = api;
 #endif
             voucherClientRow.PropertyChanged += VoucherClientRow_PropertyChanged;
 
@@ -338,7 +339,6 @@ namespace UnicontaClient.Pages.CustomPage
             if (!string.IsNullOrWhiteSpace(txtInvoice.Text))
                 vc._Invoice = txtInvoice.Text;
             vc._DocumentDate = txtDocumentDate.DateTime;
-            vc._PostingDate = txtPostingDate.DateTime;
             vc.Currency = Convert.ToString(cmbCurrency.SelectedItem);
             vc.CreditorAccount = leAccount.Text;
             vc.PayDate = txtPaymentDate.DateTime;
@@ -357,6 +357,7 @@ namespace UnicontaClient.Pages.CustomPage
             vc.PaymentMethod = Convert.ToString(cmbPaymentMethod.SelectedItemValue);
 #if !SILVERLIGHT
             vc.ViewInFolder = Convert.ToString(cmbViewInFolder.SelectedItem);
+            vc._PurchaseNumber = GetPurchaseNumber();
 #endif
             if (lbldim1.Visibility == Visibility.Visible)
                 vc.Dimension1 = cmbDim1.Text;
@@ -383,6 +384,18 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
 #if !SILVERLIGHT
+
+        private int GetPurchaseNumber()
+        {
+            int purchaseNumber;
+            var lookupValueStr = Convert.ToString(txtPurchaseNumber.LookupEditValue);
+
+            if (lookupValueStr != null && int.TryParse(lookupValueStr, out purchaseNumber))
+                return purchaseNumber;
+
+            return 0;
+        }
+
         string browseUrl;
         private void browseControl_FileSelected()
         {
@@ -417,36 +430,18 @@ namespace UnicontaClient.Pages.CustomPage
         public void LoadPageOnFileDrop(string[] filePaths)
         {
             browseControl.Visibility = Visibility.Collapsed;
-            int fileCount = filePaths.Length;
-            var fileInfos = new List<SelectedFileInfo>(fileCount);
-            var failedFiles = new List<string>();
             try
             {
-                foreach (var file in filePaths)
-                {
-                    var fileBytes = UtilFunctions.GetFileBytes(file);
-                    var fileName = System.IO.Path.GetFileNameWithoutExtension(file);
-                    var fileExt = DocumentConvert.GetDocumentType(System.IO.Path.GetExtension(file));
-
-                    if (fileBytes != null && fileBytes.Length <= TableAddOnData.MaxDocSize)
-                        fileInfos.Add(new SelectedFileInfo()
-                        {
-                            FileBytes = UtilFunctions.GetFileBytes(file),
-                            FileExtension = DocumentConvert.GetDocumentType(System.IO.Path.GetExtension(file)).ToString(),
-                            FileName = System.IO.Path.GetFileNameWithoutExtension(file),
-                            FilePath = file
-                        });
-                    else
-                        failedFiles.Add(string.Format("{0}: {1}", file, Uniconta.ClientTools.Localization.lookup("MaxFileSize")));
-                }
-                if (failedFiles.Count > 0)
+                List<string> failedFiles = null;
+                var fileInfos = UtilDisplay.CreateSelectedFileInfo(filePaths, out failedFiles);
+                if (failedFiles != null && failedFiles.Count > 0)
                 {
                     var cwErrorBox = new CWErrorBox(failedFiles.ToArray(), true);
                     cwErrorBox.Show();
                 }
 
-                txedVoucherComments.Text = fileInfos.Count > 1 ? string.Empty : fileInfos.SingleOrDefault()?.FileName;
-                browseControl.SelectedFileInfos = fileInfos.Count > 0 ? fileInfos.ToArray() : null;
+                txedVoucherComments.Text = fileInfos.Length > 1 ? string.Empty : fileInfos.SingleOrDefault()?.FileName;
+                browseControl.SelectedFileInfos = fileInfos.Length > 0 ? fileInfos : null;
             }
             catch (Exception ex)
             {
@@ -463,19 +458,15 @@ namespace UnicontaClient.Pages.CustomPage
             try
             {
                 browseControl.Visibility = Visibility.Collapsed;
-                var header = dataObject.GetData(DataFormats.UnicodeText)?.ToString();
-                var outlookMailDataObject = new OutlookMailDataObject(dataObject);
-                var filename = (string[])outlookMailDataObject.GetData("FileGroupDescriptor");
-                var fileExtVals = filename?.FirstOrDefault().Split('.');
-                var fileExtension = DocumentConvert.GetDocumentType(fileExtVals[fileExtVals.Length - 1]);
-                var subject = fileExtension == FileextensionsTypes.MSG ? Utility.GetMailSubject(header, filename[0]) : Utility.GetMailSubject((Stream)dataObject.GetData("FileGroupDescriptor"));
-                MemoryStream[] emailMemoryStream = (MemoryStream[])outlookMailDataObject.GetData("FileContents");
-                var memoryStream = emailMemoryStream.FirstOrDefault();
-                var binaryReader = new BinaryReader(memoryStream);
-                var emailbytes = binaryReader.ReadBytes((int)memoryStream.Length);
-                txedVoucherComments.Text = subject;
-                var selectedfileInfo = new SelectedFileInfo() { FileBytes = emailbytes, FileExtension = fileExtension.ToString(), FileName = subject, FilePath = string.Empty };
-                browseControl.SelectedFileInfos = new SelectedFileInfo[] { selectedfileInfo };
+                string error;
+                var selectedFileInfo = UtilDisplay.CreateSelectedFileInfo(dataObject, out error);
+                if (string.IsNullOrEmpty(error) && selectedFileInfo != null)
+                {
+                    txedVoucherComments.Text = selectedFileInfo.FileName;
+                    browseControl.SelectedFileInfos = new SelectedFileInfo[] { selectedFileInfo };
+                }
+                else
+                    UnicontaMessageBox.Show(error, Uniconta.ClientTools.Localization.lookup("Error"));
             }
             catch (Exception ex)
             {

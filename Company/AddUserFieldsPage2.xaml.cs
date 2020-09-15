@@ -85,6 +85,7 @@ namespace UnicontaClient.Pages.CustomPage
                 cbRefTable.ItemsSource = appenums;
                 layoutRefTable.Visibility = Visibility.Visible;
                 liMultiline.Visibility = Visibility.Collapsed;
+                liMultiSelection.Visibility = Visibility.Collapsed;
             }
             else if ((_FieldType == CustomTypeCode.String))
             {
@@ -103,18 +104,29 @@ namespace UnicontaClient.Pages.CustomPage
                 cbRefTable.ItemsSource = referenceTables;
                 layoutRefTable.Visibility = Visibility.Visible;
                 liMultiline.Visibility = Visibility.Visible;
+                liMultiSelection.Visibility = Visibility.Collapsed;
             }
             else if ((_FieldType == CustomTypeCode.Double) || (_FieldType == CustomTypeCode.Single) || (_FieldType == CustomTypeCode.Money))
             {
                 liMath.Visibility = Visibility.Visible;
                 layoutRefTable.Visibility = Visibility.Collapsed;
                 liMultiline.Visibility = Visibility.Collapsed;
+                liMultiSelection.Visibility = Visibility.Collapsed;
+
+            }
+            else if (_FieldType == CustomTypeCode.Enum)
+            {
+                liMath.Visibility = Visibility.Collapsed;
+                layoutRefTable.Visibility = Visibility.Collapsed;
+                liMultiline.Visibility = Visibility.Collapsed;
+                liMultiSelection.Visibility = Visibility.Visible;
             }
             else
             {
                 liMath.Visibility = Visibility.Collapsed;
                 layoutRefTable.Visibility = Visibility.Collapsed;
                 liMultiline.Visibility = Visibility.Collapsed;
+                liMultiSelection.Visibility = Visibility.Collapsed;
             }
         }
 
@@ -123,7 +135,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (ActionType == "Save")
             {
 #if !SILVERLIGHT
-                var element = FocusManager.GetFocusedElement(Application.Current.Windows[0]);
+                var element = FocusManager.GetFocusedElement(UtilDisplay.GetCurentWindow());
                 if (element is Control)
                 {
                     var ctrl = element as Control;

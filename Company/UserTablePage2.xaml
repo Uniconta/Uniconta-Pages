@@ -42,14 +42,17 @@ x:Class="UnicontaClient.Pages.CustomPage.UserTablePage2"
                         <CorasauControls:CorasauLayoutItem FieldName="Prompt" x:Name="liPrompt">
                             <CorasauControls:TextEditor Text="{Binding Prompt,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="TableBaseType" x:Name="liTableBaseType">
+                            <CorasauControls:ComboBoxEditor SelectedItem="{Binding TableBaseType,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="AccessGroup" x:Name="liAccessGroup">
-                            <CorasauControls:IntegerEditor Text="{Binding AccessGroup,Mode=TwoWay}" NullValue="0" SetMask="false"/>
+                            <CorasauControls:IntegerEditor EditValue="{Binding AccessGroup,Mode=TwoWay}" NullValue="0" SetMask="false"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="MenuPosition" x:Name="liMenuPosition">
                             <CorasauControls:ComboBoxEditor x:Name="cmbPosition" SelectedItem="{Binding MenuPosition,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="UserDefinedId" x:Name="liUserDefinedId">
-                            <CorasauControls:IntegerEditor Text="{Binding UserDefinedId,Mode=TwoWay}" NullValue="0" SetMask="false"/>
+                            <CorasauControls:IntegerEditor EditValue="{Binding UserDefinedId,Mode=TwoWay}" NullValue="0" SetMask="false"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="MasterTable" x:Name="layoutMaster">
                             <CorasauControls:ComboBoxEditor x:Name="cbMaster" SelectedItem="{Binding MasterTable,Mode=TwoWay}"/>

@@ -13,6 +13,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorPaymentFormatPage2"
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="30"/>
             </Grid.RowDefinitions>
             <CorasauControls:CorasauRibbonControl x:Name="frmRibbon" XMLSourcePath=";component/Assets/FormRibbonNoLayout.xml" Grid.Row="0"/>
@@ -49,6 +50,9 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorPaymentFormatPage2"
                         <CorasauControls:CorasauLayoutItem FieldName="NoneBankDayAction" x:Name="liNoneBankDayAction">
                             <CorasauControls:ComboBoxEditor x:Name="cmbNoneBankDayAction" SelectedItem="{Binding NoneBankDayAction,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="UseDebtorAccAsMandate" x:Name="liUseDebtorAccAsMandate">
+                            <CorasauControls:CheckEditor IsChecked="{Binding UseDebtorAccAsMandate,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
                     <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpSEPA" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=SEPA}" Orientation="Vertical" 
                                                         CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
@@ -58,7 +62,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorPaymentFormatPage2"
                     </CorasauControls:CorasauLayoutGroup>
                 </CorasauControls:CorasauLayoutGroup>
             </CorasauControls:CorasauLayoutControl>
-            <Button x:Name="btnOptions" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Options}" Click="btnOptions_Click" Grid.Row="2" Width="315" HorizontalAlignment="Left" Margin="10 0 0 0"/>
+            <Button x:Name="btnOptions" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Options}" Click="btnOptions_Click" Grid.Row="2" Width="390" HorizontalAlignment="Left" Margin="10 0 0 0"/>
         </Grid>
     </CorasauControls:BusyIndicator>
 </Pages:FormBasePage>

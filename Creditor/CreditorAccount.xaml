@@ -116,7 +116,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorAccount"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryCountry" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="OurAccount" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim1" FieldName="Dimension1" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient  x:Name="cldim2" FieldName="Dimension2" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim2" FieldName="Dimension2" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim3" FieldName="Dimension3" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim4" FieldName="Dimension4" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim5" FieldName="Dimension5" Visible="False"/>
@@ -139,6 +139,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorAccount"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="VatNumber" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="RefInPayment" Visible="False" />
+                    <localPage:ComboBoxColumnClient x:Name="BalanceMethod" Visible="False"/>
                 </localPage:CreditorAccountGrid.Columns>
                 
                 <localPage:CreditorAccountGrid.TotalSummary>

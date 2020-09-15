@@ -27,6 +27,9 @@ x:Class="UnicontaClient.Pages.CustomPage.CrmFollowUpPage2"
             <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
                 <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="grpFirst">
                     <CorasauControls:CorasauLayoutGroup x:Name="grpDescription" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Description}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="350">
+                        <CorasauControls:CorasauLayoutItem x:Name="liPrimaryKeyId" FieldName="PrimaryKeyId">
+                            <CorasauControls:IntegerEditor Text="{Binding PrimaryKeyId}" IsReadOnly="True"/>
+                        </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem x:Name="liCreated" FieldName="Created" >
                             <CorasauControls:DateEditor x:Name="deCreated" EditValue="{Binding Created, Mode=TwoWay}" Mask="g" />
                         </CorasauControls:CorasauLayoutItem>
@@ -58,11 +61,16 @@ x:Class="UnicontaClient.Pages.CustomPage.CrmFollowUpPage2"
                         </CorasauControls:CorasauLayoutItem>
 
                         <CorasauControls:CorasauLayoutItem FieldName="DCType" x:Name="itmDCType" Visibility="Collapsed">
-                            <CorasauControls:ComboBoxEditor  SelectedItem="{Binding DCType,Mode=TwoWay}"/>
+                            <CorasauControls:ComboBoxEditor  SelectedItem="{Binding DCType,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="DCAccount" x:Name="itemDCAccount" Visibility="Collapsed">
                             <CorasauControls:LookupEditor x:Name="lookupDCAccount" GotFocus="lookupDCAccount_GotFocus" Text="{Binding DCAccount,Mode=TwoWay}" HasCustomLookUp="True"  ItemsSource="{Binding AccountSource,Mode=OneWay}" />
                         </CorasauControls:CorasauLayoutItem>
+
+                        <CorasauControls:CorasauLayoutItem x:Name="liContact" FieldName="DCAccountContact" >
+                            <CorasauControls:LookupEditor x:Name="leContact" Text="{Binding DCAccountContact,Mode=TwoWay}"  HasCustomLookUp="True" ItemsSource="{Binding ContactSource,Mode=OneWay}" SelectedIndexChanged="leContact_SelectedIndexChanged"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        
                     </CorasauControls:CorasauLayoutGroup>
 
                     <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpFollowUp" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FollowUp}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="350">

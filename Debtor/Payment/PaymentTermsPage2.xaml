@@ -71,7 +71,7 @@ x:Class="UnicontaClient.Pages.CustomPage.PaymentTermsPage2"
 
                     <CorasauControls:CorasauLayoutGroup x:Name="grpDays" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Days}" Orientation="Vertical" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                         <CorasauControls:CorasauLayoutItem FieldName="Days" x:Name="liDays">
-                            <CorasauControls:IntegerEditor Text="{Binding Days,Mode=TwoWay}" SetMask="false"/>
+                            <CorasauControls:IntegerEditor EditValue="{Binding Days,Mode=TwoWay}" SetMask="false"/>
                             <!--<toolkitControls:NumericUpDown Value="{Binding Days,Mode=TwoWay}" Minimum="0" Maximum="1000"/>-->
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="EndOfMonth" x:Name="liEndofMonth">
@@ -87,7 +87,7 @@ x:Class="UnicontaClient.Pages.CustomPage.PaymentTermsPage2"
                             <CorasauControls:DoubleEditor FieldName="CashDiscountPct" MaxLength="10" />
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="CashDiscountDays" x:Name="liCashDiscountDays" >
-                            <CorasauControls:IntegerEditor  Text="{Binding CashDiscountDays,Mode=TwoWay}" MaxLength="30"/>
+                            <CorasauControls:IntegerEditor  EditValue="{Binding CashDiscountDays,Mode=TwoWay}" MaxLength="30"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="CashdiscountMethod" x:Name="liCashDiscountMethod">
                             <CorasauControls:ComboBoxEditor x:Name="cbCashdiscountMethod" SelectedItem="{Binding CashdiscountMethod,Mode=TwoWay}"/>

@@ -11,7 +11,7 @@ using UnicontaClient.Pages.Creditor.Payments;
 
 namespace UnicontaISO20022CreditTransfer
 {
-    class BankSpecificSettingsNL : BankSpecificSettings
+    public class BankSpecificSettingsNL : BankSpecificSettings
     {
 
         #region Properties
@@ -89,7 +89,7 @@ namespace UnicontaISO20022CreditTransfer
         /// </summary>
         public override string BatchBooking()
         {
-            return string.Empty;
+            return CredPaymFormat.BatchBooking ? TRUE_VALUE : FALSE_VALUE;
         }
 
 

@@ -14,6 +14,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Uniconta.API.Service;
 using Uniconta.API.System;
 using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.DataModel;
@@ -34,7 +35,7 @@ namespace UnicontaClient.Pages.CustomPage
         public override bool AllowSort { get { return false; } }
         public override bool Readonly { get { return false; } }
         public override bool IsAutoSave { get { return true; } }
-
+        public DateTime FromDate { get; set; }
         public override bool AddRowOnPageDown()
         {
             var selectedItem = (ProjectBudgetLineLocal)this.SelectedItem;
@@ -49,7 +50,7 @@ namespace UnicontaClient.Pages.CustomPage
             var lst = (IList)this.ItemsSource;
             if (lst == null || lst.Count == 0)
             {
-                newRow._Date = BasePage.GetSystemDefaultDate().Date;
+                newRow._Date = FromDate.Date != DateTime.MinValue ? FromDate.Date : BasePage.GetSystemDefaultDate().Date; ;
             }
             else
             {
@@ -81,17 +82,18 @@ namespace UnicontaClient.Pages.CustomPage
     public partial class ProjectBudgetPlaningLinePage : GridBasePage
     {
         public override string NameOfControl { get { return TabControls.ProjectBudgetPlaningLinePage; } }
-        SQLCache ProjectCache, EmployeeCache, ItemCache, PayrollCache;
-        int PriceGrp;
+        SQLCache ProjectCache, EmployeeCache, ItemCache, PayrollCache, BudgetGroupCache;
         List<PropValuePair> inputs;
+        List<UnicontaBaseEntity> inputsMaster;
+
         int monthNumber, quarterNo, year;
         double normQty, budgetQty;
         DateTime fromDate, toDate;
-        public ProjectBudgetPlaningLinePage(string[] filterFld, int[] filterDateValues,double[] qtyValues, DateTime[] dates, CrudAPI api)
+        public ProjectBudgetPlaningLinePage(string[] filterFld, int[] filterDateValues,double[] qtyValues, DateTime[] dates, CrudAPI api, string budgetGroup)
             : base(api, string.Empty)
         {
             InitializeComponent();
-            CreateFiltersForData(filterFld, filterDateValues, qtyValues, dates);
+            CreateFiltersForData(filterFld, filterDateValues, qtyValues, dates, budgetGroup);
             InitPage();
         }
 
@@ -106,15 +108,30 @@ namespace UnicontaClient.Pages.CustomPage
             dgProjectBgtPlangLine.ShowTotalSummary();
             dgProjectBgtPlangLine.CustomSummary += dgProjectBudgetLinePageGrid_CustomSummary;
             dgProjectBgtPlangLine.tableView.ShowGroupFooters = true;
-            LoadData();
+
+            var Comp = api.CompanyEntity;
+
+            ProjectCache = Comp.GetCache(typeof(Uniconta.DataModel.Project));
+            EmployeeCache = Comp.GetCache(typeof(Uniconta.DataModel.Employee));
+            ItemCache = Comp.GetCache(typeof(Uniconta.DataModel.InvItem));
+            PayrollCache = Comp.GetCache(typeof(Uniconta.DataModel.EmpPayrollCategory));
+            BudgetGroupCache = Comp.GetCache(typeof(Uniconta.DataModel.ProjectBudgetGroup));
         }
 
-        void CreateFiltersForData(string[] filterFld, int[] filterDateValues, double[] qtyValues, DateTime[] dates)
+        async void CreateFiltersForData(string[] filterFld, int[] filterDateValues, double[] qtyValues, DateTime[] dates, string projectBudgetGrp)
         {
             var filterFldName = filterFld[0];
             var filterFldValue = filterFld[1];
             inputs = new List<PropValuePair>();
             inputs.Add(PropValuePair.GenereteWhereElements(filterFldName, typeof(string), filterFldValue));
+
+            if (BudgetGroupCache == null)
+                BudgetGroupCache = await api.LoadCache(typeof(Uniconta.DataModel.ProjectBudgetGroup));
+            inputsMaster = new List<UnicontaBaseEntity>();
+            var budgetGrp = (ProjectBudgetGroup)BudgetGroupCache.Get(projectBudgetGrp);
+            if (budgetGrp != null)
+                inputsMaster.Add((ProjectBudgetGroup)BudgetGroupCache.Get(projectBudgetGrp));
+
             monthNumber = filterDateValues[0];
             quarterNo = filterDateValues[1];
             year = filterDateValues[2];
@@ -124,16 +141,11 @@ namespace UnicontaClient.Pages.CustomPage
             toDate = dates[1];
         }
 
-        public override Task InitQuery()
-        {
-            return null;
-        }
-
-        async void LoadData()
+        public async override Task InitQuery()
         {
             busyIndicator.IsBusy = true;
-            var projLst = await api.Query<ProjectBudgetLineLocal>(inputs);
-            IEnumerable<ProjectBudgetLineLocal> lst = null;
+            var projLst = await api.Query<ProjectBudgetLineLocal>(inputsMaster, inputs);
+            IEnumerable<ProjectBudgetLineLocal> lst;
             if (year > 0 && monthNumber > 0)
                 lst = projLst?.Where(x => x.Date.Year == year && x.Date.Month == monthNumber);
             else if (year > 0 && quarterNo > 0)
@@ -142,7 +154,7 @@ namespace UnicontaClient.Pages.CustomPage
                 lst = projLst?.Where(x => x.Date.Year == year && x.Date.Month >= months[0] && x.Date.Month <= months[1]);
             }
             else if (monthNumber > 0 && quarterNo > 0)
-                lst = projLst;
+                lst = null;
             else if (monthNumber > 0)
                 lst = projLst?.Where(x => x.Date.Month == monthNumber);
             else if (year > 0)
@@ -154,9 +166,9 @@ namespace UnicontaClient.Pages.CustomPage
                 period = string.Format("{0} {1}", months[0], year);
             }
             else
-                lst = projLst;
+                lst = null;
 
-            dgProjectBgtPlangLine.SetSource(lst?.ToArray());
+            dgProjectBgtPlangLine.SetSource(lst != null ? lst.ToArray() : projLst);
             busyIndicator.IsBusy = false;
             SetStatusText(budgetQty);
             dgProjectBgtPlangLine.Visibility = Visibility.Visible;
@@ -344,23 +356,11 @@ namespace UnicontaClient.Pages.CustomPage
                 rec.CostPrice = item._CostPrice;
             }
 
-            double price = 0d;
-            int pg = PriceGrp;
-            if (pg == 3)
-            {
-                price = item._SalesPrice3;
-                if (price == 0)
-                    pg = 2;
-            }
-            if (pg == 2)
-                price = item._SalesPrice2;
-            if (price == 0)
-                price = item._SalesPrice1;
-            if (price != 0d)
+            if (item._SalesPrice1 != 0d)
             {
                 if (rec._Qty == 0)
                     rec.Qty = 1d;
-                rec.SalesPrice = price;
+                rec.SalesPrice = item._SalesPrice1;
             }
 
             if (item._Dim1 != null) rec.Dimension1 = item._Dim1;
@@ -374,8 +374,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (item._PayrollCategory != null)
             {
                 rec.PayrollCategory = item._PayrollCategory;
-                if (rec._SalesPrice == 0d)
-                    PayrollCat(rec, false);
+                PayrollCat(rec, false);
             }
             if (item._Unit != 0 && rec._Unit != item._Unit)
             {
@@ -407,6 +406,7 @@ namespace UnicontaClient.Pages.CustomPage
             switch (ActionType)
             {
                 case "AddRow":
+                    dgProjectBgtPlangLine.FromDate = fromDate;
                     dgProjectBgtPlangLine.AddRow();
                     break;
                 case "CopyRow":
@@ -431,48 +431,84 @@ namespace UnicontaClient.Pages.CustomPage
 
         async void PayrollCat(ProjectBudgetLineLocal rec, bool AddItem)
         {
+            double costPrice = 0, salesPrice = 0;
+            var emp = (Uniconta.DataModel.Employee)EmployeeCache?.Get(rec._Employee);
+            if (emp != null)
+            {
+                costPrice = emp._CostPrice;
+                salesPrice = emp._SalesPrice;
+            }
+
             var pay = (Uniconta.DataModel.EmpPayrollCategory)PayrollCache?.Get(rec._PayrollCategory);
-            if (pay == null)
-                return;
-
-            if (pay._Unit != 0 && rec._Unit != pay._Unit)
+            if (pay != null)
             {
-                rec._Unit = pay._Unit;
-                rec.NotifyPropertyChanged("Unit");
+                if (pay._Unit != 0 && rec._Unit != pay._Unit)
+                {
+                    rec._Unit = pay._Unit;
+                    rec.NotifyPropertyChanged("Unit");
+                }
+
+                if (pay._PrCategory != null)
+                    rec.PrCategory = pay._PrCategory;
+
+                if (pay._Rate != 0)
+                    costPrice = pay._Rate;
+                if (pay._SalesPrice != 0)
+                    salesPrice = pay._SalesPrice;
+
+                string Item = pay._Item;
+                if (pay._Dim1 != null) rec.Dimension1 = pay._Dim1;
+                if (pay._Dim2 != null) rec.Dimension2 = pay._Dim2;
+                if (pay._Dim3 != null) rec.Dimension3 = pay._Dim3;
+                if (pay._Dim4 != null) rec.Dimension4 = pay._Dim4;
+                if (pay._Dim5 != null) rec.Dimension5 = pay._Dim5;
+
+                if (emp != null)
+                {
+                    Uniconta.DataModel.EmpPayrollCategoryEmployee found = null;
+                    var Rates = pay.Rates ?? await pay.LoadRates(api);
+                    foreach (var rate in Rates)
+                    {
+                        if (rate._ValidFrom != DateTime.MinValue && rate._ValidFrom > rec._Date)
+                            continue;
+                        if (rate._ValidTo != DateTime.MinValue && rate._ValidTo < rec._Date)
+                            continue;
+                        if (rate._Employee != emp._Number)
+                            continue;
+                        if (rate._Project != null)
+                        {
+                            if (rate._Project == rec._Project)
+                            {
+                                found = rate;
+                                break;
+                            }
+                        }
+                        else if (found == null)
+                            found = rate;
+                    }
+
+                    if (found != null)
+                    {
+                        if (found._CostPrice != 0d)
+                            costPrice = found._CostPrice;
+                        else if (found._Rate != 0d)
+                            costPrice = found._Rate;
+                        if (found._SalesPrice != 0d)
+                            salesPrice = found._SalesPrice;
+                        if (found._Item != null)
+                            Item = found._Item;
+
+                        if (found._Dim1 != null) rec.Dimension1 = found._Dim1;
+                        if (found._Dim2 != null) rec.Dimension2 = found._Dim2;
+                        if (found._Dim3 != null) rec.Dimension3 = found._Dim3;
+                        if (found._Dim4 != null) rec.Dimension4 = found._Dim4;
+                        if (found._Dim5 != null) rec.Dimension5 = found._Dim5;
+                    }
+                }
+
+                if (AddItem && Item != null)
+                    rec.Item = Item;
             }
-
-            var Rates = pay.Rates ?? await pay.LoadRates(api);
-
-            double costPrice = pay._Rate, salesPrice = pay._SalesPrice;
-            string Item = pay._Item;
-            if (pay._Dim1 != null) rec.Dimension1 = pay._Dim1;
-            if (pay._Dim2 != null) rec.Dimension2 = pay._Dim2;
-            if (pay._Dim3 != null) rec.Dimension3 = pay._Dim3;
-            if (pay._Dim4 != null) rec.Dimension4 = pay._Dim4;
-            if (pay._Dim5 != null) rec.Dimension5 = pay._Dim5;
-
-            var itm = rec._Item;
-            var rate = (from ct in Rates where ct._Employee == rec._Employee && (itm == null || itm == ct._Item) select ct).FirstOrDefault();
-            if (rate != null)
-            {
-                if (rate._CostPrice != 0d)
-                    costPrice = rate._CostPrice;
-                else if (rate._Rate != 0d)
-                    costPrice = rate._Rate;
-                if (rate._SalesPrice != 0d)
-                    salesPrice = rate._SalesPrice;
-                if (rate._Item != null)
-                    Item = rate._Item;
-
-                if (rate._Dim1 != null) rec.Dimension1 = rate._Dim1;
-                if (rate._Dim2 != null) rec.Dimension2 = rate._Dim2;
-                if (rate._Dim3 != null) rec.Dimension3 = rate._Dim3;
-                if (rate._Dim4 != null) rec.Dimension4 = rate._Dim4;
-                if (rate._Dim5 != null) rec.Dimension5 = rate._Dim5;
-            }
-
-            if (AddItem && Item != null)
-                rec.Item = Item;
             if (costPrice != 0d)
             {
                 if (rec._Qty == 0)
@@ -495,6 +531,21 @@ namespace UnicontaClient.Pages.CustomPage
                 var selected = (ProjectClient)ProjectCache.Get(selectedItem._Project);
                 setTask(selected, selectedItem);
             }
+        }
+
+        protected override async void LoadCacheInBackGround()
+        {
+            var api = this.api;
+            if (ProjectCache == null)
+                ProjectCache = await api.LoadCache(typeof(Uniconta.DataModel.Project)).ConfigureAwait(false);
+            if (EmployeeCache == null)
+                EmployeeCache = await api.LoadCache(typeof(Uniconta.DataModel.Employee)).ConfigureAwait(false);
+            if (ItemCache == null)
+                ItemCache = await api.LoadCache(typeof(Uniconta.DataModel.InvItem)).ConfigureAwait(false);
+            if (PayrollCache == null)
+                PayrollCache = await api.LoadCache(typeof(Uniconta.DataModel.EmpPayrollCategory)).ConfigureAwait(false);
+            if (BudgetGroupCache == null)
+                BudgetGroupCache = await api.LoadCache(typeof(Uniconta.DataModel.ProjectBudgetGroup)).ConfigureAwait(false);
         }
     }
 }

@@ -75,7 +75,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrdersPage2"
                             </CorasauControls:LookupEditor>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="OrderNumber" x:Name="liOrderNumber">
-                            <CorasauControls:IntegerEditor Text="{Binding OrderNumber,Mode=TwoWay}" SetMask="false"/>
+                            <CorasauControls:IntegerEditor EditValue="{Binding OrderNumber,Mode=TwoWay}" SetMask="false"/>
                         </CorasauControls:CorasauLayoutItem>
 
                         <CorasauControls:CorasauLayoutItem FieldName="DeliveryDate" x:Name="liDeliveryDate">
@@ -103,11 +103,11 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrdersPage2"
                         </CorasauControls:CorasauLayoutItem>
 
                         <CorasauControls:CorasauLayoutItem FieldName="Employee" x:Name="liEmployee">
-                            <CorasauControls:LookupEditor x:Name="Employeelookupeditor" EditValue="{Binding Employee,Mode=TwoWay}" />
+                            <CorasauControls:LookupEditor x:Name="Employeelookupeditor" Text="{Binding Employee,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                         </CorasauControls:CorasauLayoutItem>
                        
                         <CorasauControls:CorasauLayoutItem FieldName="Settlements" x:Name="liSettlements">
-                            <CorasauControls:IntegerEditor Text="{Binding Settlements,Mode=TwoWay}" SetMask="False"/>
+                            <CorasauControls:IntegerEditor EditValue="{Binding Settlements,Mode=TwoWay}" SetMask="False"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="TransType" x:Name="liTransType">
                             <CorasauControls:LookupEditor x:Name="leTransType" EditValue="{Binding TransType,Mode=TwoWay}">
@@ -121,6 +121,14 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrdersPage2"
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="PricesInclVat" x:Name="liPricesInclVat">
                             <CorasauControls:CheckEditor  x:Name="chkIncVat"  IsChecked="{Binding PricesInclVat, Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="Vat" x:Name="liVat">
+                            <CorasauControls:LookupEditor x:Name="leVat" Text="{Binding Vat,Mode=TwoWay}">
+                            </CorasauControls:LookupEditor>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="Offer" x:Name="liOffer">
+                            <CorasauControls:IntegerEditor x:Name="txtOffer" EditValue="{Binding Offer,Mode=TwoWay}">
+                            </CorasauControls:IntegerEditor>
                         </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
                     <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpSize" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Size}"  Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="400">
@@ -168,7 +176,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrdersPage2"
                             <CorasauControls:DateEditor x:Name="dePackNotePrinted" EditValue="{Binding PackNotePrinted,Mode=OneWay}" IsReadOnly="True" IsEnabled="False"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="LastPackNote" x:Name="liLastPackNote">
-                            <CorasauControls:IntegerEditor Text="{Binding LastPackNote,Mode=TwoWay}"/>
+                            <CorasauControls:IntegerEditor EditValue="{Binding LastPackNote,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="Installation" x:Name="lblDeliveryAddress" Style="{StaticResource LayoutItemsstyle}" ButtonContent="&#x2B9D;" ButtonClicked="lblDeliveryAddress_ButtonClicked">
                             <CorasauControls:LookupEditor x:Name="leDeliveryAddress" EditValue="{Binding Installation,Mode=TwoWay}"/>
@@ -234,7 +242,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrdersPage2"
                     </CorasauControls:CorasauLayoutGroup>
                     <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpProject"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Project}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="450" >
                         <CorasauControls:CorasauLayoutItem x:Name="projectItem" FieldName="Project">
-                            <CorasauControls:LookupEditor x:Name="Projectlookupeditor" EditValue="{Binding Project,Mode=TwoWay}" />
+                            <CorasauControls:LookupEditor x:Name="Projectlookupeditor" Text="{Binding Project,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem x:Name="prCategoryItem" FieldName="PrCategory">
                             <CorasauControls:LookupEditor x:Name="PrCategorylookupeditor" EditValue="{Binding PrCategory,Mode=TwoWay}" />

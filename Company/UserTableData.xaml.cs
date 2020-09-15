@@ -46,6 +46,7 @@ namespace UnicontaClient.Pages.CustomPage
         string layoutname;
         UnicontaBaseEntity master;
         string mastertabName;
+        bool isInitialized;
         public UserTableData(TableHeader thMaster, string layoutname, UnicontaBaseEntity masterRecord)
             : base(thMaster)
         {
@@ -121,7 +122,8 @@ namespace UnicontaClient.Pages.CustomPage
                         this.thMaster = tableHeaderClient;
                         Layout._SubId = api.CompanyId;
                         this.layoutname = header;
-                        Initialize(thMaster, null);
+                        if (!isInitialized)
+                            Initialize(thMaster, null);
                         break;
                     }
                 }
@@ -171,6 +173,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgTabledataGrid.UpdateMaster(masterRecord);
+            isInitialized = true;
         }
 
         List<TableHeader> dtlTables;
@@ -194,15 +197,12 @@ namespace UnicontaClient.Pages.CustomPage
                     nodeText = Uniconta.ClientTools.Localization.lookup("UserTableData");
                 else
                 {
-                    var tbl = dtlTables.FirstOrDefault();
-                    if (tbl != null)
-                    {
-                        nodeText = !string.IsNullOrEmpty(tbl._Prompt) ? UserFieldControl.LocalizePrompt(tbl._Prompt) : tbl._Name;
-                        tblName = tbl._Name;
-                    }
+                    var tbl = dtlTables[0];
+                    tblName = tbl._Name;
+                    nodeText = tbl._Prompt != null ? UserFieldControl.LocalizePrompt(tbl._Prompt) : tbl._Name;
                 }
                 childRibbon.Name = nodeText;
-                childRibbon.ActionName = dtlTables.Count > 1 ? "" : string.Format("UserTableData;{0}", tblName);
+                childRibbon.ActionName = dtlTables.Count > 1 ? "" : string.Concat("UserTableData;", tblName);
                 childRibbon.Child = childList;
                 childRibbon.Glyph = "UserFieldData_32x32.png";
                 childRibbon.LargeGlyph = "UserFieldData_32x32.png";
@@ -213,18 +213,16 @@ namespace UnicontaClient.Pages.CustomPage
                 rb.rbnlist.Add(treeRibbon);
                 if (dtlTables.Count > 1)
                 {
-                    var ribbonList = new List<TreeRibbon>();
                     foreach (var ur in dtlTables)
                     {
                         var ribbonNode = new TreeRibbon();
                         ribbonNode.Name = !string.IsNullOrEmpty(ur._Prompt) ? UserFieldControl.LocalizePrompt(ur._Prompt) : ur._Name;
-                        ribbonNode.ActionName = string.Format("UserTableData;{0}", ur._Name);
+                        ribbonNode.ActionName = string.Concat("UserTableData;", ur._Name);
                         ribbonNode.LargeGlyph = "CopyUserTable_16x16.png";
                         ribbonNode.Glyph = "CopyUserTable_16x16.png";
                         ribbonNode.Child = new List<TreeRibbon>();
-                        ribbonList.Add(ribbonNode);
+                        childList.Add(ribbonNode);
                     }
-                    childList.AddRange(ribbonList);
                 }
                 rb.RefreshMenuItem(userRbnList);
             }
@@ -238,15 +236,16 @@ namespace UnicontaClient.Pages.CustomPage
                 UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("UserTypeMasterError"), Uniconta.ClientTools.Localization.lookup("Error"));
                 return;
             }
-            var row = Activator.CreateInstance(userType) as TableData;
+            var row = Activator.CreateInstance(userType) as BaseUserTable;
             var UserFieldDef = row.UserFieldDef();
             localMenu.UserFields = UserFieldDef;
 
             if (dgTabledataGrid.Columns.Count == 0)
             {
-
                 if (thMaster._HasPrimaryKey)
                     UserFieldControl.CreateKeyFieldsOnGrid(dgTabledataGrid, thMaster._PKprompt);
+                if (thMaster._TableType == TableBaseType.Transaction)
+                    UserFieldControl.CreateDateFieldOnGrid(dgTabledataGrid);
                 if (UserFieldDef != null)
                     UserFieldControl.CreateUserFieldOnGrid(dgTabledataGrid, UserFieldDef, (RowIndexConverter)this.Resources["RowIndexConverter"], api, !dgTabledataGrid.IsEditable, useBinding: false);
                 Layout._SubId = api.CompanyId;
@@ -256,7 +255,6 @@ namespace UnicontaClient.Pages.CustomPage
             detailControl.CreateUserField(UserFieldDef, thMaster._HasPrimaryKey, this.api, thMaster._PKprompt);
             if (thMaster._MasterTable != null)
             {
-
                 var masterColumn = new CorasauDataGridTemplateColumnClient();
                 masterColumn.FieldName = "MasterKey";
                 masterColumn.RefType = row.MasterType;
@@ -298,7 +296,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
         void localMenu_OnItemClicked(string ActionType)
         {
-            var selectedItem = dgTabledataGrid.SelectedItem as TableData;
+            var selectedItem = dgTabledataGrid.SelectedItem as BaseUserTable;
             if (ActionType.Contains("UserTableData"))
             {
                 if (selectedItem == null)
@@ -309,9 +307,9 @@ namespace UnicontaClient.Pages.CustomPage
                 var userTable = dtlTables.Where(x => x._Name == tableName).FirstOrDefault();
                 object[] parmtbldata = new object[3];
                 parmtbldata[0] = userTable;
-                parmtbldata[1] = string.Format("{0};{1}", tableName, tabName);
+                parmtbldata[1] = string.Concat(tableName, ";", tabName);
                 parmtbldata[2] = dgTabledataGrid.syncEntity;
-                AddDockItem(TabControls.UserTableData, parmtbldata, string.Format("{0}:{1}/{2}", Uniconta.ClientTools.Localization.lookup("Data"), tabName, selectedItem._KeyName));
+                AddDockItem(TabControls.UserTableData, parmtbldata, string.Format("{0}:{1}/{2}", Uniconta.ClientTools.Localization.lookup("Data"), tabName, (selectedItem as TableData)?._KeyName));
                 return;
             }
             switch (ActionType)

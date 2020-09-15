@@ -19,7 +19,7 @@ using System.Text;
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
 {
-    class DanskeBankPayFormat
+    public class DanskeBankPayFormat
     {
         internal const string TRANSTYPE_CMBO = "CMBO";
         internal const string TRANSTYPE_CMUO = "CMUO";

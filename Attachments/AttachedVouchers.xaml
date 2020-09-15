@@ -20,8 +20,8 @@ x:Class="UnicontaClient.Pages.CustomPage.AttachedVouchers"
         </Grid.RowDefinitions>
         <CorasauControls:CorasauRibbonControl x:Name="localMenu" XMLSourcePath=";component/Pages/Attachments/AttachedVouchersRibbon.xml" Grid.Row="0"/>
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
-            <localPage:VouchersGrid x:Name="dgAttachedVoucherGrid" AutoGenerateColumns="None">
-                <localPage:VouchersGrid.Columns>
+            <localPage:AttachedVouchersGrid x:Name="dgAttachedVoucherGrid" AutoGenerateColumns="None">
+                <localPage:AttachedVouchersGrid.Columns>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PrimaryKeyId" Width="70" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Created" ShowTime="True" Width="120" SortOrder="Descending" Visible="False">
                         <localPage:CorasauDataGridTemplateColumnClient.EditSettings>
@@ -89,8 +89,8 @@ x:Class="UnicontaClient.Pages.CustomPage.AttachedVouchers"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Qty" Visible="False" AllowThousandMask="True" Mask="N2"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="SizeKB" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Reference" Visible="False" />
-                </localPage:VouchersGrid.Columns>
-            </localPage:VouchersGrid>
+                </localPage:AttachedVouchersGrid.Columns>
+            </localPage:AttachedVouchersGrid>
         </CorasauControls:BusyIndicator>
     </Grid>
 </Pages:GridBasePage>

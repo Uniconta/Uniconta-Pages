@@ -55,6 +55,8 @@ namespace UnicontaClient.Pages.CustomPage
             dgBankStatement.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgBankStatement.RowDoubleClick += dgBankStatement_RowDoubleClick;
+
+            RemoveMenuItem();
         }
         protected override void OnLayoutLoaded()
         {
@@ -67,9 +69,22 @@ namespace UnicontaClient.Pages.CustomPage
                 dgBankStatement.UpdateItemSource(argument);
         }
 
+        void RemoveMenuItem()
+        {
+            RibbonBase rb = (RibbonBase)localMenu.DataContext;
+            var Comp = api.CompanyEntity;
+
+#if !SILVERLIGHT
+            if (Comp._CountryId != CountryCode.Denmark)
+                UtilDisplay.RemoveMenuCommand(rb, "ConnectToBank");
+#else
+            UtilDisplay.RemoveMenuCommand(rb, "ConnectToBank");
+#endif
+        }
+
         void dgBankStatement_RowDoubleClick()
         {
-            localMenu_OnItemClicked("Lines");
+            localMenu_OnItemClicked("MatchLines");
         }
         void setDim()
         {
@@ -89,7 +104,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "MatchLines":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.BankStatementLinePage, selectedItem, string.Format("{0}, {1}: {2}", Uniconta.ClientTools.Localization.lookup("BankStatement"), Uniconta.ClientTools.Localization.lookup("Account"), selectedItem._Account));
+                        AddDockItem(TabControls.BankStatementLinePage, selectedItem, string.Format("{0}, {1}: {2}", Uniconta.ClientTools.Localization.lookup("MatchLines"), Uniconta.ClientTools.Localization.lookup("Account"), selectedItem._Account));
                     break;
                 case "LedgerPosting":
                     if (selectedItem != null)
@@ -122,7 +137,7 @@ namespace UnicontaClient.Pages.CustomPage
                     cwBank.Closing += async delegate
                     {
                         if(cwBank.DialogResult== true)
-                            await BankAPI(CWBankAPI.Type, cwBank.CustomerNo, cwBank.bank, cwBank.ActivationCode);
+                            await BankAPI(cwBank.Type, cwBank.CustomerNo, cwBank.Bank, cwBank.ActivationCode, cwBank.Company);
                     };
                     cwBank.Show();
                     break;
@@ -134,7 +149,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         #if WPF
-        async Task BankAPI(int type, string functionId, Bank bank, string activationCode)
+        async Task BankAPI(int type, string functionId, Bank bank, string activationCode, Company masterBCCompany)
         {
             busyIndicator.IsBusy = true;
             BankStatementAPI bankApi = new BankStatementAPI(api);
@@ -142,6 +157,7 @@ namespace UnicontaClient.Pages.CustomPage
             string dialogText = null;
             string logText = null;
             ErrorCodes err;
+
             switch (type)
             {
                 case 0:
@@ -151,7 +167,7 @@ namespace UnicontaClient.Pages.CustomPage
                         case ErrorCodes.Succes:
                             dialogText = string.Concat(Uniconta.ClientTools.Localization.lookup("ConnectedTo"), " Bank Connect");
                             break;
-                        case ErrorCodes.IgnoreUpdate: //Only allowed from production-environment
+                        case ErrorCodes.IgnoreUpdate:
                         case ErrorCodes.CouldNotCreate:
                         case ErrorCodes.NoSucces:
                             dialogText = string.Concat(Uniconta.ClientTools.Localization.lookup("UnableToConnectTo"), " Bank Connect");
@@ -165,12 +181,12 @@ namespace UnicontaClient.Pages.CustomPage
                             break;
                     }
                     break;
-                case 1:
+                case 1: 
                     logText = await bankApi.ShowBankConnect(functionId);
 
                     if (logText == ErrorCodes.IgnoreUpdate.ToString())
                     {
-                        dialogText = string.Concat(Uniconta.ClientTools.Localization.lookup("UnableToConnectTo"), " Bank Connect"); //Only allowed from production-environment
+                        dialogText = string.Concat(Uniconta.ClientTools.Localization.lookup("UnableToConnectTo"), " Bank Connect");
                         logText = null;
                     }
                     else if (logText == ErrorCodes.FileDoesNotExist.ToString())
@@ -180,8 +196,49 @@ namespace UnicontaClient.Pages.CustomPage
                         logText = null;
                     }
                     break;
+                case 2:
+                    
+                    err = await bankApi.AddBankConnect(functionId, masterBCCompany.CompanyId, 1);
 
-                  
+                    switch (err)
+                    {
+                        case ErrorCodes.Succes:
+                            dialogText = string.Format("{0} {1}: ({2}) {3}", Uniconta.ClientTools.Localization.lookup("ConnectedTo"), Uniconta.ClientTools.Localization.lookup("Company"), masterBCCompany.CompanyId, masterBCCompany.Name);
+                            break;
+                        case ErrorCodes.IgnoreUpdate:
+                        case ErrorCodes.CouldNotCreate:
+                        case ErrorCodes.NoSucces:
+                            dialogText = string.Format("{0} {1}: ({2}) {3}",Uniconta.ClientTools.Localization.lookup("UnableToConnectTo"), Uniconta.ClientTools.Localization.lookup("Company"), masterBCCompany.CompanyId, masterBCCompany.Name);
+                            break;
+                        case ErrorCodes.KeyExists:
+                        case ErrorCodes.RecordExists:
+                            dialogText = string.Concat(Uniconta.ClientTools.Localization.lookup("AlreadyConnectedTo"), " Bank Connect");
+                            break;
+                        default:
+                            dialogText = Uniconta.ClientTools.Localization.lookup(err.ToString());
+                            break;
+                    }
+                    break;
+                case 3: 
+                    err = await bankApi.AddBankConnect(functionId, masterBCCompany.CompanyId, 2); 
+
+                    switch (err)
+                    {
+                        case ErrorCodes.Succes:
+                            dialogText = string.Concat(Uniconta.ClientTools.Localization.lookup("Unregistered"), " Bank Connect");
+                            break;
+                        case ErrorCodes.IgnoreUpdate: 
+                            dialogText = string.Format("{0} {1}: ({2}) {3}", Uniconta.ClientTools.Localization.lookup("UnableToConnectTo"), Uniconta.ClientTools.Localization.lookup("Company"), masterBCCompany.CompanyId, masterBCCompany.Name);
+                            break;
+                        case ErrorCodes.NoSubscription:
+                        case ErrorCodes.CannotDeleteRecord:
+                            dialogText = Uniconta.ClientTools.Localization.lookup("ConnectionCannotUnregister");
+                            break;
+                        default:
+                            dialogText = Uniconta.ClientTools.Localization.lookup(err.ToString());
+                            break;
+                    }
+                    break;
             }
             busyIndicator.IsBusy = false;
 
@@ -214,7 +271,7 @@ namespace UnicontaClient.Pages.CustomPage
                             ErrorCodes result = ErrorCodes.NoSucces;
 
                             if (ActionType == "DeleteStatement")
-                                result = await bkapi.DeleteLines(selectedItem, Wininterval.FromDate, Wininterval.ToDate);
+                                result = await bkapi.DeleteLines(selectedItem, Wininterval.FromDate, Wininterval.ToDate, OnlyVoided: Wininterval.OnlyVoided);
                             else if (ActionType == "RemoveSettlements")
                                 result = await bkapi.RemoveSettlements(selectedItem, Wininterval.FromDate, Wininterval.ToDate, Wininterval.JournalPostedId, Wininterval.Voucher);
 

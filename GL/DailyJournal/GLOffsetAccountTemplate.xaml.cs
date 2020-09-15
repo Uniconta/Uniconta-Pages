@@ -224,14 +224,12 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override async void LoadCacheInBackGround()
         {
-            var api = this.api;
-            var Comp = api.CompanyEntity;
             if (LedgerCache == null)
-                LedgerCache = await Comp.LoadCache(typeof(Uniconta.DataModel.GLAccount), api).ConfigureAwait(false);
+                LedgerCache = await api.LoadCache(typeof(Uniconta.DataModel.GLAccount)).ConfigureAwait(false);
             if (DebtorCache == null)
-                DebtorCache = await Comp.LoadCache(typeof(Uniconta.DataModel.Debtor), api).ConfigureAwait(false);
+                DebtorCache = await api.LoadCache(typeof(Uniconta.DataModel.Debtor)).ConfigureAwait(false);
             if (CreditorCache == null)
-                CreditorCache = await Comp.LoadCache(typeof(Uniconta.DataModel.Creditor), api).ConfigureAwait(false);
+                CreditorCache = await api.LoadCache(typeof(Uniconta.DataModel.Creditor)).ConfigureAwait(false);
             LoadType(typeof(Uniconta.DataModel.GLVat));
         }
 
@@ -265,16 +263,13 @@ namespace UnicontaClient.Pages.CustomPage
 
         async Task BindComboBox()
         {
-            var api = this.api;
-            var Comp = api.CompanyEntity;
-            var TemplateCache = Comp.GetCache(typeof(Uniconta.DataModel.GLOffsetAccountTemplate)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.GLOffsetAccountTemplate), api);
+            var TemplateCache = api.GetCache(typeof(Uniconta.DataModel.GLOffsetAccountTemplate)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLOffsetAccountTemplate));
             BindComboBox(TemplateCache);
         }
 
         ObservableCollection<GLOffsetAccountTemplateClient> GlOffSetAccTemList;
         void BindComboBox(SQLCache TemplateCache)
         {
-            var Comp = api.CompanyEntity;
             GlOffSetAccTemList = new ObservableCollection<GLOffsetAccountTemplateClient>();
             foreach (var rec in (IEnumerable<Uniconta.DataModel.GLOffsetAccountTemplate>)TemplateCache.GetRecords)
             {

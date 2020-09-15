@@ -3,7 +3,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CWGenerateInvoice"
            xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
            xmlns:cw="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
-           xmlns:converter="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
+           xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors"
            xmlns:ClientToolsControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
            Height="{StaticResource Height39}" Width="{StaticResource Width39}" KeyDown="ChildWindow_KeyDown" SizeToContent="Height" IsTabStop="True">
     <Grid x:Name="LayoutRoot" Margin="2" Background="{StaticResource LayoutGridColor}">
@@ -47,6 +47,20 @@ x:Class="UnicontaClient.Pages.CustomPage.CWGenerateInvoice"
                         </ClientToolsControls:CorasauLayoutItem>
                         <ClientToolsControls:CorasauLayoutItem FieldName="PostOnlyDelivered" x:Name="liPostOnlyDelivered">
                             <ClientToolsControls:CheckEditor x:Name="chkPostOnlyDel" IsChecked="{Binding PostOnlyDelivered,Mode=TwoWay}"/>
+                        </ClientToolsControls:CorasauLayoutItem>
+                    </ClientToolsControls:CorasauLayoutGroup>
+                    <ClientToolsControls:CorasauLayoutGroup x:Name="lgOrders"  View="GroupBox" GroupBoxDisplayMode="Light" Visibility="Collapsed" IsCollapsible="False" HorizontalAlignment="Stretch" ClientToolsControls:CorasauLayoutControl.AllowHorizontalSizing="True">
+                        <ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
+                            <DataTemplate>
+                                <Image Source="/UnicontaPages;component/Assets/img/group-order_16x16.png" Width="16" Height="16" Stretch="UniformToFill" HorizontalAlignment="Left" />
+                            </DataTemplate>
+                        </ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
+                        <ClientToolsControls:CorasauLayoutItem FieldName="AdditionalOrders" x:Name="liAdditionalOrders">
+                            <ClientToolsControls:DimComboBoxEditor x:Name="cbOrders" DisplayMember="KeyStr" EditValue="{Binding AdditionalOrders}"  ShowCustomItems="False">
+                                <ClientToolsControls:DimComboBoxEditor.StyleSettings>
+                                    <editor:CheckedComboBoxStyleSettings  />
+                                </ClientToolsControls:DimComboBoxEditor.StyleSettings>
+                            </ClientToolsControls:DimComboBoxEditor>
                         </ClientToolsControls:CorasauLayoutItem>
                     </ClientToolsControls:CorasauLayoutGroup>
                 </ClientToolsControls:CorasauLayoutGroup>

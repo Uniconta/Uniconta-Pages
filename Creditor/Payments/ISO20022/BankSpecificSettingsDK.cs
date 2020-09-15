@@ -12,7 +12,7 @@ using UnicontaClient.Pages.Creditor.Payments;
 
 namespace UnicontaISO20022CreditTransfer
 {
-    class BankSpecificSettingsDK : BankSpecificSettings
+    public class BankSpecificSettingsDK : BankSpecificSettings
     {
 
         #region Properties

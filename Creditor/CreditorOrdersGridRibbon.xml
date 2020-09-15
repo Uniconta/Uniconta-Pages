@@ -2,7 +2,7 @@
 <root>
   <RibbonItem TabId="0" LocalizedNameKey="Home">
     <!---When we create a new group and a new TabPage -->
-    <RibbonItem Action="AddRow" LocalizedNameKey="Add" ControlName="CreditorOrdersPage2" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png"/>
+    <RibbonItem Action="AddRow" LocalizedNameKey="CreateOBJ" Parameter="PurchaseOrder" ControlName="CreditorOrdersPage2" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png"/>
     <RibbonItem Action="EditRow" ShortcutKey="Ctrl+E" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>
   </RibbonItem>
   <RibbonItem>
@@ -29,6 +29,7 @@
       <RibbonItem Action="RefVoucher" LocalizedNameKey="Attach" ControlName="AttachVoucherGridPage" Glyph="Attachments_16x16.png"  ShortcutKey="Ctrl+T"/>
       <RibbonItem Action="ImportVoucher" LocalizedNameKey="ImportFile" Glyph="Add_16x16.png" ShortcutKey="Ctrl+J" />
       <RibbonItem Action="RemoveVoucher" LocalizedNameKey="Remove" Glyph="Delete_16x16.png" ShortcutKey="Ctrl+I" />
+      <RibbonItem Action="DragDrop" LocalizedNameKey="DragAndDrop" Glyph="DragDrop_File_16x16.png" />
     </RibbonItem>
   </RibbonItem>
 
@@ -53,7 +54,7 @@
     <RibbonItem Action="EditCreditor" LocalizedNameKey="EditOBJ" Parameter="Creditor" ControlName="CreditorAccountPage2" LargeGlyph="Vendor_32x32.png"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="CreateOrder" LocalizedNameKey="CreateOBJ" Parameter="PurchaseSalesOrder" Glyph="refresh.png" LargeGlyph="Orders_32x32.png"/>
+    <RibbonItem Action="CreateOrder" LocalizedNameKey="CopyOBJ" Parameter="PurchaseSalesOrder" Glyph="refresh.png" LargeGlyph="Orders_32x32.png"/>
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="ReadOIOUBL" LocalizedNameKey="ImportOBJ" Parameter="OIOUBL" LargeGlyph="Import_32x32.png"/>

@@ -60,8 +60,11 @@ x:Class="UnicontaClient.Pages.CustomPage.AddUserFieldsPage2"
                         <CorasauControls:CorasauLayoutItem FieldName="MultiLine" x:Name="liMultiline">
                             <CorasauControls:CheckEditor IsChecked="{Binding MultiLine,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="MultiSelection" x:Name="liMultiSelection">
+                            <CorasauControls:CheckEditor IsChecked="{Binding MultiSelection,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="MaxWidth" x:Name="liMaxWidth">
-                            <CorasauControls:IntegerEditor Text="{Binding MaxWidth,Mode=TwoWay}"/>
+                            <CorasauControls:IntegerEditor EditValue="{Binding MaxWidth,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
                     <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpSql" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=SQL}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">

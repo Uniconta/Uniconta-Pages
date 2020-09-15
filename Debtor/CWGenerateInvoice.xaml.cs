@@ -61,13 +61,15 @@ namespace UnicontaClient.Pages.CustomPage
         [InputFieldData]
         [Display(Name = "SendByOutlook", ResourceType = typeof(InputFieldDataText))]
         public bool SendByOutlook { get; set; }
-#if !SILVERLIGHT
+        [Display(Name = "AdditionalOrders", ResourceType = typeof(InputFieldDataText))]
+        public List<object> AdditionalOrders { get; set; }
 
+#if !SILVERLIGHT
         protected override int DialogId { get { return DialogTableId; } }
         public int DialogTableId { get; set; }
         protected override bool ShowTableValueButton { get { return true; } }
 #endif
-
+        private bool IsSendXmlSalesInvoice;
         public CWGenerateInvoice(bool showSimulation, string title, bool showInputforInvNumber, bool askForEmail, bool showInvoice, bool isShowInvoiceVisible, bool showNoEmailMsg, string debtorName,
             bool isShowUpdateInv, bool isOrderOrQuickInv, bool isQuickPrintVisible, bool isDebtorOrder, bool InvoiceInXML, bool isPageCountVisible)
             : this(showSimulation, title, showInputforInvNumber, askForEmail, showInvoice, isShowInvoiceVisible, showNoEmailMsg, debtorName, isShowUpdateInv, isOrderOrQuickInv, isQuickPrintVisible, isDebtorOrder, InvoiceInXML, isPageCountVisible, null)
@@ -154,6 +156,10 @@ namespace UnicontaClient.Pages.CustomPage
 
         void CW_Loaded(object sender, RoutedEventArgs e)
         {
+#if !SILVERLIGHT
+            if (IsSendXmlSalesInvoice)
+                liGenerateOIOUBLClicked.Label = Uniconta.ClientTools.Localization.lookup("SendInvoicebyUBL");
+#endif
             Dispatcher.BeginInvoke(new Action(() => { OKButton.Focus(); }));
         }
         private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
@@ -181,7 +187,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         public void SetInvoiceNumber(string Number)
         {
-            InvoiceNumber = Number; 
+            InvoiceNumber = Number;
             txtInvNumber.Text = Number;
         }
         public void SetInvoiceDate(DateTime date)
@@ -192,6 +198,19 @@ namespace UnicontaClient.Pages.CustomPage
         public void SetInvPrintPreview(bool InvPrintPrvw)
         {
             chkShowInvoice.IsChecked = InvPrintPrvw;
+        }
+
+        public void SetAdditionalOrders(IEnumerable<DCOrder> orderList)
+        {
+#if !SILVERLIGHT
+            lgOrders.Visibility = Visibility.Visible;
+            cbOrders.ItemsSource = orderList;
+#endif
+        }
+
+        public void SetOIOUBLLabelText(bool sendXmlSalesInvoice)
+        {
+            IsSendXmlSalesInvoice = sendXmlSalesInvoice;
         }
 
         private void OKButton_Click(object sender, RoutedEventArgs e)

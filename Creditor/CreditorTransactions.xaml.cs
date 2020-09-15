@@ -157,9 +157,30 @@ namespace UnicontaClient.Pages.CustomPage
                 case "RefreshGrid":
                     FilterGrid(gridControl, master == null, false);
                     break;
+                case "Invoices":
+                    if (selectedItem != null)
+                    {
+                        string header = string.Format("{0}/{1}", Uniconta.ClientTools.Localization.lookup("CreditorInvoice"), selectedItem._Account);
+                        AddDockItem(TabControls.CreditorInvoice, dgCreditorTrans.syncEntity, header);
+                    }
+                    break;
+                case "InvoiceLine":
+                    if (selectedItem != null)
+                        ShowInvoiceLines(selectedItem);
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
+            }
+        }
+
+        async void ShowInvoiceLines(CreditorTransClient creditorTrans)
+        {
+            var creditorInvoice = await api.Query<CreditorInvoiceClient>(new UnicontaBaseEntity[] { creditorTrans }, null);
+            if (creditorInvoice != null && creditorInvoice.Length > 0)
+            { 
+                var credInv = creditorInvoice[0];
+                AddDockItem(TabControls.CreditorInvoiceLine, credInv, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("InvoiceNumber"), credInv.InvoiceNum));
             }
         }
 

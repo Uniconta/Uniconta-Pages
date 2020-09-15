@@ -61,7 +61,7 @@ namespace UnicontaClient.Pages.CustomPage
             layoutControl = layoutItems;
             if (LoadedRow == null && editrow == null)
             {
-                frmRibbon.DisableButtons( "Delete" );
+                frmRibbon.DisableButtons("Delete");
                 editrow = CreateNew() as DebtorEmailSetupClient;
             }
             layoutItems.DataContext = editrow;
@@ -70,7 +70,7 @@ namespace UnicontaClient.Pages.CustomPage
                 grpSmtp.IsCollapsed = true;
             frmRibbon.OnItemClicked += FrmRibbon_OnItemClicked;
             leCompanySMTP.api = api;
-            cmbExternType.ItemsSource = new List<string> { "Debtor", "DebtorInvoice", "Creditor", "CreditorInvoice" };
+            cmbExternType.ItemsSource = new List<string> { "Debtor", "DebtorInvoice", "Creditor", "CreditorInvoice", "Employee", "Contact" };
             cmbExternType.SelectedIndex = 0;
             layoutProp.Label = string.Format(Uniconta.ClientTools.Localization.lookup("AddOBJ"), Uniconta.ClientTools.Localization.lookup("Properties"));
 #if !SILVERLIGHT
@@ -125,7 +125,7 @@ namespace UnicontaClient.Pages.CustomPage
                                     itemUseSSL.IsEnabled = false;
                                 }
                                 else
-                                    UtilDisplay.ShowErrorCode(err);
+                                    ShowErrorMsg(err, editrow._host);
                                 busyIndicator.IsBusy = false;
                             }
                             else
@@ -190,7 +190,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             object element;
 #if !SILVERLIGHT
-            element = FocusManager.GetFocusedElement(Application.Current.Windows[0]);
+            element = FocusManager.GetFocusedElement(UtilDisplay.GetCurentWindow());
             if (element is Control)
             {
                 var ctrl = element as Control;
@@ -208,26 +208,37 @@ namespace UnicontaClient.Pages.CustomPage
 #endif
             if (isSMTPValidated == true)
                 return true;
-            if (editrow.Host == string.Empty)
-                editrow.Host = null;
-            if (editrow.SmtpUser == string.Empty)
-                editrow.SmtpUser = null;
+            if (editrow._host == string.Empty)
+                editrow._host = null;
+            if (editrow._smtpUser == string.Empty)
+                editrow._smtpUser = null;
             if (string.IsNullOrEmpty(editrow._smtpPassword))
             {
                 editrow._smtpPassword = null;
             }
             var loadedRow = this.LoadedRow as DebtorEmailSetupClient;
-            if (loadedRow == null && !string.IsNullOrEmpty(editrow.Host))
+            if (loadedRow == null && !string.IsNullOrEmpty(editrow._host))
                 isSMTPValidated = false;
-            else if (loadedRow != null && ((editrow.Host != null && editrow.Host != loadedRow.Host) || (editrow.Port != 0 && editrow.Port != loadedRow.Port) || (editrow.SmtpUser != null && editrow.SmtpUser != loadedRow.SmtpUser) || (editrow._smtpPassword != null && editrow._smtpPassword != loadedRow._smtpPassword)
+            else if (loadedRow != null && ((editrow._host != null && editrow._host != loadedRow._host) || (editrow._port != 0 && editrow._port != loadedRow._port) || (editrow._smtpUser != null && editrow._smtpUser != loadedRow._smtpUser) || (editrow._smtpPassword != null && editrow._smtpPassword != loadedRow._smtpPassword)
                 || (editrow.AllowDifferentSender == true && editrow.AllowDifferentSender != loadedRow.AllowDifferentSender)
                 || (editrow.AllowDifferentSender == true && editrow.EmailSendFrom != loadedRow.EmailSendFrom)))
                 isSMTPValidated = false;
             if (isSMTPValidated == false)
             {
-                UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("SMTPVerifyMsg"), Uniconta.ClientTools.Localization.lookup("Warning"));
-                isSMTPValidated = null;
-                return false;
+#if !SILVERLIGHT
+                if( UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("SMTPVerifyMsg"), Uniconta.ClientTools.Localization.lookup("Warning"), MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+#else
+                if( UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("SMTPVerifyMsg"), Uniconta.ClientTools.Localization.lookup("Warning"), MessageBoxButton.OKCancel) == MessageBoxResult.OK)
+#endif
+                {
+                    FrmRibbon_OnItemClicked("TestMail");
+                    return false;
+                }
+                else
+                {
+                    isSMTPValidated = null; 
+                    return false;
+                }
             }
             return true;
         }
@@ -270,6 +281,12 @@ namespace UnicontaClient.Pages.CustomPage
                 case 3:
                     type = typeof(CreditorInvoiceClient);
                     break;
+                case 4:
+                    type = typeof(EmployeeClient);
+                    break;
+                case 5:
+                    type = typeof(ContactClient);
+                    break;
                 default: return;
             }
 
@@ -284,8 +301,29 @@ namespace UnicontaClient.Pages.CustomPage
         private void btnTextInHtml_Click(object sender, RoutedEventArgs e)
         {
             var param = new object[1];
-            param[0] = editrow.Body;
+            param[0] = editrow._Body;
             AddDockItem(TabControls.TextInHtmlPage, param, true, Uniconta.ClientTools.Localization.lookup("TextInHtml"), null, new Point(200, 300));
+        }
+
+        public static async void ShowErrorMsg(ErrorCodes errorCode, string host)
+        {
+            var lastErrors = await BasePage.session.GetErrors();
+            string errMsg = UtilDisplay.GetFormattedErrorCode(errorCode, lastErrors);
+            string hyperlink;
+            if (host != null && host.Contains("gmail"))
+                hyperlink = "https://www.uniconta.com/unipedia-global/gmail-settings-to-send-mail-in-uniconta/";
+            else if (BasePage.session.User._Language == (byte)Uniconta.Common.Language.da)
+                hyperlink = "https://www.uniconta.com/da/unipedia/mail_server/";
+            else
+                hyperlink = "https://www.uniconta.com/unipedia-global/mail-server-set-up/";
+#if !SILVERLIGHT
+                UnicontaHyperLinkMessageBox.Show(errMsg, hyperlink,
+                    lastErrors != null && lastErrors.Length > 0 ? Uniconta.ClientTools.Localization.lookup("Error") : Uniconta.ClientTools.Localization.lookup("Message"));
+#else
+            errMsg = string.Concat(errMsg, "\r\n", hyperlink);
+            UnicontaMessageBox.Show(errMsg, lastErrors != null && lastErrors.Length > 0 ? Uniconta.ClientTools.Localization.lookup("Error") :
+                   Uniconta.ClientTools.Localization.lookup("Message"), MessageBoxButton.OK);
+#endif
         }
 
 #if !SILVERLIGHT

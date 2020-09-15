@@ -12,7 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Uniconta.ClientTools;
-using Uniconta.ClientTools.DataModel.System;
+using Uniconta.ClientTools.DataModel;
 using Uniconta.DataModel;
 
 using UnicontaClient.Pages;

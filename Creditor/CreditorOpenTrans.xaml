@@ -60,9 +60,9 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOpenTrans"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Payment" Width="60"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CashDiscount" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CashDiscountDate" Width="90"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="LastInterest" Visible="False" Width="50"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="LastCollectionLetter" Visible="False" Width="50"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CollectionsLetters" Visible="False" Width="50"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Vat" Width="60" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="VatAmount" Width="90" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="VatOfCashDiscount" Width="90" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Debit" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Credit" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DebitCur" Visible="False"/>
@@ -71,6 +71,9 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOpenTrans"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Account" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryAccount" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="YourRef" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Message" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DocumentRef" Visible="False"/>
                 </localPage:CreditorTransOpenGrid.Columns>
                 <localPage:CreditorTransOpenGrid.TotalSummary>
                     <localPage:SumColumn FieldName="Amount" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>

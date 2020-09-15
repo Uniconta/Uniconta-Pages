@@ -260,27 +260,26 @@ namespace UnicontaClient.Pages.CustomPage
 
                 var nextPaymentFileIdTest = 1;
 
-                using (var stream = File.Open(sfd.FileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                using (var stream = File.Open(sfd.FileName, FileMode.Open, FileAccess.Read, FileShare.Read))
                 {
-                    using (var sr = new StreamReader(stream))
-                    {
-                        var filecontentText = await sr.ReadToEndAsync();
+                    var sr = new StreamReader(stream);
+                    var filecontentText = await sr.ReadToEndAsync();
+                    stream.Close();
 
-                        var debPaymFile = new DebtorPaymentFile
-                        {
-                            _Created = DateTime.Now,
-                            _CredDirectDebitId = debPaymentFormat._CredDirectDebitId,
-                            _Filename = sfd.SafeFileName,
-                            _Data = Encoding.GetEncoding("iso-8859-1").GetBytes(filecontentText),
-                            _FileId = string.Format("{0}_{1}_{2}", debPaymentFormat._Format, DateTime.Now.ToString("yyMMdd"), nextPaymentFileIdTest.ToString().PadLeft(5, '0')),
-                            _Format = debPaymentFormat._Format,
-                            _StatusInfo = string.Format("{0} return file", debPaymentFormat._Format),
-                            _Status = DebtorPaymentStatus.Pending,
-                            _Output = false
-                        };
-                        showError = true;
-                        error = await api.Insert(debPaymFile);
-                    }
+                    var debPaymFile = new DebtorPaymentFile
+                    {
+                        _Created = DateTime.Now,
+                        _CredDirectDebitId = debPaymentFormat._CredDirectDebitId,
+                        _Filename = sfd.SafeFileName,
+                        _Data = Encoding.GetEncoding("iso-8859-1").GetBytes(filecontentText),
+                        _FileId = string.Format("{0}_{1}_{2}", debPaymentFormat._Format, DateTime.Now.ToString("yyMMdd"), nextPaymentFileIdTest.ToString().PadLeft(5, '0')),
+                        _Format = debPaymentFormat._Format,
+                        _StatusInfo = string.Format("{0} return file", debPaymentFormat._Format),
+                        _Status = DebtorPaymentStatus.Pending,
+                        _Output = false
+                    };
+                    showError = true;
+                    error = await api.Insert(debPaymFile);
                 }
                 gridRibbon_BaseActions("RefreshGrid");
             }
@@ -289,7 +288,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (showError)
                     UnicontaMessageBox.Show(ex.Message + "\n" + error, Uniconta.ClientTools.Localization.lookup("Execption"));
                 else
-                    UnicontaMessageBox.Show(ex.Message, Uniconta.ClientTools.Localization.lookup("Exception"));
+                    UnicontaMessageBox.Show(ex);
             }
         }
 

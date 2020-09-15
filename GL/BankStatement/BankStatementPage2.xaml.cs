@@ -61,6 +61,10 @@ namespace UnicontaClient.Pages.CustomPage
                 usedim.Visibility = Visibility.Collapsed;
             else
                 Utility.SetDimensions(crudapi, lbldim1, lbldim2, lbldim3, lbldim4, lbldim5, cmbDim1, cmbDim2, cmbDim3, cmbDim4, cmbDim5, usedim);
+
+            if (crudapi.CompanyEntity._DirectDebit == false)
+                grpBankConnect.Visibility = Visibility.Collapsed;
+
             if (LoadedRow == null)
             {
                 frmRibbon.DisableButtons(new string[] { "Delete" });
@@ -77,6 +81,13 @@ namespace UnicontaClient.Pages.CustomPage
             switch (ActionType)
             {
                 case "Save":
+                    if(editrow.BankConnect2Journal == true && string.IsNullOrWhiteSpace(lkJournal.Text))
+                    {
+                        var errTxt = string.Format("{0} ({1}: {2})",Uniconta.ClientTools.Localization.lookup("FieldCannotBeEmpty"),
+                         Uniconta.ClientTools.Localization.lookup("Field"), Uniconta.ClientTools.Localization.lookup("Journal"));
+                         UnicontaMessageBox.Show(errTxt, string.Concat(Uniconta.ClientTools.Localization.lookup("Error"), " - ", string.Concat(Uniconta.ClientTools.Localization.lookup("BankConnect"))));
+                        return;
+                    }
                     if (!editMode)
                     {
                         if (BankStmtCache == null) return;

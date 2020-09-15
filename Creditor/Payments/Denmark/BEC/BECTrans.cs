@@ -17,7 +17,7 @@ using UnicontaISO20022CreditTransfer;
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
 {
-    partial class CreateBECFileFormatBase : BankFormatBase
+    public partial class CreateBECFileFormatBase : BankFormatBase
     {
         public DanishFormatFieldBase CreateFormatField(CreditorTransPayment tran,
             CreditorPaymentFormat paymentFormat, 

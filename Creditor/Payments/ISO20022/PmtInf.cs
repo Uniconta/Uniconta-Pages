@@ -154,6 +154,9 @@ namespace UnicontaISO20022CreditTransfer
             baseDoc.AppendElement(doc, pmtInf, PMTINFID, paymentInfoId);
             baseDoc.AppendElement(doc, pmtInf, PMTMTD, paymentMethod);
 
+            if (!string.IsNullOrEmpty(batchBooking))
+                baseDoc.AppendElement(doc, pmtInf, BTCHBOOKG, batchBooking);
+
             if (pmtInfNumberOfTransActive)
             {
                 int numberOfTrans = cdtTrfTxInfList.Where(s => s.PaymentInfoIdReference == PaymentInfoId).Count();
@@ -165,9 +168,6 @@ namespace UnicontaISO20022CreditTransfer
                 double ctrlSum = cdtTrfTxInfList.Where(s => s.PaymentInfoIdReference == PaymentInfoId).Sum(s => s.Amount);
                 baseDoc.AppendElement(doc, pmtInf, CTRLSUM, ctrlSum);
             }
-
-            if (!string.IsNullOrEmpty(batchBooking))
-                baseDoc.AppendElement(doc, pmtInf, BTCHBOOKG, batchBooking);
 
             pmtTpInf.Append(baseDoc, doc, pmtInf);
 

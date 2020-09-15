@@ -288,8 +288,11 @@ namespace UnicontaClient.Pages.CustomPage
                         break;
                 }
 
-                AddToList(ref lstCatPayProj, val._InternalProject);
-                AddToList(ref lstCatPay, val._Number);
+                if (val._InternalType != Uniconta.DataModel.InternalType.Mileage)
+                {
+                    AddToList(ref lstCatPayProj, val._InternalProject);
+                    AddToList(ref lstCatPay, val._Number);
+                }
             }
 
             var empDistinct = string.Empty;
@@ -313,9 +316,9 @@ namespace UnicontaClient.Pages.CustomPage
             };
             var internalTransLst = await api.Query<ProjectTransClient>(pairInternalTrans);
 
-            if (lstCatMileage != null && mileageInternalProject == null)
+            if (lstCatMileage != null)
             {
-                var mileageCatDist = lstCatMileage != null ? string.Join(";", lstCatMileage) : string.Empty;
+                var mileageCatDist = string.Join(";", lstCatMileage);
                 
                 var pairmileageTrans = new PropValuePair[]
                 {
@@ -1101,7 +1104,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                     {
                         var employee = selectedItem.EmployeeRef;
-                        AddDockItem(TabControls.TMJournalLinePage, dgTimeSheetApprovalRpt.syncEntity, string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("TimeRegistration"), employee._Name));
+                        AddDockItem(TabControls.TMJournalLinePage, dgTimeSheetApprovalRpt.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("TimeRegistration"), employee._Name));
                     }
                     break;
                 case "Approve":
@@ -1137,10 +1140,10 @@ namespace UnicontaClient.Pages.CustomPage
                     CurEmployee = rec._Employee;
                     emplApprove = rec.EmployeeRef;
                     empPriceLst = null;
+                    await api.Read(emplApprove);
                 }
 
                 rec.ErrorInfo = TMJournalLineHelper.VALIDATE_OK;
-                await api.Read(emplApprove);
 
                 var curStatus = (StatusType)AppEnums.StatusType.IndexOf(GetStatus(emplApprove, rec.Date, rec.TotalHours));
                 if (curStatus == StatusType.Approved)
@@ -1169,7 +1172,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (rec.ErrorInfo == TMJournalLineHelper.VALIDATE_OK)
                 {
                     var days = (endDateApprove - startDateApprove).TotalDays + 1;
-                    var normHours = await GetNormalHours(rec.EmployeeRef, rec.Date);
+                    var normHours = await GetNormalHours(emplApprove, rec.Date);
                     if (days > normHours.CountDays)
                     {
                         rec.ErrorInfo = Uniconta.ClientTools.Localization.lookup("CalendarDaysMissing");
@@ -1236,7 +1239,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                 #region Hours
                 tmHelper.SetEmplPrice(tmLinesHours, 
-                                      empPriceLst, 
+                                      empPriceLst,
                                       payrollCache,
                                       projCache,
                                       startDateApprove, 

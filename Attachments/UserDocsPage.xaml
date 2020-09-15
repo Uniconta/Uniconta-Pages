@@ -35,6 +35,7 @@ x:Class="UnicontaClient.Pages.CustomPage.UserDocsPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Group" Width="80"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="GroupName" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="RowId" Width="50"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="SizeKB" Width="50"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Invoice" Width="80"  HideHeaderCheck="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Offer" Width="80"  HideHeaderCheck="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Confirmation" Width="80"  HideHeaderCheck="True"/>

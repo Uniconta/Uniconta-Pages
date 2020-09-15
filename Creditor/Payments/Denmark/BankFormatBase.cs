@@ -21,13 +21,13 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
 {
     public class BankFormatBase
     {
-        internal const string FIK04 = "04";
-        internal const string FIK71 = "71";
-        internal const string FIK73 = "73";
-        internal const string FIK75 = "75";
+        public const string FIK04 = "04";
+        public const string FIK71 = "71";
+        public const string FIK73 = "73";
+        public const string FIK75 = "75";
 
-        internal const string FI = "FI";
-        internal const string GIRO = "GIRO";
+        public const string FI = "FI";
+        public const string GIRO = "GIRO";
 
         public void SharedCodeForCreateBankFormatFields(Company company, CreditorTransPayment tran, CreditorPaymentFormat paymentFormat, BankStatement bankAccount, DanishFormatFieldBase danishFields)
         {

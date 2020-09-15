@@ -31,6 +31,7 @@
       <RibbonItem Action="PostedBy" LocalizedNameKey="PostedBy" Glyph="Debtor_Group_Posting_32x32.png" LargeGlyph="Debtor_Group_Posting_32x32.png"/>
 	</RibbonItem>
   <RibbonItem>
+     <RibbonItem Action="Invoices" LocalizedNameKey="Invoice" LargeGlyph="Account-statement_32x32.png" />
     <RibbonItem Action="InvoiceLine" LocalizedNameKey="InvoiceLines" LargeGlyph="Order_Lines_Highlighted_32x32.png" ShortcutKey="ALT+L"/>
   </RibbonItem>
 </root>

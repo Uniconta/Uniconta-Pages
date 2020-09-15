@@ -48,8 +48,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         async private void SetDebtorGroupSource()
         {
-            var Comp = crudApi.CompanyEntity;
-            var Cache = Comp.GetCache(typeof(Uniconta.DataModel.DebtorGroup)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.DebtorGroup), crudApi);
+            var Cache = crudApi.GetCache(typeof(Uniconta.DataModel.DebtorGroup)) ?? await crudApi.LoadCache(typeof(Uniconta.DataModel.DebtorGroup));
             grouplookupeditor.ItemsSource = Cache;
         }
 
@@ -85,8 +84,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (!string.IsNullOrEmpty(Group))
             {
-                var debtorType = crudApi.CompanyEntity.GetUserTypeNotNull(typeof(DebtorClient));
-                var debtor = Activator.CreateInstance(debtorType) as DebtorClient;
+                var debtor = crudApi.CompanyEntity.CreateUserType<DebtorClient>();
                 debtor.Account = AccountNumber;
                 debtor.Group = Group;
 

@@ -110,12 +110,24 @@ namespace UnicontaClient.Pages.CustomPage
 
             frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
             liOfferNumber.ButtonClicked += liOfferNumber_ButtonClicked;
+            BindContact();
         }
 
         protected override void OnLayoutLoaded()
         {
             base.OnLayoutLoaded();
             itmDCType.Visibility = itemDCAccount.Visibility = (master == null) ? Visibility.Visible : Visibility.Collapsed;
+            liContact.Visibility = master == null ? Visibility.Collapsed : Visibility.Visible;
+        }
+
+        void BindContact()
+        {
+            var dcAccount = master as DCAccount;
+            if (dcAccount == null)
+                return;
+            var contactCacheFilter = new ContactCacheFilter(ContactCache, dcAccount.__DCType(), dcAccount._Account);
+            editrow.contactSource = contactCacheFilter;
+            editrow.NotifyPropertyChanged("ContactSource");
         }
 
         private void frmRibbon_OnItemClicked(string ActionType)
@@ -201,6 +213,21 @@ namespace UnicontaClient.Pages.CustomPage
                 NewRow.accntSource = cache;
                 NewRow.NotifyPropertyChanged("AccountSource");
                 NewRow.NotifyPropertyChanged("DCAccount");
+            }
+        }
+
+        private void leContact_SelectedIndexChanged(object sender, RoutedEventArgs e)
+        {
+            var contact = leContact.SelectedItem as Contact;
+            if (contact != null)
+                editrow.SetMaster(contact);
+            else
+            {
+                var dcAccount = master as DCAccount;
+                editrow._DCType = (CrmCampaignMemberType)dcAccount.__DCType();
+                editrow._Account = dcAccount._Account;
+                editrow.NotifyPropertyChanged("DCType");
+                editrow.NotifyPropertyChanged("DCAccount");
             }
         }
 

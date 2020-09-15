@@ -108,27 +108,33 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (!initial)
                 SetValuesForSelectedBankImport();
+            else
+            {
+                var glClient = importMaster as Uniconta.DataModel.GLDailyJournal;
+                if (glClient != null)
+                    currentBankFormat.Journal = glClient._Journal;
+            }
         }
-
         async void Import(BankImportFormatClient selectedbankFormat)
         {
-            if (selectedbankFormat._Journal == null)
+            var journal = selectedbankFormat._Journal;
+            if (journal == null)
                 SetMaster(selectedbankFormat);
 
             var postingApi = new PostingAPI(api);
 
-            var maxline = await postingApi.MaxLineNumber(selectedbankFormat._Journal);
+            var maxline = await postingApi.MaxLineNumber(journal);
             if (maxline == 0)
-                doImport(selectedbankFormat, postingApi, true, selectedbankFormat._Journal);
+                doImport(selectedbankFormat, postingApi, true, journal);
             else
             {
-                var text = string.Format(Uniconta.ClientTools.Localization.lookup("JournalContainsLines"), selectedbankFormat._Journal);
+                var text = string.Format(Uniconta.ClientTools.Localization.lookup("JournalContainsLines"), journal);
                 CWConfirmationBox dialog = new CWConfirmationBox(text, Uniconta.ClientTools.Localization.lookup("Warning"), true);
                 dialog.Closing += delegate
                 {
                     var res = dialog.ConfirmationResult;
                     if (res != CWConfirmationBox.ConfirmationResultEnum.Cancel)
-                        doImport(selectedbankFormat, postingApi, (res == CWConfirmationBox.ConfirmationResultEnum.No), selectedbankFormat._Journal);
+                        doImport(selectedbankFormat, postingApi, (res == CWConfirmationBox.ConfirmationResultEnum.No), journal);
                 };
                 dialog.Show();
             }

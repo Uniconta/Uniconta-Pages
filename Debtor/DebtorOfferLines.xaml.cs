@@ -595,10 +595,8 @@ namespace UnicontaClient.Pages.CustomPage
                     row.Subtotal = true;
                     break;
                 case "StockLines":
-                    if (dgDebtorOfferLineGrid.SelectedItem == null) return;
-
-                    var debtOfferLine = dgDebtorOfferLineGrid.SelectedItem as DebtorOfferLineClient;
-                    AddDockItem(TabControls.DebtorInvoiceLines, debtOfferLine, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("InvTransaction"), debtOfferLine._Item));
+                    if (selectedItem?._Item != null)
+                        AddDockItem(TabControls.DebtorInvoiceLines, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("InvTransactions"), selectedItem._Item));
                     break;
                 case "UnfoldBOM":
                     if (selectedItem != null)
@@ -666,6 +664,22 @@ namespace UnicontaClient.Pages.CustomPage
                 case "PrintOffer":
                     if (Order != null)
                         GenerateOffer();
+                    break;
+                case "DebtorOrderLines":
+                    if (selectedItem?.InvItem != null)
+                        AddDockItem(TabControls.DebtorOrderLineReport, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("OrdersLine"), selectedItem._Item));
+                    break;
+                case "DebtorOfferLines":
+                    if (selectedItem?.InvItem != null)
+                        AddDockItem(TabControls.DebtorOfferLineReport, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("OfferLine"), selectedItem._Item));
+                    break;
+                case "PurchaseOrderLines":
+                    if (selectedItem?.InvItem != null)
+                        AddDockItem(TabControls.PurchaseLines, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("PurchaseLines"), selectedItem._Item));
+                    break;
+                case "ProductionOrderLines":
+                    if (selectedItem?.InvItem != null)
+                        AddDockItem(TabControls.ProductionOrderLineReport, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ProductionLines"), selectedItem._Item));
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);
@@ -818,12 +832,19 @@ namespace UnicontaClient.Pages.CustomPage
                     invJournalLine._Variant4 = bom._Variant4;
                     invJournalLine._Variant5 = bom._Variant5;
                     item = (InvItem)items.Get(bom._ItemPart);
-                    invJournalLine._Warehouse = bom._Warehouse ?? item._Warehouse ?? selectedItem._Warehouse;
-                    invJournalLine._Location = bom._Location ?? item._Location ?? selectedItem._Location;
-                    invJournalLine._CostPriceLine = item._CostPrice;
-                    invJournalLine.SetItemValues(item, selectedItem._Storage);
-                    invJournalLine._Qty = Math.Round(bom.GetBOMQty(Qty), item._Decimals);
+                    if (item != null)
+                    {
+                        invJournalLine._Warehouse = bom._Warehouse ?? item._Warehouse ?? selectedItem._Warehouse;
+                        invJournalLine._Location = bom._Location ?? item._Location ?? selectedItem._Location;
+                        invJournalLine._CostPriceLine = item._CostPrice;
+                        invJournalLine.SetItemValues(item, selectedItem._Storage);
+                        invJournalLine._Qty = Math.Round(bom.GetBOMQty(Qty), item._Decimals);
+                        TableField.SetUserFieldsFromRecord(item, invJournalLine);
+                    }
+                    else
+                        invJournalLine._Qty = Math.Round(bom.GetBOMQty(Qty), 2);
                     invJournalLine._Price = 0d;
+                    TableField.SetUserFieldsFromRecord(bom, invJournalLine);
                     lst.Add(invJournalLine);
                 }
                 dgDebtorOfferLineGrid.PasteRows(lst);

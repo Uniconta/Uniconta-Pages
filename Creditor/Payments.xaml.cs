@@ -72,7 +72,7 @@ namespace UnicontaClient.Pages.CustomPage
         public string ErrorInfo { get { return _ErrorInfo; } }
         public string _ErrorInfo;
 
-        internal void NotifyErrorSet()
+        public void NotifyErrorSet()
         {
             NotifyPropertyChanged("ErrorInfo");
         }
@@ -85,7 +85,7 @@ namespace UnicontaClient.Pages.CustomPage
         public string MergePaymId { get { return _MergePaymId; } }
         public string _MergePaymId;
 
-        internal void NotifyMergePaymIdSet()
+        public void NotifyMergePaymIdSet()
         {
             NotifyPropertyChanged("MergePaymId");
         }
@@ -115,7 +115,7 @@ namespace UnicontaClient.Pages.CustomPage
         protected override void DataLoaded(UnicontaBaseEntity[] Arr)
         {
             var page = this.Page as Payments;
-            page.LoadPayments((IEnumerable<CreditorTransPayment>)Arr);
+            page?.LoadPayments((IEnumerable<CreditorTransPayment>)Arr);
         }
     }
 
@@ -405,7 +405,7 @@ namespace UnicontaClient.Pages.CustomPage
                                     if (!dgCreditorTranOpenGrid.IsRowVisible(rowHandle) || rec._OnHold || (rec._PaymentAmount <= 0d && rec.PaymentRefId == 0))
                                         continue;
 
-                                    var paymRefId = rec.PaymentRefId != 0 ? rec.PaymentRefId : -rec.PrimaryKeyId;
+                                    var paymRefId = rec.PaymentRefId != 0 && rec._UsedCachDiscount == 0 ? rec.PaymentRefId : -rec.PrimaryKeyId;
 
                                     if (dictPaymTransfer.TryGetValue(paymRefId, out mergePaymentRefId)) 
                                     {
@@ -935,7 +935,7 @@ namespace UnicontaClient.Pages.CustomPage
                         return;
 
                     ISO20022StatusReport statusReport = new ISO20022StatusReport();
-                    statusReport.StatusReport(dgCreditorTranOpenGrid, cwwin.browseFile.FilePath, this.api);
+                    statusReport.StatusReport(dgCreditorTranOpenGrid, cwwin.FilePath, this.api);
                 }
             };
             cwwin.Show();

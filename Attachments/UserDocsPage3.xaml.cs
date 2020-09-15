@@ -66,15 +66,10 @@ namespace UnicontaClient.Pages.CustomPage
             if (corasauMaster == null)
                 return;
 
-            ModifiedRow = UtilDisplay.GetAttachment(corasauMaster, api.CompanyEntity);
-
-            if (userDocClient._Data == null && userDocClient._Url == null)
-            {
-                busyIndicator.IsBusy = true;
-                await api.Read(userDocClient);
-            }
-
+            busyIndicator.IsBusy = true;
+            ModifiedRow = await UtilDisplay.GetPhoto(corasauMaster, api);
             busyIndicator.IsBusy = false;
+
             this.documentViewer.Children.Clear();
 
             try

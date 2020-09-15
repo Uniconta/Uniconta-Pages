@@ -29,6 +29,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CrmFollowUpPage"
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BusyMessage}">
             <local:CrmFollowUpPageGrid x:Name="dgCrmFollowUpGrid" AutoGenerateColumns="None" >
                 <local:CrmFollowUpPageGrid.Columns>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PrimaryKeyId" Width="70" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="HasContactEmail" Visible="False"  Width="30" >
                         <local:CorasauDataGridTemplateColumnClient.HeaderTemplate>
                             <DataTemplate>
@@ -53,7 +54,6 @@ x:Class="UnicontaClient.Pages.CustomPage.CrmFollowUpPage"
                             </ControlTemplate>
                         </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                     </local:CorasauDataGridTemplateColumnClient>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="PrimaryKeyId" Width="70" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Created" MinWidth="150" ShowTime="True" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="UpdatedAt" MinWidth="150" ShowTime="True" AllowEditing="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="UserName" Width="80"/>

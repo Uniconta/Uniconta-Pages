@@ -48,14 +48,21 @@ namespace UnicontaClient.Pages.CustomPage
             BusyIndicator = busyIndicator;
             txtHtmlControl.Loaded += TxtHtmlControl_Loaded;
             txtHtmlControl.HtmlText = html;
-            externTypes = new ObservableCollection<string> { "Debtor", "DebtorInvoice" };
+            externTypes = new ObservableCollection<string> { "Debtor", "DebtorInvoice", "Creditor", "CreditorInvoice", "Employee", "Contact" };
             properties = new ObservableCollection<string>(UtilFunctions.GetAllDisplayPropertyNames(typeof(DebtorClient), api.CompanyEntity, false, false));
             this.DataContext = this;
         }
 
         private void TxtHtmlControl_Loaded(object sender, RoutedEventArgs e)
         {
-            CustomRichEditCommandFactoryService commandFactory = new CustomRichEditCommandFactoryService(txtHtmlControl, txtHtmlControl.GetService<IRichEditCommandFactoryService>());
+            var service = txtHtmlControl.GetService<IRichEditCommandFactoryService>();
+            if (service == null)
+            {
+                dockCtrl.CloseDockItem();
+                UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("HtmlEditorError"), Uniconta.ClientTools.Localization.lookup("Error"));
+                return;
+            }
+            CustomRichEditCommandFactoryService commandFactory = new CustomRichEditCommandFactoryService(txtHtmlControl, service);
             txtHtmlControl.RemoveService(typeof(IRichEditCommandFactoryService));
             txtHtmlControl.AddService(typeof(IRichEditCommandFactoryService), commandFactory);
             txtHtmlControl.ReplaceService<ISyntaxHighlightService>(new CustomHtmlSyntaxHighLightService(txtHtmlControl));
@@ -135,8 +142,16 @@ namespace UnicontaClient.Pages.CustomPage
                 properties.Clear();
                 if (name.ToString() == "Debtor")
                     type = typeof(DebtorClient);
-                else
+                else if (name.ToString() == "DebtorInvoice")
                     type = typeof(DebtorInvoiceClient);
+                else if (name.ToString() == "Creditor")
+                    type = typeof(CreditorClient);
+                else if (name.ToString() == "CreditorInvoice")
+                    type = typeof(CreditorInvoiceClient);
+                else if (name.ToString() == "Employee")
+                    type = typeof(EmployeeClient);
+                else 
+                    type = typeof(ContactClient);
 
                 foreach (var field in UtilFunctions.GetAllDisplayPropertyNames(type, api.CompanyEntity, false, false))
                     properties.Add(field);

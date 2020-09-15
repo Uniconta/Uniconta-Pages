@@ -12,6 +12,11 @@
     <RibbonItem Action="ClearFilter" ShortcutKey="Ctrl+K" LocalizedNameKey="ClearFilter" Glyph="Filter_Clear_32x32.png" LargeGlyph="Filter_Clear_32x32.png"/>
   </RibbonItem>
   <RibbonItem>
+    <RibbonItem Action="AddDoc" LocalizedNameKey="Document" ControlName="UserDocsPage" LargeGlyph="Attachments_32x32.png" />
+   <RibbonItem Action="Photo" LocalizedNameKey="SetOBJ" Parameter="Photo" LargeGlyph="UserFieldData_32x32.png" />
+    <RibbonItem Action="ViewPhoto" ShortcutKey="" LocalizedNameKey="ViewOBJ" Parameter="Photo" LargeGlyph="View_Highlighted_32x32.png"/>
+  </RibbonItem>
+  <RibbonItem>
     <!---If we want to create a new group in same PageTab-->
     <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32.png">
       <!---If we want Inner menu-->

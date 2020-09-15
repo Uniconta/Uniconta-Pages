@@ -60,6 +60,7 @@ namespace UnicontaClient.Pages.CustomPage
         static bool includeSubProject;
         static DateTime fromDate, toDate;
         static string budgetGroup;
+        static bool grpWeek;
         bool pivotIsLoaded = false;
         SQLTableCache<Uniconta.DataModel.PrCategory> prCategoryCache;
         SQLTableCache<Uniconta.DataModel.Employee> employeeCache;
@@ -108,6 +109,7 @@ namespace UnicontaClient.Pages.CustomPage
             txtFromDate.DateTime = fromDate == DateTime.MinValue ? DateTime.Today : fromDate;
             txtToDate.DateTime = toDate == DateTime.MinValue ? DateTime.Today : toDate;
             cmbBudgetGroup.Text = budgetGroup;
+            chkGroupWeek.IsChecked = grpWeek; 
             prCategoryCache = api.GetCache<Uniconta.DataModel.PrCategory>();
             employeeCache = api.GetCache<Uniconta.DataModel.Employee>();
             StartLoadCache();
@@ -141,9 +143,11 @@ namespace UnicontaClient.Pages.CustomPage
             var cell = pivotDgProjectPlanning.FocusedCell;
             if (cell == null || columnFields == null)
                 return;
-            PivotGridField monthField = null, quarterField = null, yearField = null;
+            PivotGridField weekField = null, monthField = null, quarterField = null, yearField = null;
             foreach (var colField in columnFields)
             {
+                if (colField.GroupInterval == FieldGroupInterval.DateWeekOfYear)
+                    weekField = colField;
                 if (colField.GroupInterval == FieldGroupInterval.DateMonth)
                     monthField = colField;
                 if (colField.GroupInterval == FieldGroupInterval.DateQuarter)
@@ -160,7 +164,7 @@ namespace UnicontaClient.Pages.CustomPage
                 rowField.FieldName == "ProjDim1" || rowField.FieldName == "ProjDim2" || rowField.FieldName == "ProjDim3"
                 || rowField.FieldName == "ProjDim4" || rowField.FieldName == "ProjDim5";
 
-            if (((monthField != null || quarterField != null || yearField != null) && isRowSelected) || isRowSelected)
+            if (((weekField != null || monthField != null || quarterField != null || yearField != null) && isRowSelected) || isRowSelected)
             {
                 if(rowField.FieldName == "EmployeeName")
                 {
@@ -179,6 +183,7 @@ namespace UnicontaClient.Pages.CustomPage
                         rowField = projRow;
                 }
 
+                object weekfldValue = weekField != null ? pivotDgProjectPlanning.GetFieldValue(weekField, cell.X) : null;
                 object monthfldValue = monthField != null ? pivotDgProjectPlanning.GetFieldValue(monthField, cell.X) : null;
                 object qrtfldValue = quarterField != null ? pivotDgProjectPlanning.GetFieldValue(quarterField, cell.X) : null;
                 object yearfldValue = yearField != null ? pivotDgProjectPlanning.GetFieldValue(yearField, cell.X) : null;
@@ -187,6 +192,7 @@ namespace UnicontaClient.Pages.CustomPage
                 string filterFldName = rowField.FieldName;
                 string filterFldValue = (string)rowValue;
 
+                var weekNo = weekfldValue != null ? (int)weekfldValue : 0;
                 var monthNo = monthfldValue != null ? (int)monthfldValue : 0; 
                 var quarterNo = qrtfldValue != null ? (int)qrtfldValue : 0;
                 var year = yearfldValue != null ? (int)yearfldValue : 0;
@@ -201,7 +207,12 @@ namespace UnicontaClient.Pages.CustomPage
                 DateTime cellToDate = DateTime.MaxValue;
                 if (projectTrans != null)
                 {
-                    if (monthNo != 0)
+                    if (weekNo != 0)
+                    {
+                        cellFromDate = FirstDayOfWeek(projectTrans._Date);
+                        cellToDate = cellFromDate.AddDays(6);
+                    }
+                    else if (monthNo != 0)
                     {
                         cellFromDate = new DateTime(projectTrans._Date.Year, monthNo, 1);
                         cellToDate = cellFromDate.AddMonths(1).AddDays(-1);
@@ -237,12 +248,13 @@ namespace UnicontaClient.Pages.CustomPage
                 }
 
                 string vheader = string.Format("{0} {1} ({2})", Uniconta.ClientTools.Localization.lookup("ProjectPlanning"), Uniconta.ClientTools.Localization.lookup("Lines"), filterFldValue);
-                var param = new object[5];
-                param[0] = new string[] { filterFldName, filterFldValue } ;
+                var param = new object[6];
+                param[0] = new string[] { filterFldName, filterFldValue };
                 param[1] = new int[] { monthNo, quarterNo, year };
                 param[2] = new double[] { normQty, budQty };
                 param[3] = new DateTime[] { cellFromDate.Date, cellToDate.Date };
                 param[4] = api;
+                param[5] = budgetGroup;
                 AddDockItem(TabControls.ProjectBudgetPlaningLinePage, param, vheader);
             }
         }
@@ -341,6 +353,7 @@ namespace UnicontaClient.Pages.CustomPage
             fromDate = txtFromDate.DateTime;
             toDate = txtToDate.DateTime;
             budgetGroup = cmbBudgetGroup.Text;
+            grpWeek = chkGroupWeek.IsChecked.Value;
 
             if (string.IsNullOrEmpty(budgetGroup))
             {
@@ -472,6 +485,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
 
             #region Norm Calendar
+
             CalenderNormLst[] normLst = null;
 
             var pairCalendarLine = new PropValuePair[]
@@ -482,25 +496,47 @@ namespace UnicontaClient.Pages.CustomPage
             var tmEmpCalenderLineLst = await api.Query<TMEmpCalendarLineClient>(pairCalendarLine);
             if (tmEmpCalenderLineLst.Length > 0)
             {
-
-                var grpCalendarLst = tmEmpCalenderLineLst.GroupBy(x => new { x.Calendar, x.FirstDayOfMonth }).Select(x => new { Key = x.Key, Hours = x.Sum(y => y.Hours) }).ToList();
-
-
-                foreach (var rec in grpCalendarLst)
+                if (grpWeek)
                 {
-                    var normTrans = new CalenderNormLst()
+                    var grpCalendarLst = tmEmpCalenderLineLst.GroupBy(x => new { x.Calendar, PeriodFirstDate = x.WeekMonday }).Select(x => new { x.Key, Hours = x.Sum(y => y.Hours) });
+                    foreach (var rec in grpCalendarLst)
                     {
-                        CalendarId = rec.Key.Calendar,
-                        Date = rec.Key.FirstDayOfMonth,
-                        NormQty = rec.Hours
-                    };
+                        var normTrans = new CalenderNormLst()
+                        {
+                            CalendarId = rec.Key.Calendar,
+                            Date = rec.Key.PeriodFirstDate,
+                            NormQty = rec.Hours
+                        };
 
-                    if (normLst == null)
-                        normLst = new CalenderNormLst[] { normTrans };
-                    else
+                        if (normLst == null)
+                            normLst = new CalenderNormLst[] { normTrans };
+                        else
+                        {
+                            Array.Resize(ref normLst, normLst.Length + 1);
+                            normLst[normLst.Length - 1] = normTrans;
+                        }
+                    }
+                }
+                else
+                {
+                    var grpCalendarLst = tmEmpCalenderLineLst.GroupBy(x => new { x.Calendar, x.FirstDayOfMonth }).Select(x => new { Key = x.Key, Hours = x.Sum(y => y.Hours) }).ToList();
+
+                    foreach (var rec in grpCalendarLst)
                     {
-                        Array.Resize(ref normLst, normLst.Length + 1);
-                        normLst[normLst.Length - 1] = normTrans;
+                        var normTrans = new CalenderNormLst()
+                        {
+                            CalendarId = rec.Key.Calendar,
+                            Date = rec.Key.FirstDayOfMonth,
+                            NormQty = rec.Hours
+                        };
+
+                        if (normLst == null)
+                            normLst = new CalenderNormLst[] { normTrans };
+                        else
+                        {
+                            Array.Resize(ref normLst, normLst.Length + 1);
+                            normLst[normLst.Length - 1] = normTrans;
+                        }
                     }
                 }
 
@@ -539,85 +575,127 @@ namespace UnicontaClient.Pages.CustomPage
 
                     if (calenders.Count == 0)
                         continue;
-                    
-                    foreach (var rec in calenders.OrderBy(s => s.ValidFrom))
+
+                    if (grpWeek)
                     {
-                        var newStartDate = rec._ValidFrom != DateTime.MinValue && rec._ValidFrom > fromDate ? rec._ValidFrom : fromDate;
-                        var empStartDate = empl._Hired == DateTime.MinValue ? newStartDate : empl._Hired > newStartDate ? empl._Hired : newStartDate;
-
-                        var newEndDate = rec._ValidTo != DateTime.MinValue && rec._ValidTo < toDate ? rec._ValidTo : toDate;
-                        var empEndDate = empl._Terminated == DateTime.MinValue ? newEndDate : empl._Terminated < newEndDate ? empl._Terminated : newEndDate;
-
-                        var empFirstDayOfMonth = FirstDayOfMonth(empStartDate);
-                        var empLastDayOfMonth = LastDayOfMonth(empEndDate);
-
-                        int empFirstMth = 0, empLastMth = 0;
-
-                        if (empFirstDayOfMonth != empStartDate)
-                            empFirstMth = empStartDate.Month;
-
-                        if (empLastDayOfMonth != empEndDate)
-                            empLastMth = empEndDate.Month;
-
-                        searchNorm.CalendarId = rec._Calendar;
-                        searchNorm.Date = empFirstDayOfMonth;
-
-                        var pos = Array.BinarySearch(normLst, searchNorm, normCalSort);
-                        if (pos < 0)
-                            pos = ~pos;
-                        while (pos < normLst.Length)
+                        foreach (var rec in calenders.OrderBy(s => s.ValidFrom))
                         {
-                            var s = normLst[pos++];
-                            if (s.CalendarId != rec._Calendar || s.Date > empEndDate)
-                                break;
+                            var newStartDate = rec._ValidFrom != DateTime.MinValue && rec._ValidFrom > fromDate ? rec._ValidFrom : fromDate;
+                            var empStartDate = empl._Hired == DateTime.MinValue ? newStartDate : empl._Hired > newStartDate ? empl._Hired : newStartDate;
 
+                            var newEndDate = rec._ValidTo != DateTime.MinValue && rec._ValidTo < toDate ? rec._ValidTo : toDate;
+                            var empEndDate = empl._Terminated == DateTime.MinValue ? newEndDate : empl._Terminated < newEndDate ? empl._Terminated : newEndDate;
 
-                            if (empFirstMth != 0 && s.Date.Month == empFirstMth)
+                            var empFirstDayOfWk = FirstDayOfWeek(empStartDate);
+
+                            searchNorm.CalendarId = rec._Calendar;
+                            searchNorm.Date = empFirstDayOfWk;
+
+                            var pos = Array.BinarySearch(normLst, searchNorm, normCalSort);
+                            if (pos < 0)
+                                pos = ~pos;
+                            while (pos < normLst.Length)
                             {
-                                var firstDayOfMonth = FirstDayOfMonth(empStartDate);
-                                var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
+                                var s = normLst[pos++];
+                                if (s.CalendarId != rec._Calendar || s.Date > empEndDate)
+                                    break;
 
-                                var hours = tmEmpCalenderLineLst.Where(x => x._Calendar == s.CalendarId && x.Date >= empStartDate && x.Date <= lastDayOfMonth).Sum(y => y._Hours);
-
-                                var newTrans = new ProjectTransPivotClient()
+                                if (s.Date >= empStartDate && s.Date <= empEndDate)
                                 {
-                                    _CompanyId = CompanyId,
-                                    _Employee = curEmployee,
-                                    _Date = firstDayOfMonth,
-                                    _NormQty = hours
-                                };
+                                    var newTrans = new ProjectTransPivotClient()
+                                    {
+                                        _CompanyId = CompanyId,
+                                        _Employee = curEmployee,
+                                        _Date = s.Date,
+                                        _NormQty = s.NormQty
+                                    };
 
-                                empNormLst.Add(newTrans);
+                                    empNormLst.Add(newTrans);
+                                }
                             }
-                            else if (empLastMth != 0 && s.Date.Month == empLastMth)
+                        }
+                    }
+                    else
+                    {
+                        foreach (var rec in calenders.OrderBy(s => s.ValidFrom))
+                        {
+                            var newStartDate = rec._ValidFrom != DateTime.MinValue && rec._ValidFrom > fromDate ? rec._ValidFrom : fromDate;
+                            var empStartDate = empl._Hired == DateTime.MinValue ? newStartDate : empl._Hired > newStartDate ? empl._Hired : newStartDate;
+
+                            var newEndDate = rec._ValidTo != DateTime.MinValue && rec._ValidTo < toDate ? rec._ValidTo : toDate;
+                            var empEndDate = empl._Terminated == DateTime.MinValue ? newEndDate : empl._Terminated < newEndDate ? empl._Terminated : newEndDate;
+
+                            var empFirstDayOfMonth = FirstDayOfMonth(empStartDate);
+                            var empLastDayOfMonth = LastDayOfMonth(empEndDate);
+
+                            int empFirstMth = 0, empLastMth = 0;
+
+                            if (empFirstDayOfMonth != empStartDate)
+                                empFirstMth = empStartDate.Month;
+
+                            if (empLastDayOfMonth != empEndDate)
+                                empLastMth = empEndDate.Month;
+
+                            searchNorm.CalendarId = rec._Calendar;
+                            searchNorm.Date = empFirstDayOfMonth;
+
+                            var pos = Array.BinarySearch(normLst, searchNorm, normCalSort);
+                            if (pos < 0)
+                                pos = ~pos;
+                            while (pos < normLst.Length)
                             {
-                                var firstDayOfMonth = FirstDayOfMonth(empEndDate);
-                                var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
+                                var s = normLst[pos++];
+                                if (s.CalendarId != rec._Calendar || s.Date > empEndDate)
+                                    break;
 
-                                var hours = tmEmpCalenderLineLst.Where(x => x._Calendar == s.CalendarId && x.Date >= firstDayOfMonth && x.Date <= empEndDate).Sum(y => y._Hours);
 
-                                var newTrans = new ProjectTransPivotClient()
+                                if (empFirstMth != 0 && s.Date.Month == empFirstMth)
                                 {
-                                    _CompanyId = CompanyId,
-                                    _Employee = curEmployee,
-                                    _Date = firstDayOfMonth,
-                                    _NormQty = hours
-                                };
+                                    var firstDayOfMonth = FirstDayOfMonth(empStartDate);
+                                    var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
 
-                                empNormLst.Add(newTrans);
+                                    var hours = tmEmpCalenderLineLst.Where(x => x._Calendar == s.CalendarId && x.Date >= empStartDate && x.Date <= lastDayOfMonth).Sum(y => y._Hours);
 
-                            }
-                            else if (s.Date >= empStartDate && s.Date <= empEndDate)
-                            {
-                                var newTrans = new ProjectTransPivotClient()
+                                    var newTrans = new ProjectTransPivotClient()
+                                    {
+                                        _CompanyId = CompanyId,
+                                        _Employee = curEmployee,
+                                        _Date = firstDayOfMonth,
+                                        _NormQty = hours
+                                    };
+
+                                    empNormLst.Add(newTrans);
+                                }
+                                else if (empLastMth != 0 && s.Date.Month == empLastMth)
                                 {
-                                    _CompanyId = CompanyId,
-                                    _Employee = curEmployee,
-                                    _Date = s.Date,
-                                    _NormQty = s.NormQty
-                                };
+                                    var firstDayOfMonth = FirstDayOfMonth(empEndDate);
+                                    var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
 
-                                empNormLst.Add(newTrans);
+                                    var hours = tmEmpCalenderLineLst.Where(x => x._Calendar == s.CalendarId && x.Date >= firstDayOfMonth && x.Date <= empEndDate).Sum(y => y._Hours);
+
+                                    var newTrans = new ProjectTransPivotClient()
+                                    {
+                                        _CompanyId = CompanyId,
+                                        _Employee = curEmployee,
+                                        _Date = firstDayOfMonth,
+                                        _NormQty = hours
+                                    };
+
+                                    empNormLst.Add(newTrans);
+
+                                }
+                                else if (s.Date >= empStartDate && s.Date <= empEndDate)
+                                {
+                                    var newTrans = new ProjectTransPivotClient()
+                                    {
+                                        _CompanyId = CompanyId,
+                                        _Employee = curEmployee,
+                                        _Date = s.Date,
+                                        _NormQty = s.NormQty
+                                    };
+
+                                    empNormLst.Add(newTrans);
+                                }
                             }
                         }
                     }
@@ -654,6 +732,12 @@ namespace UnicontaClient.Pages.CustomPage
         private DateTime LastDayOfMonth(DateTime date)
         {
             return FirstDayOfMonth(date).AddMonths(1).AddDays(-1);
+        }
+
+        private DateTime FirstDayOfWeek(DateTime date)
+        {
+            int diff = (7 + (date.DayOfWeek - DayOfWeek.Monday)) % 7;
+            return date.AddDays(-1 * diff);
         }
 
         private void LocalMenu_OnItemClicked(string ActionType)

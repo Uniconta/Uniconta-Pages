@@ -41,11 +41,12 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryTransactions"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Variant5Name" Width="100" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ItemName" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Date" Width="90"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="OrderNumber" AllowThousandMask="false" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="OrderNumber" Width="80"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DCAccount" Width="100"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="AccountName" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Text" Visible="False" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Qty"  Width="90">
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="StockUpdate" Width="60"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Qty"  Width="80">
                         <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                             <DataTemplate>
                                 <CorasauControls:TextEditor  x:Name="PART_Editor" HorizontalContentAlignment="Right" Mask="{Binding Path=DataContext.RowData.Row.Decimals,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource MaskConverter},ConverterParameter=Decimals}" MaskUseAsDisplayFormat="True" MaskType="Numeric" EditValue="{Binding Path=DataContext.RowData.Row.Qty,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}"/>
@@ -57,12 +58,11 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryTransactions"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Week" Width="50" Visible="false"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DateOnOrder" Width="90" Visible="false"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CostRestated" Width="60" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="StockUpdate" Width="60" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CostPrice" Width="90"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="SalesPrice" Width="90"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Total" Width="90"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="NetAmount" Width="90"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="GrossAmount" Width="90" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CostPrice" Width="80"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="SalesPrice" Width="80"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Total" Width="80"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="NetAmount" Width="80"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="GrossAmount" Width="80" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Currency" Width="35"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Vat" Width="50" Visible="false"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Employee" Width="50" Visible="false"/>
@@ -85,7 +85,7 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryTransactions"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Warehouse" Width="70"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Location" Width="70"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Project" Width="100" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ProjectName" Width="100"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ProjectName" Visible="False" Width="100"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Task" Width="80" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ReferenceNumber" Width="70" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim1" Width="70" FieldName="Dimension1" Visible="false" />
@@ -102,6 +102,9 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryTransactions"
                     <localPage:SumColumn FieldName="Margin" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                     <localPage:SumColumn FieldName="CostValue" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                     <localPage:SumColumn FieldName="MarginRatio" SummaryType="Custom" DisplayFormat="{}{0:N2}" />
+                    <localPage:SumColumn FieldName="Weight" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="Cartons" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="Volume" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                 </localPage:InvTransactionGrid.TotalSummary>
             </localPage:InvTransactionGrid>
         </CorasauControls:BusyIndicator>

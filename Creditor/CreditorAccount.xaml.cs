@@ -198,7 +198,10 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "AddNote":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.UserNotesPage, dgCreditorAccountGrid.syncEntity);
+                    {
+                        string hdr = string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("UserNotesInfo"), selectedItem._Account);
+                        AddDockItem(TabControls.UserNotesPage, dgCreditorAccountGrid.syncEntity,hdr);
+                    }
                     break;
                 case "AddDoc":
                     if (selectedItem != null)

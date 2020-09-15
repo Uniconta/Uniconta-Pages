@@ -215,7 +215,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 var debtor = invLine.Debtor;
 
-                if (invLine._Item == null || debtor._Country == companyCountryId || !Country2Language.IsEU(debtor._Country))
+                if (invLine._Item == null || debtor == null || debtor._Country == companyCountryId || !Country2Language.IsEU(debtor._Country))
                     continue;
 
                 var invoice = new EUSaleWithoutVAT();
@@ -229,7 +229,7 @@ namespace UnicontaClient.Pages.CustomPage
                 invoice.Item = invLine._Item;
                 invoice.Vat = invLine._Vat;
 
-                switch (invLine.InvItem._ItemType)
+                switch (invLine.InvItem?._ItemType)
                 {
                     case (byte)Uniconta.DataModel.ItemType.Service:
                         invoice.ServiceAmount += -invLine.NetAmount;

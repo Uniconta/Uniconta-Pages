@@ -25,6 +25,7 @@ x:Class="UnicontaClient.Pages.CustomPage.AllUserDocumentsPage"
                     </local:CorasauDataGridTemplateColumnClient>
                     <local:CorasauDataGridTemplateColumnClient x:Name="UserName" Width="100" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="DocumentType" Width="55"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Size" Width="50"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Url" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="UserId" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Text" Width="300" />

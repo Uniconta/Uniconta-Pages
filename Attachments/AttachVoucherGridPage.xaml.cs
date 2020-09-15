@@ -30,12 +30,15 @@ namespace UnicontaClient.Pages.CustomPage
     public partial class AttachVoucherGridPage : GridBasePage
     {
         private List<int> _attachedVoucherList;
-        private bool addFilter = false;
+        private bool addFilter;
         private object[] attachParams;
+        object cache;
+
         public AttachVoucherGridPage(List<int> attachedVouchers) : base(null)
         {
             InitializeComponent();
             _attachedVoucherList = attachedVouchers;
+            cache = VoucherCache.HoldGlobalVoucherCache;
             InitControl();
             dgAttachVouchers.CustomUnboundColumnData += DgAttachVouchers_CustomUnboundColumnData;
             dgAttachVouchers.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;
@@ -104,10 +107,11 @@ namespace UnicontaClient.Pages.CustomPage
         private void AttachVoucher()
         {
             var selectedVouher = dgAttachVouchers.SelectedItem as VouchersClient;
-            if (selectedVouher == null) return;
-
-            attachParams = new object[1] { selectedVouher };
-            dockCtrl.CloseDockItem();
+            if (selectedVouher != null)
+            {
+                attachParams = new object[] { selectedVouher };
+                dockCtrl.CloseDockItem();
+            }
         }
 
         private void Close()
@@ -125,7 +129,13 @@ namespace UnicontaClient.Pages.CustomPage
                 try
                 {
                     if (selectedVoucherClient._Data == null)
-                        await api.Read(selectedVoucherClient);
+                    {
+                        var cache = VoucherCache.GetGlobalVoucherCache(selectedVoucherClient);
+                        if (cache != null)
+                            selectedVoucherClient._Data = cache._Data;
+                        else if (await api.Read(selectedVoucherClient) == ErrorCodes.Succes)
+                            VoucherCache.SetGlobalVoucherCache(selectedVoucherClient);
+                    }
 
                     if (selectedVoucherClient._Fileextension != FileextensionsTypes.DIR)
                     {
@@ -154,6 +164,8 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 int rowId = Convert.ToInt32(e.GetListSourceFieldValue("RowId"));
                 e.Value = _attachedVoucherList.Contains(rowId);
+                if (_attachedVoucherList.Contains(rowId))
+                    dgAttachVouchers.View.FocusedRowHandle = e.ListSourceRowIndex;
             }
         }
     }

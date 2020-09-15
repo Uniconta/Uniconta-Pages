@@ -19,6 +19,8 @@ using Uniconta.Common;
 using Uniconta.DataModel;
 using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools;
+using Uniconta.API.Crm;
+using Uniconta.ClientTools.Util;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -70,6 +72,9 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         AddDockItem(TabControls.UserDocsPage, dgEmailList.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Documents"), selectedItem._Name));
                     break;
+                case "SendEmail":
+                    SendEmail();
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -88,6 +93,41 @@ namespace UnicontaClient.Pages.CustomPage
 
             busyIndicator.IsBusy = false;
             dgEmailList.Visibility = Visibility.Visible;
+        }
+
+           void SendEmail()
+        {
+            var rows = (ICollection<CrmCampaignMemberClient>)dgEmailList.GetVisibleRows();
+            if (rows.Count == 0)
+                return;
+
+            var cwSendEmail = new CwSendEmail(api);
+            cwSendEmail.Closed += async delegate
+            {
+                if (cwSendEmail.DialogResult == true && cwSendEmail.CompanySMTP != null)
+                {
+                    var crmAPI = new CrmAPI(api);
+                    ErrorCodes res;
+                    if (cwSendEmail.SendTestEmail)
+                        res = await crmAPI.SendMailTest(cwSendEmail.CompanySMTP, cwSendEmail.Email, cwSendEmail.Name);
+                    else
+                    {
+                        var followUp = cwSendEmail.FollowUp;
+                        if (followUp != null)
+                        {
+                            var result = await api.Insert(cwSendEmail.FollowUp);
+                            if (result != ErrorCodes.Succes)
+                                followUp = null;
+                        }
+                        res = await crmAPI.SendMail(cwSendEmail.CompanySMTP, rows, followUp);
+                    }
+                    if (res != ErrorCodes.Succes)
+                        UtilDisplay.ShowErrorCode(res);
+                    else
+                        UtilDisplay.ShowErrorCode(res);
+                }
+            };
+            cwSendEmail.Show();
         }
 
         protected override LookUpTable HandleLookupOnLocalPage(LookUpTable lookup, CorasauDataGrid dg)

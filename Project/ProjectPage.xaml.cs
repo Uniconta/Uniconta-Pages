@@ -300,20 +300,36 @@ namespace UnicontaClient.Pages.CustomPage
                      busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("LoadingMsg");
                      busyIndicator.IsBusy = true;
 
-                     var debtorOrderInstance = Activator.CreateInstance(api.CompanyEntity.GetUserTypeNotNull(typeof(DebtorOrderClient))) as DebtorOrderClient;
+                     var debtorOrderInstance = api.CompanyEntity.CreateUserType<DebtorOrderClient>();
                      var invoiceApi = new Uniconta.API.Project.InvoiceAPI(api);
                      var result = await invoiceApi.CreateOrderFromProject(debtorOrderInstance, selectedItem._Number, CWCreateOrderFromProject.InvoiceCategory, CWCreateOrderFromProject.GenrateDate,
                          CWCreateOrderFromProject.FromDate, CWCreateOrderFromProject.ToDate);
                      busyIndicator.IsBusy = false;
                      if (result != ErrorCodes.Succes)
-                         UtilDisplay.ShowErrorCode(result);
+                     {
+                         if (result == ErrorCodes.NoLinesToUpdate)
+                         {
+                             var message = string.Format("{0}. {1}?", Uniconta.ClientTools.Localization.lookup(result.ToString()), string.Format(Uniconta.ClientTools.Localization.lookup("CreateOBJ"), Uniconta.ClientTools.Localization.lookup("Order")));
+                             var res = UnicontaMessageBox.Show(message, Uniconta.ClientTools.Localization.lookup("Message"), UnicontaMessageBox.YesNo);
+                             if (res == MessageBoxResult.Yes)
+                             {
+                                 debtorOrderInstance.SetMaster(selectedItem);
+                                 debtorOrderInstance._PrCategory = CWCreateOrderFromProject.InvoiceCategory;
+                                 var er = await api.Insert(debtorOrderInstance);
+                                 if (er == ErrorCodes.Succes)
+                                     ShowOrderLines(debtorOrderInstance);
+                             }
+                         }
+                         else
+                             UtilDisplay.ShowErrorCode(result);
+                     }
                      else
                          ShowOrderLines(debtorOrderInstance);
                  }
              };
             cwCreateOrder.Show();
         }
-
+        
         void CreateZeroInvoice(ProjectClient selectedItem)
         {
             var cwCreateZeroInvoice = new UnicontaClient.Pages.CwCreateZeroInvoice(api);
@@ -327,7 +343,7 @@ namespace UnicontaClient.Pages.CustomPage
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
                     busyIndicator.IsBusy = true;
                     var invoiceApi = new Uniconta.API.Project.InvoiceAPI(api);
-                    var result = await invoiceApi.CreateZeroInvoice(selectedItem._Number, cwCreateZeroInvoice.InvoiceCategory, cwCreateZeroInvoice.InvoiceDate, cwCreateZeroInvoice.ToDate,
+                    var result = await invoiceApi.CreateZeroInvoice(selectedItem._Number, cwCreateZeroInvoice.InvoiceCategory, cwCreateZeroInvoice.AdjustmentCategory, cwCreateZeroInvoice.Employee, cwCreateZeroInvoice.InvoiceDate, cwCreateZeroInvoice.ToDate,
                         cwCreateZeroInvoice.Simulate, new GLTransClientTotal());
                     busyIndicator.IsBusy = false;
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("LoadingMsg");

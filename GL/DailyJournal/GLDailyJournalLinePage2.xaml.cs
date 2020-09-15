@@ -42,6 +42,16 @@ namespace UnicontaClient.Pages.CustomPage
             ModifiedRow = this.syncEntity.Row;
             InitPage(api);
             SetHeader();
+            RibbonBase rb = (RibbonBase)frmRibbon.DataContext;
+            if (rb != null)
+                UtilDisplay.RemoveMenuCommand(rb, "Save");
+        }
+
+        public GLDailyJournalLinePage2(UnicontaBaseEntity sourcedata)
+           :  base(sourcedata, true)
+        {
+            InitializeComponent();
+            InitPage(api);
         }
 
         private void SetHeader()

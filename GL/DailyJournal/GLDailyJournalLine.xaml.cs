@@ -530,6 +530,13 @@ namespace UnicontaClient.Pages.CustomPage
 
             this.TraceBalance.Visible = TraceVisible;
             this.TraceBalance.ShowInColumnChooser = TraceVisible;
+
+            if (dgGLDailyJournalLine.IsLoadedFromLayoutSaved)
+            {
+                dgGLDailyJournalLine.ClearSorting();
+                dgGLDailyJournalLine.ClearFilter();
+                dgGLDailyJournalLine.IsLoadedFromLayoutSaved = false;
+            }
         }
 
         static string formatAcc(GLAccount ac) { return string.Format("{0}, {1}", ac._Account, ac._Name); }
@@ -732,12 +739,12 @@ namespace UnicontaClient.Pages.CustomPage
                     ViewVoucher(TabControls.VouchersPage3, dgGLDailyJournalLine.syncEntity);
                     busyIndicator.IsBusy = false;
                     break;
-
+                case "DragDrop":
                 case "ImportVoucher":
                     if (selectedItem != null)
                     {
                         dgGLDailyJournalLine.SetLoadedRow(selectedItem);
-                        Utility.ImportVoucher(selectedItem, api);
+                        AddVoucher(selectedItem, ActionType);
                     }
                     break;
 
@@ -842,6 +849,31 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
+        private void AddVoucher(JournalLineGridClient journalLine, string actionType)
+        {
+#if !SILVERLIGHT
+            if (actionType == "DragDrop")
+            {
+                var dragDropWindow = new UnicontaDragDropWindow(false);
+                dragDropWindow.Closed += delegate
+                {
+                    if (dragDropWindow.DialogResult == true)
+                    {
+                        var fileInfo = dragDropWindow.FileInfoList?.SingleOrDefault();
+                        var voucher = new VouchersClient();
+                        voucher._Data = fileInfo.FileBytes;
+                        voucher._Text = fileInfo.FileName;
+                        voucher._Fileextension = DocumentConvert.GetDocumentType(fileInfo.FileExtension);
+
+                        Utility.ImportVoucher(journalLine, api, voucher, true);
+                    }
+                };
+                dragDropWindow.Show();
+            }
+            else
+#endif
+                Utility.ImportVoucher(journalLine, api, null, false);
+        }
         void RemoveAllVouchers()
         {
             var journalLines = dgGLDailyJournalLine.GetVisibleRows() as IEnumerable<JournalLineGridClient>;
@@ -1292,11 +1324,6 @@ namespace UnicontaClient.Pages.CustomPage
                 this.FirstVoucher = itemSource[0]._Voucher;
                 dgGLDailyJournalLine.SelectedItem = dgGLDailyJournalLine.GetRow(dgGLDailyJournalLine.GetRowHandleByListIndex(itemSource.Count - 1));
             }
-            if (dgGLDailyJournalLine.IsLoadedFromLayoutSaved)
-            {
-                dgGLDailyJournalLine.ClearSorting();
-                dgGLDailyJournalLine.IsLoadedFromLayoutSaved = false;
-            }
 
             if (LedgerCache == null || LedgerCache.IsUpdated)
                 LedgerCache = await api.LoadCache(typeof(GLAccount), (LedgerCache != null));
@@ -1630,8 +1657,8 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (type == GLJournalAccountType.Creditor)
             {
-                if (rec._PrCategory != null)
-                    rec.PrCategory = rec._PrCategory;
+                if (dc._PrCategory != null)
+                    rec.PrCategory = dc._PrCategory;
                 if (rec._PaymentMethod != dc._PaymentMethod)
                 {
                     rec._PaymentMethod = dc._PaymentMethod;
@@ -1941,7 +1968,7 @@ namespace UnicontaClient.Pages.CustomPage
                     copyDCAccount(rec, rec._OffsetAccountTypeEnum, rec._OffsetAccount, true);
                     break;
                 case "Text":
-                    SetTransText(rec, getTransText(rec._Text, TextTypes));
+                    SetText(rec);
                     break;
                 case "TransType":
                     SetTransText(rec, (Uniconta.DataModel.GLTransType)TextTypes.Get(rec._TransType));
@@ -2058,6 +2085,63 @@ namespace UnicontaClient.Pages.CustomPage
                         return txt;
             }
             return null;
+        }
+
+        void SetText(JournalLineGridClient rec)
+        {
+            var str = rec._Text;
+            if (str == null)
+                return;
+            if (str.Length >= 4)
+            {
+                bool found = false;
+                var fakt = Uniconta.ClientTools.Localization.lookup("Invoice");
+                if (string.Compare(Uniconta.ClientTools.Localization.lookup("Invoice"), 0, str, 0, 3, StringComparison.CurrentCultureIgnoreCase) == 0)
+                {
+                    found = true;
+                    rec._DCPostType = Uniconta.DataModel.DCPostType.Invoice;
+                }
+                else if (string.Compare(Uniconta.ClientTools.Localization.lookup("Payment"), 0, str, 0, 3, StringComparison.CurrentCultureIgnoreCase) == 0)
+                {
+                    found = true;
+                    rec._DCPostType = Uniconta.DataModel.DCPostType.Payment;
+                }
+                else if (string.Compare(Uniconta.ClientTools.Localization.lookup("CreditNote"), 0, str, 0, 7, StringComparison.CurrentCultureIgnoreCase) == 0)
+                {
+                    found = true;
+                    rec._DCPostType = Uniconta.DataModel.DCPostType.Creditnote;
+                }
+                if (found)
+                {
+                    int firstDigit = -1, digitLen = 0;
+                    for (int i = 0; (i < str.Length); i++)
+                    {
+                        var ch = str[i];
+                        if (char.IsDigit(ch))
+                        {
+                            if (firstDigit < 0)
+                                firstDigit = i;
+                            digitLen++;
+                        }
+                        else if (firstDigit >= 0)
+                        {
+                            if (digitLen >= 4)
+                                break;
+                            firstDigit = -1;
+                            digitLen = 0;
+                        }
+                    }
+                    if (firstDigit >= 0)
+                    {
+                        rec.Invoice = str.Substring(firstDigit, digitLen);
+                        rec.Text = null;
+                        return;
+                    }
+                }
+            }
+            var t = getTransText(str, TextTypes);
+            if (t != null)
+                SetTransText(rec, t);
         }
 
         void SetTransText(JournalLineGridClient rec, Uniconta.DataModel.GLTransType t)

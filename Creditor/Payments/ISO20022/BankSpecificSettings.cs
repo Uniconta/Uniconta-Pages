@@ -16,7 +16,7 @@ namespace UnicontaISO20022CreditTransfer
     /// <summary>
     /// Class with methods to handle bank specific settings and other methods to build the XML file.
     /// </summary>
-    abstract class BankSpecificSettings
+    public abstract class BankSpecificSettings
     {
         #region Member constants
         protected const string TRUE_VALUE = "true";
@@ -295,14 +295,9 @@ namespace UnicontaISO20022CreditTransfer
         /// <summary>
         /// Merged payments
         /// </summary>
-        public virtual string PaymentInfoId(int fileSeqNumber, string endToEndId, bool merged = false)
+        public virtual string PaymentInfoId(int fileSeqNumber, DateTime executionDate, PaymentTypes paymentMethod, Currencies? currency, bool merged = false)
         {
-            string result = string.Empty;
-
-            if (merged)
-                result = string.Format("{0}-{1}-MERGED", fileSeqNumber.ToString().PadLeft(6, '0'), endToEndId);
-            else
-                result = string.Format("{0}-{1}", fileSeqNumber.ToString().PadLeft(6, '0'), endToEndId);
+            var result = string.Format("{0}{1}{2}{3}{4}", merged ? 1 : 0, currency.HasValue ? (int)currency : 0, (int)paymentMethod, fileSeqNumber.ToString().PadLeft(6, '0'), executionDate.ToString("ddMMyy"));
 
             return StandardPaymentFunctions.RegularExpressionReplace(result, allowedCharactersRegEx, replaceCharactersRegEx);
         }

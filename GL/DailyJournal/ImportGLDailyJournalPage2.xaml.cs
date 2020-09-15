@@ -17,6 +17,7 @@ using UnicontaClient.Models;
 using UnicontaClient.Utilities;
 using Uniconta.ClientTools.Util;
 using Uniconta.API.Service;
+using Uniconta.ClientTools.Controls;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -67,20 +68,24 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void frmRibbon_OnItemClicked(string ActionType)
         {
-            switch (ActionType)
+            if (ActionType == "ViewBankstatement")
             {
-                case "ViewBankstatement":
-                    ViewBankStatemnt(_bankImportFormatClient);
-                    break;
-                default:
-                    if (ActionType == "Save" && isReadOnly)
-                    {
-                        LoadedRow = null;
-                        // will make an insert
-                    }
-                    frmRibbon_BaseActions(ActionType);
-                    break;
+                ViewBankStatemnt(_bankImportFormatClient);
+                return;
             }
+            if (ActionType == "Save")
+            {
+                // will make an insert
+                if (isReadOnly)
+                    LoadedRow = null;
+
+                if (_bankImportFormatClient._Format == Uniconta.DataModel.BankImportFormatType.CSV && (_bankImportFormatClient._DatePos == 0 || _bankImportFormatClient._AmountPos == 0))
+                {
+                    UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("BankImportunFilledPositionMsg"), Uniconta.ClientTools.Localization.lookup("Error"));
+                    return;
+                }
+            }
+            frmRibbon_BaseActions(ActionType);
         }
 
         void ViewBankStatemnt(BankImportFormatClient selectedBankFormat)

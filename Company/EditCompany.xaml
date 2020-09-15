@@ -8,7 +8,8 @@ x:Class="UnicontaClient.Pages.CustomPage.EditCompany"
     mc:Ignorable="d" xmlns:CientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
     xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools" 
     xmlns:dxinteraction="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
-                    xmlns:enumType ="clr-namespace:Uniconta.Common;assembly=Uniconta.Common"
+    xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+    xmlns:enumType ="clr-namespace:Uniconta.Common;assembly=Uniconta.Common"
     d:DesignHeight="300" d:DesignWidth="400">
     <CorasauControls:BusyIndicator x:Name="busyIndicator" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
         <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
@@ -161,6 +162,14 @@ x:Class="UnicontaClient.Pages.CustomPage.EditCompany"
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="OIOUBLSendOnServer" x:Name="liOIOUBLSendOnServer">
                             <CorasauControls:CheckEditor IsChecked="{Binding OIOUBLSendOnServer,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+
+                        <CorasauControls:CorasauLayoutItem FieldName="ApprovalReminders" x:Name="liApprovalReminders">
+                            <CorasauControls:ComboBoxEditor x:Name="cmbSendAppRemdr" Text="{Binding ApprovalReminders, Mode=TwoWay}">
+                                <CorasauControls:ComboBoxEditor.StyleSettings>
+                                    <editor:CheckedComboBoxStyleSettings />
+                                </CorasauControls:ComboBoxEditor.StyleSettings>
+                            </CorasauControls:ComboBoxEditor>
                         </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
 

@@ -61,7 +61,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (emailList != null)
             {
                 cmbPrcOrderEmail.ItemsSource = emailList.Where(x => x._EmailType == Uniconta.DataModel.DebtorEmailType.PurchaseOrder).Select(x => x._Name).ToList();
-                cmbPrcPacknoteEmail.ItemsSource = emailList.Where(x => x._EmailType == Uniconta.DataModel.DebtorEmailType.Packnote).Select(x => x._Name).ToList();
+                cmbPrcPacknoteEmail.ItemsSource = emailList.Where(x => x._EmailType == Uniconta.DataModel.DebtorEmailType.PurchasePacknote).Select(x => x._Name).ToList();
                 cmbPrcRequisitionEmail.ItemsSource = emailList.Where(x => x._EmailType == Uniconta.DataModel.DebtorEmailType.Requisition).Select(x => x._Name).ToList();
                 cmbPrcCreditnoteEmail.ItemsSource =  cmbPrcInvoiceEmail.ItemsSource = emailList.Where(x => x._EmailType == Uniconta.DataModel.DebtorEmailType.PurchaseInvoice).Select(x => x._Name).ToList();
             }

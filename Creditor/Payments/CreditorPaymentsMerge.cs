@@ -15,7 +15,7 @@ using Uniconta.ClientTools.Controls;
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
 {
-    class CreditorPaymentsMerge
+    public class CreditorPaymentsMerge
     {
         public const string MERGEID_SINGLEPAYMENT = "-";
         public bool MergePayments(Company company, PaymentsGrid dgCreditorTranOpenGrid, CreditorPaymentFormat credPaymFormat, SQLCache bankAccountCache)

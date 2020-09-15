@@ -34,6 +34,7 @@
     <RibbonItem Action="CreateEmailList" LocalizedNameKey="CreateOBJ" Parameter="EmailList" ControlName="CreateEmailListPage" LargeGlyph="Email_Add_32x32.png"/>
     <RibbonItem Action="ShowEmailList" LocalizedNameKey="ShowOBJ" Parameter="EmailList" ControlName="EmailListPage" LargeGlyph="Email_Search_32x32.png"/>
     <RibbonItem Action="DeleteEmailList" LocalizedNameKey="DeleteOBJ" Parameter="EmailList" LargeGlyph="Email_Delete_32x32.png"/>
+    <RibbonItem Action="SendEmail" LocalizedNameKey="EmailDocuments" LargeGlyph="Email_32x32.png"/>
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="FollowUp" LocalizedNameKey="FollowUp" ControlName="CrmFollowUpPage" LargeGlyph="CrmFollowUp.png"/>

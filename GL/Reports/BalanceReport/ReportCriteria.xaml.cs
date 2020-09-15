@@ -70,12 +70,14 @@ namespace UnicontaClient.Pages.CustomPage
         {
             get { return null; }
         }
+
         public override string NameOfControl { get { return TabControls.ReportCriteria.ToString(); } }
         public override UnicontaBaseEntity ModifiedRow { get { return editrow; } set { editrow = value; } }
         protected override bool IsLayoutSaveRequired()
         {
             return false;
         }
+
         Criteria objCriteria;
         List<BalanceColumn> balanceCollist;
         ObservableCollection<Balance> itemsBalance;
@@ -127,6 +129,24 @@ namespace UnicontaClient.Pages.CustomPage
 
             cmbAccountType.ItemsSource = new string[] { Uniconta.ClientTools.Localization.lookup("All"), Uniconta.ClientTools.Localization.lookup("AccountTypePL"), Uniconta.ClientTools.Localization.lookup("AccountTypeBalance") };
             cmbAccountType.IsEditable = false;
+            this.BeforeClose += ReportCriteria_BeforeClose;
+        }
+
+        private void ReportCriteria_BeforeClose()
+        {
+            if(BasePage.session.User._AutoSave)
+            {
+                var hasMissignModel = objCriteria.selectedCriteria.Any(p => p.balcolMethod == BalanceColumnMethod.FromBudget && string.IsNullOrEmpty(p.budgetModel));
+
+                if (!hasMissignModel && !string.IsNullOrEmpty(txtbalanceName.Text))
+                {
+                    if (objBalance == null || objBalance.CompanyId != api.CompanyId /* For balance copy from other company */)
+                        SaveBalance(false);
+                    else
+                        update();
+                }
+            }
+            this.BeforeClose -= ReportCriteria_BeforeClose;
         }
 
         void SetDefaultDate(SelectedCriteria Selectedcol)
@@ -149,11 +169,11 @@ namespace UnicontaClient.Pages.CustomPage
             var lstEntity = await api.Query<Balance>();
             if (lstEntity != null && lstEntity.Length > 0)
             {
-                itemsBalance = new ObservableCollection<Balance>(lstEntity.ToList());
+                itemsBalance = new ObservableCollection<Balance>(lstEntity);
                 cbBalance.ItemsSource = itemsBalance;
                 if (LastGeneratedBalance != null)
                 {
-                    var lastSelBalance = itemsBalance?.Where(x => x.RowId == LastGeneratedBalance.RowId).FirstOrDefault();
+                    var lastSelBalance = itemsBalance.Where(x => x.RowId == LastGeneratedBalance.RowId).FirstOrDefault();
                     cbBalance.SelectedItem = lastSelBalance;
                 }
                 else
@@ -169,8 +189,8 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override void LoadCacheInBackGround()
         {
-            var lst = new List<Type>() { typeof(Uniconta.DataModel.GLBudget), typeof(Uniconta.DataModel.GLAccount) };
             var noofDimensions = api.CompanyEntity.NumberOfDimensions;
+            var lst = new List<Type>(2 + noofDimensions) { typeof(Uniconta.DataModel.GLBudget), typeof(Uniconta.DataModel.GLAccount) };
             if (noofDimensions >= 1)
                 lst.Add(typeof(Uniconta.DataModel.GLDimType1));
             if (noofDimensions >= 2)
@@ -181,8 +201,7 @@ namespace UnicontaClient.Pages.CustomPage
                 lst.Add(typeof(Uniconta.DataModel.GLDimType4));
             if (noofDimensions >= 5)
                 lst.Add(typeof(Uniconta.DataModel.GLDimType5));
-
-            LoadType(lst.ToArray());
+            LoadType(lst);
         }
 
         private void populateValue(Balance obBalance)
@@ -219,7 +238,10 @@ namespace UnicontaClient.Pages.CustomPage
                         Crit.ColA = colBalance._ColA;
                         Crit.ColB = colBalance._ColB;
                         Crit.Account100 = colBalance._Account100;
-                        Crit.ForCompany = companies.Where(x => x.CompanyId == colBalance._ForCompanyId).FirstOrDefault() as Company;
+                        if (colBalance._ForCompanyId > 0)
+                            Crit.ForCompany = companies?.Where(x => x.CompanyId == colBalance._ForCompanyId).FirstOrDefault() as Company;
+                        else
+                            Crit.ForCompany = null;
                         Crit.Hide = colBalance._Hide;
                         GetBalanceDimUsed(obBalance);
                         setColNameAndNumber(Crit, 1);
@@ -227,8 +249,8 @@ namespace UnicontaClient.Pages.CustomPage
                     else
                     {
                         CriteriaControl crControl = new CriteriaControl();
-                        crControl.MouseLeftButtonDown += CrControl_MouseLeftButtonDown;
                         crControl.API = api;
+                        crControl.MouseLeftButtonDown += CrControl_MouseLeftButtonDown;
                         ControlContainer.RowDefinitions.Add(new RowDefinition() { Height= GridLength.Auto});
                         Grid.SetRow(crControl, ControlContainer.Children.Count);
                         ControlContainer.Children.Add(crControl);
@@ -266,19 +288,23 @@ namespace UnicontaClient.Pages.CustomPage
             }
             if (upperCtrl != null)
             {
-                Grid.SetRow(upperCtrl, rowNo);
-                var upperCtrlCriteria = upperCtrl.DataContext as SelectedCriteria;
-                if (upperCtrlCriteria != null)
-                    setColNameAndNumber(upperCtrlCriteria, upperCtrlCriteria.ColNo + 1);
-                Grid.SetRow(selectedColumnControl, rowNo - 1);
-                var selCtrlCriteria = selectedColumnControl.DataContext as SelectedCriteria;
-                if (selCtrlCriteria != null)
-                    setColNameAndNumber(selCtrlCriteria, selCtrlCriteria.ColNo - 1);
-
                 int oldIndex = rowNo - 2;
-                var col = objCriteria.selectedCriteria[oldIndex];
-                objCriteria.selectedCriteria.RemoveAt(oldIndex);
-                objCriteria.selectedCriteria.Insert(oldIndex - 1, col);
+                if (oldIndex > 0)
+                {
+                    Grid.SetRow(upperCtrl, rowNo);
+                    var upperCtrlCriteria = upperCtrl.DataContext as SelectedCriteria;
+                    if (upperCtrlCriteria != null)
+                        setColNameAndNumber(upperCtrlCriteria, upperCtrlCriteria.ColNo + 1);
+                    Grid.SetRow(selectedColumnControl, rowNo - 1);
+                    var selCtrlCriteria = selectedColumnControl.DataContext as SelectedCriteria;
+                    if (selCtrlCriteria != null)
+                        setColNameAndNumber(selCtrlCriteria, selCtrlCriteria.ColNo - 1);
+
+                    var crit = objCriteria.selectedCriteria;
+                    var col = crit[oldIndex];
+                    crit.RemoveAt(oldIndex);
+                    crit.Insert(oldIndex - 1, col);
+                }
             }
         }
 
@@ -303,19 +329,23 @@ namespace UnicontaClient.Pages.CustomPage
             }
             if (lowerCtrl != null)
             {
-                Grid.SetRow(lowerCtrl, rowNo);
-                var lowerCtrlCriteria = lowerCtrl.DataContext as SelectedCriteria;
-                if (lowerCtrlCriteria != null)
-                    setColNameAndNumber(lowerCtrlCriteria, lowerCtrlCriteria.ColNo - 1);
-                Grid.SetRow(selectedColumnControl, rowNo + 1);
-                var selCtrlCriteria = selectedColumnControl.DataContext as SelectedCriteria;
-                if (selCtrlCriteria != null)
-                    setColNameAndNumber(selCtrlCriteria, selCtrlCriteria.ColNo + 1);
-
+                var crit = objCriteria.selectedCriteria;
                 int oldIndex = rowNo - 2;
-                var col = objCriteria.selectedCriteria[oldIndex];
-                objCriteria.selectedCriteria.RemoveAt(oldIndex);
-                objCriteria.selectedCriteria.Insert(oldIndex + 1, col);
+                if (oldIndex + 1 < crit.Count)
+                {
+                    Grid.SetRow(lowerCtrl, rowNo);
+                    var lowerCtrlCriteria = lowerCtrl.DataContext as SelectedCriteria;
+                    if (lowerCtrlCriteria != null)
+                        setColNameAndNumber(lowerCtrlCriteria, lowerCtrlCriteria.ColNo - 1);
+                    Grid.SetRow(selectedColumnControl, rowNo + 1);
+                    var selCtrlCriteria = selectedColumnControl.DataContext as SelectedCriteria;
+                    if (selCtrlCriteria != null)
+                        setColNameAndNumber(selCtrlCriteria, selCtrlCriteria.ColNo + 1);
+
+                    var col = crit[oldIndex];
+                    crit.RemoveAt(oldIndex);
+                    crit.Insert(oldIndex + 1, col);
+                }
             }
         }
 
@@ -344,7 +374,10 @@ namespace UnicontaClient.Pages.CustomPage
             objSelectedCriteria.ColA = objBalanceColumn._ColA;
             objSelectedCriteria.ColB = objBalanceColumn._ColB;
             objSelectedCriteria.Account100 = objBalanceColumn._Account100;
-            objSelectedCriteria.ForCompany = companies.Where(x => x.CompanyId == objBalanceColumn._ForCompanyId).FirstOrDefault() as Company;
+            if (objBalanceColumn._ForCompanyId > 0)
+                objSelectedCriteria.ForCompany = companies?.Where(x => x.CompanyId == objBalanceColumn._ForCompanyId).FirstOrDefault() as Company;
+            else
+                objSelectedCriteria.ForCompany = null;
             objSelectedCriteria.Hide = objBalanceColumn._Hide;
             setColNameAndNumber(objSelectedCriteria, objCriteria.selectedCriteria.Count + 1);
             return objSelectedCriteria;
@@ -504,7 +537,10 @@ namespace UnicontaClient.Pages.CustomPage
             if (objBalance == null)
                 SaveBalance(false);
             else
-                CreateCriteraColumn(objCriteria.selectedCriteria.Last(), objCriteria.selectedCriteria.Count - 1);
+            {
+                var ColNo = objCriteria.selectedCriteria.Count - 1;
+                CreateCriteraColumn(objCriteria.selectedCriteria[ColNo], ColNo);
+            }
         }
 
         void DeleteCriteria()

@@ -56,8 +56,8 @@ x:Class="UnicontaClient.Pages.CustomPage.CustomerPriceListLinePage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="FixedContributionRate" Width="70"/>
                     <localPage:CorasauDataGridTemplateColumnClient FieldName="PriceListDebtor" x:Name="PriceListDebtor" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient FieldName="PriceListCreditor" x:Name="PriceListCreditor" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ValidFrom" ShowTime="True"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ValidTo" ShowTime="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ValidFrom"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ValidTo"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="EAN" Width="100"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="RowNumber" Width="70" Visible="False"/>
                 </localPage:InvPriceListLineClientGrid.Columns>

@@ -101,15 +101,15 @@ namespace UnicontaClient.Pages.CustomPage
             if (Comp.TimeManagement)
             {
                 colItem.Visible= colItem.ShowInColumnChooser = false;
-                colItemName.Visible = colItem.ShowInColumnChooser = false;
+                colItemName.Visible = colItemName.ShowInColumnChooser = false;
                 ValidFrom.Visible = true;
                 ValidTo.Visible = true;
                 colProject.Visible = true;
                 colProjectName.Visible = true;
                 colAccount.Visible = true;
                 colAccountName.Visible = true;
-                colPrCategory.Visible = colItem.ShowInColumnChooser = false;
-                colCategoryName.Visible= colItem.ShowInColumnChooser = false;
+                colPrCategory.Visible = colPrCategory.ShowInColumnChooser = false;
+                colCategoryName.Visible= colCategoryName.ShowInColumnChooser = false;
             }
         }
 

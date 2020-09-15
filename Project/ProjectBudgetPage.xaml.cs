@@ -188,6 +188,7 @@ namespace UnicontaClient.Pages.CustomPage
                     DateTime dFromDateUpd = CwCreateUpdateBudget.FromDate;
                     DateTime dToDateUpd = CwCreateUpdateBudget.ToDate;
                     string dEmplNumber = CwCreateUpdateBudget.Employee;
+                    string dProject = CwCreateUpdateBudget.Project;
                     string dBudgetGroup = CwCreateUpdateBudget.Group;
                     string dBudgetComment = CwCreateUpdateBudget.Comment;
 
@@ -218,11 +219,16 @@ namespace UnicontaClient.Pages.CustomPage
                         return;
                     }
 
+                    master.Add(budgetGrp);
+
                     busyIndicator.IsBusy = true;
 
 
                     if (!string.IsNullOrEmpty(dEmplNumber))
                         master.Add(employeeCache.Get(dEmplNumber));
+
+                    if (!string.IsNullOrEmpty(dProject))
+                        master.Add(projectCache.Get(dProject));
 
                     List<PropValuePair> pairTrans = new List<PropValuePair>();
                     pairTrans.Add(PropValuePair.GenereteWhereElements(nameof(ProjectBudgetLineClient._Date), typeof(DateTime), String.Format("{0:d}..{1:d}", dFromDateUpd, dToDateUpd)));
@@ -235,7 +241,7 @@ namespace UnicontaClient.Pages.CustomPage
                     foreach (var rec in budgetLineLst)
                     {
                         cntUpdate++;
-                        var prices = tmHelper.GetEmplPrice(empPriceLst, payrollCache, projectCache, projGroupCache, employeeCache?.Get(rec._Employee), rec._Project, rec._Date, rec._PayrollCategory);
+                        var prices = tmHelper.GetEmplPrice(empPriceLst, payrollCache, projGroupCache, employeeCache?.Get(rec._Employee), projectCache.Get(rec._Project), rec._Date, rec._PayrollCategory);
                         rec._CostPrice = prices.Item1;
                         rec._SalesPrice = prices.Item2;
                         rec._Text = string.Concat("(", TMJournalLineHelper.GetTimeStamp(), ") ", Uniconta.ClientTools.Localization.lookup("PriceUpdate"));

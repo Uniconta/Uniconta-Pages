@@ -54,6 +54,8 @@ namespace UnicontaClient.Pages.CustomPage
             var Comp = api.CompanyEntity;
             if (!Comp.InvDuty)
                 DutyGroup.ShowInColumnChooser = DutyGroup.Visible = false;
+            if (!Comp.Project)
+                PrCategory.ShowInColumnChooser = PrCategory.Visible = false;
         }
 
         public override void Utility_Refresh(string screenName, object argument = null)

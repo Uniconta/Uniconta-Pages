@@ -26,9 +26,10 @@ x:Class="UnicontaClient.Pages.CustomPage.DocumentsApprovalPage"
             <localPage:DocumentsApprovalPageGrid x:Name="dgVoucherApproveGrid" AutoGenerateColumns="None">
                 <localPage:DocumentsApprovalPageGrid.Columns>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PrimaryKeyId" Width="70"  />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Created" ShowTime="True"  Width="110"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Created" ShowTime="True" Width="110"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ViewInFolder" AllowEditing="False" Width="100" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="UserName" Visible="False" Width="100" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Fileextension" AllowEditing="False" Width="55" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Fileextension" AllowEditing="False" Width="50" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PostingDate" AllowEditing="False" Width="85" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Invoice" AllowEditing="False" Width="70" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Voucher" AllowEditing="False" Width="70" Visible="False" />
@@ -36,7 +37,8 @@ x:Class="UnicontaClient.Pages.CustomPage.DocumentsApprovalPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Debit" AllowEditing="False" Width="85" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Credit" AllowEditing="False" Width="85" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Currency" AllowEditing="False" Width="35"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CostAccount" AllowEditing="False" Width="80"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CostAccount"  Width="100"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CostAccountName"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PayAccount" AllowEditing="False" Width="80" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CreditorAccount" AllowEditing="False" Width="80"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CreditorName" AllowEditing="False" Visible="true"/>
@@ -60,12 +62,11 @@ x:Class="UnicontaClient.Pages.CustomPage.DocumentsApprovalPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="VatOperation" AllowEditing="False" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="TransType" AllowEditing="False"  Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PurchaseNumber" AllowEditing="False" Width="85" Visible="False" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="clDim1" AllowEditing="True" Width="70" FieldName="Dimension1" Visible="False" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="clDim2" AllowEditing="True" Width="70" FieldName="Dimension2" Visible="False" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="clDim3" AllowEditing="True" Width="70" FieldName="Dimension3" Visible="False" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="clDim4" AllowEditing="True" Width="70" FieldName="Dimension4" Visible="False" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="clDim5" AllowEditing="True" Width="70" FieldName="Dimension5" Visible="False" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CostAccountName" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="clDim1" AllowEditing="True" Width="70" FieldName="Dimension1" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="clDim2" AllowEditing="True" Width="70" FieldName="Dimension2" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="clDim3" AllowEditing="True" Width="70" FieldName="Dimension3" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="clDim4" AllowEditing="True" Width="70" FieldName="Dimension4" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="clDim5" AllowEditing="True" Width="70" FieldName="Dimension5" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PayAccountName" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Approver1Name" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Approver2Name" Visible="False" />
@@ -75,7 +76,6 @@ x:Class="UnicontaClient.Pages.CustomPage.DocumentsApprovalPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="SizeKB" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="OnHold" AllowEditing="False"   Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Reference" AllowEditing="False" Visible="False" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ViewInFolder" AllowEditing="False" Visible="False" />
                 </localPage:DocumentsApprovalPageGrid.Columns>
             </localPage:DocumentsApprovalPageGrid>
         </CorasauControls:BusyIndicator>

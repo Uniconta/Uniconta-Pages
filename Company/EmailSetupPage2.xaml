@@ -100,6 +100,17 @@ x:Class="UnicontaClient.Pages.CustomPage.EmailSetupPage2"
                     <CorasauControls:CorasauLayoutItem FieldName="RemoveSpecialSign" x:Name="liRemoveSpecialSign">
                         <CorasauControls:CheckEditor IsChecked="{Binding RemoveSpecialSign, Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="layoutProp">
+                        <StackPanel Orientation="Horizontal">
+                            <CorasauControls:ComboBoxEditor x:Name="cmbExternType" SelectedIndexChanged="cmbExternType_SelectedIndexChanged" />
+                            <CorasauControls:ComboBoxEditor x:Name="cmbProperties" Margin="5 0 0 0"/>
+                            <Button Margin="5 0 0 0" Click="InsertProperty_ButtonClicked">
+                                <Button.Content>
+                                    <Image Source="/UnicontaPages;component/Assets/img/Right_Arrow_16x16.png" Width="12" HorizontalAlignment="Left"/>
+                                </Button.Content>
+                            </Button>
+                        </StackPanel>
+                    </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem x:Name="liBodyOfEmail" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BodyOfEmail}" VerticalAlignment="Top" VerticalContentAlignment="Top" LabelVerticalAlignment="Top">
                         <CorasauControls:TextEditor x:Name="txtEmailBody" Text="{Binding Body,Mode=TwoWay}"  AcceptsReturn="True" TextWrapping="Wrap" HorizontalContentAlignment="Left" 
                                                 MinHeight="200"  VerticalContentAlignment="Top"  />

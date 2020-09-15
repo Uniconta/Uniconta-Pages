@@ -547,7 +547,10 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                     else
                     {
-                        UtilDisplay.ShowErrorCode(inTrans && Crit.journal != null ? ErrorCodes.ErrorInJournal : tranApi.LastError);
+                        if (inTrans && !string.IsNullOrEmpty(Crit.journal))
+                            UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup(ErrorCodes.ErrorInJournal.ToString()) + "\n" + Uniconta.ClientTools.Localization.lookup(tranApi.LastError.ToString()), Uniconta.ClientTools.Localization.lookup("Error"), MessageBoxButton.OK);
+                        else
+                            UtilDisplay.ShowErrorCode(tranApi.LastError);
                     }
                     first = false;
                 }

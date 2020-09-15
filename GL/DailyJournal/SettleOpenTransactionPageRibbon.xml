@@ -2,6 +2,9 @@
 <root>
   <RibbonItem TabId="0" LocalizedNameKey="Home">
     <!---When we create a new group and a new TabPage -->
+    <RibbonItem Action="EditRow" ShortcutKey="Ctrl+E" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>
+  </RibbonItem>
+  <RibbonItem>
     <RibbonItem Action="Generate" LocalizedNameKey="Generate" LargeGlyph="Generate_32x32.png" ShortcutKey="Ctrl+G"/>
     <RibbonItem Action="Cancel" LocalizedNameKey="Cancel" Glyph="close-16x16.png" LargeGlyph="close-32x32.png"/>
   </RibbonItem>

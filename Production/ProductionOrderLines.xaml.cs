@@ -463,6 +463,26 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         AddAttachment(ActionType, selectedItem);
                     break;
+                case "StockLines":
+                    if (selectedItem?.InvItem != null)
+                        AddDockItem(TabControls.ProductionPostedTransGridPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("InvTransactions"), selectedItem._Item));
+                    break;
+                case "DebtorOrderLines":
+                    if (selectedItem?.InvItem != null)
+                        AddDockItem(TabControls.DebtorOrderLineReport, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("OrdersLine"), selectedItem._Item));
+                    break;
+                case "DebtorOfferLines":
+                    if (selectedItem?.InvItem != null)
+                        AddDockItem(TabControls.DebtorOfferLineReport, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("OfferLine"), selectedItem._Item));
+                    break;
+                case "PurchaseOrderLines":
+                    if (selectedItem?.InvItem != null)
+                        AddDockItem(TabControls.PurchaseLines, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("PurchaseLines"), selectedItem._Item));
+                    break;
+                case "ProductionOrderLines":
+                    if (selectedItem?.InvItem != null)
+                        AddDockItem(TabControls.ProductionOrderLineReport, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ProductionLines"), selectedItem._Item));
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -527,17 +547,22 @@ namespace UnicontaClient.Pages.CustomPage
                     invJournalLine._Variant4 = bom._Variant4;
                     invJournalLine._Variant5 = bom._Variant5;
                     item = (InvItem)items.Get(bom._ItemPart);
-                    if (item == null)
+                    if (item == null && bom._ItemPart != null)
                     {
                         items = await api.LoadCache(typeof(InvItem), true);
                         item = (InvItem)items.Get(bom._ItemPart);
                     }
-                    invJournalLine._Warehouse = bom._Warehouse ?? item._Warehouse ?? selectedItem._Warehouse;
-                    invJournalLine._Location = bom._Location ?? item._Location ?? selectedItem._Location;
-                    invJournalLine._CostPriceLine = item._CostPrice;
-                    invJournalLine.SetItemValues(item, selectedItem._Storage);
-                    invJournalLine._Qty = Math.Round(bom.GetBOMQty(Qty), item._Decimals);
-                    TableField.SetUserFieldsFromRecord(item, invJournalLine);
+                    if (item != null)
+                    {
+                        invJournalLine._Warehouse = bom._Warehouse ?? item._Warehouse ?? selectedItem._Warehouse;
+                        invJournalLine._Location = bom._Location ?? item._Location ?? selectedItem._Location;
+                        invJournalLine._CostPriceLine = item._CostPrice;
+                        invJournalLine.SetItemValues(item, selectedItem._Storage);
+                        invJournalLine._Qty = Math.Round(bom.GetBOMQty(Qty), item._Decimals);
+                        TableField.SetUserFieldsFromRecord(item, invJournalLine);
+                    }
+                    else
+                        invJournalLine._Qty = Math.Round(bom.GetBOMQty(Qty), 2);
                     TableField.SetUserFieldsFromRecord(bom, invJournalLine);
                     lst.Add(invJournalLine);
                 }

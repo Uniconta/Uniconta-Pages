@@ -127,7 +127,7 @@ namespace UnicontaClient.Pages.CustomPage
             SetPageHeader();
         }
 
-        public AccountsTransaction(CrudAPI api, PropValuePair[] filterArray): base(api, string.Empty)
+        public AccountsTransaction(CrudAPI api, PropValuePair[] filterArray) : base(api, string.Empty)
         {
             filter = filterArray;
             InitializePage();
@@ -281,19 +281,11 @@ namespace UnicontaClient.Pages.CustomPage
                         AddDockItem(TabControls.AccountsTransaction, glAccount, accHeader);
                     }
                     break;
+                case "DragDrop":
                 case "ImportVoucher":
                     if (selectedItem == null)
                         return;
-                    CWAddVouchers addVouvhersDialog = new CWAddVouchers(api, false, null);
-                    addVouvhersDialog.Closed += delegate
-                    {
-                        if (addVouvhersDialog.DialogResult == true)
-                        {
-                            if (addVouvhersDialog.VoucherRowIds.Length > 0 && addVouvhersDialog.vouchersClient != null)
-                                SaveAttachment(selectedItem, addVouvhersDialog.vouchersClient);
-                        }
-                    };
-                    addVouvhersDialog.Show();
+                    AddVoucher(selectedItem, ActionType);
                     break;
                 case "CancelVoucher":
                     if (selectedItem == null)
@@ -465,6 +457,47 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
+        private void AddVoucher(GLTransClient selectedItem, string actionType)
+        {
+            CWAddVouchers addVouchersDialog = null;
+#if !SILVERLIGHT
+            if (actionType == "DragDrop")
+            {
+                var dragDropWindow = new UnicontaDragDropWindow(false);
+                dragDropWindow.Closed += delegate
+                {
+                    if (dragDropWindow.DialogResult == true)
+                    {
+                        var vouchersClient = new VouchersClient();
+                        var fileInfo = dragDropWindow.FileInfoList?.SingleOrDefault();
+                        if (fileInfo != null)
+                        {
+                            vouchersClient._Data = fileInfo.FileBytes;
+                            vouchersClient._Text = fileInfo.FileName;
+                            vouchersClient._Fileextension = DocumentConvert.GetDocumentType(fileInfo.FileExtension);
+                        }
+                        addVouchersDialog = new CWAddVouchers(api, vouchersClient, true);
+                    }
+                };
+                dragDropWindow.Show();
+            }
+            else
+#endif
+                addVouchersDialog = new CWAddVouchers(api, false, null);
+
+            if (addVouchersDialog == null) return;
+
+            addVouchersDialog.Closed += delegate
+            {
+                if (addVouchersDialog.DialogResult == true)
+                {
+                    if (addVouchersDialog.VoucherRowIds.Length > 0 && addVouchersDialog.vouchersClient != null)
+                        SaveAttachment(selectedItem, addVouchersDialog.vouchersClient);
+                }
+            };
+            addVouchersDialog.Show();
+        }
+
         async void SetChangeText(GLTransClient selectedItem, CWChangeDimension ChangeTextDialog)
         {
             busyIndicator.IsBusy = true;
@@ -544,7 +577,7 @@ namespace UnicontaClient.Pages.CustomPage
             var errorCodes = await postingApiInv.UpdateTransQty(selectedItem, ChangeTextDialog.Quantity, ChangeTextDialog.AllLine);
             busyIndicator.IsBusy = false;
             UtilDisplay.ShowErrorCode(errorCodes);
-            if (errorCodes == ErrorCodes.Succes)
+            if (errorCodes == ErrorCodes.Succes && ribbonControl != null)
                 BindGrid();
         }
 

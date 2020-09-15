@@ -71,6 +71,9 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorInvoiceLine"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceNumber" Visible="false"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Margin" Width="100" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="MarginRatio" Width="60" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Weight" Visible="false"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Cartons" Visible="false"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Volume" Visible="false"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim1" Width="70" FieldName="Dimension1" Visible="false" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim2" Width="70" FieldName="Dimension2" Visible="false" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim3" Width="70" FieldName="Dimension3" Visible="false"/>
@@ -85,6 +88,9 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorInvoiceLine"
                     <localPage:SumColumn FieldName="Margin" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                     <localPage:SumColumn FieldName="CostValue" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                     <localPage:SumColumn FieldName="MarginRatio" SummaryType="Custom" DisplayFormat="{}{0:N2}" />
+                    <localPage:SumColumn FieldName="Weight" SummaryType="Sum" DisplayFormat="{}{0:N2}" />
+                    <localPage:SumColumn FieldName="Cartons" SummaryType="Sum" DisplayFormat="{}{0:N2}" />
+                    <localPage:SumColumn FieldName="Volume" SummaryType="Sum" DisplayFormat="{}{0:N2}" />
                 </localPage:CreditorInvTransClientGrid.TotalSummary>
             </localPage:CreditorInvTransClientGrid>
         </CorasauControls:BusyIndicator>

@@ -42,6 +42,7 @@ namespace UnicontaClient.Pages.CustomPage
             var colCount = PassedCriteria.selectedCriteria.Count;
             foreach (var line in reportline)
             {
+
                 var amounts = new long[colCount];
                 if (line._Accounts != null && !line._ExpressionSum)
                 {
@@ -54,7 +55,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (Skip0Account)
                     {
                         bool found = false;
-                        for (int i = Cols; (--i >= 0); )
+                        for (int i = Cols; (--i >= 0);)
                             if (amounts[i] != 0)
                             {
                                 found = true;
@@ -66,7 +67,7 @@ namespace UnicontaClient.Pages.CustomPage
                 }
                 if (line._InvertSign)
                 {
-                    for (int i = Cols; (--i >= 0); )
+                    for (int i = Cols; (--i >= 0);)
                         amounts[i] = -amounts[i];
                 }
                 if (line._SaveTotal != 0)
@@ -78,7 +79,8 @@ namespace UnicontaClient.Pages.CustomPage
                 hdrData.AmountSize = template._AmountSize == 0 ? 20 * SizeFactor : (template._AmountSize * SizeFactor);
                 TemplateDataItems item = new TemplateDataItems(newBalanceCol, hdrData, line);
                 item.Masterfontsize = template._FontSize;
-                items.TemplateReportlist.Add(item);
+                if (!line._Hide)
+                    items.TemplateReportlist.Add(item);
             }
 
             // Now we will take all expressions and update.

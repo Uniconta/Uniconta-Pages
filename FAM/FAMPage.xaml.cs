@@ -61,6 +61,7 @@ namespace UnicontaClient.Pages.CustomPage
             dgFAMGrid.UpdateMaster(master);
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             ribbonControl.DisableButtons(new string[] { "DeleteRow", "SaveGrid" });
+            dgFAMGrid.ShowTotalSummary();
             //InsuranceAmount.HasDecimals = NonDepreciableAmount.HasDecimals = ResidualValue.HasDecimals = DecommissionCost.HasDecimals = false;
         }
 

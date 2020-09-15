@@ -212,7 +212,10 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "AddNote":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.UserNotesPage, dgDebtorAccountGrid.syncEntity);
+                    {
+                        string header = string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("UserNotesInfo"), selectedItem._Account);
+                        AddDockItem(TabControls.UserNotesPage, dgDebtorAccountGrid.syncEntity,header);
+                    }
                     break;
                 case "AddDoc":
                     if (selectedItem != null)
@@ -330,6 +333,8 @@ namespace UnicontaClient.Pages.CustomPage
                     var lstInsert = new List<Uniconta.DataModel.DebtorPaymentMandate>();
                     var lstUpdate = new List<Uniconta.DataModel.Debtor>();
 
+                    bool mandateIsDebtor = cwwin.PaymentFormat._UseDebtorAccAsMandate;
+
                     foreach (var rec in lstDebtors)
                     {
                         var mandate = (Uniconta.DataModel.DebtorPaymentMandate)mandateCache?.Get(rec._Account);
@@ -337,9 +342,10 @@ namespace UnicontaClient.Pages.CustomPage
                             continue;
 
                         var newMandate = new Uniconta.DataModel.DebtorPaymentMandate();
-                        newMandate._DCAccount = rec._Account;
+                        newMandate.SetMaster(rec);
+                        newMandate._AltMandateId = mandateIsDebtor ? rec._Account : null;
                         newMandate._Scheme = cwwin.directDebitScheme;
-                        newMandate._StatusInfo = string.Format("({0}) Mandate created", Uniconta.DirectDebitPayment.Common.GetTimeStamp()); ;
+                        newMandate._StatusInfo = string.Format("({0}) {1}", Uniconta.DirectDebitPayment.Common.GetTimeStamp(), Uniconta.ClientTools.Localization.lookup("Created")); ;
                         lstInsert.Add(newMandate);
 
                         if (rec.PaymentFormat != cwwin.PaymentFormat._Format)

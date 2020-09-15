@@ -35,7 +35,7 @@ x:Class="UnicontaClient.Pages.CustomPage.BankStatementPage2"
                     </CorasauControls:CorasauLayoutGroup>
                     <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpOther" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Other}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                         <CorasauControls:CorasauLayoutItem FieldName="DaysSlip" x:Name="liDaysSlip">
-                            <CorasauControls:IntegerEditor Text="{Binding DaysSlip,Mode=TwoWay}" SetMask="false"/>
+                            <CorasauControls:IntegerEditor EditValue="{Binding DaysSlip,Mode=TwoWay}" SetMask="false"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="AllowedDifInMatch" x:Name="liAllowedDifInMatch">
                             <CorasauControls:DoubleEditor FieldName="AllowedDifInMatch"/>
@@ -67,6 +67,8 @@ x:Class="UnicontaClient.Pages.CustomPage.BankStatementPage2"
                             <CorasauControls:ComboBoxEditor  SelectedItem="{Binding Currency,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
+                </CorasauControls:CorasauLayoutGroup>
+                <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="grpLast">
                     <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="usedim"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Dimensions}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                         <CorasauControls:CorasauLayoutItem x:Name="lbldim1">
                             <CorasauControls:LookupEditor x:Name="cmbDim1" Text="{Binding Dimension1,Mode=TwoWay}"/>
@@ -82,6 +84,11 @@ x:Class="UnicontaClient.Pages.CustomPage.BankStatementPage2"
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem x:Name="lbldim5">
                             <CorasauControls:LookupEditor x:Name="cmbDim5" Text="{Binding Dimension5,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                    </CorasauControls:CorasauLayoutGroup>
+                    <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpBankConnect" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BankConnect}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                        <CorasauControls:CorasauLayoutItem FieldName="BankConnect2Journal" x:Name="liBankConnect2Journal">
+                            <CorasauControls:CheckEditor x:Name="chkBankConnect2Journal" IsChecked="{Binding BankConnect2Journal,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
                 </CorasauControls:CorasauLayoutGroup>

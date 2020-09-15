@@ -35,6 +35,7 @@ using Uniconta.DirectDebitPayment;
 using UnicontaClient.Pages.Creditor.Payments;
 using Uniconta.API.System;
 using Uniconta.Common.Utility;
+using DevExpress.DataAccess.DataFederation;
 #if !SILVERLIGHT
 using Microsoft.Win32;
 #endif
@@ -88,7 +89,8 @@ namespace UnicontaClient.Pages.CustomPage
             InitPage();
         }
 
-        SQLCache DebtorCache, JournalCache, BankAccountCache, PaymentFormatCache, MandateCache, InvoiceItemNameGroupCache;
+        SQLCache DebtorCache, JournalCache, BankAccountCache, PaymentFormatCache, InvoiceItemNameGroupCache;
+        SQLTableCache<DebtorPaymentMandateClient> MandateCache;
 
         private void InitPage()
         {
@@ -120,7 +122,8 @@ namespace UnicontaClient.Pages.CustomPage
             JournalCache = Comp.GetCache(typeof(Uniconta.DataModel.GLDailyJournal));
             BankAccountCache = Comp.GetCache(typeof(Uniconta.DataModel.BankStatement));
             PaymentFormatCache = Comp.GetCache(typeof(Uniconta.DataModel.DebtorPaymentFormat));
-            MandateCache = Comp.GetCache(typeof(Uniconta.DataModel.DebtorPaymentMandate));
+            MandateCache = api.GetCache<DebtorPaymentMandateClient>();
+
             InvoiceItemNameGroupCache = Comp.GetCache(typeof(Uniconta.DataModel.InvItemNameGroup));
 
             StartLoadCache();
@@ -184,7 +187,8 @@ namespace UnicontaClient.Pages.CustomPage
             if (BankAccountCache == null)
                 BankAccountCache = await api.LoadCache(typeof(Uniconta.DataModel.BankStatement)).ConfigureAwait(false);
             if (MandateCache == null)
-                MandateCache = await api.LoadCache(typeof(Uniconta.DataModel.DebtorPaymentMandate)).ConfigureAwait(false);
+                MandateCache = await api.LoadCache<DebtorPaymentMandateClient>().ConfigureAwait(false);
+
             if (InvoiceItemNameGroupCache == null)
                 InvoiceItemNameGroupCache = await api.LoadCache(typeof(Uniconta.DataModel.InvItemNameGroup)).ConfigureAwait(false);
         }
@@ -398,34 +402,32 @@ namespace UnicontaClient.Pages.CustomPage
             if (useDialog)
             {
                 CWDirectDebit cwwin = new CWDirectDebit(api, Uniconta.ClientTools.Localization.lookup("Validate"));
-                cwwin.Closing += delegate
+                cwwin.Closing += async delegate
                 {
                     if (cwwin.DialogResult == true)
                     {
                         ExpandCollapseAllGroups();
 
                         List<DebtorTransDirectDebit> ListDebTransPaym = new List<DebtorTransDirectDebit>();
-                        int index = 0;
-                        foreach (var rec in (IEnumerable<DebtorTransDirectDebit>)dgDebtorTranOpenGrid.ItemsSource)
+
+                        var transLines = dgDebtorTranOpenGrid.GetVisibleRows() as IEnumerable<DebtorTransDirectDebit>;  
+
+                        foreach (var rec in transLines)
                         {
-                            int rowHandle = dgDebtorTranOpenGrid.GetRowHandleByListIndex(index);
-                            index++;
-                            if (dgDebtorTranOpenGrid.IsRowVisible(rowHandle) && rec._PaymentFormat == cwwin.PaymentFormat._Format && (rec._PaymentStatus == PaymentStatusLevel.None || rec._PaymentStatus == PaymentStatusLevel.Resend || rec._PaymentStatus == PaymentStatusLevel.StopPayment || rec._PaymentStatus == PaymentStatusLevel.FileSent))
+                            if (rec._PaymentFormat == cwwin.PaymentFormat._Format && (rec._PaymentStatus == PaymentStatusLevel.None || rec._PaymentStatus == PaymentStatusLevel.Resend || rec._PaymentStatus == PaymentStatusLevel.StopPayment || rec._PaymentStatus == PaymentStatusLevel.FileSent))
                                 ListDebTransPaym.Add(rec);
                             else
                                 continue;
                         }
 
-                        IEnumerable<DebtorTransDirectDebit> queryPaymentTrans = ListDebTransPaym.AsEnumerable();
-
-                        ValidatePayments(queryPaymentTrans, doMergePaym, cwwin.PaymentFormat, true, false);
+                        await ValidatePayments(ListDebTransPaym, doMergePaym, cwwin.PaymentFormat, true, false);
                     }
                 };
                 cwwin.Show();
             }
         }
 
-        private bool ValidatePayments(IEnumerable<DebtorTransDirectDebit> queryPaymentTrans, bool paymentMerged, DebtorPaymentFormat debPaymFormat, bool validateOnly = false, bool skipPrevalidate = false, bool preMerge = false)
+        private async Task<bool> ValidatePayments(List<DebtorTransDirectDebit> ListDebTransPaym, bool paymentMerged, DebtorPaymentFormat debPaymFormat, bool validateOnly = false, bool skipPrevalidate = false, bool preMerge = false)
         {
             var paymentHelper = Common.DirectPaymentHelperInstance(debPaymFormat);
             paymentHelper.DirectDebitId = debPaymFormat._CredDirectDebitId;
@@ -446,24 +448,58 @@ namespace UnicontaClient.Pages.CustomPage
                 }
             }
 
-            var valErrors = new List<DirectPaymentError>();
-            paymentHelper.ValidatePayments(api.CompanyEntity, queryPaymentTrans, debPaymFormat, MandateCache, paymentMerged, preMerge, out valErrors);
-
-            foreach (var rec in queryPaymentTrans.Where(s => s._PaymentStatus != PaymentStatusLevel.FileSent))
+            //Append invisible rows and rows with status Sent, Processed and Information >>
+            var transValidation = new List<DebtorTransDirectDebit>();
+            int index = 0;
+            foreach (var rec in (IEnumerable<DebtorTransDirectDebit>)dgDebtorTranOpenGrid.ItemsSource)
             {
-                rec.ErrorInfo = Common.VALIDATE_OK;
+                int rowHandle = dgDebtorTranOpenGrid.GetRowHandleByListIndex(index);
+                if (rec._PaymentFormat == debPaymFormat._Format && (rec._PaymentStatus == PaymentStatusLevel.FileSent || rec._PaymentStatus == PaymentStatusLevel.Processed || rec._PaymentStatus == PaymentStatusLevel.Information))
+                {
+                    if (dgDebtorTranOpenGrid.IsRowVisible(rowHandle) == false)
+                        rec.invisibleRow = true;
+                    transValidation.Add(rec);
+                }
+
+                index++;
+            }
+            if (transValidation.Count != 0)
+                ListDebTransPaym.AddRange(transValidation);
+            //Append invisible rows and rows with status Sent, Processed and Information  <<
+
+            await Common.CreateMandates(api, ListDebTransPaym, debPaymFormat, DebtorCache, MandateCache);
+
+            var valErrors = new List<DirectPaymentError>();
+            paymentHelper.ValidatePayments(api.CompanyEntity, ListDebTransPaym, debPaymFormat, MandateCache, paymentMerged, preMerge, out valErrors);
+
+            foreach (var rec in ListDebTransPaym)
+            {
+                if (rec._PaymentStatus == PaymentStatusLevel.FileSent || rec._PaymentStatus == PaymentStatusLevel.Processed || rec._PaymentStatus == PaymentStatusLevel.Information || rec.invisibleRow)
+                    continue;
+
+                if (rec.PrimaryKeyId == 0)
+                    rec.ErrorInfo = string.Format(Uniconta.ClientTools.Localization.lookup("ActionNotAllowedObj"), Uniconta.ClientTools.Localization.lookup("BalanceMethod"), Uniconta.ClientTools.Localization.lookup("DirectDebit"));
+                else
+                    rec.ErrorInfo = Common.VALIDATE_OK;
             }
 
+            int countErr = 0;
             foreach (DirectPaymentError error in valErrors)
             {
-                var rec = queryPaymentTrans.Where(s => s.PrimaryKeyId == error.RowId).First();
+                var rec = ListDebTransPaym.FirstOrDefault(s => s.PrimaryKeyId == error.RowId && s.invisibleRow == false); 
+                if (rec == null)
+                    continue;
+
                 if (rec.ErrorInfo == Common.VALIDATE_OK)
+                {
+                    countErr++; 
                     rec.ErrorInfo = error.Message;
+                }
                 else
                     rec.ErrorInfo += Environment.NewLine + error.Message;
             }
 
-            if (queryPaymentTrans.Where(s => s.ErrorInfo == Common.VALIDATE_OK).Any() == false && validateOnly == false)
+            if (ListDebTransPaym.FirstOrDefault(s => s.ErrorInfo == Common.VALIDATE_OK) == null && validateOnly == false) 
             {
                 if (doMergePaym == false)
                     UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("NoRecordSelected"), Uniconta.ClientTools.Localization.lookup("Message"));
@@ -472,8 +508,6 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (validateOnly)
             {
-                var countErr = queryPaymentTrans.Where(s => (s.ErrorInfo != Common.VALIDATE_OK) && (s.ErrorInfo != null)).Count();
-
                 if (countErr == 0)
                     UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("ValidateNoError"),  Uniconta.ClientTools.Localization.lookup("Validate"), MessageBoxButton.OK, MessageBoxImage.Information);
                 else
@@ -541,11 +575,9 @@ namespace UnicontaClient.Pages.CustomPage
                             }
                         }
 
-                        IEnumerable<DebtorTransDirectDebit> queryPaymentTrans = ListDebTransPaym.AsEnumerable();
+                        Common.MergePayment(api.CompanyEntity, ListDebTransPaym);
 
-                        Common.MergePayment(api.CompanyEntity, queryPaymentTrans);
-
-                        ValidatePayments(queryPaymentTrans, false, debPaymentFormat, false, false, true);
+                        ValidatePayments(ListDebTransPaym, false, debPaymentFormat, false, false, true);
 
                         setMergeUnMergePaym(doMergePaym);
                     }
@@ -563,7 +595,6 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        //TODO:Overvej at flytte nedenstående metode til Common
         private int nextPaymentFileId;
         private int nextPaymentRefId;
         private async void GetNextPaymentFileId()
@@ -593,13 +624,10 @@ namespace UnicontaClient.Pages.CustomPage
 
                     ExpandCollapseAllGroups();
                     List<DebtorTransDirectDebit> ListDebTransPaym = new List<DebtorTransDirectDebit>();
-                    int index = 0;
-
-                    foreach (var rec in (IEnumerable<DebtorTransDirectDebit>)dgDebtorTranOpenGrid.ItemsSource)
+                    var transLines = dgDebtorTranOpenGrid.GetVisibleRows() as IEnumerable<DebtorTransDirectDebit>;  
+                    foreach (var rec in transLines)
                     {
-                        int rowHandle = dgDebtorTranOpenGrid.GetRowHandleByListIndex(index);
-                        index++;
-                        if (dgDebtorTranOpenGrid.IsRowVisible(rowHandle) && rec._PaymentFormat == debPaymentFormat._Format && (rec._PaymentStatus == PaymentStatusLevel.None || rec._PaymentStatus == PaymentStatusLevel.Resend || rec._PaymentStatus == PaymentStatusLevel.StopPayment))
+                        if (rec._PaymentFormat == debPaymentFormat._Format && (rec._PaymentStatus == PaymentStatusLevel.None || rec._PaymentStatus == PaymentStatusLevel.Resend || rec._PaymentStatus == PaymentStatusLevel.StopPayment))
                             ListDebTransPaym.Add(rec);
                         else
                             continue;
@@ -611,8 +639,7 @@ namespace UnicontaClient.Pages.CustomPage
                         return;
                     }
 
-                    IEnumerable<DebtorTransDirectDebit> queryPaymentTrans = ListDebTransPaym.AsEnumerable();
-                    if (ValidatePayments(queryPaymentTrans, doMergePaym, debPaymentFormat, false, false))
+                    if (await ValidatePayments(ListDebTransPaym, doMergePaym, debPaymentFormat, false, false))
                     {
                         try
                         {
@@ -624,11 +651,11 @@ namespace UnicontaClient.Pages.CustomPage
                             bool stopPaymentTrans = false;
                             bool netsBS = false;
 
-                            if (doMergePaym)
-                                queryPaymentTrans = queryPaymentTrans.OrderBy(x => x.MergeDataId).OrderBy(x => x.Invoice).ToList();
-
-                            foreach (var rec in queryPaymentTrans.Where(s => s.ErrorInfo == Common.VALIDATE_OK))
+                            foreach (var rec in ListDebTransPaym) 
                             {
+                                if (rec.ErrorInfo != Common.VALIDATE_OK || rec.MergeDataId == Uniconta.ClientTools.Localization.lookup("Excluded"))
+                                    continue;
+                                
                                 stopPaymentTrans = rec._PaymentStatus == PaymentStatusLevel.StopPayment;
                                 netsBS = debPaymentFormat._ExportFormat == (byte)DebtorPaymFormatType.NetsBS;
 
@@ -697,7 +724,7 @@ namespace UnicontaClient.Pages.CustomPage
                             if (doMergePaym)
                             {
                                 paymentList = paymentListMerged.Where(s => s.MergeDataId != Uniconta.ClientTools.Localization.lookup("Excluded") && s.MergeDataId != Common.MERGEID_SINGLEPAYMENT && s._PaymentStatus != PaymentStatusLevel.StopPayment).ToList();
-                                foreach (var rec in queryPaymentTrans)
+                                foreach (var rec in ListDebTransPaym)
                                 {
                                     if (rec.MergeDataId == Common.MERGEID_SINGLEPAYMENT && rec._PaymentStatus != PaymentStatusLevel.StopPayment)
                                         paymentList.Add(rec);
@@ -705,7 +732,7 @@ namespace UnicontaClient.Pages.CustomPage
                             }
                             else
                             {
-                                paymentList = queryPaymentTrans.Where(s => s.ErrorInfo == Common.VALIDATE_OK && s._PaymentStatus != PaymentStatusLevel.StopPayment).ToList();
+                                paymentList = ListDebTransPaym.Where(s => s.ErrorInfo == Common.VALIDATE_OK && s._PaymentStatus != PaymentStatusLevel.StopPayment).ToList();
                             }
 
                             if (paymentListMerged != null)
@@ -717,7 +744,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 }
                             }
 
-                            var paymentListTotal = queryPaymentTrans.Where(s => s.ErrorInfo == Common.VALIDATE_OK).ToList();
+                            var paymentListTotal = ListDebTransPaym.Where(s => s.ErrorInfo == Common.VALIDATE_OK).ToList();
 
                             var err = await Common.CreatePaymentFile(api, paymentList, MandateCache, DebtorCache, nextPaymentFileId, debPaymentFormat, BankAccountCache);
 
@@ -787,6 +814,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                 dgDebtorTranOpenGrid.GroupBy("MergeDataId");
                 dgDebtorTranOpenGrid.Columns.GetColumnByName("PaymentDate").AllowFocus = false;
+                dgDebtorTranOpenGrid.Columns.GetColumnByName("AllowReplacement").AllowFocus = false;
 
                 ribbonControl.EnableButtons("ExpandGroups");
                 ribbonControl.EnableButtons("CollapseGroups");
@@ -798,6 +826,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                 dgDebtorTranOpenGrid.UngroupBy("MergeDataId");
                 dgDebtorTranOpenGrid.Columns.GetColumnByName("PaymentDate").AllowFocus = true;
+                dgDebtorTranOpenGrid.Columns.GetColumnByName("AllowReplacement").AllowFocus = true;
                 dgDebtorTranOpenGrid.Columns.GetColumnByName("MergeDataId").Visible = false;
 
                 ribbonControl.DisableButtons("ExpandGroups");
@@ -868,13 +897,13 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         int rowHandle = dgDebtorTranOpenGrid.GetRowHandleByListIndex(index);
                         index++;
-                        if (!dgDebtorTranOpenGrid.IsRowVisible(rowHandle) || rec._PaymentStatus == PaymentStatusLevel.OnHold) //TODO: Pt. tillades alle med undtagelse af OnHold
+                        if (!dgDebtorTranOpenGrid.IsRowVisible(rowHandle) || rec._PaymentStatus == PaymentStatusLevel.OnHold) 
                             continue;
 
                         if (rec.PaymentFormat != null)
                         {
                             var paymFormatClient = (DebtorPaymentFormat)PaymentFormatCache.Get(rec.PaymentFormat);
-                            netsBS = rec.PaymentFormat == paymFormatClient._Format;
+                            netsBS = paymFormatClient._ExportFormat == (byte)DebtorPaymFormatType.NetsBS;
                         }
 
                         var paymRefId = rec._PaymentRefId != 0 ? rec._PaymentRefId : -rec.PrimaryKeyId;

@@ -42,13 +42,18 @@ namespace UnicontaClient.Pages.CustomPage
     
         async void SetProjectTask()
         {
-                busyIndicator.IsBusy = true;
-                var ProjTaskList = await crudApi.Query<ProjectTaskClient>(new List<UnicontaBaseEntity>() { master }, null);
-                var dt = this.DataContext as ProjectTaskVM;
-                dt.Master = master;
-                dt.Project = (master as ProjectClient).Number;
-                dt.BindGantChart(ProjTaskList);
-                busyIndicator.IsBusy = false;
+            busyIndicator.IsBusy = true;
+            var ProjTaskList = await crudApi.Query<ProjectTaskClient>(new [] { master }, null);
+            var dt = this.DataContext as ProjectTaskVM;
+            dt.Master = master;
+            var proj = (master as Uniconta.DataModel.Project);
+            if (proj != null)
+            {
+                dt.Project = proj._Number;
+                proj.Tasks = ProjTaskList;
+            }
+            dt.BindGantChart(ProjTaskList);
+            busyIndicator.IsBusy = false;
         }
 
         private void LocalMenu_OnItemClicked(string ActionType)

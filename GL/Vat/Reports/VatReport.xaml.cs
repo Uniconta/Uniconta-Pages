@@ -93,8 +93,6 @@ namespace UnicontaClient.Pages.CustomPage
                 UtilDisplay.RemoveMenuCommand(rb, "VatReportNorway");
             else
                 vatReportSumSize = 19; // we need 19 columns for Norway
-            if (country != CountryCode.Singapore)
-                UtilDisplay.RemoveMenuCommand(rb, "VatReportSingapore");
             if (country != CountryCode.Denmark)
                 UtilDisplay.RemoveMenuCommand(rb, "VatReportDenmark");
             else

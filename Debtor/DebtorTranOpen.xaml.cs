@@ -115,9 +115,30 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         SendEmail(selectedItem);
                     break;
+                case "InvoiceLine":
+                    if (selectedItem != null)
+                        ShowInvoiceLines(selectedItem);
+                    break;
+                case "Invoices":
+                    if (selectedItem != null)
+                    {
+                        string header = string.Format("{0}/{1}", Uniconta.ClientTools.Localization.lookup("DebtorInvoice"), selectedItem.Account);
+                        AddDockItem(TabControls.Invoices, dgDebtorTransOpen.syncEntity, header);
+                    }
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
+            }
+        }
+
+        async void ShowInvoiceLines(DebtorTransOpenClient debTrans)
+        {
+            var debInvoice = await api.Query<DebtorInvoiceClient>(new UnicontaBaseEntity[] { debTrans }, null);
+            if (debInvoice != null && debInvoice.Length > 0)
+            {
+                var debInv = debInvoice[0];
+                AddDockItem(TabControls.DebtorInvoiceLines, debInv, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("InvoiceNumber"), debInv.InvoiceNum));
             }
         }
 
@@ -178,9 +199,15 @@ namespace UnicontaClient.Pages.CustomPage
                 ribbonControl.EnableButtons( "SaveGrid" );
                 copyRowIsEnabled = true;
                 editAllChecked = false;
+#if !SILVERLIGHT
+                OnHold.ShowCheckBoxInHeader = Paid.ShowCheckBoxInHeader = true;
+#endif
             }
             else
             {
+#if !SILVERLIGHT
+                OnHold.ShowCheckBoxInHeader = Paid.ShowCheckBoxInHeader = false;
+#endif
                 if (IsDataChaged)
                 {
                     string message = Uniconta.ClientTools.Localization.lookup("SaveChangesPrompt");

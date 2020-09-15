@@ -5,7 +5,6 @@
    <RibbonItem Action="VatReportNorway" LocalizedNameKey="Mva skattemeldingen" LargeGlyph="Add_Menu_32x32.png"/>
     <RibbonItem Action="VatReportDenmark" LocalizedNameKey="Momsopgørelse" LargeGlyph="Generate_32x32.png" ShortcutKey="Ctrl+G"/>
     <RibbonItem Action="VatReportHolland" LocalizedNameKey="BTW Aangifte" LargeGlyph="Generate_32x32.png" ShortcutKey="Ctrl+G"/>
-    <RibbonItem Action="VatReportSingapore" LocalizedNameKey="Tax Statement" LargeGlyph="Generate_32x32.png" ShortcutKey="Ctrl+G"/>
     <RibbonItem Action="VatReportEstonia" LocalizedNameKey="KM avaldus" LargeGlyph="Generate_32x32.png" ShortcutKey="Ctrl+G"/>
   <RibbonItem Action="VatReportIceland" LocalizedNameKey="VSK skýrsla" LargeGlyph="Generate_32x32.png" ShortcutKey="Ctrl+G"/>
   </RibbonItem>

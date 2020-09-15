@@ -163,9 +163,9 @@ namespace ISO20022CreditTransfer
                 doc.EndToEndId = bankSpecific.EndtoendId(rec.PaymentEndToEndId);
 
                 if (doMergePayment && rec.MergePaymId != UnicontaClient.Pages.Creditor.Payments.StandardPaymentFunctions.MERGEID_SINGLEPAYMENT)
-                    doc.PaymentInfoId = bankSpecific.PaymentInfoId(doc.NumberSeqPaymentFileId, doc.EndToEndId, true);
+                    doc.PaymentInfoId = bankSpecific.PaymentInfoId(doc.NumberSeqPaymentFileId, doc.RequestedExecutionDate, rec._PaymentMethod, rec.Currency, true);
                 else
-                    doc.PaymentInfoId = bankSpecific.PaymentInfoId(doc.NumberSeqPaymentFileId, doc.EndToEndId);
+                    doc.PaymentInfoId = bankSpecific.PaymentInfoId(doc.NumberSeqPaymentFileId, doc.RequestedExecutionDate, rec._PaymentMethod, rec.Currency);
 
                 doc.PaymentMethod = BaseDocument.PAYMENTMETHOD_TRF;
 

@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Uniconta.API.System;
 using Uniconta.ClientTools;
-using Uniconta.ClientTools.DataModel.System;
+using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
 using Uniconta.Common;
@@ -92,6 +92,14 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 editrow.Menu = 0;
                 editrow.NotifyPropertyChanged("Menu");
+            }
+        }
+
+        public override bool CheckCompany
+        {
+            get
+            {
+                    return false;
             }
         }
     }

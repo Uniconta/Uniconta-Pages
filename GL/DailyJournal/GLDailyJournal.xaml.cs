@@ -418,7 +418,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                             if (creditorCVRNum == string.Empty)
                             {
-                                journalLine.Text = Uniconta.ClientTools.Localization.lookup("BilagscanNotValidVatNo");
+                                journalLine.Text = Uniconta.ClientTools.Localization.lookup("NotValidVatNo");
                             }
                             else if (creditor == null)
                             {
@@ -465,7 +465,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 }
                                 else
                                 {
-                                    newCreditor.Name = Uniconta.ClientTools.Localization.lookup("BilagscanNotValidVatNo");
+                                    newCreditor.Name = Uniconta.ClientTools.Localization.lookup("NotValidVatNo");
                                 }
 
                                 await api.Insert(newCreditor);

@@ -7,12 +7,22 @@ x:Class="UnicontaClient.Pages.CustomPage.EmailSetupWizard"
         xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
        xmlns:Controls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools" >
     <Grid x:Name="LayoutRoot" Margin="2" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30" />
+            <RowDefinition Height="5" />
+            <RowDefinition Height="30" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="5"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Host}" HorizontalAlignment="Center" Height="23" Grid.Column="0"/>
-            <Controls:ComboBoxEditor x:Name="cmbSMTPServer" HorizontalAlignment="Left" DisplayMember="Host" Width="150" Height="23" Grid.Column="2" Margin="5,0,0,0"  />
+            <Controls:ComboBoxEditor x:Name="cmbSMTPServer" HorizontalAlignment="Left" DisplayMember="Host" Width="150" Height="23" Grid.Column="2" Margin="5,0,0,0"  EditValueChanged="cmbSMTPServer_EditValueChanged" />
+        <TextBlock Grid.Row="2" x:Name="hlgmail" Visibility="Collapsed" Grid.Column="0" Grid.ColumnSpan="3">
+            <Hyperlink NavigateUri="https://www.uniconta.com/unipedia-global/gmail-settings-to-send-mail-in-uniconta/" RequestNavigate="Hyperlink_RequestNavigate">
+                <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=GmailEmailSetting}"/></Hyperlink>
+        </TextBlock>
     </Grid>
 </Controls:UnicontaWizardControl>

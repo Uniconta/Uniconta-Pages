@@ -14,7 +14,10 @@
     <RibbonItem Action="Filter" ShortcutKey="Ctrl+I" LocalizedNameKey="Filter" LargeGlyph="Filter_32x32.png"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="ViewPhoto" ShortcutKey="" LocalizedNameKey="ViewOBJ" Parameter="Photo" LargeGlyph="View_Highlighted_32x32.png"/>
+    <RibbonItem Action="View" ShortcutKey="" LocalizedNameKey="View" LargeGlyph="View_Highlighted_32x32.png">
+    <RibbonItem Action="ViewPhoto" ShortcutKey="" LocalizedNameKey="Photo" Glyph="View_16x16.png"/>
+     <RibbonItem Action="ViewWeb" ShortcutKey="" LocalizedNameKey="Web" Glyph="View_16x16.png"/>
+  </RibbonItem>
   </RibbonItem>
   <!---If we want to create a new group in same PageTab-->
   <RibbonItem>

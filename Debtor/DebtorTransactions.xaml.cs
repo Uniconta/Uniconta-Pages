@@ -51,12 +51,14 @@ namespace UnicontaClient.Pages.CustomPage
             }
             return base.DefaultFilters();
         }
+
         protected override SortingProperties[] DefaultSort()
         {
             SortingProperties dateSort = new SortingProperties("Date") { Ascending = false };
             SortingProperties VoucherSort = new SortingProperties("Voucher");
             return new SortingProperties[] { dateSort, VoucherSort };
         }
+
         public DebtorTransactions(UnicontaBaseEntity master)
             : base(master)
         {
@@ -129,6 +131,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
             dgDebtorTran.Readonly = showFields;
         }
+
         private void localMenu_OnItemClicked(string ActionType)
         {
             DebtorTransClient selectedItem = dgDebtorTran.SelectedItem as DebtorTransClient;
@@ -165,6 +168,13 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "RefreshGrid":
                     FilterGrid(gridControl, master == null, false);
+                    break;
+                case "Invoices":
+                    if (selectedItem != null)
+                    {
+                        string header = string.Format("{0}/{1}", Uniconta.ClientTools.Localization.lookup("DebtorInvoice"), selectedItem._Account);
+                        AddDockItem(TabControls.Invoices, dgDebtorTran.syncEntity, header);
+                    }
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);
@@ -304,7 +314,8 @@ namespace UnicontaClient.Pages.CustomPage
 #if !SILVERLIGHT
                             var debtInvNumber = invoice._InvoiceNumber;
                             var standardPrintReport = await StandardPrint(invoice, crudapi);
-                            StandardPrint(standardPrintReport, debtInvNumber);
+                            var reportName = await Utilities.Utility.GetLocalizedReportName(crudapi, invoice, CompanyLayoutType.Invoice);
+                            StandardPrint(standardPrintReport, debtInvNumber, reportName);
 #else
                             DefaultPrint(invoice);
 #endif
@@ -318,7 +329,8 @@ namespace UnicontaClient.Pages.CustomPage
 #if !SILVERLIGHT
                             var credInvNumber = invoice._InvoiceNumber;
                             var iprintReport = await StandardPrint(invoice, crudapi);
-                            StandardPrint(iprintReport, credInvNumber);
+                            var reportName = await Utilities.Utility.GetLocalizedReportName(crudapi, invoice, CompanyLayoutType.PurchaseInvoice);
+                            StandardPrint(iprintReport, credInvNumber, reportName);
 #else
                             DefaultPrint(invoice);
 #endif
@@ -339,11 +351,15 @@ namespace UnicontaClient.Pages.CustomPage
 #if !SILVERLIGHT
         public static void StandardPrint(IPrintReport standardPrintReport, long invoiceNumber)
         {
+            StandardPrint(standardPrintReport, invoiceNumber, null);
+        }
+
+        public static void StandardPrint(IPrintReport standardPrintReport, long invoiceNumber, string formatReportName)
+        {
             if (standardPrintReport?.Report != null)
             {
-                var invStr = Uniconta.ClientTools.Localization.lookup("Invoice");
-                var dockName = string.Format("{0}: {1}", invStr, invoiceNumber);
-                var reportName = string.Format("{0}_{1}", invStr, invoiceNumber);
+                var reportName = formatReportName ?? string.Format("{0}_{1}", Uniconta.ClientTools.Localization.lookup("Invoice"), invoiceNumber);
+                var dockName = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Invoice"), invoiceNumber);
                 DockInvoiceVoucher(UnicontaTabs.StandardPrintReportPage, new object[] { new IPrintReport[] { standardPrintReport }, reportName }, dockName);
             }
         }

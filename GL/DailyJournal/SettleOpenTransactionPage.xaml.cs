@@ -99,6 +99,13 @@ namespace UnicontaClient.Pages.CustomPage
 #endif
             this.BeforeClose += SettleOpenTransactionPage_BeforeClose;
         }
+
+        public override void Utility_Refresh(string screenName, object argument = null)
+        {
+            if (screenName == TabControls.DebtorTranPage2 || screenName == TabControls.CreditorTranOpenPage2)
+                dgOpenTransactionGrid.UpdateItemSource(argument);
+        }
+
         public override Task InitQuery()
         {
             return null;
@@ -154,6 +161,8 @@ namespace UnicontaClient.Pages.CustomPage
             else if (OpenTransactionType == 2)
                 LoadCreditorTransOpen();
             dgOpenTransactionGrid.Focus();
+
+           
         }
 
         async private void LoadDebtorTransOpen()
@@ -304,6 +313,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void LocalMenu_OnItemClicked(string ActionType)
         {
+            var selectedItem = dgOpenTransactionGrid.SelectedItem;
             switch (ActionType)
             {
                 case "Generate":
@@ -313,9 +323,17 @@ namespace UnicontaClient.Pages.CustomPage
                     Close();
                     break;
                 case "ViewDownloadRow":
-                    var selectedItem = dgOpenTransactionGrid.SelectedItem;
                     if (selectedItem != null)
                         DebtorTransactions.ShowVoucher(dgOpenTransactionGrid.syncEntity, api, busyIndicator);
+                    break;
+                case "EditRow":
+                    if (selectedItem != null)
+                    {
+                        if (selectedItem is DebtorTransOpenClientExtended)
+                            AddDockItem(TabControls.DebtorTranPage2, selectedItem, Uniconta.ClientTools.Localization.lookup("TransactionOutstanding"), "Edit_16x16.png");
+                        else if (selectedItem is CreditorTransOpenClientExtended)
+                            AddDockItem(TabControls.CreditorTranOpenPage2, selectedItem, Uniconta.ClientTools.Localization.lookup("AmountToPay"), "Edit_16x16.png");
+                    }
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);
@@ -501,13 +519,16 @@ namespace UnicontaClient.Pages.CustomPage
             }
             var row = selectedItem as DCTransOpenClient;
             var amountOpen = row.AmountOpen;
-            var dt = SelectedJournalLine?._Date ?? SelectedBankStatemenLine?._Date;
-            if (row._CashDiscount != 0 && row._CashDiscountDate <= dt)
+            if (row._CashDiscount != 0)
             {
-                if (amountOpen > 0)
-                    amountOpen -= Math.Abs(row._CashDiscount);
-                else
-                    amountOpen += Math.Abs(row._CashDiscount);
+                DateTime dt = (SelectedJournalLine != null) ? SelectedJournalLine._Date : (SelectedBankStatemenLine != null ? SelectedBankStatemenLine._Date : DateTime.MinValue);
+                if (dt <= row._CashDiscountDate)
+                {
+                    if (amountOpen > 0)
+                        amountOpen -= Math.Abs(row._CashDiscount);
+                    else
+                        amountOpen += Math.Abs(row._CashDiscount);
+                }
             }
             if (isChecked)
                 Check(row.Voucher, row.InvoiceAN, row.PrimaryKeyId, amountOpen, row.Currency, row.AmountOpenCur);

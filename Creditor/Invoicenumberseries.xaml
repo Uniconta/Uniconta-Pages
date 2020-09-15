@@ -18,7 +18,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorInvoicenumberseries"
             <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="grpFirst">
                 <CorasauControls:CorasauLayoutGroup View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=NumberSerie}" Orientation="Vertical" MinWidth="300" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                     <CorasauControls:CorasauLayoutItem FieldName="PurchaseOrder">
-                        <CorasauControls:IntegerEditor Text="{Binding PurchaseOrder,Mode=TwoWay}" SetMask="false" x:Name="txtPurchaseOrder"/>
+                        <CorasauControls:IntegerEditor EditValue="{Binding PurchaseOrder,Mode=TwoWay}" SetMask="false" x:Name="txtPurchaseOrder"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="CreditorVoucherSerie">
                         <CorasauControls:LookupEditor x:Name="cmbCreditorVoucherSerie" Text="{Binding CreditorVoucherSerie,Mode=TwoWay}"/>

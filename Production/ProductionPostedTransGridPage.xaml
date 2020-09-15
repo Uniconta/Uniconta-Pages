@@ -63,6 +63,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionPostedTransGridPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="StockUpdate" Width="60" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="PartOfBOM" Width="50" Visible="false"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="OrderNumber" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="JournalPostedId" Visible="false"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="NetAmount" Width="90" Visible="false"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Employee" Width="50" Visible="false"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="EndDiscountPct" Width="35" Visible="false"/>

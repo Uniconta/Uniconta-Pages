@@ -251,6 +251,7 @@ namespace UnicontaClient.Pages.CustomPage
             GenrateInvoiceDialog.HideOutlookOption(true);
 #endif
             GenrateInvoiceDialog.SetInvPrintPreview(printPreview);
+            GenrateInvoiceDialog.SetOIOUBLLabelText(api.CompanyEntity._OIOUBLSendOnServer);
             GenrateInvoiceDialog.Closed += async delegate
             {
                 if (GenrateInvoiceDialog.DialogResult == true)
@@ -570,6 +571,7 @@ namespace UnicontaClient.Pages.CustomPage
 #if !SILVERLIGHT
             GenrateInvoiceDialog.DialogTableId = 2000000013;
 #endif
+            GenrateInvoiceDialog.SetOIOUBLLabelText(api.CompanyEntity._OIOUBLSendOnServer);
             GenrateInvoiceDialog.Closed += async delegate
             {
                 if (GenrateInvoiceDialog.DialogResult == true)

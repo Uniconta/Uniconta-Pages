@@ -32,6 +32,11 @@ using Microsoft.Win32;
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
+    public class AttachedVouchersGrid : VouchersGrid
+    {
+        public override bool Readonly { get { return true; } }
+    }
+
     public partial class AttachedVouchers : GridBasePage
     {
         public AttachedVouchers(BaseAPI API)
@@ -52,7 +57,6 @@ namespace UnicontaClient.Pages.CustomPage
             this.DataContext = this;
             cache = VoucherCache.HoldGlobalVoucherCache;
             InitializeComponent();
-            dgAttachedVoucherGrid.Readonly = true;
             SetRibbonControl(localMenu, dgAttachedVoucherGrid);
             dgAttachedVoucherGrid.BusyIndicator = busyIndicator;
             dgAttachedVoucherGrid.api = api;

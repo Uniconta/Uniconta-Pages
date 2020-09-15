@@ -245,6 +245,8 @@ namespace UnicontaClient.Pages.CustomPage
 
             var Debs = api.GetCache(typeof(Uniconta.DataModel.Debtor));
             var lst = (IEnumerable<DebtorTotalClient>)dgDebtorTotalsGrid.ItemsSource;
+            if (lst == null)
+                return;
             if (lst != null)
             {
                 foreach (var rec in lst)

@@ -86,12 +86,27 @@ namespace UnicontaClient.Pages.CustomPage
         }
         void SetHeader()
         {
+            string header;
             var masterClient = dgCrdInvoicesGrid.masterRecord as Uniconta.DataModel.Creditor;
-            if (masterClient == null)
-                return;
-            string header = string.Format("{0}/{1}", Uniconta.ClientTools.Localization.lookup("CreditorInvoice"), masterClient._Account);
+            if (masterClient != null)
+                header = string.Format("{0}/{1}", Uniconta.ClientTools.Localization.lookup("CreditorInvoice"), masterClient._Account);
+            else
+            {
+                var masterClient2 = dgCrdInvoicesGrid.masterRecord as Uniconta.DataModel.CreditorTrans;
+                if (masterClient2 != null)
+                    header = string.Format("{0}/{1}", Uniconta.ClientTools.Localization.lookup("CreditorInvoice"), masterClient2._Account);
+                else
+                {
+                    var masterClient3 = dgCrdInvoicesGrid.masterRecord as CreditorTransOpenClient;
+                    if (masterClient3 != null)
+                        header = string.Format("{0}/{1}", Uniconta.ClientTools.Localization.lookup("CreditorInvoice"), masterClient3.Account);
+                    else
+                        return;
+                }
+            }
             SetHeader(header);
         }
+
         private void InitPage(UnicontaBaseEntity master = null)
         {
             InitializeComponent();
@@ -101,7 +116,8 @@ namespace UnicontaClient.Pages.CustomPage
             localMenu.dataGrid = dgCrdInvoicesGrid;
             dgCrdInvoicesGrid.api = api;
             var Comp = api.CompanyEntity;
-            filterDate = BasePage.GetFilterDate(Comp, master != null);
+            if (master == null)
+                filterDate = BasePage.GetFilterDate(Comp, false);
             dgCrdInvoicesGrid.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             if (Comp.RoundTo100)
@@ -183,7 +199,7 @@ namespace UnicontaClient.Pages.CustomPage
                     object[] EditParam = new object[2];
                     EditParam[0] = selectedItem;
                     EditParam[1] = true;
-                    AddDockItem(TabControls.CreditorInvoicePage2, EditParam, string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("Invoices"), selectedItem.Name));
+                    AddDockItem(TabControls.CreditorInvoicePage2, EditParam, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Invoices"), selectedItem.Name));
                     break;
                 case "InvoiceLine":
                     if (selectedItem == null)
@@ -243,7 +259,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "SendInvoice":
                     if (dgCrdInvoicesGrid.SelectedItem == null || dgCrdInvoicesGrid.SelectedItems == null)
                         return;
-                    var selectedInvoiceEmails = dgCrdInvoicesGrid.SelectedItems.Cast<CreditorInvoiceLocal>();
+                    var selectedInvoiceEmails = dgCrdInvoicesGrid.SelectedItems as IEnumerable<CreditorInvoiceLocal>;
                     SendInvoice(selectedInvoiceEmails);
                     break;
                 case "AddDoc":
@@ -278,9 +294,11 @@ namespace UnicontaClient.Pages.CustomPage
                     InvoiceAPI Invapi = new InvoiceAPI(api);
                     List<string> errors = new List<string>();
 
+                    var sendInBackgroundOnly = CWSendInvoice.sendInBackgroundOnly;
                     foreach (var inv in invoiceEmails)
                     {
-                        var errorCode = await Invapi.SendInvoice(inv, cwSendInvoice.Emails, cwSendInvoice.sendOnlyToThisEmail, CWSendInvoice.sendInBackgroundOnly);
+                        var errorCode = await Invapi.SendInvoice(inv, cwSendInvoice.Emails, cwSendInvoice.sendOnlyToThisEmail, sendInBackgroundOnly);
+                        sendInBackgroundOnly = true;
                         if (errorCode != ErrorCodes.Succes)
                         {
                             var standardError = await api.session.GetErrors();
@@ -364,11 +382,11 @@ namespace UnicontaClient.Pages.CustomPage
                             else
                                 standardPreviewPrintPage.InsertToMasterReport(printReport.Report);
                         }
-
                         else
                         {
                             var docNumber = selected.InvoiceNum;
-                            reportName = string.Format("{0}_{1}", isInvoice ? Uniconta.ClientTools.Localization.lookup("Invoice") : Uniconta.ClientTools.Localization.lookup("CreditorPackNote"), docNumber);
+                            var docType = isInvoice ? CompanyLayoutType.PurchaseInvoice : CompanyLayoutType.PurchasePacknote;
+                            reportName = await Utilities.Utility.GetLocalizedReportName(api, selected, docType);
                             dockName = string.Format("{0} {1}", Uniconta.ClientTools.Localization.lookup("Preview"), string.Format("{0}: {1}", isInvoice ?
                                 Uniconta.ClientTools.Localization.lookup("Invoice") : Uniconta.ClientTools.Localization.lookup("CreditorPackNote"), docNumber));
 
@@ -389,7 +407,7 @@ namespace UnicontaClient.Pages.CustomPage
                     UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("FailedPrintmsg") + failedList, Uniconta.ClientTools.Localization.lookup("Error"), MessageBoxButton.OK);
                 }
 #elif SILVERLIGHT
-                        DefaultPrint(selected, true, new Point(top, left));
+                    DefaultPrint(selected, true, new Point(top, left));
                     left = left - left / count;
                     top = top - top / count;
                 }
@@ -435,7 +453,8 @@ namespace UnicontaClient.Pages.CustomPage
                 busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("LaunchingWaitMsg");
                 var creditor = invClient.Creditor;
                 var invoiceReport = await PrintInvoice(invClient);
-                InvoicePostingPrintGenerator.OpenReportInOutlook(api, invoiceReport, invClient, creditor, CompanyLayoutType.PurchaseInvoice);
+                var documentType = invClient._LineTotal >= -0.0001d ? CompanyLayoutType.PurchaseInvoice : CompanyLayoutType.Creditnote;
+                InvoicePostingPrintGenerator.OpenReportInOutlook(api, invoiceReport, invClient, creditor, documentType);
             }
             catch (Exception ex)
             {
@@ -449,8 +468,6 @@ namespace UnicontaClient.Pages.CustomPage
 
         private async Task<IPrintReport> PrintInvoice(CreditorInvoiceLocal creditorInvoice)
         {
-            IPrintReport iprintReport = null;
-
             var creditorInvoicePrint = new CreditorPrintReport(creditorInvoice, api, CompanyLayoutType.PurchaseInvoice);
             var isCreditorInitialized = await creditorInvoicePrint.InstantiateFields();
             if (isCreditorInitialized)
@@ -459,7 +476,7 @@ namespace UnicontaClient.Pages.CustomPage
                     creditorInvoicePrint.CompanyLogo, creditorInvoicePrint.ReportName, (int)Uniconta.ClientTools.Controls.Reporting.StandardReports.PurchaseInvoice, creditorInvoicePrint.CreditorMessage, creditorInvoicePrint.IsCreditNote);
 
                 var creditorStandardReport = new[] { creditorStandardInvoice };
-                iprintReport = new StandardPrintReport(api, creditorStandardReport, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.PurchaseInvoice);
+                IPrintReport iprintReport = new StandardPrintReport(api, creditorStandardReport, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.PurchaseInvoice);
                 await iprintReport.InitializePrint();
 
                 if (iprintReport?.Report == null)
@@ -467,14 +484,13 @@ namespace UnicontaClient.Pages.CustomPage
                     iprintReport = new LayoutPrintReport(api, creditorInvoice, creditorInvoicePrint.IsCreditNote ? CompanyLayoutType.Creditnote : CompanyLayoutType.Invoice);
                     await iprintReport.InitializePrint();
                 }
+                return iprintReport;
             }
-            return iprintReport;
+            return null;
         }
 
         private async Task<IPrintReport> PrintPackNote(CreditorInvoiceLocal creditorInvoice)
         {
-            IPrintReport iprintReport = null;
-
             var packnote = Uniconta.ClientTools.Controls.Reporting.StandardReports.PurchasePackNote;
 
             var creditorInvoicePrint = new UnicontaClient.Pages.CreditorPrintReport(creditorInvoice, api, CompanyLayoutType.Packnote);
@@ -486,7 +502,7 @@ namespace UnicontaClient.Pages.CustomPage
                     creditorInvoicePrint.CompanyLogo, creditorInvoicePrint.ReportName, (int)packnote, creditorInvoicePrint.CreditorMessage);
 
                 var standardReports = new[] { standardCreditorInvoice };
-                iprintReport = new StandardPrintReport(api, standardReports, (byte)packnote);
+                IPrintReport iprintReport = new StandardPrintReport(api, standardReports, (byte)packnote);
                 await iprintReport.InitializePrint();
 
                 if (iprintReport?.Report == null)
@@ -494,9 +510,9 @@ namespace UnicontaClient.Pages.CustomPage
                     iprintReport = new LayoutPrintReport(api, creditorInvoice, CompanyLayoutType.Packnote);
                     await iprintReport.InitializePrint();
                 }
+                return iprintReport;
             }
-
-            return iprintReport;
+            return null;
         }
 
         public override bool IsDataChaged => IsGeneratingDocument;
@@ -554,7 +570,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         public override void Utility_Refresh(string screenName, object argument = null)
         {
-            if(screenName == TabControls.StandardPrintReportPage)
+            if (screenName == TabControls.StandardPrintReportPage)
             {
 #if !SILVERLIGHT
                 IsGeneratingDocument = false;

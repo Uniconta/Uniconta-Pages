@@ -39,14 +39,11 @@ x:Class="UnicontaClient.Pages.CustomPage.VouchersPage2"
                         <CorasauControls:CorasauLayoutItem FieldName="Invoice" x:Name="liInvoice">
                             <CorasauControls:TextEditor  x:Name="txtInvoice" MaxLength="20" Text="{Binding Invoice,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="Voucher" x:Name="liVoucher">
-                            <CorasauControls:TextEditor  x:Name="txtVoucher" Text="{Binding Voucher,Mode=TwoWay}" />
+                        <CorasauControls:CorasauLayoutItem FieldName="PurchaseNumber" x:Name="liPurchaseNumber">
+                            <CorasauControls:UnicontaEditableLookupControl  x:Name="txtPurchaseNumber" LookupEditValue="{Binding PurchaseNumber,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="DocumentDate" x:Name="liDocumentDate">
                             <CorasauControls:DateEditor  x:Name="txtDocumentDate" EditValue="{Binding DocumentDate,Mode=TwoWay}" />
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="PostingDate" x:Name="liPostingDate">
-                            <CorasauControls:DateEditor  x:Name="txtPostingDate" EditValue="{Binding PostingDate,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="Amount" x:Name="liAmount">
                             <CorasauControls:TextEditor  x:Name="txtAmount" MaxLength="20" Text="{Binding Amount,Mode=TwoWay}" MaskType="Numeric" Mask="N2" />

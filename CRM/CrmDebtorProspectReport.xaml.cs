@@ -170,14 +170,14 @@ namespace UnicontaClient.Pages.CustomPage
                     parmas[1] = true;
                     if (selectedItem is CrmProspectView)
                     {
-                        var crmProspectUser = Activator.CreateInstance(api.CompanyEntity.GetUserTypeNotNull(typeof(CrmProspectClient))) as CrmProspectClient;
+                        var crmProspectUser = api.CompanyEntity.CreateUserType<CrmProspectClient>();
                         StreamingManager.Copy(selectedItem as CrmProspectClient, crmProspectUser);
                         parmas[0] = crmProspectUser;
                         AddDockItem(TabControls.CrmProspectPage2, parmas, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Prospects"), selectedItem.Name));
                     }
                     else if (selectedItem is CrmDebtorView)
                     {
-                        var debtorUser = Activator.CreateInstance(api.CompanyEntity.GetUserTypeNotNull(typeof(DebtorClient))) as DebtorClient;
+                        var debtorUser = api.CompanyEntity.CreateUserType<DebtorClient>();
                         StreamingManager.Copy(selectedItem as DebtorClient, debtorUser);
                         parmas[0] = debtorUser;
                         AddDockItem(TabControls.DebtorAccountPage2, parmas, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("DebtorAccount"), selectedItem.Name));
@@ -314,6 +314,21 @@ namespace UnicontaClient.Pages.CustomPage
                     AddDockItem(page, debtorClient);
             }
         }
+
+#if !SILVERLIGHT
+        private void HasEmailImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            var prospect = (sender as TextBlock).Tag as ICrmProspect;
+
+            if (prospect != null)
+            {
+                var mail = string.Concat("mailto:", prospect.ContactEmail);
+                System.Diagnostics.Process proc = new System.Diagnostics.Process();
+                proc.StartInfo.FileName = mail;
+                proc.Start();
+            }
+        }
+#endif
     }
 
     public interface ICrmProspect

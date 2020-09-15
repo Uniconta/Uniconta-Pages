@@ -125,7 +125,7 @@ x:Class="UnicontaClient.Pages.CustomPage.FAMDetailPage"
                         <CorasauControls:DoubleEditor FieldName="DepreciationPercent" IsReadOnly="True" />
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="Years" x:Name="liYears">
-                        <CorasauControls:IntegerEditor Text="{Binding Years, Mode=OneWay}" IsReadOnly="True"/>
+                        <CorasauControls:IntegerEditor EditValue="{Binding Years, Mode=OneWay}" IsReadOnly="True"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="ManualDepreciation" x:Name="liManualDepreciation">
                         <CorasauControls:DoubleEditor FieldName="ManualDepreciation" IsReadOnly="True"/>

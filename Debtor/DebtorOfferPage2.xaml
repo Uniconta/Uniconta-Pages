@@ -59,7 +59,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOfferPage2"
                             <CorasauControls:LookupEditor x:Name="leGroup" EditValue="{Binding Group,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="OfferNumber" x:Name="liOfferNumber">
-                            <CorasauControls:IntegerEditor Text="{Binding OfferNumber,Mode=TwoWay}" Mask="false"/>
+                            <CorasauControls:IntegerEditor EditValue="{Binding OfferNumber,Mode=TwoWay}" Mask="false"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="DeliveryDate" x:Name="liDeliveryDate">
                             <CorasauControls:DateEditor x:Name="deDeLiveryDate" EditValue="{Binding DeliveryDate,Mode=TwoWay}"/>

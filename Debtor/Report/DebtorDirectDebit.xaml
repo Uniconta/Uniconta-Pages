@@ -67,6 +67,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorDirectDebit"
                     <local:CorasauDataGridTemplateColumnClient x:Name="PaymentRefId" Visible="False" AllowEditing="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="PaymentId" Visible="False" AllowEditing="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="MergeDataId" Visible="False" AllowEditing="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="AllowReplacement" Visible="False" AllowEditing="True"/>
                     <local:ComboBoxColumnClient x:Name="Currency" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="AmountOpenCur" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="AmountCur" Visible="False"/>

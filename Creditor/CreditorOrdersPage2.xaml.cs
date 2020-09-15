@@ -95,7 +95,7 @@ namespace UnicontaClient.Pages.CustomPage
             lePostingAccount.api = Employeelookupeditor.api = leAccount.api = lePayment.api = cmbDim1.api
                 = leTransType.api = cmbDim2.api = cmbDim3.api = cmbDim4.api = cmbDim5.api = leGroup.api = leShipment.api =
                 PrCategorylookupeditor.api = Projectlookupeditor.api = leApprover.api = leDeliveryTerm.api = leInvoiceAccount.api =
-                PriceListlookupeditior.api = leRelatedOrder.api = leLayoutGroup.api = crudapi;
+                PriceListlookupeditior.api = leRelatedOrder.api = leLayoutGroup.api = leVat.api= crudapi;
             cbDeliveryCountry.ItemsSource = Enum.GetValues(typeof(Uniconta.Common.CountryCode));
             if (editrow == null)
             {
@@ -231,6 +231,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             AddCreditor_Click(null, null);
         }
+
         public override void Utility_Refresh(string screenName, object argument = null)
         {
             if (screenName == TabControls.CreditorAccountPage2)
@@ -247,11 +248,9 @@ namespace UnicontaClient.Pages.CustomPage
             if (screenName == TabControls.AttachVoucherGridPage && argument != null)
             {
                 var voucherObj = argument as object[];
-                if (voucherObj[0] is VouchersClient)
-                {
-                    attachedVoucher = voucherObj[0] as VouchersClient;
+                attachedVoucher = voucherObj[0] as VouchersClient;
+                if (attachedVoucher != null)
                     editrow.DocumentRef = attachedVoucher.RowId;
-                }
             }
         }
 
@@ -260,8 +259,16 @@ namespace UnicontaClient.Pages.CustomPage
         {
             switch (ActionType)
             {
+                case "Save":
+                    if (Utility.IsExecuteWithBlockedAccount(editrow.Creditor))
+                    {
+                        UpdateVoucher();
+                        frmRibbon_BaseActions(ActionType);
+                    }
+                    break;
                 case "SaveAndOrderLines":
-                    saveFormAndOpenControl(TabControls.CreditorOrderLines);
+                    if (Utility.IsExecuteWithBlockedAccount(editrow.Creditor))
+                        saveFormAndOpenControl(TabControls.CreditorOrderLines);
                     break;
                 case "RefVoucher":
                     var _refferedVouchers = new List<int>();
@@ -269,27 +276,21 @@ namespace UnicontaClient.Pages.CustomPage
                         _refferedVouchers.Add(editrow._DocumentRef);
 
                     AddDockItem(TabControls.AttachVoucherGridPage, new object[] { _refferedVouchers }, true);
-
                     break;
                 case "ViewVoucher":
                     busyIndicator.IsBusy = true;
                     ViewVoucher(TabControls.VouchersPage3, editrow);
                     busyIndicator.IsBusy = false;
                     break;
-
                 case "ImportVoucher":
                     var voucher = new VouchersClient();
                     voucher._Content = ContentTypes.PurchaseInvoice;
+                    voucher._PurchaseNumber = editrow._OrderNumber;
+                    voucher._CreditorAccount = editrow._InvoiceAccount ?? editrow._DCAccount;
                     Utility.ImportVoucher(editrow, api, voucher);
                     break;
-
                 case "RemoveVoucher":
                     RemoveVoucher(editrow);
-                    break;
-                case "Save":
-                    if (!Utility.IsExecuteWithBlockedAccount(editrow.Creditor)) return;
-                    if (attachedVoucher != null) UpdateVoucher(editrow._OrderNumber);
-                    frmRibbon_BaseActions(ActionType);
                     break;
                 default:
                     frmRibbon_BaseActions(ActionType);
@@ -297,19 +298,24 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        async void UpdateVoucher(int orderNumber)
+        void UpdateVoucher()
         {
-            busyIndicator.IsBusy = true;
-            attachedVoucher.PurchaseNumber = orderNumber;
-            var err = await api.Update(attachedVoucher);
-            busyIndicator.IsBusy = false;
-            if (err != ErrorCodes.Succes)
-                UtilDisplay.ShowErrorCode(err);
+            var attachedVoucher = this.attachedVoucher;
+            if (attachedVoucher == null)
+                return;
+            this.attachedVoucher = null;
+            var buf = attachedVoucher._Data;
+            attachedVoucher._Data = null;
+            var org = StreamingManager.Clone(attachedVoucher);
+            attachedVoucher._Content = ContentTypes.PurchaseInvoice;
+            attachedVoucher._PurchaseNumber = editrow._OrderNumber;
+            attachedVoucher._CreditorAccount = editrow._InvoiceAccount ?? editrow._DCAccount;
+            api.UpdateNoResponse(org, attachedVoucher);
+            attachedVoucher._Data = buf;
         }
+
         public override async void saveFormAndOpenControl(string Control, string header = null)
         {
-            if (!Utility.IsExecuteWithBlockedAccount(editrow.Creditor)) return;
-
             closePageOnSave = false;
             var res = await saveForm(false);
             closePageOnSave = true;
@@ -318,6 +324,8 @@ namespace UnicontaClient.Pages.CustomPage
                 header = string.Format("{0}:{1},{2}", Uniconta.ClientTools.Localization.lookup("PurchaseLines"), editrow._OrderNumber, editrow.Name);
                 AddDockItem(Control, ModifiedRow, header);
                 dockCtrl?.JustClosePanel(this.ParentControl);
+
+                UpdateVoucher();
             }
         }
         private void AddCreditor_Click(object sender, RoutedEventArgs e)
@@ -334,7 +342,7 @@ namespace UnicontaClient.Pages.CustomPage
             var creditors = api.GetCache(typeof(Uniconta.DataModel.Creditor));
             SetValuesFromMaster((Uniconta.DataModel.Creditor)creditors?.Get(id));
         }
-        void SetValuesFromMaster(Uniconta.DataModel.Creditor creditor)
+        async void SetValuesFromMaster(Uniconta.DataModel.Creditor creditor)
         {
             if (creditor == null)
                 return;
@@ -369,7 +377,8 @@ namespace UnicontaClient.Pages.CustomPage
             }
             TableField.SetUserFieldsFromRecord(creditor, editrow);
             BindContact(creditor);
-            api.Read(creditor);
+            await api.Read(creditor);
+            editrow.RefreshBalance();
         }
 
         private void cmbContactName_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
@@ -388,13 +397,11 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
 #if !SILVERLIGHT
-
         private void LiDeliveryZipCode_OnButtonClicked(object sender)
         {
             var location = editrow._DeliveryAddress1 + "+" + editrow._DeliveryAddress2 + "+" + editrow._DeliveryAddress3 + "+" + editrow._DeliveryZipCode + "+" + editrow._DeliveryCity + "+" + editrow.DeliveryCountry;
             Utility.OpenGoogleMap(location);
         }
 #endif
-
     }
 }

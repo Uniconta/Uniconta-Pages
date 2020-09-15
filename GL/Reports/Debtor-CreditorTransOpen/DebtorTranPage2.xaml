@@ -63,6 +63,17 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorTranPage2"
                             <CorasauControls:LookupEditor x:Name="Vatlookupeditior" Text="{Binding Vat,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
+                    <CorasauControls:CorasauLayoutGroup x:Name="grpReminders" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Reminders}" Orientation="Vertical" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                        <CorasauControls:CorasauLayoutItem FieldName="CollectionsLetters" x:Name="liCollectionsLetters">
+                            <CorasauControls:IntegerEditor Text="{Binding CollectionsLetters, Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="LastInterest" x:Name="liLastInterest">
+                            <CorasauControls:DateEditor EditValue="{Binding LastInterest,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="LastCollectionLetter" x:Name="liLastCollectionLetter">
+                            <CorasauControls:DateEditor EditValue="{Binding LastCollectionLetter,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                    </CorasauControls:CorasauLayoutGroup>
                 </CorasauControls:CorasauLayoutGroup>
             </CorasauControls:CorasauLayoutControl>
         </Grid>

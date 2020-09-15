@@ -16,6 +16,7 @@ using Uniconta.Common.Utility;
 using Uniconta.ClientTools.Util;
 using Uniconta.API.Service;
 using Uniconta.ClientTools.Controls;
+using Uniconta.ClientTools;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -29,6 +30,40 @@ namespace UnicontaClient.Pages.CustomPage
         public override string NameOfControl { get { return TabControls.InvVariantDetailPage; } }
         InvItemClient invMaster;
         SQLCache items;
+        public InvVariantDetailPage(SynchronizeEntity syncEntity) : base(syncEntity, true)
+        {
+            invMaster = (InvItemClient)syncEntity.Row;
+            InitializeComponent();
+            Init();
+            SetHeader();
+        }
+
+        protected override void SyncEntityMasterRowChanged(UnicontaBaseEntity args)
+        {
+            invMaster = (InvItemClient)args;
+            dgInvVariantDetailGrid.UpdateMaster(args);
+            SetHeader();
+            InitQuery();
+        }
+
+        private void SetHeader()
+        {
+            var table = dgInvVariantDetailGrid.masterRecord;
+            string key = string.Empty;
+            if (table is InvItemClient)
+            {
+                var invItem = table as InvItemClient;
+                key = invItem._Item;
+            }
+            else
+                key = Utility.GetHeaderString(dgInvVariantDetailGrid.masterRecord);
+
+            if (string.IsNullOrEmpty(key)) return;
+            string header = string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("ItemVariants"), key);
+            SetHeader(header);
+        }
+
+
         public InvVariantDetailPage(UnicontaBaseEntity master)
             : base(master)
         {
@@ -84,6 +119,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void localMenu_OnItemClicked(string ActionType)
         {
+            var selectedItem = dgInvVariantDetailGrid.SelectedItem as InvVariantDetailClient;
             switch (ActionType)
             {
                 case "AddRow":
@@ -102,6 +138,29 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "DeleteRow":
                     dgInvVariantDetailGrid.DeleteRow();
+                    break;
+                case "AddDoc":
+
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.UserDocsPage, dgInvVariantDetailGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Documents"), selectedItem.VariantName));
+                    break;
+                case "Photo":
+                    if (selectedItem == null)
+                        return;
+#if !SILVERLIGHT
+                    var cw = new CwSelectPhotoId(api, selectedItem);
+                    cw.Closing += delegate
+                      {
+                          if(cw.DialogResult== true)
+                          {
+                              dgInvVariantDetailGrid.SetLoadedRow(selectedItem);
+                              selectedItem.Photo = cw.Photo;
+                              dgInvVariantDetailGrid.UpdateItemSource(selectedItem);
+                              dgInvVariantDetailGrid.SetModifiedRow(selectedItem);
+                          }
+                      };
+                    cw.Show();
+#endif
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);

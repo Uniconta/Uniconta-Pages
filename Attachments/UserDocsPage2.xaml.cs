@@ -18,6 +18,7 @@ using UnicontaClient.Utilities;
 using UnicontaClient.Models;
 using System.IO;
 using Uniconta.ClientTools;
+using Uniconta.ClientTools.Controls;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -83,6 +84,10 @@ namespace UnicontaClient.Pages.CustomPage
 
 #if !SILVERLIGHT
             browseControl.CompressVisibility = Visibility.Visible;
+            if (isFieldsAvailableForEdit)
+                liDocumentType.Visibility = Visibility.Visible;
+            else
+                liDocumentType.Visibility = Visibility.Collapsed;
 #endif
         }
 
@@ -107,28 +112,30 @@ namespace UnicontaClient.Pages.CustomPage
                         var nameOfFile = indexOfExtention > 0 ? browseControl.FileName.Substring(0, indexOfExtention) : browseControl.FileName;
                         userDocsClientRow.DocumentType = DocumentConvert.GetDocumentType(browseControl.FileExtension);
                         userDocsClientRow.Text = string.IsNullOrWhiteSpace(txedUserDocNotes.Text) ? nameOfFile : txedUserDocNotes.Text;
+                        userDocsClientRow._Url = null;
                     }
                     else if (!string.IsNullOrWhiteSpace(userDocsClientRow._Url))
                     {
                         var url = userDocsClientRow._Url;
-                        if (url.EndsWith("/"))
-                            url = url.Substring(0, url.Length - 1);
-                        int indexOfExtention = url.LastIndexOf('.');
-                        int indexOfpath = url.LastIndexOf('/') + 1;
-                        if (indexOfpath == -1)
-                            indexOfpath = url.LastIndexOf('\\') + 1;
-                        if (indexOfExtention > indexOfpath)
+                        string fileName = txedUserDocNotes.Text;
+                        FileextensionsTypes fileExt = isFieldsAvailableForEdit ? userDocsClientRow._DocumentType : FileextensionsTypes.UNK;
+#if !SILVERLIGHT
+                        if (url.StartsWith("http", StringComparison.OrdinalIgnoreCase) || url.StartsWith("www", StringComparison.OrdinalIgnoreCase))
                         {
-                            var nameOfFile = indexOfpath > 0 ? url.Substring(indexOfpath, indexOfExtention - indexOfpath) : url;
-                            userDocsClientRow.DocumentType = DocumentConvert.GetDocumentType(url.Substring(indexOfExtention, url.Length - indexOfExtention));
-                            userDocsClientRow.Text = string.IsNullOrWhiteSpace(txedUserDocNotes.Text) ? nameOfFile : txedUserDocNotes.Text;
-                        }
-                        else
-                        {
-                            userDocsClientRow.DocumentType = FileextensionsTypes.UNK;
-                            userDocsClientRow.Text = txedUserDocNotes.Text;
+                            int idxExtension = url.LastIndexOf('.');
+                            if (fileExt == FileextensionsTypes.UNK)
+                            {
+                                var ext = DocumentConvert.GetDocumentType(url.Substring(idxExtension, url.Length - idxExtension));
+                                fileExt = ext != FileextensionsTypes.UNK ? ext : FileextensionsTypes.WWW;
+                            }
 
                         }
+                        else
+#endif
+                            if (!TryParseUrl(url, ref fileName, ref fileExt)) return;
+
+                        userDocsClientRow.DocumentType = fileExt;
+                        userDocsClientRow.Text = fileName;
                     }
                     else
                         userDocsClientRow.Text = txedUserDocNotes.Text;
@@ -142,6 +149,38 @@ namespace UnicontaClient.Pages.CustomPage
 
                 frmRibbon_BaseActions(ActionType);
             }
+        }
+
+        private bool TryParseUrl(string url, ref string fielName, ref FileextensionsTypes fileExtension)
+        {
+            try
+            {
+                if (url.EndsWith("/"))
+                    url = url.Substring(0, url.Length - 1);
+                int indexOfExtention = url.LastIndexOf('.');
+                int indexOfpath = url.LastIndexOf('/') + 1;
+                if (indexOfpath == 0)
+                    indexOfpath = url.LastIndexOf('\\') + 1;
+                if (indexOfpath > 0 && indexOfExtention > indexOfpath)
+                {
+                    var nameOfFile = indexOfpath > 0 ? url.Substring(indexOfpath, indexOfExtention - indexOfpath) : url;
+                    var ext = DocumentConvert.GetDocumentType(url.Substring(indexOfExtention, url.Length - indexOfExtention));
+                    if (!isFieldsAvailableForEdit)
+                        fileExtension = ext;
+                    else
+                    {
+                        if (fileExtension == FileextensionsTypes.UNK || fileExtension != ext)
+                        {
+                            UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("InvalidFileFormat"), Uniconta.ClientTools.Localization.lookup("Warning"));
+                            return false;
+                        }
+                    }
+                    fielName = string.IsNullOrWhiteSpace(fielName) ? nameOfFile : fielName;
+
+                }
+                return true;
+            }
+            catch { return false; }
         }
 
         private bool ValidateSave()
@@ -163,18 +202,6 @@ namespace UnicontaClient.Pages.CustomPage
             return isSucess;
         }
 
-        FileextensionsTypes GetUrlFileExtension()
-        {
-            FileextensionsTypes extension;
-            var url = userDocsClientRow._Url;
-            int indexOfExtention = url.LastIndexOf('.');
-            int indexOfpath = url.LastIndexOf('/') + 1;
-            if (indexOfpath == -1)
-                indexOfpath = url.LastIndexOf('\\') + 1;
-            var nameOfFile = indexOfpath > 0 ? url.Substring(indexOfpath, indexOfExtention - indexOfpath) : url;
-            extension = DocumentConvert.GetDocumentType(url.Substring(indexOfExtention, url.Length - indexOfExtention));
-            return extension;
-        }
 
         public override void OnClosePage(object[] RefreshParams)
         {
@@ -185,18 +212,22 @@ namespace UnicontaClient.Pages.CustomPage
         private void browseControl_FileSelected()
         {
             browseUrl = browseControl.FilePath;
-            if (chkIncludeOnlyReference.IsChecked == true)
+            if (chkIncludeOnlyReference.IsChecked == true && !string.IsNullOrEmpty(browseUrl))
+            {
                 userDocsClientRow.Url = browseUrl;
+                string fileName = txedUserDocNotes.Text;
+                FileextensionsTypes fileExt = userDocsClientRow._DocumentType;
+
+                if (TryParseUrl(browseUrl, ref fileName, ref fileExt))
+                    userDocsClientRow.DocumentType = fileExt;
+            }
         }
 
         private void chkIncludeOnlyReference_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
         {
             browseControl.CheckMaxSize = !chkIncludeOnlyReference.IsChecked.Value;
             if (chkIncludeOnlyReference.IsChecked == true)
-            {
-                if (!string.IsNullOrEmpty(browseUrl))
-                    userDocsClientRow.Url = browseUrl;
-            }
+                browseControl_FileSelected();
             else
                 userDocsClientRow.Url = null;
         }

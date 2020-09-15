@@ -101,6 +101,9 @@ x:Class="UnicontaClient.Pages.CustomPage.Profile"
                     <CorasauControls:CorasauLayoutItem FieldName="ConfirmDelete" x:Name="liConfirmDelete">
                         <CorasauControls:CheckEditor IsChecked="{Binding ConfirmDelete,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="UseDefaultBrowser" x:Name="liUseDefaultBrowser">
+                        <CorasauControls:CheckEditor IsChecked="{Binding UseDefaultBrowser,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
                 <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpInformation" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Information}" Orientation="Vertical" Width="500" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                     <CorasauControls:CorasauLayoutItem x:Name="liXapBuildDate" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter= XapBuildDate,StringFormat=\{0\}:}">

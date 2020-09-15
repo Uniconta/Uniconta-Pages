@@ -19,7 +19,7 @@ using Uniconta.ClientTools.Controls;
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
 {
-    class SDCPayFormat
+    public class SDCPayFormat
     {
         internal const string RECORDTYPE_3 = "3"; //Konto til konto med kort advis
         internal const string RECORDTYPE_K006 = "K006"; //Giroindbetaling kortart 01, 04 og 15

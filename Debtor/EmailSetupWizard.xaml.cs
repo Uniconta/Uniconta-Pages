@@ -14,20 +14,22 @@ using System.Windows.Shapes;
 using DevExpress.Xpf.WindowsUI;
 using Uniconta.ClientTools.Controls;
 using Uniconta.DataModel;
+using System.Diagnostics;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
- 
+
     public partial class EmailSetupWizard : UnicontaWizardControl
     {
-        ServerInformation _emailSetup;
         public EmailSetupWizard()
         {
             InitializeComponent();
             DataContext = this;
             List<ServerInformation> servers = new List<ServerInformation>();
-            servers.Add(new ServerInformation { Host = "smtp.office365.com", Port = 587, SSL= true });
+            servers.Add(new ServerInformation { Host = "smtp.office365.com", Port = 587, SSL = true });
+            servers.Add(new ServerInformation { Host = "asmtp.yousee.dk", Port = 587, SSL = true });
+            servers.Add(new ServerInformation { Host = "smtp.gmail.com", Port = 587, SSL = true, User = "@gmail.com" });
             cmbSMTPServer.ItemsSource = servers;
         }
 
@@ -35,7 +37,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             get
             {
-                return  Uniconta.ClientTools.Localization.lookup("EmailSetUp");
+                return Uniconta.ClientTools.Localization.lookup("EmailSetUp");
             }
         }
 
@@ -43,20 +45,31 @@ namespace UnicontaClient.Pages.CustomPage
 
         public override void NavigateView(NavigationFrame frameView)
         {
-            var selectedServer = cmbSMTPServer.SelectedItem as ServerInformation; 
+            var selectedServer = cmbSMTPServer.SelectedItem as ServerInformation;
             if (selectedServer != null)
             {
-                _emailSetup = new ServerInformation();
-                _emailSetup.Host = selectedServer.Host;
-                _emailSetup.Port = selectedServer.Port;
-                _emailSetup.SSL = selectedServer.SSL;
-                WizardData = _emailSetup;
+                WizardData = selectedServer;
                 frameView.Navigate(new EmailUserPasswordWizard(WizardData));
             }
             else
                 UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("NoServerSelected"), Uniconta.ClientTools.Localization.lookup("Warning"),
                     MessageBoxButton.OK);
         }
+#if !SILVERLIGHT
+        private void cmbSMTPServer_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
+        {
+            if (cmbSMTPServer.SelectedIndex == 2)
+                hlgmail.Visibility = Visibility.Visible;
+            else
+                hlgmail.Visibility = Visibility.Collapsed;
+        }
+
+        private void Hyperlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
+        {
+            Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
+            e.Handled = true;
+        }
+#endif
     }
 
     public class ServerInformation

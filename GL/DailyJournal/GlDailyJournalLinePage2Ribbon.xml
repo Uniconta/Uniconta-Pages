@@ -10,4 +10,7 @@
     <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16.png" />
 </RibbonItem>
   </RibbonItem>
+ <RibbonItem  >
+     <RibbonItem Action="Save" ShortcutKey="Ctrl+S" LocalizedNameKey="Save" LargeGlyph="save-32x32.png"/>
+   </RibbonItem>
 </root>

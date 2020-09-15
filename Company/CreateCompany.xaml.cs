@@ -499,6 +499,19 @@ namespace UnicontaClient.Pages.CustomPage
             concatC5ItemNames = chkConcatC5ItemNames.IsChecked.Value;
             includeVatInPrices = chkInvoiceVatPriceCheck.IsChecked.Value;
             importDim = cmbImportDimension.SelectedIndex;
+            switch ((ImportFrom)importFrom)
+            {
+                case ImportFrom.c5_Danmark:
+                case ImportFrom.c5_Iceland: editrow._ConvertedFrom = (int)ConvertFromType.C5; break;
+                case ImportFrom.economic_Danmark:
+                case ImportFrom.economic_English:
+                case ImportFrom.economic_Norge:
+                case ImportFrom.economic_Germany:
+                case ImportFrom.economic_Sweden: editrow._ConvertedFrom = (int)ConvertFromType.Eco; break;
+                case ImportFrom.NAV: editrow._ConvertedFrom = (int)ConvertFromType.Nav; break;
+                case ImportFrom.Ax30_eCTRL: editrow._ConvertedFrom = (int)ConvertFromType.eCtrl; break;
+                case ImportFrom.dk_Iceland: editrow._ConvertedFrom = (int)ConvertFromType.dk_Iceland; break;
+            }
 #endif
             if (setupType == 1)
             {
@@ -531,7 +544,7 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         editrow.CopyFunctions(fromCompany);
                         busyIndicator.BusyContent = string.Format(Uniconta.ClientTools.Localization.lookup("CopyingCompany"), fromCompany._Name, editrow._Name);
-                    }
+                    }                    
                     busyIndicator.IsBusy = true;
                     if (chkDimensions.IsChecked == true && fromCompany != null)
                     {
@@ -646,12 +659,13 @@ namespace UnicontaClient.Pages.CustomPage
                 companyDocumentsList.Add(AddLogosToCompanyDocument(browseTopLogo.FileBytes, browseTopLogo.FileExtension, CompanyDocumentUse.TopBarLogo));
             if (browseInvoiceLogo.FileBytes != null && browseInvoiceLogo.FileBytes.Length > 0)
                 companyDocumentsList.Add(AddLogosToCompanyDocument(browseInvoiceLogo.FileBytes, browseInvoiceLogo.FileExtension, CompanyDocumentUse.CompanyLogo));
-
-            var companyApi = new CrudAPI(session, (CompanyClient)ModifiedRow);
-            var result = await companyApi.Insert(companyDocumentsList);
-
-            if (result != ErrorCodes.Succes)
-                UtilDisplay.ShowErrorCode(result);
+            if (companyDocumentsList.Count > 0)
+            {
+                var companyApi = new CrudAPI(session, (CompanyClient)ModifiedRow);
+                var result = await companyApi.Insert(companyDocumentsList);
+                if (result != ErrorCodes.Succes)
+                    UtilDisplay.ShowErrorCode(result);
+            }
         }
 
         private CompanyDocumentClient AddLogosToCompanyDocument(byte[] fileBytes, string fileExtension, CompanyDocumentUse documentUseFor)

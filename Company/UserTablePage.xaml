@@ -23,6 +23,7 @@ x:Class="UnicontaClient.Pages.CustomPage.UserTablePage"
                 <localPage:UserTableGrid.Columns>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" Width="150" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Prompt" Width="150" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="TableBaseType" Width="100" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="AccessGroup" Width="50"  />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="MenuPosition" Width="80"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="MasterTable" />

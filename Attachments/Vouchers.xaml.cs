@@ -79,12 +79,13 @@ namespace UnicontaClient.Pages.CustomPage
                 }
 
                 var result = await base.SaveData();
-                if (result == ErrorCodes.Succes)
-                    Utility.UpdateBuffers(api, buffers, vouchersClient);
+                if (result != ErrorCodes.Succes)
+                    return result;
 
-                await Filter(null);
+                Utility.UpdateBuffers(api, buffers, vouchersClient);
+                this.RefreshData();
 
-                return result;
+                return 0;
             }
             else
                 return await base.SaveData();
@@ -470,18 +471,33 @@ namespace UnicontaClient.Pages.CustomPage
                             rec.PayAccount = Acc._DefaultOffsetAccount;
                     }
                     break;
+                case "PurchaseNumber":
+                    if (rec._PurchaseNumber != 0 && api.CompanyEntity.Purchase)
+                        SetPurchaseNumber(rec);
+                    break;
                 case "Invoice":
-                    if (rec != null)
-                        rec.UpdateDefaultText();
+                    rec.UpdateDefaultText();
                     break;
                 case "Project":
-                    if (rec?._Project != null)
+                    if (rec._Project != null)
                         lookupProjectDim(rec);
                     break;
                 case "TransType":
-                    if (rec?._TransType != null)
+                    if (rec._TransType != null)
                         SetTransText(rec);
                     break;
+            }
+        }
+
+        async void SetPurchaseNumber(VouchersClient rec)
+        {
+            var cache = api.GetCache(typeof(Uniconta.DataModel.CreditorOrder)) ?? await api.LoadCache(typeof(Uniconta.DataModel.CreditorOrder));
+            var order = (DCOrder)cache?.Get(NumberConvert.ToStringNull(rec._PurchaseNumber));
+            if (order != null)
+            {
+                rec.CreditorAccount = order._InvoiceAccount ?? order._DCAccount;
+                if (order._Employee != null)
+                    rec.Approver1 = order._Employee;
             }
         }
 
@@ -572,7 +588,11 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
 
                 case "DeleteRow":
-                    dgVoucherGrid.DeleteRow();
+                    if (selectedItem != null)
+                    {
+                        VoucherCache.RemoveGlobalVoucherCache(selectedItem);
+                        dgVoucherGrid.DeleteRow();
+                    }
                     break;
 
                 case "Save":
@@ -726,7 +746,12 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "RemoveFromInbox":
                     if (selectedItem != null)
-                        UpdateInBox(selectedItem);
+                    {
+                        if (selectedItem._Fileextension == FileextensionsTypes.UNK)
+                            dgVoucherGrid.DeleteRow();
+                        else
+                            UpdateInBox(selectedItem);
+                    }
                     break;
                 case "ResendToApprover":
                     if (selectedItem == null || (selectedItem._Approver1 == null && selectedItem._Approver2 == null))
@@ -896,7 +921,10 @@ namespace UnicontaClient.Pages.CustomPage
                 await api.Insert(saveVoucher);
 
             if (isDeleteVoucher && copiedVoucher != null)
+            {
+                VoucherCache.RemoveGlobalVoucherCache(copiedVoucher);
                 await api.Delete(copiedVoucher);
+            }
 
             await dgVoucherGrid.Filter(null);
             busyIndicator.IsBusy = false;
@@ -999,9 +1027,11 @@ namespace UnicontaClient.Pages.CustomPage
                     else
                     {
                         if (deleteOriginal)
+                        {
+                            VoucherCache.RemoveGlobalVoucherCache(selectedItem);
                             await api.Delete(selectedItem);
-
-                        await dgVoucherGrid.Filter(null);
+                        }
+                        dgVoucherGrid.Filter(null);
                     }
                 }
             }
@@ -1012,20 +1042,12 @@ namespace UnicontaClient.Pages.CustomPage
         void CreateContextMenu()
         {
             var menu = dgVoucherGrid.tableView.RowCellMenuCustomizations;
-            var moveToMenu = new BarSubItem()
-            {
-                Content = Uniconta.ClientTools.Localization.lookup("MoveTo"),
-
-            };
+            var moveToMenu = new BarSubItem() { Content = Uniconta.ClientTools.Localization.lookup("MoveTo") };
             foreach (var bin in Folders)
             {
-                var binMenu = new BarButtonItem()
-                {
-                    Content = bin,
-                };
+                var binMenu = new BarButtonItem() { Content = bin };
                 binMenu.ItemClick += BinMenu_ItemClick;
                 moveToMenu.Items.Add(binMenu);
-
             }
             menu.Add(moveToMenu);
         }
@@ -1483,7 +1505,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                                 if (creditorCVRNum == string.Empty)
                                 {
-                                    originalVoucher._Text = Uniconta.ClientTools.Localization.lookup("BilagscanNotValidVatNo");
+                                    originalVoucher._Text = Uniconta.ClientTools.Localization.lookup("NotValidVatNo");
                                 }
                                 else if (creditor == null)
                                 {
@@ -1530,7 +1552,7 @@ namespace UnicontaClient.Pages.CustomPage
                                     }
                                     else
                                     {
-                                        newCreditor.Name = Uniconta.ClientTools.Localization.lookup("BilagscanNotValidVatNo");
+                                        newCreditor.Name = Uniconta.ClientTools.Localization.lookup("NotValidVatNo");
                                     }
 
                                     await api.Insert(newCreditor);

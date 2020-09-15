@@ -76,7 +76,15 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void cmbBank_SelectedIndexChanged(object sender, RoutedEventArgs e)
         {
-
+            switch (paymentFormatISODE.Bank)
+            {
+                case deBank.Commerzbank:
+                    lblBatchBook.Visibility = ceBatchBooking.Visibility = Visibility.Visible;
+                    break;
+                default:
+                    lblBatchBook.Visibility = ceBatchBooking.Visibility = Visibility.Collapsed;
+                    break;
+            }
         }
     }
 }

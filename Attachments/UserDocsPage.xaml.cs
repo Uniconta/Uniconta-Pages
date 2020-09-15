@@ -57,19 +57,22 @@ namespace UnicontaClient.Pages.CustomPage
                 foreach (var row in addedRows)
                 {
                     userDocs[iCtr] = row.DataItem as UserDocsClient;
-                    buffers[iCtr] = userDocs[iCtr]._Data;
-                    userDocs[iCtr]._Data = null;
-                    iCtr++;
+                    if (userDocs[iCtr]._Data != null)
+                    {
+                        buffers[iCtr] = userDocs[iCtr]._Data;
+                        userDocs[iCtr]._Data = null;
+                        iCtr++;
+                    }
                 }
 
                 var result = await base.SaveData();
+                if (result != ErrorCodes.Succes)
+                    return result;
 
-                if (result == ErrorCodes.Succes)
-                    UpdateDocsBuffer(buffers, userDocs);
+                UpdateDocsBuffer(api, buffers, userDocs, iCtr);
+                this.RefreshData();
 
-                await Filter(null);
-
-                return result;
+                return 0;
             }
             else
                 return await base.SaveData();
@@ -78,35 +81,94 @@ namespace UnicontaClient.Pages.CustomPage
 #endif
         }
 
-        void UpdateDocsBuffer(byte[][] buffers, UserDocsClient[] multiDocs)
+        static void UpdateDocsBuffer(CrudAPI api, byte[][] buffers, UserDocsClient[] multiDocs, int Cnt)
         {
-            int l = multiDocs.Length;
-            for (int i = 0; i < l; i++)
+            for (int i = 0; i < Cnt; i++)
             {
                 var updateDoc = multiDocs[i];
                 updateDoc._Data = buffers[i];
+
+                var org = new UserDocsClient();
+                org.Copy(updateDoc);
+                org._Data = updateDoc._Data;
+                multiDocs[i] = org;
             }
-            uploadingDocs = l;
-            UpdateDocs(multiDocs, 0);
+            uploadingDocs = Cnt;
+            UpdateBuffersOne(api, multiDocs, 0);
         }
 
-        int uploadingDocs;
-        private void UpdateDocs(UserDocsClient[] userDocs, int iCtr)
-        {
-            api.Update(userDocs[iCtr]).ContinueWith((e) =>
-            {
-                if (!e.IsFaulted)
-                    iCtr++;
+        static public int uploadingDocs;
 
-                var remaining = userDocs.Length - iCtr;
-                if (remaining > 0)
+        static void UpdateBuffersOne(CrudAPI api, UserDocsClient[] multiVouchers, int i)
+        {
+            var vouchersClient = multiVouchers[i];
+            if (vouchersClient == null)
+            {
+                for (int j = 0; (j < multiVouchers.Length); j++)
+                    if (multiVouchers[j] != null)
+                    {
+                        UpdateBuffersOne(api, multiVouchers, j);
+                        return;
+                    }
+                uploadingDocs = 0;
+                return;
+            }
+
+            var org = new UserDocsClient();
+            org.Copy(vouchersClient);
+
+            int cnt = 0;
+            retry:
+
+            try
+            {
+                var tsk = api.Update(org, vouchersClient);
+                tsk.ContinueWith((e) =>
                 {
-                    uploadingDocs = remaining;
-                    UpdateDocs(userDocs, iCtr);
-                }
-                else
-                    uploadingDocs = 0;
-            }, TaskContinuationOptions.None);
+                    int next;
+                    if (!e.IsFaulted)
+                    {
+                        multiVouchers[i] = null;
+                        next = i + 1; // go to next
+                    }
+                    else
+                        next = i;
+
+                    var remaining = multiVouchers.Length - next;
+                    if (remaining > 0)
+                    {
+                        uploadingDocs = remaining;
+                        UpdateBuffersOne(api, multiVouchers, next);
+                    }
+                    else
+                        uploadingDocs = 0;
+
+                }, TaskContinuationOptions.None);
+
+#if !SILVERLIGHT
+                var tskw = Task.Delay(60000);
+                tskw.ContinueWith((e) =>
+                {
+                    if (multiVouchers[i] != null)
+                    {
+                        if ((i + 1) < multiVouchers.Length)
+                            UpdateBuffersOne(api, multiVouchers, i + 1);
+
+                        Task.Delay(5000).ContinueWith((x) =>
+                        {
+                            UpdateBuffersOne(api, multiVouchers, i);
+                        }, TaskContinuationOptions.None);
+                    }
+
+                }, TaskContinuationOptions.None);
+#endif
+            }
+            catch (Exception ex)
+            {
+                if (++cnt < 3)
+                    goto retry;
+                throw ex;
+            }
         }
     }
 

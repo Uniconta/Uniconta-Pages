@@ -144,12 +144,13 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
             }
             else //Default message
             {
+                sbAdvText = BuildBankAdviceText(sbAdvText, rec.PaymentEndToEndId.ToString(), tuple.Item3);
                 if (rec.invoiceNumbers == null || rec._MergePaymId == MERGEID_SINGLEPAYMENT)
                     sbAdvText = BuildBankAdviceText(sbAdvText, rec.InvoiceAN == null ? string.Empty : rec.InvoiceAN, tuple.Item2);
-                sbAdvText = BuildBankAdviceText(sbAdvText, creditor?._Account, tuple.Item1);
-                sbAdvText = BuildBankAdviceText(sbAdvText, rec.PaymentEndToEndId.ToString(), tuple.Item3);
-                advText = sbAdvText.ToString();
 
+                sbAdvText = BuildBankAdviceText(sbAdvText, creditor?._Account, tuple.Item1);
+                
+                advText = sbAdvText.ToString();
             }
 
             return advText;

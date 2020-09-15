@@ -5,7 +5,6 @@ using UnicontaClient.Utilities;
 using Uniconta.ClientTools;
 using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.DataModel;
-using Uniconta.ClientTools.DataModel.System;
 using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
 using Uniconta.Common;
@@ -218,6 +217,15 @@ namespace UnicontaClient.Pages.CustomPage
                     selectedRowIndex = 0;
                     InitQuery();
                     break;
+                case "UserOperations":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.UserOperationsLog, selectedItem, string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("UserOperations"), selectedItem._Name));
+                    break;
+                case "UserLoginHistory":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.AllUsersLoginHistoryPage, selectedItem, string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("UserLoginHistory"), selectedItem._Name));
+                    break;
+
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
