@@ -66,19 +66,6 @@ x:Class="UnicontaClient.Pages.CustomPage.SerialToOrderLinePage"
                                     </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridTemplateColumnClient>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="CostPrice" MinWidth="90"/>
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Warehouse" Width="100"/>
-                                <localPage:CorasauDataGridForeignKeyColumnClient x:Name="Location" Width="100">
-                                    <localPage:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
-                                        <ControlTemplate>
-                                            <TextBlock Margin="2" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.Location,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"></TextBlock>
-                                        </ControlTemplate>
-                                    </localPage:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
-                                    <localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
-                                        <DataTemplate>
-                                            <localPage:CorasauGridLookupEditorClient HasCustomLookUp="true" GotFocus="PART_Editor_GotFocus" x:Name="PART_Editor" ItemsSource="{Binding DataContext.RowData.Row.LocationSource,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" />
-                                        </DataTemplate>
-                                    </localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
-                                </localPage:CorasauDataGridForeignKeyColumnClient>
                             </localPage:SerialToOrderlineGrid.Columns>
                         </localPage:SerialToOrderlineGrid>
                     </docking:LayoutPanel>

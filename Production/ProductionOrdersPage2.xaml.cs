@@ -171,25 +171,36 @@ namespace UnicontaClient.Pages.CustomPage
 
         public async void SaveAndCreateLine(bool goToLines)
         {
-            closePageOnSave = false;
-            var res = await saveForm(false);
-            closePageOnSave = true;
-
-            if (!res) return;
-
             if (rowId == 0 || (editrow._ProdQty != prodQty))
             {
                 if (goToLines)
                     CreateOrderLines(editrow);
                 else
+                {
+                    var result = await Save();
+                    if (!result) return;
+
                     UpdateLines(editrow, editrow._Storage, false, false);
+                }
             }
             else
             {
+                var result = await Save();
+                if (!result) return;
+
                 prodQty = editrow._ProdQty;
                 if (goToLines)
                     GoToLines(editrow);
             }
+        }
+
+        async private Task<bool> Save()
+        {
+            closePageOnSave = false;
+            var res = await saveForm(false);
+            closePageOnSave = true;
+
+            return res;
         }
 
         async void UpdateLines(ProductionOrderClient productionOrder, StorageRegister Storage, bool OverwriteLines, bool goToLines)
@@ -219,11 +230,14 @@ namespace UnicontaClient.Pages.CustomPage
 #if !SILVERLIGHT
             dialog.DialogTableId = 2000000077;
 #endif
-            dialog.Closing += delegate
+            dialog.Closed += async delegate
             {
                 if (dialog.DialogResult == true)
                 {
-                    UpdateLines(productionOrder, (StorageRegister)dialog.storage, dialog.Force, true);
+                    var result = await Save();
+                    if (!result) return;
+
+                    UpdateLines(productionOrder, (StorageRegister)dialog.Storage, dialog.Force, true);
                 }
             };
             dialog.Show();

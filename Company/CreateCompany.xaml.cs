@@ -373,6 +373,32 @@ namespace UnicontaClient.Pages.CustomPage
                 lblImportInvoice.Visibility = Visibility.Visible;
                 chkImportInvoice.IsChecked = true;
             }
+            SetCountry();
+        }
+
+        void SetCountry()
+        {
+            var index = cmbImportFrom.SelectedIndex;
+            switch (index)
+            {
+                case (int)ImportFrom.c5_Danmark:
+                case (int)ImportFrom.economic_Danmark:
+                    editrow.Country = CountryCode.Denmark;
+                    break;
+                case (int)ImportFrom.c5_Iceland:
+                case (int)ImportFrom.dk_Iceland:
+                    editrow.Country = CountryCode.Iceland;
+                    break;
+                case (int)ImportFrom.economic_Norge:
+                    editrow.Country = CountryCode.Norway;
+                    break;
+                case (int)ImportFrom.economic_Sweden:
+                    editrow.Country = CountryCode.Sweden;
+                    break;
+                case (int)ImportFrom.economic_Germany:
+                    editrow.Country = CountryCode.Germany;
+                    break;
+            }
         }
 
         private void FileBrowse_ButtonClicked(object sender)

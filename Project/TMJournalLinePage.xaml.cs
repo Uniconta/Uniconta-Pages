@@ -799,17 +799,11 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 if (internalTransLst != null || journalLineNotApprovedLst != null)
                 {
-                    var vacationStartDate = JournalLineDate < new DateTime(JournalLineDate.Year, 5, 1) ? new DateTime(JournalLineDate.Year - 1, 5, 1) : new DateTime(JournalLineDate.Year, 5, 1);
+                    var vacationStartDate = JournalLineDate < new DateTime(2021, 1, 1) ? new DateTime(2020, 5, 1) : new DateTime(JournalLineDate.Year, 1, 1);
 
                     if (internalTransLst != null)
                     {
-                        var projtransEndDate = approvedCutOffDate == DateTime.MinValue ? vacationStartDate :
-                                               approvedCutOffDate.AddDays(-1) < vacationStartDate ? vacationStartDate : approvedCutOffDate.AddDays(-1);
-
-                        if (projtransEndDate > JournalLineDate.AddDays(6))
-                            projtransEndDate = JournalLineDate.AddDays(6);
-                        else if (JournalLineDate.AddDays(6) >= vacationStartDate.AddYears(1))
-                            projtransEndDate = JournalLineDate;
+                        var projtransEndDate = JournalLineDate.AddDays(6);
 
                         var transList = internalTransLst.Where(s => lstCatVacation.Any(n => n == s._PayrollCategory) && s.Date >= vacationStartDate && s.Date <= projtransEndDate).ToList();
                         vacationYTD = -transList.Select(x => x.Qty).Sum();
@@ -842,17 +836,11 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 if (internalTransLst != null || journalLineNotApprovedLst != null)
                 {
-                    var vacationStartDate = JournalLineDate < new DateTime(JournalLineDate.Year, 5, 1) ? new DateTime(JournalLineDate.Year - 1, 5, 1) : new DateTime(JournalLineDate.Year, 5, 1);
+                    var vacationStartDate = JournalLineDate < new DateTime(2021, 1, 1) ? new DateTime(2020, 5, 1) : new DateTime(JournalLineDate.Year, 1, 1);
 
                     if (internalTransLst != null)
                     {
-                        var projtransEndDate = approvedCutOffDate == DateTime.MinValue ? vacationStartDate :
-                                               approvedCutOffDate.AddDays(-1) < vacationStartDate ? vacationStartDate : approvedCutOffDate.AddDays(-1);
-
-                        if (projtransEndDate > JournalLineDate.AddDays(6))
-                            projtransEndDate = JournalLineDate.AddDays(6);
-                        else if (JournalLineDate.AddDays(6) >= vacationStartDate.AddYears(1))
-                            projtransEndDate = JournalLineDate;
+                        var projtransEndDate = JournalLineDate.AddDays(6);
 
                         var transList = internalTransLst.Where(s => lstCatOtherVacation.Any(n => n == s._PayrollCategory) && s.Date >= vacationStartDate && s.Date <= projtransEndDate).ToList();
                         otherVacationYTD = -transList.Select(x => x.Qty).Sum();

@@ -64,7 +64,8 @@ namespace UnicontaClient.Pages.CustomPage
         public override string LineNumberProperty { get { return "_LineNumber"; } }
         public override bool AllowSort { get { return false; } }
         public override bool Readonly { get { return false; } }
-        public override bool IsAutoSave { get { return true; } }
+        public override bool IsAutoSave { get { return _AutoSave; } }
+        public bool _AutoSave;
 
         public override bool AddRowOnPageDown()
         {
@@ -134,12 +135,14 @@ namespace UnicontaClient.Pages.CustomPage
             : base(API, string.Empty)
         {
             Init();
+            dgProjectJournalLinePageGrid._AutoSave = api.session.User._AutoSave;
         }
         public ProjectJournalLinePage(UnicontaBaseEntity master)
             : base(master)
         {
             Init();
             masterJournal = (Uniconta.DataModel.PrJournal)master;
+            dgProjectJournalLinePageGrid._AutoSave = masterJournal._AutoSave;
             dgProjectJournalLinePageGrid.UpdateMaster(master);
         }
 
@@ -156,6 +159,13 @@ namespace UnicontaClient.Pages.CustomPage
             dictPriceLookup = new Dictionary<string, Uniconta.API.DebtorCreditor.FindPrices>();
             this.BeforeClose += JournalLine_BeforeClose;
             dgProjectJournalLinePageGrid.ShowTotalSummary();
+
+            ProjectCache = api.GetCache(typeof(Uniconta.DataModel.Project));
+            ItemsCache = api.GetCache(typeof(Uniconta.DataModel.InvItem));
+            CreditorCache = api.GetCache(typeof(Uniconta.DataModel.Creditor));
+            CategoryCache = api.GetCache(typeof(Uniconta.DataModel.PrCategory));
+            EmployeeCache = api.GetCache(typeof(Uniconta.DataModel.Employee));
+            PrStandardCache = api.GetCache(typeof(Uniconta.DataModel.PrStandard));
         }
 
         public override void SetParameter(IEnumerable<ValuePair> Parameters)
@@ -167,7 +177,10 @@ namespace UnicontaClient.Pages.CustomPage
                     var cache = api.GetCache(typeof(Uniconta.DataModel.PrJournal)) ?? api.LoadCache(typeof(Uniconta.DataModel.PrJournal)).GetAwaiter().GetResult();
                     masterJournal = (Uniconta.DataModel.PrJournal)cache.Get(rec.Value);
                     if (masterJournal != null)
+                    {
                         dgProjectJournalLinePageGrid.UpdateMaster(masterJournal);
+                        dgProjectJournalLinePageGrid._AutoSave = masterJournal._AutoSave;
+                    }
                 }
             }
             base.SetParameter(Parameters);
@@ -623,12 +636,18 @@ namespace UnicontaClient.Pages.CustomPage
         protected override async void LoadCacheInBackGround()
         {
             var api = this.api;
-            ProjectCache = api.GetCache(typeof(Uniconta.DataModel.Project)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Project)).ConfigureAwait(false);
-            ItemsCache = api.GetCache(typeof(Uniconta.DataModel.InvItem)) ?? await api.LoadCache(typeof(Uniconta.DataModel.InvItem)).ConfigureAwait(false);
-            CreditorCache = api.GetCache(typeof(Uniconta.DataModel.Creditor)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Creditor)).ConfigureAwait(false);
-            CategoryCache = api.GetCache(typeof(Uniconta.DataModel.PrCategory)) ?? await api.LoadCache(typeof(Uniconta.DataModel.PrCategory)).ConfigureAwait(false);
-            EmployeeCache = api.GetCache(typeof(Uniconta.DataModel.Employee)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Employee)).ConfigureAwait(false);
-            PrStandardCache = api.GetCache(typeof(Uniconta.DataModel.PrStandard)) ?? await api.LoadCache(typeof(Uniconta.DataModel.PrStandard)).ConfigureAwait(false);
+            if (ProjectCache == null)
+                ProjectCache = await api.LoadCache(typeof(Uniconta.DataModel.Project)).ConfigureAwait(false);
+            if (ItemsCache == null)
+                ItemsCache = await api.LoadCache(typeof(Uniconta.DataModel.InvItem)).ConfigureAwait(false);
+            if (CreditorCache == null)
+                CreditorCache = await api.LoadCache(typeof(Uniconta.DataModel.Creditor)).ConfigureAwait(false);
+            if (CategoryCache == null)
+                CategoryCache = await api.LoadCache(typeof(Uniconta.DataModel.PrCategory)).ConfigureAwait(false);
+            if (EmployeeCache == null)
+                EmployeeCache = await api.LoadCache(typeof(Uniconta.DataModel.Employee)).ConfigureAwait(false);
+            if (PrStandardCache == null)
+                PrStandardCache =  await api.LoadCache(typeof(Uniconta.DataModel.PrStandard)).ConfigureAwait(false);
             if (api.CompanyEntity.Payroll)
                 PayrollCache = api.GetCache(typeof(Uniconta.DataModel.EmpPayrollCategory)) ?? await api.LoadCache(typeof(Uniconta.DataModel.EmpPayrollCategory)).ConfigureAwait(false);
             if (api.CompanyEntity.Warehouse)

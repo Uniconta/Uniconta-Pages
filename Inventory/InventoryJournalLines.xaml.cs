@@ -644,7 +644,9 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override async Task<ErrorCodes> saveGrid()
         {
+            var lin = dgInvJournalLine.SelectedItem;
             dgInvJournalLine.SelectedItem = null;
+            dgInvJournalLine.SelectedItem = lin;
             ErrorCodes res = await dgInvJournalLine.SaveData();
             if (res == ErrorCodes.Succes)
                 DataChanged = false;

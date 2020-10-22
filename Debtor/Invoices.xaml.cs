@@ -413,7 +413,7 @@ namespace UnicontaClient.Pages.CustomPage
                         {
                             ribbonControl.DisableButtons(new string[] { "ShowInvoice", "ShowPackNote" });
                             if (standardViewerPageForDocument == null)
-                                standardViewerPageForDocument = dockCtrl.AddDockItem(api?.CompanyEntity, TabControls.StandardPrintReportPage, ParentControl, new object[] { printReport }, dockName) as StandardPrintReportPage;
+                                standardViewerPageForDocument = dockCtrl.AddDockItem(api?.CompanyEntity, TabControls.StandardPrintReportPage, ParentControl, new object[] { printReport, reportName }, dockName) as StandardPrintReportPage;
                             else
                                 standardViewerPageForDocument.InsertToMasterReport(printReport.Report);
                         }

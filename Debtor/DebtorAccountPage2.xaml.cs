@@ -27,6 +27,7 @@ using Uniconta.Common.Utility;
 using System.Diagnostics;
 using System.Text;
 using UnicontaClient.Controls.Dialogs;
+using Uniconta.Common.Enums;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -129,7 +130,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
             else
                 twolettercode = Enum.GetName(typeof(CountryISOCode), countryCode);
-            if (twolettercode != null && !cvrFound)
+            if (twolettercode != null && !cvrFound && Country2Language.IsEU(country))
             {
                 var vatInfo = EuropeanVatInformation.Get(twolettercode, cvr);
                 if (vatInfo == null)

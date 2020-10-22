@@ -99,9 +99,9 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     dcInv = invoicePostingResult.Header;
 
-                    var linesCount = invoicePostingResult.Lines.Count();
-                    if (linesCount > 0)
+                    if (invoicePostingResult?.Lines != null && invoicePostingResult.Lines.Count() > 0)
                     {
+                        var linesCount = invoicePostingResult.Lines.Count();
                         var lines = invoicePostingResult.Lines;
                         InvTransInvoiceLines = Array.CreateInstance(debtorInvoiceLineUserType, linesCount) as DebtorInvoiceLines[];
                         int i = 0;

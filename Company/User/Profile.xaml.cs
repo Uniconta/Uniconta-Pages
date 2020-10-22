@@ -138,6 +138,7 @@ namespace UnicontaClient.Pages.CustomPage
                     user._ShowGridLines = editrow._ShowGridLines;
                     user._ConfirmDelete = editrow._ConfirmDelete;
                     user._AutoSave = editrow._AutoSave;
+                    user._UseDefaultBrowser = editrow._UseDefaultBrowser;
                     string msg;
                     if (Curlanguage != editrow._Language)
                         msg = string.Format(Uniconta.ClientTools.Localization.lookup("LanguageApplyMsg"), editrow.UserLanguage);

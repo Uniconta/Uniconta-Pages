@@ -33,6 +33,8 @@ namespace UnicontaClient.Pages.CustomPage
     public partial class ContactPage : GridBasePage
     {
         SQLCache CrmProspectCache, DebtorCache, CreditorCache;
+        bool hasPageMaster;
+
         public override string NameOfControl
         {
             get { return TabControls.ContactPage.ToString(); }
@@ -81,7 +83,11 @@ namespace UnicontaClient.Pages.CustomPage
         private void Init(UnicontaBaseEntity master)
         {
             InitializeComponent();
-            dgContactGrid.UpdateMaster(master);
+            if (master != null)
+            {
+                hasPageMaster = true;
+                dgContactGrid.UpdateMaster(master);
+            }
             localMenu.dataGrid = dgContactGrid;
             dgContactGrid.api = api;
             dgContactGrid.BusyIndicator = busyIndicator;
@@ -244,15 +250,16 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override void OnLayoutLoaded()
         {
-            base.OnLayoutLoaded();
-            bool showFields = (dgContactGrid.masterRecords == null);
-            DCAccount.Visible = showFields;
-            DCType.Visible = showFields;
-            AccountName.Visible = showFields;
+            if (hasPageMaster)
+            {
+                AccountName.Visible = DCType.Visible = DCAccount.Visible = false;
+                AccountName.ShowInColumnChooser = DCType.ShowInColumnChooser = DCAccount.ShowInColumnChooser = false;
+            }
 
             bool showIntProdCol = api.CompanyEntity.CRM;
             Interests.Visible = showIntProdCol;
             Products.Visible = showIntProdCol;
+            base.OnLayoutLoaded();
         }
 
         public override void Utility_Refresh(string screenName, object argument = null)
@@ -449,9 +456,9 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (cache != null)
             {
-                    rec.accntSource = cache.GetNotNullArray;
-                    if (rec.accntSource != null)
-                        rec.NotifyPropertyChanged("AccountSource");
+                rec.accntSource = cache.GetNotNullArray;
+                if (rec.accntSource != null)
+                    rec.NotifyPropertyChanged("AccountSource");
             }
         }
 

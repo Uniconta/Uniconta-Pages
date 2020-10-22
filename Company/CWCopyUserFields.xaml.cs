@@ -163,6 +163,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (cbCompany.SelectedItem != null)
             {
                 masterList = new List<UnicontaBaseEntity>();
+                listClient.Clear();
                 if (this.master != null)
                     masterList.Add(master);
                 dgUserFields.ItemsSource = null;

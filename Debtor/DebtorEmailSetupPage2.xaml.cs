@@ -226,7 +226,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (isSMTPValidated == false)
             {
 #if !SILVERLIGHT
-                if( UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("SMTPVerifyMsg"), Uniconta.ClientTools.Localization.lookup("Warning"), MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                if (UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("SMTPVerifyMsg"), Uniconta.ClientTools.Localization.lookup("Warning"), MessageBoxButton.YesNo) == MessageBoxResult.Yes)
 #else
                 if( UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("SMTPVerifyMsg"), Uniconta.ClientTools.Localization.lookup("Warning"), MessageBoxButton.OKCancel) == MessageBoxResult.OK)
 #endif
@@ -236,7 +236,7 @@ namespace UnicontaClient.Pages.CustomPage
                 }
                 else
                 {
-                    isSMTPValidated = null; 
+                    isSMTPValidated = null;
                     return false;
                 }
             }
@@ -252,17 +252,10 @@ namespace UnicontaClient.Pages.CustomPage
         }
         private void InsertProperty_ButtonClicked(object sender, RoutedEventArgs e)
         {
-            var olSelectionStart = txtEmailBody.SelectionStart;
             var selectedText = Convert.ToString(cmbProperties.SelectedItem);
             string propName = string.Concat("{", cmbExternType.SelectedItem, ".", selectedText, "}");
-            if (string.IsNullOrEmpty(txtEmailBody.Text))
-                txtEmailBody.Text = propName;
-            else
-                txtEmailBody.Text = txtEmailBody.Text.Insert(txtEmailBody.SelectionStart, propName);
-            txtEmailBody.Focus();
-            txtEmailBody.SelectionStart = olSelectionStart + propName.Length;
-            txtEmailBody.Select(txtEmailBody.SelectionStart, 0);
-            txtEmailBody.Focus();
+
+            InsertIntoBody(propName);
         }
         private void cmbExternType_SelectedIndexChanged(object sender, RoutedEventArgs e)
         {
@@ -302,7 +295,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var param = new object[1];
             param[0] = editrow._Body;
-            AddDockItem(TabControls.TextInHtmlPage, param, true, Uniconta.ClientTools.Localization.lookup("TextInHtml"), null, new Point(200, 300));
+            AddDockItem(TabControls.TextInHtmlPage, param, true, Uniconta.ClientTools.Localization.lookup("TextInHtml"), null, new Point(250, 200));
         }
 
         public static async void ShowErrorMsg(ErrorCodes errorCode, string host)
@@ -317,8 +310,8 @@ namespace UnicontaClient.Pages.CustomPage
             else
                 hyperlink = "https://www.uniconta.com/unipedia-global/mail-server-set-up/";
 #if !SILVERLIGHT
-                UnicontaHyperLinkMessageBox.Show(errMsg, hyperlink,
-                    lastErrors != null && lastErrors.Length > 0 ? Uniconta.ClientTools.Localization.lookup("Error") : Uniconta.ClientTools.Localization.lookup("Message"));
+            UnicontaHyperLinkMessageBox.Show(errMsg, hyperlink,
+                lastErrors != null && lastErrors.Length > 0 ? Uniconta.ClientTools.Localization.lookup("Error") : Uniconta.ClientTools.Localization.lookup("Message"));
 #else
             errMsg = string.Concat(errMsg, "\r\n", hyperlink);
             UnicontaMessageBox.Show(errMsg, lastErrors != null && lastErrors.Length > 0 ? Uniconta.ClientTools.Localization.lookup("Error") :
@@ -326,6 +319,18 @@ namespace UnicontaClient.Pages.CustomPage
 #endif
         }
 
+        private void InsertIntoBody(string inputText)
+        {
+            var olSelectionStart = txtEmailBody.SelectionStart;
+            if (string.IsNullOrEmpty(txtEmailBody.Text))
+                txtEmailBody.Text = inputText;
+            else
+                txtEmailBody.Text = txtEmailBody.Text.Insert(txtEmailBody.SelectionStart, inputText);
+            txtEmailBody.Focus();
+            txtEmailBody.SelectionStart = olSelectionStart + inputText.Length;
+            txtEmailBody.Select(txtEmailBody.SelectionStart, 0);
+            txtEmailBody.Focus();
+        }
 #if !SILVERLIGHT
 
         private void Email_ButtonClicked(object sender)
@@ -337,6 +342,31 @@ namespace UnicontaClient.Pages.CustomPage
             System.Diagnostics.Process proc = new System.Diagnostics.Process();
             proc.StartInfo.FileName = mail;
             proc.Start();
+        }
+
+        private void InsertMobilePay_ButtonClicked(object sender, RoutedEventArgs e)
+        {
+            var cwTextControl = new CWTextControl(Uniconta.ClientTools.Localization.lookup("FloatWindow"), Uniconta.ClientTools.Localization.lookup("MobilPhone"));
+            cwTextControl.Closed += delegate
+            {
+                if (cwTextControl.DialogResult == true)
+                {
+                    var phoneNumber = cwTextControl.InputValue;
+                    if (!phoneNumber.All(char.IsNumber))
+                    {
+                        UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("Invalid"), Uniconta.ClientTools.Localization.lookup("Warning"));
+                        return;
+                    }
+
+                    string mobilePayUrl = @"https://mobilepay.dk/erhverv/betalingslink/betalingslink-svar?phone=" + phoneNumber +
+                                          @"&amount={DebtorInvoice.TotalAmount}&comment=Faktura{DebtorInvoice.InvoiceNumber}&lock=1";
+                    if (editrow._Html)
+                        mobilePayUrl = @"<a href=" + mobilePayUrl + ">Mobilepay</a>";
+                        
+                    InsertIntoBody(mobilePayUrl);
+                }
+            };
+            cwTextControl.Show();
         }
 #endif
     }

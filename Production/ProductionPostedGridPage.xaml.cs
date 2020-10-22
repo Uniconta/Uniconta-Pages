@@ -144,7 +144,7 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     var prodOrder = new ProductionOrderClient();
                     var prodApi = new ProductionAPI(api);
-                    var result = await prodApi.CreateProductionFromProduction(fromProductionPosted, prodOrder, cwProductionOrderLine.quantity, (StorageRegister)cwProductionOrderLine.storage);
+                    var result = await prodApi.CreateProductionFromProduction(fromProductionPosted, prodOrder, cwProductionOrderLine.quantity, (StorageRegister)cwProductionOrderLine.Storage);
                     if (result != ErrorCodes.Succes)
                         Uniconta.ClientTools.Util.UtilDisplay.ShowErrorCode(result);
                     else

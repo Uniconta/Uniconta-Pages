@@ -229,7 +229,7 @@ namespace UnicontaClient.Pages.CustomPage
                         if (count > 1 && isGeneratingPacknote)
                         {
                             if (standardViewerPrintPage == null)
-                                standardViewerPrintPage = dockCtrl.AddDockItem(api?.CompanyEntity, TabControls.StandardPrintReportPage, ParentControl, new object[] { printReport }, dockName) as StandardPrintReportPage;
+                                standardViewerPrintPage = dockCtrl.AddDockItem(api?.CompanyEntity, TabControls.StandardPrintReportPage, ParentControl, new object[] { printReport, reportName }, dockName) as StandardPrintReportPage;
                             else
                                 standardViewerPrintPage.InsertToMasterReport(printReport.Report);
                         }
@@ -268,7 +268,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 api.ReportException(ex, string.Format("PackNotes.ShowInvoice(), CompanyId={0}", api.CompanyId));
             }
-            finally 
+            finally
             {
                 ribbonControl?.EnableButtons("ShowDeliveryNote");
                 busyIndicator.IsBusy = false;

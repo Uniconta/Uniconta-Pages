@@ -68,10 +68,36 @@ namespace UnicontaClient.Pages.CustomPage
             {
 #if !SILVERLIGHT
                 ((CustomTableView)this.View).HasPageBreak = PageBreak;
-#endif
+                SelectRowsToPrint();
                 base.PrintGrid(reportName, printparam, format, page);
+                SelectionMode = MultiSelectMode.Row;
+#else
+                base.PrintGrid(reportName, printparam, format, page);
+#endif
             }
         }
+
+#if !SILVERLIGHT
+        private void SelectRowsToPrint()
+        {
+            BeginSelection();
+            UnselectAll();
+            bool hasMarkedSelections = false;
+            SelectionMode = MultiSelectMode.MultipleRow;
+            for (int index = 0; index < VisibleRowCount; index++)
+            {
+                var rowhandle = GetRowHandleByVisibleIndex(index);
+                var row = GetRow(rowhandle) as DebtorStatementList;
+                if (row.Mark)
+                {
+                    SelectItem(rowhandle);
+                    hasMarkedSelections = true;
+                }
+            }
+            EndSelection();
+            ((CustomTableView)this.View).PrintSelectedRowsOnly = hasMarkedSelections;
+        }
+#endif
     }
     public class DebtorStatementList : INotifyPropertyChanged
     {
@@ -469,7 +495,7 @@ namespace UnicontaClient.Pages.CustomPage
                 IEnumerable<DebtorStatementList> debtorStatementList = (IEnumerable<DebtorStatementList>)dgDebtorTrans.ItemsSource;
                 var marked = debtorStatementList.Any(m => m.Mark == true);
 
-                var iReports = await GeneratePrintReport(debtorStatementList, marked, chkShowCurrency.IsChecked == true);
+                var iReports = await GeneratePrintReport(debtorStatementList.ToList(), marked, chkShowCurrency.IsChecked == true);
 
                 if (iReports.Count() > 0)
                 {

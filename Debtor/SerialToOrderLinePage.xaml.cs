@@ -342,6 +342,8 @@ namespace UnicontaClient.Pages.CustomPage
             if (markedList.Count == 0)
                 return;
 
+            UnicontaBaseEntity orgMaster = null;
+
             var _UseSerial = this.invItemMaster._UseSerial;
             List<DCOrderLineSerieBatch> olSerieBatchList = new List<DCOrderLineSerieBatch>();
             foreach (var row in markedList)
@@ -358,13 +360,22 @@ namespace UnicontaClient.Pages.CustomPage
                 olSerieBatch.SetMaster(row);
                 olSerieBatch.SetMaster(dcorderlineMaster as UnicontaBaseEntity);
                 olSerieBatchList.Add(olSerieBatch);
-                if (row._Warehouse != null && dcorderlineMaster._Warehouse == null)
+                if (row._Warehouse != null && (dcorderlineMaster._Warehouse != row._Warehouse || dcorderlineMaster._Location != row._Location))
                 {
+                    orgMaster = StreamingManager.Clone((UnicontaBaseEntity)dcorderlineMaster);
                     dcorderlineMaster.Warehouse = row._Warehouse;
                     dcorderlineMaster.Location = row._Location;
                 }
             }
-            var err = await api.Insert(olSerieBatchList);
+            ErrorCodes err;
+            if (orgMaster != null)
+            {
+                var Updates = new Uniconta.API.System.CrudAPI.UpdatePair() { loaded = orgMaster, modified = (UnicontaBaseEntity)dcorderlineMaster };
+                err = await api.MultiCrud(olSerieBatchList, new[] { Updates }, null);
+            }
+            else
+                err = await api.Insert(olSerieBatchList);
+
             if (err != ErrorCodes.Succes)
                 UtilDisplay.ShowErrorCode(err);
             else
@@ -409,12 +420,12 @@ namespace UnicontaClient.Pages.CustomPage
             var company = api.CompanyEntity;
             if (!company.Location || !company.Warehouse)
             {
-                Location.Visible = Location.ShowInColumnChooser = false;
+//                Location.Visible = Location.ShowInColumnChooser = false;
                 LocationCol.Visible = LocationCol.ShowInColumnChooser = false;
             }
             if (!company.Warehouse)
             {
-                Warehouse.Visible = Warehouse.ShowInColumnChooser = false;
+//                Warehouse.Visible = Warehouse.ShowInColumnChooser = false;
                 WarehouseCol.Visible = WarehouseCol.ShowInColumnChooser = false;
             }
         }
@@ -440,7 +451,7 @@ namespace UnicontaClient.Pages.CustomPage
                 string cp = Convert.ToString(QtyOpen);
                 if (string.IsNullOrEmpty(cp))
                     cp = "0";
-                return string.Format("{0}({1})", num, cp);
+                return string.Concat(num, "(", cp, ")");
             }
         }
        

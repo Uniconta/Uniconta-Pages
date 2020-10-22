@@ -147,7 +147,7 @@ namespace UnicontaClient.Pages.CustomPage
             var postType = debtorTransOpen.Trans._PostType;
             DebtorEmailType emailType = DebtorEmailType.InterestNote;
             bool isInterest = false;
-            if (postType != (byte)DCPostType.Collection || postType != (byte)DCPostType.CollectionLetter || postType != (byte)DCPostType.InterestFee || postType != (byte)DCPostType.PaymentCharge)
+            if (postType != (byte)DCPostType.Collection && postType != (byte)DCPostType.CollectionLetter && postType != (byte)DCPostType.InterestFee && postType != (byte)DCPostType.PaymentCharge)
                 return;
 
             if (postType == (byte)DCPostType.InterestFee)

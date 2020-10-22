@@ -82,12 +82,12 @@ namespace UnicontaISO20022CreditTransfer
             switch (companyBankEnum)
             {
                 case CompanyBankENUM.Volks_Raiffeisenbanken:
+                    return new UTF8Encoding(false);
                 case CompanyBankENUM.Commerzbank:
-                    return Encoding.UTF8;
+                    return new UpperCaseUTF8Encoding(false);
                 default:
                     return Encoding.GetEncoding("ISO-8859-1"); ;
             }
-          
         }
 
         /// <summary>

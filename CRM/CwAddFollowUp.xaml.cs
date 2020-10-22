@@ -36,7 +36,7 @@ namespace UnicontaClient.Pages.CustomPage
             this.Title = string.Format(Uniconta.ClientTools.Localization.lookup("AddOBJ"), Uniconta.ClientTools.Localization.lookup("FollowUp"));
             leGroup.api = leEmployee.api =  api;
 #if !SILVERLIGHT
-            FocusManager.SetFocusedElement(deCreated, deCreated);
+            FocusManager.SetFocusedElement(txtText, txtText);
 #endif
         }
 

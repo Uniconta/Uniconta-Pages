@@ -31,6 +31,7 @@ namespace UnicontaClient.Pages.CustomPage
     {
         public override Type TableType { get { return typeof(ProductionOrderLineClient); } }
         public override bool Readonly { get { return false; } }
+        public override bool IsAutoSave { get { return false; } }
         public override bool AddRowOnPageDown()
         {
             var selectedItem = (DCOrderLineClient)SelectedItem;

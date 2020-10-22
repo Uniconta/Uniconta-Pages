@@ -119,6 +119,7 @@ namespace UnicontaClient.Pages.CustomPage
                     dgTableValueGrid.DeleteRow();
                     break;
                 case "SaveGrid":
+                    dgTableValueGrid.SelectedItem = null;
                     var t = dgTableValueGrid.SaveData();
                     t.ContinueWith((e) => api.CompanyEntity.LoadTableValues(api));
                     break;

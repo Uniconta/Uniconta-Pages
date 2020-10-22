@@ -29,7 +29,6 @@ namespace UnicontaClient.Pages.CustomPage
     {
         CompanyAccessAPI accessAPI;
         AccountantClient currentAccountant;
-        long Rights;
         List<TasksAccess> lstAccess;
         public AccountantAccess(CrudAPI api, AccountantClient accountant)
         {
@@ -42,7 +41,7 @@ namespace UnicontaClient.Pages.CustomPage
 #endif
             OKButton.Content = string.Format(Uniconta.ClientTools.Localization.lookup("AssignOBJ"), "");
             if (accountant != null)
-                txtCurrentAccountant.Text = string.Format("({0})", accountant.Name);
+                txtCurrentAccountant.Text = string.Concat("(", accountant.Name, ")");
             BindAccountant(api, accountant);
             accessAPI = new CompanyAccessAPI(api);
             lstAccess = new List<TasksAccess>();
@@ -52,7 +51,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private async void GetRights()
         {
-            Rights = await accessAPI.GetAccountantRights();
+            var Rights = await accessAPI.GetAccountantRights();
             var tasks = (CompanyTasks[])Enum.GetValues(typeof(CompanyTasks));
             for (int i = 0; i <= (int)AccessLevel.MaxTask; i++)
             {
@@ -99,18 +98,17 @@ namespace UnicontaClient.Pages.CustomPage
         }
         private async void OKButton_Click(object sender, RoutedEventArgs e)
         {
-            var selectedAcct = cbAccountant.SelectedItem as AccountantClient;
-            ErrorCodes res = ErrorCodes.Succes;
+            var selectedAcct = (cbAccountant.SelectedItem as AccountantClient) ?? currentAccountant;
+            ErrorCodes res = ErrorCodes.RecordNotSelected;
             if (selectedAcct != null)
             {
+                long r = 0;
                 foreach (TasksAccess access in lstAccess)
-                {
-                    Rights = AccessLevel.Set(Rights, access._task, access._permission);
-                }
-                res = await accessAPI.GiveAccountantAccess(selectedAcct, Rights);
+                    r = AccessLevel.Set(r, access._task, access._permission);
+
+                res = await accessAPI.GiveAccountantAccess(selectedAcct, r);
             }
-            if (res != ErrorCodes.Succes)
-                UtilDisplay.ShowErrorCode(res);
+            UtilDisplay.ShowErrorCode(res);
             this.DialogResult = true;
         }
 
@@ -122,8 +120,7 @@ namespace UnicontaClient.Pages.CustomPage
         private async void ClearButton_Click(object sender, RoutedEventArgs e)
         {
             ErrorCodes res = await accessAPI.GiveAccountantAccess(null, 0);
-            if (res != ErrorCodes.Succes)
-                UtilDisplay.ShowErrorCode(res);
+            UtilDisplay.ShowErrorCode(res);
             this.DialogResult = true;
         }
 

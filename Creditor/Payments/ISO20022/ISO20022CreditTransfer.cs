@@ -134,8 +134,6 @@ namespace ISO20022CreditTransfer
             }
             //Update ISO PaymentType <<
 
-            string paymentInfoIdPrev = string.Empty;
-
             IOrderedEnumerable<CreditorTransPayment> queryPaymentTransSorted;
             if (doMergePayment)
                 queryPaymentTransSorted = from s in queryPaymentTrans orderby s._PaymentRefId select s;
@@ -143,6 +141,8 @@ namespace ISO20022CreditTransfer
                 queryPaymentTransSorted = from s in queryPaymentTrans orderby s._PaymentDate, s.ISOPaymentType, s._PaymentMethod, s._CurrencyLocal select s;
 
             paymentISO20022Validate.CompanyBank(credPaymFormat);
+
+            List<string> paymentInfoIdLst = new List<string>();
 
             foreach (var rec in queryPaymentTransSorted)
             {
@@ -260,8 +260,9 @@ namespace ISO20022CreditTransfer
 
                 List<string> unstructuredPaymInfoList = bankSpecific.Ustrd(externalAdvText, doc.ISOPaymentType, rec._PaymentMethod, credPaymFormat._ExtendedText);
 
-                if (doc.PaymentInfoId != paymentInfoIdPrev)
+                if (!paymentInfoIdLst.Contains(doc.PaymentInfoId))
                 {
+                    paymentInfoIdLst.Add(doc.PaymentInfoId);
                     doc.PmtInfList.Add(new PmtInf(doc,
                         new PmtTpInf(doc.ExtServiceCode, doc.ExternalLocalInstrument, doc.ExtCategoryPurpose, doc.InstructionPriority, doc.ExtProprietaryCode),
                         new Dbtr(doc.CompanyName, debtorAddress, doc.DebtorIdentificationCode),
@@ -276,8 +277,6 @@ namespace ISO20022CreditTransfer
                     new Cdtr(credName, creditorAddress),
                     new CdtrAcct(creditorAcc, isPaymentTypeIBAN, isOCRPayment, doc.CompanyCountryId),
                     new RmtInf(unstructuredPaymInfoList, remittanceInfo, creditorOCRPaymentId, isOCRPayment), chargeBearer));
-
-                paymentInfoIdPrev = doc.PaymentInfoId;
             }
 
             var generatedFileName = bankSpecific.GenerateFileName(doc.NumberSeqPaymentFileId, doc.CompanyID);

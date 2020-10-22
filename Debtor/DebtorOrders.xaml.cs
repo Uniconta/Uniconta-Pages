@@ -474,7 +474,9 @@ namespace UnicontaClient.Pages.CustomPage
                 showSendByMail = (!string.IsNullOrEmpty(debtor.InvoiceEmail) || debtor.EmailDocuments);
             string debtorName = debtor?._Name ?? dbOrder._DCAccount;
             bool showUpdateInv = api.CompanyEntity.Storage || (doctype == CompanyLayoutType.Packnote && api.CompanyEntity.Packnote);
-            CWGenerateInvoice GenrateOfferDialog = new CWGenerateInvoice(false, doctype.ToString(), isShowInvoiceVisible: true, askForEmail: true, showNoEmailMsg: !showSendByMail, debtorName: debtorName, isShowUpdateInv: showUpdateInv, isDebtorOrder: true);
+            var accountName = string.Format("{0} ({1})", dbOrder._DCAccount, dbOrder.Name);
+            CWGenerateInvoice GenrateOfferDialog = new CWGenerateInvoice(false, doctype.ToString(), isShowInvoiceVisible: true, askForEmail: true, showNoEmailMsg: !showSendByMail, debtorName: debtorName,
+                isShowUpdateInv: showUpdateInv, isDebtorOrder: true, AccountName: accountName);
 #if !SILVERLIGHT
             if (doctype == CompanyLayoutType.OrderConfirmation)
                 GenrateOfferDialog.DialogTableId = 2000000009;
@@ -482,6 +484,9 @@ namespace UnicontaClient.Pages.CustomPage
                 GenrateOfferDialog.DialogTableId = 2000000018;
 #endif
             GenrateOfferDialog.SetInvPrintPreview(showPrintPreview);
+            var additionalOrdersList = Utility.GetAdditionalOrders(api, dbOrder);
+            if (additionalOrdersList != null)
+                GenrateOfferDialog.SetAdditionalOrders(additionalOrdersList);
             GenrateOfferDialog.Closed += async delegate
             {
                 if (GenrateOfferDialog.DialogResult == true)
@@ -492,6 +497,7 @@ namespace UnicontaClient.Pages.CustomPage
                     invoicePostingResult.SetUpInvoicePosting(dbOrder, null, doctype, GenrateOfferDialog.GenrateDate, null, !GenrateOfferDialog.UpdateInventory, GenrateOfferDialog.ShowInvoice, GenrateOfferDialog.PostOnlyDelivered,
                         GenrateOfferDialog.InvoiceQuickPrint, GenrateOfferDialog.NumberOfPages, GenrateOfferDialog.SendByEmail, openOutlook, GenrateOfferDialog.sendOnlyToThisEmail, GenrateOfferDialog.Emails,
                         false, null, false);
+                    invoicePostingResult.SetAdditionalOrders(GenrateOfferDialog.AdditionalOrders?.Cast<DCOrder>().ToList());
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
                     busyIndicator.IsBusy = true;
                     var result = await invoicePostingResult.Execute();

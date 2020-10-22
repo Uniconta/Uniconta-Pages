@@ -369,7 +369,7 @@ namespace UnicontaClient.Pages.CustomPage
         void SetJournal(Uniconta.DataModel.GLDailyJournal masterRecord)
         {
             if (masterRecord == null)
-                return;
+                throw new UnicontaException("Journal need a master");
             this.masterRecord = masterRecord;
             dgGLDailyJournalLine._AutoSave = masterRecord._AutoSave;
             dgGLDailyJournalLine.Blocked = masterRecord._Blocked;
@@ -859,13 +859,15 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     if (dragDropWindow.DialogResult == true)
                     {
-                        var fileInfo = dragDropWindow.FileInfoList?.SingleOrDefault();
-                        var voucher = new VouchersClient();
-                        voucher._Data = fileInfo.FileBytes;
-                        voucher._Text = fileInfo.FileName;
-                        voucher._Fileextension = DocumentConvert.GetDocumentType(fileInfo.FileExtension);
-
-                        Utility.ImportVoucher(journalLine, api, voucher, true);
+                        var fileInfo = dragDropWindow.FileInfoList?.FirstOrDefault();
+                        if (fileInfo != null)
+                        {
+                            var voucher = new VouchersClient();
+                            voucher._Data = fileInfo.FileBytes;
+                            voucher._Text = fileInfo.FileName;
+                            voucher._Fileextension = DocumentConvert.GetDocumentType(fileInfo.FileExtension);
+                            Utility.ImportVoucher(journalLine, api, voucher, true);
+                        }
                     }
                 };
                 dragDropWindow.Show();
@@ -1087,6 +1089,7 @@ namespace UnicontaClient.Pages.CustomPage
                 var TakeVoucher = selectedItem.TakeVoucher;
                 selectedItem.TakeVoucher = false;
                 dgGLDailyJournalLine.SelectedItem = null;
+                dgGLDailyJournalLine.SelectedItem = selectedItem;
                 selectedItem.TakeVoucher = TakeVoucher;
                 TestForTakeVoucher(selectedItem);
             }
@@ -1452,10 +1455,6 @@ namespace UnicontaClient.Pages.CustomPage
             if (LedgerCache == null)
                 return;
 
-            var gridItems = (IEnumerable<JournalLineGridClient>)dgGLDailyJournalLine.ItemsSource;
-            if (gridItems == null)
-                return;
-
             double sumCredit = 0d, sumDebit = 0d;
             var TraceAccount = this.TraceAccount;
             bool[] AddVatTrace = null;
@@ -1481,6 +1480,11 @@ namespace UnicontaClient.Pages.CustomPage
             var NoVATCalculation = this.NoVATCalculation;
             bool TraceSumChange = false;
             DateTime Date = DateTime.MinValue;
+
+            var gridItems = (IEnumerable<JournalLineGridClient>)dgGLDailyJournalLine.ItemsSource;
+            if (gridItems == null)
+                return;
+
             foreach (var journalLine in gridItems)
             {
                 if (Renumber && NewVoucher == 0)
@@ -1968,7 +1972,7 @@ namespace UnicontaClient.Pages.CustomPage
                     copyDCAccount(rec, rec._OffsetAccountTypeEnum, rec._OffsetAccount, true);
                     break;
                 case "Text":
-                    SetText(rec);
+                    SetTransText(rec, getTransText(rec._Text, TextTypes));
                     break;
                 case "TransType":
                     SetTransText(rec, (Uniconta.DataModel.GLTransType)TextTypes.Get(rec._TransType));
@@ -2087,15 +2091,15 @@ namespace UnicontaClient.Pages.CustomPage
             return null;
         }
 
+        /*
         void SetText(JournalLineGridClient rec)
         {
             var str = rec._Text;
             if (str == null)
                 return;
-            if (str.Length >= 4)
+            if (str.Length >= 4 && api.CompanyEntity._AutoSettlement != 1 && (rec._AccountType != 0 || rec._OffsetAccountType != 0))
             {
                 bool found = false;
-                var fakt = Uniconta.ClientTools.Localization.lookup("Invoice");
                 if (string.Compare(Uniconta.ClientTools.Localization.lookup("Invoice"), 0, str, 0, 3, StringComparison.CurrentCultureIgnoreCase) == 0)
                 {
                     found = true;
@@ -2143,6 +2147,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (t != null)
                 SetTransText(rec, t);
         }
+        */
 
         void SetTransText(JournalLineGridClient rec, Uniconta.DataModel.GLTransType t)
         {

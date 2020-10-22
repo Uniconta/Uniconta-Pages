@@ -257,7 +257,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var param = new object[1];
             param[0] = editrow.Body;
-            AddDockItem(TabControls.TextInHtmlPage, param, true, Uniconta.ClientTools.Localization.lookup("TextInHtml"), null, new Point(200, 300));
+            AddDockItem(TabControls.TextInHtmlPage, param, true, Uniconta.ClientTools.Localization.lookup("TextInHtml"), null, new Point(250, 200));
         }
 
 #if !SILVERLIGHT

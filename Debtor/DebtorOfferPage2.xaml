@@ -59,7 +59,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOfferPage2"
                             <CorasauControls:LookupEditor x:Name="leGroup" EditValue="{Binding Group,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="OfferNumber" x:Name="liOfferNumber">
-                            <CorasauControls:IntegerEditor EditValue="{Binding OfferNumber,Mode=TwoWay}" Mask="false"/>
+                            <CorasauControls:IntegerEditor EditValue="{Binding OfferNumber,Mode=TwoWay}" SetMask="false"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="DeliveryDate" x:Name="liDeliveryDate">
                             <CorasauControls:DateEditor x:Name="deDeLiveryDate" EditValue="{Binding DeliveryDate,Mode=TwoWay}"/>
@@ -88,6 +88,13 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOfferPage2"
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="Currency" x:Name="liCurrency">
                             <CorasauControls:ComboBoxEditor x:Name="cmbCurrency" SelectedItem="{Binding Currency,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="PricesInclVat" x:Name="liPricesInclVat">
+                            <CorasauControls:CheckEditor  x:Name="chkIncVat"  IsChecked="{Binding PricesInclVat, Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="Vat" x:Name="liVat">
+                            <CorasauControls:LookupEditor x:Name="leVat" Text="{Binding Vat,Mode=TwoWay}">
+                            </CorasauControls:LookupEditor>
                         </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
                 </CorasauControls:CorasauLayoutGroup>

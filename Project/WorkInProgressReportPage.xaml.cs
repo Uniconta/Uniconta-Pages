@@ -409,6 +409,7 @@ namespace UnicontaClient.Pages.CustomPage
                 var feeLst = new List<ProjectTransClient>();
                 var onAccLst = new List<ProjectTransClient>();
                 var finalInvLst = new List<ProjectTransClient>();
+                var invCostValueLst = new List<ProjectTransClient>();
                 var adjLst = new List<ProjectTransClient>();
                 string lastCat = null;
                 CategoryType catType = 0;
@@ -438,6 +439,15 @@ namespace UnicontaClient.Pages.CustomPage
                         finalInvLst.Add(x);
                     else if (catType == CategoryType.Adjustment)
                         adjLst.Add(x);
+                    
+                    if (x.Invoiced && (catType == CategoryType.Materials ||
+                                       catType == CategoryType.Expenses ||
+                                       catType == CategoryType.ExternalWork ||
+                                       catType == CategoryType.Miscellaneous ||
+                                       catType == CategoryType.Other ||
+                                       catType == CategoryType.Labour ||
+                                       catType == CategoryType.Adjustment))
+                        invCostValueLst.Add(x);
                 }
                
                 var lstGrouped = GetProjectTransLines(feeLst, isFee: true); 
@@ -449,6 +459,8 @@ namespace UnicontaClient.Pages.CustomPage
                 lstGrouped = GetProjectTransLines(finalInvLst, isFinalInvoice: true);
                 transList.AddRange(lstGrouped);
                 lstGrouped = GetProjectTransLines(adjLst, isAdjustement: true);
+                transList.AddRange(lstGrouped);
+                lstGrouped = GetProjectTransLines(invCostValueLst, isCostInvoice: true);
                 transList.AddRange(lstGrouped);
 
                 var newLst1 = transList.GroupBy(x => x.Project).Select(y => new ProjectTransLocalClient
@@ -494,6 +506,7 @@ namespace UnicontaClient.Pages.CustomPage
                 var xpensLst = new List<ProjectTransClient>();
                 var feeLst = new List<ProjectTransClient>();
                 var onAccLst = new List<ProjectTransClient>();
+                var invCostValueLst = new List<ProjectTransClient>();
                 var finalInvLst = new List<ProjectTransClient>();
                 var adjLst = new List<ProjectTransClient>();
                 string lastCat = null;
@@ -524,6 +537,15 @@ namespace UnicontaClient.Pages.CustomPage
                         finalInvLst.Add(x);
                     else if (catType == CategoryType.Adjustment)
                         adjLst.Add(x);
+
+                    if (x.Invoiced && (catType == CategoryType.Materials ||
+                                     catType == CategoryType.Expenses ||
+                                     catType == CategoryType.ExternalWork ||
+                                     catType == CategoryType.Miscellaneous ||
+                                     catType == CategoryType.Other ||
+                                     catType == CategoryType.Labour ||
+                                     catType == CategoryType.Adjustment))
+                        invCostValueLst.Add(x);
                 }
 
                 var lstGrouped = GetProjectTransLines(feeLst, isFee: true);
@@ -535,6 +557,8 @@ namespace UnicontaClient.Pages.CustomPage
                 lstGrouped = GetProjectTransLines(finalInvLst, isFinalInvoice: true);
                 secTransLst.AddRange(lstGrouped);
                 lstGrouped = GetProjectTransLines(adjLst, isAdjustement: true);
+                secTransLst.AddRange(lstGrouped);
+                lstGrouped = GetProjectTransLines(invCostValueLst, isCostInvoice: true);
                 secTransLst.AddRange(lstGrouped);
 
                 var newLst2 = secTransLst.GroupBy(x => x._Project).Select(y => new ProjectTransLocalClient
@@ -618,7 +642,13 @@ namespace UnicontaClient.Pages.CustomPage
                 IncludeJournals();
         }
 
-        IEnumerable<ProjectTransLocalClient> GetProjectTransLines(IEnumerable<ProjectTransClient> projectTransLst, bool isFee = false, bool isExpenses = false, bool isOnAccount = false, bool isFinalInvoice = false, bool isAdjustement = false)
+        IEnumerable<ProjectTransLocalClient> GetProjectTransLines(IEnumerable<ProjectTransClient> projectTransLst, 
+                                                                  bool isFee = false, 
+                                                                  bool isExpenses = false, 
+                                                                  bool isOnAccount = false, 
+                                                                  bool isFinalInvoice = false, 
+                                                                  bool isAdjustement = false, 
+                                                                  bool isCostInvoice = false)
         {
             var lst = projectTransLst.GroupBy(x => x.Project).Select(y => new ProjectTransLocalClient
             {
@@ -631,7 +661,7 @@ namespace UnicontaClient.Pages.CustomPage
                 ExpensesCostValue = isExpenses == true ? y.Sum(xs => xs.CostAmount) : 0d,
                 OnAccount = isOnAccount == true ? y.Sum(xs => xs.SalesAmount) : 0d,
                 Invoiced = isFinalInvoice == true ? y.Sum(xs => xs.SalesAmount) : 0d,
-                InvoicedCostValue = isFinalInvoice == true ? y.Sum(xs => xs.CostAmount) : 0d,
+                InvoicedCostValue = isCostInvoice == true ? -y.Sum(xs => xs.CostAmount) : 0d,
                 Adjustment = isAdjustement == true ? y.Sum(xs => xs.SalesAmount) : 0d,
                 AdjustmentCostValue = isAdjustement == true ? y.Sum(xs => xs.CostAmount) : 0d
             });
@@ -852,6 +882,7 @@ namespace UnicontaClient.Pages.CustomPage
                             {
                                 debtorOrderInstance.SetMaster(project);
                                 debtorOrderInstance._PrCategory = CWCreateOrderFromProject.InvoiceCategory;
+                                debtorOrderInstance._NoItemUpdate = true;
                                 var er = await api.Insert(debtorOrderInstance);
                                 if (er == ErrorCodes.Succes)
                                     ShowOrderLines(debtorOrderInstance);

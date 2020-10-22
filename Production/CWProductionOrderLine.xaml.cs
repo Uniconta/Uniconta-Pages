@@ -22,7 +22,8 @@ namespace UnicontaClient.Pages.CustomPage
     public partial class CWProductionOrderLine : ChildWindow
     {
         public int get_storage() { return storage; }
-        public int storage;
+        private int storage;
+
         [InputFieldData]
         [Display(Name = "Storage", ResourceType = typeof(InputFieldDataText))]
         public int Storage { get { return storage; } set { storage = value; } }

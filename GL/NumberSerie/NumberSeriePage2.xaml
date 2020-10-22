@@ -38,13 +38,13 @@ x:Class="UnicontaClient.Pages.CustomPage.NumberSeriePage2"
 
                     <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpValues" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Values}" Orientation="Vertical"   CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                         <CorasauControls:CorasauLayoutItem FieldName="FirstValue" x:Name="liFirstValue">
-                            <CorasauControls:IntegerEditor EditValue="{Binding FirstValue,Mode=TwoWay}" SetMask="false"/>
+                            <CorasauControls:IntegerEditor EditValue="{Binding FirstValue,Mode=TwoWay}" MaxLength="9"  SetMask="false"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="LastValue" x:Name="liLastValue">
-                            <CorasauControls:IntegerEditor EditValue="{Binding LastValue,Mode=TwoWay}" SetMask="false"/>
+                            <CorasauControls:IntegerEditor EditValue="{Binding LastValue,Mode=TwoWay}" MaxLength="9" SetMask="false"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="Next" x:Name="liNext">
-                            <CorasauControls:IntegerEditor EditValue="{Binding Next,Mode=TwoWay}" SetMask="false"/>
+                            <CorasauControls:IntegerEditor EditValue="{Binding Next,Mode=TwoWay}" MaxLength="9" SetMask="false"/>
                         </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
 

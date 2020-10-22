@@ -70,11 +70,7 @@ namespace UnicontaClient.Pages.CustomPage
                 txtActivateWarning.Text = Uniconta.ClientTools.Localization.lookup("DirectDebitActivateWarning");
             }
             else
-            {
                 rowWarning.Height = new GridLength(0);
-                double h = this.Height - 120;
-                this.Height = h;
-            }
         }
 
         private void DirectDebitSchemeVisible()

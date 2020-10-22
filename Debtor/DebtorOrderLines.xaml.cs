@@ -28,6 +28,7 @@ using UnicontaClient.Utilities;
 using DevExpress.Xpf.Grid;
 using UnicontaClient.Controls.Dialogs;
 using UnicontaClient.Pages;
+using Uniconta.Common.Utility;
 
 #if !SILVERLIGHT
 using Microsoft.Win32;
@@ -349,7 +350,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 if (screenName == TabControls.AddMultipleInventoryItem)
                 {
-                    var orderNumber = Convert.ToInt32(param[1]);
+                    var orderNumber = (int)NumberConvert.ToInt(Convert.ToString(param[1]));
                     if (orderNumber == Order._OrderNumber)
                     {
                         if (dgDebtorOrderLineGrid.isDefaultFirstRow)
@@ -363,7 +364,7 @@ namespace UnicontaClient.Pages.CustomPage
                 }
                 else if (screenName == TabControls.ItemVariantAddPage)
                 {
-                    var orderNumber = Convert.ToInt32(param[1]);
+                    var orderNumber = (int)NumberConvert.ToInt(Convert.ToString(param[1]));
                     if (orderNumber == Order._OrderNumber)
                     {
                         var invItems = param[0] as List<UnicontaBaseEntity>;
@@ -906,6 +907,9 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem?.InvItem != null)
                         AddDockItem(TabControls.ProductionOrderLineReport, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ProductionLines"), selectedItem._Item));
                     break;
+                case "RefreshGrid":
+                    RefreshGrid();
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -934,7 +938,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (debtor != null)
                 showSendByMail = (!string.IsNullOrEmpty(debtor.InvoiceEmail) || debtor.EmailDocuments);
             string debtorName = debtor?._Name ?? dbOrder._DCAccount;
-            bool showUpdateInv = api.CompanyEntity.Storage;
+            bool showUpdateInv = api.CompanyEntity.Storage || (doctype == CompanyLayoutType.Packnote && api.CompanyEntity.Packnote);
             bool invoiceInXML = debtor?._InvoiceInXML ?? false;
             var accountName = string.Format("{0} ({1})", dbOrder._DCAccount, dbOrder.Name);
             CWGenerateInvoice GenrateOfferDialog = new CWGenerateInvoice(false, doctype.ToString(), isShowInvoiceVisible: true, askForEmail: true, showNoEmailMsg: !showSendByMail, debtorName: debtorName,
@@ -946,6 +950,9 @@ namespace UnicontaClient.Pages.CustomPage
                 GenrateOfferDialog.DialogTableId = 2000000080;
 #endif
             GenrateOfferDialog.SetInvPrintPreview(showPrintPreview);
+            var additionalOrdersList = Utility.GetAdditionalOrders(api, dbOrder);
+            if (additionalOrdersList != null)
+                GenrateOfferDialog.SetAdditionalOrders(additionalOrdersList);
             GenrateOfferDialog.Closed += async delegate
             {
                 if (GenrateOfferDialog.DialogResult == true)
@@ -963,6 +970,7 @@ namespace UnicontaClient.Pages.CustomPage
                     invoicePostingGenerator.SetUpInvoicePosting(dbOrder, null, doctype, GenrateOfferDialog.GenrateDate, null, !GenrateOfferDialog.UpdateInventory, GenrateOfferDialog.ShowInvoice, GenrateOfferDialog.PostOnlyDelivered,
                         GenrateOfferDialog.InvoiceQuickPrint, GenrateOfferDialog.NumberOfPages, GenrateOfferDialog.SendByEmail, openOutlook, GenrateOfferDialog.sendOnlyToThisEmail, GenrateOfferDialog.Emails,
                         false, null, false);
+                    invoicePostingGenerator.SetAdditionalOrders(GenrateOfferDialog.AdditionalOrders?.Cast<DCOrder>().ToList());
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
                     busyIndicator.IsBusy = true;
                     var result = await invoicePostingGenerator.Execute();
@@ -1074,6 +1082,14 @@ namespace UnicontaClient.Pages.CustomPage
             if (api.CompanyEntity.Warehouse)
                 dgDebtorOrderLineGrid.SetLoadedRow(orderLine); // serial page add warehouse and location
             AddDockItem(TabControls.SerialToOrderLinePage, dgDebtorOrderLineGrid.syncEntity, string.Format("{0}:{1}/{2},{3}", Uniconta.ClientTools.Localization.lookup("SerialBatchNumbers"), orderLine.OrderRowId, orderLine._Item, orderLine.RowId));
+        }
+
+        async void RefreshGrid()
+        {
+            var savetask = saveGridLocal(); // we need to wait until it is saved, otherwise Storage is not updated
+            if (savetask != null)
+                await savetask;
+            gridRibbon_BaseActions("RefreshGrid");
         }
 
         async void ViewStorage()

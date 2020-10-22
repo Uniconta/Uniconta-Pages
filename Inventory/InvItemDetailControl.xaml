@@ -219,39 +219,43 @@ x:Class="UnicontaClient.Pages.CustomPage.InvItemDetailControl"
 
                     <CorasauControls:CorasauLayoutItem FieldName="MinStockLevel" x:Name="liMinStockLevel">
                         <StackPanel Orientation="Horizontal">
-                            <CorasauControls:DoubleEditor FieldName="MinStockLevel" IsReadOnly="True"/>
+                            <CorasauControls:DoubleEditor FieldName="MinStockLevel"  ApplyMask="false"
+                                   ShowError="False"  Mask="{Binding Decimals,Converter={StaticResource MaskConverter},ConverterParameter=Decimals}"
+                                   HideZero="True"   MaskUseAsDisplayFormat="True" MaskType="Numeric" IsReadOnly="True" />
                         </StackPanel>
                     </CorasauControls:CorasauLayoutItem>
-
                     <CorasauControls:CorasauLayoutItem FieldName="MaxStockLevel" x:Name="liMaxStockLevel">
                         <StackPanel Orientation="Horizontal">
-                            <CorasauControls:DoubleEditor FieldName="MaxStockLevel" IsReadOnly="True"/>
+                            <CorasauControls:DoubleEditor FieldName="MaxStockLevel" ApplyMask="false" ShowError="False" 
+                                  Mask="{Binding Decimals,Converter={StaticResource MaskConverter},ConverterParameter=Decimals}"
+                                 MaskUseAsDisplayFormat="True" MaskType="Numeric" IsReadOnly="True"/>
                         </StackPanel>
                     </CorasauControls:CorasauLayoutItem>
-
                     <CorasauControls:CorasauLayoutItem FieldName="PurchaseQty" x:Name="liPurchaseQty">
                         <StackPanel Orientation="Horizontal">
-                            <CorasauControls:DoubleEditor FieldName="PurchaseQty" IsReadOnly="True"/>
+                            <CorasauControls:DoubleEditor FieldName="PurchaseQty" ShowError="False" ApplyMask="false"
+                                 Mask="{Binding Decimals,Converter={StaticResource MaskConverter},ConverterParameter=Decimals}"
+                                 MaskUseAsDisplayFormat="True" MaskType="Numeric" IsReadOnly="True"/>
                         </StackPanel>
                     </CorasauControls:CorasauLayoutItem>
-
                     <CorasauControls:CorasauLayoutItem FieldName="PurchaseMin" x:Name="liPurchaseMin">
                         <StackPanel Orientation="Horizontal">
-                            <CorasauControls:DoubleEditor FieldName="PurchaseMin" IsReadOnly="True"/>
+                            <CorasauControls:DoubleEditor FieldName="PurchaseMin"  ApplyMask="false" ShowError="False" 
+                                  Mask="{Binding Decimals,Converter={StaticResource MaskConverter},ConverterParameter=Decimals}"
+                                  MaskUseAsDisplayFormat="True" MaskType="Numeric" IsReadOnly="True"/>
                         </StackPanel>
                     </CorasauControls:CorasauLayoutItem>
-
                     <CorasauControls:CorasauLayoutItem FieldName="DeliveryTime" x:Name="liDeliveryTime">
-                        <CorasauControls:IntegerEditor EditValue="{Binding DeliveryTime}" IsReadOnly="True" />
+                        <CorasauControls:IntegerEditor ShowError="False" IsReadOnly="True"  EditValue="{Binding DeliveryTime ,Mode=TwoWay}" />
                     </CorasauControls:CorasauLayoutItem>
-                    
                     <CorasauControls:CorasauLayoutItem FieldName="SalesQty" x:Name="liSalesQty">
-                            <StackPanel Orientation="Horizontal">
-                                <CorasauControls:DoubleEditor FieldName="SalesQty" IsReadOnly="True"/>
-                            </StackPanel>
-                        </CorasauControls:CorasauLayoutItem>
+                        <StackPanel Orientation="Horizontal">
+                            <CorasauControls:DoubleEditor FieldName="SalesQty" ApplyMask="false" ShowError="False" 
+                                  Mask="{Binding Decimals,Converter={StaticResource MaskConverter},ConverterParameter=Decimals}"
+                                  MaskUseAsDisplayFormat="True" MaskType="Numeric" IsReadOnly="True"/>
+                        </StackPanel>
+                    </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
-
 
                 <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpAlternative" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=AlternativeItem}"  Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                     <CorasauControls:CorasauLayoutItem FieldName="UseAlternative" x:Name="liUseAlternative">

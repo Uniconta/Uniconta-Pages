@@ -30,6 +30,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DocumentsApprovalPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ViewInFolder" AllowEditing="False" Width="100" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="UserName" Visible="False" Width="100" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Fileextension" AllowEditing="False" Width="50" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Text" AllowEditing="True" Width="200" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PostingDate" AllowEditing="False" Width="85" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Invoice" AllowEditing="False" Width="70" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Voucher" AllowEditing="False" Width="70" Visible="False" />
@@ -51,7 +52,6 @@ x:Class="UnicontaClient.Pages.CustomPage.DocumentsApprovalPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Approver2" AllowEditing="False" Visible="False" Width="80"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DocumentDate"   Visible="False" AllowEditing="False" Width="85"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Url" AllowEditing="False" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Text" AllowEditing="True" Width="200" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PostingInstruction" AllowEditing="False" MinWidth="500" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Approved" AllowEditing="False" Width="70"  Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Approved2" AllowEditing="False" Width="70"  Visible="False"/>

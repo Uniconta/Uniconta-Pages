@@ -15,6 +15,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Uniconta.API.Service;
 using Uniconta.ClientTools.Page;
+using Uniconta.Common;
+using Uniconta.ClientTools.DataModel;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -34,8 +36,19 @@ namespace UnicontaClient.Pages.CustomPage
 
         public UserLayoutPage(BaseAPI API) : base(API, string.Empty)
         {
+            Init();
+        }
+
+        public UserLayoutPage(UnicontaBaseEntity master): base(master)
+        {
+            Init(master);
+        }
+
+        void Init(UnicontaBaseEntity master=null)
+        {
             InitializeComponent();
             dgUseyLayoutGrid.api = api;
+            dgUseyLayoutGrid.UpdateMaster(master);
             dgUseyLayoutGrid.BusyIndicator = busyIndicator;
             SetRibbonControl(localMenu, dgUseyLayoutGrid);
             localMenu.OnItemClicked += localMenu_OnItemClicked;

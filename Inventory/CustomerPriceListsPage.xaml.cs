@@ -34,6 +34,7 @@ namespace UnicontaClient.Pages.CustomPage
     {
         public override Type TableType { get { return typeof(DebtorPriceListClient); } }
         public override bool Readonly { get { return false; } }
+        public override bool IsAutoSave { get { return false; } }
     }
 
     public partial class CustomerPriceListsPage : GridBasePage

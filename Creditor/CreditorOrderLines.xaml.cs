@@ -229,7 +229,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (screenName == TabControls.AddMultipleInventoryItem)
             {
-                var orderNumber = Convert.ToInt32(param[1]);
+                var orderNumber = (int)Uniconta.Common.Utility.NumberConvert.ToInt(Convert.ToString(param[1]));
                 if (orderNumber == orderMaster._OrderNumber)
                 {
                     if (dgCreditorOrderLineGrid.isDefaultFirstRow)
@@ -243,7 +243,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
             else if (screenName == TabControls.ItemVariantAddPage)
             {
-                var orderNumber = Convert.ToInt32(param[1]);
+                var orderNumber = (int)Uniconta.Common.Utility.NumberConvert.ToInt(Convert.ToString(param[1]));
                 if (orderNumber == orderMaster._OrderNumber)
                 {
                     var invItems = param[0] as List<UnicontaBaseEntity>;
@@ -680,6 +680,9 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem?.InvItem != null)
                         AddDockItem(TabControls.ProductionOrderLineReport, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ProductionLines"), selectedItem._Item));
                     break;
+                case "RefreshGrid":
+                    RefreshGrid();
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -785,6 +788,9 @@ namespace UnicontaClient.Pages.CustomPage
             }
 #endif
             GenrateOfferDialog.SetInvPrintPreview(showInvPrintPreview);
+            var additionalOrdersList = Utility.GetAdditionalOrders(api, dbOrder);
+            if (additionalOrdersList != null)
+                GenrateOfferDialog.SetAdditionalOrders(additionalOrdersList);
             GenrateOfferDialog.Closed += async delegate
             {
                 if (GenrateOfferDialog.DialogResult == true)
@@ -806,9 +812,10 @@ namespace UnicontaClient.Pages.CustomPage
 
                     var openOutlook = doctype == CompanyLayoutType.PurchasePacknote ? GenrateOfferDialog.UpdateInventory && GenrateOfferDialog.SendByOutlook : GenrateOfferDialog.SendByOutlook;
                     var invoicePostingResult = new InvoicePostingPrintGenerator(api, this);
-                    invoicePostingResult.SetUpInvoicePosting(dbOrder, null, doctype, GenrateOfferDialog.GenrateDate, null, !GenrateOfferDialog.UpdateInventory, GenrateOfferDialog.ShowInvoice, false,
+                    invoicePostingResult.SetUpInvoicePosting(dbOrder, null, doctype, GenrateOfferDialog.GenrateDate, documentNumber, !GenrateOfferDialog.UpdateInventory, GenrateOfferDialog.ShowInvoice, false,
                         GenrateOfferDialog.InvoiceQuickPrint, GenrateOfferDialog.NumberOfPages, GenrateOfferDialog.SendByEmail, GenrateOfferDialog.SendByOutlook, GenrateOfferDialog.sendOnlyToThisEmail,
                         GenrateOfferDialog.Emails, false, null, false);
+                    invoicePostingResult.SetAdditionalOrders(GenrateOfferDialog.AdditionalOrders?.Cast<DCOrder>().ToList());
 
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
                     busyIndicator.IsBusy = true;
@@ -868,6 +875,15 @@ namespace UnicontaClient.Pages.CustomPage
                 dgCreditorOrderLineGrid.SetLoadedRow(orderLine); // serial page add warehouse and location
             AddDockItem(TabControls.SerialToOrderLinePage, dgCreditorOrderLineGrid.syncEntity, string.Format("{0}:{1}/{2},{3}", Uniconta.ClientTools.Localization.lookup("SerialBatchNumbers"), orderLine.OrderRowId, orderLine._Item, orderLine.RowId));
         }
+
+        async void RefreshGrid()
+        {
+            var savetask = saveGridLocal(); // we need to wait until it is saved, otherwise Storage is not updated
+            if (savetask != null)
+                await savetask;
+            gridRibbon_BaseActions("RefreshGrid");
+        }
+
         async void ViewStorage()
         {
             var t = saveGridLocal();

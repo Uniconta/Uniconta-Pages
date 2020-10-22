@@ -39,7 +39,7 @@ x:Class="UnicontaClient.Pages.CustomPage.Payments"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Account" ReadOnly="True" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" ReadOnly="True" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Date" ReadOnly="True" Width="90"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DueDate" Width="90" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DueDate" Width="90" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CashDiscountDate" Visible="False" />                    
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PaymentDate" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="TransType" Visible="False" />

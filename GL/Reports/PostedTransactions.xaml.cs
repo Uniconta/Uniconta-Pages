@@ -138,7 +138,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             return dgPostedTran.Filter(propValuePair);
         }
-       
+
         private void localMenu_OnItemClicked(string ActionType)
         {
             var selectedItem = dgPostedTran.SelectedItem as GLTransClient;

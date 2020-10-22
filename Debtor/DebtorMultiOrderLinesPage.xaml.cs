@@ -35,6 +35,7 @@ namespace UnicontaClient.Pages.CustomPage
         public override Type TableType { get { return typeof(DebtorOrderLineClient); } }
         public override bool Readonly { get { return false; } }
         public override bool SingleBufferUpdate { get { return false; } }
+        public override bool IsAutoSave { get { return false; } }
         public override bool AddRowOnPageDown()
         {
             var selectedItem = (DCOrderLine)this.SelectedItem;

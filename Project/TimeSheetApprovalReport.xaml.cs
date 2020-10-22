@@ -458,12 +458,13 @@ namespace UnicontaClient.Pages.CustomPage
                         #region Vacation
                         if (lstCatVacation != null)
                         {
-                            var vacationStartDate = new DateTime(startDate.Year, 5, 1);
+                            var vacationStartDate = startDate < new DateTime(2021, 1, 1) ? new DateTime(2020, 5, 1) : new DateTime(startDate.Year, 1, 1);
+
                             if (startDate < vacationStartDate)
                                 vacationStartDate = vacationStartDate.AddYears(-1);
 
                             startDate = startDate == vacationStartDate ? startDate.AddDays(1) : startDate;
-                            var vacationStartDateNext = new DateTime(vacationStartDate.Year + 1, 5, 1);
+                            var vacationStartDateNext = new DateTime(vacationStartDate.Year + 1, 1, 1);
 
                             sum = 0;
                             foreach (var s in empInternalTransLst)
@@ -484,11 +485,12 @@ namespace UnicontaClient.Pages.CustomPage
                         #region Other vacation
                         if (lstCatOtherVacation != null)
                         {
-                            var otherVacationStartDate = new DateTime(startDate.Year, 5, 1);
+                            var otherVacationStartDate = startDate < new DateTime(2021, 1, 1) ? new DateTime(2020, 5, 1) : new DateTime(startDate.Year, 1, 1);
+
                             if (startDate < otherVacationStartDate)
                                 otherVacationStartDate = otherVacationStartDate.AddYears(-1);
 
-                            var otherVacationStartDateNext = new DateTime(otherVacationStartDate.Year + 1, 5, 1);
+                            var otherVacationStartDateNext = new DateTime(otherVacationStartDate.Year + 1, 1, 1);
 
                             sum = 0;
                             foreach (var s in empInternalTransLst)

@@ -227,7 +227,8 @@ namespace UnicontaClient.Pages.CustomPage
                         {
                             ribbonControl.DisableButtons(new string[] { "ShowDeliveryNote" });
                             if (standardPrintPreviewPage == null)
-                                standardPrintPreviewPage = dockCtrl.AddDockItem(api?.CompanyEntity, TabControls.StandardPrintReportPage, ParentControl, new object[] { printreport }, dockName) as StandardPrintReportPage;
+                                standardPrintPreviewPage = dockCtrl.AddDockItem(api?.CompanyEntity, TabControls.StandardPrintReportPage, ParentControl, new object[] { printreport, Uniconta.ClientTools.Localization.lookup("CreditorPackNote") }
+                                , dockName) as StandardPrintReportPage;
                             else
                                 standardPrintPreviewPage.InsertToMasterReport(printreport.Report);
                         }

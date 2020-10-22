@@ -111,20 +111,8 @@ namespace UnicontaClient.Pages.CustomPage
                     if (cwSendEmail.SendTestEmail)
                         res = await crmAPI.SendMailTest(cwSendEmail.CompanySMTP, cwSendEmail.Email, cwSendEmail.Name);
                     else
-                    {
-                        var followUp = cwSendEmail.FollowUp;
-                        if (followUp != null)
-                        {
-                            var result = await api.Insert(cwSendEmail.FollowUp);
-                            if (result != ErrorCodes.Succes)
-                                followUp = null;
-                        }
-                        res = await crmAPI.SendMail(cwSendEmail.CompanySMTP, rows, followUp);
-                    }
-                    if (res != ErrorCodes.Succes)
-                        UtilDisplay.ShowErrorCode(res);
-                    else
-                        UtilDisplay.ShowErrorCode(res);
+                        res = await crmAPI.SendMail(cwSendEmail.CompanySMTP, rows, cwSendEmail.FollowUp);
+                    UtilDisplay.ShowErrorCode(res);
                 }
             };
             cwSendEmail.Show();

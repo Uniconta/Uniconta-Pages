@@ -36,7 +36,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionOrdersPage2"
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="ProdQty" x:Name="liProdQty">
                             <StackPanel Orientation="Horizontal">
-                                <CorasauControls:DoubleEditor Text="{Binding ProdQty,Mode=TwoWay}" BindningIsSet="True"
+                                <CorasauControls:DoubleEditor Text="{Binding ProdQty,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" BindningIsSet="True"
                                        Mask="{Binding Decimals,Converter={StaticResource MaskConverter},ConverterParameter=Decimals}"
                                        MaskUseAsDisplayFormat="True" MaskType="Numeric" />
                             </StackPanel>

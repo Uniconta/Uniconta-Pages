@@ -681,6 +681,9 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem?.InvItem != null)
                         AddDockItem(TabControls.ProductionOrderLineReport, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ProductionLines"), selectedItem._Item));
                     break;
+                case "RefreshGrid":
+                    RefreshGrid();
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -754,7 +757,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (screenName == TabControls.AddMultipleInventoryItem)
             {
-                var orderNumber = Convert.ToInt32(param[1]);
+                var orderNumber = (int)Uniconta.Common.Utility.NumberConvert.ToInt(Convert.ToString(param[1]));
                 if (orderNumber == Order._OrderNumber)
                 {
                     if (dgDebtorOfferLineGrid.isDefaultFirstRow)
@@ -768,7 +771,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
             else if (screenName == TabControls.ItemVariantAddPage)
             {
-                var orderNumber = Convert.ToInt32(param[1]);
+                var orderNumber = (int)Uniconta.Common.Utility.NumberConvert.ToInt(Convert.ToString(param[1]));
                 if (orderNumber == Order._OrderNumber)
                 {
                     var invItems = param[0] as List<UnicontaBaseEntity>;
@@ -776,6 +779,15 @@ namespace UnicontaClient.Pages.CustomPage
                 }
             }
         }
+
+        async void RefreshGrid()
+        {
+            var savetask = saveGridLocal(); // we need to wait until it is saved, otherwise Storage is not updated
+            if (savetask != null)
+                await savetask;
+            gridRibbon_BaseActions("RefreshGrid");
+        }
+
         async void ViewStorage()
         {
             var savetask = saveGridLocal(); // we need to wait until it is saved, otherwise Storage is not updated

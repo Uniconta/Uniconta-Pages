@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -97,7 +98,7 @@ namespace UnicontaISO20022CreditTransfer
         /// </summary>
         public virtual Encoding EncodingFormat()
         {
-            return Encoding.UTF8;
+            return new UTF8Encoding(false);
         }
 
 
@@ -809,5 +810,22 @@ namespace UnicontaISO20022CreditTransfer
             return value != null ? ", " : string.Empty;
         }
 
+    }
+
+    public class UpperCaseUTF8Encoding : UTF8Encoding
+    {
+        public UpperCaseUTF8Encoding() : this(false)
+        {
+        }
+
+        public UpperCaseUTF8Encoding(bool encoderShouldEmitUTF8Identifier) : this(encoderShouldEmitUTF8Identifier, false)
+        {
+        }
+
+        public UpperCaseUTF8Encoding(bool encoderShouldEmitUTF8Identifier, bool throwOnInvalidBytes) : base(encoderShouldEmitUTF8Identifier, throwOnInvalidBytes)
+        {
+        }
+
+        public override string WebName => base.WebName.ToUpper(CultureInfo.InvariantCulture);
     }
 }

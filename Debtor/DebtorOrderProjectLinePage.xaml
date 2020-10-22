@@ -9,7 +9,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrderProjectLinePage"
         xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
         xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
         xmlns:dxn="http://schemas.devexpress.com/winfx/2008/xaml/navbar">
-    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -26,7 +26,18 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrderProjectLinePage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="Item" Width="80" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="ItemName" Width="120" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Text" Width="150" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Width="70" />
+                    <local:CorasauDataGridForeignKeyColumnClient x:Name="PrCategory" Width="70">
+                        <local:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <TextBlock Margin="2" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.PrCategory,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"></TextBlock>
+                            </ControlTemplate>
+                        </local:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
+                        <local:CorasauDataGridForeignKeyColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <local:CorasauGridLookupEditorClient HasCustomLookUp="true"  x:Name="PART_Editor" ItemsSource="{Binding DataContext.RowData.Row.ProjectCategorySource,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" LostFocus="PrCategory_LostFocus"  GotFocus="PrCategory_GotFocus"/>
+                            </DataTemplate>
+                        </local:CorasauDataGridForeignKeyColumnClient.CellTemplate>
+                    </local:CorasauDataGridForeignKeyColumnClient>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Qty" Width="80"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="CostPrice" Width="80" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="SalesPrice" Width="80"/>

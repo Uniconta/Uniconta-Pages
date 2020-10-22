@@ -417,6 +417,7 @@ namespace UnicontaClient.Pages.CustomPage
                     dgDebtorTranOpenGrid.DeleteRow();
                     break;
                 case "SaveGrid":
+                    saveGrid();
                     break;
                 case "ViewDownloadRow":
                     if (selectedItem != null)

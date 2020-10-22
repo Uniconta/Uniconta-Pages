@@ -18,6 +18,8 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using Uniconta.API.Service;
+using Uniconta.ClientTools.Controls;
+using Uniconta.ClientTools.Util;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -46,8 +48,9 @@ namespace UnicontaClient.Pages.CustomPage
             dgInventoryGroupGrid.api = api;
             dgInventoryGroupGrid.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
-            
+            ribbonControl.DisableButtons(new string[] { "AddLine", "DeleteRow", "CopyRow", "UndoDelete", "SaveGrid" });
         }
+
         protected override void OnLayoutLoaded()
         {
             base.OnLayoutLoaded();
@@ -68,8 +71,15 @@ namespace UnicontaClient.Pages.CustomPage
             var selectedItem = dgInventoryGroupGrid.SelectedItem as InvGroupClient;
             switch (ActionType)
             {
+                case "EditAll":
+                    if (dgInventoryGroupGrid.Visibility == System.Windows.Visibility.Visible)
+                        EditAll();
+                    break;
                 case "AddRow":
                     AddDockItem(TabControls.InventoryGroupPage2, api, Uniconta.ClientTools.Localization.lookup("InventoryGroup"), "Add_16x16.png");
+                    break;
+                case "AddLine":
+                    dgInventoryGroupGrid.AddRow();
                     break;
                 case "EditRow":
                     if (selectedItem == null)
@@ -80,13 +90,22 @@ namespace UnicontaClient.Pages.CustomPage
                     AddDockItem(TabControls.InventoryGroupPage2, param, string.Format("{0}:{1},{2}", Uniconta.ClientTools.Localization.lookup("InventoryGroup"), selectedItem.Group, selectedItem.Name));
                     break;
                 case "CopyRow":
-                    if (selectedItem == null)
-                        return;
-                    object[] copyParam = new object[2];
-                    copyParam[0] = selectedItem;
-                    copyParam[1] = false;
-                    string header = string.Format(Uniconta.ClientTools.Localization.lookup("CopyOBJ"), selectedItem.Group);
-                    AddDockItem(TabControls.InventoryGroupPage2, copyParam, header);
+                    if (copyRowIsEnabled)
+                        dgInventoryGroupGrid.CopyRow();
+                    else
+                        CopyRecord(selectedItem);
+                    break;
+                case "CopyRecord":
+                    CopyRecord(selectedItem);
+                    break;
+                case "UndoDelete":
+                    dgInventoryGroupGrid.UndoDeleteRow();
+                    break;
+                case "DeleteRow":
+                    dgInventoryGroupGrid.DeleteRow();
+                    break;
+                case "SaveGrid":
+                    saveGrid();
                     break;
                 case "DebtorGroupPosting":
                     if (selectedItem == null) return;
@@ -105,6 +124,86 @@ namespace UnicontaClient.Pages.CustomPage
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
+            }
+        }
+
+        void CopyRecord(InvGroupClient selectedItem)
+        {
+            if (selectedItem == null)
+                return;
+            object[] copyParam = new object[2];
+            copyParam[0] = selectedItem;
+            copyParam[1] = false;
+            string header = string.Format(Uniconta.ClientTools.Localization.lookup("CopyOBJ"), selectedItem.Group);
+            AddDockItem(TabControls.InventoryGroupPage2, copyParam, header);
+        }
+
+        bool copyRowIsEnabled = false;
+        bool editAllChecked;
+        private void EditAll()
+        {
+            RibbonBase rb = (RibbonBase)localMenu.DataContext;
+            var ibase = UtilDisplay.GetMenuCommandByName(rb, "EditAll");
+            if (ibase == null)
+                return;
+            if (dgInventoryGroupGrid.Readonly)
+            {
+                api.AllowBackgroundCrud = false;
+                dgInventoryGroupGrid.MakeEditable();
+                UserFieldControl.MakeEditable(dgInventoryGroupGrid);
+                ibase.Caption = Uniconta.ClientTools.Localization.lookup("LeaveEditAll");
+                ribbonControl.EnableButtons(new string[] { "AddLine", "DeleteRow", "CopyRow", "UndoDelete", "SaveGrid" });
+                editAllChecked = false;
+                copyRowIsEnabled = true;
+            }
+            else
+            {
+                if (IsDataChaged)
+                {
+                    string message = Uniconta.ClientTools.Localization.lookup("SaveChangesPrompt");
+                    CWConfirmationBox confirmationDialog = new CWConfirmationBox(message);
+                    confirmationDialog.Closing += async delegate
+                    {
+                        if (confirmationDialog.DialogResult == null)
+                            return;
+
+                        switch (confirmationDialog.ConfirmationResult)
+                        {
+                            case CWConfirmationBox.ConfirmationResultEnum.Yes:
+                                var err = await dgInventoryGroupGrid.SaveData();
+                                if (err != 0)
+                                {
+                                    api.AllowBackgroundCrud = true;
+                                    return;
+                                }
+                                break;
+                            case CWConfirmationBox.ConfirmationResultEnum.No:
+                                break;
+                        }
+                        editAllChecked = true;
+                        dgInventoryGroupGrid.Readonly = true;
+                        dgInventoryGroupGrid.tableView.CloseEditor();
+                        ibase.Caption = Uniconta.ClientTools.Localization.lookup("EditAll");
+                        ribbonControl.DisableButtons(new string[] { "AddLine", "DeleteRow", "CopyRow", "UndoDelete", "SaveGrid" });
+                        copyRowIsEnabled = false;
+                    };
+                    confirmationDialog.Show();
+                }
+                else
+                {
+                    dgInventoryGroupGrid.Readonly = true;
+                    dgInventoryGroupGrid.tableView.CloseEditor();
+                    ibase.Caption = Uniconta.ClientTools.Localization.lookup("EditAll");
+                    ribbonControl.DisableButtons(new string[] { "AddLine", "DeleteRow", "CopyRow", "UndoDelete", "SaveGrid" });
+                    copyRowIsEnabled = false;
+                }
+            }
+        }
+        public override bool IsDataChaged
+        {
+            get
+            {
+                return editAllChecked ? false : dgInventoryGroupGrid.HasUnsavedData;
             }
         }
     }

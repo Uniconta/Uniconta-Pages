@@ -82,42 +82,37 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
-            if (!string.IsNullOrEmpty(Group))
-            {
-                var debtor = crudApi.CompanyEntity.CreateUserType<DebtorClient>();
-                debtor.Account = AccountNumber;
-                debtor.Group = Group;
+            var debtor = crudApi.CompanyEntity.CreateUserType<DebtorClient>();
+            debtor.Account = AccountNumber;
+            debtor.Group = Group;
 
-                debtor._Name = crmProspect._Name;
-                debtor._Address1 = crmProspect._Address1;
-                debtor._Address2 = crmProspect._Address2;
-                debtor._Address3 = crmProspect._Address3;
-                debtor._City = crmProspect._City;
-                debtor._ZipCode = crmProspect._ZipCode;
-                debtor._Country = crmProspect._Country;
-                debtor._LegalIdent = crmProspect._LegalIdent;
-                debtor._Currency = crmProspect._Currency;
-                debtor._Phone = crmProspect._Phone;
-                debtor._VatZone = crmProspect._VatZone;
-                debtor._PriceList = crmProspect._PriceList;
-                debtor._PriceGroup = crmProspect._PriceGroup;
-                debtor._ItemNameGroup = crmProspect._ItemNameGroup;
-                debtor._LayoutGroup = crmProspect._LayoutGroup;
-                debtor._Blocked = crmProspect._Blocked;
-                debtor._Language = crmProspect._Language;
-                debtor._ContactEmail = crmProspect._ContactEmail;
-                debtor._InvoiceEmail = crmProspect._InvoiceEmail;
-                debtor._ContactPerson = crmProspect._ContactPerson;
-                debtor._Employee = crmProspect._Employee;
-                debtor._EAN = crmProspect._EAN;
-                debtor._Interests = crmProspect._Interests;
-                debtor._Products = crmProspect._Products;
+            debtor._Name = crmProspect._Name;
+            debtor._Address1 = crmProspect._Address1;
+            debtor._Address2 = crmProspect._Address2;
+            debtor._Address3 = crmProspect._Address3;
+            debtor._City = crmProspect._City;
+            debtor._ZipCode = crmProspect._ZipCode;
+            debtor._Country = crmProspect._Country;
+            debtor._LegalIdent = crmProspect._LegalIdent;
+            debtor._Currency = crmProspect._Currency;
+            debtor._Phone = crmProspect._Phone;
+            debtor._VatZone = crmProspect._VatZone;
+            debtor._PriceList = crmProspect._PriceList;
+            debtor._PriceGroup = crmProspect._PriceGroup;
+            debtor._ItemNameGroup = crmProspect._ItemNameGroup;
+            debtor._LayoutGroup = crmProspect._LayoutGroup;
+            debtor._Blocked = crmProspect._Blocked;
+            debtor._Language = crmProspect._Language;
+            debtor._ContactEmail = crmProspect._ContactEmail;
+            debtor._InvoiceEmail = crmProspect._InvoiceEmail;
+            debtor._ContactPerson = crmProspect._ContactPerson;
+            debtor._Employee = crmProspect._Employee;
+            debtor._EAN = crmProspect._EAN;
+            debtor._Interests = crmProspect._Interests;
+            debtor._Products = crmProspect._Products;
 
-                DebtorClient = debtor;
-                this.DialogResult = true;
-            }
-            else
-                Uniconta.ClientTools.Controls.UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("CannotBeBlank"), Uniconta.ClientTools.Localization.lookup("Group")), Uniconta.ClientTools.Localization.lookup("Error"));
+            DebtorClient = debtor;
+            this.DialogResult = true;
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)

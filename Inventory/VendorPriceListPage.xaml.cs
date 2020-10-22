@@ -29,7 +29,9 @@ namespace UnicontaClient.Pages.CustomPage
     {
         public override Type TableType { get { return typeof(CreditorPriceListClient); } }
         public override bool Readonly { get { return false; } }
+        public override bool IsAutoSave { get { return false; } }
     }
+
     public partial class VendorPriceListPage : GridBasePage
     {
         public override string NameOfControl { get { return TabControls.VendorPriceListPage; } }

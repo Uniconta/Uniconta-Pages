@@ -6,6 +6,14 @@ x:Class="UnicontaClient.Pages.CustomPage.CWGenerateInvoice"
            xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors"
            xmlns:ClientToolsControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
            Height="{StaticResource Height39}" Width="{StaticResource Width39}" KeyDown="ChildWindow_KeyDown" SizeToContent="Height" IsTabStop="True">
+    <cw:ChildWindow.Resources>
+        <DataTemplate x:Key="PrimaryLableTemplate">
+            <TextBlock Text="{Binding }" MaxWidth="120" TextWrapping="Wrap" />
+        </DataTemplate>
+        <DataTemplate x:Key="SecondayLableTemplate">
+            <TextBlock Text="{Binding }" MaxWidth="150" TextWrapping="Wrap" />
+        </DataTemplate>
+    </cw:ChildWindow.Resources>
     <Grid x:Name="LayoutRoot" Margin="2" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
             <RowDefinition />
@@ -20,7 +28,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CWGenerateInvoice"
                                 <Image Source="/UnicontaPages;component/Assets/img/group-user_16x16.png" Width="16" Height="16" Stretch="UniformToFill" HorizontalAlignment="Left" />
                             </DataTemplate>
                         </ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
-                        <ClientToolsControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Account}">
+                        <ClientToolsControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Account}" LabelTemplate="{StaticResource PrimaryLableTemplate}">
                             <TextBlock x:Name="txtAccountName"  />
                         </ClientToolsControls:CorasauLayoutItem>
                     </ClientToolsControls:CorasauLayoutGroup>
@@ -30,22 +38,22 @@ x:Class="UnicontaClient.Pages.CustomPage.CWGenerateInvoice"
                                 <Image Source="/UnicontaPages;component/Assets/img/group-questiont_16x16.png" Width="16" Height="16" Stretch="UniformToFill" HorizontalAlignment="Left" />
                             </DataTemplate>
                         </ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
-                        <ClientToolsControls:CorasauLayoutItem FieldName="GenrateDate" x:Name="liGenrateDate">
+                        <ClientToolsControls:CorasauLayoutItem FieldName="GenrateDate" x:Name="liGenrateDate" LabelTemplate="{StaticResource PrimaryLableTemplate}">
                             <ClientToolsControls:DateEditor x:Name="dpDate" EditValue="{Binding GenrateDate,Mode=TwoWay}"/>
                         </ClientToolsControls:CorasauLayoutItem>
-                        <ClientToolsControls:CorasauLayoutItem x:Name="liInvoiceNumber">
+                        <ClientToolsControls:CorasauLayoutItem x:Name="liInvoiceNumber" LabelTemplate="{StaticResource PrimaryLableTemplate}">
                             <ClientToolsControls:TextEditor x:Name="txtInvNumber" Text="{Binding InvoiceNumber,Mode=TwoWay}" MaxLength="17"/>
                         </ClientToolsControls:CorasauLayoutItem>
-                        <ClientToolsControls:CorasauLayoutItem FieldName="IsSimulation" x:Name="liIsSimulation">
+                        <ClientToolsControls:CorasauLayoutItem FieldName="IsSimulation" x:Name="liIsSimulation" LabelTemplate="{StaticResource PrimaryLableTemplate}">
                             <ClientToolsControls:CheckEditor x:Name="chkSimulation" IsChecked="{Binding IsSimulation,Mode=TwoWay}"/>
                         </ClientToolsControls:CorasauLayoutItem>
-                        <ClientToolsControls:CorasauLayoutItem FieldName="UpdateInventory" x:Name="liUpdateInventory">
+                        <ClientToolsControls:CorasauLayoutItem FieldName="UpdateInventory" x:Name="liUpdateInventory" LabelTemplate="{StaticResource PrimaryLableTemplate}">
                             <ClientToolsControls:CheckEditor x:Name="chkUpdateInv" IsChecked="{Binding UpdateInventory,Mode=TwoWay}"/>
                         </ClientToolsControls:CorasauLayoutItem>
-                        <ClientToolsControls:CorasauLayoutItem FieldName="ShowInvoice" x:Name="liShowInvoice">
+                        <ClientToolsControls:CorasauLayoutItem FieldName="ShowInvoice" x:Name="liShowInvoice" LabelTemplate="{StaticResource PrimaryLableTemplate}">
                             <ClientToolsControls:CheckEditor x:Name="chkShowInvoice" IsChecked="{Binding ShowInvoice,Mode=TwoWay}" Checked="chkShowInvoice_Checked"/>
                         </ClientToolsControls:CorasauLayoutItem>
-                        <ClientToolsControls:CorasauLayoutItem FieldName="PostOnlyDelivered" x:Name="liPostOnlyDelivered">
+                        <ClientToolsControls:CorasauLayoutItem FieldName="PostOnlyDelivered" x:Name="liPostOnlyDelivered" LabelTemplate="{StaticResource PrimaryLableTemplate}">
                             <ClientToolsControls:CheckEditor x:Name="chkPostOnlyDel" IsChecked="{Binding PostOnlyDelivered,Mode=TwoWay}"/>
                         </ClientToolsControls:CorasauLayoutItem>
                     </ClientToolsControls:CorasauLayoutGroup>
@@ -55,7 +63,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CWGenerateInvoice"
                                 <Image Source="/UnicontaPages;component/Assets/img/group-order_16x16.png" Width="16" Height="16" Stretch="UniformToFill" HorizontalAlignment="Left" />
                             </DataTemplate>
                         </ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
-                        <ClientToolsControls:CorasauLayoutItem FieldName="AdditionalOrders" x:Name="liAdditionalOrders">
+                        <ClientToolsControls:CorasauLayoutItem FieldName="AdditionalOrders" x:Name="liAdditionalOrders" LabelTemplate="{StaticResource PrimaryLableTemplate}">
                             <ClientToolsControls:DimComboBoxEditor x:Name="cbOrders" DisplayMember="KeyStr" EditValue="{Binding AdditionalOrders}"  ShowCustomItems="False">
                                 <ClientToolsControls:DimComboBoxEditor.StyleSettings>
                                     <editor:CheckedComboBoxStyleSettings  />
@@ -71,10 +79,10 @@ x:Class="UnicontaClient.Pages.CustomPage.CWGenerateInvoice"
                                 <Image Source="/UnicontaPages;component/Assets/img/group-print_16x16.png" Width="16" Height="16" Stretch="Fill" HorizontalAlignment="Left" />
                             </DataTemplate>
                         </ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
-                        <ClientToolsControls:CorasauLayoutItem FieldName="InvoiceQuickPrint" x:Name="liInvoiceQuickPrint">
+                        <ClientToolsControls:CorasauLayoutItem FieldName="InvoiceQuickPrint" x:Name="liInvoiceQuickPrint" LabelTemplate="{StaticResource SecondayLableTemplate}">
                             <ClientToolsControls:CheckEditor x:Name="chkPrintInvoice" IsChecked="{Binding InvoiceQuickPrint,Mode=TwoWay}" Checked="chkPrintInvoice_Checked" />
                         </ClientToolsControls:CorasauLayoutItem>
-                        <ClientToolsControls:CorasauLayoutItem FieldName="NumberOfPages" x:Name="liNumberOfPages">
+                        <ClientToolsControls:CorasauLayoutItem FieldName="NumberOfPages" x:Name="liNumberOfPages" LabelTemplate="{StaticResource SecondayLableTemplate}">
                             <ClientToolsControls:TextEditor   MaskType="RegEx" Mask="{StaticResource NumberGreaterThanZeroRegx}" IsEnabled="{Binding IsChecked,ElementName=chkPrintInvoice}" 
                                                                      Text="{Binding NumberOfPages}" HorizontalContentAlignment="Right" />
                         </ClientToolsControls:CorasauLayoutItem>
@@ -85,20 +93,20 @@ x:Class="UnicontaClient.Pages.CustomPage.CWGenerateInvoice"
                                 <Image Source="/UnicontaPages;component/Assets/img/group-envelope_16x16.png" Width="16" Height="16" Stretch="Fill" HorizontalAlignment="Left"/>
                             </DataTemplate>
                         </ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
-                        <ClientToolsControls:CorasauLayoutItem FieldName="SendByOutlook" x:Name="liSendByOutlook">
+                        <ClientToolsControls:CorasauLayoutItem FieldName="SendByOutlook" x:Name="liSendByOutlook" LabelTemplate="{StaticResource SecondayLableTemplate}">
                             <ClientToolsControls:CheckEditor x:Name="chkSendOutlook" IsChecked="{Binding SendByOutlook,Mode=TwoWay}" Checked="chkSendOutlook_Checked" />
                         </ClientToolsControls:CorasauLayoutItem>
-                        <ClientToolsControls:CorasauLayoutItem FieldName="SendByEmail" x:Name="liSendByEmail">
+                        <ClientToolsControls:CorasauLayoutItem FieldName="SendByEmail" x:Name="liSendByEmail" LabelTemplate="{StaticResource SecondayLableTemplate}">
                             <ClientToolsControls:CheckEditor x:Name="chkSendEmail" IsChecked="{Binding SendByEmail,Mode=TwoWay}" Checked="chkSendEmail_Checked" />
                         </ClientToolsControls:CorasauLayoutItem>
-                        <ClientToolsControls:CorasauLayoutItem FieldName="sendOnlyToThisEmail" x:Name="lisendOnlyToThisEmail">
+                        <ClientToolsControls:CorasauLayoutItem FieldName="sendOnlyToThisEmail" x:Name="lisendOnlyToThisEmail" LabelTemplate="{StaticResource SecondayLableTemplate}">
                             <ClientToolsControls:CheckEditor x:Name="chkSendOnlyEmail" IsChecked="{Binding sendOnlyToThisEmail,Mode=TwoWay}" />
                         </ClientToolsControls:CorasauLayoutItem>
-                        <ClientToolsControls:CorasauLayoutItem FieldName="Emails" x:Name="liEmails">
+                        <ClientToolsControls:CorasauLayoutItem FieldName="Emails" x:Name="liEmails" LabelTemplate="{StaticResource SecondayLableTemplate}">
                             <ClientToolsControls:TextEditor x:Name="txtEmail" Text="{Binding Emails, Mode=TwoWay}" HandleKeyDown="False" MaskType="RegEx" Mask="{StaticResource EmailValidationRegx}" Height="25" 
                                                             IsEnabled="{Binding IsChecked,ElementName=chksendOnlyToThisEmail}" />
                         </ClientToolsControls:CorasauLayoutItem>
-                        <ClientToolsControls:CorasauLayoutItem x:Name="liNoEmailMsg">
+                        <ClientToolsControls:CorasauLayoutItem x:Name="liNoEmailMsg" LabelTemplate="{StaticResource SecondayLableTemplate}">
                             <TextBlock x:Name="txtNoMailMsg" />
                         </ClientToolsControls:CorasauLayoutItem>
                     </ClientToolsControls:CorasauLayoutGroup>
@@ -108,7 +116,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CWGenerateInvoice"
                                 <Image Source="/UnicontaPages;component/Assets/img/group-file_16x16.png" Width="16" Height="16" Stretch="Fill" HorizontalAlignment="Left"/>
                             </DataTemplate>
                         </ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
-                        <ClientToolsControls:CorasauLayoutItem FieldName="GenerateOIOUBLClicked" x:Name="liGenerateOIOUBLClicked">
+                        <ClientToolsControls:CorasauLayoutItem FieldName="GenerateOIOUBLClicked" x:Name="liGenerateOIOUBLClicked" LabelTemplate="{StaticResource SecondayLableTemplate}">
                             <ClientToolsControls:CheckEditor x:Name="chkOIOUBL" IsChecked="{Binding GenerateOIOUBLClicked,Mode=TwoWay}"/>
                         </ClientToolsControls:CorasauLayoutItem>
                     </ClientToolsControls:CorasauLayoutGroup>

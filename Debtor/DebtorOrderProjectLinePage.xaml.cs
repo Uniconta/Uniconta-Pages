@@ -41,6 +41,9 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         public PrCategoryCacheFilter PrCategorySource { get; internal set; }
+
+        internal object _prCategorySource;
+        public object ProjectCategorySource { get { return _prCategorySource; } }
     }
 
     public class DebtorOrderProjectLineGrid : CorasauDataGridClient
@@ -50,7 +53,6 @@ namespace UnicontaClient.Pages.CustomPage
         public override string LineNumberProperty { get { return "_LineNumber"; } }
         public override bool AllowSort { get { return false; } }
         public override bool Readonly { get { return false; } }
-        public override bool IsAutoSave { get { return true; } }
 
         public override bool AddRowOnPageDown()
         {
@@ -113,6 +115,7 @@ namespace UnicontaClient.Pages.CustomPage
         public override string NameOfControl { get { return TabControls.DebtorOrderProjectLinePage; } }
 
         SQLCache ItemsCache, ProjectCache, DebtorCache, CategoryCache, EmployeeCache, PrStandardCache;
+        SQLTableCache<Uniconta.ClientTools.DataModel.PrCategoryClient> prCategoryCache;
         Dictionary<string, Uniconta.API.DebtorCreditor.FindPrices> dictPriceLookup;
         DebtorOrder debtorOrder;
         public DebtorOrderProjectLinePage(UnicontaBaseEntity master) : base(master)
@@ -338,6 +341,8 @@ namespace UnicontaClient.Pages.CustomPage
             CategoryCache = api.GetCache(typeof(Uniconta.DataModel.PrCategory)) ?? await api.LoadCache(typeof(Uniconta.DataModel.PrCategory)).ConfigureAwait(false);
             EmployeeCache = api.GetCache(typeof(Uniconta.DataModel.Employee)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Employee)).ConfigureAwait(false);
             PrStandardCache = api.GetCache(typeof(Uniconta.DataModel.PrStandard)) ?? await api.LoadCache(typeof(Uniconta.DataModel.PrStandard)).ConfigureAwait(false);
+            if (prCategoryCache == null)
+                prCategoryCache = await api.LoadCache<Uniconta.ClientTools.DataModel.PrCategoryClient>().ConfigureAwait(false);
         }
 
         void RecalculateAmount()
@@ -361,6 +366,58 @@ namespace UnicontaClient.Pages.CustomPage
                     grp.StatusValue = Amountsum.ToString("N2");
                 if (grp.Caption == diff)
                     grp.StatusValue = difference.ToString("N2");
+            }
+        }
+
+        private void SetPrCategorySource(DebtorOrderProjectLineLocal rec)
+        {
+            if (prCategoryCache != null && prCategoryCache.Count != 0)
+            {
+                rec._prCategorySource = new PrCategoryRegulationFilter(prCategoryCache.cache);
+                if (rec._prCategorySource != null)
+                    rec.NotifyPropertyChanged("ProjectCategorySource");
+            }
+        }
+
+        private void PrCategory_LostFocus(object sender, RoutedEventArgs e)
+        {
+            SetPrCategoryByLookupText(sender, true);
+        }
+
+        void SetPrCategoryByLookupText(object sender, bool isHours)
+        {
+            DebtorOrderProjectLineLocal selectedItem = dgDebtorOrderProjectLineGrid.SelectedItem as DebtorOrderProjectLineLocal;
+            if (selectedItem == null)
+                return;
+            var le = sender as CorasauGridLookupEditor;
+            if (string.IsNullOrEmpty(le.EnteredText))
+                return;
+
+            if (prCategoryCache != null)
+            {
+                var prCat = prCategoryCache.FirstOrDefault(s => s._Number == le.EnteredText);
+                if (prCat != null)
+                {
+                    dgDebtorOrderProjectLineGrid.SetLoadedRow(selectedItem);
+                    selectedItem.PrCategory = prCat.KeyStr;
+                    le.EditValue = prCat.KeyStr;
+                }
+            }
+            le.EnteredText = null;
+        }
+
+        CorasauGridLookupEditorClient prevPrCategory;
+        private void PrCategory_GotFocus(object sender, RoutedEventArgs e)
+        {
+            DebtorOrderProjectLineLocal selectedItem = dgDebtorOrderProjectLineGrid.SelectedItem as DebtorOrderProjectLineLocal;
+            if (selectedItem != null)
+            {
+                SetPrCategorySource(selectedItem);
+                if (prevPrCategory != null)
+                    prevPrCategory.isValidate = false;
+                var editor = (CorasauGridLookupEditorClient)sender;
+                prevPrCategory = editor;
+                editor.isValidate = true;
             }
         }
     }

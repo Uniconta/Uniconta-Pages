@@ -113,7 +113,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "SeriesBatch":
                     if (selectedItem == null)
                         return;
-                    AddDockItem(TabControls.InvSeriesBatch, selectedItem, string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("SerialBatchNumbers"), selectedItem._InvoiceRowId));
+                    AddDockItem(TabControls.InvSeriesBatch, selectedItem, string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("SerialBatchNumbers"), selectedItem._Item));
                     break;
                 case "AddEditNote":
                     if (selectedItem == null) return;
@@ -135,6 +135,25 @@ namespace UnicontaClient.Pages.CustomPage
                 case "PostedBy":
                     if (selectedItem != null)
                         JournalPosted(selectedItem);
+                    break;
+                case "VoucherTransactions":
+                    if (selectedItem == null)
+                        return;
+                    string arg;
+                    if (selectedItem._JournalPostedId != 0)
+                        arg = string.Format("{0}={1}", Uniconta.ClientTools.Localization.lookup("JournalPostedId"), selectedItem._JournalPostedId);
+                    else if (selectedItem._InvoiceNumber != 0)
+                        arg = string.Format("{0}={1}", Uniconta.ClientTools.Localization.lookup("Invoice"), selectedItem._InvoiceNumber);
+                    else if (selectedItem._InvJournalPostedId != 0)
+                        arg = string.Format("{0} ({1})={2}", Uniconta.ClientTools.Localization.lookup("JournalPostedId"), Uniconta.ClientTools.Localization.lookup("Inventory"), selectedItem._InvJournalPostedId);
+                    else
+                        arg = string.Format("{0}={1}", Uniconta.ClientTools.Localization.lookup("Account"), selectedItem.AccountName);
+                    string vheader = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("VoucherTransactions"), arg);
+                    AddDockItem(TabControls.AccountsTransaction, dgProductionPostedTrans.syncEntity, vheader);
+                    break;
+                case "AttachSerialBatch":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.AttachInvSeriesBatch, selectedItem, Uniconta.ClientTools.Localization.lookup("SerialBatchNumbers"));
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);

@@ -20,6 +20,7 @@ using System.Windows;
 using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.Util;
 using DevExpress.Xpf.Editors;
+using Uniconta.Common.Utility;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -260,6 +261,22 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 case "SaveAndOrderLines":
                     saveFormAndOpenControl(TabControls.DebtorOfferLines);
+                    break;
+                case "Delete":
+                    if (editrow._OrderTotal != 0)
+                    {
+                        var msg = Uniconta.ClientTools.Localization.lookup("NumberOfLines") + ": " + NumberConvert.ToString(editrow._Lines);
+                        var msg2 = msg + "\r\n" + string.Format(Uniconta.ClientTools.Localization.lookup("ConfirmDeleteOBJ"), editrow._OrderNumber);
+                        CWConfirmationBox dialog = new CWConfirmationBox(msg2, Uniconta.ClientTools.Localization.lookup("Confirmation"), false);
+                        dialog.Closing += delegate
+                        {
+                            if (dialog.ConfirmationResult == CWConfirmationBox.ConfirmationResultEnum.Yes)
+                                frmRibbon_BaseActions(ActionType);
+                        };
+                        dialog.Show();
+                    }
+                    else
+                        frmRibbon_BaseActions(ActionType);
                     break;
                 default:
                     frmRibbon_BaseActions(ActionType);

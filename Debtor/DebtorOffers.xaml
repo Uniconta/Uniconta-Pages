@@ -73,7 +73,8 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOffers"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Employee" Width="70"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Project" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PricesInclVat" Width="60"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Vat" Width="70" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PricesInclVat" Width="60" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceEmail" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryName" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryAddress1" Visible="False" />

@@ -300,7 +300,7 @@ namespace UnicontaClient.Pages.CustomPage
             sw.Write("Betrag(EUR)"); sw.Write(';');
             sw.Write("Art der Leistung"); sw.Write(Environment.NewLine);
 
-            long sumOfAmount = 0;
+            long amount = 0;
             var exp = Localization.lookup("Exported");
             foreach (var rec in listOfImportExport)
             {
@@ -313,25 +313,16 @@ namespace UnicontaClient.Pages.CustomPage
                 sw.Write(countryStr); sw.Write(';');
                 sw.Write(rec._DebtorRegNoFile); sw.Write(';');
 
-                var itemAmount = NumberConvert.ToLong(rec.ItemAmount);
-                var serviceAmount = NumberConvert.ToLong(rec.ServiceAmount);
-                var triangularTradeAmount = NumberConvert.ToLong(rec.TriangularTradeAmount);
-                sumOfAmount += itemAmount + serviceAmount + triangularTradeAmount;
                 string type = null;
-                if (itemAmount > 0)
+                switch (rec.DeType)
                 {
-                    type = "L";
-                }
-                if (serviceAmount > 0)
-                {
-                    type = "S";
-                }
-                if (triangularTradeAmount > 0)
-                {
-                    type = "D";
+                    case 1: type = "L"; amount = NumberConvert.ToLong(rec.ItemAmount);  break;
+                    case 2: type = "S"; amount = NumberConvert.ToLong(rec.ServiceAmount); break;
+                    case 3: type = "D"; amount = NumberConvert.ToLong(rec.TriangularTradeAmount); break;
+                    default: type = ""; break;
                 }
 
-                NumberConvert.ToStream(sw, sumOfAmount); sw.Write(';');
+                NumberConvert.ToStream(sw, amount); sw.Write(';');
                 sw.Write(type); sw.Write(Environment.NewLine);
 
                 rec.SystemInfo = exp;

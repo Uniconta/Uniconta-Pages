@@ -1200,20 +1200,10 @@ namespace UnicontaClient.Pages.CustomPage
                     filename = saveDialog.FileName;
                    
                     result.Document.DocumentElement.SetAttribute(BaseDocument.XMLNS_XSI, BaseDocument.XMLNS_XSI_VALUE);
-
-                    if (result.Encoding == Encoding.UTF8) //Remove BOM (Byte Order Mark)
+               
+                    using (TextWriter sw = new StreamWriter(filename, false, result.Encoding))
                     {
-                        using (TextWriter sw = new StreamWriter(filename, false, new UTF8Encoding(false)))
-                        {
-                            result.Document.Save(sw);
-                        }
-                    }
-                    else
-                    {
-                        using (TextWriter sw = new StreamWriter(filename, false, result.Encoding))
-                        {
-                            result.Document.Save(sw);
-                        }
+                        result.Document.Save(sw);
                     }
 
                     paymentReference.InsertPaymentReferenceTask(paymentList.Where(s => s._ErrorInfo == BaseDocument.VALIDATE_OK).ToList(),
@@ -1274,6 +1264,7 @@ namespace UnicontaClient.Pages.CustomPage
             //FIK PaymentId mask is used >>
             if (rec._PaymentId != null && rec._PaymentMethod != PaymentTypes.PaymentMethod4)
             {
+                bool removeLast = false;
                 var OCRMask = rec._PaymentId ?? string.Empty;
                 OCRMask = OCRMask.ToUpper();
 
@@ -1289,6 +1280,12 @@ namespace UnicontaClient.Pages.CustomPage
                 OCRMask = OCRMask.Replace(">04<", "");
                 OCRMask = OCRMask.Replace("<", "");
                 OCRMask = OCRMask.Replace(">", "");
+
+                if (OCRMask.IndexOf("L") != -1)
+                {
+                    OCRMask = OCRMask.Replace("L", "");
+                    removeLast = true;
+                }
 
                 StringBuilder FIKString;
 
@@ -1330,7 +1327,12 @@ namespace UnicontaClient.Pages.CustomPage
 
                 int invoiceMaskLength = maskIndexEnd - maskIndexStart + 1;
                 if (invoiceMaskLength < invoiceNumberStr.Length)
-                    invoiceNumberStr = invoiceNumberStr.Substring(invoiceNumberStr.Length - invoiceMaskLength);
+                {
+                    if (removeLast)
+                        invoiceNumberStr = invoiceNumberStr.Substring(0, invoiceNumberStr.Length - 1);
+                    else
+                        invoiceNumberStr = invoiceNumberStr.Substring(invoiceNumberStr.Length - invoiceMaskLength);
+                }
 
                 invoiceNumberStr = invoiceNumberStr.PadLeft(invoiceMaskLength, '0');
                 var invoiceNumberMask = string.Empty;

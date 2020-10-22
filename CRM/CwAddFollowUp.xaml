@@ -19,7 +19,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CwAddFollowUp"
                         <CorasauControls:DateEditor x:Name="deCreated" EditValue="{Binding Created, Mode=TwoWay}" Mask="g" />
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem x:Name="liText" FieldName="Text" VerticalAlignment="Top" VerticalContentAlignment="Top" LabelVerticalAlignment="Top">
-                        <CorasauControls:TextEditor Text="{Binding Text, Mode=TwoWay}" TextWrapping="Wrap" AcceptsReturn="True"  MinHeight="60" VerticalContentAlignment="Top"/>
+                        <CorasauControls:TextEditor x:Name="txtText" Text="{Binding Text, Mode=TwoWay}" TextWrapping="Wrap" AcceptsReturn="True"  MinHeight="60" VerticalContentAlignment="Top"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem x:Name="liAmount" FieldName="Amount">
                         <CorasauControls:DoubleEditor FieldName="Amount" />

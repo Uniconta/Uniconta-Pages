@@ -122,6 +122,8 @@ namespace UnicontaClient.Pages.CustomPage
             : base(syncEntity, true)
         {
             this.syncEntity = syncEntity;
+            if (RemoveMenu(syncEntity.Row))
+                IsmenuRemove = true;
             var mlist = new List<UnicontaBaseEntity>() { syncEntity.Row };
             InitializePage(mlist);
             SetPageHeader();
@@ -430,7 +432,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "ChangeDate":
                     if (selectedItem == null) return;
-                    var dateSelector = new CWDateSelector(false, true);
+                    var dateSelector = new CWDateSelector(selectedItem.Date, true);
 #if !SILVERLIGHT
                     dateSelector.DialogTableId = 2000000058;
 #endif

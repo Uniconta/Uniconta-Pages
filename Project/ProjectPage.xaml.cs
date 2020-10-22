@@ -315,6 +315,7 @@ namespace UnicontaClient.Pages.CustomPage
                              {
                                  debtorOrderInstance.SetMaster(selectedItem);
                                  debtorOrderInstance._PrCategory = CWCreateOrderFromProject.InvoiceCategory;
+                                 debtorOrderInstance._NoItemUpdate = true;
                                  var er = await api.Insert(debtorOrderInstance);
                                  if (er == ErrorCodes.Succes)
                                      ShowOrderLines(debtorOrderInstance);

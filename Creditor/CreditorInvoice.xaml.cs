@@ -259,7 +259,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "SendInvoice":
                     if (dgCrdInvoicesGrid.SelectedItem == null || dgCrdInvoicesGrid.SelectedItems == null)
                         return;
-                    var selectedInvoiceEmails = dgCrdInvoicesGrid.SelectedItems as IEnumerable<CreditorInvoiceLocal>;
+                    var selectedInvoiceEmails = dgCrdInvoicesGrid.SelectedItems.Cast<CreditorInvoiceLocal>();
                     SendInvoice(selectedInvoiceEmails);
                     break;
                 case "AddDoc":
@@ -378,7 +378,7 @@ namespace UnicontaClient.Pages.CustomPage
                         {
                             ribbonControl.DisableButtons(new string[] { "ShowInvoice", "ShowPackNote" });
                             if (standardPreviewPrintPage == null)
-                                standardPreviewPrintPage = dockCtrl.AddDockItem(api?.CompanyEntity, TabControls.StandardPrintReportPage, ParentControl, new object[] { printReport }, dockName) as StandardPrintReportPage;
+                                standardPreviewPrintPage = dockCtrl.AddDockItem(api?.CompanyEntity, TabControls.StandardPrintReportPage, ParentControl, new object[] { printReport, reportName }, dockName) as StandardPrintReportPage;
                             else
                                 standardPreviewPrintPage.InsertToMasterReport(printReport.Report);
                         }
@@ -481,7 +481,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                 if (iprintReport?.Report == null)
                 {
-                    iprintReport = new LayoutPrintReport(api, creditorInvoice, creditorInvoicePrint.IsCreditNote ? CompanyLayoutType.Creditnote : CompanyLayoutType.Invoice);
+                    iprintReport = new LayoutPrintReport(api, creditorInvoice, creditorInvoicePrint.IsCreditNote ? CompanyLayoutType.Creditnote : CompanyLayoutType.PurchaseInvoice);
                     await iprintReport.InitializePrint();
                 }
                 return iprintReport;

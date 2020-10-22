@@ -511,11 +511,15 @@ namespace UnicontaClient.Pages.CustomPage
                 rec.Text = t._TransType;
                 if (t._AccountType == 0 && t._Account != null)
                     rec.CostAccount = t._Account;
-                if (t._OffsetAccountType == 0 && t._OffsetAccount != null)
-                    rec.PayAccount = t._OffsetAccount;
+                if (t._OffsetAccount != null)
+                {
+                    if (t._OffsetAccountType == 0)
+                        rec.PayAccount = t._OffsetAccount;
+                    else if (t._OffsetAccountType == GLJournalAccountType.Creditor)
+                        rec.CreditorAccount = t._OffsetAccount;
+                }
             }
         }
-
         async void lookupProjectDim(VouchersClient rec)
         {
             if (ProjectCache == null)

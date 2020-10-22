@@ -361,7 +361,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (dialog.DialogResult == true)
                 {
                     var prodAPI = new ProductionAPI(api);
-                    var result = await prodAPI.CreateProductionLines(productionOrder, (StorageRegister)dialog.storage, dialog.Force);
+                    var result = await prodAPI.CreateProductionLines(productionOrder, (StorageRegister)dialog.Storage, dialog.Force);
                     UtilDisplay.ShowErrorCode(result);
                     //else
                     //    CreditorOrders.ShowOrderLines(4, productionOrder, this, dgProductionOrders);
