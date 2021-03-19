@@ -6,7 +6,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ItemStockStatusPage"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:UnicontaControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"      
         xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
-        xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage" xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage">
+        xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage">
     <UserControl.Resources>
         <Util:MaskConverter x:Key="MaskConverter" />
     </UserControl.Resources>
@@ -22,17 +22,19 @@ x:Class="UnicontaClient.Pages.CustomPage.ItemStockStatusPage"
             <UnicontaControls:DateEditor x:Name="ToDate"  Margin="10 0 0 0" ShowToday="True"/>
         </StackPanel>
         <UnicontaControls:BusyIndicator x:Name="busyIndicator" Grid.Row="2" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BusyMessage}">
-            <local:ItemStockStatusPageGrid   x:Name="dgItemStockStatusGrid" AutoGenerateColumns="None" HorizontalAlignment="Stretch">
-                <local:ItemStockStatusPageGrid.Columns>
+            <localPage:ItemStockStatusPageGrid   x:Name="dgItemStockStatusGrid" AutoGenerateColumns="None" HorizontalAlignment="Stretch">
+                <localPage:ItemStockStatusPageGrid.Columns>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Item" Width="100"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ItemName" Width="200"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ItemType" Width="60" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ItemGroup" Width="100"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant1" FieldName="Variant1" Width="80" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant2" FieldName="Variant2" Width="80" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant3" FieldName="Variant3" Width="80" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant4" FieldName="Variant4" Width="80" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant5" FieldName="Variant5" Width="80" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant" FieldName="Variant" Width="80"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="VariantName" Width="100" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant1" FieldName="Variant1" Width="80" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant2" FieldName="Variant2" Width="80" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant3" FieldName="Variant3" Width="80" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant4" FieldName="Variant4" Width="80" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant5" FieldName="Variant5" Width="80" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Variant1Name" Width="100" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Variant2Name" Width="100" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Variant3Name" Width="100" Visible="False"/>
@@ -54,12 +56,12 @@ x:Class="UnicontaClient.Pages.CustomPage.ItemStockStatusPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim3" Width="70" FieldName="Dimension3" Visible="false"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim4" Width="70" FieldName="Dimension4" Visible="false"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim5" Width="70" FieldName="Dimension5" Visible="false" />
-                </local:ItemStockStatusPageGrid.Columns>
-                <local:ItemStockStatusPageGrid.TotalSummary>
+                </localPage:ItemStockStatusPageGrid.Columns>
+                <localPage:ItemStockStatusPageGrid.TotalSummary>
                     <localPage:SumColumn FieldName="Qty" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                     <localPage:SumColumn FieldName="CostValue" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
-                </local:ItemStockStatusPageGrid.TotalSummary>
-            </local:ItemStockStatusPageGrid>
+                </localPage:ItemStockStatusPageGrid.TotalSummary>
+            </localPage:ItemStockStatusPageGrid>
         </UnicontaControls:BusyIndicator>
     </Grid>
 </Pages:GridBasePage>

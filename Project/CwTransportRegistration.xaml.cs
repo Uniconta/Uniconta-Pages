@@ -21,6 +21,7 @@ using UnicontaClient.Pages.Project.TimeManagement;
 using Uniconta.ClientTools.Controls;
 using System.Globalization;
 using static UnicontaClient.Pages.Project.TimeManagement.TMJournalLineHelper;
+using Uniconta.Common.Utility;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -57,6 +58,7 @@ namespace UnicontaClient.Pages.CustomPage
         CrudAPI crudApi;
         bool addMileage = false;
         double mileageTotal;
+        private bool doCalculate = false;
         private string EMPTYADDRESS = string.Concat("<", Uniconta.ClientTools.Localization.lookup("address")+">");
 
         public CwTransportRegistration(TMJournalLineClientLocal tmJournalLine, CrudAPI _crudApi, double mileageTotal, bool returning, bool _addMileage = false)
@@ -89,39 +91,43 @@ namespace UnicontaClient.Pages.CustomPage
         {
             txtFromAdd.Text = string.Empty;
             txtToAdd.Text = string.Empty;
+            var journalline = this.journalline;
 
             addressList = new List<Address>();
 
-            var workAddress = new StringBuilder();
-            workAddress.AppendLine(company._Name).AppendLine(company._Address1).AppendLine(company._Address2).AppendLine(company._Address3);
-            workAddress.Replace(Environment.NewLine + Environment.NewLine + Environment.NewLine, Environment.NewLine);
-            workAddress.Replace(Environment.NewLine + Environment.NewLine, Environment.NewLine);
-            addressList.Add(new Address { Name = Uniconta.ClientTools.Localization.lookup("Company"), ContactAddress = workAddress?.ToString() });
+            var sbWork = StringBuilderReuse.Create();
+            sbWork.AppendLineConditional(company._Name).AppendLineConditional(company._Address1).AppendLineConditional(company._Address2).AppendLineConditional(company._Address3);
+            addressList.Add(new Address { Name = Uniconta.ClientTools.Localization.lookup("Company"), ContactAddress = sbWork.ToString() });
+            sbWork.Clear();
 
-            var homeAddress = new StringBuilder();
             if (employee != null)
             {
-                homeAddress.AppendLine(employee._Name).AppendLine(employee._Address1).AppendLine(employee._Address2).Append(employee._ZipCode != null ? employee._ZipCode + " " : string.Empty).Append(employee._City);
-                homeAddress.Replace(Environment.NewLine + Environment.NewLine + Environment.NewLine, Environment.NewLine);
-                homeAddress.Replace(Environment.NewLine + Environment.NewLine, Environment.NewLine);
+                sbWork.AppendLineConditional(employee._Name).AppendLineConditional(employee._Address1).AppendLineConditional(employee._Address2);
+                if (employee._ZipCode != null)
+                    sbWork.Append(employee._ZipCode).Append(' ');
+                sbWork.Append(employee._City);
+                addressList.Add(new Address { Name = Uniconta.ClientTools.Localization.lookup("Private"), ContactAddress = sbWork.ToString() });
             }
-            addressList.Add(new Address { Name = Uniconta.ClientTools.Localization.lookup("Private"), ContactAddress = homeAddress?.ToString() });
+            sbWork.Clear();
 
-            var otherAddress = new StringBuilder();
             if (debtor != null)
             {
-                otherAddress.AppendLine(debtor._Name).AppendLine(debtor._Address1).AppendLine(debtor._Address2).AppendLine(debtor._Address3).Append(debtor._ZipCode != null ? debtor._ZipCode + " " : string.Empty).Append(debtor._City);
-                otherAddress.Replace(Environment.NewLine + Environment.NewLine + Environment.NewLine, Environment.NewLine);
-                otherAddress.Replace(Environment.NewLine + Environment.NewLine, Environment.NewLine);
-                addressList.Add(new Address { Name = Uniconta.ClientTools.Localization.lookup("Debtor"), ContactAddress = otherAddress?.ToString() });
+                sbWork.AppendLineConditional(debtor._Name).AppendLineConditional(debtor._Address1).AppendLineConditional(debtor._Address2).AppendLineConditional(debtor._Address3);
+                if (debtor._ZipCode != null)
+                    sbWork.Append(debtor._ZipCode).Append(' ');
+                sbWork.Append(debtor._City);
+                addressList.Add(new Address { Name = Uniconta.ClientTools.Localization.lookup("Debtor"), ContactAddress = sbWork.ToString() });
             }
             else if (installation != null)
             {
-                otherAddress.AppendLine(installation._Name).AppendLine(installation._Address1).AppendLine(installation._Address2).AppendLine(installation._Address3).Append(installation._ZipCode != null ? installation._ZipCode + " " : string.Empty).Append(installation._City);
-                otherAddress.Replace(Environment.NewLine + Environment.NewLine + Environment.NewLine, Environment.NewLine);
-                otherAddress.Replace(Environment.NewLine + Environment.NewLine, Environment.NewLine);
-                addressList.Add(new Address { Name = Uniconta.ClientTools.Localization.lookup("Debtor"), ContactAddress = otherAddress?.ToString() });
+                sbWork.AppendLineConditional(installation._Name).AppendLineConditional(installation._Address1).AppendLineConditional(installation._Address2).AppendLineConditional(installation._Address3);
+                if (installation._ZipCode != null)
+                    sbWork.Append(installation._ZipCode).Append(' ');
+                sbWork.Append(installation._City);
+                addressList.Add(new Address { Name = Uniconta.ClientTools.Localization.lookup("Debtor"), ContactAddress = sbWork.ToString() });
             }
+            sbWork.Release();
+            sbWork = null;
 
             Address emptyAddress = null;
             if (journalline.RowId != 0 && journalline._RegistrationType == RegistrationType.Mileage && addEmptyAddress)
@@ -144,17 +150,17 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 cmbFromAdd.SelectedIndex = 0;
                 cmbToAdd.SelectedIndex = 1;
-                txtFromAdd.Text = addressList.Count >= 1 ? addressList[0]?.ContactAddress : string.Empty;
+                txtFromAdd.Text = addressList.Count >= 1 ? addressList[0].ContactAddress : string.Empty;
 
                 if (addressList.Count == 4)
                 {
                     cmbToAdd.SelectedIndex = 2;
-                    txtToAdd.Text = addressList[2]?.ContactAddress;
+                    txtToAdd.Text = addressList[2].ContactAddress;
                 }
-                else 
+                else if (addressList.Count >= 4)
                 {
                     cmbToAdd.SelectedIndex = 3;
-                    txtToAdd.Text = addressList[3]?.ContactAddress;
+                    txtToAdd.Text = addressList[3].ContactAddress;
                 }
             }
 
@@ -180,6 +186,7 @@ namespace UnicontaClient.Pages.CustomPage
             txtSatHrs.Background = SetBackGroundColor(txtSatHrs, journalline.StatusDay6);
             txtSunHrs.Background = SetBackGroundColor(txtSunHrs, journalline.StatusDay7);
 
+            doCalculate = true;
             if (addMileage)
                 CalulateMileage();
             else
@@ -203,18 +210,19 @@ namespace UnicontaClient.Pages.CustomPage
             var payrollCategoryLst = await crudApi.LoadCache<Uniconta.DataModel.EmpPayrollCategory>();
             var payrollCategory = payrollCategoryLst.Where(s => s._InternalType == Uniconta.DataModel.InternalType.Mileage).OrderByDescending(s => s._Rate).FirstOrDefault(); //TODO:Mangler håndtering af Høj/Lav sats
 
+            var journalline = this.journalline;
             if (journalline.RowId != 0 && journalline._RegistrationType == RegistrationType.Mileage)
                 Project = string.Empty;
             else
-                Project = journalline.Project;
-            RegistrationProject = payrollCategory?._InternalProject ?? journalline?.Project;
+                Project = journalline._Project;
+            RegistrationProject = payrollCategory?._InternalProject ?? journalline._Project;
             PayType = payrollCategory?._Number;
             if (journalline._RegistrationType == RegistrationType.Mileage)
             {
                 Purpose = journalline.Text;
-                VechicleRegNo = journalline.VechicleRegNo;
-                FromAddress = journalline.AddressFrom;
-                ToAddress = journalline.AddressTo;
+                VechicleRegNo = journalline._VechicleRegNo;
+                FromAddress = journalline._AddressFrom;
+                ToAddress = journalline._AddressTo;
                 Day1 = journalline.Day1;
                 Day2 = journalline.Day2;
                 Day3 = journalline.Day3;
@@ -286,45 +294,50 @@ namespace UnicontaClient.Pages.CustomPage
 
         void CalulateMileage()
         {
+            if (!doCalculate)
+                return;
+
             double distance = 0d;
             if (string.IsNullOrWhiteSpace(txtFromAdd.Text) || string.IsNullOrWhiteSpace(txtToAdd.Text) || txtFromAdd.Text == EMPTYADDRESS || txtToAdd.Text == EMPTYADDRESS)
-                distance = 0;
+            { }
+#if !SILVERLIGHT
             else
-                distance = TMJournalLineHelper.GetDistance(txtFromAdd.Text, txtToAdd.Text, (bool)chkAvdFerr.IsChecked);
-    
+                distance = GoogleMaps.GetDistance(txtFromAdd.Text, txtToAdd.Text, (bool)chkAvdFerr.IsChecked);
+#endif
+            object dist = distance;
             if (!addMileage)
             {
                 if (!txtMonHrs.IsReadOnly)
-                    txtMonHrs.EditValue = distance;
+                    txtMonHrs.EditValue = dist;
                 else if (!txtTueHrs.IsReadOnly)
-                    txtTueHrs.EditValue = distance;
+                    txtTueHrs.EditValue = dist;
                 else if (!txtWedHrs.IsReadOnly)
-                    txtWedHrs.EditValue = distance;
+                    txtWedHrs.EditValue = dist;
                 else if (!txtThuHrs.IsReadOnly)
-                    txtThuHrs.EditValue = distance;
+                    txtThuHrs.EditValue = dist;
                 else if (!txtFriHrs.IsReadOnly)
-                    txtFriHrs.EditValue = distance;
+                    txtFriHrs.EditValue = dist;
                 else if (!txtSatHrs.IsReadOnly)
-                    txtSatHrs.EditValue = distance;
+                    txtSatHrs.EditValue = dist;
                 else if (!txtSunHrs.IsReadOnly)
-                    txtSunHrs.EditValue = distance;
+                    txtSunHrs.EditValue = dist;
             }
             else
             {
                 if (!txtMonHrs.IsReadOnly && journalline.Day1 > 0)
-                    txtMonHrs.EditValue = distance;
+                    txtMonHrs.EditValue = dist;
                  if (!txtTueHrs.IsReadOnly && journalline.Day2 > 0)
-                    txtTueHrs.EditValue = distance;
+                    txtTueHrs.EditValue = dist;
                  if (!txtWedHrs.IsReadOnly && journalline.Day3 > 0)
-                    txtWedHrs.EditValue = distance;
+                    txtWedHrs.EditValue = dist;
                  if (!txtThuHrs.IsReadOnly && journalline.Day4 > 0)
-                    txtThuHrs.EditValue = distance;
+                    txtThuHrs.EditValue = dist;
                  if (!txtFriHrs.IsReadOnly && journalline.Day5 > 0)
-                    txtFriHrs.EditValue = distance;
+                    txtFriHrs.EditValue = dist;
                  if (!txtSatHrs.IsReadOnly && journalline.Day6 > 0)
-                    txtSatHrs.EditValue = distance;
+                    txtSatHrs.EditValue = dist;
                  if (!txtSunHrs.IsReadOnly && journalline.Day7 > 0)
-                    txtSunHrs.EditValue = distance;
+                    txtSunHrs.EditValue = dist;
             }
             CalculateTotal();
         }
@@ -348,41 +361,40 @@ namespace UnicontaClient.Pages.CustomPage
                 if (journalline.RowId != 0 && journalline._RegistrationType == RegistrationType.Mileage)
                     addEmptyAddress = false;
                 LoadControls();
-                double distance = 0d;
                 if (!txtMonHrs.IsReadOnly)
                 {
-                    txtMonHrs.Text = distance.ToString();
-                    Day1 = distance;
+                    txtMonHrs.Text = "0";
+                    Day1 = 0d;
                 }
                 if (!txtTueHrs.IsReadOnly)
                 {
-                    txtTueHrs.Text = distance.ToString();
-                    Day2 = distance;
+                    txtTueHrs.Text = "0";
+                    Day2 = 0d;
                 }
                 if (!txtWedHrs.IsReadOnly)
                 {
-                    txtWedHrs.Text = distance.ToString();
-                    Day3 = distance;
+                    txtWedHrs.Text = "0";
+                    Day3 = 0d;
                 }
                 if (!txtThuHrs.IsReadOnly)
                 {
-                    txtThuHrs.Text = distance.ToString();
-                    Day4 = distance;
+                    txtThuHrs.Text = "0";
+                    Day4 = 0d;
                 }
                 if (!txtFriHrs.IsReadOnly)
                 {
-                    txtFriHrs.Text = distance.ToString();
-                    Day5 = distance;
+                    txtFriHrs.Text = "0";
+                    Day5 = 0d;
                 }
                 if (!txtSatHrs.IsReadOnly)
                 {
-                    txtSatHrs.Text = distance.ToString();
-                    Day6 = distance;
+                    txtSatHrs.Text = "0";
+                    Day6 = 0d;
                 }
                 if (!txtSunHrs.IsReadOnly)
                 {
-                    txtSunHrs.Text = distance.ToString();
-                    Day7 = distance;
+                    txtSunHrs.Text = "0";
+                    Day7 = 0d;
                 }
                 CalculateTotal();
                 CalulateMileage();

@@ -203,15 +203,15 @@ namespace UnicontaClient.Pages.CustomPage
 
         private string GetInvalidEntries<T>(IEnumerable<T> entities, Func<T, string> GetErrorKey)
         {
-            var sb = new StringBuilder();
+            var sb = StringBuilderReuse.Create();
 
             foreach (var entity in entities)
             {
                 sb.Append(GetErrorKey(entity));
-                sb.Append(" \n");
+                sb.Append(' ').Append('\n');
             }
 
-            return sb.ToString();
+            return sb.ToStringAndRelease();
         }
 
         async void ExportToDatev()
@@ -407,6 +407,8 @@ namespace UnicontaClient.Pages.CustomPage
             byte Country;
             GLTransExportedClient glTransExported;
             public SQLCache Accounts, Debtors, Creditors, VATs, Pays;
+            HashSet<string> bankAccounts;
+            string[] line;
 
             public DateveWrapper(Company company, GLTransExportedClient glTransExported, DatevHeader datev, int AccountLength)
             {
@@ -427,6 +429,7 @@ namespace UnicontaClient.Pages.CustomPage
                 this.glTransExported = glTransExported;
                 fromDate = glTransExported._FromDate;
                 toDate = glTransExported._ToDate;
+                line = new string[300];
             }
 
             void PopulateEmptyFieldIndexLists()
@@ -473,11 +476,10 @@ namespace UnicontaClient.Pages.CustomPage
                 fileStream.WriteLine(header.getHeaderString());
                 fileStream.WriteLine(AccountLabelsHeadline);
 
-                var line = new string[3];
                 foreach (var gla in GLAccounts.GetRecords as GLAccount[])
                 {
                     var acc = new DATEVAccountLabel() { Account = gla, LanguageId = LanguageId };
-                    MakeCSV(acc, EmptyFieldIndicesDatevAccountLabel, line, fileStream);
+                    MakeCSV(acc, EmptyFieldIndicesDatevAccountLabel, 3, fileStream);
                 }
                 fileStream.Close();
             }
@@ -501,7 +503,6 @@ namespace UnicontaClient.Pages.CustomPage
 
             void buildCSV(DCAccount[] accounts, SQLCache Payments, TextWriter fileStream)
             {
-                var line = new string[254]; //auf 254 von 243
                 foreach (var dca in accounts)
                 {
                     var acc = new DCDATEV() { Payment = (PaymentTerm)Payments.Get(dca._Payment), dcAccount = dca };
@@ -509,7 +510,7 @@ namespace UnicontaClient.Pages.CustomPage
                         acc.TwoLetterISOLanguageName = ((CountryISOCode)dca._Country).ToString().ToUpper();
                     else
                         acc.TwoLetterISOLanguageName = TwoLetterISOLanguageName;
-                    MakeCSV(acc, EmptyFieldIndicesDCDatev, line, fileStream);
+                    MakeCSV(acc, EmptyFieldIndicesDCDatev, 254, fileStream);
                 }
             }
 
@@ -518,8 +519,18 @@ namespace UnicontaClient.Pages.CustomPage
             #region Transactions
             public void GenerateTransactionFile(IEnumerable<GLTransClient> trans, TextWriter fileStream)
             {
-                var dcSumAccounts = (from ac in (IEnumerable<GLAccount>)Accounts.GetNotNullArray where (ac._AccountType == (byte)GLAccountTypes.Debtor || ac._AccountType == (byte)GLAccountTypes.Creditor) select ac._Account).ToList();
-                var dcVATAccounts = (from ac in (IEnumerable<GLAccount>)Accounts.GetNotNullArray where (ac._SystemAccount == (byte)SystemAccountTypes.SalesTaxPayable || ac._SystemAccount == (byte)SystemAccountTypes.VatRounding || ac._SystemAccount == (byte)SystemAccountTypes.SalesTaxReceiveable) select ac._Account).ToList();
+                var dcSumAccounts = new HashSet<string>();
+                var dcVATAccounts = new HashSet<string>();
+                this.bankAccounts = new HashSet<string>();
+                foreach (var ac in (IEnumerable<GLAccount>)Accounts.GetNotNullArray)
+                {
+                    if (ac._AccountType == (byte)GLAccountTypes.Debtor || ac._AccountType == (byte)GLAccountTypes.Creditor)
+                        dcSumAccounts.Add(ac._Account);
+                    else if (ac._AccountType == (byte)GLAccountTypes.Bank)
+                        bankAccounts.Add(ac._Account);
+                    else if (ac._SystemAccount == (byte)SystemAccountTypes.SalesTaxPayable || ac._SystemAccount == (byte)SystemAccountTypes.VatRounding || ac._SystemAccount == (byte)SystemAccountTypes.SalesTaxReceiveable)
+                        dcVATAccounts.Add(ac._Account);
+                }
 
                 var header = CreateBasicHeader();
                 header.DataCategory = 21;
@@ -532,7 +543,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                 List<GLTransClient> voucher = new List<GLTransClient>(100);
                 int LastVoucher = -1;
-                bool hasSumAccount = false;
+                bool hasSumAccount = false, hasBankAccount = false;
                 bool DefaultContraAccount = false;
                 foreach (var tc in trans)
                 {
@@ -544,29 +555,34 @@ namespace UnicontaClient.Pages.CustomPage
 
                     if (tc._Voucher != LastVoucher)
                     {
-                        GenerateDatevPostingLines(voucher, fileStream, hasSumAccount, DefaultContraAccount);
+                        GenerateDatevPostingLines(voucher, fileStream, !(hasSumAccount || hasBankAccount), DefaultContraAccount);
                         voucher.Clear();
                         LastVoucher = tc.Voucher;
                         hasSumAccount = false;
                     }
 
-                    if (tc._DCType > 0 && (byte)tc._DCType <= 2 && dcSumAccounts.Contains(tc.Account))
+                    if (tc._DCType > 0 && (byte)tc._DCType <= 2) 
                     {
-                        hasSumAccount = true;
-                        continue;
+                        if (dcSumAccounts.Contains(tc._Account))
+                        {
+                            hasSumAccount = true;
+                            continue;
+                        }
+                        if (bankAccounts.Contains(tc._Account))
+                            hasBankAccount = true;
                     }
 
                     voucher.Add(tc);
                 }
-                GenerateDatevPostingLines(voucher, fileStream, hasSumAccount, DefaultContraAccount);
+                GenerateDatevPostingLines(voucher, fileStream, ! (hasSumAccount || hasBankAccount), DefaultContraAccount);
                 fileStream.Close();
             }
 
-            void GenerateDatevPostingLines(List<GLTransClient> trans, TextWriter w, bool hasSumAccount, bool useDefaultContraAccount)
+            void GenerateDatevPostingLines(List<GLTransClient> trans, TextWriter w, bool removeOffsetAccount, bool useDefaultContraAccount)
             {
                 string OffsetAccount = null;
 
-                if (!hasSumAccount)
+                if (removeOffsetAccount)
                 {
                     for (int i = 0; (i < trans.Count); i++)
                     {
@@ -627,7 +643,6 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                 }
 
-                var line = new string[120];
                 foreach (var tc in trans)
                 {
                     string cAcc;
@@ -636,7 +651,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if ((byte)tc._DCType >= 1 && (byte)tc._DCType <= 2)
                     {
                         cAcc = tc._DCAccount;
-                        if (tc._Invoice > 0) //Datev Rechnungsnummer
+                        if (tc._Invoice > 0 && !bankAccounts.Contains(tc._Account)) //Datev Rechnungsnummer
                         {
                             var cache = (byte)tc._DCType == 1 ? this.Debtors : this.Creditors;
                             var rec = (DCAccount)cache.Get(cAcc);
@@ -649,7 +664,7 @@ namespace UnicontaClient.Pages.CustomPage
                         cAcc = OffsetAccount;
 
                     var post = ToDatevPosting(tc, currency, cAcc, DueDate);
-                    MakeCSV(post, EmptyFieldIndicesDatevPosting, line, w); //Datev 120 im Version 700
+                    MakeCSV(post, EmptyFieldIndicesDatevPosting, 120, w); //Datev 120 im Version 700
                 }
             }
 
@@ -705,21 +720,20 @@ namespace UnicontaClient.Pages.CustomPage
             }
             #endregion
 
-            private void MakeCSV(DatevEntity entitiy, List<int> emptyFieldIndices, string[] line, TextWriter w)
+            private void MakeCSV(DatevEntity entitiy, List<int> emptyFieldIndices, int length, TextWriter w)
             {
+                var line = this.line;
                 int i;
                 for (i = 0; (i < emptyFieldIndices.Count); i++)
                     line[emptyFieldIndices[i]] = "\"\"";
 
                 entitiy.ToDatevArray(line);
 
-                bool first = true;
-                for (i = 0; (i < line.Length); i++)
+                for (i = 0; (i < length); i++)
                 {
-                    if (!first)
+                    if (i > 0)
                         w.Write(';');
                     w.Write(line[i]);
-                    first = false;
                 }
                 Array.Clear(line, 0, line.Length); // we clear it so we can reuse it in next call
                 w.WriteLine();
@@ -821,7 +835,7 @@ namespace UnicontaClient.Pages.CustomPage
                 line[0] = dcAccount._Account;
                 line[1] = AddSingleQuotes(dcAccount._Name);
                 var Ust = dcAccount._LegalIdent;
-                if (Ust != null && Ust.Length > 0) //Ust im Stamdaten
+                if (Ust != null && Ust.Length >= 2) //Ust im Stamdaten
                 {
                     line[8] = AddSingleQuotes(Ust.Substring(0, 2));
                     line[9] = AddSingleQuotes(Ust.Substring(2));

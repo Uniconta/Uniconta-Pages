@@ -35,14 +35,18 @@ namespace UnicontaClient.Pages.CustomPage
                 return null;
 
             var reportline = await api.Query<GLReportLine>(template);
-            TemplateDataContext items = new TemplateDataContext();
-            List<BalanceClient> newBalance = new List<BalanceClient>();
+            var items = new TemplateDataContext();
+            var TemplateReportlist = items.TemplateReportlist;
+            TemplateReportlist.Capacity = reportline.Length;
 
-            TemplateSumContext SumContext = new TemplateSumContext(Cols);
+            var newBalance = new List<BalanceClient>(reportline.Length);
+
+            var SumContext = new TemplateSumContext(Cols);
             var colCount = PassedCriteria.selectedCriteria.Count;
+            bool AnyHidden = false;
+            int i;
             foreach (var line in reportline)
             {
-
                 var amounts = new long[colCount];
                 if (line._Accounts != null && !line._ExpressionSum)
                 {
@@ -55,7 +59,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (Skip0Account)
                     {
                         bool found = false;
-                        for (int i = Cols; (--i >= 0);)
+                        for (i = 0; (i < Cols); i++)
                             if (amounts[i] != 0)
                             {
                                 found = true;
@@ -67,26 +71,25 @@ namespace UnicontaClient.Pages.CustomPage
                 }
                 if (line._InvertSign)
                 {
-                    for (int i = Cols; (--i >= 0);)
+                    for (i = 0; (i < Cols); i++)
                         amounts[i] = -amounts[i];
                 }
                 if (line._SaveTotal != 0)
                     SumContext.CalcMethod.AddSum(line._SaveTotal, amounts);
+                if (line._Hide)
+                    AnyHidden = true;
 
                 var newBalanceCol = new BalanceClient(amounts);
                 newBalance.Add(newBalanceCol);
                 hdrData.TextSize = template._TextSize == 0 ? 70 * SizeFactor : (template._TextSize * SizeFactor);
                 hdrData.AmountSize = template._AmountSize == 0 ? 20 * SizeFactor : (template._AmountSize * SizeFactor);
-                TemplateDataItems item = new TemplateDataItems(newBalanceCol, hdrData, line);
-                item.Masterfontsize = template._FontSize;
-                if (!line._Hide)
-                    items.TemplateReportlist.Add(item);
-            }
+                TemplateReportlist.Add(new TemplateDataItems(newBalanceCol, hdrData, line) { Masterfontsize = template._FontSize });
+           }
 
             // Now we will take all expressions and update.
             var pars = new parser(SumContext);
 
-            foreach (TemplateDataItems item in items.TemplateReportlist)
+            foreach (var item in TemplateReportlist)
             {
                 var line = item.line;
                 if (line._ExpressionSum)
@@ -96,13 +99,11 @@ namespace UnicontaClient.Pages.CustomPage
                     if (e != null)
                     {
                         var amounts = item.blc.amount;
-                        for (int i = Cols; (--i >= 0); )
+                        for (i = 0; (i < Cols); i++)
                         {
                             SumContext.CurIndex = i;
                             var val = NumberConvert.ToLong(e.Value());
-                            if (InvertSign)
-                                val = -val;
-                            amounts[i] = val;
+                            amounts[i] = !InvertSign ? val : -val;
                         }
                         if (line._SaveTotal != 0)
                             SumContext.CalcMethod.AddSum(line._SaveTotal, amounts);
@@ -110,9 +111,18 @@ namespace UnicontaClient.Pages.CustomPage
                 }
             }
 
+            if (AnyHidden)
+            {
+                for (i = TemplateReportlist.Count; (--i >= 0); )
+                {
+                    if (TemplateReportlist[i].line._Hide)
+                        TemplateReportlist.RemoveAt(i);
+                }
+            }
+
             AccountName.Visible = AccountNo.Visible = false;
             Text.Visible = true;
-            dgBalanceReport.ItemsSource = items.TemplateReportlist;
+            dgBalanceReport.ItemsSource = TemplateReportlist;
             templateReportData = new object[4];
             templateReportData[0] = items;
             templateReportData[1] = hdrData;

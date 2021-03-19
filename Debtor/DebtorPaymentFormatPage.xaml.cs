@@ -36,6 +36,12 @@ namespace UnicontaClient.Pages.CustomPage
         {
             return false;
         }
+        public DebtorPaymentFormatPage(BaseAPI api, string lookupKey)
+          : base(api, lookupKey)
+        {
+            Init();
+        }
+
         public DebtorPaymentFormatPage(BaseAPI API) : base(API, string.Empty)
         {
             Init();

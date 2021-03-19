@@ -56,7 +56,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedVoucherClient.Fileextension == FileextensionsTypes.UNK)
                         documentViewer.Children.Add(Uniconta.ClientTools.Util.UtilDisplay.LoadMessage(Uniconta.ClientTools.Localization.lookup("InvalidDocSave")));
                     else
-                        documentViewer.Children.Add(Uniconta.ClientTools.Util.UtilDisplay.LoadControl(selectedVoucherClient.Buffer, selectedVoucherClient.Fileextension, false, false));
+                        documentViewer.Children.Add(Uniconta.ClientTools.Util.UtilDisplay.LoadControl(selectedVoucherClient, false, false));
                 }
                 catch (Exception ex)
                 {

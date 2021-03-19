@@ -126,7 +126,11 @@ namespace UnicontaClient.Pages.CustomPage
                 cmbDCType.Visibility = Visibility.Collapsed;
             }
 
+#if !SILVERLIGHT
+            Utility.SetupVariants(api, colVariant, VariantName, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
+#else
             Utility.SetupVariants(api, null, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
+#endif
             LoadType(new Type[] { typeof(Uniconta.DataModel.InvItem), typeof(Uniconta.DataModel.Debtor), typeof(Uniconta.DataModel.Creditor) });
         }
 

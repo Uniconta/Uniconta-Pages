@@ -38,6 +38,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionOrderLines"
                                         </DataTemplate>
                                     </local:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </local:CorasauDataGridTemplateColumnClient>
+                                <local:CorasauDataGridTemplateColumnClient x:Name="colNote" FieldName="Note" Width="150" Visible="False"/>
                                 <local:CorasauDataGridTemplateColumnClient x:Name="Item" Width="100"/>
                                 <local:CorasauDataGridTemplateColumnClient x:Name="colVariant" FieldName="Variant">
                                     <local:CorasauDataGridTemplateColumnClient.CellTemplate>
@@ -107,10 +108,11 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionOrderLines"
                                 <local:CorasauDataGridTemplateColumnClient x:Name="ReportAsFinishedDeep" Width="70"/>
                                 <local:CorasauDataGridTemplateColumnClient x:Name="IgnoreBlocked" Width="50" Visible="False" />
                                 <local:ComboBoxColumnClient x:Name="Unit" Width="50" Visible="False" />
+                                <local:CorasauDataGridTemplateColumnClient x:Name="Week" Visible="False" />
+                                <local:CorasauDataGridTemplateColumnClient x:Name="Date" Visible="False" />
                                 <local:CorasauDataGridTemplateColumnClient x:Name="ReferenceNumber" Visible="False" />
                                 <local:CorasauDataGridTemplateColumnClient x:Name="PostingAccount" Width="100" Visible="False"/>
                                 <local:CorasauDataGridTemplateColumnClient x:Name="SerieBatchMarked" Width="90" HideHeaderCheck="true" Visible="False"/>
-                                <local:CorasauDataGridTemplateColumnClient x:Name="Vat" Width="50" Visible="False"/>
                                 <local:CorasauDataGridTemplateColumnClient x:Name="Employee" Width="50" Visible="False"/>
                                 <local:CorasauDataGridTemplateColumnClient x:Name="EmployeeName" Visible="False"/>
                                 <local:CorasauDataGridTemplateColumnClient x:Name="Remaining" Width="80" Visible="False" >

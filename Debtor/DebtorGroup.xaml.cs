@@ -59,7 +59,9 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var Comp = api.CompanyEntity;
             if (!Comp.InvDuty)
-                this.ExemptDuty.ShowInColumnChooser= false;
+                this.ExemptDuty.ShowInColumnChooser = false;
+            else
+                this.ExemptDuty.ShowInColumnChooser = true;
         }
 
         private void localMenu_OnItemClicked(string ActionType)

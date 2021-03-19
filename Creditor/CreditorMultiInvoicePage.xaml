@@ -86,6 +86,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorMultiInvoicePage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="Weight" Visible="False" AllowThousandMask="True" Mask="N3"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Volume" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Cartons" Visible="False" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PurchaseValue" Visible="False" />
                 </local:CreditorMultiInvoiceGrid.Columns>
                 <local:CreditorMultiInvoiceGrid.TotalSummary>
                     <local:SumColumn FieldName="OrderTotal" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>

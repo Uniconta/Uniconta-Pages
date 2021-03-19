@@ -203,6 +203,9 @@ namespace UnicontaClient.Pages.CustomPage
             dgAccountsTransGrid.RowDoubleClick += DgAccountsTransGrid_RowDoubleClick;
             dgAccountsTransGrid.ShowTotalSummary();
             postingApiInv = new PostingAPI(api);
+
+            if (Comp.GetCache(typeof(GLAccount)) == null)
+                api.LoadCache(typeof(GLAccount));
         }
 
         IEnumerable<PropValuePair> filter;
@@ -212,6 +215,16 @@ namespace UnicontaClient.Pages.CustomPage
                 return dgAccountsTransGrid.Filter(filter);
             else
                 return Filter();
+        }
+
+        private void BindGrid()
+        {
+            var pairs = ribbonControl.filterValues;
+            var sort = ribbonControl.PropSort;
+            if (pairs != null || sort != null)
+                ribbonControl.FilterGrid?.Filter(pairs, sort);
+            else
+                InitQuery();
         }
 
         private void DgAccountsTransGrid_RowDoubleClick()
@@ -233,7 +246,7 @@ namespace UnicontaClient.Pages.CustomPage
         void RemoveMenuItem()
         {
             RibbonBase rb = (RibbonBase)localMenu.DataContext;
-            UtilDisplay.RemoveMenuCommand(rb, new string[] { "CancelVoucher", "InvertSign", "ChangeDimension", "AddEditNote", "DeleteVoucher", "ChangeText", "ChangeQuantity", "ChangeDate" /*,"RefVoucher", "ImportVoucher", "RemoveVoucher", "PhyslVoucher" */ });
+            UtilDisplay.RemoveMenuCommand(rb, new string[] { "AddEditNote", "EditTransaction" /*,"RefVoucher", "ImportVoucher", "RemoveVoucher", "PhyslVoucher" */ });
         }
 
         void RemoveDeleteVoucher()
@@ -329,7 +342,7 @@ namespace UnicontaClient.Pages.CustomPage
                         if (deleteDialog.DialogResult == true)
                         {
                             PostingAPI pApi = new PostingAPI(api);
-                            ErrorCodes res = await pApi.DeletePostedVoucher(selectedItem);
+                            ErrorCodes res = await pApi.DeletePostedVoucher(selectedItem, deleteDialog.Comment);
                             UtilDisplay.ShowErrorCode(res);
                             if (res == ErrorCodes.Succes)
                                 dgAccountsTransGrid.ItemsSource = new GLTransClient[0];
@@ -397,6 +410,18 @@ namespace UnicontaClient.Pages.CustomPage
                         ChangeTextDialog.Show();
                     }
                     break;
+                case "ChangeReference":
+                    if (selectedItem != null)
+                    {
+                        CWChangeDimension updateReferenceDialog = new CWChangeDimension(api, isChangeDimension: false);
+                        updateReferenceDialog.Closing += delegate
+                        {
+                            if (updateReferenceDialog.DialogResult == true)
+                                SetChangeReference(selectedItem, updateReferenceDialog);
+                        };
+                        updateReferenceDialog.Show();
+                    }
+                    break;
                 case "ChangeQuantity":
                     if (selectedItem != null)
                     {
@@ -443,10 +468,158 @@ namespace UnicontaClient.Pages.CustomPage
                      };
                     dateSelector.Show();
                     break;
+                case "RemoveVat":
+                    if (selectedItem == null) return;
+                    RemoveVat(selectedItem);
+                    break;
+                case "AddVat":
+                    if (selectedItem == null) return;
+                    AddVat(selectedItem);
+                    break;
+                case "SetNewDcAccount":
+                    if (selectedItem == null) return;
+                    SetNewAccount(selectedItem);
+                    break;
+                case "CopyVoucherToJournal":
+                    if (selectedItem == null) return;
+                    CopyToJOurnal();
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
+        }
+
+        void CopyToJOurnal()
+        {
+            var gltranslst = dgAccountsTransGrid.GetVisibleRows() as IEnumerable<GLTransClient>;
+            var cwObj = new CWCopyVoucherToJrnl(api);
+#if !SILVERLIGHT
+            cwObj.DialogTableId = 2000000082;
+#endif
+            cwObj.Closed += async delegate
+            {
+                if (cwObj.DialogResult == true)
+                {
+                    var Accounts = api.GetCache(typeof(GLAccount));
+
+                    GLDailyJournalLineClient gljournaLine = null;
+                    double factor = CWCopyVoucherToJrnl.InvertSign ? -1d : 1d;
+                    double vatAmount = 0;
+                    var glDailyJrnlLineLst = new List<GLDailyJournalLineClient>(gltranslst.Count());
+                    foreach (var trans in gltranslst)
+                    {
+                        if (gljournaLine != null && gljournaLine._AccountType == 0 && vatAmount != 0 && vatAmount == trans._Amount && gljournaLine._Vat == trans._Vat)
+                        {
+                            // We join vat with previous line
+                            gljournaLine.Amount += (factor * vatAmount);
+                            gljournaLine.AmountCur += factor * trans._AmountCur;
+                            gljournaLine = null;
+                            continue;
+                        }
+                        vatAmount = trans._AmountVat;
+
+                        gljournaLine = new GLDailyJournalLineClient();
+
+                        gljournaLine.Date = CWCopyVoucherToJrnl.Date == DateTime.MinValue ? trans.Date : CWCopyVoucherToJrnl.Date;
+                        gljournaLine.Text = string.IsNullOrEmpty(CWCopyVoucherToJrnl.Comment) ? trans.Text : CWCopyVoucherToJrnl.Comment;
+                        gljournaLine.TransType = string.IsNullOrEmpty(CWCopyVoucherToJrnl.TransType) ? trans.TransType : CWCopyVoucherToJrnl.TransType;
+
+                        gljournaLine._DocumentDate = trans._DocumentDate;
+                        gljournaLine._Account = trans._Account;
+                        gljournaLine._Vat = trans._Vat;
+                        gljournaLine._VatOperation = trans._VatOperation;
+                        gljournaLine._Voucher = trans._Voucher;
+                        gljournaLine.Amount = factor * trans._Amount;
+                        gljournaLine._Currency = trans._Currency;
+                        gljournaLine.AmountCur = factor * trans._AmountCur;
+                        gljournaLine._Project = trans._Project;
+                        gljournaLine._DocumentRef = trans._DocumentRef;
+                        gljournaLine._Qty = trans._Qty;
+                        gljournaLine._Dim1 = trans._Dimension1;
+                        gljournaLine._Dim2 = trans._Dimension2;
+                        gljournaLine._Dim3 = trans._Dimension3;
+                        gljournaLine._Dim4 = trans._Dimension4;
+                        gljournaLine._Dim5 = trans._Dimension5;
+
+                        if (trans._DCType > 0)
+                        {
+                            var acc = (GLAccount)Accounts.Get(trans._Account);
+                            if (acc != null)
+                            {
+                                if ((trans._DCType == GLTransRefType.Debtor && acc.AccountTypeEnum == GLAccountTypes.Debtor) ||
+                                    (trans._DCType == GLTransRefType.Creditor && acc.AccountTypeEnum == GLAccountTypes.Creditor))
+                                {
+                                    gljournaLine._Account = trans._DCAccount;
+                                    gljournaLine._AccountType = (byte)trans._DCType;
+                                }
+                            }
+                        }
+
+                        gljournaLine.SetMaster(cwObj.GlDailyJournal);
+                        glDailyJrnlLineLst.Add(gljournaLine);
+                    }
+                    busyIndicator.IsBusy = true;
+                    var result = await api.Insert(glDailyJrnlLineLst);
+                    busyIndicator.IsBusy = false;
+                    UtilDisplay.ShowErrorCode(result);
+                }
+            };
+            cwObj.Show();
+        }
+
+        void RemoveVat(GLTransClient selectedItem)
+        {
+            var cwObj = new CwEditTransaction(api, hideVat: true);
+            cwObj.Closed += async delegate
+            {
+                if (cwObj.DialogResult == true)
+                {
+                    busyIndicator.IsBusy = true;
+                    var errorCodes = await postingApiInv.RemoveVat(selectedItem, cwObj.Comment);
+                    busyIndicator.IsBusy = false;
+                    UtilDisplay.ShowErrorCode(errorCodes);
+                    if (errorCodes == ErrorCodes.Succes)
+                        BindGrid();
+                }
+            };
+            cwObj.Show();
+        }
+
+        void AddVat(GLTransClient selectedItem)
+        {
+            var cwObj = new CwEditTransaction(api);
+            cwObj.Closed += async delegate
+            {
+                if (cwObj.DialogResult == true)
+                {
+                    busyIndicator.IsBusy = true;
+                    var errorCodes = await postingApiInv.AddVat(selectedItem, cwObj.Vat, cwObj.Comment);
+                    busyIndicator.IsBusy = false;
+                    UtilDisplay.ShowErrorCode(errorCodes);
+                    if (errorCodes == ErrorCodes.Succes)
+                        BindGrid();
+                }
+            };
+            cwObj.Show();
+        }
+
+        void SetNewAccount(GLTransClient selectedItem)
+        {
+            var cwObj = new CwEditTransaction(api, hideComments: true, hideVat: true);
+            cwObj.Closed += async delegate
+            {
+                if (cwObj.DialogResult == true)
+                {
+                    busyIndicator.IsBusy = true;
+                    var errorCodes = await postingApiInv.SetNewDCAccount(selectedItem, cwObj.DCAccount);
+                    busyIndicator.IsBusy = false;
+                    UtilDisplay.ShowErrorCode(errorCodes);
+                    if (errorCodes == ErrorCodes.Succes)
+                        BindGrid();
+                }
+            };
+            cwObj.Show();
         }
 
         async private void JournalPosted(GLTransClient selectedItem)
@@ -504,6 +677,16 @@ namespace UnicontaClient.Pages.CustomPage
         {
             busyIndicator.IsBusy = true;
             var errorCodes = await postingApiInv.UpdateTransText(selectedItem, ChangeTextDialog.Text, ChangeTextDialog.AllLine);
+            busyIndicator.IsBusy = false;
+            UtilDisplay.ShowErrorCode(errorCodes);
+            if (errorCodes == ErrorCodes.Succes)
+                BindGrid();
+        }
+
+        async void SetChangeReference(GLTransClient selectedITem, CWChangeDimension ChangeReferenceDialog)
+        {
+            busyIndicator.IsBusy = true;
+            var errorCodes = await postingApiInv.UpdateTransReference(selectedITem, ChangeReferenceDialog.Text, ChangeReferenceDialog.AllLine);
             busyIndicator.IsBusy = false;
             UtilDisplay.ShowErrorCode(errorCodes);
             if (errorCodes == ErrorCodes.Succes)
@@ -641,15 +824,6 @@ namespace UnicontaClient.Pages.CustomPage
             dialog.Show();
         }
 
-        private void BindGrid()
-        {
-            var pairs = ribbonControl.filterValues;
-            var sort = ribbonControl.PropSort;
-            if (pairs != null || sort != null)
-                ribbonControl.FilterGrid?.Filter(pairs, sort);
-            else
-                Filter();
-        }
         void setDim()
         {
             UnicontaClient.Utilities.Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);

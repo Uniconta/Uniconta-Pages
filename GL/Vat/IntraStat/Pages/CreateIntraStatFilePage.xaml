@@ -1,4 +1,5 @@
 <Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools" 
+                    xmlns:dxsps="http://schemas.devexpress.com/winfx/2008/xaml/spreadsheet"
    xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
 x:Class="UnicontaClient.Pages.CustomPage.CreateIntraStatFilePage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -35,8 +36,6 @@ x:Class="UnicontaClient.Pages.CustomPage.CreateIntraStatFilePage"
             <CorasauControls:DateEditor x:Name="txtDateFrm" Grid.Column="1" Grid.Row="0" Height="23" />
             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ToDate}" Margin="0,5,0,0" Grid.Column="0" Grid.Row="10" VerticalAlignment="Center"/>
             <CorasauControls:DateEditor x:Name="txtDateTo" Grid.Column="1" Grid.Row="1" Height="23" Margin="0,5,0,0"/>
-            <Button x:Name="btnSearch" Grid.Column="3"  Grid.RowSpan="2" Margin="10,3,3,3" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Search}" Height="23" Width="80" Click="BtnSearch_OnClick"/>
-
             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ImportItem}" Grid.Row="0" Grid.Column="2" x:Name="lblimportCheck" VerticalAlignment="Center" Margin="10,0,5,0" Grid.ColumnSpan="2" ></TextBlock>
             <CorasauControls:CheckEditor Grid.Row="0" x:Name="checkImport" Grid.Column="2" Height="23" HorizontalAlignment="Right" Margin="10,0,0,0" VerticalAlignment="Center"></CorasauControls:CheckEditor>
 
@@ -46,39 +45,36 @@ x:Class="UnicontaClient.Pages.CustomPage.CreateIntraStatFilePage"
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="2" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <localPage:CreateIntraStatFilePageGrid  x:Name="dgIntraStatGrid" AutoGenerateColumns="None">
                 <localPage:CreateIntraStatFilePageGrid.Columns>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="MonthAndYearOfDate" FieldName="MonthAndYearOfDate" Width="90"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ImportOrExport" FieldName="ImportOrExport" Width="80" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Date" FieldName="Date" Width="90" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Period" FieldName="Period" Width="90" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ImportOrExport" FieldName="ImportOrExport" Width="80" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="TransType" FieldName="TransType" Width="75"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DCAccount" FieldName="DCAccount" Width="90" ReadOnly="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="AccountName" FieldName="AccountName" Width="90" ReadOnly="True"/>
-                    <!--<localPage:CorasauDataGridTemplateColumnClient x:Name="ItemIntra" FieldName="ItemIntra" Width="90"/>-->
-
-                    <localPage:CorasauDataGridForeignKeyColumnClient x:Name="ItemIntra" Width="90">
-                        <localPage:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
-                            <ControlTemplate>
-                                <TextBlock Margin="2" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.ItemIntra,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"></TextBlock>
-                            </ControlTemplate>
-                        </localPage:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
-                        <localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
-                            <DataTemplate>
-                                <localPage:CorasauGridLookupEditorClient x:Name="PART_Editor" />
-                            </DataTemplate>
-                        </localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
-                    </localPage:CorasauDataGridForeignKeyColumnClient>
-                    
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ItemNameIntra" FieldName="ItemNameIntra" Width="90"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="TransType" FieldName="TransType" Width="75"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DebtorRegNo" Width="150" Visible="False" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="fDebtorRegNo" Width="150" Visible="False" ReadOnly="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Country" FieldName="Country" Width="80" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Item" Width="90" ReadOnly="True" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ItemName" Width="200" ReadOnly="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ItemCode" FieldName="ItemCode" Width="80" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="WeightPerPCS" FieldName="WeightPerPCS" Width="50"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceQuantity" FieldName="InvoiceQuantity" Width="50"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CountryOfOrigin" FieldName="CountryOfOrigin" Width="80" />
+                    <localPage:ComboBoxColumnClient x:Name="CountryOfOriginUNK" Width="80" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="WeightPerPCS" FieldName="WeightPerPCS" Width="50" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="IntraUnitPerPCS" FieldName="IntraUnitPerPCS" Width="80" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceQuantity" FieldName="InvoiceQuantity" Width="80"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="NetWeight" FieldName="NetWeight" Width="50" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="AdditionalAmount" FieldName="AdditionalAmount" Width="80" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="EUCountry" FieldName="EUCountry" Width="80" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceNumber" FieldName="InvoiceNumber" Width="50" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceAmount" FieldName="InvoiceAmount" Width="80" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="IntraUnit" FieldName="IntraUnit" Width="80" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceNumber" FieldName="InvoiceNumber" Width="50" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="InvAmount" FieldName="InvAmount" Width="80" ReadOnly="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="IsTriangularTrade" FieldName="IsTriangularTrade" Width="50"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Compressed" Width="60" ReadOnly="True" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="SystemInfo" FieldName="SystemInfo" Width="100" ReadOnly="True"/>
                 </localPage:CreateIntraStatFilePageGrid.Columns>
+                <localPage:CreateIntraStatFilePageGrid.TotalSummary>
+                    <localPage:SumColumn FieldName="ItemCode" SummaryType="Count"/>
+                </localPage:CreateIntraStatFilePageGrid.TotalSummary>
             </localPage:CreateIntraStatFilePageGrid>
         </CorasauControls:BusyIndicator>
+        <CorasauControls:UnicontaSpreadSheetControl  x:Name="spreadSheet" Visibility="Collapsed"/>
     </Grid>
 </Pages:GridBasePage>

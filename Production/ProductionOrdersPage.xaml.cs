@@ -20,6 +20,7 @@ using Uniconta.ClientTools.Controls.Reporting;
 using Uniconta.API.Service;
 using System.Windows.Input;
 using System.Windows.Controls;
+using UnicontaClient.Controls.Dialogs;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -59,7 +60,6 @@ namespace UnicontaClient.Pages.CustomPage
             SetRibbonControl(localMenu, dgProductionOrders);
             dgProductionOrders.api = api;
             dgProductionOrders.BusyIndicator = busyIndicator;
-
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgProductionOrders.RowDoubleClick += DgProductionOrders_RowDoubleClick;
             ribbonControl.DisableButtons(new string[] { "DeleteRow", "UndoDelete", "SaveGrid" });
@@ -91,14 +91,28 @@ namespace UnicontaClient.Pages.CustomPage
             var Comp = api.CompanyEntity;
             if (!Comp.Location || !Comp.Warehouse)
                 Location.Visible = Location.ShowInColumnChooser = false;
+            else
+                Location.ShowInColumnChooser = true;
             if (!Comp.Warehouse)
                 Warehouse.Visible = Warehouse.ShowInColumnChooser = false;
+            else
+                Warehouse.ShowInColumnChooser = true;
             if (!Comp.Project)
             {
                 Project.Visible = Project.ShowInColumnChooser = false;
                 PrCategory.Visible = PrCategory.ShowInColumnChooser = false;
             }
+            else
+                Project.ShowInColumnChooser = PrCategory.ShowInColumnChooser = true;
+            if (!Comp.ProjectTask)
+                Task.ShowInColumnChooser = Task.Visible = false;
+            else
+                Task.ShowInColumnChooser = true;
+#if !SILVERLIGHT
+            Utility.SetupVariants(api, colVariant, VariantName, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
+#else
             Utility.SetupVariants(api, null, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
+#endif
         }
 
         private void localMenu_OnItemClicked(string ActionType)
@@ -181,11 +195,51 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null && selectedItem?.ProdItemRef != null)
                         AddDockItem(TabControls.UserDocsPage, selectedItem.ProdItemRef, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Documents"), selectedItem?.ProdItemRef?._Name));
                     break;
+                case "ViewNotes":
+                    if (selectedItem != null && selectedItem?.ProdItemRef != null)
+                        AddDockItem(TabControls.UserNotesPage, selectedItem.ProdItemRef, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Notes"), selectedItem?.ProdItemRef?._Name));
+                    break;
                 case "DeleteRow":
                     dgProductionOrders.DeleteRow();
                     break;
                 case "UndoDelete":
                     dgProductionOrders.UndoDeleteRow();
+                    break;
+                case "CreateOrder":
+                    if (selectedItem != null)
+                    {
+                        CWOrderFromOrder cwOrderFromOrder = new CWOrderFromOrder(api);
+#if !SILVERLIGHT
+                        cwOrderFromOrder.DialogTableId = 2000000084;
+#endif
+                        cwOrderFromOrder.Closed += async delegate
+                        {
+                            if (cwOrderFromOrder.DialogResult == true)
+                            {
+                                var perSupplier = cwOrderFromOrder.orderPerPurchaseAccount;
+                                if (!perSupplier && string.IsNullOrEmpty(cwOrderFromOrder.Account))
+                                    return;
+                                busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
+                                busyIndicator.IsBusy = true;
+                                var orderApi = new OrderAPI(api);
+                                var inversign = cwOrderFromOrder.InverSign;
+                                var account = cwOrderFromOrder.Account;
+                                var copyAttachment = cwOrderFromOrder.copyAttachment;
+                                var dcOrder = cwOrderFromOrder.dcOrder;
+                                dcOrder._DeliveryDate = cwOrderFromOrder.DeliveryDate;
+                                var copyDelAddress = cwOrderFromOrder.copyDeliveryAddress;
+                                var reCalPrice = cwOrderFromOrder.reCalculatePrice;
+                                var onlyItemsWthSupp = cwOrderFromOrder.onlyItemsWithSupplier;
+                                var result = await orderApi.CreateOrderFromOrder(selectedItem, dcOrder, account, inversign, CopyAttachments: copyAttachment, CopyDeliveryAddress: copyDelAddress, RecalculatePrices: reCalPrice, OrderPerPurchaseAccount: perSupplier, OnlyItemsWithSupplier: onlyItemsWthSupp);
+                                busyIndicator.IsBusy = false;
+                                if (result != ErrorCodes.Succes)
+                                    UtilDisplay.ShowErrorCode(result);
+                                else
+                                    CreditorOrders.ShowOrderLines(1, dcOrder, this, dgProductionOrders);
+                            }
+                        };
+                        cwOrderFromOrder.Show();
+                    }
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);
@@ -352,7 +406,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         void CreateOrderLines(ProductionOrderClient productionOrder)
         {
-            CWProductionOrderLine dialog = new CWProductionOrderLine(api);
+            CWProductionOrderLine dialog = new CWProductionOrderLine(productionOrder, api, false, null);
 #if !SILVERLIGHT
             dialog.DialogTableId = 2000000078;
 #endif
@@ -361,7 +415,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (dialog.DialogResult == true)
                 {
                     var prodAPI = new ProductionAPI(api);
-                    var result = await prodAPI.CreateProductionLines(productionOrder, (StorageRegister)dialog.Storage, dialog.Force);
+                    var result = await prodAPI.CreateProductionLines(productionOrder, (StorageRegister)dialog.Storage, dialog.Force, dialog.ProductionTime);
                     UtilDisplay.ShowErrorCode(result);
                     //else
                     //    CreditorOrders.ShowOrderLines(4, productionOrder, this, dgProductionOrders);
@@ -370,10 +424,10 @@ namespace UnicontaClient.Pages.CustomPage
             dialog.Show();
         }
 
-        protected override void LoadCacheInBackGround()
+        protected override  void LoadCacheInBackGround()
         {
-            var Comp = api.CompanyEntity;
             var lst = new List<Type>(4) { typeof(Uniconta.DataModel.InvItem), typeof(Uniconta.DataModel.Debtor) };
+            var Comp = api.CompanyEntity;
             if (Comp.Warehouse)
                 lst.Add(typeof(Uniconta.DataModel.InvWarehouse));
             if (Comp.Project)

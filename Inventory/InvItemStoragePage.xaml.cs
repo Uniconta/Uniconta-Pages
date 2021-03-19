@@ -148,7 +148,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void Init(UnicontaBaseEntity sourcedata = null)
         {
             InitializeComponent();
-            Utility.SetupVariants(api, colVariant, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
+            Utility.SetupVariants(api, colVariant, VariantName, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
             ((TableView)dgInvItemStorageClientGrid.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
             SetRibbonControl(localMenu, dgInvItemStorageClientGrid);
             dgInvItemStorageClientGrid.api = api;
@@ -254,17 +254,23 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         AddDockItem(TabControls.InventoryReservationReport, dgInvItemStorageClientGrid.syncEntity, Uniconta.ClientTools.Localization.lookup("Reservations"));
                     break;
+                case "InvStockProfile":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.InvStorageProfileReport, dgInvItemStorageClientGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("StockProfile"), selectedItem._Item));
+                    break;
+                case "SetWarehouse":
+                    SetWarehouse();
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
         }
-        public override void PageClosing()
+        public void SetWarehouse()
         {
             var selected = dgInvItemStorageClientGrid.SelectedItem as Uniconta.DataModel.InvItemStorage;
             if (selected != null)
                 globalEvents.OnRefresh(TabControls.InvItemStoragePage, selected);
-            base.PageClosing();
         }
         private Task Filter(IEnumerable<PropValuePair> propValuePair)
         {

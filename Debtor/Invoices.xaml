@@ -25,6 +25,9 @@ x:Class="UnicontaClient.Pages.CustomPage.Invoices"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" Width="150" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Date" Width="90" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="SendTime" Width="90" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="SendTimeOIO" Width="90" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ErrorEmail" Width="90" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ErrorOIO" Width="90" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="OrderCreated" Width="90" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="OrderNumber" Width="60" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceNumber" Width="60"/>

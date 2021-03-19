@@ -34,6 +34,7 @@ namespace UnicontaClient.Pages.CustomPage
         public string Name { get; set; }
         public CrmFollowUpClient FollowUp { get; set; }
         public bool AddFollowUp { get; set; }
+        public bool IncludeAttachements { get; set; }
         CrudAPI api;
 
         public CwSendEmail(CrudAPI _api)
@@ -45,6 +46,11 @@ namespace UnicontaClient.Pages.CustomPage
             this.Loaded += CW_Loaded;
             api = _api;
             tbChkFollowUp.Text = string.Format(Uniconta.ClientTools.Localization.lookup("AddOBJ"), Uniconta.ClientTools.Localization.lookup("FollowUp"));
+        }
+
+        public void ShowAttachments()
+        {
+            chkIncludeAttach.Visibility = tbChkIncludeAttach.Visibility = Visibility.Visible;
         }
 
         private void CW_Loaded(object sender, RoutedEventArgs e)

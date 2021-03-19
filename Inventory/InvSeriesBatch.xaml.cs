@@ -117,8 +117,12 @@ namespace UnicontaClient.Pages.CustomPage
             var Comp = api.CompanyEntity;
             if (!Comp.Location || !Comp.Warehouse)
                 Location.Visible = Location.ShowInColumnChooser = false;
+            else
+                Location.ShowInColumnChooser = true;
             if (!Comp.Warehouse)
                 Warehouse.Visible = Warehouse.ShowInColumnChooser = false;
+            else
+                Warehouse.ShowInColumnChooser = true;
         }
 
         async protected override void LoadCacheInBackGround()

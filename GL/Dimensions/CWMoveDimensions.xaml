@@ -1,0 +1,41 @@
+<ClientTools:ChildWindow x:Class="Uniconta.ClientTools.Controls.CWMoveDimensions"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+             xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools" 
+             SizeToContent="Height" Height="{StaticResource Height40}" Width="{StaticResource Width40}" KeyDown="ChildWindow_KeyDown">
+    <ClientTools:ChildWindow.Resources>
+        <DataTemplate x:Key="DimensionItemTemplate">
+            <Grid Margin="10" Background="{StaticResource LayoutGridColor}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="0.5*" />
+                    <ColumnDefinition Width="3" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="15" />
+                    <ColumnDefinition Width="0.5*" />
+                    <ColumnDefinition Width="3" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="{Binding FromDimension,StringFormat=\{0\} : }" Grid.Column="0"/>
+                <CorasauControls:DimComboBoxEditor ItemsSource="{Binding DimensionValues}" EditValue="{Binding ActualDimensionValue}" DisplayMember="KeyStr" ValueMember="RowId" Grid.Column="2" />
+                <TextBlock Text="{Binding ToDimension,StringFormat=\{0\} : }" Grid.Column="4"/>
+                <CorasauControls:DimComboBoxEditor ItemsSource="{Binding DimensionValues}" EditValue="{Binding SelectedDimensionValue}" DisplayMember="KeyStr" ValueMember="RowId" Grid.Column="6" />
+            </Grid>
+        </DataTemplate>
+    </ClientTools:ChildWindow.Resources>
+    <CorasauControls:BusyIndicator x:Name="busyIndicator" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+        <Grid x:Name="LayoutRoot" Margin="2" Background="{StaticResource LayoutGridColor}">
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <ItemsControl x:Name="dimensionList" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ItemTemplate="{StaticResource DimensionItemTemplate}" />
+            <StackPanel x:Name="actionButton" HorizontalAlignment="Right" Grid.Row="1" Orientation="Horizontal" Margin="0 10 0 10">
+                <Button x:Name="MoveButton" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Move}" Click="MoveButton_Click" MinWidth="75" Height="23" HorizontalAlignment="Right" 
+                   Margin="0 0 3 0"  />
+                <Button x:Name="CancelButton" IsCancel="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Cancel}" Click="CancelButton_Click" MinWidth="75" Height="23" 
+                    HorizontalAlignment="Right"  />
+            </StackPanel>
+        </Grid>
+    </CorasauControls:BusyIndicator>
+</ClientTools:ChildWindow>

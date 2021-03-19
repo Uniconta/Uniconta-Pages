@@ -26,6 +26,7 @@ using UnicontaClient.Controls.Dialogs;
 using UnicontaClient.Models;
 using Uniconta.API.Inventory;
 using Uniconta.API.Service;
+using Uniconta.Common.Utility;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -103,12 +104,12 @@ namespace UnicontaClient.Pages.CustomPage
                 if (this._Variant3 != null)
                     return string.Format("{0};{1};{2}", _Variant1, _Variant2, _Variant3);
                 if (this._Variant2 != null)
-                    return string.Format("{0};{1}", _Variant1, _Variant2);
+                    return string.Concat(_Variant1, ";", _Variant2);
                 return _Variant1;
             }
         }
 
-        [Display(Name = "Variant", ResourceType = typeof(InvVariantClientsText))]
+        [Display(Name = "VariantNames", ResourceType = typeof(InvVariantClientsText))]
         [NoSQL]
         public string VariantName
         {
@@ -121,7 +122,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (this._Variant3 != null)
                     return string.Format("{0};{1};{2}", Variant1Name, Variant2Name, Variant3Name);
                 if (this._Variant2 != null)
-                    return string.Format("{0};{1}", Variant1Name, Variant2Name);
+                    return string.Concat(Variant1Name, ";", Variant2Name);
                 if (this._Variant1 != null)
                     return Variant1Name;
                 return null;
@@ -171,7 +172,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             get
             {
-                return ClientHelper.GetRefClient<InvItemClient>(CompanyId, typeof(Uniconta.DataModel.InvItem), _Item);
+                return ClientHelper.GetRefClient<InvItemClient>(CompanyId, typeof(Uniconta.DataModel.InvItem), RowId);
             }
         }
     }
@@ -250,33 +251,8 @@ namespace UnicontaClient.Pages.CustomPage
                     InvPurchaseAccount.Visible = InvPurchaseAccount.ShowInColumnChooser = false;
                 }
             }
-
-            if (Comp._Variant1 != null && Comp.ItemVariants)
-            {
-                colVariant1.Header = Comp._Variant1;
-                colVariant1Name.Header = string.Format("{0} {1}", Comp._Variant1, Uniconta.ClientTools.Localization.lookup("Name"));
-            }
-            else
-            {
-                colVariant1.Visible = colVariant1.ShowInColumnChooser = false;
-                colVariant1Name.Visible = colVariant1Name.ShowInColumnChooser = false;
-            }
-
-            if (Comp._Variant2 != null && Comp.ItemVariants)
-            {
-                colVariant2.Header = Comp._Variant2;
-                colVariant2Name.Header = string.Format("{0} {1}", Comp._Variant2, Uniconta.ClientTools.Localization.lookup("Name"));
-            }
-            else
-            {
-                colVariant2.Visible = colVariant2.ShowInColumnChooser = false;
-                colVariant2Name.Visible = colVariant2Name.ShowInColumnChooser = false;
-            }
-
             Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
         }
-
-      
 
         protected override void OnLayoutLoaded()
         {
@@ -285,8 +261,15 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (!Comp.Location || !Comp.Warehouse)
                 Location.Visible = Location.ShowInColumnChooser = false;
+            else
+                Location.ShowInColumnChooser = true;
             if (!Comp.Warehouse)
                 Warehouse.Visible = Warehouse.ShowInColumnChooser = false;
+            else
+                Warehouse.ShowInColumnChooser = true;
+
+            Utility.SetupVariants(api, colVariant, VariantName, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
+
         }
 
         private void LocalMenu_OnChecked(string ActionType, bool IsChecked)
@@ -329,6 +312,8 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "CreateOrder":
                     CwPurOrderDfltVal dailog = new CwPurOrderDfltVal(api);
+                    dailog.WarehouseCheck = ReorderPrWarehouse;
+                    dailog.LocationCheck = ReorderPrLocation;
                     dailog.Closed += delegate
                     {
                         if (dailog.DialogResult == true)
@@ -358,10 +343,9 @@ namespace UnicontaClient.Pages.CustomPage
                         {
                             if (cw.InvItem != null)
                             {
-                                ReOrderListPageGridClient item = new ReOrderListPageGridClient();
+                                var item = new ReOrderListPageGridClient();
                                 StreamingManager.Copy(cw.InvItem, item);
-                                var list = new UnicontaBaseEntity[] { item };
-                                dgReOrderList.PasteRows(list);
+                                dgReOrderList.PasteRows(new [] { item });
                             }
                         }
                     };
@@ -382,7 +366,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "OrderLines":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.DebtorOrderLines, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("OrderLines"), selectedItem._Item));
+                        AddDockItem(TabControls.DebtorOrderLineReport, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("OrderLines"), selectedItem._Item));
                     break;
                 case "PurchaseLines":
                     if (selectedItem != null)
@@ -409,6 +393,13 @@ namespace UnicontaClient.Pages.CustomPage
                 case "Storage":
                     AddDockItem(TabControls.InvItemStoragePage, dgReOrderList.syncEntity, true);
                     break;
+                case "RefreshGrid":
+                    InitQuery();
+                    break;
+                case "InvStockProfile":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.InvStorageProfileReport, dgReOrderList.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("StockProfile"), selectedItem._Item));
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -429,6 +420,8 @@ namespace UnicontaClient.Pages.CustomPage
         {
             SetBusy();
             Task< Uniconta.DataModel.InvItemStorage[]> ReservedTask;
+
+            DateTime FromDate = txtDateFrm.DateTime, ToDate = txtDateTo.DateTime;
 
             if (_useStorage)
                 ReservedTask = api.Query<Uniconta.DataModel.InvItemStorage>();
@@ -459,6 +452,17 @@ namespace UnicontaClient.Pages.CustomPage
             searchrec = null;
             if (ReservedTask != null)
             {
+                Uniconta.DataModel.DCOrderLineStorageRef[] ExclOrders = null;
+                if (FromDate != DateTime.MinValue || ToDate != DateTime.MinValue)
+                {
+                    var filter = new List<PropValuePair>(2);
+                    if (FromDate != DateTime.MinValue)
+                        filter.Add(PropValuePair.GenereteParameter("FromDate", typeof(string), NumberConvert.ToString(FromDate.Ticks)));
+                    if (ToDate != DateTime.MinValue)
+                        filter.Add(PropValuePair.GenereteParameter("ToDate", typeof(string), NumberConvert.ToString(ToDate.Ticks)));
+                    ExclOrders = await api.Query<Uniconta.DataModel.DCOrderLineStorageRef>(filter);
+                }
+
                 Reserved = await ReservedTask;
                 if (Reserved != null)
                 {
@@ -467,6 +471,34 @@ namespace UnicontaClient.Pages.CustomPage
                     searchrec = new Uniconta.DataModel.InvItemStorage();
                     if (! ReOrderListPage.ReorderPrWarehouse)
                         ReOrderListPage.ReorderPrLocation = false;
+
+                    if (ExclOrders != null && ExclOrders.Length > 0)
+                    {
+                        for(int i = 0; (i < ExclOrders.Length); i++)
+                        {
+                            var ord = ExclOrders[i];
+                            if (ord._MoveType > 0)
+                            {
+                                searchrec._Item = ord._Item;
+                                searchrec._Variant1 = ord._Variant1;
+                                searchrec._Variant2 = ord._Variant2;
+                                searchrec._Variant3 = ord._Variant3;
+                                searchrec._Variant4 = ord._Variant4;
+                                searchrec._Variant5 = ord._Variant5;
+                                searchrec._Warehouse = ord._Warehouse;
+                                searchrec._Location = ord._Location;
+                                var pos = Array.BinarySearch(Reserved, searchrec, reservedSort);
+                                if (pos >= 0 && pos < Reserved.Length)
+                                {
+                                    var r = Reserved[pos];
+                                    if (ord._MoveType == 1)
+                                        r._QtyReserved -= (ord._Qty - ord._QtyDelivered);
+                                    else
+                                        r._QtyOrdered -= (ord._Qty - ord._QtyDelivered);
+                                }
+                            }
+                        }
+                    }
                 }
             }
 
@@ -843,15 +875,14 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     var ord = this.CreateGridObject(typeof(CreditorOrderClient)) as CreditorOrderClient;
                     ord.SetMaster(creditor);
-                    ord._Payment = creditor._Payment;
-                    ord._PostingAccount = creditor._PostingAccount;
                     ord._OurRef = dfltCreditorOrder._OurRef;
                     ord._Remark = dfltCreditorOrder._Remark;
                     ord._Group = dfltCreditorOrder._Group;
                     ord._DeliveryDate = dfltCreditorOrder._DeliveryDate;
-                    ord._Shipment = dfltCreditorOrder._Shipment;
                     if (dfltCreditorOrder._Employee != null)
                         ord._Employee = dfltCreditorOrder._Employee;
+
+                    TableField.SetUserFieldsFromRecord(creditor, ord);
 
                     creditorOrders.Add(ord);
 
@@ -892,6 +923,7 @@ namespace UnicontaClient.Pages.CustomPage
                     await PriceLookup.OrderChanged(order);
 
                     var acc = order._DCAccount;
+                    var creditor = (Uniconta.DataModel.Creditor)Creditors.Get(acc);
                     int line = 0;
                     foreach (var item in rows)
                     {
@@ -931,12 +963,14 @@ namespace UnicontaClient.Pages.CustomPage
                             if (_InvoiceUseQtyNowCre)
                                 orderLine._QtyNow = orderLine._Qty;
                             orderLine._Storage = defaultStorage;
+                            orderLine._DiscountPct = creditor._LineDiscountPct;
                             if (item._Project != null)
                             {
                                 orderLine._Project = item._Project;
                                 orderLine._PrCategory = item._PrCategory;
                             }
                             orderLine.SetMaster(order);
+                            TableField.SetUserFieldsFromRecord(orderLine, item);
                             orderList.Add(orderLine);
                         }
                     }
@@ -963,12 +997,17 @@ namespace UnicontaClient.Pages.CustomPage
                                 last._Location = lin._Location = null;
                         }
                         last = lin;
-                        if (item._PurchaseUnit == 0 || item._PurchaseUnit == item._Unit)
-                        {
+                        if (item._UnitGroup == null || item._PurchaseUnit == 0 || item._PurchaseUnit == item._Unit)
                             lin._Unit = item._Unit;
-                            var t = PriceLookup.SetPriceFromItem(lin, item);
-                            if (t != null)
-                                await t;
+
+                        var t = PriceLookup.SetPriceFromItem(lin, item);
+                        if (t != null)
+                            await t;
+
+                        if (item._UnitGroup != null && (lin._Price == item._PurchasePrice || lin._Price == item._CostPrice))
+                        {
+                            lin._Price = 0;  // Server will set it
+                            lin._Unit = 0;
                         }
                     }
                 }
@@ -993,6 +1032,7 @@ namespace UnicontaClient.Pages.CustomPage
                     continue;
 
                 var ord = this.CreateGridObject(typeof(ProductionOrderClient)) as ProductionOrderClient;
+                ord.SetMaster(rec);
                 ord._OurRef = dfltProductionOrder._OurRef;
                 ord._Remark = dfltProductionOrder._Remark;
                 ord._Group = dfltProductionOrder._Group;
@@ -1000,10 +1040,8 @@ namespace UnicontaClient.Pages.CustomPage
                 ord._Shipment = dfltProductionOrder._Shipment;
                 ord._Employee = dfltProductionOrder._Employee;
                 ord._ProdQty = Math.Max(Math.Max(rec._PurchaseQty, rec._PurchaseMin), rec._Quantity);
-                ord._ProdItem = rec._Item;
-                ord._Warehouse = rec._Warehouse;
-                ord._Location = rec._Location;
                 ord._Storage = (StorageRegister)storage;
+                TableField.SetUserFieldsFromRecord(rec, ord);
                 productionOrders.Add(ord);
             }
 

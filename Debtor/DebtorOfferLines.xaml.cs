@@ -41,15 +41,10 @@ namespace UnicontaClient.Pages.CustomPage
                 return typeof(DebtorOfferLineClient);
             }
         }
+        public override bool SingleBufferUpdate { get { return false; } }
         public override IComparer GridSorting { get { return new DCOrderLineSort(); } }
         public override string LineNumberProperty { get { return "_LineNumber"; } }
-        public override bool AllowSort
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public override bool AllowSort { get { return false; } }
         public override bool Readonly { get { return false; } }
         public override bool AddRowOnPageDown()
         {
@@ -135,7 +130,7 @@ namespace UnicontaClient.Pages.CustomPage
 
     public partial class DebtorOfferLines : GridBasePage
     {
-        SQLCache items, standardVariants, variants1, variants2, employees;
+        SQLCache items, standardVariants, variants1, variants2, employees, warehouse;
         DebtorOfferClient Order { get { return dgDebtorOfferLineGrid.masterRecord as DebtorOfferClient; } }
         Uniconta.API.DebtorCreditor.FindPrices PriceLookup;
         double exchangeRate;
@@ -210,6 +205,12 @@ namespace UnicontaClient.Pages.CustomPage
             base.OnLayoutLoaded();
             Utility.SetupVariants(api, colVariant, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
             Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
+            var company = api.CompanyEntity;
+            if (!company.Location)
+                Location.Visible = Location.ShowInColumnChooser = false;
+           
+            if (!company.Warehouse)
+                Warehouse.Visible = Warehouse.ShowInColumnChooser = false;
         }
 
         public bool DataChaged;
@@ -304,6 +305,13 @@ namespace UnicontaClient.Pages.CustomPage
                 case "Total":
                     RecalculateAmount();
                     break;
+                case "Warehouse":
+                    if (warehouse != null)
+                    {
+                        var selected = (InvWarehouse)warehouse.Get(rec._Warehouse);
+                        setLocation(selected, rec);
+                    }
+                    break;
                 case "Location":
                     if (string.IsNullOrEmpty(rec._Warehouse))
                         rec._Location = null;
@@ -376,6 +384,21 @@ namespace UnicontaClient.Pages.CustomPage
                 rec._EAN = variant._EAN;
                 if (variant._CostPrice != 0d)
                     rec._CostPrice = variant._CostPrice;
+            }
+        }
+
+        public static async void FindItemFromCustomerItem(DCOrderLineClient rec, DCOrder order, QueryAPI api, string CustomerItemNumber)
+        {
+            var ap = new Uniconta.API.Inventory.ReportAPI(api);
+            var variant = await ap.FindItemFromCustomerItem(order, CustomerItemNumber);
+            if (variant != null)
+            {
+                rec.Item = variant._Item;
+                rec.Variant1 = variant._Variant1;
+                rec.Variant2 = variant._Variant2;
+                rec.Variant3 = variant._Variant3;
+                rec.Variant4 = variant._Variant4;
+                rec.Variant5 = variant._Variant5;
             }
         }
 
@@ -458,6 +481,34 @@ namespace UnicontaClient.Pages.CustomPage
                 rec.NotifyPropertyChanged("Variant2Source");
             else
                 rec.NotifyPropertyChanged("Variant1Source");
+        }
+
+        async void setLocation(InvWarehouse master, DebtorOfferLineClient rec)
+        {
+            if (api.CompanyEntity.Location)
+            {
+                if (master != null)
+                    rec.locationSource = master.Locations ?? await master.LoadLocations(api);
+                else
+                {
+                    rec.locationSource = null;
+                    rec.Location = null;
+                }
+                rec.NotifyPropertyChanged("LocationSource");
+            }
+        }
+
+        private void PART_Editor_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if (warehouse == null)
+                return;
+
+            var selectedItem = dgDebtorOfferLineGrid.SelectedItem as DebtorOfferLineClient;
+            if (selectedItem?._Warehouse != null)
+            {
+                var selected = (InvWarehouse)warehouse.Get(selectedItem._Warehouse);
+                setLocation(selected, selectedItem);
+            }
         }
 
         static public Tuple<double, double, double> RecalculateLineSum(IList source, double exRate)
@@ -684,6 +735,14 @@ namespace UnicontaClient.Pages.CustomPage
                 case "RefreshGrid":
                     RefreshGrid();
                     break;
+                case "ViewPhoto":
+                    if (selectedItem?.InvItem != null && selectedItem?.Item!= null)
+                        AddDockItem(TabControls.UserDocsPage, selectedItem.InvItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Documents"), selectedItem?.InvItem?._Name));
+                    break;
+                case "ViewNotes":
+                    if (selectedItem?.InvItem != null && selectedItem?.Item != null)
+                        AddDockItem(TabControls.UserNotesPage, selectedItem.InvItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Notes"), selectedItem?.InvItem?._Name));
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -863,6 +922,8 @@ namespace UnicontaClient.Pages.CustomPage
                 DataChaged = true;
                 this.PriceLookup = pl;
 
+                dgDebtorOfferLineGrid.SetLoadedRow(selectedItem);
+
                 double _AmountEntered = 0d;
                 if (!usePriceFromBOM)
                     _AmountEntered = selectedItem._Amount;
@@ -927,9 +988,12 @@ namespace UnicontaClient.Pages.CustomPage
         protected override async void LoadCacheInBackGround()
         {
             var api = this.api;
-
+            var Comp = api.CompanyEntity;
             if (this.items == null)
                 this.items = api.GetCache(typeof(Uniconta.DataModel.InvItem)) ?? await api.LoadCache(typeof(Uniconta.DataModel.InvItem)).ConfigureAwait(false);
+
+            if (Comp.Warehouse && this.warehouse == null)
+                this.warehouse = api.GetCache(typeof(Uniconta.DataModel.InvWarehouse)) ?? await api.LoadCache(typeof(Uniconta.DataModel.InvWarehouse)).ConfigureAwait(false);
 
             if (api.CompanyEntity.ItemVariants)
             {

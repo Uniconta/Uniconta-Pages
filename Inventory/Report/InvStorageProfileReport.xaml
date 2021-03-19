@@ -1,0 +1,83 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools" 
+             xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.InvStorageProfileReport"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:UnicontaControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"      
+             xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage" xmlns:WPFPages="clr-namespace:UnicontaClient.Pages.CustomPage" >
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="10" />
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <UnicontaControls:CorasauRibbonControl x:Name="localMenu" XMLSourcePath=";component/Pages/Inventory/Report/InvStorageProfileGridRibbon.xml"/>
+        <Grid Grid.Row="1" Margin="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="3" />
+                <ColumnDefinition Width="170" />
+                <ColumnDefinition Width="3" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="3" />
+                <ColumnDefinition Width="120" />
+                <ColumnDefinition Width="3" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="3" />
+                <ColumnDefinition Width="120" />
+                <ColumnDefinition Width="3" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="3" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Date}" VerticalAlignment="Center" Grid.Row="0" Grid.Column="0" />
+            <UnicontaControls:DateEditor x:Name="BalanceDate" Grid.Row="0" Grid.Column="2" ShowToday="True"/>
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=AgeInterval}" Grid.Row="0" Grid.Column="4" VerticalAlignment="Center" />
+            <UnicontaControls:NumericUpDownEditor x:Name="intervalEdit"  MaxValue="1000" Grid.Row="0" Grid.Column="6" />
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=NumberOfColumns}" Grid.Row="0" Grid.Column="8" VerticalAlignment="Center" />
+            <UnicontaControls:NumericUpDownEditor x:Name="countEdit" MaxValue="20" MinValue="1" Text="10" Grid.Row="0" Grid.Column="10"/>
+            <RadioButton x:Name="rdbMovement" IsChecked="True"  Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Movement}" Grid.Row="0" Grid.Column="12" Checked="rdbMovement_Checked" />
+            <RadioButton x:Name="rdbInhand"  Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OnHand}" Grid.Row="0" Grid.Column="14" Checked="rdbInhand_Checked" />
+        </Grid>
+        <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{StaticResource WindowHeaderGradient}" />
+        <UnicontaControls:BusyIndicator x:Name="busyIndicator" Grid.Row="3" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BusyMessage}">
+            <WPFPages:InvStorageProfileGrid  x:Name="dgInvStorageProfileGrid" AutoGenerateColumns="None" HorizontalAlignment="Stretch">
+                <WPFPages:InvStorageProfileGrid.Columns>
+                    <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Item" Width="100"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant" FieldName="Variant" Width="80"  />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="VariantName" Width="80" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant1" IsEditSettingSet="True" FieldName="Variant1" Width="80" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant2" IsEditSettingSet="True" FieldName="Variant2" Width="80" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant3" IsEditSettingSet="True" FieldName="Variant3" Width="80" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant4" IsEditSettingSet="True" FieldName="Variant4" Width="80" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant5" IsEditSettingSet="True" FieldName="Variant5" Width="80" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Variant1Name" Width="100" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Variant2Name" Width="100" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Variant3Name" Width="100" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Variant4Name" Width="100" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Variant5Name" Width="100" Visible="False"/>
+                    <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Name" Width="150"/>
+                    <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Group" Width="80" />
+                    <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Qty" Width="90" />
+                    <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Amount0" Width="90" Visible="False" />
+                    <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Amount1" Width="90" Visible="False" />
+                    <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Amount2" Width="90" Visible="False" />
+                    <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Amount3" Width="90" Visible="False" />
+                    <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Amount4" Width="90" Visible="False" />
+                    <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Amount5" Width="90" Visible="False" />
+                    <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Amount6" Width="90" Visible="False" />
+                    <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Amount7" Width="90" Visible="False" />
+                    <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Amount8" Width="90" Visible="False" />
+                    <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Amount9" Width="90" Visible="False" />
+                    <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Total" Width="90" />
+                </WPFPages:InvStorageProfileGrid.Columns>
+                <WPFPages:InvStorageProfileGrid.TotalSummary>
+                    <localPage:SumColumn FieldName="Total" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                </WPFPages:InvStorageProfileGrid.TotalSummary>
+            </WPFPages:InvStorageProfileGrid>
+        </UnicontaControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

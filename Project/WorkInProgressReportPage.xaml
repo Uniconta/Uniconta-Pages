@@ -48,6 +48,7 @@ x:Class="UnicontaClient.Pages.CustomPage.WorkInProgressReportPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="DebtorName" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Project" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="ProjectName" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Task" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Phase" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="RootProject" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="PersonInCharge" />
@@ -83,6 +84,13 @@ x:Class="UnicontaClient.Pages.CustomPage.WorkInProgressReportPage"
                         <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                             <ControlTemplate>
                                 <CorasauControls:TextEditor IsPrintingMode="True" HorizontalContentAlignment="Right" Text="{Binding Path=DataContext.RowData.Row.EmployeeFeeCostValue,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" Mask="N2" MaskUseAsDisplayFormat="True" MaskType="Numeric" Width="100"/>
+                            </ControlTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="EmployeeHoursPosted" Visible="False">
+                        <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <CorasauControls:TextEditor IsPrintingMode="True" HorizontalContentAlignment="Right" Text="{Binding Path=DataContext.RowData.Row.EmployeeHoursPosted,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" Mask="N2" MaskUseAsDisplayFormat="True" MaskType="Numeric" Width="100"/>
                             </ControlTemplate>
                         </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                     </local:CorasauDataGridTemplateColumnClient>
@@ -204,6 +212,7 @@ x:Class="UnicontaClient.Pages.CustomPage.WorkInProgressReportPage"
                 <local:WorkInProgressReportGrid.GroupSummary >
                     <local:SumColumn FieldName="EmployeeFee" SummaryType="Sum" ShowInGroupColumnFooter="EmployeeFee"/>
                     <local:SumColumn FieldName="EmployeeFeeCostValue" SummaryType="Sum" ShowInGroupColumnFooter="EmployeeFeeCostValue"/>
+                    <local:SumColumn FieldName="EmployeeHoursPosted" SummaryType="Sum" ShowInGroupColumnFooter="EmployeeHoursPosted"/>
                     <local:SumColumn FieldName="EmployeeHoursJournal" SummaryType="Sum" ShowInGroupColumnFooter="EmployeeHoursJournal"/>
                     <local:SumColumn FieldName="EmployeeFeeJournal" SummaryType="Sum" ShowInGroupColumnFooter="EmployeeFeeJournal"/>
                     <local:SumColumn FieldName="EmployeeFeeJournalCostValue" SummaryType="Sum" ShowInGroupColumnFooter="EmployeeFeeJournalCostValue"/>
@@ -225,7 +234,8 @@ x:Class="UnicontaClient.Pages.CustomPage.WorkInProgressReportPage"
                 </local:WorkInProgressReportGrid.GroupSummary>
                 <local:WorkInProgressReportGrid.TotalSummary >
                     <local:SumColumn FieldName="EmployeeFee" SummaryType="Sum"/>
-                    <local:SumColumn FieldName="EmployeeFeeCostValue" SummaryType="Sum"/>                    
+                    <local:SumColumn FieldName="EmployeeFeeCostValue" SummaryType="Sum"/>
+                    <local:SumColumn FieldName="EmployeeHoursPosted" SummaryType="Sum"/>
                     <local:SumColumn FieldName="EmployeeHoursJournal" SummaryType="Sum"/>
                     <local:SumColumn FieldName="EmployeeFeeJournal" SummaryType="Sum"/>
                     <local:SumColumn FieldName="EmployeeFeeJournalCostValue" SummaryType="Sum"/>                    

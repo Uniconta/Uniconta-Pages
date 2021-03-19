@@ -48,7 +48,6 @@ namespace UnicontaClient.Pages.CustomPage
     {
         public override string NameOfControl { get { return TabControls.DebtorOrders; } }
         private SynchronizeEntity syncEntity;
-
         public DebtorOrders(BaseAPI api, string lookupKey)
             : base(api, lookupKey)
         {
@@ -148,8 +147,8 @@ namespace UnicontaClient.Pages.CustomPage
             Account.Visible = showFields;
             Name.Visible = showFields;
             setDim();
-
-            if (!api.CompanyEntity.DeliveryAddress)
+            var Comp = api.CompanyEntity;
+            if (!Comp.DeliveryAddress)
             {
                 DeliveryName.Visible = false;
                 DeliveryAddress1.Visible = false;
@@ -160,9 +159,18 @@ namespace UnicontaClient.Pages.CustomPage
                 DeliveryCountry.Visible = false;
             }
             dgDebtorOrdersGrid.Readonly = true;
-
-            if (!api.CompanyEntity.ApproveSalesOrders)
+            if (!Comp.ApproveSalesOrders)
+                Approver.ShowInColumnChooser = Approved.ShowInColumnChooser = ApprovedDate.ShowInColumnChooser = false;
+            else
                 Approver.ShowInColumnChooser = Approved.ShowInColumnChooser = ApprovedDate.ShowInColumnChooser = true;
+            if (!Comp.Project)
+                Project.ShowInColumnChooser = Project.Visible = PrCategory.ShowInColumnChooser = PrCategory.Visible = Task.ShowInColumnChooser = Task.Visible = false;
+            else
+                Project.ShowInColumnChooser = PrCategory.ShowInColumnChooser = Task.ShowInColumnChooser = true;
+            if (!Comp.ProjectTask)
+                Task.ShowInColumnChooser = Task.Visible = false;
+            else
+                Task.ShowInColumnChooser = Task.Visible = true;
         }
 
         void dgDebtorOrdersGrid_RowDoubleClick()
@@ -268,6 +276,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 var account = cwOrderFromOrder.Account;
                                 var copyAttachment = cwOrderFromOrder.copyAttachment;
                                 var dcOrder = cwOrderFromOrder.dcOrder;
+                                dcOrder._DeliveryDate = cwOrderFromOrder.DeliveryDate;
                                 var copyDelAddress = cwOrderFromOrder.copyDeliveryAddress;
                                 var reCalPrice = cwOrderFromOrder.reCalculatePrice;
                                 var onlyItemsWthSupp = cwOrderFromOrder.onlyItemsWithSupplier;
@@ -312,14 +321,14 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "ProjectTransaction":
                     if (selectedItem?._Project != null)
-                        AddDockItem(TabControls.DebtorOrderProjectLinePage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ProjectAdjustments"), selectedItem._OrderNumber));
+                        AddDockItem(TabControls.DebtorOrderProjectLinePage, dgDebtorOrdersGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ProjectAdjustments"), selectedItem._OrderNumber));
                     break;
                 case "RefreshGrid":
                     TestDebtorReload(true, dgDebtorOrdersGrid.ItemsSource as IEnumerable<DebtorOrder>);
                     break;
                 case "RegenerateOrderFromProject":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.RegenerateOrderFromProjectPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("RegenerateOrder"), selectedItem._OrderNumber));
+                        AddDockItem(TabControls.RegenerateOrderFromProjectPage, dgDebtorOrdersGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("RegenerateOrder"), selectedItem._OrderNumber));
                     break;
                 case "ApproveOrder":
                     if (selectedItem != null && api.CompanyEntity.ApproveSalesOrders)
@@ -516,11 +525,21 @@ namespace UnicontaClient.Pages.CustomPage
         {
             InvoiceAPI Invapi = new InvoiceAPI(api);
             var debtor = dbOrder.Debtor;
-            string debtorName = debtor?._Name ?? dbOrder._DCAccount;
+            string debtorName = string.Empty, accountName = string.Empty;
+            bool showSendByMail = false;
 
-            var cwPickingList = new CWGeneratePickingList();
+            if (debtor != null)
+            {
+                debtorName = debtor._Name ?? dbOrder._DCAccount;
+                accountName = string.Format("{0} ({1})", dbOrder._DCAccount, dbOrder.Name);
+                showSendByMail = !string.IsNullOrEmpty(debtor.InvoiceEmail) || debtor.EmailDocuments;
+            }
+
 #if !SILVERLIGHT
+            var cwPickingList = new CWGeneratePickingList(accountName, true, true, debtorName, showSendByMail);
             cwPickingList.DialogTableId = 2000000049;
+#else
+            var cwPickingList = new CWGeneratePickingList();
 #endif
             cwPickingList.Closed += async delegate
              {
@@ -535,7 +554,7 @@ namespace UnicontaClient.Pages.CustomPage
 #endif
                      var invoicePostingResult = new InvoicePostingPrintGenerator(api, this);
                      invoicePostingResult.SetUpInvoicePosting(dbOrder, null, CompanyLayoutType.PickingList, selectedDate, null, false, cwPickingList.ShowDocument, false, printDoc, cwPickingList.NumberOfPages,
-                         false, false, true, cwPickingList.EmailList, false, null, false);
+                        cwPickingList.SendByEmail, cwPickingList.SendByOutlook, cwPickingList.sendOnlyToThisEmail, cwPickingList.EmailList, false, null, false);
 
                      busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
                      busyIndicator.IsBusy = true;
@@ -800,7 +819,6 @@ namespace UnicontaClient.Pages.CustomPage
                 AddDockItem(TabControls.UserNotesPage, dgDebtorOrdersGrid.syncEntity);
         }
 
-
 #if !SILVERLIGHT
         static public async void GenerateOIOXml(CrudAPI api, InvoicePostingResult res)
         {
@@ -913,7 +931,7 @@ namespace UnicontaClient.Pages.CustomPage
                 }
 
                 result.Document.Save(filename);
-                await Invapi.MarkSendInvoice(invClient);
+                await Invapi.MarkSendInvoiceOIO(invClient);
 
                 if (hasUserFolder)
                     UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("SaveFileMsgOBJ"), 1, Uniconta.ClientTools.Localization.lookup("Invoice"), applFilePath)

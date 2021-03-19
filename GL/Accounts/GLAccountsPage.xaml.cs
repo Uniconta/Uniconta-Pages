@@ -177,7 +177,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (selectedItem == null)
                 return;
             var glAccount = Activator.CreateInstance(selectedItem.GetType()) as GLAccountClient;
-            StreamingManager.Copy(selectedItem, glAccount);
+            CorasauDataGrid.CopyAndClearRowId(selectedItem, glAccount);
             var parms = new object[2] { glAccount, false };
             AddDockItem(TabControls.GLAccountPage2, parms, Uniconta.ClientTools.Localization.lookup("Accounts"), "Add_16x16.png");
         }

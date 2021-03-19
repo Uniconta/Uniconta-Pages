@@ -38,7 +38,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         public override string NameOfControl { get { return TabControls.VouchersPage2; } }
         public override UnicontaBaseEntity ModifiedRow { get { return voucherClientRow; } set { voucherClientRow = (VouchersClient)value; } }
-        SQLCache PaymentCache, LedgerCache;
+        SQLCache PaymentCache, LedgerCache, GLTransTypeCache;
 
         public VouchersPage2(UnicontaBaseEntity sourcedata, bool isEdit)
             : base(sourcedata, isEdit)
@@ -101,6 +101,7 @@ namespace UnicontaClient.Pages.CustomPage
             browseControl.CompressVisibility = Visibility.Visible;
             browseControl.PDFSplitVisibility = Visibility.Visible;
             txtPurchaseNumber.CrudApi = api;
+            txtUrl.LostFocus += txtUrl_LostFocus;
 #endif
             voucherClientRow.PropertyChanged += VoucherClientRow_PropertyChanged;
 
@@ -114,6 +115,7 @@ namespace UnicontaClient.Pages.CustomPage
             this.LedgerCache = api.GetCache(typeof(Uniconta.DataModel.GLAccount)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLAccount)).ConfigureAwait(false);
             if (PaymentCache == null)
                 PaymentCache = await api.LoadCache(typeof(Uniconta.DataModel.PaymentTerm)).ConfigureAwait(false);
+            this.GLTransTypeCache = api.GetCache(typeof(Uniconta.DataModel.GLTransType)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLTransType)).ConfigureAwait(false);
             LoadType(new Type[] { typeof(Uniconta.DataModel.Creditor), typeof(Uniconta.DataModel.GLVat) });
         }
 
@@ -161,6 +163,26 @@ namespace UnicontaClient.Pages.CustomPage
                         rec.PayAccount = Acc._DefaultOffsetAccount;
                 }
             }
+            else if (prop == "TransType")
+            {
+                var glTransTYpe = (Uniconta.DataModel.GLTransType)GLTransTypeCache?.Get(rec._TransType);
+                if (glTransTYpe != null)
+                {
+                    if (glTransTYpe._AccountType == GLJournalAccountType.Finans && glTransTYpe._Account != null)
+                    {
+                        rec.Text = glTransTYpe._TransType;
+                        if (glTransTYpe._AccountType == 0 && glTransTYpe._Account != null)
+                            rec.CostAccount = glTransTYpe._Account;
+                        if (glTransTYpe._OffsetAccount != null)
+                        {
+                            if (glTransTYpe._OffsetAccountType == 0)
+                                rec.PayAccount = glTransTYpe._OffsetAccount;
+                            else if (glTransTYpe._OffsetAccountType == GLJournalAccountType.Creditor)
+                                rec.CreditorAccount = glTransTYpe._OffsetAccount;
+                        }
+                    }
+                }
+            }
         }
 
         async void SaveIn2Steps()
@@ -189,15 +211,14 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         for (int i = 0; (i < l); i++)
                             multiVouchers[i]._Data = buffers[i];
-                        busyIndicator.IsBusy = false;
+                        ClearBusy();
                         UtilDisplay.ShowErrorCode(err);
                     }
                     else
                     {
                         Utility.UpdateBuffers(api, buffers, multiVouchers);
-                        ClosePage(4); // full refresh
-                        dockCtrl.CloseDockItem();
-                        busyIndicator.IsBusy = false;
+                        ClosePage(4); // full refresh and clearBusy inside
+                        dockCtrl?.CloseDockItem();
                     }
                     return;
                 }
@@ -214,7 +235,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
 
             await saveForm();
-            busyIndicator.IsBusy = false;
+            ClearBusy();
 
             if (buf != null)
             {
@@ -252,9 +273,26 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 isSucess = true;
                 var url = voucherClientRow._Url;
-                int indexOfExtention = voucherClientRow._Url.LastIndexOf('.');
-                if (indexOfExtention > -1)
-                    voucherClientRow._Fileextension = DocumentConvert.GetDocumentType(url.Substring(indexOfExtention, url.Length - indexOfExtention));
+                var fileExt = voucherClientRow._Fileextension;
+                var fileName = voucherClientRow._Text;
+
+                if (!isFileExtManualSet)
+                {
+                    if (url.StartsWith("http", StringComparison.OrdinalIgnoreCase) || url.StartsWith("www", StringComparison.OrdinalIgnoreCase))
+                    {
+                        int indexOfExtention = voucherClientRow._Url.LastIndexOf('.');
+                        var ext = DocumentConvert.GetDocumentType(url.Substring(indexOfExtention, url.Length - indexOfExtention));
+                        fileExt = ext != FileextensionsTypes.UNK ? ext : FileextensionsTypes.WWW;
+                    }
+                    else if (!Utility.TryParseUrl(url, false, ref fileName, ref fileExt))
+                    {
+                        isSucess = false;
+                        return isSucess;
+                    }
+                }
+                voucherClientRow._Fileextension = fileExt;
+                voucherClientRow._Text = fileName;
+
                 return isSucess;
             }
 #endif
@@ -420,6 +458,33 @@ namespace UnicontaClient.Pages.CustomPage
                 }
                 else
                     voucherClientRow.Url = null;
+            }
+        }
+
+        bool isFileExtManualSet;
+        private void cmbFileextensionType_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
+        {
+            FileextensionsTypes updatedFileExt;
+            if (e.OldValue != e.NewValue && Enum.TryParse(Convert.ToString(e.NewValue), out updatedFileExt) && voucherClientRow.Fileextension != updatedFileExt)
+            {
+                string comments = voucherClientRow._Text;
+                if (Utility.TryParseUrl(voucherClientRow._Url, false, ref comments, ref updatedFileExt))
+                {
+                    voucherClientRow.Fileextension = updatedFileExt;
+                    voucherClientRow.Text = comments;
+                    isFileExtManualSet = true;
+                }
+            }
+        }
+
+        private void txtUrl_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrEmpty(voucherClientRow._Url))
+                liFileextension.Visibility = Visibility.Collapsed;
+            else
+            {
+                liFileextension.Visibility = Visibility.Visible;
+                voucherClientRow.Fileextension = FileextensionsTypes.WWW;
             }
         }
 

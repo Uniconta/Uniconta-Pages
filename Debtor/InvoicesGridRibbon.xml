@@ -41,6 +41,7 @@
       <RibbonItem Action="GenerateMarkedOioXml" LocalizedNameKey="SelectedRows" Glyph="Item_Number_16x16.png"/>
       <RibbonItem Action="GenerateAllOioXml" LocalizedNameKey="All" Glyph="Reseller_16x16.png"/>
     </RibbonItem>
+    <RibbonItem Action="DocSendLog" LocalizedNameKey="Log" ControlName="DocsSendLogGridPage" LargeGlyph="Server_Count_32x32.png" />
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="CreateOrder" LocalizedNameKey="CreateOBJ" Parameter="Order" LargeGlyph="Orders_32x32.png"/>

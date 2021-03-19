@@ -84,6 +84,9 @@ namespace UnicontaClient.Pages.CustomPage
                         cur._Issue = rec._Amount;
                         cur._Primo += rec._Primo;
                         break;
+                    case (byte)FAMTransCodes.ReversedDepreciation:
+                        cur._ReversedDepreciation += rec._Amount;
+                        break;
                 }
             }
 
@@ -130,7 +133,7 @@ namespace UnicontaClient.Pages.CustomPage
         public int _CompanyId;
         public string _Asset;
 
-        public long _Primo, _Receipt, _Issue, _DepreciationPrimo, _Depreciation, _WriteUp, _WriteOff, _WriteDown;
+        public long _Primo, _Receipt, _Issue, _DepreciationPrimo, _Depreciation, _WriteUp, _WriteOff, _WriteDown, _ReversedDepreciation;
 
         [Uniconta.Common.ForeignKeyAttribute(ForeignKeyTable = typeof(Uniconta.DataModel.FAM))]
         [Display(Name = "Asset", ResourceType = typeof(FamText))]
@@ -157,6 +160,9 @@ namespace UnicontaClient.Pages.CustomPage
         [Display(Name = "Depreciation", ResourceType = typeof(FamText))]
         public double Depreciation { get { return _Depreciation / 100d; } }
 
+        [Display(Name = "ReversedDepreciation", ResourceType = typeof(FamText))]
+        public double ReversedDepreciation { get { return _ReversedDepreciation / 100d; } }
+
         [Display(Name = "WriteUp", ResourceType = typeof(FamText))]
         public double WriteUp { get { return _WriteUp / 100d; } }
 
@@ -167,10 +173,10 @@ namespace UnicontaClient.Pages.CustomPage
         public double WriteOff { get { return _WriteOff / 100d; } }
 
         [Display(Name = "DepreciationUltimo", ResourceType = typeof(FamSumText))]
-        public double DepreciationUltimo { get { return (_DepreciationPrimo + _Depreciation + _WriteOff + _WriteDown) / 100d; } }
+        public double DepreciationUltimo { get { return (_DepreciationPrimo + _Depreciation + _ReversedDepreciation + _WriteOff + _WriteDown) / 100d; } }
 
         [Display(Name = "BookedValue", ResourceType = typeof(FamText))]
-        public double BookedValue { get { return (_Primo + _Receipt + _Issue + _DepreciationPrimo + _Depreciation + _WriteUp + _WriteOff + _WriteDown) / 100d; } }
+        public double BookedValue { get { return (_Primo + _Receipt + _Issue + _DepreciationPrimo + _Depreciation + _ReversedDepreciation + _WriteUp + _WriteOff + _WriteDown) / 100d; } }
 
         [ReportingAttribute]
         public FamClient AssetRef

@@ -245,9 +245,9 @@ namespace UnicontaISO20022CreditTransfer
             }
 
             if (bankName == null)
-                return string.Format("{0}_{1}_{2}", "ISO20022", fileID.ToString().PadLeft(5, '0'), companyID);
+                return string.Format("{0}_{1}_{2}", "ISO20022", fileID, companyID);
             else
-                return string.Format("{0}_{1}_{2}_{3}", "ISO20022", bankName, fileID.ToString().PadLeft(5, '0'), companyID);
+                return string.Format("{0}_{1}_{2}_{3}", "ISO20022", bankName, fileID, companyID);
         }
 
         /// <summary>
@@ -304,7 +304,7 @@ namespace UnicontaISO20022CreditTransfer
         }
       
 
-        public override PostalAddress CreditorAddress(Uniconta.DataModel.Creditor creditor, PostalAddress creditorAddress)
+        public override PostalAddress CreditorAddress(Uniconta.DataModel.Creditor creditor, PostalAddress creditorAddress, bool unstructured = false)
         {
             switch (companyBankEnum)
             {

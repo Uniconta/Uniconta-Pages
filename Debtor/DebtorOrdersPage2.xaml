@@ -69,7 +69,6 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrdersPage2"
                         </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
                     <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpOrders" ItemLabelsAlignment="Default" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Orders}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="400">
-
                         <CorasauControls:CorasauLayoutItem FieldName="Group" x:Name="liGroup">
                             <CorasauControls:LookupEditor x:Name="leGroup" EditValue="{Binding Group,Mode=TwoWay}">
                             </CorasauControls:LookupEditor>
@@ -77,9 +76,11 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrdersPage2"
                         <CorasauControls:CorasauLayoutItem FieldName="OrderNumber" x:Name="liOrderNumber">
                             <CorasauControls:IntegerEditor EditValue="{Binding OrderNumber,Mode=TwoWay}" SetMask="false"/>
                         </CorasauControls:CorasauLayoutItem>
-
                         <CorasauControls:CorasauLayoutItem FieldName="DeliveryDate" x:Name="liDeliveryDate">
                             <CorasauControls:DateEditor x:Name="deDeLiveryDate" EditValue="{Binding DeliveryDate,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="DeliveryDateConfirmed" x:Name="liDeliveryDateConfirmed">
+                            <CorasauControls:CheckEditor  IsChecked="{Binding DeliveryDateConfirmed, Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="EndDiscountPct" x:Name="liEndDiscountPct">
                             <CorasauControls:DoubleEditor FieldName="EndDiscountPct"/>
@@ -242,10 +243,13 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrdersPage2"
                     </CorasauControls:CorasauLayoutGroup>
                     <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpProject"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Project}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="450" >
                         <CorasauControls:CorasauLayoutItem x:Name="projectItem" FieldName="Project">
-                            <CorasauControls:LookupEditor x:Name="Projectlookupeditor" Text="{Binding Project,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <CorasauControls:LookupEditor x:Name="Projectlookupeditor" Text="{Binding Project,Mode=TwoWay}" SelectedIndexChanged="Projectlookupeditor_SelectedIndexChanged"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem x:Name="prCategoryItem" FieldName="PrCategory">
                             <CorasauControls:LookupEditor x:Name="PrCategorylookupeditor" EditValue="{Binding PrCategory,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="Task" x:Name="projectTask">
+                            <CorasauControls:LookupEditor x:Name="prTasklookupeditor" HasCustomLookUp="True"  GotFocus="prTasklookupeditor_GotFocus"  Text="{Binding Task,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="ProjectTotal" x:Name="liProjectTotal">
                             <CorasauControls:TextEditor Text="{Binding ProjectTotal, Mode=OneWay}" IsReadOnly="True"  Mask="N2" MaskType="Numeric" />

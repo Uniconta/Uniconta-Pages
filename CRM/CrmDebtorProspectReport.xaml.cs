@@ -154,10 +154,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 case "AddDebtor":
                 case "AddProspect":
-                    object[] param = new object[2];
-                    param[0] = api;
-                    param[1] = null;
-
+                    object[] param = new object[2] { api, null };
                     if (ActionType == "AddDebtor")
                         AddDockItem(TabControls.DebtorAccountPage2, param, Uniconta.ClientTools.Localization.lookup("DebtorAccount"), "Add_16x16.png");
                     else if (ActionType == "AddProspect")
@@ -165,32 +162,26 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
 
                 case "EditRow":
-                    if (selectedItem == null) return;
-                    var parmas = new object[2];
-                    parmas[1] = true;
                     if (selectedItem is CrmProspectView)
                     {
                         var crmProspectUser = api.CompanyEntity.CreateUserType<CrmProspectClient>();
                         StreamingManager.Copy(selectedItem as CrmProspectClient, crmProspectUser);
-                        parmas[0] = crmProspectUser;
-                        AddDockItem(TabControls.CrmProspectPage2, parmas, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Prospects"), selectedItem.Name));
+                        AddDockItem(TabControls.CrmProspectPage2, new object[] { crmProspectUser, true }, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Prospects"), selectedItem.Name));
                     }
                     else if (selectedItem is CrmDebtorView)
                     {
                         var debtorUser = api.CompanyEntity.CreateUserType<DebtorClient>();
                         StreamingManager.Copy(selectedItem as DebtorClient, debtorUser);
-                        parmas[0] = debtorUser;
-                        AddDockItem(TabControls.DebtorAccountPage2, parmas, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("DebtorAccount"), selectedItem.Name));
+                        AddDockItem(TabControls.DebtorAccountPage2, new object[] { debtorUser, true }, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("DebtorAccount"), selectedItem.Name));
                     }
                     break;
 
                 case "Contacts":
-                    if (selectedItem == null) return;
-                    AddDockItem(TabControls.ContactPage, dgCrmDebtorProspect.syncEntity);
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.ContactPage, dgCrmDebtorProspect.syncEntity);
                     break;
 
                 case "FollowUp":
-                    if (selectedItem == null) return;
                     if (selectedItem is CrmDebtorView)
                     {
                         var crmSelectedItem = selectedItem as CrmDebtorView;
@@ -214,7 +205,7 @@ namespace UnicontaClient.Pages.CustomPage
                         AddDockItem(TabControls.UserDocsPage, dgCrmDebtorProspect.syncEntity);
                     break;
                 case "Orders":
-                    if (dgCrmDebtorProspect.syncEntity == null || !selectedItem.IsDebtor)
+                    if (dgCrmDebtorProspect.syncEntity == null || selectedItem == null || !selectedItem.IsDebtor)
                         return;
                     AddDockItem(TabControls.DebtorOrdersMultiple, dgCrmDebtorProspect.syncEntity);
                     break;
@@ -226,13 +217,12 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
 
                 case "ConvertToDebtor":
-                    if (selectedItem != null && selectedItem is CrmProspectView)
+                    if (selectedItem is CrmProspectView)
                         ConvertProspectToDebtor(selectedItem as CrmProspectClient);
                     break;
                 case "RefreshGrid":
                     InitQuery();
                     break;
-
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -241,13 +231,11 @@ namespace UnicontaClient.Pages.CustomPage
 
         public async override Task InitQuery()
         {
-            var debtorProspectList = new List<ICrmProspect>();
             busyIndicator.IsBusy = true;
-            IEnumerable<CrmDebtorView> debtorEntity;
-            debtorEntity = await api.Query<CrmDebtorView>();
-            IEnumerable<CrmProspectView> prospectEntity;
-            prospectEntity = await api.Query<CrmProspectView>();
+            var debtorEntity = await api.Query<CrmDebtorView>();
+            var prospectEntity = await api.Query<CrmProspectView>();
 
+            var debtorProspectList = new List<ICrmProspect>();
             if (debtorEntity != null)
                 debtorProspectList.AddRange(debtorEntity);
             if (prospectEntity != null)

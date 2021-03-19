@@ -27,7 +27,7 @@ namespace UnicontaClient.Pages.CustomPage
     {
         public SelectedCriteria()
         {
-            _ShowDebitCredit = true;
+            _ShowDebitCredit = _InclPrimo = true;
         }
 
         internal string journal;
@@ -41,7 +41,7 @@ namespace UnicontaClient.Pages.CustomPage
         public BalanceColumnFormat balanceColumnFormat { get { return balcolFormat; } set { balcolFormat = value; NotifyPropertyChanged("BalanceFormat"); } }
         public BalanceColumnMethod balanceColumnMethod { get { return balcolMethod; } set { balcolMethod = value; NotifyPropertyChanged("BalanceMethod"); } }
         internal int colA, colB;
-        internal bool _ShowDebitCredit, _InvertSign, _Hide;
+        internal bool _ShowDebitCredit, _InvertSign, _Hide, _InclPrimo;
         internal string criteriaName, fromaccount, toaccount;
         internal List<int> dimval1, dimval2, dimval3, dimval4, dimval5;
         public DateTime FromDate { get { return frmdateval; } set { frmdateval = value; NotifyPropertyChanged("FromDate"); } }
@@ -61,6 +61,7 @@ namespace UnicontaClient.Pages.CustomPage
         public List<object> Dim5 { get { return CheckDim(dimval5); } set { dimval5 = SetDim(value); NotifyPropertyChanged("Dim5"); } }
         public bool ShowDebitCredit { get { return _ShowDebitCredit; } set { _ShowDebitCredit = value; NotifyPropertyChanged("ShowDebitCredit"); } }
         public bool InvertSign { get { return _InvertSign; } set { _InvertSign = value; NotifyPropertyChanged("InvertSign"); } }
+        public bool InclPrimo { get { return _InclPrimo; } set { _InclPrimo = value; NotifyPropertyChanged("InclPrimo"); } }
         [ForeignKeyAttribute(ForeignKeyTable = typeof(Uniconta.DataModel.GLDailyJournal))]
         public string Journal { get { return journal; } set { journal = value; SetAllJournal(value); NotifyPropertyChanged("Journal"); } }
         [ForeignKeyAttribute(ForeignKeyTable = typeof(Uniconta.DataModel.GLBudget))]

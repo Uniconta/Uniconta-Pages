@@ -43,7 +43,7 @@ namespace UnicontaClient.Pages.CustomPage
                 }
             }
         }
-     
+
         public override bool Readonly
         {
             get
@@ -143,8 +143,33 @@ namespace UnicontaClient.Pages.CustomPage
                      };
                     cwJoinTwoDimension.Show();
                     break;
+#if !SILVERLIGHT
+                case "ReorganizeDim":
+                    ReOrganizeDimensions();
+                    break;
+#endif
             }
         }
+
+#if !SILVERLIGHT
+
+        private void ReOrganizeDimensions()
+        {
+            var cwMoveDimensions = new CWMoveDimensions(api);
+            cwMoveDimensions.Closed += delegate
+            {
+                if (cwMoveDimensions.DialogResult == true)
+                {
+                    if (cwMoveDimensions.Result == ErrorCodes.Succes)
+                        dgDimension.Refresh();
+                    else
+                        UtilDisplay.ShowErrorCode(cwMoveDimensions.Result);
+                }
+            };
+            cwMoveDimensions.Show();
+        }
+
+#endif
 
         private async void Save(int NewDim)
         {

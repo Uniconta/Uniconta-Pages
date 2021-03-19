@@ -217,7 +217,7 @@ namespace UnicontaClient.Pages.CustomPage
             {              
                 if (objCWBudgetLineDialog.DialogResult == true)
                 {
-                    var Cache = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.GLAccount));
+                    var Cache = api.GetCache(typeof(Uniconta.DataModel.GLAccount));
                     if (Cache == null)
                         return;
 
@@ -241,7 +241,7 @@ namespace UnicontaClient.Pages.CustomPage
                             var objGLBudgetLineClient = new GLBudgetLineClient();
                             StreamingManager.Copy(objCWBudgetLineDialog.editrow, objGLBudgetLineClient);
                             objGLBudgetLineClient._Account = Account;
-                            dgGLBudgetLine.AddRow(objGLBudgetLineClient);
+                            dgGLBudgetLine.AddRow(objGLBudgetLineClient, -1, false);
                         }              
                     }           
                 }
@@ -341,9 +341,7 @@ namespace UnicontaClient.Pages.CustomPage
                 }
             }
           
-            object[] param = new object[1];
-            param[0] = lst;
-            AddDockItem(TabControls.SimulatedGLBudgetLinePage, param, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Simulate"), this.budgetName));
+            AddDockItem(TabControls.SimulatedGLBudgetLinePage, new object[] { lst }, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Simulate"), this.budgetName));
         }
 
         public async override Task InitQuery()

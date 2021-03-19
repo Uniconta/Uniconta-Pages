@@ -57,7 +57,7 @@ x:Class="UnicontaClient.Pages.CustomPage.SerialToOrderLinePage"
                                         </DataTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridTemplateColumnClient>
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="QtyOpen" MinWidth="90">
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="QtyOpen" MinWidth="90" ReadOnly="True">
                                     <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                         <DataTemplate>
                                             <CorasauControls:TextEditor x:Name="PART_Editor" HorizontalContentAlignment="Right" Mask="{Binding Path=DataContext.RowData.Row.Decimals,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource MaskConverter},ConverterParameter=Decimals}" MaskUseAsDisplayFormat="True" MaskType="Numeric" 

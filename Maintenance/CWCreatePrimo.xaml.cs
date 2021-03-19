@@ -14,6 +14,7 @@ using Uniconta.API.System;
 using Uniconta.ClientTools;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.Common;
+using Uniconta.Common.Utility;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage.Maintenance
@@ -72,7 +73,7 @@ namespace UnicontaClient.Pages.CustomPage.Maintenance
             BalanceName = txtBalance.Text;
             PLText = txtPL.Text;
             if (!string.IsNullOrEmpty(txtVoucher.Text))
-                Voucher = Convert.ToInt32(txtVoucher.Text);
+                Voucher = (int)NumberConvert.ToInt(txtVoucher.Text);
             else
                 Voucher = 0;
             this.DialogResult = true;

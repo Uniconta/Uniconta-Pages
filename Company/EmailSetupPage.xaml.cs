@@ -78,6 +78,14 @@ namespace UnicontaClient.Pages.CustomPage
                     var approverEmailDialog = new CWApprovalEmailSetup(api, smtps);
                     approverEmailDialog.Show();
                     break;
+                case "AddNote":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.UserNotesPage, dgEmailSetupGrid.syncEntity);
+                    break;
+                case "AddDoc":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.UserDocsPage, dgEmailSetupGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Documents"), selectedItem._Name));
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -88,6 +96,20 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (screenName == TabControls.EmailSetupPage2)
                 dgEmailSetupGrid.UpdateItemSource(argument);
+        }
+
+        private void HasDocImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            var client = (sender as Image).Tag as CompanySMTPClient;
+            if (client != null)
+                AddDockItem(TabControls.UserDocsPage, dgEmailSetupGrid.syncEntity);
+        }
+
+        private void HasNoteImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            var client = (sender as Image).Tag as CompanySMTPClient;
+            if (client != null)
+                AddDockItem(TabControls.UserNotesPage, dgEmailSetupGrid.syncEntity);
         }
     }
 }

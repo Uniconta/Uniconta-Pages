@@ -54,11 +54,11 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorStatement"
                 <CheckBox x:Name="cbxAscending" Grid.Column="5" Grid.Row="0" Margin="0,3,3,3" IsChecked="False"/>
                 <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=SkipEmpty}" Grid.Column="3" Grid.Row="1" Margin="3,3,3,3"/>
                 <CheckBox x:Name="cbxSkipBlank" Grid.Column="5" Grid.Row="1" Margin="0,3,3,3" IsChecked="true"/>
-                <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OnlyOpen}" Grid.Column="3" Grid.Row="2" Margin="3,3,3,3"/>
-                <CheckBox x:Name="cbxOnlyOpen" Grid.Column="5" Grid.Row="2" Margin="0,3,3,3" IsChecked="False"/>
+                <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Transactions}" Grid.Column="3" Grid.Row="2" Margin="3,3,3,3"/>
+                <CorasauControls:DimComboBoxEditor x:Name="cmbTrasaction" Width="100" Grid.Column="5" Grid.Row="2" Margin="0,3,3,3" SelectedIndexChanged="cmbTrasaction_SelectedIndexChanged"  IsTextEditable="False"/>
                 <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=PageBreak}" Grid.Column="3" Grid.Row="3" Margin="3,3,3,3"/>
                 <CheckBox x:Name="cbxPageBreak" Grid.Column="5" Grid.Row="3" Margin="0,3,3,3" IsChecked="False" Click="cbxPageBreak_Click"/>
-                <Button x:Name="btnSerach" Grid.Column="6" Grid.Row="0" Margin="10,3,3,3" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Search}" Height="23" Width="80" Click="btnSerach_Click"/>
+                <Button x:Name="btnSerach" Grid.Column="6" Grid.Row="3" Margin="10,3,3,3" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Search}" Height="23" Width="80" Click="btnSerach_Click"/>
 
             </Grid>
             <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{StaticResource WindowHeaderGradient}" />
@@ -66,7 +66,9 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorStatement"
                 <localPage:CreditorStatementGridClient x:Name="dgCreditorTrans" AutoGenerateColumns="None" SelectionMode="None" MasterRowExpanded="MasterRowExpanded" SubstituteFilter="SubstituteFilter">
                     <localPage:CreditorStatementGridClient.Columns>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="AccountNumber" CellTemplate="{StaticResource RegularCellTemplate}"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="Name"  />
+                        <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" />
+                        <localPage:CorasauDataGridTemplateColumnClient x:Name="Address1"/>
+                        <localPage:CorasauDataGridTemplateColumnClient x:Name="City"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="SumAmount">
                             <localPage:CorasauDataGridTemplateColumnClient.EditSettings>
                                 <editorSettings:TextEditSettings MaskUseAsDisplayFormat="True" DisplayFormat="N2" Mask="N2" MaskType="Numeric" HorizontalContentAlignment="Right"  />
@@ -89,6 +91,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorStatement"
                                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Text" Width="150" />
                                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Amount" Width="100"/>
                                     <localPage:CorasauDataGridTemplateColumnClient x:Name="AmountOpen" Width="100"/>
+                                    <localPage:CorasauDataGridTemplateColumnClient x:Name="OverDue" Width="100" />
                                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PostType" Width="90"/>
                                     <localPage:CorasauDataGridTemplateColumnClient x:Name="colSumAmount" FieldName="SumAmount" />
                                     <localPage:CorasauDataGridTemplateColumnClient x:Name="TransType" Visible="False"/>
@@ -97,6 +100,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorStatement"
                                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Currency" Visible="False"/>
                                     <localPage:CorasauDataGridTemplateColumnClient x:Name="AmountCur" Visible="False"/>
                                     <localPage:CorasauDataGridTemplateColumnClient x:Name="AmountOpenCur" Visible="False"/>
+                                    <localPage:CorasauDataGridTemplateColumnClient x:Name="OverDueCur" Visible="False" />
                                     <localPage:CorasauDataGridTemplateColumnClient x:Name="SumAmountCur" Visible="False"/>
                                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DebitCur" Visible="False"/>
                                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CreditCur" Visible="False"/>
@@ -107,6 +111,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorStatement"
                                 <localPage:CreditorStatementGridClient.TotalSummary>
                                     <localPage:SumColumn FieldName="Amount" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                                     <localPage:SumColumn FieldName="AmountOpen" SummaryType="Sum" DisplayFormat="{}{0:N2}" />
+                                    <localPage:SumColumn FieldName="OverDue" SummaryType="Sum" DisplayFormat="{}{0:N2}" />
                                 </localPage:CreditorStatementGridClient.TotalSummary>
                             </localPage:CreditorStatementGridClient>
                         </localPage:DataControlDetailDescriptorCls>

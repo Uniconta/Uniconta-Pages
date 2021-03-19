@@ -36,6 +36,7 @@ x:Class="UnicontaClient.Pages.CustomPage.PrCategoryPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="AggregatePayroll" Width="60" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CostRecognition" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="RevenueRecognition" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Forward" Width="60"/>
                 </localPage:PrCategoryGrid.Columns>
             </localPage:PrCategoryGrid>
         </CorasauControls:BusyIndicator>

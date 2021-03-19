@@ -313,6 +313,12 @@ namespace UnicontaClient.Pages.CustomPage
                     var debPaymentFormat = cwwin.PaymentFormat;
                     var schemeType = cwwin.directDebitScheme;
 
+                    if (debPaymentFormat._ExportFormat ==  (byte)Uniconta.DataModel.DebtorPaymFormatType.NetsBS)
+                    {
+                        UnicontaMessageBox.Show("Denne funktion understøttes ikke af Uniconta", Uniconta.ClientTools.Localization.lookup("Register"));
+                        return;
+                    }
+
                     List<DebtorMandateDirectDebit> LstDebMandate = new List<DebtorMandateDirectDebit>();
                     foreach (var s in lstMandates.Cast<DebtorMandateDirectDebit>())
                     {

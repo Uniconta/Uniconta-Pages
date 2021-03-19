@@ -48,7 +48,7 @@ namespace ISO20022CreditTransfer
         /// <param name="Company">Uniconta company</param> 
         /// <param name="xxx">xxx.</param>
         /// <returns>An XML payment file</returns>                                                                                                                                                              
-        public XMLDocumentGenerateResult GenerateISO20022(Company company, IEnumerable<CreditorTransPayment> queryPaymentTrans, SQLCache bankAccountCache, CreditorPaymentFormat credPaymFormat, int maxFileId, bool doMergePayment, bool schemaValidation = true)
+        public XMLDocumentGenerateResult GenerateISO20022(Company company, IEnumerable<CreditorTransPayment> queryPaymentTrans, SQLCache bankAccountCache, CreditorPaymentFormat credPaymFormat, int uniqueFileId, bool doMergePayment, bool schemaValidation = true)
         {
             CreditTransferDocument doc = new CreditTransferDocument();
             BankSpecificSettings bankSpecific = BankSpecificSettings.BankSpecTypeInstance(credPaymFormat);
@@ -88,7 +88,7 @@ namespace ISO20022CreditTransfer
             doc.ChargeBearer = bankSpecific.ChargeBearerDebtor();
 
             doc.CompanyID = company.CompanyId;
-            doc.NumberSeqPaymentFileId = maxFileId;
+            doc.NumberSeqPaymentFileId = uniqueFileId;
 
             string companyAccountId = string.Empty;
             string companyBIC = string.Empty;
@@ -109,11 +109,9 @@ namespace ISO20022CreditTransfer
             //Update ISO PaymentType >>
             foreach (var rec in queryPaymentTrans)
             {
-                string currency = rec._CurrencyLocal;
-                currency = string.IsNullOrEmpty(currency) ? doc.CompanyCcy : currency;
-
+                var currency = rec.CurrencyLocalStr;
                 double amount = 0;
-                amount = rec._PaymentAmount;
+                amount = rec.PaymentAmount;
 
                 var BICnumber = "";
                 var IBANnumber = "";
@@ -131,6 +129,7 @@ namespace ISO20022CreditTransfer
                 rec.internationalPayment = bankSpecific.InternationalPayment(bankAccount._IBAN, IBANnumber, BICnumber, UnicontaCountryToISO(creditor._Country), doc.CompanyCountryId);
                 doc.ISOPaymentType = bankSpecific.ISOPaymentType(currency, bankAccount._IBAN, IBANnumber, BICnumber, UnicontaCountryToISO(creditor._Country), doc.CompanyCountryId);
                 rec.ISOPaymentType = doc.ISOPaymentType.ToString();
+                bankSpecific.paymentType = doc.ISOPaymentType;
             }
             //Update ISO PaymentType <<
 
@@ -138,7 +137,7 @@ namespace ISO20022CreditTransfer
             if (doMergePayment)
                 queryPaymentTransSorted = from s in queryPaymentTrans orderby s._PaymentRefId select s;
             else
-                queryPaymentTransSorted = from s in queryPaymentTrans orderby s._PaymentDate, s.ISOPaymentType, s._PaymentMethod, s._CurrencyLocal select s;
+                queryPaymentTransSorted = from s in queryPaymentTrans orderby s._PaymentDate, s.ISOPaymentType, s._PaymentMethod, s.Currency select s;
 
             paymentISO20022Validate.CompanyBank(credPaymFormat);
 
@@ -151,13 +150,13 @@ namespace ISO20022CreditTransfer
                 doc.HeaderNumberOfTrans++;
                 doc.PmtInfNumberOfTransActive = bankSpecific.PmtInfNumberOfTransActive();
 
-                doc.HeaderCtrlSum += bankSpecific.HeaderCtrlSum(rec._PaymentAmount);
+                doc.HeaderCtrlSum += bankSpecific.HeaderCtrlSum(rec.PaymentAmount);
 
                 doc.PmtInfCtrlSumActive = bankSpecific.PmtInfCtrlSumActive();
 
                 doc.RequestedExecutionDate = bankSpecific.RequestedExecutionDate(doc.CompanyIBAN, rec._PaymentDate);
 
-                string currency = rec._CurrencyLocal;
+                string currency = rec.CurrencyLocalStr;
                 currency = string.IsNullOrEmpty(currency) ? doc.CompanyCcy : currency;
 
                 doc.EndToEndId = bankSpecific.EndtoendId(rec.PaymentEndToEndId);
@@ -242,7 +241,7 @@ namespace ISO20022CreditTransfer
                 }
 
                 double amount = 0;
-                amount = rec._PaymentAmount;
+                amount = rec.PaymentAmount;
 
                 doc.ISOPaymentType = bankSpecific.ISOPaymentType(currency, bankAccount._IBAN, isPaymentTypeIBAN ? creditorAcc : string.Empty, creditorBIC, credBankCountryId, doc.CompanyCountryId);
                 doc.ExtServiceCode = bankSpecific.ExtServiceCode(doc.ISOPaymentType); 

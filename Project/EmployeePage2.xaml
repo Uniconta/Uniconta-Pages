@@ -57,8 +57,14 @@ x:Class="UnicontaClient.Pages.CustomPage.EmployeePage2"
                         <CorasauControls:CorasauLayoutItem x:Name="liMobil" FieldName="Mobil">
                             <CorasauControls:TextEditor Text="{Binding Mobil,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liPrivateMobil" FieldName="PrivateMobil">
+                            <CorasauControls:TextEditor Text="{Binding PrivateMobil,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem x:Name="liEmail" FieldName="Email" Style="{StaticResource LayoutItemsstyle}" ButtonClicked="Email_ButtonClicked" ButtonContent="&#x2709;" Padding="0">
                             <CorasauControls:TextEditor x:Name="txtEmail" Text="{Binding Email,Mode=TwoWay}" MaskType="RegEx" Mask="{StaticResource EmailValidationRegx}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liPrivateEmail" FieldName="PrivateEmail" Style="{StaticResource LayoutItemsstyle}" ButtonClicked="PrivateEmail_ButtonClicked" ButtonContent="&#x2709;" Padding="0">
+                            <CorasauControls:TextEditor x:Name="txtPrivateEmail" Text="{Binding PrivateEmail,Mode=TwoWay}" MaskType="RegEx" Mask="{StaticResource EmailValidationRegx}"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem x:Name="liPersonalId" FieldName="PersonalId">
                             <CorasauControls:TextEditor Text="{Binding PersonalId,Mode=TwoWay}"/>
@@ -69,6 +75,10 @@ x:Class="UnicontaClient.Pages.CustomPage.EmployeePage2"
                         <CorasauControls:CorasauLayoutItem x:Name="liPayrollCategory" FieldName="PayrollCategory">
                             <CorasauControls:LookupEditor x:Name="lePayrollCategory" Text="{Binding PayrollCategory,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
+                    </CorasauControls:CorasauLayoutGroup>
+                </CorasauControls:CorasauLayoutGroup>
+                <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="lastGroup">
+                    <CorasauControls:CorasauLayoutGroup x:Name="grpUser" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=User}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                         <CorasauControls:CorasauLayoutItem x:Name="liApprover" FieldName="Approver">
                             <CorasauControls:LookupEditor x:Name="leApprover" Text="{Binding Approver,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
@@ -97,9 +107,7 @@ x:Class="UnicontaClient.Pages.CustomPage.EmployeePage2"
                             <CorasauControls:CheckEditor IsChecked="{Binding ApproveOnEmail,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
-                </CorasauControls:CorasauLayoutGroup>
-                <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="lastGroup">
-                    <CorasauControls:CorasauLayoutGroup x:Name="grpPrices" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Prices}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                        <CorasauControls:CorasauLayoutGroup x:Name="grpPrices" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Prices}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                         <CorasauControls:CorasauLayoutItem x:Name="liCostPrice" FieldName="CostPrice">
                             <CorasauControls:DoubleEditor FieldName="CostPrice" />
                         </CorasauControls:CorasauLayoutItem>

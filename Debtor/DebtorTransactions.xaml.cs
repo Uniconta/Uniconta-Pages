@@ -130,6 +130,7 @@ namespace UnicontaClient.Pages.CustomPage
                 UtilDisplay.RemoveMenuCommand(rb, "SaveGrid");
             }
             dgDebtorTran.Readonly = showFields;
+            FromCreditor.Visible = ((master as Uniconta.DataModel.Debtor)?._D2CAccount != null);
         }
 
         private void localMenu_OnItemClicked(string ActionType)

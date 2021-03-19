@@ -22,13 +22,14 @@
     </RibbonItem>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem LocalizedNameKey="GenerateInvoice" Action="GenerateInvoice" LargeGlyph="Generate_32x32.png" ShortcutKey="Ctrl+M"></RibbonItem>
+    <RibbonItem LocalizedNameKey="ShowInvoice" Action="ShowInvoice" LargeGlyph="Show_Invoice_32x32.png" ShortcutKey="F7" />
+    <RibbonItem LocalizedNameKey="GenerateInvoice" Action="GenerateInvoice" LargeGlyph="Generate_32x32.png" ShortcutKey="Ctrl+M" />
     <RibbonItem Action="Storage" LocalizedNameKey="OnHand" Module="Storage" LargeGlyph="Storage_32x32.png"/>
     <RibbonItem Action="StockLines" LocalizedNameKey="InvTransactions" LargeGlyph="Inventory_Trans_32x32.png"/>
   </RibbonItem>
   <RibbonItem>
     <RibbonItem LocalizedNameKey="PhysicalVoucher"  LargeGlyph="View_Voucher_32x32.png" >
-      <RibbonItem Action="ViewVoucher"   LocalizedNameKey="View" Glyph="View_16x16.png"  ShortcutKey="F7"/>
+      <RibbonItem Action="ShowVoucher"   LocalizedNameKey="View" Glyph="View_16x16.png"  ShortcutKey="Alt+V"/>
       <RibbonItem Action="RefVoucher" LocalizedNameKey="Attach" Glyph="Attachments_16x16.png"  ShortcutKey="Ctrl+T"/>
       <RibbonItem Action="ImportVoucher" LocalizedNameKey="ImportFile" Glyph="Add_16x16.png"  ShortcutKey="Ctrl+J"/>
       <RibbonItem Action="RemoveVoucher" LocalizedNameKey="Remove" Glyph="Delete_16x16.png"  ShortcutKey="Ctrl+I"/>
@@ -46,7 +47,7 @@
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="CreateFromInvoice" LocalizedNameKey="CopyOBJ" Parameter="Invoice"  LargeGlyph="Orders_32x32.png" />
-    </RibbonItem>
+  </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="InsertSubTotal" LocalizedNameKey="InsertSubTotal" Parameter="Line"  LargeGlyph="Add_32x32.png"/>
   </RibbonItem>

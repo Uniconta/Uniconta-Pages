@@ -62,6 +62,9 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorGroupPage2"
                         <CorasauControls:CorasauLayoutItem FieldName="ItemNameGroup" x:Name="liItemNameGroup">
                             <CorasauControls:LookupEditor x:Name="itemNameGroupLookupEditor" Text="{Binding ItemNameGroup}" />
                         </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="InvoiceSerie" x:Name="liInvoiceSerie">
+                            <CorasauControls:LookupEditor x:Name="invoiceSerieLookupEditor" Text="{Binding InvoiceSerie}" />
+                        </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
                     <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpAccount" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Accounts}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                         <CorasauControls:CorasauLayoutItem FieldName="SummeryAccount" x:Name="liSummeryAccount">

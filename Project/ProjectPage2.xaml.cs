@@ -149,6 +149,11 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var debtors = api.GetCache(typeof(Uniconta.DataModel.Debtor));
             var debtor = (Uniconta.DataModel.Debtor)debtors?.Get(Convert.ToString(e.NewValue));
+            if (debtor != null && debtor._Blocked)
+            {
+                UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("AccountIsBlocked"), Uniconta.ClientTools.Localization.lookup("Information"));
+                return;
+            }
             if (debtor != null && installationCache != null)
             {
                 leInstallation.cacheFilter = new AccountCacheFilter(installationCache, 1, debtor._Account);

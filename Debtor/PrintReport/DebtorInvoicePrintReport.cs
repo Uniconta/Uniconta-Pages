@@ -201,6 +201,8 @@ namespace UnicontaClient.Pages.CustomPage
 
                 MessageClient = await GetMessageClient(lang);
 
+                await CopyLayoutFieldToCompany();
+
                 return true;
             }
             catch (Exception ex)
@@ -210,6 +212,11 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
+        /// <summary>
+        /// Method to get message client information
+        /// </summary>
+        /// <param name="lang">Debtor language</param>
+        /// <returns>DebtorMessagesClient</returns>
         private Task<DebtorMessagesClient> GetMessageClient(Language lang)
         {
             DebtorEmailType emailType = DebtorEmailType.Invoice;
@@ -226,6 +233,22 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
             }
             return Utility.GetDebtorMessageClient(crudApi, lang, emailType);
+        }
+
+        /// <summary>
+        /// Copy fields of layout group to company
+        /// </summary>
+        /// <returns>Task</returns>
+        async private Task CopyLayoutFieldToCompany()
+        {
+            var comp = crudApi.CompanyEntity;
+            var cache = comp.GetCache(typeof(DebtorLayoutGroup)) ?? await comp.LoadCache(typeof(DebtorLayoutGroup), crudApi);
+            var _LayoutGroup = DebtorInvoice._LayoutGroup ?? Debtor._LayoutGroup;
+            if (_LayoutGroup != null)
+            {
+                var layClient = (DCLayoutGroup)cache.Get(_LayoutGroup);
+                layClient.SetCompanyBank(Company);
+            }
         }
     }
 }

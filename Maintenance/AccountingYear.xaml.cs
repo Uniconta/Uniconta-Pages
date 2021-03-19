@@ -278,8 +278,8 @@ namespace UnicontaClient.Pages.CustomPage
         void ShowHideMenu()
         {
             RibbonBase rb = (RibbonBase)localMenu.DataContext;
-            if (api.session.User._Role < (byte)Uniconta.Common.User.UserRoles.Reseller)
-                UtilDisplay.RemoveMenuCommand(rb, new string[] { "RecalcPeriodSum" });
+            if (api.session.User._Role <= (byte)Uniconta.Common.User.UserRoles.Reseller)
+                UtilDisplay.RemoveMenuCommand(rb, "RecalcPeriodSum");
         }
     }
 }

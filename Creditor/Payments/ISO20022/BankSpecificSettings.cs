@@ -32,6 +32,8 @@ namespace UnicontaISO20022CreditTransfer
         protected Dictionary<string, string> replaceCharactersRegEx;
         #endregion
 
+        internal ISO20022PaymentTypes paymentType;
+
         #region Properties
         public CompanyBankENUM CompanyBankEnum
         {
@@ -290,7 +292,7 @@ namespace UnicontaISO20022CreditTransfer
         /// </summary>
         public virtual string GenerateFileName(int fileID, int companyID)
         {
-            return string.Format("{0}_{1}_{2}", "ISO20022", fileID.ToString().PadLeft(5, '0'), companyID);
+            return string.Format("{0}_{1}_{2}", "ISO20022", fileID, companyID);
         }
 
         /// <summary>
@@ -637,7 +639,7 @@ namespace UnicontaISO20022CreditTransfer
         /// <summary>
         /// Creditor Address
         /// </summary>
-        public virtual PostalAddress CreditorAddress(Uniconta.DataModel.Creditor creditor, PostalAddress creditorAddress)
+        public virtual PostalAddress CreditorAddress(Uniconta.DataModel.Creditor creditor, PostalAddress creditorAddress, bool unstructured = false)
         {
             var adr1 = StandardPaymentFunctions.RegularExpressionReplace(creditor._Address1, allowedCharactersRegEx, replaceCharactersRegEx);
             var adr2 = StandardPaymentFunctions.RegularExpressionReplace(creditor._Address2, allowedCharactersRegEx, replaceCharactersRegEx);
@@ -645,7 +647,7 @@ namespace UnicontaISO20022CreditTransfer
             var zipCode = StandardPaymentFunctions.RegularExpressionReplace(creditor._ZipCode, allowedCharactersRegEx, replaceCharactersRegEx);
             var city = StandardPaymentFunctions.RegularExpressionReplace(creditor._City, allowedCharactersRegEx, replaceCharactersRegEx);
 
-            if (creditor._ZipCode != null)
+            if (creditor._ZipCode != null && !unstructured)
             {
                 creditorAddress.ZipCode = zipCode;
                 creditorAddress.CityName =city;

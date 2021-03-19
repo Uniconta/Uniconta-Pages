@@ -87,20 +87,27 @@ namespace UnicontaClient.Pages.CustomPage
             var master = dgEmpPayCatGrid.masterRecords?.First();
             if (master is Uniconta.DataModel.EmpPayrollCategory)
             {
-                colPayrolCat.Visible= colPayrolCat.ShowInColumnChooser = false;
+                colPayrolCat.Visible = colPayrolCat.ShowInColumnChooser = false;
                 colPayrolCatName.Visible = colPayrolCatName.ShowInColumnChooser = false;
             }
-
+            else
+            {
+                colPayrolCat.ShowInColumnChooser = true;
+                colPayrolCatName.ShowInColumnChooser = true;
+            }
             if (master is Uniconta.DataModel.Employee)
             {
                 colEmployee.Visible = colEmployee.ShowInColumnChooser = false;
-                colEmployeeName.Visible= colEmployeeName.ShowInColumnChooser = false;
+                colEmployeeName.Visible = colEmployeeName.ShowInColumnChooser = false;
             }
-
+            else
+            {
+                colEmployee.ShowInColumnChooser = colEmployeeName.ShowInColumnChooser = true;
+            }
             var Comp = api.CompanyEntity;
             if (Comp.TimeManagement)
             {
-                colItem.Visible= colItem.ShowInColumnChooser = false;
+                colItem.Visible = colItem.ShowInColumnChooser = false;
                 colItemName.Visible = colItemName.ShowInColumnChooser = false;
                 ValidFrom.Visible = true;
                 ValidTo.Visible = true;
@@ -109,7 +116,11 @@ namespace UnicontaClient.Pages.CustomPage
                 colAccount.Visible = true;
                 colAccountName.Visible = true;
                 colPrCategory.Visible = colPrCategory.ShowInColumnChooser = false;
-                colCategoryName.Visible= colCategoryName.ShowInColumnChooser = false;
+                colCategoryName.Visible = colCategoryName.ShowInColumnChooser = false;
+            }
+            else
+            {
+                colItem.ShowInColumnChooser = colItemName.ShowInColumnChooser = colPrCategory.ShowInColumnChooser = colCategoryName.ShowInColumnChooser = true;
             }
         }
 

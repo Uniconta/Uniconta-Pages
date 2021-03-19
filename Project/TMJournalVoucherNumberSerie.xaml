@@ -57,6 +57,14 @@ x:Class="UnicontaClient.Pages.CustomPage.TMJournalVoucherNumberSerie"
                         <CorasauControls:LookupEditor x:Name="leZeroInvoiceItem" Text="{Binding ZeroInvoiceItem,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
+                <CorasauControls:CorasauLayoutGroup View="GroupBox"   x:Name="grpRounding" ItemLabelsAlignment="Default" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TimeRounding}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                    <CorasauControls:CorasauLayoutItem x:Name="liRoundingStart" FieldName="RoundingStart">
+                        <CorasauControls:ComboBoxEditor SelectedItem="{Binding RoundingStart, Mode=TwoWay}" />
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="liRoundingStop" FieldName="RoundingStop">
+                        <CorasauControls:ComboBoxEditor SelectedItem="{Binding RoundingStop, Mode=TwoWay}" />
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
             </CorasauControls:CorasauLayoutGroup>
         </CorasauControls:CorasauLayoutControl>
     </Grid>

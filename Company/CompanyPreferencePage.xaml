@@ -39,6 +39,9 @@ x:Class="UnicontaClient.Pages.CustomPage.CompanyPreferencePage"
                         <CorasauControls:CorasauLayoutItem FieldName="InvoiceShowEmptyLines">
                             <CorasauControls:CheckEditor IsChecked="{Binding InvoiceShowEmptyLines,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="PacknoteShowEmptyLines">
+                            <CorasauControls:CheckEditor IsChecked="{Binding PacknoteShowEmptyLines,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="UseActualCostPrice">
                             <CorasauControls:CheckEditor IsChecked="{Binding UseActualCostPrice,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>

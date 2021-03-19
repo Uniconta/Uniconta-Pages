@@ -15,371 +15,225 @@ using Uniconta.Common.Utility;
 using UnicontaClient.Creditor.Payments;
 using Localization = Uniconta.ClientTools.Localization;
 using Uniconta.ClientTools.Controls;
+using Uniconta.Common.Enums;
+using static UnicontaClient.Pages.CreateIntraStatFilePage;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
-    class CreateFileForIntra
+    class IntraHelper
     {
-        static String companyRegNr;
+        #region Constants
+        public const string VALIDATE_OK = "Ok";
+        #endregion
 
-#if !SILVERLIGHT
-        public static List<IntrastatClient> CreateIntraStatfile(List<IntrastatClient> listOfIntraStat, CrudAPI api)
-#else
-        public static List<IntrastatClient> CreateIntraStatfile(List<IntrastatClient> listOfIntraStat, CrudAPI api, System.Windows.Controls.SaveFileDialog sfd)
-#endif
+        #region Variables
+        private CrudAPI api;
+        private string companyRegNo;
+        private CountryCode companyCountryId;
+        #endregion
+
+        public IntraHelper(CrudAPI api)
         {
-            List<IntrastatClient> listOfImport = new List<IntrastatClient>();
-            List<IntrastatClient> listOfExport = new List<IntrastatClient>();
-            companyRegNr = "";
-
-            List<IntrastatClient> listToReturn = new List<IntrastatClient>();
-            List<IntrastatClient> listOfNotValidated = new List<IntrastatClient>();
-
-
-            var tempImpList = listOfIntraStat.Where(a => a.ImportOrExport == CreateIntraStatFilePage.ImportOrExportIntrastat.Import).ToList();
-            var tempExppList = listOfIntraStat.Where(a => a.ImportOrExport == CreateIntraStatFilePage.ImportOrExportIntrastat.Export).ToList();
-
-            foreach (var c in api.CompanyEntity._Id)
-            {
-                if (Char.IsDigit(c))
-                {
-                    companyRegNr = companyRegNr + c;
-                }
-            }
-
-            if (string.IsNullOrWhiteSpace(companyRegNr))
-            {
-                UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("MissingAccountVATNr"), Uniconta.ClientTools.Localization.lookup("Error"));
-                return null;
-            }
-
-            if (tempImpList.Count > 999)
-            {
-                listToReturn.AddRange(tempImpList.GetRange(998, Int32.MaxValue));
-                tempImpList.RemoveRange(998, Int32.MaxValue);
-            }
-            if (tempExppList.Count > 999)
-            {
-                listToReturn.AddRange(tempExppList.GetRange(998, Int32.MaxValue));
-                tempExppList.RemoveRange(998, Int32.MaxValue);
-            }
-
-            var countOfPost = 1;
-            var isRec2Created = false;
-            var compress = Localization.lookup("Compress");
-
-            if (tempImpList != null || tempImpList.Count > 0)
-            {
-                foreach (var intrastat in tempImpList)
-                {
-
-                    if (!intrastat.systemInfo.Contains(compress) && !intrastat.systemInfo.Contains(Localization.lookup("Ok")) && !string.IsNullOrWhiteSpace(intrastat.systemInfo))
-                    {
-                        listOfNotValidated.Add(intrastat);
-                        continue;
-                    }
-
-                    if (!intrastat.systemInfo.Contains(compress) && isRec2Created ==false)
-                    {
-                        var importItem = new IntrastatClient();
-                        importItem.companyRegNr = companyRegNr;
-
-                        while (importItem.companyRegNr.Length <= 7)
-                            importItem.companyRegNr = "0" + importItem.companyRegNr;
-
-                        isRec2Created = true;
-
-                        listOfImport = new List<IntrastatClient>();
-                        importItem.recNr = "02";
-                        importItem.importOrExport = CreateIntraStatFilePage.ImportOrExportIntrastat.Import;
-
-                        importItem.itemAmount = tempImpList.Count.ToString();
-                        importItem.itemAmount = importItem.itemAmount.Length != 3
-                            ? importItem.itemAmount.PadLeft(3, '0')
-                            : importItem.itemAmount;
-
-                        importItem.interntRefNrForAll = new string('0', 10);
-                        importItem.monthAndYearOfDate = intrastat.MonthAndYearOfDate;
-                        importItem.filler = new string(' ', 52);
-                        listOfImport.Insert(0, importItem);
-                    }
-
-                    intrastat.itemCount = countOfPost;
-                    countOfPost++;
-
-                    intrastat.interntRefNr =
-                        NETSNorge.processString(intrastat.itemIntra + intrastat.itemNameIntra, 10, false);
-                    listOfImport.Add(intrastat);
-                }
-            }
-
-            countOfPost = 1;
-            isRec2Created = false;
-
-            if (tempExppList != null || tempExppList.Count > 0)
-            {
-                foreach (var intrastat in tempExppList)
-                {
-                    if (!intrastat.systemInfo.Contains(compress) && !intrastat.systemInfo.Contains(Localization.lookup("Ok")) && !string.IsNullOrWhiteSpace(intrastat.systemInfo))
-                    {
-                        listOfNotValidated.Add(intrastat);
-                        continue;
-                    }
-
-                    if (!intrastat.systemInfo.Contains(compress) && isRec2Created == false)
-                    {
-                        var exportItem = new IntrastatClient();
-                        listOfExport = new List<IntrastatClient>();
-
-                        exportItem.companyRegNr = companyRegNr;
-
-                        while (exportItem.companyRegNr.Length <= 7)
-                            exportItem.companyRegNr = "0" + exportItem.companyRegNr;
-
-                        isRec2Created = true;
-
-                        exportItem.recNr = "02";
-                        exportItem.importOrExport = CreateIntraStatFilePage.ImportOrExportIntrastat.Export;
-
-                        exportItem.itemAmount = tempExppList.Count.ToString();
-                        exportItem.itemAmount = exportItem.itemAmount.Length != 3
-                            ? exportItem.itemAmount.PadLeft(3, '0')
-                            : exportItem.itemAmount;
-
-                        exportItem.interntRefNrForAll = new string('0', 10);
-                       
-                        exportItem.monthAndYearOfDate = intrastat.MonthAndYearOfDate;
-                        exportItem.filler = new string(' ', 52);
-                        listOfExport.Insert(0, exportItem);
-                    }
-                    intrastat.itemCount = countOfPost;
-                    countOfPost++;
-
-                    intrastat.interntRefNr = NETSNorge.processString(intrastat.itemIntra + intrastat.itemNameIntra, 10, false);
-
-                    listOfExport.Add(intrastat);
-                }
-            }
-
-            if (listOfImport.Count <= 0 && listOfExport.Count <= 0)
-            {
-                UnicontaMessageBox.Show(Localization.lookup("NoRecordExport"), Uniconta.ClientTools.Localization.lookup("Warning"));
-                return null;
-            }
-
-            try
-            {
-#if !SILVERLIGHT
-                var sfd = UtilDisplay.LoadSaveFileDialog;
-                sfd.Filter = UtilFunctions.GetFilteredExtensions(FileextensionsTypes.TXT);
-                var userClickedSave = sfd.ShowDialog();
-
-                if (userClickedSave != true)
-                    return null;
-#endif
-
-#if !SILVERLIGHT
-                using (var stream = File.Create(sfd.FileName))
-#else
-                using (var stream = sfd.OpenFile())
-#endif
-                {
-#if !SILVERLIGHT
-                    var sw = new StreamWriter(stream, Encoding.Default);
-#else
-                    var sw = new StreamWriter(stream);
-#endif
-                    CreateAndStreamFirstAndLast(listOfImport, sw, true, api);
-                    listOfImport.AddRange(listOfExport);
-                    StreamToFile(listOfImport, sw);
-                    CreateAndStreamFirstAndLast(listOfImport, sw, false, api);
-                    sw.Flush();
-                }
-               
-            }
-            catch (Exception ex)
-            {
-                UnicontaMessageBox.Show(ex);
-                return null;
-            }
-
-            if (listToReturn != null && listToReturn.Count > 0)
-                listToReturn.InsertRange(0, listOfNotValidated);
-
-                return listToReturn;
+            companyRegNo = Regex.Replace(api.CompanyEntity._Id ?? string.Empty, "[^0-9]", "");
+            companyCountryId = api.CompanyEntity._CountryId;
         }
 
-        public static void StreamToFile(List<IntrastatClient> listOfImportExport, StreamWriter sw)
+        public bool PreValidate()
         {
-            var type = new IntrastatClient();
-
-            var outputFields = new[]
+            if (!Country2Language.IsEU(companyCountryId))
             {
-                "recNr", "itemAmount", "interntRefNrForAll", "companyRegNr", "importOrExport", "monthAndYearOfDate", "filler",
-            };
+                UnicontaMessageBox.Show(Localization.lookup("AccountCountryNotEu"), Localization.lookup("Warning"));
+                return false;
+            }
 
-
-            var outputFields2 = new[]
+            if (string.IsNullOrWhiteSpace(companyRegNo))
             {
-                "recNr", "itemCount", "interntRefNr", "euCountry", "transType", "zeroes", "zeroes",
-                "itemCode", "zeroes", "netWeight", "additionalAmount", "invoiceAmount", "filler",
-            };
+                UnicontaMessageBox.Show(string.Format(Localization.lookup("MissingOBJ"), Localization.lookup("CompanyRegNo")), Localization.lookup("Warning"));
+                return false;
+            }
 
-            var fields = outputFields.Select(fld => type.GetType().GetField(fld)).ToList();
-            var fields2 = outputFields2.Select(fld => type.GetType().GetField(fld)).ToList();
+            return true;
+        }
 
+        public void Validate(IEnumerable<IntrastatClient> intralst, bool compressed, bool onlyValidate)
+        {
+            var countErr = 0;
 
-            foreach (var impAndExp in listOfImportExport)
+            foreach (var intra in intralst)
             {
-                if (impAndExp.RecNr == "02")
+                var hasErrors = false;
+                intra.SystemInfo = null;
+
+                if (compressed && intra.Compressed == false)
                 {
-                    foreach (var f in fields)
-                    {
-                        var val = f.GetValue(impAndExp);
-                        string value;
+                    hasErrors = true;
+                    if (intra.SystemInfo == VALIDATE_OK)
+                        intra.SystemInfo = Localization.lookup("CompressPosting");
+                    else
+                        intra.SystemInfo += Environment.NewLine + Localization.lookup("CompressPosting");
+                }
 
-                        if (val is DateTime)
-                        {
-                            value = ((DateTime)val).ToString("yyMM");
-                        }
-                        else if (f.Name == "importOrExport")
-                        {
-                            var enumImpOrExp = (CreateIntraStatFilePage.ImportOrExportIntrastat)val;
-                            value = ((int)enumImpOrExp).ToString();
-                        }
-                        else
-                        {
-                            value = Convert.ToString(val);
-                        }
-                        value = Regex.Replace(value, "[\"\';]", " ");
-                        sw.Write(value);
-                    }
+                if (intra.IsTriangularTrade)
+                {
+                    intra.SystemInfo = Localization.lookup("TriangleTrade"); 
+                    continue;
+                }
+
+                if (intra.ItemCode == null)
+                {
+                    hasErrors = true;
+                    intra.SystemInfo += intra.SystemInfo != null ? Environment.NewLine : null;
+                    intra.SystemInfo += string.Format(Localization.lookup("OBJisEmpty"), Localization.lookup("TariffNumber"));
                 }
                 else
+                    intra.ItemCode = Regex.Replace(intra.ItemCode, "[^0-9]", "");
+
+                if (intra.ItemCode != null && intra.ItemCode.Length != 8)
                 {
-                    foreach (var f in fields2)
+                    hasErrors = true;
+                    intra.SystemInfo += intra.SystemInfo != null ? Environment.NewLine : null;
+                    intra.SystemInfo += string.Format(Localization.lookup("InvalidValue"), Localization.lookup("TariffNumber"), intra.ItemCode);
+                }
+
+                if (intra.Country == CountryCode.Unknown)
+                {
+                    hasErrors = true;
+                    intra.SystemInfo += intra.SystemInfo != null ? Environment.NewLine : null;
+                    intra.SystemInfo += intra.SystemInfo + Localization.lookup("CountryNotSet");
+                }
+                if (intra.Country == companyCountryId)
+                {
+                    hasErrors = true;
+                    intra.SystemInfo += intra.SystemInfo != null ? Environment.NewLine : null;
+                    intra.SystemInfo += intra.SystemInfo + Localization.lookup("OwnCountryProblem");
+                }
+                if (!Country2Language.IsEU(intra.Country))
+                {
+                    hasErrors = true;
+                    intra.SystemInfo += intra.SystemInfo != null ? Environment.NewLine : null;
+                    intra.SystemInfo += Localization.lookup("NonEUCountry");
+                }
+
+                if (intra.CountryOfOrigin == CountryCode.Unknown && intra._CountryOfOriginUNK == IntraUnknownCountry.None)
+                {
+                    hasErrors = true;
+                    intra.SystemInfo += intra.SystemInfo != null ? Environment.NewLine : null;
+                    intra.SystemInfo += string.Format(Localization.lookup("MissingOBJ"), Localization.lookup("CountryOfOrigin"));
+                }
+                
+                if (intra.InvAmount == 0)
+                {
+                    hasErrors = true;
+                    intra.SystemInfo += intra.SystemInfo != null ? Environment.NewLine : null;
+                    intra.SystemInfo += Localization.lookup("NoValues");
+                }
+
+                if (intra.NetWeight == 0 && intra.IntraUnit == 0 && (string.IsNullOrWhiteSpace(intra.ItemCode) || !intra.ItemCode.Contains("99500000")))
+                {
+                    hasErrors = true;
+                    intra.SystemInfo += intra.SystemInfo != null ? Environment.NewLine : null;
+                    intra.SystemInfo += string.Format(Localization.lookup("MissingOBJ"), Localization.lookup("Weight"));
+                }
+
+                if (intra.TransType == null)
+                {
+                    hasErrors = true;
+                    intra.SystemInfo += intra.SystemInfo != null ? Environment.NewLine : null;
+                    intra.SystemInfo += Localization.lookup("EmptyTransferType");
+                }
+
+                if (!string.IsNullOrWhiteSpace(intra.TransType) && intra.TransType.Length != 2)
+                {
+                    hasErrors = true;
+                    intra.SystemInfo += intra.SystemInfo != null ? Environment.NewLine : null;
+                    intra.SystemInfo += string.Format(Localization.lookup("InvalidValue"), Localization.lookup("TransferType"), intra.TransType);
+                }
+
+                if (intra.ImportOrExport == ImportOrExportIntrastat.Export)
+                {
+                    if (string.IsNullOrWhiteSpace(intra.fDebtorRegNo))
                     {
-                        var val = f.GetValue(impAndExp);
-                        string value;
-
-                        if (val is double)
-                        {
-                            var doubleNumber = (double)val;
-
-                            if (f.Name == "netWeight")
-                            {
-                                if (0 < doubleNumber && doubleNumber < 1)
-                                {
-                                    doubleNumber = 1;
-                                }
-                            }
-                            value = NumberConvert.ToLong(Math.Abs(doubleNumber)).ToString();
-                            value = value.PadLeft(f.Name == "additionalAmount" ? 10 : 15, '0');
-                        }
-                        else switch (f.Name)
-                            {
-                                case "itemCount":
-                                    value = ((int)val).ToString();
-                                    while (value.Length < 3)
-                                    {
-                                        value = "0" + value;
-                                    }
-                                    break;
-                                case "euCountry":
-                                    var countryCode = (CountryCode)Enum.Parse(typeof(CountryCode),
-                                        ((CreateIntraStatFilePage.EUCountries)val).ToString(), true);
-
-                                    var iso = Enum.GetName(typeof(CountryISOCode), ((int)countryCode));
-
-                                    value = iso + " ";
-                                    break;
-
-                                case "interntRefNr":
-                                    value = NETSNorge.processString(val.ToString(), 10, false);
-                                    break;
-                                default:
-                                    value = Convert.ToString(val);
-                                    break;
-                            }
-
-                        value = Regex.Replace(value, "[\"\';]", " ");
-                        sw.Write(value);
+                        hasErrors = true;
+                        intra.SystemInfo += intra.SystemInfo != null ? Environment.NewLine : null;
+                        intra.SystemInfo += string.Format(Localization.lookup("MissingOBJ"), Localization.lookup("DebtorRegNo"));
                     }
                 }
+
+                if (hasErrors)
+                    countErr++;
+                else
+                    intra.SystemInfo = VALIDATE_OK;
             }
         }
 
-        public static void CreateAndStreamFirstAndLast(List<IntrastatClient> listOfImportExport, StreamWriter sw, bool firstOrLast, CrudAPI api)
+        class CompressCompare : IEqualityComparer<IntrastatClient>
         {
-            var intraStat = new IntrastatClient();
-            var streamFileList = new List<IntrastatClient>();
-            if (firstOrLast)
+            public bool Equals(IntrastatClient x, IntrastatClient y)
             {
-                intraStat.recNr = "00";
-                intraStat.companyRegNr = companyRegNr;
-                intraStat.intraField = "INTRASTAT";
-                intraStat.filler = new string(' ', 61);
-                streamFileList.Add(intraStat);
-
-                intraStat = new IntrastatClient
-                {
-                    recNr = "01",
-                    transType = "00004",
-                    filler = new string(' ', 73)
-                };
-                streamFileList.Add(intraStat);
+                int c = x.Country - y.Country;
+                if (c != 0)
+                    return false;
+                c = x.CountryOfOrigin - y.CountryOfOrigin;
+                if (c != 0)
+                    return false;
+                c = string.Compare(x.CountryOfOriginUNK, y.CountryOfOriginUNK);
+                if (c != 0)
+                    return false;
+                c = string.Compare(x.Period, y.Period);
+                if (c != 0)
+                    return false;
+                c = string.Compare(x.fDebtorRegNo, y.fDebtorRegNo);
+                if (c != 0)
+                    return false;
+                c = x.ImportOrExport - y.ImportOrExport;
+                if (c != 0)
+                    return false;
+                c = string.Compare(x.ItemCode, y.ItemCode);
+                if (c != 0)
+                    return false;
+                c = string.Compare(x.TransType, y.TransType);
+                if (c != 0)
+                    return false;
+                if (x.IsTriangularTrade != y.IsTriangularTrade)
+                    return false;
+                return true;
             }
-            else
+            public int GetHashCode(IntrastatClient x)
             {
-                var amountTotal = listOfImportExport.Sum(fakcal => Math.Abs(fakcal.invoiceAmount));
-
-                intraStat.recNr = "10";
-                intraStat.suminvoiceAmount = amountTotal;
-                intraStat.filler = new string(' ', 62);
-                streamFileList.Add(intraStat);
+                return (int)(x.Country + 1) * ((int)x.ImportExport + 1) * Util.GetHashCode(x.ItemCode);
             }
-
-
-            var outputFields = new[]
-            {
-                "recNr", "companyRegNr", "intraField", "transType", "suminvoiceAmount", "filler"
-            };
-
-            var fields = outputFields.Select(fld => intraStat.GetType().GetField(fld)).ToList();
-
-            foreach (var startEnd in streamFileList)
-            {
-                foreach (var f in fields)
-                {
-                    var val = f.GetValue(startEnd);
-                    string value;
-
-                    if (val is DateTime)
-                    {
-                        value = ((DateTime)val).ToString("yyMM");
-                    }
-                    else if (val is double)
-                    {
-                        if (streamFileList.Count == 1)
-                        {
-                            value = NumberConvert.ToLong(Math.Abs((double)val) * 100d).ToString();
-                            value = value.PadLeft(16, '0');
-                        }
-                        else
-                        {
-                            value = String.Empty;
-                        }
-                    }
-                    else
-                    {
-                        value = Convert.ToString(val);
-                    }
-                    value = Regex.Replace(value, "[\"\';]", " ");
-                    sw.Write(value);
-                }
-            }
-            
         }
+
+        public List<IntrastatClient> Compress(IEnumerable<IntrastatClient> intralst)
+        {
+            var dictIntra =  new Dictionary<IntrastatClient, IntrastatClient>(new CompressCompare());
+
+            foreach (var intra in intralst)
+            {
+                intra.Compressed = true;
+
+                IntrastatClient found;
+                if (dictIntra.TryGetValue(intra, out found))
+                {
+                    found.InvAmount += intra.InvAmount;
+                    found.NetWeight += intra.NetWeight;
+                    found.InvoiceQuantity += intra.InvoiceQuantity;
+                    found.IntraUnit += intra.IntraUnit;
+                    found.Date = intra.Date;
+                    found.WeightPerPCS = 0;
+                    found.IntraUnitPerPCS = 0;
+                    found._InvoiceNumber = 0;
+                }
+                else
+                    dictIntra.Add(intra, intra);
+            }
+
+            if (dictIntra.Count == 0)
+                return null;
+
+            return dictIntra.Values.ToList();
+        }
+
     }
 }

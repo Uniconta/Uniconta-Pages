@@ -86,6 +86,22 @@ namespace UnicontaClient.Pages.CustomPage
             }
 
             var header = (Uniconta.DataModel.GLDailyJournal)this.masterRecord;
+
+            newRow._AccountType = (byte)header._DefaultAccountType;
+            newRow._Account = header._Account;
+            newRow._OffsetAccountType = (byte)header._DefaultOffsetAccountType;
+            newRow._OffsetAccount = header._OffsetAccount;
+            if (newRow._TransType == null)
+                newRow._TransType = header._TransType;
+            newRow._Vat = header._Vat;
+            newRow._OffsetVat = header._OffsetVat;
+            newRow._Dim1 = header._Dim1;
+            newRow._Dim2 = header._Dim2;
+            newRow._Dim3 = header._Dim3;
+            newRow._Dim4 = header._Dim4;
+            newRow._Dim5 = header._Dim5;
+            newRow._SettleValue = header._SettleValue;
+
             var TakeVoucher = !header._GenerateVoucher && !header._ManualAllocation;
             var lst = (IEnumerable<JournalLineGridClient>)this.ItemsSource;
             if (lst == null)
@@ -120,6 +136,9 @@ namespace UnicontaClient.Pages.CustomPage
                     newRow._TransType = Cur._TransType;
                     newRow._DocumentRef = Cur._DocumentRef;
                     newRow._DocumentDate = Cur._DocumentDate;
+                    if (header._Account == null)
+                        newRow._AccountType = 0; // typically, if we have unbalance, then we need to add ledger account
+
                     if (header._GenOffsetAmount)
                     {
                         if (GridBase.LineTotal > 0d)
@@ -148,20 +167,6 @@ namespace UnicontaClient.Pages.CustomPage
                     newRow._Voucher = GridBase.maxVoucher + 1;
             }
 
-            newRow._AccountType = (byte)header._DefaultAccountType;
-            newRow._Account = header._Account;
-            newRow._OffsetAccountType = (byte)header._DefaultOffsetAccountType;
-            newRow._OffsetAccount = header._OffsetAccount;
-            if (newRow._TransType == null)
-                newRow._TransType = header._TransType;
-            newRow._Vat = header._Vat;
-            newRow._OffsetVat = header._OffsetVat;
-            newRow._Dim1 = header._Dim1;
-            newRow._Dim2 = header._Dim2;
-            newRow._Dim3 = header._Dim3;
-            newRow._Dim4 = header._Dim4;
-            newRow._Dim5 = header._Dim5;
-            newRow._SettleValue = header._SettleValue;
             newRow.TakeVoucher = TakeVoucher;
             newRow.SetMaster(header);
 
@@ -2019,6 +2024,7 @@ namespace UnicontaClient.Pages.CustomPage
             switch (rec._AssetPostType)
             {
                 case FAMTransCodes.Depreciation:
+                case FAMTransCodes.ReversedDepreciation:
                     acc = grp._DepreciationAccount;
                     offset = grp._DepreciationOffset;
                     break;
@@ -2228,23 +2234,10 @@ namespace UnicontaClient.Pages.CustomPage
                 rec._PaymentDate = curDate > trans._DueDate ? curDate : trans._DueDate;
                 rec._PaymentId = lin._PaymentId;
                 rec._PaymentMethod = lin._PaymentMethod;
-                rec._CurrencyLocal = CurrencyUtil.GetStringFromId(trans._Currency != 0 ? (Currencies)trans._Currency : (Currencies)Comp._Currency);
                 rec._AmountOpen = trans._Amount;
                 rec._AmountOpenCur = trans._AmountCur;
-                if (trans._Currency != 0)
-                {
-                    rec._PaymentAmount = -rec._AmountOpenCur;
-                    rec._RemainingAmount = -rec._AmountOpenCur;
-                    rec._InvoiceAmount = -rec._AmountOpenCur;
-                }
-                else
-                {
-                    rec._PaymentAmount = -rec._AmountOpen;
-                    rec._RemainingAmount = -rec._AmountOpen;
-                    rec._InvoiceAmount = -rec._AmountOpen;
-                }
 
-                rec._ErrorInfo = "<DailyJournal Generated>";
+                rec.ErrorInfo = "<DailyJournal Generated>";
                 rec._Comment = trans._Text;
 
                 //CreditorPaymentFormat >>

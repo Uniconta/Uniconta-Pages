@@ -74,6 +74,7 @@ x:Class="UnicontaClient.Pages.CustomPage.FAMPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ResidualValue" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DecommissionCost" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Depresiation" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ReversedDepreciation" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Adjustment" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="WriteUp" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="WriteOff" Visible="False"/>

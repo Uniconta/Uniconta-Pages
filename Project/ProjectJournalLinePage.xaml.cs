@@ -204,21 +204,29 @@ namespace UnicontaClient.Pages.CustomPage
                 PayrollCategory.Visible = false;
                 PayrollCategory.ShowInColumnChooser = false;
             }
+            else
+                PayrollCategory.ShowInColumnChooser = true;
             if (!Comp.ProjectTask)
             {
                 Task.Visible = false;
                 Task.ShowInColumnChooser = false;
             }
+            else
+                Task.ShowInColumnChooser = true;
             if (!Comp.Warehouse)
             {
                 Warehouse.Visible = false;
                 Warehouse.ShowInColumnChooser = false;
             }
+            else
+                Warehouse.ShowInColumnChooser = true;
             if (!Comp.Location)
             {
                 Location.Visible = false;
                 Location.ShowInColumnChooser = false;
             }
+            else
+                Location.ShowInColumnChooser = true;
             UnicontaClient.Utilities.Utility.SetupVariants(api, colVariant, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
             UnicontaClient.Utilities.Utility.SetDimensionsGrid(api, coldim1, coldim2, coldim3, coldim4, coldim5);
 
@@ -267,6 +275,7 @@ namespace UnicontaClient.Pages.CustomPage
                         if (pro._Dim3 != null) rec.Dimension3 = pro._Dim3;
                         if (pro._Dim4 != null) rec.Dimension4 = pro._Dim4;
                         if (pro._Dim5 != null) rec.Dimension5 = pro._Dim5;
+                        rec.Invoiceable = pro._InvoiceAble;
                         getCostAndSales(rec);
                         setTask(pro, rec);
                     }
@@ -571,10 +580,10 @@ namespace UnicontaClient.Pages.CustomPage
 
         async void getCostAndSales(ProjectJournalLineLocal rec)
         {
-            var project = rec._Project;
-            if (project == null)
+            var proj = (Uniconta.DataModel.Project)ProjectCache.Get(rec._Project);
+            if (proj == null)
                 return;
-            var proj = (Uniconta.DataModel.Project)ProjectCache.Get(project);
+
             var Categories = proj.Categories ?? await proj.LoadCategories(api);
 
             rec.costPct = 0d; rec.salesPct = 0d; rec.costAmount = 0d; rec.salesAmount = 0d;

@@ -83,35 +83,51 @@ namespace UnicontaClient.Pages.CustomPage
         void SetHeader()
         {
             var syncMaster = dgPartInvItemsGrid.masterRecord as Uniconta.DataModel.InvItem;
-            string header = null;
+            string Item;
             if (syncMaster != null)
-                header = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("BOM"), syncMaster._Item);
-            if (header != null)
-                SetHeader(header);
+                Item = syncMaster._Item;
+            else
+            {
+                var syncMaster2 = dgPartInvItemsGrid.masterRecord as IVariant;
+                if (syncMaster2 != null)
+                    Item = syncMaster2.Item + "/" + syncMaster2.Variant;
+                else
+                    return;
+            }
+            SetHeader(Uniconta.ClientTools.Localization.lookup("BOM") + ": " + Item);
         }
 
         public override void Utility_Refresh(string screenName, object argument = null)
         {
-            if ( (screenName == TabControls.UserNotesPage || screenName == TabControls.UserDocsPage && argument != null))
+            if ((screenName == TabControls.UserNotesPage || screenName == TabControls.UserDocsPage && argument != null))
             {
                 dgPartInvItemsGrid.UpdateItemSource(argument);
             }
         }
 
         void InitPage(UnicontaBaseEntity _master)
-        {   
+        {
+            this.items = api.GetCache(typeof(Uniconta.DataModel.InvItem));
+            this.warehouse = api.GetCache(typeof(Uniconta.DataModel.InvWarehouse));
+
             master = _master;
-            Invitem = master as InvItemClient;
+            Invitem = _master as InvItemClient;
+            if (Invitem == null)
+            {
+                var syncMaster2 = _master as IVariant;
+                if (syncMaster2 != null)
+                    Invitem = this.items?.Get(syncMaster2.Item) as InvItemClient;
+            }
+
             InitializeComponent();
             ((TableView)dgPartInvItemsGrid.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
             localMenu.dataGrid = dgPartInvItemsGrid;
             SetRibbonControl(localMenu, dgPartInvItemsGrid);
             dgPartInvItemsGrid.api = api;
-            dgPartInvItemsGrid.UpdateMaster(master);
+            dgPartInvItemsGrid.UpdateMaster(_master);
             dgPartInvItemsGrid.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgPartInvItemsGrid.SelectedItemChanged += DgPartInvItemsGrid_SelectedItemChanged;
-            InitialLoad();
             dgPartInvItemsGrid.ShowTotalSummary();
         }
 
@@ -192,9 +208,12 @@ namespace UnicontaClient.Pages.CustomPage
             var company = api.CompanyEntity;
             if (!company.Location || !company.Warehouse)
                 Location.Visible = Location.ShowInColumnChooser = false;
+            else
+                Location.ShowInColumnChooser = true;
             if (!company.Warehouse)
                 Warehouse.Visible = Warehouse.ShowInColumnChooser = false;
-
+            else
+                Warehouse.ShowInColumnChooser = true;
             MoveType.Visible = showFields;
             ShowOnInvoice.Visible = showFields;
             ShowOnPacknote.Visible = showFields;
@@ -204,20 +223,11 @@ namespace UnicontaClient.Pages.CustomPage
             Utility.SetupVariants(api, colVariant, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
         }
 
-        private void InitialLoad()
-        {
-            var Comp = api.CompanyEntity;
-            this.items = Comp.GetCache(typeof(Uniconta.DataModel.InvItem));
-            this.warehouse = Comp.GetCache(typeof(InvWarehouse));
-        }
-
         protected override async void LoadCacheInBackGround()
         {
-            var api = this.api;
-            var Comp = api.CompanyEntity;
             if (this.items == null)
-                this.items = await Comp.LoadCache(typeof(Uniconta.DataModel.InvItem), api).ConfigureAwait(false);
-            if (Comp.Warehouse && this.warehouse == null)
+                this.items = await api.LoadCache(typeof(Uniconta.DataModel.InvItem)).ConfigureAwait(false);
+            if (api.CompanyEntity.Warehouse && this.warehouse == null)
                 this.warehouse = api.GetCache(typeof(Uniconta.DataModel.InvWarehouse)) ?? await api.LoadCache(typeof(Uniconta.DataModel.InvWarehouse)).ConfigureAwait(false);
         }
 
@@ -226,9 +236,8 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (prevVariant1 != null)
                 prevVariant1.isValidate = false;
-            var editor = (CorasauGridLookupEditorClient)sender;
-            prevVariant1 = editor;
-            editor.isValidate = true;
+            prevVariant1 = (CorasauGridLookupEditorClient)sender;
+            prevVariant1.isValidate = true;
         }
 
         CorasauGridLookupEditorClient prevVariant2;
@@ -236,9 +245,8 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (prevVariant2 != null)
                 prevVariant2.isValidate = false;
-            var editor = (CorasauGridLookupEditorClient)sender;
-            prevVariant2 = editor;
-            editor.isValidate = true;
+            prevVariant2 = (CorasauGridLookupEditorClient)sender;
+            prevVariant2.isValidate = true;
         }
 
         private void localMenu_OnItemClicked(string ActionType)
@@ -277,7 +285,8 @@ namespace UnicontaClient.Pages.CustomPage
                         AddDockItem(TabControls.ProductionPostedGridPage, selectedItem, string.Format("{0}:{1}/{2}", Uniconta.ClientTools.Localization.lookup("ProductionPosted"), selectedItem.ItemPart, selectedItem.Name));
                     break;
                 case "HierarichalInvBOMReport":
-                    AddDockItem(TabControls.InventoryHierarchicalBOMStatement, Invitem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("HierarchicalBOM"), Invitem._Item));
+                    if (Invitem != null)
+                        AddDockItem(TabControls.InventoryHierarchicalBOMStatement, Invitem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("HierarchicalBOM"), Invitem._Item));
                     break;
                 case "AddNote":
                     if (selectedItem != null)
@@ -292,7 +301,7 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                     break;
                 case "InvExplodeBOM":
-                    if (selectedItem != null)
+                    if (Invitem != null)
                         AddDockItem(TabControls.InvBOMExplodePage, Invitem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ExplodedBOM"), Invitem._Item));
                     break;
                 default:
@@ -303,8 +312,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private InvBOMClient GetSelectedItem()
         {
-            var selectedItem = dgPartInvItemsGrid.SelectedItem as InvBOMClient;
-            return selectedItem;
+            return dgPartInvItemsGrid.SelectedItem as InvBOMClient;
         }
 
         async void ViewStorage()

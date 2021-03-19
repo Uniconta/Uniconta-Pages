@@ -25,6 +25,12 @@ using Uniconta.ClientTools.Controls;
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
+    public class CreditorOpenTransGrid : CorasauDataGridClient
+    {
+        public override Type TableType { get { return typeof(CreditorTransOpenClient); } }
+        public override bool Readonly { get { return false; } }
+    }
+
     public partial class CreditorOpenTrans : GridBasePage
     {
         public override string NameOfControl
@@ -61,7 +67,6 @@ namespace UnicontaClient.Pages.CustomPage
             SetRibbonControl(localMenu, dgCreditorTranOpenGrid);
             dgCreditorTranOpenGrid.api = api;
             dgCreditorTranOpenGrid.BusyIndicator = busyIndicator;
-            dgCreditorTranOpenGrid.api = api;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgCreditorTranOpenGrid.UpdateMaster(pageMaster = master);
             dgCreditorTranOpenGrid.ShowTotalSummary();
@@ -224,7 +229,7 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     transOpenMaster = null;
                     settles = null;
-                    var openTrans = dgCreditorTranOpenGrid.ItemsSource as CreditorTransOpenClient[];
+                    var openTrans = dgCreditorTranOpenGrid.ItemsSource as List<CreditorTransOpenClient>;
                     foreach (CreditorTransOpenClient openTran in openTrans)
                     {
                         openTran.IsSettled = false;

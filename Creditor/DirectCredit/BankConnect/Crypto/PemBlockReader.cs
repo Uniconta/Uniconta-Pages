@@ -3,6 +3,7 @@ using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using Org.BouncyCastle.OpenSsl;
+using Uniconta.Common.Utility;
 
 namespace SecuredClient.Crypto
 {
@@ -19,7 +20,7 @@ namespace SecuredClient.Crypto
         {
             var stringReader = new StringReader(pemBlock);
 
-            var pemLines = new StringBuilder();
+            var pemLines = StringBuilderReuse.Create();
             string line;
             var certificates = new List<X509Certificate2>();
             while ((line = stringReader.ReadLine()) != null)
@@ -27,12 +28,13 @@ namespace SecuredClient.Crypto
                 pemLines.Append(line).Append("\n");
                 if (line != "-----END CERTIFICATE-----") continue;
                 var pemCertificate = pemLines.ToString();
+                pemLines.Clear();
                 var certReader = new StringReader(pemCertificate);
                 var pemReader = new PemReader(certReader);
                 var readCert = pemReader.ReadObject() as Org.BouncyCastle.X509.X509Certificate;
                 certificates.Add(new X509Certificate2(readCert.GetEncoded()));
-                pemLines.Clear();
             }
+            pemLines.Release();
 
             return certificates;
         }

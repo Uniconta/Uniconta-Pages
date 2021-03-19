@@ -28,19 +28,18 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
         internal const string EXPENSECODE_BOTH = "N";
         internal const string TEXTCODE_SHORTADVICE = "100";
 
-        public static void GenerateFile(IEnumerable<CreditorTransPayment> paymentList, IEnumerable<CreditorTransPayment> paymentListTotal, CrudAPI api, 
-                                        CreditorPaymentFormat paymentFormat, PaymentReference paymReference, SQLCache bankAccountCache, SQLCache creditorCache, bool glJournalGenerated = false)
+        public static bool GenerateFile(IEnumerable<CreditorTransPayment> paymentList, Company company, 
+                                        CreditorPaymentFormat paymentFormat, SQLCache bankAccountCache, SQLCache creditorCache, bool glJournalGenerated = false)
         {
             var bankStatement = (BankStatement)bankAccountCache.Get(paymentFormat._BankAccount);
             var fileFormat = new CreateNordeaFileFormatBase();
             var listofNordeaProperties = new List<DanishFormatFieldBase>();
-            var paymentReference = paymReference;
             
             foreach (var tran in paymentList)
             {
                 var creditor = (Uniconta.DataModel.Creditor)creditorCache.Get(tran.Account);
 
-                var newProp = fileFormat.CreateFormatField(tran, paymentFormat, bankStatement, creditor, api.CompanyEntity, glJournalGenerated);
+                var newProp = fileFormat.CreateFormatField(tran, paymentFormat, bankStatement, creditor, company, glJournalGenerated);
                 if (newProp != null)
                     listofNordeaProperties.Add(newProp);
             }
@@ -52,7 +51,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
 
                 var userClickedSave = sfd.ShowDialog();
                 if (userClickedSave != true)
-                    return;
+                    return false;
 
                 try
                 {
@@ -66,9 +65,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
                         fileFormat.StreamToFile(listofNordeaProperties, sw);
                         sw.Flush();
                     }
-
-                    paymentReference.InsertPaymentReferenceTask(paymentList.Where(s => s._ErrorInfo == BaseDocument.VALIDATE_OK).ToList(),
-                                                                paymentListTotal.Where(s => s._ErrorInfo == BaseDocument.VALIDATE_OK).ToList(), api, glJournalGenerated);
+                    return true;
                 }
                 catch (Exception ex)
                 {
@@ -79,6 +76,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
             {
                 UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("NoRecords"), Uniconta.ClientTools.Localization.lookup("Message"));
             }
+            return false;
         }
     }
 }

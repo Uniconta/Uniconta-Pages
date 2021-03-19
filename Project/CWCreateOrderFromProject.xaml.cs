@@ -50,12 +50,30 @@ namespace UnicontaClient.Pages.CustomPage
         [Display(Name = "ToDate", ResourceType = typeof(InputFieldDataText))]
         static public DateTime ToDate { get; set; }
 
+        [ForeignKeyAttribute(ForeignKeyTable = typeof(Uniconta.DataModel.ProjectTask))]
+        [Display(Name = "Task", ResourceType = typeof(InputFieldDataText))]
+        public string ProjectTask { get; set; }
+
         CrudAPI api;
 #if !SILVERLIGHT
         public int DialogTableId;
         protected override int DialogId { get { return DialogTableId; } }
         protected override bool ShowTableValueButton { get { return true; } }
 #endif
+        public CWCreateOrderFromProject(CrudAPI crudApi, bool createOrder) : this(crudApi)
+        {
+            if (createOrder)
+                dpDate.DateTime = DateTime.MinValue;
+        }
+
+        public CWCreateOrderFromProject(CrudAPI crudApi, bool createOrder, ProjectClient project, ProjectTaskClient projTask = null) : this(crudApi, createOrder)
+        {
+            if (crudApi.CompanyEntity.ProjectTask && project != null)
+            {
+                setTask(project, projTask);
+                lblProjTask.Visibility = leProjTask.Visibility = Visibility.Visible;
+            }
+        }
 
         public CWCreateOrderFromProject(CrudAPI crudApi)
         {
@@ -78,11 +96,18 @@ namespace UnicontaClient.Pages.CustomPage
             Dispatcher.BeginInvoke(new Action(() => { OKButton.Focus(); }));
         }
 
-        async void SetItemSource(QueryAPI api)
+        void SetItemSource(QueryAPI api)
         {
-            var prCache = api.GetCache(typeof(Uniconta.DataModel.PrCategory)) ?? await api.LoadCache(typeof(Uniconta.DataModel.PrCategory));
+            var prCache = api.GetCache(typeof(Uniconta.DataModel.PrCategory)) ?? api.LoadCache(typeof(Uniconta.DataModel.PrCategory)).GetAwaiter().GetResult();
             var cache = new PrCategoryRevenueFilter(prCache);
             cmbCategory.cacheFilter = new PrCategoryRevenueFilter(prCache);
+        }
+
+        async void setTask(ProjectClient project, ProjectTaskClient projTask)
+        {
+            leProjTask.ItemsSource = project.Tasks ?? await project.LoadTasks(api);
+            leProjTask.SelectedItem = projTask;
+            leProjTask.Focus();
         }
 
         private void ChildWindow_KeyDown(object sender, KeyEventArgs e)

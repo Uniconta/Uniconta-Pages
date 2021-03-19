@@ -32,7 +32,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
             danishFields.TransTypeCommand = BankDataPayFormat.TRANSTYPE_IB030207000002;
             danishFields.Index = BankDataPayFormat.INDEX01;
 
-            var lineamountint = NumberConvert.ToLong(tran._PaymentAmount * 100d);
+            var lineamountint = NumberConvert.ToLong(tran.PaymentAmount * 100d);
             danishFields.AmountLong = lineamountint;
 
             danishFields.FromAccountType = 2;

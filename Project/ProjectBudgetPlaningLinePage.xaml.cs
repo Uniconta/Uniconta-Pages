@@ -269,11 +269,15 @@ namespace UnicontaClient.Pages.CustomPage
                 Task.Visible = false;
                 Task.ShowInColumnChooser = false;
             }
+            else
+                Task.ShowInColumnChooser = true;
             if (!Comp.Payroll)
             {
                 PayrollCategory.Visible = false;
                 PayrollCategory.ShowInColumnChooser = false;
             }
+            else
+                PayrollCategory.ShowInColumnChooser = true;
         }
 
         private void SelectedItem_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<root>
+  <RibbonItem TabId="0" LocalizedNameKey="Home">
+    <!---When we create a new group and a new TabPage -->
+    <RibbonItem Action="Backward" LocalizedNameKey="Backward"   LargeGlyph="Back_32x32.png"/>
+    <RibbonItem Action="Forward" LocalizedNameKey="Forward" LargeGlyph="Forward_32x32.png"/>
+    <RibbonItem Action="GoToday" LocalizedNameKey="GoToday" LargeGlyph="GoToToday_32x32.png"/>
+  </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="DayView" LocalizedNameKey="DayView" LargeGlyph="Day_View_32x32.png"/>
+    <RibbonItem Action="TimeLineView" LocalizedNameKey="TimeLine" LargeGlyph="Timesheet_32x32.png"/>
+  </RibbonItem>
+</root>

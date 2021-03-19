@@ -191,20 +191,16 @@ namespace UnicontaClient.Pages.CustomPage
             var Debcache = Comp.GetCache(typeof(Debtor)) ?? await api.LoadCache(typeof(Debtor));
             var debtor = (Debtor)Debcache.Get(invClient._DCAccount);
 
-            if (debtor == null || !debtor._InvoiceInXML || invClient.SendTime != DateTime.MinValue)
+            if (debtor == null || !debtor._InvoiceInXML || invClient.SendTimeOIO != DateTime.MinValue)
             {
                 if (!debtor._InvoiceInXML)
                     UnicontaMessageBox.Show("Faktura i OIOUBL er ikke sat til denne debitor", Uniconta.ClientTools.Localization.lookup("Warning"));
                 return;
             }
 
-            var Invoicemasters = new UnicontaBaseEntity[] { invClient };
-            var invoiceLines = await api.Query<InvTransClient>(Invoicemasters, null);
-            var layoutGroupCache = api.GetCache(typeof(DebtorLayoutGroup)) ?? await api.LoadCache(typeof(DebtorLayoutGroup));
+            var InvTransInvoiceLines = (DebtorInvoiceLines[])await Invapi.GetInvoiceLines(invClient, new DebtorInvoiceLines()); //TODO:Test fakturering
 
-            InvItemText[] invItemText = null;
-            if (debtor._ItemNameGroup != null)
-                invItemText = await api.Query<InvItemText>(new UnicontaBaseEntity[] { debtor }, null);
+            var layoutGroupCache = api.GetCache(typeof(DebtorLayoutGroup)) ?? await api.LoadCache(typeof(DebtorLayoutGroup));
 
             Contact contactPerson = null;
             if (invClient._ContactRef != 0)
@@ -236,11 +232,11 @@ namespace UnicontaClient.Pages.CustomPage
             CreationResult result;
 
             if (Comp._CountryId == CountryCode.Norway || Comp._CountryId == CountryCode.Netherlands)
-                result = EHF.GenerateEHFXML(Comp, debtor, deliveryAccount, invClient, invoiceLines, InvCache, VatCache, invItemText, contactPerson);
+                result = EHF.GenerateEHFXML(Comp, debtor, deliveryAccount, invClient, InvTransInvoiceLines, InvCache, VatCache, null, contactPerson);
             else
             {
                 var attachments = await FromXSDFile.OIOUBL.ExportImport.Attachments.CollectInvoiceAttachments(invClient, api);
-                result = Uniconta.API.DebtorCreditor.OIOUBL.GenerateOioXML(Comp, debtor, deliveryAccount, invClient, invoiceLines, InvCache, VatCache, invItemText, contactPerson, attachments, layoutGroupCache, workInstallation);
+                result = Uniconta.API.DebtorCreditor.OIOUBL.GenerateOioXML(Comp, debtor, deliveryAccount, invClient, InvTransInvoiceLines, InvCache, VatCache, null, contactPerson, attachments, layoutGroupCache, workInstallation);
             }
 
             bool createXmlFile = true;
@@ -250,7 +246,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 countErr++;
                 createXmlFile = false;
-                //invClient._SystemInfo = string.Empty;
+
                 foreach (FromXSDFile.OIOUBL.ExportImport.PrecheckError error in result.PrecheckErrors)
                 {
                     errorInfo += error.ToString() + "\n";
@@ -270,9 +266,8 @@ namespace UnicontaClient.Pages.CustomPage
                 var filename = saveDialog.FileName;
 
                 result.Document.Save(filename);
-                await Invapi.MarkSendInvoice(invClient);
-                invClient.SendTime = BasePage.GetSystemDefaultDate();
-                //invClient._SystemInfo = "File created";
+                await Invapi.MarkSendInvoiceOIO(invClient);
+                invClient.SendTimeOIO = BasePage.GetSystemDefaultDate();
             }
 
             //invClient.NotifySystemInfoSet();

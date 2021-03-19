@@ -53,6 +53,7 @@
     <RibbonItem Action="Statistics" LocalizedNameKey="Statistics" ControlName="InventoryTotals" LargeGlyph="Statistics_32x32.png"/>
     <RibbonItem Action="Storage" LocalizedNameKey="OnHand" Module="Storage" ControlName="InvItemStoragePage" LargeGlyph="Inventory_Trans_32x32.png"/>
     <RibbonItem Action="InvReservation" LocalizedNameKey="Reservations" ControlName="InventoryReservationReport" Module="Storage" LargeGlyph="Item_Number_32x32.png"/>
+    <RibbonItem Action="InvStockProfile" LocalizedNameKey="StockProfile" ControlName="InvStorageProfileReport" Module="Storage" LargeGlyph="Storage_32x32.png"/>
     <RibbonItem Action="VariantCombi" LocalizedNameKey="ItemVariants" Module="ItemVariants" LargeGlyph="Variants_Combination_32x32.png"/>
     <RibbonItem Action="VariantDetails" LocalizedNameKey="InvVariantDetail" Module="ItemVariants" LargeGlyph="Preview_32x32.png"/>
     <RibbonItem Action="InvTransPivot" LocalizedNameKey="PivotTable" ControlName="InvTransPivotPage" LargeGlyph="Category_Charge_32x32.png" />

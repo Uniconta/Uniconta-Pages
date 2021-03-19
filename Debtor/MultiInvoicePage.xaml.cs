@@ -177,7 +177,7 @@ namespace UnicontaClient.Pages.CustomPage
 #if SILVERLIGHT
             packListPosted = new List<InvoicePostingResult>();
 #endif
-            var cwPickingList = new CWGeneratePickingList(false, false);
+            var cwPickingList = new CWGeneratePickingList(true);
 #if !SILVERLIGHT
             cwPickingList.DialogTableId = 2000000024;
 #endif
@@ -227,7 +227,7 @@ namespace UnicontaClient.Pages.CustomPage
 #else
                     var invoicePostringPrintGenerator = new InvoicePostingPrintGenerator(api, this);
                     invoicePostringPrintGenerator.SetUpInvoicePosting(dbVisibleOrders, selectedDate, false, CompanyLayoutType.PickingList, cwPickingList.ShowDocument, false, cwPickingList.PrintDocument,
-                        false, true, cwPickingList.EmailList, false);
+                        cwPickingList.SendByEmail, cwPickingList.sendOnlyToThisEmail, cwPickingList.EmailList, false);
 
                     await invoicePostringPrintGenerator.Execute();
                     busyIndicator.IsBusy = false;
@@ -585,8 +585,8 @@ namespace UnicontaClient.Pages.CustomPage
                         GenrateInvoiceDialog.Emails, GenrateInvoiceDialog.GenerateOIOUBLClicked, null, false);
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
                     var result = await invoicePostingResult.Execute();
-                             busyIndicator.IsBusy = true;
-           busyIndicator.IsBusy = false;
+                    busyIndicator.IsBusy = true;
+                    busyIndicator.IsBusy = false;
 
                     if (!result)
                         Utility.ShowJournalError(invoicePostingResult.PostingResult.ledgerRes, dgMultiInvGrid);

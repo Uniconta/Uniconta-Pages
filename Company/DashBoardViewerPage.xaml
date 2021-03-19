@@ -41,7 +41,6 @@ x:Class="UnicontaClient.Pages.CustomPage.DashBoardViewerPage"
                 <CorasauControls:UnicontaDashboardControl.PivotItemStyle>
                     <Style TargetType="dxdash:PivotDashboardLayoutItem">
                         <Setter Property="ContentTemplate" Value="{StaticResource pivotTemplate}" />
-                        <EventSetter Event="MouseUp" Handler="DashboardLayoutItem_MouseUp"/>
                     </Style>
                 </CorasauControls:UnicontaDashboardControl.PivotItemStyle>
             </CorasauControls:UnicontaDashboardControl>

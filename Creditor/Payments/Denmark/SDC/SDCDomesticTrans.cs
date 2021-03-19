@@ -31,7 +31,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
           
             danishFields.TransTypeCommand = SDCPayFormat.RECORDTYPE_3;
 
-            var paymentAmount = Math.Round(tran._PaymentAmount, 2);
+            var paymentAmount = Math.Round(tran.PaymentAmount, 2);
             var paymentAmountSTR = paymentAmount.ToString("F");
             danishFields.AmountSTR = NETSNorge.processString(paymentAmountSTR, 15, true);
             danishFields.Receipt = "N";

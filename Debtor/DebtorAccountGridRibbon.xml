@@ -45,6 +45,7 @@
     <RibbonItem Action="DebtorStatement" LocalizedNameKey="Statement" ControlName="DebtorStatement" LargeGlyph="Show_Invoice_32x32.png"/>
     <RibbonItem Action="InvTran" LocalizedNameKey="InvTransactions" ControlName="InvTransactions" LargeGlyph="Inventory_Trans_32x32.png"/>
     <RibbonItem Action="DebtorTransPivot" LocalizedNameKey="PivotTable" ControlName="DebtorInvoiceLinesPivotReport" LargeGlyph="Category_Charge_32x32.png" />
+    <RibbonItem Action="DocSendLog" LocalizedNameKey="Log" ControlName="DocsSendLogGridPage" LargeGlyph="Server_Count_32x32.png" />
   </RibbonItem>
   <RibbonItem LocalizedNameKey="Sales">
     <RibbonItem Action="Orders" LocalizedNameKey="Orders" ControlName="DebtorOrdersMultiple" Module="Order" LargeGlyph="Orders_32x32.png"/>

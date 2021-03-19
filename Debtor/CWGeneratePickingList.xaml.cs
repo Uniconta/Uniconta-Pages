@@ -50,24 +50,42 @@ namespace UnicontaClient.Pages.CustomPage
         [Display(Name = "NumberOfCopies", ResourceType = typeof(InputFieldDataText))]
         public short NumberOfPages { get; set; } = 1;
 
+        [InputFieldData]
+        [Display(Name = "SendInvoiceByEmail", ResourceType = typeof(InputFieldDataText))]
+        public bool SendByEmail { get; set; }
+
+        [InputFieldData]
+        [Display(Name = "SendOnlyToThisEmail", ResourceType = typeof(InputFieldDataText))]
+        public bool sendOnlyToThisEmail { get; set; }
+
+        [InputFieldData]
+        [Display(Name = "SendByOutlook", ResourceType = typeof(InputFieldDataText))]
+        public bool SendByOutlook { get; set; }
+
 #if !SILVERLIGHT
         protected override int DialogId { get { return DialogTableId; } }
         public int DialogTableId { get; set; }
         protected override bool ShowTableValueButton { get { return true; } }
 #endif
-        public CWGeneratePickingList(bool showPageCount = true, bool showEmail = true)
+        public CWGeneratePickingList(bool showquickPrint = true, bool showEmail = true)
         {
             this.DataContext = this;
             InitializeComponent();
+            Title = string.Format("{0} {1}", Uniconta.ClientTools.Localization.lookup("Generate"), Uniconta.ClientTools.Localization.lookup("PickingList"));
 #if !SILVERLIGHT
-            rdbShowInvoice.IsChecked = true;
-            stkPageNumberCount.Visibility = showPageCount ? Visibility.Visible : Visibility.Collapsed;
-#endif
+            if (!showquickPrint && !showEmail)
+                lgSecondary.Visibility = Visibility.Collapsed;
+            else if (!showEmail)
+                lgEmail.Visibility = Visibility.Collapsed;
+            else if (!showquickPrint)
+                lgPrint.Visibility = Visibility.Collapsed;
+#else
             tbShEmail.Visibility = showEmail ? Visibility.Visible : Visibility.Collapsed;
             txtEmail.Visibility = showEmail ? Visibility.Visible : Visibility.Collapsed;
-
-            Title = string.Format("{0} {1}", Uniconta.ClientTools.Localization.lookup("Generate"), Uniconta.ClientTools.Localization.lookup("PickingList"));
+#endif
         }
+
+       
 
         private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
         {
@@ -93,5 +111,59 @@ namespace UnicontaClient.Pages.CustomPage
         {
             DialogResult = false;
         }
+
+#if !SILVERLIGHT
+
+        public CWGeneratePickingList(string accountName, bool showQuickPrint, bool showEmail, string debtorName, bool hasEmail) : this(showQuickPrint, showEmail)
+        {
+            if (!string.IsNullOrEmpty(accountName))
+                txtAccountName.Text = accountName;
+            else
+                lgAccount.Visibility = txtAccountName.Visibility = Visibility.Collapsed;
+
+            if (showEmail)
+            {
+                if (!string.IsNullOrEmpty(debtorName) && !hasEmail)
+                {
+                    txtNoMailMsg.Text = string.Format(Uniconta.ClientTools.Localization.lookup("DebtorHasNoEmail"), debtorName);
+                    chkSendEmail.IsEnabled = false;
+                    chkSendEmail.IsChecked = false;
+                }
+                else
+                    liNoEmailMsg.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        public CWGeneratePickingList(bool isMultiInvoicePage) : this(null, true, true, null, false)
+        {
+            if (isMultiInvoicePage)
+            {
+                liSendByOutlook.Visibility = Visibility.Collapsed;
+                liNumberOfPages.Visibility = Visibility.Collapsed;
+                liNoEmailMsg.Visibility = Visibility.Collapsed;
+                chkSendEmail.IsEnabled = true;
+            }
+        }
+
+        private void chkShowInvoice_Checked(object sender, RoutedEventArgs e)
+        {
+            chkPrintInvoice.IsChecked = false;
+        }
+
+        private void chkPrintInvoice_Checked(object sender, RoutedEventArgs e)
+        {
+            chkShowInvoice.IsChecked = false;
+        }
+
+        private void chkSendEmail_Checked(object sender, RoutedEventArgs e)
+        {
+            chkSendOutlook.IsChecked = false;
+        }
+
+        private void chkSendOutlook_Checked(object sender, RoutedEventArgs e)
+        {
+            chkSendEmail.IsChecked = false;
+        }
+#endif
     }
 }

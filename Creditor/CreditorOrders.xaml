@@ -53,6 +53,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOrders"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Group"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="OrderNumber" AllowThousandMask="false" Width="70"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryDate"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryDateConfirmed" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="NoLines" Width="50" ReadOnly="True" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="OrderTotal" Width="80" ReadOnly="True" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Currency" Width="50" ReadOnly="True"  />
@@ -101,6 +102,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOrders"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ProjectName" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CategoryName" Visible="False" />
+                    <localPage:CorasauDataGridForeignKeyColumnClient x:Name="Task" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim1" Width="70" FieldName="Dimension1"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim2" Width="70" FieldName="Dimension2" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim3" Width="70" FieldName="Dimension3" />
@@ -115,6 +117,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOrders"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Volume" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Cartons" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Vat" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PurchaseValue" Visible="False" />
                 </localPage:CreditorOrdersGrid.Columns>
             </localPage:CreditorOrdersGrid>
         </CorasauControls:BusyIndicator>

@@ -83,6 +83,9 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOrdersPage2"
                         <CorasauControls:CorasauLayoutItem FieldName="DeliveryDate" x:Name="liDeliveryDate">
                             <CorasauControls:DateEditor x:Name="deDeLiveryDate" EditValue="{Binding DeliveryDate,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="DeliveryDateConfirmed" x:Name="liDeliveryDateConfirmed">
+                            <CorasauControls:CheckEditor  IsChecked="{Binding DeliveryDateConfirmed, Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="EndDiscountPct" x:Name="liEndDiscountPct">
                             <CorasauControls:DoubleEditor FieldName="EndDiscountPct"/>
                         </CorasauControls:CorasauLayoutItem>
@@ -104,12 +107,6 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOrdersPage2"
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="Employee" x:Name="liEmployee">
                             <CorasauControls:LookupEditor x:Name="Employeelookupeditor" EditValue="{Binding Employee,Mode=TwoWay}" />
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="Project" x:Name="liProject">
-                            <CorasauControls:LookupEditor x:Name="Projectlookupeditor" EditValue="{Binding Project,Mode=TwoWay}" />
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="PrCategory" x:Name="liPrCategory">
-                            <CorasauControls:LookupEditor x:Name="PrCategorylookupeditor" EditValue="{Binding PrCategory,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="Settlements" x:Name="liSettlements">
                             <CorasauControls:IntegerEditor EditValue="{Binding Settlements,Mode=TwoWay}" SetMask="False"/>
@@ -242,6 +239,17 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOrdersPage2"
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="ApprovedDate" x:Name="liApprovedDate">
                             <CorasauControls:DateEditor x:Name="deApprovedDate" Mask="g" EditValue="{Binding ApprovedDate,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                    </CorasauControls:CorasauLayoutGroup>
+                    <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpProject"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Project}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="450" >
+                        <CorasauControls:CorasauLayoutItem x:Name="liProject" FieldName="Project">
+                            <CorasauControls:LookupEditor x:Name="Projectlookupeditor" Text="{Binding Project,Mode=TwoWay}" SelectedIndexChanged="Projectlookupeditor_SelectedIndexChanged"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liPrCategory" FieldName="PrCategory">
+                            <CorasauControls:LookupEditor x:Name="PrCategorylookupeditor" EditValue="{Binding PrCategory,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="projectTask" FieldName="Task">
+                            <CorasauControls:LookupEditor x:Name="prTasklookupeditor" HasCustomLookUp="True" GotFocus="prTasklookupeditor_GotFocus" Text="{Binding Task,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                         </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
                 </CorasauControls:CorasauLayoutGroup>

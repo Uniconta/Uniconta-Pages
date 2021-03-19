@@ -70,6 +70,9 @@ x:Class="UnicontaClient.Pages.CustomPage.ConfigureFunctionalityPage"
                     <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ItemVariants}">
                         <CorasauControls:CheckEditor IsChecked="{Binding ItemVariants,Mode=TwoWay}" />
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=InvBOMVariant}">
+                        <CorasauControls:CheckEditor IsChecked="{Binding InvBOMVariant,Mode=TwoWay}" />
+                    </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=UnitConversion}">
                         <CorasauControls:CheckEditor IsChecked="{Binding UnitConversion,Mode=TwoWay}" />
                     </CorasauControls:CorasauLayoutItem>
@@ -81,6 +84,9 @@ x:Class="UnicontaClient.Pages.CustomPage.ConfigureFunctionalityPage"
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=PurchaseAccounts}">
                         <CorasauControls:CheckEditor IsChecked="{Binding PurchaseAccounts,Mode=TwoWay}" />
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ProdCatalog}">
+                        <CorasauControls:CheckEditor IsChecked="{Binding ProductCatalog,Mode=TwoWay}" />
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
 
@@ -129,6 +135,9 @@ x:Class="UnicontaClient.Pages.CustomPage.ConfigureFunctionalityPage"
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem  Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Payroll}">
                         <CorasauControls:CheckEditor IsChecked="{Binding Payroll,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem >
+                    <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=MyProjects}">
+                        <CorasauControls:CheckEditor IsChecked="{Binding MyProjects,Mode=TwoWay}" />
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
 

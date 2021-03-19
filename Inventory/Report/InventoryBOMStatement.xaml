@@ -35,11 +35,13 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryBOMStatement"
                             <local:InvBOMClientGrid.Columns>
                                 <local:CorasauDataGridTemplateColumnClient x:Name="ItemPart" Width="100"/>
                                 <local:CorasauDataGridTemplateColumnClient x:Name="partName" FieldName="Name" />
-                                <local:CorasauDataGridTemplateColumnClient x:Name="colVariant1" FieldName="Variant1" Width="80" />
-                                <local:CorasauDataGridTemplateColumnClient x:Name="colVariant2" FieldName="Variant2" Width="80" />
-                                <local:CorasauDataGridTemplateColumnClient x:Name="colVariant3" FieldName="Variant3" Width="80" />
-                                <local:CorasauDataGridTemplateColumnClient x:Name="colVariant4" FieldName="Variant4" Width="80" />
-                                <local:CorasauDataGridTemplateColumnClient x:Name="colVariant5" FieldName="Variant5" Width="80" />
+                                <local:CorasauDataGridTemplateColumnClient x:Name="colVariant" FieldName="Variant" Width="80" />
+                                <local:CorasauDataGridTemplateColumnClient x:Name="VariantName" Width="100" Visible="False"/>
+                                <local:CorasauDataGridTemplateColumnClient x:Name="colVariant1" FieldName="Variant1" Width="80" Visible="False"/>
+                                <local:CorasauDataGridTemplateColumnClient x:Name="colVariant2" FieldName="Variant2" Width="80" Visible="False"/>
+                                <local:CorasauDataGridTemplateColumnClient x:Name="colVariant3" FieldName="Variant3" Width="80" Visible="False"/>
+                                <local:CorasauDataGridTemplateColumnClient x:Name="colVariant4" FieldName="Variant4" Width="80" Visible="False"/>
+                                <local:CorasauDataGridTemplateColumnClient x:Name="colVariant5" FieldName="Variant5" Width="80" Visible="False"/>
                                 <local:CorasauDataGridTemplateColumnClient x:Name="Variant1Name" Width="100" Visible="False"/>
                                 <local:CorasauDataGridTemplateColumnClient x:Name="Variant2Name" Width="100" Visible="False"/>
                                 <local:CorasauDataGridTemplateColumnClient x:Name="Variant3Name" Width="100" Visible="False"/>

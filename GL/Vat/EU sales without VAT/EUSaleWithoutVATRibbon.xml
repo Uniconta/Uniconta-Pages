@@ -9,7 +9,7 @@
   <RibbonItem>
     <RibbonItem Action="Validate" LocalizedNameKey="Validate" LargeGlyph="Check_Journal_32x32.png"/>
     <RibbonItem Action="Compress" LocalizedNameKey="Compress" LargeGlyph="Match_Add_32x32.png"/>
-    <RibbonItem Action="CreateFile" LocalizedNameKey="CreateOBJ" Parameter="File" LargeGlyph="Import_32x32.png"/>
+    <RibbonItem Action="CreateFile" LocalizedNameKey="CreateOBJ" Parameter="File" LargeGlyph="Export_32x32.png"/>
   </RibbonItem>
   <RibbonItem>
     <!---If we want to create a new group in same PageTab-->

@@ -41,7 +41,6 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 _api = value;
                 Utility.SetDimensions(api, lbldim1, lbldim2, lbldim3, lbldim4, lbldim5, cmbDim1, cmbDim2, cmbDim3, cmbDim4, cmbDim5, usedim);
-                setUserFields();
             }
         }
         public Visibility Visible { get { return this.Visibility; } set { this.Visibility = value; this.layoutItems.Visibility = value; } }
@@ -55,15 +54,7 @@ namespace UnicontaClient.Pages.CustomPage
                     layoutItems.DataContext = dataContext;
             }
         }
-
-        void setUserFields()
-        {
-            var row = new ProjectClient();
-            row.SetMaster(api.CompanyEntity);
-            var UserFieldDef = row.UserFieldDef();
-            if (UserFieldDef != null)
-                UserFieldControl.CreateUserFieldOnPage2(layoutItems, UserFieldDef, (RowIndexConverter)this.Resources["RowIndexConverter"], this.api, this, true);
-        }
+        
 #if !SILVERLIGHT
         private void Email_ButtonClicked(object sender)
         {

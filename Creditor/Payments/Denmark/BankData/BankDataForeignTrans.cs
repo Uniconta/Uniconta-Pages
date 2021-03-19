@@ -54,14 +54,14 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
             danishFields.TransTypeCommand = BankDataPayFormat.TRANSTYPE_IB030204000003;
             danishFields.Index = BankDataPayFormat.INDEX01;
 
-            var lineamountint = NumberConvert.ToLong(tran._PaymentAmount * 100d);
+            var lineamountint = NumberConvert.ToLong(tran.PaymentAmount * 100d);
             danishFields.AmountLong = lineamountint;
 
             danishFields.FromAccountType = 2;
 
             danishFields.TransferCoin = new string(' ', 3);
 
-            var paymentType = ISOPaymentType(tran._CurrencyLocal, bankAccount, danishFields.ReceiverIBAN, company);
+            var paymentType = ISOPaymentType(tran.CurrencyLocalStr, bankAccount, danishFields.ReceiverIBAN, company);
 
             danishFields.TransferType = paymentType == UnicontaISO20022CreditTransfer.ISO20022PaymentTypes.SEPA ? BankDataPayFormat.FOREIGN_SEPATRANSFER : BankDataPayFormat.FOREIGN_STANDARDTRANSFER;
 
@@ -129,9 +129,9 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
             danishFields.ToAccountNumber = NETSNorge.processString(danishFields.ToAccountNumber, 34, false);
             danishFields.ReceiverIBAN = NETSNorge.processString(danishFields.ReceiverIBAN, 35, false);  
 
-            var paymentType = ISOPaymentType(tran._CurrencyLocal, bankAccount, danishFields.ReceiverIBAN, company);
+            var paymentType = ISOPaymentType(tran.CurrencyLocalStr, bankAccount, danishFields.ReceiverIBAN, company);
             danishFields.TransferType = paymentType == UnicontaISO20022CreditTransfer.ISO20022PaymentTypes.SEPA ? 1 : 0; ;
-            danishFields.TransferTypeForeign = paymentType == UnicontaISO20022CreditTransfer.ISO20022PaymentTypes.SEPA ? 1 : 0;
+            danishFields.TransferTypeForeign = 1; //Cross border payments always paid by receiver
             danishFields.Blanks2 = NETSNorge.processString(string.Empty, 15, false);
 
             danishFields.Messages = new List<string>()

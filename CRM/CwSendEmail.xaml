@@ -16,6 +16,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CwSendEmail"
             <RowDefinition x:Name="rowName" />
             <RowDefinition />
             <RowDefinition x:Name="rowFollowUp"/>
+            <RowDefinition x:Name="rowIncludeAttachments" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -23,7 +24,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CwSendEmail"
             <ColumnDefinition Width="5"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding Converter={StaticResource  GlobalLocalizationValueConverter},ConverterParameter=SMTPUser,Mode=OneWay}" Grid.Column="0" Grid.Row="0" />
+        <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding Converter={StaticResource  GlobalLocalizationValueConverter},ConverterParameter=EmailSetup,Mode=OneWay}" Grid.Column="0" Grid.Row="0" />
         <Controls:LookupEditor Margin="5,0,0,0" x:Name="leCompanySMTP"  HorizontalAlignment="Left" Grid.Column="2" Text="{Binding CompanySMTP}" SelectedIndexChanged="leCompanySMTP_SelectedIndexChanged" Height="23"  Width="170" />
        
         <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding Converter={StaticResource  GlobalLocalizationValueConverter},ConverterParameter=SendTestEmail,Mode=OneWay}" Grid.Column="0" Grid.Row="1" />
@@ -38,7 +39,10 @@ x:Class="UnicontaClient.Pages.CustomPage.CwSendEmail"
         <TextBlock HorizontalAlignment="Left" x:Name="tbFollowUp" Visibility="{Binding ElementName=chkAddFollowUp, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}}" VerticalAlignment="Center" Text="{Binding Converter={StaticResource  GlobalLocalizationValueConverter},ConverterParameter=FollowUp,Mode=OneWay}" Grid.Column="0" Grid.Row="5" />
         <Controls:TextEditor Margin="5,0,0,0" Visibility="{Binding ElementName=chkAddFollowUp, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}}" x:Name="txtFollowUp" Grid.Row="5"  HorizontalAlignment="Left" Grid.Column="2" Height="23"  Width="170" />
 
-        <StackPanel x:Name="actionButton" HorizontalAlignment="Right" Grid.Row="6" Orientation="Horizontal" Margin="0 10 0 0" Grid.ColumnSpan="2" Grid.Column="1">
+        <TextBlock HorizontalAlignment="Left" x:Name="tbChkIncludeAttach" Visibility="Collapsed" VerticalAlignment="Center" Text="{Binding Converter={StaticResource  GlobalLocalizationValueConverter},ConverterParameter=IncludeAttachments,Mode=OneWay}"  Grid.Column="0" Grid.Row="6" />
+        <Controls:CheckEditor Margin="5,0,0,0" x:Name="chkIncludeAttach" Visibility="Collapsed" Grid.Row="6" HorizontalAlignment="Left" Grid.Column="2" IsChecked="{Binding IncludeAttachements, Mode=TwoWay}" />
+        
+        <StackPanel x:Name="actionButton" HorizontalAlignment="Right" Grid.Row="7" Orientation="Horizontal" Margin="0 10 0 0" Grid.ColumnSpan="2" Grid.Column="1">
             <Button x:Name="OKButton" IsDefault="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OK}"  
                     Click="OKButton_Click"  MinWidth="75" Height="23" HorizontalAlignment="Right" Margin="0 0 3 0" />
             <Button x:Name="CancelButton" IsCancel="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Cancel}"

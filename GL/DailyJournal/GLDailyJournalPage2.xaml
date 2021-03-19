@@ -131,13 +131,13 @@ x:Class="UnicontaClient.Pages.CustomPage.GLDailyJournalPage2"
                             <CorasauControls:ComboBoxEditor x:Name="cbdefaultAccount" SelectedItem="{Binding DefaultAccountType,Mode=TwoWay}" SelectedIndexChanged="cbdefaultAccount_SelectedIndexChanged"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="Account" x:Name="liAccount">
-                            <CorasauControls:LookupEditor x:Name="AccountLookupEditor" HasCustomLookUp="true" ItemsSource="{Binding AccountSource,Mode=TwoWay}"  Text="{Binding Account,Mode=TwoWay}" />
+                            <CorasauControls:LookupEditor x:Name="AccountLookupEditor" HasCustomLookUp="true" ItemsSource="{Binding AccountSource,Mode=TwoWay}"  Text="{Binding Account,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="DefaultOffsetAccountType" x:Name="liDefaultOffsetAccountType">
                             <CorasauControls:ComboBoxEditor x:Name="cboffsetAccount" SelectedItem="{Binding DefaultOffsetAccountType,Mode=TwoWay}" SelectedIndexChanged="cboffsetAccount_SelectedIndexChanged"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="OffsetAccount" x:Name="liOffsetAccount">
-                            <CorasauControls:LookupEditor x:Name="OffsetAccountLookupEditor" HasCustomLookUp="true" ItemsSource="{Binding OffsetAccountSource,Mode=TwoWay}" Text="{Binding OffsetAccount,Mode=TwoWay}" />
+                            <CorasauControls:LookupEditor x:Name="OffsetAccountLookupEditor" HasCustomLookUp="true" ItemsSource="{Binding OffsetAccountSource,Mode=TwoWay}" Text="{Binding OffsetAccount,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="Vat" x:Name="liVat">
                             <CorasauControls:LookupEditor x:Name="Vatlookupeditior" Text="{Binding Vat,Mode=TwoWay}"/>

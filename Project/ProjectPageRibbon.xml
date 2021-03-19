@@ -54,6 +54,9 @@
      <RibbonItem Action="ZeroInvoice" LocalizedNameKey="CreateOBJ" Parameter="ZeroInvoice" Glyph="Add_Notes_16x16.png"/>
     </RibbonItem>
   </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="ProjectEmployee" LocalizedNameKey="Employees"  LargeGlyph="Debitor_Group_32x32.png" Module="MyProjects"/>
+  </RibbonItem>
   <RibbonItem TabId="1" LocalizedNameKey="EditAll">
     <RibbonItem Action="EditAll"  LocalizedNameKey="EditAll" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>
     <RibbonItem Action="AddLine"  LocalizedNameKey="AddOBJ" Parameter="Project" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png"/>

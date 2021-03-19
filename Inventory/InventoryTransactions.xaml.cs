@@ -280,17 +280,24 @@ namespace UnicontaClient.Pages.CustomPage
             var company = api.CompanyEntity;
             if (!company.Location || !company.Warehouse)
                 Location.Visible = Location.ShowInColumnChooser = false;
+            else
+                Location.ShowInColumnChooser = true;
             if (!company.Warehouse)
                 Warehouse.Visible = Warehouse.ShowInColumnChooser = false;
-            if(!company.Project)
+            else
+                Warehouse.ShowInColumnChooser = true;
+            if (!company.Project)
             {
                 Project.Visible = Project.ShowInColumnChooser = false;
                 ProjectName.Visible = ProjectName.ShowInColumnChooser = false;
             }
+            else
+                Project.ShowInColumnChooser = ProjectName.ShowInColumnChooser = true;
             if (!company.ProjectTask)
                 Task.Visible = Task.ShowInColumnChooser = false;
-
-            Utilities.Utility.SetupVariants(api, null, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
+            else
+                Task.ShowInColumnChooser = true;
+            Utilities.Utility.SetupVariants(api, colVariant, VariantName, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
             Utilities.Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
         }
 
@@ -388,6 +395,11 @@ namespace UnicontaClient.Pages.CustomPage
                 case "PostedBy":
                     if (selectedItem != null)
                         JournalPosted(selectedItem);
+                    break;
+                case "MarkOrderLineAgnstInvTrans":
+                    if (selectedItem?._Item == null) return;
+                    object[] param = new object[] { selectedItem };
+                    AddDockItem(TabControls.InventoryTransactionsMarkedPage, param, true);
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);

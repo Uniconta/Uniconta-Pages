@@ -180,6 +180,11 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
+        public void SetSendAsEmailCheck(bool isChecked)
+        {
+            chkSendEmail.IsChecked = isChecked;
+        }
+
         public void SetInvoiceNumber(long Number)
         {
             SetInvoiceNumber(NumberConvert.ToStringNull(Number));

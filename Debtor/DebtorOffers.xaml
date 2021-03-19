@@ -52,6 +52,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOffers"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Group"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="OfferNumber" Width="70"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryDate" Width="90" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryDateConfirmed" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="OrderTotal" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="NoLines" Width="50" ReadOnly="True" />
                     <localPage:ComboBoxColumnClient x:Name="Currency" Width="50"/>
@@ -73,6 +74,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOffers"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Employee" Width="70"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Project" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Visible="False"/>
+                    <localPage:CorasauDataGridForeignKeyColumnClient x:Name="Task" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Vat" Width="70" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PricesInclVat" Width="60" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceEmail" Visible="False"/>

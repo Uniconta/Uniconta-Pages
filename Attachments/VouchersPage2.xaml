@@ -3,9 +3,8 @@
 x:Class="UnicontaClient.Pages.CustomPage.VouchersPage2" 
            xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
-           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-           xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+           xmlns:enumType ="clr-namespace:Uniconta.Common;assembly=Uniconta.Common"
+           xmlns:dxinteraction="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
            xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools" 
            xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
     <UserControl.Resources>
@@ -29,6 +28,13 @@ x:Class="UnicontaClient.Pages.CustomPage.VouchersPage2"
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="Url" x:Name="liUrl">
                             <CorasauControls:TextEditor x:Name="txtUrl" Text="{Binding Url,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="Fileextension" x:Name="liFileextension" Visibility="Collapsed">
+                            <CorasauControls:ComboBoxEditor x:Name="cmbFileextensionType" EditValue="{Binding Fileextension,Mode=TwoWay}" EditValueChanged="cmbFileextensionType_EditValueChanged">
+                                <dxinteraction:Interaction.Behaviors>
+                                    <dxinteraction:EnumItemsSourceBehavior EnumType="{x:Type enumType:FileextensionsTypes}" />
+                                </dxinteraction:Interaction.Behaviors>
+                            </CorasauControls:ComboBoxEditor>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="Content" x:Name="liContent">
                             <CorasauControls:ComboBoxEditor x:Name="cmbContentTypes" SelectedItem="{Binding Content ,Mode=TwoWay}" />
@@ -61,7 +67,7 @@ x:Class="UnicontaClient.Pages.CustomPage.VouchersPage2"
                             <CorasauControls:DateEditor  x:Name="txtPaymentDate" EditValue="{Binding PayDate,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="CostAccount" x:Name="liCostAccount">
-                            <CorasauControls:LookupEditor  x:Name="leCostAccount" Text="{Binding CostAccount,Mode=TwoWay}"/>
+                            <CorasauControls:LookupEditor  x:Name="leCostAccount" Text="{Binding CostAccount,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="PayAccount" x:Name="liPayAccount">
                             <CorasauControls:LookupEditor  x:Name="lePayAccount" Text="{Binding PayAccount,Mode=TwoWay}"/>

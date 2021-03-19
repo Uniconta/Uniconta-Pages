@@ -32,6 +32,7 @@ namespace UnicontaClient.Pages.CustomPage
         public override bool SingleBufferUpdate { get { return false; } }
         public IList ToListLocal(VouchersClient[] Arr) { return this.ToList(Arr); }
         public override bool Readonly { get { return false; } }
+        public override bool IsAutoSave { get { return false; } }
     }
     public partial class DocumentsApprovalPage : GridBasePage
     {

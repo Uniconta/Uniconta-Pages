@@ -33,9 +33,9 @@ namespace UnicontaClient.Pages.CustomPage
 {
     public class CustomColumn
     {
-        long[] amount;
-        int index;
-        bool header;
+        readonly long[] amount;
+        readonly int index;
+        readonly bool header;
 
         public CustomColumn(CustomColumn org, Visibility showDebitCredit, bool hide, int aWidth, bool header) : this(org, showDebitCredit, header)
         {
@@ -78,17 +78,22 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         [Display(Name = "Amount", ResourceType = typeof(GLDailyJournalText))]
-        public double? Amount { get { var d = this.amount[index]; return (d != 0) ? d / 100d : (header ? (double?)null : (double?)0d); } }
+        public double? Amount { get { var d = GetAmountValue(this.amount, index); return (d != 0) ? d / 100d : (header ? (double?)null : (double?)0d); } }
 
         [Display(Name = "Debit", ResourceType = typeof(GLDailyJournalText))]
-        public double? Debit { get { var d = this.amount[index]; return (d > 0) ? d / 100d : (double?)null; } }
+        public double? Debit { get { var d = GetAmountValue(this.amount, index); return (d > 0) ? d / 100d : (double?)null; } }
 
         [Display(Name = "Credit", ResourceType = typeof(GLDailyJournalText))]
-        public double? Credit { get { var d = this.amount[index]; return (d < 0) ? d / -100d : (double?)null; } }
+        public double? Credit { get { var d = GetAmountValue(this.amount, index); return (d < 0) ? d / -100d : (double?)null; } }
 
         public Visibility ShowDebitCredit { get; set; }
         public Visibility ShowAmount { get; set; }
         public int AmountWidth { get; set; }
+
+        static long GetAmountValue(long[] amount, int index)
+        {
+            return index < amount.Length ? amount[index] : 0;
+        }
     }
 
     public class TemplateDataItems
@@ -266,6 +271,7 @@ namespace UnicontaClient.Pages.CustomPage
             headerdata.LeftMargin = new Thickness(bal.LeftMargin, 0, 0, 0);
             headerdata.DimColWidth = bal.ColumnSizeDim == (byte)0 ? 90 : bal.ColumnSizeDim;
             headerdata.DClblWidth = bal.ColumnSizeAmount == (byte)0 ? 100 : bal.ColumnSizeAmount;
+            headerdata.FontSize = bal.FontSize == 0 ? 12 : bal.FontSize;
 #if !SILVERLIGHT
             List<List<TemplateDataItems>> simpleLinkItems = new List<List<TemplateDataItems>>();
             var currentItems = ((TemplateDataContext)sourceData).TemplateReportlist;

@@ -90,6 +90,9 @@ x:Class="UnicontaClient.Pages.CustomPage.FAMPage2"
                         <CorasauControls:CorasauLayoutItem FieldName="Depreciation" x:Name="liDepreciation">
                             <CorasauControls:DoubleEditor FieldName="Depreciation" MarkReadOnly="True" />
                         </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="ReversedDepreciation" x:Name="liReversedDepreciation">
+                            <CorasauControls:DoubleEditor FieldName="ReversedDepreciation" MarkReadOnly="True" />
+                        </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="WriteUp" x:Name="liWriteUp">
                             <CorasauControls:DoubleEditor FieldName="WriteUp"  MarkReadOnly="True"/>
                         </CorasauControls:CorasauLayoutItem>

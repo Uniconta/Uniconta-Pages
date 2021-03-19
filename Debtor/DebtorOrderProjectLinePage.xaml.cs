@@ -20,6 +20,8 @@ using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
 using Uniconta.Common;
 using Uniconta.DataModel;
+using Uniconta.ClientTools;
+using Uniconta.Common.Utility;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -53,6 +55,7 @@ namespace UnicontaClient.Pages.CustomPage
         public override string LineNumberProperty { get { return "_LineNumber"; } }
         public override bool AllowSort { get { return false; } }
         public override bool Readonly { get { return false; } }
+        public override bool IsAutoSave { get { return false; } }
 
         public override bool AddRowOnPageDown()
         {
@@ -114,11 +117,22 @@ namespace UnicontaClient.Pages.CustomPage
     {
         public override string NameOfControl { get { return TabControls.DebtorOrderProjectLinePage; } }
 
-        SQLCache ItemsCache, ProjectCache, DebtorCache, CategoryCache, EmployeeCache, PrStandardCache;
-        SQLTableCache<Uniconta.ClientTools.DataModel.PrCategoryClient> prCategoryCache;
+        SQLCache ItemsCache, ProjectCache, CategoryCache, PrStandardCache;
         Dictionary<string, Uniconta.API.DebtorCreditor.FindPrices> dictPriceLookup;
         DebtorOrder debtorOrder;
         public DebtorOrderProjectLinePage(UnicontaBaseEntity master) : base(master)
+        {
+            InitPage(master);
+        }
+
+        public DebtorOrderProjectLinePage(SynchronizeEntity syncEntity)
+           : base(syncEntity, true)
+        {
+            if (syncEntity != null)
+                InitPage(syncEntity.Row);
+        }
+
+        private void InitPage(UnicontaBaseEntity master)
         {
             InitializeComponent();
             localMenu.dataGrid = dgDebtorOrderProjectLineGrid;
@@ -143,7 +157,20 @@ namespace UnicontaClient.Pages.CustomPage
             await dgDebtorOrderProjectLineGrid.Filter(null);
             if (debtorOrder != null)
                 await api.Read(debtorOrder);
+            var itemSource = (IList)dgDebtorOrderProjectLineGrid.ItemsSource;
+            if (itemSource == null || itemSource.Count == 0)
+                dgDebtorOrderProjectLineGrid.AddFirstRow();
             RecalculateAmount();
+        }
+
+        protected override void SyncEntityMasterRowChanged(UnicontaBaseEntity args)
+        {
+            dgDebtorOrderProjectLineGrid.UpdateMaster(args);
+            var debtOrderMaster = dgDebtorOrderProjectLineGrid.masterRecord as Uniconta.DataModel.DebtorOrder;
+            if (debtOrderMaster != null)
+                SetHeader(string.Concat(Uniconta.ClientTools.Localization.lookup("ProjectAdjustments"), ": ", NumberConvert.ToString(debtOrderMaster._OrderNumber)));
+
+            InitQuery();
         }
 
         private void localMenu_OnItemClicked(string ActionType)
@@ -157,7 +184,8 @@ namespace UnicontaClient.Pages.CustomPage
                     dgDebtorOrderProjectLineGrid.CopyRow();
                     break;
                 case "SaveGrid":
-                    saveGrid();
+                        saveGrid();
+                        dockCtrl?.CloseDockItem();
                     break;
                 case "DeleteRow":
                     dgDebtorOrderProjectLineGrid.DeleteRow();
@@ -250,6 +278,11 @@ namespace UnicontaClient.Pages.CustomPage
             rec.costPct = 0d; rec.salesPct = 0d; rec.costAmount = 0d; rec.salesAmount = 0d;
 
             var Category = rec._PrCategory;
+
+            var prcategory = (Uniconta.DataModel.PrCategory)CategoryCache.Get(Category);
+            if (prcategory != null && prcategory._Forward)
+                rec.ProjectForward = debtorOrder._Project;
+
             var projCat = (from ct in Categories where ct._PrCategory == Category select ct).FirstOrDefault();
             if (projCat != null)
             {
@@ -335,14 +368,10 @@ namespace UnicontaClient.Pages.CustomPage
         protected override async void LoadCacheInBackGround()
         {
             var api = this.api;
+            CategoryCache = api.GetCache(typeof(Uniconta.DataModel.PrCategory)) ?? await api.LoadCache(typeof(Uniconta.DataModel.PrCategory)).ConfigureAwait(false);
             ProjectCache = api.GetCache(typeof(Uniconta.DataModel.Project)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Project)).ConfigureAwait(false);
             ItemsCache = api.GetCache(typeof(Uniconta.DataModel.InvItem)) ?? await api.LoadCache(typeof(Uniconta.DataModel.InvItem)).ConfigureAwait(false);
-            DebtorCache = api.GetCache(typeof(Uniconta.DataModel.Debtor)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Debtor)).ConfigureAwait(false);
-            CategoryCache = api.GetCache(typeof(Uniconta.DataModel.PrCategory)) ?? await api.LoadCache(typeof(Uniconta.DataModel.PrCategory)).ConfigureAwait(false);
-            EmployeeCache = api.GetCache(typeof(Uniconta.DataModel.Employee)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Employee)).ConfigureAwait(false);
             PrStandardCache = api.GetCache(typeof(Uniconta.DataModel.PrStandard)) ?? await api.LoadCache(typeof(Uniconta.DataModel.PrStandard)).ConfigureAwait(false);
-            if (prCategoryCache == null)
-                prCategoryCache = await api.LoadCache<Uniconta.ClientTools.DataModel.PrCategoryClient>().ConfigureAwait(false);
         }
 
         void RecalculateAmount()
@@ -351,7 +380,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (lst == null)
                 return;
             double adjustment = debtorOrder._OrderTotal - debtorOrder._ProjectTotal;
-            double Amountsum = lst.Sum(x=>x._SalesAmount);
+            double Amountsum = lst.Sum(x => x._SalesAmount);
             double difference = adjustment - Amountsum;
             RibbonBase rb = (RibbonBase)localMenu.DataContext;
             var groups = UtilDisplay.GetMenuCommandsByStatus(rb, true);
@@ -371,11 +400,10 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void SetPrCategorySource(DebtorOrderProjectLineLocal rec)
         {
-            if (prCategoryCache != null && prCategoryCache.Count != 0)
+            if (CategoryCache != null && CategoryCache.Count != 0)
             {
-                rec._prCategorySource = new PrCategoryRegulationFilter(prCategoryCache.cache);
-                if (rec._prCategorySource != null)
-                    rec.NotifyPropertyChanged("ProjectCategorySource");
+                rec._prCategorySource = new PrCategoryRegulationFilter(CategoryCache);
+                rec.NotifyPropertyChanged("ProjectCategorySource");
             }
         }
 
@@ -393,15 +421,12 @@ namespace UnicontaClient.Pages.CustomPage
             if (string.IsNullOrEmpty(le.EnteredText))
                 return;
 
-            if (prCategoryCache != null)
+            var prCat = CategoryCache?.Get(le.EnteredText);
+            if (prCat != null)
             {
-                var prCat = prCategoryCache.FirstOrDefault(s => s._Number == le.EnteredText);
-                if (prCat != null)
-                {
-                    dgDebtorOrderProjectLineGrid.SetLoadedRow(selectedItem);
-                    selectedItem.PrCategory = prCat.KeyStr;
-                    le.EditValue = prCat.KeyStr;
-                }
+                dgDebtorOrderProjectLineGrid.SetLoadedRow(selectedItem);
+                selectedItem.PrCategory = prCat.KeyStr;
+                le.EditValue = prCat.KeyStr;
             }
             le.EnteredText = null;
         }

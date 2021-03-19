@@ -160,7 +160,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (selectedItem == null)
                 return;
             var followUp = Activator.CreateInstance(selectedItem.GetType()) as PartnerProspectFollowUpClient;
-            StreamingManager.Copy(selectedItem, followUp);
+            CorasauDataGrid.CopyAndClearRowId(selectedItem, followUp);
             var parms = new object[3] { followUp, false, dgCrmFollowUpGrid.masterRecord };
             AddDockItem(TabControls.PartnerProspectFollowUpPage2, parms, Uniconta.ClientTools.Localization.lookup("FollowUp"), "Add_16x16.png");
         }

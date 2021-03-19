@@ -141,7 +141,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (!hasMissignModel && !string.IsNullOrEmpty(txtbalanceName.Text))
                 {
                     if (objBalance == null || objBalance.CompanyId != api.CompanyId /* For balance copy from other company */)
-                        SaveBalance(false);
+                        SaveBalance();
                     else
                         update();
                 }
@@ -164,7 +164,7 @@ namespace UnicontaClient.Pages.CustomPage
         async void LoadBalance()
         {
             busyIndicator.IsBusy = true;
-            Company[] compList = await BasePage.session.GetCompanies();
+            Company[] compList = CWDefaultCompany.loadedCompanies;
             companies = compList;
             var lstEntity = await api.Query<Balance>();
             if (lstEntity != null && lstEntity.Length > 0)
@@ -235,6 +235,7 @@ namespace UnicontaClient.Pages.CustomPage
                         Crit.balanceColumnMethod = colBalance.ColumnMethodEnum;
                         Crit.ShowDebitCredit = colBalance._ShowDebitCredit;
                         Crit.InvertSign = colBalance._InvertSign;
+                        Crit.InclPrimo = colBalance._InclPrimo;
                         Crit.ColA = colBalance._ColA;
                         Crit.ColB = colBalance._ColB;
                         Crit.Account100 = colBalance._Account100;
@@ -371,6 +372,7 @@ namespace UnicontaClient.Pages.CustomPage
             objSelectedCriteria.balanceColumnMethod = objBalanceColumn.ColumnMethodEnum;
             objSelectedCriteria.ShowDebitCredit = objBalanceColumn._ShowDebitCredit;
             objSelectedCriteria.InvertSign = objBalanceColumn._InvertSign;
+            objSelectedCriteria.InclPrimo = objBalanceColumn._InclPrimo;
             objSelectedCriteria.ColA = objBalanceColumn._ColA;
             objSelectedCriteria.ColB = objBalanceColumn._ColB;
             objSelectedCriteria.Account100 = objBalanceColumn._Account100;
@@ -392,7 +394,14 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "SaveBalance":
                     if (ValidateBalanceBudgetField())
-                        SaveBalance(true);
+                    {
+                        if (string.IsNullOrEmpty(txtbalanceName.Text))
+                        {
+                            UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("CannotBeBlank"), Uniconta.ClientTools.Localization.lookup("Name")), Uniconta.ClientTools.Localization.lookup("Warning"));
+                            return;
+                        }
+                        SaveBalance();
+                    }
                     break;
                 case "DeleteBalance":
                     DeleteBalance();
@@ -480,7 +489,7 @@ namespace UnicontaClient.Pages.CustomPage
         void RunBalance()
         {
             if (objBalance == null || objBalance.CompanyId != api.CompanyId /* For balance copy from other company */)
-                SaveBalance(false);
+                SaveBalance();
             else
                 update();
             if (objBalance == null)
@@ -522,7 +531,8 @@ namespace UnicontaClient.Pages.CustomPage
             ClearcolumnList();
             ClearGrid();
             var Crit = objCriteria.selectedCriteria[0];
-            Crit._ShowDebitCredit = true;
+            Crit._ShowDebitCredit = Crit._InclPrimo= true;
+            Crit.NotifyPropertyChanged("InclPrimo");
             Crit.balcolFormat = BalanceColumnFormat.Decimal2;
             SetDefaultDate(Crit);
             objCriteria.dim1details = objCriteria.dim2details = objCriteria.dim3details = objCriteria.dim4details = objCriteria.dim5details = false;
@@ -535,7 +545,7 @@ namespace UnicontaClient.Pages.CustomPage
         void SaveNewCritera()
         {
             if (objBalance == null)
-                SaveBalance(false);
+                SaveBalance();
             else
             {
                 var ColNo = objCriteria.selectedCriteria.Count - 1;
@@ -550,7 +560,7 @@ namespace UnicontaClient.Pages.CustomPage
                 var deleteRow = balanceCollist[balanceCollist.Count - 1];
                 api.DeleteNoResponse(deleteRow);
                 balanceCollist.RemoveAt(balanceCollist.Count - 1);
-                objCriteria.selectedCriteria.Remove(objCriteria.selectedCriteria.Last());
+                objCriteria.selectedCriteria.Remove(objCriteria.selectedCriteria[objCriteria.selectedCriteria.Count-1]);
 #if !SILVERLIGHT
                 ControlContainer.Children.RemoveAt(ControlContainer.Children.Count - 1);
 #else
@@ -597,18 +607,8 @@ namespace UnicontaClient.Pages.CustomPage
                 rowdim1.Height = GridLength.Auto;
             }
         }
-        public async void SaveBalance(bool showError)
+        public void SaveBalance()
         {
-            if (showError && string.IsNullOrEmpty(txtbalanceName.Text))
-            {
-                UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("CannotBeBlank"), Uniconta.ClientTools.Localization.lookup("Name")), Uniconta.ClientTools.Localization.lookup("Warning"));
-                return;
-            }
-
-            ErrorCodes res = 0;
-            if (showError)
-                busyIndicator.IsBusy = true;
-
             if (objBalance == null || objBalance.RowId == 0 || objBalance.CompanyId != api.CompanyId /* For balance copy from other company */)
             {
                 if (itemsBalance == null)
@@ -623,38 +623,25 @@ namespace UnicontaClient.Pages.CustomPage
                 SetBalanceDimUsed(objBalance);
                 // if we can't save it, we still generate the colums, so he can run it
                 balanceCollist = null;
-                var cols = new List<BalanceColumn>();
+                var cols = new List<BalanceColumn>(objCriteria.selectedCriteria.Count);
                 int i = 0;
                 foreach (var crit in objCriteria.selectedCriteria)
-                {
-                    var col = CreateCriteraColumn(crit, i++);
-                    cols.Add(col);
-                }
+                    cols.Add(CreateCriteraColumn(crit, i++));
+
                 cbBalance.SelectedIndex = itemsBalance.Count - 1;
                 objBalance.ColumnList = cols;
 
-                if (objBalance._Name != null)
-                    res = await api.Insert(objBalance);
-                else
-                    res = ErrorCodes.FieldCannotBeBlank;
+                if (objBalance._Name == null)
+                    objBalance._Name = Uniconta.ClientTools.Localization.lookup("Balance") + NumberConvert.ToString(itemsBalance.Count);
 
-                if (res == ErrorCodes.Succes && objBalance.CompanyId != api.CompanyId)
-                    UpdateBalancelist(cbBalance.SelectedIndex);
+                objBalance.SetMaster(api.CompanyEntity);
+                api.InsertNoResponse(objBalance);
+                UpdateBalancelist(cbBalance.SelectedIndex);
             }
             else
             {
-                var t = update();
-                if (showError && t != null)
-                    res = await t;
-                if (res == ErrorCodes.Succes)
-                    UpdateBalancelist(cbBalance.SelectedIndex);
-            }
-
-            if (showError)
-            {
-                busyIndicator.IsBusy = false;
-                if (res != ErrorCodes.Succes)
-                    UtilDisplay.ShowErrorCode(res);
+                update();
+                UpdateBalancelist(cbBalance.SelectedIndex);
             }
         }
 
@@ -729,6 +716,7 @@ namespace UnicontaClient.Pages.CustomPage
             row.ColumnMethodEnum = objColCriteria.balcolMethod;
             row._ShowDebitCredit = objColCriteria._ShowDebitCredit;
             row._InvertSign = objColCriteria._InvertSign;
+            row._InclPrimo = objColCriteria._InclPrimo;
             row._ColA = (byte)objColCriteria.colA;
             row._ColB = (byte)objColCriteria.colB;
             row.Dims1 = objColCriteria.dimval1;
@@ -794,19 +782,19 @@ namespace UnicontaClient.Pages.CustomPage
             updaterow.LeftMargin = (byte)NumberConvert.ToInt(txtLeftMargin.Text);
             return updaterow;
         }
-        Task<ErrorCodes> update()
+        void update()
         {
             Balance bal;
             var idx = cbBalance.SelectedIndex;
             if (idx < 0)
             {
                 if (itemsBalance != null && itemsBalance.Count > 0)
-                    bal = (Balance)itemsBalance[0];
+                    bal = itemsBalance[0];
                 else
                     bal = null;
             }
             else if (idx < itemsBalance.Count)
-                bal = (Balance)itemsBalance[idx];
+                bal = itemsBalance[idx];
             else
                 bal = null;
 
@@ -817,19 +805,10 @@ namespace UnicontaClient.Pages.CustomPage
 
                 bal.ColumnList = new List<BalanceColumn>();
                 foreach (var crit in objCriteria.selectedCriteria)
-                {
-                    var modifiedRow = CreateUpdateRow(crit, new BalanceColumn());
-                    bal.ColumnList.Add(modifiedRow);
-                }
-                return api.Update(bal);
+                    bal.ColumnList.Add(CreateUpdateRow(crit, new BalanceColumn()));
+
+                api.UpdateNoResponse(bal);
             }
-#if !SILVERLIGHT
-            return Task.FromResult(ErrorCodes.CannotUpdateRecord);
-#elif SILVERLIGHT
-            var taskSource = new TaskCompletionSource<ErrorCodes>();
-            taskSource.SetResult(ErrorCodes.CannotUpdateRecord);
-            return taskSource.Task;
-#endif
         }
 
         void SetBalanceDimUsed(Balance objBalance)

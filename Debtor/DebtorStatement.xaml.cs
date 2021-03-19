@@ -130,6 +130,12 @@ namespace UnicontaClient.Pages.CustomPage
         [Display(Name = "LayoutGroup", ResourceType = typeof(DCAccountText))]
         public string LayoutGrp { get { return deb._LayoutGroup; } }
 
+        [Display(Name = "Address1", ResourceType = typeof(DCAccountText))]
+        public string Address1 { get { return deb._Address1; } }
+
+        [Display(Name = "City", ResourceType = typeof(DCAccountText))]
+        public string City { get { return deb._City; } }
+
         public DebtorTransClientTotal[] ChildRecords { get; set; }
 
         public double _SumAmount;
@@ -163,7 +169,8 @@ namespace UnicontaClient.Pages.CustomPage
         static public DateTime DefaultFromDate, DefaultToDate;
         static bool IsCollapsed = true;
         static bool pageBreak, showCurrency = false;
-        static int printIntPreview;
+        static int printIntPreview, transaction;
+        bool OnlyOpen, OnlyDue = false;
         public static void SetDateTime(DateEditor frmDateeditor, DateEditor todateeditor)
         {
             if (frmDateeditor.Text == string.Empty)
@@ -236,7 +243,7 @@ namespace UnicontaClient.Pages.CustomPage
             var Pref = api.session.Preference;
             cbxAscending.IsChecked = Pref.Debtor_isAscending;
             cbxSkipBlank.IsChecked = Pref.Debtor_skipBlank;
-            cbxOnlyOpen.IsChecked = Pref.Debtor_OnlyOpen;
+            // cbxOnlyOpen.IsChecked = Pref.Debtor_OnlyOpen;
 #if !SILVERLIGHT
             cbxPageBreak.IsChecked = pageBreak;
 #endif
@@ -246,6 +253,8 @@ namespace UnicontaClient.Pages.CustomPage
             txtDateFrm.DateTime = DebtorStatement.DefaultFromDate;
             cmbPrintintPreview.ItemsSource = new string[] { Uniconta.ClientTools.Localization.lookup("Internal"), Uniconta.ClientTools.Localization.lookup("External") };
             cmbPrintintPreview.SelectedIndex = printIntPreview;
+            cmbTrasaction.ItemsSource = AppEnums.TransToShow.Values;
+            cmbTrasaction.SelectedIndex = transaction;
             GetMenuItem();
             var Comp = api.CompanyEntity;
             accountCache = Comp.GetCache(typeof(Uniconta.DataModel.Debtor));
@@ -330,7 +339,7 @@ namespace UnicontaClient.Pages.CustomPage
             return new AggregateOperand("ChildRecords", Aggregate.Exists, detailOperator);
         }
 
-        async private Task<IEnumerable<IPrintReport>> GeneratePrintReport(IEnumerable<DebtorStatementList> statementList, bool marked, bool hasCurrency)
+        async private Task<IEnumerable<IPrintReport>> GeneratePrintReport(IEnumerable<DebtorStatementList> statementList, bool marked, bool hasCurrency, bool applyGridFilter)
         {
             var iprintReportList = new List<IPrintReport>();
 
@@ -338,11 +347,20 @@ namespace UnicontaClient.Pages.CustomPage
             var companyClient = new CompanyClient();
             StreamingManager.Copy(api.CompanyEntity, companyClient);
             byte[] getLogoBytes = await UtilDisplay.GetLogo(api);
-
+            int rowHandle = -1;
             foreach (var db in statementList)
             {
+                rowHandle = rowHandle + 1;
+
                 if (db.ChildRecords.Length == 0 || (marked && !db.Mark))
                     continue;
+
+                if (applyGridFilter)
+                {
+                    var visibelDetails = dgDebtorTrans.GetVisibleDetail(rowHandle);
+                    if (visibelDetails == null || visibelDetails.VisibleItems?.Count == 0)
+                        continue;
+                }
 
                 var lan = UtilDisplay.GetLanguage(db.deb, companyClient);
 
@@ -358,7 +376,7 @@ namespace UnicontaClient.Pages.CustomPage
                 var debtorType = Uniconta.Reports.Utilities.ReportUtil.GetUserType(typeof(DebtorClient), api.CompanyEntity);
                 var debt = Activator.CreateInstance(debtorType) as DebtorClient;
                 StreamingManager.Copy(db.deb, debt);
-                debt.Transactions = db.ChildRecords;
+                debt.Transactions = applyGridFilter ? dgDebtorTrans.GetVisibleDetail(rowHandle).VisibleItems.Cast<DebtorTransClientTotal>() : db.ChildRecords;
 
                 if (lastMessage == null || messageLanguage != lan)
                 {
@@ -391,10 +409,10 @@ namespace UnicontaClient.Pages.CustomPage
                 if (debtorStatementList != null)
                 {
                     var hasCurrency = debtorStatementList.ChildRecords.Where(p => p._AmountCur != 0.0d).Any();
-                    var debtStatementReport = await GeneratePrintReport(new List<DebtorStatementList>(1) { debtorStatementList }, true, hasCurrency);
+                    var debtStatementReport = await GeneratePrintReport(new List<DebtorStatementList>(1) { debtorStatementList }, true, hasCurrency, false);
                     if (debtStatementReport != null && debtStatementReport.Count() == 1)
                         InvoicePostingPrintGenerator.OpenReportInOutlook(api, debtStatementReport.Single(), debtorStatementList.deb,
-                            CompanyLayoutType.AccountStatement, DefaultFromDate, DefaultToDate);
+                            CompanyLayoutType.AccountStatement, DefaultFromDate, DefaultToDate, hasCurrency);
                 }
 
             }
@@ -495,7 +513,7 @@ namespace UnicontaClient.Pages.CustomPage
                 IEnumerable<DebtorStatementList> debtorStatementList = (IEnumerable<DebtorStatementList>)dgDebtorTrans.ItemsSource;
                 var marked = debtorStatementList.Any(m => m.Mark == true);
 
-                var iReports = await GeneratePrintReport(debtorStatementList.ToList(), marked, chkShowCurrency.IsChecked == true);
+                var iReports = await GeneratePrintReport(debtorStatementList.ToList(), marked, chkShowCurrency.IsChecked == true, true);
 
                 if (iReports.Count() > 0)
                 {
@@ -777,7 +795,6 @@ namespace UnicontaClient.Pages.CustomPage
             var transApi = new ReportAPI(api);
             DebtorStatement.SetDateTime(txtDateFrm, txtDateTo);
             DateTime fromDate = DebtorStatement.DefaultFromDate, toDate = DebtorStatement.DefaultToDate;
-            bool OnlyOpen = cbxOnlyOpen.IsChecked.Value;
 
             var lstDebtorTransLst = ((IEnumerable<DebtorStatementList>)dgDebtorTrans.ItemsSource);
             if (!SendAll)
@@ -887,13 +904,12 @@ namespace UnicontaClient.Pages.CustomPage
 
             var isAscending = cbxAscending.IsChecked.Value;
             var skipBlank = cbxSkipBlank.IsChecked.Value;
-            var OnlyOpen = cbxOnlyOpen.IsChecked.Value;
 #if !SILVERLIGHT
             pageBreak = cbxPageBreak.IsChecked.Value;
 #endif
             showCurrency = chkShowCurrency.IsChecked.Value;
             printIntPreview = cmbPrintintPreview.SelectedIndex;
-
+            transaction = cmbTrasaction.SelectedIndex;
             var Pref = api.session.Preference;
             Pref.Debtor_isAscending = isAscending;
             Pref.Debtor_skipBlank = skipBlank;
@@ -910,14 +926,14 @@ namespace UnicontaClient.Pages.CustomPage
 
             busyIndicator.IsBusy = true;
             var transApi = new ReportAPI(api);
-            var listTrans = (DebtorTransClientTotal[])await transApi.GetTransWithPrimo(new DebtorTransClientTotal(), fromDate, toDate, fromAccount, toAccount, OnlyOpen, null, debtorFilterValues);
+            var listTrans = (DebtorTransClientTotal[])await transApi.GetTransWithPrimo(new DebtorTransClientTotal(), fromDate, toDate, fromAccount, toAccount, OnlyOpen, null, debtorFilterValues, OnlyDue);
             if (listTrans != null)
             {
                 var t = accountCacheTask;
                 if (t != null)
                     accountCache = await t;
 
-                FillStatement(listTrans, isAscending, skipBlank, OnlyOpen);
+                FillStatement(listTrans, isAscending, skipBlank, OnlyOpen, toDate);
             }
             busyIndicator.IsBusy = false;
 
@@ -927,7 +943,7 @@ namespace UnicontaClient.Pages.CustomPage
                 SetExpandAndCollapse(IsCollapsed);
         }
 
-        void FillStatement(DebtorTransClientTotal[] listTrans, bool isAscending, bool skipBlank, bool OnlyOpen)
+        void FillStatement(DebtorTransClientTotal[] listTrans, bool isAscending, bool skipBlank, bool OnlyOpen, DateTime toDate)
         {
             string currentItem = string.Empty;
             DebtorStatementList masterDbStatement = null;
@@ -965,6 +981,12 @@ namespace UnicontaClient.Pages.CustomPage
                 trans._SumAmountCur = SumAmountCur;
                 masterDbStatement._SumAmountCur = SumAmountCur;
 
+                if (trans._DueDate <= toDate)
+                {
+                    trans._OverDue = trans._AmountOpen;
+                    trans._OverDueCur = trans._AmountOpenCur;
+                }
+
                 dbTransClientChildList.Add(trans);
             }
 
@@ -994,6 +1016,19 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var cmbItems = sender as DimComboBoxEditor;
             dgDebtorTrans.IsStandardPrint = (Convert.ToString(cmbItems.SelectedItem) == Uniconta.ClientTools.Localization.lookup("Internal"));
+        }
+
+        private void cmbTrasaction_SelectedIndexChanged(object sender, RoutedEventArgs e)
+        {
+            if (cmbTrasaction.SelectedIndex == 0)
+                OnlyOpen = OnlyDue = false;
+            else if (cmbTrasaction.SelectedIndex == 1)
+            {
+                OnlyOpen = true;
+                OnlyDue = false;
+            }
+            else if (cmbTrasaction.SelectedIndex == 2)
+                OnlyOpen = OnlyDue = true;
         }
 #if !SILVERLIGHT
         private void cbxPageBreak_Click(object sender, RoutedEventArgs e)

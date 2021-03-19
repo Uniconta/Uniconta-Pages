@@ -61,6 +61,7 @@ namespace UnicontaClient.Pages.CustomPage
         static DateTime fromDate, toDate;
         static string budgetGroup;
         static bool grpWeek;
+        static bool grpPrevYear;
         bool pivotIsLoaded = false;
         SQLTableCache<Uniconta.DataModel.PrCategory> prCategoryCache;
         SQLTableCache<Uniconta.DataModel.Employee> employeeCache;
@@ -106,10 +107,11 @@ namespace UnicontaClient.Pages.CustomPage
             localMenu.OnChecked += LocalMenu_OnChecked;
             pivotDgProjectPlanning.CellDoubleClick += PivotGridControl_CellDoubleClick;
             GetMenuItem();
-            txtFromDate.DateTime = fromDate == DateTime.MinValue ? DateTime.Today : fromDate;
-            txtToDate.DateTime = toDate == DateTime.MinValue ? DateTime.Today : toDate;
+            txtFromDate.DateTime = fromDate == DateTime.MinValue ? GetSystemDefaultDate() : fromDate;
+            txtToDate.DateTime = toDate == DateTime.MinValue ? GetSystemDefaultDate() : toDate;
             cmbBudgetGroup.Text = budgetGroup;
-            chkGroupWeek.IsChecked = grpWeek; 
+            chkGroupWeek.IsChecked = grpWeek;
+            chkGroupPrevYear.IsChecked = grpPrevYear;
             prCategoryCache = api.GetCache<Uniconta.DataModel.PrCategory>();
             employeeCache = api.GetCache<Uniconta.DataModel.Employee>();
             StartLoadCache();
@@ -120,6 +122,9 @@ namespace UnicontaClient.Pages.CustomPage
             fieldQtyActualNormDiff.Caption = ProjectTransPivotClientText.QtyActualNormDiff;
             fieldSalesActualBudgetDiff.Caption = ProjectTransPivotClientText.SalesActualBudgetDiff;
             fieldCostActualBudgetDiff.Caption = ProjectTransPivotClientText.CostActualBudgetDiff;
+            fieldQtyActualPrevBudDiff.Caption = ProjectTransPivotClientText.QtyActualPrevBudDiff;
+            fieldSalesActualPrevBudgetDiff.Caption = ProjectTransPivotClientText.SalesActualPrevBudgetDiff;
+            fieldCostActualPrevBudgetDiff.Caption = ProjectTransPivotClientText.CostActualPrevBudgetDiff;
         }
 
         PivotGridField[] selectedCellColumnFields = null;
@@ -354,6 +359,14 @@ namespace UnicontaClient.Pages.CustomPage
             toDate = txtToDate.DateTime;
             budgetGroup = cmbBudgetGroup.Text;
             grpWeek = chkGroupWeek.IsChecked.Value;
+            grpPrevYear = chkGroupPrevYear.IsChecked.Value;
+
+            fieldQtyPrev.Visible = grpPrevYear;
+            fieldCostPrev.Visible = grpPrevYear;
+            fieldSalesPrev.Visible = grpPrevYear;
+            fieldQtyActualPrevBudDiff.Visible = grpPrevYear;
+            fieldSalesActualPrevBudgetDiff.Visible = grpPrevYear;
+            fieldCostActualPrevBudgetDiff.Visible = grpPrevYear;
 
             if (string.IsNullOrEmpty(budgetGroup))
             {
@@ -453,15 +466,49 @@ namespace UnicontaClient.Pages.CustomPage
                         extras.Add(prTrans);
                     }
                 }
+            }
 
-                if (extras != null)
+            if (grpPrevYear)
+            {
+                foreach (var p in filter)
                 {
-                    Array.Resize(ref trans, len + extras.Count);
-                    foreach (var sum in extras)
-                        trans[len++] = sum;
-                    Array.Sort(trans, sort);
-                    extras = null;
+                    if (p.Prop == "FromDate")
+                        p.Arg = Convert.ToString(fromDate.AddYears(-1).Ticks);
+                    if (p.Prop == "ToDate")
+                        p.Arg = Convert.ToString(toDate.AddYears(-1).Ticks);
                 }
+
+                var transTaskPrev = api.Query(new ProjectTransPivotClient(), new List<UnicontaBaseEntity>() { master }, filter);
+                var transPrev = await transTaskPrev;
+
+                foreach (var y in transPrev)
+                {
+                    var prTrans = new ProjectTransPivotClient()
+                    {
+                        _CompanyId = CompanyId,
+                        _SalesPrev = y._Sales,
+                        _CostPrev = y._Cost,
+                        _QtyPrev = y._Qty,
+                        _PrCategory = y._PrCategory,
+                        _Project = y._Project,
+                        _Date = y._Date,
+                        _Employee = y._Employee,
+                        _PayrollCategory = y._PayrollCategory
+                    };
+
+                    if (extras == null)
+                        extras = new List<ProjectTransPivotClient>();
+                    extras.Add(prTrans);
+                }
+            }
+
+            if (extras != null)
+            {
+                Array.Resize(ref trans, len + extras.Count);
+                foreach (var sum in extras)
+                    trans[len++] = sum;
+                Array.Sort(trans, sort);
+                extras = null;
             }
 
             int start = 0;
@@ -824,6 +871,8 @@ namespace UnicontaClient.Pages.CustomPage
             string name = e.DataField.Name;
             if (name == "fieldQtyActualBudDiff")
                 e.CustomValue = CalculateQty("Qty", "BudgetQty", e.CreateDrillDownDataSource());
+            if (name == "fieldQtyActualPrevBudDiff")
+                e.CustomValue = CalculateQty("QtyPrev", "BudgetQty", e.CreateDrillDownDataSource());
             else if (name == "fieldQtyNormBudDiff")
                 e.CustomValue = CalculateQty("NormQty", "BudgetQty", e.CreateDrillDownDataSource());
             else if (name == "fieldQtyActualNormDiff")
@@ -832,6 +881,10 @@ namespace UnicontaClient.Pages.CustomPage
                 e.CustomValue = CalculateQty("Sales", "BudgetSales", e.CreateDrillDownDataSource());
             else if (name == "fieldCostActualBudgetDiff")
                 e.CustomValue = CalculateQty("Cost", "BudgetCost", e.CreateDrillDownDataSource());
+            else if (name == "fieldSalesActualPrevBudgetDiff")
+                e.CustomValue = CalculateQty("SalesPrev", "BudgetSales", e.CreateDrillDownDataSource());
+            else if (name == "fieldCostActualPrevBudgetDiff")
+                e.CustomValue = CalculateQty("CostPrev", "BudgetCost", e.CreateDrillDownDataSource());
             else if (name == "fieldPercentage")
                 e.CustomValue = CalculatePercentage("NormQty", "BudgetQty", e.CreateDrillDownDataSource());
         }

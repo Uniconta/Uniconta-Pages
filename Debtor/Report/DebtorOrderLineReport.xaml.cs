@@ -26,6 +26,7 @@ namespace UnicontaClient.Pages.CustomPage
     public class DebtorOrderLineReportGrid : CorasauDataGridClient
     {
         public override Type TableType { get { return typeof(DebtorOrderLineClient); } }
+        public override bool SingleBufferUpdate { get { return false; } }
     }
     public partial class DebtorOrderLineReport : GridBasePage
     {

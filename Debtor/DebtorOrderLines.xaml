@@ -40,6 +40,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrderLines"
                                         </DataTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridTemplateColumnClient>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="colNote" FieldName="Note" Width="150" Visible="False"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Item" Width="100"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant" FieldName="Variant">
                                     <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
@@ -102,6 +103,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrderLines"
                                     </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridTemplateColumnClient>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="EAN" Visible="False" Width="150"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="CustomerItemNumber" Width="150"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Price" Width="90"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Discount" Width="80" Visible="False"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="DiscountPct" Width="50"/>

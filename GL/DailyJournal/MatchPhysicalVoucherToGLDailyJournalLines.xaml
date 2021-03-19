@@ -40,14 +40,14 @@ x:Class="UnicontaClient.Pages.CustomPage.MatchPhysicalVoucherToGLDailyJournalLin
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Approved" Width="60" />
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Fileextension" Width="55" />
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Content" />
+                        <localPage:CorasauDataGridTemplateColumnClient x:Name="PostingDate" Width="85"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="DocumentDate" Width="85"/>
-                        <localPage:CorasauDataGridTemplateColumnClient FieldName="Invoice" x:Name="vcInvoice" AllowThousandMask="False" Width="80" />
+                        <localPage:CorasauDataGridTemplateColumnClient FieldName="Invoice" x:Name="vcInvoice" Width="80" />
                         <localPage:CorasauDataGridTemplateColumnClient FieldName="Amount" x:Name="vcAmount" Width="90" />
                         <localPage:CorasauDataGridTemplateColumnClient FieldName="Currency" x:Name="vcCurrency" Width="35"  />
-                        <localPage:CorasauDataGridForeignKeyColumnClient x:Name="CreditorAccount"  Width="60" />
+                        <localPage:CorasauDataGridForeignKeyColumnClient x:Name="CreditorAccount"  Width="90" />
                         <localPage:CorasauDataGridForeignKeyColumnClient x:Name="CreditorName" Visible="False" />
-                        <localPage:CorasauDataGridTemplateColumnClient FieldName="Text" x:Name="vcText"  />
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="PostingDate" AllowEditing="True" Width="85" Visible="False"/>
+                        <localPage:CorasauDataGridTemplateColumnClient FieldName="Text" x:Name="vcText" Width="250" />
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Debet" AllowEditing="True" Width="85" Visible="False"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Credit" AllowEditing="True" Width="85" Visible="False"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="CostAccount" Visible="False"/>
@@ -59,7 +59,6 @@ x:Class="UnicontaClient.Pages.CustomPage.MatchPhysicalVoucherToGLDailyJournalLin
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="PaymentId" Visible="False" MinWidth="100"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Approver1" Visible="False" Width="80"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Approver2" Visible="False" Width="80"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="PostingInstruction" MinWidth="500" Visible="False" />
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Approved2" Width="70" Visible="False"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Folder" AllowEditing="False" Visible="False" Width="55" />
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="PayDate"  Width="85" Visible="False" />
@@ -79,6 +78,7 @@ x:Class="UnicontaClient.Pages.CustomPage.MatchPhysicalVoucherToGLDailyJournalLin
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="CategoryName" Visible="False"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Qty" Visible="False" AllowThousandMask="True" Mask="N2"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Reference" Visible="False" />
+                        <localPage:CorasauDataGridTemplateColumnClient x:Name="PostingInstruction" MinWidth="300" />
                     </localPage:VouchersGridLocal.Columns>
                 </localPage:VouchersGridLocal>
                 <Border Grid.Row="2" HorizontalAlignment="Stretch" Height="10" VerticalAlignment="Center" Background="{StaticResource WindowHeaderGradient}" />

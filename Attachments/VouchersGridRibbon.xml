@@ -17,6 +17,7 @@
     <RibbonItem Action="ViewDownloadRow" ShortcutKey="F7" LocalizedNameKey="View" LargeGlyph="View_Highlighted_32x32.png" />
     <RibbonItem Action="GenerateJournalLines" LocalizedNameKey="GenerateJournalLines" LargeGlyph="Generate_32x32.png" ShortcutKey="Ctrl+G" />
     <RibbonItem Action="ViewJournalLines" LocalizedNameKey="Journallines" LargeGlyph="Journal_Lines_32x32.png" />
+    <RibbonItem Action="GeneratePurchaseOrder" LocalizedNameKey="GeneratePurchaseOrder" LargeGlyph="Generate_32x32.png" ShortcutKey="Ctrl+G" />    
   </RibbonItem>
   <RibbonItem LocalizedNameKey="Bilagscan">
     <RibbonItem Action="BilagscanSendVouchers" LocalizedNameKey="BilagscanSend" Module="Bilagscan" LargeGlyph=";component/Assets/img/Export_32x32.png" />

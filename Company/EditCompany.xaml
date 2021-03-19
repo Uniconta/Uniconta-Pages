@@ -61,6 +61,9 @@ x:Class="UnicontaClient.Pages.CustomPage.EditCompany"
                         <CorasauControls:CorasauLayoutItem FieldName="ScanMail">
                             <CorasauControls:TextEditor Text="{Binding ScanMail,Mode=OneWay}" IsReadOnly="True"/>
                         </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="ForwardEmail">
+                            <CorasauControls:TextEditor Text="{Binding ForwardEmail,Mode=TwoWay}" MaskType="RegEx" Mask="{StaticResource EmailValidationRegx}" />
+                        </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="PrimaryKeyId">
                             <CorasauControls:TextEditor Text="{Binding PrimaryKeyId,Mode=OneWay}" IsReadOnly="True"/>
                         </CorasauControls:CorasauLayoutItem>
@@ -72,6 +75,9 @@ x:Class="UnicontaClient.Pages.CustomPage.EditCompany"
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="Created">
                             <CorasauControls:DateEditor Text="{Binding Created,Mode=OneWay}" IsReadOnly="True" IsEnabled="False"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="TransCount">
+                            <CorasauControls:IntegerEditor Text="{Binding TransCount,Mode=OneWay}" IsReadOnly="True" />
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="CompanyType" >
                             <CorasauControls:ComboBoxEditor x:Name="cmbCompanyType" SelectedItem="{Binding CompanyType,Mode=TwoWay}" />
@@ -117,6 +123,9 @@ x:Class="UnicontaClient.Pages.CustomPage.EditCompany"
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="IBAN">
                             <CorasauControls:TextEditor Text="{Binding IBAN,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="MobilePay">
+                            <CorasauControls:TextEditor Text="{Binding MobilePay,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
 

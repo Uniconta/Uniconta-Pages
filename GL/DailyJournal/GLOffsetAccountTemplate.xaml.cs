@@ -24,6 +24,7 @@ namespace UnicontaClient.Pages.CustomPage
         public override bool Readonly { get { return false; } }
         protected override List<string> GridSkipFields { get { return new List<string>() { "AccountName" }; } }
         protected override bool RenderAllColumns { get { return true; } }
+        public override bool IsAutoSave { get { return false; } }
     }
 
     public partial class GLOffsetAccountTemplate : GridBasePage

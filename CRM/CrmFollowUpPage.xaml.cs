@@ -271,7 +271,8 @@ namespace UnicontaClient.Pages.CustomPage
 
         void CopyRecord(CrmFollowUpClient selectedItem)
         {
-            var followUp = StreamingManager.Clone(selectedItem) as CrmFollowUpClient;
+            var followUp = new CrmFollowUpClient();
+            CorasauDataGrid.CopyAndClearRowId(selectedItem, followUp);
             followUp.dc = selectedItem.dc;
             followUp.pros = selectedItem.pros;
             followUp.cont = selectedItem.cont;
@@ -279,7 +280,7 @@ namespace UnicontaClient.Pages.CustomPage
             followUp._Ended = DateTime.MinValue;
             if (followUp._Action == Uniconta.DataModel.FollowUpAction.Lost)
                 followUp._Action = 0;
-            var parms = new object[3] { followUp, false , dgCrmFollowUpGrid.masterRecord};
+            var parms = new object[3] { followUp, false, dgCrmFollowUpGrid.masterRecord };
             AddDockItem(TabControls.CrmFollowUpPage2, parms, Uniconta.ClientTools.Localization.lookup("FollowUp"), "Add_16x16.png");
         }
 

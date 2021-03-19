@@ -93,12 +93,11 @@ namespace UnicontaClient.Pages.CustomPage
             SetRibbonControl(localMenu, dgDebtorOffers);
             dgDebtorOffers.api = api;
             dgDebtorOffers.BusyIndicator = busyIndicator;
-
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             InitialLoad();
             ribbonControl.DisableButtons(new string[] { "UndoDelete", "DeleteRow", "SaveGrid" });
         }
-
+       
         protected override void OnLayoutLoaded()
         {
             base.OnLayoutLoaded();
@@ -106,7 +105,8 @@ namespace UnicontaClient.Pages.CustomPage
             Account.Visible = showFields;
             Name.Visible = showFields;
             setDim();
-            if (!api.CompanyEntity.DeliveryAddress)
+            var Comp = api.CompanyEntity;
+            if (!Comp.DeliveryAddress)
             {
                 DeliveryName.Visible = false;
                 DeliveryAddress1.Visible = false;
@@ -117,6 +117,14 @@ namespace UnicontaClient.Pages.CustomPage
                 DeliveryCountry.Visible = false;
             }
             dgDebtorOffers.Readonly = true;
+            if (!Comp.Project)
+                Project.ShowInColumnChooser = Project.Visible = PrCategory.ShowInColumnChooser = PrCategory.Visible = Task.ShowInColumnChooser = Task.Visible = false;
+            else
+                Project.ShowInColumnChooser = PrCategory.ShowInColumnChooser = Task.ShowInColumnChooser = true;
+            if (!Comp.ProjectTask)
+                Task.ShowInColumnChooser = Task.Visible = false;
+            else
+                Task.ShowInColumnChooser = true;
         }
 
         private void InitialLoad()
@@ -245,6 +253,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 var copyAttachment = cwOrderFromOrder.copyAttachment;
                                 var copyDelAddress = cwOrderFromOrder.copyDeliveryAddress;
                                 var dcOrder = cwOrderFromOrder.dcOrder;
+                                dcOrder._DeliveryDate = cwOrderFromOrder.DeliveryDate;
                                 var reCalPrice = cwOrderFromOrder.reCalculatePrice;
                                 var result = await orderApi.CreateOrderFromOrder(selectedItem, dcOrder, account, inversign, CopyAttachments: copyAttachment, CopyDeliveryAddress: copyDelAddress, RecalculatePrices: reCalPrice, OrderPerPurchaseAccount: perSupplier);
                                 busyIndicator.IsBusy = false;

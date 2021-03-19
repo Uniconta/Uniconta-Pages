@@ -105,7 +105,17 @@ namespace UnicontaClient.Pages.CustomPage
 #if !SILVERLIGHT
         private void Email_ButtonClicked(object sender)
         {
-            var mail = string.Concat("mailto:", txtEmail.Text);
+            OpenEmail(txtEmail.Text);
+        }
+
+        private void PrivateEmail_ButtonClicked(object sender)
+        {
+            OpenEmail(txtPrivateEmail.Text);
+        }
+
+        void OpenEmail(string email)
+        {
+            var mail = string.Concat("mailto:", email);
             System.Diagnostics.Process proc = new System.Diagnostics.Process();
             proc.StartInfo.FileName = mail;
             proc.Start();

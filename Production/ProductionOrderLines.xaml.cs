@@ -46,13 +46,7 @@ namespace UnicontaClient.Pages.CustomPage
         public override bool SingleBufferUpdate { get { return false; } }
         public override IComparer GridSorting { get { return new DCOrderLineSort(); } }
         public override string LineNumberProperty { get { return "_LineNumber"; } }
-        public override bool AllowSort
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public override bool AllowSort { get { return false; } }
         public override bool Readonly { get { return false; } }
         public override bool AddRowOnPageDown()
         {
@@ -482,6 +476,18 @@ namespace UnicontaClient.Pages.CustomPage
                 case "ProductionOrderLines":
                     if (selectedItem?.InvItem != null)
                         AddDockItem(TabControls.ProductionOrderLineReport, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ProductionLines"), selectedItem._Item));
+                    break;
+                case "InvStockProfile":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.InvStorageProfileReport, dgProductionOrderLineGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("StockProfile"), selectedItem._Item));
+                    break;
+                case "ViewPhoto":
+                    if (selectedItem?.InvItem != null && selectedItem?.Item != null)
+                        AddDockItem(TabControls.UserDocsPage, selectedItem.InvItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Documents"), selectedItem?.InvItem?._Name));
+                    break;
+                case "ViewNotes":
+                    if (selectedItem?.InvItem != null && selectedItem?.Item != null)
+                        AddDockItem(TabControls.UserNotesPage, selectedItem.InvItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Notes"), selectedItem?.InvItem?._Name));
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);

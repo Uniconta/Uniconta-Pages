@@ -23,6 +23,7 @@ using System.ComponentModel;
 using System.Reflection;
 using Uniconta.ClientTools.Controls;
 using System.Collections;
+using Uniconta.Common.Utility;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -90,7 +91,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 return CheckProperty(oldRecord, newRecord, IsNewValue, prop);
             }
-            StringBuilder values = null;
+            StringBuilderReuse values = null;
             string singleVal = null;
             foreach (var RecProperty in oldRecord.GetType().GetProperties())
             {
@@ -103,14 +104,14 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         if (values == null)
                         {
-                            values = new StringBuilder();
+                            values =  StringBuilderReuse.Create();
                             values.Append(singleVal);
                         }
                         values.Append(';').Append(val);
                     }
                 }
             }
-            return (values != null) ? values.ToString() : singleVal;
+            return (values != null) ? values.ToStringAndRelease() : singleVal;
         }
 
         string CheckProperty(UnicontaBaseEntity oldRecord, UnicontaBaseEntity newRecord, bool IsNewValue, PropertyInfo RecProperty)

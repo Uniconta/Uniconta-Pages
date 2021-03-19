@@ -56,6 +56,11 @@ namespace UnicontaClient.Pages.CustomPage
             var itm = (table as InvItem);
             if (itm != null)
                 key = itm._Item;
+            else if (table is IVariant)
+            {
+                var variantMaster = table as IVariant;
+                key = variantMaster.Item + "/" + variantMaster.Variant;
+            }
             else
             {
                 var bom = (table as InvBOM);
@@ -84,7 +89,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         public InvBOMPartOfPage(UnicontaBaseEntity master) : base(master)
         {
-            InitPage(); 
+            InitPage();
             setMaster(master);
         }
 
@@ -107,6 +112,15 @@ namespace UnicontaClient.Pages.CustomPage
             InvItem invItem = master as InvItem;
             if (invItem != null)
                 item = invItem._Item;
+            else if (master is IVariant)
+            {
+                var variantMaster = master as IVariant;
+                var items = api.GetCache(typeof(Uniconta.DataModel.InvItem));
+                if (variantMaster != null)
+                    invItem = items?.Get(variantMaster.Item) as InvItemClient;
+
+                item = invItem?._Item;
+            }
             else
             {
                 var bom = master as InvBOM;
@@ -120,7 +134,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         void setItem(string item)
-        { 
+        {
             if (item != null)
             {
                 MasterItem = item;

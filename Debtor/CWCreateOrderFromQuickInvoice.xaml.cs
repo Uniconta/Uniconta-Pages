@@ -160,6 +160,8 @@ namespace UnicontaClient.Pages.CustomPage
             if (invoiceLines == null || invoiceLines.Length == 0)
                 return;
 
+            Array.Sort(invoiceLines, new InvLineSort());
+
             offerlines.Capacity = invoiceLines.Length;
             int lineNo = 0;
             double sign = checkIfCreditNote ? -1d : 1d;
@@ -218,6 +220,8 @@ namespace UnicontaClient.Pages.CustomPage
             var invoiceLines = await api.Query<DebtorInvoiceLines>(invoice);
             if (invoiceLines == null || invoiceLines.Length == 0)
                 return;
+
+            Array.Sort(invoiceLines, new InvLineSort());
 
             orderlines.Capacity = invoiceLines.Length;
             int lineNo = 0;

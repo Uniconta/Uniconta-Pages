@@ -95,8 +95,8 @@ namespace UnicontaClient.Pages.CustomPage
             layoutControl = layoutItems;
             lePostingAccount.api = Employeelookupeditor.api = leAccount.api = lePayment.api = cmbDim1.api
                 = leTransType.api = cmbDim2.api = cmbDim3.api = cmbDim4.api = cmbDim5.api = leGroup.api = leShipment.api =
-                PrCategorylookupeditor.api = Projectlookupeditor.api = leApprover.api = leDeliveryTerm.api = leInvoiceAccount.api =
-                PriceListlookupeditior.api = leRelatedOrder.api = leLayoutGroup.api = leVat.api= crudapi;
+                PrCategorylookupeditor.api = Projectlookupeditor.api = leApprover.api = leDeliveryTerm.api = leInvoiceAccount.api = 
+                PriceListlookupeditior.api = leRelatedOrder.api = leLayoutGroup.api = leVat.api= prTasklookupeditor.api = crudapi;
             cbDeliveryCountry.ItemsSource = Enum.GetValues(typeof(Uniconta.Common.CountryCode));
             if (editrow == null)
             {
@@ -202,17 +202,23 @@ namespace UnicontaClient.Pages.CustomPage
             if (!Comp.DeliveryAddress)
                 dAddress.Visibility = Visibility.Collapsed;
             if (!Comp.Project)
-            {
-                liProject.Visibility = Visibility.Collapsed;
-                liPrCategory.Visibility = Visibility.Collapsed;
-            }
+                grpProject.Visibility = Visibility.Collapsed;
             if (!Comp.Shipments)
                 itemShipment.Visibility = Visibility.Collapsed;
             if (!Comp.ApprovePurchaseOrders)
                 grpApproval.Visibility = Visibility.Collapsed;
             if (!Comp.SetupSizes)
                 grpSize.Visibility = Visibility.Collapsed;
+
+            if (!Comp.ProjectTask)
+                projectTask.Visibility = Visibility.Collapsed;
+            else if (editrow?._Project != null)
+            {
+                var project = Comp.GetCache(typeof(Uniconta.DataModel.Project))?.Get(editrow._Project) as ProjectClient;
+                setTask(project);
+            }
         }
+
         public override bool BeforeSetUserField(ref CorasauLayoutGroup parentGroup)
         {
             parentGroup = lastGroup;
@@ -366,15 +372,9 @@ namespace UnicontaClient.Pages.CustomPage
             var loadedOrder = LoadedRow as DCOrder;
             if (loadedOrder?._DCAccount == creditor._Account)
                 return;
-            editrow.Account = creditor._Account;
-            editrow.SetCurrency(creditor._Currency);
-            editrow.Payment = creditor._Payment;
-            editrow.EndDiscountPct = creditor._EndDiscountPct;
-            editrow.PostingAccount = creditor._PostingAccount;
-            editrow._PaymentMethod = creditor._PaymentMethod;
-            editrow.Shipment = creditor._Shipment;
-            editrow.DeliveryTerm = creditor._DeliveryTerm;
             editrow.SetMaster(creditor);
+            layoutItems.DataContext = null;
+            layoutItems.DataContext = editrow;
             if (!RecordLoadedFromTemplate || creditor._DeliveryAddress1 != null)
             {
                 editrow.DeliveryName = creditor._DeliveryName;
@@ -411,6 +411,31 @@ namespace UnicontaClient.Pages.CustomPage
                 editrow._ContactRef = 0;
                 editrow.ContactName = null;
             }
+        }
+
+        private void Projectlookupeditor_SelectedIndexChanged(object sender, RoutedEventArgs e)
+        {
+            var selectedItem = Projectlookupeditor.SelectedItem as ProjectClient;
+            setTask(selectedItem);
+        }
+
+        async private void setTask(ProjectClient master)
+        {
+            if (api.CompanyEntity.ProjectTask)
+            {
+                if (master != null)
+                    editrow.taskSource = master.Tasks ?? await master.LoadTasks(api);
+                else
+                    editrow.taskSource = api.GetCache(typeof(Uniconta.DataModel.ProjectTask));
+                editrow.NotifyPropertyChanged("TaskSource");
+                prTasklookupeditor.ItemsSource = editrow.TaskSource;
+            }
+        }
+
+        private void prTasklookupeditor_GotFocus(object sender, RoutedEventArgs e)
+        {
+            var selectedItem = Projectlookupeditor.SelectedItem as ProjectClient;
+            setTask(selectedItem);
         }
 
 #if !SILVERLIGHT

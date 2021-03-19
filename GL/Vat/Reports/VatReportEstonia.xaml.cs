@@ -895,7 +895,6 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 Encoding = Encoding.UTF8
             };
-            StringBuilder sb = new StringBuilder();
 
             var mainDeclaration = GenerateDeclaration(fromDate, toDate, reportLines, noSales, noPurchases);
             XmlWriter xmlWriter = XmlWriter.Create(sfd, xmlWriterSettings);

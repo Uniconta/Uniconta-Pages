@@ -39,13 +39,16 @@ namespace UnicontaClient.Pages.CustomPage
         }
         public override void SetDefaultValues(UnicontaBaseEntity dataEntity, int selectedIndex)
         {
+            var newRow = (DCOrderLine)dataEntity;
             var last = (this.ItemsSource as IEnumerable<ProductionOrderLineClient>)?.LastOrDefault();
             if (last != null)
             {
-                var newRow = (DCOrderLine)dataEntity;
                 newRow._Date = last._Date;
                 newRow._OrderNumber = last._OrderNumber;
+                newRow._Storage = last._Storage;
             }
+            else
+                newRow._Storage = StorageRegister.Move;
         }
     }
     /// <summary>
@@ -151,6 +154,8 @@ namespace UnicontaClient.Pages.CustomPage
                 PrCategory.Visible = PrCategory.ShowInColumnChooser = false;
                 Project.Visible = Project.ShowInColumnChooser = false;
             }
+            else
+                PrCategory.ShowInColumnChooser = Project.ShowInColumnChooser = true;
             if (!company.Storage)
             {
                 Storage.Visible = Storage.ShowInColumnChooser = false;
@@ -158,14 +163,25 @@ namespace UnicontaClient.Pages.CustomPage
             }
             else if (!company._OrderLineEditDelivered)
                 QtyDelivered.Visible = QtyDelivered.ShowInColumnChooser = false;
+            else
+                Storage.ShowInColumnChooser = QtyDelivered.ShowInColumnChooser = true;
             if (!company.Location || !company.Warehouse)
                 Location.Visible = Location.ShowInColumnChooser = false;
+            else
+                Location.ShowInColumnChooser = true;
             if (!company.Warehouse)
                 Warehouse.Visible = Warehouse.ShowInColumnChooser = false;
+            else
+                Warehouse.ShowInColumnChooser = true;
             if (!company.SerialBatchNumbers)
                 SerieBatch.Visible = SerieBatch.ShowInColumnChooser = false;
-
+            else
+                SerieBatch.ShowInColumnChooser = true;
+#if !SILVERLIGHT
+            Utility.SetupVariants(api, colVariant, VariantName, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
+#else
             Utility.SetupVariants(api, colVariant, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
+#endif
             Utility.SetDimensionsGrid(api, colDim1, colDim2, colDim3, colDim4, colDim5);
         }
         private void ProductionMultiOrderLine_CurrentItemChanged(object sender, DevExpress.Xpf.Grid.CurrentItemChangedEventArgs e)

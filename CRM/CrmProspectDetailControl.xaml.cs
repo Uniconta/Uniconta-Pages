@@ -35,7 +35,6 @@ namespace UnicontaClient.Pages.CustomPage
                     usedim.Visibility = Visibility.Collapsed;
                 else
                     Utility.SetDimensions(api, lbldim1, lbldim2, lbldim3, lbldim4, lbldim5, dim1lookupeditior, dim2lookupeditior, dim3lookupeditior, dim4lookupeditior, dim5lookupeditior, usedim);
-                setUserFields();
             }
         }
 
@@ -55,14 +54,6 @@ namespace UnicontaClient.Pages.CustomPage
                 if (Operation != 3)
                     layoutItems.DataContext = dataContext;
             }
-        }
-        void setUserFields()
-        {
-            var row = new CrmProspectClient();
-            row.SetMaster(api.CompanyEntity);
-            var UserFieldDef = row.UserFieldDef();
-            if (UserFieldDef != null)
-                UserFieldControl.CreateUserFieldOnPage2(layoutItems, UserFieldDef, (RowIndexConverter)this.Resources["RowIndexConverter"], this.api, this, true, lastGroup);
         }
 
 #if !SILVERLIGHT

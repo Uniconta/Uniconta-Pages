@@ -32,19 +32,8 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
         public void SharedCodeForCreateBankFormatFields(Company company, CreditorTransPayment tran, CreditorPaymentFormat paymentFormat, BankStatement bankAccount, DanishFormatFieldBase danishFields)
         {
             danishFields.TransferDate = tran.PaymentDate;
-
-            Currencies curr;
-            bool isCurrency = Enum.TryParse(tran._CurrencyLocal, true, out curr);
-
-            if (isCurrency && !string.IsNullOrWhiteSpace(tran.CurrencyLocal))
-            {
-                danishFields.Currency = curr;
-            }
-            else
-            {
-                danishFields.Currency = bankAccount._Currency != 0 ? (Currencies)bankAccount._Currency : company._CurrencyId;
-            }
-
+            danishFields.Currency = tran.Trans._Currency != 0 ? (Currencies)tran.Trans._Currency : company._CurrencyId;
+            
             var regNum = bankAccount._BankAccountPart1 ?? string.Empty;
             var bban = bankAccount._BankAccountPart2 ?? string.Empty;
             

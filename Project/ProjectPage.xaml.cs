@@ -279,6 +279,10 @@ namespace UnicontaClient.Pages.CustomPage
                 case "UndoDelete":
                     dgProjectGrid.UndoDeleteRow();
                     break;
+                case "ProjectEmployee":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.ProjectEmployeePage, dgProjectGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Employees"), selectedItem._Name ?? salesHeader));
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -290,7 +294,7 @@ namespace UnicontaClient.Pages.CustomPage
 #if SILVERLIGHT
             var cwCreateOrder = new CWCreateOrderFromProject(api);
 #else
-            var cwCreateOrder = new UnicontaClient.Pages.CWCreateOrderFromProject(api);
+            var cwCreateOrder = new UnicontaClient.Pages.CWCreateOrderFromProject(api, true, selectedItem);
             cwCreateOrder.DialogTableId = 2000000053;
 #endif
             cwCreateOrder.Closed += async delegate
@@ -303,7 +307,7 @@ namespace UnicontaClient.Pages.CustomPage
                      var debtorOrderInstance = api.CompanyEntity.CreateUserType<DebtorOrderClient>();
                      var invoiceApi = new Uniconta.API.Project.InvoiceAPI(api);
                      var result = await invoiceApi.CreateOrderFromProject(debtorOrderInstance, selectedItem._Number, CWCreateOrderFromProject.InvoiceCategory, CWCreateOrderFromProject.GenrateDate,
-                         CWCreateOrderFromProject.FromDate, CWCreateOrderFromProject.ToDate);
+                         CWCreateOrderFromProject.FromDate, CWCreateOrderFromProject.ToDate, cwCreateOrder.ProjectTask);
                      busyIndicator.IsBusy = false;
                      if (result != ErrorCodes.Succes)
                      {
@@ -434,7 +438,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (selectedItem == null)
                 return;
             var project = Activator.CreateInstance(selectedItem.GetType()) as ProjectClient;
-            StreamingManager.Copy(selectedItem, project);
+            CorasauDataGrid.CopyAndClearRowId(selectedItem, project);
             var parms = new object[2] { project, false };
             AddDockItem(TabControls.ProjectPage2, parms, Uniconta.ClientTools.Localization.lookup("Project"), "Add_16x16.png");
         }

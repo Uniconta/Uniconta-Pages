@@ -60,17 +60,22 @@ namespace UnicontaClient.Pages.CustomPage
             dgVatReport.api = api;
             SetRibbonControl(localMenu, dgVatReport);
             localMenu.dataGrid = dgVatReport;
-            localMenu.OnItemClicked += localMenu_OnItemClicked;   
+            localMenu.OnItemClicked += localMenu_OnItemClicked;
+            dgVatReport.RowDoubleClick += DgVatReport_RowDoubleClick;
             gridControl.BusyIndicator = busyIndicator;
             //this.Loaded += VatReport_Loaded;
-            var FromDate = DateTime.Today;
+            var FromDate = GetSystemDefaultDate();
             FromDate = FromDate.AddDays(1 - FromDate.Day); // first day in current month
             txtDateFrm.DateTime = FromDate;
-
             var ToDate = FromDate.AddMonths(1);
             ToDate = ToDate.AddDays(-ToDate.Day); // last day in current month
             txtDateTo.DateTime = ToDate;
             SetMenuItem();
+        }
+
+        private void DgVatReport_RowDoubleClick()
+        {
+            localMenu_OnItemClicked("Transactions");
         }
 
         public override Task InitQuery()
@@ -270,8 +275,7 @@ namespace UnicontaClient.Pages.CustomPage
             FinancialBalance[] sumVat = await vatTask;
             Array.Sort(sumVat, new AccountSorter());
 
-            List<int> AccLst = new List<int>();
-            List<VatReportLine> lst = new List<VatReportLine>();
+            List<VatReportLine> lst = new List<VatReportLine>(sumVat.Length);
 
             int decm = 2;
             var RoundTo100 = Comp.RoundTo100;
@@ -281,13 +285,20 @@ namespace UnicontaClient.Pages.CustomPage
                 decm = 0;
             }
 
+            var AccsFound = new HashSet<int>();
+            GLAccount Account;
+            GLVat Vat;
+            int i;
             bool HasOffsetType0 = false, HasOffsetType1 = false;
             int PrevAccount = 0;
-            foreach (var sum in sumVat)
+            for (i = 0; (i < sumVat.Length); i++)
             {
-                var Account = (GLAccount)accounts.Get(sum.AccountRowId);
+                var sum = sumVat[i];
+                Account = (GLAccount)accounts.Get(sum.AccountRowId);
                 if (Account == null) // || Account._SystemAccount == (byte)SystemAccountTypes.SalesTaxOffset)
                     continue;
+                //if (sum._Debit == 0 && sum._Credit == 0)
+                //    continue;
 
                 var acStr = Account._Account;
                 VatReportLine v = new VatReportLine();
@@ -298,8 +309,8 @@ namespace UnicontaClient.Pages.CustomPage
                 v.AccountNumber = acStr;
                 v.Account = Account;
                 v.AccountIsVat = Account._SystemAccount == (byte)SystemAccountTypes.SalesTaxPayable || Account._SystemAccount == (byte)SystemAccountTypes.SalesTaxReceiveable ? (byte)1 : (byte)0;
-
-                var Vat = (GLVat)vats.Get(sum.VatRowId);
+ 
+                Vat = (GLVat)vats.Get(sum.VatRowId);
                 if (Vat == null)
                     continue;
 
@@ -366,24 +377,33 @@ namespace UnicontaClient.Pages.CustomPage
                 if (PrevAccount != sum.AccountRowId)
                 {
                     PrevAccount = sum.AccountRowId;
-                    AccLst.Add(sum.AccountRowId);
+                    AccsFound.Add(sum.AccountRowId);
                 }
             }
+
+            foreach (var acc in (GLAccount[])accounts.GetNotNullArray)
+            {
+                if (acc._Vat != null)
+                    AccsFound.Add(acc.RowId);
+            }
+
+            List<int> AccLst = AccsFound.ToList();
+            AccsFound.Clear();
 
             FinancialBalance[] AccTotals = await rapi.GenerateTotal(AccLst, FromDate, ToDate, null, null, 0, true, false);
             SQLCacheTemplate<FinancialBalance> AccLookup = null;
             if (AccTotals != null && AccTotals.Length > 0)
                 AccLookup = new SQLCacheTemplate<FinancialBalance>(AccTotals, false);
 
-            var arr = lst.ToArray();
-            Array.Sort(arr, new VatAccountSort());
+            lst.Sort(new VatAccountSort());
 
+            FinancialBalance AccTotal;
             int AccountRowId = 0;
             double AmountDif = 0d;
             VatReportLine vDif = new VatReportLine();
-            for (int i = arr.Length; (--i >= 0); )
+            for (i = lst.Count; (--i >= 0); )
             {
-                var v = arr[i];
+                var v = lst[i];
                 if (v.Account.RowId != AccountRowId)
                 {
                     if (AmountDif > 0.005d || AmountDif < -0.005d)
@@ -394,11 +414,13 @@ namespace UnicontaClient.Pages.CustomPage
                     }
 
                     AccountRowId = v.Account.RowId;
-                    var AccTotal = AccLookup?.Get(AccountRowId);
+                    AccTotal = AccLookup?.Get(AccountRowId);
                     if (AccTotal != null)
-                        AmountDif = AccTotal.Debit - AccTotal.Credit;
+                        AmountDif = (AccTotal._Debit - AccTotal._Credit) / 100d;
                     else
                         AmountDif = 0d;
+
+                    AccsFound.Add(AccountRowId);
                 }
                 AmountDif -= v.AmountWithVat;
                 vDif.Account = v.Account;
@@ -413,6 +435,32 @@ namespace UnicontaClient.Pages.CustomPage
                 vDif.AmountWithout = GLVat.Round(AmountDif);
                 lst.Add(vDif);
             }
+
+            if (AccLookup != null)
+            {
+                // Add account, that has a VAT-code but no transactios with VAT.
+                for (i = 0; (i < AccTotals.Length); i++)
+                {
+                    AccTotal = AccTotals[i];
+                    if (!AccsFound.Contains(AccTotal.RowId) && (AccTotal._Debit - AccTotal._Credit) != 0)
+                    {
+                        Account = (GLAccount)accounts.Get(AccTotal.RowId);
+                        if (Account?._Vat == null)
+                            continue;
+                        Vat = (GLVat)vats.Get(Account._Vat);
+                        if (Vat == null)
+                            continue;
+
+                        vDif = new VatReportLine();
+                        vDif.AmountWithout = (AccTotal._Debit - AccTotal._Credit) / 100d;
+                        vDif.Account = Account;
+                        vDif.AccountNumber = Account._Account;
+                        vDif.VatType = (byte)Vat._VatType;
+                        lst.Add(vDif);
+                    }
+                }
+            }
+
             vDif = null;
 
             for (int k = 0; (k < 4); k++)
@@ -455,9 +503,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
             vDif = null;
 
-            arr = lst.ToArray();
-            Array.Sort(arr, new VatTotalsSort());
-            int l = arr.Length;
+            lst.Sort(new VatTotalsSort());
             double d1 = 0d, d2 = 0d, d3 = 0d, d4 = 0d;
 
             double[] VatOperationValues = new double[256];
@@ -468,9 +514,9 @@ namespace UnicontaClient.Pages.CustomPage
 
             VatSumOperationReport[] vatReportSum = new VatSumOperationReport[127];
 
-            for (int i = 0; (i < l); i++)
+            for (i = 0; (i < lst.Count); i++)
             {
-                var v = arr[i];
+                var v = lst[i];
 
                 if (v.Order == 1) // total
                 {
@@ -533,8 +579,6 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                 }
             }
-
-            lst = arr.ToList();
 
             vDif = new VatReportLine();
             vDif.Text = string.Format("{0}: {1}, {2}", Uniconta.ClientTools.Localization.lookup("FinalVatStatus"), Uniconta.ClientTools.Localization.lookup("AmountBase"), Uniconta.ClientTools.Localization.lookup("VATamount"));
@@ -622,7 +666,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (AccTotals != null && AccTotals.Length > 0)
                     {
                         var otherTaxList = new ReportDataDenmark[AccTotals.Length];
-                        int i = 14;
+                        i = 14;
                         foreach (var acTot in AccTotals)
                         {
                             var Acc = accounts.Get(acTot.AccountRowId);
@@ -641,7 +685,7 @@ namespace UnicontaClient.Pages.CustomPage
                 }
             }
 
-            for (int i = vatReportSumSize + 1; (--i >= 1);)
+            for (i = vatReportSumSize + 1; (--i >= 1);)
                 if (vatReportSum[i] == null)
                     vatReportSum[i] = new VatSumOperationReport() { _Line = i };
 

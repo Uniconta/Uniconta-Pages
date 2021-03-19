@@ -38,6 +38,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOfferLines"
                             </DataTemplate>
                         </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                     </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colNote" FieldName="Note" Width="150" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Item" Width="100" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant" FieldName="Variant">
                         <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
@@ -104,6 +105,19 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOfferLines"
                     </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Currency" Width="35" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CostPrice" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Warehouse" Width="100"/>
+                    <localPage:CorasauDataGridForeignKeyColumnClient x:Name="Location" Width="100">
+                        <localPage:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <TextBlock Margin="2" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.Location,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"></TextBlock>
+                            </ControlTemplate>
+                        </localPage:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
+                        <localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <localPage:CorasauGridLookupEditorClient HasCustomLookUp="true" GotFocus="PART_Editor_GotFocus" x:Name="PART_Editor" ItemsSource="{Binding DataContext.RowData.Row.LocationSource,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" />
+                            </DataTemplate>
+                        </localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
+                    </localPage:CorasauDataGridForeignKeyColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="IsMarked" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="IgnoreBlocked" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ReferenceNumber" Width="70" Visible="False"/>

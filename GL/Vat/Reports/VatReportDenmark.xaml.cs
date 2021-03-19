@@ -65,6 +65,9 @@ namespace UnicontaClient.Pages.CustomPage
             link.PageHeaderData = ReportHeaderDataContext;
             link.PageHeaderTemplate = PageHeaderTemplate;
             link.DetailTemplate = DetailTemplate;
+#if !SILVERLIGHT
+            link.PaperKind = System.Drawing.Printing.PaperKind.A4;
+#endif
             link.DetailCount = 1;
             link.CreateDetail += link_CreateDetail;
             return link;
@@ -78,12 +81,12 @@ namespace UnicontaClient.Pages.CustomPage
 
     public partial class VatReportDenmark : BasePage
     {
-       
+
         public override string NameOfControl
         {
             get { return TabControls.VatReportDenmark; }
         }
-        
+
         public VatReportDenmark(CrudAPI api, List<VatSumOperationReport> vatSumOperationLst, DateTime fromDate, DateTime toDate)
         {
             InitializeComponent();
@@ -95,7 +98,7 @@ namespace UnicontaClient.Pages.CustomPage
             var OtherTaxName = new string[10];
             data.OtherTaxName = OtherTaxName;
 
-            foreach(var rec in vatSumOperationLst)
+            foreach (var rec in vatSumOperationLst)
             {
                 if (rec == null)
                     continue;
@@ -138,8 +141,8 @@ namespace UnicontaClient.Pages.CustomPage
 
     public class ReportDataDenmark
     {
-        public string VatPeriode { get;set; }
-        public string CompanyInfo { get;set; }
+        public string VatPeriode { get; set; }
+        public string CompanyInfo { get; set; }
         public string CompanyRegNr { get; set; }
         public double[] VatArray { get; set; }
         public string[] OtherTaxName { get; set; }

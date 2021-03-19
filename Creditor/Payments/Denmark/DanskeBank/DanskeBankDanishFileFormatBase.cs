@@ -62,7 +62,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
                     break;
             }
 
-            danishFields.Amount = Math.Round(tran._PaymentAmount, 2);
+            danishFields.Amount = Math.Round(tran.PaymentAmount, 2);
 
             danishFields.ClearingTypeChannel = "N";
 

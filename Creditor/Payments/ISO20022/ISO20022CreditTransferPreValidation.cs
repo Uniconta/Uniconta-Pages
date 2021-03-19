@@ -107,10 +107,10 @@ namespace ISO20022CreditTransfer
         /// <summary>
         /// Pre-validate general settings before generating the payment file in the XML format Credit Transfer ISO20022 pain003.
         /// </summary>
-        /// <param name="xxx">xxx.</param> //TODO:Mangler at specificere parametre
+        /// <param name="xxx">xxx.</param> 
         /// <param name="xxx">xxx.</param>
         /// <returns>An XML payment file</returns>
-        public XMLDocumentGenerateResult PreValidateISO20022(Company company, SQLCache bankAccountCache, CreditorPaymentFormat credPaymFormat, bool schemaValidation = true)
+        public XMLDocumentGenerateResult PreValidateISO20022(Company company, SQLCache bankAccountCache, CreditorPaymentFormat credPaymFormat, bool glJournalGenerated = false, bool schemaValidation = true)
         {
             XmlDocument dummyDoc = new XmlDocument();
 
@@ -134,6 +134,9 @@ namespace ISO20022CreditTransfer
 
                     formatTypeISO = paymentformat == ExportFormatType.ISO20022_DK || paymentformat == ExportFormatType.ISO20022_NL || paymentformat == ExportFormatType.ISO20022_NO ||
                                     paymentformat == ExportFormatType.ISO20022_DE || paymentformat == ExportFormatType.ISO20022_SE || paymentformat == ExportFormatType.ISO20022_UK || paymentformat == ExportFormatType.ISO20022_LT;
+
+                    if (glJournalGenerated && formatTypeISO) 
+                        PreCheckErrors.Add(new PreCheckError(string.Format("Payment format '{0}' is not available for GL Journal generated payments", credPaymFormat._ExportFormat))); //TODO:Opret label
 
                     CompanyBankName(paymentformat);
                     CustomerIdentificationId(bankAccount._BankCompanyId, paymentformat);

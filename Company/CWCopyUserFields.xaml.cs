@@ -189,7 +189,8 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (masterList.Count == 0)
                 return;
-
+            if (cbtable.SelectedItem == null)
+                return; 
             var list = await newapi.Query<CustomTableFieldsClient>(masterList, null);
             if (list != null)
             {

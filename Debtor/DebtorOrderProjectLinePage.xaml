@@ -21,7 +21,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrderProjectLinePage"
                 <local:DebtorOrderProjectLineGrid.Columns>
                     <local:CorasauDataGridTemplateColumnClient FieldName="Name"  Width="90"  Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient FieldName="Account" Width="90"  Visible="False"/>
-                    <local:CorasauDataGridTemplateColumnClient FieldName="Date" x:Name="colDate" Width="90" />
+                    <local:CorasauDataGridTemplateColumnClient FieldName="Date" x:Name="colDate" Width="90" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Project" Width="80" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Item" Width="80" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="ItemName" Width="120" Visible="False"/>

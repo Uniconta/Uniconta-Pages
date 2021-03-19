@@ -29,11 +29,13 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryTransactions"
             <localPage:InvTransactionGrid  x:Name="dgInvTransGrid" AutoGenerateColumns="None">
                 <localPage:InvTransactionGrid.Columns>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Item" Width="100"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant1" IsEditSettingSet="True" FieldName="Variant1" Width="80" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant2" IsEditSettingSet="True" FieldName="Variant2" Width="80" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant3" IsEditSettingSet="True" FieldName="Variant3" Width="80" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant4" IsEditSettingSet="True" FieldName="Variant4" Width="80" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant5" IsEditSettingSet="True" FieldName="Variant5" Width="80" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant" IsEditSettingSet="True" FieldName="Variant" Width="80" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="VariantName" Width="100" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant1" IsEditSettingSet="True" FieldName="Variant1" Width="80" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant2" IsEditSettingSet="True" FieldName="Variant2" Width="80" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant3" IsEditSettingSet="True" FieldName="Variant3" Width="80" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant4" IsEditSettingSet="True" FieldName="Variant4" Width="80" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant5" IsEditSettingSet="True" FieldName="Variant5" Width="80" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Variant1Name" Width="100" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Variant2Name" Width="100" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Variant3Name" Width="100" Visible="False"/>

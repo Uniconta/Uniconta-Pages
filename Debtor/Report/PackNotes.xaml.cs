@@ -206,11 +206,22 @@ namespace UnicontaClient.Pages.CustomPage
                 var failedPrints = new List<long>();
                 var count = invoicesList.Count;
                 string dockName = null, reportName = null;
+                bool exportAsPdf = false;
+                System.Windows.Forms.FolderBrowserDialog folderDialogSaveInvoice = null;
 
                 if (count > 1)
                 {
-                    dockName = string.Concat(Uniconta.ClientTools.Localization.lookup("ShowPrint"), ":", Uniconta.ClientTools.Localization.lookup("Packnote"));
-                    reportName = Uniconta.ClientTools.Localization.lookup("Packnote");
+                    if (count > StandardPrintReportPage.MAX_PREVIEW_REPORT_LIMIT)
+                    {
+                        var confirmMsg = string.Format(Uniconta.ClientTools.Localization.lookup("PreivewRecordsExportMsg"), count);
+                        if (UnicontaMessageBox.Show(confirmMsg, Uniconta.ClientTools.Localization.lookup("Confirmation"), MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                            exportAsPdf = true;
+                    }
+                    else
+                    {
+                        dockName = string.Concat(Uniconta.ClientTools.Localization.lookup("ShowPrint"), ":", Uniconta.ClientTools.Localization.lookup("Packnote"));
+                        reportName = Uniconta.ClientTools.Localization.lookup("Packnote");
+                    }
                 }
 #elif SILVERLIGHT
                 int top = 200, left = 300;
@@ -228,10 +239,30 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         if (count > 1 && isGeneratingPacknote)
                         {
-                            if (standardViewerPrintPage == null)
-                                standardViewerPrintPage = dockCtrl.AddDockItem(api?.CompanyEntity, TabControls.StandardPrintReportPage, ParentControl, new object[] { printReport, reportName }, dockName) as StandardPrintReportPage;
+                            if (exportAsPdf)
+                            {
+                                string docName = Uniconta.ClientTools.Localization.lookup("Packnote");
+                                var docNumber = debtInvoice._PackNote;
+                                string directoryPath = string.Empty;
+                                if (folderDialogSaveInvoice == null)
+                                {
+                                    folderDialogSaveInvoice = UtilDisplay.LoadFolderBrowserDialog;
+                                    var dialogResult = folderDialogSaveInvoice.ShowDialog();
+                                    if (dialogResult == System.Windows.Forms.DialogResult.OK || dialogResult == System.Windows.Forms.DialogResult.Yes)
+                                        directoryPath = folderDialogSaveInvoice.SelectedPath;
+                                }
+                                else
+                                    directoryPath = folderDialogSaveInvoice.SelectedPath;
+
+                                Utility.ExportReportAsPdf(printReport.Report, directoryPath, docName, docNumber.ToString());
+                            }
                             else
-                                standardViewerPrintPage.InsertToMasterReport(printReport.Report);
+                            {
+                                if (standardViewerPrintPage == null)
+                                    standardViewerPrintPage = dockCtrl.AddDockItem(api?.CompanyEntity, TabControls.StandardPrintReportPage, ParentControl, new object[] { printReport, reportName }, dockName) as StandardPrintReportPage;
+                                else
+                                    standardViewerPrintPage.InsertToMasterReport(printReport.Report);
+                            }
                         }
                         else
                         {

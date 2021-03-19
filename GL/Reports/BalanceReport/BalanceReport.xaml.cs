@@ -160,6 +160,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         public int[] DimArry;
         public bool PageBreak { get { return Acc._PageBreak; } }
+        public bool Hide { get { return Acc._HideInBalance; } }
 
         public bool UseExternal { get { return _UseExternal; } }
 
@@ -274,8 +275,7 @@ namespace UnicontaClient.Pages.CustomPage
             this.dim3details = PassedCriteria.dim3details;
             this.dim4details = PassedCriteria.dim4details;
             this.dim5details = PassedCriteria.dim5details;
-            CriteriaLst = new List<SelectedCriteria>();
-            CriteriaLst.AddRange(PassedCriteria.selectedCriteria);
+            CriteriaLst = new List<SelectedCriteria>(PassedCriteria.selectedCriteria);
             this.AppliedTemplate = PassedCriteria.Template;
             if (string.IsNullOrWhiteSpace(this.AppliedTemplate))
                 this.AppliedTemplate = null;
@@ -485,10 +485,13 @@ namespace UnicontaClient.Pages.CustomPage
         async void GenerateBalance()
         {
             busyIndicator.IsBusy = true;
-            var Cache = api.GetCache(typeof(GLAccount)) ?? await api.LoadCache(typeof(GLAccount));
+            var Cache = api.GetCache(typeof(GLAccount)) ?? api.LoadCache(typeof(GLAccount)).GetAwaiter().GetResult();
+            if (balanceClient.Capacity == 0)
+                balanceClient.Capacity = Cache.Count;
 
-            var CriteriaList = CriteriaLst;
-            int k;
+            var CriteriaList = this.CriteriaLst;
+            SelectedCriteria Crit;
+            int k, c;
 
             bool CalcFound = false;
             for (k = CriteriaList.Count; (--k >= 0);)
@@ -506,7 +509,7 @@ namespace UnicontaClient.Pages.CustomPage
             bool hiddenFound = false;
             for (k = 0; (k < CriteriaList.Count); k++)
             {
-                var Crit = CriteriaList[k];
+                Crit = CriteriaList[k];
                 if (Crit._Hide)
                 {
                     hiddenFound = true;
@@ -526,7 +529,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (method == BalanceColumnMethod.FromTrans || method == BalanceColumnMethod.OnlyJournals)
                     {
                         inTrans = true;
-                        tsk = tranApi.GenerateTotal(null, Crit.frmdateval, Crit.todateval, Crit.journal, dimParams, Crit.forCompany != null ? Crit.forCompany.CompanyId : 0, false, method == BalanceColumnMethod.OnlyJournals);
+                        tsk = tranApi.GenerateTotal(null, Crit.frmdateval, Crit.todateval, Crit.journal, dimParams, Crit.forCompany != null ? Crit.forCompany.CompanyId : 0, !Crit.InclPrimo, method == BalanceColumnMethod.OnlyJournals);
                     }
                     else if (method == BalanceColumnMethod.TransQty)
                     {
@@ -542,8 +545,8 @@ namespace UnicontaClient.Pages.CustomPage
                     if (bal != null)
                     {
                         var balance = tranApi.Format(bal, Cache);
-                        foreach (BalanceHeader finbal in balance)
-                            CreateBalanceRow(finbal, Cols, first);
+                        for (c = 0; (c < balance.Length); c++)
+                            CreateBalanceRow(balance[c], Cols, first);
                     }
                     else
                     {
@@ -558,6 +561,9 @@ namespace UnicontaClient.Pages.CustomPage
             }
             ShowColumns();
             List<BalanceClient> BalanceList;
+            BalanceClient col;
+            long[] amount;
+            long d;
             if (AppliedTemplate != null)
                 BalanceList = await GenerateTemplateGrid(Cols);
             else
@@ -573,7 +579,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 for (k = 0; (k < CriteriaList.Count); k++)
                 {
-                    var Crit = CriteriaList[k];
+                    Crit = CriteriaList[k];
                     var ColA = Crit.colA - 1;
                     var ColB = Crit.colB - 1;
                     var Method = Crit.balcolMethod;
@@ -591,47 +597,63 @@ namespace UnicontaClient.Pages.CustomPage
                         var Acc100 = Crit.Account100;
                         if (!string.IsNullOrEmpty(Acc100))
                         {
-                            var Sum100 = (from col in balanceClient where col.AccountNo == Acc100 select col.amount[ColA]).Sum(); // here we use the original balanceClient
+                            long Sum100 = 0;
+                            for (c = 0; (c < BalanceList.Count); c++)
+                            {
+                                col = BalanceList[c];
+                                if (col.AccountNo == Acc100)
+                                    Sum100 += col.amount[ColA];
+                            }
+
                             if (Sum100 != 0)
                             {
-                                foreach (var col in BalanceList)
-                                    col.amount[k] = Math.Abs(10000 * col.amount[ColA] / Sum100);
+                                var half = Math.Abs(Sum100) >> 1;
+                                for (c = 0; (c < BalanceList.Count); c++)
+                                {
+                                    amount = BalanceList[c].amount;
+                                    d = 10000 * amount[ColA];
+                                    if (d > 0)
+                                        d += half;
+                                    else
+                                        d -= half;
+                                    amount[k] = Math.Abs(d / Sum100);
+                                }
                             }
                         }
                     }
                     else if ((Method > BalanceColumnMethod.FromBudget && Method < BalanceColumnMethod.OnlyJournals) && ColA >= 0 && ColA < Cols && ColB >= 0 && ColB < Cols)
                     {
-                        foreach (var col in BalanceList)
+                        for (c = 0; (c < BalanceList.Count); c++)
                         {
-                            long d;
+                            amount = BalanceList[c].amount;
                             switch (Method)
                             {
                                 case BalanceColumnMethod.ColAMinusColB:
-                                    d = col.amount[ColA] - col.amount[ColB];
+                                    d = amount[ColA] - amount[ColB];
                                     break;
                                 case BalanceColumnMethod.ColAPlusColB:
-                                    d = col.amount[ColA] + col.amount[ColB];
+                                    d = amount[ColA] + amount[ColB];
                                     break;
                                 case BalanceColumnMethod.ColAMinusColBDivColB:
-                                    d = col.amount[ColB];
+                                    d = amount[ColB];
                                     if (d != 0)
-                                        d = 10000 * (col.amount[ColA] - d) / d;  // has to be 10000 since it is in cent
+                                        d = 10000 * (amount[ColA] - d) / d;  // has to be 10000 since it is in cent
                                     break;
                                 case BalanceColumnMethod.ColAMinusColBDivColBPct:
-                                    d = col.amount[ColB];
+                                    d = amount[ColB];
                                     if (d != 0)
-                                        d = 10000 + 10000 * (col.amount[ColA] - d) / d;  // has to be 10000 since it is in cent
+                                        d = 10000 + 10000 * (amount[ColA] - d) / d;  // has to be 10000 since it is in cent
                                     break;
                                 case BalanceColumnMethod.SumAtoB:
                                     d = 0;
                                     for (int j = ColA; j <= ColB; j++)
-                                        d += col.amount[j];
+                                        d += amount[j];
                                     break;
                                 default:
                                     d = 0;
                                     break;
                             }
-                            col.amount[k] = d;
+                            amount[k] = d;
                         }
                     }
                 }
@@ -644,25 +666,35 @@ namespace UnicontaClient.Pages.CustomPage
                     if (CriteriaList[k]._Hide)
                     {
                         CriteriaList.RemoveAt(k);
-                        foreach (var col in BalanceList)
-                            col.RemoveColumn(k);
+                        for (c = 0; (c < BalanceList.Count); c++)
+                            BalanceList[c].RemoveColumn(k);
                     }
                 }
             }
 
             for (k = 0; (k < CriteriaList.Count); k++)
             {
-                var Crit = CriteriaList[k];
+                Crit = CriteriaList[k];
                 if (Crit.balanceColumnFormat == BalanceColumnFormat.Thousand)
                 {
-                    foreach (var col in BalanceList)
-                        col.amount[k] /= 1000;
+                    for (c = 0; (c < BalanceList.Count); c++)
+                    {
+                        amount = BalanceList[c].amount;
+                        d = amount[k];
+                        if (d > 0)
+                            d += 500;
+                        else
+                            d -= 500;
+                        amount[k] = d / 1000;
+                    }
                 }
+
                 if (AppliedTemplate == null && Crit._InvertSign)
                 {
                     bool plFound = false;
-                    foreach (var col in BalanceList)
+                    for (c = 0; (c < BalanceList.Count); c++)
                     {
+                        col = BalanceList[c];
                         if (col.AccountTypeEnum >= GLAccountTypes.BalanceSheet)
                         {
                             plFound = false;
@@ -689,16 +721,17 @@ namespace UnicontaClient.Pages.CustomPage
 
                 if (FromAccount != null || ToAccount != null || Skip0Account || SkipSumAccount || OnlySumAccounts || ShowAccType != 0)
                 {
-                    var lst = new List<BalanceClient>();
-                    foreach (var acc in balanceClient)
+                    GLAccount lastAcc;
+                    var lst = new List<BalanceClient>(BalanceList.Count);
+                    for (c = 0; (c < BalanceList.Count); c++)
                     {
-                        var accType = acc.AccountTypeEnum;
+                        col = BalanceList[c];
+                        var accType = col.AccountTypeEnum;
                         if (SkipSumAccount && accType <= GLAccountTypes.CalculationExpression)
                             continue;
 
-                        var account = acc.AccountNo;
-                        if ((FromAccount == null || string.Compare(account, FromAccount, StringComparison.CurrentCultureIgnoreCase) >= 0) &&
-                              (ToAccount == null || string.Compare(account, ToAccount, StringComparison.CurrentCultureIgnoreCase) <= 0))
+                        if ((FromAccount == null || string.Compare(col.AccountNo, FromAccount, StringComparison.CurrentCultureIgnoreCase) >= 0) &&
+                              (ToAccount == null || string.Compare(col.AccountNo, ToAccount, StringComparison.CurrentCultureIgnoreCase) <= 0))
                         {
                             if (ShowAccType != 0)
                             {
@@ -728,10 +761,10 @@ namespace UnicontaClient.Pages.CustomPage
                                         continue;
                                     if (accType == GLAccountTypes.Sum)
                                     {
-                                        var lastAcc = lst.LastOrDefault()?.Acc;
+                                        lastAcc = lst.Count > 0 ? lst[lst.Count - 1].Acc : null;
                                         if (lastAcc != null && lastAcc._AccountType == (byte)GLAccountTypes.Header)
                                         {
-                                            var Sum = acc.Acc._SumInfo;
+                                            var Sum = col.Acc._SumInfo;
                                             if (Sum != null && Sum.StartsWith(lastAcc._Account)) // This sum account starts from this header. Lets remove this header
                                                 lst.RemoveAt(lst.Count - 1);
                                         }
@@ -739,35 +772,44 @@ namespace UnicontaClient.Pages.CustomPage
                                     }
                                 }
                             }
-                            if (!Skip0Account || accType == GLAccountTypes.Header || !acc.AmountsAreZero())
+                            if (!Skip0Account || accType == GLAccountTypes.Header || !col.AmountsAreZero())
                             {
-                                if (!OnlySumAccounts || acc.AccountTypeEnum <= GLAccountTypes.CalculationExpression)
-                                    lst.Add(acc);
+                                if (col.Hide && col.AmountsAreZero())
+                                    continue;
+                                if (!OnlySumAccounts || col.AccountTypeEnum <= GLAccountTypes.CalculationExpression)
+                                    lst.Add(col);
                             }
                             else if (accType == GLAccountTypes.Sum)
                             {
                                 // We are skipping a sum. Lets check if the account above is a header. We do not want a header, if we have no details and no sum
-                                var lastAcc = lst.LastOrDefault()?.Acc;
+                                lastAcc = lst.Count > 0 ? lst[lst.Count - 1].Acc : null;
                                 if (lastAcc != null && lastAcc._AccountType == (byte)GLAccountTypes.Header)
                                 {
-                                    var Sum = acc.Acc._SumInfo;
+                                    var Sum = col.Acc._SumInfo;
                                     if ((Sum != null && Sum.StartsWith(lastAcc._Account)) || lastAcc._HideInBalance) // This sum account starts from this header. Lets remove this header
                                         lst.RemoveAt(lst.Count - 1);
                                 }
                                 else
-                                    lst.Add(acc); // we add sum anyway, since the sum is zero because accounts add up to zero.
+                                    lst.Add(col); // we add sum anyway, since the sum is zero because accounts add up to zero.
                             }
                         }
                     }
-                    balanceClient = lst;
+                    BalanceList = balanceClient = lst;
+                }
+                else
+                {
+                    for (c = BalanceList.Count; (--c > 0);)
+                    {
+                        if (BalanceList[c].Hide && BalanceList[c].AmountsAreZero())
+                            BalanceList.RemoveAt(c);
+                    }
                 }
 
-                var arr = balanceClient.ToArray();
-                Array.Sort(arr, new BalanceClientSort());
+                BalanceList.Sort(new BalanceClientSort());
 
                 AccountName.Visible = AccountNo.Visible = true;
                 Text.Visible = false;
-                dgBalanceReport.ItemsSource = arr;
+                dgBalanceReport.ItemsSource = BalanceList;
             }
             dgBalanceReport.Visibility = Visibility.Visible;
         }
@@ -975,6 +1017,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var AccountRowId = finbal.Account.RowId;
             var colCount = PassedCriteria.selectedCriteria.Count;
+            BalanceClient client;
             if (finbal.SumOfDimensions != null)
             {
                 foreach (var dimValue in finbal.SumOfDimensions)
@@ -997,7 +1040,7 @@ namespace UnicontaClient.Pages.CustomPage
                             continue;
                     }
 
-                    BalanceClient client = new BalanceClient(finbal.Account, this.UseExternal, colCount);
+                    client = new BalanceClient(finbal.Account, this.UseExternal, colCount);
                     client.amount[ColNo] = dimValue._Debit - dimValue._Credit;
                     client.DimArry = dimValue.Dimensions;
                     SetDimKeystr(client);
@@ -1006,7 +1049,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
             else if (FirstTime)
             {
-                BalanceClient client = new BalanceClient(finbal.Account, this.UseExternal, colCount);
+                client = new BalanceClient(finbal.Account, this.UseExternal, colCount);
                 balanceClient.Add(client);
             }
         }

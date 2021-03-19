@@ -84,9 +84,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "GroupPosting":
                     if (selectedItem == null) return;
-
-                    string grpPostingHeader = string.Format("{0}: {1}", string.Format(Uniconta.ClientTools.Localization.lookup("GroupPostingOBJ"), Uniconta.ClientTools.Localization.lookup("Creditor")), 
-                        selectedItem.Group);
+                    string grpPostingHeader = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ItemPosting"), selectedItem.Group);
                     AddDockItem(TabControls.CreditorGroupPostingPage, selectedItem, grpPostingHeader);
                     break;
                 default:
@@ -111,6 +109,8 @@ namespace UnicontaClient.Pages.CustomPage
             var Comp = api.CompanyEntity;
             if (!Comp.InvDuty)
                 this.ExemptDuty.ShowInColumnChooser = false;
+            else
+                this.ExemptDuty.ShowInColumnChooser = true;
         }
     }
 }

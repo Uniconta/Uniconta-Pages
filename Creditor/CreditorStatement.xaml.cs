@@ -59,6 +59,12 @@ namespace UnicontaClient.Pages.CustomPage
         [Display(Name = "Name", ResourceType = typeof(GLTableText))]
         public string Name { get { return cred._Name; } }
 
+        [Display(Name = "Address1", ResourceType = typeof(DCAccountText))]
+        public string Address1 { get { return cred._Address1; } }
+
+        [Display(Name = "City", ResourceType = typeof(DCAccountText))]
+        public string City { get { return cred._City; } }
+
         public CreditorTransClientTotal[] ChildRecords { get; set; }
 
         public double _SumAmount;
@@ -70,8 +76,7 @@ namespace UnicontaClient.Pages.CustomPage
 
     public class CreditorTransClientTotal : CreditorTransClient
     {
-        public double _SumAmount;
-        public double _SumAmountCur;
+        public double _SumAmount, _SumAmountCur, _OverDue, _OverDueCur;
 
         [Display(Name = "Total", ResourceType = typeof(GLDailyJournalText))]
         public double SumAmount { get { return _SumAmount; } }
@@ -86,9 +91,17 @@ namespace UnicontaClient.Pages.CustomPage
         [NoSQL]
         public double AmountOpen { get { return _AmountOpen; } }
 
+        [Display(Name = "OverDue", ResourceType = typeof(DCTransText))]
+        [NoSQL]
+        public double OverDue { get { return _OverDue; } }
+
         [Display(Name = "RemainingCur", ResourceType = typeof(DCTransText))]
         [NoSQL]
         public double AmountOpenCur { get { return _AmountOpenCur; } }
+
+        [Display(Name = "OverDueCur", ResourceType = typeof(DCTransText))]
+        [NoSQL]
+        public double OverDueCur { get { return _OverDueCur; } }
     }
 
     public partial class CreditorStatement : GridBasePage
@@ -105,12 +118,12 @@ namespace UnicontaClient.Pages.CustomPage
 
         static public DateTime DefaultFromDate, DefaultToDate;
         static bool IsCollapsed = true;
-
+        static int  transaction;
         CWServerFilter creditorFilterDialog = null;
         bool creditorFilterCleared;
         TableField[] CreditorUserFields { get; set; }
         IEnumerable<PropValuePair> creditorFilterValues;
-
+        bool OnlyOpen, OnlyDue = false;
         public static void SetDateTime(DateEditor frmDateeditor, DateEditor todateeditor)
         {
             if (frmDateeditor.Text == string.Empty)
@@ -189,11 +202,11 @@ namespace UnicontaClient.Pages.CustomPage
             var Pref = api.session.Preference;
             cbxAscending.IsChecked = Pref.Debtor_isAscending;
             cbxSkipBlank.IsChecked = Pref.Debtor_skipBlank;
-            cbxOnlyOpen.IsChecked = Pref.Debtor_OnlyOpen;
 
             txtDateTo.DateTime = CreditorStatement.DefaultToDate;
             txtDateFrm.DateTime = CreditorStatement.DefaultFromDate;
-
+            cmbTrasaction.ItemsSource = AppEnums.TransToShow.Values;
+            cmbTrasaction.SelectedIndex = transaction;
             GetMenuItem();
 
             var Comp = api.CompanyEntity;
@@ -386,8 +399,8 @@ namespace UnicontaClient.Pages.CustomPage
             if (!IsChild)
             {
                 var selectedRowHandle = dgCreditorTrans.GetSelectedRowHandles();
-                selectedMasterRowhandle = selectedRowHandle.FirstOrDefault();
-                expandState = dgCreditorTrans.IsMasterRowExpanded(selectedRowHandle.FirstOrDefault());
+                selectedMasterRowhandle = selectedRowHandle.Length > 0 ? selectedRowHandle[0] : 0;
+                expandState = dgCreditorTrans.IsMasterRowExpanded(selectedMasterRowhandle);
             }
             else
                 selectedMasterRowhandle = ((TableView)dgCreditorTrans.View.MasterRootRowsContainer.FocusedView).Grid.GetMasterRowHandle();
@@ -500,6 +513,19 @@ namespace UnicontaClient.Pages.CustomPage
                     dgCreditorTrans.CollapseMasterRow(iRow);
         }
 
+        private void cmbTrasaction_SelectedIndexChanged(object sender, RoutedEventArgs e)
+        {
+            if (cmbTrasaction.SelectedIndex == 0)
+                OnlyOpen = OnlyDue = false;
+            else if (cmbTrasaction.SelectedIndex == 1)
+            {
+                OnlyOpen = true;
+                OnlyDue = false;
+            }
+            else if (cmbTrasaction.SelectedIndex == 2)
+                OnlyOpen = OnlyDue = true;
+        }
+
         async void LoadDCTrans()
         {
             SetExpandAndCollapse(true);
@@ -509,8 +535,7 @@ namespace UnicontaClient.Pages.CustomPage
             DateTime fromDate = CreditorStatement.DefaultFromDate, toDate = CreditorStatement.DefaultToDate;
             var isAscending = cbxAscending.IsChecked.Value;
             var skipBlank = cbxSkipBlank.IsChecked.Value;
-            var OnlyOpen = cbxOnlyOpen.IsChecked.Value;
-
+            transaction = cmbTrasaction.SelectedIndex;
             var Pref = api.session.Preference;
             Pref.Debtor_isAscending = isAscending;
             Pref.Debtor_skipBlank = skipBlank;
@@ -521,7 +546,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             busyIndicator.IsBusy = true;
             var transApi = new ReportAPI(api);
-            var listTrans = (CreditorTransClientTotal[])await transApi.GetTransWithPrimo(new CreditorTransClientTotal(), fromDate, toDate, fromAccount, toAccount, OnlyOpen, PropWhere: creditorFilterValues);
+            var listTrans = (CreditorTransClientTotal[])await transApi.GetTransWithPrimo(new CreditorTransClientTotal(), fromDate, toDate, fromAccount, toAccount, OnlyOpen, null,creditorFilterValues,OnlyDue);
             if (listTrans != null)
             {
                 if (accountCache == null)
@@ -563,6 +588,12 @@ namespace UnicontaClient.Pages.CustomPage
                     trans._SumAmountCur = SumAmountCur;
                     masterCredStatement._SumAccountCur = SumAmountCur;
 
+                    if (trans._DueDate <= toDate)
+                    {
+                        trans._OverDue = trans._AmountOpen;
+                        trans._OverDueCur = trans._AmountOpenCur;
+                    }
+
                     credTransClientChildList.Add(trans);
                 }
 
@@ -591,6 +622,7 @@ namespace UnicontaClient.Pages.CustomPage
             else
                 SetExpandAndCollapse(IsCollapsed);
         }
+
 #if !SILVERLIGHT
         private void cbxPageBreak_Click(object sender, RoutedEventArgs e)
         {
@@ -601,7 +633,6 @@ namespace UnicontaClient.Pages.CustomPage
                 tableView.HasPageBreak = false;
         }
 #endif
-
         private void cmbFromAccount_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
         {
             cmbToAccount.SelectedItem = cmbFromAccount.SelectedItem;

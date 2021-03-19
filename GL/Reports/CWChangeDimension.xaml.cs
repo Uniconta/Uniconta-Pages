@@ -58,41 +58,124 @@ namespace UnicontaClient.Pages.CustomPage
                 if (noofDimensions >= 5)
                     TransactionReport.SetDimValues(typeof(GLDimType5), lookupDim5, api, true);
                 //lookupDim1.SelectedIndex = lookupDim2.SelectedIndex = lookupDim3.SelectedIndex = lookupDim4.SelectedIndex = lookupDim5.SelectedIndex = 0;
-          
-                rowText.Height = new GridLength(0);
-                rowQty.Height = new GridLength(0);
+
+                //Text Row
+                HideRow(6);
+                //Qty Row
+                HideRow(7);
+
                 double h = this.Height - 60;
                 this.Height = h;
                 this.Title = Uniconta.ClientTools.Localization.lookup("ChangeDimension");
             }
             else if(isChangeText)
             {
-                rowAccount.Height = new GridLength(0);
-                rowDim1.Height = new GridLength(0);
-                rowDim2.Height = new GridLength(0);
-                rowDim3.Height = new GridLength(0);
-                rowDim4.Height = new GridLength(0);
-                rowDim5.Height = new GridLength(0);
-                rowQty.Height = new GridLength(0);
+                //Account Row
+                HideRow(0);
+                //Dimension1 Row
+                HideRow(1);
+                //Dimension3 Row
+                HideRow(2);
+                //Dimension3 Row
+                HideRow(3);
+                //Dimension4 Row
+                HideRow(4);
+                //Dimension5 Row
+                HideRow(5);
+                //Qty Row
+                HideRow(7);
+
                 double h = this.Height - 210;
                 this.Height = h;
                 this.Title = Uniconta.ClientTools.Localization.lookup("ChangeText");
             }
             else
             {
-                rowAccount.Height = new GridLength(0);
-                rowDim1.Height = new GridLength(0);
-                rowDim2.Height = new GridLength(0);
-                rowDim3.Height = new GridLength(0);
-                rowDim4.Height = new GridLength(0);
-                rowDim5.Height = new GridLength(0);
-                rowText.Height = new GridLength(0);
+                //Account Row
+                HideRow(0);
+                //Dimension1 Row
+                HideRow(1);
+                //Dimension3 Row
+                HideRow(2);
+                //Dimension3 Row
+                HideRow(3);
+                //Dimension4 Row
+                HideRow(4);
+                //Dimension5 Row
+                HideRow(5);
+                //Text Row
+                HideRow(6);
+
                 double h = this.Height - 210;
                 this.Height = h;
                 this.Title = string.Format(Uniconta.ClientTools.Localization.lookup("ChangeOBJ"), Uniconta.ClientTools.Localization.lookup("Qty"));
             }
             this.Loaded += CW_Loaded;
         }
+
+        private void HideRow(int rowIndex)
+        {
+            switch(rowIndex)
+            {
+                case 0:
+                    rowAccount.Height = new GridLength(0);
+#if !SILVERLIGHT
+                    lblAccount.Visibility = Visibility.Hidden;
+                    leAccount.Visibility = Visibility.Hidden;
+#endif
+                    break;
+                case 1:
+                    rowDim1.Height = new GridLength(0);
+#if !SILVERLIGHT
+                    lblDim1.Visibility = Visibility.Hidden;
+                    lookupDim1.Visibility = Visibility.Hidden;
+#endif
+                    break;
+                case 2:
+                    rowDim2.Height = new GridLength(0);
+#if !SILVERLIGHT
+                    lblDim2.Visibility = Visibility.Hidden;
+                    lookupDim2.Visibility = Visibility.Hidden;
+#endif
+                    break;
+                case 3:
+                    rowDim3.Height = new GridLength(0);
+#if !SILVERLIGHT
+                    lblDim3.Visibility = Visibility.Hidden;
+                    lookupDim3.Visibility = Visibility.Hidden;
+#endif
+                    break;
+                case 4:
+                    rowDim4.Height = new GridLength(0);
+#if !SILVERLIGHT
+                    lblDim4.Visibility = Visibility.Hidden;
+                    lookupDim4.Visibility = Visibility.Hidden;
+#endif
+                    break;
+                case 5:
+                    rowDim5.Height = new GridLength(0);
+#if !SILVERLIGHT
+                    lblDim5.Visibility = Visibility.Hidden;
+                    lookupDim5.Visibility = Visibility.Hidden;
+#endif
+                    break;
+                case 6:
+                    rowText.Height = new GridLength(0);
+#if !SILVERLIGHT
+                    lblText.Visibility = Visibility.Collapsed;
+                    txtText.Visibility = Visibility.Collapsed;
+#endif
+                    break;
+                case 7:
+                    rowQty.Height = new GridLength(0);
+#if !SILVERLIGHT
+                    lblQty.Visibility = Visibility.Hidden;
+                    deQuantity.Visibility = Visibility.Hidden;
+#endif
+                    break;
+            }
+        }
+
         void CW_Loaded(object sender, RoutedEventArgs e)
         {
             Dispatcher.BeginInvoke(new Action(() => { leAccount.Focus(); }));

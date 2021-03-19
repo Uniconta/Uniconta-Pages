@@ -30,7 +30,7 @@ x:Class="UnicontaClient.Pages.CustomPage.UserDocsPage2"
                             <CorasauControls:TextEditor x:Name="txtUrl" Text="{Binding Url,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="DocumentType" x:Name="liDocumentType" Visibility="Collapsed">
-                            <CorasauControls:ComboBoxEditor x:Name="cmbDocType" EditValue="{Binding DocumentType,Mode=TwoWay}">
+                            <CorasauControls:ComboBoxEditor x:Name="cmbDocType" EditValue="{Binding DocumentType,Mode=TwoWay}" EditValueChanged="cmbDocType_EditValueChanged">
                                 <dxinteraction:Interaction.Behaviors>
                                     <dxinteraction:EnumItemsSourceBehavior EnumType="{x:Type enumType:FileextensionsTypes}" />
                                 </dxinteraction:Interaction.Behaviors>

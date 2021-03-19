@@ -113,7 +113,7 @@ namespace UnicontaClient.Pages.CustomPage
                             line._Date = data.CalenderDate;
                             line._Hours = bankHolidayName == null ? data.Hours : 0;
                             line._Description = bankHolidayName;
-                            dgTMEmpCalendarLineGrid.AddRow(line);
+                            dgTMEmpCalendarLineGrid.AddRow(line, -1, false);
                         }
                     }
                     else
@@ -150,7 +150,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 line._Date = data.CalenderDate;
                                 line._Hours = bankHolidayName == null ? data.Hours : 0;
                                 line._Description = bankHolidayName;
-                                dgTMEmpCalendarLineGrid.AddRow(line);
+                                dgTMEmpCalendarLineGrid.AddRow(line, -1, false);
                             }
                         }
                     }

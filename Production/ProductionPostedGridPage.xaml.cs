@@ -134,7 +134,8 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void CreateProdcution(ProductionPostedClient fromProductionPosted)
         {
-            var cwProductionOrderLine = new CWProductionOrderLine(api, true,Uniconta.ClientTools.Localization.lookup("ProductionOrder"),Decimal: fromProductionPosted.Decimals);
+            var prodOrder = new ProductionOrderClient() { _ProdItem = fromProductionPosted._Item, _ProdQty = fromProductionPosted._Qty };
+            var cwProductionOrderLine = new CWProductionOrderLine(prodOrder, api, true, Uniconta.ClientTools.Localization.lookup("ProductionOrder"));
 #if !SILVERLIGHT
             cwProductionOrderLine.DialogTableId = 2000000079;
 #endif
@@ -142,7 +143,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 if (cwProductionOrderLine.DialogResult == true)
                 {
-                    var prodOrder = new ProductionOrderClient();
+                    prodOrder._DeliveryDate = cwProductionOrderLine.DeliveryDate;
                     var prodApi = new ProductionAPI(api);
                     var result = await prodApi.CreateProductionFromProduction(fromProductionPosted, prodOrder, cwProductionOrderLine.quantity, (StorageRegister)cwProductionOrderLine.Storage);
                     if (result != ErrorCodes.Succes)

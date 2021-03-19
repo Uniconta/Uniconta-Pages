@@ -116,24 +116,31 @@ namespace UnicontaClient.Pages.CustomPage
             switch (ActionType)
             {
                 case "AddRow":
-                    CWSearchUser searchUserDialog = new CWSearchUser(companyAPI);
-                    searchUserDialog.Closing += delegate
+                    var curComp = UtilDisplay.GetDefaultCompany();
+                    long rights = curComp.Rights;
+                    if (AccessLevel.Get(rights, CompanyTasks.AsOwner) == CompanyPermissions.Full)
                     {
-                        if (searchUserDialog.DialogResult == true)
+                        CWSearchUser searchUserDialog = new CWSearchUser(companyAPI);
+                        searchUserDialog.Closing += delegate
                         {
-                            if (searchUserDialog.lstSetupType.SelectedIndex != 0)
-                                InitQuery();
-                            else
+                            if (searchUserDialog.DialogResult == true)
                             {
-                                object[] parm = new object[3];
-                                parm[0] = api;
-                                parm[1] = true;
-                                parm[2] = dockCtrl.Activpanel;
-                                AddDockItem(TabControls.UsersPage2, parm, Uniconta.ClientTools.Localization.lookup("User"), "Add_16x16.png");
+                                if (searchUserDialog.lstSetupType.SelectedIndex != 0)
+                                    InitQuery();
+                                else
+                                {
+                                    object[] parm = new object[3];
+                                    parm[0] = api;
+                                    parm[1] = true;
+                                    parm[2] = dockCtrl.Activpanel;
+                                    AddDockItem(TabControls.UsersPage2, parm, Uniconta.ClientTools.Localization.lookup("User"), "Add_16x16.png");
+                                }
                             }
-                        }
-                    };
-                    searchUserDialog.Show();
+                        };
+                        searchUserDialog.Show();
+                    }
+                    else
+                        UnicontaMessageBox.Show(string.Format("{0} {1}", Uniconta.ClientTools.Localization.lookup("NoRightsToInsert"), Uniconta.ClientTools.Localization.lookup("User")), Uniconta.ClientTools.Localization.lookup("Warning"));
                     break;
                 case "EditRow":
                     if (selectedItem != null)

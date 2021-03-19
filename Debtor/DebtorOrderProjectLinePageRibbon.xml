@@ -5,7 +5,7 @@
     <RibbonItem Action="AddRow" LocalizedNameKey="AddOBJ" Parameter="JournalLines" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png"/>
     <RibbonItem Action="CopyRow" LocalizedNameKey="CopyLine" LargeGlyph="Copy_32x32.png"/>    
     <RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="Delete" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png"/>    
-    <RibbonItem Action="SaveGrid" ShortcutKey="CTRL+S" LocalizedNameKey="Save" Glyph="save-16x16.png" LargeGlyph="save-32x32.png"/>        
+    <RibbonItem Action="SaveGrid" ShortcutKey="CTRL+S" LocalizedNameKey="SaveExit" Glyph="save-16x16.png" LargeGlyph="save-32x32.png"/>        
   </RibbonItem>
   <RibbonItem>
     <!---next group-->

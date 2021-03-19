@@ -97,6 +97,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorPayments"
                     <local:CorasauDataGridTemplateColumnClient x:Name="JournalPostedId" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Open" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="DocumentRef" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="FromCreditor" Visible="False" ShowCheckBoxInHeader="False"/>
                 </local:DebtorPaymentsGrid.Columns>
                 <local:DebtorPaymentsGrid.TotalSummary>
                     <local:SumColumn FieldName="Debit" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>

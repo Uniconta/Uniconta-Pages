@@ -77,7 +77,7 @@ namespace UnicontaClient.Pages.CustomPage
             layoutEndDate.Label = Uniconta.ClientTools.Localization.lookup("ToDate");
             layoutControl = layoutItems;
             editrow = CreateNew() as CompanyClient;
-            var defaultCompany = api.session.DefaultCompany;
+            var defaultCompany = UtilDisplay.GetDefaultCompany();
             if (defaultCompany != null)
             {
                 editrow.Country = defaultCompany._CountryId;
@@ -660,7 +660,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (setupType == 1)
                     {
                         globalEvents.OnRefresh(TabControls.CreateCompany, editrow.RowId);
-                        dockCtrl.CloseDockItem();
+                        dockCtrl?.CloseDockItem();
                     }
                 }
                 else

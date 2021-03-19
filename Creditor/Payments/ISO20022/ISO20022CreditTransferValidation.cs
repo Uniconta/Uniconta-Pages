@@ -118,17 +118,16 @@ namespace ISO20022CreditTransfer
         /// <summary>
         /// Validate proposed payment records before generating the payment file in the XML format Credit Transfer ISO20022 pain003.
         /// </summary>
-        /// <param name="xxx">xxx.</param> //TODO:Mangler at specificere parametre
+        /// <param name="xxx">xxx.</param> 
         /// <param name="xxx">xxx.</param>
         /// <returns>An XML payment file</returns>
-        public XMLDocumentGenerateResult ValidateISO20022(Company company, UnicontaClient.Pages.CreditorTransPayment trans, SQLCache bankAccountCache, bool journalGenerated = false) //, CreditorPaymentFormat credPaymFormat)
+        public XMLDocumentGenerateResult ValidateISO20022(Company company, UnicontaClient.Pages.CreditorTransPayment trans, SQLCache bankAccountCache, bool journalGenerated = false)
         {
             XmlDocument dummyDoc = new XmlDocument();
 
             CreditTransferDocument doc = new CreditTransferDocument();
 
-            var bankAccount = (BankStatement)bankAccountCache.Get(credPaymFormat._BankAccount); //Dette kald bør laves uden for denne method, da det er unødvendigt at kalde flere gange
-
+            var bankAccount = (BankStatement)bankAccountCache.Get(credPaymFormat._BankAccount);
             var credCache = company.GetCache(typeof(Uniconta.DataModel.Creditor));
             var creditor = (Creditor)credCache.Get(trans.Account);
 
@@ -144,16 +143,18 @@ namespace ISO20022CreditTransfer
             //Validations >>
 
             RequestedExecutionDate(trans._PaymentDate, company);
-            PaymentCurrency(trans._CurrencyLocal.ToString(), trans._PaymentMethod, trans._PaymentId, trans.SWIFT);
+            PaymentCurrency(trans.CurrencyLocalStr, trans._PaymentMethod, trans._PaymentId, trans.SWIFT);
 
             if(glJournalGenerated == false)
                 CreditorAddress(creditor);
 
             if (trans.PaymentMethod == null)
-                checkErrors.Add(new CheckError(String.Format("Method of payment must not be empty")));
+                checkErrors.Add(new CheckError(fieldCannotBeEmpty("PaymentMethod" )));
+            else if (trans._PaymentMethod == PaymentTypes.None)
+                checkErrors.Add(new CheckError(string.Concat(Uniconta.ClientTools.Localization.lookup("PaymentMethod"), " = ", trans.PaymentMethod)));
 
             if (trans.MergePaymId == Uniconta.ClientTools.Localization.lookup("Excluded") && trans.PaymentAmount <= 0)
-                checkErrors.Add(new CheckError(String.Format("Credit amount is not allowed")));
+                checkErrors.Add(new CheckError(string.Concat(Uniconta.ClientTools.Localization.lookup("PaymentAmount"), "< 0")));
 
             switch (trans._PaymentMethod)
             {
@@ -186,7 +187,7 @@ namespace ISO20022CreditTransfer
 
             var countryCode = glJournalGenerated ? (CountryCode)company._Country : creditor._Country;
 
-            ISOPaymentType(trans._CurrencyLocal, bankAccount._IBAN, trans._PaymentMethod, UnicontaCountryToISO(countryCode));
+            ISOPaymentType(trans.CurrencyLocalStr, bankAccount._IBAN, trans._PaymentMethod, UnicontaCountryToISO(countryCode));
             
             //Validations <<
 
@@ -340,7 +341,7 @@ namespace ISO20022CreditTransfer
             else
             {
                 if(!bbanSwift)
-                    checkErrors.Add(new CheckError(String.Format("The Creditor SWIFT code has not been filled in")));
+                    checkErrors.Add(new CheckError(Uniconta.ClientTools.Localization.lookup("ErrorSWIFTAddress")));
             }
         }
 
@@ -368,7 +369,7 @@ namespace ISO20022CreditTransfer
 
                     if (!StandardPaymentFunctions.ValidateIBAN(creditorIBAN))
                     {
-                        checkErrors.Add(new CheckError(String.Format("The Creditor IBAN number has not a valid format")));
+                        checkErrors.Add(new CheckError(Uniconta.ClientTools.Localization.lookup("PaymentIdInvalid")));
                     }
                     else
                     {
@@ -398,7 +399,7 @@ namespace ISO20022CreditTransfer
 
                     if (!StandardPaymentFunctions.ValidateIBAN(creditorIBAN))
                     {
-                        checkErrors.Add(new CheckError(String.Format("The Creditor IBAN number has not a valid format")));
+                        checkErrors.Add(new CheckError(Uniconta.ClientTools.Localization.lookup("PaymentIdInvalid"))); 
                     }
                     else
                     {
@@ -413,7 +414,7 @@ namespace ISO20022CreditTransfer
                 }
                 else
                 {
-                    checkErrors.Add(new CheckError(String.Format("The Creditor IBAN number has not been filled in")));
+                    checkErrors.Add(new CheckError(fieldCannotBeEmpty("PaymentId")));
                 }
             }
         }
@@ -441,9 +442,7 @@ namespace ISO20022CreditTransfer
                     bban = Regex.Replace(bban, "[^0-9]", "");
 
                     if (bban.Length <= 4 || bban.Length > 11)
-                    {
-                        checkErrors.Add(new CheckError(String.Format("The Creditor bank account number (BBAN) doesn't have a valid format")));
-                    }
+                        checkErrors.Add(new CheckError(Uniconta.ClientTools.Localization.lookup("PaymentIdInvalid")));
                 }
                 //Validate Creditor BBAN <<
 
@@ -468,24 +467,20 @@ namespace ISO20022CreditTransfer
             {
                 if (string.IsNullOrEmpty(bban))
                 {
-                    checkErrors.Add(new CheckError(Uniconta.ClientTools.Localization.lookup("CredBBANMissing")));
+                    checkErrors.Add(new CheckError(fieldCannotBeEmpty("PaymentId")));
                 }
                 else
                 {
                     bban = Regex.Replace(bban, "[^0-9]", "");
                     if (bban.Length <= 4)
-                    {
-                        checkErrors.Add(new CheckError(String.Format("The Creditor bank account number (BBAN) doesn't have a valid format")));
-                    }
+                        checkErrors.Add(new CheckError(Uniconta.ClientTools.Localization.lookup("PaymentIdInvalid"))); 
 
                     var countryId = glJournalGenerated ? UnicontaCountryToISO(company._CountryId) : UnicontaCountryToISO(creditor._Country);
 
                     if (countryId == BaseDocument.COUNTRY_DK)
                     {
                         if (bban.Length > 14)
-                        {
-                            checkErrors.Add(new CheckError(String.Format("The Creditor bank account number (BBAN) doesn't have a valid format")));
-                        }
+                            checkErrors.Add(new CheckError(Uniconta.ClientTools.Localization.lookup("PaymentIdInvalid"))); 
                     }
                 }
             }
@@ -499,13 +494,13 @@ namespace ISO20022CreditTransfer
         {
             if (string.IsNullOrEmpty(ocrLine))
             {
-                checkErrors.Add(new CheckError(String.Format("Field PaymentId must not be empty. Need to be filled in with a FIK71 OCR-reference")));
+                checkErrors.Add(new CheckError(fieldCannotBeEmpty("PaymentId"))); 
                 return false;
             }
 
             if (ocrLine.IndexOf("N") != -1 || ocrLine.IndexOf("n") != -1)
             {
-                checkErrors.Add(new CheckError(String.Format("The FIK mask doesn't have a valid format.")));
+                checkErrors.Add(new CheckError(Uniconta.ClientTools.Localization.lookup("PaymentIdInvalid")));
                 return false;
             }
 
@@ -524,39 +519,9 @@ namespace ISO20022CreditTransfer
                 creditorAccount = ocrLine.Remove(0, index + 1);
             }
 
-            if (paymID == string.Empty)
+            if (paymID == string.Empty || paymID.Length > BaseDocument.FIK71LENGTH || creditorAccount == string.Empty || creditorAccount.Length != 8 || creditorAccount[0] != '8' || Mod10Check(paymID) == false)
             {
-                checkErrors.Add(new CheckError(String.Format("Payment Id part of the FIK71 OCR-reference could not be found due to an invalid format.")));
-                return false;
-            }
-
-            if (paymID.Length > BaseDocument.FIK71LENGTH)
-            {
-                checkErrors.Add(new CheckError(String.Format("Payment Id part of the FIK71 OCR-reference may not exceed length {0}", BaseDocument.FIK71LENGTH)));
-                return false;
-            }
-
-            if (creditorAccount == string.Empty)
-            {
-                checkErrors.Add(new CheckError(String.Format("Creditor account part of the FIK71 OCR-reference could not be found due to an invalid format.")));
-                return false;
-            }
-
-            if (creditorAccount.Length != 8)
-            {
-                checkErrors.Add(new CheckError(String.Format("Creditor account part of the FIK71 OCR-reference must 8 characters.")));
-                return false;
-            }
-
-            if (creditorAccount[0] != '8')
-            {
-                checkErrors.Add(new CheckError(String.Format("Creditor account part of the FIK71 OCR-reference must start with the character 8 or it will be invalid.")));
-                return false;
-            }
-
-            if (Mod10Check(paymID) == false)
-            {
-                checkErrors.Add(new CheckError(String.Format("The PaymentId part of a FIK71 OCR-reference failed the Modulus 10 check digit.")));
+                checkErrors.Add(new CheckError(Uniconta.ClientTools.Localization.lookup("PaymentIdInvalid"))); 
                 return false;
             }
 
@@ -581,7 +546,7 @@ namespace ISO20022CreditTransfer
         {
             if (string.IsNullOrEmpty(ocrLine))
             {
-                checkErrors.Add(new CheckError(String.Format("Field PaymentId must not be empty. Need to be filled in with a Creditor account")));
+                checkErrors.Add(new CheckError(fieldCannotBeEmpty("PaymentId")));
                 return false;
             }
 
@@ -591,21 +556,10 @@ namespace ISO20022CreditTransfer
             ocrLine = ocrLine.Replace("<", "");
             ocrLine = ocrLine.Replace(">", "");
             var creditorAccount = ocrLine.Replace("+", "");
-            if (creditorAccount == string.Empty)
+           
+            if (creditorAccount == string.Empty || creditorAccount.Length != 8 || creditorAccount[0] != '8')
             {
-                checkErrors.Add(new CheckError(String.Format("Creditor account could not be found due to an invalid format.")));
-                return false;
-            }
-
-            if (creditorAccount.Length != 8)
-            {
-                checkErrors.Add(new CheckError(String.Format("Creditor account must 8 characters.")));
-                return false;
-            }
-
-            if (creditorAccount[0] != '8')
-            {
-                checkErrors.Add(new CheckError(String.Format("Creditor account must start with the character 8 or it will be invalid.")));
+                checkErrors.Add(new CheckError(Uniconta.ClientTools.Localization.lookup("PaymentIdInvalid")));
                 return false;
             }
 
@@ -630,13 +584,13 @@ namespace ISO20022CreditTransfer
         {
             if (string.IsNullOrEmpty(ocrLine))
             {
-                checkErrors.Add(new CheckError(String.Format("Field PaymentId must not be empty. Need to be filled in with a FIK75 OCR-reference")));
+                checkErrors.Add(new CheckError(fieldCannotBeEmpty("PaymentId")));
                 return false;
             }
 
             if (ocrLine.IndexOf("N") != -1 || ocrLine.IndexOf("n") != -1)
             {
-                checkErrors.Add(new CheckError(String.Format("The FIK mask doesn't have a valid format.")));
+                checkErrors.Add(new CheckError(Uniconta.ClientTools.Localization.lookup("PaymentIdInvalid"))); 
                 return false;
             }
 
@@ -655,39 +609,9 @@ namespace ISO20022CreditTransfer
                 creditorAccount = ocrLine.Remove(0, index + 1);
             }
 
-            if (paymID == string.Empty)
+            if (paymID == string.Empty || paymID.Length > BaseDocument.FIK75LENGTH || creditorAccount == string.Empty || creditorAccount.Length != 8 || creditorAccount[0] != '8' || Mod10Check(paymID) == false)
             {
-                checkErrors.Add(new CheckError(String.Format("Payment Id part of the FIK75 OCR-reference could not be found due to an invalid format.")));
-                return false;
-            }
-
-            if (paymID.Length > BaseDocument.FIK75LENGTH)
-            {
-                checkErrors.Add(new CheckError(String.Format("Payment Id part of the FIK75 OCR-reference may not exceed length {0}", BaseDocument.FIK75LENGTH)));
-                return false;
-            }
-
-            if (creditorAccount == string.Empty)
-            {
-                checkErrors.Add(new CheckError(String.Format("Creditor account part of the FIK75 OCR-reference could not be found due to an invalid format.")));
-                return false;
-            }
-
-            if (creditorAccount.Length != 8)
-            {
-                checkErrors.Add(new CheckError(String.Format("Creditor account part of the FIK75 OCR-reference must 8 characters.")));
-                return false;
-            }
-
-            if (creditorAccount[0] != '8')
-            {
-                checkErrors.Add(new CheckError(String.Format("Creditor account part of the FIK75 OCR-reference must start with the character 8 or it will be invalid.")));
-                return false;
-            }
-
-            if (Mod10Check(paymID) == false)
-            {
-                checkErrors.Add(new CheckError(String.Format("The PaymentId part of a FIK75 OCR-reference failed the Modulus 10 check digit.")));
+                checkErrors.Add(new CheckError(Uniconta.ClientTools.Localization.lookup("PaymentIdInvalid")));
                 return false;
             }
 
@@ -712,13 +636,13 @@ namespace ISO20022CreditTransfer
         {
             if (string.IsNullOrEmpty(ocrLine))
             {
-                checkErrors.Add(new CheckError(String.Format("Field PaymentId must not be empty. Need to be filled in with a FIK04 OCR-reference")));
+                checkErrors.Add(new CheckError(fieldCannotBeEmpty("PaymentId"))); 
                 return false;
             }
 
             if (ocrLine.IndexOf("N") != -1 || ocrLine.IndexOf("n") != -1)
             {
-                checkErrors.Add(new CheckError(String.Format("The FIK mask doesn't have a valid format.")));
+                checkErrors.Add(new CheckError(Uniconta.ClientTools.Localization.lookup("PaymentIdInvalid")));
                 return false;
             }
 
@@ -737,28 +661,9 @@ namespace ISO20022CreditTransfer
                 giroAccount = ocrLine.Remove(0, index + 1);
             }
 
-            if (paymID == string.Empty)
+            if (paymID == string.Empty || paymID.Length > BaseDocument.FIK04LENGTH || giroAccount == string.Empty || giroAccount.Length < 2 || giroAccount.Length > 8 || Mod10Check(paymID) == false)
             {
-                checkErrors.Add(new CheckError(String.Format("Payment Id part of the FIK04 OCR-reference could not be found due to an invalid format.")));
-                return false;
-            }
-
-            if (paymID.Length > BaseDocument.FIK04LENGTH)
-            {
-                checkErrors.Add(new CheckError(String.Format("Payment Id part of the FIK04 OCR-reference may not exceed length {0}", BaseDocument.FIK04LENGTH)));
-                return false;
-            }
-
-
-            if (giroAccount == string.Empty)
-            {
-                checkErrors.Add(new CheckError(String.Format("Giro account part of the FIK04 OCR-reference could not be found due to an invalid format.")));
-                return false;
-            }
-
-            if (giroAccount.Length < 2 || giroAccount.Length > 8)
-            {
-                checkErrors.Add(new CheckError(String.Format("Giro account part of the FIK04 OCR-reference must be between 2 and 8 digits.")));
+                checkErrors.Add(new CheckError(Uniconta.ClientTools.Localization.lookup("PaymentIdInvalid")));
                 return false;
             }
 
@@ -769,12 +674,6 @@ namespace ISO20022CreditTransfer
                     checkErrors.Add(new CheckError(String.Format("Giro account part of the FIK04 OCR-reference can max be 69999999.")));
                     return false;
                 }
-            }
-
-            if (Mod10Check(paymID) == false)
-            {
-                checkErrors.Add(new CheckError(String.Format("The PaymentId part of a FIK04 OCR-reference failed the Modulus 10 check digit.")));
-                return false;
             }
 
             if (glJournalGenerated)

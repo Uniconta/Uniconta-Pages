@@ -167,10 +167,13 @@ namespace UnicontaClient.Pages.CustomPage
             var comp = api.CompanyEntity;
             if (!comp.Location || !comp.Warehouse)
                 Location.Visible = Location.ShowInColumnChooser = false;
+            else
+                Location.ShowInColumnChooser = true;
             if (!comp.Warehouse)
                 Warehouse.Visible = Warehouse.ShowInColumnChooser = false;
-
-            Utility.SetupVariants(api, null, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
+            else
+                Warehouse.ShowInColumnChooser = true;
+            Utility.SetupVariants(api, colVariant, VariantName, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
             Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
         }
 

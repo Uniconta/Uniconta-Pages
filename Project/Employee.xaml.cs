@@ -148,6 +148,14 @@ namespace UnicontaClient.Pages.CustomPage
                 case "UndoDelete":
                     dgEmployeeGrid.UndoDeleteRow();
                     break;
+                case "BudgetPanningSchedule":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.ProjectBudgetPlanningSchedulePage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("BudgetPlanningSchedule"), selectedItem._Name));
+                    break;
+                case "ProjectEmployee":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.ProjectEmployeePage, dgEmployeeGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Projects"), selectedItem._Name));
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -156,8 +164,10 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void CopyRecord(EmployeeClient selectedItem)
         {
+            var emp = Activator.CreateInstance(selectedItem.GetType()) as EmployeeClient;
+            CorasauDataGrid.CopyAndClearRowId(selectedItem, emp);
             object[] copyParam = new object[2];
-            copyParam[0] = selectedItem;
+            copyParam[0] = emp;
             copyParam[1] = false;
             string header = string.Format(Uniconta.ClientTools.Localization.lookup("CopyOBJ"), selectedItem._Name);
             AddDockItem(TabControls.EmployeePage2, copyParam, header);

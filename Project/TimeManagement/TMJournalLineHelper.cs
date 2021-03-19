@@ -512,7 +512,7 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
 
         #region SetEmplPrice
 
-        private EmpPayrollCategoryEmployeeClient PriceMatrix(DateTime date, int dayIdx, Uniconta.DataModel.Project project, string payrollCat)
+        private EmpPayrollCategoryEmployeeClient PriceMatrix(DateTime date, int dayIdx, Uniconta.DataModel.Project project, string payrollCat, bool continueSearch = false)
         {
             if (payrollCat == null)
                 return null;
@@ -539,11 +539,12 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
                     if (found?._DCAccount == null) // better fit
                         found = rate;
                 }
-                else if (rate._DCAccount == null && found == null)
+                else if (rate._DCAccount == null && found == null && !continueSearch)
                     found = rate; // a fit, but weakest fit.
             }
             return found;
         }
+
 
         public void SetEmplPrice(IEnumerable<TMJournalLineClientLocal> lst,
                                  IList<EmpPayrollCategoryEmployeeClient> empPriceLst,
@@ -592,7 +593,10 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
                     if (empPriceLst != null && empPriceLst.Count > 0)
                     {
                         prices = PriceMatrix(startDate, x, Proj, trans._PayrollCategory);
-                        if (prices == null && defaultPayrollCategory != null && !isMileageTrans)
+
+                        if (prices != null && prices._Project == null && prices._DCAccount == null && !isMileageTrans)
+                            prices = PriceMatrix(startDate, x, Proj, defaultPayrollCategory?.KeyStr, true) ?? prices;
+                        else if (prices == null && defaultPayrollCategory != null && !isMileageTrans)
                             prices = PriceMatrix(startDate, x, Proj, defaultPayrollCategory.KeyStr);
 
                         if (prices != null)
@@ -696,6 +700,7 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
                 invoiceable = projGroup._Invoiceable && payrollCat._Invoiceable;
             }
 
+
             if (empPriceLst != null && empPriceLst.Count > 0 && empPriceLst.Any(s => s._Employee != employee._Number)) // it contains other employees, remove them
                 empPriceLst = empPriceLst.Where(s => s._Employee == employee._Number).ToList();
 
@@ -706,12 +711,14 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
 
             if (empPriceLst != null && empPriceLst.Count > 0)
             {
+                var defaultPayrollCategory = empPayrollCatLst.Where(s => s._PrCategory == null && s.KeyStr == "Default").FirstOrDefault();
+
                 var prices = PriceMatrix(priceDate, 1, project, payrollCategory);
-                if (prices == null && !isMileagePrice)
-                {
-                    var defaultPayrollCategory = empPayrollCatLst.Where(s => s._PrCategory == null && s.KeyStr == "Default").FirstOrDefault();
+
+                if (prices != null && prices._Project == null && prices._DCAccount == null)
+                    prices = PriceMatrix(priceDate, 1, project, defaultPayrollCategory?.KeyStr, true) ?? prices;
+                else if (prices == null && defaultPayrollCategory != null)
                     prices = PriceMatrix(priceDate, 1, project, defaultPayrollCategory.KeyStr);
-                }
 
                 if (prices != null)
                 {
@@ -982,68 +989,6 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
                 }
             }
         }
-        #endregion
-
-        #region Google Maps calculate distance
-        public static double GetDistance(string fromAddress, string toAddress, bool avoidFerries = true, int decimals = 1)
-        {
-            string apiKey = "AIzaSyC1g0oHHskaL5_o059GBCNzKcvhJEsF-Dg";
-            string googlemapURL = "https://maps.googleapis.com/maps/api/distancematrix/json?&origins=";
-
-            fromAddress = new String(fromAddress.Select(ch => ch == ' ' || ch == '\n' ? '+' : ch).ToArray());
-            toAddress = new String(toAddress.Select(ch => ch == ' ' || ch == '\n' ? '+' : ch).ToArray());
-
-            if (fromAddress == string.Empty || toAddress == string.Empty)
-                return 0;
-
-            string requesturl = string.Format("{0}{1}&destinations={2}&mode=driving{3}&key={4}", googlemapURL, fromAddress, toAddress, avoidFerries ? "&avoid=ferries" : string.Empty, apiKey);
-            string content = FileGetContents(requesturl);
-
-            return UtilFunctions.GetDistance(content, decimals);
-        }
-#if !SILVERLIGHT
-        private static string FileGetContents(string fileName)
-        {
-            string sContents = string.Empty;
-            try
-            {
-                System.Net.WebClient wc = new System.Net.WebClient();
-                byte[] response = wc.DownloadData(fileName);
-                sContents = System.Text.Encoding.ASCII.GetString(response);
-            }
-            catch
-            {
-                UnicontaMessageBox.Show(string.Format("{0} {1}", Uniconta.ClientTools.Localization.lookup("UnableToConnectTo"), "Google Maps"), Uniconta.ClientTools.Localization.lookup("Error"));
-            }
-
-            return sContents;
-        }
-#else
-        private static string FileGetContents(string fileName)
-        {
-            string sContents = string.Empty;
-            //try
-            //{
-            //    System.Net.WebClient wc = new System.Net.WebClient();
-            //    wc.DownloadStringCompleted += new DownloadStringCompletedEventHandler(client_DownloadStringCompleted);
-            //    wc.DownloadStringAsync(new Uri(fileName, UriKind.RelativeOrAbsolute));
-            //    //  sContents = System.Text.Encoding.UTF8.GetString(response);
-            //}
-            //catch
-            //{
-            //    UnicontaMessageBox.Show(string.Format("{0} {1}", Uniconta.ClientTools.Localization.lookup("UnableToConnectTo"), "Google Maps"), Uniconta.ClientTools.Localization.lookup("Error"));
-            //}
-
-            return sContents;
-        }
-        private static void client_DownloadStringCompleted(object sender, DownloadStringCompletedEventArgs e)
-        {
-            if (e.Error == null)
-            {
-                string response = e.Result;
-            }
-        }
-#endif
         #endregion
     }
 }

@@ -24,6 +24,7 @@ using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
 using Uniconta.Common;
 using Uniconta.DataModel;
+using Uniconta.Common.Utility;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -104,8 +105,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private string GetFilterString(string defaultFilter, List<int> newRowIds, List<int> existingRowIds = null)
         {
-            var filterString = string.Empty;
-            StringBuilder strBuilder = new StringBuilder();
+            var strBuilder = StringBuilderReuse.Create(defaultFilter);
             strBuilder.Append(" And Not [RowId] In (");
             var totalRowIds = new List<int>();
             if (newRowIds != null)
@@ -114,13 +114,12 @@ namespace UnicontaClient.Pages.CustomPage
                 totalRowIds.AddRange(existingRowIds);
 
             foreach (var rowId in totalRowIds)
-                strBuilder.Append('\'').Append(rowId).Append('\'').Append(',');
+                strBuilder.Append('\'').AppendNum(rowId).Append('\'').Append(',');
 
-            strBuilder.Remove(strBuilder.Length - 1, 1);
+            strBuilder.Length--;
             strBuilder.Append(')');
-            filterString = string.Concat(defaultFilter, strBuilder);
 
-            return filterString;
+            return strBuilder.ToStringAndRelease();
         }
         private void LocalMenu_OnItemClicked(string ActionType)
         {
@@ -179,12 +178,12 @@ namespace UnicontaClient.Pages.CustomPage
             foreach (var voucher in vouchersAdd)
             {
                 if (dgVoucherFolderGrid.ItemsSource == null)
-                    dgVoucherFolderGrid.AddRow(voucher);
+                    dgVoucherFolderGrid.AddRow(voucher, -1, false);
                 else
                 {
                     var list = (IEnumerable<VouchersClient>)dgVoucherFolderGrid.ItemsSource;
                     if (!list.Contains(voucher))
-                        dgVoucherFolderGrid.AddRow(voucher);
+                        dgVoucherFolderGrid.AddRow(voucher, -1, false);
                 }
             }
         }

@@ -33,6 +33,7 @@
       <RibbonItem Action="AddNote" ShortcutKey="Alt+N" LocalizedNameKey="Note" ControlName="UserNotesPage" Glyph="Add_Notes_16x16.png" />
       <RibbonItem Action="AddDoc" LocalizedNameKey="Document" ControlName="UserDocsPage" Glyph="Accounts_Statement_Report_16x16.png" />
       <RibbonItem Action="ViewPhoto" LocalizedNameKey="ItemAttachments" Glyph="View_16x16.png" />
+      <RibbonItem Action="ViewNotes" LocalizedNameKey="ItemNotes" Glyph="Note_16x16.png" />
     </RibbonItem>
   </RibbonItem>
   <RibbonItem>
@@ -40,6 +41,9 @@
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="ProductionReport" LocalizedNameKey="GenerateOBJ" Parameter="Report" LargeGlyph="Re_Open_32x32.png" Glyph=""/>
+  </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="CreateOrder" LocalizedNameKey="CopyOBJ" Parameter="PurchaseSalesOrder" Glyph="refresh.png" LargeGlyph="Orders_32x32.png"/>
   </RibbonItem>
   <RibbonItem TabId="1" LocalizedNameKey="EditAll">
     <RibbonItem Action="EditAll"  LocalizedNameKey="EditAll" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>

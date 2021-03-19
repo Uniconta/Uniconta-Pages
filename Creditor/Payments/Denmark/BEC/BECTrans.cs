@@ -72,7 +72,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
 
             danishFields.BeneficiaryName = glJournalGenerated ? string.Empty : ShortenWordToCriteria(tran.Creditor.Name, 35); 
 
-            var paymentAmount = Math.Round(tran._PaymentAmount, 2);
+            var paymentAmount = Math.Round(tran.PaymentAmount, 2);
 
             if (danishFields.TransTypeCommand == BECPayFormat.TRANSTYPE_ERH400)
             {

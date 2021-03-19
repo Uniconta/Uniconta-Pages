@@ -20,6 +20,8 @@ using Uniconta.ClientTools;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.Common;
+using Uniconta.ClientTools.Controls;
+using Uniconta.DataModel;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -101,7 +103,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void Init(UnicontaBaseEntity sourcedata = null)
         {
             InitializeComponent();
-            Utility.SetupVariants(api, null, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
+            Utility.SetupVariants(api, colVariant, VariantName, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
             dgInvReservationReportGrid.api = api;
             SetRibbonControl(localMenu, dgInvReservationReportGrid);
             dgInvReservationReportGrid.BusyIndicator = busyIndicator;
@@ -147,6 +149,32 @@ namespace UnicontaClient.Pages.CustomPage
         protected override void LoadCacheInBackGround()
         {
             LoadType(new Type[] { typeof(Uniconta.DataModel.InvItem), typeof(Uniconta.DataModel.InvWarehouse) });
+        }
+
+        protected override LookUpTable HandleLookupOnLocalPage(LookUpTable lookup, CorasauDataGrid dg)
+        {
+            var invRes = dg.SelectedItem as InvReservationClient;
+            if (invRes == null)
+                return lookup;
+            if (dg.CurrentColumn?.Name == "OrderNumber")
+            {
+                switch (invRes._DCType)
+                {
+                    case OrderType.SalesOrder:
+                        lookup.TableType = typeof(Uniconta.DataModel.DebtorOrder);
+                        break;
+                    case OrderType.PurchaseOrder:
+                        lookup.TableType = typeof(Uniconta.DataModel.CreditorOrder);
+                        break;
+                    case OrderType.Offer:
+                        lookup.TableType = typeof(Uniconta.DataModel.DebtorOffer);
+                        break;
+                    case OrderType.Production:
+                        lookup.TableType = typeof(Uniconta.DataModel.ProductionOrder);
+                        break;
+                }
+            }
+            return lookup;
         }
     }
 }

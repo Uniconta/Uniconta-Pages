@@ -304,11 +304,11 @@ namespace UnicontaClient.Pages.CustomPage
                             bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "invoice_date", true) == 0).FirstOrDefault();
                             if (bsItem != null)
                             {
-                                var invoiceDate = bsItem.value == string.Empty ? DateTime.Today : StringSplit.DateParse(bsItem.value, DateFormat.ymd);
+                                var invoiceDate = bsItem.value == string.Empty ? GetSystemDefaultDate() : StringSplit.DateParse(bsItem.value, DateFormat.ymd);
                                 journalLine.Date = invoiceDate;
 
                                 if (journalLine.Date == DateTime.MinValue)
-                                    journalLine.Date = DateTime.Today;
+                                    journalLine.Date = GetSystemDefaultDate();
                             }
 
                             bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_date", true) == 0).FirstOrDefault();

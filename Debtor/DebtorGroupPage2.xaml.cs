@@ -83,6 +83,9 @@ namespace UnicontaClient.Pages.CustomPage
             leAutoNumber.api = crudapi;
             layoutGroupLookupEditor.api = crudapi;
             itemNameGroupLookupEditor.api = crudapi;
+#if !SILVERLIGHT
+            invoiceSerieLookupEditor.api = crudapi;
+#endif
 
             if (!crudapi.CompanyEntity._UseVatOperation)
             {

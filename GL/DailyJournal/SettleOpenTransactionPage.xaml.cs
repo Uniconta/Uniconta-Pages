@@ -100,6 +100,19 @@ namespace UnicontaClient.Pages.CustomPage
             this.BeforeClose += SettleOpenTransactionPage_BeforeClose;
         }
 
+        protected override void OnLayoutLoaded()
+        {
+            var winSetting = BasePage.session.Preference.GetWindowSetting(TabControls.SettleOpenTransactionPage);
+            if (winSetting == null)
+            {
+                var curpanel = dockCtrl?.Activpanel;
+                if (curpanel != null && curpanel.IsFloating)
+                    curpanel.MinWidth = 1400;
+                curpanel.UpdateLayout();
+            }
+            base.OnLayoutLoaded();
+        }
+
         public override void Utility_Refresh(string screenName, object argument = null)
         {
             if (screenName == TabControls.DebtorTranPage2 || screenName == TabControls.CreditorTranOpenPage2)
@@ -353,7 +366,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (selectedInvoices != null && selectedRowIds != null)
             {
-                var sb = new StringBuilder(50);
+                var sb = StringBuilderReuse.Create();
                 if (selectedInvoices.Count > 0)
                 {
                     sb.Append("I:");
@@ -364,7 +377,7 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     sb.Append("R:");
                     foreach (var row in selectedRowIds)
-                        sb.Append(row).Append(';');
+                        sb.AppendNum(row).Append(';');
                 }
 
                 var len = sb.Length;
@@ -372,7 +385,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (len > 0 && sb[len - 1] == ';') // remove the last
                     sb.Length--;
 
-                settlement = sb.ToString();
+                settlement = sb.ToStringAndRelease();
 
                 if (SelectedJournalLine != null)
                 {

@@ -20,6 +20,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
+using System.Threading.Tasks;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -70,23 +71,32 @@ namespace UnicontaClient.Pages.CustomPage
             ItemNameGrouplookupeditior.api =
            Withholdinglookupeditior.api =
            Vatlookupeditior.api = VatOprlookupeditior.api = Employeelookupeditor.api = leInvoiceAccount.api =
-           dim1lookupeditior.api = dim2lookupeditior.api = dim3lookupeditior.api = dim4lookupeditior.api = dim5lookupeditior.api = Paymentlookupeditior.api = grouplookupeditor.api = PriceListlookupeditior.api = lePostingAccount.api = lePaymtFormat.api = leShipment.api = leDeliveryTerm.api = LayoutGrouplookupeditior.api = prCategoryLookUpeditor.api = crudapi;
+           dim1lookupeditior.api = dim2lookupeditior.api = dim3lookupeditior.api = dim4lookupeditior.api = dim5lookupeditior.api = 
+           Paymentlookupeditior.api = grouplookupeditor.api = PriceListlookupeditior.api = lePostingAccount.api = lePaymtFormat.api = 
+           leShipment.api = leDeliveryTerm.api = LayoutGrouplookupeditior.api = prCategoryLookUpeditor.api = leD2CAccount.api = leCrmGroup.api= crudapi;
 
             AdjustLayout();
+            Task t;
+            if (crudapi.CompanyEntity.CRM)
+                t = GetInterestAndProduct();
+            else
+                t = null;
 
             if (LoadedRow == null)
             {
                 frmRibbon.DisableButtons("Delete");
                 if (!isCopiedRow)
                     editrow = CreateNew() as CreditorClient;
+                else
+                    editrow._D2CAccount = null;
                 editrow.Country = crudapi.CompanyEntity._CountryId;
             }
 
             layoutItems.DataContext = editrow;
-            frmRibbon.OnItemClicked += frmRibbon_BaseActions;
-
-            StartLoadCache();
-
+            frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
+            StartLoadCache(t);
+            if (editrow.RowId != 0)
+                leD2CAccount.IsReadOnly = true;
             editrow.PropertyChanged += Editrow_PropertyChanged;
             txtCompanyRegNo.EditValueChanged += TxtCVR_EditValueChanged;
 #if !SILVERLIGHT
@@ -102,6 +112,21 @@ namespace UnicontaClient.Pages.CustomPage
 #else
         }
 #endif
+
+        async Task GetInterestAndProduct()
+        {
+            var crmInterestCache = api.GetCache(typeof(Uniconta.DataModel.CrmInterest)) ?? await api.LoadCache(typeof(Uniconta.DataModel.CrmInterest));
+            cmbInterests.ItemsSource = crmInterestCache.GetKeyList();
+            var crmProductCache = api.GetCache(typeof(Uniconta.DataModel.CrmProduct)) ?? await api.LoadCache(typeof(Uniconta.DataModel.CrmProduct));
+            cmbProducts.ItemsSource = crmProductCache.GetKeyList();
+        }
+
+        private void frmRibbon_OnItemClicked(string ActionType)
+        {
+            if (ActionType == "Save" && !VaidateEAN(editrow._EAN))
+                return;
+            frmRibbon_BaseActions(ActionType);
+        }
 
         protected override void OnLayoutCtrlLoaded()
         {
@@ -130,6 +155,10 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (Comp._CountryId != CountryCode.Estonia)
                 liEEIsNotVatDeclOrg.Visibility = Visibility.Collapsed;
+            if (!Comp.CRM)
+                crmGroup.Visibility = Visibility.Collapsed;
+            else
+                crmGroup.Visibility = Visibility.Visible;
         }
 
         public override bool BeforeSetUserField(ref CorasauLayoutGroup parentGroup)
@@ -143,16 +172,16 @@ namespace UnicontaClient.Pages.CustomPage
             var api = this.api;
             var Comp = api.CompanyEntity;
 
-            var Cache = Comp.GetCache(typeof(Uniconta.DataModel.GLVat)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.GLVat), api).ConfigureAwait(false);
+            var Cache = Comp.GetCache(typeof(Uniconta.DataModel.GLVat)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLVat)).ConfigureAwait(false);
             Vatlookupeditior.cacheFilter = new VatCacheFilter(Cache, GLVatSaleBuy.Buy);
 
-            if (api.CompanyEntity._UseVatOperation)
+            if (Comp._UseVatOperation)
             {
-                Cache = Comp.GetCache(typeof(Uniconta.DataModel.GLVatType)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.GLVatType), api).ConfigureAwait(false);
+                Cache = Comp.GetCache(typeof(Uniconta.DataModel.GLVatType)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLVatType)).ConfigureAwait(false);
                 VatOprlookupeditior.cacheFilter = new VatTypeSQLCacheFilter(Cache, GLVatSaleBuy.Buy);
             }
 
-            creditorCache = Comp.GetCache(typeof(Uniconta.DataModel.Creditor)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.Creditor), api).ConfigureAwait(false);
+            creditorCache = Comp.GetCache(typeof(Uniconta.DataModel.Creditor)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Creditor)).ConfigureAwait(false);
 
             LoadType(new Type[] { typeof(Uniconta.DataModel.CreditorGroup), typeof(Uniconta.DataModel.PaymentTerm) });
         }
@@ -312,6 +341,15 @@ namespace UnicontaClient.Pages.CustomPage
                     onlyRunOnce = false;
             }
         }
+
+        bool VaidateEAN(string ean)
+        {
+            if (Utility.IsValidEAN(ean, api.CompanyEntity))
+                return true;
+            UnicontaMessageBox.Show(string.Format("{0} {1}", Uniconta.ClientTools.Localization.lookup("EANinvalid"), ean), Uniconta.ClientTools.Localization.lookup("Warning"));
+            return false;
+        }
+
 #if !SILVERLIGHT
 
         private void Email_ButtonClicked(object sender)
@@ -342,7 +380,6 @@ namespace UnicontaClient.Pages.CustomPage
         {
             Utility.OpenWebSite(editrow._Www);
         }
-
 #endif
     }
 }

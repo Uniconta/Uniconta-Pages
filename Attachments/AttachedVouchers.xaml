@@ -71,7 +71,7 @@ x:Class="UnicontaClient.Pages.CustomPage.AttachedVouchers"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PurchaseNumber" Width="85" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DocumentDate" Visible="False" Width="85"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PostingInstruction" MinWidth="500" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Folder" Visible="False" Width="55" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ViewInFolder" Visible="False" Width="100" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PayDate" Width="85" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="VatOperation"  Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="TransType"  Visible="False" />

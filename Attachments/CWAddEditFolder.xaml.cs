@@ -87,26 +87,30 @@ namespace UnicontaClient.Pages.CustomPage.Attachments
             if (FolderName != null)
                 folder = folderCache.Get(FolderName) as DocumentFolder;
             FolderName = txtFolder.Text;
+            ErrorCodes result = ErrorCodes.NoSucces;
             switch (Action)
             {
                 case 0:
                     var folderClient = new DocumentFolderClient();
                     folderClient._Name = FolderName;
-                    api.Insert(folderClient).GetAwaiter().GetResult();
+                    result = api.Insert(folderClient).GetAwaiter().GetResult();
                     break;
                 case 1:
                     if (folder != null)
                     {
                         folder._Name = FolderName;
-                        api.Update(folder).GetAwaiter().GetResult();
+                        result = api.Update(folder).GetAwaiter().GetResult();
                     }
                     break;
                 case 2:
                     if (folder != null)
-                        api.Delete(folder).GetAwaiter().GetResult();
+                        result = api.Delete(folder).GetAwaiter().GetResult();
                     break;
             }
 
+            if (result != ErrorCodes.Succes)
+                Uniconta.ClientTools.Util.UtilDisplay.ShowErrorCode(result);
+            
             this.DialogResult = true;
         }
 

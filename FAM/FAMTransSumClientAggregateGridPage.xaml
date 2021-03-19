@@ -21,6 +21,7 @@ x:Class="UnicontaClient.Pages.CustomPage.FAMTransSumClientAggregateGridPage"
                 <localPage:CorasauDataGridTemplateColumnClient x:Name="DepreciationBase" Width="100" />
                 <localPage:CorasauDataGridTemplateColumnClient x:Name="DepreciationPrimo" Width="100"/>
                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Depreciation" Width="100"/>
+                <localPage:CorasauDataGridTemplateColumnClient x:Name="ReversedDepreciation" Width="100"/>
                 <localPage:CorasauDataGridTemplateColumnClient x:Name="WriteUp" Width="100"/>
                 <localPage:CorasauDataGridTemplateColumnClient x:Name="WriteDown" Width="100"/>
                 <localPage:CorasauDataGridTemplateColumnClient x:Name="WriteOff" Width="100"/>
@@ -34,6 +35,7 @@ x:Class="UnicontaClient.Pages.CustomPage.FAMTransSumClientAggregateGridPage"
                 <localPage:SumColumn FieldName="DepreciationBase" SummaryType="Sum" DisplayFormat="{}{0:N2}" />
                 <localPage:SumColumn FieldName="DepreciationPrimo" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                 <localPage:SumColumn FieldName="Depreciation" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                <localPage:SumColumn FieldName="ReversedDepreciation" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                 <localPage:SumColumn FieldName="WriteUp" SummaryType="Sum" DisplayFormat="{}{0:N2}" />
                 <localPage:SumColumn FieldName="WriteDown" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                 <localPage:SumColumn FieldName="WriteOff" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>

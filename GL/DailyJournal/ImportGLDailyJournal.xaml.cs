@@ -184,7 +184,7 @@ namespace UnicontaClient.Pages.CustomPage
             else if (selectedbankFormat.Format == BankImportFormatType.LANDSBANKINN || selectedbankFormat.Format == BankImportFormatType.ISLANDSBANKI || selectedbankFormat.Format == BankImportFormatType.ARION)
             {
                 busyIndicator.IsBusy = true;
-                errt = postingApi.ImportJournalLines(selectedbankFormat, new MemoryStream(), Append, txtFromDate.DateTime, txtToDate.DateTime);
+                errt = postingApi.ImportJournalLines(selectedbankFormat, (Stream)null, Append, txtFromDate.DateTime, txtToDate.DateTime);
                 err = await errt;
             }
             else if (voucherClient != null)
@@ -233,10 +233,13 @@ namespace UnicontaClient.Pages.CustomPage
                     continue;
 
                 var bufferSize = (int)zipEntry.Size;
-                byte[] buffer = new byte[bufferSize];
+                var buffer = UnistreamReuse.Create(bufferSize);
+                var stream = zipFile.GetInputStream(zipEntry);
+                buffer.CopyFrom(stream);
 
                 var zipFileInfo = new FileInfo(zipEntry.Name);
-                importZipResult = await postingapi.ImportJournalLines(selectedbankFormat, new MemoryStream(buffer), append, fromDate, toDate);
+                importZipResult = await postingapi.ImportJournalLines(selectedbankFormat, buffer, append, fromDate, toDate);
+                buffer.Release();
 
                 if (importZipResult != ErrorCodes.Succes)
                     break;
@@ -248,7 +251,8 @@ namespace UnicontaClient.Pages.CustomPage
         private void ShowGlDailyJournalLines(string journal)
         {
             var parms = new[] { new BasePage.ValuePair("Journal", journal) };
-            AddDockItem(TabControls.GL_DailyJournalLine, null, null, null, true, null, parms);
+            var header = string.Concat(Uniconta.ClientTools.Localization.lookup("Journal"), ": ", journal);
+            AddDockItem(TabControls.GL_DailyJournalLine, null, header, null, true, null, parms);
         }
 
         private void ShowBankStatementLines(string bankAccount)

@@ -415,7 +415,16 @@ namespace UnicontaISO20022CreditTransfer
                     }
             }
         }
-        
+
+        public override PostalAddress CreditorAddress(Uniconta.DataModel.Creditor creditor, PostalAddress creditorAddress, bool unstructured = false)
+        {
+            if (paymentType != ISO20022PaymentTypes.DOMESTIC && (companyBankEnum == CompanyBankENUM.Nordea_DK || companyBankEnum == CompanyBankENUM.Nordea_NO))
+                unstructured = true;
+
+            return base.CreditorAddress(creditor, creditorAddress, unstructured);
+        }
+
+
 
         /// <summary>
         /// Unstructured Remittance Information

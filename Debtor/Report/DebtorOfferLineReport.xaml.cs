@@ -29,13 +29,14 @@ namespace UnicontaClient.Pages.CustomPage
     public class DebtorOfferLineReportGrid : CorasauDataGridClient
     {
         public override Type TableType { get { return typeof(DebtorOfferLineClient); } }
+        public override bool SingleBufferUpdate { get { return false; } }
     }
     /// <summary>
     /// Interaction logic for DebtorOfferLineReport.xaml
     /// </summary>
     public partial class DebtorOfferLineReport : GridBasePage
     {
-        public override string NameOfControl { get { return TabControls.DebtorOfferLineReport ; } }
+        public override string NameOfControl { get { return TabControls.DebtorOfferLineReport; } }
 
         SQLCache items, warehouse;
         public DebtorOfferLineReport(UnicontaBaseEntity masterRecord) : base(masterRecord)
@@ -223,12 +224,13 @@ namespace UnicontaClient.Pages.CustomPage
             var company = api.CompanyEntity;
             if (!company.Location || !company.Warehouse)
                 Location.Visible = Location.ShowInColumnChooser = false;
+            else
+                Location.ShowInColumnChooser = true;
             if (!company.Warehouse)
                 Warehouse.Visible = Warehouse.ShowInColumnChooser = false;
+            else
+                Warehouse.ShowInColumnChooser = true;
             Utility.SetupVariants(api, colVariant, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
-        }
-        void setDim()
-        {
             Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
         }
 

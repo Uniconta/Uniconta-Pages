@@ -300,7 +300,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         public static async void ShowErrorMsg(ErrorCodes errorCode, string host)
         {
-            var lastErrors = await BasePage.session.GetErrors();
+            var lastErrors = await BasePage.session.GetErrors(errorCode);
             string errMsg = UtilDisplay.GetFormattedErrorCode(errorCode, lastErrors);
             string hyperlink;
             if (host != null && host.Contains("gmail"))
@@ -359,7 +359,7 @@ namespace UnicontaClient.Pages.CustomPage
                     }
 
                     string mobilePayUrl = @"https://mobilepay.dk/erhverv/betalingslink/betalingslink-svar?phone=" + phoneNumber +
-                                          @"&amount={DebtorInvoice.TotalAmount}&comment=Faktura{DebtorInvoice.InvoiceNumber}&lock=1";
+                                          @"&amount={DebtorInvoice.TotalAmount.0.00}&comment=Faktura{DebtorInvoice.InvoiceNumber}&lock=1";
                     if (editrow._Html)
                         mobilePayUrl = @"<a href=" + mobilePayUrl + ">Mobilepay</a>";
                         

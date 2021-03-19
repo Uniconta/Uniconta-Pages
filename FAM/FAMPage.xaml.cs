@@ -172,7 +172,8 @@ namespace UnicontaClient.Pages.CustomPage
                         if (select == MessageBoxResult.Yes)
                         {
                             var parms = new[] { new BasePage.ValuePair("Journal", journalName) };
-                            AddDockItem(TabControls.GL_DailyJournalLine, null, null, null, true, null, parms);
+                            var header = string.Concat(Uniconta.ClientTools.Localization.lookup("Journal"), ": ", journalName);
+                            AddDockItem(TabControls.GL_DailyJournalLine, null, header, null, true, null, parms);
                         }
                     }
                 }

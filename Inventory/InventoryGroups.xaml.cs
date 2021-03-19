@@ -57,8 +57,12 @@ namespace UnicontaClient.Pages.CustomPage
             var Comp = api.CompanyEntity;
             if (!Comp.InvDuty)
                 DutyGroup.ShowInColumnChooser = DutyGroup.Visible = false;
+            else
+                DutyGroup.ShowInColumnChooser = true;
             if (!Comp.Project)
                 PrCategory.ShowInColumnChooser = PrCategory.Visible = false;
+            else
+                PrCategory.ShowInColumnChooser = true;
         }
 
         public override void Utility_Refresh(string screenName, object argument = null)
@@ -131,8 +135,10 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (selectedItem == null)
                 return;
+            var invGroup = Activator.CreateInstance(selectedItem.GetType()) as InvGroupClient;
+            CorasauDataGrid.CopyAndClearRowId(selectedItem, invGroup);
             object[] copyParam = new object[2];
-            copyParam[0] = selectedItem;
+            copyParam[0] = invGroup;
             copyParam[1] = false;
             string header = string.Format(Uniconta.ClientTools.Localization.lookup("CopyOBJ"), selectedItem.Group);
             AddDockItem(TabControls.InventoryGroupPage2, copyParam, header);

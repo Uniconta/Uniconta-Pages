@@ -155,7 +155,10 @@ namespace UnicontaClient.Pages.CustomPage
 
             ErrorCodes errorCode;
             if (lst.Count > 0)
+            {
+                api.AllowBackgroundCrud = false;
                 errorCode = await api.Insert(lst);
+            }
             else
                 errorCode = ErrorCodes.Succes;
 
@@ -189,20 +192,20 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     var prodItem = new ProdItemClient
                     {
-                        Item = row["Item"].ToString(),
-                        EAN = row["EAN"].ToString(),
-                        Name = row["Name"].ToString(),
+                        _Item = row["Item"].ToString(),
+                        _EAN = row["EAN"].ToString(),
+                        _Name = row["Name"].ToString(),
                         Unit = row["Unit"].ToString(),
-                        SupplierItemId = row["SupplierItemId"].ToString(),
+                        _SupplierItemId = row["SupplierItemId"].ToString(),
                         //AlternativeItem = row["AlternativeItem"].ToString(),
-                        SalesPrice = NumberConvert.ToDouble(row["SalesPrice"].ToString()),
-                        //Supplier = row["Supplier"].ToString(),
-                        //DiscountGroup = row["DiscountGroup"].ToString(),
-                        //ItemGroup = row["ItemGroup"].ToString(),
-                        WebArg = row["WebArg"].ToString(),
+                        _SalesPrice = NumberConvert.ToDouble(row["SalesPrice"].ToString()),
+                        _Supplier = row["Supplier"].ToString(),
+                        _DiscountGroup = row["DiscountGroup"].ToString(),
+                        _ItemGroup = row["ItemGroup"].ToString(),
+                        _WebArg = row["WebArg"].ToString(),
                     };
                     prodItem.SetMaster(master);
-                    dgProdItem.AddRow(prodItem);
+                    dgProdItem.AddRow(prodItem, -1, false);
                 }
             }
         }

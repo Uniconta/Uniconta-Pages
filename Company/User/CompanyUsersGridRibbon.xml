@@ -18,7 +18,7 @@
     <RibbonItem Action="UserOf" LocalizedNameKey="UserOf" LargeGlyph="UsresOf_32x32.png"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="UserLoginHistory" LocalizedNameKey="UserLoginHistory" LargeGlyph="History_32x32.png"/>
+    <RibbonItem Action="UserLoginHistory" LocalizedNameKey="LoginHistory" LargeGlyph="History_32x32.png"/>
     <RibbonItem Action="UserOperations" LocalizedNameKey="UserOperations" LargeGlyph="User_Operations_32x32.png"/>
 </RibbonItem>
 </root>

@@ -49,7 +49,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorDirectDebit"
                     <local:CorasauDataGridTemplateColumnClient x:Name="CashDiscountDate" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="PaymentDate" Width="90"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Text" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Invoice" AllowThousandMask="false" Width="60"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Invoice" AllowThousandMask="false" Width="70"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Amount"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="AmountOpen" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="PartialPaymentAmount"  Width="100"/>
@@ -79,7 +79,8 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorDirectDebit"
                     <local:CorasauDataGridTemplateColumnClient x:Name="CreditCur" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="JournalPostedId" AllowThousandMask="false" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Open" Visible="False"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="TransactionText" AllowEditing="False" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="FromCreditor" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="IsDCInvoice" Visible="False"/>
                 </local:DebtorDirectDebitGrid.Columns>
                 <local:DebtorDirectDebitGrid.TotalSummary>
                     <local:SumColumn FieldName="Debit" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
@@ -87,6 +88,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorDirectDebit"
                     <local:SumColumn FieldName="Amount" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                     <local:SumColumn FieldName="AmountOpen" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                     <local:SumColumn FieldName="PaymentAmount" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <local:SumColumn FieldName="Invoice" SummaryType="Count"/>
                 </local:DebtorDirectDebitGrid.TotalSummary>
             </local:DebtorDirectDebitGrid>
         </CorasauControls:BusyIndicator>
@@ -107,7 +109,6 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorDirectDebit"
                         </Grid.ColumnDefinitions>
                         <TextBlock x:Name="HeaderTxt" Grid.Row="0" Grid.Column="0" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=StatusInfo}" FontWeight="Bold"/>
                         <TextBlock Grid.Row="1" TextWrapping="Wrap" Grid.Column="0" x:Name="CommentTxt" Text="{Binding Path=StatusInfo}"/>
-                        <TextBlock Grid.Row="1" TextWrapping="Wrap" Grid.Column="0" x:Name="NetsBSText" Text="{Binding Path=TransactionText}" FontFamily="Courier New"/>
                     </Grid>
                 </dxn:NavBarGroup>
             </dxn:NavBarControl.Groups>

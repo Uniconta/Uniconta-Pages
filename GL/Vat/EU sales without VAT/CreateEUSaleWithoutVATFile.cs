@@ -206,7 +206,7 @@ namespace UnicontaClient.Pages.CustomPage
                         euSale.SystemInfo += Environment.NewLine + "Triangular trade amount is 0";
                 }
 
-                if (debtor.Country == CountryCode.Unknown)
+                if (debtor?.Country == CountryCode.Unknown)
                 {
                     hasErrors = true;
                     if (euSale.SystemInfo == VALIDATE_OK)
@@ -214,7 +214,7 @@ namespace UnicontaClient.Pages.CustomPage
                     else
                         euSale.SystemInfo += Environment.NewLine + Localization.lookup("CountryNotSet");
                 }
-                else if (debtor.Country == companyCountryId)
+                else if (debtor?.Country == companyCountryId)
                 {
                     hasErrors = true;
                     if (euSale.SystemInfo == VALIDATE_OK)
@@ -259,7 +259,6 @@ namespace UnicontaClient.Pages.CustomPage
         private long StreamToFile(List<EUSaleWithoutVAT> listOfImportExport, StreamWriter sw)
         {
             long sumOfAmount = 0;
-            StringBuilder sbEUList = new StringBuilder();
 
             foreach (var rec in listOfImportExport)
             {
@@ -276,19 +275,17 @@ namespace UnicontaClient.Pages.CustomPage
 
                 rec.SystemInfo = Localization.lookup("Exported");
 
-                sbEUList.AppendLine(string.Format("{0};{1};{2};{3};{4};{5};{6};{7};{8}",
-                rec.RecordType,
-                rec.ReferenceNumber,
-                rec.Date.ToString("yyyy-MM-dd"),
-                rec.CompanyRegNo,
-                countryStr,
-                rec._DebtorRegNoFile,
-                itemAmount,
-                triangularTradeAmount,
-                serviceAmount));
+                sw.Write(rec.RecordType); sw.Write(';');
+                sw.Write(rec.ReferenceNumber); sw.Write(';');
+                sw.Write(rec.Date.ToString("yyyy-MM-dd")); sw.Write(';');
+                sw.Write(rec.CompanyRegNo); sw.Write(';');
+                sw.Write(countryStr); sw.Write(';');
+                sw.Write(rec._DebtorRegNoFile); sw.Write(';');
+                NumberConvert.ToStream(sw, itemAmount); sw.Write(';');
+                NumberConvert.ToStream(sw, triangularTradeAmount); sw.Write(';');
+                NumberConvert.ToStream(sw, serviceAmount);
+                sw.WriteLine();
             }
-
-            sw.Write(sbEUList);
 
             return sumOfAmount;
         }
@@ -298,7 +295,8 @@ namespace UnicontaClient.Pages.CustomPage
             sw.Write("Laenderkennzeichen"); sw.Write(';');
             sw.Write("USt-IdNr."); sw.Write(';');
             sw.Write("Betrag(EUR)"); sw.Write(';');
-            sw.Write("Art der Leistung"); sw.Write(Environment.NewLine);
+            sw.Write("Art der Leistung");
+            sw.WriteLine();
 
             long amount = 0;
             var exp = Localization.lookup("Exported");
@@ -323,7 +321,8 @@ namespace UnicontaClient.Pages.CustomPage
                 }
 
                 NumberConvert.ToStream(sw, amount); sw.Write(';');
-                sw.Write(type); sw.Write(Environment.NewLine);
+                sw.Write(type);
+                sw.WriteLine();
 
                 rec.SystemInfo = exp;
             }
@@ -331,26 +330,30 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void CreateAndStreamFirstAndLast(List<EUSaleWithoutVAT> listOfEUSale, StreamWriter sw, bool firstOrLast, string companyRegNo, int countRec = 0, long sumOfAmount = 0)
         {
-            StringBuilder sbEUList = new StringBuilder();
-
             if (firstOrLast)
             {
-               sbEUList.AppendLine(string.Format("{0};{1};{2};{3}",
-               "0",
-               companyRegNo,
-               "LISTE",
-               new string(';', 5)));
+                sw.Write('0'); sw.Write(';');
+                sw.Write(companyRegNo); sw.Write(';');
+                sw.Write("LISTE"); sw.Write(';');
+                sw.Write(';');
+                sw.Write(';');
+                sw.Write(';');
+                sw.Write(';');
+                sw.Write(';');
+                sw.WriteLine();
             }
             else
             {
-               sbEUList.AppendLine(string.Format("{0};{1};{2};{3}",
-               "10",
-               countRec,
-               sumOfAmount,
-               new string(';', 5)));
+                sw.Write("10"); sw.Write(';');
+                NumberConvert.ToStream(sw, countRec); sw.Write(';');
+                NumberConvert.ToStream(sw, sumOfAmount); sw.Write(';');
+                sw.Write(';');
+                sw.Write(';');
+                sw.Write(';');
+                sw.Write(';');
+                sw.Write(';');
+                sw.WriteLine();
             }
-
-            sw.Write(sbEUList);
         }
 
 #region Estonian VIES report to XML
@@ -364,7 +367,6 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 Encoding = Encoding.UTF8
             };
-            StringBuilder sb = new StringBuilder();
             XmlWriter xmlWriter = XmlWriter.Create(sfd, xmlWriterSettings);
             serializer.Serialize(xmlWriter, declaration, ns);
             xmlWriter.Close();
@@ -387,8 +389,9 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var declaration = new VD_deklaratsioon_Type();
             declaration.deklareerijaKood = api.CompanyEntity._VatNumber;
-            declaration.perioodAasta = invStats.FirstOrDefault().Date.Year.ToString();
-            declaration.perioodKuu = invStats.FirstOrDefault().Date.Month.ToString();
+            var f = invStats[invStats.Count - 1];
+            declaration.perioodAasta = NumberConvert.ToString(f.Date.Year);
+            declaration.perioodKuu = NumberConvert.ToString(f.Date.Month);
 
             declaration.aruandeRead = GenerateReportLines(invStats);
             CreateXml(declaration);

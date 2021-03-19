@@ -159,6 +159,14 @@ x:Class="UnicontaClient.Pages.CustomPage.SubscriptionsPage"
                             <CorasauControls:DateEditor EditValue="{Binding Ended, Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
+                    <CorasauControls:CorasauLayoutGroup View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=AzureDetails}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                        <CorasauControls:CorasauLayoutItem FieldName="ADClientId" >
+                            <CorasauControls:TextEditor Text="{Binding ADClientId, Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="ADTenantId" >
+                            <CorasauControls:TextEditor Text="{Binding ADTenantId, Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                    </CorasauControls:CorasauLayoutGroup>
                 </CorasauControls:CorasauLayoutGroup>
             </CorasauControls:CorasauLayoutControl>
         </Grid>

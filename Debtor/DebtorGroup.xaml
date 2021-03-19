@@ -54,6 +54,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorGroup"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="MandatoryItem" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DiscountAccount" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DiscountAccountOffset" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceSerie"/>
                 </localPage:DebtorGroupGrid.Columns>
             </localPage:DebtorGroupGrid>
         </CorasauControls:BusyIndicator>

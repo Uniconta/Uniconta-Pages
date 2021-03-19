@@ -54,7 +54,7 @@ namespace UnicontaClient.Pages.CustomPage
             master = sourceData as BankStatement;
             if (fromDate == DateTime.MinValue)
             {
-                DateTime date = DateTime.Today;
+                DateTime date = GetSystemDefaultDate();
                 var firstDayOfMonth = new DateTime(date.Year, date.Month, 1);
                 var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
                 fromDate = firstDayOfMonth;

@@ -197,7 +197,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (selectedItem == null)
                 return;
             var prospect = Activator.CreateInstance(selectedItem.GetType()) as PartnerProspectClient;
-            StreamingManager.Copy(selectedItem, prospect);
+            CorasauDataGrid.CopyAndClearRowId(selectedItem, prospect);
             var parms = new object[2] { prospect, false };
             AddDockItem(TabControls.PartnerProspectPage2, parms, Uniconta.ClientTools.Localization.lookup("PartnerProspects"), "Add_16x16.png");
         }

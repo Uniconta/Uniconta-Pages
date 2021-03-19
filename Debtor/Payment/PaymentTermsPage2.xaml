@@ -86,6 +86,9 @@ x:Class="UnicontaClient.Pages.CustomPage.PaymentTermsPage2"
                         <CorasauControls:CorasauLayoutItem FieldName="CashDiscountPct" x:Name="liCashDiscountPct">
                             <CorasauControls:DoubleEditor FieldName="CashDiscountPct" MaxLength="10" />
                         </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="EndOfMonthCashDiscount" x:Name="liEndOfMonthCashDiscount">
+                            <CheckBox x:Name="chkEndOfMonthCashDiscount" IsChecked="{Binding EndOfMonthCashDiscount,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="CashDiscountDays" x:Name="liCashDiscountDays" >
                             <CorasauControls:IntegerEditor  EditValue="{Binding CashDiscountDays,Mode=TwoWay}" MaxLength="30"/>
                         </CorasauControls:CorasauLayoutItem>

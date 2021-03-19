@@ -121,13 +121,20 @@ namespace UnicontaClient.Pages.CustomPage
             var company = api.CompanyEntity;
             if (!company.Location || !company.Warehouse)
                 Location.Visible = Location.ShowInColumnChooser = false;
+            else
+                Location.ShowInColumnChooser = true;
             if (!company.Warehouse)
                 Warehouse.Visible = Warehouse.ShowInColumnChooser = false;
+            else
+                Warehouse.ShowInColumnChooser = true;
             if (!company.Project)
                 Project.Visible = Project.ShowInColumnChooser = false;
+            else
+                Project.ShowInColumnChooser = true;
             if (!company.ProjectTask)
                 Task.Visible = Task.ShowInColumnChooser = false;
-
+            else
+                Task.ShowInColumnChooser = true;
             if (this.master != null)
                 colAccount.Visible = AccountName.Visible = false;
 

@@ -136,39 +136,55 @@ namespace UnicontaClient.Pages.CustomPage
 
         double sumQty, sumCost, sumSales, sumMargin, sumBudgetQty, sumBudgetCost, sumBudgetSales, sumMarginRatio, sumSalesValue, sumMarginValue;
         double sumInvoicedQty, sumInvoiced, sumBudgetInvoicedQty, sumBudgetInvoiced;
+        bool OnlySum;
 
+        void Set0()
+        {
+            sumQty = sumCost = sumSales = sumMargin = sumBudgetQty = sumBudgetCost = sumBudgetSales = sumSalesValue = sumMarginValue = 0d;
+            sumInvoicedQty = sumInvoiced = sumBudgetInvoicedQty = sumBudgetInvoiced = 0d;
+        }
         private void dgProjectTransCategorySum_CustomSummary(object sender, DevExpress.Data.CustomSummaryEventArgs e)
         {
             var fieldName = ((GridSummaryItem)e.Item).FieldName;
             switch (e.SummaryProcess)
             {
                 case CustomSummaryProcess.Start:
-                    sumQty = sumCost = sumSales = sumMargin = sumBudgetQty = sumBudgetCost = sumBudgetSales = sumSalesValue= sumMarginValue= 0d;
-                    sumInvoicedQty = sumInvoiced = sumBudgetInvoicedQty = sumBudgetInvoiced = 0d;
+                    Set0();
+                    OnlySum = true;
                     break;
                 case CustomSummaryProcess.Calculate:
-                    double val = (double)e.FieldValue;
-                    if (((ProjectTransCategorySumClientLocal)e.Row)?._CatType != CategoryType.Sum)
+                    var row = e.Row as ProjectTransCategorySumClientLocal;
+                    if (row == null)
+                        break;
+                    if (row._CatType != CategoryType.Sum)
                     {
-                        switch (fieldName)
+                        if (OnlySum)
                         {
-                            case "Qty": sumQty += val; break;
-                            case "Cost": sumCost += val; break;
-                            case "Sales": sumSales += val; break;
-                            case "Margin": sumMargin += val; break;
-                            case "BudgetQty": sumBudgetQty += val; break;
-                            case "BudgetCost": sumBudgetCost += val; break;
-                            case "BudgetSales": sumBudgetSales += val; break;
-                            case "Invoiced": sumInvoiced += val; break;
-                            case "BudgetInvoiced": sumBudgetInvoiced += val; break;
-                            case "InvoicedQty": sumInvoicedQty += val; break;
-                            case "BudgetInvoicedQty": sumBudgetInvoicedQty += val; break;
+                            OnlySum = false;
+                            Set0();
                         }
-
-                        var row = e.Row as ProjectTransCategorySumClientLocal;
-                        sumSalesValue += row.Sales;
-                        sumMarginValue += row.Margin;
                     }
+                    else if (!OnlySum)
+                        break;
+
+                    double val = (double)e.FieldValue;
+                    switch (fieldName)
+                    {
+                        case "Qty": sumQty += val; break;
+                        case "Cost": sumCost += val; break;
+                        case "Sales": sumSales += val; break;
+                        case "Margin": sumMargin += val; break;
+                        case "BudgetQty": sumBudgetQty += val; break;
+                        case "BudgetCost": sumBudgetCost += val; break;
+                        case "BudgetSales": sumBudgetSales += val; break;
+                        case "Invoiced": sumInvoiced += val; break;
+                        case "BudgetInvoiced": sumBudgetInvoiced += val; break;
+                        case "InvoicedQty": sumInvoicedQty += val; break;
+                        case "BudgetInvoicedQty": sumBudgetInvoicedQty += val; break;
+                    }
+
+                    sumSalesValue += row.Sales;
+                    sumMarginValue += row.Margin;
                     break;
                 case CustomSummaryProcess.Finalize:
                     switch (fieldName)
@@ -358,6 +374,7 @@ namespace UnicontaClient.Pages.CustomPage
                     end = len;
                 }
 
+                int headerAddedLast = 0;
                 foreach (var cat in (PrCategory[])cats.GetKeyStrRecords)
                 {
                     if (cat != null && (cat._CatType == CategoryType.Sum || cat._CatType == CategoryType.Header))
@@ -397,12 +414,27 @@ namespace UnicontaClient.Pages.CustomPage
                             sum._BudgetInvoiced = Math.Round(InvoicedBudget, 2);
                             sum._InvoicedQty = Math.Round(InvoicedQty, 2);
                             sum._BudgetInvoicedQty = Math.Round(InvoicedBudgetQty, 2);
-                            if (cat._CatType == CategoryType.Header || sum._Qty != 0 || sum._BudgetQty != 0 || sum._Sales != 0 ||  sum._Cost != 0 || sum._BudgetSales != 0 || 
+                            if (sum._Qty != 0 || sum._BudgetQty != 0 || sum._Sales != 0 || sum._Cost != 0 || sum._BudgetSales != 0 ||
                                 sum._BudgetCost != 0 || sum._Invoiced != 0 || sum._BudgetInvoiced != 0 || sum._InvoicedQty != 0 || sum._BudgetInvoicedQty != 0)
+                            {
                                 sums.Add(sum);
+                                headerAddedLast = 0;
+                            }
+                            else if (cat._CatType == CategoryType.Header)
+                            {
+                                sums.Add(sum);
+                                headerAddedLast++;
+                            }
+                        }
+                        else if (cat._CatType == CategoryType.Header)
+                        {
+                            sums.Add(new ProjectTransCategorySumClientLocal() { _CompanyId = CompanyId, _Project = ProjectNumber, _PrCategory = cat._Number, _CatType = CategoryType.Header });
+                            headerAddedLast++;
                         }
                     }
                 }
+                if (headerAddedLast > 0)
+                    sums.RemoveRange(sums.Count - headerAddedLast, headerAddedLast);
                 start = end;
             }
 
@@ -577,6 +609,5 @@ namespace UnicontaClient.Pages.CustomPage
         public double _InvoicedQty;
         [Display(Name = "InvoicedQty", ResourceType = typeof(ProjectTransClientText))]
         public double InvoicedQty { get { return _InvoicedQty; } }
-
     }
 }

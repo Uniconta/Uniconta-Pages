@@ -111,6 +111,12 @@ namespace UnicontaClient.Pages.CustomPage
                 DeliveryCity.Visible = false;
                 DeliveryCountry.Visible = false;
             }
+            if (!api.CompanyEntity.CRM)
+            {
+                CrmGroup.Visible = false;
+                Interests.Visible = false;
+                Products.Visible = false;
+            }
             dgCreditorAccountGrid.Readonly = true;
         }
 
@@ -258,7 +264,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (selectedItem == null)
                 return;
             var creditor = Activator.CreateInstance(selectedItem.GetType()) as CreditorClient;
-            StreamingManager.Copy(selectedItem, creditor);
+            CorasauDataGrid.CopyAndClearRowId(selectedItem, creditor);
             var parms = new object[2] { creditor, false };
             AddDockItem(TabControls.CreditorAccountPage2, parms, Uniconta.ClientTools.Localization.lookup("Creditorsaccount"), "Add_16x16.png");
         }

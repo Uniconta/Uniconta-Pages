@@ -75,7 +75,7 @@ namespace UnicontaClient.Pages.CustomPage
             var Comp = api.CompanyEntity;
 
 #if !SILVERLIGHT
-            if (Comp._CountryId != CountryCode.Denmark)
+            if (Comp._CountryId != CountryCode.Denmark && Comp._CountryId != CountryCode.Greenland && Comp._CountryId != CountryCode.FaroeIslands)
                 UtilDisplay.RemoveMenuCommand(rb, "ConnectToBank");
 #else
             UtilDisplay.RemoveMenuCommand(rb, "ConnectToBank");

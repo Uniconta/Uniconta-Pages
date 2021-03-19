@@ -78,6 +78,13 @@ namespace UnicontaClient.Pages.CustomPage
             this.PreviewKeyDown += RootVisual_KeyDown;
 #endif
             this.BeforeClose += DebtorAccount_BeforeClose;
+
+            //var row = new DebtorClient();
+            //row.SetMaster(api.CompanyEntity);
+            //var UserFieldDef = row.UserFieldDef();
+            //if (UserFieldDef != null)
+            //    UserFieldControl.CreateUserFieldOnPage2(detailControl.layoutItems, UserFieldDef, (RowIndexConverter)this.Resources["RowIndexConverter"], this.api, this, true, null);
+
         }
 
         private void RootVisual_KeyDown(object sender, KeyEventArgs e)
@@ -303,6 +310,12 @@ namespace UnicontaClient.Pages.CustomPage
                 case "UndoDelete":
                     dgDebtorAccountGrid.UndoDeleteRow();
                     break;
+#if !SILVERLIGHT
+                case "DocSendLog":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.DocsSendLogGridPage, dgDebtorAccountGrid.syncEntity);
+                    break;
+#endif
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -314,7 +327,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (selectedItem == null)
                 return;
             var debtor = Activator.CreateInstance(selectedItem.GetType()) as DebtorClient;
-            StreamingManager.Copy(selectedItem, debtor);
+            CorasauDataGrid.CopyAndClearRowId(selectedItem, debtor);
             var parms = new object[2] { debtor, false };
             AddDockItem(TabControls.DebtorAccountPage2, parms, Uniconta.ClientTools.Localization.lookup("DebtorAccount"), "Add_16x16.png");
         }

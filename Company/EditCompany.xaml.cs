@@ -338,7 +338,7 @@ namespace UnicontaClient.Pages.CustomPage
                         else
                             globalEvents.OnRefresh(TabControls.CreateCompany, companiesTemp.FirstOrDefault());
 
-                        dockCtrl.CloseAllDocuments(true);
+                        dockCtrl?.CloseAllDocuments(true);
                     }
                 }
             };
@@ -350,7 +350,6 @@ namespace UnicontaClient.Pages.CustomPage
             EraseYearWindow EraseYearWindowDialog = new EraseYearWindow(editrow.CompanyName, false);
             EraseYearWindowDialog.Closed += delegate
             {
-
                 if (EraseYearWindowDialog.DialogResult == true)
                 {
                     EnterPasswordWindow passwordConfirmationDailog = new EnterPasswordWindow();
@@ -358,13 +357,21 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         if (passwordConfirmationDailog.DialogResult == true)
                         {
-                            CompanyAPI compApi = new CompanyAPI(api);
-                            var res = await compApi.EraseAllTransactions(passwordConfirmationDailog.Password);
-                            if (res != ErrorCodes.Succes)
-                                UtilDisplay.ShowErrorCode(res);
-                            else
+                            if (UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("ConfirmDeleteTrans"), editrow.CompanyName), Uniconta.ClientTools.Localization.lookup("Confirmation"),
+#if !SILVERLIGHT
+                        MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+#else
+                        MessageBoxButton.OKCancel) == MessageBoxResult.OK)
+#endif
                             {
-                                UtilDisplay.ShowErrorCode(res);
+                                CompanyAPI compApi = new CompanyAPI(api);
+                                var res = await compApi.EraseAllTransactions(passwordConfirmationDailog.Password);
+                                if (res != ErrorCodes.Succes)
+                                    UtilDisplay.ShowErrorCode(res);
+                                else
+                                {
+                                    UtilDisplay.ShowErrorCode(res);
+                                }
                             }
                         }
                     };
@@ -373,7 +380,6 @@ namespace UnicontaClient.Pages.CustomPage
                 }
             };
             EraseYearWindowDialog.Show();
-
         }
 
         async void save()

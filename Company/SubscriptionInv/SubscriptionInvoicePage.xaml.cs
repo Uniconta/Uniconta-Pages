@@ -151,7 +151,7 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                     else
                     {
-                            SendMail(selectedItem, selectedItem._Date);
+                        SendMail(selectedItem, selectedItem._Date);
                     }
                     break;
 
@@ -245,7 +245,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         async void SendMail(SubscriptionInvoice Invoice, DateTime selectedDate, bool SendALL = false)
         {
-            var subscriptionMsg = string.Format(Uniconta.ClientTools.Localization.lookup("SendInvoiceSubscriptionMsg"), Invoice._Sid);
+            var subscriptionMsg = SendALL ? Uniconta.ClientTools.Localization.lookup("SendAllInvoiceMsg") : string.Format(Uniconta.ClientTools.Localization.lookup("SendInvoiceSubscriptionMsg"), Invoice._Sid);
             if (UnicontaMessageBox.Show(subscriptionMsg, Uniconta.ClientTools.Localization.lookup("Message"), MessageBoxButton.OKCancel
 #if !SILVERLIGHT
                 , MessageBoxImage.Question

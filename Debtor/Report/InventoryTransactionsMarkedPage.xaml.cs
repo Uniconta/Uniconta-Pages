@@ -44,14 +44,41 @@ namespace UnicontaClient.Pages.CustomPage
     public partial class InventoryTransactionsMarkedPage : GridBasePage
     {
         public override string NameOfControl { get { return TabControls.InventoryTransactionsMarkedPage; } }
-        DCOrderLineClient debtorOrderLine;
         long costRefTrans;
+        string Item, dcaccount;
+        byte DCType;
+        double qty;
+        DCOrderLineClient debtorOrderLine;
+        InvTrans invtrans;
         public InventoryTransactionsMarkedPage(UnicontaBaseEntity orderLine) : base(null)
         {
             this.DataContext = this;
             InitializeComponent();
             debtorOrderLine = orderLine as DCOrderLineClient;
-            costRefTrans = debtorOrderLine.CostRefTrans;
+            if (debtorOrderLine != null)
+            {
+                Item = debtorOrderLine._Item;
+                DCType = debtorOrderLine.__DCType();
+                this.qty = debtorOrderLine._Qty;
+                costRefTrans = debtorOrderLine.CostRefTrans;
+                if (DCType == 2)
+                    dcaccount = ((CreditorOrderLineClient)debtorOrderLine).Order?._DCAccount;
+                else
+                    dcaccount = ((DebtorOrderLineClient)debtorOrderLine).Order?._DCAccount;
+            }
+            else
+            {
+                invtrans = orderLine as InvTrans;
+                if (invtrans != null)
+                {
+                    Item = invtrans._Item;
+                    DCType = invtrans._MovementType;
+                    this.qty = invtrans._Qty;
+                    dcaccount = invtrans._DCAccount;
+                    if (DCType != 2 && this.qty < 0)
+                        this.qty = -this.qty;
+                }
+            }
             SetHeader();
             dgInvTransGrid.api = api;
             localMenu.dataGrid = dgInvTransGrid;
@@ -87,33 +114,28 @@ namespace UnicontaClient.Pages.CustomPage
         }
         void SetHeader()
         {
-            var itemName = ClientHelper.GetName(api.CompanyId, typeof(InvItem), debtorOrderLine._Item);
-            string header = string.Format("{0}: {1}, {2}", Uniconta.ClientTools.Localization.lookup("InvTransactions"), debtorOrderLine._Item, itemName);
+            var itemName = ClientHelper.GetName(api.CompanyId, typeof(InvItem), Item);
+            string header = string.Format("{0}: {1}, {2}", Uniconta.ClientTools.Localization.lookup("InvTransactions"), Item, itemName);
             SetHeader(header);
         }
 
         async public override Task InitQuery()
         {
-            var debtorOrderLine = this.debtorOrderLine;
-            var dctype = debtorOrderLine.__DCType();
+            var dctype = DCType;
 
             busyIndicator.IsBusy = true;
             var pair = new List<PropValuePair>()
             {
-                PropValuePair.GenereteWhereElements("Item", debtorOrderLine._Item, CompareOperator.Equal),
-                PropValuePair.GenereteWhereElements("Qty", 0d, dctype == 2 || debtorOrderLine._Qty > 0d ? CompareOperator.GreaterThan : CompareOperator.LessThan),
+                PropValuePair.GenereteWhereElements("Item", Item, CompareOperator.Equal),
+                PropValuePair.GenereteWhereElements("Qty", 0d, dctype == 2 || qty > 0d ? CompareOperator.GreaterThan : CompareOperator.LessThan),
                 PropValuePair.GenereteWhereElements("Date", DateTime.Now.Date.AddYears(-1), CompareOperator.GreaterThanOrEqual),
             };
-            if (dctype == 2 || debtorOrderLine._Qty < 0) // creditnota
+            if (dctype == 2 || qty < 0) // creditnota
             {
                 pair.Add(PropValuePair.GenereteWhereElements("MovementType", Convert.ToString(dctype), CompareOperator.Equal));
                 string dc;
-                if (dctype == 2)
-                    dc = ((CreditorOrderLineClient)debtorOrderLine).Order?._DCAccount;
-                else
-                    dc = ((DebtorOrderLineClient)debtorOrderLine).Order?._DCAccount;
-                if (dc != null)
-                    pair.Add(PropValuePair.GenereteWhereElements("DCAccount", dc, CompareOperator.Equal));
+                if (dcaccount != null)
+                    pair.Add(PropValuePair.GenereteWhereElements("DCAccount", dcaccount, CompareOperator.Equal));
             }
 
             var lst = await api.Query<InvTransMarkedLocalGrid>(pair);
@@ -137,9 +159,12 @@ namespace UnicontaClient.Pages.CustomPage
             var company = api.CompanyEntity;
             if (!company.Location || !company.Warehouse)
                 Location.Visible = Location.ShowInColumnChooser = false;
+            else
+                Location.ShowInColumnChooser = true;
             if (!company.Warehouse)
                 Warehouse.Visible = Warehouse.ShowInColumnChooser = false;
-
+            else
+                Warehouse.ShowInColumnChooser = true;
             Utility.SetupVariants(api, null, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
             Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
         }
@@ -168,11 +193,15 @@ namespace UnicontaClient.Pages.CustomPage
 
         private async void MarkOrderLineAgainstIT(InvTransClient selectedItem)
         {
-            OrderAPI orderApi = new OrderAPI(api);
             busyIndicator.IsBusy = true;
-            var err = await orderApi.MarkedOrderLineAgainstInvTrans(debtorOrderLine, selectedItem);
+            Task<ErrorCodes> t;
+            if (debtorOrderLine != null)
+                t = (new Uniconta.API.DebtorCreditor.OrderAPI(api)).MarkedOrderLineAgainstInvTrans(debtorOrderLine, selectedItem);
+            else
+                t = (new Uniconta.API.Inventory.TransactionsAPI(api)).MarkInvTransAgainstInvTrans(invtrans, selectedItem);
+            var err = await t;
             busyIndicator.IsBusy = false;
-            if(err != ErrorCodes.Succes)
+            if (err != ErrorCodes.Succes)
                 UtilDisplay.ShowErrorCode(err);
             else
                dockCtrl.CloseDockItem();

@@ -160,7 +160,7 @@ namespace UnicontaClient.Pages.CustomPage
                 else
                 {
                     busyIndicator.IsBusy = false;
-                    this.documentViewer.Children.Add(UtilDisplay.LoadControl(voucherClient.Buffer, voucherClient._Fileextension, false, setFocus));
+                    this.documentViewer.Children.Add(UtilDisplay.LoadControl(voucherClient, false, setFocus));
                 }
             }
             catch (Exception ex)
@@ -258,7 +258,7 @@ namespace UnicontaClient.Pages.CustomPage
                             VoucherCache.SetGlobalVoucherCache(vClient);
                     }
                 }
-                this.documentViewer.Children.Add(UtilDisplay.LoadControl(vClient.Buffer, vClient._Fileextension, false, setFocus));
+                this.documentViewer.Children.Add(UtilDisplay.LoadControl(vClient, false, setFocus));
             }
             catch (Exception ex)
             {

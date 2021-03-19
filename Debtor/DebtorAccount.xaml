@@ -136,11 +136,15 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorAccount"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="BankAccount" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="LastInvoice" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="EndDiscountPct" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="LineDiscountPct" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Shipment" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryTerm" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="VatNumber" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="RefInPayment" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Created" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="D2CAccount" Visible="False" />
                     <localPage:ComboBoxColumnClient x:Name="BalanceMethod" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="EORI" Visible="False"/>
                 </localPage:DebtorAccountGrid.Columns>
                 <localPage:DebtorAccountGrid.TotalSummary>
                     <localPage:SumColumn FieldName="CurBalance" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>

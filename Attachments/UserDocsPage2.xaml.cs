@@ -27,6 +27,7 @@ namespace UnicontaClient.Pages.CustomPage
     {
         UserDocsClient userDocsClientRow;
         bool isFieldsAvailableForEdit;
+        bool isFileExtManualSet;
         public override Type TableType { get { return typeof(UserDocsClient); } }
         public override string NameOfControl { get { return TabControls.UserDocsPage2.ToString(); } }
         public override UnicontaBaseEntity ModifiedRow { get { return userDocsClientRow; } set { userDocsClientRow = (UserDocsClient)value; } }
@@ -84,10 +85,8 @@ namespace UnicontaClient.Pages.CustomPage
 
 #if !SILVERLIGHT
             browseControl.CompressVisibility = Visibility.Visible;
-            if (isFieldsAvailableForEdit)
-                liDocumentType.Visibility = Visibility.Visible;
-            else
-                liDocumentType.Visibility = Visibility.Collapsed;
+            liDocumentType.Visibility = isFieldsAvailableForEdit ? Visibility.Visible : Visibility.Collapsed;
+            txtUrl.LostFocus += txtUrl_LostFocus;
 #endif
         }
 
@@ -116,29 +115,34 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                     else if (!string.IsNullOrWhiteSpace(userDocsClientRow._Url))
                     {
-                        var url = userDocsClientRow._Url;
                         string fileName = txedUserDocNotes.Text;
-                        FileextensionsTypes fileExt = isFieldsAvailableForEdit ? userDocsClientRow._DocumentType : FileextensionsTypes.UNK;
-#if !SILVERLIGHT
-                        if (url.StartsWith("http", StringComparison.OrdinalIgnoreCase) || url.StartsWith("www", StringComparison.OrdinalIgnoreCase))
+                        FileextensionsTypes fileExt = userDocsClientRow._DocumentType;
+
+                        if (!isFileExtManualSet)
                         {
-                            int idxExtension = url.LastIndexOf('.');
-                            if (fileExt == FileextensionsTypes.UNK)
+                            var url = userDocsClientRow._Url;
+#if !SILVERLIGHT
+                            if (url.StartsWith("http", StringComparison.OrdinalIgnoreCase) || url.StartsWith("www", StringComparison.OrdinalIgnoreCase))
                             {
+                                int idxExtension = url.LastIndexOf('.');
                                 var ext = DocumentConvert.GetDocumentType(url.Substring(idxExtension, url.Length - idxExtension));
                                 fileExt = ext != FileextensionsTypes.UNK ? ext : FileextensionsTypes.WWW;
                             }
-
-                        }
-                        else
+                            else
 #endif
-                            if (!TryParseUrl(url, ref fileName, ref fileExt)) return;
+                            if (!Utility.TryParseUrl(url, isFieldsAvailableForEdit, ref fileName, ref fileExt)) return;
+                        }
+                        /* only updating if different */
+                        if (userDocsClientRow.DocumentType != fileExt)
+                            userDocsClientRow.DocumentType = fileExt;
 
-                        userDocsClientRow.DocumentType = fileExt;
                         userDocsClientRow.Text = fileName;
                     }
                     else
                         userDocsClientRow.Text = txedUserDocNotes.Text;
+#if !SILVERLIGHT
+                    txtUrl.LostFocus -= txtUrl_LostFocus;
+#endif
                     saveForm();
                 }
             }
@@ -151,37 +155,6 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        private bool TryParseUrl(string url, ref string fielName, ref FileextensionsTypes fileExtension)
-        {
-            try
-            {
-                if (url.EndsWith("/"))
-                    url = url.Substring(0, url.Length - 1);
-                int indexOfExtention = url.LastIndexOf('.');
-                int indexOfpath = url.LastIndexOf('/') + 1;
-                if (indexOfpath == 0)
-                    indexOfpath = url.LastIndexOf('\\') + 1;
-                if (indexOfpath > 0 && indexOfExtention > indexOfpath)
-                {
-                    var nameOfFile = indexOfpath > 0 ? url.Substring(indexOfpath, indexOfExtention - indexOfpath) : url;
-                    var ext = DocumentConvert.GetDocumentType(url.Substring(indexOfExtention, url.Length - indexOfExtention));
-                    if (!isFieldsAvailableForEdit)
-                        fileExtension = ext;
-                    else
-                    {
-                        if (fileExtension == FileextensionsTypes.UNK || fileExtension != ext)
-                        {
-                            UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("InvalidFileFormat"), Uniconta.ClientTools.Localization.lookup("Warning"));
-                            return false;
-                        }
-                    }
-                    fielName = string.IsNullOrWhiteSpace(fielName) ? nameOfFile : fielName;
-
-                }
-                return true;
-            }
-            catch { return false; }
-        }
 
         private bool ValidateSave()
         {
@@ -218,7 +191,7 @@ namespace UnicontaClient.Pages.CustomPage
                 string fileName = txedUserDocNotes.Text;
                 FileextensionsTypes fileExt = userDocsClientRow._DocumentType;
 
-                if (TryParseUrl(browseUrl, ref fileName, ref fileExt))
+                if (Utility.TryParseUrl(browseUrl, isFieldsAvailableForEdit, ref fileName, ref fileExt))
                     userDocsClientRow.DocumentType = fileExt;
             }
         }
@@ -230,6 +203,32 @@ namespace UnicontaClient.Pages.CustomPage
                 browseControl_FileSelected();
             else
                 userDocsClientRow.Url = null;
+        }
+
+        private void txtUrl_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrEmpty(userDocsClientRow._Url))
+                liDocumentType.Visibility = isFieldsAvailableForEdit ? Visibility.Visible : Visibility.Collapsed;
+            else
+            {
+                liDocumentType.Visibility = Visibility.Visible;
+                userDocsClientRow.DocumentType = FileextensionsTypes.WWW;
+            }
+        }
+
+        private void cmbDocType_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
+        {
+            FileextensionsTypes updatedFileExt;
+            if (e.OldValue != e.NewValue && Enum.TryParse(Convert.ToString(e.NewValue), out updatedFileExt) && userDocsClientRow.DocumentType != updatedFileExt)
+            {
+                string comments = userDocsClientRow._Text;
+                if (Utility.TryParseUrl(txtUrl.Text, isFieldsAvailableForEdit, ref comments, ref updatedFileExt))
+                {
+                    userDocsClientRow.DocumentType = updatedFileExt;
+                    userDocsClientRow._Text = comments;
+                    isFileExtManualSet = true;
+                }
+            }
         }
 #endif
     }

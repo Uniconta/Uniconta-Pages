@@ -19,6 +19,7 @@ using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Util;
 using Uniconta.Common;
+using Uniconta.Common.Utility;
 using UnicontaClient.Controls;
 
 using UnicontaClient.Pages;
@@ -81,12 +82,12 @@ namespace UnicontaClient.Pages.CustomPage
                 if (importDateV.faultyAccounts.Count != 0)
                 {
                     journalLines = null;
-                    var sb = new StringBuilder();
-                    sb.AppendFormat(Uniconta.ClientTools.Localization.lookup("MissingOBJ"), Uniconta.ClientTools.Localization.lookup("Account")).AppendLine(":");
+                    var sb = StringBuilderReuse.Create();
+                    sb.Append(string.Format(Uniconta.ClientTools.Localization.lookup("MissingOBJ"), Uniconta.ClientTools.Localization.lookup("Account"))).AppendLine(':');
                     foreach (var s in importDateV.faultyAccounts)
                         sb.AppendLine(s);
 
-                    UnicontaMessageBox.Show(sb.ToString(), "", MessageBoxButton.OK);
+                    UnicontaMessageBox.Show(sb.ToStringAndRelease(), "", MessageBoxButton.OK);
                     return;
                 }
 

@@ -118,7 +118,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (fromDate == DateTime.MinValue)
             {
-                DateTime date = DateTime.Today;
+                DateTime date = GetSystemDefaultDate();
                 var firstDayOfMonth = new DateTime(date.Year, date.Month, 1);
                 toDate = firstDayOfMonth.AddMonths(1).AddDays(-1);
                 fromDate = firstDayOfMonth.AddMonths(-2);
@@ -134,7 +134,7 @@ namespace UnicontaClient.Pages.CustomPage
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgBankStatementLine.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;
             dgAccountsTransGrid.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged1;
-            State.Header = 
+            State.Header =
             StateCol.Header = Uniconta.ClientTools.Localization.lookup("Status");
             SetStatusText();
             Mark.Visible = MarkCol.Visible = true;
@@ -229,6 +229,10 @@ namespace UnicontaClient.Pages.CustomPage
             if (e.Key == Key.F8)
             {
                 localMenu_OnItemClicked("OpenTran");
+            }
+            else if (e.Key == Key.F6)
+            {
+                localMenu_OnItemClicked("VoidTransaction");
             }
         }
 
@@ -368,7 +372,7 @@ namespace UnicontaClient.Pages.CustomPage
                         val = (from t in lstAct where t._Mark select t._AmountCent).Sum();
                     transAmt = (val / 100d);
                     this.layOutTrans.Caption = string.Format("'{0:N2}'    '({1:N2})'", transAmt, bankStatAmt - transAmt);
-                   
+
                     break;
             }
         }
@@ -423,7 +427,7 @@ namespace UnicontaClient.Pages.CustomPage
                     var val = (from t in lstBst where t._Mark select t._AmountCent).Sum();
                     bankStatAmt = (val / 100d);
                     this.layOutBankStat.Caption = string.Format("'{0:N2}'", bankStatAmt);
-                    this.layOutTrans.Caption = string.Format("'{0:N2}'    '({1:N2})'", transAmt , bankStatAmt - transAmt);
+                    this.layOutTrans.Caption = string.Format("'{0:N2}'    '({1:N2})'", transAmt, bankStatAmt - transAmt);
                     break;
             }
         }
@@ -702,7 +706,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedTrans != null)
                         ChangeVoidState(selectedTrans);
                     break;
-                 case "ChangeOrientation":
+                case "ChangeOrientation":
                     orient = 1 - orient;
                     lGroup.Orientation = orient;
                     api.session.Preference.BankStatementHorisontal = (orient == Orientation.Horizontal);
@@ -890,7 +894,7 @@ namespace UnicontaClient.Pages.CustomPage
                 }
                 else
                 {
-                    if(settleType!= bankStatementLine._SettleValue)
+                    if (settleType != bankStatementLine._SettleValue)
                     {
                         bankStatementLine._SettleValue = settleType;
                         bankStatementLine.NotifyPropertyChanged("SettleValue");
@@ -978,7 +982,8 @@ namespace UnicontaClient.Pages.CustomPage
                         if (select == MessageBoxResult.OK)
                         {
                             var parms = new[] { new BasePage.ValuePair("Journal", winTransfer.Journal) };
-                            AddDockItem(TabControls.GL_DailyJournalLine, null, null, null, true, null, parms);
+                            var header = string.Concat(Uniconta.ClientTools.Localization.lookup("Journal"), ": ", winTransfer.Journal);
+                            AddDockItem(TabControls.GL_DailyJournalLine, null, header, null, true, null, parms);
                         }
                     }
                     else
@@ -1421,7 +1426,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         void setInterval()
         {
-            CWInterval winInterval = new CWInterval(fromDate, toDate, DaysSlip,hideVoucher:true);
+            CWInterval winInterval = new CWInterval(fromDate, toDate, DaysSlip, hideVoucher: true);
             winInterval.Closed += delegate
             {
                 if (winInterval.DialogResult == true)

@@ -202,11 +202,22 @@ namespace UnicontaClient.Pages.CustomPage
                 var failedPrints = new List<long>();
                 var count = packNotelist.Count;
                 string dockName = null, reportName = null;
+                bool exportAsPdf = false;
+                System.Windows.Forms.FolderBrowserDialog folderDialogSaveInvoice = null;
 
                 if (count > 1)
                 {
-                    dockName = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Preview"), Uniconta.ClientTools.Localization.lookup("CreditorPackNote"));
-                    reportName = Uniconta.ClientTools.Localization.lookup("CreditorPackNote");
+                    if (count > StandardPrintReportPage.MAX_PREVIEW_REPORT_LIMIT)
+                    {
+                        var confirmMsg = string.Format(Uniconta.ClientTools.Localization.lookup("PreivewRecordsExportMsg"), count);
+                        if (UnicontaMessageBox.Show(confirmMsg, Uniconta.ClientTools.Localization.lookup("Confirmation"), MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                            exportAsPdf = true;
+                    }
+                    else
+                    {
+                        dockName = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Preview"), Uniconta.ClientTools.Localization.lookup("CreditorPackNote"));
+                        reportName = Uniconta.ClientTools.Localization.lookup("CreditorPackNote");
+                    }
                 }
 #elif SILVERLIGHT
                 int top = 200, left = 300;
@@ -226,11 +237,31 @@ namespace UnicontaClient.Pages.CustomPage
                         if (count > 1 && IsGeneratingPacknote)
                         {
                             ribbonControl.DisableButtons(new string[] { "ShowDeliveryNote" });
-                            if (standardPrintPreviewPage == null)
-                                standardPrintPreviewPage = dockCtrl.AddDockItem(api?.CompanyEntity, TabControls.StandardPrintReportPage, ParentControl, new object[] { printreport, Uniconta.ClientTools.Localization.lookup("CreditorPackNote") }
-                                , dockName) as StandardPrintReportPage;
+                            if (exportAsPdf)
+                            {
+                                string docName = Uniconta.ClientTools.Localization.lookup("CreditorPackNote");
+                                var docNumber = pckNote.InvoiceNum;
+                                string directoryPath = string.Empty;
+                                if (folderDialogSaveInvoice == null)
+                                {
+                                    folderDialogSaveInvoice = UtilDisplay.LoadFolderBrowserDialog;
+                                    var dialogResult = folderDialogSaveInvoice.ShowDialog();
+                                    if (dialogResult == System.Windows.Forms.DialogResult.OK || dialogResult == System.Windows.Forms.DialogResult.Yes)
+                                        directoryPath = folderDialogSaveInvoice.SelectedPath;
+                                }
+                                else
+                                    directoryPath = folderDialogSaveInvoice.SelectedPath;
+
+                                Utilities.Utility.ExportReportAsPdf(printreport.Report, directoryPath, docName, docNumber);
+                            }
                             else
-                                standardPrintPreviewPage.InsertToMasterReport(printreport.Report);
+                            {
+                                if (standardPrintPreviewPage == null)
+                                    standardPrintPreviewPage = dockCtrl.AddDockItem(api?.CompanyEntity, TabControls.StandardPrintReportPage, ParentControl, new object[] { printreport, Uniconta.ClientTools.Localization.lookup("CreditorPackNote") }
+                                    , dockName) as StandardPrintReportPage;
+                                else
+                                    standardPrintPreviewPage.InsertToMasterReport(printreport.Report);
+                            }
                         }
                         else
                         {

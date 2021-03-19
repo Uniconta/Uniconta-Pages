@@ -54,7 +54,7 @@
     <RibbonItem Action="EnableStatusInfoSection" LocalizedNameKey="ShowOBJ" Parameter="StatusInfo" Glyph="Account-statement_32x32.png" LargeGlyph="Account-statement_32x32.png" />
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="EnableTextSection" LocalizedNameKey="ShowText" Glyph="Account-statement_32x32.png" LargeGlyph="Account-statement_32x32.png" />
+    <RibbonItem Action="ShowInvoiceText" LocalizedNameKey="InvoiceText" Glyph="Account-statement_32x32.png" LargeGlyph="Account-statement_32x32.png" />
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="FileArchive" LocalizedNameKey="ShowOBJ" Parameter="FileArchive" LargeGlyph="Pack_Note_32x32.png" />

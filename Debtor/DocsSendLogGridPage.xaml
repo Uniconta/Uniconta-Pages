@@ -1,0 +1,46 @@
+<Pages:GridBasePage xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.DocsSendLogGridPage"
+             xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
+             xmlns:UnicontaControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+             xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+             xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+             xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors">
+    <UserControl.Resources>
+        <Style x:Key="StyleRow" TargetType="dxg:RowControl">
+            <Setter Property="Height" Value="Auto"/>
+        </Style>
+    </UserControl.Resources>
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <UnicontaControls:CorasauRibbonControl XMLSourcePath=";component/Assets/GridRibbonReadOnlyLayout.xml" x:Name="localMenu"/>
+        <UnicontaControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <local:DocsSendLogDataGridClient x:Name="dgDocsSendLogDataGrid" AutoGenerateColumns="None">
+                <local:DocsSendLogDataGridClient.Columns>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Date" ShowSec="True" Width="150"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Status" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="LogType" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DocType" Width="90"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DocNumber" Width="90"/>                    
+                    <local:CorasauDataGridTemplateColumnClient x:Name="UserId" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Message" Width="400">
+                        <local:CorasauDataGridTemplateColumnClient.EditSettings>
+                            <editor:TextEditSettings TextWrapping="Wrap" AcceptsReturn="True"/>
+                        </local:CorasauDataGridTemplateColumnClient.EditSettings>
+                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Server" Width="300"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="To" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Cc" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Bcc" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Account"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Name" Width="200"/>
+                    </local:DocsSendLogDataGridClient.Columns>
+            </local:DocsSendLogDataGridClient>
+        </UnicontaControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.Common;
+using Uniconta.Common.Utility;
 using Uniconta.DataModel;
 using UnicontaClient.Pages.Creditor.Payments;
 
@@ -172,7 +173,7 @@ namespace UnicontaISO20022CreditTransfer
         /// <summary>
         /// LT: Only two Addresslines are accepted
         /// </summary>
-        public override PostalAddress CreditorAddress(Uniconta.DataModel.Creditor creditor, PostalAddress creditorAddress)
+        public override PostalAddress CreditorAddress(Uniconta.DataModel.Creditor creditor, PostalAddress creditorAddress, bool unstructured = false)
         {
             if (CredPaymFormat.Bank == ltBank.Standard)
                 return null;
@@ -183,7 +184,7 @@ namespace UnicontaISO20022CreditTransfer
             var zipCode = StandardPaymentFunctions.RegularExpressionReplace(creditor._ZipCode, allowedCharactersRegEx, replaceCharactersRegEx);
             var city = StandardPaymentFunctions.RegularExpressionReplace(creditor._City, allowedCharactersRegEx, replaceCharactersRegEx);
 
-            bool unstructured = false;
+            unstructured = false;
             switch (CredPaymFormat.Bank)
             {
                 case ltBank.Swedbank:
@@ -196,15 +197,16 @@ namespace UnicontaISO20022CreditTransfer
                     break;
             }
 
-            StringBuilder strB = new StringBuilder();
             if (unstructured)
             {
+                var strB = StringBuilderReuse.Create();
                 var adr1_result = strB.Append(adr1).Append(AddSeparator(adr2)).Append(adr2).ToString();
                 creditorAddress.AddressLine1 = adr1_result.Length > 70 ? adr1_result.Substring(0, 70) : adr1_result;
                 strB.Clear();
                 var adr2_result = strB.Append(adr3).Append(AddSeparator(zipCode)).Append(zipCode).Append(AddSeparator(city)).Append(city).ToString();
                 creditorAddress.AddressLine2 = adr2_result.Length > 70 ? adr2_result.Substring(0, 70) : adr2_result;
                 creditorAddress.Unstructured = true;
+                strB.Release();
             }
             else
             {

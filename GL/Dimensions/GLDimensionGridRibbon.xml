@@ -12,4 +12,7 @@
   <RibbonItem>
     <RibbonItem Action="JoinDimensions" LocalizedNameKey="JoinTwoOBJ" Parameter="Dimensions" LargeGlyph="Match_Lines_32x32.png"/>
   </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="ReorganizeDim" LocalizedNameKey="ReorganizeDim" LargeGlyph="Edit_Mileage_32x32.png"/>
+  </RibbonItem>
 </root>

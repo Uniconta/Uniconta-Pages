@@ -16,6 +16,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProdCatalogPage"
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <local:ProdCatalogPageGrid x:Name="dgProdCatalog" AutoGenerateColumns="None">
                 <local:ProdCatalogPageGrid.Columns>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Selected" HideHeaderCheck="True" ReadOnly="True"  Width="50" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Name" Width="50" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Country" Width="50"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="BusinessType" Width="70"/>
