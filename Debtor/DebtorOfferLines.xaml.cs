@@ -196,7 +196,7 @@ namespace UnicontaClient.Pages.CustomPage
             var syncMaster = Order;
             string header = null;
             if (syncMaster != null)
-                header = string.Format("{0}:{1},{2}", Uniconta.ClientTools.Localization.lookup("OfferLine"), syncMaster._OrderNumber, syncMaster.Name);
+                header = string.Format("{0}:{1},{2}", Uniconta.ClientTools.Localization.lookup("OfferLine"), syncMaster._OrderNumber, syncMaster._DCAccount);
             if (header != null)
                 SetHeader(header);
         }

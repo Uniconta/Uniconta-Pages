@@ -73,6 +73,14 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     rec = addedRows[iCtr].DataItem as VouchersClient;
                     vouchersClient[iCtr] = rec;
+#if !SILVERLIGHT
+                    if (rec._Fileextension == FileextensionsTypes.JPEG)
+                    {
+                        var imageBytes = FileBrowseControl.ImageResize(rec._Data, ".jpg");
+                        if (imageBytes != null)
+                            rec._Data = imageBytes;
+                    }
+#endif
                     buffers[iCtr] = rec._Data;
                     rec._Data = null;
                 }
@@ -374,7 +382,7 @@ namespace UnicontaClient.Pages.CustomPage
             var api = this.api;
             if (this.LedgerCache == null)
                 this.LedgerCache = api.GetCache(typeof(Uniconta.DataModel.GLAccount)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLAccount)).ConfigureAwait(false);
-            if (this.PaymentCache == null)
+            if (this.CreditorCache == null)
                 this.CreditorCache = api.GetCache(typeof(Uniconta.DataModel.Creditor)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Creditor)).ConfigureAwait(false);
             if (this.PaymentCache == null)
                 this.PaymentCache = api.GetCache(typeof(Uniconta.DataModel.PaymentTerm)) ?? await api.LoadCache(typeof(Uniconta.DataModel.PaymentTerm)).ConfigureAwait(false);
@@ -803,12 +811,6 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (vouchersClientLine != null)
             {
-                if (vouchersClientLine._Envelope)
-                {
-                    var dapi = new DocumentAPI(api);
-                    var envelopes = (VouchersClient[])await dapi.GetEnvelopeContent(vouchersClientLine, false);
-                    vouchersClientLine = envelopes[0];
-                }
 
                 var errorCode = await tsk;  // make sure save is completed.
                 if (errorCode != ErrorCodes.Succes)

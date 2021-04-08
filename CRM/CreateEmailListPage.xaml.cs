@@ -303,7 +303,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
             var result = await api.Insert(lst);
             if (result == ErrorCodes.Succes)
-                this.dockCtrl.CloseDockItem();
+                this.CloseDockItem();
             else
                 UtilDisplay.ShowErrorCode(result);
         }

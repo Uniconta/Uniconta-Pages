@@ -166,7 +166,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
             var param = !IsInvJrnLine ? new object[2] { InvItems, master._OrderNumber } : new object[2] { InvItems, journalMaster._Journal };
             globalEvents.OnRefresh(TabControls.ItemVariantAddPage, param);
-            dockCtrl.CloseDockItem();
+            CloseDockItem();
         }
 
         public void VariantSetup(GridColumn Variant1, GridColumn Variant2, GridColumn Variant3, GridColumn Variant4, GridColumn Variant5, InvStandardVariant stdVariant)

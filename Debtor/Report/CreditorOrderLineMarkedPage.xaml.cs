@@ -123,7 +123,7 @@ namespace UnicontaClient.Pages.CustomPage
                         MarkOrderLineAgainstOL();
                     break;
                 case "Cancel":
-                    dockCtrl.CloseDockItem();
+                    CloseDockItem();
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);
@@ -140,7 +140,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (err != ErrorCodes.Succes)
                 UtilDisplay.ShowErrorCode(err);
             else
-                dockCtrl.CloseDockItem();
+                CloseDockItem();
         }
     }
 }

@@ -168,7 +168,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 UtilDisplay.ShowErrorCode(errcode);
                             else
                             {
-                                dockCtrl.CloseDockItem();
+                                CloseDockItem();
                                 UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("OwnershipChanged"),Uniconta.ClientTools.Localization.lookup("Warning"));
                             }
                         }

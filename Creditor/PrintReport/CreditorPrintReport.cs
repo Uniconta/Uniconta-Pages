@@ -140,8 +140,8 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     var contactCache = Comp.GetCache(typeof(Contact)) ?? await crudApi.LoadCache(typeof(Contact));
                     var contactCacheFilter = new ContactCacheFilter(contactCache, Creditor.__DCType(), Creditor._Account);
-                    var contacts = contactCacheFilter.Cast<ContactClient>().ToArray();
-                    Creditor.Contacts = contacts;
+                    if (contactCacheFilter.Any())
+                        Creditor.Contacts = contactCacheFilter.Cast<ContactClient>().ToArray();
                 }
                 UnicontaClient.Pages.DebtorOrders.SetDeliveryAdress(creditorInvoiceClientUser, Creditor, crudApi);
 

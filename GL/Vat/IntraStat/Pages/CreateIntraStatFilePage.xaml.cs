@@ -319,7 +319,7 @@ namespace UnicontaClient.Pages.CustomPage
             int cnt = 0;
 #if !SILVERLIGHT
             var writer = new StreamWriter(stream, Encoding.Default);
-            cnt = CSVHelper.ExportDataGridToExcel(stream, Headers, corasauBaseEntity, Props, spreadSheet, ".xlsx");
+            cnt = CSVHelper.ExportDataGridToExcel(stream, Headers, corasauBaseEntity, Props, spreadSheet, ".xlsx", "Intrastat");
             writer.Flush();
 #endif
             return cnt;
@@ -374,21 +374,20 @@ namespace UnicontaClient.Pages.CustomPage
             dgIntraStatGrid.Visibility = Visibility.Visible;
         }
 
-        List<IntrastatClient> UpdateValues(IEnumerable<IntrastatClient> listIntraStat, ImportOrExportIntrastat importOrExport, double factor)
+        List<IntrastatClient> UpdateValues(IntrastatClient[] listIntraStat, ImportOrExportIntrastat importOrExport, double factor)
         {
-            if (listIntraStat == null || listIntraStat.Count() <= 0)
+            if (listIntraStat == null || listIntraStat.Length == 0)
                 return null;
 
-            var intraList = new List<IntrastatClient>();
+            var intraList = new List<IntrastatClient>(listIntraStat.Length >> 4);  // div 8
             var companyCountry = api.CompanyEntity._CountryId;
             var companyRegNo = Regex.Replace(api.CompanyEntity._Id ?? string.Empty, "[^0-9]", "");
-
 
             foreach (var intraStat in listIntraStat)
             {
                 intraStat.ImportOrExport = importOrExport;
 
-                if ((intraStat._Qty == 0 && intraStat._Amount == 0) || intraStat._Subtotal || intraStat._PartOfBOM || intraStat._DCAccount == null || intraStat._Item == null)
+                if (intraStat._NetAmount() == 0 || intraStat._Subtotal || intraStat._PartOfBOM || intraStat._DCAccount == null || intraStat._Item == null)
                     continue;
 
                 var item = intraStat.InvItem;

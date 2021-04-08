@@ -42,24 +42,23 @@ namespace UnicontaClient.Pages.CustomPage
 
         public DCAccount DCAccount;
         SQLCache  DebtorCache, CreditorCache;
+        Company Comp;
 
-        public CwEditTransaction(CrudAPI api, bool hideComments= false , bool hideVat= false)
+        public CwEditTransaction(CrudAPI api, bool hideComments= false , bool hideVat= false, bool IsCreditor = false)
         {
             InitializeComponent();
             this.DataContext = this;
             leVat.api = api;
+            Comp = api.CompanyEntity;
             this.Title = string.Format(Uniconta.ClientTools.Localization.lookup("EditOBJ"), Uniconta.ClientTools.Localization.lookup("Transaction"));
             cmbDCtype.ItemsSource = new string[] { Uniconta.ClientTools.Localization.lookup("Debtor"), Uniconta.ClientTools.Localization.lookup("Creditor") };
-            var Comp = api.CompanyEntity;
-            DebtorCache = Comp.GetCache(typeof(Debtor));
-            CreditorCache = Comp.GetCache(typeof(Uniconta.DataModel.Creditor));
             if (hideComments && hideVat)
                 txtVat.Visibility = leVat.Visibility = txtBlockComments.Visibility = txtComments.Visibility = Visibility.Collapsed;
             else if (!hideComments && !hideVat)
                 cmbDCtype.Visibility = txtDcType.Visibility = txtAccount.Visibility = leAccount.Visibility = Visibility.Collapsed;
             else if (!hideComments && hideVat)
                 txtVat.Visibility = leVat.Visibility = cmbDCtype.Visibility = txtDcType.Visibility = txtAccount.Visibility = leAccount.Visibility = Visibility.Collapsed;
-            cmbDCtype.SelectedIndex = 0;
+            cmbDCtype.SelectedIndex = IsCreditor ? 1 : 0;
         }
 
         private void cmbDCtype_SelectedIndexChanged(object sender, RoutedEventArgs e)
@@ -71,12 +70,16 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 case 0:
                     {
+                        if (DebtorCache == null)
+                            DebtorCache = Comp.GetCache(typeof(Debtor));
                         cache = DebtorCache;
                         txtAccount.Text=  Uniconta.ClientTools.Localization.lookup("Debtor");
                     }
                     break;
                 case 1:
                     {
+                        if (CreditorCache == null)
+                            CreditorCache = Comp.GetCache(typeof(Uniconta.DataModel.Creditor));
                         cache = CreditorCache;
                         txtAccount.Text = Uniconta.ClientTools.Localization.lookup("Creditor");
                     }
@@ -85,9 +88,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
 
             if (cache != null)
-            {
                 leAccount.ItemsSource = cache;
-            }
         }
 
         private void ChildWindow_KeyDown(object sender, KeyEventArgs e)

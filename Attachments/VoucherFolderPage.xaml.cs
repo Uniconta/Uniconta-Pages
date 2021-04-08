@@ -212,7 +212,7 @@ namespace UnicontaClient.Pages.CustomPage
                                        if (createResult == ErrorCodes.Succes)
                                        {
                                            globalEvents.OnRefresh(TabControls.VoucherFolderPage);
-                                           dockCtrl.CloseDockItem();
+                                           CloseDockItem();
                                        }
                                        else
                                            UtilDisplay.ShowErrorCode(ErrorCodes.CouldNotSave);
@@ -261,7 +261,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (action != "Create")
             {
                 if (result)
-                    dockCtrl.CloseDockItem();
+                    CloseDockItem();
                 else
                     UtilDisplay.ShowErrorCode(ErrorCodes.CouldNotSave);
             }

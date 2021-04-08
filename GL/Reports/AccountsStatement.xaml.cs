@@ -134,7 +134,7 @@ namespace UnicontaClient.Pages.CustomPage
         List<AccountStatementList> statementList;
         ReportAPI transApi;
         Uniconta.DataModel.GLAccount _master;
-        static bool pageBreak; 
+        static bool pageBreak;
         static public DateTime DefaultFromDate, DefaultToDate;
         static int setShowDimOnPrimoIndex = 0;
         static bool IsCollapsed = true;
@@ -226,6 +226,7 @@ namespace UnicontaClient.Pages.CustomPage
             cbxSkipBlank.IsChecked = Pref.Debtor_skipBlank;
 #if !SILVERLIGHT
             cbxPageBreak.IsChecked = pageBreak;
+            dgGLTrans.PageBreak = pageBreak;
 #endif
             cmbShowDimOnPrimo.ItemsSource = new string[] { Uniconta.ClientTools.Localization.lookup("OnePrimo"), Uniconta.ClientTools.Localization.lookup("PrimoPerDim"), Uniconta.ClientTools.Localization.lookup("NoPrimo") };
             cmbShowDimOnPrimo.SelectedIndex = setShowDimOnPrimoIndex;

@@ -87,6 +87,7 @@ namespace UnicontaClient.Pages.CustomPage
             dashboardViewerUniconta.SetInitialDashboardState += DashboardViewerUniconta_SetInitialDashboardState;
             dashboardViewerUniconta.DashboardChanged += DashboardViewerUniconta_DashboardChanged;
             dashboardViewerUniconta.DataLoadingError += DashboardViewerUniconta_DataLoadingError;
+            dashboardViewerUniconta.Unloaded += DashboardViewerUniconta_Unloaded;
         }
 
         private void DashboardViewerUniconta_DataLoadingError(object sender, DataLoadingErrorEventArgs e)
@@ -322,6 +323,14 @@ namespace UnicontaClient.Pages.CustomPage
                 isDashBoardLaoded = true;
                 Initialise();
             }
+            if (isDashBoardLaoded && timer != null)
+                timer.Start();
+        }
+
+        private void DashboardViewerUniconta_Unloaded(object sender, RoutedEventArgs e)
+        {
+            if (isDashBoardLaoded && timer != null)
+                timer.Stop();
         }
 
         private async Task<bool> Initialise()
@@ -450,7 +459,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 ClearBusy();
                 UnicontaMessageBox.Show(ex);
-                dockCtrl?.CloseDockItem();
+                CloseDockItem();
                 return false;
             }
         }

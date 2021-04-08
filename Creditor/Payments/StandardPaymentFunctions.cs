@@ -23,14 +23,16 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
         /// <returns></returns>
         public static CreditorPaymentFormatClient GetDefaultCreditorPaymentFormat(SQLCache credPaymFormatCache)
         {
-            var creditorPaymFormatList = (IEnumerable<CreditorPaymentFormat>)credPaymFormatCache.GetNotNullArray;
-
-            var credPaymFormat = (from dl in creditorPaymFormatList where dl._Default == true select dl).FirstOrDefault();
-            if (credPaymFormat != null)
+            if (credPaymFormatCache != null)
             {
-                var credPaymFormatClient = new CreditorPaymentFormatClient();
-                StreamingManager.Copy(credPaymFormat, credPaymFormatClient);
-                return credPaymFormatClient;
+                var creditorPaymFormatList = (IEnumerable<CreditorPaymentFormat>)credPaymFormatCache.GetNotNullArray;
+                var credPaymFormat = (from dl in creditorPaymFormatList where dl._Default == true select dl).FirstOrDefault();
+                if (credPaymFormat != null)
+                {
+                    var credPaymFormatClient = new CreditorPaymentFormatClient();
+                    StreamingManager.Copy(credPaymFormat, credPaymFormatClient);
+                    return credPaymFormatClient;
+                }
             }
             return null;
         }
@@ -111,7 +113,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
                 }
 
                 sbAdvText.Replace("%1", "{0}").Replace("%2", "{1}").Replace("%3", "{2}").Replace("%4", "{3}").Replace("%5", "{4}");
-                advText = string.Format(sbAdvText.ToStringAndRelease(), rec.InvoiceAN ?? string.Empty, creditor?._Account, creditor?._Name, rec.Voucher == 0 ? string.Empty : rec.Voucher.ToString(), rec.PaymentRefId == 0 ? string.Empty : rec.PaymentEndToEndId.ToString());
+                advText = string.Format(sbAdvText.ToStringAndRelease(), rec.InvoiceAN, creditor?._Account, creditor?._Name, NumberConvert.ToStringNull(rec.Voucher), NumberConvert.ToStringNull(rec.PaymentRefId));
             }
             else //Default message
             {
@@ -184,7 +186,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
                 else if (UIMessage == false) //Default message
                 {
                     BuildBankAdviceText(sbAdvText, creditor?._OurAccount, tuple.Item1);
-                    BuildBankAdviceText(sbAdvText, rec.InvoiceAN == null ? string.Empty : rec.InvoiceAN, tuple.Item2);
+                    BuildBankAdviceText(sbAdvText, rec.InvoiceAN, tuple.Item2);
                     BuildBankAdviceText(sbAdvText, company.Name);
                     advText = sbAdvText.ToStringAndRelease();
                 }

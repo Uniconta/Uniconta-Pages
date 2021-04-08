@@ -53,11 +53,23 @@ namespace UnicontaClient.Pages.CustomPage
 
                 foreach (var row in addedRows)
                 {
-                    userDocs[iCtr] = row.DataItem as UserDocsClient;
-                    if (userDocs[iCtr]._Data != null)
+                    var doc = row.DataItem as UserDocsClient;
+                    userDocs[iCtr] = doc;
+                    if (doc._Data != null)
                     {
-                        buffers[iCtr] = userDocs[iCtr]._Data;
-                        userDocs[iCtr]._Data = null;
+#if !SILVERLIGHT
+                        if (doc._DocumentType == FileextensionsTypes.JPEG)
+                        {
+                            var imageBytes = FileBrowseControl.ImageResize(doc._Data, ".jpg");
+                            if (imageBytes != null)
+                            {
+                                doc._Data = imageBytes;
+                                doc._NoCompression = true;
+                            }
+                        }
+#endif
+                        buffers[iCtr] = doc._Data;
+                        doc._Data = null;
                         iCtr++;
                     }
                 }

@@ -58,7 +58,10 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     Contact = master as ContactClient;
                     if (Contact == null)
+                    {
                         Project = master as ProjectClient;
+                        Debtor = Project?.Debtor;
+                    }
                     else
                         Debtor = Contact.Debtor;
                 }
@@ -76,7 +79,10 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     Contact = master as ContactClient;
                     if (Contact == null)
+                    {
                         Project = master as ProjectClient;
+                        Debtor = Project?.Debtor;
+                    }
                     else
                         Debtor = Contact.Debtor;
                 }
@@ -432,7 +438,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         void SetContactSource(SQLCache cache, Debtor debtor)
         {
-            cmbContactName.ItemsSource = ((IEnumerable<Uniconta.DataModel.Contact>)cache.GetNotNullArray)?.Where(x => x._DCType == 1 && x._DCAccount == debtor._Account).ToList();
+            cmbContactName.ItemsSource = ((IEnumerable<Uniconta.DataModel.Contact>)cache?.GetNotNullArray)?.Where(x => x._DCType == 1 && x._DCAccount == debtor._Account)?.ToList();
         }
 
         async void BindContact(Debtor debtor)

@@ -215,7 +215,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 var debtor = invLine.Debtor;
 
-                if (invLine._Item == null || debtor == null || debtor._Country == companyCountryId || !Country2Language.IsEU(debtor._Country))
+                if (invLine.NetAmount == 0 || debtor == null || debtor._Country == companyCountryId || !Country2Language.IsEU(debtor._Country))
                     continue;
 
                 var invoice = new EUSaleWithoutVAT();
@@ -228,16 +228,10 @@ namespace UnicontaClient.Pages.CustomPage
                 invoice.InvoiceNumber = invLine._InvoiceNumber;
                 invoice.Item = invLine._Item;
                 invoice.Vat = invLine._Vat;
+                invoice._Amount = -invLine.NetAmount;
 
-                switch (invLine.InvItem?._ItemType)
-                {
-                    case (byte)Uniconta.DataModel.ItemType.Service:
-                        invoice.ServiceAmount += -invLine.NetAmount;
-                        break;
-                    default:
-                        invoice.ItemAmount += -invLine.NetAmount;
-                        break;
-                }
+                if (invLine.Item != null)
+                    invoice._ItemOrService = invLine.InvItem._ItemType == 1 ? ItemOrServiceType.Service : ItemOrServiceType.Item;
 
                 var debtorCVR = debtor.CompanyRegNo;
                 if (debtorCVR != null)
@@ -254,10 +248,7 @@ namespace UnicontaClient.Pages.CustomPage
                     invoice._DebtorRegNoFile = debtorCVR;
                 }
 
-                if (invoice.ItemAmount == 0 && invoice.ServiceAmount == 0)
-                    continue;
-
-                sumOfAmount = sumOfAmount + invoice.ItemAmount + invoice.ServiceAmount;
+                sumOfAmount += invoice._Amount;
                 listOfResults.Add(invoice);
             };
 
@@ -312,6 +303,8 @@ namespace UnicontaClient.Pages.CustomPage
                     cols.GetColumnByName("Compressed").Visible = true;
                     cols.GetColumnByName("TriangularTradeAmount").Visible = true;
                     cols.GetColumnByName("SystemInfo").Visible = true;
+                    cols.GetColumnByName("ItemOrService").Visible = false;
+                    cols.GetColumnByName("IsTriangularTrade").Visible = false;
                     dgEUSalesWithoutVATGrid.ItemsSource = listOfEU;
                     dgEUSalesWithoutVATGrid.Visibility = Visibility.Visible;
                     dgEUSalesWithoutVATGrid.UpdateTotalSummary();
@@ -319,6 +312,8 @@ namespace UnicontaClient.Pages.CustomPage
                     compressed = true;
 
                     CallValidate(true);
+
+                    ribbonControl.DisableButtons("Compress");
                 }
             }
             catch (Exception e)
@@ -378,7 +373,9 @@ namespace UnicontaClient.Pages.CustomPage
             cols.GetColumnByName("ItemName").Visible = true;
             cols.GetColumnByName("Vat").Visible = true;
             cols.GetColumnByName("Compressed").Visible = false;
-
+            cols.GetColumnByName("ItemOrService").Visible = true;
+            cols.GetColumnByName("IsTriangularTrade").Visible = true;
+            ribbonControl.EnableButtons("Compress");
             compressed = false;
             GetInvoiceEuSale(txtDateFrm.DateTime, txtDateTo.DateTime);
         }

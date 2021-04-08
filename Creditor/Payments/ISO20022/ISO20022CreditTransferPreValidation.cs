@@ -133,7 +133,8 @@ namespace ISO20022CreditTransfer
                     var paymentformat = (ExportFormatType)credPaymFormat._ExportFormat;
 
                     formatTypeISO = paymentformat == ExportFormatType.ISO20022_DK || paymentformat == ExportFormatType.ISO20022_NL || paymentformat == ExportFormatType.ISO20022_NO ||
-                                    paymentformat == ExportFormatType.ISO20022_DE || paymentformat == ExportFormatType.ISO20022_SE || paymentformat == ExportFormatType.ISO20022_UK || paymentformat == ExportFormatType.ISO20022_LT;
+                                    paymentformat == ExportFormatType.ISO20022_DE || paymentformat == ExportFormatType.ISO20022_SE || paymentformat == ExportFormatType.ISO20022_UK || 
+                                    paymentformat == ExportFormatType.ISO20022_LT || paymentformat == ExportFormatType.ISO20022_CH;
 
                     if (glJournalGenerated && formatTypeISO) 
                         PreCheckErrors.Add(new PreCheckError(string.Format("Payment format '{0}' is not available for GL Journal generated payments", credPaymFormat._ExportFormat))); //TODO:Opret label

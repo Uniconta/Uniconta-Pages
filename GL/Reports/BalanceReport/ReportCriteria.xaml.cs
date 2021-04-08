@@ -302,9 +302,12 @@ namespace UnicontaClient.Pages.CustomPage
                         setColNameAndNumber(selCtrlCriteria, selCtrlCriteria.ColNo - 1);
 
                     var crit = objCriteria.selectedCriteria;
-                    var col = crit[oldIndex];
-                    crit.RemoveAt(oldIndex);
-                    crit.Insert(oldIndex - 1, col);
+                    if (crit?.ElementAtOrDefault(oldIndex)!= null)
+                    {
+                        var col = crit[oldIndex];
+                        crit.RemoveAt(oldIndex);
+                        crit.Insert(oldIndex - 1, col);
+                    }
                 }
             }
         }

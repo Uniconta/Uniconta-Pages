@@ -84,7 +84,10 @@ namespace UnicontaClient.Pages.CustomPage
                 if (master is DebtorOrder)
                     StreamingManager.Copy(master, initialOrder);
                 else
+                {
+                    initialOrder.SetMaster((master as ProjectClient)?.Debtor);
                     initialOrder.SetMaster(master);
+                }
                 LeAccount.IsEnabled = false;
                 lePrCategory.api = api;
                 InputWindowOrder1.ActiveGroup = navGroupOrders;
@@ -714,6 +717,8 @@ namespace UnicontaClient.Pages.CustomPage
 
         void ClearFields()
         {
+            if (Order?._DCAccount != initialOrder._DCAccount)
+                cmbContactName.SelectedItem = null;
             Order = StreamingManager.Clone(initialOrder) as DebtorOrderClient;
             Order.PropertyChanged += Editrow_PropertyChanged;
             this.DataContext = Order;

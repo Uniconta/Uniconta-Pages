@@ -998,7 +998,7 @@ namespace UnicontaClient.Pages.CustomPage
             double overTimeTotal = 0;
             double flexTimeTotal = 0;
 
-            if (employee._TMApproveDate < JournalLineDate.AddDays(6))
+            if (approvedCutOffDate < JournalLineDate.AddDays(6))
             {
                 var gridHours = (IEnumerable<TMJournalLineClient>)dgTMJournalLineGrid.ItemsSource;
                 if (gridHours != null)

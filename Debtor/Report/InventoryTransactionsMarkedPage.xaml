@@ -54,6 +54,7 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryTransactionsMarkedPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="SalesPriceCur" Visible="false"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="LineNumber" Visible="false"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="InvoiceNumber" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ReferenceNumber" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Warehouse" Width="70"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Location" Width="70"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Project" Width="100"/>

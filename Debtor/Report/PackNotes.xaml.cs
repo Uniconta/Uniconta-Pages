@@ -386,7 +386,7 @@ namespace UnicontaClient.Pages.CustomPage
                 switch (confirmationBox.ConfirmationResult)
                 {
                     case CWConfirmationBox.ConfirmationResultEnum.Yes:
-                        AddDockItem(TabControls.DebtorOrderLines, order, string.Format("{0}:{1},{2}", Uniconta.ClientTools.Localization.lookup("OrdersLine"), order._OrderNumber, ClientHelper.GetName(order.CompanyId, typeof(Debtor), order._DCAccount)));
+                        AddDockItem(TabControls.DebtorOrderLines, order, string.Format("{0}:{1},{2}", Uniconta.ClientTools.Localization.lookup("OrdersLine"), order._OrderNumber, order._DCAccount));
                         break;
 
                     case CWConfirmationBox.ConfirmationResultEnum.No:

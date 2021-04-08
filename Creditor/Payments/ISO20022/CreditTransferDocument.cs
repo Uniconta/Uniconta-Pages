@@ -15,9 +15,6 @@ namespace UnicontaISO20022CreditTransfer
     {
         #region Constants
 
-        // protected const string XMLNS_INVOICE = "urn:oasis:names:specification:ubl:schema:xsd:Invoice-2";
-        protected const string XMLNS_PAIN003 = "urn:iso:std:iso:20022:tech:xsd:pain.001.001.03";
-        //  protected const string PROFILE_ID_NES_UBL_PROFILE_5 = "urn:www.nesubl.eu:profiles:profile5:ver2.0";
 
         protected const string UNICONTA = "UNICONTA";
 
@@ -822,7 +819,8 @@ namespace UnicontaISO20022CreditTransfer
             }
         }
 
-      
+        public string XMLAttributeNS;
+
         /// <summary>
         /// Allowed characters - Regular expression
         /// </summary>
@@ -874,7 +872,7 @@ namespace UnicontaISO20022CreditTransfer
         {
             XmlElement root = doc.CreateElement(DOCUMENT_TAG_NAME);
 
-            root.SetAttribute(XMLNS, XMLNS_PAIN003);
+            root.SetAttribute(XMLNS, XMLAttributeNS);
 
             return root;
         }

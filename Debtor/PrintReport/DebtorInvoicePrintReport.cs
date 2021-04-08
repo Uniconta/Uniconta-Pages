@@ -134,14 +134,14 @@ namespace UnicontaClient.Pages.CustomPage
                 //For Getting User fields for Debtor
                 var debtorClietUserType = ReportUtil.GetUserType(typeof(DebtorClient), Comp);
                 var debtorClientUser = Activator.CreateInstance(debtorClietUserType) as DebtorClient;
-                var dcCache = Comp.GetCache(typeof(Uniconta.DataModel.Debtor)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.Debtor), crudApi);
+                var dcCache = Comp.GetCache(typeof(Uniconta.DataModel.Debtor)) ?? await crudApi.LoadCache(typeof(Uniconta.DataModel.Debtor));
                 var debtor = dcCache.Get(DebtorInvoice._DCAccount);
                 if (debtor != null)
                     StreamingManager.Copy((UnicontaBaseEntity)debtor, debtorClientUser);
                 else if (DebtorInvoice._Prospect != 0)
                 {
                     //Check for Prospect. Create a Debtor for Prospect
-                    var prosCache = Comp.GetCache(typeof(Uniconta.DataModel.CrmProspect)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.CrmProspect), crudApi);
+                    var prosCache = Comp.GetCache(typeof(Uniconta.DataModel.CrmProspect)) ?? await crudApi.LoadCache(typeof(Uniconta.DataModel.CrmProspect));
                     var prospect = prosCache?.Get(DebtorInvoice._Prospect) as CrmProspect;
                     if (prospect != null)
                         debtorClientUser.CopyFrom(prospect);
@@ -162,8 +162,8 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     var ContactsCache = Comp.GetCache(typeof(Uniconta.DataModel.Contact)) ?? await crudApi.LoadCache(typeof(Uniconta.DataModel.Contact)).ConfigureAwait(false);
                     var contactCacheFilter = new ContactCacheFilter(ContactsCache, debtorClientUser.__DCType(), debtorClientUser._Account);
-                    var contacts = contactCacheFilter.Cast<ContactClient>().ToArray();
-                    debtorClientUser.Contacts = contacts;
+                    if (contactCacheFilter.Any())
+                        debtorClientUser.Contacts = contactCacheFilter.Cast<ContactClient>().ToArray();
                 }
                 Debtor = debtorClientUser;
 
@@ -184,7 +184,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                 Company = Utility.GetCompanyClientUserInstance(Comp);
 
-                var InvCache = Comp.GetCache(typeof(InvItem)) ?? await Comp.LoadCache(typeof(InvItem), crudApi);
+                var InvCache = Comp.GetCache(typeof(InvItem)) ?? await crudApi.LoadCache(typeof(InvItem));
 
                 CompanyLogo = await Uniconta.ClientTools.Util.UtilDisplay.GetLogo(crudApi);
 
@@ -201,7 +201,13 @@ namespace UnicontaClient.Pages.CustomPage
 
                 MessageClient = await GetMessageClient(lang);
 
-                await CopyLayoutFieldToCompany();
+                var _LayoutGroup = DebtorInvoice._LayoutGroup ?? Debtor._LayoutGroup;
+                if (_LayoutGroup != null)
+                {
+                    var cache = crudApi.GetCache(typeof(DebtorLayoutGroup)) ?? await crudApi.LoadCache(typeof(DebtorLayoutGroup));
+                    var layClient = (DebtorLayoutGroup)cache.Get(_LayoutGroup);
+                    layClient?.SetCompanyBank(Company);
+                }
 
                 return true;
             }
@@ -233,22 +239,6 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
             }
             return Utility.GetDebtorMessageClient(crudApi, lang, emailType);
-        }
-
-        /// <summary>
-        /// Copy fields of layout group to company
-        /// </summary>
-        /// <returns>Task</returns>
-        async private Task CopyLayoutFieldToCompany()
-        {
-            var comp = crudApi.CompanyEntity;
-            var cache = comp.GetCache(typeof(DebtorLayoutGroup)) ?? await comp.LoadCache(typeof(DebtorLayoutGroup), crudApi);
-            var _LayoutGroup = DebtorInvoice._LayoutGroup ?? Debtor._LayoutGroup;
-            if (_LayoutGroup != null)
-            {
-                var layClient = (DCLayoutGroup)cache.Get(_LayoutGroup);
-                layClient.SetCompanyBank(Company);
-            }
         }
     }
 }

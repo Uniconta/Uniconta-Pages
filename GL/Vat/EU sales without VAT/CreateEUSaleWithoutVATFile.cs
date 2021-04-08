@@ -100,11 +100,18 @@ namespace UnicontaClient.Pages.CustomPage
         {
             public bool Equals(EUSaleWithoutVAT x, EUSaleWithoutVAT y)
             {
-                return (x.Country == y.Country) && (x.IsTriangularTrade == y.IsTriangularTrade) && (x._DebtorRegNoFile == y._DebtorRegNoFile);
+                int c = x.Country - y.Country;
+                if (c != 0)
+                    return false;
+                c = string.Compare(x._DebtorRegNoFile, y._DebtorRegNoFile);
+                if (c != 0)
+                    return false;
+                return true;
             }
+           
             public int GetHashCode(EUSaleWithoutVAT obj)
             {
-                return ((int)obj.Country + 1) * (obj.IsTriangularTrade ? 2 : 1) * (obj._DebtorRegNoFile != null ? obj._DebtorRegNoFile.GetHashCode() : 1);
+                return ((int)obj.Country + 1) * (obj._DebtorRegNoFile != null ? obj._DebtorRegNoFile.GetHashCode() : 1);
             }
         }
 
@@ -126,26 +133,25 @@ namespace UnicontaClient.Pages.CustomPage
             
             foreach (var euSale in listOfEU)
             {
-                euSale.Compressed = true;
-                if (euSale.IsTriangularTrade)
-                {
-                    euSale.TriangularTradeAmount += euSale.ItemAmount;
-                    euSale.ItemAmount = 0;
-                    euSale.ServiceAmount = 0;
-                }
-
                 EUSaleWithoutVAT found;
                 if (dictEUSale.TryGetValue(euSale, out found))
                 {
-                    found.ItemAmount += euSale.ItemAmount;
-                    found.TriangularTradeAmount += euSale.TriangularTradeAmount;
-                    found.ServiceAmount += euSale.ServiceAmount;
+                    found._CompressItemAmount += euSale.IsTriangularTrade ? 0 : euSale.ItemAmount;
+                    found._CompressTriangularAmount += euSale.IsTriangularTrade ? euSale.ItemAmount : 0;
+                    found._CompressServiceAmount += euSale.IsTriangularTrade ? 0 : euSale.ServiceAmount;
                     found.InvoiceNumber = 0;
                     found.Item = null;
                     found.Vat = null;
                 }
                 else
+                {
+                    euSale._CompressItemAmount = euSale.IsTriangularTrade ? 0 : euSale.ItemAmount;
+                    euSale._CompressTriangularAmount = euSale.IsTriangularTrade ? euSale.ItemAmount : 0;
+                    euSale._CompressServiceAmount = euSale.IsTriangularTrade ? 0 : euSale.ServiceAmount;
                     dictEUSale.Add(euSale, euSale);
+                }
+
+                euSale.Compressed = true;
             }
 
             if (dictEUSale.Count == 0)
@@ -189,7 +195,15 @@ namespace UnicontaClient.Pages.CustomPage
                         euSale.SystemInfo += Environment.NewLine + Localization.lookup("CompressPosting");
                 }
 
-                if (euSale.ItemAmount == 0 && euSale.ServiceAmount == 0 && euSale.TriangularTradeAmount == 0)
+                if (euSale.Item == null && euSale._ItemOrService == ItemOrServiceType.None)
+                {
+                    hasErrors = true;
+                    if (euSale.SystemInfo == VALIDATE_OK)
+                        euSale.SystemInfo = Localization.lookup(fieldCannotBeEmpty(string.Format("{0} ({1}={2})", Localization.lookup("ItemType"), Localization.lookup("Item"), Localization.lookup("Blank"))));
+                    else
+                        euSale.SystemInfo += Environment.NewLine + Localization.lookup(fieldCannotBeEmpty(string.Format("{0} ({1}={2})", Localization.lookup("ItemType"), Localization.lookup("Item"), Localization.lookup("Blank"))));
+                }
+                else if (euSale.ItemAmount == 0 && euSale.ServiceAmount == 0 && euSale.TriangularTradeAmount == 0)
                 {
                     hasErrors = true;
                     if (euSale.SystemInfo == VALIDATE_OK)
@@ -423,8 +437,16 @@ namespace UnicontaClient.Pages.CustomPage
             }
             return read.ToArray();
         }
-#endregion
+        #endregion
+
+        static string fieldCannotBeEmpty(string field)
+        {
+            return String.Format("{0} : {1}",
+                    Uniconta.ClientTools.Localization.lookup("FieldCannotBeEmpty"),
+                    Uniconta.ClientTools.Localization.lookup(field));
+        }
     }
+
 
     public class EUSaleWithoutVATText
     {
@@ -438,6 +460,7 @@ namespace UnicontaClient.Pages.CustomPage
         public static string DebtorRegNo { get { return string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("CompanyRegNo"), Uniconta.ClientTools.Localization.lookup("Debtor")); } }
         public static string DebtorRegNoFile { get { return string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("CompanyRegNo"), Uniconta.ClientTools.Localization.lookup("File")); } }
         public static string TriangularTradeAmount { get { return string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("Amount"), Uniconta.ClientTools.Localization.lookup("TriangleTrade")); } }
+        public static string ItemOrService { get { return string.Format("{0} ({1}={2})", Localization.lookup("ItemType"), Localization.lookup("Item"), Localization.lookup("Blank")); } }
     }
 
     [ClientTable(LabelKey = "EUSaleWithoutVAT")]
@@ -508,66 +531,44 @@ namespace UnicontaClient.Pages.CustomPage
             } 
         }
 
-        private double _ItemAmount;
-        [Price]
+        public double _Amount; 
+        public double _CompressItemAmount;
+        public double _CompressServiceAmount;
+        public double _CompressTriangularAmount;
+
+        [Price] 
         [Display(Name = "ItemAmount", ResourceType = typeof(EUSaleWithoutVATText))]
-        public double ItemAmount
-        {
-            get
+        public double ItemAmount 
+        { 
+            get 
             {
                 if (_Compressed)
-                    return Math.Round(_ItemAmount, 0);
+                    return Math.Round(_CompressItemAmount, 0);
                 else
-                    return _ItemAmount;
-            }
-            set
-            {
-                _ItemAmount = value;
-                NotifyPropertyChanged("ItemAmount");
-            }
+                    return _ItemOrService == ItemOrServiceType.Item ? _Amount : 0; 
+            } 
         }
 
-        private double _ServiceAmount;
         [Price]
         [Display(Name = "ServiceAmount", ResourceType = typeof(EUSaleWithoutVATText))]
-        public double ServiceAmount
-        {
-            get
+        public double ServiceAmount 
+        { 
+            get 
             {
                 if (_Compressed)
-                    return Math.Round(_ServiceAmount, 0);
+                    return Math.Round(_CompressServiceAmount, 0);
                 else
-                    return _ServiceAmount;
-            }
-            set
-            {
-                _ServiceAmount = value;
-                NotifyPropertyChanged("ServiceAmount");
-            }
+                    return _ItemOrService == ItemOrServiceType.Service && !_IsTriangularTrade ? _Amount : 0; 
+            } 
         }
+
+        [Price] 
+        [Display(Name = "TriangularTradeAmount", ResourceType = typeof(EUSaleWithoutVATText))]
+        public double TriangularTradeAmount { get { return Math.Round(_CompressTriangularAmount, 0); } }
 
         private bool _Compressed;
         [Display(Name = "Compressed", ResourceType = typeof(EUSaleWithoutVATText))]
         public bool Compressed { get { return _Compressed; } set { _Compressed = value; NotifyPropertyChanged("Compressed"); } }
-
-        private double _TriangularTradeAmount;
-        [Price]
-        [Display(Name = "TriangularTradeAmount", ResourceType = typeof(EUSaleWithoutVATText))]
-        public double TriangularTradeAmount
-        {
-            get
-            {
-                if (_Compressed)
-                    return Math.Round(_TriangularTradeAmount, 0);
-                else
-                    return _TriangularTradeAmount;
-            }
-            set
-            {
-                _TriangularTradeAmount = value;
-                NotifyPropertyChanged("TriangularTradeAmount");
-            }
-        }
 
         private string _Item;
         [ForeignKeyAttribute(ForeignKeyTable = typeof(InvItem))]
@@ -590,6 +591,27 @@ namespace UnicontaClient.Pages.CustomPage
         [ForeignKeyAttribute(ForeignKeyTable = typeof(GLVat))]
         [Display(Name = "Vat", ResourceType = typeof(GLDailyJournalText)), Key]
         public string Vat { get { return _Vat; } set { _Vat = value; NotifyPropertyChanged("Vat"); } }
+
+        public ItemOrServiceType _ItemOrService;
+        [AppEnumAttribute(EnumName = "ItemOrService")]
+        [Display(Name = "ItemOrService", ResourceType = typeof(EUSaleWithoutVATText))]
+        public string ItemOrService
+        {
+            get 
+            { 
+                return Item == null && !_Compressed ? AppEnums.ItemOrService.ToString((int)_ItemOrService) : null;
+            }
+            set
+            {
+                if (value == null || Item != null) return;
+                var _val = (ItemOrServiceType)AppEnums.ItemOrService.IndexOf(value);
+                if (_val != _ItemOrService)
+                {
+                    _ItemOrService = _val;
+                    NotifyPropertyChanged("ItemOrService");
+                }
+            }
+        }
 
         [ReportingAttribute]
         public DebtorClient DebtorRef
@@ -709,4 +731,10 @@ namespace UnicontaClient.Pages.CustomPage
         public string Value;
     }
 #endif
+    public enum ItemOrServiceType : byte
+    {
+        None,
+        Item,
+        Service
+    };
 }

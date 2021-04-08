@@ -83,6 +83,8 @@ namespace UnicontaISO20022CreditTransfer
                     return new BankSpecificSettingsUK(credPaymFormat);
                 case (byte)ExportFormatType.ISO20022_LT:
                     return new BankSpecificSettingsLT(credPaymFormat);
+                case (byte)ExportFormatType.ISO20022_CH:
+                    return new BankSpecificSettingsCH(credPaymFormat);
                 default:
                     return new BankSpecificSettingsDK(credPaymFormat); //This is active for all the proprietary bank formats - In a future version Test class has to be differentiated
             }
@@ -119,6 +121,14 @@ namespace UnicontaISO20022CreditTransfer
         {
             replaceCharactersRegEx = null;
             return replaceCharactersRegEx;
+        }
+
+        /// <summary>
+        /// XML Attribute NS
+        /// </summary>
+        public virtual string XMLAttributeNS()
+        {
+            return BaseDocument.XMLNS_PAIN003;
         }
 
         /// <summary>

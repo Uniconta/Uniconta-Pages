@@ -23,6 +23,7 @@ namespace UnicontaISO20022CreditTransfer
         Luminor,
         Standard,
         Handelsbanken,
-        Commerzbank
+        Commerzbank,
+        UBS_SIX
     }
 }

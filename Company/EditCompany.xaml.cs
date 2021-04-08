@@ -306,7 +306,7 @@ namespace UnicontaClient.Pages.CustomPage
                 UtilDisplay.ShowErrorCode(result);
             else
             {
-                dockCtrl.CloseDockItem();
+                CloseDockItem();
                 UnicontaMessageBox.Show(string.Format("{0}. {1}", Uniconta.ClientTools.Localization.lookup(message), api.CompanyEntity._Name),
                     Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OK);
             }

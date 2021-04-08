@@ -177,7 +177,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (result == ErrorCodes.Succes)
             {
                 globalEvents.OnRefresh(NameOfControl, null);
-                dockCtrl?.CloseDockItem();
+                CloseDockItem();
             }
         }
     }

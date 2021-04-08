@@ -185,7 +185,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "SaveGrid":
                         saveGrid();
-                        dockCtrl?.CloseDockItem();
+                        CloseDockItem();
                     break;
                 case "DeleteRow":
                     dgDebtorOrderProjectLineGrid.DeleteRow();

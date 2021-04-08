@@ -84,7 +84,9 @@ namespace ISO20022CreditTransfer
             doc.CompanyCountryId = UnicontaCountryToISO(company._CountryId);
             bankSpecific.CompanyCountryId = doc.CompanyCountryId;
             doc.EncodingFormat = bankSpecific.EncodingFormat();
-           
+
+            doc.XMLAttributeNS = bankSpecific.XMLAttributeNS();
+
             doc.ChargeBearer = bankSpecific.ChargeBearerDebtor();
 
             doc.CompanyID = company.CompanyId;
@@ -283,7 +285,7 @@ namespace ISO20022CreditTransfer
 
             XmlDocument creditTransferDoc = doc.CreateXmlDocument();
             
-            return new XMLDocumentGenerateResult(creditTransferDoc, (preCheckErrors.Count > 0 || checkErrors.Count > 0), doc.HeaderNumberOfTrans, checkErrors, doc.EncodingFormat, generatedFileName);
+            return new XMLDocumentGenerateResult(creditTransferDoc, (preCheckErrors.Count > 0 || checkErrors.Count > 0), doc, checkErrors, generatedFileName);
         }
     }
 }

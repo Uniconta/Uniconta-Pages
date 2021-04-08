@@ -2374,14 +2374,14 @@ namespace UnicontaClient.Pages.CustomPage
 
                         // lets read value in case it has change while we awaited
                         var propCur = typeof(JournalLineGridClient).GetProperty(field + "Cur");
-                        val = (double)propCur.GetValue(rec, null);
+                        val = Convert.ToDouble(propCur?.GetValue(rec, null));
                     }
                     if (LastRate == 0d)
                         return;
                     val = Math.Round(val * LastRate, RoundTo100 ? 0 : 2);
                 }
                 var prop = typeof(JournalLineGridClient).GetProperty(field);
-                prop.SetValue(rec, val, null);
+                prop?.SetValue(rec, val, null);
             }
         }
 
@@ -2636,9 +2636,9 @@ namespace UnicontaClient.Pages.CustomPage
         private void Task_GotFocus(object sender, RoutedEventArgs e)
         {
             var selectedItem = dgGLDailyJournalLine.SelectedItem as JournalLineGridClient;
-            if (selectedItem?._Project != null)
+            var selected = (ProjectClient)ProjectCache?.Get(selectedItem?._Project);
+            if (selected != null)
             {
-                var selected = (ProjectClient)ProjectCache.Get(selectedItem._Project);
                 setTask(selected, selectedItem);
                 if (prevTask != null)
                     prevTask.isValidate = false;

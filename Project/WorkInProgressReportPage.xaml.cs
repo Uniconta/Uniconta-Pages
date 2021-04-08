@@ -448,13 +448,13 @@ namespace UnicontaClient.Pages.CustomPage
                         xpensLst.Add(x);
                     else if (catType == CategoryType.Labour)
                         feeLst.Add(x);
-                    else if (catType == CategoryType.OnAccountInvoicing && x.Invoiced == false)
+                    else if (catType == CategoryType.OnAccountInvoicing)
                         onAccLst.Add(x);
                     else if (catType == CategoryType.Revenue || (catType == CategoryType.OnAccountInvoicing && x.Invoiced == false))
                         finalInvLst.Add(x);
                     else if (catType == CategoryType.Adjustment)
                         adjLst.Add(x);
-                    
+
                     if (x.Invoiced && (catType == CategoryType.Materials ||
                                        catType == CategoryType.Expenses ||
                                        catType == CategoryType.ExternalWork ||

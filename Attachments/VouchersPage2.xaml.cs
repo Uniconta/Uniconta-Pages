@@ -202,6 +202,14 @@ namespace UnicontaClient.Pages.CustomPage
                         var voucher = multiVouchers[i];
                         if (voucher._Data != null)
                         {
+    #if !SILVERLIGHT
+                            if (voucher._Fileextension == FileextensionsTypes.JPEG)
+                            {
+                                var imageBytes = FileBrowseControl.ImageResize(voucher._Data, ".jpg");
+                                if (imageBytes != null)
+                                    voucher._Data = imageBytes;
+                            }
+#endif
                             buffers[i] = voucher._Data;
                             voucher._Data = null;
                         }
@@ -218,7 +226,7 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         Utility.UpdateBuffers(api, buffers, multiVouchers);
                         ClosePage(4); // full refresh and clearBusy inside
-                        dockCtrl?.CloseDockItem();
+                        CloseDockItem();
                     }
                     return;
                 }
@@ -228,6 +236,16 @@ namespace UnicontaClient.Pages.CustomPage
             if (LoadedRow == null)
             {
                 buf = voucherClientRow._Data;
+#if !SILVERLIGHT
+                if (buf != null && voucherClientRow._Fileextension == FileextensionsTypes.JPEG)
+                {
+                    buf = FileBrowseControl.ImageResize(buf, ".jpg");
+                    if (buf != null)
+                        voucherClientRow._Data = buf;
+                    else
+                        buf = voucherClientRow._Data;
+                }
+#endif
                 if (buf != null && buf.Length > 200000)
                     voucherClientRow._Data = null;
                 else
@@ -314,7 +332,7 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         if (fileInfo == null)
                             continue;
-                        var vc = Activator.CreateInstance(voucherClientRow?.GetType()) as VouchersClient;
+                        var vc = Activator.CreateInstance(voucherClientRow.GetType()) as VouchersClient;
                         vc.SetMaster(api.CompanyEntity);
                         multiVouchers[iCtr++] = vc;
                         vc._Fileextension = DocumentConvert.GetDocumentType(fileInfo.FileExtension);

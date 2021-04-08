@@ -93,7 +93,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOffers"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceAccount"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PriceList" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Shipment" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryTerm" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryTerm" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Discount" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="TotalBeforeVAT" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="LayoutGroup" Visible="False" />

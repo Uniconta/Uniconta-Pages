@@ -44,9 +44,10 @@ namespace UnicontaClient.Pages.CustomPage
             var SumContext = new TemplateSumContext(Cols);
             var colCount = PassedCriteria.selectedCriteria.Count;
             bool AnyHidden = false;
-            int i;
-            foreach (var line in reportline)
+            int i, j;
+            for(j = 0; (j < reportline.Length); j++)
             {
+                var line = reportline[j];
                 var amounts = new long[colCount];
                 if (line._Accounts != null && !line._ExpressionSum)
                 {
@@ -80,6 +81,7 @@ namespace UnicontaClient.Pages.CustomPage
                     AnyHidden = true;
 
                 var newBalanceCol = new BalanceClient(amounts);
+                newBalanceCol.Acc._Name = line._Text;
                 newBalance.Add(newBalanceCol);
                 hdrData.TextSize = template._TextSize == 0 ? 70 * SizeFactor : (template._TextSize * SizeFactor);
                 hdrData.AmountSize = template._AmountSize == 0 ? 20 * SizeFactor : (template._AmountSize * SizeFactor);
@@ -89,8 +91,9 @@ namespace UnicontaClient.Pages.CustomPage
             // Now we will take all expressions and update.
             var pars = new parser(SumContext);
 
-            foreach (var item in TemplateReportlist)
+            for (j = 0; (j < TemplateReportlist.Count); j++)
             {
+                var item = TemplateReportlist[j];
                 var line = item.line;
                 if (line._ExpressionSum)
                 {
@@ -123,10 +126,7 @@ namespace UnicontaClient.Pages.CustomPage
             AccountName.Visible = AccountNo.Visible = false;
             Text.Visible = true;
             dgBalanceReport.ItemsSource = TemplateReportlist;
-            templateReportData = new object[4];
-            templateReportData[0] = items;
-            templateReportData[1] = hdrData;
-            templateReportData[2] = PassedCriteria.ObjBalance;
+            templateReportData = new object[] { items, hdrData, PassedCriteria.ObjBalance, null };
             return newBalance;
         }
     }

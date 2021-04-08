@@ -41,6 +41,7 @@ namespace UnicontaClient.Pages.CustomPage
         CrudAPI newapi;
         UnicontaBaseEntity master;
         UnicontaBaseEntity masterWithCompanyId;
+        bool copyUserFields = false;
         public CWCopyUserFields(UnicontaBaseEntity sourcedata, CrudAPI api)
         {
             this.DataContext = this;
@@ -59,6 +60,7 @@ namespace UnicontaClient.Pages.CustomPage
             this.Loaded += CWCopyUserFields_Loaded;
             this.Height += 40;
             rowh.Height = new GridLength(270);
+            copyUserFields = true;
         }
 
         public CWCopyUserFields(CrudAPI api)
@@ -189,7 +191,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (masterList.Count == 0)
                 return;
-            if (cbtable.SelectedItem == null)
+            if (cbtable.SelectedItem == null && !copyUserFields)
                 return; 
             var list = await newapi.Query<CustomTableFieldsClient>(masterList, null);
             if (list != null)

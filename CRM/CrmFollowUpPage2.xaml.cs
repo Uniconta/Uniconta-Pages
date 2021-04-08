@@ -157,7 +157,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (err != ErrorCodes.Succes)
                 UtilDisplay.ShowErrorCode(err);
             else
-                dockCtrl.CloseDockItem();
+                CloseDockItem();
         }
 
         private void lookupDCAccount_GotFocus(object sender, RoutedEventArgs e)

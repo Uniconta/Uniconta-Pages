@@ -121,6 +121,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             this.NumberOfCol = amount.Length;
             this.amount = amount;
+            this.Acc = new GLAccount(); // dummy
             init();
         }
 

@@ -208,7 +208,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (errorCodes == ErrorCodes.Succes)
                     {
                         dgCreditorOrderCostLine.ItemsSource = null;
-                        dockCtrl?.CloseDockItem();
+                        CloseDockItem();
                     }
                 }
             };

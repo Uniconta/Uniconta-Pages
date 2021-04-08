@@ -58,7 +58,7 @@ namespace UnicontaClient.Pages.CustomPage
             var service = txtHtmlControl.GetService<IRichEditCommandFactoryService>();
             if (service == null)
             {
-                dockCtrl.CloseDockItem();
+                CloseDockItem();
                 UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("HtmlEditorError"), Uniconta.ClientTools.Localization.lookup("Error"));
                 return;
             }
@@ -70,7 +70,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            dockCtrl?.CloseDockItem();
+            CloseDockItem();
         }
 
         private void OKButton_Click(object sender, RoutedEventArgs e)
@@ -79,7 +79,7 @@ namespace UnicontaClient.Pages.CustomPage
                 return;
             var htmlScript = Encoding.UTF8.GetBytes(txtHtmlControl.HtmlText);
             globalEvents.OnRefresh(TabControls.TextInHtmlPage, htmlScript);
-            dockCtrl?.CloseDockItem();
+            CloseDockItem();
         }
 
         private void txtHtmlControl_AutoCorrect(object sender, DevExpress.XtraRichEdit.AutoCorrectEventArgs e)

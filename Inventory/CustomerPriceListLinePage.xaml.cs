@@ -81,9 +81,11 @@ namespace UnicontaClient.Pages.CustomPage
             }
             else if (row.GetType() == type)
             {
+                /*
+                Give problems setting Exchange rate
                 foreach (var inv in copyFromRows)
                    ((InvPriceListLineClient)inv).ExchangeRate = this.ExchangeRate;
-
+                */
                 return copyFromRows;
             }
             return null;
@@ -117,7 +119,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             string key = Utility.GetHeaderString(dgInvPriceListLineClientGrid.masterRecord);
             if (string.IsNullOrEmpty(key)) return;
-            string header = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("SalesPricesAndDiscounts"), key);
+            string header = string.Concat(Uniconta.ClientTools.Localization.lookup("SalesPricesAndDiscounts"), ": ", key);
             SetHeader(header);
         }
 

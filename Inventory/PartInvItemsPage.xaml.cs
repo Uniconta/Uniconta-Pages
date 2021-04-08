@@ -192,15 +192,11 @@ namespace UnicontaClient.Pages.CustomPage
         protected override void OnLayoutLoaded()
         {
             base.OnLayoutLoaded();
-            bool showFields = false;
-            if (master is InvItem)
-                showFields = (Invitem != null && Invitem._ItemType == (byte)Uniconta.DataModel.ItemType.BOM);
-            else if (master is InvBOM)
-            {
-                var invBom = master as InvBOMClient;
+            var invBom = master as InvBOMClient;
+            if (invBom != null)
                 Invitem = invBom.InvItemMaster;
-                showFields = Invitem._ItemType == (byte)Uniconta.DataModel.ItemType.BOM;
-            }
+
+            bool showFields = (Invitem != null && Invitem._ItemType >= (byte)Uniconta.DataModel.ItemType.BOM);
 
             if (Invitem != null && Invitem._ItemType == (byte)Uniconta.DataModel.ItemType.ProductionBOM)
                 this.UnfoldBOM.Visible = true;

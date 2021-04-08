@@ -281,6 +281,8 @@ namespace UnicontaClient.Pages.CustomPage
 
             var lst = new List<GLBudgetLineClient>();
             var itemSource = (IEnumerable<GLBudgetLine>)dgGLBudgetLine.ItemsSource;
+            if (itemSource == null)
+                return;
             foreach (var rec in itemSource)
             {
                 if (rec._Disable)

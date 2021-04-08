@@ -358,7 +358,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void Close()
         {
             refreshParams = null;
-            dockCtrl.CloseDockItem();
+            CloseDockItem();
         }
         private void Generate()
         {
@@ -403,7 +403,7 @@ namespace UnicontaClient.Pages.CustomPage
                     refreshParams[0] = SelectedBankStatemenLine;
                     refreshParams[1] = settlement;
                 }
-                dockCtrl.CloseDockItem();
+                CloseDockItem();
             }
         }
 

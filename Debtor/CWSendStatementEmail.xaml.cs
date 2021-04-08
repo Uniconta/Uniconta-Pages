@@ -28,6 +28,21 @@ namespace UnicontaClient.Pages.CustomPage
         [Display(Name = "SelectedRows", ResourceType = typeof(InputFieldDataText))]
         public bool SendOnlyMarked { get; set; }
 
+        public int SentEmailCount
+        {
+            get
+            {
+                if (SendAll)
+                    return totalEmails;
+                else if (SendOnlyMarked)
+                    return markedEmails;
+
+                return 0;
+            }
+        }
+
+        int totalEmails = 0, markedEmails = 0;
+
 #if !SILVERLIGHT
         protected override int DialogId { get { return DialogTableId; } }
         public int DialogTableId { get; set; }
@@ -45,6 +60,14 @@ namespace UnicontaClient.Pages.CustomPage
 #endif
             this.Loaded += CW_Loaded;
         }
+
+#if !SILVERLIGHT
+        public void UpdateCount(int totalLines, int markedLines)
+        {
+            totalEmails = totalLines;
+            markedEmails = markedLines;
+        }
+#endif
 
         void CW_Loaded(object sender, RoutedEventArgs e)
         {
@@ -71,6 +94,9 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
+            if (cbxAll.IsChecked == false && cbxMarked.IsChecked == false)
+                cbxAll.IsChecked = true;
+
             this.DialogResult = true;
         }
 
@@ -79,10 +105,42 @@ namespace UnicontaClient.Pages.CustomPage
             this.DialogResult = false;
         }
 
-        private void cbxAll_Checked(object sender, RoutedEventArgs e)
+        private void AllChecked(object sender, RoutedEventArgs e)
         {
-            SendAll = object.Equals(cbxAll.IsChecked, true);
-            SendOnlyMarked = object.Equals(cbxMarked.IsChecked, false);
+            if (ReferenceEquals(sender, cbxAll))
+            {
+                cbxMarked.IsChecked = false;
+                ShowEmailMessage(totalEmails);
+            }
+        }
+
+        private void MarkedChecked(object sender, RoutedEventArgs e)
+        {
+            if (ReferenceEquals(sender, cbxMarked))
+            {
+                cbxAll.IsChecked = false;
+                ShowEmailMessage(markedEmails);
+            }
+        }
+
+        private void UnChecked(object sender,RoutedEventArgs e)
+        {
+#if !SILVERLIGHT
+
+            emailsendMsg.Visibility = Visibility.Collapsed;
+#endif
+        }
+
+        private void ShowEmailMessage(int count)
+        {
+#if !SILVERLIGHT
+            if (count > 0)
+                emailsendMsg.Text = string.Format(Uniconta.ClientTools.Localization.lookup("SendEmailCount"), count);
+            else
+                emailsendMsg.Text = string.Format(Uniconta.ClientTools.Localization.lookup("NoRecordSelected"));
+
+            emailsendMsg.Visibility = Visibility.Visible;
+#endif
         }
     }
 }

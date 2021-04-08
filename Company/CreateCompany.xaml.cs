@@ -660,7 +660,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (setupType == 1)
                     {
                         globalEvents.OnRefresh(TabControls.CreateCompany, editrow.RowId);
-                        dockCtrl?.CloseDockItem();
+                        CloseDockItem();
                     }
                 }
                 else

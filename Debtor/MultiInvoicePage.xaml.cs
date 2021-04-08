@@ -117,7 +117,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "OrderLine":
                     if (selectedItem == null)
                         return;
-                    var olheader = string.Format("{0}:{1},{2}", Uniconta.ClientTools.Localization.lookup("OrdersLine"), selectedItem._OrderNumber, selectedItem.Name);
+                    var olheader = string.Format("{0}:{1},{2}", Uniconta.ClientTools.Localization.lookup("OrdersLine"), selectedItem._OrderNumber, selectedItem._DCAccount);
                     AddDockItem(TabControls.DebtorOrderLines, dgMultiInvGrid.syncEntity, olheader);
                     break;
                 case "GenerateInvoice":

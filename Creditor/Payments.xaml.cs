@@ -90,14 +90,13 @@ namespace UnicontaClient.Pages.CustomPage
 
                 return RemainingTransAmount - _UsedCashDiscount;
             }
-            set { PaymentAmount = value; }
         }
 
         private string _ErrorInfo;
         [Display(Name = "SystemInfo", ResourceType = typeof(DCTransText))]
         public string ErrorInfo { get { return _ErrorInfo; } set { _ErrorInfo = value; NotifyPropertyChanged("ErrorInfo"); } }
 
-        public string CurrencyLocalStr { get { return CurrencyUtil.GetStringFromId(Currency != null ? (Currencies)Currency : CompanyRef._CurrencyId); } }
+        public string CurrencyLocalStr { get { return CurrencyUtil.GetStringFromId(Currency ?? (CompanyId != 0 ? CompanyRef._CurrencyId : Currencies.DKK)); } }
 
         private string _MergePaymId;
         [Display(Name = "MergePaymId", ResourceType = typeof(DCTransText))]
@@ -792,7 +791,8 @@ namespace UnicontaClient.Pages.CustomPage
                             else if (paymMethod == ExportFormatType.BEC_CSV)
                                 ret = BECPayFormat.GenerateFile(paymentList, api.CompanyEntity, paymentFormatRec, BankAccountCache, CreditorCache, glJournalGenerated);
                             else if (paymMethod == ExportFormatType.ISO20022_DK || paymMethod == ExportFormatType.ISO20022_NL || paymMethod == ExportFormatType.ISO20022_NO || paymMethod == ExportFormatType.ISO20022_DE ||
-                                     paymMethod == ExportFormatType.ISO20022_EE || paymMethod == ExportFormatType.ISO20022_SE || paymMethod == ExportFormatType.ISO20022_UK || paymMethod == ExportFormatType.ISO20022_LT)
+                                     paymMethod == ExportFormatType.ISO20022_EE || paymMethod == ExportFormatType.ISO20022_SE || paymMethod == ExportFormatType.ISO20022_UK || paymMethod == ExportFormatType.ISO20022_LT || 
+                                     paymMethod == ExportFormatType.ISO20022_CH)
                                 ret = GeneratePaymentFileISO20022(paymentList, paymentFormatRec, uniqueFileId);
 
                             if (ret == true)
@@ -1063,7 +1063,7 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     var filename = saveDialog.FileName;
                     result.Document.DocumentElement.SetAttribute(BaseDocument.XMLNS_XSI, BaseDocument.XMLNS_XSI_VALUE);
-               
+
                     using (TextWriter sw = new StreamWriter(filename, false, result.Encoding))
                     {
                         result.Document.Save(sw);

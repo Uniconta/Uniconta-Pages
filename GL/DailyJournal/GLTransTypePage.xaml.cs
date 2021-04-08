@@ -163,7 +163,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var err = await dgGLTrans.SaveData();
             if (err == ErrorCodes.Succes)
-                dockCtrl.CloseDockItem();
+                CloseDockItem();
         }
 
         protected override async void LoadCacheInBackGround()

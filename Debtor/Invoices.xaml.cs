@@ -207,11 +207,6 @@ namespace UnicontaClient.Pages.CustomPage
                 DeliveryCity.Visible = false;
                 DeliveryCountry.Visible = false;
             }
-            if (!api.CompanyEntity._OIOUBLSendOnServer)
-            {
-                SendTimeOIO.Visible = false;
-                ErrorOIO.Visible = false;
-            }
         }
 
         async void initialLoad()
@@ -784,7 +779,7 @@ namespace UnicontaClient.Pages.CustomPage
                 switch (confirmationBox.ConfirmationResult)
                 {
                     case CWConfirmationBox.ConfirmationResultEnum.Yes:
-                        AddDockItem(order.__DCType() == 1 ? TabControls.DebtorOrderLines : TabControls.DebtorOfferLines, order, string.Format("{0}:{1},{2}", Uniconta.ClientTools.Localization.lookup("OrdersLine"), order._OrderNumber, ClientHelper.GetName(order.CompanyId, typeof(Debtor), order._DCAccount)));
+                        AddDockItem(order.__DCType() == 1 ? TabControls.DebtorOrderLines : TabControls.DebtorOfferLines, order, string.Format("{0}:{1},{2}", Uniconta.ClientTools.Localization.lookup("OrdersLine"), order._OrderNumber, order._DCAccount));
                         break;
 
                     case CWConfirmationBox.ConfirmationResultEnum.No:

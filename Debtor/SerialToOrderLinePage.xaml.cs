@@ -277,7 +277,7 @@ namespace UnicontaClient.Pages.CustomPage
             await dgLinkedGrid.SaveData();
             saveAndExit = true;
             await LinkRows(true);
-            dockCtrl?.CloseDockItem();
+            CloseDockItem();
         }
 
         private async void UnlinkRows()

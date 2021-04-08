@@ -780,7 +780,14 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
             checkList.Add(value);
         }
 
-        #region TMJournalLineClientPage
+#if !SILVERLIGHT
+        public static double GetDistance(string fromAddress, string toAddress, bool avoidFerries = true, int decimals = 1)
+        {
+            return Uniconta.ClientTools.GoogleMaps.GetDistance(fromAddress, toAddress, avoidFerries, decimals);
+        }
+#endif
+
+#region TMJournalLineClientPage
         public class TMJournalLineClientLocal : TMJournalLineClient 
         {
             internal object _projectSource;
@@ -989,6 +996,6 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
                 }
             }
         }
-        #endregion
+#endregion
     }
 }

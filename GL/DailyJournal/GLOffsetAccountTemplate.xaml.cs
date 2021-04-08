@@ -168,7 +168,7 @@ namespace UnicontaClient.Pages.CustomPage
                 bankStatementLine?.SetOffsetAccount(lines);
                 vouchersClient?.SetOffsetAccount(lines);
             }
-            dockCtrl?.CloseDockItem();
+            CloseDockItem();
         }
 
         protected override void OnLayoutLoaded()
@@ -370,7 +370,7 @@ namespace UnicontaClient.Pages.CustomPage
             else if (bankStatementLine != null)
                 Amount = bankStatementLine.Amount;
             else if (vouchersClient != null)
-                Amount = vouchersClient.Amount;
+                Amount = - vouchersClient._Amount;
             else
                 Amount = 0d;
             if (Amount != 0d)
@@ -422,7 +422,7 @@ namespace UnicontaClient.Pages.CustomPage
                 else if (bankStatementLine != null)
                     amount = bankStatementLine.Amount;
                 else if (vouchersClient != null)
-                    amount = vouchersClient.Amount;
+                    amount = - vouchersClient._Amount;
                 else
                     amount = 0d;
                 SetStatusText(amount, offSetAccAmountSum);

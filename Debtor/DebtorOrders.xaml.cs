@@ -575,11 +575,10 @@ namespace UnicontaClient.Pages.CustomPage
             var installation = (WorkInstallation)api.GetCache(typeof(WorkInstallation))?.Get(InvClient._Installation);
             var dctype = InvClient.__DCType();
             var dccache = api.GetCache((dctype == 2 || dctype == 9) ? typeof(Uniconta.DataModel.Creditor) : typeof(Uniconta.DataModel.Debtor));
-            var deliveryAccount = (DCAccount)dccache?.Get(InvClient._DeliveryAccount);
             var debtor = client ?? (DCAccount)dccache?.Get(InvClient._DCAccount);
             var contact = (Contact)api.GetCache(typeof(Contact))?.Get(InvClient._ContactRef);
 
-            InvClient._EAN = installation?._GLN ?? contact?._EAN ?? debtor?._EAN ?? deliveryAccount?._EAN;
+            InvClient._EAN = installation?._GLN ?? contact?._EAN ?? debtor?._EAN;
         }
 
         static public void SetDeliveryAdress(DCInvoice InvClient, DCAccount client, QueryAPI api)

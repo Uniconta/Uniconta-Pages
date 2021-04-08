@@ -30,6 +30,7 @@ namespace UnicontaISO20022CreditTransfer
         protected const string XMLNS_UDT = "xmlns:udt";
         protected const string XMLNS_CCTS = "xmlns:ccts";
         public const string XMLNS_XSI_VALUE = "http://www.w3.org/2001/XMLSchema-instance";
+        public const string XMLNS_PAIN003 = "urn:iso:std:iso:20022:tech:xsd:pain.001.001.03";
         protected const string CAC = "cac";
         protected const string CBC = "cbc";
 

@@ -202,7 +202,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "OfferLine":
                     if (selectedItem == null)
                         return;
-                    var olheader = string.Format("{0}:{1},{2}", Uniconta.ClientTools.Localization.lookup("OfferLine"), selectedItem._OrderNumber, selectedItem.Name);
+                    var olheader = string.Format("{0}:{1},{2}", Uniconta.ClientTools.Localization.lookup("OfferLine"), selectedItem._OrderNumber, selectedItem._DCAccount);
                     AddDockItem(TabControls.DebtorOfferLines, dgDebtorOffers.syncEntity, olheader);
                     break;
                 case "AddNote":

@@ -22,6 +22,7 @@ using Uniconta.ClientTools.Controls;
 using System.Globalization;
 using static UnicontaClient.Pages.Project.TimeManagement.TMJournalLineHelper;
 using Uniconta.Common.Utility;
+using DevExpress.Xpf.Core;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -198,6 +199,10 @@ namespace UnicontaClient.Pages.CustomPage
         SolidColorBrush SetBackGroundColor(NumericUpDownEditor txtHours, int dayStatus)
         {
             var SolidColorBrush = new SolidColorBrush(Colors.White);
+#if !SILVERLIGHT
+            if (ApplicationThemeHelper.ApplicationThemeName == Theme.MetropolisDarkName)
+                SolidColorBrush = (SolidColorBrush)(new BrushConverter().ConvertFrom("#FF6E6E6E"));
+#endif
             if (dayStatus == 1)
                 SolidColorBrush = new SolidColorBrush(Colors.Yellow);
             else if (dayStatus == 2)

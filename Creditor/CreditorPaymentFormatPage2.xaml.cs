@@ -182,6 +182,15 @@ namespace UnicontaClient.Pages.CustomPage
                     };
                     dialogISOLT.Show();
                     break;
+                case ExportFormatType.ISO20022_CH:
+                    CWISOCH_PaymentSetup dialogISOCH = new CWISOCH_PaymentSetup(this.api, editrow);
+                    dialogISOCH.Closing += delegate
+                    {
+                        if (dialogISOCH.DialogResult == true)
+                            StreamingManager.Copy(dialogISOCH.paymentFormatISOCH, editrow);
+                    };
+                    dialogISOCH.Show();
+                    break;
 #endif
                 default:
                     UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("NoOptions"), Uniconta.ClientTools.Localization.lookup("Information"));

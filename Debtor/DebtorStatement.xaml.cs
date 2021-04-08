@@ -246,6 +246,7 @@ namespace UnicontaClient.Pages.CustomPage
             // cbxOnlyOpen.IsChecked = Pref.Debtor_OnlyOpen;
 #if !SILVERLIGHT
             cbxPageBreak.IsChecked = pageBreak;
+            dgDebtorTrans.PageBreak = pageBreak;
 #endif
             chkShowCurrency.IsChecked = showCurrency;
 
@@ -761,6 +762,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var fromAccount = Convert.ToString(cmbFromAccount.EditValue);
             var toAccount = Convert.ToString(cmbToAccount.EditValue);
+            var lstDebtorTransLst = ((IEnumerable<DebtorStatementList>)dgDebtorTrans.ItemsSource);
 
             if (!string.IsNullOrEmpty(toAccount) && fromAccount == toAccount)
             {
@@ -771,7 +773,7 @@ namespace UnicontaClient.Pages.CustomPage
                 cwSendMail.Closed += delegate
                   {
                       if (cwSendMail.DialogResult == true)
-                          DoSendAsEmail(true, fromAccount, toAccount, cwSendMail.Emails, cwSendMail.sendOnlyToThisEmail);
+                          DoSendAsEmail(lstDebtorTransLst, true, fromAccount, toAccount, cwSendMail.Emails, cwSendMail.sendOnlyToThisEmail);
                   };
                 cwSendMail.Show();
             }
@@ -780,23 +782,23 @@ namespace UnicontaClient.Pages.CustomPage
                 CWSendStatementEmail cw = new CWSendStatementEmail();
 #if !SILVERLIGHT
                 cw.DialogTableId = 2000000031;
+                cw.UpdateCount(lstDebtorTransLst.Count(), lstDebtorTransLst.Where(p => p.Mark == true).Count());
 #endif
                 cw.Closed += delegate
                 {
                     if (cw.DialogResult == true)
-                        DoSendAsEmail(cw.SendAll, fromAccount, toAccount, null, false);
+                        DoSendAsEmail(lstDebtorTransLst, cw.SendAll, fromAccount, toAccount, null, false);
                 };
                 cw.Show();
             }
         }
 
-        async void DoSendAsEmail(bool SendAll, string fromAccount, string toAccount, string emails, bool onlyThisEmail)
+        async void DoSendAsEmail(IEnumerable<DebtorStatementList> lstDebtorTransLst, bool SendAll, string fromAccount, string toAccount, string emails, bool onlyThisEmail)
         {
             var transApi = new ReportAPI(api);
             DebtorStatement.SetDateTime(txtDateFrm, txtDateTo);
             DateTime fromDate = DebtorStatement.DefaultFromDate, toDate = DebtorStatement.DefaultToDate;
 
-            var lstDebtorTransLst = ((IEnumerable<DebtorStatementList>)dgDebtorTrans.ItemsSource);
             if (!SendAll)
             {
                 // lets check if we will send all anyway.

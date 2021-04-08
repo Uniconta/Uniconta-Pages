@@ -71,9 +71,8 @@ namespace UnicontaClient.Pages.CustomPage
         async private void BindGrid()
         {
             busyIndicator.IsBusy = true;
-            var propValuePairFolder = PropValuePair.GenereteWhereElements("Folder", typeof(bool), "false");
             dgVouchersGrid.UpdateMaster(new DocumentNoRef());
-            await dgVouchersGrid.Filter(new List<PropValuePair>() { propValuePairFolder });
+            await dgVouchersGrid.Filter(new [] { PropValuePair.GenereteWhereElements("Envelope", typeof(bool), "0") } );
             busyIndicator.IsBusy = false;
         }
 

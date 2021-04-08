@@ -606,7 +606,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         void SetNewAccount(GLTransClient selectedItem)
         {
-            var cwObj = new CwEditTransaction(api, hideComments: true, hideVat: true);
+            var cwObj = new CwEditTransaction(api, hideComments: true, hideVat: true, IsCreditor: (selectedItem._DCType == GLTransRefType.Creditor));
             cwObj.Closed += async delegate
             {
                 if (cwObj.DialogResult == true)
@@ -795,13 +795,16 @@ namespace UnicontaClient.Pages.CustomPage
             CWForAllTrans cwconfirm = new CWForAllTrans();
             cwconfirm.Closing += async delegate
             {
-                busyIndicator.IsBusy = true;
-                var errorCodes = await postingApiInv.AddPhysicalVoucher(selectedItem, doc, cwconfirm.ForAllTransactions, cwconfirm.AppendDoc);
-                busyIndicator.IsBusy = false;
-                if (errorCodes == ErrorCodes.Succes)
-                    BindGrid();
-                else
-                    UtilDisplay.ShowErrorCode(errorCodes);
+                if (cwconfirm.DialogResult == true)
+                {
+                    busyIndicator.IsBusy = true;
+                    var errorCodes = await postingApiInv.AddPhysicalVoucher(selectedItem, doc, cwconfirm.ForAllTransactions, cwconfirm.AppendDoc);
+                    busyIndicator.IsBusy = false;
+                    if (errorCodes == ErrorCodes.Succes)
+                        BindGrid();
+                    else
+                        UtilDisplay.ShowErrorCode(errorCodes);
+                }
             };
             cwconfirm.Show();
         }

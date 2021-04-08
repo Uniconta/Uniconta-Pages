@@ -27,15 +27,17 @@ namespace UnicontaClient.Pages.CustomPage
     /// </summary>
     public partial class CWCalculateCommission : ChildWindow
     {
-        static readonly DateTime FirstOfMonth = new DateTime(BasePage.GetSystemDefaultDate().Year, BasePage.GetSystemDefaultDate().Month, 01);
-
-        public DateTime FromDateTime { get; set; } = FirstOfMonth;
-        public DateTime ToDateTime { get; set; } = BasePage.GetSystemDefaultDate();
-        CrudAPI Capi;
+        static DateTime _FromDateTime, _ToDateTime;
+        public DateTime FromDateTime { get { return _FromDateTime; } set { _FromDateTime = value; } }
+        public DateTime ToDateTime { get { return _ToDateTime; } set { _ToDateTime = value; } }
 
         public CWCalculateCommission(CrudAPI api)
         {
-            Capi = api;
+            if (_ToDateTime == DateTime.MinValue)
+                _ToDateTime = BasePage.GetSystemDefaultDate();
+            if (_FromDateTime == DateTime.MinValue)
+                _FromDateTime = new DateTime(_ToDateTime.Year, _ToDateTime.Month, 01);
+
             this.DataContext = this;
             InitializeComponent();
             this.Title = Uniconta.ClientTools.Localization.lookup("CalculateCommission");

@@ -110,14 +110,14 @@ namespace UnicontaClient.Pages.CustomPage
             if (selectedVouher != null)
             {
                 attachParams = new object[] { selectedVouher };
-                dockCtrl.CloseDockItem();
+                CloseDockItem();
             }
         }
 
         private void Close()
         {
             attachParams = null;
-            dockCtrl.CloseDockItem();
+            CloseDockItem();
         }
 
         async private void DataControl_CurrentItemChanged(object sender, DevExpress.Xpf.Grid.CurrentItemChangedEventArgs e)

@@ -118,7 +118,7 @@ namespace UnicontaClient.Pages.CustomPage
                 else if (companyDocumentClientRow.UseFor == CompanyDocumentUse.CompanyLogo)
                     companyClient.Logo = null;
             }
-            dockCtrl.CloseDockItem();
+            CloseDockItem();
         }
         async void DeleteDoc()
         {
