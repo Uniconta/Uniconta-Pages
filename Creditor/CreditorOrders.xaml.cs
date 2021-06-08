@@ -274,12 +274,12 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem._DocumentRef != 0)
                         _refferedVouchers.Add(selectedItem._DocumentRef);
 
-                    AddDockItem(TabControls.AttachVoucherGridPage, new object[1] { _refferedVouchers }, true);
+                    VoucherOpen = true;
+                    AddDockItem(TabControls.AttachVoucherGridPage, new object[] { _refferedVouchers }, true);
                     break;
                 case "ViewVoucher":
-                    if (selectedItem == null)
-                        return;
-                    ViewVoucher(TabControls.VouchersPage3, dgCreditorOrdersGrid.syncEntity);
+                    if (selectedItem != null)
+                        ViewVoucher(TabControls.VouchersPage3, dgCreditorOrdersGrid.syncEntity);
                     break;
                 case "DragDrop":
                 case "ImportVoucher":
@@ -287,9 +287,8 @@ namespace UnicontaClient.Pages.CustomPage
                         AddVoucher(selectedItem, ActionType);
                     break;
                 case "RemoveVoucher":
-                    if (selectedItem == null)
-                        return;
-                    RemoveVoucher(selectedItem);
+                    if (selectedItem != null)
+                        RemoveVoucher(selectedItem);
                     break;
                 case "EditAll":
                     if (dgCreditorOrdersGrid.Visibility == Visibility.Visible)
@@ -793,6 +792,7 @@ namespace UnicontaClient.Pages.CustomPage
             GenrateOfferDialog.Show();
         }
 
+        bool VoucherOpen;
         public override async void Utility_Refresh(string screenName, object argument = null)
         {
             if (screenName == TabControls.CreditorOrdersPage2)
@@ -808,8 +808,9 @@ namespace UnicontaClient.Pages.CustomPage
                 else if (err == ErrorCodes.Succes)
                     dgCreditorOrdersGrid.UpdateItemSource(2, creditorOrder);
             }
-            else if (screenName == TabControls.AttachVoucherGridPage)
+            else if (screenName == TabControls.AttachVoucherGridPage && VoucherOpen)
             {
+                VoucherOpen = false;
                 var voucherObj = argument as object[];
                 if (voucherObj != null && voucherObj.Length > 0)
                 {

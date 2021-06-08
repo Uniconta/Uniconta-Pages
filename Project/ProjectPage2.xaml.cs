@@ -102,9 +102,8 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override void AfterTemplateSet(UnicontaBaseEntity row)
         {
-            base.AfterTemplateSet(row);
             if (this.Debtor != null)
-                (row as ProjectClient).Account = Debtor._Account;
+                (row as ProjectClient).SetMaster(this.Debtor);
         }
 
         private void frmRibbon_OnItemClicked(string ActionType)

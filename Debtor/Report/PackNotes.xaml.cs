@@ -192,6 +192,9 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
+        DCPreviousAddressClient[] previousAddressLookup;
+        DebtorMessagesClient[] messagesLookup;
+        bool hasLookups;
         async private void ShowDeliveryNote(IEnumerable<DebtorDeliveryNoteLocal> debtorInvoices)
         {
             busyIndicator.IsBusy = true;
@@ -208,9 +211,10 @@ namespace UnicontaClient.Pages.CustomPage
                 string dockName = null, reportName = null;
                 bool exportAsPdf = false;
                 System.Windows.Forms.FolderBrowserDialog folderDialogSaveInvoice = null;
-
+                hasLookups = false;
                 if (count > 1)
                 {
+                    hasLookups = true;
                     if (count > StandardPrintReportPage.MAX_PREVIEW_REPORT_LIMIT)
                     {
                         var confirmMsg = string.Format(Uniconta.ClientTools.Localization.lookup("PreivewRecordsExportMsg"), count);
@@ -305,8 +309,35 @@ namespace UnicontaClient.Pages.CustomPage
                 busyIndicator.IsBusy = false;
             }
         }
-
 #if !SILVERLIGHT
+        /// <summary>
+        /// Asycn FillLookup for MultiInvoice
+        /// </summary>
+        /// <param name="debtorInvoicePrint">DebtorInvoicePrint instance</param>
+        async private Task FillLookUps(DebtorInvoicePrintReport debtorInvoicePrint)
+        {
+            if (previousAddressLookup == null)
+                previousAddressLookup = await api.Query<DCPreviousAddressClient>();
+
+            debtorInvoicePrint.SetLookUpForPreviousAddressClients(previousAddressLookup);
+
+            if (messagesLookup == null)
+                messagesLookup = await api.Query<DebtorMessagesClient>();
+
+            debtorInvoicePrint.SetLookUpForDebtorMessageClients(messagesLookup);
+        }
+
+        /// <summary>
+        /// Fill look up for MultiInvoice
+        /// </summary>
+        /// <param name="layoutPrint">LayoutPrint Instances</param>
+        private void FillLookUps(LayoutPrintReport layoutPrint)
+        {
+            layoutPrint.SetLookUpForDebtorMessageClients(messagesLookup);
+            layoutPrint.SetLookUpForPreviousAddressClients(previousAddressLookup);
+        }
+
+
 
         async private void OpenOutLook(DebtorInvoiceClient invClient)
         {
@@ -330,6 +361,11 @@ namespace UnicontaClient.Pages.CustomPage
         private async Task<IPrintReport> PrintPacknote(DebtorInvoiceClient debtorInvoice)
         {
             var debtorQcpPrint = new UnicontaClient.Pages.DebtorInvoicePrintReport(debtorInvoice, api, CompanyLayoutType.Packnote);
+
+            //In case of Multple invoices we create a lookup for Previous Address Clients
+            if (hasLookups)
+                await FillLookUps(debtorQcpPrint);
+
             var isInitializedSuccess = await debtorQcpPrint.InstantiateFields();
             if (isInitializedSuccess)
             {
@@ -339,13 +375,18 @@ namespace UnicontaClient.Pages.CustomPage
                 var standardReports = new[] { standardDebtorPackNote };
                 IPrintReport iprintReport = new StandardPrintReport(api, standardReports, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.PackNote);
                 await iprintReport.InitializePrint();
+                if (iprintReport.Report != null)
+                    return iprintReport;
 
-                if (iprintReport.Report == null)
-                {
-                    iprintReport = new LayoutPrintReport(api, debtorInvoice, CompanyLayoutType.Packnote);
-                    await iprintReport.InitializePrint();
-                }
-                return iprintReport;
+                //Call Invoice Layout
+                var layoutPrint = new LayoutPrintReport(api, debtorInvoice, CompanyLayoutType.Packnote);
+                layoutPrint.SetupLayoutPrintFields(debtorQcpPrint);
+                
+                if (hasLookups)
+                    FillLookUps(layoutPrint);
+
+                await layoutPrint.InitializePrint();
+                return layoutPrint;
             }
             return null;
         }

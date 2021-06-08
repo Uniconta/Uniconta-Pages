@@ -58,8 +58,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrdersPage2"
                             <CorasauControls:TextEditor  Text="{Binding OurRef,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="RelatedOrder" x:Name="liRelatedOrder">
-                            <CorasauControls:LookupEditor x:Name="leRelatedOrder" EditValue="{Binding RelatedOrder,Mode=TwoWay}">
-                            </CorasauControls:LookupEditor>
+                            <CorasauControls:UnicontaEditableLookupControl  x:Name="leRelatedOrder" LookupEditValue="{Binding RelatedOrder,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="CustomsNo" x:Name="liCustomsNo">
                             <CorasauControls:TextEditor  Text="{Binding CustomsNo,Mode=TwoWay}"/>

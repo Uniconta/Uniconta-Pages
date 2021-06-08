@@ -6,7 +6,6 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOfferPage2"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
-    xmlns:toolkit="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Toolkit"
     xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
     xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
     mc:Ignorable="d"
@@ -51,7 +50,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOfferPage2"
                             <CorasauControls:TextEditor  Text="{Binding Remark,Mode=TwoWay}" AcceptsReturn="True" VerticalContentAlignment="Top" TextWrapping="Wrap" MinHeight="60"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="RelatedOrder" x:Name="liRelatedOrder">
-                            <CorasauControls:TextEditor  Text="{Binding RelatedOrder,Mode=TwoWay}"/>
+                            <CorasauControls:UnicontaEditableLookupControl  x:Name="leRelatedOrder" LookupEditValue="{Binding RelatedOrder,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
                     <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpOrders" ItemLabelsAlignment="Default" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Orders}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="400">

@@ -473,16 +473,26 @@ namespace UnicontaClient.Pages.CustomPage
                                 return;
                             }
                         }
+
+                        bool MakeConversion = false;
+                        var _priceLookup = this.PriceLookup;
+                        this.PriceLookup = null; // avoid that we call priceupdated in property change on Qty
                         var Comp = api.CompanyEntity;
                         if (selectedItem._PurchaseQty != 0d)
+                        {
+                            MakeConversion = (selectedItem._PurchaseUnit != 0 && selectedItem._PurchaseUnit != selectedItem._Unit && Comp.UnitConversion);
                             rec.Qty = selectedItem._PurchaseQty;
+                        }
                         else if (Comp._PurchaseLineOne)
                             rec.Qty = 1d;
                         if (Comp._InvoiceUseQtyNowCre)
                             rec.QtyNow = rec._Qty;
                         rec.SetItemValues(selectedItem, Comp._PurchaseLineStorage);
-                        if (this.PriceLookup != null)
-                            this.PriceLookup.SetPriceFromItem(rec, selectedItem);
+                        if (_priceLookup != null)
+                        {
+                            this.PriceLookup = _priceLookup;
+                            _priceLookup.SetPriceFromItem(rec, selectedItem);
+                        }
                         else if (selectedItem._PurchasePrice != 0 && Comp.SameCurrency(selectedItem._PurchaseCurrency, (byte)orderMaster._Currency))
                             rec.Price = selectedItem._PurchasePrice;
                         else
@@ -501,6 +511,8 @@ namespace UnicontaClient.Pages.CustomPage
                             UtilDisplay.ShowErrorCode(ErrorCodes.ItemIsOnHold, null);
 
                         globalEvents.NotifyRefreshViewer(NameOfControl, selectedItem);
+                        if (MakeConversion)
+                            SaveLineToGetConversion(rec);
                     }
                     break;
                 case "Qty":
@@ -591,18 +603,21 @@ namespace UnicontaClient.Pages.CustomPage
         }
         private void localMenu_OnItemClicked(string ActionType)
         {
-            CreditorOrderLineClient row;
             var selectedItem = dgCreditorOrderLineGrid.SelectedItem as CreditorOrderLineClient;
             switch (ActionType)
             {
                 case "AddRow":
-                    row = dgCreditorOrderLineGrid.AddRow() as CreditorOrderLineClient;
-                    row._ExchangeRate = this.exchangeRate;
+                    selectedItem = dgCreditorOrderLineGrid.AddRow() as CreditorOrderLineClient;
+                    selectedItem._ExchangeRate = this.exchangeRate;
                     break;
                 case "CopyRow":
-                    var copRow = dgCreditorOrderLineGrid.CopyRow() as CreditorOrderLineClient;
-                    copRow._QtyDelivered = 0;
-                    copRow._QtyInvoiced = 0;
+                    if (selectedItem != null)
+                    {
+                        selectedItem = dgCreditorOrderLineGrid.CopyRow() as CreditorOrderLineClient;
+                        selectedItem._QtyDelivered = 0;
+                        selectedItem._QtyInvoiced = 0;
+                        selectedItem._ExchangeRate = this.exchangeRate;
+                    }
                     break;
                 case "SaveGrid":
                     saveGridLocal();
@@ -618,8 +633,8 @@ namespace UnicontaClient.Pages.CustomPage
                         LinkSerialNumber(selectedItem);
                     break;
                 case "InsertSubTotal":
-                    row = dgCreditorOrderLineGrid.AddRow() as CreditorOrderLineClient;
-                    row.Subtotal = true;
+                    selectedItem = dgCreditorOrderLineGrid.AddRow() as CreditorOrderLineClient;
+                    selectedItem.Subtotal = true;
                     break;
                 case "StockLines":
                     if (selectedItem?._Item != null)
@@ -697,19 +712,19 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                     break;
                 case "DebtorOrderLines":
-                    if (selectedItem?.InvItem != null)
+                    if (selectedItem?._Item != null)
                         AddDockItem(TabControls.DebtorOrderLineReport, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("OrdersLine"), selectedItem._Item));
                     break;
                 case "DebtorOfferLines":
-                    if (selectedItem?.InvItem != null)
+                    if (selectedItem?._Item != null)
                         AddDockItem(TabControls.DebtorOfferLineReport, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("OfferLine"), selectedItem._Item));
                     break;
                 case "PurchaseOrderLines":
-                    if (selectedItem?.InvItem != null)
+                    if (selectedItem?._Item != null)
                         AddDockItem(TabControls.PurchaseLines, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("PurchaseLines"), selectedItem._Item));
                     break;
                 case "ProductionOrderLines":
-                    if (selectedItem?.InvItem != null)
+                    if (selectedItem?._Item != null)
                         AddDockItem(TabControls.ProductionOrderLineReport, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ProductionLines"), selectedItem._Item));
                     break;
                 case "RefreshGrid":
@@ -720,11 +735,11 @@ namespace UnicontaClient.Pages.CustomPage
                         AddDockItem(TabControls.InvStorageProfileReport, dgCreditorOrderLineGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("StockProfile"), selectedItem._Item));
                     break;
                 case "ViewPhoto":
-                    if (selectedItem?.InvItem != null && selectedItem?.Item != null)
+                    if (selectedItem?._Item != null)
                         AddDockItem(TabControls.UserDocsPage, selectedItem.InvItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Documents"), selectedItem?.InvItem?._Name));
                     break;
                 case "ViewNotes":
-                    if (selectedItem?.InvItem != null && selectedItem?.Item != null)
+                    if (selectedItem?._Item != null)
                         AddDockItem(TabControls.UserNotesPage, selectedItem.InvItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Notes"), selectedItem?.InvItem?._Name));
                     break;
                 default:
@@ -959,10 +974,12 @@ namespace UnicontaClient.Pages.CustomPage
             }
 
             var accountName = string.Format("{0} ({1})", orderMaster._DCAccount, orderMaster.Name);
-            CWGenerateInvoice GenrateInvoiceDialog = new CWGenerateInvoice(true, string.Empty, true, false, false, AccountName: accountName);
+            bool showSendByEmail = dc != null ? (!string.IsNullOrEmpty(dc._InvoiceEmail) || dc._EmailDocuments) : false;
+            CWGenerateInvoice GenrateInvoiceDialog = new CWGenerateInvoice(true, string.Empty, true, true, showNoEmailMsg: !showSendByEmail, AccountName: accountName);
 #if !SILVERLIGHT
             GenrateInvoiceDialog.DialogTableId = 2000000001;
 #endif
+            GenrateInvoiceDialog.SetSendAsEmailCheck(false);
             GenrateInvoiceDialog.SetInvoiceNumber(dbOrder._InvoiceNumber);
             if (dbOrder._InvoiceDate != DateTime.MinValue)
                 GenrateInvoiceDialog.SetInvoiceDate(dbOrder._InvoiceDate);
@@ -1050,6 +1067,22 @@ namespace UnicontaClient.Pages.CustomPage
             if (dgCreditorOrderLineGrid.HasUnsavedData)
                 return saveGrid();
             return null;
+        }
+
+        async void SaveLineToGetConversion(CreditorOrderLineClient rec)
+        {
+            rec._Price = 0;
+            rec._Unit = 0;
+            var tsk = dgCreditorOrderLineGrid.SaveData();
+            if (tsk != null)
+            {
+                await tsk;
+                rec.NotifyPropertyChanged("Qty");
+                rec.NotifyPropertyChanged("Price");
+                var ind = dgCreditorOrderLineGrid.GetVisibleRows().IndexOf(rec);
+                if (ind >= 0)
+                    dgCreditorOrderLineGrid.RefreshRow(ind);
+            }
         }
 
         protected override async Task<ErrorCodes> saveGrid()

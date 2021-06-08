@@ -159,7 +159,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (sourcedata != null)
             {
                 dgInvItemStorageClientGrid.UpdateMaster(sourcedata);
-                dgInvItemStorageClientGrid.readOnly = true;
+                dgInvItemStorageClientGrid.readOnly = ! (sourcedata is InvItem);
             }
             else
                 dgInvItemStorageClientGrid.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;

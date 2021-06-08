@@ -434,10 +434,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var selectedItem = dgProjectJournalLinePageGrid.SelectedItem as ProjectJournalLineLocal;
             if (selectedItem?._Project != null)
-            {
-                var selected = (Uniconta.DataModel.Project)ProjectCache.Get(selectedItem._Project);
-                setTask(selected, selectedItem);
-            }
+                setTask((Uniconta.DataModel.Project)ProjectCache.Get(selectedItem._Project), selectedItem);
         }
 
         void SetCat(ProjectJournalLineLocal rec, string cat)
@@ -709,17 +706,13 @@ namespace UnicontaClient.Pages.CustomPage
         {
             ProjectJournalLineLocal selectedItem = dgProjectJournalLinePageGrid.SelectedItem as ProjectJournalLineLocal;
             if (selectedItem?._Item != null)
-            {
-                var selected = ItemsCache.Get<InvItem>(selectedItem._Item);
-                setSerieBatch(selected, selectedItem);
-            }
+                setSerieBatch(ItemsCache.Get<InvItem>(selectedItem._Item), selectedItem);
         }
         async void setSerieBatch(InvItem master, ProjectJournalLineLocal rec)
         {
             if (master != null && master._UseSerialBatch)
             {
-                var serie = new InvSerieBatchOpen() { _Item = rec._Item };
-                var lst = await api.Query<InvSerieBatchClient>(serie);
+                var lst = await api.Query<InvSerieBatchClient>(new InvSerieBatchOpen() { _Item = rec._Item });
                 rec.serieBatchSource = lst?.Select(x => x.Number).ToList();
             }
             else
@@ -734,7 +727,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var items = this.ItemsCache;
             var item = (InvItem)items.Get(selectedItem._Item);
-            if (item == null || item._ItemType != (byte)ItemType.ProductionBOM)
+            if (item == null || item._ItemType < (byte)ItemType.BOM)
                 return;
 
             busyIndicator.IsBusy = true;

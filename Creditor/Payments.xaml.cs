@@ -780,7 +780,9 @@ namespace UnicontaClient.Pages.CustomPage
                                 paymentList = credTransPaymSelectedLst.ToList();
 
                             bool ret = false;
-                            if (paymMethod == ExportFormatType.Nordea_CSV)
+                            if (paymMethod == ExportFormatType.CSV)
+                                ret = true;
+                            else if (paymMethod == ExportFormatType.Nordea_CSV)
                                 ret = NordeaPaymentFormat.GenerateFile(paymentList, api.CompanyEntity, paymentFormatRec, BankAccountCache, CreditorCache, glJournalGenerated);
                             else if (paymMethod == ExportFormatType.DanskeBank_CSV)
                                 ret = DanskeBankPayFormat.GenerateFile(paymentList, api.CompanyEntity, paymentFormatRec, BankAccountCache, CreditorCache, glJournalGenerated);
@@ -791,7 +793,7 @@ namespace UnicontaClient.Pages.CustomPage
                             else if (paymMethod == ExportFormatType.BEC_CSV)
                                 ret = BECPayFormat.GenerateFile(paymentList, api.CompanyEntity, paymentFormatRec, BankAccountCache, CreditorCache, glJournalGenerated);
                             else if (paymMethod == ExportFormatType.ISO20022_DK || paymMethod == ExportFormatType.ISO20022_NL || paymMethod == ExportFormatType.ISO20022_NO || paymMethod == ExportFormatType.ISO20022_DE ||
-                                     paymMethod == ExportFormatType.ISO20022_EE || paymMethod == ExportFormatType.ISO20022_SE || paymMethod == ExportFormatType.ISO20022_UK || paymMethod == ExportFormatType.ISO20022_LT || 
+                                     paymMethod == ExportFormatType.ISO20022_EE || paymMethod == ExportFormatType.ISO20022_SE || paymMethod == ExportFormatType.ISO20022_UK || paymMethod == ExportFormatType.ISO20022_LT ||
                                      paymMethod == ExportFormatType.ISO20022_CH)
                                 ret = GeneratePaymentFileISO20022(paymentList, paymentFormatRec, uniqueFileId);
 
@@ -1007,25 +1009,30 @@ namespace UnicontaClient.Pages.CustomPage
                     if (doMergePaym && rec.MergePaymId == null)
                     {
                         countErr++;
-                        rec.ErrorInfo = "Merge of payments has failed"; //TODO:Opret label
+                        rec.ErrorInfo = "Merge of payments has failed";
                     }
                     else
                     {
-                        var validateRes = paymentISO20022Validate.ValidateISO20022(api.CompanyEntity, rec, BankAccountCache, glJournalGenerated);
-
-                        if (validateRes.HasErrors)
+                        if (credPaymFormat._ExportFormat != (byte)ExportFormatType.CSV)
                         {
-                            countErr++;
-                            foreach (CheckError error in validateRes.CheckErrors)
+                            var validateRes = paymentISO20022Validate.ValidateISO20022(api.CompanyEntity, rec, BankAccountCache, glJournalGenerated);
+
+                            if (validateRes.HasErrors)
                             {
-                                rec.ErrorInfo += rec.ErrorInfo != null ? Environment.NewLine : null;
-                                rec.ErrorInfo += error.ToString();
+                                countErr++;
+                                foreach (CheckError error in validateRes.CheckErrors)
+                                {
+                                    rec.ErrorInfo += rec.ErrorInfo != null ? Environment.NewLine : null;
+                                    rec.ErrorInfo += error.ToString();
+                                }
+                            }
+                            else
+                            {
+                                rec.ErrorInfo = BaseDocument.VALIDATE_OK;
                             }
                         }
                         else
-                        {
                             rec.ErrorInfo = BaseDocument.VALIDATE_OK;
-                        }
                     }
                 }
 

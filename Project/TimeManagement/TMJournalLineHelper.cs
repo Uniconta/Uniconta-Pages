@@ -253,11 +253,10 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
             if (err)
                 return;
 
-            var payrollCat = empPayrollCatList.Get(rec._PayrollCategory);
-            var proj = projCache.Get(rec.Project);
+            var proj = projCache.Get(rec._Project);
             var projGroup = projGroupList.Get(proj?._Group);
-
-            if (payrollCat._PrCategory == null)
+            var payrollCat = empPayrollCatList.Get(rec._PayrollCategory);
+            if (payrollCat?._PrCategory == null)
             {
                 checkErrors.Add(new TMJournalLineError()
                 {

@@ -276,12 +276,16 @@ namespace UnicontaClient.Pages.CustomPage
                                 return;
                             }
                         }
+                        var _priceLookup = this.PriceLookup;
+                        this.PriceLookup = null; // avoid that we call priceupdated in property change on Qty
                         if (selectedItem._SalesQty != 0d)
                             rec.Qty = selectedItem._SalesQty;
                         else if (api.CompanyEntity._OrderLineOne)
                             rec.Qty = 1d;
                         rec.SetItemValues(selectedItem);
-                        this.PriceLookup?.SetPriceFromItem(rec, selectedItem);
+                        this.PriceLookup = _priceLookup;
+                        _priceLookup?.SetPriceFromItem(rec, selectedItem);
+
                         if (selectedItem._StandardVariant != rec.standardVariant)
                         {
                             rec.Variant1 = null;

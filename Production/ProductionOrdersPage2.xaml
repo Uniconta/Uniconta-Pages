@@ -115,8 +115,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionOrdersPage2"
                             <CorasauControls:TextEditor  Text="{Binding OurRef,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="RelatedOrder" x:Name="liRelatedOrder">
-                            <CorasauControls:LookupEditor x:Name="leRelatedOrder" Text="{Binding RelatedOrder,Mode=TwoWay}">
-                            </CorasauControls:LookupEditor>
+                            <CorasauControls:UnicontaEditableLookupControl  x:Name="leRelatedOrder" LookupEditValue="{Binding RelatedOrder,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="Remark" LabelVerticalAlignment="Top" x:Name="liRemark">
                             <CorasauControls:TextEditor  Text="{Binding Remark,Mode=TwoWay}" AcceptsReturn="True" VerticalContentAlignment="Top" TextWrapping="Wrap" MinHeight="60"/>

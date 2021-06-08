@@ -113,7 +113,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (existingRowIds != null)
                 totalRowIds.AddRange(existingRowIds);
 
-            foreach (var rowId in totalRowIds)
+            foreach (var rowId in totalRowIds.Distinct())
                 strBuilder.Append('\'').AppendNum(rowId).Append('\'').Append(',');
 
             strBuilder.Length--;
@@ -136,10 +136,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (VouchersAdd.Count > 0)
                         AddVouchers(VouchersAdd);
                     else if (selectedVoucher != null)
-                    {
-                        var selectedList = new List<VoucherExtendedClient>() { selectedVoucher };
-                        AddVouchers(selectedList);
-                    }
+                        AddVouchers(new List<VoucherExtendedClient>() { selectedVoucher });
                     var itemsNew = VouchersAdd.Select(p => p.RowId).ToList();
                     dgVouchersGrid.FilterString = GetFilterString("Contains([Envelope],'false')", itemsNew, itemsOld);
                     dgVoucherFolderGrid.Visibility = Visibility.Visible;
@@ -150,7 +147,7 @@ namespace UnicontaClient.Pages.CustomPage
                     var rowId = selectedVoucherFolder.RowId;
                     dgVoucherFolderGrid.DeleteRow();
                     removedRowIds.Add(rowId);
-                   
+
                     var voucherRow = ((IEnumerable<VoucherExtendedClient>)dgVouchersGrid.ItemsSource).Where(p => p.RowId == rowId).SingleOrDefault();
                     voucherRow.IsAdded = false;
                     var itemExisting = ((IEnumerable<VouchersClient>)dgVoucherFolderGrid.ItemsSource).Select(p => p.RowId).ToList();
@@ -175,15 +172,28 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void AddVouchers(List<VoucherExtendedClient> vouchersAdd)
         {
+            var t = api.CompanyEntity.GetUserType(typeof(VouchersClient));
             foreach (var voucher in vouchersAdd)
             {
+                VouchersClient voucherClient;
+                if (t != null)
+                    voucherClient = Activator.CreateInstance(t) as VouchersClient;
+                else
+                    voucherClient = new VouchersClient();
+
+                var buf = voucher._Data;
+                voucher._Data = null;
+                StreamingManager.Copy(voucher, voucherClient);
+                voucher._Data = buf;
+                voucherClient._Data = buf;
+
                 if (dgVoucherFolderGrid.ItemsSource == null)
-                    dgVoucherFolderGrid.AddRow(voucher, -1, false);
+                    dgVoucherFolderGrid.InsertRow(voucherClient, -1);
                 else
                 {
                     var list = (IEnumerable<VouchersClient>)dgVoucherFolderGrid.ItemsSource;
-                    if (!list.Contains(voucher))
-                        dgVoucherFolderGrid.AddRow(voucher, -1, false);
+                    if (!list.Contains(voucherClient))
+                        dgVoucherFolderGrid.InsertRow(voucherClient, dgVoucherFolderGrid.View.FocusedRowHandle < 0 ? -1 : dgVoucherFolderGrid.View.FocusedRowHandle);
                 }
             }
         }
@@ -249,7 +259,7 @@ namespace UnicontaClient.Pages.CustomPage
                             var appendResult = await documentApi.AppendToEnvelope(voucherClient, appendList);
                             result = (appendResult == ErrorCodes.Succes);
                         }
-                        
+
                         break;
                 }
             }

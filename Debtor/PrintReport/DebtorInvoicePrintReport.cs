@@ -26,12 +26,16 @@ namespace UnicontaClient.Pages.CustomPage
         public bool IsCreditNote { get; private set; }
         public DebtorMessagesClient MessageClient { get; private set; }
         public DCOrder DebtorOrder { get; private set; }
+        public DCPreviousAddressClient PreviousAddressClient { get; private set; }
 
         private readonly CrudAPI crudApi;
         private InvoicePostingResult invoicePostingResult;
         private bool isRePrint;
         private CompanyLayoutType layoutType;
         private DebtorInvoiceClient debtorInvoice;
+        private DCPreviousAddressClient[] previousAddressLookup;
+        private DebtorMessagesClient[] debtorMessageLookup;
+        private bool isMultipleInvoicePrint;
 
         /// <summary>
         /// Intitialization  for Post Invoice
@@ -84,7 +88,6 @@ namespace UnicontaClient.Pages.CustomPage
                 var Comp = crudApi.CompanyEntity;
                 var debtorInvoiceLineUserType = ReportUtil.GetUserType(typeof(DebtorInvoiceLines), Comp);
                 var debtorInvoiceClientUserType = ReportUtil.GetUserType(typeof(DebtorInvoiceClient), Comp);
-                DCPreviousAddressClient previousAddressClient = null;
                 DCInvoice dcInv;
 
                 if (!isRePrint)
@@ -93,7 +96,8 @@ namespace UnicontaClient.Pages.CustomPage
                     var invoiceLIneInstance = Activator.CreateInstance(debtorInvoiceLineUserType) as DebtorInvoiceLines;
                     dcInv = debtorInvoice;
                     InvTransInvoiceLines = (DebtorInvoiceLines[])await invApi.GetInvoiceLines(dcInv, invoiceLIneInstance);
-                    previousAddressClient = await LayoutPrintReport.GetPreviousAddressClientForInvoice(dcInv, crudApi);
+                    PreviousAddressClient = isMultipleInvoicePrint ? LayoutPrintReport.GetPreviousAddressClientForInvoice(previousAddressLookup, debtorInvoice) :
+                        await LayoutPrintReport.GetPreviousAddressClientForInvoice(dcInv, crudApi);
                 }
                 else
                 {
@@ -147,14 +151,14 @@ namespace UnicontaClient.Pages.CustomPage
                         debtorClientUser.CopyFrom(prospect);
                 }
 
-                if (previousAddressClient != null) //Setting the Previous Address if Exist for current invoice
+                if (PreviousAddressClient != null) //Setting the Previous Address if Exist for current invoice
                 {
-                    debtorClientUser._Name = previousAddressClient._Name;
-                    debtorClientUser._Address1 = previousAddressClient._Address1;
-                    debtorClientUser._Address2 = previousAddressClient._Address2;
-                    debtorClientUser._Address3 = previousAddressClient._Address3;
-                    debtorClientUser._City = previousAddressClient._City;
-                    debtorClientUser._ZipCode = previousAddressClient._ZipCode;
+                    debtorClientUser._Name = PreviousAddressClient._Name;
+                    debtorClientUser._Address1 = PreviousAddressClient._Address1;
+                    debtorClientUser._Address2 = PreviousAddressClient._Address2;
+                    debtorClientUser._Address3 = PreviousAddressClient._Address3;
+                    debtorClientUser._City = PreviousAddressClient._City;
+                    debtorClientUser._ZipCode = PreviousAddressClient._ZipCode;
                 }
 
                 //to Contact listing for the current debtor
@@ -163,7 +167,13 @@ namespace UnicontaClient.Pages.CustomPage
                     var ContactsCache = Comp.GetCache(typeof(Uniconta.DataModel.Contact)) ?? await crudApi.LoadCache(typeof(Uniconta.DataModel.Contact)).ConfigureAwait(false);
                     var contactCacheFilter = new ContactCacheFilter(ContactsCache, debtorClientUser.__DCType(), debtorClientUser._Account);
                     if (contactCacheFilter.Any())
-                        debtorClientUser.Contacts = contactCacheFilter.Cast<ContactClient>().ToArray();
+                    {
+                        try
+                        {
+                            debtorClientUser.Contacts = contactCacheFilter.Cast<ContactClient>().ToArray();
+                        }
+                        catch { }
+                    }
                 }
                 Debtor = debtorClientUser;
 
@@ -199,7 +209,8 @@ namespace UnicontaClient.Pages.CustomPage
                 ReportName = layoutType != CompanyLayoutType.Invoice ? layoutType.ToString() : invoiceNumber == 0 ? IsCreditNote ? "ProformaCreditNote" : "ProformaInvoice"
                     : IsCreditNote ? "Creditnote" : "Invoice";
 
-                MessageClient = await GetMessageClient(lang);
+                MessageClient = isMultipleInvoicePrint ? LayoutPrintReport.GetDebtorMessageClient(debtorMessageLookup, lang, GetDebtorEmailType()) :
+                    await Utility.GetDebtorMessageClient(crudApi, lang, GetDebtorEmailType());
 
                 var _LayoutGroup = DebtorInvoice._LayoutGroup ?? Debtor._LayoutGroup;
                 if (_LayoutGroup != null)
@@ -219,11 +230,10 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         /// <summary>
-        /// Method to get message client information
+        /// Gets the debtor email type
         /// </summary>
-        /// <param name="lang">Debtor language</param>
-        /// <returns>DebtorMessagesClient</returns>
-        private Task<DebtorMessagesClient> GetMessageClient(Language lang)
+        /// <returns>DebtorEmailType</returns>
+        private DebtorEmailType GetDebtorEmailType()
         {
             DebtorEmailType emailType = DebtorEmailType.Invoice;
             switch (layoutType)
@@ -238,7 +248,30 @@ namespace UnicontaClient.Pages.CustomPage
                     emailType = DebtorEmailType.Packnote;
                     break;
             }
-            return Utility.GetDebtorMessageClient(crudApi, lang, emailType);
+
+            return emailType;
+        }
+
+        /// <summary>
+        /// Setup lookup for DebtorMessageClients
+        /// </summary>
+        internal void SetLookUpForDebtorMessageClients(DebtorMessagesClient[] debtorMessageClients)
+        {
+            isMultipleInvoicePrint = true;
+
+            if (debtorMessageLookup == null)
+                debtorMessageLookup = debtorMessageClients;
+        }
+
+        /// <summary>
+        /// Setup lookup for PreviousAddress Clients
+        /// </summary>
+        /// <param name="preivousAddressClients"></param>
+        internal void SetLookUpForPreviousAddressClients(DCPreviousAddressClient[] preivousAddressClients)
+        {
+            isMultipleInvoicePrint = true;
+            if (previousAddressLookup == null)
+                previousAddressLookup = preivousAddressClients;
         }
     }
 }

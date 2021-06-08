@@ -23,10 +23,13 @@ namespace UnicontaClient.Pages.CustomPage
         public CreditorOrderClient CreditorOrder { get; private set; }
         public bool IsCreditNote { get; private set; }
         public string CreditorMessage { get; private set; }
+        
         private bool isRePrint;
         private readonly CrudAPI crudApi;
         private InvoicePostingResult invoicePostingResult;
         private CompanyLayoutType layoutType;
+        private DebtorMessagesClient[] debtorMessageLookup;
+        private bool isMultiInvoice;
 
         /// <summary>
         /// Initialization for Post invoice
@@ -141,7 +144,13 @@ namespace UnicontaClient.Pages.CustomPage
                     var contactCache = Comp.GetCache(typeof(Contact)) ?? await crudApi.LoadCache(typeof(Contact));
                     var contactCacheFilter = new ContactCacheFilter(contactCache, Creditor.__DCType(), Creditor._Account);
                     if (contactCacheFilter.Any())
-                        Creditor.Contacts = contactCacheFilter.Cast<ContactClient>().ToArray();
+                    {
+                        try
+                        {
+                            Creditor.Contacts = contactCacheFilter.Cast<ContactClient>().ToArray();
+                        }
+                        catch { }
+                    }
                 }
                 UnicontaClient.Pages.DebtorOrders.SetDeliveryAdress(creditorInvoiceClientUser, Creditor, crudApi);
 
@@ -167,7 +176,8 @@ namespace UnicontaClient.Pages.CustomPage
                 IsCreditNote = CreditorInvoice._LineTotal < -0.0001d && layoutType == CompanyLayoutType.PurchaseInvoice;
                 ReportName = IsCreditNote ? "CreditNote" : layoutType.ToString();
 
-                CreditorMessage = await GetMessageClientText(lang);
+                CreditorMessage = isMultiInvoice? LayoutPrintReport.GetDebtorMessageClient(debtorMessageLookup, lang, GetEmailTypeForCreditor())?._Text:
+                    await GetMessageClientText(lang);
                 return true;
             }
             catch (Exception ex)
@@ -184,23 +194,38 @@ namespace UnicontaClient.Pages.CustomPage
         /// <returns>Text</returns>
         async private Task<string> GetMessageClientText(Language lang)
         {
-            DebtorMessagesClient messageClient = null;
+            var messageClient = await Utility.GetDebtorMessageClient(crudApi, lang, GetEmailTypeForCreditor());
+            return messageClient?._Text;
+        }
+
+        /// <summary>
+        /// Gets the email type for Creditor
+        /// </summary>
+        /// <returns></returns>
+        private DebtorEmailType GetEmailTypeForCreditor()
+        {
             switch (layoutType)
             {
-                case CompanyLayoutType.PurchaseInvoice:
-                    messageClient = await Utility.GetDebtorMessageClient(crudApi, lang, DebtorEmailType.PurchaseInvoice);
-                    break;
                 case CompanyLayoutType.PurchaseOrder:
-                    messageClient = await Utility.GetDebtorMessageClient(crudApi, lang, DebtorEmailType.PurchaseOrder);
-                    break;
+                    return DebtorEmailType.PurchaseOrder;
                 case CompanyLayoutType.PurchasePacknote:
-                    messageClient = await Utility.GetDebtorMessageClient(crudApi, lang, DebtorEmailType.PurchasePacknote);
-                    break;
+                    return DebtorEmailType.PurchasePacknote;
                 case CompanyLayoutType.Requisition:
-                    messageClient = await Utility.GetDebtorMessageClient(crudApi, lang, DebtorEmailType.Requisition);
-                    break;
+                    return DebtorEmailType.Requisition;
+                default:
+                    return DebtorEmailType.PurchaseInvoice;
             }
-            return messageClient?._Text;
+        }
+
+        /// <summary>
+        /// Create lookup for Message clients
+        /// </summary>
+        /// <returns></returns>
+        public void SetLookUpForMessageClient(DebtorMessagesClient[] debtorMessageClients)
+        {
+            isMultiInvoice = true;
+            if (debtorMessageLookup == null)
+                debtorMessageLookup = debtorMessageClients;
         }
     }
 }

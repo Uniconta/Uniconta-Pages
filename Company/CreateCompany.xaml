@@ -142,8 +142,11 @@ x:Class="UnicontaClient.Pages.CustomPage.CreateCompany"
                             <CorasauControls:CorasauLayoutItem x:Name="lblAccountForPrimo" Visibility="Collapsed" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=AccountTypeYearResultTransfer}" LabelVerticalAlignment="Top">
                                 <CorasauControls:TextEditor x:Name="txtAccountForPrimo" Visibility="Collapsed" FontWeight="UltraLight" GotFocus="TxtAccountForPrimo_OnGotFocus"/>
                             </CorasauControls:CorasauLayoutItem>
-                            <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=SelectDirectory}" LabelVerticalAlignment="Top" Style="{StaticResource LayoutItemsstyle}" ButtonClicked="FileBrowse_ButtonClicked" ButtonContent="&#128194;" Padding="0">
+                            <CorasauControls:CorasauLayoutItem x:Name="liDirectory" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=SelectDirectory}" LabelVerticalAlignment="Top" Style="{StaticResource LayoutItemsstyle}" ButtonClicked="FileBrowse_ButtonClicked" ButtonContent="&#128194;" Padding="0">
                                 <CorasauControls:TextEditor x:Name="txtImportFromDirectory" />
+                            </CorasauControls:CorasauLayoutItem>
+                            <CorasauControls:CorasauLayoutItem x:Name="liExcelFile" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadFile}" LabelVerticalAlignment="Top" Style="{StaticResource LayoutItemsstyle}" ButtonClicked="ExcelFileBrowse_ButtonClicked" ButtonContent="&#128194;" Padding="0" Visibility="Collapsed">
+                                <CorasauControls:TextEditor x:Name="txtImportFromFile" />
                             </CorasauControls:CorasauLayoutItem>
                         </CorasauControls:CorasauLayoutGroup>
 

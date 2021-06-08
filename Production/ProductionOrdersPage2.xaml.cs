@@ -79,7 +79,13 @@ namespace UnicontaClient.Pages.CustomPage
             BusyIndicator = busyIndicator;
             layoutControl = layoutItems;
             cmbDim1.api = cmbDim2.api = cmbDim3.api = cmbDim4.api = cmbDim5.api = leGroup.api = leProject.api = lePrCategory.api = leEmployee.api
-           = leRelatedOrder.api = leProdItem.api = leGroup.api = leAccount.api = cmbWarehouse.api = cmbLocation.api = prTasklookupeditor.api = crudapi;
+           = leProdItem.api = leGroup.api = leAccount.api = cmbWarehouse.api = cmbLocation.api = prTasklookupeditor.api = crudapi;
+
+#if SILVERLIGHT
+            leRelatedOrder.api = api;
+#else
+            leRelatedOrder.CrudApi = api;
+#endif
 
             if (editrow == null)
             {
@@ -112,7 +118,7 @@ namespace UnicontaClient.Pages.CustomPage
                 grpProject.Visibility = Visibility.Collapsed;
             if (!Comp.Location)
                 itemLocation.Visibility = Visibility.Collapsed;
-          
+
             if (!Comp.Warehouse)
                 itemWarehouse.Visibility = Visibility.Collapsed;
             else if (editrow._Warehouse != null)

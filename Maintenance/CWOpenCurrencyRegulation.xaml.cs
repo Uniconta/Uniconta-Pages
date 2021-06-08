@@ -62,6 +62,7 @@ namespace UnicontaClient.Pages.CustomPage
         public string CreditorOffset { get; set; }
 
         [ForeignKeyAttribute(ForeignKeyTable = typeof(GLAccount))]
+        [InputFieldData]
         public string LedgerOffset { get; set; }
 
         CrudAPI api;

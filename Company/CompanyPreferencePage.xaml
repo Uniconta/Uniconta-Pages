@@ -84,6 +84,9 @@ x:Class="UnicontaClient.Pages.CustomPage.CompanyPreferencePage"
                         <CorasauControls:CorasauLayoutItem FieldName="LoadVariantsInCounting">
                             <CorasauControls:CheckEditor IsChecked="{Binding LoadVariantsInCounting,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="UpdateDeliveryDate">
+                            <CorasauControls:CheckEditor IsChecked="{Binding UpdateDeliveryDate,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
                     <CorasauControls:CorasauLayoutGroup View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Project}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" MinWidth="420">
                         <CorasauControls:CorasauLayoutItem FieldName="DimFromProject">

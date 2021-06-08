@@ -190,6 +190,8 @@ namespace UnicontaClient.Pages.CustomPage
              };
         }
 
+        DebtorMessagesClient[] messagesLookup;
+        bool hasLookups;
         async private void ShowDeliveryNote(IEnumerable<CreditorDeliveryNoteLocal> packNoteItems)
         {
             busyIndicator.IsBusy = true;
@@ -204,9 +206,10 @@ namespace UnicontaClient.Pages.CustomPage
                 string dockName = null, reportName = null;
                 bool exportAsPdf = false;
                 System.Windows.Forms.FolderBrowserDialog folderDialogSaveInvoice = null;
-
+                hasLookups = false;
                 if (count > 1)
                 {
+                    hasLookups = true;
                     if (count > StandardPrintReportPage.MAX_PREVIEW_REPORT_LIMIT)
                     {
                         var confirmMsg = string.Format(Uniconta.ClientTools.Localization.lookup("PreivewRecordsExportMsg"), count);
@@ -325,9 +328,11 @@ namespace UnicontaClient.Pages.CustomPage
         StandardPrintReportPage standardPrintPreviewPage;
         private async Task<IPrintReport> PrintPacknote(CreditorDeliveryNoteLocal creditorInvoice)
         {
-            IPrintReport iprintReport = null;
-
             var creditorPrint = new UnicontaClient.Pages.CreditorPrintReport(creditorInvoice, api, Uniconta.DataModel.CompanyLayoutType.PurchasePacknote);
+
+            if (hasLookups)
+                await FillLookUps(creditorPrint);
+
             var isInitializedSuccess = await creditorPrint.InstantiateFields();
             if (isInitializedSuccess)
             {
@@ -335,17 +340,33 @@ namespace UnicontaClient.Pages.CustomPage
                     creditorPrint.CompanyLogo, creditorPrint.ReportName, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.PurchasePackNote, creditorPrint.CreditorMessage);
 
                 var standardReports = new[] { standardCreditorInvoice };
-                iprintReport = new StandardPrintReport(api, standardReports, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.PurchasePackNote);
+                IPrintReport iprintReport = new StandardPrintReport(api, standardReports, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.PurchasePackNote);
                 await iprintReport.InitializePrint();
+                if (iprintReport?.Report != null)
+                    return iprintReport;
 
+                //Call LayoutInvoice
+                var layoutReport = new LayoutPrintReport(api, creditorInvoice, Uniconta.DataModel.CompanyLayoutType.PurchasePacknote);
+                layoutReport.SetupLayoutPrintFields(creditorPrint);
+                if (hasLookups)
+                    layoutReport.SetLookUpForDebtorMessageClients(messagesLookup);
 
-                if (iprintReport?.Report == null)
-                {
-                    iprintReport = new LayoutPrintReport(api, creditorInvoice, Uniconta.DataModel.CompanyLayoutType.PurchasePacknote);
-                    await iprintReport.InitializePrint();
-                }
+                await layoutReport.InitializePrint();
+                return layoutReport;
             }
-            return iprintReport;
+            return null;
+        }
+
+        /// <summary>
+        /// Asycn FillLookup for MultiInvoice
+        /// </summary>
+        /// <param name="debtorInvoicePrint">DebtorInvoicePrint instance</param>
+        async private Task FillLookUps(CreditorPrintReport creditorPrintReport)
+        {
+            if (messagesLookup == null)
+                messagesLookup = await api.Query<DebtorMessagesClient>();
+
+            creditorPrintReport.SetLookUpForMessageClient(messagesLookup);
         }
 
         public override bool IsDataChaged => IsGeneratingPacknote;

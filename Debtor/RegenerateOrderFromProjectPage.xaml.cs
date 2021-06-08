@@ -113,9 +113,8 @@ namespace UnicontaClient.Pages.CustomPage
         {
             busyIndicator.IsBusy = true;
 
-            var invApi = new InvoiceAPI(api);
-            var lst = (ProjectTransClientLocal[])await invApi.GetTransNotOnOrder(master, fromdate, todate, new ProjectTransClientLocal());
-            if (lst == null || lst.Length == 0)
+            var lst = (ProjectTransClientLocal[])await (new InvoiceAPI(api)).GetTransNotOnOrder(master, fromdate, todate, new ProjectTransClientLocal());
+            if (lst == null)
             {
                 busyIndicator.IsBusy = false;
                 UtilDisplay.ShowErrorCode(ErrorCodes.NoLinesFound);
@@ -170,8 +169,7 @@ namespace UnicontaClient.Pages.CustomPage
                 return;
             }
             busyIndicator.IsBusy = true;
-            var invApi = new InvoiceAPI(api);
-            var result = await invApi.RegenerateOrderFromProject(master, excludedTransLst, includedTransLst);
+            var result = await (new InvoiceAPI(api)).RegenerateOrderFromProject(master, excludedTransLst, includedTransLst);
             busyIndicator.IsBusy = false;
             UtilDisplay.ShowErrorCode(result);
             if (result == ErrorCodes.Succes)

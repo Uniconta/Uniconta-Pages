@@ -379,7 +379,9 @@ namespace UnicontaClient.Pages.CustomPage
                 if (iprintReport.Report != null)
                     return iprintReport;
 
+                //Call LayoutInvoice
                 var layoutReport = new LayoutPrintReport(crudapi, debtorInvoice);
+                layoutReport.SetupLayoutPrintFields(debtorInvoicePrint);
                 await layoutReport.InitializePrint();
                 return layoutReport;
             }

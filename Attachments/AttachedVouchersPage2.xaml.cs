@@ -49,6 +49,10 @@ namespace UnicontaClient.Pages.CustomPage
             layoutItems.DataContext = editrow;
             leApprover1.api = leApprover2.api = api;
             frmRibbon.OnItemClicked += FrmRibbon_OnItemClicked;
+#if !SILVERLIGHT
+            if (string.IsNullOrWhiteSpace(editrow._Url))
+                grpURL.Visibility = Visibility.Collapsed;
+#endif
         }
 
         private void FrmRibbon_OnItemClicked(string ActionType)

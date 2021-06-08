@@ -256,7 +256,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void PART_Editor_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var glTrans = dgFamTransGrid.syncEntity.LoadedRow as FAMTransClient;
+            var glTrans = dgFamTransGrid.syncEntity.Row as FAMTransClient;
             if (glTrans._HasNote)
             {
                 CWAddEditNote cwAddEditNote = new CWAddEditNote(api, null, glTrans, true);

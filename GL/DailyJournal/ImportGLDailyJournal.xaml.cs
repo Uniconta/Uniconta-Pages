@@ -380,7 +380,7 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         voucherClient = attachVouchersDialog.Voucher;
                         if (voucherClient._Data == null)
-                            await api.Read(voucherClient);
+                            await UtilDisplay.GetData(voucherClient, api);
                         this.txtAttachedFile.Text = voucherClient.Text;
                         this.txtAttachedFile.TextWrapping = TextWrapping.Wrap;
                     }

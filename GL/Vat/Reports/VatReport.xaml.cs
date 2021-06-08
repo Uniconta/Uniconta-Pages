@@ -243,7 +243,6 @@ namespace UnicontaClient.Pages.CustomPage
         private async void LoadVatReport()
         {
             DateTime FromDate, ToDate;
-            var country = api.CompanyEntity._CountryId;
 
             if (txtDateFrm.Text == string.Empty)
             {
@@ -263,25 +262,29 @@ namespace UnicontaClient.Pages.CustomPage
             busyIndicator.IsBusy = true;
 
             var qapi = api;
+            var country = qapi.CompanyEntity._CountryId;
             var rapi = new ReportAPI(qapi);
-            var Comp = rapi.CompanyEntity;
 
             var vatTask = rapi.VatCodeSum(FromDate, ToDate);
 
-            SQLCache accounts = Comp.GetCache(typeof(Uniconta.DataModel.GLAccount)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.GLAccount), qapi);
-            SQLCache vats = Comp.GetCache(typeof(Uniconta.DataModel.GLVat)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.GLVat), qapi);
-            SQLCache vattypes = Comp.GetCache(typeof(Uniconta.DataModel.GLVatType)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.GLVatType), qapi);
+            SQLCache accounts = qapi.GetCache(typeof(Uniconta.DataModel.GLAccount)) ?? await qapi.LoadCache(typeof(Uniconta.DataModel.GLAccount));
+            SQLCache vats = qapi.GetCache(typeof(Uniconta.DataModel.GLVat)) ?? await qapi.LoadCache(typeof(Uniconta.DataModel.GLVat));
+            SQLCache vattypes = qapi.GetCache(typeof(Uniconta.DataModel.GLVatType)) ?? await qapi.LoadCache(typeof(Uniconta.DataModel.GLVatType));
 
             FinancialBalance[] sumVat = await vatTask;
+            if (sumVat == null)
+                return;
+
             Array.Sort(sumVat, new AccountSorter());
 
-            List<VatReportLine> lst = new List<VatReportLine>(sumVat.Length);
+            var lst = new List<VatReportLine>(sumVat.Length);
 
             int decm = 2;
-            var RoundTo100 = Comp.RoundTo100;
-            if (!api.CompanyEntity.HasDecimals)
+            bool RoundTo100 = false;
+            if (!qapi.CompanyEntity.HasDecimals)
             {
                 CalculatedVAT.HasDecimals = PostedVAT.HasDecimals = WithoutVAT.HasDecimals = Accumulated.HasDecimals = false;
+                RoundTo100 = true;
                 decm = 0;
             }
 

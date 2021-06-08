@@ -21,17 +21,17 @@ x:Class="UnicontaClient.Pages.CustomPage.BankStatementPage"
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <local:BankStatementGrid  x:Name="dgBankStatement" AutoGenerateColumns="None" HorizontalAlignment="Stretch">
                 <local:BankStatementGrid.Columns>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Name"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Account" ReadOnly="True" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Name" Width="200"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Currency" Width="50" ReadOnly="True" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Journal" Width="100"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="BankAccountPart1" Visible="False"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="BankAccountPart2" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="BankAccountPart1" Width="50"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="BankAccountPart2" Width="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Account" ReadOnly="True" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="SWIFT" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="IBAN" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Balance" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="StartBalance"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="DaysSlip" Width="60"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Journal" Width="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DaysSlip" Width="60" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="LastTransaction" Width="90" />
                     <local:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension1" x:Name="coldim1"/>
                     <local:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension2" x:Name="coldim2"/>

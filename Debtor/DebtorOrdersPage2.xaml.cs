@@ -115,7 +115,13 @@ namespace UnicontaClient.Pages.CustomPage
             Employeelookupeditor.api = leAccount.api = lePayment.api = cmbDim1.api = cmbDim2.api =
             cmbDim3.api = cmbDim4.api = cmbDim5.api = leTransType.api = leGroup.api = lePostingAccount.api
             = leShipment.api = leLayoutGroup.api = leDeliveryTerm.api = leInvoiceAccount.api = PriceListlookupeditior.api =
-            leRelatedOrder.api = leDeliveryAddress.api = leApprover.api = leSplit.api = leVat.api= prTasklookupeditor.api= crudapi;
+            leDeliveryAddress.api = leApprover.api = leSplit.api = leVat.api = prTasklookupeditor.api = crudapi;
+
+#if SILVERLIGHT
+            leRelatedOrder.api = crudapi;
+#else
+            leRelatedOrder.CrudApi = crudapi;
+#endif
             cbDeliveryCountry.ItemsSource = Enum.GetValues(typeof(Uniconta.Common.CountryCode));
             AdjustLayout();
             if (editrow == null)
@@ -126,9 +132,7 @@ namespace UnicontaClient.Pages.CustomPage
                 editrow._Created = DateTime.MinValue;
                 if (Debtor != null)
                 {
-                    editrow.SetMaster(Debtor);
-                    if (editrow.RowId == 0)
-                        SetFieldFromDebtor(Debtor);
+                    SetFieldFromDebtor(editrow, Debtor);
                     leAccount.IsEnabled = txtName.IsEnabled = false;
                 }
                 if (Contact != null)
@@ -141,7 +145,7 @@ namespace UnicontaClient.Pages.CustomPage
                     editrow.SetMaster(Project);
                     leAccount.IsEnabled = txtName.IsEnabled = false;
                     Projectlookupeditor.IsEnabled = false;
-                    SetPrCategory();
+                    SetPrCategory(editrow);
                 }
             }
             else
@@ -166,10 +170,21 @@ namespace UnicontaClient.Pages.CustomPage
         }
         protected override void AfterTemplateSet(UnicontaBaseEntity row)
         {
-            base.AfterTemplateSet(row);
-            if (this.Debtor != null)
-                (row as DebtorOrderClient).Account = Debtor.Account;
+            var editrow = row as DebtorOrderClient;
+            if (this.editrow != null)
+            {
+                editrow._OrderNumber = this.editrow._OrderNumber;
+                editrow.RowId = this.editrow.RowId;
+            }
+            if (Debtor != null)
+                SetFieldFromDebtor(editrow, Debtor);
+            if (Project != null)
+            {
+                editrow.SetMaster(Project);
+                SetPrCategory(editrow);
+            }
         }
+
         protected override void OnLayoutCtrlLoaded()
         {
             AdjustLayout();
@@ -200,7 +215,7 @@ namespace UnicontaClient.Pages.CustomPage
                 grpApproval.Visibility = Visibility.Collapsed;
             if (!Comp.SetupSizes)
                 grpSize.Visibility = Visibility.Collapsed;
-          
+
             if (!Comp.ProjectTask)
                 projectTask.Visibility = Visibility.Collapsed;
             else if (editrow?._Project != null)
@@ -224,7 +239,7 @@ namespace UnicontaClient.Pages.CustomPage
                 editrow.SetMaster(Contact);
             else if (Project != null)
                 editrow.SetMaster(Project);
-            SetFieldFromDebtor(Debtor);
+            SetFieldFromDebtor(editrow, Debtor);
         }
 
         void AcItem_ButtonClicked(object sender)
@@ -232,23 +247,25 @@ namespace UnicontaClient.Pages.CustomPage
             AddDebtor_Click(null, null);
         }
 
+        bool setVoucher;
         public override void Utility_Refresh(string screenName, object argument = null)
         {
+            object[] args;
             if (screenName == TabControls.DebtorAccountPage2)
             {
-                var args = argument as object[];
+                args = argument as object[];
                 if (args[2] == this.ParentControl)
                 {
                     leAccount.LoadItemSource();
-                    var dc = args[3] as UnicontaBaseEntity;
-                    editrow.SetMaster(dc);
+                    editrow.SetMaster(args[3] as UnicontaBaseEntity);
                 }
             }
 
-            if (screenName == TabControls.AttachVoucherGridPage && argument != null)
+            if (screenName == TabControls.AttachVoucherGridPage && argument != null && setVoucher)
             {
-                var voucherObj = argument as object[];
-                var voucher = voucherObj[0] as VouchersClient;
+                setVoucher = false;
+                args = argument as object[];
+                var voucher = args[0] as VouchersClient;
                 if (voucher != null)
                     editrow.DocumentRef = voucher.RowId;
             }
@@ -265,7 +282,7 @@ namespace UnicontaClient.Pages.CustomPage
                     var _refferedVouchers = new List<int>();
                     if (editrow._DocumentRef != 0)
                         _refferedVouchers.Add(editrow._DocumentRef);
-
+                    setVoucher = true;
                     AddDockItem(TabControls.AttachVoucherGridPage, new object[] { _refferedVouchers }, true);
                     break;
                 case "ViewVoucher":
@@ -275,17 +292,15 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
 
                 case "ImportVoucher":
-                    var voucher = new VouchersClient();
-                    voucher._Content = ContentTypes.Invoice;
-                    Utility.ImportVoucher(editrow, api, voucher);
+                    Utility.ImportVoucher(editrow, api, new VouchersClient() { _Content = ContentTypes.Invoice });
                     break;
 
                 case "RemoveVoucher":
                     RemoveVoucher(editrow);
                     break;
                 case "Save":
-                    if (!Utility.IsExecuteWithBlockedAccount(editrow.Debtor)) return;
-                    frmRibbon_BaseActions(ActionType);
+                    if (Utility.IsExecuteWithBlockedAccount(editrow.Debtor))
+                        frmRibbon_BaseActions(ActionType);
                     break;
                 case "Delete":
                     if (editrow._OrderTotal != 0)
@@ -327,30 +342,30 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void AddDebtor_Click(object sender, RoutedEventArgs e)
         {
-            object[] param = new object[2];
-            param[0] = api;
-            param[1] = null;
-            AddDockItem(TabControls.DebtorAccountPage2, param, Uniconta.ClientTools.Localization.lookup("DebtorAccount"), "Add_16x16.png");
+            AddDockItem(TabControls.DebtorAccountPage2, new object[] { api, null }, Uniconta.ClientTools.Localization.lookup("DebtorAccount"), "Add_16x16.png");
         }
 
         private void leAccount_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
         {
             string debAcc = Convert.ToString(e.OldValue);
             string id = Convert.ToString(e.NewValue);
-            var debtors = api.GetCache(typeof(Uniconta.DataModel.Debtor));
-            var debtor = (Uniconta.DataModel.Debtor)debtors?.Get(id);
-            if (leAccount.IsEnabled && !string.IsNullOrEmpty(debAcc) && debAcc != editrow.Debtor?._Account)
-                editrow.Installation = null;
-            SetFieldFromDebtor(debtor);
+            if (id != editrow._DCAccount ||
+                editrow.RowId == 0 ||
+                (!string.IsNullOrEmpty(debAcc) && debAcc != id) ||
+                ((LoadedRow as DCOrder)?._DCAccount != id))
+            {
+                if (leAccount.IsEnabled)
+                {
+                    editrow.Installation = null;
+                    SetFieldFromDebtor(editrow, (Uniconta.DataModel.Debtor)api.GetCache(typeof(Uniconta.DataModel.Debtor))?.Get(id));
+                }
+            }
         }
 
         private void Projectlookupeditor_SelectedIndexChanged(object sender, RoutedEventArgs e)
         {
             if (Project != null)
-            {
-                var selectedItem = Projectlookupeditor.SelectedItem as ProjectClient;
-                setTask(selectedItem);
-            }
+                setTask(Projectlookupeditor.SelectedItem as ProjectClient);
         }
 
         async private void setTask(ProjectClient master)
@@ -365,32 +380,20 @@ namespace UnicontaClient.Pages.CustomPage
                 prTasklookupeditor.ItemsSource = editrow.TaskSource;
             }
         }
-       
+
         private void prTasklookupeditor_GotFocus(object sender, RoutedEventArgs e)
         {
-            var selectedItem = Projectlookupeditor.SelectedItem as ProjectClient;
-            setTask(selectedItem);
+            setTask(Projectlookupeditor.SelectedItem as ProjectClient);
         }
 
-        async void SetFieldFromDebtor(Debtor debtor)
+        async void SetFieldFromDebtor(DebtorOrderClient editrow, Debtor debtor)
         {
             if (debtor == null)
                 return;
             var loadedOrder = LoadedRow as DCOrder;
-            if (loadedOrder?._DCAccount == debtor._Account)
-                return;
+            editrow.SetMaster(debtor);
             if (this.Project == null) // no project master
-            {
-                editrow.SetMaster(debtor);
-                layoutItems.DataContext = null;
-                layoutItems.DataContext = editrow;
-            }
-            else
-            {
-                editrow.Account = debtor._Account;
-                editrow.SetCurrency(debtor._Currency);
-            }
-            editrow.PricesInclVat = debtor._PricesInclVat;
+                editrow.PricesInclVat = debtor._PricesInclVat;
             if (!RecordLoadedFromTemplate || debtor._DeliveryAddress1 != null)
             {
                 editrow.DeliveryName = debtor._DeliveryName;
@@ -410,7 +413,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
             if (ProjectCache != null)
                 Projectlookupeditor.cache = ProjectCache;
-            
+
             TableField.SetUserFieldsFromRecord(debtor, editrow);
             BindContact(debtor);
             if (installationCache != null)
@@ -418,11 +421,14 @@ namespace UnicontaClient.Pages.CustomPage
                 leDeliveryAddress.cacheFilter = new AccountCacheFilter(installationCache, 1, debtor._Account);
                 leDeliveryAddress.InvalidCache();
             }
+            layoutItems.DataContext = null;
+            layoutItems.DataContext = editrow;
+
             await api.Read(debtor);
             editrow.RefreshBalance();
         }
 
-        async void SetPrCategory()
+        async void SetPrCategory(DebtorOrderClient editrow)
         {
             var cats = api.GetCache(typeof(Uniconta.DataModel.PrCategory)) ?? await api.LoadCache(typeof(Uniconta.DataModel.PrCategory));
             foreach (var rec in (Uniconta.DataModel.PrCategory[])cats.GetNotNullArray)
@@ -438,7 +444,8 @@ namespace UnicontaClient.Pages.CustomPage
 
         void SetContactSource(SQLCache cache, Debtor debtor)
         {
-            cmbContactName.ItemsSource = ((IEnumerable<Uniconta.DataModel.Contact>)cache?.GetNotNullArray)?.Where(x => x._DCType == 1 && x._DCAccount == debtor._Account)?.ToList();
+            if (cache != null && cache.Count > 0)
+                cmbContactName.ItemsSource = new ContactCacheFilter(cache, 1, debtor._Account);
         }
 
         async void BindContact(Debtor debtor)
@@ -448,6 +455,8 @@ namespace UnicontaClient.Pages.CustomPage
             var cache = api.GetCache(typeof(Uniconta.DataModel.Contact)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Contact));
             SetContactSource(cache, debtor);
             cmbContactName.DisplayMember = "KeyName";
+
+            if (editrow == null) return;
 
             var contactRefId = editrow._ContactRef;
             if (contactRefId != 0)
@@ -584,12 +593,6 @@ namespace UnicontaClient.Pages.CustomPage
             }
             editrow.DeliveryCountry = country;
         }
-
-       
-
-
-
-
 #endif
     }
 }

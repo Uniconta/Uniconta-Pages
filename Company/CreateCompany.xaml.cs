@@ -217,7 +217,7 @@ namespace UnicontaClient.Pages.CustomPage
                 lblImportInvoice.Visibility = Visibility.Visible;
                 chkImportInvoice.IsChecked = true;
             }
-            else if (cmbImportFrom.SelectedIndex == (int)ImportFrom.NAV) //NAV
+            else if (cmbImportFrom.SelectedIndex == (int)ImportFrom.NAV || cmbImportFrom.SelectedIndex == (int)ImportFrom.BC_NAVOnline) //NAV
             {
                 cmbImportDimension.IsEnabled = false;
 
@@ -254,6 +254,17 @@ namespace UnicontaClient.Pages.CustomPage
 
                 lblImportInvoice.Visibility = Visibility.Visible;
                 chkImportInvoice.IsChecked = true;
+                if (cmbImportFrom.SelectedIndex == (int)ImportFrom.NAV)
+                {
+                    liDirectory.Visibility = Visibility.Visible;
+                    liExcelFile.Visibility = Visibility.Collapsed;
+                }
+                else
+                {
+                    liExcelFile.Visibility = Visibility.Visible;
+                    liDirectory.Visibility = Visibility.Collapsed;
+
+                }
             }
             else if (cmbImportFrom.SelectedIndex == (int)ImportFrom.dk_Iceland) //DK Iceland
             {
@@ -400,12 +411,19 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
             }
         }
-
         private void FileBrowse_ButtonClicked(object sender)
         {
             var openFolderDialog = UtilDisplay.LoadFolderBrowserDialog;
-            if (openFolderDialog.ShowDialog() ==  System.Windows.Forms.DialogResult.OK)
+            if (openFolderDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 txtImportFromDirectory.Text = openFolderDialog.SelectedPath;
+        }
+        private void ExcelFileBrowse_ButtonClicked(object sender)
+        {
+
+            var openFileDialog = UtilDisplay.LoadOpenFileDialog;
+            openFileDialog.Filter = "Excel Files|*.xls;*.xlsx;*.xlsm";
+            if (openFileDialog.ShowDialog() == true)
+                txtImportFromFile.Text = openFileDialog.FileName;
         }
 #endif
         private void BrowseTopLogo_FileSelected()
@@ -446,9 +464,25 @@ namespace UnicontaClient.Pages.CustomPage
                     MoveFocus();
                     if (editrow._Name == null)
                     {
-                        UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("CannotBeBlank"), Uniconta.ClientTools.Localization.lookup("CompanyName")), 
-                            Uniconta.ClientTools.Localization.lookup("Warning"));
-                        return;
+#if !SILVERLIGHT
+                        int importFrom = cmbImportFrom.SelectedIndex;
+                        int setupType = lstSetupType.SelectedIndex;
+#else
+                        int importFrom = -1;
+                        int setupType = 1;
+#endif
+#if !SILVERLIGHT
+                        if (setupType == 1 || importFrom == (int)ImportFrom.dk_Iceland || (importFrom >= (int)ImportFrom.economic_Danmark && importFrom <= (int)ImportFrom.economic_Germany))
+
+#else
+                        if (setupType == 1)
+
+#endif
+                        {
+                            UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("CannotBeBlank"), Uniconta.ClientTools.Localization.lookup("CompanyName")),
+                                Uniconta.ClientTools.Localization.lookup("Warning"));
+                            return;
+                        }
                     }
                     if (editrow._Country == (byte)CountryCode.Unknown)
                     {
@@ -470,8 +504,6 @@ namespace UnicontaClient.Pages.CustomPage
                             Uniconta.ClientTools.Localization.lookup("Warning"));
                         return;
                     }
-
-
 
                     if (lstSetupType.SelectedIndex == 1)
                     {
@@ -518,7 +550,10 @@ namespace UnicontaClient.Pages.CustomPage
 #if !SILVERLIGHT
             setupType = lstSetupType.SelectedIndex;
             importFrom = cmbImportFrom.SelectedIndex;
-            path = txtImportFromDirectory.Text;
+            if (importFrom == (int)ImportFrom.BC_NAVOnline)
+                path = txtImportFromFile.Text;
+            else
+                path = txtImportFromDirectory.Text;
             set0InAccount = chkSet0InAct.IsChecked.Value;
             set0InCustAcc = chkSet0InCustAcc.IsChecked.Value;
             set0InVendAcc = chkSet0InVendAcc.IsChecked.Value;
@@ -534,6 +569,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case ImportFrom.economic_Norge:
                 case ImportFrom.economic_Germany:
                 case ImportFrom.economic_Sweden: editrow._ConvertedFrom = (int)ConvertFromType.Eco; break;
+                case ImportFrom.BC_NAVOnline:
                 case ImportFrom.NAV: editrow._ConvertedFrom = (int)ConvertFromType.Nav; break;
                 case ImportFrom.Ax30_eCTRL: editrow._ConvertedFrom = (int)ConvertFromType.eCtrl; break;
                 case ImportFrom.dk_Iceland: editrow._ConvertedFrom = (int)ConvertFromType.dk_Iceland; break;
@@ -589,6 +625,8 @@ namespace UnicontaClient.Pages.CustomPage
                 else
                     busyIndicator.IsBusy = true;
                 ErrorCodes err;
+                if (editrow._Name == null)
+                    editrow._Name = "import";
                 if (usermaster != null)
                     err = await session.CreateCompany(editrow, usermaster);
                 else

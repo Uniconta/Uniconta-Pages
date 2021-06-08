@@ -302,11 +302,21 @@ namespace UnicontaClient.Pages.CustomPage
                 if (selectedItem == null)
                     return;
                 var sender = ribbonControl.senderRibbonButton;
-                var tabName = sender?.Content;
+                if (sender == null)
+                    return;
+                var tabName = sender.Content;
                 var tableName = (sender.Tag as string)?.Split(';')[1];
                 var userTable = dtlTables.Where(x => x._Name == tableName).FirstOrDefault();
+                if (userTable == null)
+                    return;
+                var tableHeaderClient = userTable as TableHeaderClient;
+                if (tableHeaderClient == null)
+                {
+                    tableHeaderClient = new TableHeaderClient();
+                    StreamingManager.Copy(userTable, tableHeaderClient);
+                }
                 object[] parmtbldata = new object[3];
-                parmtbldata[0] = userTable;
+                parmtbldata[0] = tableHeaderClient;
                 parmtbldata[1] = string.Concat(tableName, ";", tabName);
                 parmtbldata[2] = dgTabledataGrid.syncEntity;
                 AddDockItem(TabControls.UserTableData, parmtbldata, string.Format("{0}:{1}/{2}", Uniconta.ClientTools.Localization.lookup("Data"), tabName, (selectedItem as TableData)?._KeyName));

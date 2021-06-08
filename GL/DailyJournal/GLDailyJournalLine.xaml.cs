@@ -136,7 +136,7 @@ namespace UnicontaClient.Pages.CustomPage
                     newRow._TransType = Cur._TransType;
                     newRow._DocumentRef = Cur._DocumentRef;
                     newRow._DocumentDate = Cur._DocumentDate;
-                    if (header._Account == null)
+                    if (header._Account == null) // i tried this, but we got bad feedback. Erik && header._DefaultAccountType == 0)
                         newRow._AccountType = 0; // typically, if we have unbalance, then we need to add ledger account
 
                     if (header._GenOffsetAmount)
@@ -488,7 +488,10 @@ namespace UnicontaClient.Pages.CustomPage
                         var currentRow = dgGLDailyJournalLine.SelectedItem as JournalLineGridClient;
                         if (currentRow != null && upperline != null)
                         {
+                            dgGLDailyJournalLine.SetLoadedRow(currentRow);
                             currentRow.DocumentRef = upperline.DocumentRef;
+                            currentRow.NotifyPropertyChanged("DocumentRef");
+                            dgGLDailyJournalLine.SetModifiedRow(currentRow);
                         }
                     }
                 }
@@ -544,7 +547,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        static string formatAcc(GLAccount ac) { return string.Format("{0}, {1}", ac._Account, ac._Name); }
+        static string formatAcc(GLAccount ac) { return string.Concat("| ", ac._Account, ", ", ac._Name); }
 
         void setTraceAccount()
         {
@@ -807,14 +810,7 @@ namespace UnicontaClient.Pages.CustomPage
                             if (showOpen)
                             {
                                 var lst = GetOtherMarked(selectedItem, Ac, (byte)AcType);
-                                object[] param = new object[5];
-                                param[0] = AccountObj;
-                                param[1] = (object)((byte)AcType);
-                                param[2] = selectedItem;
-                                param[3] = Offset;
-                                param[4] = lst;
-
-                                AddDockItem(TabControls.SettleOpenTransactionPage, param, true);
+                                AddDockItem(TabControls.SettleOpenTransactionPage, new object[] { AccountObj, IdObject.get((byte)AcType), selectedItem, IdObject.get(Offset), lst }, true);
                             }
                             else
                                 AddDockItem(AcType == GLJournalAccountType.Debtor ? TabControls.DebtorTransactions : TabControls.CreditorTransactions, AccountObj, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("AccountsTransaction"), Ac));
@@ -1015,17 +1011,27 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 dgGLDailyJournalLine.SetLoadedRow(selectedItem);
                 selectedItem.DocumentRef = vouchersClient.RowId;
-                selectedItem.Invoice = vouchersClient.Invoice;
-                selectedItem.DocumentDate = vouchersClient.DocumentDate;
-                if (selectedItem._Text == null && selectedItem._TransType == null)
-                    selectedItem.Text = vouchersClient.Text;
+                if (vouchersClient._Invoice != null)
+                    selectedItem.Invoice = vouchersClient._Invoice;
+                selectedItem.DocumentDate = vouchersClient._DocumentDate;
+                if (selectedItem._Text == null && selectedItem._TransType == null && selectedItem._AccountType == 0 && selectedItem._OffsetAccountType == 0)
+                    selectedItem.Text = vouchersClient._Text;
                 if (selectedItem.Amount == 0d || selectedItem.AmountSetBySystem)
                 {
                     selectedItem.AmountSetBySystem = true;
-                    selectedItem.Amount = vouchersClient.Amount;
+                    selectedItem.Amount = vouchersClient._Amount;
                 }
                 dgGLDailyJournalLine.SetModifiedRow(selectedItem);
             }
+        }
+
+        static bool showDif(double settle, double journal)
+        {
+            if (Math.Abs(settle + journal) < 0.01) // they have different signs
+                return false;
+            return UnicontaMessageBox.Show( string.Format(Uniconta.ClientTools.Localization.lookup("SumSettleDif"), settle.ToString("N2"), journal.ToString("N2")) + "\n" +
+                Uniconta.ClientTools.Localization.lookup("UseSettleAmount") + " ?",
+                Uniconta.ClientTools.Localization.lookup("Settlement"), UnicontaMessageBox.YesNo) == UnicontaMessageBox.Yes;
         }
 
         private void SetSettlementsForJournalLine(JournalLineGridClient selectedItem, string settlementStr, double MarkedRemainingAmt, double MarkedRemainingAmtCur, string Currency, bool Offset)
@@ -1033,7 +1039,7 @@ namespace UnicontaClient.Pages.CustomPage
             dgGLDailyJournalLine.SetLoadedRow(selectedItem);
             if (Currency != null)
             {
-                if (selectedItem.AmountSetBySystem || (selectedItem.Amount == 0d && selectedItem.AmountCur == 0d))
+                if (selectedItem.AmountSetBySystem || (selectedItem.Amount == 0d && selectedItem.AmountCur == 0d) || showDif(MarkedRemainingAmtCur, selectedItem.AmountCur))
                 {
                     selectedItem.AmountSetBySystem = true;
                     if (Currency != null)
@@ -1041,7 +1047,7 @@ namespace UnicontaClient.Pages.CustomPage
                     selectedItem.AmountCur = Offset ? MarkedRemainingAmtCur : -MarkedRemainingAmtCur;
                 }
             }
-            else if (selectedItem.AmountSetBySystem || selectedItem.Amount == 0d)
+            else if (selectedItem.AmountSetBySystem || selectedItem.Amount == 0d || showDif(MarkedRemainingAmt, selectedItem.Amount))
             {
                 selectedItem.AmountSetBySystem = true;
                 selectedItem.Amount = Offset ? MarkedRemainingAmt : -MarkedRemainingAmt;
@@ -1139,18 +1145,15 @@ namespace UnicontaClient.Pages.CustomPage
             busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
             busyIndicator.IsBusy = true;
 
-            var tsk = saveGrid();
-
-            var Err = await tsk;
+            var Err = await saveGrid();
             if (Err != 0)
             {
                 busyIndicator.IsBusy = false;
-                UtilDisplay.ShowErrorCode(Err);
                 return;
             }
 
             IEnumerable<Uniconta.DataModel.GLDailyJournalLine> glLines = null;
-            if (anyChange && cnt < 1000)
+            if (anyChange && cnt < 2000)
                 glLines = source;
 
             var postingApi = new PostingAPI(api);
@@ -1164,37 +1167,6 @@ namespace UnicontaClient.Pages.CustomPage
                 return;
             }
             Utility.ShowJournalError(postingRes, dgGLDailyJournalLine);
-            setLineDirty(postingRes);
-        }
-
-        void setLineDirty(PostingResult postingRes)
-        {
-            /*
-            if (postingRes.Err == ErrorCodes.AccountIsMissing)
-            {
-                var linNo = postingRes.Counter;
-                if (linNo == 0)
-                    return;
-                bool first = true;
-                var lst = dgGLDailyJournalLine.ItemsSource as IList<JournalLineGridClient>;
-                int cnt = lst.Count;
-                while (linNo <= cnt)
-                {
-                    var row = lst[linNo - 1];
-                    if (row.RowId == 0)
-                        dgGLDailyJournalLine.SetModifiedRow(row);
-                    else
-                        dgGLDailyJournalLine.SetLoadedRow(row);
-                    linNo++;
-                    if (first)
-                    {
-                        first = false;
-                        if (string.IsNullOrWhiteSpace(row._Account) && string.IsNullOrWhiteSpace(row._OffsetAccount))
-                            break;
-                    }
-                }
-            }
-            */
         }
 
         private void PostJournal()
@@ -1237,10 +1209,15 @@ namespace UnicontaClient.Pages.CustomPage
                     busyIndicator.IsBusy = true;
 
                     var Err = await saveTask;
+                    if (Err != 0)
+                    {
+                        busyIndicator.IsBusy = false;
+                        return;
+                    }
 
                     var cnt = source.Count;
                     IEnumerable<Uniconta.DataModel.GLDailyJournalLine> glLines = null;
-                    if (anyChange && cnt < 1000)
+                    if (anyChange && cnt < 2000)
                         glLines = source;
 
                     Task<PostingResult> task;
@@ -1249,15 +1226,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (postingDialog.IsSimulation)
                         task = postingApi.CheckDailyJournal(masterRecord, postingDialog.PostedDate, true, new GLTransClientTotal(), cnt, false, glLines);
                     else
-                    {
-                        if (Err != 0)
-                        {
-                            busyIndicator.IsBusy = false;
-                            UtilDisplay.ShowErrorCode(Err);
-                            return;
-                        }
                         task = postingApi.PostDailyJournal(masterRecord, postingDialog.PostedDate, postingDialog.comments, cnt, false, glLines);
-                    }
 
                     var postingResult = await task;
 
@@ -1272,25 +1241,19 @@ namespace UnicontaClient.Pages.CustomPage
                         if (postingResult.Err == ErrorCodes.NoLinesFound && masterRecord._UseApproved)
                             UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("TransactionsNotApproved"), Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OK);
                         else
-                        {
                             Utility.ShowJournalError(postingResult, dgGLDailyJournalLine);
-                            setLineDirty(postingResult);
-                        }
                     }
 
                     else if (postingResult.SimulatedTrans != null && postingResult.SimulatedTrans.Length > 0)
                     {
-                        object[] paramArr = new object[2];
-                        paramArr[0] = postingResult.AccountBalance;
-                        paramArr[1] = postingResult.SimulatedTrans;
-                        AddDockItem(TabControls.SimulatedTransactions, paramArr, Uniconta.ClientTools.Localization.lookup("SimulatedTransactions"), null, true);
+                        AddDockItem(TabControls.SimulatedTransactions, new object[] { postingResult.AccountBalance, postingResult.SimulatedTrans }, Uniconta.ClientTools.Localization.lookup("SimulatedTransactions"), null, true);
                     }
                     else
                     {
                         // everything was posted fine
                         string msg;
                         if (postingResult.JournalPostedlId != 0)
-                            msg = string.Format("{0} {1}={2}", Uniconta.ClientTools.Localization.lookup("JournalHasBeenPosted"), Uniconta.ClientTools.Localization.lookup("JournalPostedId"), postingResult.JournalPostedlId);
+                            msg = string.Format("{0} {1}={2}", Uniconta.ClientTools.Localization.lookup("JournalHasBeenPosted"), Uniconta.ClientTools.Localization.lookup("JournalPostedId"), NumberConvert.ToString(postingResult.JournalPostedlId));
                         else
                             msg = Uniconta.ClientTools.Localization.lookup("JournalHasBeenPosted");
                         UnicontaMessageBox.Show(msg, Uniconta.ClientTools.Localization.lookup("Message"));
@@ -1486,7 +1449,7 @@ namespace UnicontaClient.Pages.CustomPage
             bool TraceSumChange = false;
             DateTime Date = DateTime.MinValue;
 
-            var gridItems = (IEnumerable<JournalLineGridClient>)dgGLDailyJournalLine.ItemsSource;
+            var gridItems = (IList<JournalLineGridClient>)dgGLDailyJournalLine.ItemsSource;
             if (gridItems == null)
                 return;
 
@@ -1549,11 +1512,11 @@ namespace UnicontaClient.Pages.CustomPage
                     if (NoVATCalculation)
                         Vat2 = calcVat2 = 0d;
                     else
-                    {
                         Vat2 = CalcExtraVat(VatCode2, Amount, Date, VatMethod, out calcVat2);
-                        if (journalLine._OffsetAccountType == 0)
-                            AddTraceValues(journalLine._OffsetAccount, -Amount, -Vat1, TraceSum, AddVatTrace);
-                    }
+
+                    if (journalLine._OffsetAccountType == 0)
+                        AddTraceValues(journalLine._OffsetAccount, -Amount, -Vat2, TraceSum, AddVatTrace);
+
                     if (journalLine._Debit != 0d)
                     {
                         sumCredit += journalLine._Debit + Vat1 + Vat2;
@@ -1605,10 +1568,9 @@ namespace UnicontaClient.Pages.CustomPage
             if (TraceSumChange)
             {
                 var selectedItem = dgGLDailyJournalLine.SelectedItem as JournalLineGridClient;
-                if (selectedItem == null)
-                    selectedItem = gridItems.LastOrDefault();
-                if (selectedItem != null)
-                    selectedItem.NotifyTranceSumChange();
+                if (selectedItem == null && gridItems.Count > 0)
+                    selectedItem = gridItems[gridItems.Count-1];
+                selectedItem?.NotifyTranceSumChange();
             }
 
             this.maxVoucher = maxVoucher;
@@ -2553,9 +2515,12 @@ namespace UnicontaClient.Pages.CustomPage
 
         public override object GetPrintParameter()
         {
-            var source = dgGLDailyJournalLine.ItemsSource as IEnumerable<JournalLineGridClient>;
-            var lastLine = source?.LastOrDefault();
-            if (lastLine?._TraceSum == null || string.IsNullOrEmpty(tracAc1.Text))
+            if (ActiveTraceAccount == 0 || string.IsNullOrEmpty(tracAc1.Text))
+                return base.GetPrintParameter();
+
+            var source = dgGLDailyJournalLine.ItemsSource as IList<JournalLineGridClient>;
+            var lastLine = source != null && source.Count > 0 ? source[source.Count - 1] : null;
+            if (lastLine?._TraceSum == null)
                 return base.GetPrintParameter();
 
             var LedgerCache = this.LedgerCache;
@@ -2734,7 +2699,15 @@ namespace UnicontaClient.Pages.CustomPage
             get
             {
                 string s;
-                if (_AccountType > 0)
+                if (_Asset != null)
+                {
+                    var rec = ClientHelper.GetRef(CompanyId, typeof(FAM), _Asset);
+                    if (rec != null)
+                        s = string.Concat(rec.KeyStr, ", ", rec.KeyName);
+                    else
+                        s = null;
+                }
+                else if (_AccountType > 0)
                     s = AccountName;
                 else if (_OffsetAccountType > 0 && _OffsetAccount != null)
                     s = OffsetAccountName;
@@ -2748,7 +2721,7 @@ namespace UnicontaClient.Pages.CustomPage
                     string t = (_DCPostType == Uniconta.DataModel.DCPostType.Creditnote) ? Uniconta.ClientTools.Localization.lookup("Creditnote") :
                                (_DCPostType == Uniconta.DataModel.DCPostType.Payment) ? Uniconta.ClientTools.Localization.lookup("Payment") :
                                                                                            Uniconta.ClientTools.Localization.lookup("Invoice");
-                    s = string.Format("{0} {1}: {2}", s, t, _Invoice);
+                    s = string.Concat(s, " ", t, ": ", _Invoice);
                 }
                 if (_TransType == null)
                     return s;

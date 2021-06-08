@@ -31,13 +31,15 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectDetailControl"
                     <CorasauControls:CorasauLayoutItem FieldName="MasterProject" x:Name="liMasterProject">
                             <CorasauControls:TextEditor  x:Name="leMasterProject" Text="{Binding MasterProject}" IsReadOnly="True" />
                         </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="liInvoicingMethod" FieldName="InvoicingMethod">
+                        <CorasauControls:TextEditor  x:Name="leInvoicingMethod" Text="{Binding InvoicingMethod}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem x:Name="liPrType" FieldName="PrType">
                         <CorasauControls:TextEditor  x:Name="lePrType" Text="{Binding PrType}" IsReadOnly="True"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem x:Name="liInstallation" FieldName="Installation">
                         <CorasauControls:TextEditor  x:Name="leInstallation" Text="{Binding Installation}" IsReadOnly="True"/>
                     </CorasauControls:CorasauLayoutItem>
-                  
                 </CorasauControls:CorasauLayoutGroup>
                 <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpOrders" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Orders}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                     <CorasauControls:CorasauLayoutItem FieldName="Phase" x:Name="liPhase">
@@ -100,6 +102,9 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectDetailControl"
                 <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpReference" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Reference}"  Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                     <CorasauControls:CorasauLayoutItem FieldName="YourRef" x:Name="liYourRef">
                         <CorasauControls:TextEditor Text="{Binding YourRef}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="liOurRef" FieldName="OurRef">
+                        <CorasauControls:TextEditor Text="{Binding OurRef}" IsReadOnly="True"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem x:Name="liRequisition" FieldName="Requisition">
                         <CorasauControls:TextEditor Text="{Binding Requisition}" IsReadOnly="True" />

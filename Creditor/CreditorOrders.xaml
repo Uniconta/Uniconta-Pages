@@ -6,7 +6,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOrders"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage"
-    xmlns:toolkit="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Toolkit"
+    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
     xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
     mc:Ignorable="d"   xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
     d:DesignHeight="300" d:DesignWidth="400">
@@ -95,7 +95,21 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOrders"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Requisition" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Country" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="UpdatedAt" Visible="False" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="RelatedOrder"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="RelatedOrder" IsEditSettingSet="True">
+                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <CorasauControls:UnicontaPopupBaseEdit x:Name="PART_Editor" FocusPopupOnOpen="True" ValidateOnTextInput="False" ValidateOnEnterKeyPressed="False"  
+                                                                       DataContext="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}">
+                                    <CorasauControls:UnicontaPopupBaseEdit.PopupContentTemplate>
+                                        <ControlTemplate>
+                                            <CorasauControls:UnicontaEditableLookupControl x:Name="editableLookup" UseBindingValue="True" Width="Auto"  LookupBindingValue="{Binding RelatedOrder,RelativeSource={RelativeSource TemplatedParent}}"
+                                                                                        LookupEditValue="{Binding Path=(dxe:BaseEdit.OwnerEdit).EditValue, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" Margin="2" />
+                                        </ControlTemplate>
+                                    </CorasauControls:UnicontaPopupBaseEdit.PopupContentTemplate>
+                                </CorasauControls:UnicontaPopupBaseEdit>
+                            </DataTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                    </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Discount" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="TotalBeforeVAT" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Contact" Visible="False" />

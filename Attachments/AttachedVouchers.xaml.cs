@@ -85,24 +85,9 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (selectedItem._Data == null)
             {
-                var voucherClient = VoucherCache.GetGlobalVoucherCache(selectedItem);
-                if (voucherClient != null)
-                    selectedItem._Data = voucherClient._Data;
-                else
-                {
-                    //Getting Contents for the Document Viewer
-                    busyIndicator.IsBusy = true;
-                    var res = await api.Read(selectedItem);
-                    if (res != ErrorCodes.Succes)
-                    {
-                        busyIndicator.IsBusy = false;
-                        UtilDisplay.ShowErrorCode(res);
-                        return;
-                    }
-                    VoucherCache.SetGlobalVoucherCache(selectedItem);
-                }
+                busyIndicator.IsBusy = true;
+                await UtilDisplay.GetData(selectedItem, api);
             }
-
             ViewVoucher(TabControls.VouchersPage3, dgAttachedVoucherGrid.syncEntity);
             busyIndicator.IsBusy = false;
         }
@@ -238,9 +223,7 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     zippedMemoryStream.SecureSize();
                     if (voucher._Data == null)
-                    {
-                        await api.Read(voucher);
-                    }
+                        await UtilDisplay.GetData(voucher, api);
                     byte[] attachment = voucher.Buffer;
                     zippedMemoryStream.SecureSize(attachment.Length);
                     // Write the data to the ZIP file  

@@ -96,7 +96,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (PaymentFormat != null)
             {
-                if (PaymentFormat._ExportFormat == (byte)ExportFormatType.CSV || PaymentFormat._ExportFormat == (byte)ExportFormatType.NETS_Norge)
+                if (PaymentFormat._ExportFormat == (byte)ExportFormatType.NETS_Norge)
                 {
                     UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("NotActive"), Uniconta.ClientTools.Localization.lookup("Warning"));
                     return;

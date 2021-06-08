@@ -202,7 +202,7 @@ namespace UnicontaClient.Pages.CustomPage
                         var voucher = multiVouchers[i];
                         if (voucher._Data != null)
                         {
-    #if !SILVERLIGHT
+#if !SILVERLIGHT
                             if (voucher._Fileextension == FileextensionsTypes.JPEG)
                             {
                                 var imageBytes = FileBrowseControl.ImageResize(voucher._Data, ".jpg");

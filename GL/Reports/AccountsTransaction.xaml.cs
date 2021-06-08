@@ -219,12 +219,18 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void BindGrid()
         {
-            var pairs = ribbonControl.filterValues;
-            var sort = ribbonControl.PropSort;
-            if (pairs != null || sort != null)
-                ribbonControl.FilterGrid?.Filter(pairs, sort);
-            else
-                InitQuery();
+            var rb = ribbonControl;
+            if (rb != null)
+            {
+                var pairs = rb.filterValues;
+                var sort = rb.PropSort;
+                if (pairs != null || sort != null)
+                {
+                    rb.FilterGrid?.Filter(pairs, sort);
+                    return;
+                }
+            }
+            InitQuery();
         }
 
         private void DgAccountsTransGrid_RowDoubleClick()
@@ -267,25 +273,25 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void localMenu_OnItemClicked(string ActionType)
         {
+            string header;
             var selectedItem = dgAccountsTransGrid.SelectedItem as GLTransClient;
             switch (ActionType)
             {
                 case "PostedTransaction":
                     if (selectedItem == null)
                         return;
-                    string header = string.Format("{0} / {1}", Uniconta.ClientTools.Localization.lookup("PostedTransactions"), selectedItem._JournalPostedId);
+                    header = string.Format("{0} / {1}", Uniconta.ClientTools.Localization.lookup("PostedTransactions"), selectedItem._JournalPostedId);
                     AddDockItem(TabControls.PostedTransactions, selectedItem, header);
                     break;
                 case "ViewDownloadRow":
-                    if (selectedItem == null)
-                        return;
-                    DebtorTransactions.ShowVoucher(dgAccountsTransGrid.syncEntity, api, busyIndicator);
+                    if (selectedItem != null)
+                        DebtorTransactions.ShowVoucher(dgAccountsTransGrid.syncEntity, api, busyIndicator);
                     break;
                 case "VoucherTransactions":
                     if (selectedItem == null)
                         return;
-                    string vheader = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("VoucherTransactions"), selectedItem._Voucher);
-                    AddDockItem(TabControls.AccountsTransaction, dgAccountsTransGrid.syncEntity, vheader);
+                    header = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("VoucherTransactions"), selectedItem._Voucher);
+                    AddDockItem(TabControls.AccountsTransaction, dgAccountsTransGrid.syncEntity, header);
                     break;
                 case "AccountsTransaction":
                     if (selectedItem != null)
@@ -298,9 +304,8 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "DragDrop":
                 case "ImportVoucher":
-                    if (selectedItem == null)
-                        return;
-                    AddVoucher(selectedItem, ActionType);
+                    if (selectedItem != null)
+                        AddVoucher(selectedItem, ActionType);
                     break;
                 case "CancelVoucher":
                     if (selectedItem == null)
@@ -469,21 +474,26 @@ namespace UnicontaClient.Pages.CustomPage
                     dateSelector.Show();
                     break;
                 case "RemoveVat":
-                    if (selectedItem == null) return;
-                    RemoveVat(selectedItem);
+                    if (selectedItem != null)
+                        RemoveVat(selectedItem);
                     break;
                 case "AddVat":
-                    if (selectedItem == null) return;
-                    AddVat(selectedItem);
+                    if (selectedItem != null)
+                        AddVat(selectedItem);
                     break;
                 case "SetNewDcAccount":
-                    if (selectedItem == null) return;
-                    SetNewAccount(selectedItem);
+                    if (selectedItem != null)
+                        SetNewAccount(selectedItem);
                     break;
                 case "CopyVoucherToJournal":
-                    if (selectedItem == null) return;
-                    CopyToJOurnal();
+                    if (selectedItem != null)
+                        CopyToJOurnal();
                     break;
+                case "ExportVouchers":
+                    var glTrans = ((IEnumerable<GLTransClient>)dgAccountsTransGrid.GetVisibleRows())?.Where(x=>x._DocumentRef != 0);
+                    AddDockItem(TabControls.VoucherExportPage, new object[] { glTrans }, Uniconta.ClientTools.Localization.lookup("ExportVouchers"));
+                    break;
+
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -797,6 +807,8 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 if (cwconfirm.DialogResult == true)
                 {
+                    if (selectedItem._DocumentRef != 0)
+                        VoucherCache.RemoveGlobalVoucherCache(selectedItem.CompanyId, selectedItem._DocumentRef);
                     busyIndicator.IsBusy = true;
                     var errorCodes = await postingApiInv.AddPhysicalVoucher(selectedItem, doc, cwconfirm.ForAllTransactions, cwconfirm.AppendDoc);
                     busyIndicator.IsBusy = false;
@@ -869,7 +881,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void PART_Editor_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var glTrans = dgAccountsTransGrid.syncEntity.LoadedRow as GLTransClient;
+            var glTrans = dgAccountsTransGrid.syncEntity.Row as GLTransClient;
             if (glTrans._HasNote)
             {
                 CWAddEditNote cwAddEditNote = new CWAddEditNote(api, null, glTrans, true);

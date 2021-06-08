@@ -215,14 +215,19 @@ namespace UnicontaClient.Pages.CustomPage
                                     return;
                                 }
                             }
+                            var lookup = SetPriceLookup(rec);
+                            if (lookup != null)
+                                lookup.UseCustomerPrices = false;
                             if (selectedItem._SalesQty != 0d)
                                 rec.Qty = selectedItem._SalesQty;
                             else if (api.CompanyEntity._PurchaseLineOne)
                                 rec.Qty = 1d;
                             rec.SetItemValues(selectedItem, api.CompanyEntity._PurchaseLineStorage);
-                            var lookup = SetPriceLookup(rec);
                             if (lookup != null)
+                            {
+                                lookup.UseCustomerPrices = true;
                                 lookup.SetPriceFromItem(rec, selectedItem);
+                            }
                             else if (selectedItem._PurchasePrice != 0)
                                 rec.Price = selectedItem._PurchasePrice;
                             else

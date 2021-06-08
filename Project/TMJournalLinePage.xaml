@@ -157,10 +157,10 @@ x:Class="UnicontaClient.Pages.CustomPage.TMJournalLinePage"
                                         </DataTemplate>
                                     </localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridForeignKeyColumnClient>
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Invoiceable" Visible="False">
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Invoiceable" Visible="False" >
                                     <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                         <DataTemplate>
-                                            <CorasauControls:CheckEditor  x:Name="PART_Editor" IsReadOnly="{Binding DataContext.RowData.Row.IsEditable,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToBoolConverter}}" HorizontalContentAlignment="Right"  EditValue="{Binding Path=DataContext.RowData.Row.Invoiceable,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}"/>
+                                            <CorasauControls:CheckEditor x:Name="PART_Editor" IsReadOnly="{Binding DataContext.RowData.Row.IsEditable,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToBoolConverter}, Mode=OneWay}" HorizontalAlignment="Center" VerticalAlignment="Center"  EditValue="{Binding Path=DataContext.RowData.Row.Invoiceable,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}, UpdateSourceTrigger=PropertyChanged}"/>
                                         </DataTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridTemplateColumnClient>
@@ -396,7 +396,7 @@ x:Class="UnicontaClient.Pages.CustomPage.TMJournalLinePage"
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="colInvoiceable" FieldName="Invoiceable" Visible="False">
                                     <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                         <DataTemplate>
-                                            <CorasauControls:CheckEditor  x:Name="PART_Editor" IsReadOnly="{Binding DataContext.RowData.Row.IsEditable,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToBoolConverter}}" HorizontalContentAlignment="Right"  EditValue="{Binding Path=DataContext.RowData.Row.Invoiceable,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}"/>
+                                            <CorasauControls:CheckEditor x:Name="PART_Editor" IsReadOnly="{Binding DataContext.RowData.Row.IsEditable,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToBoolConverter}}" HorizontalAlignment="Center" VerticalAlignment="Center"  EditValue="{Binding Path=DataContext.RowData.Row.Invoiceable,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}, UpdateSourceTrigger=PropertyChanged}"/>
                                         </DataTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridTemplateColumnClient>

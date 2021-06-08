@@ -41,7 +41,7 @@
     <RibbonItem Action="AddMatch" LocalizedNameKey="AddOBJ" Parameter="Match" Glyph="Match_Add_32x32.png" LargeGlyph="Match_Add_32x32.png"/>
     <RibbonItem Action="RemoveMatch" LocalizedNameKey="RemoveOBJ" Parameter="Match" Glyph="Match_Remove_32x32.png" LargeGlyph="Match_Remove_32x32.png" />
     <RibbonItem Action="AutoMatch" LocalizedNameKey="AutoMatch" Glyph="Match_Lines_32x32.png" LargeGlyph="Match_Lines_32x32.png" />
-    <RibbonItem Action="VoidTransaction" LocalizedNameKey="VoidTransaction" ShortcutKey="F6" Glyph="Cancel_Voucher_32x32.png" LargeGlyph="Cancel_Voucher_32x32.png" />
+    <RibbonItem Action="VoidTransaction" LocalizedNameKey="VoidTransaction" ShortcutKey="F9" Glyph="Cancel_Voucher_32x32.png" LargeGlyph="Cancel_Voucher_32x32.png" />
     <RibbonItem Action="AddMapping" LocalizedNameKey="AddOBJ" Parameter="PostingRule" LargeGlyph="Match_32x32.png" />
     <RibbonItem Action="OpenTran" LocalizedNameKey="OpenTrans" ShortcutKey="F8" LargeGlyph="Open_Transaction_32x32.png" />
   </RibbonItem>

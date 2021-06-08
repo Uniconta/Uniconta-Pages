@@ -133,6 +133,11 @@ namespace UnicontaClient.Pages.CustomPage
             StartLoadCache();
         }
 
+        protected override void BeforeTemplateSet(UnicontaBaseEntity row)
+        {
+            ((InvItem)row)._Decimals = 2;
+        }
+
         private void frmRibbon_OnItemClicked(string ActionType)
         {
             if (ActionType == "Save" && !VaidateEAN(editrow._EAN))
@@ -178,19 +183,13 @@ namespace UnicontaClient.Pages.CustomPage
             LoadType(t);
 
             if (api.CompanyEntity.Project)
-            {
-                var prCategories = new PrCategoryCostFilter(prCatCache);
-                cmbPrCategory.cacheFilter = prCategories;
-            }
+                cmbPrCategory.cacheFilter = new PrCategoryCostFilter(prCatCache);
         }
 
         private void cmbWarehouse_SelectedIndexChanged(object sender, RoutedEventArgs e)
         {
             if (warehouse != null)
-            {
-                var selectedItem = cmbWarehouse.SelectedItem as InvWarehouseClient;
-                setLocation(selectedItem);
-            }
+                setLocation(cmbWarehouse.SelectedItem as InvWarehouseClient);
         }
 
         async private void setLocation(InvWarehouseClient master)
@@ -208,15 +207,13 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void cmbLocation_GotFocus(object sender, RoutedEventArgs e)
         {
-            var selectedItem = cmbWarehouse.SelectedItem as InvWarehouseClient;
-            setLocation(selectedItem);
+            setLocation(cmbWarehouse.SelectedItem as InvWarehouseClient);
         }
 
-        bool lookupIsSet = false;
+        bool lookupIsSet;
         private void liPhoto_LookupButtonClicked(object sender)
         {
             var lookupEditor = sender as LookupEditor;
-
             if (!lookupIsSet)
             {
                 lookupEditor.PopupContentTemplate = (Application.Current).Resources["LookUpDocumentClientPopupContent"] as ControlTemplate;
@@ -239,7 +236,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        bool isUrlLookupSet = false;
+        bool isUrlLookupSet;
         private void liURL_LookupButtonClicked(object sender)
         {
             var lookupUrlEditor = sender as LookupEditor;
@@ -293,7 +290,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 var item = itemCache.Get(s.Text);
                 if (item != null && item.RowId != editrow.RowId)
-                    UnicontaMessageBox.Show(string.Format("{0} {1} ", Uniconta.ClientTools.Localization.lookup("Item"), string.Format(Uniconta.ClientTools.Localization.lookup("AlreadyExistOBJ"), s.Text)), Uniconta.ClientTools.Localization.lookup("Warning"));
+                    UnicontaMessageBox.Show(string.Format("{0} {1}", Uniconta.ClientTools.Localization.lookup("Item"), string.Format(Uniconta.ClientTools.Localization.lookup("AlreadyExistOBJ"), s.Text)), Uniconta.ClientTools.Localization.lookup("Warning"));
             }
         }
     }

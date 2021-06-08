@@ -236,12 +236,13 @@ namespace UnicontaClient.Pages.CustomPage
             if (ft != null)
                 FolderCache = await ft;
 
+            await t;
+
             BindFolders();
 #if !SILVERLIGHT
             CreateContextMenu();
             accordionView.SelectedItem = ((UnicontaClient.Controls.AccordionFilterGroup)(accordionView.Items.FirstOrDefault())).FilterItems[0];
 #endif
-            await t;
         }
 
         List<string> Folders;
@@ -252,21 +253,61 @@ namespace UnicontaClient.Pages.CustomPage
                 Folders.Remove(deletedItem);
 #if !SILVERLIGHT
             accordionView.ItemsSource = null;
-            accordionView.ItemsSource = new AccordionFilterGroup[] { new AccordionFilterGroup(Uniconta.ClientTools.Localization.lookup("Folders"), "ViewInFolder",Folders,
-                Uniconta.ClientTools.Localization.lookup("All")) };
+            var allItemLabel = Uniconta.ClientTools.Localization.lookup("All");
+            var folderGroup = new AccordionFilterGroup(Uniconta.ClientTools.Localization.lookup("Folders"), "ViewInFolder",
+                Folders, allItemLabel);
+
+            //Updating the Filter counts
+            var folderCount = UpdateFolderItemCount(allItemLabel != null);
+            if (folderCount != null && folderCount.Count > 0)
+                folderGroup.UpdateFilterCount(folderCount);
+
+            accordionView.ItemsSource = new AccordionFilterGroup[] { folderGroup };
 #endif
         }
-
 #if !SILVERLIGHT
+        private IList<int> UpdateFolderItemCount(bool showAll)
+        {
+            if (Folders == null || dgVoucherGrid.ItemsSource == null)
+                return null;
+
+            var itmSrc = (IEnumerable<VouchersClient>)dgVoucherGrid.ItemsSource;
+            var updCountFolders = showAll ? new List<int>(Folders.Count + 1) { itmSrc.Count() } : new List<int>(Folders.Count);
+            foreach (var fld in Folders)
+            {
+                try
+                {
+                    var filterString = string.Format("([ViewInFolder] = '{0}')", fld);
+                    var criteria = DevExpress.Data.Filtering.CriteriaOperator.Parse(filterString, fld);
+                    var caseInsensitiveCriteria = DevExpress.Data.Helpers.StringsTolowerCloningHelper.Process(criteria);
+                    var genericWhere = DevExpress.Data.Utils.CriteriaOperatorToExpressionConverter.GetGenericWhere<VouchersClient>(caseInsensitiveCriteria);
+                    var count = itmSrc.Where(genericWhere.Compile()).Count();
+                    updCountFolders.Add(count);
+                }
+                catch
+                {
+                    updCountFolders.Add(-1);
+                }
+            }
+
+            return updCountFolders;
+        }
+
         private void AccordionView_MouseLeftButtonUp(object sender, MouseEventArgs e)
         {
             var txt = e.OriginalSource as TextBlock;
             if (txt == null)
                 return;
+
             if (dgVoucherGrid.dragStarted)
             {
-                SetRowsWithFolderValue(txt.Text);
-                dgVoucherGrid.dragStarted = false;
+                var bindingExp = txt.GetBindingExpression(TextBlock.TextProperty);
+                if (bindingExp != null && bindingExp.DataItem is AccordionFilterItem)
+                {
+                    var filter = bindingExp.DataItem as AccordionFilterItem;
+                    SetRowsWithFolderValue(filter.FilterName);
+                    dgVoucherGrid.dragStarted = false;
+                }
             }
         }
 
@@ -294,6 +335,7 @@ namespace UnicontaClient.Pages.CustomPage
                 }
 #if WPF
                 dgVoucherGrid.RefreshData();
+                BindFolders();
 #endif
             }
         }
@@ -652,7 +694,10 @@ namespace UnicontaClient.Pages.CustomPage
 
                             var errorCode = await task;  // make sure save is completed.
                             if (errorCode != ErrorCodes.Succes)
+                            {
+                                UtilDisplay.ShowErrorCode(errorCode);
                                 return;
+                            }
 
                             var postingApi = new PostingAPI(api);
                             IEnumerable<VouchersClient> lst;
@@ -1004,17 +1049,9 @@ namespace UnicontaClient.Pages.CustomPage
 
         async private Task<VouchersClient> ValidateVoucher(VouchersClient voucher)
         {
-            if (voucher != null)
-            {
-                if (voucher._Data == null)
-                {
-                    var voucherClient = VoucherCache.GetGlobalVoucherCache(voucher);
-                    if (voucherClient != null && voucherClient._Data != null)
-                        voucher._Data = voucherClient._Data;
-                    else
-                        await api.Read(voucher);
-                }
-            }
+            if (voucher != null && voucher._Data == null)
+                await UtilDisplay.GetData(voucher, api);
+
             return voucher;
         }
 
@@ -1032,15 +1069,12 @@ namespace UnicontaClient.Pages.CustomPage
                     return;
                 }
 
-                busyIndicator.IsBusy = true;
                 if (selectedItem._Data == null)
                 {
-                    var voucherClient = VoucherCache.GetGlobalVoucherCache(selectedItem);
-                    if (voucherClient != null && voucherClient._Data != null)
-                        selectedItem._Data = voucherClient._Data;
-                    else
-                        await api.Read(selectedItem);
+                    busyIndicator.IsBusy = true;
+                    await UtilDisplay.GetData(selectedItem, api);
                 }
+
                 if (selectedItem.Buffer == null)
                 {
                     UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("EmptyTable"), Uniconta.ClientTools.Localization.lookup("Error"), MessageBoxButton.OK);
@@ -1228,12 +1262,12 @@ namespace UnicontaClient.Pages.CustomPage
             switch (tag)
             {
                 case "Add":
-                    folderdialog = new CWAddEditFolder(api, null, 0);
+                    folderdialog = new CWAddEditFolder(api, null, 0, true);
                     break;
                 case "Edit":
                     if (standardFolder || string.IsNullOrEmpty(folderName))
                         return;
-                    folderdialog = new CWAddEditFolder(api, folderName, 1);
+                    folderdialog = new CWAddEditFolder(api, folderName, 1, true);
                     break;
                 case "Delete":
                     if (standardFolder || string.IsNullOrEmpty(folderName) || dgVoucherGrid.VisibleRowCount > 0)
@@ -1353,31 +1387,25 @@ namespace UnicontaClient.Pages.CustomPage
             foreach (var voucher in vouchersToPaperFlow)
             {
                 if (voucher._Data == null)
-                {
-                    var voucherClient = VoucherCache.GetGlobalVoucherCache(voucher);
-                    if (voucherClient != null && voucherClient._Data != null)
-                        voucher._Data = voucherClient._Data;
-                    else   
-                        await api.Read(voucher);
-                }
+                    await UtilDisplay.GetData(voucher, api);
 
                 if (await Bilagscan.Voucher.Upload(voucher, orgNo, accessToken))
                 {
-                   voucherUpdates.Add(voucher);
-                   voucher.SentToBilagscan = true;
+                    voucherUpdates.Add(voucher);
+                    voucher.SentToBilagscan = true;
                 }
                 else
                 {
-                   voucherErrors.Add(voucher);
-                   if (errorText == null)
-                   {
-                       errorText = StringBuilderReuse.Create().AppendLine();
-                       errorText.AppendLine(Uniconta.ClientTools.Localization.lookup("Error"));
-                   }
-                    
+                    voucherErrors.Add(voucher);
+                    if (errorText == null)
+                    {
+                        errorText = StringBuilderReuse.Create().AppendLine();
+                        errorText.AppendLine(Uniconta.ClientTools.Localization.lookup("Error"));
+                    }
+
                     errorText.Append(Uniconta.ClientTools.Localization.lookup("UniqueId")).Append(":").Append(NumberConvert.ToString(voucher.PrimaryKeyId)).AppendLine();
                 }
-               
+
             }
             if (voucherUpdates.Count > 0)
                 api.UpdateNoResponse(voucherUpdates);

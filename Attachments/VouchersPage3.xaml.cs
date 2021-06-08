@@ -121,12 +121,17 @@ namespace UnicontaClient.Pages.CustomPage
                             VoucherCache.SetGlobalVoucherCache(voucherClient);
                     }
                 }
+
                 if (voucherClient._Data == null)
                 {
                     busyIndicator.IsBusy = true;
-                    await api.Read(voucherClient);
-                    if (voucherClient._Data != null)
-                        VoucherCache.SetGlobalVoucherCache(voucherClient);
+                    var result = await UtilDisplay.GetData(voucherClient, api);
+                    if (result != 0)
+                    {
+                        busyIndicator.IsBusy = false;
+                        UtilDisplay.ShowErrorCode(result);
+                        return;
+                    }
                 }
 
                 this.documentViewer.Children.Clear();
@@ -247,17 +252,8 @@ namespace UnicontaClient.Pages.CustomPage
                 if (vClient._Data != null)
                     VoucherCache.SetGlobalVoucherCache(vClient);
                 else
-                {
-                    var cacheClient = VoucherCache.GetGlobalVoucherCache(vClient.CompanyId, vClient.RowId);
-                    if (cacheClient != null)
-                        vClient = cacheClient;
-                    else
-                    {
-                        await api.Read(vClient);
-                        if (vClient._Data != null)
-                            VoucherCache.SetGlobalVoucherCache(vClient);
-                    }
-                }
+                    await UtilDisplay.GetData(vClient, api);
+
                 this.documentViewer.Children.Add(UtilDisplay.LoadControl(vClient, false, setFocus));
             }
             catch (Exception ex)

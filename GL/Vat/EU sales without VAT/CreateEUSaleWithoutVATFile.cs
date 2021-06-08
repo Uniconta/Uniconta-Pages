@@ -496,7 +496,7 @@ namespace UnicontaClient.Pages.CustomPage
         [Display(Name = "DebtorRegNoFile", ResourceType = typeof(EUSaleWithoutVATText))]
         public string DebtorRegNoFile { get { return _DebtorRegNoFile; } set { _DebtorRegNoFile = value; NotifyPropertyChanged("DebtorRegNoFile"); } }
 
-        private DateTime _Date;
+        public DateTime _Date;
         [Display(Name = "Date", ResourceType = typeof(EUSaleWithoutVATText))]
         public DateTime Date
         {
@@ -517,7 +517,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        private long _InvoiceNumber;
+        public long _InvoiceNumber;
         [Display(Name = "InvoiceNumber", ResourceType = typeof(DCInvoiceText))]
         public long InvoiceNumber { get { return _InvoiceNumber; } set { _InvoiceNumber = value; NotifyPropertyChanged("InvoiceNumber"); } }
 
@@ -525,9 +525,9 @@ namespace UnicontaClient.Pages.CustomPage
         { 
             get 
             {
-                return ItemAmount > 0 ? 1 :
-                       ServiceAmount > 0 ? 2 :
-                       TriangularTradeAmount > 0 ? 3 : 0;
+                return ItemAmount != 0 ? 1 :
+                       ServiceAmount != 0 ? 2 :
+                       TriangularTradeAmount != 0 ? 3 : 0;
             } 
         }
 
@@ -570,7 +570,7 @@ namespace UnicontaClient.Pages.CustomPage
         [Display(Name = "Compressed", ResourceType = typeof(EUSaleWithoutVATText))]
         public bool Compressed { get { return _Compressed; } set { _Compressed = value; NotifyPropertyChanged("Compressed"); } }
 
-        private string _Item;
+        public string _Item;
         [ForeignKeyAttribute(ForeignKeyTable = typeof(InvItem))]
         [Display(Name = "Item", ResourceType = typeof(InventoryText))]
         public string Item { get { return _Item; } set { _Item = value; NotifyPropertyChanged("Item"); } }
@@ -583,11 +583,11 @@ namespace UnicontaClient.Pages.CustomPage
         [Display(Name = "SystemInfo", ResourceType = typeof(DCTransText))]
         public string SystemInfo { get { return _SystemInfo; } set { _SystemInfo = value; NotifyPropertyChanged("SystemInfo"); } }
 
-        private bool _IsTriangularTrade;
+        public bool _IsTriangularTrade;
         [Display(Name = "IsTriangularTrade", ResourceType = typeof(EUSaleWithoutVATText))]
         public bool IsTriangularTrade { get { return _IsTriangularTrade; } set { _IsTriangularTrade = value; NotifyPropertyChanged("IsTriangularTrade"); } }
 
-        private string _Vat;
+        public string _Vat;
         [ForeignKeyAttribute(ForeignKeyTable = typeof(GLVat))]
         [Display(Name = "Vat", ResourceType = typeof(GLDailyJournalText)), Key]
         public string Vat { get { return _Vat; } set { _Vat = value; NotifyPropertyChanged("Vat"); } }

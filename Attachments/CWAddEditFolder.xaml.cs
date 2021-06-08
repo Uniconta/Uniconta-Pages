@@ -11,6 +11,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using Uniconta.API.System;
 using Uniconta.ClientTools;
+using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.Common;
 using Uniconta.DataModel;
@@ -24,6 +25,8 @@ namespace UnicontaClient.Pages.CustomPage.Attachments
         public byte Action;
         CrudAPI api;
         SQLCache folderCache;
+        bool _validateFolderName;
+        
         public CWAddEditFolder(CrudAPI api, string folderName, byte action)
         {
             InitializeComponent();
@@ -49,6 +52,11 @@ namespace UnicontaClient.Pages.CustomPage.Attachments
             this.KeyDown += CWCreateFolder_KeyDown;
             this.Loaded += CWCreateFolder_Loaded;
             folderCache = this.api.CompanyEntity.GetCache(typeof(DocumentFolder));
+        }
+
+        public CWAddEditFolder(CrudAPI api, string folderName, byte action, bool validateFolderName) : this(api, folderName, action)
+        {
+            _validateFolderName = validateFolderName;
         }
 
         private void CWCreateFolder_Loaded(object sender, RoutedEventArgs e)
@@ -87,6 +95,12 @@ namespace UnicontaClient.Pages.CustomPage.Attachments
             if (FolderName != null)
                 folder = folderCache.Get(FolderName) as DocumentFolder;
             FolderName = txtFolder.Text;
+
+            if (_validateFolderName && Utilities.Utility.HasSpecialCharacters(FolderName))
+            {
+                UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("Invalid"), Uniconta.ClientTools.Localization.lookup("Error"));
+                return;
+            }
             ErrorCodes result = ErrorCodes.NoSucces;
             switch (Action)
             {
@@ -110,7 +124,7 @@ namespace UnicontaClient.Pages.CustomPage.Attachments
 
             if (result != ErrorCodes.Succes)
                 Uniconta.ClientTools.Util.UtilDisplay.ShowErrorCode(result);
-            
+
             this.DialogResult = true;
         }
 

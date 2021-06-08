@@ -48,6 +48,9 @@
     <RibbonItem Action="CopyVoucherToJournal" LocalizedNameKey="CopyVoucherToJournal" LargeGlyph="Install_32x32.png"/>
   </RibbonItem>
   <RibbonItem>
+    <RibbonItem Action="ExportVouchers" LocalizedNameKey="ExportVouchers" LargeGlyph="Upload_32x32.png" />
+  </RibbonItem>
+  <RibbonItem>
     <RibbonItem Action="AddEditNote" LocalizedNameKey="AddEditOBJ" Parameter="Note" LargeGlyph="AddUpdate_32x32.png"/>
   </RibbonItem>
 </root>

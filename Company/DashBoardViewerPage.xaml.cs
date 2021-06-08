@@ -95,7 +95,7 @@ namespace UnicontaClient.Pages.CustomPage
             e.Handled = true;
         }
 
-        public override void PageClosing()
+        public override void PageClosing() 
         {
             if (timer != null)
                 timer.Tick -= Timer_Tick;
@@ -122,6 +122,20 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void DashboardViewerUniconta_DashboardLoaded(object sender, DevExpress.DashboardWpf.DashboardLoadedEventArgs e)
         {
+            Dashboard dasdboard = e.Dashboard;
+            foreach (var item in dasdboard?.Items)
+            {
+                var name = dasdboard?.CustomProperties.GetValue(item.ComponentName);
+                if (name != null)
+                {
+                    if (name[0] == '&')
+                        item.Name = Uniconta.ClientTools.Localization.lookup(name.Substring(1)); ;
+                }
+            }
+
+            if (!dasdboard.Title.ShowMasterFilterState)
+                rowFilter.Visibility = Visibility.Collapsed;
+
             XElement data = e.Dashboard.UserData;
             if (data != null)
             {
@@ -354,8 +368,6 @@ namespace UnicontaClient.Pages.CustomPage
                     if (_selectedDashBoard.Layout != null)
                         ReadDataFromDB(_selectedDashBoard.Layout);
                     dashboardViewerUniconta.TitleContent = _selectedDashBoard.Name;
-                    if (dashboardViewerUniconta.Dashboard != null)
-                        dashboardViewerUniconta.Dashboard.Title.Visible = true;
                 }
                 else
                     UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup(result.ToString()), Uniconta.ClientTools.Localization.lookup("Error"));
@@ -363,7 +375,6 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (_selectedDashBoard == null)
                 busyIndicator.IsBusy = false;
-
             return true;
         }
 
@@ -393,7 +404,7 @@ namespace UnicontaClient.Pages.CustomPage
                         lstOfFilters.Add(key, arrpropval);
                     }
                 }
-                else
+                else if (version == 3 )
                 {
                     if (customReader.readBoolean())
                     {
@@ -420,17 +431,14 @@ namespace UnicontaClient.Pages.CustomPage
                 }
                 if (customReader.readBoolean())
                 {
-                    if (version < 3)
+                    int sortCount = (int)customReader.readNum();
+                    for (int i = 0; i < sortCount; i++)
                     {
-                        int sortCount = (int)customReader.readNum();
-                        for (int i = 0; i < sortCount; i++)
-                        {
-                            var key = customReader.readString();
-                            var arrSort = (SortingProperties[])customReader.ToArray(typeof(SortingProperties));
-                            FilterSorter propSort = new FilterSorter(arrSort);
-                            if (lstOfSorters != null && !lstOfSorters.ContainsKey(key))
-                                lstOfSorters.Add(key, propSort);
-                        }
+                        var key = customReader.readString();
+                        var arrSort = (SortingProperties[])customReader.ToArray(typeof(SortingProperties));
+                        FilterSorter propSort = new FilterSorter(arrSort);
+                        if (lstOfSorters != null && !lstOfSorters.ContainsKey(key))
+                            lstOfSorters.Add(key, propSort);
                     }
                 }
                 customReader.Release();
@@ -782,14 +790,14 @@ namespace UnicontaClient.Pages.CustomPage
         protected override void OnAttached()
         {
             base.OnAttached();
-            ((PivotGridControl)AssociatedObject).EndRefresh += PivotBehavior_EndRefresh;
+            ((PivotGridControl)AssociatedObject).DataSourceChanged += PivotBehavior_DataSourceChanged;
         }
         protected override void OnDetaching()
         {
-            ((PivotGridControl)AssociatedObject).EndRefresh -= PivotBehavior_EndRefresh;
+            ((PivotGridControl)AssociatedObject).DataSourceChanged -= PivotBehavior_DataSourceChanged;
             base.OnDetaching();
         }
-        private void PivotBehavior_EndRefresh(object sender, RoutedEventArgs e)
+        private void PivotBehavior_DataSourceChanged(object sender, RoutedEventArgs e)
         {
             AssociatedObject.BestFitMaxRowCount = 100;
             ((PivotGridControl)AssociatedObject).BestFit();

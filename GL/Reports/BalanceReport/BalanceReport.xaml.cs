@@ -676,17 +676,33 @@ namespace UnicontaClient.Pages.CustomPage
             for (k = 0; (k < CriteriaList.Count); k++)
             {
                 Crit = CriteriaList[k];
-                if (Crit.balanceColumnFormat == BalanceColumnFormat.Thousand)
+                if (Crit.balcolFormat > BalanceColumnFormat.Decimal2)
                 {
+                    int factor, multFactor;
+                    if (Crit.balcolFormat == BalanceColumnFormat.Decimal1)
+                    {
+                        factor = 5;
+                        multFactor = 10;
+                    }
+                    else if (Crit.balcolFormat == BalanceColumnFormat.Decimal0)
+                    {
+                        factor = 50;
+                        multFactor = 100;
+                    }
+                    else
+                    {
+                        factor = 500;
+                        multFactor = 1;
+                    }
                     for (c = 0; (c < BalanceList.Count); c++)
                     {
                         amount = BalanceList[c].amount;
                         d = amount[k];
                         if (d > 0)
-                            d += 500;
+                            d += factor;
                         else
-                            d -= 500;
-                        amount[k] = d / 1000;
+                            d -= factor;
+                        amount[k] = (d / (factor << 1)) * multFactor;
                     }
                 }
 

@@ -978,6 +978,8 @@ namespace UnicontaClient.Pages.CustomPage
                     foreach(var lin in orderList)
                     {
                         var item = (InvItem)items.Get(lin._Item);
+                        if (item == null)
+                            continue;
                         if (PrWarehouse && lin._Warehouse == null)
                         {
                             lin._Warehouse = item._Warehouse;

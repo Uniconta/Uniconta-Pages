@@ -89,6 +89,7 @@ namespace UnicontaClient.Pages.CustomPage
             txtDateFrm.DateTime = DefaultFromDate;
             SetDateTime(txtDateFrm, txtDateTo);
 
+            glVatCache = api.GetCache<Uniconta.DataModel.GLVat>();
             StartLoadCache();
         }
 
@@ -181,9 +182,9 @@ namespace UnicontaClient.Pages.CustomPage
             }
 
             if (glVatCache == null)
-                glVatCache = api.GetCache<Uniconta.DataModel.GLVat>() ?? await api.LoadCache<Uniconta.DataModel.GLVat>();
+                glVatCache = await api.LoadCache<Uniconta.DataModel.GLVat>();
 
-            var vatEUList = glVatCache.Where(s => s._TypeSales == "s3" || s._TypeSales == "s4").Select(x => x._Vat).Distinct();
+            var vatEUList = glVatCache.Where(s => s._TypeSales == "s3" || s._TypeSales == "s4" || s._TypeSales == "s7").Select(x => x._Vat).Distinct();
             if (vatEUList != null && vatEUList.Count() > 0)
             {
                 var strLst = string.Join(";", vatEUList);
@@ -206,47 +207,72 @@ namespace UnicontaClient.Pages.CustomPage
             dgEUSalesWithoutVATGrid.Visibility = Visibility.Visible;
         }
 
-        public List<EUSaleWithoutVAT> UpdateValues(IEnumerable<DebtorInvoiceLines> listOfDebInvLines)
+        public List<EUSaleWithoutVAT> UpdateValues(DebtorInvoiceLines[] listOfDebInvLines)
         {
-            var listOfResults = new List<EUSaleWithoutVAT>();
+            var listOfResults = new List<EUSaleWithoutVAT>(listOfDebInvLines.Length);
             var companyCountryId = api.CompanyEntity._CountryId;
+
+            bool triangularTrade = false;
+            string lastVat = null;
+            DebtorClient debtor = null;
+            string debtorCVR = null;
+            bool DebtorOk = false;
 
             foreach (var invLine in listOfDebInvLines)
             {
-                var debtor = invLine.Debtor;
-
-                if (invLine.NetAmount == 0 || debtor == null || debtor._Country == companyCountryId || !Country2Language.IsEU(debtor._Country))
+                var netAmount = invLine.NetAmount;
+                if (netAmount == 0 || invLine._DCAccount == null)
                     continue;
+
+                if (debtor?._Account != invLine._DCAccount)
+                {
+                    debtor = invLine.Debtor;
+                    if (debtor == null || debtor._Country == companyCountryId || !Country2Language.IsEU(debtor._Country))
+                    {
+                        DebtorOk = false;
+                        continue;
+                    }
+
+                    DebtorOk = true;
+                    debtorCVR = debtor._LegalIdent;
+                    if (debtorCVR != null)
+                    {
+                        long value;
+                        if (!long.TryParse(debtorCVR, out value))
+                        {
+                            debtorCVR = Regex.Replace(debtorCVR, @"[-/ ]", "");
+                        }
+
+                        if (char.IsLetter(debtorCVR[0]) && char.IsLetter(debtorCVR[1]))
+                            debtorCVR = debtorCVR.Substring(2);
+                    }
+                }
+
+                if (! DebtorOk)
+                    continue;
+
+                if (lastVat != invLine._Vat)
+                {
+                    lastVat = invLine._Vat;
+                    triangularTrade = glVatCache.Get(lastVat)?._TypeSales == "s7";
+                }
 
                 var invoice = new EUSaleWithoutVAT();
                 invoice._CompanyId = api.CompanyId;
                 invoice.CompanyRegNo = companyRegNo;
-                invoice.Account = invLine._DCAccount;
                 invoice.RecordType = "2";
                 invoice.ReferenceNumber = "X";
-                invoice.Date = invLine._Date;
-                invoice.InvoiceNumber = invLine._InvoiceNumber;
-                invoice.Item = invLine._Item;
-                invoice.Vat = invLine._Vat;
-                invoice._Amount = -invLine.NetAmount;
+                invoice._Account = invLine._DCAccount;
+                invoice._Date = invLine._Date;
+                invoice._InvoiceNumber = invLine._InvoiceNumber;
+                invoice._Item = invLine._Item;
+                invoice._Vat = lastVat;
+                invoice._Amount = -netAmount;
+                invoice._IsTriangularTrade = triangularTrade;
+                invoice._DebtorRegNoFile = debtorCVR;
 
-                if (invLine.Item != null)
+                if (invLine._Item != null)
                     invoice._ItemOrService = invLine.InvItem._ItemType == 1 ? ItemOrServiceType.Service : ItemOrServiceType.Item;
-
-                var debtorCVR = debtor.CompanyRegNo;
-                if (debtorCVR != null)
-                {
-                    long value;
-                    if (!long.TryParse(debtorCVR, out value))
-                    {
-                        debtorCVR = Regex.Replace(debtorCVR, @"[-/ ]", "");
-                    }
-
-                    if (char.IsLetter(debtorCVR[0]) && char.IsLetter(debtorCVR[1]))
-                        debtorCVR = debtorCVR.Substring(2);
-
-                    invoice._DebtorRegNoFile = debtorCVR;
-                }
 
                 sumOfAmount += invoice._Amount;
                 listOfResults.Add(invoice);

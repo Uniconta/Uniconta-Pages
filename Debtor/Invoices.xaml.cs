@@ -30,6 +30,7 @@ using System.IO;
 using Uniconta.Client.Pages;
 using DevExpress.Xpf.Grid;
 using DevExpress.Data;
+using Uniconta.Common.Utility;
 
 
 #if !SILVERLIGHT
@@ -246,6 +247,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void localMenu_OnItemClicked(string ActionType)
         {
+            IEnumerable<DebtorInvoiceClient> selectedInvoiceUBL;
             var selectedItem = dgInvoicesGrid.SelectedItem as DebtorInvoiceClient;
             string salesHeader = string.Empty;
             if (selectedItem != null)
@@ -269,12 +271,10 @@ namespace UnicontaClient.Pages.CustomPage
                     if (dgInvoicesGrid.SelectedItem == null || dgInvoicesGrid.SelectedItems == null)
                         return;
                     var selectedItems = dgInvoicesGrid.SelectedItems.Cast<DebtorInvoiceClient>();
-
                     if (ActionType == "ShowInvoice")
                         ShowDocument(selectedItems, true);
                     else
                         ShowDocument(selectedItems, false);
-
                     break;
                 case "Trans":
                     if (selectedItem != null)
@@ -330,19 +330,17 @@ namespace UnicontaClient.Pages.CustomPage
                         GenerateOIOXmlForAll(new[] { selectedItem });
                     break;
                 case "GenerateMarkedOioXml":
-                    var selected = dgInvoicesGrid.SelectedItems;
-                    if (selected != null)
-                        GenerateOIOXmlForAll(selected, true);
+                    selectedInvoiceUBL = dgInvoicesGrid.SelectedItems?.Cast<DebtorInvoiceClient>();
+                    if (selectedInvoiceUBL != null)
+                        GenerateOIOXmlForAll(selectedInvoiceUBL, true);
                     break;
                 case "GenerateAllOioXml":
-                    var filteredRows = dgInvoicesGrid.GetVisibleRows();
-                    GenerateOIOXmlForAll(filteredRows);
+                    GenerateOIOXmlForAll(dgInvoicesGrid.GetVisibleRows() as IEnumerable<DebtorInvoiceClient>);
                     break;
                 case "SendUBL":
-                    if (dgInvoicesGrid.SelectedItem == null || dgInvoicesGrid.SelectedItems == null)
-                        return;
-                    var selectedInvoiceUBL = dgInvoicesGrid.SelectedItems.Cast<DebtorInvoiceClient>();
-                    SendUBL(selectedInvoiceUBL);
+                    selectedInvoiceUBL = dgInvoicesGrid.SelectedItems?.Cast<DebtorInvoiceClient>();
+                    if (selectedInvoiceUBL != null)
+                        SendUBL(selectedInvoiceUBL);
                     break;
                 case "SendAsOutlook":
                     if (selectedItem != null)
@@ -385,7 +383,9 @@ namespace UnicontaClient.Pages.CustomPage
 #if !SILVERLIGHT
         StandardPrintReportPage standardViewerPageForDocument;
         bool IsGeneratingDocument;
-
+        DCPreviousAddressClient[] previousAddressLookup;
+        DebtorMessagesClient[] messagesLookup;
+        bool hasLookups;
 #endif
         async private void ShowDocument(IEnumerable<DebtorInvoiceClient> debtorInvoices, bool isInvoice)
         {
@@ -401,9 +401,10 @@ namespace UnicontaClient.Pages.CustomPage
                 string dockName = null, reportName = null;
                 bool exportAsPdf = false;
                 System.Windows.Forms.FolderBrowserDialog folderDialogSaveInvoice = null;
-
+                hasLookups = false;
                 if (count > 1)
                 {
+                    hasLookups = true;
                     if (count > StandardPrintReportPage.MAX_PREVIEW_REPORT_LIMIT)
                     {
                         var confirmMsg = string.Format(Uniconta.ClientTools.Localization.lookup("PreivewRecordsExportMsg"), count);
@@ -421,6 +422,8 @@ namespace UnicontaClient.Pages.CustomPage
                         dockName = string.Concat(Uniconta.ClientTools.Localization.lookup("Preview"), ": ", Uniconta.ClientTools.Localization.lookup("Packnote"));
                         reportName = Uniconta.ClientTools.Localization.lookup("Packnote");
                     }
+
+                    ribbonControl.DisableButtons(new [] { "ShowInvoice", "ShowPackNote" });
                 }
 
 #elif SILVERLIGHT
@@ -437,14 +440,12 @@ namespace UnicontaClient.Pages.CustomPage
                     IPrintReport printReport = isInvoice ? await PrintInvoice(debtInvoice) : await PrintPackNote(debtInvoice);
                     if (printReport?.Report != null)
                     {
+                        var docNumber = isInvoice ? debtInvoice._InvoiceNumber : debtInvoice._PackNote;
                         if (count > 1 && IsGeneratingDocument)
                         {
-                            ribbonControl.DisableButtons(new string[] { "ShowInvoice", "ShowPackNote" });
-
                             if (exportAsPdf)
                             {
                                 string docName = isInvoice ? Uniconta.ClientTools.Localization.lookup("Invoice") : Uniconta.ClientTools.Localization.lookup("Packnote");
-                                var docNumber = isInvoice ? debtInvoice._InvoiceNumber : debtInvoice._PackNote;
                                 string directoryPath = string.Empty;
                                 if (folderDialogSaveInvoice == null)
                                 {
@@ -456,7 +457,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 else
                                     directoryPath = folderDialogSaveInvoice.SelectedPath;
 
-                                Utility.ExportReportAsPdf(printReport.Report, directoryPath, docName, docNumber.ToString());
+                                Utility.ExportReportAsPdf(printReport.Report, directoryPath, docName, NumberConvert.ToString(docNumber));
                             }
                             else
                             {
@@ -468,11 +469,10 @@ namespace UnicontaClient.Pages.CustomPage
                         }
                         else
                         {
-                            var docNumber = isInvoice ? debtInvoice._InvoiceNumber : debtInvoice._PackNote;
                             var docType = isInvoice ? CompanyLayoutType.Invoice : CompanyLayoutType.Packnote;
                             reportName = await Utility.GetLocalizedReportName(api, debtInvoice, docType);
                             dockName = string.Format("{0} {1}", Uniconta.ClientTools.Localization.lookup("Preview"), string.Format("{0}: {1}", isInvoice ? Uniconta.ClientTools.Localization.lookup("Invoice") :
-                                Uniconta.ClientTools.Localization.lookup("Packnote"), docNumber));
+                                Uniconta.ClientTools.Localization.lookup("Packnote"), NumberConvert.ToString(docNumber)));
 
                             AddDockItem(TabControls.StandardPrintReportPage, new object[] { new List<IPrintReport> { printReport }, reportName }, dockName);
                             break;
@@ -483,7 +483,7 @@ namespace UnicontaClient.Pages.CustomPage
                 }
 
                 IsGeneratingDocument = false;
-                ribbonControl.EnableButtons(new string[] { "ShowInvoice", "ShowPackNote" });
+                ribbonControl?.EnableButtons(new [] { "ShowInvoice", "ShowPackNote" });
 
                 if (failedPrints.Count > 0)
                 {
@@ -497,7 +497,7 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                 }
                 else
-                    DefaultPrint(debtorInvoices.Single());
+                    DefaultPrint(debtorInvoices.First());
 #endif
             }
             catch (Exception ex)
@@ -532,6 +532,11 @@ namespace UnicontaClient.Pages.CustomPage
         private async Task<IPrintReport> PrintInvoice(DebtorInvoiceClient debtorInvoice)
         {
             var debtorInvoicePrint = new DebtorInvoicePrintReport(debtorInvoice, api);
+
+            //In case of Multple invoices we create a lookup
+            if (hasLookups)
+                await FillLookUps(debtorInvoicePrint);
+
             var isInitializedSuccess = await debtorInvoicePrint.InstantiateFields();
             if (isInitializedSuccess)
             {
@@ -541,13 +546,20 @@ namespace UnicontaClient.Pages.CustomPage
                 var standardReports = new[] { standardDebtorInvoice };
                 IPrintReport iprintReport = new StandardPrintReport(api, standardReports, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.Invoice);
                 await iprintReport.InitializePrint();
+                if (iprintReport.Report != null)
+                    return iprintReport;
 
-                if (iprintReport.Report == null)
-                {
-                    iprintReport = new LayoutPrintReport(api, debtorInvoice, debtorInvoicePrint.IsCreditNote ? CompanyLayoutType.Creditnote : CompanyLayoutType.Invoice);
-                    await iprintReport.InitializePrint();
-                }
-                return iprintReport;
+                //Call LayoutInvoice
+                var layoutPrint = new LayoutPrintReport(api, debtorInvoice, debtorInvoicePrint.IsCreditNote ?
+                    CompanyLayoutType.Creditnote : CompanyLayoutType.Invoice);
+                layoutPrint.SetupLayoutPrintFields(debtorInvoicePrint);
+
+                //In case of Multple invoices we create lookups
+                if (hasLookups)
+                    FillLookUps(layoutPrint);
+
+                await layoutPrint.InitializePrint();
+                return layoutPrint;
             }
             return null;
         }
@@ -556,6 +568,11 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var packnote = Uniconta.ClientTools.Controls.Reporting.StandardReports.PackNote;
             var debtorInvoicePrint = new DebtorInvoicePrintReport(debtorInvoice, api, CompanyLayoutType.Packnote);
+
+            //In case of Multple invoices we create lookups
+            if (hasLookups)
+                await FillLookUps(debtorInvoicePrint);
+
             var isInitializedSuccess = await debtorInvoicePrint.InstantiateFields();
             if (isInitializedSuccess)
             {
@@ -566,24 +583,51 @@ namespace UnicontaClient.Pages.CustomPage
                 var standardReports = new[] { standardDebtorInvoice };
                 IPrintReport iprintReport = new StandardPrintReport(api, standardReports, (byte)packnote);
                 await iprintReport.InitializePrint();
+                if (iprintReport.Report != null)
+                    return iprintReport;
 
-                if (iprintReport.Report == null)
-                {
-                    iprintReport = new LayoutPrintReport(api, debtorInvoice, CompanyLayoutType.Packnote);
-                    await iprintReport.InitializePrint();
-                }
-                return iprintReport;
+                //Call Layout Invoice
+                var layoutPrint = new LayoutPrintReport(api, debtorInvoice, CompanyLayoutType.Packnote);
+                layoutPrint.SetupLayoutPrintFields(debtorInvoicePrint);
+
+                //In case of Multple invoices we create lookups
+                if (hasLookups)
+                    FillLookUps(layoutPrint);
+
+                await layoutPrint.InitializePrint();
+                return layoutPrint;
             }
             return null;
         }
 
-        private async void GenerateOIOXmlForAll(IList lstInvClient, bool selectedrows = false)
+        async private Task FillLookUps(DebtorInvoicePrintReport debtorInvoicePrint)
         {
+            if (previousAddressLookup == null)
+                previousAddressLookup = await api.Query<DCPreviousAddressClient>();
+
+            debtorInvoicePrint.SetLookUpForPreviousAddressClients(previousAddressLookup);
+
+            if (messagesLookup == null)
+                messagesLookup = await api.Query<DebtorMessagesClient>();
+
+            debtorInvoicePrint.SetLookUpForDebtorMessageClients(messagesLookup);
+        }
+
+        private void FillLookUps(LayoutPrintReport layoutPrint)
+        {
+            layoutPrint.SetLookUpForDebtorMessageClients(messagesLookup);
+            layoutPrint.SetLookUpForPreviousAddressClients(previousAddressLookup);
+        }
+
+        private async void GenerateOIOXmlForAll(IEnumerable<DebtorInvoiceClient> lst, bool selectedrows = false)
+        {
+            IEnumerable<DebtorInvoiceClient> lstInvClient = (lst is Array) ? lst : lst.ToList();
             var api = this.api;
             var Comp = api.CompanyEntity;
 
             var InvCache = api.GetCache(typeof(Uniconta.DataModel.InvItem)) ?? await api.LoadCache(typeof(Uniconta.DataModel.InvItem));
             var VatCache = api.GetCache(typeof(Uniconta.DataModel.GLVat)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLVat));
+            LayoutGroupCache = api.GetCache(typeof(DebtorLayoutGroup)) ?? await api.LoadCache(typeof(DebtorLayoutGroup));
             SQLCache workInstallCache = null;
             SQLCache Contacts = null;
             SystemInfo.Visible = true;
@@ -595,22 +639,17 @@ namespace UnicontaClient.Pages.CustomPage
             SaveFileDialog saveDialog = null;
             System.Windows.Forms.FolderBrowserDialog folderBrowserDialog = null;
             InvoiceAPI Invapi = new InvoiceAPI(api);
-            foreach (var inv in lstInvClient)
+            var cnt = lstInvClient.Count();
+            foreach (var invClient in lstInvClient)
             {
-                var invClient = inv as DebtorInvoiceClient;
-                if (invClient == null)
-                    continue;
-
                 var debtor = (Debtor)Debcache.Get(invClient._DCAccount);
                 if (debtor == null)
                     continue;
 
-                if (!selectedrows && lstInvClient.Count > 1 && (!debtor._InvoiceInXML || invClient.SendTime != DateTime.MinValue))
+                if (!selectedrows && cnt > 1 && (!debtor._InvoiceInXML || invClient._SendTimeOIO != DateTime.MinValue))
                     continue;
 
                 var InvTransInvoiceLines = (DebtorInvoiceLines[])await Invapi.GetInvoiceLines(invClient, new DebtorInvoiceLines());
-
-                LayoutGroupCache = api.GetCache(typeof(DebtorLayoutGroup)) ?? await api.LoadCache(typeof(DebtorLayoutGroup));
 
                 Contact contactPerson = null;
                 if (invClient._ContactRef != 0)
@@ -668,7 +707,7 @@ namespace UnicontaClient.Pages.CustomPage
                     invClient._SystemInfo = string.Empty;
                     foreach (FromXSDFile.OIOUBL.ExportImport.PrecheckError error in result.PrecheckErrors)
                     {
-                        invClient._SystemInfo += error.ToString() + "\n";
+                        invClient._SystemInfo = invClient._SystemInfo + error.ToString() + "\n";
                     }
                 }
 
@@ -681,7 +720,7 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         try
                         {
-                            applFilePath = string.Format("{0}\\OIOUBL", session.User._AppDocPath);
+                            applFilePath = string.Concat(session.User._AppDocPath, "\\OIOUBL");
                             Directory.CreateDirectory(applFilePath);
 
                             filename = string.Format("{0}\\{1}_{2}.xml", applFilePath, invoice, invClient.InvoiceNumber);
@@ -694,10 +733,10 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                     else
                     {
-                        if (saveDialog == null && lstInvClient.Count == 1)
+                        if (saveDialog == null && cnt == 1)
                         {
                             saveDialog = UtilDisplay.LoadSaveFileDialog;
-                            saveDialog.FileName = string.Format("{0}_{1}", invoice, invClient.InvoiceNumber);
+                            saveDialog.FileName = string.Concat(invoice, "_", NumberConvert.ToString(invClient.InvoiceNumber));
                             saveDialog.Filter = "XML-File | *.xml";
                             bool? dialogResult = saveDialog.ShowDialog();
                             if (dialogResult != true)
@@ -711,7 +750,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 break;
                         }
 
-                        if (lstInvClient.Count > 1)
+                        if (cnt > 1)
                         {
                             filename = folderBrowserDialog.SelectedPath;
                             filename = string.Format("{0}\\{1}_{2}.xml", filename, invoice, invClient.InvoiceNumber);

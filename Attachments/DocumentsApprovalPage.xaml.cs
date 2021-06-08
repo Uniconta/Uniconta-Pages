@@ -58,7 +58,7 @@ namespace UnicontaClient.Pages.CustomPage
             SetRibbonControl(localMenu, dgVoucherApproveGrid);
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             docApi = new DocumentAPI(api);
-            if (!api.CompanyEntity.Project)
+            if (api.CompanyEntity != null && !api.CompanyEntity.Project)
             {
                 Project.Visible = Project.ShowInColumnChooser = false;
                 PrCategory.Visible = PrCategory.ShowInColumnChooser = false;

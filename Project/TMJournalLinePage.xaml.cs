@@ -211,6 +211,28 @@ namespace UnicontaClient.Pages.CustomPage
             ribbonControl.lowerSearchGrid = dgTMJournalLineTransRegGrid;
             ribbonControl.UpperSearchNullText = Uniconta.ClientTools.Localization.lookup("Hours");
             ribbonControl.LowerSearchNullText = Uniconta.ClientTools.Localization.lookup("Mileage");
+            dgTMJournalLineGrid.tableView.ShowingEditor += TableView_ShowingEditor;
+            dgTMJournalLineTransRegGrid.tableView.ShowingEditor += TableView_ShowingEditor1;
+        }
+
+        private void TableView_ShowingEditor1(object sender, ShowingEditorEventArgs e)
+        {
+            var selectedItem = dgTMJournalLineTransRegGrid.SelectedItem as TMJournalLineClientLocal;
+            if (selectedItem != null)
+            {
+                if (e.Column.FieldName != "Invoiceable") return;
+                e.Cancel = selectedItem.IsEditable == 0 ? false : true;
+            }
+        }
+
+        private void TableView_ShowingEditor(object sender, ShowingEditorEventArgs e)
+        {
+            var selectedItem = dgTMJournalLineGrid.SelectedItem as TMJournalLineClientLocal;
+            if (selectedItem != null)
+            {
+                if (e.Column.FieldName != "Invoiceable") return;
+                e.Cancel = selectedItem.IsEditable == 0 ? false : true;
+            }
         }
 
         protected override void OnLayoutLoaded()
@@ -502,7 +524,6 @@ namespace UnicontaClient.Pages.CustomPage
 
         TMApprovalSetupClient[] approverLst;
         Uniconta.DataModel.Employee[] employeeLst;
-        Uniconta.DataModel.Employee curUser;
         async void SetButtons()
         {
             if (payrollCache == null)
@@ -510,6 +531,10 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (projGroupCache == null)
                 projGroupCache = api.GetCache<Uniconta.DataModel.ProjectGroup>() ?? await api.LoadCache<Uniconta.DataModel.ProjectGroup>();
+
+            var ribbonControl = this.ribbonControl;
+            if (ribbonControl == null)
+                return;
 
             EnableMileageRegistration();
 
@@ -548,6 +573,8 @@ namespace UnicontaClient.Pages.CustomPage
                 return;
             }
 
+            Uniconta.DataModel.Employee curUser = null;
+
             if (employeeLst == null)
             {
                 employeeLst = await api.Query<Uniconta.DataModel.Employee>(BasePage.session.User);
@@ -556,6 +583,8 @@ namespace UnicontaClient.Pages.CustomPage
                 else
                     ribbonControl.DisableButtons("Approve");
             }
+            else if (employeeLst.Length > 0)
+                curUser = employeeLst[0];
 
             if (curUser != null)
             {
@@ -744,7 +773,7 @@ namespace UnicontaClient.Pages.CustomPage
                         PropValuePair.GenereteWhereElements(nameof(ProjectTransClient.PayrollCategory), typeof(string), catPayDist),
                     };
                     var internalProjTrans = await api.Query<ProjectTransClient>(pairInternalTrans);
-                    internalTransLst = internalProjTrans.ToList();
+                    internalTransLst = internalProjTrans != null ? internalProjTrans.ToList() : new List<ProjectTransClient>();
 
                     if (lstCatMileage != null)
                     {
@@ -772,7 +801,7 @@ namespace UnicontaClient.Pages.CustomPage
                     };
 
                     var lineNotApprovedLst = await api.Query<TMJournalLineClient>(pairJournalTrans);
-                    journalLineNotApprovedLst = lineNotApprovedLst.ToList();
+                    journalLineNotApprovedLst = lineNotApprovedLst != null ? lineNotApprovedLst.ToList() : new List<TMJournalLineClient>();
 
                     if (lstCatMileage != null)
                     {
@@ -1128,7 +1157,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         void SetStatusTextEfficiencyPercentage(double efficiencyPercentage = 0)
         {
-            string format = "N2";
+            const string format = "N2";
             RibbonBase rb = (RibbonBase)localMenu.DataContext;
             var groups = UtilDisplay.GetMenuCommandsByStatus(rb, true);
             var lblEfficiencyPercentage = Uniconta.ClientTools.Localization.lookup("EfficiencyPercentage");
@@ -1373,6 +1402,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         CorasauGridLookupEditorClient prevPayroll, prevMilagePayroll;
+
         private void Hours_Payroll_GotFocus(object sender, RoutedEventArgs e)
         {
             TMJournalLineClientLocal selectedItem = dgTMJournalLineGrid.SelectedItem as TMJournalLineClientLocal;
@@ -1690,13 +1720,15 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "Forward":
                     saveGrid();
-                    txtDateTo.DateTime = JournalLineDate = JournalLineDate.AddDays(7);
+                    if (JournalLineDate != DateTime.MinValue)
+                        txtDateTo.DateTime = JournalLineDate = JournalLineDate.AddDays(7);
                     LoadGridOnWeekChange();
                     SetButtons();
                     break;
                 case "BackWard":
                     saveGrid();
-                    txtDateTo.DateTime = JournalLineDate = JournalLineDate.AddDays(-7);
+                    if (JournalLineDate != DateTime.MinValue)
+                        txtDateTo.DateTime = JournalLineDate = JournalLineDate.AddDays(-7);
                     LoadGridOnWeekChange();
                     SetButtons();
                     break;

@@ -230,7 +230,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 localMenu_OnItemClicked("OpenTran");
             }
-            else if (e.Key == Key.F6)
+            else if (e.Key == Key.F9)
             {
                 localMenu_OnItemClicked("VoidTransaction");
             }
@@ -1474,7 +1474,7 @@ namespace UnicontaClient.Pages.CustomPage
                 bank.Updated = false;
 
                 var _Trans = bank._Trans;
-                if (_Trans != null && _Trans.Count == 1 && _Trans[0].StatementLines.Count > 1)
+                if (_Trans != null && _Trans.Count == 1 && _Trans[0].StatementLines != null && _Trans[0].StatementLines.Count > 1)
                 {
                     if (multiSettleBank == null)
                         multiSettleBank = new List<BankStatementAPI.TransSettle>();

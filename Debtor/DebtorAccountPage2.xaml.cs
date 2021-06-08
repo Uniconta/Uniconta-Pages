@@ -49,7 +49,8 @@ namespace UnicontaClient.Pages.CustomPage
         public override string NameOfControl { get { return TabControls.DebtorAccountPage2.ToString(); } }
         public override Type TableType { get { return typeof(DebtorClient); } }
         public override UnicontaBaseEntity ModifiedRow { get { return editrow; } set { editrow = (DebtorClient)value; } }
-        bool isCopiedRow = false;
+        bool isCopiedRow;
+
         public DebtorAccountPage2(UnicontaBaseEntity sourcedata, bool IsEdit)
             : base(sourcedata, IsEdit)
         {

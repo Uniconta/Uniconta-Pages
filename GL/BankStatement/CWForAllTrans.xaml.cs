@@ -41,7 +41,9 @@ namespace UnicontaClient.Pages.CustomPage
         }
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
-            AppendDoc = cmbPhysicalvoucher.SelectedIndex > 0 ? true : false;
+#if !SILVERLIGHT
+            AppendDoc = (bool)rdbAppend.IsChecked ? true : false;
+#endif
             this.DialogResult = true;
         }
         private void ChildWindow_KeyDown(object sender, KeyEventArgs e)

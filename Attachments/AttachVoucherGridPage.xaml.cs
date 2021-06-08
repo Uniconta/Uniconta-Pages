@@ -20,6 +20,7 @@ using Uniconta.Common;
 using Uniconta.ClientTools.Controls;
 using UnicontaClient.Models;
 using Uniconta.API.Service;
+using DevExpress.Xpf.Docking;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -33,7 +34,8 @@ namespace UnicontaClient.Pages.CustomPage
         private bool addFilter;
         private object[] attachParams;
         object cache;
-
+        static double pageHeight = 650.0d, pageWidth = 850.0d;
+        static Point position = new Point();
         public AttachVoucherGridPage(List<int> attachedVouchers) : base(null)
         {
             InitializeComponent();
@@ -65,9 +67,18 @@ namespace UnicontaClient.Pages.CustomPage
         private void AttachVouchers_BeforeClose()
         {
             attachParams = null;
+            position = GetPosition();
             BeforeClose -= AttachVouchers_BeforeClose;
         }
 
+        private Point GetPosition()
+        {
+            var floatGrp = GetFloatGroup();
+            if (floatGrp == null)
+                return new Point();
+
+            return floatGrp.FloatLocation;
+        }
         public override void PageClosing()
         {
             globalEvents.OnRefresh(NameOfControl, attachParams);
@@ -101,7 +112,7 @@ namespace UnicontaClient.Pages.CustomPage
             dgAttachVouchers.api = api;
             dgAttachVouchers.BusyIndicator = busyIndicator;
             SetRibbonControl(localMenu, dgAttachVouchers);
-            dgAttachVouchers.UpdateMaster( new Uniconta.DataModel.DocumentNoRef() );
+            dgAttachVouchers.UpdateMaster(new Uniconta.DataModel.DocumentNoRef());
         }
 
         private void AttachVoucher()
@@ -129,13 +140,7 @@ namespace UnicontaClient.Pages.CustomPage
                 try
                 {
                     if (selectedVoucherClient._Data == null)
-                    {
-                        var cache = VoucherCache.GetGlobalVoucherCache(selectedVoucherClient);
-                        if (cache != null)
-                            selectedVoucherClient._Data = cache._Data;
-                        else if (await api.Read(selectedVoucherClient) == ErrorCodes.Succes)
-                            VoucherCache.SetGlobalVoucherCache(selectedVoucherClient);
-                    }
+                        await UtilDisplay.GetData(selectedVoucherClient, api);
 
                     if (selectedVoucherClient._Fileextension != FileextensionsTypes.DIR)
                     {
@@ -150,7 +155,7 @@ namespace UnicontaClient.Pages.CustomPage
                     }
 
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     UnicontaMessageBox.Show(ex);
                 }
@@ -167,6 +172,47 @@ namespace UnicontaClient.Pages.CustomPage
                 if (_attachedVoucherList.Contains(rowId))
                     dgAttachVouchers.View.FocusedRowHandle = e.ListSourceRowIndex;
             }
+        }
+
+        protected override void OnLayoutLoaded()
+        {
+            var winSetting = BasePage.session.Preference.GetWindowSetting(TabControls.AttachVoucherGridPage);
+            if (winSetting == null)
+            {
+                var currPanel = dockCtrl?.Activpanel;
+                if (currPanel != null && currPanel.IsFloating)
+                {
+                    SetFloatGroup();
+                    currPanel.Parent.FloatSize = new Size(pageWidth, pageHeight);
+                    currPanel.SizeChanged += CurrPanel_SizeChanged;
+                    currPanel.UpdateLayout();
+                }
+            }
+            base.OnLayoutLoaded();
+        }
+
+        private void SetFloatGroup()
+        {
+            var floatgrp = GetFloatGroup();
+            if (floatgrp != null)
+                floatgrp.FloatLocation = position;
+        }
+
+        private FloatGroup GetFloatGroup()
+        {
+            var curPanel = dockCtrl?.Activpanel;
+
+            if (curPanel != null && curPanel.IsFloating && curPanel.Parent is FloatGroup)
+                return curPanel.Parent as FloatGroup;
+
+            return null;
+        }
+
+        private void CurrPanel_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            var size = e.NewSize;
+            pageHeight = size.Height;
+            pageWidth = size.Width;
         }
     }
 }

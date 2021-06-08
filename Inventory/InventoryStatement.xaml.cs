@@ -31,30 +31,59 @@ using DevExpress.Data.Filtering;
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
+    public class InventoryStatementGrid : CorasauDataGridClient
+    {
+        public delegate void PrintClickDelegate();
+
+        public override Type TableType { get { return typeof(InvTransClientTotal); } }
+
+        public bool PageBreak { get; internal set; }
+
+        public InventoryStatementGrid(IDataControlOriginationElement dataControlOriginationElement) : base(dataControlOriginationElement) { }
+        public InventoryStatementGrid()
+        {
+            CustomTableView tv = new CustomTableView();
+            tv.AllowEditing = false;
+            tv.ShowGroupPanel = false;
+            SetTableViewStyle(tv);
+            tv.ShowTotalSummary = true;
+            tv.ShowGroupFooters = true;
+            this.View = tv;
+        }
+        public override void PrintGrid(string reportName, object printparam, string format = null, BasePage page = null, bool showDialogInPrint = true)
+        {
+#if !SILVERLIGHT
+            ((CustomTableView)View).HasPageBreak = PageBreak;
+#endif
+            base.PrintGrid(reportName, printparam, format, page, false);
+        }
+    }
+
     public class InvItemStatementList
     {
+        internal InvItem itm;
         [Display(Name = "Item", ResourceType = typeof(InventoryText))]
-        public string ItemNumber { get; set; }
+        public string ItemNumber { get { return itm._Item; } }
         [Display(Name = "Name", ResourceType = typeof(InventoryText))]
-        public string Name { get; set; }
+        public string Name { get { return itm._Name; } }
         [Display(Name = "ItemType", ResourceType = typeof(InventoryText))]
-        public string ItemType { get; set; }
-        public List<InvTransClientTotal> ChildRecord { get; set; }
+        public string ItemType { get { return AppEnums.ItemType.ToString(itm._ItemType); } }
+        public InvTransClientTotal[] ChildRecord { get; set; }
 
-        public double SumCost { get { return _SumCost; } }
-        public double SumQty { get { return _SumQty; } }
+        public long _SumCost;
+        public double SumCost { get { return _SumCost / 100d; } }
 
-        public double _SumCost;
         public double _SumQty;
+        public double SumQty { get { return _SumQty; } }
     }
 
     public class InvTransClientTotal : InvTransClient
     {
-        public double _SumCost;
+        public long _SumCost;
         public double _SumQty;
 
         [Display(Name = "SumCost", ResourceType = typeof(InvTransText))]
-        public double SumCost { get { return _SumCost; } }
+        public double SumCost { get { return _SumCost / 100d; } }
 
         [Display(Name = "SumQty", ResourceType = typeof(InvTransText))]
         public double SumQty { get { return _SumQty; } }
@@ -71,7 +100,6 @@ namespace UnicontaClient.Pages.CustomPage
         SQLCache ItemCache;
         ItemBase ibase;
         public override string NameOfControl { get { return TabControls.InventoryStatement; } }
-        List<InvItemStatementList> statementlist;
 
         static DateTime DefaultFromDate, DefaultToDate;
 
@@ -94,7 +122,6 @@ namespace UnicontaClient.Pages.CustomPage
             cmbFromAccount.api = cmbToAccount.api = api;
             SetRibbonControl(localMenu, dgInvTran);
             localMenu.OnItemClicked += localMenu_OnItemClicked;
-            statementlist = new List<InvItemStatementList>();
             if (InventoryStatement.DefaultFromDate == DateTime.MinValue)
             {
                 var Now = BasePage.GetSystemDefaultDate();
@@ -183,6 +210,9 @@ namespace UnicontaClient.Pages.CustomPage
             else
                 Warehouse.ShowInColumnChooser = true;
             UnicontaClient.Utilities.Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
+#if!SILVERLIGHT
+            Utilities.Utility.SetupVariants(api, colVariant, VariantName, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
+#endif
         }
 
         public override void AssignMultipleGrid(List<Uniconta.ClientTools.Controls.CorasauDataGrid> gridCtrls)
@@ -195,10 +225,24 @@ namespace UnicontaClient.Pages.CustomPage
         private async void LoadInvTran()
         {
             setExpandAndCollapse(true);
-            statementlist.Clear();
 
             InventoryStatement.setDateTime(txtDateFrm, txtDateTo);
             DateTime FromDate = InventoryStatement.DefaultFromDate, ToDate = InventoryStatement.DefaultToDate;
+
+            var fromItem = Convert.ToString(cmbFromAccount.EditValue);
+            var toItem = Convert.ToString(cmbToAccount.EditValue);
+
+            busyIndicator.IsBusy = true;
+            var listtran = (InvTransClientTotal[])await (new ReportAPI(api)).GetInvTrans(new InvTransClientTotal(), FromDate, ToDate, fromItem, toItem);
+            if (listtran != null)
+                FillStatement(listtran);
+
+            dgInvTran.Visibility = Visibility.Visible;
+            busyIndicator.IsBusy = false;
+        }
+
+        void FillStatement(InvTransClientTotal[] listtran)
+        {
             var isAscending = cbxAscending.IsChecked.Value;
             var skipBlank = cbxSkipBlank.IsChecked.Value;
 
@@ -206,58 +250,67 @@ namespace UnicontaClient.Pages.CustomPage
             Pref.Inventory_isAscending = isAscending;
             Pref.Inventory_skipBlank = skipBlank;
 
-            var fromItem = Convert.ToString(cmbFromAccount.EditValue);
-            var toItem = Convert.ToString(cmbToAccount.EditValue);
+            var statementList = new List<InvItemStatementList>(Math.Min(20, dataRowCount));
 
-            busyIndicator.IsBusy = true;
-            var tranApi = new ReportAPI(api);
-            var listtran = (InvTransClientTotal[])await tranApi.GetInvTrans(new InvTransClientTotal(), FromDate, ToDate, fromItem, toItem);
-            if (listtran != null)
+            string curItem = " ";
+            InvItemStatementList ob = null;
+            var tlst = new List<InvTransClientTotal>(100);
+            long SumCost = 0;
+            double SumQty = 0;
+
+            for (int n = 0; (n < listtran.Length); n++)
             {
-                string curItem = " ";
-                InvItemStatementList ob = null;
-                List<InvTransClientTotal> tlst = null;
-                double SumCost = 0d, SumQty = 0d;
-
-                foreach (var t in listtran)
+                var t = listtran[n];
+                if (t._Item != curItem)
                 {
-                    if (t._Item != curItem)
+                    var ac = (InvItem)ItemCache.Get(t._Item);
+                    if (ac == null)
+                        continue;
+
+                    if (ob != null)
                     {
-                        var ac = (InvItem)ItemCache.Get(t._Item);
-                        if (ac == null)
-                            continue;
-                        ob = new InvItemStatementList();
-                        curItem = ac._Item;
-                        ob.ItemNumber = ac._Item;
-                        ob.Name = ac._Name;
-                        ob.ItemType = AppEnums.ItemType.ToString(ac._ItemType);
-                        tlst = new List<InvTransClientTotal>();
-                        ob.ChildRecord = tlst;
-                        statementlist.Add(ob);
-                        SumCost = SumQty = 0d;
+                        if (!skipBlank || SumCost != 0 || SumQty != 0 || tlst.Count > 1)
+                        {
+                            ob._SumQty = Math.Round(SumQty, ob.itm._Decimals);
+                            ob._SumCost = SumCost;
+                            ob.ChildRecord = tlst.ToArray();
+                            if (!isAscending)
+                                Array.Reverse(ob.ChildRecord);
+                        }
                     }
-                    t._Item = curItem;
-                    SumCost += t._CostValue;
-                    t._SumCost = SumCost;
-                    ob._SumCost = SumCost;
+                    tlst.Clear();
 
-                    SumQty += t._Qty;
-                    t._SumQty = SumQty;
-                    ob._SumQty = SumQty;
-
-                    if (isAscending)
-                        tlst.Add(t);
-                    else
-                        tlst.Insert(0, t);
+                    curItem = ac._Item;
+                    ob = new InvItemStatementList() { itm = ac };
+                    statementList.Add(ob);
+                    SumCost = 0;
+                    SumQty = 0d;
                 }
+                t._Item = curItem;
+                SumCost += t._CostValueCent;
+                t._SumCost = SumCost;
+
+                SumQty += t._Qty;
+                t._SumQty = SumQty;
+
+                tlst.Add(t);
             }
-            if (statementlist.Count > 0)
+
+            if (ob != null)
+            {
+                ob._SumQty = Math.Round(SumQty, ob.itm._Decimals);
+                ob._SumCost = SumCost;
+                ob.ChildRecord = tlst.ToArray();
+                if (!isAscending)
+                    Array.Reverse(ob.ChildRecord);
+            }
+
+            dataRowCount = statementList.Count;
+            if (dataRowCount > 0)
             {
                 dgInvTran.ItemsSource = null;
-                dgInvTran.ItemsSource = statementlist;
+                dgInvTran.ItemsSource = statementList;
             }
-            dgInvTran.Visibility = Visibility.Visible;
-            busyIndicator.IsBusy = false;
         }
 
         protected async override void LoadCacheInBackGround()
@@ -316,9 +369,16 @@ namespace UnicontaClient.Pages.CustomPage
             RibbonBase rb = (RibbonBase)localMenu.DataContext;
             ibase = UtilDisplay.GetMenuCommandByName(rb, "ExpandAndCollapse");
         }
+
+        int dataRowCount;
+
+        private void cmbFromAccount_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
+        {
+            cmbToAccount.SelectedItem = cmbFromAccount.SelectedItem;
+        }
+
         void ExpandAndCollapseAll(bool ISCollapseAll)
         {
-            int dataRowCount = statementlist.Count;
             for (int rowHandle = 0; rowHandle < dataRowCount; rowHandle++)
                 if (!ISCollapseAll)
                     dgInvTran.ExpandMasterRow(rowHandle);

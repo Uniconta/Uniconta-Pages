@@ -282,7 +282,7 @@ namespace ISO20022CreditTransfer
                     if (! string.IsNullOrEmpty(paymentId))
                     {
                         paymentId = Regex.Replace(paymentId, "[^\\w\\d]", "");
-                        countryId = paymentId.Substring(0, 2).ToUpper();
+                        countryId = paymentId.Length < 2 ? string.Empty : paymentId.Substring(0, 2).ToUpper();
                     }
                 }
 

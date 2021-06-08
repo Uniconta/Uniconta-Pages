@@ -5,6 +5,14 @@ x:Class="UnicontaClient.Pages.CustomPage.AccountPostingBalancePage"
              xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"  
              xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage">
     <Grid>
-        <local:AccountPostingBalanceGridClient x:Name="dgAccountPostingGrid" AutoGenerateColumns="AddNew" EnableSmartColumnsGeneration="True" />
+        <local:AccountPostingBalanceGridClient x:Name="dgAccountPostingGrid" AutoGenerateColumns="None" >
+            <local:AccountPostingBalanceGridClient.Columns>
+                <local:CorasauDataGridTemplateColumnClient x:Name="Account"/>
+                <local:CorasauDataGridTemplateColumnClient x:Name="AccountName"/>
+                <local:CorasauDataGridTemplateColumnClient x:Name="BalanceBefore"/>
+                <local:CorasauDataGridTemplateColumnClient x:Name="PostingAmount"/>
+                <local:CorasauDataGridTemplateColumnClient x:Name="BalanceNow"/>
+            </local:AccountPostingBalanceGridClient.Columns>
+        </local:AccountPostingBalanceGridClient>
     </Grid>
 </Pages:GridBasePage>

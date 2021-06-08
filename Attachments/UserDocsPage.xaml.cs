@@ -58,13 +58,17 @@ namespace UnicontaClient.Pages.CustomPage
                     if (doc._Data != null)
                     {
 #if !SILVERLIGHT
-                        if (doc._DocumentType == FileextensionsTypes.JPEG)
+                        if (doc._DocumentType == FileextensionsTypes.JPEG || 
+                            doc._DocumentType == FileextensionsTypes.BMP ||
+                            doc._DocumentType == FileextensionsTypes.GIF ||
+                            doc._DocumentType == FileextensionsTypes.TIFF)
                         {
                             var imageBytes = FileBrowseControl.ImageResize(doc._Data, ".jpg");
                             if (imageBytes != null)
                             {
                                 doc._Data = imageBytes;
-                                doc._NoCompression = true;
+                                doc._NoCompression = (doc._DocumentType == FileextensionsTypes.JPEG);
+                                doc._DocumentType = FileextensionsTypes.JPEG;
                             }
                         }
 #endif

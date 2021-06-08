@@ -404,14 +404,19 @@ namespace UnicontaClient.Pages.CustomPage
                                 return;
                             }
                         }
+                        var _priceLookup = this.PriceLookup;
+                        this.PriceLookup = null; // avoid that we call priceupdated in property change on Qty
                         var Comp = api.CompanyEntity;
                         if (selectedItem._PurchaseQty != 0d)
                             rec.Qty = selectedItem._PurchaseQty;
                         else if (Comp._PurchaseLineOne)
                             rec.Qty = 1d;
                         rec.SetItemValues(selectedItem, Comp._PurchaseLineStorage);
-                        if (this.PriceLookup != null)
-                            this.PriceLookup.SetPriceFromItem(rec, selectedItem);
+                        if (_priceLookup != null)
+                        {
+                            this.PriceLookup = _priceLookup;
+                            _priceLookup.SetPriceFromItem(rec, selectedItem);
+                        }
                         else if (selectedItem._PurchasePrice != 0 && Comp.SameCurrency(selectedItem._PurchaseCurrency, (byte)this.Order._Currency))
                             rec.Price = selectedItem._PurchasePrice;
                         else
@@ -652,9 +657,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (lines == null || lines.Count() == 0)
                 return;
             var dc = dbOrder.Creditor;
-            if (dc == null)
-                return;
-            if (!Utility.IsExecuteWithBlockedAccount(dc))
+            if (dc == null || !Utility.IsExecuteWithBlockedAccount(dc))
                 return;
             if (!api.CompanyEntity.SameCurrency(dbOrder._Currency, dc._Currency))
             {

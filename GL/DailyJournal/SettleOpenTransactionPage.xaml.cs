@@ -108,7 +108,7 @@ namespace UnicontaClient.Pages.CustomPage
                 var curpanel = dockCtrl?.Activpanel;
                 if (curpanel != null && curpanel.IsFloating)
                     curpanel.MinWidth = 1400;
-                curpanel.UpdateLayout();
+                curpanel?.UpdateLayout();
             }
             base.OnLayoutLoaded();
         }

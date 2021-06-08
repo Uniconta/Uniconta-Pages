@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.Common;
+using Uniconta.Common.Utility;
 using Uniconta.DataModel;
 using UnicontaClient.Pages.Creditor.Payments;
 
@@ -419,12 +420,29 @@ namespace UnicontaISO20022CreditTransfer
         public override PostalAddress CreditorAddress(Uniconta.DataModel.Creditor creditor, PostalAddress creditorAddress, bool unstructured = false)
         {
             if (paymentType != ISO20022PaymentTypes.DOMESTIC && (companyBankEnum == CompanyBankENUM.Nordea_DK || companyBankEnum == CompanyBankENUM.Nordea_NO))
+            {
+                int maxLines = 3;
+                int maxStrLen = 34;
+
+                string adrText = string.Concat(creditor._Address1, " ", creditor._Address2, " ", creditor._Address3, " ", creditor._ZipCode, " ", creditor._City);
+
+                if (adrText.Length > maxLines * maxStrLen)
+                    adrText = adrText.Substring(0, maxLines * maxStrLen);
+
+                var resultList = adrText.Select((x, i) => i)
+                            .Where(i => i % maxStrLen == 0)
+                            .Select(i => adrText.Substring(i, adrText.Length - i >= maxStrLen ? maxStrLen : adrText.Length - i)).ToArray();
+
+                var len = resultList.Length;
+                creditor._Address1 = len > 0 ? resultList[0].Trim() : null;
+                creditor._Address2 = len > 1 ? resultList[1].Trim() : null;
+                creditor._Address3 = len > 2 ? resultList[2].Trim() : null;
+
                 unstructured = true;
+            }
 
             return base.CreditorAddress(creditor, creditorAddress, unstructured);
         }
-
-
 
         /// <summary>
         /// Unstructured Remittance Information
