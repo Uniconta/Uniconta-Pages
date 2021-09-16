@@ -89,6 +89,7 @@ namespace UnicontaClient.Pages.CustomPage
             int RowId = VoucherCache.GetDocumentRowId(corasauMaster);
             if (RowId == 0)
             {
+                voucherClient = null;
                 NoVoucherLoadMessage();
                 return;
             }

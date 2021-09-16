@@ -31,20 +31,18 @@ namespace UnicontaClient.Pages.CustomPage
         public DateTime FromDateTime { get { return _FromDateTime; } set { _FromDateTime = value; } }
         public DateTime ToDateTime { get { return _ToDateTime; } set { _ToDateTime = value; } }
 
-        public CWCalculateCommission(CrudAPI api)
+        public CWCalculateCommission(CrudAPI api) : this(api, _FromDateTime, _ToDateTime) { }
+        public CWCalculateCommission(CrudAPI api, DateTime _FromTime, DateTime _ToTime)
         {
-            if (_ToDateTime == DateTime.MinValue)
-                _ToDateTime = BasePage.GetSystemDefaultDate();
-            if (_FromDateTime == DateTime.MinValue)
-                _FromDateTime = new DateTime(_ToDateTime.Year, _ToDateTime.Month, 01);
-
+            if (_ToTime == DateTime.MinValue)
+                _ToTime = BasePage.GetSystemDefaultDate();
+            if (_FromTime == DateTime.MinValue)
+                _FromTime = new DateTime(_ToTime.Year, _ToTime.Month, 01);
+            _FromDateTime = _FromTime;
+            _ToDateTime = _ToTime;
             this.DataContext = this;
             InitializeComponent();
             this.Title = Uniconta.ClientTools.Localization.lookup("CalculateCommission");
-
-#if SILVERLIGHT
-            Utility.SetThemeBehaviorOnChildWindow(this);
-#endif
             this.Loaded += CW_Loaded;
         }
 

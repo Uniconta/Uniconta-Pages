@@ -5,16 +5,10 @@ x:Class="UnicontaClient.Pages.CustomPage.FinanceYearPage2"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
     xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"     
-                     xmlns:toolkit="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Toolkit"
     mc:Ignorable="d"
     d:DesignHeight="300" d:DesignWidth="400">
-    <UserControl.Resources>
-           
-    </UserControl.Resources>
-    <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="0" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BusyMessage}">
-        <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+       <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
@@ -62,5 +56,4 @@ x:Class="UnicontaClient.Pages.CustomPage.FinanceYearPage2"
                 </CorasauControls:CorasauLayoutGroup>
             </CorasauControls:CorasauLayoutControl>
         </Grid>
-    </CorasauControls:BusyIndicator>
 </Pages:FormBasePage>

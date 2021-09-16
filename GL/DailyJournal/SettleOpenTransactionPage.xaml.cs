@@ -22,6 +22,7 @@ using UnicontaClient.Utilities;
 using Uniconta.Common.Utility;
 using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.Util;
+using Uniconta.API.Service;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -50,7 +51,7 @@ namespace UnicontaClient.Pages.CustomPage
         int OpenTransactionType;
         private string settlement;
         private double RemainingAmt, RemainingAmtCur;
-        string settleCur;
+        byte settleCur;
         GLDailyJournalLineClient SelectedJournalLine;
         BankStatementLineClient SelectedBankStatemenLine;
         bool OffSet, RoundTo100;
@@ -394,7 +395,7 @@ namespace UnicontaClient.Pages.CustomPage
                     refreshParams[1] = settlement;
                     refreshParams[2] = RemainingAmt;
                     refreshParams[3] = RemainingAmtCur;
-                    refreshParams[4] = settleCur;
+                    refreshParams[4] = settleCur != 0 ? Enum.GetName(typeof(Currencies), IdObject.get(settleCur)) : null;
                     refreshParams[5] = OffSet;
                 }
                 else if (SelectedBankStatemenLine != null)
@@ -411,7 +412,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (selectedVouchers.Count == 0 && selectedInvoices.Count == 0 && selectedRowIds.Count == 0)
             {
-                settleCur = null;
+                settleCur = 0;
                 RemainingAmt = 0;
                 RemainingAmtCur = 0;
                 return true;
@@ -419,7 +420,7 @@ namespace UnicontaClient.Pages.CustomPage
             return false;
         }
 
-        void Check(int voucher, string invoice, int rowId, double amtOpen, Currencies? currency, double? amtOpenCur)
+        void Check(int voucher, string invoice, int rowId, double amtOpen, byte currency, double amtOpenCur)
         {
             bool isFirst = ResetFields();
 
@@ -445,25 +446,23 @@ namespace UnicontaClient.Pages.CustomPage
 
             RemainingAmt += amtOpen;
 
-            if (isFirst && currency != null)
-                settleCur = currency.ToString();
+            if (isFirst && currency != 0)
+                settleCur = currency;
 
-            if (settleCur != null)
+            if (settleCur != 0)
             {
-                if (settleCur == currency.ToString())
-                {
-                    RemainingAmtCur += Convert.ToDouble(amtOpenCur);
-                }
+                if (settleCur == currency)
+                    RemainingAmtCur += amtOpenCur;
                 else
                 {
                     RemainingAmtCur = 0d;
-                    settleCur = null;
+                    settleCur = 0;
                 }
             }
             SetStatusText(RemainingAmt, RemainingAmtCur);
         }
 
-        void UnCheck(int voucher, string invoice, int rowId, double amtOpen, Currencies? currency, double? amtOpenCur)
+        void UnCheck(int voucher, string invoice, int rowId, double amtOpen, byte currency, double amtOpenCur)
         {
             bool isFirst = ResetFields();
 
@@ -472,8 +471,8 @@ namespace UnicontaClient.Pages.CustomPage
             selectedRowIds.Remove(rowId);
             RemainingAmt -= amtOpen;
 
-            if (settleCur != null)
-                RemainingAmtCur -= Convert.ToDouble(amtOpenCur);
+            if (settleCur != 0)
+                RemainingAmtCur -= amtOpenCur;
 
             SetStatusText(RemainingAmt, RemainingAmtCur);
         }
@@ -531,22 +530,30 @@ namespace UnicontaClient.Pages.CustomPage
                     return;
             }
             var row = selectedItem as DCTransOpenClient;
-            var amountOpen = row.AmountOpen;
+            var amountOpen = row._AmountOpen;
+            var amountOpenCur = row._AmountOpenCur;
             if (row._CashDiscount != 0)
             {
                 DateTime dt = (SelectedJournalLine != null) ? SelectedJournalLine._Date : (SelectedBankStatemenLine != null ? SelectedBankStatemenLine._Date : DateTime.MinValue);
                 if (dt <= row._CashDiscountDate)
                 {
-                    if (amountOpen > 0)
-                        amountOpen -= Math.Abs(row._CashDiscount);
+                    if (amountOpenCur == 0)
+                    {
+                        if (amountOpen > 0)
+                            amountOpen -= Math.Abs(row._CashDiscount);
+                        else
+                            amountOpen += Math.Abs(row._CashDiscount);
+                    }
+                    else if (amountOpenCur > 0)
+                        amountOpenCur -= Math.Abs(row._CashDiscount);
                     else
-                        amountOpen += Math.Abs(row._CashDiscount);
+                        amountOpenCur += Math.Abs(row._CashDiscount);
                 }
             }
             if (isChecked)
-                Check(row.Voucher, row.InvoiceAN, row.PrimaryKeyId, amountOpen, row.Currency, row.AmountOpenCur);
+                Check(row.Voucher, row.InvoiceAN, row.PrimaryKeyId, amountOpen, row.Trans._Currency, amountOpenCur);
             else
-                UnCheck(row.Voucher, row.InvoiceAN, row.PrimaryKeyId, amountOpen, row.Currency, row.AmountOpenCur);
+                UnCheck(row.Voucher, row.InvoiceAN, row.PrimaryKeyId, amountOpen, row.Trans._Currency, amountOpenCur);
         }
 
         public override bool IsDataChaged { get { return false; } }

@@ -45,7 +45,6 @@ namespace UnicontaClient.Pages.CustomPage
         }
         void InitPage(CrudAPI crudapi)
         {
-            BusyIndicator = busyIndicator;
             layoutControl = layoutItems;
             cmbDim1.api = cmbDim2.api = cmbDim3.api = cmbDim4.api = cmbDim5.api =leCostGroup.api= crudapi;
             Utility.SetDimensions(crudapi, lbldim1, lbldim2, lbldim3, lbldim4, lbldim5, cmbDim1, cmbDim2, cmbDim3, cmbDim4, cmbDim5, usedim);

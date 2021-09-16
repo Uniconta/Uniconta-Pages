@@ -30,6 +30,7 @@
       <RibbonItem Action="PickList" LocalizedNameKey="PickingList" Glyph="AccountInvoice_16x16.png" ShortcutKey="Ctrl+H"/>
       <RibbonItem Action="PackNote" LocalizedNameKey="Packnote" Glyph="Note_16x16.png" ShortcutKey="Ctrl+K" />
       <RibbonItem Action="CreateInvoice" LocalizedNameKey="Invoice" Glyph="Invoice_16x16.png" ShortcutKey="Ctrl+M"/>
+	  <RibbonItem Action="PostProjectOrder" LocalizedNameKey="PostProjectOrder" Module="Project" Glyph="Accounts_Statement_Report_16x16.png" ShortcutKey="Ctrl+P"/>
     </RibbonItem>
   </RibbonItem>
   <RibbonItem>

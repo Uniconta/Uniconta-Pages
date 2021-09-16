@@ -36,7 +36,7 @@ namespace UnicontaClient.Pages.CustomPage
             : base(sourceData, true)
         {
             InitializeComponent();
-            cmbDebtorVoucherSerie.api = cmbTMJournalVoucherSerie.api= leZeroInvoiceItem.api= api;
+            cmbProjectOrderVoucherSerie.api = cmbTMJournalVoucherSerie.api= leZeroInvoiceItem.api= api;
             layoutControl = layoutItems;
 
             layoutItems.DataContext = editrow;
@@ -62,16 +62,6 @@ namespace UnicontaClient.Pages.CustomPage
                     frmRibbon_BaseActions(ActionType);
                     break;
             }
-        }
-
-        private void CheckEditor_Checked(object sender, System.Windows.RoutedEventArgs e)
-        {
-            cmbSalesInvoice.IsEnabled = false;
-        }
-
-        private void CheckEditor_Unchecked(object sender, System.Windows.RoutedEventArgs e)
-        {
-            cmbSalesInvoice.IsEnabled = true;
         }
     }
 }

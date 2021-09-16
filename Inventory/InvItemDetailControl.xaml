@@ -37,6 +37,9 @@ x:Class="UnicontaClient.Pages.CustomPage.InvItemDetailControl"
                     <CorasauControls:CorasauLayoutItem FieldName="URL" x:Name="liURL" Style="{StaticResource LayoutItemsstyle}" ButtonContent="&#x1f441;" ButtonClicked="liURL_ButtonClicked">
                         <CorasauControls:IntegerEditor Text="{Binding URL}" IsReadOnly="True" />
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="InvoiceAttachment" x:Name="liInvoiceAttachment" Style="{StaticResource LayoutItemsstyle}" ButtonContent="&#x1f441;" ButtonClicked="liInvoiceAttachment_ButtonClicked">
+                        <CorasauControls:IntegerEditor Text="{Binding InvoiceAttachment}" IsReadOnly="True" />
+                    </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
 
                 <CorasauControls:CorasauLayoutGroup View="GroupBox" Width="400" x:Name="grpPrices" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Prices}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">

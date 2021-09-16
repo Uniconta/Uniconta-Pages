@@ -59,6 +59,7 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryTransactionsMarkedPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="Location" Width="70"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Project" Width="100"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="ProjectName" Width="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PrCategory"  Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="cldim1" Width="70" FieldName="Dimension1" Visible="false" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="cldim2" Width="70" FieldName="Dimension2" Visible="false" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="cldim3" Width="70" FieldName="Dimension3" Visible="false"/>

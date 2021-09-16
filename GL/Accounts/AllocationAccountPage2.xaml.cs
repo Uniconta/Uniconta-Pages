@@ -51,7 +51,6 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if(LoadedRow== null)
                 frmRibbon.DisableButtons(new string[] { "Delete" });
-            BusyIndicator = busyIndicator;
             leOffsetAccount.api =
             leTransType.api = leAlloc.api = leAllocdim1.api = leAllocdim2.api = leAllocdim3.api = leAllocdim4.api
             = leAllocdim5.api = leFrmdim1.api = leFrmdim2.api = leFrmdim3.api = leFrmdim4.api = leFrmdim5.api = crudapi;

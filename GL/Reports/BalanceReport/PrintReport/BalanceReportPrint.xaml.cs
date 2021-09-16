@@ -193,7 +193,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (_landscape)
                 link.Landscape = true;
-            
+
             link.Margins.Right = 5;
             link.Margins.Left = 5;
             link.Margins.Top = 10;
@@ -296,7 +296,7 @@ namespace UnicontaClient.Pages.CustomPage
         public string Col12AmountHeader { get; set; }
         public string Col13AmountHeader { get; set; }
 
-        public int TextSize { get; set; }
+        // public int TextSize { get; set; }
         public int AmountSize { get; set; }
         public Visibility Col1Width { get { return string.IsNullOrEmpty(ColName1) == true ? Visibility.Collapsed : Visibility.Visible; } }
         public Visibility Col2Width { get { return string.IsNullOrEmpty(ColName2) == true ? Visibility.Collapsed : Visibility.Visible; } }

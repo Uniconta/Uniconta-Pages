@@ -88,11 +88,13 @@ x:Class="UnicontaClient.Pages.CustomPage.Employee"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ShowCost" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="TMCloseDate" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="TMApproveDate" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="VechicleRegNo" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ApproveOnEmail" ShowCheckBoxInHeader="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Approver" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ApproverName" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Approver2" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Approver2Name" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Warehouse" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim1" Width="70" FieldName="Dimension1" ShowInColumnChooser="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim2" Width="70" FieldName="Dimension2" ShowInColumnChooser="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim3" Width="70" FieldName="Dimension3" ShowInColumnChooser="False"/>

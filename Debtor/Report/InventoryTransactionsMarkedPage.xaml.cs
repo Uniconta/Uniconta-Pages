@@ -63,6 +63,8 @@ namespace UnicontaClient.Pages.CustomPage
                 costRefTrans = debtorOrderLine.CostRefTrans;
                 if (DCType == 2)
                     dcaccount = ((CreditorOrderLineClient)debtorOrderLine).Order?._DCAccount;
+                else if (DCType == 4)
+                    dcaccount = ((ProductionOrderLineClient)debtorOrderLine).Production?._DCAccount;
                 else
                     dcaccount = ((DebtorOrderLineClient)debtorOrderLine).Order?._DCAccount;
             }
@@ -133,7 +135,6 @@ namespace UnicontaClient.Pages.CustomPage
             if (dctype == 2 || qty < 0) // creditnota
             {
                 pair.Add(PropValuePair.GenereteWhereElements("MovementType", Convert.ToString(dctype), CompareOperator.Equal));
-                string dc;
                 if (dcaccount != null)
                     pair.Add(PropValuePair.GenereteWhereElements("DCAccount", dcaccount, CompareOperator.Equal));
             }
@@ -165,6 +166,8 @@ namespace UnicontaClient.Pages.CustomPage
                 Warehouse.Visible = Warehouse.ShowInColumnChooser = false;
             else
                 Warehouse.ShowInColumnChooser = true;
+            if (!company.Project)
+                PrCategory.Visible = PrCategory.ShowInColumnChooser = false;
             Utility.SetupVariants(api, null, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
             Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
         }

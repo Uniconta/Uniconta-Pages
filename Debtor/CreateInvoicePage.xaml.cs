@@ -70,6 +70,8 @@ namespace UnicontaClient.Pages.CustomPage
         double exchangeRate;
         bool linesFromProjectInvoice;
         ProjectClient ProjectMaster;
+        public string userWarehouse;
+
         private void InitPage(UnicontaBaseEntity master, DebtorOrderLineClient[] orderLines = null)
         {
             InitializeComponent();
@@ -188,9 +190,14 @@ namespace UnicontaClient.Pages.CustomPage
             if (!company.DeliveryAddress)
                 delAddNavBar.IsVisible = false;
             if (!company.Project)
+            {
                 tbProject.Visibility = tbPrCategory.Visibility = Projectlookupeditor.Visibility = PrCategorylookupeditor.Visibility = Visibility.Collapsed;
+                WorkSpace.ShowInColumnChooser = WorkSpace.Visible = false;
+            }
             if (company.NumberOfDimensions == 0)
                 barGrpDimension.IsVisible = false;
+            if (!company.InvPrice)
+                tbPriceList.Visibility = lePriceList.Visibility = Visibility.Collapsed;
 
             Utility.SetupVariants(api, colVariant, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
             Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
@@ -388,6 +395,8 @@ namespace UnicontaClient.Pages.CustomPage
                         }
                         setVariant(rec, false);
                         TableField.SetUserFieldsFromRecord(selectedItem, rec);
+                        if (rec._Warehouse == null)
+                            rec.Warehouse = this.userWarehouse;
                         if (selectedItem._Blocked)
                             UtilDisplay.ShowErrorCode(ErrorCodes.ItemIsOnHold, null);
                     }
@@ -401,10 +410,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "Warehouse":
                     if (warehouse != null)
-                    {
-                        var selected = (InvWarehouse)warehouse.Get(rec._Warehouse);
-                        setLocation(selected, (DebtorOrderLineClient)rec);
-                    }
+                        setLocation((InvWarehouse)warehouse.Get(rec._Warehouse), (DebtorOrderLineClient)rec);
                     break;
                 case "Location":
                     if (string.IsNullOrEmpty(rec._Warehouse))
@@ -788,7 +794,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                     var invoicePostingResult = SetupInvoicePostingPrintGenerator(dbOrder, lines, GenrateInvoiceDialog.GenrateDate, isSimulated, GenrateInvoiceDialog.ShowInvoice,
                         GenrateInvoiceDialog.PostOnlyDelivered, GenrateInvoiceDialog.InvoiceQuickPrint, GenrateInvoiceDialog.NumberOfPages, GenrateInvoiceDialog.SendByEmail,
-                        !isSimulated && GenrateInvoiceDialog.SendByOutlook, GenrateInvoiceDialog.sendOnlyToThisEmail, GenrateInvoiceDialog.Emails, GenrateInvoiceDialog.GenerateOIOUBLClicked,
+                        GenrateInvoiceDialog.SendByOutlook, GenrateInvoiceDialog.sendOnlyToThisEmail, GenrateInvoiceDialog.Emails, GenrateInvoiceDialog.GenerateOIOUBLClicked,
                         documents, false);
 
                     busyIndicator.IsBusy = true;
@@ -1037,8 +1043,16 @@ namespace UnicontaClient.Pages.CustomPage
             if (this.items == null)
                 this.items = Comp.GetCache(typeof(Uniconta.DataModel.InvItem)) ?? await api.LoadCache(typeof(Uniconta.DataModel.InvItem)).ConfigureAwait(false);
 
-            if (Comp.Warehouse && this.warehouse == null)
-                this.warehouse = await api.LoadCache(typeof(Uniconta.DataModel.InvWarehouse)).ConfigureAwait(false);
+            if (Comp.Warehouse)
+            {
+                if (this.warehouse == null)
+                    this.warehouse = await api.LoadCache(typeof(Uniconta.DataModel.InvWarehouse)).ConfigureAwait(false);
+
+                if (api.GetCache(typeof(Uniconta.DataModel.Employee)) == null)
+                    await api.LoadCache(typeof(Uniconta.DataModel.Employee)).ConfigureAwait(false);
+
+                userWarehouse = EmployeeClient.GetUserEmployee(api)?._Warehouse;
+            }
 
             if (Comp.ItemVariants)
             {
@@ -1052,6 +1066,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (Comp.DeliveryAddress)
                 installationCache = Comp.GetCache(typeof(Uniconta.DataModel.WorkInstallation)) ?? await api.LoadCache(typeof(Uniconta.DataModel.WorkInstallation)).ConfigureAwait(false);
+
 
             PriceLookup = new Uniconta.API.DebtorCreditor.FindPrices(Order, api);
             if (this.PriceLookup != null)

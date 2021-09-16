@@ -61,13 +61,12 @@ namespace UnicontaClient.Pages.CustomPage
         void InitPage(CrudAPI crudapi)
         {
             var Comp = api.CompanyEntity;
-            BusyIndicator = busyIndicator;
             layoutControl = layoutItems;
             leInvReceipt.api = leCostAccount.api = leInvAccount.api =
             leRevenueAccount.api = leRevenueAccount1.api = leRevenueAccount2.api = leRevenueAccount3.api = leRevenueAccount4.api = leBomIssue.api= leBomReciept.api= leBomIncVal.api= leJournalOffset.api =
             lePurchaseAccount.api = lePurchaseAccount1.api = lePurchaseAccount2.api = lePurchaseAccount3.api = lePurchaseAccount4.api =
             leSalesVat.api = leSalesVat1.api = leSalesVat2.api = leSalesVat3.api = leSalesVat4.api = leLossProfit.api= leRevaluation.api=
-            lePurchaseVat.api = lePurchaseVat1.api = lePurchaseVat2.api = lePurchaseVat3.api = lePurchaseVat4.api = leAutoNumber.api = leDutyGroup.api= cmbPrCategory.api=crudapi;
+            lePurchaseVat.api = lePurchaseVat1.api = lePurchaseVat2.api = lePurchaseVat3.api = lePurchaseVat4.api = leAutoNumber.api = leDutyGroup.api= cmbPrCategory.api = leProfitLossPurchase.api=crudapi;
             cbCountry.ItemsSource = Enum.GetValues(typeof(Uniconta.Common.CountryCode));
             if (editrow == null && LoadedRow == null)
             {

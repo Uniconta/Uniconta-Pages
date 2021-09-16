@@ -30,6 +30,7 @@
   <RibbonItem LocalizedNameKey="Reports">
     <RibbonItem Action="StLines" LocalizedNameKey="BankStatement" ControName="StatementLine" Glyph="Bank_Statement_32x32.png" LargeGlyph="Bank_Statement_32x32.png"/>
     <RibbonItem Action="GLTrans" LocalizedNameKey="LedgerTransactions" ControlName="StatementLineTransPage" Glyph="Transactions_32x32.png" LargeGlyph="Transactions_32x32.png"/>
+    <RibbonItem Action="ReconciliationReport" LocalizedNameKey="ReconciliationReport" LargeGlyph="Match_Lines_32x32.png" />
   </RibbonItem>
   <RibbonItem  LocalizedNameKey="BankStatement">
     <RibbonItem Action="ImportBankStatement" LocalizedNameKey="LoadFile" ControlName="ImportGLDailyJournal"  LargeGlyph="Import_32x32.png"/>

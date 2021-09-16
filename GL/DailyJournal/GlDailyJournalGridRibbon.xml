@@ -6,6 +6,9 @@
     <RibbonItem Action="EditRow" ShortcutKey="CTRL+E" LocalizedNameKey="SetupOBJ" Parameter="Journal" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>
   </RibbonItem>
   <RibbonItem>
+    <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh.png" LargeGlyph="refresh.png"/>
+  </RibbonItem>
+  <RibbonItem>
     <!---If we want to create a new group in same PageTab-->
     <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32.png">
       <!---If we want Inner menu-->
@@ -35,6 +38,7 @@
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="DeleteAllJournalLines" LocalizedNameKey="DeleteAllJournalLines" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png" />
+	<RibbonItem Action="MoveJournalLines" LocalizedNameKey="MoveOBJ" Parameter="Journallines" LargeGlyph="Default_Values_32x32.png" />
   </RibbonItem>
   <RibbonItem>
     <RibbonItem LocalizedNameKey="TransTypes" LargeGlyph="Enumerated_Label_32x32.png">

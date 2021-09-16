@@ -26,6 +26,7 @@ using Uniconta.API.GeneralLedger;
 using Uniconta.ClientTools;
 using DevExpress.Xpf.Grid;
 using DevExpress.Data;
+using Uniconta.ClientTools.Util;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -46,7 +47,7 @@ namespace UnicontaClient.Pages.CustomPage
         public override bool AllowSort { get { return false; } }
         public override bool Readonly { get { return false; } }
         public override bool IsAutoSave { get { return true; } }
-
+      
         public override bool AddRowOnPageDown()
         {
             var selectedItem = (ProjectBudgetLineLocal)this.SelectedItem;
@@ -95,6 +96,13 @@ namespace UnicontaClient.Pages.CustomPage
         public override string NameOfControl { get { return TabControls.ProjectBudgetLinePage; } }
         SQLCache ProjectCache, EmployeeCache, ItemCache, PayrollCache;
         int PriceGrp;
+
+        bool showAnchorBudget;
+        ItemBase iShowAnchorBudget;
+
+        private const string AND_OPERATOR = "And";
+        private const string FILTERVALUE_ANCHORBUDGET = @"[AnchorBudget] = False";
+
         public ProjectBudgetLinePage(UnicontaBaseEntity master)
             : base(master)
         {
@@ -125,16 +133,22 @@ namespace UnicontaClient.Pages.CustomPage
 
         void InitPage(UnicontaBaseEntity master)
         {
+            ((TableView)dgProjectBudgetLinePageGrid.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
             localMenu.dataGrid = dgProjectBudgetLinePageGrid;
             dgProjectBudgetLinePageGrid.api = api;
             dgProjectBudgetLinePageGrid.UpdateMaster(master);
             SetRibbonControl(localMenu, dgProjectBudgetLinePageGrid);
             dgProjectBudgetLinePageGrid.BusyIndicator = busyIndicator;
+            localMenu.OnChecked += LocalMenu_OnChecked;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
+
             dgProjectBudgetLinePageGrid.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;
             dgProjectBudgetLinePageGrid.ShowTotalSummary();
             dgProjectBudgetLinePageGrid.CustomSummary += dgProjectBudgetLinePageGrid_CustomSummary;
             dgProjectBudgetLinePageGrid.tableView.ShowGroupFooters = true;
+
+            GetMenuItem();
+            iShowAnchorBudget.IsChecked = showAnchorBudget;
         }
 
         double sumMargin, sumSales, sumMarginRatio;
@@ -188,6 +202,12 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
+        void GetMenuItem()
+        {
+            RibbonBase rb = (RibbonBase)localMenu.DataContext;
+            iShowAnchorBudget = UtilDisplay.GetMenuCommandByName(rb, "ShowAnchorBudget");
+        }
+
         protected override void OnLayoutLoaded()
         {
             base.OnLayoutLoaded();
@@ -213,6 +233,8 @@ namespace UnicontaClient.Pages.CustomPage
             }
             else
                 PayrollCategory.ShowInColumnChooser = true;
+
+            SetIncludeFilter();
         }
 
         private void DataControl_CurrentItemChanged(object sender, DevExpress.Xpf.Grid.CurrentItemChangedEventArgs e)
@@ -473,6 +495,44 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
         
+        private void LocalMenu_OnChecked(string actionType, bool IsChecked)
+        {
+            switch (actionType)
+            {
+                case "ShowAnchorBudget":
+                    showAnchorBudget = IsChecked;
+                    iShowAnchorBudget.IsChecked = showAnchorBudget;
+                    SetIncludeFilter();
+                    break;
+                default:
+                    gridRibbon_BaseActions(actionType);
+                    break;
+            }
+        }
+
+        private void SetIncludeFilter()
+        {
+            string filterString = dgProjectBudgetLinePageGrid.FilterString ?? string.Empty;
+
+            if (showAnchorBudget)
+            {
+                filterString = filterString.Replace(FILTERVALUE_ANCHORBUDGET, string.Empty).Trim();
+                if (filterString != string.Empty && filterString.IndexOf(AND_OPERATOR, 0, 3) != -1)
+                    filterString = filterString.Substring(3).Trim();
+                else if (filterString != string.Empty && filterString.IndexOf(AND_OPERATOR, filterString.Length - 3) != -1)
+                    filterString = filterString.Substring(0, filterString.IndexOf(AND_OPERATOR, filterString.Length - 3)).Trim();
+            }
+            else
+            {
+                if (filterString == string.Empty)
+                    filterString = FILTERVALUE_ANCHORBUDGET;
+                else
+                    filterString += filterString.IndexOf(FILTERVALUE_ANCHORBUDGET) == -1 ? string.Format(" {0} {1}", AND_OPERATOR, FILTERVALUE_ANCHORBUDGET) : string.Empty;
+            }
+
+            dgProjectBudgetLinePageGrid.FilterString = filterString;
+        }
+
         private void Task_GotFocus(object sender, RoutedEventArgs e)
         {
             var selectedItem = dgProjectBudgetLinePageGrid.SelectedItem as ProjectBudgetLineLocal;
@@ -485,6 +545,13 @@ namespace UnicontaClient.Pages.CustomPage
         private Task Filter(IEnumerable<PropValuePair> propValuePair)
         {
             return dgProjectBudgetLinePageGrid.Filter(propValuePair);
+        }
+
+        public override bool CheckIfBindWithUserfield(out bool isReadOnly, out bool useBinding)
+        {
+            isReadOnly = false;
+            useBinding = true;
+            return true;
         }
     }
 }

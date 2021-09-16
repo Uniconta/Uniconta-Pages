@@ -66,7 +66,6 @@ namespace UnicontaClient.Pages.CustomPage
 
         void InitPage(CrudAPI crudapi, UnicontaBaseEntity master = null)
         {
-            BusyIndicator = busyIndicator;
             layoutControl = layoutItems;
             leAutoNumber.api = crudapi;
             if (LoadedRow == null)

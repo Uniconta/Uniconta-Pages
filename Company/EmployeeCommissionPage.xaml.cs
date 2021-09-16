@@ -159,6 +159,7 @@ namespace UnicontaClient.Pages.CustomPage
             var calCom = new CalCommissionClient();
             calCom.SetMaster(tran);
             calCom._InvoiceNumber = tran._InvoiceNumber;
+            calCom._InvoiceRowId = tran._InvoiceRowId;
             calCom._Commission = Math.Round(amount, 2);
             return calCom;
         }
@@ -181,6 +182,7 @@ namespace UnicontaClient.Pages.CustomPage
             calCom._Employee = dic._Employee;
             calCom._Account = dic._DCAccount;
             calCom._InvoiceNumber = (int)dic._InvoiceNumber;
+            calCom._InvoiceRowId = dic.RowId;
             calCom._Commission = Math.Round(amount, 2);
             return calCom;
         }

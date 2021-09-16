@@ -57,7 +57,6 @@ namespace UnicontaClient.Pages.CustomPage
         private void InitPage(CrudAPI api)
         {
             leGroup.api = api;
-            BusyIndicator = busyIndicator;
             layoutControl = layoutItems;
             layoutItems.DataContext = userDocsClientRow;
             frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
@@ -96,7 +95,6 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 if (!ValidateSave())
                 {
-                    busyIndicator.IsBusy = false;
                     Uniconta.ClientTools.Controls.UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("NoFilesSelected"), Uniconta.ClientTools.Localization.lookup("Warning"));
                 }
                 else

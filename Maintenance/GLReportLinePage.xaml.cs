@@ -57,8 +57,7 @@ namespace UnicontaClient.Pages.CustomPage
                     dgGLReportLine.CopyRow();
                     break;
                 case "SaveGrid":
-                    dgGLReportLine.SelectedItem = null;
-                    dgGLReportLine.SaveData();
+                    saveGrid();
                     break;
                 case "DeleteRow":
                     dgGLReportLine.DeleteRow();

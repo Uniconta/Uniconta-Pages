@@ -92,6 +92,15 @@ x:Class="UnicontaClient.Pages.CustomPage.CompanyPreferencePage"
                         <CorasauControls:CorasauLayoutItem FieldName="DimFromProject">
                             <CorasauControls:CheckEditor IsChecked="{Binding DimFromProject,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="ProjShowPctAcontoInvoice">
+                            <CorasauControls:CheckEditor IsChecked="{Binding ProjShowPctAcontoInvoice,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="ProjZeroInvoice">
+                            <CorasauControls:CheckEditor IsChecked="{Binding ProjZeroInvoice,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="ProjOrderInvoice">
+                            <CorasauControls:CheckEditor IsChecked="{Binding ProjOrderInvoice,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
                     </CorasauControls:CorasauLayoutGroup>
             </CorasauControls:CorasauLayoutControl>

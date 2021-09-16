@@ -51,6 +51,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void Init()
         {
+            StartLoadCache();
             InitializeComponent();
             SetVariants();
             LayoutControl = detailControl.layoutItems;
@@ -67,7 +68,6 @@ namespace UnicontaClient.Pages.CustomPage
             this.PreviewKeyDown += RootVisual_KeyDown;
 #endif
             this.BeforeClose += DebtorAccount_BeforeClose;
-            LoadNow(typeof(InvGroup));
         }
 
         private void RootVisual_KeyDown(object sender, KeyEventArgs e)
@@ -87,13 +87,8 @@ namespace UnicontaClient.Pages.CustomPage
 
         public override Task InitQuery()
         {
-            Task t = null;
             if (!this.dgInventoryItemsGrid.ReuseCache(typeof(Uniconta.DataModel.InvItem)))
-            {
-                t = Filter(null);
-                StartLoadCache(t);
-                return t;
-            }
+                return Filter(null);
             return null;
         }
 
@@ -104,10 +99,7 @@ namespace UnicontaClient.Pages.CustomPage
                 oldselectedItem.PropertyChanged -= DgInventoryItemsGrid_PropertyChanged;
             var selectedItem = e.NewItem as InvItemClient;
             if (selectedItem != null)
-            {
                 selectedItem.PropertyChanged += DgInventoryItemsGrid_PropertyChanged;
-
-            }
         }
 
         private void DgInventoryItemsGrid_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -163,12 +155,17 @@ namespace UnicontaClient.Pages.CustomPage
         }
         protected override async void LoadCacheInBackGround()
         {
-            var lst = new List<Type>(3) { typeof(Uniconta.DataModel.InvGroup) };
+            var lst = new List<Type>(10) { typeof(Uniconta.DataModel.InvGroup) };
             var Comp = api.CompanyEntity;
             if (Comp.ItemVariants)
                 lst.Add(typeof(Uniconta.DataModel.InvStandardVariant));
             if (Comp.Warehouse)
                 lst.Add(typeof(Uniconta.DataModel.InvWarehouse));
+            lst.Add(typeof(Uniconta.DataModel.InvBrandGroup));
+            lst.Add(typeof(Uniconta.DataModel.InvCategoryGroup));
+            lst.Add(typeof(Uniconta.DataModel.InvDiscountGroup));
+            if (Comp.InvDuty)
+                lst.Add(typeof(Uniconta.DataModel.InvDutyGroup));
             LoadType(lst);
 
             if (Comp.Warehouse && this.warehouse == null)
@@ -265,10 +262,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "EditRow":
                     if (selectedItem != null)
-                    {
-                        var parms = new object[2] { selectedItem, true };
-                        AddDockItem(TabControls.InventoryItemPage2, parms, string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("InventoryItems"), selectedItem.Item));
-                    }
+                        AddDockItem(TabControls.InventoryItemPage2, new object[2] { selectedItem, true }, string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("InventoryItems"), selectedItem.Item));
                     break;
                 case "AddNote":
                     if (selectedItem != null)
@@ -303,7 +297,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "CopyRow":
                     if (copyRowIsEnabled)
-                        dgInventoryItemsGrid.CopyRow();
+                        ClearValues(dgInventoryItemsGrid.CopyRow() as InvItem);
                     else
                         CopyRecord(selectedItem);
                     break;
@@ -377,28 +371,39 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         AddDockItem(TabControls.InvStorageProfileReport, dgInventoryItemsGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("StockProfile"), selectedItem._Item));
                     break;
+                case "ViewAttachment":
+                    if (selectedItem != null)
+                        ViewDocument(UnicontaTabs.UserDocsPage3, dgInventoryItemsGrid.syncEntity, string.Format(Uniconta.ClientTools.Localization.lookup("ViewOBJ"), Uniconta.ClientTools.Localization.lookup("Attachment")), ViewerType.Attachment);
+                    break;
+                case "ViewWeb":
+                    if (selectedItem != null)
+                        ViewDocument(UnicontaTabs.UserDocsPage3, dgInventoryItemsGrid.syncEntity, string.Format(Uniconta.ClientTools.Localization.lookup("ViewOBJ"), Uniconta.ClientTools.Localization.lookup("Url")), ViewerType.Url);
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
         }
 
+        static void ClearValues(InvItem item)
+        {
+            item._EAN = null;
+            item._Qty = 0;
+            item._CostValue = 0;
+            item._qtyOnStock = 0;
+            item._qtyOrdered = 0;
+            item._qtyReserved = 0;
+            item.HasNotes = false;
+            item.HasDocs = false;
+        }
         void CopyRecord(InvItemClient selectedItem)
         {
             if (selectedItem == null)
                 return;
-            var invItem = Activator.CreateInstance(selectedItem.GetType()) as InvItemClient;
-            CorasauDataGrid.CopyAndClearRowId(selectedItem, invItem);
-            invItem._EAN = null;
-            invItem._Qty = 0;
-            invItem._CostValue = 0;
-            invItem._qtyOnStock = 0;
-            invItem._qtyOrdered = 0;
-            invItem._qtyReserved = 0;
-            invItem.HasNotes = false;
-            invItem.HasDocs = false;
-            var parms = new object[2] { invItem, false };
-            AddDockItem(TabControls.InventoryItemPage2, parms, Uniconta.ClientTools.Localization.lookup("InventoryItems"), "Add_16x16.png");
+            var item = Activator.CreateInstance(selectedItem.GetType()) as InvItemClient;
+            CorasauDataGrid.CopyAndClearRowId(selectedItem, item);
+            ClearValues(item);
+            AddDockItem(TabControls.InventoryItemPage2, new object[] { item, false }, Uniconta.ClientTools.Localization.lookup("InventoryItems"), "Add_16x16.png");
         }
 
         bool copyRowIsEnabled;

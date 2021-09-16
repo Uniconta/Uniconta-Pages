@@ -115,11 +115,9 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     if (master._Name == tablename)
                     {
-                        var tableHeaderClient = new TableHeaderClient();
-                        StreamingManager.Copy(master, tableHeaderClient);
-                        string header = master._Prompt == null ? master._Name : master._Prompt;
+                        string header = master._Prompt != null ? UserFieldControl.LocalizePrompt(master._Prompt) : master._Name;
                         this.SetHeader(header);
-                        this.thMaster = tableHeaderClient;
+                        this.thMaster = master;
                         Layout._SubId = api.CompanyId;
                         this.layoutname = header;
                         if (!isInitialized)
@@ -185,7 +183,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (dgTabledataGrid.IsEditable)
                 UtilDisplay.RemoveMenuCommand(rb, new string[] { "AddItem", "EditItem" });
             else
-                UtilDisplay.RemoveMenuCommand(rb, new string[] { "AddRow", "CopyRow", "DeleteRow", "SaveGrid" });
+                UtilDisplay.RemoveMenuCommand(rb, new string[] { "AddRow", "CopyRow", "DeleteRow", "SaveGrid", "UndoDelete" });
             dtlTables = Utilities.Utility.GetDefaultCompany().UserTables.Where(x => x._MasterTable == thMaster._Name).ToList();
             if (dtlTables.Count > 0)
             {
@@ -309,14 +307,8 @@ namespace UnicontaClient.Pages.CustomPage
                 var userTable = dtlTables.Where(x => x._Name == tableName).FirstOrDefault();
                 if (userTable == null)
                     return;
-                var tableHeaderClient = userTable as TableHeaderClient;
-                if (tableHeaderClient == null)
-                {
-                    tableHeaderClient = new TableHeaderClient();
-                    StreamingManager.Copy(userTable, tableHeaderClient);
-                }
                 object[] parmtbldata = new object[3];
-                parmtbldata[0] = tableHeaderClient;
+                parmtbldata[0] = userTable;
                 parmtbldata[1] = string.Concat(tableName, ";", tabName);
                 parmtbldata[2] = dgTabledataGrid.syncEntity;
                 AddDockItem(TabControls.UserTableData, parmtbldata, string.Format("{0}:{1}/{2}", Uniconta.ClientTools.Localization.lookup("Data"), tabName, (selectedItem as TableData)?._KeyName));
@@ -326,22 +318,11 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 case "AddItem":
                     if (this.thMaster?.UserType != null)
-                    {
-                        object[] param = new object[3];
-                        param[0] = api;
-                        param[1] = this.thMaster;
-                        param[2] = this.master;
-                        AddDockItem(TabControls.UserTableDataPage2, param, (this.thMaster as TableHeader)?._Name, "Add_16x16.png");
-                    }
+                        AddDockItem(TabControls.UserTableDataPage2, new object[] { api, this.thMaster, this.master }, (this.thMaster as TableHeader)?._Name, "Add_16x16.png");
                     break;
                 case "EditItem":
                     if (selectedItem != null)
-                    {
-                        object[] parameter = new object[2];
-                        parameter[0] = selectedItem;
-                        parameter[1] = this.thMaster;
-                        AddDockItem(TabControls.UserTableDataPage2, parameter, (this.thMaster as TableHeader)?._Name, "Edit_16x16.png");
-                    }
+                        AddDockItem(TabControls.UserTableDataPage2, new object[] { selectedItem, this.thMaster }, (this.thMaster as TableHeader)?._Name, "Edit_16x16.png");
                     break;
                 case "AddNote":
                     if (selectedItem != null)
@@ -366,6 +347,9 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "DeleteRow":
                     dgTabledataGrid.DeleteRow();
+                    break;
+                case "UndoDelete":
+                    dgTabledataGrid.UndoDeleteRow();
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);

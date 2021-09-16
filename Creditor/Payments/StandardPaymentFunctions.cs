@@ -170,7 +170,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
                     if (rec.CashDiscount == 0 && sbAdvText.IndexOf("%3") >= 0)
                         MessageFormatRemove(sbAdvText, "%3");
 
-                    if (creditor._OurAccount == null && sbAdvText.IndexOf("%4") >= 0)
+                    if (creditor?._OurAccount == null && sbAdvText.IndexOf("%4") >= 0)
                         MessageFormatRemove(sbAdvText, "%4");
 
                     if (rec.TransType == null && sbAdvText.IndexOf("%5") >= 0)
@@ -180,7 +180,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
                                              rec.InvoiceAN,
                                              company.Name,
                                              rec.CashDiscount,
-                                             creditor._OurAccount,
+                                             creditor?._OurAccount,
                                              rec.TransType);
                 }
                 else if (UIMessage == false) //Default message

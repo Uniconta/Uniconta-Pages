@@ -94,7 +94,6 @@ namespace UnicontaClient.Pages.CustomPage
             dgDebtorOffers.api = api;
             dgDebtorOffers.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
-            InitialLoad();
             ribbonControl.DisableButtons(new string[] { "UndoDelete", "DeleteRow", "SaveGrid" });
         }
        
@@ -118,7 +117,8 @@ namespace UnicontaClient.Pages.CustomPage
             }
             dgDebtorOffers.Readonly = true;
             if (!Comp.Project)
-                Project.ShowInColumnChooser = Project.Visible = PrCategory.ShowInColumnChooser = PrCategory.Visible = Task.ShowInColumnChooser = Task.Visible = false;
+                Project.ShowInColumnChooser = Project.Visible = PrCategory.ShowInColumnChooser = PrCategory.Visible =
+                    Task.ShowInColumnChooser = Task.Visible = WorkSpace.ShowInColumnChooser = WorkSpace.Visible = false;
             else
                 Project.ShowInColumnChooser = PrCategory.ShowInColumnChooser = Task.ShowInColumnChooser = true;
             if (!Comp.ProjectTask)
@@ -127,19 +127,10 @@ namespace UnicontaClient.Pages.CustomPage
                 Task.ShowInColumnChooser = true;
         }
 
-        private void InitialLoad()
-        {
-            // load Debtor first, since we use Debtor name in grid
-            if (api.CompanyEntity.CRM)
-                LoadType(new Type[] { typeof(Uniconta.DataModel.Debtor), typeof(Uniconta.DataModel.CrmProspect) });
-            else
-                LoadType(typeof(Uniconta.DataModel.Debtor));
-        }
-
         protected override void LoadCacheInBackGround()
         {
             var Comp = api.CompanyEntity;
-            var lst = new List<Type>(12) { typeof(Uniconta.DataModel.InvItem), typeof(Uniconta.DataModel.Employee) };
+            var lst = new List<Type>(20) { typeof(Uniconta.DataModel.Debtor), typeof(Uniconta.DataModel.Employee) };
             if (Comp.Contacts)
                 lst.Add(typeof(Uniconta.DataModel.Contact));
             if (Comp.InvPrice)
@@ -159,6 +150,18 @@ namespace UnicontaClient.Pages.CustomPage
             }
             if (Comp.Warehouse)
                 lst.Add(typeof(Uniconta.DataModel.InvWarehouse));
+            lst.Add(typeof(Uniconta.DataModel.InvGroup));
+            if (Comp.NumberOfDimensions >= 1)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType1));
+            if (Comp.NumberOfDimensions >= 2)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType2));
+            if (Comp.NumberOfDimensions >= 3)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType3));
+            if (Comp.NumberOfDimensions >= 4)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType4));
+            if (Comp.NumberOfDimensions >= 5)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType5));
+            lst.Add(typeof(Uniconta.DataModel.InvItem));
             LoadType(lst);
         }
 

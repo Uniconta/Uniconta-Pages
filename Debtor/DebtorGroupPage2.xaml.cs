@@ -62,7 +62,6 @@ namespace UnicontaClient.Pages.CustomPage
         }
         void InitPage(CrudAPI crudapi)
         {
-            BusyIndicator = busyIndicator;
             layoutControl = layoutItems;
             cbRevenueFollowDC.ItemsSource = AppEnums.FollowItemDebtor.Values;
             lookupEndDiscountAccount.api =

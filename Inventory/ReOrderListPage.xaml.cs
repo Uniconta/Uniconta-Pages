@@ -35,6 +35,8 @@ namespace UnicontaClient.Pages.CustomPage
     {
         public override Type TableType { get { return typeof(ReOrderListPageGridClient); } }
         public override bool Readonly { get { return false; } }
+        public override bool CanDelete { get { return false; } }
+        public override bool IsAutoSave { get { return false; } }
     }
 
     public class ReOrderListPageGridClient : InvItemClient
@@ -213,45 +215,23 @@ namespace UnicontaClient.Pages.CustomPage
             if (rb != null)
             {
                 if (!Comp.InvBOM)
-                {
-                    UtilDisplay.RemoveMenuCommand(rb, "ReportAsFinished");
-                    UtilDisplay.RemoveMenuCommand(rb, "UnfoldBOM");
-#if !SILVERLIGHT
                     Added.Visible = false;
-#endif
-                }
 
-                if (!Comp.Location || !Comp.Warehouse || !Comp.Storage)
-                    UtilDisplay.RemoveMenuCommand(rb, "PerLocation");
-                else
+                if (Comp.Location)
                 {
                     var rbMenuLocation = UtilDisplay.GetMenuCommandByName(rb, "PerLocation");
                     rbMenuLocation.IsChecked = ReorderPrLocation;
                 }
 
-                if (!Comp.Warehouse || !Comp.Storage)
-                {
-                    UtilDisplay.RemoveMenuCommand(rb, "PerWarehouse");
-                    UtilDisplay.RemoveMenuCommand(rb, "MoveFromWarehouse");
-                }
-                else
+                if (Comp.Warehouse)
                 {
                     var rbMenuWarehouse = UtilDisplay.GetMenuCommandByName(rb, "PerWarehouse");
                     rbMenuWarehouse.IsChecked = ReorderPrWarehouse;
                 }
-
-                if (!Comp.Production)
-                {
-                    UtilDisplay.RemoveMenuCommand(rb, "ProductionOrders");
-                    UtilDisplay.RemoveMenuCommand(rb, "ProductionLines");
-                    UtilDisplay.RemoveMenuCommand(rb, "CreateProductionOrder");
-                }
+               
                 if (!Comp.PurchaseAccounts)
-                {
                     InvPurchaseAccount.Visible = InvPurchaseAccount.ShowInColumnChooser = false;
-                }
             }
-            Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
         }
 
         protected override void OnLayoutLoaded()
@@ -268,8 +248,8 @@ namespace UnicontaClient.Pages.CustomPage
             else
                 Warehouse.ShowInColumnChooser = true;
 
+            Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
             Utility.SetupVariants(api, colVariant, VariantName, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
-
         }
 
         private void LocalMenu_OnChecked(string ActionType, bool IsChecked)
@@ -296,8 +276,7 @@ namespace UnicontaClient.Pages.CustomPage
             switch (ActionType)
             {
                 case "DeleteRow":
-                    if (selectedItem != null)
-                        dgReOrderList.DeleteRow();
+                    dgReOrderList.RemoveFocusedRowFromGrid();
                     break;
                 case "Filter":
                     var pairs = ribbonControl.filterValues;

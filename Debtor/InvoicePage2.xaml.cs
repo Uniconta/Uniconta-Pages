@@ -46,7 +46,6 @@ namespace UnicontaClient.Pages.CustomPage
         {
             InitializeComponent();
             ribbonControl = frmRibbon;
-            BusyIndicator = busyIndicator;
             layoutControl = layoutItems;
             layoutItems.DataContext = editrow;
             cmbDelCountry.ItemsSource = Enum.GetValues(typeof(Uniconta.Common.CountryCode));

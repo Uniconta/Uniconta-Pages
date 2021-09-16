@@ -151,8 +151,7 @@ namespace UnicontaClient.Pages.CustomPage
                     DebtorTransactions.ShowVoucher(dgCreditorTranOpenGrid.syncEntity, api, busyIndicator);
                     break;
                 case "SaveGrid":
-                    dgCreditorTranOpenGrid.SelectedItem = null;
-                    dgCreditorTranOpenGrid.SaveData();
+                    saveGrid();
                     break;
                 case "ReopenAll":
                     ReOpenAllTrans();

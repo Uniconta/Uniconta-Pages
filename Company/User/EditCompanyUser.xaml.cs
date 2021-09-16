@@ -38,7 +38,6 @@ namespace UnicontaClient.Pages.CustomPage
         public EditCompanyUser(UnicontaBaseEntity sourcedata, bool IsEdit) :  base(sourcedata, IsEdit)
         {
             InitializeComponent();
-            BusyIndicator = busyIndicator;
             layoutControl = layoutItems;
             cbProfile.ItemsSource = AppEnums.FixedProfiles.Values;
             var Rights = editrow._Rights;

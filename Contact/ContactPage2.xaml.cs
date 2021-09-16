@@ -39,13 +39,11 @@ namespace UnicontaClient.Pages.CustomPage
         public ContactPage2(UnicontaBaseEntity sourcedata, bool isEdit, UnicontaBaseEntity master = null)
             : base(sourcedata, isEdit)
         {
-            InitializeComponent();
             InitPage(api, master);
         }
         public ContactPage2(CrudAPI crudApi, string dummy)
             : base(crudApi, dummy)
         {
-            InitializeComponent();
             InitPage(crudApi, null);
 #if !SILVERLIGHT
             FocusManager.SetFocusedElement(txtName, txtName);
@@ -53,10 +51,10 @@ namespace UnicontaClient.Pages.CustomPage
         }
         void InitPage(CrudAPI crudapi, UnicontaBaseEntity master)
         {
-            var Comp = api.CompanyEntity;
-            BusyIndicator = busyIndicator;
-            layoutControl = layoutItems;
+            InitializeComponent();
             StartLoadCache();
+            var Comp = api.CompanyEntity;
+            layoutControl = layoutItems;
             if (LoadedRow == null)
             {
                 if (editrow == null)
@@ -92,19 +90,13 @@ namespace UnicontaClient.Pages.CustomPage
         async void GetInterestAndProduct()
         {
             var api = this.api;
-            crmInterestCache = api.GetCache(typeof(Uniconta.DataModel.CrmInterest));
-            if (crmInterestCache == null)
-                crmInterestCache = await api.LoadCache(typeof(Uniconta.DataModel.CrmInterest));
-
-            crmProductCache = api.GetCache(typeof(Uniconta.DataModel.CrmProduct));
-            if (crmProductCache == null)
-                crmProductCache = await api.LoadCache(typeof(Uniconta.DataModel.CrmProduct));
-
-            cmbInterests.ItemsSource = crmInterestCache.GetKeyList();
-            cmbProducts.ItemsSource = crmProductCache.GetKeyList();
+            var cache = api.GetCache(typeof(Uniconta.DataModel.CrmInterest)) ?? await api.LoadCache(typeof(Uniconta.DataModel.CrmInterest));
+            cmbInterests.ItemsSource = cache.GetKeyList();
+            cache = api.GetCache(typeof(Uniconta.DataModel.CrmProduct)) ?? await api.LoadCache(typeof(Uniconta.DataModel.CrmProduct));
+            cmbProducts.ItemsSource = cache.GetKeyList();
         }
 
-        SQLCache DebtorCache, CreditorCache, CrmProspectCache, crmInterestCache, crmProductCache;
+        SQLCache DebtorCache, CreditorCache, CrmProspectCache;
         protected override async void LoadCacheInBackGround()
         {
             var api = this.api;

@@ -36,6 +36,9 @@ namespace UnicontaClient.Pages.CustomPage
         public override IComparer GridSorting { get { return new DCOrderSort(); } }
         public override bool SingleBufferUpdate { get { return false; } }
         public override bool Readonly { get { return false; } }
+        public override bool CanDelete { get { return false; } }
+        public override bool CanInsert { get { return false; } }
+        public override bool IsAutoSave { get { return false; } }
     }
 
     /// <summary>
@@ -109,7 +112,7 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                     break;
                 case "DeleteRow":
-                    dgMultiInvGrid.DeleteRow();
+                    dgMultiInvGrid.RemoveFocusedRowFromGrid();
                     break;
                 case "OrderLine":
                     if (selectedItem == null)

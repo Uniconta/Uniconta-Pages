@@ -5,40 +5,36 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorMessagesPage2"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
-        xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
         xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools" >
-    <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="0" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BusyMessage}">
-        <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <CorasauControls:CorasauRibbonControl x:Name="frmRibbon" XMLSourcePath=";component/Pages/Debtor/DebtorMessagesPage2Ribbon.xml" Grid.Row="0"/>
-            <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Vertical" Grid.Row="1">
-                <CorasauControls:CorasauLayoutGroup x:Name="grpDescription" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Description}" HorizontalAlignment="Left" Orientation="Vertical" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" >
-                    <CorasauControls:CorasauLayoutItem FieldName="Name" x:Name="liName">
-                        <CorasauControls:TextEditor Text="{Binding Name,Mode=TwoWay}" x:Name="txtName"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="MessageType" x:Name="liMessageType">
-                        <CorasauControls:ComboBoxEditor SelectedItem="{Binding MessageType,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="Language" x:Name="liLanguage">
-                        <CorasauControls:ComboBoxEditor SelectedItem="{Binding Language,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="Default" x:Name="liDefault">
-                        <CorasauControls:CheckEditor IsChecked="{Binding Default, Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                </CorasauControls:CorasauLayoutGroup>
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl x:Name="frmRibbon" XMLSourcePath=";component/Pages/Debtor/DebtorMessagesPage2Ribbon.xml" Grid.Row="0"/>
+        <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Vertical" Grid.Row="1">
+            <CorasauControls:CorasauLayoutGroup x:Name="grpDescription" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Description}" HorizontalAlignment="Left" Orientation="Vertical" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" >
+                <CorasauControls:CorasauLayoutItem FieldName="Name" x:Name="liName">
+                    <CorasauControls:TextEditor Text="{Binding Name,Mode=TwoWay}" x:Name="txtName"/>
+                </CorasauControls:CorasauLayoutItem>
+                <CorasauControls:CorasauLayoutItem FieldName="MessageType" x:Name="liMessageType">
+                    <CorasauControls:ComboBoxEditor SelectedItem="{Binding MessageType,Mode=TwoWay}"/>
+                </CorasauControls:CorasauLayoutItem>
+                <CorasauControls:CorasauLayoutItem FieldName="Language" x:Name="liLanguage">
+                    <CorasauControls:ComboBoxEditor SelectedItem="{Binding Language,Mode=TwoWay}"/>
+                </CorasauControls:CorasauLayoutItem>
+                <CorasauControls:CorasauLayoutItem FieldName="Default" x:Name="liDefault">
+                    <CorasauControls:CheckEditor IsChecked="{Binding Default, Mode=TwoWay}"/>
+                </CorasauControls:CorasauLayoutItem>
+            </CorasauControls:CorasauLayoutGroup>
 
-                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpMessage" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Message}" Orientation="Vertical" HorizontalAlignment="Stretch" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" >
-                    <CorasauControls:CorasauLayoutItem x:Name="liMessage" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Message}" VerticalAlignment="Top" VerticalContentAlignment="Top" LabelVerticalAlignment="Top">
-                        <CorasauControls:TextEditor Text="{Binding Text,Mode=TwoWay}"  AcceptsReturn="True" TextWrapping="Wrap" HorizontalContentAlignment="Left" 
+            <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpMessage" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Message}" Orientation="Vertical" HorizontalAlignment="Stretch" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" >
+                <CorasauControls:CorasauLayoutItem x:Name="liMessage" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Message}" VerticalAlignment="Top" VerticalContentAlignment="Top" LabelVerticalAlignment="Top">
+                    <CorasauControls:TextEditor Text="{Binding Text,Mode=TwoWay}"  AcceptsReturn="True" TextWrapping="Wrap" HorizontalContentAlignment="Left" 
                                                 MinHeight="200"  VerticalContentAlignment="Top"  />
-                    </CorasauControls:CorasauLayoutItem>
-                </CorasauControls:CorasauLayoutGroup>
+                </CorasauControls:CorasauLayoutItem>
+            </CorasauControls:CorasauLayoutGroup>
 
-            </CorasauControls:CorasauLayoutControl>
-        </Grid>
-    </CorasauControls:BusyIndicator>
+        </CorasauControls:CorasauLayoutControl>
+    </Grid>
 </Pages:FormBasePage>

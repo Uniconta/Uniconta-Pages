@@ -512,11 +512,11 @@ namespace UnicontaClient.Pages.CustomPage
             switch (exCode)
             {
                 case 1:
-                    if (glt.VatCode._ModelBoxId1 == 1)
+                    if (glt.VatCode.ModelBoxId == 1)
                         return true;
                     break;
                 case 2:
-                    if (glt.VatCode._ModelBoxId1 == 2)
+                    if (glt.VatCode.ModelBoxId == 2)
                         result = true;
                     break;
                 case 3:

@@ -140,8 +140,7 @@ namespace UnicontaClient.Pages.CustomPage
                         DebtorTransactions.ShowVoucher(dgDebtorTransOpen.syncEntity, api, busyIndicator);
                     break;
                 case "SaveGrid":
-                    dgDebtorTransOpen.SelectedItem = null;
-                    dgDebtorTransOpen.SaveData();
+                    saveGrid();
                     break;
                 case "ReopenAll":
                     ReOpenAllTrans();
@@ -172,7 +171,13 @@ namespace UnicontaClient.Pages.CustomPage
             DebtorEmailType emailType = DebtorEmailType.InterestNote;
             bool isInterest = false;
             if (postType != (byte)DCPostType.Collection && postType != (byte)DCPostType.CollectionLetter && postType != (byte)DCPostType.InterestFee && postType != (byte)DCPostType.PaymentCharge)
+            {
+                if (postType == (byte)DCPostType.Invoice || postType == (byte)DCPostType.Creditnote)
+                    AddDockItem(TabControls.Invoices, debtorTransOpen, string.Format("{0}: {1}", postType == (byte)DCPostType.Invoice ? Uniconta.ClientTools.Localization.lookup("Invoice") :
+                        Uniconta.ClientTools.Localization.lookup("Creditnote"), debtorTransOpen.Invoice));
+
                 return;
+            }
 
             if (postType == (byte)DCPostType.InterestFee)
                 isInterest = true;
@@ -198,7 +203,7 @@ namespace UnicontaClient.Pages.CustomPage
             cwSendInvoice.Closed += delegate
             {
                 var selectedRow = new DebtorTransOpenClient[] { debtorTransOpen };
-                var feelist = new [] { debtorTransOpen.Amount };
+                var feelist = new[] { debtorTransOpen.Amount };
 
                 if (cwSendInvoice.DialogResult == true)
                     DebtorPayments.ExecuteDebtorCollection(api, busyIndicator, selectedRow, feelist, null, false, emailType, cwSendInvoice.Emails,
@@ -353,7 +358,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override void LoadCacheInBackGround()
         {
-            LoadType(new [] { typeof(Uniconta.DataModel.GLVat), typeof(Uniconta.DataModel.PaymentTerm) });
+            LoadType(new[] { typeof(Uniconta.DataModel.GLVat), typeof(Uniconta.DataModel.PaymentTerm) });
         }
     }
 }

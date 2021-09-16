@@ -217,10 +217,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override async Task<ErrorCodes> saveGrid()
         {
-            var lin = dgInvVariantDetailGrid.SelectedItem;
-            dgInvVariantDetailGrid.SelectedItem = null;
-            dgInvVariantDetailGrid.SelectedItem = lin;
-            ErrorCodes res = await dgInvVariantDetailGrid.SaveData();
+            ErrorCodes res = await base.saveGrid();
             if (res == ErrorCodes.Succes)
                 globalEvents.OnRefresh(NameOfControl, invMaster);
             return res;

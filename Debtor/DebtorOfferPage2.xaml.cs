@@ -96,11 +96,10 @@ namespace UnicontaClient.Pages.CustomPage
         void InitPage(CrudAPI crudapi, UnicontaBaseEntity master)
         {
             RemoveMenuItem();
-            BusyIndicator = busyIndicator;
             dAddress.Header = Uniconta.ClientTools.Localization.lookup("DeliveryAddr");
             layoutControl = layoutItems;
             Employeelookupeditor.api = leAccount.api = lePayment.api = cmbDim1.api = cmbDim2.api = cmbDim3.api = cmbDim4.api = cmbDim5.api = leLayoutGroup.api = leInvoiceAccount.api = PriceListlookupeditior.api =
-               leGroup.api = leShipment.api = leDeliveryTerm.api = Projectlookupeditor.api = PrCategorylookupeditor.api = leDeliveryAddress.api = leVat.api = prTasklookupeditor.api = crudapi;
+               leGroup.api = leShipment.api = leDeliveryTerm.api = Projectlookupeditor.api = PrCategorylookupeditor.api = leDeliveryAddress.api = leVat.api = prTasklookupeditor.api = lePrWorkSpace.api = crudapi;
 
 #if SILVERLIGHT
             leRelatedOrder.api = crudapi;
@@ -211,6 +210,8 @@ namespace UnicontaClient.Pages.CustomPage
                 var project = Comp.GetCache(typeof(Uniconta.DataModel.Project))?.Get(editrow._Project) as ProjectClient;
                 setTask(project);
             }
+            if (!Comp.InvPrice)
+                priceListLayoutItem.Visibility = Visibility.Collapsed;
         }
         public override bool BeforeSetUserField(ref CorasauLayoutGroup parentGroup)
         {

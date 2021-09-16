@@ -48,7 +48,6 @@ namespace UnicontaClient.Pages.CustomPage
         }
         void InitPage(CrudAPI crudapi)
         {
-            BusyIndicator = busyIndicator;
             leFromAccount.api = dim1lookupeditior.api = dim2lookupeditior.api = dim3lookupeditior.api = dim4lookupeditior.api = dim5lookupeditior.api =
             leNumberSerie.api = leOffsetAccount.api = leToAccount.api = leTransType.api = crudapi;
             layoutControl = layoutItems;

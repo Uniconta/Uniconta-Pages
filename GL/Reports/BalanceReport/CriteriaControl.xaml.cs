@@ -134,7 +134,8 @@ namespace UnicontaClient.Pages.CustomPage
         {
             this.CriteriaBorder.BorderBrush = Application.Current.Resources["LightBoxBorderColor"] as SolidColorBrush;
         }
-
+        public List<Company> companyList = null;
+       
         async void SetSources()
         {
             var api = this.api;
@@ -149,16 +150,7 @@ namespace UnicontaClient.Pages.CustomPage
             dim5.Text = Comp._Dim5;
             company.Text = Uniconta.ClientTools.Localization.lookup("Company");
 
-            List<Company> compList = new List<Company>();
-            var companies = CWDefaultCompany.loadedCompanies;
-            if (companies != null)
-            {
-                compList.Capacity = companies.Length + 1;
-                compList.Add(new Company() { _Name = "" });
-                compList.AddRange(companies);
-                compList.Sort(SQLCache.KeyStrSorter);
-            }
-            cbCompany.ItemsSource = compList;
+            cbCompany.ItemsSource = companyList;
 
             var journalSource = new List<string>();
             var cache = Comp.GetCache(typeof(Uniconta.DataModel.GLDailyJournal)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLDailyJournal));
@@ -188,7 +180,7 @@ namespace UnicontaClient.Pages.CustomPage
                 rowdim5.Height = GridLength.Auto;
             }
             else
-                await TransactionReport.SetDimValues(typeof(GLDimType5), cbdim5, api);
+                TransactionReport.SetDimValues(typeof(GLDimType5), cbdim5, api);
 
             if (noofDimensions < 4)
             {
@@ -196,7 +188,7 @@ namespace UnicontaClient.Pages.CustomPage
                 rowdim4.Height = GridLength.Auto;
             }
             else
-                await TransactionReport.SetDimValues(typeof(GLDimType4), cbdim4, api);
+                TransactionReport.SetDimValues(typeof(GLDimType4), cbdim4, api);
 
             if (noofDimensions < 3)
             {
@@ -204,7 +196,7 @@ namespace UnicontaClient.Pages.CustomPage
                 rowdim3.Height = GridLength.Auto;
             }
             else
-                await TransactionReport.SetDimValues(typeof(GLDimType3), cbdim3, api);
+                TransactionReport.SetDimValues(typeof(GLDimType3), cbdim3, api);
 
             if (noofDimensions < 2)
             {
@@ -212,7 +204,7 @@ namespace UnicontaClient.Pages.CustomPage
                 rowdim2.Height = GridLength.Auto;
             }
             else
-                await TransactionReport.SetDimValues(typeof(GLDimType2), cbdim2, api);
+                TransactionReport.SetDimValues(typeof(GLDimType2), cbdim2, api);
 
             if (noofDimensions < 1)
             {
@@ -220,7 +212,7 @@ namespace UnicontaClient.Pages.CustomPage
                 rowdim1.Height = GridLength.Auto;
             }
             else
-                await TransactionReport.SetDimValues(typeof(GLDimType1), cbdim1, api);
+                TransactionReport.SetDimValues(typeof(GLDimType1), cbdim1, api);
         }
 
         public void SetcmbIndex()

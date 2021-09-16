@@ -117,6 +117,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOrders"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ProjectName" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CategoryName" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="WorkSpace" Visible="False" />
                     <localPage:CorasauDataGridForeignKeyColumnClient x:Name="Task" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim1" Width="70" FieldName="Dimension1"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim2" Width="70" FieldName="Dimension2" />
@@ -133,6 +134,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOrders"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Cartons" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Vat" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PurchaseValue" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PostingText" Visible="False" />
                 </localPage:CreditorOrdersGrid.Columns>
             </localPage:CreditorOrdersGrid>
         </CorasauControls:BusyIndicator>

@@ -130,9 +130,9 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOrderLines"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ReferenceNumber" Width="70" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Week" Width="100" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Date" Width="100" Visible="False" />
-
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Project" Width="100" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Width="100" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="WorkSpace" Width="100" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PostingAccount" Width="100" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Vat" Width="100" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Employee" Width="50" Visible="False"/>

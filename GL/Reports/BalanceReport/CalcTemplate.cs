@@ -45,7 +45,7 @@ namespace UnicontaClient.Pages.CustomPage
             var colCount = PassedCriteria.selectedCriteria.Count;
             bool AnyHidden = false;
             int i, j;
-            for(j = 0; (j < reportline.Length); j++)
+            for (j = 0; (j < reportline.Length); j++)
             {
                 var line = reportline[j];
                 var amounts = new long[colCount];
@@ -83,10 +83,8 @@ namespace UnicontaClient.Pages.CustomPage
                 var newBalanceCol = new BalanceClient(amounts);
                 newBalanceCol.Acc._Name = line._Text;
                 newBalance.Add(newBalanceCol);
-                hdrData.TextSize = template._TextSize == 0 ? 70 * SizeFactor : (template._TextSize * SizeFactor);
-                hdrData.AmountSize = template._AmountSize == 0 ? 20 * SizeFactor : (template._AmountSize * SizeFactor);
                 TemplateReportlist.Add(new TemplateDataItems(newBalanceCol, hdrData, line) { Masterfontsize = template._FontSize });
-           }
+            }
 
             // Now we will take all expressions and update.
             var pars = new parser(SumContext);
@@ -116,7 +114,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (AnyHidden)
             {
-                for (i = TemplateReportlist.Count; (--i >= 0); )
+                for (i = TemplateReportlist.Count; (--i >= 0);)
                 {
                     if (TemplateReportlist[i].line._Hide)
                         TemplateReportlist.RemoveAt(i);

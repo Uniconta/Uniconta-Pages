@@ -13,6 +13,7 @@ x:Class="UnicontaClient.Pages.CustomPage.AccountsTransaction"
     <UserControl.Resources>
         <Util:VisibilityBoolConverter x:Key="VisibilityBoolConverter" />
         <Util:ImageNameToImagesourceConverter x:Key="ImageNameToImagesourceConverter"/>
+        <Util:RowIndexConverter x:Key="RowIndexConverter" />
     </UserControl.Resources>
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>

@@ -100,7 +100,6 @@ namespace UnicontaClient.Pages.CustomPage
         void InitPage(CrudAPI crudapi)
         {
             InitializeComponent();
-            BusyIndicator = busyIndicator;
             SetDefault(crudapi);
             cmbPeriodState.ItemsSource = AppEnums.GLFinancePeriodeState.Values;
             layoutItems.DataContext = editrow;

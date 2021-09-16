@@ -191,7 +191,10 @@ namespace UnicontaClient.Pages.CustomPage
             else
                 Task.ShowInColumnChooser = true;
             if (!company.Project)
+            {
                 tbProject.Visibility = tbPrCategory.Visibility = Projectlookupeditor.Visibility = PrCategorylookupeditor.Visibility = Visibility.Collapsed;
+                WorkSpace.ShowInColumnChooser = WorkSpace.Visible = false; 
+            }
             if (company.NumberOfDimensions == 0)
                 barGrpDimension.IsVisible = false;
             Utility.SetupVariants(api, colVariant, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
@@ -741,7 +744,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var invoicePostingResult = new InvoicePostingPrintGenerator(api, this);
             invoicePostingResult.SetUpInvoicePosting(crOrder, lines, CompanyLayoutType.PurchaseInvoice, generateDate, invoiceNumber, isSimulated, showInvoice,
-                        postOnlyDelivered, isQuickPrint, printPageCount, sendInvoiceByEmail, !isSimulated && sendInvoiceByOutlook, sendOnlyToEmail, SendOnlyEmailList, false, documents, false);
+                        postOnlyDelivered, isQuickPrint, printPageCount, sendInvoiceByEmail, sendInvoiceByOutlook, sendOnlyToEmail, SendOnlyEmailList, false, documents, false);
 
             return invoicePostingResult;
         }

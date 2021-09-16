@@ -34,6 +34,8 @@ namespace UnicontaClient.Pages.CustomPage
         public override IComparer GridSorting { get { return new CompanyFinanceYearSort(); } }
 
         public override bool Readonly { get { return false; } }
+        public override bool IsAutoSave { get { return false; } }
+        public override bool CanDelete { get { return false; } }
     }
 
     public partial class AccountingYear : GridBasePage
@@ -153,7 +155,7 @@ namespace UnicontaClient.Pages.CustomPage
                     { UtilDisplay.ShowErrorCode(res); }
                     else
                     {  
-                        dgFinanceYearGrid.DeleteRow();
+                        dgFinanceYearGrid.RemoveFocusedRowFromGrid();
                         (dgFinanceYearGrid.View as TableView).FocusedRowHandle = 0; 
                     }
                         

@@ -74,6 +74,14 @@ namespace UnicontaClient.Pages.CustomPage
             dgSubInvoiceslineGrid.api = api;
             dgSubInvoiceslineGrid.BusyIndicator = busyIndicator;
         }
+
+        protected override Filter[] DefaultFilters()
+        {
+            Filter dateFilter = new Filter();
+            dateFilter.name = "Date";
+            dateFilter.value = String.Format("{0:d}..", GetSystemDefaultDate().AddMonths(-1));
+            return new Filter[] { dateFilter };
+        }
         void localMenu_OnItemClicked(string ActionType)
         {
             gridRibbon_BaseActions(ActionType);

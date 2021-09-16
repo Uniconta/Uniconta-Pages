@@ -203,6 +203,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 PrCategory.Visible = PrCategory.ShowInColumnChooser = false;
                 Project.Visible = Project.ShowInColumnChooser = false;
+                WorkSpace.ShowInColumnChooser = WorkSpace.Visible = false;
             }
             else
             {
@@ -377,9 +378,12 @@ namespace UnicontaClient.Pages.CustomPage
                             if (cmb._Variant1 == vr1 && cmb._Variant2 != null)
                             {
                                 var v2 = (InvVariant2)variants2.Get(cmb._Variant2);
-                                invs2.Add(v2);
-                                if (var2Value == v2._Variant)
-                                    hasVariantValue = true;
+                                if (v2 != null)
+                                {
+                                    invs2.Add(v2);
+                                    if (var2Value == v2._Variant)
+                                        hasVariantValue = true;
+                                }
 
                             }
                         }
@@ -387,7 +391,8 @@ namespace UnicontaClient.Pages.CustomPage
                         {
                             LastVariant = cmb._Variant1;
                             var v1 = (InvVariant1)variants1.Get(cmb._Variant1);
-                            invs1.Add(v1);
+                            if (v1 != null)
+                                invs1.Add(v1);
                         }
                     }
                     if (SetVariant2)
@@ -620,7 +625,7 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                     break;
                 case "SaveGrid":
-                    saveGridLocal();
+                    saveGrid();
                     break;
                 case "DeleteRow":
                     dgCreditorOrderLineGrid.DeleteRow();
@@ -653,7 +658,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "MarkOrderLineAgnstInvTrans":
                     if (selectedItem?._Item == null) return;
-                    saveGridLocal();
+                    saveGrid();
                     object[] param = new object[] { selectedItem };
                     AddDockItem(TabControls.InventoryTransactionsMarkedPage, param, true);
                     break;
@@ -734,7 +739,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         AddDockItem(TabControls.InvStorageProfileReport, dgCreditorOrderLineGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("StockProfile"), selectedItem._Item));
                     break;
-                case "ViewPhoto":
+                case "ViewItemAttachments":
                     if (selectedItem?._Item != null)
                         AddDockItem(TabControls.UserDocsPage, selectedItem.InvItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Documents"), selectedItem?.InvItem?._Name));
                     break;
@@ -823,7 +828,7 @@ namespace UnicontaClient.Pages.CustomPage
         static bool showInvPrintPreview = true;
         private void OrderConfirmation(CreditorOrderClient dbOrder, CompanyLayoutType doctype)
         {
-            var savetask = saveGridLocal();
+            var savetask = saveGrid();
             InvoiceAPI Invapi = new InvoiceAPI(api);
             var creditor = dbOrder.Creditor;
             bool showSendByMail = true;
@@ -929,7 +934,7 @@ namespace UnicontaClient.Pages.CustomPage
             var item = (InvItem)items.Get(orderLine._Item);
             if (item == null || !item._UseSerialBatch)
                 return;
-            var t = saveGridLocal();
+            var t = saveGrid();
             if (t != null && orderLine.RowId == 0)
                 await t;
             if (api.CompanyEntity.Warehouse)
@@ -939,7 +944,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         async void RefreshGrid()
         {
-            var savetask = saveGridLocal(); // we need to wait until it is saved, otherwise Storage is not updated
+            var savetask = saveGrid(); // we need to wait until it is saved, otherwise Storage is not updated
             if (savetask != null)
                 await savetask;
             gridRibbon_BaseActions("RefreshGrid");
@@ -947,7 +952,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         async void ViewStorage()
         {
-            var t = saveGridLocal();
+            var t = saveGrid();
             if (t != null)
                 await t;
             AddDockItem(TabControls.InvItemStoragePage, dgCreditorOrderLineGrid.syncEntity, true);
@@ -955,7 +960,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void GenerateInvoice(CreditorOrderClient dbOrder, bool showProformaInvoice)
         {
-            var savetask = saveGridLocal();
+            var savetask = saveGrid();
             var curpanel = dockCtrl.Activpanel;
 
             var dc = ClientHelper.GetRef(dbOrder.CompanyId, typeof(Uniconta.DataModel.Creditor), dbOrder._DCAccount) as DCAccount;
@@ -1030,7 +1035,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var invoicePostingResult = new InvoicePostingPrintGenerator(api, this);
             invoicePostingResult.SetUpInvoicePosting(crOrder, null, CompanyLayoutType.PurchaseInvoice, generateDate, invoiceNumber, isSimulated, showInvoice,
-                        false, isQuickPrint, printPageCount, false, !isSimulated && sendInvoiceByOutlook, sendOnlyToEmail, SendOnlyEmailList, false, null, false);
+                        false, isQuickPrint, printPageCount, false, sendInvoiceByOutlook, sendOnlyToEmail, SendOnlyEmailList, false, null, false);
             return invoicePostingResult;
         }
 
@@ -1059,16 +1064,6 @@ namespace UnicontaClient.Pages.CustomPage
                 RecalculateAmount();
         }
 
-        Task<ErrorCodes> saveGridLocal()
-        {
-            var orderLine = dgCreditorOrderLineGrid.SelectedItem as DCOrderLine;
-            dgCreditorOrderLineGrid.SelectedItem = null;
-            dgCreditorOrderLineGrid.SelectedItem = orderLine;
-            if (dgCreditorOrderLineGrid.HasUnsavedData)
-                return saveGrid();
-            return null;
-        }
-
         async void SaveLineToGetConversion(CreditorOrderLineClient rec)
         {
             rec._Price = 0;
@@ -1087,17 +1082,13 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override async Task<ErrorCodes> saveGrid()
         {
-            if (dgCreditorOrderLineGrid.HasUnsavedData)
+            ErrorCodes res = await base.saveGrid();
+            if (res == ErrorCodes.Succes)
             {
-                ErrorCodes res = await dgCreditorOrderLineGrid.SaveData();
-                if (res == ErrorCodes.Succes)
-                {
-                    DataChanged = false;
-                    globalEvents.OnRefresh(NameOfControl, orderMaster);
-                }
-                return res;
+                DataChanged = false;
+                globalEvents.OnRefresh(NameOfControl, orderMaster);
             }
-            return 0;
+            return res;
         }
 
         private Task Filter(IEnumerable<PropValuePair> propValuePair)

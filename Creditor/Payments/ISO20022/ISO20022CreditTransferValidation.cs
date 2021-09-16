@@ -127,12 +127,20 @@ namespace ISO20022CreditTransfer
 
             CreditTransferDocument doc = new CreditTransferDocument();
 
+            glJournalGenerated = journalGenerated;
             var bankAccount = (BankStatement)bankAccountCache.Get(credPaymFormat._BankAccount);
             var credCache = company.GetCache(typeof(Uniconta.DataModel.Creditor));
             var creditor = (Creditor)credCache.Get(trans.Account);
+            if (creditor == null && !glJournalGenerated)
+            {
+                CheckError.Add(new CheckError(String.Format("{0} : {1}",
+                    Uniconta.ClientTools.Localization.lookup("AccountDoesNotExist"),
+                    Uniconta.ClientTools.Localization.lookup(trans.Account))));
+                return new XMLDocumentGenerateResult(dummyDoc, CheckError.Count > 0, 0, CheckError);
+            }
 
             exportFormat = (ExportFormatType)credPaymFormat._ExportFormat;
-            glJournalGenerated = journalGenerated;
+            
             companyCountryId = UnicontaCountryToISO(company._CountryId);
 
             creditorIBAN = string.Empty;
@@ -311,6 +319,14 @@ namespace ISO20022CreditTransfer
                 var string2 = string.Format("{0} {1}", Uniconta.ClientTools.Localization.lookup("Creditor"), creditor._Account);
                 checkErrors.Add(new CheckError(String.Format("{0}, {1}", string1, string2)));
             }
+
+            if (CompanyBankEnum == CompanyBankENUM.CreditSuisse && creditor._ZipCode == null)
+            {
+                var string1 = fieldCannotBeEmpty("ZipCode");
+                var string2 = string.Format("{0} {1}", Uniconta.ClientTools.Localization.lookup("Creditor"), creditor._Account);
+                checkErrors.Add(new CheckError(String.Format("{0}, {1}", string1, string2)));
+            }
+
         }
 
         /// <summary>
@@ -356,7 +372,7 @@ namespace ISO20022CreditTransfer
             if (exportFormat == ExportFormatType.ISO20022_EE)
             {
                 var paymRefNumber = iban ?? string.Empty;
-                iban = creditor._PaymentId ?? string.Empty;
+                iban = glJournalGenerated ? string.Empty : creditor._PaymentId ?? string.Empty;
 
                 //Validate Creditor IBAN >>
                 if (iban == string.Empty)
@@ -430,7 +446,7 @@ namespace ISO20022CreditTransfer
             if (exportFormat == ExportFormatType.ISO20022_NO)
             {
                 var kidNo = bban ?? string.Empty;
-                bban = creditor._PaymentId ?? string.Empty;
+                bban = glJournalGenerated ? string.Empty : creditor._PaymentId ?? string.Empty;
 
                 //Validate Creditor BBAN >>
                 if (bban == string.Empty)

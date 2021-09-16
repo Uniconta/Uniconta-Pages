@@ -45,7 +45,6 @@ namespace UnicontaClient.Pages.CustomPage
            // XpfRichEditLocalizer.Active = new UnicontaXPfRichEditLocalizer();
             InitializeComponent();
             MainControl = txtHtmlControl;
-            BusyIndicator = busyIndicator;
             txtHtmlControl.Loaded += TxtHtmlControl_Loaded;
             txtHtmlControl.HtmlText = html;
             externTypes = new ObservableCollection<string> { "Debtor", "DebtorInvoice", "Creditor", "CreditorInvoice", "Employee", "Contact" };

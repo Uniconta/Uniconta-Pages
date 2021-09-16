@@ -34,6 +34,9 @@ namespace UnicontaISO20022CreditTransfer
                 case chBank.UBS_SIX:
                     companyBankEnum = CompanyBankENUM.UBS_SIX;
                     return companyBankEnum;
+                case chBank.CreditSuisse:
+                    companyBankEnum = CompanyBankENUM.CreditSuisse;
+                    return companyBankEnum;
                 default:
                     return CompanyBankENUM.None;
             }
@@ -63,6 +66,7 @@ namespace UnicontaISO20022CreditTransfer
             switch (companyBankEnum)
             {
                 case CompanyBankENUM.UBS_SIX:
+                case CompanyBankENUM.CreditSuisse:
                     return new UpperCaseUTF8Encoding(false);
                 default:
                     return Encoding.GetEncoding("ISO-8859-1");
@@ -115,6 +119,7 @@ namespace UnicontaISO20022CreditTransfer
             switch (companyBankEnum)
             {
                 case CompanyBankENUM.UBS_SIX:
+                case CompanyBankENUM.CreditSuisse:
                     return CredPaymFormat.BatchBooking ? TRUE_VALUE : FALSE_VALUE;
                 default:
                     return string.Empty;
@@ -166,6 +171,9 @@ namespace UnicontaISO20022CreditTransfer
                 case CompanyBankENUM.UBS_SIX:
                     bankName = "UBSSIX";
                     break;
+                case CompanyBankENUM.CreditSuisse:
+                    bankName = "CreditSuisse";
+                    break;
                 default:
                     bankName = null;
                     break;
@@ -205,7 +213,11 @@ namespace UnicontaISO20022CreditTransfer
 
         public override PostalAddress CreditorAddress(Uniconta.DataModel.Creditor creditor, PostalAddress creditorAddress, bool unstructured = false)
         {
+            if (companyBankEnum == CompanyBankENUM.CreditSuisse)
+                return base.CreditorAddress(creditor, creditorAddress, unstructured);
+
             return null;
+
         }
 
         public override PostalAddress DebtorAddress(Company company, PostalAddress debtorAddress)

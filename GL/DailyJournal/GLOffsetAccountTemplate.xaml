@@ -80,11 +80,11 @@ x:Class="UnicontaClient.Pages.CustomPage.GLOffsetAccountTemplate"
                             </DataTemplate>
                         </local:CorasauDataGridForeignKeyColumnClient.CellTemplate>
                     </local:CorasauDataGridForeignKeyColumnClient>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="cldim1" FieldName="Dimension1" Width="70"  Visible="False"/>
-                    <local:CorasauDataGridTemplateColumnClient  x:Name="cldim2" FieldName="Dimension2" Width="70"  Visible="False"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="cldim3" FieldName="Dimension3" Width="70"  Visible="False"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="cldim4" FieldName="Dimension4" Width="70"  Visible="False"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="cldim5" FieldName="Dimension5" Width="70"  Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="cldim1" FieldName="Dimension1" Width="70" />
+                    <local:CorasauDataGridTemplateColumnClient  x:Name="cldim2" FieldName="Dimension2" Width="70" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="cldim3" FieldName="Dimension3" Width="70" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="cldim4" FieldName="Dimension4" Width="70" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="cldim5" FieldName="Dimension5" Width="70" />
                 </local:GLOffsetAccountLineGrid.Columns>
             </local:GLOffsetAccountLineGrid>
         </CorasauControls:BusyIndicator>

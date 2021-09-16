@@ -15,9 +15,10 @@
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="View" ShortcutKey="" LocalizedNameKey="View" LargeGlyph="View_Highlighted_32x32.png">
-    <RibbonItem Action="ViewPhoto" ShortcutKey="" LocalizedNameKey="Photo" Glyph="View_16x16.png"/>
-     <RibbonItem Action="ViewWeb" ShortcutKey="" LocalizedNameKey="Web" Glyph="View_16x16.png"/>
-  </RibbonItem>
+      <RibbonItem Action="ViewPhoto" ShortcutKey="" LocalizedNameKey="Photo" Glyph="View_16x16.png"/>
+      <RibbonItem Action="ViewWeb" ShortcutKey="" LocalizedNameKey="Web" Glyph="View_16x16.png"/>
+      <RibbonItem Action="ViewAttachment" ShortcutKey="" LocalizedNameKey="Attachment" Glyph="View_16x16.png"/>
+    </RibbonItem>
   </RibbonItem>
   <!---If we want to create a new group in same PageTab-->
   <RibbonItem>

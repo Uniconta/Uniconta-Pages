@@ -51,6 +51,9 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectDetailControl"
                     <CorasauControls:CorasauLayoutItem x:Name="liFixedPrice" FieldName="FixedPrice">
                         <CorasauControls:DoubleEditor  FieldName="FixedPrice" IsReadOnly="True"/>
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="liSalesPrice" FieldName="SalesPrice">
+                        <CorasauControls:DoubleEditor  FieldName="SalesPrice" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="EndDiscountPct" x:Name="liEndDiscountPct">
                         <CorasauControls:DoubleEditor FieldName="EndDiscountPct" IsReadOnly="True"/>
                     </CorasauControls:CorasauLayoutItem>

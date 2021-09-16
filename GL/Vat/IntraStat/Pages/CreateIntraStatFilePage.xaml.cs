@@ -624,7 +624,7 @@ namespace UnicontaClient.Pages.CustomPage
                     return _CountryOfOriginUNK == IntraUnknownCountry.EUCountry ? "QV" :
                            _CountryOfOriginUNK == IntraUnknownCountry.ThirdCountry ? "QW" : "";
                 else
-                    return ((CountryISOCode)CountryOfOrigin).ToString();
+                    return CountryOfOrigin == CountryCode.UnitedKingdom ? "XU" : ((CountryISOCode)CountryOfOrigin).ToString();
             } 
         }
 

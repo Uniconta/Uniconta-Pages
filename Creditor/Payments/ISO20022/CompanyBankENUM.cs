@@ -24,6 +24,7 @@ namespace UnicontaISO20022CreditTransfer
         Standard,
         Handelsbanken,
         Commerzbank,
-        UBS_SIX
+        UBS_SIX,
+        CreditSuisse
     }
 }

@@ -300,11 +300,18 @@ namespace UnicontaClient.Pages.CustomPage
             return detail == null ? null : detail.View as TableView;
         }
 
+        public override bool CheckIfBindWithUserfield(out bool isReadOnly, out bool useBinding)
+        {
+            isReadOnly = true;
+            useBinding = true;
+            return true;
+        }
+
 #if !SILVERLIGHT
 
         void SubstituteFilter(object sender, DevExpress.Data.SubstituteFilterEventArgs e)
         {
-            if (string.IsNullOrEmpty(ribbonControl.SearchControl.SearchText))
+            if (string.IsNullOrEmpty(ribbonControl?.SearchControl?.SearchText))
                 return;
             e.Filter = new GroupOperator(GroupOperatorType.Or, e.Filter, GetDetailFilter(ribbonControl.SearchControl.SearchText));
         }

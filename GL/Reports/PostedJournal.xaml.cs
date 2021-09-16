@@ -28,6 +28,18 @@ namespace UnicontaClient.Pages.CustomPage
     {
         public override Type TableType { get { return typeof(GLDailyJournalPostedClient); } }
         public override IComparer GridSorting { get { return new GLDailyJournalPostedClientSort(); } }
+
+        protected override void DataLoaded(UnicontaBaseEntity[] Arr)
+        {
+            var cache = this.api.CompanyEntity.GLPosted;
+            if (cache != null)
+            {
+                var a = (GLDailyJournalPostedClient[])Arr;
+                for (int i = 0; (i < a.Length); i++)
+                    if (cache.Get(a[i].RowId) == null)
+                        cache.Add(a[i]);
+            }
+        }
     }
 
     public partial class PostedJournals : GridBasePage
@@ -41,10 +53,11 @@ namespace UnicontaClient.Pages.CustomPage
             if (dif.TotalDays < 365)
                 return null;
 
-            Filter postedFilter = new Filter();
-            postedFilter.name = "Posted";
-            postedFilter.value = today.AddDays(-90).ToShortDateString() + "..";
-            return new Filter[] { postedFilter };
+            return new Filter[] { new Filter()
+            {
+                name = "Posted",
+                value = BasePage.GetFilterDate(api.CompanyEntity, false, 2).ToShortDateString() + ".."
+            } };
         }
         public PostedJournals(UnicontaBaseEntity master)
             : base(master)
@@ -81,7 +94,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override void LoadCacheInBackGround()
         {
-            LoadType(new Type[] { typeof(Uniconta.DataModel.Debtor), typeof(Uniconta.DataModel.Creditor), typeof(Uniconta.DataModel.GLAccount) });
+            LoadType(new Type[] { typeof(Uniconta.DataModel.GLDailyJournal), typeof(Uniconta.DataModel.NumberSerie), typeof(Uniconta.DataModel.Debtor), typeof(Uniconta.DataModel.Creditor), typeof(Uniconta.DataModel.GLAccount) });
         }
 
         private void localMenu_OnItemClicked(string ActionType)

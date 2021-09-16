@@ -119,6 +119,7 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryStatement"
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="HasSeriaBatch" Width="50" Visible="false"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Warehouse" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Location" />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="PrCategory"  Visible="false"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim1" Width="70" FieldName="Dimension1" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim2" Width="70" FieldName="Dimension2" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim3" Width="70" FieldName="Dimension3" />

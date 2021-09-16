@@ -41,7 +41,7 @@ namespace UnicontaClient.Pages.CustomPage
         public override UnicontaBaseEntity ModifiedRow { get { return (UnicontaBaseEntity)editrow; } set { editrow = (BaseUserTable)value; } }
         UnicontaBaseEntity sourcdata;
         TableHeader tableheadermaster;
-        public UserTableDataPage2(UnicontaBaseEntity sourcedata, TableHeaderClient master = null)
+        public UserTableDataPage2(UnicontaBaseEntity sourcedata, TableHeader master = null)
             : base(sourcedata, true)
         {
             tableheadermaster = master;
@@ -64,7 +64,6 @@ namespace UnicontaClient.Pages.CustomPage
         {
             frmRibbon.TableName = tableheadermaster?._Name;
             Layout._SubId = crudapi.CompanyId;
-            BusyIndicator = busyIndicator;
             layoutControl = layoutItems;
             if (LoadedRow == null)
             {
@@ -117,15 +116,11 @@ namespace UnicontaClient.Pages.CustomPage
             var selectedItem = lookupMasterKey.SelectedItem;
             if (selectedItem != null)
             {
-                if (selectedItem is TableDataWithKey)
-                {
-                    var item = selectedItem as TableDataWithKey;
+                var item = selectedItem as TableDataWithKey;
+                if (item != null)
                     txtMasterName.Text = item.KeyName;
-                }
                 else if (selectedItem is UnicontaBaseEntity)
-                {
                     txtMasterName.Text = Convert.ToString(selectedItem.GetType().GetProperty("KeyName").GetValue(selectedItem, null));
-                }
             }
         }
     }

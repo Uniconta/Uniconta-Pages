@@ -42,8 +42,11 @@
     <RibbonItem Action="Transactions" LocalizedNameKey="Transactions"  LargeGlyph="Account-statement_32x32.png" ShortcutKey="CTRL+T"/>
   </RibbonItem>
   <RibbonItem >
-    <RibbonItem Action="SalesOrder" LocalizedNameKey="GenerateOnAccountInvoice" LargeGlyph="Orders_32x32.png"/>  
-    <RibbonItem Action="CreateOrder" LocalizedNameKey="GenerateFinalInvoice" LargeGlyph="AccountInvoice_16x16.png"/>
-    <RibbonItem Action="ZeroInvoice" LocalizedNameKey="CreateOBJ" Parameter="ZeroInvoice" LargeGlyph="Blank_32x32.png"/>
+    <RibbonItem Action="ViewNotes" LocalizedNameKey="ProjectNotes" LargeGlyph="Note_32x32.png" ShortcutKey="CTRL+N"/>
+  </RibbonItem>
+  <RibbonItem >
+    <RibbonItem Action="SalesOrder" LocalizedNameKey="GenerateOnAccountProposal" LargeGlyph="Orders_32x32.png"/>  
+    <RibbonItem Action="CreateOrder" LocalizedNameKey="CreateOBJ" Parameter="InvoiceProposal" LargeGlyph="Invoice_32x32.png"/>
+    <RibbonItem Action="ZeroInvoice" LocalizedNameKey="CreateOBJ" Parameter="ZeroInvoice" Module="_ProjZeroInvoice" LargeGlyph="Blank_32x32.png"/>
   </RibbonItem>
 </root>

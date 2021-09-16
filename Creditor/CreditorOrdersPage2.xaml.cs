@@ -90,13 +90,12 @@ namespace UnicontaClient.Pages.CustomPage
 
         void InitPage(CrudAPI crudapi)
         {
-            BusyIndicator = busyIndicator;
             dAddress.Header = Uniconta.ClientTools.Localization.lookup("DeliveryAddr");
             layoutControl = layoutItems;
             lePostingAccount.api = Employeelookupeditor.api = leAccount.api = lePayment.api = cmbDim1.api
                 = leTransType.api = cmbDim2.api = cmbDim3.api = cmbDim4.api = cmbDim5.api = leGroup.api = leShipment.api =
                 PrCategorylookupeditor.api = Projectlookupeditor.api = leApprover.api = leDeliveryTerm.api = leInvoiceAccount.api =
-                PriceListlookupeditior.api = leLayoutGroup.api = leVat.api = prTasklookupeditor.api = crudapi;
+                PriceListlookupeditior.api = leLayoutGroup.api = leVat.api = prTasklookupeditor.api = lePrWorkSpace.api= crudapi;
 
 #if SILVERLIGHT
             leRelatedOrder.api = crudapi;
@@ -229,6 +228,8 @@ namespace UnicontaClient.Pages.CustomPage
                 var project = Comp.GetCache(typeof(Uniconta.DataModel.Project))?.Get(editrow._Project) as ProjectClient;
                 setTask(project);
             }
+            if (!Comp.CreditorPrice)
+                priceListLayoutItem.Visibility = Visibility.Collapsed;
         }
 
         public override bool BeforeSetUserField(ref CorasauLayoutGroup parentGroup)
@@ -297,9 +298,7 @@ namespace UnicontaClient.Pages.CustomPage
                     AddDockItem(TabControls.AttachVoucherGridPage, new object[] { _refferedVouchers }, true);
                     break;
                 case "ViewVoucher":
-                    busyIndicator.IsBusy = true;
                     ViewVoucher(TabControls.VouchersPage3, editrow);
-                    busyIndicator.IsBusy = false;
                     break;
                 case "ImportVoucher":
                     var voucher = new VouchersClient();

@@ -5,68 +5,60 @@ x:Class="UnicontaClient.Pages.CustomPage.NumberSeriePage2"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
     xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"  
-                    xmlns:toolkit="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Toolkit"
-   
-    mc:Ignorable="d"
+   mc:Ignorable="d"
     d:DesignHeight="300" d:DesignWidth="400">
-    <UserControl.Resources>
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl x:Name="frmRibbon" XMLSourcePath=";component/Assets/FormRibbonNoLayout.xml" Grid.Row="0"/>
+        <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
+            <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="grpFirst">
 
-    </UserControl.Resources>
-    <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="0" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
-        <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <CorasauControls:CorasauRibbonControl x:Name="frmRibbon" XMLSourcePath=";component/Assets/FormRibbonNoLayout.xml" Grid.Row="0"/>
-            <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
-                <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="grpFirst">
-
-                    <CorasauControls:CorasauLayoutGroup x:Name="grpNumberSerie" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=NumberSerie}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                        <CorasauControls:CorasauLayoutItem FieldName="Serie" x:Name="liSerie">
-                            <CorasauControls:TextEditor Text="{Binding Serie,Mode=TwoWay}" MaxLength="10" x:Name="txtSerie"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="Name" x:Name="liName">
-                            <CorasauControls:TextEditor Text="{Binding Name,Mode=TwoWay}" MaxLength="30"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="Usage" x:Name="liUsage">
-                            <CorasauControls:ComboBoxEditor  x:Name="cmbUsage" SelectedItem="{Binding Usage,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                    </CorasauControls:CorasauLayoutGroup>
-
-                    <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpValues" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Values}" Orientation="Vertical"   CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                        <CorasauControls:CorasauLayoutItem FieldName="FirstValue" x:Name="liFirstValue">
-                            <CorasauControls:IntegerEditor EditValue="{Binding FirstValue,Mode=TwoWay}" MaxLength="9"  SetMask="false"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="LastValue" x:Name="liLastValue">
-                            <CorasauControls:IntegerEditor EditValue="{Binding LastValue,Mode=TwoWay}" MaxLength="9" SetMask="false"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="Next" x:Name="liNext">
-                            <CorasauControls:IntegerEditor EditValue="{Binding Next,Mode=TwoWay}" MaxLength="9" SetMask="false"/>
-                        </CorasauControls:CorasauLayoutItem>
-                    </CorasauControls:CorasauLayoutGroup>
-
-                    <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpOptions" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Options}" Orientation="Vertical"   CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                        <CorasauControls:CorasauLayoutItem FieldName="Prefix" x:Name="liPrefix">
-                            <CorasauControls:TextEditor Text="{Binding Prefix,Mode=TwoWay}" MaxLength="10"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="Length" x:Name="liLength">
-                            <CorasauControls:IntegerEditor  EditValue="{Binding Length,Mode=TwoWay}" />
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="Blocked" x:Name="liBlocked">
-                            <CorasauControls:CheckEditor  IsChecked="{Binding Blocked,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="Manual" x:Name="liManual">
-                            <CorasauControls:CheckEditor  IsChecked="{Binding Manual,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="InUse" x:Name="liInUse">
-                            <CorasauControls:CheckEditor  IsChecked="{Binding InUse,Mode=OneWay}" IsReadOnly="True"/>
-                        </CorasauControls:CorasauLayoutItem>
-                    </CorasauControls:CorasauLayoutGroup>
+                <CorasauControls:CorasauLayoutGroup x:Name="grpNumberSerie" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=NumberSerie}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                    <CorasauControls:CorasauLayoutItem FieldName="Serie" x:Name="liSerie">
+                        <CorasauControls:TextEditor Text="{Binding Serie,Mode=TwoWay}" MaxLength="10" x:Name="txtSerie"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Name" x:Name="liName">
+                        <CorasauControls:TextEditor Text="{Binding Name,Mode=TwoWay}" MaxLength="30"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Usage" x:Name="liUsage">
+                        <CorasauControls:ComboBoxEditor  x:Name="cmbUsage" SelectedItem="{Binding Usage,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
-            </CorasauControls:CorasauLayoutControl>
-        </Grid>
-    </CorasauControls:BusyIndicator>
+
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpValues" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Values}" Orientation="Vertical"   CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                    <CorasauControls:CorasauLayoutItem FieldName="FirstValue" x:Name="liFirstValue">
+                        <CorasauControls:IntegerEditor EditValue="{Binding FirstValue,Mode=TwoWay}" MaxLength="9"  SetMask="false"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="LastValue" x:Name="liLastValue">
+                        <CorasauControls:IntegerEditor EditValue="{Binding LastValue,Mode=TwoWay}" MaxLength="9" SetMask="false"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Next" x:Name="liNext">
+                        <CorasauControls:IntegerEditor EditValue="{Binding Next,Mode=TwoWay}" MaxLength="9" SetMask="false"/>
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
+
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpOptions" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Options}" Orientation="Vertical"   CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                    <CorasauControls:CorasauLayoutItem FieldName="Prefix" x:Name="liPrefix">
+                        <CorasauControls:TextEditor Text="{Binding Prefix,Mode=TwoWay}" MaxLength="10"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Length" x:Name="liLength">
+                        <CorasauControls:IntegerEditor  EditValue="{Binding Length,Mode=TwoWay}" />
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Blocked" x:Name="liBlocked">
+                        <CorasauControls:CheckEditor  IsChecked="{Binding Blocked,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Manual" x:Name="liManual">
+                        <CorasauControls:CheckEditor  IsChecked="{Binding Manual,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="InUse" x:Name="liInUse">
+                        <CorasauControls:CheckEditor  IsChecked="{Binding InUse,Mode=OneWay}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
+            </CorasauControls:CorasauLayoutGroup>
+        </CorasauControls:CorasauLayoutControl>
+    </Grid>
 </Pages:FormBasePage>

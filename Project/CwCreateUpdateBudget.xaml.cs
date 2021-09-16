@@ -7,7 +7,9 @@ using Uniconta.API.System;
 using Uniconta.ClientTools;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.Common;
+using Uniconta.DataModel;
 using UnicontaClient.Controls;
+using UnicontaClient.Utilities;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -24,7 +26,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         [InputFieldData]
         [ForeignKeyAttribute(ForeignKeyTable = typeof(Uniconta.DataModel.ProjectBudgetGroup))]
-        [Display(Name = "Group", ResourceType = typeof(InputFieldDataText))]
+        [Display(Name = "BudgetGroup", ResourceType = typeof(InputFieldDataText))]
         public static string Group { get; set; }
 
         [InputFieldData]
@@ -33,13 +35,35 @@ namespace UnicontaClient.Pages.CustomPage
         public static string Employee { get; set; }
 
         [InputFieldData]
-        [ForeignKeyAttribute(ForeignKeyTable = typeof(Uniconta.DataModel.Project))]
-        [Display(Name = "Project", ResourceType = typeof(InputFieldDataText))]
-        public static string Project { get; set; }
+        [ForeignKeyAttribute(ForeignKeyTable = typeof(Uniconta.DataModel.EmpPayrollCategory))]
+        [Display(Name = "Payroll", ResourceType = typeof(InputFieldDataText))]
+        public static string Payroll { get; set; }
 
         [InputFieldData]
-        [Display(Name = "Comment", ResourceType = typeof(InputFieldDataText))]
-        public static string Comment { get; set; }
+        [ForeignKeyAttribute(ForeignKeyTable = typeof(Uniconta.DataModel.PrCategory))]
+        [Display(Name = "ProjectCategory", ResourceType = typeof(InputFieldDataText))]
+        public static string PrCategory { get; set; }
+
+        [InputFieldData]
+        [Display(Name = "BudgetMethod", ResourceType = typeof(InputFieldDataText))]
+        public static BudgetMethod BudgetMethod { get; set; }
+
+        [InputFieldData]
+        [Display(Name = "Name", ResourceType = typeof(InputFieldDataText))]
+        public static string BudgetName { get; set; }
+
+        [InputFieldData]
+        [ForeignKeyAttribute(ForeignKeyTable = typeof(Uniconta.DataModel.PrWorkSpace))]
+        [Display(Name = "WorkSpace", ResourceType = typeof(InputFieldDataText))]
+        public static string PrWorkSpace { get; set; }
+
+        [InputFieldData]
+        [Display(Name = "DeleteBudget", ResourceType = typeof(InputFieldDataText))]
+        public bool DeleteBudget { get; set; }
+
+        [InputFieldData]
+        [Display(Name = "InclProjectTasks", ResourceType = typeof(InputFieldDataText))]
+        public bool InclProjectTask { get; set; }
 
 #if !SILVERLIGHT
         public int DialogTableId;
@@ -56,21 +80,36 @@ namespace UnicontaClient.Pages.CustomPage
             fromDate.DateTime = FromDate;
             toDate.DateTime = ToDate;
 
+            if (!crudApi.CompanyEntity.ProjectTask)
+            {
+                inclProjectTask.Visibility = Visibility.Collapsed;
+                lblInclProjectTask.Visibility = Visibility.Collapsed;
+            }
+
             switch (dialogType)
             {
                 case 0:
-                    this.Title = string.Format(Uniconta.ClientTools.Localization.lookup("CreateOBJ"), Uniconta.ClientTools.Localization.lookup("Budget"));
-                    txtComment.Visibility = Visibility.Visible;
-                    lblTxtCommment.Visibility = txtComment.Visibility;
+                    Width = 425;
+                    Height = 540;
+                    this.Title = Uniconta.ClientTools.Localization.lookup("CreateBudgetRealized");
+                    txtName.Visibility = Visibility.Visible;
+                    lblTxtName.Visibility = txtName.Visibility;
                     break;
                 case 1:
+                    Width = 400;
+                    Height = 400;
                     this.Title = string.Format(Uniconta.ClientTools.Localization.lookup("UpdateOBJ"), Uniconta.ClientTools.Localization.lookup("Prices"));
-                    txtComment.Visibility = Visibility.Collapsed;
-                    lblTxtCommment.Visibility = txtComment.Visibility;
+                    txtName.Visibility = Visibility.Collapsed;
+                    lblTxtName.Visibility = Visibility.Collapsed;
+                    layoutGroupSettings.Visibility = Visibility.Collapsed;
+                    cmbBudgetMethod.Visibility = Visibility.Collapsed;
+                    lblBudgetMethod.Visibility = Visibility.Collapsed;
                     break;
             }
 
-            leGroup.api = leEmp.api = leProject.api = crudApi;
+            leGroup.api = leEmp.api = lePayroll.api = lePrCategory.api = leWorkspace.api = crudApi;
+            cmbBudgetMethod.ItemsSource = new string[] { Uniconta.ClientTools.Localization.lookup("MonthView"), Uniconta.ClientTools.Localization.lookup("WeekView"), Uniconta.ClientTools.Localization.lookup("DayView") };
+            cmbBudgetMethod.SelectedIndex = (byte)BudgetMethod;
         }
 
         private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
@@ -88,6 +127,16 @@ namespace UnicontaClient.Pages.CustomPage
                     return;
                 }
                 OKButton_Click(null, null);
+            }
+        }
+
+        private void cmbBudgetMethod_SelectedIndexChanged(object sender, RoutedEventArgs e)
+        {
+            switch (cmbBudgetMethod.SelectedIndex)
+            {
+                case 0: BudgetMethod = BudgetMethod.Month; break;
+                case 1: BudgetMethod = BudgetMethod.Week; break;
+                case 2: BudgetMethod = BudgetMethod.Day; break;
             }
         }
 

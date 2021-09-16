@@ -20,10 +20,12 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectTransactionPage"
         <CorasauControls:BusyIndicator  x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <localPage:ProjectTransactionGridClient x:Name="dgProjectTransaction" AutoGenerateColumns="None">
                 <localPage:ProjectTransactionGridClient.Columns>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="IsTimeJournal" Width="35" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Date" Width="90" AllowEditing="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ProjectCol" FieldName="Project" Width="80"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ProjectName" Visible="False" AllowEditing="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Task" Width="80" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="WorkSpace" Width="80" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Width="70" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CategoryName" Visible="False" AllowEditing="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PayrollCategory" Width="70"/>

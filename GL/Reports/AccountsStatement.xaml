@@ -15,6 +15,7 @@ x:Class="UnicontaClient.Pages.CustomPage.AccountStatement"
         </DataTemplate>
         <Util:ImageNameToImagesourceConverter x:Key="ImageNameToImagesourceConverter"/>
         <Util:VisibilityBoolConverter x:Key="VisibilityBoolConverter" />
+        <Util:RowIndexConverter x:Key="RowIndexConverter" />
     </UserControl.Resources>
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>

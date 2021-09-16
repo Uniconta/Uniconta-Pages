@@ -64,7 +64,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CWGenerateInvoice"
                             </DataTemplate>
                         </ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
                         <ClientToolsControls:CorasauLayoutItem FieldName="AdditionalOrders" x:Name="liAdditionalOrders" LabelTemplate="{StaticResource PrimaryLableTemplate}">
-                            <ClientToolsControls:DimComboBoxEditor x:Name="cbOrders" DisplayMember="KeyStr" EditValue="{Binding AdditionalOrders}"  ShowCustomItems="False">
+                            <ClientToolsControls:DimComboBoxEditor x:Name="cbOrders" DisplayMember="KeyStr" EditValue="{Binding AdditionalOrders}">
                                 <ClientToolsControls:DimComboBoxEditor.StyleSettings>
                                     <editor:CheckedComboBoxStyleSettings  />
                                 </ClientToolsControls:DimComboBoxEditor.StyleSettings>

@@ -29,13 +29,14 @@ namespace UnicontaClient.Pages.CustomPage
     {
         DCGroupPostingClient editRow;
         public override string NameOfControl { get { return TabControls.CreditorGroupPostingPage2; } }
-
-        public CreditorGroupPostingPage2(UnicontaBaseEntity sourceData, bool isEdit = true) : base(sourceData, isEdit)
+        bool isGroupEnabled = true;
+        public CreditorGroupPostingPage2(UnicontaBaseEntity sourceData, UnicontaBaseEntity groupMaster,bool isEdit = true) : base(sourceData, isEdit)
         {
             InitializeComponent();
             if (!isEdit)
                 editRow = (DCGroupPostingClient)StreamingManager.Clone(sourceData);
-            InitPage(api);
+            isGroupEnabled = !isEdit;
+            InitPage(api, groupMaster);
         }
 
         public CreditorGroupPostingPage2(CrudAPI crudApi,UnicontaBaseEntity groupMaster):base(crudApi,null)
@@ -45,9 +46,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
         private void InitPage(CrudAPI crudApi, UnicontaBaseEntity groupMaster = null)
         {
-            BusyIndicator = busyIndicator;
             layoutControl = layoutItems;
-
             leRevenueAccount.api = leRevenueAccount1.api =leRevenueAccount2.api = leRevenueAccount3.api = leRevenueAccount4.api = leInvGroup.api = leGroup.api
                = leVat.api = leVat1.api = leVat2.api = leVat3.api = leVat4.api = crudApi;
 
@@ -71,12 +70,12 @@ namespace UnicontaClient.Pages.CustomPage
                 if (groupMaster is Uniconta.DataModel.DCGroup)
                 {
                     liGroup.Visibility = Visibility.Collapsed;
-                    leInvGroup.IsEnabled = true;
+                    leInvGroup.IsEnabled = isGroupEnabled;
                 }
                 else if (groupMaster is Uniconta.DataModel.InvGroup)
                 {
                     liInventoryGroup.Visibility = Visibility.Collapsed;
-                    leGroup.IsEnabled = true;
+                    leGroup.IsEnabled = isGroupEnabled;
                     leGroup.SetForeignKeyRef(typeof(CreditorGroupClient), 0);
                 }
             }

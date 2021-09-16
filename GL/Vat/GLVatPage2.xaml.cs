@@ -53,7 +53,6 @@ namespace UnicontaClient.Pages.CustomPage
         }
         void InitPage(CrudAPI crudapi)
         {
-            BusyIndicator = busyIndicator;
             cbMethod.ItemsSource = AppEnums.GLVatCalculationMethod.Values;
             leAccountRate2.api = leOffsetAccountRate2.api = leRate2Vat.api = leRate1Vat.api = leOffsetVatOperation.api=
             leAccount.api = leOffsetAccount.api = leUnrealizedAccount.api = leTypeBuy.api = leTypeSales.api = crudapi;
@@ -70,7 +69,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (!crudapi.CompanyEntity._UseUnrealizedVat)
                 liUnrealizedAccount.Visibility = Visibility.Collapsed;
-
+            cbVatCountry.ItemsSource = cbBusinessCountry.ItemsSource = cbShipmentCountry.ItemsSource = Enum.GetValues(typeof(Uniconta.Common.CountryCode));
             StartLoadCache();
         }
         private void frmRibbon_OnItemClicked(string ActionType)

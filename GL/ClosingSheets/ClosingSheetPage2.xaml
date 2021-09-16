@@ -6,138 +6,132 @@ x:Class="UnicontaClient.Pages.CustomPage.ClosingSheetPage2"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-                     xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
     xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"  
-                     
     d:DesignHeight="300" d:DesignWidth="400">
-
     <UserControl.Resources>
         <SolidColorBrush x:Key="LayoutGridColor" Color="Transparent">
         </SolidColorBrush>
     </UserControl.Resources>
-    <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="0" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BusyMessage}">
-        <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <CorasauControls:CorasauRibbonControl x:Name="frmRibbon" XMLSourcePath=";component/Assets/FormRibbon.xml" Grid.Row="0"/>
-            <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
-                <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="grpFirst">
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl x:Name="frmRibbon" XMLSourcePath=";component/Assets/FormRibbon.xml" Grid.Row="0"/>
+        <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
+            <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="grpFirst">
 
-                    <CorasauControls:CorasauLayoutGroup x:Name="grpDescription" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Description}" Orientation="Vertical"  Width="Auto" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                        <CorasauControls:CorasauLayoutItem FieldName="Name"  x:Name="liName">
-                            <CorasauControls:TextEditor Text="{Binding Name,Mode=TwoWay}" MaxLength="30" x:Name="txtName"/>
-                        </CorasauControls:CorasauLayoutItem>
-                    </CorasauControls:CorasauLayoutGroup>
-
-                    <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpAccounts" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Accounts}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                        <CorasauControls:CorasauLayoutItem FieldName="FromAccount" x:Name="liFromAccount">
-                            <CorasauControls:LookupEditor x:Name="leFromAccount" Text="{Binding FromAccount,Mode=TwoWay}">
-                            </CorasauControls:LookupEditor>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="ToAccount" x:Name="liToAccount">
-                            <CorasauControls:LookupEditor x:Name="leToAccount" Text="{Binding ToAccount,Mode=TwoWay}">
-                            </CorasauControls:LookupEditor>
-                        </CorasauControls:CorasauLayoutItem>
-                    </CorasauControls:CorasauLayoutGroup>
-
-                    <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpPeriod" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Period}" Orientation="Vertical" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                        <CorasauControls:CorasauLayoutItem FieldName="FromDate" x:Name="liFromDate">
-                            <CorasauControls:DateEditor  EditValue="{Binding FromDate,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="ToDate" x:Name="liToDate">
-                            <CorasauControls:DateEditor  EditValue="{Binding ToDate,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                    </CorasauControls:CorasauLayoutGroup>
-
-                    <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpLastPeriod" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LastPeriod}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                        <CorasauControls:CorasauLayoutItem FieldName="FromDate2" x:Name="liFromDate2">
-                            <CorasauControls:DateEditor  EditValue="{Binding FromDate2,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="ToDate2" x:Name="liToDate2">
-                            <CorasauControls:DateEditor  EditValue="{Binding ToDate2,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                    </CorasauControls:CorasauLayoutGroup>
-
-                    <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="useDim" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Dimensions}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                        <CorasauControls:CorasauLayoutItem x:Name="lbldim1">
-                            <StackPanel Orientation="Horizontal">
-                                <CorasauControls:LookupEditor x:Name="dim1lookupeditior" Text="{Binding Dimension1,Mode=TwoWay}" >
-                                </CorasauControls:LookupEditor>
-                                <CorasauControls:CheckEditor Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=IncludeAll}" x:Name="chkIncludeAll1" IsChecked="{Binding IncludeAll1,Mode=TwoWay}" Margin="10,0,0,0"/>
-                            </StackPanel>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem x:Name="lbldim2">
-                            <StackPanel Orientation="Horizontal">
-                                <CorasauControls:LookupEditor x:Name="dim2lookupeditior" Text="{Binding Dimension2,Mode=TwoWay}">
-                                </CorasauControls:LookupEditor>
-                                <CorasauControls:CheckEditor x:Name="chkIncludeAll2" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=IncludeAll}" IsChecked="{Binding IncludeAll2,Mode=TwoWay}" Margin="10,0,0,0"/>
-                            </StackPanel>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem x:Name="lbldim3">
-                            <StackPanel Orientation="Horizontal">
-                                <CorasauControls:LookupEditor x:Name="dim3lookupeditior" Text="{Binding Dimension3,Mode=TwoWay}" >
-                                </CorasauControls:LookupEditor>
-                                <CorasauControls:CheckEditor x:Name="chkIncludeAll3" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=IncludeAll}" IsChecked="{Binding IncludeAll3,Mode=TwoWay}" Margin="10,0,0,0"/>
-                            </StackPanel>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem x:Name="lbldim4">
-                            <StackPanel Orientation="Horizontal">
-                                <CorasauControls:LookupEditor x:Name="dim4lookupeditior" Text="{Binding Dimension4,Mode=TwoWay}" >
-                                </CorasauControls:LookupEditor>
-                                <CorasauControls:CheckEditor x:Name="chkIncludeAll4" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=IncludeAll}" IsChecked="{Binding IncludeAll4,Mode=TwoWay}" Margin="10,0,0,0"/>
-                            </StackPanel>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem x:Name="lbldim5">
-                            <StackPanel Orientation="Horizontal">
-                                <CorasauControls:LookupEditor x:Name="dim5lookupeditior" Text="{Binding Dimension5,Mode=TwoWay}" >
-                                </CorasauControls:LookupEditor>
-                                <CorasauControls:CheckEditor x:Name="chkIncludeAll5" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=IncludeAll}" IsChecked="{Binding IncludeAll5,Mode=TwoWay}" Margin="10,0,0,0"/>
-                            </StackPanel>
-                        </CorasauControls:CorasauLayoutItem>
-                    </CorasauControls:CorasauLayoutGroup>
-
-                    <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpNumberSerie" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=NumberSerie}" Orientation="Vertical" Width="Auto" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                        <CorasauControls:CorasauLayoutItem FieldName="NumberSerie" Style="{StaticResource LayoutItemsstyle}" x:Name="AcItem">
-                            <CorasauControls:LookupEditor x:Name="leNumberSerie" Text="{Binding NumberSerie,Mode=TwoWay}">
-                            </CorasauControls:LookupEditor>
-                            <CorasauControls:CorasauLayoutItem.ButtonContent>
-                                <Image Source="/UnicontaPages;component/Assets/img/Right_Arrow_16x16.png" Width="12"/>
-                            </CorasauControls:CorasauLayoutItem.ButtonContent>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="ManualAllocation" x:Name="liManualAllocation">
-                            <CorasauControls:CheckEditor  IsChecked="{Binding ManualAllocation,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="GenerateVoucher" x:Name="liGenerateVoucher">
-                            <CorasauControls:CheckEditor  IsChecked="{Binding GenerateVoucher,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="OneVoucherForAll" x:Name="liOneVoucherForAll">
-                            <CorasauControls:CheckEditor  IsChecked="{Binding OneVoucherForAll,Mode=TwoWay}" IsEnabled="{Binding GenerateVoucher,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                    </CorasauControls:CorasauLayoutGroup>
-
-                    <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpAllocAccount" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=AllocAccount}" Orientation="Vertical"  Width="Auto" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                        <CorasauControls:CorasauLayoutItem FieldName="BlockedForAllocation" x:Name="liBlockedForAllocation">
-                            <CorasauControls:CheckEditor  IsChecked="{Binding BlockedForAllocation,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                    </CorasauControls:CorasauLayoutGroup>
-
-                    <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpDefaultValues" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Defaultvalues}" Orientation="Vertical"  Width="Auto" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                        <CorasauControls:CorasauLayoutItem FieldName="OffsetAccount" x:Name="liOffsetAccount">
-                            <CorasauControls:LookupEditor x:Name="leOffsetAccount" Text="{Binding OffsetAccount,Mode=TwoWay}">
-                            </CorasauControls:LookupEditor>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="TransType" x:Name="liTransType">
-                            <CorasauControls:LookupEditor x:Name="leTransType" Text="{Binding TransType,Mode=TwoWay}">
-                            </CorasauControls:LookupEditor>
-                        </CorasauControls:CorasauLayoutItem>
-                    </CorasauControls:CorasauLayoutGroup>
-
+                <CorasauControls:CorasauLayoutGroup x:Name="grpDescription" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Description}" Orientation="Vertical"  Width="Auto" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                    <CorasauControls:CorasauLayoutItem FieldName="Name"  x:Name="liName">
+                        <CorasauControls:TextEditor Text="{Binding Name,Mode=TwoWay}" MaxLength="30" x:Name="txtName"/>
+                    </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
-            </CorasauControls:CorasauLayoutControl>
 
-        </Grid>
-    </CorasauControls:BusyIndicator>
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpAccounts" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Accounts}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                    <CorasauControls:CorasauLayoutItem FieldName="FromAccount" x:Name="liFromAccount">
+                        <CorasauControls:LookupEditor x:Name="leFromAccount" Text="{Binding FromAccount,Mode=TwoWay}">
+                        </CorasauControls:LookupEditor>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="ToAccount" x:Name="liToAccount">
+                        <CorasauControls:LookupEditor x:Name="leToAccount" Text="{Binding ToAccount,Mode=TwoWay}">
+                        </CorasauControls:LookupEditor>
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
+
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpPeriod" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Period}" Orientation="Vertical" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                    <CorasauControls:CorasauLayoutItem FieldName="FromDate" x:Name="liFromDate">
+                        <CorasauControls:DateEditor  EditValue="{Binding FromDate,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="ToDate" x:Name="liToDate">
+                        <CorasauControls:DateEditor  EditValue="{Binding ToDate,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
+
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpLastPeriod" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LastPeriod}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                    <CorasauControls:CorasauLayoutItem FieldName="FromDate2" x:Name="liFromDate2">
+                        <CorasauControls:DateEditor  EditValue="{Binding FromDate2,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="ToDate2" x:Name="liToDate2">
+                        <CorasauControls:DateEditor  EditValue="{Binding ToDate2,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
+
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="useDim" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Dimensions}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                    <CorasauControls:CorasauLayoutItem x:Name="lbldim1">
+                        <StackPanel Orientation="Horizontal">
+                            <CorasauControls:LookupEditor x:Name="dim1lookupeditior" Text="{Binding Dimension1,Mode=TwoWay}" >
+                            </CorasauControls:LookupEditor>
+                            <CorasauControls:CheckEditor Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=IncludeAll}" x:Name="chkIncludeAll1" IsChecked="{Binding IncludeAll1,Mode=TwoWay}" Margin="10,0,0,0"/>
+                        </StackPanel>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="lbldim2">
+                        <StackPanel Orientation="Horizontal">
+                            <CorasauControls:LookupEditor x:Name="dim2lookupeditior" Text="{Binding Dimension2,Mode=TwoWay}">
+                            </CorasauControls:LookupEditor>
+                            <CorasauControls:CheckEditor x:Name="chkIncludeAll2" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=IncludeAll}" IsChecked="{Binding IncludeAll2,Mode=TwoWay}" Margin="10,0,0,0"/>
+                        </StackPanel>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="lbldim3">
+                        <StackPanel Orientation="Horizontal">
+                            <CorasauControls:LookupEditor x:Name="dim3lookupeditior" Text="{Binding Dimension3,Mode=TwoWay}" >
+                            </CorasauControls:LookupEditor>
+                            <CorasauControls:CheckEditor x:Name="chkIncludeAll3" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=IncludeAll}" IsChecked="{Binding IncludeAll3,Mode=TwoWay}" Margin="10,0,0,0"/>
+                        </StackPanel>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="lbldim4">
+                        <StackPanel Orientation="Horizontal">
+                            <CorasauControls:LookupEditor x:Name="dim4lookupeditior" Text="{Binding Dimension4,Mode=TwoWay}" >
+                            </CorasauControls:LookupEditor>
+                            <CorasauControls:CheckEditor x:Name="chkIncludeAll4" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=IncludeAll}" IsChecked="{Binding IncludeAll4,Mode=TwoWay}" Margin="10,0,0,0"/>
+                        </StackPanel>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="lbldim5">
+                        <StackPanel Orientation="Horizontal">
+                            <CorasauControls:LookupEditor x:Name="dim5lookupeditior" Text="{Binding Dimension5,Mode=TwoWay}" >
+                            </CorasauControls:LookupEditor>
+                            <CorasauControls:CheckEditor x:Name="chkIncludeAll5" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=IncludeAll}" IsChecked="{Binding IncludeAll5,Mode=TwoWay}" Margin="10,0,0,0"/>
+                        </StackPanel>
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
+
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpNumberSerie" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=NumberSerie}" Orientation="Vertical" Width="Auto" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                    <CorasauControls:CorasauLayoutItem FieldName="NumberSerie" Style="{StaticResource LayoutItemsstyle}" x:Name="AcItem">
+                        <CorasauControls:LookupEditor x:Name="leNumberSerie" Text="{Binding NumberSerie,Mode=TwoWay}">
+                        </CorasauControls:LookupEditor>
+                        <CorasauControls:CorasauLayoutItem.ButtonContent>
+                            <Image Source="/UnicontaPages;component/Assets/img/Right_Arrow_16x16.png" Width="12"/>
+                        </CorasauControls:CorasauLayoutItem.ButtonContent>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="ManualAllocation" x:Name="liManualAllocation">
+                        <CorasauControls:CheckEditor  IsChecked="{Binding ManualAllocation,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="GenerateVoucher" x:Name="liGenerateVoucher">
+                        <CorasauControls:CheckEditor  IsChecked="{Binding GenerateVoucher,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="OneVoucherForAll" x:Name="liOneVoucherForAll">
+                        <CorasauControls:CheckEditor  IsChecked="{Binding OneVoucherForAll,Mode=TwoWay}" IsEnabled="{Binding GenerateVoucher,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
+
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpAllocAccount" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=AllocAccount}" Orientation="Vertical"  Width="Auto" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                    <CorasauControls:CorasauLayoutItem FieldName="BlockedForAllocation" x:Name="liBlockedForAllocation">
+                        <CorasauControls:CheckEditor  IsChecked="{Binding BlockedForAllocation,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
+
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpDefaultValues" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Defaultvalues}" Orientation="Vertical"  Width="Auto" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                    <CorasauControls:CorasauLayoutItem FieldName="OffsetAccount" x:Name="liOffsetAccount">
+                        <CorasauControls:LookupEditor x:Name="leOffsetAccount" Text="{Binding OffsetAccount,Mode=TwoWay}">
+                        </CorasauControls:LookupEditor>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="TransType" x:Name="liTransType">
+                        <CorasauControls:LookupEditor x:Name="leTransType" Text="{Binding TransType,Mode=TwoWay}">
+                        </CorasauControls:LookupEditor>
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
+
+            </CorasauControls:CorasauLayoutGroup>
+        </CorasauControls:CorasauLayoutControl>
+    </Grid>
 </Pages:FormBasePage>
 

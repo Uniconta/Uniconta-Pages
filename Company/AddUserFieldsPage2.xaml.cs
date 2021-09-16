@@ -63,7 +63,6 @@ namespace UnicontaClient.Pages.CustomPage
                 UtilDisplay.RemoveMenuCommand(rb, new string[] { "Delete" });
             }
             this.master = master;
-            BusyIndicator = busyIndicator;
             layoutControl = layoutItems;
             if (LoadedRow == null && master != null)
             {

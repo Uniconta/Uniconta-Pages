@@ -36,6 +36,10 @@ namespace UnicontaClient.Pages.CustomPage
             this.Loaded += CWReadOnlyCompany_Loaded;
         }
 
+        public CWReadOnlyCompany(Company[] objcompanies, string title): this(objcompanies)
+        {
+            this.Title = Uniconta.ClientTools.Localization.lookup(title);
+        }
         void CWReadOnlyCompany_Loaded(object sender, RoutedEventArgs e)
         {
             BindCompany();

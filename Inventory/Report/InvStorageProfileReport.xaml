@@ -62,6 +62,8 @@ x:Class="UnicontaClient.Pages.CustomPage.InvStorageProfileReport"
                     <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Name" Width="150"/>
                     <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Group" Width="80" />
                     <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Qty" Width="90" />
+                    <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Warehouse" Width="100" Visible="False"/>
+                    <UnicontaControls:CorasauDataGridTemplateColumn x:Name="WarehouseName" Width="100" Visible="False"/>
                     <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Amount0" Width="90" Visible="False" />
                     <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Amount1" Width="90" Visible="False" />
                     <UnicontaControls:CorasauDataGridTemplateColumn x:Name="Amount2" Width="90" Visible="False" />

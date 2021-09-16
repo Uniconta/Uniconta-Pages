@@ -74,11 +74,9 @@ namespace UnicontaClient.Pages.CustomPage
 
         void RemoveMenuItem()
         {
-            RibbonBase rb = (RibbonBase)localMenu.DataContext;
             var Comp = api.CompanyEntity;
-
             if (Comp._CountryId != CountryCode.Denmark && Comp._CountryId != CountryCode.Iceland && Comp._CountryId != CountryCode.Netherlands && Comp._CountryId != CountryCode.Austria)
-                UtilDisplay.RemoveMenuCommand(rb, "BilagscanReadVouchers");
+                UtilDisplay.RemoveMenuCommand((RibbonBase)localMenu.DataContext, "BilagscanReadVouchers");
         }
 
         void dgGldailyJournal_RowDoubleClick()
@@ -119,24 +117,20 @@ namespace UnicontaClient.Pages.CustomPage
                     AddDockItem(TabControls.GLDailyJournalPage2, api, Uniconta.ClientTools.Localization.lookup("Posting"), "Add_16x16.png");
                     break;
                 case "EditRow":
-                    if (selectedItem == null)
-                        return;
-                    AddDockItem(TabControls.GLDailyJournalPage2, selectedItem);
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.GLDailyJournalPage2, selectedItem);
                     break;
                 case "GLDailyJournalLine":
-                    if (selectedItem == null)
-                        return;
-                    AddDockItem(TabControls.GL_DailyJournalLine, selectedItem);
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.GL_DailyJournalLine, selectedItem);
                     break;
                 case "GLDailyJournalPosted":
-                    if (selectedItem == null)
-                        return;
-                    AddDockItem(TabControls.PostedJournals, selectedItem);
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.PostedJournals, selectedItem);
                     break;
                 case "MatchVoucherToJournalLines":
-                    if (selectedItem == null)
-                        return;
-                    AddDockItem(TabControls.MatchPhysicalVoucherToGLDailyJournalLines, selectedItem);
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.MatchPhysicalVoucherToGLDailyJournalLines, selectedItem);
                     break;
                 case "DeleteAllJournalLines":
                     if (selectedItem == null)
@@ -157,9 +151,8 @@ namespace UnicontaClient.Pages.CustomPage
                     EraseYearWindowDialog.Show();
                     break;
                 case "ImportBankStatement":
-                    if (selectedItem == null)
-                        return;
-                    AddDockItem(TabControls.ImportGLDailyJournal, selectedItem, string.Concat(string.Format(Uniconta.ClientTools.Localization.lookup("ImportOBJ"),
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.ImportGLDailyJournal, selectedItem, string.Concat(string.Format(Uniconta.ClientTools.Localization.lookup("ImportOBJ"),
                             Uniconta.ClientTools.Localization.lookup("BankStatement")), " : ", selectedItem._Journal), null, true);
                     break;
                 case "TransType":
@@ -170,41 +163,63 @@ namespace UnicontaClient.Pages.CustomPage
                     dialog.Show();
                     break;
                 case "ImportData":
-                    if (selectedItem == null)
-                        return;
-                    OpenImportDataPage(selectedItem);
+                    if (selectedItem != null)
+                        OpenImportDataPage(selectedItem);
                     break;
                 case "GLOffSetAccountTemplate":
                     AddDockItem(TabControls.GLOffsetAccountTemplate, null, Uniconta.ClientTools.Localization.lookup("OffsetAccountTemplates"));
                     break;
                 case "AccountActivity":
-                    if (selectedItem == null) return;
-
-                    AddDockItem(TabControls.GLTransLogPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("GLTransLog"), selectedItem._Journal));
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.GLTransLogPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("GLTransLog"), selectedItem._Journal));
                     break;
-
                 case "BilagscanReadVouchers":
                     ReadFromBilagscan(selectedItem);
                     break;
-
+                case "MoveJournalLines":
+                    if (selectedItem != null)
+                        MoveJournalLines(selectedItem);
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
         }
 
-        void OpenImportDataPage(GLDailyJournalClient selectedItem)
+        void MoveJournalLines(GLDailyJournalClient journal)
         {
-            var dailyJournals = new GLDailyJournalLineClient();
-            string header = selectedItem.Journal;
-            UnicontaBaseEntity[] baseEntityArray = new UnicontaBaseEntity[2] { dailyJournals, selectedItem };
-            object[] param = new object[2];
-            param[0] = baseEntityArray;
-            param[1] = header;
-            AddDockItem(TabControls.ImportPage, param, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Import"), header));
+            CwMoveJournalLines cwWin = new CwMoveJournalLines(api);
+            cwWin.Closed += async delegate
+            {
+                if (cwWin.DialogResult == true && cwWin.GLDailyJournal != null)
+                {
+                    busyIndicator.IsBusy = true;
+                    var result = await (new Uniconta.API.GeneralLedger.PostingAPI(api)).MoveJournalLines(journal, cwWin.GLDailyJournal);
+                    busyIndicator.IsBusy = false;
+                    UtilDisplay.ShowErrorCode(result);
+                    if (result == 0)
+                    {
+                        foreach (var lin in (IEnumerable<GLDailyJournalClient>)dgGldailyJournal.ItemsSource)
+                            if (lin.RowId == cwWin.GLDailyJournal.RowId)
+                            {
+                                lin.NumberOfLines = lin._NumberOfLines + journal._NumberOfLines;
+                                journal.NumberOfLines = 0;
+                                break;
+                            }
+                    }
+                }
+            };
+            cwWin.Show();
         }
 
-        private bool readingFromBilagscan = false;
+        void OpenImportDataPage(GLDailyJournalClient selectedItem)
+        {
+            string header = selectedItem._Journal;
+            UnicontaBaseEntity[] baseEntityArray = new UnicontaBaseEntity[2] { new GLDailyJournalLineClient(), selectedItem };
+            AddDockItem(TabControls.ImportPage, new object[] { baseEntityArray, header }, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Import"), header));
+        }
+         
+        private bool readingFromBilagscan;
         private async void ReadFromBilagscan(UnicontaBaseEntity selectedItem)
         {
 #if !SILVERLIGHT

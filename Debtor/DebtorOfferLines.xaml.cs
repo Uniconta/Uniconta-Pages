@@ -739,7 +739,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "RefreshGrid":
                     RefreshGrid();
                     break;
-                case "ViewPhoto":
+                case "ViewItemAttachments":
                     if (selectedItem?.InvItem != null && selectedItem?.Item!= null)
                         AddDockItem(TabControls.UserDocsPage, selectedItem.InvItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Documents"), selectedItem?.InvItem?._Name));
                     break;
@@ -756,7 +756,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void GenerateOffer()
         {
-            saveGridLocal();
+            saveGrid();
             bool showSendByMail = false;
             var dbOrder = Order;
             string debtorName;
@@ -804,7 +804,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         async void CreateProductionOrder(DebtorOfferLineClient offerLine)
         {
-            var t = saveGridLocal();
+            var t = saveGrid();
             if (t != null && offerLine.RowId == 0)
                 await t;
 
@@ -845,7 +845,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         async void RefreshGrid()
         {
-            var savetask = saveGridLocal(); // we need to wait until it is saved, otherwise Storage is not updated
+            var savetask = saveGrid(); // we need to wait until it is saved, otherwise Storage is not updated
             if (savetask != null)
                 await savetask;
             gridRibbon_BaseActions("RefreshGrid");
@@ -853,20 +853,10 @@ namespace UnicontaClient.Pages.CustomPage
 
         async void ViewStorage()
         {
-            var savetask = saveGridLocal(); // we need to wait until it is saved, otherwise Storage is not updated
+            var savetask = saveGrid(); // we need to wait until it is saved, otherwise Storage is not updated
             if (savetask != null)
                 await savetask;
             AddDockItem(TabControls.InvItemStoragePage, dgDebtorOfferLineGrid.syncEntity, true);
-        }
-
-        Task<ErrorCodes> saveGridLocal()
-        {
-            var offerLineLine = dgDebtorOfferLineGrid.SelectedItem as DebtorOfferLineClient;
-            dgDebtorOfferLineGrid.SelectedItem = null;
-            dgDebtorOfferLineGrid.SelectedItem = offerLineLine;
-            if (dgDebtorOfferLineGrid.HasUnsavedData)
-                return saveGrid();
-            return null;
         }
 
         public override bool IsDataChaged { get { return DataChaged || base.IsDataChaged; } }

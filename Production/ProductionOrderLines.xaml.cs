@@ -479,7 +479,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         AddDockItem(TabControls.InvStorageProfileReport, dgProductionOrderLineGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("StockProfile"), selectedItem._Item));
                     break;
-                case "ViewPhoto":
+                case "ViewItemAttachments":
                     if (selectedItem?.InvItem != null && selectedItem?.Item != null)
                         AddDockItem(TabControls.UserDocsPage, selectedItem.InvItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Documents"), selectedItem?.InvItem?._Name));
                     break;

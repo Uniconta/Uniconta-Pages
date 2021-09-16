@@ -167,6 +167,13 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
+        public override bool CheckIfBindWithUserfield(out bool isReadOnly, out bool useBinding)
+        {
+            isReadOnly = true;
+            useBinding = true;
+            return true;
+        }
+
         async void ShowVoucherInfo(GLTransClient voucherRef)
         {
             busyIndicator.IsBusy = true;

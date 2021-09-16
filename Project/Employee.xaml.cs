@@ -19,6 +19,7 @@ using System.Windows.Shapes;
 using Uniconta.ClientTools.Util;
 using Uniconta.API.Service;
 using Uniconta.ClientTools.Controls;
+using UnicontaClient.Controls.Dialogs;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -49,6 +50,8 @@ namespace UnicontaClient.Pages.CustomPage
         {
             base.OnLayoutLoaded();
             UnicontaClient.Utilities.Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
+            if (!api.CompanyEntity.Warehouse)
+                Warehouse.Visible = Warehouse.ShowInColumnChooser = false;
         }
 
         public override void Utility_Refresh(string screenName, object argument = null)
@@ -86,12 +89,8 @@ namespace UnicontaClient.Pages.CustomPage
                     dgEmployeeGrid.AddRow();
                     break;
                 case "EditRow":
-                    if (selectedItem == null)
-                        return;
-                    object[] EditParam = new object[2];
-                    EditParam[0] = selectedItem;
-                    EditParam[1] = true;
-                    AddDockItem(TabControls.EmployeePage2, EditParam, string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("Employee"), selectedItem._Name));
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.EmployeePage2, new object[] { selectedItem, true }, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Employee"), selectedItem._Name));
                     break;
                 case "DeleteRow":
                     if (selectedItem != null)
@@ -135,12 +134,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "ApproveDocument":
                     if (selectedItem != null)
-                    {
-                        var param= new object[2];
-                        param[0] = api;
-                        param[1] = selectedItem;
-                        AddDockItem(TabControls.DocumentsApprovalPage, param, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ApproveDocument"), selectedItem._Name));
-                    }
+                        AddDockItem(TabControls.DocumentsApprovalPage, new object[] { api, selectedItem }, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ApproveDocument"), selectedItem._Name));
                     break;
                 case "SaveGrid":
                     saveGrid();
@@ -156,6 +150,21 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         AddDockItem(TabControls.ProjectEmployeePage, dgEmployeeGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Projects"), selectedItem._Name));
                     break;
+                case "ChartView":
+#if SILVERLIGHT
+                    UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("SilverlightSupport"), Uniconta.ClientTools.Localization.lookup("Message"), MessageBoxButton.OK);
+#else
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.ProjectTaskPage, selectedItem, string.Format("{0}({1}): {2}", Uniconta.ClientTools.Localization.lookup("Tasks"), Uniconta.ClientTools.Localization.lookup("EnableChart")
+                            , selectedItem._Number));
+#endif
+                    break;
+
+                case "GridView":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.ProjectTaskGridPage, selectedItem, string.Format("{0}({1}): {2}", Uniconta.ClientTools.Localization.lookup("Tasks"), Uniconta.ClientTools.Localization.lookup("DataGrid")
+                            , selectedItem._Number));
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -166,11 +175,8 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var emp = Activator.CreateInstance(selectedItem.GetType()) as EmployeeClient;
             CorasauDataGrid.CopyAndClearRowId(selectedItem, emp);
-            object[] copyParam = new object[2];
-            copyParam[0] = emp;
-            copyParam[1] = false;
             string header = string.Format(Uniconta.ClientTools.Localization.lookup("CopyOBJ"), selectedItem._Name);
-            AddDockItem(TabControls.EmployeePage2, copyParam, header);
+            AddDockItem(TabControls.EmployeePage2, new object[] { emp, false }, header);
         }
 
         bool copyRowIsEnabled;

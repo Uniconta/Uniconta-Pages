@@ -13,173 +13,177 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOfferPage2"
     <UserControl.Resources>
         <Util:RowIndexConverter x:Key="RowIndexConverter" />
     </UserControl.Resources>
-    <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="0" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BusyMessage}">
-        <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <CorasauControls:CorasauRibbonControl x:Name="frmRibbon" XMLSourcePath=";component/Pages/Debtor/OrderRibbon.xml" Grid.Row="0"/>
-            <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
-                <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="grpFirst">
-                    <CorasauControls:CorasauLayoutGroup x:Name="grpAccounts" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Accounts}" Orientation="Vertical" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="400">
-                        <CorasauControls:CorasauLayoutItem FieldName="Account" Style="{StaticResource LayoutItemsstyle}" x:Name="AcItem" ButtonContent="+">
-                            <CorasauControls:LookupEditor x:Name="leAccount" EditValue="{Binding Account,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" EditValueChanged="leAccount_EditValueChanged"  />
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="Name" x:Name="liName">
-                            <CorasauControls:TextEditor x:Name="txtName" Text="{Binding Name,Mode=OneWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="CreatedTime" x:Name="liCreatedTime">
-                            <CorasauControls:TextEditor x:Name="txtCreatedTime"  Text="{Binding CreatedTime, Mode=OneWay}" MaskType="DateTime"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="ContactName" x:Name="liContactName">
-                            <CorasauControls:ComboBoxEditor AllowNullInput="True" AssignNullValueOnClearingEditText="True" x:Name="cmbContactName"  EditValueChanged="cmbContactName_EditValueChanged"/>
-                        </CorasauControls:CorasauLayoutItem>
-                    </CorasauControls:CorasauLayoutGroup>
-                    <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpReference" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Reference}"  Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="400">
-                        <CorasauControls:CorasauLayoutItem FieldName="YourRef" x:Name="liYourRef">
-                            <CorasauControls:TextEditor Text="{Binding YourRef,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="Requisition" x:Name="liRequisition">
-                            <CorasauControls:TextEditor  Text="{Binding Requisition,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="OurRef" x:Name="liOurRef">
-                            <CorasauControls:TextEditor  Text="{Binding OurRef,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="Remark" x:Name="liRemark" VerticalAlignment="Top" VerticalContentAlignment="Top" LabelVerticalAlignment="Top">
-                            <CorasauControls:TextEditor  Text="{Binding Remark,Mode=TwoWay}" AcceptsReturn="True" VerticalContentAlignment="Top" TextWrapping="Wrap" MinHeight="60"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="RelatedOrder" x:Name="liRelatedOrder">
-                            <CorasauControls:UnicontaEditableLookupControl  x:Name="leRelatedOrder" LookupEditValue="{Binding RelatedOrder,Mode=TwoWay}" />
-                        </CorasauControls:CorasauLayoutItem>
-                    </CorasauControls:CorasauLayoutGroup>
-                    <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpOrders" ItemLabelsAlignment="Default" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Orders}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="400">
-                        <CorasauControls:CorasauLayoutItem FieldName="Group" x:Name="liGroup">
-                            <CorasauControls:LookupEditor x:Name="leGroup" EditValue="{Binding Group,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="OfferNumber" x:Name="liOfferNumber">
-                            <CorasauControls:IntegerEditor EditValue="{Binding OfferNumber,Mode=TwoWay}" SetMask="false"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="DeliveryDate" x:Name="liDeliveryDate">
-                            <CorasauControls:DateEditor x:Name="deDeLiveryDate" EditValue="{Binding DeliveryDate,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="DeliveryDateConfirmed" x:Name="liDeliveryDateConfirmed">
-                            <CorasauControls:CheckEditor  IsChecked="{Binding DeliveryDateConfirmed, Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="EndDiscountPct" x:Name="liEndDiscountPct">
-                            <CorasauControls:DoubleEditor FieldName="EndDiscountPct"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="Payment" x:Name="liPayment">
-                            <CorasauControls:LookupEditor x:Name="lePayment" EditValue="{Binding Payment,Mode=TwoWay}">
-                            </CorasauControls:LookupEditor>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem x:Name="shipmentItem" FieldName="Shipment">
-                            <CorasauControls:LookupEditor x:Name="leShipment" EditValue="{Binding Shipment,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="DeliveryTerm" x:Name="liDeliveryTerm" Visibility="{Binding ElementName=shipmentItem, Path=Visibility}">
-                            <CorasauControls:LookupEditor x:Name="leDeliveryTerm" EditValue="{Binding DeliveryTerm,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="Employee" x:Name="liEmployee">
-                            <CorasauControls:LookupEditor x:Name="Employeelookupeditor" EditValue="{Binding Employee,Mode=TwoWay}" />
-                        </CorasauControls:CorasauLayoutItem>
-                       
-                        <CorasauControls:CorasauLayoutItem FieldName="Currency" x:Name="liCurrency">
-                            <CorasauControls:ComboBoxEditor x:Name="cmbCurrency" SelectedItem="{Binding Currency,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="PricesInclVat" x:Name="liPricesInclVat">
-                            <CorasauControls:CheckEditor  x:Name="chkIncVat"  IsChecked="{Binding PricesInclVat, Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="Vat" x:Name="liVat">
-                            <CorasauControls:LookupEditor x:Name="leVat" Text="{Binding Vat,Mode=TwoWay}">
-                            </CorasauControls:LookupEditor>
-                        </CorasauControls:CorasauLayoutItem>
-                    </CorasauControls:CorasauLayoutGroup>
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl x:Name="frmRibbon" XMLSourcePath=";component/Pages/Debtor/OrderRibbon.xml" Grid.Row="0"/>
+        <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
+            <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="grpFirst">
+                <CorasauControls:CorasauLayoutGroup x:Name="grpAccounts" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Accounts}" Orientation="Vertical" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="400">
+                    <CorasauControls:CorasauLayoutItem FieldName="Account" Style="{StaticResource LayoutItemsstyle}" x:Name="AcItem" ButtonContent="+">
+                        <CorasauControls:LookupEditor x:Name="leAccount" EditValue="{Binding Account,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" EditValueChanged="leAccount_EditValueChanged"  />
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Name" x:Name="liName">
+                        <CorasauControls:TextEditor x:Name="txtName" Text="{Binding Name,Mode=OneWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="CreatedTime" x:Name="liCreatedTime">
+                        <CorasauControls:TextEditor x:Name="txtCreatedTime"  Text="{Binding CreatedTime, Mode=OneWay}" MaskType="DateTime"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="ContactName" x:Name="liContactName">
+                        <CorasauControls:ComboBoxEditor AllowNullInput="True" AssignNullValueOnClearingEditText="True" x:Name="cmbContactName"  EditValueChanged="cmbContactName_EditValueChanged"/>
+                    </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
-                <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="lastGroup">
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpReference" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Reference}"  Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="400">
+                    <CorasauControls:CorasauLayoutItem FieldName="YourRef" x:Name="liYourRef">
+                        <CorasauControls:TextEditor Text="{Binding YourRef,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Requisition" x:Name="liRequisition">
+                        <CorasauControls:TextEditor  Text="{Binding Requisition,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="OurRef" x:Name="liOurRef">
+                        <CorasauControls:TextEditor  Text="{Binding OurRef,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Remark" x:Name="liRemark" VerticalAlignment="Top" VerticalContentAlignment="Top" LabelVerticalAlignment="Top">
+                        <CorasauControls:TextEditor  Text="{Binding Remark,Mode=TwoWay}" AcceptsReturn="True" VerticalContentAlignment="Top" TextWrapping="Wrap" MinHeight="60"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="RelatedOrder" x:Name="liRelatedOrder">
+                        <CorasauControls:UnicontaEditableLookupControl  x:Name="leRelatedOrder" LookupEditValue="{Binding RelatedOrder,Mode=TwoWay}" />
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpOrders" ItemLabelsAlignment="Default" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Orders}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="400">
+                    <CorasauControls:CorasauLayoutItem FieldName="Group" x:Name="liGroup">
+                        <CorasauControls:LookupEditor x:Name="leGroup" EditValue="{Binding Group,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="OfferNumber" x:Name="liOfferNumber">
+                        <CorasauControls:IntegerEditor EditValue="{Binding OfferNumber,Mode=TwoWay}" SetMask="false"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="DeliveryDate" x:Name="liDeliveryDate">
+                        <CorasauControls:DateEditor x:Name="deDeLiveryDate" EditValue="{Binding DeliveryDate,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="DeliveryDateConfirmed" x:Name="liDeliveryDateConfirmed">
+                        <CorasauControls:CheckEditor  IsChecked="{Binding DeliveryDateConfirmed, Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="EndDiscountPct" x:Name="liEndDiscountPct">
+                        <CorasauControls:DoubleEditor FieldName="EndDiscountPct"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Payment" x:Name="liPayment">
+                        <CorasauControls:LookupEditor x:Name="lePayment" EditValue="{Binding Payment,Mode=TwoWay}">
+                        </CorasauControls:LookupEditor>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="shipmentItem" FieldName="Shipment">
+                        <CorasauControls:LookupEditor x:Name="leShipment" EditValue="{Binding Shipment,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="DeliveryTerm" x:Name="liDeliveryTerm" Visibility="{Binding ElementName=shipmentItem, Path=Visibility}">
+                        <CorasauControls:LookupEditor x:Name="leDeliveryTerm" EditValue="{Binding DeliveryTerm,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Employee" x:Name="liEmployee">
+                        <CorasauControls:LookupEditor x:Name="Employeelookupeditor" EditValue="{Binding Employee,Mode=TwoWay}" />
+                    </CorasauControls:CorasauLayoutItem>
 
-                    <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpSize" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Size}"  Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="450">
-                        <CorasauControls:CorasauLayoutItem FieldName="Weight" x:Name="liWeigt">
-                            <CorasauControls:DoubleEditor FieldName="Weight" ApplyMask="False"  />
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="Volume" x:Name="liVolume" >
-                            <CorasauControls:DoubleEditor FieldName="Volume" ApplyMask="False" />
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="Cartons" x:Name="liCartons">
-                            <CorasauControls:DoubleEditor FieldName="Cartons" ApplyMask="False" />
-                        </CorasauControls:CorasauLayoutItem>
-                    </CorasauControls:CorasauLayoutGroup>
-                    
-                    <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="dAddress" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="450">
-                        <CorasauControls:CorasauLayoutItem FieldName="DeliveryName" x:Name="liDeliveryname">
-                            <CorasauControls:TextEditor Text="{Binding DeliveryName,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="DeliveryAddress1" x:Name="liDeliveryAddress1">
-                            <CorasauControls:TextEditor Text="{Binding DeliveryAddress1,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="DeliveryAddress2" x:Name="liDeliveryAddress2">
-                            <CorasauControls:TextEditor  Text="{Binding DeliveryAddress2,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="DeliveryAddress3" x:Name="liDeliveryAddress3">
-                            <CorasauControls:TextEditor  Text="{Binding DeliveryAddress3,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="DeliveryZipCode" x:Name="liDeliveryZipCode"  Style="{StaticResource LayoutItemsstyle}" ButtonClicked="LiDeliveryZipCode_OnButtonClicked"  ButtonContent="&#x26EF;" Padding="0" >
-                            <CorasauControls:TextEditor Text="{Binding DeliveryZipCode,Mode=TwoWay}" x:Name="txtDelZipCode"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="DeliveryCity" x:Name="liDeliveryCity">
-                            <CorasauControls:TextEditor Text="{Binding DeliveryCity,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>    
-                        <CorasauControls:CorasauLayoutItem FieldName="DeliveryCountry" x:Name="liDeliveryCountry">
-                            <CorasauControls:ComboBoxEditor x:Name="cbDeliveryCountry" SelectedItem="{Binding DeliveryCountry,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="Installation" x:Name="lblDeliveryAddress" Style="{StaticResource LayoutItemsstyle}" ButtonContent="&#x2B9D;" ButtonClicked="lblDeliveryAddress_ButtonClicked">
-                            <CorasauControls:LookupEditor x:Name="leDeliveryAddress" EditValue="{Binding Installation,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="DeliveryIsInvoiceAddress" x:Name="liDeliveryIsInvoiceAddress">
-                            <CorasauControls:CheckEditor x:Name="chkDeliveryIsInvoiceAddress" IsChecked="{Binding DeliveryIsInvoiceAddress, Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                    </CorasauControls:CorasauLayoutGroup>
-                    <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="usedim"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Dimensions}" Orientation="Vertical" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="450">
-                        <CorasauControls:CorasauLayoutItem x:Name="lbldim1">
-                            <CorasauControls:LookupEditor x:Name="cmbDim1" Text="{Binding Dimension1,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem x:Name="lbldim2">
-                            <CorasauControls:LookupEditor x:Name="cmbDim2" Text="{Binding Dimension2,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem x:Name="lbldim3">
-                            <CorasauControls:LookupEditor x:Name="cmbDim3" Text="{Binding Dimension3,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem x:Name="lbldim4">
-                            <CorasauControls:LookupEditor x:Name="cmbDim4" Text="{Binding Dimension4,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem x:Name="lbldim5">
-                            <CorasauControls:LookupEditor x:Name="cmbDim5" Text="{Binding Dimension5,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                    </CorasauControls:CorasauLayoutGroup>
-                    <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="useInvoice"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=invoice}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="450">
-                        <CorasauControls:CorasauLayoutItem FieldName="InvoiceAccount" x:Name="liInvoiceAccount">
-                            <CorasauControls:LookupEditor x:Name="leInvoiceAccount" EditValue="{Binding InvoiceAccount,Mode=TwoWay}" />
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="PriceList" x:Name="priceListLayoutItem">
-                            <CorasauControls:LookupEditor x:Name="PriceListlookupeditior" EditValue="{Binding PriceList,Mode=TwoWay}" />
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="LayoutGroup" x:Name="liLayoutgroup">
-                            <CorasauControls:LookupEditor x:Name="leLayoutGroup" EditValue="{Binding LayoutGroup,Mode=TwoWay}"  />
-                        </CorasauControls:CorasauLayoutItem>
-                    </CorasauControls:CorasauLayoutGroup>
-                    <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpProject"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Project}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="450" >
-                        <CorasauControls:CorasauLayoutItem x:Name="projectItem" FieldName="Project">
-                            <CorasauControls:LookupEditor x:Name="Projectlookupeditor" Text="{Binding Project,Mode=TwoWay}" SelectedIndexChanged="Projectlookupeditor_SelectedIndexChanged"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem x:Name="prCategoryItem" FieldName="PrCategory">
-                            <CorasauControls:LookupEditor x:Name="PrCategorylookupeditor" EditValue="{Binding PrCategory,Mode=TwoWay}" />
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem x:Name="projectTask" FieldName="Task">
-                            <CorasauControls:LookupEditor x:Name="prTasklookupeditor" HasCustomLookUp="True" GotFocus="prTasklookupeditor_GotFocus" Text="{Binding Task,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                        </CorasauControls:CorasauLayoutItem>
-                    </CorasauControls:CorasauLayoutGroup>
-                    </CorasauControls:CorasauLayoutGroup>
-            </CorasauControls:CorasauLayoutControl>
-        </Grid>
-    </CorasauControls:BusyIndicator>
+                    <CorasauControls:CorasauLayoutItem FieldName="Currency" x:Name="liCurrency">
+                        <CorasauControls:ComboBoxEditor x:Name="cmbCurrency" SelectedItem="{Binding Currency,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="PricesInclVat" x:Name="liPricesInclVat">
+                        <CorasauControls:CheckEditor  x:Name="chkIncVat"  IsChecked="{Binding PricesInclVat, Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Vat" x:Name="liVat">
+                        <CorasauControls:LookupEditor x:Name="leVat" Text="{Binding Vat,Mode=TwoWay}">
+                        </CorasauControls:LookupEditor>
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
+            </CorasauControls:CorasauLayoutGroup>
+            <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="lastGroup">
+
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpSize" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Size}"  Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="450">
+                    <CorasauControls:CorasauLayoutItem FieldName="Weight" x:Name="liWeigt">
+                        <CorasauControls:DoubleEditor FieldName="Weight" ApplyMask="False"  />
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Volume" x:Name="liVolume" >
+                        <CorasauControls:DoubleEditor FieldName="Volume" ApplyMask="False" />
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Cartons" x:Name="liCartons">
+                        <CorasauControls:DoubleEditor FieldName="Cartons" ApplyMask="False" />
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
+
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="dAddress" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="450">
+                    <CorasauControls:CorasauLayoutItem FieldName="DeliveryName" x:Name="liDeliveryname">
+                        <CorasauControls:TextEditor Text="{Binding DeliveryName,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="DeliveryAddress1" x:Name="liDeliveryAddress1">
+                        <CorasauControls:TextEditor Text="{Binding DeliveryAddress1,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="DeliveryAddress2" x:Name="liDeliveryAddress2">
+                        <CorasauControls:TextEditor  Text="{Binding DeliveryAddress2,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="DeliveryAddress3" x:Name="liDeliveryAddress3">
+                        <CorasauControls:TextEditor  Text="{Binding DeliveryAddress3,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="DeliveryZipCode" x:Name="liDeliveryZipCode"  Style="{StaticResource LayoutItemsstyle}" ButtonClicked="LiDeliveryZipCode_OnButtonClicked"  ButtonContent="&#x26EF;" Padding="0" >
+                        <CorasauControls:TextEditor Text="{Binding DeliveryZipCode,Mode=TwoWay}" x:Name="txtDelZipCode"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="DeliveryCity" x:Name="liDeliveryCity">
+                        <CorasauControls:TextEditor Text="{Binding DeliveryCity,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="DeliveryCountry" x:Name="liDeliveryCountry">
+                        <CorasauControls:ComboBoxEditor x:Name="cbDeliveryCountry" SelectedItem="{Binding DeliveryCountry,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Installation" x:Name="lblDeliveryAddress" Style="{StaticResource LayoutItemsstyle}" ButtonContent="&#x2B9D;" ButtonClicked="lblDeliveryAddress_ButtonClicked">
+                        <CorasauControls:LookupEditor x:Name="leDeliveryAddress" EditValue="{Binding Installation,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="DeliveryIsInvoiceAddress" x:Name="liDeliveryIsInvoiceAddress">
+                        <CorasauControls:CheckEditor x:Name="chkDeliveryIsInvoiceAddress" IsChecked="{Binding DeliveryIsInvoiceAddress, Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="usedim"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Dimensions}" Orientation="Vertical" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="450">
+                    <CorasauControls:CorasauLayoutItem x:Name="lbldim1">
+                        <CorasauControls:LookupEditor x:Name="cmbDim1" Text="{Binding Dimension1,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="lbldim2">
+                        <CorasauControls:LookupEditor x:Name="cmbDim2" Text="{Binding Dimension2,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="lbldim3">
+                        <CorasauControls:LookupEditor x:Name="cmbDim3" Text="{Binding Dimension3,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="lbldim4">
+                        <CorasauControls:LookupEditor x:Name="cmbDim4" Text="{Binding Dimension4,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="lbldim5">
+                        <CorasauControls:LookupEditor x:Name="cmbDim5" Text="{Binding Dimension5,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="useInvoice"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=invoice}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="450">
+                    <CorasauControls:CorasauLayoutItem FieldName="InvoiceAccount" x:Name="liInvoiceAccount">
+                        <CorasauControls:LookupEditor x:Name="leInvoiceAccount" EditValue="{Binding InvoiceAccount,Mode=TwoWay}" />
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="PriceList" x:Name="priceListLayoutItem">
+                        <CorasauControls:LookupEditor x:Name="PriceListlookupeditior" EditValue="{Binding PriceList,Mode=TwoWay}" />
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="LayoutGroup" x:Name="liLayoutgroup">
+                        <CorasauControls:LookupEditor x:Name="leLayoutGroup" EditValue="{Binding LayoutGroup,Mode=TwoWay}"  />
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="PostingText" x:Name="liPostingText">
+                        <CorasauControls:TextEditor  Text="{Binding PostingText,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpProject"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Project}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="450" >
+                    <CorasauControls:CorasauLayoutItem x:Name="projectItem" FieldName="Project">
+                        <CorasauControls:LookupEditor x:Name="Projectlookupeditor" Text="{Binding Project,Mode=TwoWay}" SelectedIndexChanged="Projectlookupeditor_SelectedIndexChanged"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="prCategoryItem" FieldName="PrCategory">
+                        <CorasauControls:LookupEditor x:Name="PrCategorylookupeditor" EditValue="{Binding PrCategory,Mode=TwoWay}" />
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="projectTask" FieldName="Task">
+                        <CorasauControls:LookupEditor x:Name="prTasklookupeditor" HasCustomLookUp="True" GotFocus="prTasklookupeditor_GotFocus" Text="{Binding Task,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="prjWorkSpace" FieldName="WorkSpace">
+                        <CorasauControls:LookupEditor x:Name="lePrWorkSpace" EditValue="{Binding WorkSpace,Mode=TwoWay}" />
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
+            </CorasauControls:CorasauLayoutGroup>
+        </CorasauControls:CorasauLayoutControl>
+    </Grid>
 </Pages:FormBasePage>
 

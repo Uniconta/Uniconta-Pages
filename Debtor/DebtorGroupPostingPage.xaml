@@ -11,7 +11,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorGroupPostingPage"
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Assets/GridRibbonReadOnly.xml" x:Name="localMenu"/>
+        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Debtor/DebtorGroupPostingPageRibbon.xml" x:Name="localMenu"/>
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <local:DebtorGroupPostingGrid x:Name="dgGroupPosting" AutoGenerateColumns="None">
                 <local:DebtorGroupPostingGrid.Columns>
@@ -27,6 +27,11 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorGroupPostingPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="CostAccount2" Width="200"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="CostAccount3" Width="250"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="CostAccount4" Width="200"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Vat"  Width="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Vat1"  Width="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Vat2"  Width="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Vat3"  Width="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Vat4"  Width="100"/>
                 </local:DebtorGroupPostingGrid.Columns>
             </local:DebtorGroupPostingGrid>
         </CorasauControls:BusyIndicator>

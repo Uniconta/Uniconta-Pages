@@ -35,7 +35,7 @@ namespace UnicontaClient.Pages.CustomPage
     {
         public override string NameOfControl { get { return TabControls.RegenerateOrderFromProjectPage; } }
 
-        Uniconta.DataModel.DebtorOrder master;
+        Uniconta.DataModel.DCOrder master;
 
         public RegenerateOrderFromProjectPage(UnicontaBaseEntity master) : base(master)
         {
@@ -50,7 +50,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void InitPage(UnicontaBaseEntity master)
         {
-            this.master = master as Uniconta.DataModel.DebtorOrder;
+            this.master = master as Uniconta.DataModel.DCOrder;
             InitializeComponent();
             SetRibbonControl(localMenu, dgGenerateOrder);
             dgGenerateOrder.UpdateMaster(master);
@@ -74,7 +74,7 @@ namespace UnicontaClient.Pages.CustomPage
         protected override void SyncEntityMasterRowChanged(UnicontaBaseEntity args)
         {
             dgGenerateOrder.UpdateMaster(args);
-            var debtOrderMaster = dgGenerateOrder.masterRecord as Uniconta.DataModel.DebtorOrder;
+            var debtOrderMaster = dgGenerateOrder.masterRecord as Uniconta.DataModel.DCOrder;
             if (debtOrderMaster != null)
                 SetHeader(string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("RegenerateOrder"), debtOrderMaster._OrderNumber));
 
@@ -184,6 +184,8 @@ namespace UnicontaClient.Pages.CustomPage
     {
         [Display(Name = "Include", ResourceType = typeof(ProjectTransClientText))]
         internal bool _remove;
+       
+        [Display(Name = "Check", ResourceType = typeof(ProjectTransClientText))]
         public bool Check { get { return !_remove; } set { _remove = !value; } }
     }
 }

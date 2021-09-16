@@ -130,7 +130,7 @@ namespace UnicontaClient.Pages.CustomPage
             dgCrdInvoicesGrid.api = api;
             var Comp = api.CompanyEntity;
             if (master == null)
-                filterDate = BasePage.GetFilterDate(Comp, false);
+                filterDate = BasePage.GetFilterDate(Comp, false, 2);
             dgCrdInvoicesGrid.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             if (Comp.RoundTo100)

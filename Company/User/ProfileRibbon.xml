@@ -27,6 +27,7 @@
     <RibbonItem Action="UserOperations" LocalizedNameKey="UserOperations" LargeGlyph="User_Operations_32x32.png"/>
     <RibbonItem Action="ActiveSessions" LocalizedNameKey="ActiveSessions" LargeGlyph="Convert_To_User_32x32.png"/>
    <RibbonItem Action="UserLoginHistory" LocalizedNameKey="LoginHistory" LargeGlyph="History_32x32.png"/>
+  <RibbonItem Action="ProgramModules" LocalizedNameKey="AppKeys" LargeGlyph="Generate_32x32.png"/>
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="UserLayout" LocalizedNameKey="UserLayout" LargeGlyph="UserFieldData_32x32.png"/>

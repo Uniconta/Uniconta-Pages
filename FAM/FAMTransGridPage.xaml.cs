@@ -122,7 +122,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             InitializeComponent();
             var Comp = this.api.CompanyEntity;
-            filterDate = BasePage.GetFilterDate(Comp, master != null);
+            filterDate = BasePage.GetFilterDate(Comp, master != null, 4);
             localMenu.dataGrid = dgFamTransGrid;
             SetRibbonControl(localMenu, dgFamTransGrid);
             dgFamTransGrid.UpdateMaster(master);

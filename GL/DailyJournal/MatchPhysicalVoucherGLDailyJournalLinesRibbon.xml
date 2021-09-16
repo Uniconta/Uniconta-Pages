@@ -27,4 +27,7 @@
   <RibbonItem>
     <RibbonItem Action="Unlinked" LocalizedNameKey="Unlinked"  LargeGlyph="Check_Journal_32x32.png"/>
   </RibbonItem>
+	<RibbonItem>
+		<RibbonItem Action="AssignText" LocalizedNameKey="AssignOBJ" Parameter="Text" ButtonType="CheckBox" />
+	</RibbonItem>
 </root>

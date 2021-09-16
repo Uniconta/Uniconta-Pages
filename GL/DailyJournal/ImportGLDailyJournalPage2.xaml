@@ -5,102 +5,95 @@ x:Class="UnicontaClient.Pages.CustomPage.ImportGLDailyJournalPage2"
             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-            xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
-                    xmlns:toolkit="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Toolkit"
             xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
-    <Pages:FormBasePage.Resources>
-    
-    </Pages:FormBasePage.Resources>
-    <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="0" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BusyMessage}">
-        <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-           <CorasauControls:CorasauRibbonControl x:Name="frmRibbon" XMLSourcePath=";component/Pages/GL/DailyJournal/ImportGLDailyJournalFormPageRibbon.xml" Grid.Row="0"/>
-            <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
-                <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="grpFirst">
-                    <CorasauControls:CorasauLayoutGroup x:Name="grpDescription" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Description}" Orientation="Vertical"
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl x:Name="frmRibbon" XMLSourcePath=";component/Pages/GL/DailyJournal/ImportGLDailyJournalFormPageRibbon.xml" Grid.Row="0"/>
+        <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
+            <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="grpFirst">
+                <CorasauControls:CorasauLayoutGroup x:Name="grpDescription" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Description}" Orientation="Vertical"
                                                 CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                        <CorasauControls:CorasauLayoutItem FieldName="FormatName" x:Name="liFormatName">
-                            <CorasauControls:TextEditor Text="{Binding FormatName,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="Format" x:Name="liFormat">
-                            <CorasauControls:ComboBoxEditor x:Name="cmbFormat" SelectedItem="{Binding Format,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="Seperator" x:Name="liSeperator">
-                            <CorasauControls:TextEditor Text="{Binding Seperator,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="DateFormat" x:Name="liDateFormat">
-                            <CorasauControls:ComboBoxEditor SelectedItem="{Binding DateFormat,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="SkipLines" x:Name="liSkipLines">
-                            <CorasauControls:TextEditor Text="{Binding SkipLines,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="FormatName" x:Name="liFormatName">
+                        <CorasauControls:TextEditor Text="{Binding FormatName,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Format" x:Name="liFormat">
+                        <CorasauControls:ComboBoxEditor x:Name="cmbFormat" SelectedItem="{Binding Format,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Seperator" x:Name="liSeperator">
+                        <CorasauControls:TextEditor Text="{Binding Seperator,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="DateFormat" x:Name="liDateFormat">
+                        <CorasauControls:ComboBoxEditor SelectedItem="{Binding DateFormat,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="SkipLines" x:Name="liSkipLines">
+                        <CorasauControls:TextEditor Text="{Binding SkipLines,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
 
-                    </CorasauControls:CorasauLayoutGroup>
-                    <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpFieldPositions" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FieldPosition}" Orientation="Vertical"
-                                                CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                        <CorasauControls:CorasauLayoutItem FieldName="DatePosition" x:Name="liDatePosition">
-                            <CorasauControls:TextEditor Text="{Binding DatePosition,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="TextPosition" x:Name="liTextPosition">
-                            <CorasauControls:TextEditor Text="{Binding TextPosition,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="AmountPosition" x:Name="liAmountPosition">
-                            <CorasauControls:TextEditor Text="{Binding AmountPosition,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="VoucherPos" x:Name="liVoucherPos">
-                            <CorasauControls:TextEditor Text="{Binding VoucherPos,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="InvoicePos" x:Name="liInvoicePos">
-                            <CorasauControls:TextEditor Text="{Binding InvoicePos,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="DocumentPos" x:Name="liDocuentPos">
-                            <CorasauControls:TextEditor Text="{Binding DocumentPos,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="OffsetAccountPos" x:Name="liOffsetAccountPos">
-                            <CorasauControls:TextEditor Text="{Binding OffsetAccountPos,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="ReferencePosition" x:Name="liReferecePosition">
-                            <CorasauControls:TextEditor Text="{Binding ReferencePosition,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="PaymentIdentifier" x:Name="liPaymentIdentifier">
-                            <CorasauControls:TextEditor Text="{Binding PaymentIdentifier,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="IdentifierAmountPos" x:Name="liIdentifiedAmountPos">
-                            <CorasauControls:TextEditor Text="{Binding IdentifierAmountPos,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="DCIdentifierPos" x:Name="liDCIdentifierPos">
-                            <CorasauControls:TextEditor Text="{Binding DCIdentifierPos,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="DebetIdentifier" x:Name="liDebetIdentifier">
-                            <CorasauControls:TextEditor Text="{Binding DebetIdentifier,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="CreditIdentifier" x:Name="liCreditIdentifier">
-                            <CorasauControls:TextEditor Text="{Binding CreditIdentifier,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="IBANFormat" x:Name="liIBANFormat">
-                            <CorasauControls:TextEditor Text="{Binding IBANFormat,Mode=TwoWay}" />
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="NotePos" x:Name="liNotePos">
-                            <CorasauControls:TextEditor Text="{Binding NotePos,Mode=TwoWay}" />
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="CurrencyPos" x:Name="liCurrencyPos">
-                            <CorasauControls:TextEditor Text="{Binding CurrencyPos,Mode=TwoWay}" />
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="CurrencyAmountPos" x:Name="liCurrencyAmountPos">
-                            <CorasauControls:TextEditor Text="{Binding CurrencyAmountPos,Mode=TwoWay}" />
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="InfoPos" x:Name="liInfoPos">
-                            <CorasauControls:TextEditor Text="{Binding InfoPos,Mode=TwoWay}" />
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="PhysPos" x:Name="liPhysPos">
-                            <CorasauControls:TextEditor Text="{Binding PhysPos,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                    </CorasauControls:CorasauLayoutGroup>
                 </CorasauControls:CorasauLayoutGroup>
-            </CorasauControls:CorasauLayoutControl>
-        </Grid>
-    </CorasauControls:BusyIndicator>
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpFieldPositions" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FieldPosition}" Orientation="Vertical"
+                                                CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                    <CorasauControls:CorasauLayoutItem FieldName="DatePosition" x:Name="liDatePosition">
+                        <CorasauControls:TextEditor Text="{Binding DatePosition,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="TextPosition" x:Name="liTextPosition">
+                        <CorasauControls:TextEditor Text="{Binding TextPosition,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="AmountPosition" x:Name="liAmountPosition">
+                        <CorasauControls:TextEditor Text="{Binding AmountPosition,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="VoucherPos" x:Name="liVoucherPos">
+                        <CorasauControls:TextEditor Text="{Binding VoucherPos,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="InvoicePos" x:Name="liInvoicePos">
+                        <CorasauControls:TextEditor Text="{Binding InvoicePos,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="DocumentPos" x:Name="liDocuentPos">
+                        <CorasauControls:TextEditor Text="{Binding DocumentPos,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="OffsetAccountPos" x:Name="liOffsetAccountPos">
+                        <CorasauControls:TextEditor Text="{Binding OffsetAccountPos,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="ReferencePosition" x:Name="liReferecePosition">
+                        <CorasauControls:TextEditor Text="{Binding ReferencePosition,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="PaymentIdentifier" x:Name="liPaymentIdentifier">
+                        <CorasauControls:TextEditor Text="{Binding PaymentIdentifier,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="IdentifierAmountPos" x:Name="liIdentifiedAmountPos">
+                        <CorasauControls:TextEditor Text="{Binding IdentifierAmountPos,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="DCIdentifierPos" x:Name="liDCIdentifierPos">
+                        <CorasauControls:TextEditor Text="{Binding DCIdentifierPos,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="DebetIdentifier" x:Name="liDebetIdentifier">
+                        <CorasauControls:TextEditor Text="{Binding DebetIdentifier,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="CreditIdentifier" x:Name="liCreditIdentifier">
+                        <CorasauControls:TextEditor Text="{Binding CreditIdentifier,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="IBANFormat" x:Name="liIBANFormat">
+                        <CorasauControls:TextEditor Text="{Binding IBANFormat,Mode=TwoWay}" />
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="NotePos" x:Name="liNotePos">
+                        <CorasauControls:TextEditor Text="{Binding NotePos,Mode=TwoWay}" />
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="CurrencyPos" x:Name="liCurrencyPos">
+                        <CorasauControls:TextEditor Text="{Binding CurrencyPos,Mode=TwoWay}" />
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="CurrencyAmountPos" x:Name="liCurrencyAmountPos">
+                        <CorasauControls:TextEditor Text="{Binding CurrencyAmountPos,Mode=TwoWay}" />
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="InfoPos" x:Name="liInfoPos">
+                        <CorasauControls:TextEditor Text="{Binding InfoPos,Mode=TwoWay}" />
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="PhysPos" x:Name="liPhysPos">
+                        <CorasauControls:TextEditor Text="{Binding PhysPos,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
+            </CorasauControls:CorasauLayoutGroup>
+        </CorasauControls:CorasauLayoutControl>
+    </Grid>
 </Pages:FormBasePage>

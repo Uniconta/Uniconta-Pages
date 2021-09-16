@@ -7,10 +7,10 @@
     <RibbonItem Action="Save" LocalizedNameKey="Save" LargeGlyph="save-32x32.png" />
   </RibbonItem>
   <RibbonItem>
-  <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh.png" LargeGlyph="refresh.png"/>
+    <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh.png" LargeGlyph="refresh.png"/>
   </RibbonItem>
   <RibbonItem>
-     <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32.png">
+    <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32.png">
       <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
       <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16.png" ShortcutKey="" />
       <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
@@ -23,9 +23,11 @@
     </RibbonItem>
   </RibbonItem>
   <RibbonItem>
-  <RibbonItem Action="ViewDownloadRow" ShortcutKey="Alt+V" LocalizedNameKey="View" LargeGlyph="View_Highlighted_32x32.png" />
+    <RibbonItem Action="ViewDownloadRow" ShortcutKey="Alt+V" LocalizedNameKey="View" LargeGlyph="View_Highlighted_32x32.png" />
+    <RibbonItem Action="ViewInWeb" LocalizedNameKey="ViewInOBJ" Parameter="Web" LargeGlyph="Translation_32x32.png" />
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="JoinPDF" LocalizedNameKey="JoinTwoOBJ" Parameter="pdfs" LargeGlyph="Match_Add_32x32.png" />
+    <!--RibbonItem Action="ConvertToPDF" LocalizedNameKey="ConvertToPDF" LargeGlyph="Image_To_PDF_32x32.png" /-->
   </RibbonItem>
 </root>

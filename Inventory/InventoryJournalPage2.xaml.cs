@@ -53,15 +53,13 @@ namespace UnicontaClient.Pages.CustomPage
 
         void InitPage(CrudAPI crudapi)
         {
-            
-            BusyIndicator = busyIndicator;
             layoutControl = layoutItems;
-            lkNumberSerie.api = lkTransType.api = cmbDim1.api = cmbDim2.api = cmbDim3.api = cmbDim4.api = cmbDim5.api = lkAccount.api=lkOffsetAccount.api= crudapi;
+            lkNumberSerie.api = lkTransType.api = cmbDim1.api = cmbDim2.api = cmbDim3.api = cmbDim4.api = cmbDim5.api = lkAccount.api = lkOffsetAccount.api = crudapi;
             Utility.SetDimensions(crudapi, lbldim1, lbldim2, lbldim3, lbldim4, lbldim5, cmbDim1, cmbDim2, cmbDim3, cmbDim4, cmbDim5, usedim);
             if (LoadedRow == null)
             {
                 frmRibbon.DisableButtons(new string[] { "Delete" });
-                editrow =CreateNew() as InvJournalClient;
+                editrow = CreateNew() as InvJournalClient;
             }
             layoutItems.DataContext = editrow;
             frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;

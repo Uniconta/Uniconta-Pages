@@ -22,6 +22,8 @@ using Uniconta.ClientTools.Controls;
 using System.Windows;
 using UnicontaClient.Pages.Project.TimeManagement;
 using Uniconta.DataModel;
+using Uniconta.API.Project;
+using Uniconta.ClientTools.Util;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -45,7 +47,7 @@ namespace UnicontaClient.Pages.CustomPage
         SQLTableCache<Uniconta.DataModel.ProjectGroup> projGroupCache;
         SQLTableCache<Uniconta.DataModel.ProjectBudgetGroup> budgetGroupCache;
         SQLTableCache<Uniconta.DataModel.PrCategory> prCategoryCache;
-
+        SQLTableCache<Uniconta.DataModel.PrWorkSpace> workspaceCache;
 
         public override string NameOfControl { get { return TabControls.ProjectBudgetPage; } }
         public ProjectBudgetPage(UnicontaBaseEntity master)
@@ -160,9 +162,19 @@ namespace UnicontaClient.Pages.CustomPage
                 case "CreateBudget":
                     CreateBudget();
                     break;
+                case "CreateBudgetTask":
+                    CreateBudgetTask();
+                    break;
                 case "UpdatePrices":
                     if (dgProjectBudgetGrid.ItemsSource != null)
                         UpdatePrices();
+                    break;
+                case "CreateAnchorBudget":
+                    if (dgProjectBudgetGrid.ItemsSource != null)
+                        CreateAnchorBudget();
+                    break;
+                case "Check":
+                    AddDockItem(TabControls.TMPlanningCheckPage, null);
                     break;
                 case "RefreshGrid":
                     gridRibbon_BaseActions(ActionType);
@@ -173,392 +185,107 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
+        #region Create Budget
+        private void CreateBudget()
+        {
+            var cwCreateBjt = new CwCreateUpdateBudget(api);
+#if !SILVERLIGHT
+            cwCreateBjt.DialogTableId = 2000000100;
+#endif
+            cwCreateBjt.Closed += async delegate
+            {
+                if (cwCreateBjt.DialogResult == true) 
+                {
+                    BudgetAPI budgetApi = new BudgetAPI(api);
+                    var result = await budgetApi.CreateBudget(CwCreateUpdateBudget.FromDate, CwCreateUpdateBudget.ToDate, CwCreateUpdateBudget.Employee, CwCreateUpdateBudget.Payroll,
+                                                              CwCreateUpdateBudget.PrCategory, CwCreateUpdateBudget.Group, (byte)CwCreateUpdateBudget.BudgetMethod, CwCreateUpdateBudget.BudgetName,
+                                                               CwCreateUpdateBudget.PrWorkSpace, cwCreateBjt.DeleteBudget, cwCreateBjt.InclProjectTask, null);
+
+                    if (result != ErrorCodes.Succes)
+                        UtilDisplay.ShowErrorCode(result);
+                    else
+                        UnicontaMessageBox.Show(string.Concat(Uniconta.ClientTools.Localization.lookup("Budget"), " ", Uniconta.ClientTools.Localization.lookup("Created").ToLower()), 
+                            Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OK);
+                }
+            };
+            cwCreateBjt.Show();
+            
+        }
+
+        private void CreateBudgetTask()
+        {
+            var cwCreateBjtTask = new CwCreateBudgetTask(api);
+#if !SILVERLIGHT
+            cwCreateBjtTask.DialogTableId = 2000000106;
+#endif
+            cwCreateBjtTask.Closed += async delegate
+            {
+                if (cwCreateBjtTask.DialogResult == true)
+                {
+                    BudgetAPI budgetApi = new BudgetAPI(api);
+                    var result = await budgetApi.CreateBudgetTask(CwCreateBudgetTask.Employee, CwCreateBudgetTask.Payroll, CwCreateBudgetTask.Group,
+                                                                  CwCreateBudgetTask.PrWorkSpace, cwCreateBjtTask.DeleteBudget, (byte)CwCreateBudgetTask.BudgetTaskPrincip,
+                                                                  CwCreateBudgetTask.TaskHours, null);
+
+                    if (result != ErrorCodes.Succes)
+                        UtilDisplay.ShowErrorCode(result);
+                    else
+                        UnicontaMessageBox.Show(string.Concat(Uniconta.ClientTools.Localization.lookup("Budget"), " ", Uniconta.ClientTools.Localization.lookup("Created").ToLower()),
+                            Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OK);
+                }
+            };
+            cwCreateBjtTask.Show();
+        }
+        #endregion
+
         #region UpdatePrices
         private void UpdatePrices()
         {
             var cwUpdateBjt = new CwCreateUpdateBudget(api, 1);
 #if !SILVERLIGHT
-            cwUpdateBjt.DialogTableId = 2000000073;
+            cwUpdateBjt.DialogTableId = 2000000101;
 #endif
-
             cwUpdateBjt.Closed += async delegate
             {
                 if (cwUpdateBjt.DialogResult == true)
                 {
-                    DateTime dFromDateUpd = CwCreateUpdateBudget.FromDate;
-                    DateTime dToDateUpd = CwCreateUpdateBudget.ToDate;
-                    string dEmplNumber = CwCreateUpdateBudget.Employee;
-                    string dProject = CwCreateUpdateBudget.Project;
-                    string dBudgetGroup = CwCreateUpdateBudget.Group;
-                    string dBudgetComment = CwCreateUpdateBudget.Comment;
+                    BudgetAPI budgetApi = new BudgetAPI(api);
+                    var result = await budgetApi.UpdatePrices(CwCreateUpdateBudget.FromDate, CwCreateUpdateBudget.ToDate, CwCreateUpdateBudget.Employee, CwCreateUpdateBudget.Payroll,
+                                                              CwCreateUpdateBudget.PrCategory, CwCreateUpdateBudget.Group, CwCreateUpdateBudget.PrWorkSpace, cwUpdateBjt.InclProjectTask, null);
 
-                    if (string.IsNullOrEmpty(CwCreateUpdateBudget.Group))
-                    {
-                        UnicontaMessageBox.Show(FieldCannotBeEmpty(Uniconta.ClientTools.Localization.lookup("BudgetGroup")), Uniconta.ClientTools.Localization.lookup("Warning"), MessageBoxButton.OK);
-                        return;
-                    }
-
-                    if (dFromDateUpd == DateTime.MinValue)
-                    {
-                        UnicontaMessageBox.Show(FieldCannotBeEmpty(Uniconta.ClientTools.Localization.lookup("FromDate")), Uniconta.ClientTools.Localization.lookup("Warning"), MessageBoxButton.OK);
-                        return;
-                    }
-
-                    if (dToDateUpd == DateTime.MinValue)
-                    {
-                        UnicontaMessageBox.Show(FieldCannotBeEmpty(Uniconta.ClientTools.Localization.lookup("ToDate")), Uniconta.ClientTools.Localization.lookup("Warning"), MessageBoxButton.OK);
-                        return;
-                    }
-
-                    var master = new List<UnicontaBaseEntity>();
-                    ProjectBudgetGroup budgetGrp = budgetGroupCache.Get(dBudgetGroup);
-
-                    if (budgetGrp._Blocked)
-                    {
-                        UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("IsBlockedOBJ"), Uniconta.ClientTools.Localization.lookup("Budget")), Uniconta.ClientTools.Localization.lookup("Warning"), MessageBoxButton.OK);
-                        return;
-                    }
-
-                    master.Add(budgetGrp);
-
-                    busyIndicator.IsBusy = true;
-
-
-                    if (!string.IsNullOrEmpty(dEmplNumber))
-                        master.Add(employeeCache.Get(dEmplNumber));
-
-                    if (!string.IsNullOrEmpty(dProject))
-                        master.Add(projectCache.Get(dProject));
-
-                    List<PropValuePair> pairTrans = new List<PropValuePair>();
-                    pairTrans.Add(PropValuePair.GenereteWhereElements(nameof(ProjectBudgetLineClient._Date), typeof(DateTime), String.Format("{0:d}..{1:d}", dFromDateUpd, dToDateUpd)));
-
-                    var empPriceLst = await api.Query<EmpPayrollCategoryEmployeeClient>(master, pairTrans);
-                    var budgetLineLst = await api.Query<ProjectBudgetLineClient>(master, pairTrans);
-
-                    var cntUpdate = 0;
-                    var tmHelper = new TMJournalLineHelper(api); 
-                    foreach (var rec in budgetLineLst)
-                    {
-                        cntUpdate++;
-                        var prices = tmHelper.GetEmplPrice(empPriceLst, payrollCache, projGroupCache, employeeCache?.Get(rec._Employee), projectCache.Get(rec._Project), rec._Date, rec._PayrollCategory);
-                        rec._CostPrice = prices.Item1;
-                        rec._SalesPrice = prices.Item2;
-                        rec._Text = string.Concat("(", TMJournalLineHelper.GetTimeStamp(), ") ", Uniconta.ClientTools.Localization.lookup("PriceUpdate"));
-                    }
-
-                    ErrorCodes res;
-                    if (cntUpdate > 0)
-                        res = await api.Update(budgetLineLst);
-
-                    busyIndicator.IsBusy = false;
-
-                    UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("RecordsUpdated"), cntUpdate, string.Empty), Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OK);
+                    if (result != ErrorCodes.Succes)
+                        UtilDisplay.ShowErrorCode(result);
+                    else
+                        UnicontaMessageBox.Show(string.Concat(Uniconta.ClientTools.Localization.lookup("Prices"), " ", Uniconta.ClientTools.Localization.lookup("Updated").ToLower()),
+                      Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OK);
                 }
             };
             cwUpdateBjt.Show();
         }
         #endregion
 
-        
-        private class ProjectBudgetLineLocal : ProjectBudgetLine
+        #region Create Anchor Budget
+        private void CreateAnchorBudget()
         {
-            public double _CostTotal;
-            public double _SalesTotal;
-        }
-
-        private DateTime FirstDayOfWeek(DateTime selectedDate)
-        {
-            var dt = selectedDate;
-            int diff = (7 + (dt.DayOfWeek - DayOfWeek.Monday)) % 7;
-            return dt.AddDays(-diff).Date.AddYears(1);
-        }
-
-        private DateTime FirstDayOfMonth(DateTime selectedDate)
-        {
-            return new DateTime(selectedDate.Year, selectedDate.Month, 1).AddYears(1);
-        }
-
-        public DateTime GetDate(DateTime date, int method)
-        {
-            switch (method)
-            {
-                case 0:
-                case 2: return FirstDayOfMonth(date);
-                case 1:
-                case 3: return FirstDayOfWeek(date);
-                default: return DateTime.MinValue;
-            }
-        }
-
-        private static string FieldCannotBeEmpty(string field)
-        {
-            return String.Format("{0} ({1}: {2})",
-                   Uniconta.ClientTools.Localization.lookup("FieldCannotBeEmpty"),
-                   Uniconta.ClientTools.Localization.lookup("Field"), field);
-        }
-
-        public int GetHashCode(ProjectTransPivotClient obj, int method) //TODO:Ret til generel class
-        {
-            switch (method)
-            {
-                case 0: return obj._Project.GetHashCode() * 
-                              (obj._Employee != null ? obj._Employee.GetHashCode() : 1) * 
-                              (obj._PayrollCategory != null ? obj._PayrollCategory.GetHashCode() : 1) * 
-                               obj._Date.Month.GetHashCode();
-                case 1: return obj._Project.GetHashCode() *
-                              (obj._Employee != null ? obj._Employee.GetHashCode() : 1) *
-                              (obj._PayrollCategory != null ? obj._PayrollCategory.GetHashCode() : 1) * 
-                               FirstDayOfWeek(obj._Date).GetHashCode();
-                case 2: return obj._Project.GetHashCode() *
-                              (obj._Employee != null ? obj._Employee.GetHashCode() : 1) *
-                               obj._PrCategory.GetHashCode() *
-                               obj._Date.Month.GetHashCode();
-                case 3: return obj._Project.GetHashCode() *
-                              (obj._Employee != null ? obj._Employee.GetHashCode() : 1) *
-                               obj._PrCategory.GetHashCode() * 
-                               FirstDayOfWeek(obj._Date).GetHashCode();
-                default: return 0;
-            }
-        }
-
-        public int GetHashCodeBudget(ProjectBudgetLineClient obj, int method) //TODO:Ret til generel class
-        {
-            switch (method)
-            {
-                case 0:
-                    return obj._Project.GetHashCode() *
-                          (obj._Employee != null ? obj._Employee.GetHashCode() : 1) *
-                          (obj._PayrollCategory != null ? obj._PayrollCategory.GetHashCode() : 1) *
-                           obj._Date.Month.GetHashCode();
-                case 1:
-                    return obj._Project.GetHashCode() *
-                          (obj._Employee != null ? obj._Employee.GetHashCode() : 1) *
-                          (obj._PayrollCategory != null ? obj._PayrollCategory.GetHashCode() : 1) *
-                           FirstDayOfWeek(obj._Date).GetHashCode();
-                case 2:
-                    return obj._Project.GetHashCode() *
-                          (obj._Employee != null ? obj._Employee.GetHashCode() : 1) *
-                           obj._PrCategory.GetHashCode() *
-                           obj._Date.Month.GetHashCode();
-                case 3:
-                    return obj._Project.GetHashCode() *
-                          (obj._Employee != null ? obj._Employee.GetHashCode() : 1) *
-                           obj._PrCategory.GetHashCode() *
-                           FirstDayOfWeek(obj._Date).GetHashCode();
-                default: return 0;
-            }
-        }
-
-
-        #region Create Budget
-        private void CreateBudget()
-        {
-            var cwCreateBjt = new CwCreateUpdateBudget(api);
+            var cwCreateAnchorBjt = new CwCreateAnchorBudget(api);
 #if !SILVERLIGHT
-            cwCreateBjt.DialogTableId = 2000000074;
+            cwCreateAnchorBjt.DialogTableId = 2000000102;
 #endif
-            cwCreateBjt.Closed += async delegate
+            cwCreateAnchorBjt.Closed += async delegate
             {
-                if (cwCreateBjt.DialogResult == true) 
+                if (cwCreateAnchorBjt.DialogResult == true)
                 {
-                    int budgetMethod = 0;
-                    DateTime dFromDate = CwCreateUpdateBudget.FromDate;
-                    DateTime dToDate = CwCreateUpdateBudget.ToDate;
-                    string dEmplNumber = CwCreateUpdateBudget.Employee;
-                    string dProjectNumber = CwCreateUpdateBudget.Project;
-                    string dBudgetGroup = CwCreateUpdateBudget.Group;
-                    string dBudgetComment = CwCreateUpdateBudget.Comment;
+                    BudgetAPI budgetApi = new BudgetAPI(api);
+                    var result = await budgetApi.CreateAnchorBudget(CwCreateAnchorBudget.Group);
 
-                    dBudgetComment =  string.IsNullOrEmpty(dBudgetComment) ? Uniconta.ClientTools.Localization.lookup("Budget") : dBudgetComment; //
-
-                    if (string.IsNullOrEmpty(CwCreateUpdateBudget.Group))
-                    {
-                        UnicontaMessageBox.Show(FieldCannotBeEmpty(Uniconta.ClientTools.Localization.lookup("BudgetGroup")), Uniconta.ClientTools.Localization.lookup("Warning"), MessageBoxButton.OK);
-                        return;
-                    }
-
-                    if (dFromDate == DateTime.MinValue)
-                    {
-                        UnicontaMessageBox.Show(FieldCannotBeEmpty(Uniconta.ClientTools.Localization.lookup("FromDate")), Uniconta.ClientTools.Localization.lookup("Warning"), MessageBoxButton.OK);
-                        return;
-                    }
-
-                    if (dToDate == DateTime.MinValue)
-                    {
-                        UnicontaMessageBox.Show(FieldCannotBeEmpty(Uniconta.ClientTools.Localization.lookup("ToDate")), Uniconta.ClientTools.Localization.lookup("Warning"), MessageBoxButton.OK);
-                        return;
-                    }
-
-                    ErrorCodes res;
-                    var master = new List<UnicontaBaseEntity>();
-
-                    //Delete Budget Lines >>
-                    ProjectBudgetGroup budgetGrp = budgetGroupCache.Get(dBudgetGroup);
-
-                    if (budgetGrp._Blocked)
-                    {
-                        UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("IsBlockedOBJ"), Uniconta.ClientTools.Localization.lookup("Budget")), Uniconta.ClientTools.Localization.lookup("Warning"), MessageBoxButton.OK);
-                        return;
-                    }
-
-                    busyIndicator.IsBusy = true;
-
-                    master.Add(budgetGrp); 
-
-                    if (!string.IsNullOrEmpty(dEmplNumber))
-                        master.Add(employeeCache.Get(dEmplNumber));
-
-                    if (!string.IsNullOrEmpty(dProjectNumber))
-                        master.Add(projectCache.Get(dProjectNumber));
-
-                    List<PropValuePair> pairLine = new List<PropValuePair>();
-                    pairLine.Add(PropValuePair.GenereteWhereElements(nameof(ProjectBudgetLine._Date), typeof(DateTime), String.Format("{0:d}..{1:d}", dFromDate, dToDate)));
-
-                    var projBudgetLineDelete = await api.Query<ProjectBudgetLine>(master, pairLine);
-                    if (projBudgetLineDelete.Length != 0)
-                        res = await api.Delete(projBudgetLineDelete);
-                    //Delete Budget Lines <<
-
-
-                    List<PropValuePair> pairBudget = new List<PropValuePair>();
-                    pairBudget.Add(PropValuePair.GenereteWhereElements(nameof(ProjectBudget._Group), typeof(string), dBudgetGroup));
-                    var projBudgetLst = await api.Query<ProjectBudget>(pairBudget);
-
-                    var dictProjBudget = new Dictionary<string, ProjectBudget>();
-                    foreach (ProjectBudget rec in projBudgetLst)
-                    {
-                        ProjectBudget projBudget;
-                        bool hasValue = dictProjBudget.TryGetValue(string.Concat(rec._Project, dBudgetGroup), out projBudget);
-                        if (!hasValue)
-                            dictProjBudget.Add(string.Concat(rec._Project, dBudgetGroup), rec);
-                    }
-
-                    List<PropValuePair> filterTrans = new List<PropValuePair>();
-                    filterTrans.Add(PropValuePair.GenereteWhereElements(nameof(ProjectTrans._Date), typeof(DateTime), String.Format("{0:d}..{1:d}", dFromDate.AddYears(-1), dToDate.AddYears(-1))));
-
-                    var transTask = api.Query(new ProjectTransPivotClient(), master, filterTrans);
-                    var projTransLst = await transTask;
-
-                    var projTransLstEntity = new List<ProjectTransPivotClient>();
-                    //string lastProj = null;
-                    string lastPrCat = null;
-                    string lastPayrollCat = null;
-
-                    //Uniconta.DataModel.ProjectGroup projGrp = null;
-                    Uniconta.DataModel.PrCategory prCat = null;
-                    Uniconta.DataModel.EmpPayrollCategory payrollCat = null;
-
-                    foreach (var x in projTransLst)
-                    {
-                        //if (lastProj != x._Project)
-                        //{
-                        //    lastProj = x._Project;
-                        //    var proj = x.ProjectRef;
-                        //    projGrp = projGroupCache.Get(proj._Group);
-                        //}
-                        if (lastPrCat != x._PrCategory)
-                        {
-                            lastPrCat = x._PrCategory;
-                            prCat = x.CategoryRef;
-                        }
-                        if (lastPayrollCat != x._PayrollCategory)
-                        {
-                            lastPayrollCat = x._PayrollCategory;
-                            payrollCat = x.PayrollCategoryRef;
-                        }
-
-                        if (prCat != null && payrollCat != null && prCat._CatType == CategoryType.Labour && payrollCat._Unit == ItemUnit.Hours && payrollCat._InternalType == InternalType.None)
-                            projTransLstEntity.Add(x);
-
-                    }
-
-                    if (projTransLstEntity == null)
-                    {
-                        busyIndicator.IsBusy = false;
-                        UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("RecordsUpdated"), 0, string.Empty), Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OK);
-                        return;
-                    }
-
-                    //Only create budget project with transactions
-                    var insertLst = new List<UnicontaBaseEntity>();
-                    var grpProject = projTransLstEntity.GroupBy(x => x._Project); 
-                    foreach (var rec in grpProject)
-                    {
-                        ProjectBudget projBudget;
-                        bool hasValue = dictProjBudget.TryGetValue(string.Concat(rec.Key, dBudgetGroup), out projBudget);
-                        if (!hasValue)
-                        {
-                            insertLst.Add(new ProjectBudget()
-                            {
-                                _Project = rec.Key,
-                                _Group = dBudgetGroup,
-                                _Name = dBudgetComment,
-                                _Current = true
-                            });
-                        }
-                    }
-                    if (insertLst.Count > 0)
-                        res = await api.Insert(insertLst); //Create new Budget-Header
-
-                    //Insert new header in dictionary for fast lookup
-                    foreach (ProjectBudget rec in insertLst)
-                    {
-                        ProjectBudget projBudget;
-                        bool hasValue = dictProjBudget.TryGetValue(string.Concat(rec._Project, dBudgetGroup), out projBudget);
-                        if (!hasValue)
-                            dictProjBudget.Add(string.Concat(rec._Project, dBudgetGroup), rec);
-                    }
-
-                    ProjectBudgetLineLocal projBudgetLine;
-                    var dictProjBudgetLine = new Dictionary<int, ProjectBudgetLineLocal>();
-                    foreach (var trans in projTransLstEntity)
-                    {
-                        if (dictProjBudgetLine.TryGetValue(GetHashCode(trans, budgetMethod), out projBudgetLine))
-                        {
-                            projBudgetLine._Qty += trans._Qty;
-                            projBudgetLine._CostTotal += trans.Cost;
-                            projBudgetLine._CostPrice = projBudgetLine._Qty != 0 ? Math.Round(projBudgetLine._CostTotal / projBudgetLine._Qty, 2) : 0; 
-                            projBudgetLine._SalesTotal += trans.Sales; 
-                            projBudgetLine._SalesPrice = projBudgetLine._Qty != 0 ? Math.Round(projBudgetLine._SalesTotal / projBudgetLine._Qty, 2) : 0;
-                        }
-                        else
-                        {
-                            ProjectBudget projBudget;
-                            bool hasValue = dictProjBudget.TryGetValue(string.Concat(trans._Project, dBudgetGroup), out projBudget);
-                            if (hasValue)
-                            {
-                                projBudgetLine = new ProjectBudgetLineLocal();
-                                projBudgetLine.SetMaster(projBudget);
-                                projBudgetLine._Project = trans._Project;
-                                projBudgetLine._Qty = trans._Qty;
-                                projBudgetLine._CostTotal += trans.Cost; 
-                                projBudgetLine._CostPrice = projBudgetLine._Qty != 0 ? Math.Round(projBudgetLine._CostTotal / projBudgetLine._Qty, 2) : 0;
-                                projBudgetLine._SalesTotal += trans.Sales;
-                                projBudgetLine._SalesPrice = projBudgetLine._Qty != 0 ? Math.Round(projBudgetLine._SalesTotal / projBudgetLine._Qty, 2) : 0;
-                                projBudgetLine._Date = GetDate(trans._Date, budgetMethod);
-                                projBudgetLine._Employee = trans._Employee;
-                                projBudgetLine._PayrollCategory = budgetMethod == 0 || budgetMethod == 1 ? trans._PayrollCategory : null;
-                                projBudgetLine._PrCategory = trans._PrCategory;
-                                projBudgetLine._Text = string.Concat("(", TMJournalLineHelper.GetTimeStamp(), ") ", Uniconta.ClientTools.Localization.lookup("Created"));
-                                dictProjBudgetLine.Add(GetHashCode(trans, budgetMethod), projBudgetLine);
-                            }
-                        }
-                    }
-
-                    if (dictProjBudgetLine.Count > 0)
-                    {
-                        res = await api.Insert(dictProjBudgetLine.Values);
-                        localMenu_OnItemClicked("RefreshGrid");
-                    }
-
-                    busyIndicator.IsBusy = false;
-
-                    UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("RecordsUpdated"), dictProjBudgetLine.Count, string.Empty), Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OK);
+                    if (result != ErrorCodes.Succes)
+                        UtilDisplay.ShowErrorCode(result);
+                    else
+                        UnicontaMessageBox.Show(string.Concat(Uniconta.ClientTools.Localization.lookup("AnchorBudget"), " ", Uniconta.ClientTools.Localization.lookup("Updated").ToLower()),
+                      Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OK);
                 }
             };
-            cwCreateBjt.Show();
-            
+            cwCreateAnchorBjt.Show();
         }
         #endregion
 
@@ -590,8 +317,24 @@ namespace UnicontaClient.Pages.CustomPage
                 employeeCache = await api.LoadCache<Uniconta.DataModel.Employee>().ConfigureAwait(false);
             if (budgetGroupCache == null)
                 budgetGroupCache = await api.LoadCache<Uniconta.DataModel.ProjectBudgetGroup>().ConfigureAwait(false);
+            
+            if (workspaceCache == null)
+                workspaceCache = await api.LoadCache<Uniconta.DataModel.PrWorkSpace>().ConfigureAwait(false);
         }
     }
+
+    public enum BudgetMethod : byte
+    {
+        Month,
+        Week,
+        Day
+    };
+
+    public enum BudgetTaskPrincip : byte
+    {
+        Princip1,
+        Princip2
+    };
 }
 
 

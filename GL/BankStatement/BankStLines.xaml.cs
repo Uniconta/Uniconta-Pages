@@ -40,8 +40,8 @@ namespace UnicontaClient.Pages.CustomPage
     public partial class BankStLines : GridBasePage
     {
         public override string NameOfControl { get { return TabControls.StatementLine; } }
-        static public DateTime fromDate { get; set; }
-        static public DateTime toDate { get; set; }
+        static public DateTime fromDate { get { return BankStatementPage.fromDate; } set { BankStatementPage.fromDate = value; } }
+        static public DateTime toDate { get { return BankStatementPage.toDate; } set { BankStatementPage.toDate = value; } }
         BankStatement master;
         BankStatementAPI bankTransApi;
 
@@ -52,14 +52,6 @@ namespace UnicontaClient.Pages.CustomPage
             this.DataContext = this;
 
             master = sourceData as BankStatement;
-            if (fromDate == DateTime.MinValue)
-            {
-                DateTime date = GetSystemDefaultDate();
-                var firstDayOfMonth = new DateTime(date.Year, date.Month, 1);
-                var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
-                fromDate = firstDayOfMonth;
-                toDate = lastDayOfMonth;
-            }
 
             bool RoundTo100;
             var Comp = api.CompanyEntity;
@@ -85,9 +77,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override Filter[] DefaultFilters()
         {
-            Filter dateFilter = new Filter() { name = "Date" };
-            dateFilter.value = String.Format("{0:d}..{1:d}", fromDate, toDate);
-            return new Filter[] { dateFilter };
+            return new[] { new Filter() { name = "Date", value = string.Format("{0:d}..{1:d}", fromDate, toDate) } };
         }
 
         protected override SortingProperties[] DefaultSort()
@@ -121,14 +111,13 @@ namespace UnicontaClient.Pages.CustomPage
         public async override Task InitQuery()
         {
             busyIndicator.IsBusy = true;
-            var bankStmtLines = (BankStatementLineGridClient[])await bankTransApi.GetTransactions(new BankStatementLineGridClient(), master, fromDate, toDate, false);
+            var bankStmtLines = (BankStatementLineGridClient[])await bankTransApi.GetTransactions(new BankStatementLineGridClient(), master, fromDate, toDate, true);
             if (bankStmtLines != null)
             {
-                long Total = 0;
-                int l = bankStmtLines.Length;
-                if (l > 0)
+                if (bankStmtLines.Length > 0)
                     bankStmtLines[0]._AmountCent += Uniconta.Common.Utility.NumberConvert.ToLong(100d * master._StartBalance);
-                for (int i = 0; (i < l); i++)
+                long Total = 0;
+                for (int i = 0; (i < bankStmtLines.Length); i++)
                 {
                     var p = bankStmtLines[i];
                     //if (!p._Void)

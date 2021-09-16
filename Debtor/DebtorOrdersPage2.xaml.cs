@@ -108,14 +108,13 @@ namespace UnicontaClient.Pages.CustomPage
         void InitPage(CrudAPI crudapi)
         {
             RemoveMenuItem();
-            BusyIndicator = busyIndicator;
             dAddress.Header = Uniconta.ClientTools.Localization.lookup("DeliveryAddr");
             layoutControl = layoutItems;
             PrCategorylookupeditor.api = Projectlookupeditor.api =
             Employeelookupeditor.api = leAccount.api = lePayment.api = cmbDim1.api = cmbDim2.api =
             cmbDim3.api = cmbDim4.api = cmbDim5.api = leTransType.api = leGroup.api = lePostingAccount.api
             = leShipment.api = leLayoutGroup.api = leDeliveryTerm.api = leInvoiceAccount.api = PriceListlookupeditior.api =
-            leDeliveryAddress.api = leApprover.api = leSplit.api = leVat.api = prTasklookupeditor.api = crudapi;
+            leDeliveryAddress.api = leApprover.api = leSplit.api = leVat.api = prTasklookupeditor.api = lePrWorkSpace.api= crudapi;
 
 #if SILVERLIGHT
             leRelatedOrder.api = crudapi;
@@ -223,6 +222,8 @@ namespace UnicontaClient.Pages.CustomPage
                 var project = Comp.GetCache(typeof(Uniconta.DataModel.Project))?.Get(editrow._Project) as ProjectClient;
                 setTask(project);
             }
+            if (!Comp.InvPrice)
+                priceListLayoutItem.Visibility = Visibility.Collapsed;
         }
 
         public override bool BeforeSetUserField(ref CorasauLayoutGroup parentGroup)
@@ -286,9 +287,7 @@ namespace UnicontaClient.Pages.CustomPage
                     AddDockItem(TabControls.AttachVoucherGridPage, new object[] { _refferedVouchers }, true);
                     break;
                 case "ViewVoucher":
-                    busyIndicator.IsBusy = true;
                     ViewVoucher(TabControls.VouchersPage3, editrow);
-                    busyIndicator.IsBusy = false;
                     break;
 
                 case "ImportVoucher":
@@ -444,8 +443,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         void SetContactSource(SQLCache cache, Debtor debtor)
         {
-            if (cache != null && cache.Count > 0)
-                cmbContactName.ItemsSource = new ContactCacheFilter(cache, 1, debtor._Account);
+            cmbContactName.ItemsSource = cache != null ? new ContactCacheFilter(cache, 1, debtor._Account) : null;
         }
 
         async void BindContact(Debtor debtor)

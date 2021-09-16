@@ -43,6 +43,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void InitPage()
         {
+            LoadNow(typeof(Uniconta.DataModel.CreditorGroup));
             InitializeComponent();
             dgCreditorAccountGrid.RowDoubleClick += dgCreditorAccountGrid_RowDoubleClick;
             dgCreditorAccountGrid.BusyIndicator = busyIndicator;
@@ -62,7 +63,6 @@ namespace UnicontaClient.Pages.CustomPage
             this.PreviewKeyDown += RootVisual_KeyDown;
 #endif
             this.BeforeClose += CreditorAccount_BeforeClose;
-            LoadNow(typeof(Uniconta.DataModel.CreditorGroup));
         }
 
         private void CreditorAccount_BeforeClose()
@@ -362,6 +362,25 @@ namespace UnicontaClient.Pages.CustomPage
         private Task BindGrid()
         {
             return dgCreditorAccountGrid.Filter(null);
+        }
+
+        protected override void LoadCacheInBackGround()
+        {
+            var Comp = api.CompanyEntity;
+            var lst = new List<Type>(12) { typeof(Uniconta.DataModel.Employee), typeof(Uniconta.DataModel.GLVat), typeof(Uniconta.DataModel.CreditorGroup), typeof(Uniconta.DataModel.PaymentTerm), typeof(Uniconta.DataModel.CreditorLayoutGroup) };
+            if (Comp.CreditorPrice)
+                lst.Add(typeof(Uniconta.DataModel.CreditorPriceList));
+            if (Comp.NumberOfDimensions >= 1)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType1));
+            if (Comp.NumberOfDimensions >= 2)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType2));
+            if (Comp.NumberOfDimensions >= 3)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType3));
+            if (Comp.NumberOfDimensions >= 4)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType4));
+            if (Comp.NumberOfDimensions >= 5)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType5));
+            LoadType(lst);
         }
 
         private void HasDocImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

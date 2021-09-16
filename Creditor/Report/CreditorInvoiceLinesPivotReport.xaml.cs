@@ -10,6 +10,7 @@ using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.Common;
 using Uniconta.DataModel;
+using System;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -19,6 +20,13 @@ namespace UnicontaClient.Pages.CustomPage
         CWServerFilter filterDialog = null;
         bool filterCleared;
         TableField[] UserFields { get; set; }
+        DateTime filterDate;
+        Filter[] DefaultFilters()
+        {
+
+            Filter dateFilter = new Filter() { name = "Date", value = String.Format("{0:d}..", filterDate) };
+            return new Filter[] { dateFilter };
+        }
         public override string NameOfControl { get { return TabControls.CreditorInvoiceLinesPivotReport; } }
         bool pivotIsLoaded = false;
         public CreditorInvoiceLinesPivotReport(UnicontaBaseEntity master) : base(master)
@@ -44,6 +52,8 @@ namespace UnicontaClient.Pages.CustomPage
             pivotDgCreditorInvLines.api = api;
             pivotDgCreditorInvLines.TableType = typeof(CreditorInvoiceLines);
             pivotDgCreditorInvLines.UpdateMaster(master);
+            if (master == null)
+                SetDefaultFilter();
             BindGrid();
             pivotDgCreditorInvLines.EndUpdate();
             localMenu.OnItemClicked += LocalMenu_OnItemClicked;
@@ -53,6 +63,13 @@ namespace UnicontaClient.Pages.CustomPage
                 fieldLocation.Visible = false;
         }
 
+        void SetDefaultFilter()
+        {
+            filterDate = BasePage.GetFilterDate(api.CompanyEntity, false);
+            var filterSorthelper = new FilterSortHelper(typeof(DebtorInvoiceLines), DefaultFilters(), null);
+            List<string> errors;
+            filterValues = filterSorthelper.GetPropValuePair(out errors);
+        }
         private Task Filter(bool refreshData)
         {
             return pivotDgCreditorInvLines.Filter(refreshData ? null : filterValues);
@@ -89,7 +106,7 @@ namespace UnicontaClient.Pages.CustomPage
                         if (filterCleared)
                             filterDialog = new CWServerFilter(api, typeof(CreditorInvoiceLines), null, null, UserFields);
                         else
-                            filterDialog = new CWServerFilter(api, typeof(CreditorInvoiceLines), null, null, UserFields);
+                            filterDialog = new CWServerFilter(api, typeof(CreditorInvoiceLines), DefaultFilters(), null, UserFields);
                         filterDialog.Closing += filterDialog_Closing;
                         filterDialog.Show();
                     }

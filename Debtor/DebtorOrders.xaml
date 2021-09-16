@@ -79,6 +79,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrders"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Project" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Visible="False"/>
                     <localPage:CorasauDataGridForeignKeyColumnClient x:Name="Task" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="WorkSpace" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeleteOrder" Width="50" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PricesInclVat" Width="60" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeleteLines" Visible="False" />
@@ -142,6 +143,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrders"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Cartons" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Vat" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Offer" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PostingText" Visible="False" />
                 </localPage:DebtorOrdersGrid.Columns>
                 <localPage:DebtorOrdersGrid.TotalSummary>
                     <localPage:SumColumn FieldName="OrderTotal" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>

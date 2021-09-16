@@ -40,7 +40,6 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void InitPage(CrudAPI crudApi)
         {
-            BusyIndicator = busyIndicator;
             layoutControl = layoutItems;
             SetSource();
             if(editRow==null && LoadedRow==null)
@@ -86,8 +85,8 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var instance = Activator.CreateInstance(type) as UnicontaBaseEntity;
             var list = (UserReportDevExpressClient[])await api.Query(instance, null, null);
-
-            return list.Select(p => p.Name).ToArray();
+            var listCmpId = list?.Where(p => p._ForCompanyId == api.CompanyId || p._AllCompanies == true);
+            return listCmpId.Select(p => p.Name).ToArray();
         }
 
         public override void OnClosePage(object[] refreshParams)

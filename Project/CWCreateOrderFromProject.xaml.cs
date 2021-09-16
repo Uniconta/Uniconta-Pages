@@ -54,6 +54,11 @@ namespace UnicontaClient.Pages.CustomPage
         [Display(Name = "Task", ResourceType = typeof(InputFieldDataText))]
         public string ProjectTask { get; set; }
 
+        [InputFieldData]
+        [ForeignKeyAttribute(ForeignKeyTable = typeof(Uniconta.DataModel.PrWorkSpace))]
+        [Display(Name = "WorkSpace", ResourceType = typeof(InputFieldDataText))]
+        public string ProjectWorkspace { get; set; }
+
         CrudAPI api;
 #if !SILVERLIGHT
         public int DialogTableId;
@@ -83,7 +88,7 @@ namespace UnicontaClient.Pages.CustomPage
             this.Title = string.Format(Uniconta.ClientTools.Localization.lookup("CreateOBJ"), Uniconta.ClientTools.Localization.lookup("Order"));
             dpDate.DateTime = GenrateDate;
             api = crudApi;
-            cmbCategory.api = crudApi;
+            leProjWorkspace.api = cmbCategory.api = crudApi;
             Loaded += CWCreateOrderFromProject_Loaded;
             SetItemSource(crudApi);
 #if SILVERLIGHT
@@ -99,8 +104,7 @@ namespace UnicontaClient.Pages.CustomPage
         void SetItemSource(QueryAPI api)
         {
             var prCache = api.GetCache(typeof(Uniconta.DataModel.PrCategory)) ?? api.LoadCache(typeof(Uniconta.DataModel.PrCategory)).GetAwaiter().GetResult();
-            var cache = new PrCategoryRevenueFilter(prCache);
-            cmbCategory.cacheFilter = new PrCategoryRevenueFilter(prCache);
+            cmbCategory.cacheFilter = new PrCategoryRevenueOnlyFilter(prCache);
         }
 
         async void setTask(ProjectClient project, ProjectTaskClient projTask)

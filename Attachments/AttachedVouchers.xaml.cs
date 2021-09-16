@@ -100,7 +100,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 case "UpdateRow":
                     if (selectedItem != null)
-                        UploadData(selectedItem);   
+                        UploadData(selectedItem);
                     break;
                 case "ViewDownloadRow":
                     if (selectedItem != null)
@@ -138,8 +138,8 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        public override bool IsDataChaged { get{ return false; } }
-       
+        public override bool IsDataChaged { get { return false; } }
+
         async void UpdateInBox(VouchersClient selectedItem)
         {
             var rec = new DocumentNoRef();
@@ -158,17 +158,17 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 if (cwUpdateFile.DialogResult == true)
                 {
-                    if (cwUpdateFile.Contents != null)
+                    byte[] buffer = cwUpdateFile.Contents;
+                    string url = cwUpdateFile.Url;
+                    if (selectedItem.RowId != 0 && (buffer != null || !string.IsNullOrEmpty(url)))
                     {
-                        byte[] buffer = cwUpdateFile.Contents;
-                        if (buffer != null && selectedItem.RowId != 0)
-                        {
-                            selectedItem._Data = buffer;
-                            VoucherCache.SetGlobalVoucherCache(selectedItem);
-                            busyIndicator.IsBusy = true;
-                            await api.Update(selectedItem);
-                            busyIndicator.IsBusy = false;
-                        }
+                        selectedItem._Data = buffer;
+                        selectedItem._Url = url;
+                        selectedItem._NoCompress = ! cwUpdateFile.Compress;
+                        VoucherCache.SetGlobalVoucherCache(selectedItem);
+                        busyIndicator.IsBusy = true;
+                        await api.Update(selectedItem);
+                        busyIndicator.IsBusy = false;
                     }
                     else
                     {

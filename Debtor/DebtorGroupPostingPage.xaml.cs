@@ -19,6 +19,8 @@ using Uniconta.ClientTools;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.Common;
+using Uniconta.ClientTools.Controls;
+using Uniconta.ClientTools.Util;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -38,7 +40,6 @@ namespace UnicontaClient.Pages.CustomPage
         {
             InitPage(master);
         }
-
         private void InitPage(UnicontaBaseEntity master)
         {
             InitializeComponent();
@@ -51,6 +52,7 @@ namespace UnicontaClient.Pages.CustomPage
                 HideColumns(false);
             else
                 HideColumns(true);
+            ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "UndoDelete", "SaveGrid" });
         }
 
         private void HideColumns(bool value)
@@ -71,32 +73,111 @@ namespace UnicontaClient.Pages.CustomPage
                     addParam[1] = dgGroupPosting.masterRecord;
                     AddDockItem(TabControls.DebtorGroupPostingPage2, addParam, Uniconta.ClientTools.Localization.lookup("CustomerPosting"), "Add_16x16.png");
                     break;
-
                 case "EditRow":
                     if (selectedItem == null) return;
                     string grpPostingHeader = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("CustomerPosting"), selectedItem._Group);
-                    object[] EditParam = new object[2];
+                    object[] EditParam = new object[3];
                     EditParam[0] = selectedItem;
-                    EditParam[1] = true;
+                    EditParam[1] = dgGroupPosting.masterRecord;
+                    EditParam[2] = true;
                     AddDockItem(TabControls.DebtorGroupPostingPage2, EditParam, grpPostingHeader, "Edit_16x16.png");
                     break;
-
                 case "CopyRow":
-                    if (selectedItem == null) return;
-
-                    object[] copyParam = new object[2];
-                    copyParam[0] = selectedItem;
-                    copyParam[1] = false;
-                    string header = string.Format(Uniconta.ClientTools.Localization.lookup("CopyOBJ"), selectedItem._Group);
-                    AddDockItem(TabControls.DebtorGroupPostingPage2, copyParam, header);
+                    dgGroupPosting.CopyRow();
                     break;
-
+                case "EditAll":
+                    if (dgGroupPosting.Visibility == System.Windows.Visibility.Visible)
+                        EditAll();
+                    break;
+                case "CopyRecord":
+                    CopyRecord(selectedItem);
+                    break;
+                case "UndoDelete":
+                    dgGroupPosting.UndoDeleteRow();
+                    break;
+                case "DeleteRow":
+                    dgGroupPosting.DeleteRow();
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
         }
 
+        void CopyRecord(DCGroupPostingClient selectedItem)
+        {
+            if (selectedItem == null) return;
+            object[] copyParam = new object[3];
+            copyParam[0] = selectedItem;
+            copyParam[1] = dgGroupPosting.masterRecord;
+            copyParam[2] = false;
+            string header = string.Format(Uniconta.ClientTools.Localization.lookup("CopyOBJ"), selectedItem._Group);
+            AddDockItem(TabControls.DebtorGroupPostingPage2, copyParam, header);
+        }
+
+        bool editAllChecked;
+        private void EditAll()
+        {
+            RibbonBase rb = (RibbonBase)localMenu.DataContext;
+            var ibase = UtilDisplay.GetMenuCommandByName(rb, "EditAll");
+            if (ibase == null)
+                return;
+            if (dgGroupPosting.Readonly)
+            {
+                api.AllowBackgroundCrud = false;
+                dgGroupPosting.MakeEditable();
+                ibase.Caption = Uniconta.ClientTools.Localization.lookup("LeaveEditAll");
+                ribbonControl.EnableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "UndoDelete", "SaveGrid" });
+                editAllChecked = false;
+            }
+            else
+            {
+                if (IsDataChaged)
+                {
+                    string message = Uniconta.ClientTools.Localization.lookup("SaveChangesPrompt");
+                    CWConfirmationBox confirmationDialog = new CWConfirmationBox(message);
+                    confirmationDialog.Closing += async delegate
+                    {
+                        if (confirmationDialog.DialogResult == null)
+                            return;
+
+                        switch (confirmationDialog.ConfirmationResult)
+                        {
+                            case CWConfirmationBox.ConfirmationResultEnum.Yes:
+                                var err = await dgGroupPosting.SaveData();
+                                if (err != 0)
+                                {
+                                    api.AllowBackgroundCrud = true;
+                                    return;
+                                }
+                                break;
+                            case CWConfirmationBox.ConfirmationResultEnum.No:
+                                break;
+                        }
+                        editAllChecked = true;
+                        dgGroupPosting.tableView.CloseEditor();
+                        ibase.Caption = Uniconta.ClientTools.Localization.lookup("EditAll");
+                        ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "UndoDelete", "SaveGrid" });
+                    };
+                    confirmationDialog.Show();
+                }
+                else
+                {
+                    dgGroupPosting.Readonly = true;
+                    dgGroupPosting.tableView.CloseEditor();
+                    ibase.Caption = Uniconta.ClientTools.Localization.lookup("EditAll");
+                    ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "UndoDelete", "SaveGrid" });
+                }
+            }
+        }
+        public override bool IsDataChaged
+        {
+            get
+            {
+                return editAllChecked ? false : dgGroupPosting.HasUnsavedData;
+            }
+        }
+        
         public override void Utility_Refresh(string screenName, object argument = null)
         {
             if (screenName == TabControls.DebtorGroupPostingPage2)

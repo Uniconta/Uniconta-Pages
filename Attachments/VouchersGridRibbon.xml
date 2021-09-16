@@ -17,7 +17,7 @@
     <RibbonItem Action="ViewDownloadRow" ShortcutKey="F7" LocalizedNameKey="View" LargeGlyph="View_Highlighted_32x32.png" />
     <RibbonItem Action="GenerateJournalLines" LocalizedNameKey="GenerateJournalLines" LargeGlyph="Generate_32x32.png" ShortcutKey="Ctrl+G" />
     <RibbonItem Action="ViewJournalLines" LocalizedNameKey="Journallines" LargeGlyph="Journal_Lines_32x32.png" />
-    <RibbonItem Action="GeneratePurchaseOrder" LocalizedNameKey="GeneratePurchaseOrder" LargeGlyph="Generate_32x32.png" ShortcutKey="Ctrl+G" />    
+    <RibbonItem Action="GeneratePurchaseOrder" LocalizedNameKey="GeneratePurchaseOrder" LargeGlyph="Generate_32x32.png" ShortcutKey="Ctrl+G" />
   </RibbonItem>
   <RibbonItem LocalizedNameKey="Bilagscan">
     <RibbonItem Action="BilagscanSendVouchers" LocalizedNameKey="BilagscanSend" Module="Bilagscan" LargeGlyph=";component/Assets/img/Export_32x32.png" />
@@ -26,10 +26,11 @@
   <RibbonItem>
     <RibbonItem Action="SplitPDF" LocalizedNameKey="SplitPDF" LargeGlyph="Match_Remove_32x32.png" />
     <RibbonItem Action="JoinPDF" LocalizedNameKey="JoinTwoOBJ" Parameter="pdfs" LargeGlyph="Match_Add_32x32.png" />
+    <RibbonItem Action="ConvertToPDF" LocalizedNameKey="ConvertToPDF" LargeGlyph="Image_To_PDF_32x32.png" />
   </RibbonItem>
   <RibbonItem>
     <!---If we want to create a new group in same PageTab-->
-     <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32.png">
+    <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32.png">
       <!---If we want Inner menu-->
       <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
       <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16.png" ShortcutKey="" />
@@ -42,14 +43,15 @@
       <RibbonItem Action="FieldSetting" LocalizedNameKey="FieldSetting" Glyph="Setup_16x16.png" ShortcutKey=""/>
     </RibbonItem>
   </RibbonItem>
-   <RibbonItem>
+  <RibbonItem>
     <RibbonItem Action="OffSetAccount" LocalizedNameKey="OffSetAccount"  LargeGlyph="Offset_Account_32x32.png"/>
   </RibbonItem>
-   <RibbonItem>
+  <RibbonItem>
     <RibbonItem Action="EnvelopeWizard" LocalizedNameKey="CreateOBJ" Parameter="Envelope" Glyph="Folder_32x32.png" LargeGlyph="Folder_32x32.png"/>
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="CopyOrMoveVoucher" LocalizedNameKey="CopyOrMoveOBJ" Parameter="Attachments" LargeGlyph="Job_Change_32x32.png" />
+	<RibbonItem Action="MoveToCompany" LocalizedNameKey="MoveToCompany" LargeGlyph="CopyUserTable_32x32.png" />
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="ResendToApprover" LocalizedNameKey="ResendToApprover" LargeGlyph="Email_Add_32x32.png" />

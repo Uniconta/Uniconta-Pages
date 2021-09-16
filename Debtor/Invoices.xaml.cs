@@ -141,7 +141,7 @@ namespace UnicontaClient.Pages.CustomPage
             dgInvoicesGrid.api = api;
             var Comp = api.CompanyEntity;
             if (master == null)
-                filterDate = BasePage.GetFilterDate(Comp, false);
+                filterDate = BasePage.GetFilterDate(Comp, false, 2);
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             initialLoad();
             dgInvoicesGrid.ShowTotalSummary();

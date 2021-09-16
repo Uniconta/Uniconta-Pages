@@ -137,6 +137,13 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
+        public override bool CheckIfBindWithUserfield(out bool isReadOnly, out bool useBinding)
+        {
+            isReadOnly = true;
+            useBinding = true;
+            return true;
+        }
+
         public override Task InitQuery()
         {
             return null;
@@ -502,6 +509,7 @@ namespace UnicontaClient.Pages.CustomPage
             cbdim5.EditValue = Dim5;
             cmbJournal.Text = journals;
             this.NoPrimo = true;
+            cmbShowDimOnPrimo.SelectedIndex = 2;
             LoadGlTran();
         }
     }

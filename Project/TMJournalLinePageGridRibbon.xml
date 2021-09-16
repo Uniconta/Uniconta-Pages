@@ -27,7 +27,6 @@
   <RibbonItem>
     <RibbonItem Action="ShowMileage" LocalizedNameKey="ShowOBJ" Parameter="Mileage" LargeGlyph="Mileage_32x32.png"/>
     <RibbonItem Action="AddMileage" LocalizedNameKey="AddOBJ" Parameter="Mileage" LargeGlyph="Add_Mileage_32x32.png"/>
-    <RibbonItem Action="EditMileage" LocalizedNameKey="EditOBJ" Parameter="Mileage"  LargeGlyph="Edit_Mileage_32x32.png" />
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="Today" LocalizedNameKey="Today" Glyph="Day_View_32x32.png" LargeGlyph="Day_View_32x32.png"/>
@@ -43,6 +42,9 @@
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="Approve" LocalizedNameKey="Approve"   LargeGlyph="Order_Confirmation_32x32.png"/>
+  </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="RemainingBudget" LocalizedNameKey="RemainingBudget" Module="ProjectBudget" LargeGlyph="Budget_32x32.png"/>
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="EfficiencyPercentage" LocalizedNameKey="EfficiencyPercentage" StatusValue=""/>

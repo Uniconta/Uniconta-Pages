@@ -10,7 +10,6 @@ x:Class="UnicontaClient.Pages.CustomPage.UserDocsPage2"
            xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
            mc:Ignorable="d"
            d:DesignWidth="640" d:DesignHeight="480">
-    <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="0" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BusyMessage}">
         <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -71,5 +70,4 @@ x:Class="UnicontaClient.Pages.CustomPage.UserDocsPage2"
                 </CorasauControls:CorasauLayoutGroup>
             </CorasauControls:CorasauLayoutControl>
         </Grid>
-    </CorasauControls:BusyIndicator>
 </Pages:FormBasePage>

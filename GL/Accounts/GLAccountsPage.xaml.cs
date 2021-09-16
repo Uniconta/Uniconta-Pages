@@ -72,7 +72,7 @@ namespace UnicontaClient.Pages.CustomPage
                 ThisYear.HasDecimals = ThisYearDebit.HasDecimals = ThisYearCredit.HasDecimals = false;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
 
-            if (Comp._CountryId != CountryCode.Germany)
+            if (Comp?._CountryId != CountryCode.Germany)
                 DATEVAuto.ShowInColumnChooser = false;
 
             dgGLTable.BusyIndicator = busyIndicator;
@@ -261,6 +261,23 @@ namespace UnicontaClient.Pages.CustomPage
         {
             UnicontaClient.Utilities.Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
             UnicontaClient.Utilities.Utility.SetDimensionsGrid(api, clNewDim1, clNewDim2, clNewDim3, clNewDim4, clNewDim5);
+        }
+
+        protected override void LoadCacheInBackGround()
+        {
+            var Comp = api.CompanyEntity;
+            var lst = new List<Type>(Comp.NumberOfDimensions + 1) { typeof(Uniconta.DataModel.GLVat) };
+            if (Comp.NumberOfDimensions >= 1)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType1));
+            if (Comp.NumberOfDimensions >= 2)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType2));
+            if (Comp.NumberOfDimensions >= 3)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType3));
+            if (Comp.NumberOfDimensions >= 4)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType4));
+            if (Comp.NumberOfDimensions >= 5)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType5));
+            LoadType(lst);
         }
 
         private void HasDocImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

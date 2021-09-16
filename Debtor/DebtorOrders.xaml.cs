@@ -104,6 +104,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
         private void Init(UnicontaBaseEntity master)
         {
+            LoadNow(typeof(DebtorOrderGroup));
             InitializeComponent();
             dgDebtorOrdersGrid.UpdateMaster(master);
             dgDebtorOrdersGrid.RowDoubleClick += dgDebtorOrdersGrid_RowDoubleClick;
@@ -114,7 +115,6 @@ namespace UnicontaClient.Pages.CustomPage
             dgDebtorOrdersGrid.ShowTotalSummary();
             ribbonControl.DisableButtons(new string[] { "UndoDelete", "DeleteRow", "SaveGrid" });
             dgDebtorOrdersGrid.CustomSummary += dgDebtorOrdersGrid_CustomSummary;
-            LoadNow(typeof(Debtor));
         }
 
         double sumMargin, sumSales, sumMarginRatio;
@@ -164,7 +164,8 @@ namespace UnicontaClient.Pages.CustomPage
             else
                 Approver.ShowInColumnChooser = Approved.ShowInColumnChooser = ApprovedDate.ShowInColumnChooser = true;
             if (!Comp.Project)
-                Project.ShowInColumnChooser = Project.Visible = PrCategory.ShowInColumnChooser = PrCategory.Visible = Task.ShowInColumnChooser = Task.Visible = false;
+                Project.ShowInColumnChooser = Project.Visible = PrCategory.ShowInColumnChooser = PrCategory.Visible = Task.ShowInColumnChooser = Task.Visible =
+                    WorkSpace.ShowInColumnChooser = WorkSpace.Visible = false;
             else
                 Project.ShowInColumnChooser = PrCategory.ShowInColumnChooser = Task.ShowInColumnChooser = true;
             if (!Comp.ProjectTask)
@@ -180,57 +181,47 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void localMenu_OnItemClicked(string ActionType)
         {
+            string header;
             var dgDebtorOrdersGrid = this.dgDebtorOrdersGrid;
             var selectedItem = dgDebtorOrdersGrid.SelectedItem as DebtorOrderClient;
-            string salesHeader = string.Empty;
-            if (selectedItem != null)
-                salesHeader = string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("Orders"), selectedItem._OrderNumber);
             switch (ActionType)
             {
                 case "AddRow":
                     if (dgDebtorOrdersGrid.masterRecords != null)
-                    {
-                        object[] arr = new object[2] { api, dgDebtorOrdersGrid.masterRecord };
-                        AddDockItem(TabControls.DebtorOrdersPage2, arr, Uniconta.ClientTools.Localization.lookup("Orders"), "Add_16x16.png");
-                    }
+                        AddDockItem(TabControls.DebtorOrdersPage2, new object[] { api, dgDebtorOrdersGrid.masterRecord }, Uniconta.ClientTools.Localization.lookup("Orders"), "Add_16x16.png");
                     else
-                    {
                         AddDockItem(TabControls.DebtorOrdersPage2, api, Uniconta.ClientTools.Localization.lookup("Orders"), "Add_16x16.png");
-                    }
                     break;
                 case "EditRow":
                     if (selectedItem == null)
                         return;
+                    header = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Orders"), selectedItem._OrderNumber);
                     if (dgDebtorOrdersGrid.masterRecords != null)
-                    {
-                        object[] arr = new object[2] { selectedItem, dgDebtorOrdersGrid.masterRecord };
-                        AddDockItem(TabControls.DebtorOrdersPage2, arr, salesHeader);
-                    }
+                        AddDockItem(TabControls.DebtorOrdersPage2, new object[] { selectedItem, dgDebtorOrdersGrid.masterRecord }, header);
                     else
-                    {
-                        AddDockItem(TabControls.DebtorOrdersPage2, selectedItem, salesHeader);
-                    }
+                        AddDockItem(TabControls.DebtorOrdersPage2, selectedItem, header);
                     break;
                 case "OrderLine":
                     if (selectedItem == null)
                         return;
-                    var olheader = string.Format("{0}:{1},{2}", Uniconta.ClientTools.Localization.lookup("OrdersLine"), selectedItem._OrderNumber, selectedItem.Name);
-                    AddDockItem(TabControls.DebtorOrderLines, dgDebtorOrdersGrid.syncEntity, olheader);
+                    header = string.Format("{0}:{1},{2}", Uniconta.ClientTools.Localization.lookup("OrdersLine"), selectedItem._OrderNumber, selectedItem.Name);
+                    AddDockItem(TabControls.DebtorOrderLines, dgDebtorOrdersGrid.syncEntity, header);
                     break;
                 case "Invoices":
-                    AddDockItem(TabControls.Invoices, selectedItem, salesHeader);
+                    header = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Orders"), selectedItem._OrderNumber);
+                    AddDockItem(TabControls.Invoices, selectedItem, header);
                     break;
                 case "AddNote":
                     if (selectedItem != null)
                     {
-                        string header = string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("UserNotesInfo"), selectedItem._OrderNumber);
+                        header = string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("UserNotesInfo"), selectedItem._OrderNumber);
                         AddDockItem(TabControls.UserNotesPage, dgDebtorOrdersGrid.syncEntity, header);
                     }
                     break;
                 case "AddDoc":
                     if (selectedItem != null)
                     {
-                        string header = string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("Documents"), selectedItem._OrderNumber);
+                        header = string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("Documents"), selectedItem._OrderNumber);
                         AddDockItem(TabControls.UserDocsPage, dgDebtorOrdersGrid.syncEntity, header);
                     }
                     break;
@@ -299,7 +290,8 @@ namespace UnicontaClient.Pages.CustomPage
                     dgDebtorOrdersGrid.AddRow();
                     break;
                 case "CopyRow":
-                    dgDebtorOrdersGrid.CopyRow();
+                    selectedItem = dgDebtorOrdersGrid.CopyRow() as DebtorOrderClient;
+                    selectedItem.OrderNumber = 0;
                     break;
                 case "DeleteRow":
                     dgDebtorOrdersGrid.DeleteRow();
@@ -334,10 +326,53 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null && api.CompanyEntity.ApproveSalesOrders)
                         Utility.ApproveOrder(api, selectedItem);
                     break;
+                case "PostProjectOrder":
+                    if(string.IsNullOrEmpty(selectedItem._Project))
+                    {
+                        UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("ProjectCannotBeBlank"), Uniconta.ClientTools.Localization.lookup("Message"));
+                        return;
+                    }
+                    PostProjectOrder(selectedItem);
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
+        }
+
+        void PostProjectOrder(DebtorOrderClient order)
+        {
+            var dialog = new CwPostProjectOrder();
+            dialog.DialogTableId = 2000000087;
+            dialog.Closed += async delegate
+            {
+                if (dialog.DialogResult == true)
+                {
+                    busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
+                    busyIndicator.IsBusy = true;
+                    var invApi = new Uniconta.API.DebtorCreditor.InvoiceAPI(api);
+                    var postingResult = await invApi.PostProjectOrder(order, null, dialog.Date, dialog.Simulation, new GLTransClientTotal(), null, dialog.PostOnlyDelivered);
+                    busyIndicator.IsBusy = false;
+                    busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("LoadingMsg");
+                    var ledgerRes = postingResult.ledgerRes;
+                    if (ledgerRes == null)
+                        return;
+                    if (ledgerRes.Err != ErrorCodes.Succes)
+                        Utility.ShowJournalError(ledgerRes, dgDebtorOrdersGrid, false);
+                    else if (dialog.Simulation && ledgerRes.SimulatedTrans != null && ledgerRes.SimulatedTrans.Length > 0)
+                        AddDockItem(TabControls.SimulatedTransactions, ledgerRes.SimulatedTrans, Uniconta.ClientTools.Localization.lookup("SimulatedTransactions"), null, true);
+                    else
+                    {
+                        string msg;
+                        if (ledgerRes.JournalPostedlId != 0)
+                            msg = string.Format("{0} {1}={2}", Uniconta.ClientTools.Localization.lookup("JournalHasBeenPosted"), Uniconta.ClientTools.Localization.lookup("JournalPostedId"), ledgerRes.JournalPostedlId);
+                        else
+                            msg = Uniconta.ClientTools.Localization.lookup("JournalHasBeenPosted");
+                        UnicontaMessageBox.Show(msg, Uniconta.ClientTools.Localization.lookup("Message"));
+                    }
+                }
+            };
+            dialog.Show();
         }
 
         async void TestDebtorReload(bool refresh, IEnumerable<DebtorOrder> lst)
@@ -697,7 +732,7 @@ namespace UnicontaClient.Pages.CustomPage
             TestDebtorReload(false, orders?.GetNotNullArray as IEnumerable<DebtorOrder>);
 
             var Comp = api.CompanyEntity;
-            var lst = new List<Type>(14) { typeof(Uniconta.DataModel.InvItem), typeof(Uniconta.DataModel.DebtorOrderGroup), typeof(Uniconta.DataModel.Employee), typeof(Uniconta.DataModel.GLVat) };
+            var lst = new List<Type>(20) { typeof(Uniconta.DataModel.Debtor), typeof(Uniconta.DataModel.Employee), typeof(Uniconta.DataModel.GLVat) };
             if (Comp.Contacts)
                 lst.Add(typeof(Uniconta.DataModel.Contact));
             if (Comp.DeliveryAddress)
@@ -719,6 +754,18 @@ namespace UnicontaClient.Pages.CustomPage
             }
             if (Comp.Warehouse)
                 lst.Add(typeof(Uniconta.DataModel.InvWarehouse));
+            lst.Add(typeof(Uniconta.DataModel.InvGroup));
+            if (Comp.NumberOfDimensions >= 1)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType1));
+            if (Comp.NumberOfDimensions >= 2)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType2));
+            if (Comp.NumberOfDimensions >= 3)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType3));
+            if (Comp.NumberOfDimensions >= 4)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType4));
+            if (Comp.NumberOfDimensions >= 5)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType5));
+            lst.Add(typeof(Uniconta.DataModel.InvItem));
             LoadType(lst);
         }
 
@@ -784,7 +831,7 @@ namespace UnicontaClient.Pages.CustomPage
                     var isSimulated = GenrateInvoiceDialog.IsSimulation;
                     var invoicePostingResult = new InvoicePostingPrintGenerator(api, this);
                     invoicePostingResult.SetUpInvoicePosting(dbOrder, null, CompanyLayoutType.Invoice, GenrateInvoiceDialog.GenrateDate, null, isSimulated, GenrateInvoiceDialog.ShowInvoice, GenrateInvoiceDialog.PostOnlyDelivered,
-                        GenrateInvoiceDialog.InvoiceQuickPrint, GenrateInvoiceDialog.NumberOfPages, GenrateInvoiceDialog.SendByEmail, !isSimulated && GenrateInvoiceDialog.SendByOutlook, GenrateInvoiceDialog.sendOnlyToThisEmail,
+                        GenrateInvoiceDialog.InvoiceQuickPrint, GenrateInvoiceDialog.NumberOfPages, GenrateInvoiceDialog.SendByEmail, GenrateInvoiceDialog.SendByOutlook, GenrateInvoiceDialog.sendOnlyToThisEmail,
                         GenrateInvoiceDialog.Emails, GenrateInvoiceDialog.GenerateOIOUBLClicked, null, false);
                     invoicePostingResult.SetAdditionalOrders(GenrateInvoiceDialog.AdditionalOrders?.Cast<DCOrder>().ToList());
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
@@ -901,36 +948,35 @@ namespace UnicontaClient.Pages.CustomPage
             if (result.Document != null && createXmlFile)
             {
                 var filename = string.Format("{0}_{1}", Uniconta.ClientTools.Localization.lookup("Invoice"), invClient.InvoiceNumber);
-
-                if (session.User._AppDocPath != string.Empty && Directory.Exists(session.User._AppDocPath))
+                try
                 {
-                    try
+                    if (session.User._AppDocPath != string.Empty && Directory.Exists(session.User._AppDocPath))
                     {
-                        applFilePath = string.Format("{0}\\OIOUBL", session.User._AppDocPath);
+                        applFilePath = string.Concat(session.User._AppDocPath, "\\OIOUBL");
                         Directory.CreateDirectory(applFilePath);
 
-                        filename = string.Format("{0}\\{1}.xml", applFilePath, filename);
+                        filename = string.Concat(applFilePath, "\\", filename, ".xml");
                         hasUserFolder = true;
                     }
-                    catch (Exception ex)
+                    else
                     {
-                        UnicontaMessageBox.Show(ex);
+                        saveDialog = UtilDisplay.LoadSaveFileDialog;
+                        saveDialog.FileName = filename;
+                        saveDialog.Filter = "XML-File | *.xml";
+                        bool? dialogResult = saveDialog.ShowDialog();
+                        if (dialogResult != true)
+                            return;
+
+                        filename = saveDialog.FileName;
                     }
+
+                    result.Document.Save(filename);
                 }
-                else
+                catch (Exception ex)
                 {
-                    saveDialog = UtilDisplay.LoadSaveFileDialog;
-                    saveDialog.FileName = filename;
-                    saveDialog.Filter = "XML-File | *.xml";
-                    bool? dialogResult = saveDialog.ShowDialog();
-                    if (dialogResult != true)
-                        return;
-
-                    filename = saveDialog.FileName;
+                    UnicontaMessageBox.Show(ex);
                 }
-
-                result.Document.Save(filename);
-                await Invapi.MarkSendInvoiceOIO(invClient);
+                Invapi.MarkSendInvoiceOIO(invClient);
 
                 if (hasUserFolder)
                     UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("SaveFileMsgOBJ"), 1, Uniconta.ClientTools.Localization.lookup("Invoice"), applFilePath)

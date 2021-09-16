@@ -44,7 +44,6 @@ namespace UnicontaClient.Pages.CustomPage
         {
             InitializeComponent();
             ribbonControl = frmRibbon;
-            BusyIndicator = busyIndicator;
             layoutControl = layoutItems;
             layoutItems.DataContext = editrow;
             leApprover1.api = leApprover2.api = api;

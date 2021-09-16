@@ -6,13 +6,9 @@ x:Class="UnicontaClient.Pages.CustomPage.GLSplitTemplatePage2"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
     xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
-    xmlns:toolkit="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Toolkit"
     d:DesignHeight="300" d:DesignWidth="400">
-
-    <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="0" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
-        <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+      <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
@@ -26,5 +22,4 @@ x:Class="UnicontaClient.Pages.CustomPage.GLSplitTemplatePage2"
                 </CorasauControls:CorasauLayoutGroup>
             </CorasauControls:CorasauLayoutControl>
         </Grid>
-    </CorasauControls:BusyIndicator>
 </Pages:FormBasePage>

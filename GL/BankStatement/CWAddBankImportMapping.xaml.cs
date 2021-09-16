@@ -46,6 +46,7 @@ namespace UnicontaClient.Pages.CustomPage
             else
                 SetBankFormats(true);
 
+            chkEqual.IsChecked = chkContains.IsChecked = ckkStartWith.IsChecked = true;
             txtAccountType.Text = bankStatement.AccountType;
             txtAccount.Text = bankStatement._Account;
             txtText.Text = bankStatement._Text;
@@ -79,6 +80,9 @@ namespace UnicontaClient.Pages.CustomPage
             bankImportMap._AccountType = (GLJournalAccountType)AppEnums.GLAccountType.IndexOf(txtAccountType.Text);
             bankImportMap._Account = txtAccount.Text;
             bankImportMap._Text = txtText.Text;
+            bankImportMap._Equal = (bool)chkEqual.IsChecked;
+            bankImportMap._StartsWith = (bool)ckkStartWith.IsChecked;
+            bankImportMap._Contains = (bool)chkContains.IsChecked;
             var err = await api.Insert(bankImportMap);
             if (err != ErrorCodes.Succes)
                 UtilDisplay.ShowErrorCode(err);

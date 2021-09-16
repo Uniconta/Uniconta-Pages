@@ -48,7 +48,6 @@ namespace UnicontaClient.Pages.CustomPage
 
         void InitPage(CrudAPI crudapi)
         {
-            BusyIndicator = busyIndicator;
             if (editrow == null)
             {
                 frmRibbon.DisableButtons(new string[] { "Delete" });

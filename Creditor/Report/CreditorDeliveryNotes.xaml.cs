@@ -87,6 +87,13 @@ namespace UnicontaClient.Pages.CustomPage
                 CostValue.HasDecimals = NetAmount.HasDecimals = TotalAmount.HasDecimals = Margin.HasDecimals = SalesValue.HasDecimals = false;
         }
 
+        public override bool CheckIfBindWithUserfield(out bool isReadOnly, out bool useBinding)
+        {
+            isReadOnly = true;
+            useBinding = true;
+            return true;
+        }
+
         protected override void OnLayoutLoaded()
         {
             base.OnLayoutLoaded();
@@ -438,15 +445,15 @@ namespace UnicontaClient.Pages.CustomPage
 
         public override void Utility_Refresh(string screenName, object argument = null)
         {
-            if (screenName == TabControls.StandardPrintReportPage)
+            if (screenName == TabControls.CreditorInvoicePage2)
+                dgCreditorDeliveryNoteGrid.UpdateItemSource(argument);
+            else if (screenName == TabControls.StandardPrintReportPage)
             {
 #if !SILVERLIGHT
                 IsGeneratingPacknote = false;
                 standardPrintPreviewPage = null;
 #endif
             }
-            if (screenName == TabControls.InvoicePage2)
-                dgCreditorDeliveryNoteGrid.UpdateItemSource(argument);
         }
     }
 }

@@ -82,10 +82,14 @@ namespace UnicontaClient.Pages.CustomPage
         }
         void SetHeader()
         {
-            var syncMaster = dgInvLines.masterRecord as DebtorInvoiceClient;
+            var syncMaster = dgInvLines.masterRecord as DCInvoice;
             if (syncMaster == null)
                 return;
-            string header = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("InvoiceNumber"), syncMaster.InvoiceNumber);
+            string header;
+            if (syncMaster.__DCType() != 6)
+                header = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("InvoiceNumber"), syncMaster._InvoiceNumber);
+            else
+                header = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ProjectOrder"), syncMaster._OrderNumber);
             SetHeader(header);
         }
         UnicontaBaseEntity master;
@@ -94,7 +98,7 @@ namespace UnicontaClient.Pages.CustomPage
             InitializeComponent();
             this.master = master;
             dgInvLines.UpdateMaster(master);
-            AddFilterAndSort = (master != null);
+            AddFilterAndSort = (master == null);
             filterDate = BasePage.GetFilterDate(api.CompanyEntity, master != null);
             if (filterDate == DateTime.MinValue)
                 AddFilterAndSort = false;
@@ -151,7 +155,7 @@ namespace UnicontaClient.Pages.CustomPage
             else
                 Warehouse.ShowInColumnChooser = true;
             if (!company.Project)
-                Project.Visible = Project.ShowInColumnChooser = false;
+                Project.Visible = Project.ShowInColumnChooser = WorkSpace.ShowInColumnChooser= WorkSpace.Visible= PrCategory.Visible = PrCategory.ShowInColumnChooser= false;
             else
                 Project.ShowInColumnChooser = true;
             if (!company.ProjectTask)

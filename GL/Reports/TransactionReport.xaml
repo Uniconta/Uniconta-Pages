@@ -5,16 +5,15 @@ x:Class="UnicontaClient.Pages.CustomPage.TransactionReport"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"   
-    mc:Ignorable="d"
     xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
     xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage" 
     xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools" 
-    xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors"   
-    d:DesignHeight="300" d:DesignWidth="400">
+    xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors">
     <UserControl.Resources>
         <SolidColorBrush x:Key="LayoutGridColor" Color="Transparent" />
         <Util:VisibilityBoolConverter x:Key="VisibilityBoolConverter" />
         <Util:ImageNameToImagesourceConverter x:Key="ImageNameToImagesourceConverter"/>
+        <Util:RowIndexConverter x:Key="RowIndexConverter" />
     </UserControl.Resources>
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>

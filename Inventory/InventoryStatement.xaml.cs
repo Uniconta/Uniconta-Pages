@@ -171,7 +171,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         void SubstituteFilter(object sender, DevExpress.Data.SubstituteFilterEventArgs e)
         {
-            if (string.IsNullOrEmpty(ribbonControl.SearchControl.SearchText))
+            if (string.IsNullOrEmpty(ribbonControl?.SearchControl?.SearchText))
                 return;
             e.Filter = new GroupOperator(GroupOperatorType.Or, e.Filter, GetDetailFilter(ribbonControl.SearchControl.SearchText));
         }
@@ -210,6 +210,8 @@ namespace UnicontaClient.Pages.CustomPage
             else
                 Warehouse.ShowInColumnChooser = true;
             UnicontaClient.Utilities.Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
+            if (!company.Project)
+                PrCategory.Visible = PrCategory.ShowInColumnChooser = false;
 #if!SILVERLIGHT
             Utilities.Utility.SetupVariants(api, colVariant, VariantName, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
 #endif

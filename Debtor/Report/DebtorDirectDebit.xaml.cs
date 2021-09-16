@@ -49,6 +49,9 @@ namespace UnicontaClient.Pages.CustomPage
     {
         public override Type TableType { get { return typeof(DebtorTransDirectDebit); } }
         public override bool Readonly { get { return false; } }
+        public override bool IsAutoSave { get { return false; } }
+        public override bool CanDelete { get { return false; } }
+        public override bool CanInsert { get { return false; } }
 
         protected override void DataLoaded(UnicontaBaseEntity[] Arr)
         {
@@ -70,7 +73,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         public override string NameOfControl
         {
-            get { return TabControls.DebtorPayments.ToString(); }
+            get { return TabControls.DebtorDirectDebit; }
         }
 
         public override bool IsDataChaged { get { return false; } }

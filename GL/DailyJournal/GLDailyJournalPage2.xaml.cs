@@ -51,7 +51,6 @@ namespace UnicontaClient.Pages.CustomPage
         }
         void InitPage(CrudAPI crudapi)
         {
-            BusyIndicator = busyIndicator;
             cbdefaultAccount.ItemsSource = cboffsetAccount.ItemsSource = AppEnums.GLAccountType.Values;
             cbVATCalcMethod.ItemsSource = AppEnums.VATCalcMethod.Values;
             cbDateFunction.ItemsSource = AppEnums.GLJournalDate.Values;

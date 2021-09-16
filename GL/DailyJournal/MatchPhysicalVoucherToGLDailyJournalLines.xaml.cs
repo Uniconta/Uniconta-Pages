@@ -36,6 +36,7 @@ namespace UnicontaClient.Pages.CustomPage
     {
         GLDailyJournalClient masterRecord;
         ItemBase ibase;
+        static bool AssignText;
         public MatchPhysicalVoucherToGLDailyJournalLines(UnicontaBaseEntity master)
             : base(null)
         {
@@ -70,6 +71,7 @@ namespace UnicontaClient.Pages.CustomPage
             LedgerCache = Comp.GetCache(typeof(Uniconta.DataModel.GLAccount));
             DebtorCache = Comp.GetCache(typeof(Uniconta.DataModel.Debtor));
             CreditorCache = Comp.GetCache(typeof(Uniconta.DataModel.Creditor));
+            localMenu.OnChecked += LocalMenu_OnChecked;
         }
 
         void DataControl_CurrentItemChanged(object sender, DevExpress.Xpf.Grid.CurrentItemChangedEventArgs e)
@@ -266,6 +268,8 @@ namespace UnicontaClient.Pages.CustomPage
         {
             RibbonBase rb = (RibbonBase)localMenu.DataContext;
             ibase = UtilDisplay.GetMenuCommandByName(rb, "Unlinked");
+            var rbMenuAssignText = UtilDisplay.GetMenuCommandByName(rb, "AssignText");
+            rbMenuAssignText.IsChecked = AssignText;
         }
 
         private void DgGldailyJournalLinesGrid_SelectedItemChanged(object sender, DevExpress.Xpf.Grid.SelectedItemChangedEventArgs e)
@@ -341,7 +345,8 @@ namespace UnicontaClient.Pages.CustomPage
                         dgGldailyJournalLinesGrid.SetLoadedRow(selectedJournalLine);
                         selectedJournalLine.DocumentRef = selectedRowId;
                         selectedJournalLine.DocumentDate = selectedVoucher._DocumentDate;
-                        selectedJournalLine.Text = selectedJournalLine._Text ?? selectedVoucher._Text;
+                        if (AssignText)
+                            selectedJournalLine.Text = selectedJournalLine._Text ?? selectedVoucher._Text;
                         var amount = selectedJournalLine.Amount;
                         selectedJournalLine.Amount = amount != 0d ? amount : selectedVoucher._Amount;
                         dgGldailyJournalLinesGrid.SetModifiedRow(selectedJournalLine);
@@ -374,6 +379,15 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
+        private void LocalMenu_OnChecked(string ActionType, bool IsChecked)
+        {
+            switch (ActionType)
+            {
+                case "AssignText":
+                    AssignText = IsChecked;
+                    break;
+            }
+        }
         private void SetUnlinkedAndLinkedAll()
         {
             if (ibase == null)

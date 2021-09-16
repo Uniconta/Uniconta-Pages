@@ -33,6 +33,8 @@ namespace UnicontaClient.Pages.CustomPage
         public IList ToListLocal(VouchersClient[] Arr) { return this.ToList(Arr); }
         public override bool Readonly { get { return false; } }
         public override bool IsAutoSave { get { return false; } }
+        public override bool CanDelete { get { return false; } }
+        public override bool CanInsert { get { return false; } }
     }
     public partial class DocumentsApprovalPage : GridBasePage
     {
@@ -123,7 +125,7 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     var result = await docApi.ChangeApprover(voucher, cwEmployee.Employee, cwEmployee.Comment);
                     if (result == ErrorCodes.Succes)
-                        RemoveRow(voucher);
+                        dgVoucherApproveGrid.RemoveFocusedRowFromGrid();
                     else
                         UtilDisplay.ShowErrorCode(result);
                 }
@@ -137,7 +139,7 @@ namespace UnicontaClient.Pages.CustomPage
                 await dgVoucherApproveGrid.SaveData();
             var result = await docApi.DocumentSetApprove(selectedItem, null, employee);
             if (result == ErrorCodes.Succes)
-                RemoveRow(selectedItem);
+                dgVoucherApproveGrid.RemoveFocusedRowFromGrid();
             else
                 UtilDisplay.ShowErrorCode(result);
         }
@@ -165,19 +167,12 @@ namespace UnicontaClient.Pages.CustomPage
                     else
                         result = ErrorCodes.NoSucces;
                     if (result == ErrorCodes.Succes)
-                        RemoveRow(selectedItem);
+                        dgVoucherApproveGrid.RemoveFocusedRowFromGrid();
                     else
                         UtilDisplay.ShowErrorCode(result);
                 }
             };
             commentsDialog.Show();
-        }
-
-        void RemoveRow(VouchersClient selectedItem)
-        {
-            var rows = dgVoucherApproveGrid.GetSelectedRowHandles();
-            if (rows != null && rows.Length > 0)
-                dgVoucherApproveGrid.tableView.DeleteRow(rows[0]);
         }
     }
 }

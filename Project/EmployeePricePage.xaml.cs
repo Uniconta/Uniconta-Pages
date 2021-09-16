@@ -41,6 +41,8 @@ namespace UnicontaClient.Pages.CustomPage
 
     public partial class EmpPayrolCategoryPage : GridBasePage
     {
+        UnicontaBaseEntity master;
+
         public EmpPayrolCategoryPage(UnicontaBaseEntity master) : base(master)
         {
             InitializeComponent();
@@ -73,6 +75,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         void InitPage(UnicontaBaseEntity master)
         {
+            this.master = master;
             dgEmpPayCatGrid.api = api;
             dgEmpPayCatGrid.UpdateMaster(master);
             SetRibbonControl(localMenu, dgEmpPayCatGrid);
@@ -136,7 +139,7 @@ namespace UnicontaClient.Pages.CustomPage
                     dgEmpPayCatGrid.CopyRow();
                     break;
                 case "SaveGrid":
-                    dgEmpPayCatGrid.SaveData();
+                    saveGrid();
                     break;
                 case "DeleteRow":
                     if (selectedItem != null)
@@ -146,6 +149,26 @@ namespace UnicontaClient.Pages.CustomPage
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
+        }
+
+        protected override Task<ErrorCodes> saveGrid()
+        {
+            var t = base.saveGrid();
+
+            if (master != null)
+            {
+                Uniconta.DataModel.Employee emp = master as Uniconta.DataModel.Employee;
+                if (emp != null)
+                    emp.EmpPrices = null;
+                else
+                {
+                    Uniconta.DataModel.EmpPayrollCategory pay = master as Uniconta.DataModel.EmpPayrollCategory;
+                    if (pay != null)
+                        pay.Rates = null;
+                }
+            }
+
+            return t;
         }
 
         void setDim()

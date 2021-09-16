@@ -67,7 +67,6 @@ namespace UnicontaClient.Pages.CustomPage
 
         void InitPage(CrudAPI crudapi)
         {
-            BusyIndicator = busyIndicator;
             layoutControl = layoutItems;
             cmbPaymentMethod.ItemsSource = Enum.GetValues(typeof(ExportFormatType));
             cmbPaymentGrpg.ItemsSource = AppEnums.PaymentGroupingType.Values;

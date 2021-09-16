@@ -116,6 +116,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrderLineReport"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Date" Width="80" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Project" Width="80" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Width="80" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="WorkSpace" Width="80" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PostingAccount" Width="80" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Vat" Width="80" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Employee" Width="50" Visible="False"/>

@@ -42,6 +42,7 @@ x:Class="UnicontaClient.Pages.CustomPage.UserDocsPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PackNote" Width="80"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Requisition" Width="80"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="UpdatedAt" Width="80" ShowTime="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DocumentGuid"/>
                 </localPage:DocumentInfoGrid.Columns>
             </localPage:DocumentInfoGrid>
         </CorasauControls:BusyIndicator>

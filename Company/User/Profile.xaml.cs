@@ -182,6 +182,9 @@ namespace UnicontaClient.Pages.CustomPage
                 case "PasswordOnEmail":
                     SetEmailPassowrd();
                     break;
+                case "ProgramModules":
+                    AddDockItem(TabControls.AppKeyPage, api.session.User, string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("AppKeys"), editrow._Name));
+                    break;
                 default:
                     frmRibbon_BaseActions(ActionType);
                     break;

@@ -45,7 +45,6 @@ namespace UnicontaClient.Pages.CustomPage
         }
         void InitPage(CrudAPI crudapi,UnicontaBaseEntity master=null)
         {
-            BusyIndicator = busyIndicator;
             layoutControl = layoutItems;
             lkAllocAccount.api = lkTransType.api =cmbDim1.api=cmbDim2.api=cmbDim3.api=cmbDim4.api=cmbDim5.api=leOffsetAccount.api= crudapi;
             if (api.CompanyEntity.NumberOfDimensions == 0)

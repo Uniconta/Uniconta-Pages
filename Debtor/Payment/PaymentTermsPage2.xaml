@@ -5,103 +5,98 @@ x:Class="UnicontaClient.Pages.CustomPage.PaymentTermsPage2"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"     
-    xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
     xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools" 
-    xmlns:toolkitControls="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Input.Toolkit"    
     mc:Ignorable="d"  xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
-                    xmlns:toolkit="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Toolkit"
     d:DesignHeight="300" d:DesignWidth="400">
     <UserControl.Resources>
         <Util:RowIndexConverter x:Key="RowIndexConverter" />
     </UserControl.Resources>
-    <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="0" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BusyMessage}">
-        <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <CorasauControls:CorasauRibbonControl x:Name="frmRibbon" XMLSourcePath=";component/Assets/FormRibbon.xml" Grid.Row="0"/>
-            <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
-                <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="grpFirst">
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl x:Name="frmRibbon" XMLSourcePath=";component/Assets/FormRibbon.xml" Grid.Row="0"/>
+        <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
+            <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="grpFirst">
 
-                    <CorasauControls:CorasauLayoutGroup x:Name="grpDescription" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Description}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                        <CorasauControls:CorasauLayoutItem x:Name="liPayment" FieldName="Payment">
-                            <CorasauControls:TextEditor Text="{Binding Payment,Mode=TwoWay}" MaxLength="10" x:Name="txtPayment"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="Name" x:Name="liName" >
-                            <CorasauControls:TextEditor Text="{Binding Name,Mode=TwoWay}" MaxLength="30"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="IsDefault" x:Name="liIsDefault">
-                            <CheckBox IsChecked="{Binding IsDefault,Mode=TwoWay}" />
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="PaymentMethod" x:Name="liPaymentMethod">
-                            <CorasauControls:ComboBoxEditor x:Name="cbPaymentmethod" SelectedItem="{Binding PaymentMethod,Mode=TwoWay}" SelectedIndexChanged="ComboBoxEditor_SelectedIndexChanged" />
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="UseForCollection" x:Name="liUseForCollection">
-                            <CheckBox IsChecked="{Binding UseForCollection,Mode=TwoWay}" />
-                        </CorasauControls:CorasauLayoutItem>
-                    </CorasauControls:CorasauLayoutGroup>
-
-                    <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpAccount" Visibility="Collapsed"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Accounts}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                        <CorasauControls:CorasauLayoutItem x:Name="liAccount" FieldName="Account">
-                            <CorasauControls:LookupEditor x:Name="leAccount" Text="{Binding Account,Mode=TwoWay}">
-                            </CorasauControls:LookupEditor>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="OffsetAccount" x:Name="lItemOffsetAccount">
-                            <CorasauControls:LookupEditor x:Name="leOffsetAccount" Text="{Binding OffsetAccount,Mode=TwoWay}">
-                            </CorasauControls:LookupEditor>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem x:Name="itemPct1" FieldName="Pct1">
-                            <CorasauControls:DoubleEditor FieldName="Pct1"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="PostOnDC" x:Name="liPostOnDC">
-                            <CorasauControls:CheckEditor x:Name="chkPostOnDC"  IsChecked="{Binding PostOnDC,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                    </CorasauControls:CorasauLayoutGroup>
-
-                    <CorasauControls:CorasauLayoutGroup x:Name="grpDebtor" Visibility="Collapsed" View="GroupBox"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Options}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                        <CorasauControls:CorasauLayoutItem FieldName="DebtorAccount" x:Name="liDebtorAccount">
-                            <CorasauControls:LookupEditor x:Name="DebtorAccount" Text="{Binding DebtorAccount,Mode=TwoWay}">
-                            </CorasauControls:LookupEditor>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="Pct2" x:Name="liPct2">
-                            <CorasauControls:DoubleEditor FieldName="Pct2" />
-                        </CorasauControls:CorasauLayoutItem>
-                    </CorasauControls:CorasauLayoutGroup>
-
-                    <CorasauControls:CorasauLayoutGroup x:Name="grpDays" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Days}" Orientation="Vertical" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                        <CorasauControls:CorasauLayoutItem FieldName="Days" x:Name="liDays">
-                            <CorasauControls:IntegerEditor EditValue="{Binding Days,Mode=TwoWay}" SetMask="false"/>
-                            <!--<toolkitControls:NumericUpDown Value="{Binding Days,Mode=TwoWay}" Minimum="0" Maximum="1000"/>-->
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="EndOfMonth" x:Name="liEndofMonth">
-                            <CheckBox x:Name="chkEndOfMonth" IsChecked="{Binding EndOfMonth,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="PartialPayment" x:Name="liPartialPayment">
-                            <CheckBox x:Name="chkPartialPayment" IsChecked="{Binding PartialPayment,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                    </CorasauControls:CorasauLayoutGroup>
-
-                    <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpCashDisCount" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CashDiscount}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                        <CorasauControls:CorasauLayoutItem FieldName="CashDiscountPct" x:Name="liCashDiscountPct">
-                            <CorasauControls:DoubleEditor FieldName="CashDiscountPct" MaxLength="10" />
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="EndOfMonthCashDiscount" x:Name="liEndOfMonthCashDiscount">
-                            <CheckBox x:Name="chkEndOfMonthCashDiscount" IsChecked="{Binding EndOfMonthCashDiscount,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="CashDiscountDays" x:Name="liCashDiscountDays" >
-                            <CorasauControls:IntegerEditor  EditValue="{Binding CashDiscountDays,Mode=TwoWay}" MaxLength="30"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="CashdiscountMethod" x:Name="liCashDiscountMethod">
-                            <CorasauControls:ComboBoxEditor x:Name="cbCashdiscountMethod" SelectedItem="{Binding CashdiscountMethod,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="ReverseVatOnCachdiscount" x:Name="liReverseVatOnCachdiscount">
-                            <CheckBox x:Name="chkReverseVatOnCachdiscount" IsChecked="{Binding ReverseVatOnCachdiscount,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                    </CorasauControls:CorasauLayoutGroup>
-
+                <CorasauControls:CorasauLayoutGroup x:Name="grpDescription" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Description}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                    <CorasauControls:CorasauLayoutItem x:Name="liPayment" FieldName="Payment">
+                        <CorasauControls:TextEditor Text="{Binding Payment,Mode=TwoWay}" MaxLength="10" x:Name="txtPayment"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Name" x:Name="liName" >
+                        <CorasauControls:TextEditor Text="{Binding Name,Mode=TwoWay}" MaxLength="30"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="IsDefault" x:Name="liIsDefault">
+                        <CheckBox IsChecked="{Binding IsDefault,Mode=TwoWay}" />
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="PaymentMethod" x:Name="liPaymentMethod">
+                        <CorasauControls:ComboBoxEditor x:Name="cbPaymentmethod" SelectedItem="{Binding PaymentMethod,Mode=TwoWay}" SelectedIndexChanged="ComboBoxEditor_SelectedIndexChanged" />
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="UseForCollection" x:Name="liUseForCollection">
+                        <CheckBox IsChecked="{Binding UseForCollection,Mode=TwoWay}" />
+                    </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
-            </CorasauControls:CorasauLayoutControl>
-        </Grid>
-    </CorasauControls:BusyIndicator>
+
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpAccount" Visibility="Collapsed"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Accounts}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                    <CorasauControls:CorasauLayoutItem x:Name="liAccount" FieldName="Account">
+                        <CorasauControls:LookupEditor x:Name="leAccount" Text="{Binding Account,Mode=TwoWay}">
+                        </CorasauControls:LookupEditor>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="OffsetAccount" x:Name="lItemOffsetAccount">
+                        <CorasauControls:LookupEditor x:Name="leOffsetAccount" Text="{Binding OffsetAccount,Mode=TwoWay}">
+                        </CorasauControls:LookupEditor>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="itemPct1" FieldName="Pct1">
+                        <CorasauControls:DoubleEditor FieldName="Pct1"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="PostOnDC" x:Name="liPostOnDC">
+                        <CorasauControls:CheckEditor x:Name="chkPostOnDC"  IsChecked="{Binding PostOnDC,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
+
+                <CorasauControls:CorasauLayoutGroup x:Name="grpDebtor" Visibility="Collapsed" View="GroupBox"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Options}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                    <CorasauControls:CorasauLayoutItem FieldName="DebtorAccount" x:Name="liDebtorAccount">
+                        <CorasauControls:LookupEditor x:Name="DebtorAccount" Text="{Binding DebtorAccount,Mode=TwoWay}">
+                        </CorasauControls:LookupEditor>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Pct2" x:Name="liPct2">
+                        <CorasauControls:DoubleEditor FieldName="Pct2" />
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
+
+                <CorasauControls:CorasauLayoutGroup x:Name="grpDays" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Days}" Orientation="Vertical" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                    <CorasauControls:CorasauLayoutItem FieldName="Days" x:Name="liDays">
+                        <CorasauControls:IntegerEditor EditValue="{Binding Days,Mode=TwoWay}" SetMask="false"/>
+                        <!--<toolkitControls:NumericUpDown Value="{Binding Days,Mode=TwoWay}" Minimum="0" Maximum="1000"/>-->
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="EndOfMonth" x:Name="liEndofMonth">
+                        <CheckBox x:Name="chkEndOfMonth" IsChecked="{Binding EndOfMonth,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="PartialPayment" x:Name="liPartialPayment">
+                        <CheckBox x:Name="chkPartialPayment" IsChecked="{Binding PartialPayment,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
+
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpCashDisCount" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CashDiscount}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                    <CorasauControls:CorasauLayoutItem FieldName="CashDiscountPct" x:Name="liCashDiscountPct">
+                        <CorasauControls:DoubleEditor FieldName="CashDiscountPct" MaxLength="10" />
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="EndOfMonthCashDiscount" x:Name="liEndOfMonthCashDiscount">
+                        <CheckBox x:Name="chkEndOfMonthCashDiscount" IsChecked="{Binding EndOfMonthCashDiscount,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="CashDiscountDays" x:Name="liCashDiscountDays" >
+                        <CorasauControls:IntegerEditor  EditValue="{Binding CashDiscountDays,Mode=TwoWay}" MaxLength="30"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="CashdiscountMethod" x:Name="liCashDiscountMethod">
+                        <CorasauControls:ComboBoxEditor x:Name="cbCashdiscountMethod" SelectedItem="{Binding CashdiscountMethod,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="ReverseVatOnCachdiscount" x:Name="liReverseVatOnCachdiscount">
+                        <CheckBox x:Name="chkReverseVatOnCachdiscount" IsChecked="{Binding ReverseVatOnCachdiscount,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
+
+            </CorasauControls:CorasauLayoutGroup>
+        </CorasauControls:CorasauLayoutControl>
+    </Grid>
 </Pages:FormBasePage>

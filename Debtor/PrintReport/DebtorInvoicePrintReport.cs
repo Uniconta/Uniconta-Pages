@@ -165,14 +165,17 @@ namespace UnicontaClient.Pages.CustomPage
                 if (Comp.Contacts)
                 {
                     var ContactsCache = Comp.GetCache(typeof(Uniconta.DataModel.Contact)) ?? await crudApi.LoadCache(typeof(Uniconta.DataModel.Contact)).ConfigureAwait(false);
-                    var contactCacheFilter = new ContactCacheFilter(ContactsCache, debtorClientUser.__DCType(), debtorClientUser._Account);
-                    if (contactCacheFilter.Any())
+                    if (ContactsCache != null)
                     {
-                        try
+                        var contactCacheFilter = new ContactCacheFilter(ContactsCache, debtorClientUser.__DCType(), debtorClientUser._Account);
+                        if (contactCacheFilter.Any())
                         {
-                            debtorClientUser.Contacts = contactCacheFilter.Cast<ContactClient>().ToArray();
+                            try
+                            {
+                                debtorClientUser.Contacts = contactCacheFilter.Cast<ContactClient>().ToArray();
+                            }
+                            catch { }
                         }
-                        catch { }
                     }
                 }
                 Debtor = debtorClientUser;

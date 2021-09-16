@@ -32,11 +32,13 @@ namespace UnicontaClient.Pages.CustomPage
 
     public partial class TMEmpCalendarLinePage : GridBasePage
     {
+        UnicontaBaseEntity master;
         public override string NameOfControl { get { return TabControls.TMEmpCalendarLinePage; } }
         public TMEmpCalendarLinePage(UnicontaBaseEntity master)
             : base(master)
         {
             InitializeComponent();
+            this.master = master;
             dgTMEmpCalendarLineGrid.UpdateMaster(master);
             localMenu.dataGrid = dgTMEmpCalendarLineGrid;
             SetRibbonControl(localMenu, dgTMEmpCalendarLineGrid);
@@ -58,7 +60,7 @@ namespace UnicontaClient.Pages.CustomPage
                     dgTMEmpCalendarLineGrid.CopyRow();
                     break;
                 case "SaveGrid":
-                    dgTMEmpCalendarLineGrid.SaveData();
+                    saveGrid();
                     break;
                 case "DeleteRow":
                     if (selectedItem != null)
@@ -92,6 +94,21 @@ namespace UnicontaClient.Pages.CustomPage
         }
         bool DataChaged;
         public override bool IsDataChaged { get { return DataChaged || base.IsDataChaged; } }
+
+        protected override Task<ErrorCodes> saveGrid()
+        {
+            var t = base.saveGrid();
+           
+            if (master != null)
+            {
+                var calendar = master as Uniconta.DataModel.TMEmpCalendar;
+                if (calendar != null)
+                    calendar.CalendarLines = null;
+            }
+
+            return t;
+        }
+
 
         void BuildCalender()
         {

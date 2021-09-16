@@ -4,7 +4,8 @@ x:Class="UnicontaClient.Pages.CustomPage.AccountStatement2"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
             xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
-            xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage"     
+            xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage"  
+             xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools" 
             xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
             xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors"   >
     <UserControl.Resources>
@@ -13,6 +14,7 @@ x:Class="UnicontaClient.Pages.CustomPage.AccountStatement2"
                 <TextBlock FontWeight="Bold" Foreground="Red" VerticalAlignment="Center"  Text="{Binding RowData.Row.Account}" />
             </Grid>
         </DataTemplate>
+        <Util:RowIndexConverter x:Key="RowIndexConverter" />
     </UserControl.Resources>
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>

@@ -55,7 +55,9 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorInvoiceLinesPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Warehouse" Width="90" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Location" Width="90" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Project" Width="100" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Task" Width="80" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="WorkSpace" Width="80" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Currency" Width="50" Visible="false"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Vat" Width="50" Visible="false"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="UnitStr" Width="50" Visible="false"/>

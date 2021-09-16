@@ -104,7 +104,7 @@ namespace UnicontaClient.Pages.CustomPage
                 }
                 else if (rowType == pageMasterType)
                     dgUserField.UpdateItemSource(argument);
-
+                api.CompanyEntity.UserTables = null;
                 session.OpenCompany(api.CompanyEntity.CompanyId, false);
             }
         }

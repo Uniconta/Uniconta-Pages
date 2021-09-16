@@ -28,7 +28,7 @@ namespace UnicontaClient.Pages.CustomPage
         public override Type TableType { get { return typeof(InvItemClient); } }
 
         InvItemClient editrow;
-        SQLCache warehouse, itemCache, prCatCache;
+        SQLCache warehouse, itemCache;
         public override void OnClosePage(object[] RefreshParams)
         {
             ((InvItemClient)RefreshParams[1]).NotifyPropertyChanged("UserField");
@@ -58,9 +58,49 @@ namespace UnicontaClient.Pages.CustomPage
         }
         void InitPage(CrudAPI crudapi)
         {
-            var Comp = crudapi.CompanyEntity;
-            itemCache = Comp.GetCache(typeof(Uniconta.DataModel.InvItem));
-            prCatCache = Comp.GetCache(typeof(Uniconta.DataModel.PrCategory));
+            itemCache = api.GetCache(typeof(Uniconta.DataModel.InvItem));
+            StartLoadCache();
+
+            layoutControl = layoutItems;
+            cbCountry.ItemsSource = Enum.GetValues(typeof(Uniconta.Common.CountryCode));
+            leAlternativeItem.api = leGroup.api = cmbDim1.api = cmbDim2.api = cmbDim3.api = cmbDim4.api = cmbDim5.api = cmbPrCategory.api =
+                leBrandGrp.api = leCategoryGrp.api = cmbPayrollCategory.api = cmbPurchaseAccount.api = cmbWarehouse.api = cmbLocation.api =
+                leDiscountGroup.api = leUnitGroup.api = leDutyGroup.api = crudapi;
+
+            if (LoadedRow == null)
+            {
+                frmRibbon.DisableButtons("Delete");
+                if (!isCopiedRow)
+                    editrow = CreateNew() as InvItemClient;
+            }
+            layoutItems.DataContext = editrow;
+            frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
+        }
+
+        protected override void BeforeTemplateSet(UnicontaBaseEntity row)
+        {
+            ((InvItem)row)._Decimals = 2;
+        }
+
+        private void frmRibbon_OnItemClicked(string ActionType)
+        {
+            if (ActionType == "Save" && !VaidateEAN(editrow._EAN))
+                return;
+            frmRibbon_BaseActions(ActionType);
+        }
+
+        bool VaidateEAN(string ean)
+        {
+            if (Utility.IsValidEAN(ean, api.CompanyEntity))
+                return true;
+            else
+                UnicontaMessageBox.Show(string.Format("{0} {1}", Uniconta.ClientTools.Localization.lookup("EANinvalid"), ean), Uniconta.ClientTools.Localization.lookup("Warning"));
+            return false;
+        }
+        bool isLayoutCtrlLoaded;
+        protected override void OnLayoutCtrlLoaded()
+        {
+            var Comp = api.CompanyEntity;
 
             if (!Comp.Storage || Comp.StorageOnAll)
                 itemUsestorage.Visibility = Visibility.Collapsed;
@@ -88,12 +128,12 @@ namespace UnicontaClient.Pages.CustomPage
             if (Comp.NumberOfDimensions == 0)
                 usedim.Visibility = Visibility.Collapsed;
             else
-                Utility.SetDimensions(crudapi, lbldim1, lbldim2, lbldim3, lbldim4, lbldim5, cmbDim1, cmbDim2, cmbDim3, cmbDim4, cmbDim5, usedim);
+                Utility.SetDimensions(api, lbldim1, lbldim2, lbldim3, lbldim4, lbldim5, cmbDim1, cmbDim2, cmbDim3, cmbDim4, cmbDim5, usedim);
 
             if (!Comp.ItemVariants)
                 useVariants.Visibility = Visibility.Collapsed;
             else
-                cmbStandardVariant.api = crudapi;
+                cmbStandardVariant.api = api;
 
             if (!Comp.Project)
                 projectLayGrp.Visibility = Visibility.Collapsed;
@@ -103,8 +143,6 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (!Comp.Warehouse)
                 itemWarehouse.Visibility = Visibility.Collapsed;
-            else
-                this.warehouse = Comp.GetCache(typeof(Uniconta.DataModel.InvWarehouse));
 
             if (!Comp.SetupSizes)
                 grpSize.Visibility = Visibility.Collapsed;
@@ -114,49 +152,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (!Comp.InvDuty)
                 liDutyGroup.Visibility = Visibility.Collapsed;
 
-            BusyIndicator = busyIndicator;
-            layoutControl = layoutItems;
-            cbCountry.ItemsSource = Enum.GetValues(typeof(Uniconta.Common.CountryCode));
-            leAlternativeItem.api = leGroup.api = cmbDim1.api = cmbDim2.api = cmbDim3.api = cmbDim4.api = cmbDim5.api = cmbPrCategory.api =
-                leBrandGrp.api = leCategoryGrp.api = cmbPayrollCategory.api = cmbPurchaseAccount.api = cmbWarehouse.api = cmbLocation.api =
-                leDiscountGroup.api = leUnitGroup.api = leDutyGroup.api = crudapi;
-
-            if (LoadedRow == null)
-            {
-                frmRibbon.DisableButtons("Delete");
-                if (!isCopiedRow)
-                    editrow = CreateNew() as InvItemClient;
-            }
-            layoutItems.DataContext = editrow;
-            frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
-
-            StartLoadCache();
-        }
-
-        protected override void BeforeTemplateSet(UnicontaBaseEntity row)
-        {
-            ((InvItem)row)._Decimals = 2;
-        }
-
-        private void frmRibbon_OnItemClicked(string ActionType)
-        {
-            if (ActionType == "Save" && !VaidateEAN(editrow._EAN))
-                return;
-            frmRibbon_BaseActions(ActionType);
-        }
-
-        bool VaidateEAN(string ean)
-        {
-            if (Utility.IsValidEAN(ean, api.CompanyEntity))
-                return true;
-            else
-                UnicontaMessageBox.Show(string.Format("{0} {1}", Uniconta.ClientTools.Localization.lookup("EANinvalid"), ean), Uniconta.ClientTools.Localization.lookup("Warning"));
-            return false;
-        }
-        bool isLayoutCtrlLoaded;
-        protected override void OnLayoutCtrlLoaded()
-        {
-            if (editrow._Warehouse != null && api.CompanyEntity.Location && this.warehouse != null)
+            if (editrow._Warehouse != null && Comp.Location && this.warehouse != null)
             {
                 var wareHouse = this.warehouse.Get(editrow._Warehouse) as InvWarehouseClient;
                 setLocation(wareHouse);
@@ -171,19 +167,20 @@ namespace UnicontaClient.Pages.CustomPage
         protected override async void LoadCacheInBackGround()
         {
             var api = this.api;
-            if (api.CompanyEntity.Warehouse && this.warehouse == null)
-                this.warehouse = await api.LoadCache(typeof(Uniconta.DataModel.InvWarehouse)).ConfigureAwait(false);
+            if (api.CompanyEntity.Warehouse)
+                this.warehouse = api.GetCache(typeof(Uniconta.DataModel.InvWarehouse)) ?? await api.LoadCache(typeof(Uniconta.DataModel.InvWarehouse)).ConfigureAwait(false);
             if (itemCache == null)
                 itemCache = await api.LoadCache(typeof(Uniconta.DataModel.InvItem)).ConfigureAwait(false);
-            if (prCatCache == null)
-                prCatCache = await api.LoadCache(typeof(Uniconta.DataModel.PrCategory)).ConfigureAwait(false);
             var t = new List<Type>(2) { typeof(Uniconta.DataModel.InvGroup) };
             if (api.CompanyEntity.ItemVariants)
                 t.Add(typeof(Uniconta.DataModel.InvStandardVariant));
             LoadType(t);
 
             if (api.CompanyEntity.Project)
+            {
+                var prCatCache = api.GetCache(typeof(Uniconta.DataModel.PrCategory)) ?? await api.LoadCache(typeof(Uniconta.DataModel.PrCategory)).ConfigureAwait(false);
                 cmbPrCategory.cacheFilter = new PrCategoryCostFilter(prCatCache);
+            }
         }
 
         private void cmbWarehouse_SelectedIndexChanged(object sender, RoutedEventArgs e)
@@ -232,7 +229,8 @@ namespace UnicontaClient.Pages.CustomPage
                 userDocsClient.SetMaster(editrow);
                 userDocsClient._RowId = editrow._Photo;
                 await api.Read(userDocsClient);
-                ViewDocument(TabControls.UserDocsPage3, userDocsClient);
+                ViewDocument(TabControls.UserDocsPage3, userDocsClient, string.Format(Uniconta.ClientTools.Localization.lookup("ViewOBJ"), 
+                    Uniconta.ClientTools.Localization.lookup("Photo")), ViewerType.Photo);
             }
         }
 
@@ -240,7 +238,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void liURL_LookupButtonClicked(object sender)
         {
             var lookupUrlEditor = sender as LookupEditor;
-            if(!isUrlLookupSet)
+            if (!isUrlLookupSet)
             {
                 lookupUrlEditor.PopupContentTemplate = (Application.Current).Resources["LookUpUrlDocumentClientPopupContent"] as ControlTemplate;
                 lookupUrlEditor.ValueMember = "RowId";
@@ -254,7 +252,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void LookupUrlEditor_SelectedIndexChanged(object sender, RoutedEventArgs e)
         {
             var lookUpEditor = sender as LookupEditor;
-            var docsClient = lookUpEditor.SelectedItem as UserDocsClient;;
+            var docsClient = lookUpEditor.SelectedItem as UserDocsClient; ;
             editrow.URL = docsClient?.RowId ?? 0;
         }
 
@@ -272,7 +270,8 @@ namespace UnicontaClient.Pages.CustomPage
                     Utility.OpenWebSite(userDocsClient.Url);
                 else
 #endif
-                    ViewDocument(TabControls.UserDocsPage3, userDocsClient);
+                    ViewDocument(TabControls.UserDocsPage3, userDocsClient, string.Format(Uniconta.ClientTools.Localization.lookup("ViewOBJ"), 
+                        Uniconta.ClientTools.Localization.lookup("Url")), ViewerType.Url);
             }
         }
 
@@ -281,6 +280,40 @@ namespace UnicontaClient.Pages.CustomPage
             var lookupEditor = sender as LookupEditor;
             var docsClient = lookupEditor.SelectedItem as UserDocsClient;
             editrow.Photo = docsClient?._RowId ?? 0;
+        }
+
+        bool isAttachmentLookupset;
+        private void liInvoiceAttachment_LookupButtonClicked(object sender)
+        {
+            var lookupInvAttachmentEditor = sender as LookupEditor;
+            if (!isAttachmentLookupset)
+            {
+                lookupInvAttachmentEditor.PopupContentTemplate = (Application.Current).Resources["LookUpDocumentClientPopupContent"] as ControlTemplate;
+                lookupInvAttachmentEditor.ValueMember = "RowId";
+                lookupInvAttachmentEditor.SelectedIndexChanged += LookupInvAttachmentEditor_SelectedIndexChanged;
+                isAttachmentLookupset = true;
+                lookupInvAttachmentEditor.ItemsSource = api.Query<UserDocsClient>(editrow).GetAwaiter().GetResult();
+            }
+        }
+
+        private void LookupInvAttachmentEditor_SelectedIndexChanged(object sender, RoutedEventArgs e)
+        {
+            var lookupEditor = sender as LookupEditor;
+            var docsClient = lookupEditor.SelectedItem as UserDocsClient;
+            editrow.InvoiceAttachment = docsClient?._RowId ?? 0;
+        }
+
+        async private void liInvoiceAttachment_ButtonClicked(object sender)
+        {
+            if (editrow != null)
+            {
+                var userDocsClient = new UserDocsClient();
+                userDocsClient.SetMaster(editrow);
+                userDocsClient._RowId = editrow._InvoiceAttachment;
+                await api.Read(userDocsClient);
+                ViewDocument(TabControls.UserDocsPage3, userDocsClient, string.Format(Uniconta.ClientTools.Localization.lookup("ViewOBJ"),
+                    Uniconta.ClientTools.Localization.lookup("Attachment")), ViewerType.Attachment);
+            }
         }
 
         private void txtItem_LostFocus(object sender, RoutedEventArgs e)

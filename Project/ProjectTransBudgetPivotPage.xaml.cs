@@ -89,6 +89,10 @@ namespace UnicontaClient.Pages.CustomPage
         UnicontaBaseEntity master;
         private void Init(UnicontaBaseEntity _master)
         {
+            prCategoryCache = api.GetCache<Uniconta.DataModel.PrCategory>();
+            employeeCache = api.GetCache<Uniconta.DataModel.Employee>();
+            StartLoadCache();
+
             InitializeComponent();
             pivotDgProjectPlanning.ShowColumnGrandTotals = true;
             pivotDgProjectPlanning.ShowRowTotals = false;
@@ -112,9 +116,6 @@ namespace UnicontaClient.Pages.CustomPage
             cmbBudgetGroup.Text = budgetGroup;
             chkGroupWeek.IsChecked = grpWeek;
             chkGroupPrevYear.IsChecked = grpPrevYear;
-            prCategoryCache = api.GetCache<Uniconta.DataModel.PrCategory>();
-            employeeCache = api.GetCache<Uniconta.DataModel.Employee>();
-            StartLoadCache();
             pivotDgProjectPlanning.CellClick += PivotDgProjectPlanning_CellClick;
             pivotDgProjectPlanning.CustomCellAppearance += PivotDgProjectPlanning_CustomCellAppearance;
             fieldQtyActualBudDiff.Caption = ProjectTransPivotClientText.QtyActualBudDiff;
@@ -125,11 +126,21 @@ namespace UnicontaClient.Pages.CustomPage
             fieldQtyActualPrevBudDiff.Caption = ProjectTransPivotClientText.QtyActualPrevBudDiff;
             fieldSalesActualPrevBudgetDiff.Caption = ProjectTransPivotClientText.SalesActualPrevBudgetDiff;
             fieldCostActualPrevBudgetDiff.Caption = ProjectTransPivotClientText.CostActualPrevBudgetDiff;
+            fieldQtyActualAnchorBudDiff.Caption = ProjectTransPivotClientText.QtyActualAnchorBudDiff;
+            fieldQtyNormAnchorBudDiff.Caption = ProjectTransPivotClientText.QtyNormAnchorBudDiff;
+            fieldSalesActualAnchorBudgetDiff.Caption = ProjectTransPivotClientText.SalesActualAnchorBudgetDiff;
+            fieldCostActualAnchorBudgetDiff.Caption = ProjectTransPivotClientText.CostActualAnchorBudgetDiff;
+            fieldQtyActualPrevAnchorBudDiff.Caption = ProjectTransPivotClientText.QtyActualPrevAnchorBudDiff;
+            fieldSalesActualPrevAnchorBudgetDiff.Caption = ProjectTransPivotClientText.SalesActualPrevAnchorBudgetDiff;
+            fieldCostActualPrevAnchorBudgetDiff.Caption = ProjectTransPivotClientText.CostActualPrevAnchorBudgetDiff;
+            fieldQtyAnchorBudBudDiff.Caption = ProjectTransPivotClientText.QtyAnchorBudBudDiff;
+            fieldSalesAnchorBudBudDiff.Caption = ProjectTransPivotClientText.SalesAnchorBudBudDiff;
+            fieldCostAnchorBudBudDiff.Caption = ProjectTransPivotClientText.CostAnchorBudBudDiff;
         }
 
-        PivotGridField[] selectedCellColumnFields = null;
-        PivotGridField selectedCellRow = null;
-        PivotGridField[] selectedRowFields = null;
+        PivotGridField[] selectedCellColumnFields;
+        PivotGridField selectedCellRow;
+        PivotGridField[] selectedRowFields;
         private void PivotDgProjectPlanning_CellClick(object sender, PivotCellEventArgs e)
         {
             selectedCellRow = e.RowField;
@@ -161,25 +172,26 @@ namespace UnicontaClient.Pages.CustomPage
                     yearField = colField;
             }
 
-            bool isRowSelected = rowField.FieldName == "EmployeeName" || rowField.FieldName == "Employee" ||
-                rowField.FieldName == "ProjectName" || rowField.FieldName == "Project" ||
-                rowField.FieldName == "PrCategory" || rowField.FieldName == "PayrollCategory" ||
-                rowField.FieldName == "EmplDim1" || rowField.FieldName == "EmplDim2" || rowField.FieldName == "EmplDim3"
-                || rowField.FieldName == "EmplDim4" || rowField.FieldName == "EmplDim5" ||
-                rowField.FieldName == "ProjDim1" || rowField.FieldName == "ProjDim2" || rowField.FieldName == "ProjDim3"
-                || rowField.FieldName == "ProjDim4" || rowField.FieldName == "ProjDim5";
+            var fldName = rowField?.FieldName;
+            bool isRowSelected = (fldName == "EmployeeName" || fldName == "Employee" ||
+                fldName == "ProjectName" || fldName == "Project" ||
+                fldName == "PrCategory" || fldName == "PayrollCategory" ||
+                fldName == "EmplDim1" || fldName == "EmplDim2" || fldName == "EmplDim3"
+                || fldName == "EmplDim4" || fldName == "EmplDim5" ||
+                fldName == "ProjDim1" || fldName == "ProjDim2" || fldName == "ProjDim3"
+                || fldName == "ProjDim4" || fldName == "ProjDim5");
 
             if (((weekField != null || monthField != null || quarterField != null || yearField != null) && isRowSelected) || isRowSelected)
             {
-                if(rowField.FieldName == "EmployeeName")
+                if (fldName == "EmployeeName")
                 {
-                   var empRow = selectedRowFields?.FirstOrDefault(x => x.FieldName == "Employee");
+                    var empRow = selectedRowFields?.FirstOrDefault(x => x.FieldName == "Employee");
                     if (empRow == null)
                         return;
                     else
                         rowField = empRow;
                 }
-                else if(rowField.FieldName == "ProjectName")
+                else if (fldName == "ProjectName")
                 {
                     var projRow = selectedRowFields?.FirstOrDefault(x => x.FieldName == "Project");
                     if (projRow == null)
@@ -188,28 +200,21 @@ namespace UnicontaClient.Pages.CustomPage
                         rowField = projRow;
                 }
 
-                object weekfldValue = weekField != null ? pivotDgProjectPlanning.GetFieldValue(weekField, cell.X) : null;
-                object monthfldValue = monthField != null ? pivotDgProjectPlanning.GetFieldValue(monthField, cell.X) : null;
-                object qrtfldValue = quarterField != null ? pivotDgProjectPlanning.GetFieldValue(quarterField, cell.X) : null;
-                object yearfldValue = yearField != null ? pivotDgProjectPlanning.GetFieldValue(yearField, cell.X) : null;
-                object rowValue = pivotDgProjectPlanning.GetFieldValue(rowField, cell.Y);
+                var weekNo = Convert.ToInt32(weekField != null ? pivotDgProjectPlanning.GetFieldValue(weekField, cell.X) : null);
+                var monthNo = Convert.ToInt32(monthField != null ? pivotDgProjectPlanning.GetFieldValue(monthField, cell.X) : null);
+                var quarterNo = Convert.ToInt32(quarterField != null ? pivotDgProjectPlanning.GetFieldValue(quarterField, cell.X) : null);
+                var year = Convert.ToInt32(yearField != null ? pivotDgProjectPlanning.GetFieldValue(yearField, cell.X) : null);
 
-                string filterFldName = rowField.FieldName;
-                string filterFldValue = (string)rowValue;
-
-                var weekNo = weekfldValue != null ? (int)weekfldValue : 0;
-                var monthNo = monthfldValue != null ? (int)monthfldValue : 0; 
-                var quarterNo = qrtfldValue != null ? (int)qrtfldValue : 0;
-                var year = yearfldValue != null ? (int)yearfldValue : 0;
+                string filterFldValue = pivotDgProjectPlanning.GetFieldValue(rowField, cell.Y) as string;
 
                 var selectedcell = pivotDgProjectPlanning.SelectedCellInfo.DrillDownDataSource?.Cast<ProjectTransPivotClient>();
                 double budQty = selectedcell.Sum(x => x._BudgetQty);
                 double normQty = selectedcell.Sum(x => x._NormQty);
 
-                var projectTrans = selectedcell?.FirstOrDefault();
-
                 DateTime cellFromDate = DateTime.MinValue;
                 DateTime cellToDate = DateTime.MaxValue;
+
+                var projectTrans = selectedcell.FirstOrDefault();
                 if (projectTrans != null)
                 {
                     if (weekNo != 0)
@@ -254,7 +259,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                 string vheader = string.Format("{0} {1} ({2})", Uniconta.ClientTools.Localization.lookup("ProjectPlanning"), Uniconta.ClientTools.Localization.lookup("Lines"), filterFldValue);
                 var param = new object[6];
-                param[0] = new string[] { filterFldName, filterFldValue };
+                param[0] = new string[] { fldName, filterFldValue };
                 param[1] = new int[] { monthNo, quarterNo, year };
                 param[2] = new double[] { normQty, budQty };
                 param[3] = new DateTime[] { cellFromDate.Date, cellToDate.Date };
@@ -266,8 +271,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private async void SetBudgetGroup()
         {
-            var budgetGroup = await api.Query<ProjectBudgetGroup>();
-            cmbBudgetGroup.ItemsSource = budgetGroup;
+            cmbBudgetGroup.ItemsSource = await api.LoadCache<ProjectBudgetGroup>();
         }
 
         private void LocalMenu_OnChecked(string actionType, bool IsChecked)
@@ -297,23 +301,25 @@ namespace UnicontaClient.Pages.CustomPage
 
         bool labelVisibility = true;
         bool chartEnable = true;
-        int seriesIndex = 0;
+        int seriesIndex;
         protected override void OnLayoutLoaded()
         {
             base.OnLayoutLoaded();
             Utility.SetDimensionsPivotGrid(api, fieldEmplDim1, fieldEmplDim2, fieldEmplDim3, fieldEmplDim4, fieldEmplDim5);
-            fieldEmplDim1.Caption = string.Concat(fieldEmplDim1, " (", Uniconta.ClientTools.Localization.lookup("Employee"), ")");
-            fieldEmplDim2.Caption = string.Concat(fieldEmplDim2, " (", Uniconta.ClientTools.Localization.lookup("Employee"), ")");
-            fieldEmplDim3.Caption = string.Concat(fieldEmplDim3, " (", Uniconta.ClientTools.Localization.lookup("Employee"), ")");
-            fieldEmplDim4.Caption = string.Concat(fieldEmplDim4, " (", Uniconta.ClientTools.Localization.lookup("Employee"), ")");
-            fieldEmplDim5.Caption = string.Concat(fieldEmplDim5, " (", Uniconta.ClientTools.Localization.lookup("Employee"), ")");
+            var str = Uniconta.ClientTools.Localization.lookup("Employee");
+            fieldEmplDim1.Caption = string.Concat(fieldEmplDim1, " (", str, ")");
+            fieldEmplDim2.Caption = string.Concat(fieldEmplDim2, " (", str, ")");
+            fieldEmplDim3.Caption = string.Concat(fieldEmplDim3, " (", str, ")");
+            fieldEmplDim4.Caption = string.Concat(fieldEmplDim4, " (", str, ")");
+            fieldEmplDim5.Caption = string.Concat(fieldEmplDim5, " (", str, ")");
 
             Utility.SetDimensionsPivotGrid(api, fieldProjDim1, fieldProjDim2, fieldProjDim3, fieldProjDim4, fieldProjDim5);
-            fieldProjDim1.Caption = string.Concat(fieldProjDim1, " (", Uniconta.ClientTools.Localization.lookup("Project"), ")");
-            fieldProjDim2.Caption = string.Concat(fieldProjDim2, " (", Uniconta.ClientTools.Localization.lookup("Project"), ")");
-            fieldProjDim3.Caption = string.Concat(fieldProjDim3, " (", Uniconta.ClientTools.Localization.lookup("Project"), ")");
-            fieldProjDim4.Caption = string.Concat(fieldProjDim4, " (", Uniconta.ClientTools.Localization.lookup("Project"), ")");
-            fieldProjDim5.Caption = string.Concat(fieldProjDim5, " (", Uniconta.ClientTools.Localization.lookup("Project"), ")");
+            str = Uniconta.ClientTools.Localization.lookup("Project");
+            fieldProjDim1.Caption = string.Concat(fieldProjDim1, " (", str, ")");
+            fieldProjDim2.Caption = string.Concat(fieldProjDim2, " (", str, ")");
+            fieldProjDim3.Caption = string.Concat(fieldProjDim3, " (", str, ")");
+            fieldProjDim4.Caption = string.Concat(fieldProjDim4, " (", str, ")");
+            fieldProjDim5.Caption = string.Concat(fieldProjDim5, " (", str, ")");
 
             if (chartControl.Diagram != null)
             {
@@ -368,6 +374,20 @@ namespace UnicontaClient.Pages.CustomPage
             fieldSalesActualPrevBudgetDiff.Visible = grpPrevYear;
             fieldCostActualPrevBudgetDiff.Visible = grpPrevYear;
 
+            fieldAnchorBudgetQty.Visible = false;
+            fieldAnchorBudgetCost.Visible = false;
+            fieldAnchorBudgetSales.Visible = false;
+            fieldQtyNormAnchorBudDiff.Visible = false;
+            fieldQtyActualAnchorBudDiff.Visible = false;
+            fieldQtyActualPrevAnchorBudDiff.Visible = false;
+            fieldQtyAnchorBudBudDiff.Visible = false;
+            fieldSalesActualAnchorBudgetDiff.Visible = false;
+            fieldCostActualAnchorBudgetDiff.Visible = false;
+            fieldSalesActualPrevAnchorBudgetDiff.Visible = false;
+            fieldCostActualPrevAnchorBudgetDiff.Visible = false;
+            fieldSalesAnchorBudBudDiff.Visible = false;
+            fieldCostAnchorBudBudDiff.Visible = false;
+
             if (string.IsNullOrEmpty(budgetGroup))
             {
                 var msgText = FieldCannotBeEmpty(Uniconta.ClientTools.Localization.lookup("BudgetGroup"));
@@ -391,7 +411,6 @@ namespace UnicontaClient.Pages.CustomPage
 
             busyIndicator.IsBusy = true;
 
-
             List<PropValuePair> filter = new List<PropValuePair>();
             if (fromDate != DateTime.MinValue)
             {
@@ -403,7 +422,6 @@ namespace UnicontaClient.Pages.CustomPage
                 var propValuePairFolder = PropValuePair.GenereteParameter("ToDate", typeof(string), Convert.ToString(toDate.Ticks));
                 filter.Add(propValuePairFolder);
             }
-
             if (budgetGroup != null)
             {
                 var propValuePairFolder = PropValuePair.GenereteParameter("BudgetGroup", typeof(string), budgetGroup);
@@ -413,13 +431,9 @@ namespace UnicontaClient.Pages.CustomPage
             var api = this.api;
             var CompanyId = api.CompanyId;
 
-            var transTask = api.Query(new ProjectTransPivotClient(), new List<UnicontaBaseEntity>() { master} , filter);
-
-            var trans = await transTask;
+            var trans = await api.Query(new ProjectTransPivotClient(), new [] { master }, filter);
             if (trans == null)
-            {
                 return;
-            }
 
             var len = trans.Length;
             var sort = new ProjectTransBudgetPivotSort();
@@ -442,25 +456,44 @@ namespace UnicontaClient.Pages.CustomPage
                     if (idx >= 0 && idx < len)
                     {
                         var t = trans[idx];
-                        t._BudgetSales += bc._Sales;
-                        t._BudgetCost += bc._Cost;
-                        t._BudgetQty += bc._Qty;
+                        if (bc._AnchorBudget)
+                        {
+                            t._AnchorBudgetSales += bc._Sales;
+                            t._AnchorBudgetCost += bc._Cost;
+                            t._AnchorBudgetQty += bc._Qty;
+                        }
+                        else
+                        {
+                            t._BudgetSales += bc._Sales;
+                            t._BudgetCost += bc._Cost;
+                            t._BudgetQty += bc._Qty;
+                        }
                     }
                     else
                     {
                         var prTrans = new ProjectTransPivotClient()
                         {
                             _CompanyId = CompanyId,
-                            _BudgetSales = bc._Sales,
-                            _BudgetCost = bc._Cost,
-                            _BudgetQty = bc._Qty,
                             _PrCategory = bc._PrCategory,
                             _Project = bc._Project,
                             _Date = bc._Date,
                             _Employee = bc._Employee,
-                            _PayrollCategory = bc._PayrollCategory
+                            _PayrollCategory = bc._PayrollCategory,
                         };
-                                                    
+
+                        if (bc._AnchorBudget)
+                        {
+                            prTrans._AnchorBudgetSales = bc._Sales;
+                            prTrans._AnchorBudgetCost = bc._Cost;
+                            prTrans._AnchorBudgetQty = bc._Qty;
+                        }
+                        else
+                        {
+                            prTrans._BudgetSales = bc._Sales;
+                            prTrans._BudgetCost = bc._Cost;
+                            prTrans._BudgetQty = bc._Qty;
+                        }
+
                         if (extras == null)
                             extras = new List<ProjectTransPivotClient>();
                         extras.Add(prTrans);
@@ -478,7 +511,7 @@ namespace UnicontaClient.Pages.CustomPage
                         p.Arg = Convert.ToString(toDate.AddYears(-1).Ticks);
                 }
 
-                var transTaskPrev = api.Query(new ProjectTransPivotClient(), new List<UnicontaBaseEntity>() { master }, filter);
+                var transTaskPrev = api.Query(new ProjectTransPivotClient(), new [] { master }, filter);
                 var transPrev = await transTaskPrev;
 
                 foreach (var y in transPrev)
@@ -769,7 +802,7 @@ namespace UnicontaClient.Pages.CustomPage
             busyIndicator.IsBusy = false;
         }
 
-        bool isPivotIsVisible = false;
+        bool isPivotIsVisible;
 
         private DateTime FirstDayOfMonth(DateTime date)
         {
@@ -841,6 +874,9 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedCellRow != null && selectedCellColumnFields != null)
                         OpenBudgetTransactions(selectedCellColumnFields, selectedCellRow);
                     break;
+                case "Check":
+                    AddDockItem(TabControls.TMPlanningCheckPage, null);
+                    break;
                 default:
                     controlRibbon_BaseActions(ActionType);
                     break;
@@ -871,7 +907,7 @@ namespace UnicontaClient.Pages.CustomPage
             string name = e.DataField.Name;
             if (name == "fieldQtyActualBudDiff")
                 e.CustomValue = CalculateQty("Qty", "BudgetQty", e.CreateDrillDownDataSource());
-            if (name == "fieldQtyActualPrevBudDiff")
+            else if (name == "fieldQtyActualPrevBudDiff")
                 e.CustomValue = CalculateQty("QtyPrev", "BudgetQty", e.CreateDrillDownDataSource());
             else if (name == "fieldQtyNormBudDiff")
                 e.CustomValue = CalculateQty("NormQty", "BudgetQty", e.CreateDrillDownDataSource());
@@ -885,6 +921,26 @@ namespace UnicontaClient.Pages.CustomPage
                 e.CustomValue = CalculateQty("SalesPrev", "BudgetSales", e.CreateDrillDownDataSource());
             else if (name == "fieldCostActualPrevBudgetDiff")
                 e.CustomValue = CalculateQty("CostPrev", "BudgetCost", e.CreateDrillDownDataSource());
+            if (name == "fieldQtyActualAnchorBudDiff")
+                e.CustomValue = CalculateQty("Qty", "AnchorBudgetQty", e.CreateDrillDownDataSource());
+            else if (name == "fieldQtyActualPrevAnchorBudDiff")
+                e.CustomValue = CalculateQty("QtyPrev", "AnchorBudgetQty", e.CreateDrillDownDataSource());
+            else if (name == "fieldQtyNormAnchorBudDiff")
+                e.CustomValue = CalculateQty("NormQty", "AnchorBudgetQty", e.CreateDrillDownDataSource());
+            else if (name == "fieldQtyAnchorBudBudDiff")
+                e.CustomValue = CalculateQty("AnchorBudgetQty", "BudgetQty", e.CreateDrillDownDataSource());
+            else if (name == "fieldSalesActualAnchorBudgetDiff")
+                e.CustomValue = CalculateQty("Sales", "AnchorBudgetSales", e.CreateDrillDownDataSource());
+            else if (name == "fieldCostActualAnchorBudgetDiff")
+                e.CustomValue = CalculateQty("Cost", "AnchorBudgetCost", e.CreateDrillDownDataSource());
+            else if (name == "fieldSalesActualPrevAnchorBudgetDiff")
+                e.CustomValue = CalculateQty("SalesPrev", "AnchorBudgetSales", e.CreateDrillDownDataSource());
+            else if (name == "fieldCostActualPrevAnchorBudgetDiff")
+                e.CustomValue = CalculateQty("CostPrev", "AnchorBudgetCost", e.CreateDrillDownDataSource());
+            else if (name == "fieldCostAnchorBudBudDiff")
+                e.CustomValue = CalculateQty("AnchorBudgetCost", "BudgetCost", e.CreateDrillDownDataSource());
+            else if (name == "fieldSalesAnchorBudBudDiff")
+                e.CustomValue = CalculateQty("AnchorBudgetSales", "BudgetSales", e.CreateDrillDownDataSource());
             else if (name == "fieldPercentage")
                 e.CustomValue = CalculatePercentage("NormQty", "BudgetQty", e.CreateDrillDownDataSource());
         }

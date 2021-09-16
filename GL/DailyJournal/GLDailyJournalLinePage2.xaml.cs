@@ -79,7 +79,6 @@ namespace UnicontaClient.Pages.CustomPage
         {
             leAccount.api = leOffsetAccount.api = lePayment.api = leSplit.api = leTransType.api = leVat.api = leOffsetVat.api = leVatOffsetOperation.api = leVatOperation.api = leWithholding.api =
             leDim1.api = leDim2.api = leDim3.api = leDim4.api = leDim5.api = leProject.api = lePrCaegory.api = leTask.api = leAsset.api = crudapi;
-            BusyIndicator = busyIndicator;
             layoutControl = layoutItems;
             var comp = api.CompanyEntity;
             if (comp.NumberOfDimensions == 0)

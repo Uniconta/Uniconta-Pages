@@ -290,13 +290,13 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 Project.Visible = Project.ShowInColumnChooser = false;
                 ProjectName.Visible = ProjectName.ShowInColumnChooser = false;
+                WorkSpace.Visible = WorkSpace.ShowInColumnChooser = false;
+                PrCategory.Visible = PrCategory.ShowInColumnChooser = false;
             }
-            else
-                Project.ShowInColumnChooser = ProjectName.ShowInColumnChooser = true;
+            
             if (!company.ProjectTask)
                 Task.Visible = Task.ShowInColumnChooser = false;
-            else
-                Task.ShowInColumnChooser = true;
+            
             Utilities.Utility.SetupVariants(api, colVariant, VariantName, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
             Utilities.Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
         }

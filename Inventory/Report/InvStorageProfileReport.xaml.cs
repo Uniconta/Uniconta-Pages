@@ -61,6 +61,7 @@ namespace UnicontaClient.Pages.CustomPage
         static bool isMovement = true;
         CWServerFilter itemFilterDialog;
         bool itemFilterCleared;
+        static public bool ReorderPrWarehouse;
         public TableField[] InventoryUserFields { get; set; }
 
         public InvStorageProfileReport(SynchronizeEntity syncEntity)
@@ -96,6 +97,31 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 dgInvStorageProfileGrid.UpdateMaster(master);
                 LoadData();
+            }
+            localMenu.OnChecked += LocalMenu_OnChecked;
+            RibbonBase rb = (RibbonBase)localMenu.DataContext;
+            if (!api.CompanyEntity.Warehouse)
+            {
+                Warehouse.Visible = Warehouse.ShowInColumnChooser = false;
+                WarehouseName.Visible = WarehouseName.ShowInColumnChooser = false;
+                ReorderPrWarehouse = false;
+                if (rb != null)
+                    UtilDisplay.RemoveMenuCommand(rb, "PerWarehouse");
+            }
+            else
+            {
+                var rbMenuWarehouse = UtilDisplay.GetMenuCommandByName(rb, "PerWarehouse");
+                rbMenuWarehouse.IsChecked = ReorderPrWarehouse;
+            }
+        }
+
+        private void LocalMenu_OnChecked(string ActionType, bool IsChecked)
+        {
+            switch (ActionType)
+            {
+                case "PerWarehouse":
+                    ReorderPrWarehouse = IsChecked;
+                    break;
             }
         }
 
@@ -197,7 +223,7 @@ namespace UnicontaClient.Pages.CustomPage
             balDate = BalanceDate.DateTime;
             if (balDate == DateTime.MinValue)
                 balDate = DateTime.Today;
-            string reportTypeContent = String.Format("{0:d}", balDate);
+            string reportTypeContent = balDate.ToShortDateString();
             dgInvStorageProfileGrid.PrintReportName = string.Format("{0} {1} ({2})", Uniconta.ClientTools.Localization.lookup("Item"), Uniconta.ClientTools.Localization.lookup("StockProfile"), reportTypeContent);
             interval = (int)NumberConvert.ToInt(intervalEdit.Text);
             count = (int)NumberConvert.ToInt(countEdit.Text);
@@ -216,9 +242,12 @@ namespace UnicontaClient.Pages.CustomPage
             }
 
             inputs = new List<PropValuePair>();
-            inputs.Add(PropValuePair.GenereteParameter("PrDate", typeof(DateTime), String.Format("{0:d}", BalanceDate.DateTime)));
+            inputs.Add(PropValuePair.GenereteParameter("PrDate", typeof(DateTime), BalanceDate.DateTime.ToShortDateString()));
             inputs.Add(PropValuePair.GenereteParameter("Interval", typeof(Int32), intervalEdit.Text));
             inputs.Add(PropValuePair.GenereteParameter("Count", typeof(Int32), countEdit.Text));
+            Warehouse.Visible = ReorderPrWarehouse;
+            if (ReorderPrWarehouse)
+                inputs.Add(PropValuePair.GenereteParameter("UseWarehouse", typeof(string), "1"));
             if (itemFilterValues != null)
                 inputs.AddRange(itemFilterValues);
 

@@ -29,7 +29,7 @@
     <RibbonItem LocalizedNameKey="GenerateInvoiceCurrentLine" Action="GenerateInvoice2" LargeGlyph="Invoice_32x32.png"></RibbonItem>
   </RibbonItem>
  <RibbonItem>
-   <RibbonItem LocalizedNameKey="CreateOBJ" Parameter="Orders" Action="CreateOrder" LargeGlyph="Orders_32x32.png"></RibbonItem>
+   <RibbonItem LocalizedNameKey="CreateOBJ" Parameter="InvoiceProposal" Action="CreateOrder" LargeGlyph="Orders_32x32.png"></RibbonItem>
    <RibbonItem LocalizedNameKey="CreateOBJ" Parameter="Order" Action="CreateOrder2" LargeGlyph="Copy_ToClipboard_32x32.png"></RibbonItem>
   </RibbonItem>
 </root>

@@ -64,23 +64,22 @@ namespace UnicontaClient.Pages.CustomPage
 
         void InitPage(CrudAPI crudapi)
         {
-            BusyIndicator = busyIndicator;
             dAddress.Header = Uniconta.ClientTools.Localization.lookup("DeliveryAddr");
             layoutControl = layoutItems;
             cbDeliveryCountry.ItemsSource = cbCountry.ItemsSource = Enum.GetValues(typeof(Uniconta.Common.CountryCode));
             ItemNameGrouplookupeditior.api =
-           Withholdinglookupeditior.api =
-           Vatlookupeditior.api = VatOprlookupeditior.api = Employeelookupeditor.api = leInvoiceAccount.api =
-           dim1lookupeditior.api = dim2lookupeditior.api = dim3lookupeditior.api = dim4lookupeditior.api = dim5lookupeditior.api = 
-           Paymentlookupeditior.api = grouplookupeditor.api = PriceListlookupeditior.api = lePostingAccount.api = lePaymtFormat.api = 
-           leShipment.api = leDeliveryTerm.api = LayoutGrouplookupeditior.api = prCategoryLookUpeditor.api = leD2CAccount.api = leCrmGroup.api= crudapi;
+               Withholdinglookupeditior.api =
+               Vatlookupeditior.api = VatOprlookupeditior.api = Employeelookupeditor.api = leInvoiceAccount.api =
+               dim1lookupeditior.api = dim2lookupeditior.api = dim3lookupeditior.api = dim4lookupeditior.api = dim5lookupeditior.api =
+               Paymentlookupeditior.api = grouplookupeditor.api = PriceListlookupeditior.api = lePostingAccount.api = lePaymtFormat.api =
+               leShipment.api = leDeliveryTerm.api = LayoutGrouplookupeditior.api = prCategoryLookUpeditor.api = leD2CAccount.api = leCrmGroup.api = crudapi;
 
-            AdjustLayout();
             Task t;
             if (crudapi.CompanyEntity.CRM)
                 t = GetInterestAndProduct();
             else
                 t = null;
+            StartLoadCache(t);
 
             if (LoadedRow == null)
             {
@@ -94,7 +93,6 @@ namespace UnicontaClient.Pages.CustomPage
 
             layoutItems.DataContext = editrow;
             frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
-            StartLoadCache(t);
             if (editrow.RowId != 0)
                 leD2CAccount.IsReadOnly = true;
             editrow.PropertyChanged += Editrow_PropertyChanged;
@@ -103,7 +101,7 @@ namespace UnicontaClient.Pages.CustomPage
             txtCompanyRegNo.LostFocus += TxtCompanyRegNo_LostFocus;
         }
 
-        private async void TxtCompanyRegNo_LostFocus(object sender, RoutedEventArgs e)
+        private void TxtCompanyRegNo_LostFocus(object sender, RoutedEventArgs e)
         {
             var countryCode = DebtorAccountPage2.CheckEuropeanVatInformation(editrow._LegalIdent, editrow._Country, cvrFound);
             if (countryCode != null && editrow._Country != countryCode)
@@ -115,10 +113,10 @@ namespace UnicontaClient.Pages.CustomPage
 
         async Task GetInterestAndProduct()
         {
-            var crmInterestCache = api.GetCache(typeof(Uniconta.DataModel.CrmInterest)) ?? await api.LoadCache(typeof(Uniconta.DataModel.CrmInterest));
-            cmbInterests.ItemsSource = crmInterestCache.GetKeyList();
-            var crmProductCache = api.GetCache(typeof(Uniconta.DataModel.CrmProduct)) ?? await api.LoadCache(typeof(Uniconta.DataModel.CrmProduct));
-            cmbProducts.ItemsSource = crmProductCache.GetKeyList();
+            var cache = api.GetCache(typeof(Uniconta.DataModel.CrmInterest)) ?? await api.LoadCache(typeof(Uniconta.DataModel.CrmInterest));
+            cmbInterests.ItemsSource = cache.GetKeyList();
+            cache = api.GetCache(typeof(Uniconta.DataModel.CrmProduct)) ?? await api.LoadCache(typeof(Uniconta.DataModel.CrmProduct));
+            cmbProducts.ItemsSource = cache.GetKeyList();
         }
 
         private void frmRibbon_OnItemClicked(string ActionType)
@@ -129,11 +127,6 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         protected override void OnLayoutCtrlLoaded()
-        {
-            AdjustLayout();
-        }
-
-        void AdjustLayout()
         {
             var Comp = api.CompanyEntity;
             if (!Comp._UseVatOperation)

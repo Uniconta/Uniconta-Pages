@@ -74,10 +74,7 @@ namespace UnicontaClient.Pages.CustomPage
         void InitPage(CrudAPI crudapi)
         {
             var Comp = api.CompanyEntity;
-            BusyIndicator = busyIndicator;
-
             layoutControl = layoutItems;
-
             leAcquisitionAccount.api = leAcquisitionOffset.api = leDepreciationAccount.api = leDepreciationOffset.api =
                 leWriteOffAccount.api = leWriteOffOffset.api = leSalesAccount.api = leSalesOffset.api = 
                  leWriteDownAccount.api = leWriteDownOffset.api = leWriteUpAccount.api = leWriteUpOffset.api = leAutoNumber.api = crudapi;

@@ -62,7 +62,6 @@ namespace UnicontaClient.Pages.CustomPage
         void InitPage(CrudAPI crudapi)
         {
             ribbonControl = frmRibbon;
-            BusyIndicator = busyIndicator;
             layoutControl = layoutItems;
             cbCountry.ItemsSource = Enum.GetValues(typeof(Uniconta.Common.CountryCode));
             cbCurrentERP.ItemsSource= Enum.GetValues(typeof(Uniconta.Common.ERPSystem));

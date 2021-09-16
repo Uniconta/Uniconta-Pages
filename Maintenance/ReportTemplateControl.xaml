@@ -27,8 +27,6 @@ x:Class="UnicontaClient.Pages.CustomPage.GLReportTemplatePage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Font" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="FontSize" Width="60" AllowThousandMask="false"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="LineSpace" Width="60" AllowThousandMask="false"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="TextSize" Width="60" AllowThousandMask="false"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="AmountSize" Width="60" AllowThousandMask="false"/>
                 </localPage:GLReportTemplateGrid.Columns>
             </localPage:GLReportTemplateGrid>
         </CorasauControls:BusyIndicator>

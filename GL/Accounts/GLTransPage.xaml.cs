@@ -201,6 +201,13 @@ namespace UnicontaClient.Pages.CustomPage
             return true;
         }
 
+        public override bool CheckIfBindWithUserfield(out bool isReadOnly, out bool useBinding)
+        {
+            isReadOnly = true;
+            useBinding = true;
+            return true;
+        }
+
         private string GetInvalidEntries<T>(IEnumerable<T> entities, Func<T, string> GetErrorKey)
         {
             var sb = StringBuilderReuse.Create();

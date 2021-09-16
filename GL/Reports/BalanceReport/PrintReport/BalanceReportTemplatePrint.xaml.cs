@@ -125,7 +125,7 @@ namespace UnicontaClient.Pages.CustomPage
             this.Col12 = new CustomColumn(blc.Col12, hdrData.ShowDCCol12, hide, asize, header);
             this.Col13 = new CustomColumn(blc.Col13, hdrData.ShowDCCol13, hide, asize, header);
             Columns = new List<CustomColumn>();
-            foreach(var col in blc.Columns)
+            foreach (var col in blc.Columns)
             {
                 Columns.Add(new CustomColumn(col, col.ShowDebitCredit, hide, asize, header));
             }
@@ -178,7 +178,7 @@ namespace UnicontaClient.Pages.CustomPage
         //New Prop 
         public FontFamily Font { get; set; }
         public int Masterfontsize;
-        public int TextSize { get { return hdrData.TextSize; } }
+        public int TextSize { get { return hdrData.AccountNameColWidth; } }
         public int AmountSize { get { return hdrData.AmountSize; } }
         public float GridHeight { get { return hdrData.LineSpace.Bottom != 0 ? 3 * (int)hdrData.LineSpace.Bottom / 2 : 30f; } }
         public Thickness Indent { get { return new Thickness(hdrData.LeftMargin.Left + line._Indent != 0d ? hdrData.LeftMargin.Left + line._Indent : 2, 0, 0, 0); } }
@@ -272,6 +272,7 @@ namespace UnicontaClient.Pages.CustomPage
             headerdata.DimColWidth = bal.ColumnSizeDim == (byte)0 ? 90 : bal.ColumnSizeDim;
             headerdata.DClblWidth = bal.ColumnSizeAmount == (byte)0 ? 100 : bal.ColumnSizeAmount;
             headerdata.FontSize = bal.FontSize == 0 ? 12 : bal.FontSize;
+            headerdata.AmountSize = bal.ColumnSizeAmount;
 #if !SILVERLIGHT
             List<List<TemplateDataItems>> simpleLinkItems = new List<List<TemplateDataItems>>();
             var currentItems = ((TemplateDataContext)sourceData).TemplateReportlist;
@@ -287,7 +288,6 @@ namespace UnicontaClient.Pages.CustomPage
                 if (i == currentItems.Count - 1)
                     simpleLinkItems.Add(currentLinkItems);
             }
-
             DevExpress.XtraPrinting.PrintingSystem ps = new DevExpress.XtraPrinting.PrintingSystem();
             ps.Graph.PageBackColor = System.Drawing.Color.Transparent;
             //Setting the default Printer

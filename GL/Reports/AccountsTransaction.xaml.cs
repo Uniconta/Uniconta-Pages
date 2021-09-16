@@ -208,6 +208,13 @@ namespace UnicontaClient.Pages.CustomPage
                 api.LoadCache(typeof(GLAccount));
         }
 
+        public override bool CheckIfBindWithUserfield(out bool isReadOnly, out bool useBinding)
+        {
+            isReadOnly = true;
+            useBinding = true;
+            return true;
+        }
+
         IEnumerable<PropValuePair> filter;
         public override Task InitQuery()
         {

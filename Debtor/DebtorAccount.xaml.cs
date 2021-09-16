@@ -24,6 +24,7 @@ using System.Windows.Shapes;
 using System.Collections;
 using Uniconta.ClientTools.Controls;
 using Uniconta.DataModel;
+using Uniconta.Common.User;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -51,6 +52,12 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void InitPage()
         {
+            var Comp = api.CompanyEntity;
+            if (Comp.CRM)
+                LoadType(new Type[] { typeof(Uniconta.DataModel.DebtorGroup), typeof(Uniconta.DataModel.CrmInterest), typeof(Uniconta.DataModel.CrmProduct) });
+            else
+                LoadNow(typeof(Uniconta.DataModel.DebtorGroup));
+
             InitializeComponent();
             dgDebtorAccountGrid.RowDoubleClick += dgDebtorAccountGrid_RowDoubleClick;
             localMenu.dataGrid = dgDebtorAccountGrid;
@@ -62,13 +69,8 @@ namespace UnicontaClient.Pages.CustomPage
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "UndoDelete", "SaveGrid" });
 
-            var Comp = api.CompanyEntity;
             if (Comp.RoundTo100)
                 CurBalance.HasDecimals = Overdue.HasDecimals = false;
-            if (Comp.CRM)
-                LoadType(new Type[] { typeof(Uniconta.DataModel.DebtorGroup), typeof(Uniconta.DataModel.CrmInterest), typeof(Uniconta.DataModel.CrmProduct) });
-            else
-                LoadNow(typeof(Uniconta.DataModel.DebtorGroup));
 
             dgDebtorAccountGrid.ShowTotalSummary();
 
@@ -138,6 +140,10 @@ namespace UnicontaClient.Pages.CustomPage
                 PaymentFormat.Visible = false;
             }
             dgDebtorAccountGrid.Readonly = true;
+
+            var rb = (RibbonBase)localMenu.DataContext;
+            if(rb!= null && BasePage.session.User._Role != (byte)UserRoles.Accountant)
+                UtilDisplay.RemoveMenuCommand(rb, "AccountantClientInfo");
         }
 
         void dgDebtorAccountGrid_RowDoubleClick()
@@ -309,6 +315,14 @@ namespace UnicontaClient.Pages.CustomPage
                         AddDockItem(TabControls.DocsSendLogGridPage, dgDebtorAccountGrid.syncEntity);
                     break;
 #endif
+                case "TaskGroups":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.DebtorProjTaskGroup, dgDebtorAccountGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("TaskGroups"), selectedItem._Name));
+                    break;
+                case "AccountantClientInfo":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.AccountantClientInfo, selectedItem, string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("AccountantClientInfo"), selectedItem._Account));
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -468,6 +482,25 @@ namespace UnicontaClient.Pages.CustomPage
         private Task BindGrid()
         {
             return dgDebtorAccountGrid.Filter(null);
+        }
+
+        protected override void LoadCacheInBackGround()
+        {
+            var Comp = api.CompanyEntity;
+            var lst = new List<Type>(12) { typeof(Uniconta.DataModel.Employee), typeof(Uniconta.DataModel.GLVat), typeof(Uniconta.DataModel.DebtorGroup), typeof(Uniconta.DataModel.PaymentTerm), typeof(Uniconta.DataModel.DebtorLayoutGroup) };
+            if (Comp.InvPrice)
+                lst.Add(typeof(Uniconta.DataModel.DebtorPriceList));
+            if (Comp.NumberOfDimensions >= 1)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType1));
+            if (Comp.NumberOfDimensions >= 2)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType2));
+            if (Comp.NumberOfDimensions >= 3)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType3));
+            if (Comp.NumberOfDimensions >= 4)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType4));
+            if (Comp.NumberOfDimensions >= 5)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType5));
+            LoadType(lst);
         }
 
         private void HasDocImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

@@ -252,7 +252,8 @@ namespace UnicontaClient.Pages.CustomPage
             base.OnLayoutLoaded();
             setDim();
             Amountcol.Visible = !this.ShowCurrency;
-            AmountCur.Visible = this.ShowCurrency;
+            if (this.ShowCurrency)
+                AmountCur.Visible = true;
         }
 
         protected override LookUpTable HandleLookupOnLocalPage(LookUpTable lookup, CorasauDataGrid dg)
@@ -1236,6 +1237,11 @@ namespace UnicontaClient.Pages.CustomPage
                 return false;
             var markedbstList = lstbsl.Where(bl => bl.Mark == true && bl.State == (byte)1).ToList();
             var markedactList = lstAct.Where(ac => ac.Mark == true && ac.State == (byte)1).ToList();
+            if (markedbstList.Count > 100 && markedactList.Count > 100)
+            {
+                UtilDisplay.ShowErrorCode(ErrorCodes.TooManyLinesSelected);
+                return false;
+            }
             if (markedbstList.Count == 0 && markedactList.Count == 0)
             {
                 /* take selected item */
@@ -1252,13 +1258,6 @@ namespace UnicontaClient.Pages.CustomPage
                     markedactList.Add(ac);
                 }
             }
-            /*
-            if (markedbstList.Count > 1 && markedactList.Count > 1)
-            {
-                UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("TooManyLinesSelected"), Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OK);
-                return false;
-            }
-            */
             var ShowCurrency = this.ShowCurrency;
 
             if (markedbstList.Count > 0 && markedactList.Count > 0)

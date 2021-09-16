@@ -50,7 +50,7 @@
       <RibbonItem Action="DebtorOfferLines" LocalizedNameKey="ShowOBJ" Parameter="OfferLine" Module="Order" Glyph="Offer_Lines_16x16.png"/>
       <RibbonItem Action="PurchaseOrderLines" LocalizedNameKey="ShowOBJ" Parameter="PurchaseLines" Module="Purchase" Glyph="Purchase_Lines_16x16.png"/>
       <RibbonItem Action="ProductionOrderLines" LocalizedNameKey="ShowOBJ" Parameter="ProductionLines" Module="Production" Glyph="Production_Lines_16x16.png"/>
-      <RibbonItem Action="ViewPhoto" LocalizedNameKey="ItemAttachments" Glyph="View_16x16.png" />
+      <RibbonItem Action="ViewItemAttachments" LocalizedNameKey="ItemAttachments" Glyph="View_16x16.png" />
       <RibbonItem Action="ViewNotes" LocalizedNameKey="ItemNotes" Glyph="Note_16x16.png" />
     </RibbonItem>
 

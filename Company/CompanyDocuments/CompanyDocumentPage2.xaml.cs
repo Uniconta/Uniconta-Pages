@@ -61,7 +61,6 @@ namespace UnicontaClient.Pages.CustomPage
                 cmbDocumentUse.ItemsSource = AppEnums.CompanyDoc.Values;
                 cmbDocumentUse.SelectedItem = companyDocumentClientRow.DocumentUseFor;
             }
-            BusyIndicator = busyIndicator;
             layoutItems.DataContext = companyDocumentClientRow;
             frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
 

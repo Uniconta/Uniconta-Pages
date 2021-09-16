@@ -78,6 +78,8 @@ namespace UnicontaClient.Pages.CustomPage
         {
             InitializeComponent();
             dcorderlineMaster = master as DCOrderLineClient;
+            if (dcorderlineMaster == null)
+                throw new CustomException(CustomExceptionType.MandatoryMaster, typeof(DCOrderLineClient));
             Comp = api.CompanyEntity;
             api.AllowBackgroundCrud = true;
             itemCache = Comp.GetCache(typeof(InvItem));

@@ -37,6 +37,8 @@ namespace UnicontaClient.Pages.CustomPage
         public override Type TableType { get { return typeof(InvItemStorageCount); } }
         public override IComparer GridSorting { get { return new InvItemStorageLocalSort(); } }
         public override bool Readonly { get { return false; } }
+        public override bool CanDelete { get { return false; } }
+        public override bool IsAutoSave { get { return false; } }
     }
 
     internal class InvItemVariantSort : IComparer<InvItemStorage>
@@ -300,8 +302,7 @@ namespace UnicontaClient.Pages.CustomPage
             switch (ActionType)
             {
                 case "DeleteRow":
-                    if (selectedItem != null)
-                        dgInvStockStatus.DeleteRow();
+                    dgInvStockStatus.RemoveFocusedRowFromGrid();
                     break;
                 case "PostJournal":
                     PostInvJournal();

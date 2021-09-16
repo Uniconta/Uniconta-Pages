@@ -27,7 +27,12 @@
     <RibbonItem Action="BudgetCategorySum" LocalizedNameKey="BudgetCategorySum" Glyph="Add_16x16.png" LargeGlyph="Balance_Report_32x32.png"/>
   </RibbonItem>
 <RibbonItem>
-      <RibbonItem Action="CreateBudget" LocalizedNameKey="CreateOBJ" Parameter="Budget" Glyph="Add_Menu_32x32.png" LargeGlyph="Add_Menu_32x32.png" ShortcutKey=""/>
-      <RibbonItem Action="UpdatePrices" LocalizedNameKey="UpdateOBJ" Parameter="Prices" Glyph="Update_32x32.png" LargeGlyph="Update_32x32.png" ShortcutKey=""/>
+    <RibbonItem Action="Check" LocalizedNameKey="Check" Glyph="Check_Journal_32x32.png" LargeGlyph="Check_Journal_32x32.png" ShortcutKey=""/>    
+    <RibbonItem Action="CreateBudget" LocalizedNameKey="CreateBudgetRealized" Glyph="Add_Menu_32x32.png" LargeGlyph="Add_Menu_32x32.png" ShortcutKey=""/>
+    <RibbonItem Action="CreateBudgetTask" LocalizedNameKey="CreateBudgetTask" Module="ProjectTask" Glyph="Add_Menu_32x32.png" LargeGlyph="Add_Menu_32x32.png" ShortcutKey=""/>
+    <RibbonItem Action="UpdatePrices" LocalizedNameKey="UpdateOBJ" Parameter="Prices" Glyph="Update_32x32.png" LargeGlyph="Update_32x32.png" ShortcutKey=""/>
+</RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="CreateAnchorBudget" LocalizedNameKey="LockAnchorBudget" Glyph="Update_32x32.png" LargeGlyph="Copy_32x32.png" ShortcutKey=""/>
   </RibbonItem>
 </root>

@@ -71,6 +71,12 @@ namespace UnicontaClient.Pages.CustomPage
 
         void CW_Loaded(object sender, RoutedEventArgs e)
         {
+#if !SILVERLIGHT
+            if (markedEmails > 0)
+                cbxMarked.IsChecked = true;
+            else
+                cbxAll.IsChecked = true;
+#endif
             Dispatcher.BeginInvoke(new Action(() => { OKButton.Focus(); }));
         }
 
@@ -107,26 +113,33 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void AllChecked(object sender, RoutedEventArgs e)
         {
+#if SILVERLIGHT
             if (ReferenceEquals(sender, cbxAll))
             {
                 cbxMarked.IsChecked = false;
                 ShowEmailMessage(totalEmails);
             }
+#else
+            ShowEmailMessage(totalEmails);
+#endif
         }
 
         private void MarkedChecked(object sender, RoutedEventArgs e)
         {
+#if SILVERLIGHT
             if (ReferenceEquals(sender, cbxMarked))
             {
                 cbxAll.IsChecked = false;
                 ShowEmailMessage(markedEmails);
             }
+#else
+            ShowEmailMessage(markedEmails);
+#endif
         }
 
-        private void UnChecked(object sender,RoutedEventArgs e)
+        private void UnChecked(object sender, RoutedEventArgs e)
         {
 #if !SILVERLIGHT
-
             emailsendMsg.Visibility = Visibility.Collapsed;
 #endif
         }

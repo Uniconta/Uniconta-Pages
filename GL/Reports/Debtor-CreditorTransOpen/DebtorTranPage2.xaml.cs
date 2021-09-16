@@ -48,7 +48,6 @@ namespace UnicontaClient.Pages.CustomPage
         {
             Paymentlookupeditior.api= Vatlookupeditior.api = PaymtFormatlookupeditor.api = api;
             Paymentlookupeditior.api = api;
-            BusyIndicator = busyIndicator;
             layoutControl = layoutItems;
             frmRibbon.DisableButtons("Delete");
             layoutItems.DataContext = editrow;

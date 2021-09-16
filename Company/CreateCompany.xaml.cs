@@ -462,7 +462,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 case "Save":
                     MoveFocus();
-                    if (editrow._Name == null)
+                    if (string.IsNullOrWhiteSpace(editrow._Name))
                     {
 #if !SILVERLIGHT
                         int importFrom = cmbImportFrom.SelectedIndex;
@@ -625,7 +625,7 @@ namespace UnicontaClient.Pages.CustomPage
                 else
                     busyIndicator.IsBusy = true;
                 ErrorCodes err;
-                if (editrow._Name == null)
+                if (string.IsNullOrWhiteSpace(editrow._Name))
                     editrow._Name = "import";
                 if (usermaster != null)
                     err = await session.CreateCompany(editrow, usermaster);

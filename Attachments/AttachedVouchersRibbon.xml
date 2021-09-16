@@ -3,7 +3,7 @@
   <RibbonItem TabId="0" LocalizedNameKey="Home">
     <RibbonItem Action="EditRow" ShortcutKey="Ctrl+E" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>
     <RibbonItem Action="UpdateRow" LocalizedNameKey="UpdateOBJ" Parameter="Content" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey="Ctrl+E"/>
-    <RibbonItem Action="ShowInInbox" LocalizedNameKey="ShowInInbox" LargeGlyph="Allow_32x32.png" />
+    <RibbonItem Action="ShowInInbox" LocalizedNameKey="ViewInOBJ" Parameter="Inbox" LargeGlyph="Allow_32x32.png" />
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="Filter" ShortcutKey="Ctrl+I" LocalizedNameKey="Filter" Glyph="Filter_16x16.png" LargeGlyph="Filter_32x32.png"/>

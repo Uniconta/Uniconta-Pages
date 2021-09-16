@@ -311,6 +311,13 @@ namespace UnicontaClient.Pages.CustomPage
             LoadType(new Type[] { typeof(Uniconta.DataModel.Debtor), typeof(Uniconta.DataModel.Creditor) });
         }
 
+        public override bool CheckIfBindWithUserfield(out bool isReadOnly, out bool useBinding)
+        {
+            isReadOnly = true;
+            useBinding = true;
+            return true;
+        }
+
         void LocalMenu_OnItemClicked(string ActionType)
         {
             GLTransClientTotal selectedItem = dgGLTrans.View.MasterRootRowsContainer.FocusedView.DataControl.CurrentItem as GLTransClientTotal;

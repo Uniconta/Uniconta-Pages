@@ -123,6 +123,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionOrdersPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="Project"  Visible="False" Width="100"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="PrCategory"  Visible="False" Width="100"/>
                     <local:CorasauDataGridForeignKeyColumnClient x:Name="Task" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="WorkSpace"  Visible="False" Width="100"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Created" Width="100" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Remaining" Width="80" Visible="False" >
                         <local:CorasauDataGridTemplateColumnClient.CellTemplate>
@@ -131,6 +132,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionOrdersPage"
                             </DataTemplate>
                         </local:CorasauDataGridTemplateColumnClient.CellTemplate>
                     </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PostingText" Visible="False" />
                 </local:ProductionOrdersPageGrid.Columns>
             </local:ProductionOrdersPageGrid>
         </CorasauControls:BusyIndicator>

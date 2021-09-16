@@ -37,8 +37,9 @@ namespace UnicontaClient.Pages.CustomPage
         public string RegistrationProject { get; set; }
         [ForeignKeyAttribute(ForeignKeyTable = typeof(Uniconta.DataModel.EmpPayrollCategory))]
         public string PayType { get; set; }
-        //string _ProjectName;
-        //public string ProjectName { get { return _ProjectName; } }
+        [ForeignKeyAttribute(ForeignKeyTable = typeof(Uniconta.DataModel.PrWorkSpace))]
+        public string WorkSpace { get; set; }
+        public string PrTask {  get; set; }
         public bool Returning { get; set; }
         public string VechicleRegNo { get; set; }
         public double Day1 { get; set; }
@@ -49,7 +50,6 @@ namespace UnicontaClient.Pages.CustomPage
         public double Day6 { get; set; }
         public double Day7 { get; set; }
         public double Total { get; set; }
-        public bool ExistingTransportJrnlLine { get; set; }
         List<Address> addressList;
         Uniconta.DataModel.Employee employee;
         Company company;
@@ -57,35 +57,65 @@ namespace UnicontaClient.Pages.CustomPage
         WorkInstallation installation;
         TMJournalLineClientLocal journalline;
         CrudAPI crudApi;
-        bool addMileage = false;
-        double mileageTotal;
+        SQLCache payrollCache, projectCache;
+        string internalProject;
+        EmpPayrollCategory catMileage;
+
         private bool doCalculate = false;
         private string EMPTYADDRESS = string.Concat("<", Uniconta.ClientTools.Localization.lookup("address")+">");
 
-        public CwTransportRegistration(TMJournalLineClientLocal tmJournalLine, CrudAPI _crudApi, double mileageTotal, bool returning, bool _addMileage = false)
+        public CwTransportRegistration(TMJournalLineClientLocal tmJournalLine, CrudAPI _crudApi)
         {
             crudApi = _crudApi;
             journalline = tmJournalLine;
-            Returning = returning;
+            Returning = true;
+            company = crudApi.CompanyEntity;
+            employee = tmJournalLine.EmployeeRef;
             intializeProperties();
             this.DataContext = this;
             InitializeComponent();
-            lePayType.api = leProject.api = crudApi;
+            lePayType.api = leProject.api = leProjectTask.api = leWorkSpace.api = crudApi;
             this.Title = string.Format("{0} {1}", Uniconta.ClientTools.Localization.lookup("Mileage"), Uniconta.ClientTools.Localization.lookup("ProjectRegistration"));
-            employee = tmJournalLine.EmployeeRef;
-            company = crudApi.CompanyEntity;
-            if (journalline.RowId != 0 && journalline._RegistrationType == RegistrationType.Mileage)
-                chkReturning.IsEnabled = false;
-            else
+           
+            payrollCache = crudApi.GetCache(typeof(Uniconta.DataModel.EmpPayrollCategory));
+            projectCache = crudApi.GetCache(typeof(Uniconta.DataModel.Project));
+
+            debtor = tmJournalLine.ProjectRef?.Debtor;
+            txtProjectName.Text = tmJournalLine.ProjectRef?._Name;
+            installation = tmJournalLine.ProjectRef?.InstallationRef;
+
+            if (!company.ProjectTask)
             {
-                debtor = tmJournalLine.ProjectRef?.Debtor;
-                txtProjectName.Text = tmJournalLine.ProjectRef?._Name;
-                installation = tmJournalLine.ProjectRef?.InstallationRef;
+                lblProjectTask.Visibility = Visibility.Collapsed;
+                leProjectTask.Visibility = Visibility.Collapsed;
             }
-            addMileage = _addMileage;
-            this.mileageTotal = mileageTotal;
+
             LoadControls();
-            this.DataContext = this;
+
+            lePayType.cacheFilter = new MileagePayrollFilter(payrollCache);
+            SetProjectTask();
+        }
+
+        void intializeProperties()
+        {
+            var journalline = this.journalline;
+            Project = journalline._Project;
+            WorkSpace = journalline._WorkSpace;
+            
+            VechicleRegNo = employee._VechicleRegNo;
+
+            if (catMileage == null)
+            {
+                payrollCache = payrollCache ?? crudApi.GetCache(typeof(Uniconta.DataModel.EmpPayrollCategory));
+                var payrollLst = (EmpPayrollCategory[])payrollCache.GetRecords;
+                catMileage = payrollLst.Where(s => s._InternalType == Uniconta.DataModel.InternalType.Mileage).OrderByDescending(s => s._Rate).FirstOrDefault();
+            }
+
+            internalProject = catMileage?._InternalProject;
+            RegistrationProject = internalProject ?? journalline._Project;
+            PrTask = internalProject ?? journalline._Task;
+
+            PayType = catMileage?._Number;
         }
 
         void LoadControls()
@@ -165,7 +195,6 @@ namespace UnicontaClient.Pages.CustomPage
                 }
             }
 
-
             if (string.IsNullOrEmpty(txtFromAdd.Text))
                 txtFromAdd.Text = journalline.AddressFrom;
             if (string.IsNullOrEmpty(txtToAdd.Text))
@@ -188,21 +217,26 @@ namespace UnicontaClient.Pages.CustomPage
             txtSunHrs.Background = SetBackGroundColor(txtSunHrs, journalline.StatusDay7);
 
             doCalculate = true;
-            if (addMileage)
-                CalulateMileage();
-            else
-                mileageTotal = mileageTotal - journalline.Total;
-
+            CalulateMileage();
             CalculateTotal();
+        }
+
+        public class MileagePayrollFilter : SQLCacheFilter
+        {
+            public MileagePayrollFilter(SQLCache cache) : base(cache) { }
+            public override bool IsValid(object rec)
+            {
+                var pay = ((Uniconta.DataModel.EmpPayrollCategory)rec);
+                return (pay._InternalType == Uniconta.DataModel.InternalType.Mileage);
+            }
         }
 
         SolidColorBrush SetBackGroundColor(NumericUpDownEditor txtHours, int dayStatus)
         {
             var SolidColorBrush = new SolidColorBrush(Colors.White);
-#if !SILVERLIGHT
+
             if (ApplicationThemeHelper.ApplicationThemeName == Theme.MetropolisDarkName)
                 SolidColorBrush = (SolidColorBrush)(new BrushConverter().ConvertFrom("#FF6E6E6E"));
-#endif
             if (dayStatus == 1)
                 SolidColorBrush = new SolidColorBrush(Colors.Yellow);
             else if (dayStatus == 2)
@@ -210,31 +244,20 @@ namespace UnicontaClient.Pages.CustomPage
             return SolidColorBrush;
         }
 
-        async void intializeProperties()
+        async void SetProjectTask()
         {
-            var payrollCategoryLst = await crudApi.LoadCache<Uniconta.DataModel.EmpPayrollCategory>();
-            var payrollCategory = payrollCategoryLst.Where(s => s._InternalType == Uniconta.DataModel.InternalType.Mileage).OrderByDescending(s => s._Rate).FirstOrDefault(); //TODO:Mangler håndtering af Høj/Lav sats
-
-            var journalline = this.journalline;
-            if (journalline.RowId != 0 && journalline._RegistrationType == RegistrationType.Mileage)
-                Project = string.Empty;
-            else
-                Project = journalline._Project;
-            RegistrationProject = payrollCategory?._InternalProject ?? journalline._Project;
-            PayType = payrollCategory?._Number;
-            if (journalline._RegistrationType == RegistrationType.Mileage)
+            if (crudApi.CompanyEntity.ProjectTask)
             {
-                Purpose = journalline.Text;
-                VechicleRegNo = journalline._VechicleRegNo;
-                FromAddress = journalline._AddressFrom;
-                ToAddress = journalline._AddressTo;
-                Day1 = journalline.Day1;
-                Day2 = journalline.Day2;
-                Day3 = journalline.Day3;
-                Day4 = journalline.Day4;
-                Day5 = journalline.Day5;
-                Day6 = journalline.Day6;
-                Day7 = journalline.Day7;
+                if (Project != null && internalProject == null)
+                {
+                    var project = (Uniconta.DataModel.Project)projectCache?.Get(Project);
+                    var tasks = project.Tasks ?? await project.LoadTasks(crudApi);
+                    leProjectTask.ItemsSource = tasks.Where(s => s.Ended == false && (WorkSpace == null || s._WorkSpace == WorkSpace));
+                }
+                else
+                {
+                    leProjectTask.ItemsSource = null;
+                }
             }
         }
 
@@ -245,10 +268,9 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void btnOk_Click(object sender, RoutedEventArgs e)
         {
-            if (journalline._RegistrationType == RegistrationType.Mileage)
-                ExistingTransportJrnlLine = true;
             FromAddress = txtFromAdd.Text;
             ToAddress = txtToAdd.Text;
+            PrTask = internalProject == null ? leProjectTask.Text : null;
             this.DialogResult = true;
         }
 
@@ -266,9 +288,7 @@ namespace UnicontaClient.Pages.CustomPage
         void CalculateTotal()
         {
             total = Day1 + Day2 + Day3 + Day4 + Day5 + Day6 + Day7;
-            txtTotal.Text = total.ToString();
-
-            var calcmileageTotal = Returning ? mileageTotal + total*2 : mileageTotal + total;
+            var calcmileageTotal = Returning ? total*2 : total;
             txtMileageBal.EditValue = calcmileageTotal.ToString();
         }
 
@@ -299,51 +319,20 @@ namespace UnicontaClient.Pages.CustomPage
 
         void CalulateMileage()
         {
-            if (!doCalculate)
+            if (!doCalculate || string.IsNullOrWhiteSpace(txtFromAdd.Text) || string.IsNullOrWhiteSpace(txtToAdd.Text) || txtFromAdd.Text == EMPTYADDRESS || txtToAdd.Text == EMPTYADDRESS)
                 return;
 
             double distance = 0d;
-            if (string.IsNullOrWhiteSpace(txtFromAdd.Text) || string.IsNullOrWhiteSpace(txtToAdd.Text) || txtFromAdd.Text == EMPTYADDRESS || txtToAdd.Text == EMPTYADDRESS)
-            { }
-#if !SILVERLIGHT
-            else
-                distance = GoogleMaps.GetDistance(txtFromAdd.Text, txtToAdd.Text, (bool)chkAvdFerr.IsChecked);
-#endif
-            object dist = distance;
-            if (!addMileage)
-            {
-                if (!txtMonHrs.IsReadOnly)
-                    txtMonHrs.EditValue = dist;
-                else if (!txtTueHrs.IsReadOnly)
-                    txtTueHrs.EditValue = dist;
-                else if (!txtWedHrs.IsReadOnly)
-                    txtWedHrs.EditValue = dist;
-                else if (!txtThuHrs.IsReadOnly)
-                    txtThuHrs.EditValue = dist;
-                else if (!txtFriHrs.IsReadOnly)
-                    txtFriHrs.EditValue = dist;
-                else if (!txtSatHrs.IsReadOnly)
-                    txtSatHrs.EditValue = dist;
-                else if (!txtSunHrs.IsReadOnly)
-                    txtSunHrs.EditValue = dist;
-            }
-            else
-            {
-                if (!txtMonHrs.IsReadOnly && journalline.Day1 > 0)
-                    txtMonHrs.EditValue = dist;
-                 if (!txtTueHrs.IsReadOnly && journalline.Day2 > 0)
-                    txtTueHrs.EditValue = dist;
-                 if (!txtWedHrs.IsReadOnly && journalline.Day3 > 0)
-                    txtWedHrs.EditValue = dist;
-                 if (!txtThuHrs.IsReadOnly && journalline.Day4 > 0)
-                    txtThuHrs.EditValue = dist;
-                 if (!txtFriHrs.IsReadOnly && journalline.Day5 > 0)
-                    txtFriHrs.EditValue = dist;
-                 if (!txtSatHrs.IsReadOnly && journalline.Day6 > 0)
-                    txtSatHrs.EditValue = dist;
-                 if (!txtSunHrs.IsReadOnly && journalline.Day7 > 0)
-                    txtSunHrs.EditValue = dist;
-            }
+            distance = GoogleMaps.GetDistance(txtFromAdd.Text, txtToAdd.Text, (bool)chkAvdFerr.IsChecked);
+            
+            double dist = distance;
+            if (!txtMonHrs.IsReadOnly && journalline.Day1 > 0) txtMonHrs.EditValue = dist;
+            if (!txtTueHrs.IsReadOnly && journalline.Day2 > 0) txtTueHrs.EditValue = dist;
+            if (!txtWedHrs.IsReadOnly && journalline.Day3 > 0) txtWedHrs.EditValue = dist;
+            if (!txtThuHrs.IsReadOnly && journalline.Day4 > 0) txtThuHrs.EditValue = dist;
+            if (!txtFriHrs.IsReadOnly && journalline.Day5 > 0) txtFriHrs.EditValue = dist;
+            if (!txtSatHrs.IsReadOnly && journalline.Day6 > 0) txtSatHrs.EditValue = dist;
+            if (!txtSunHrs.IsReadOnly && journalline.Day7 > 0) txtSunHrs.EditValue = dist;
             CalculateTotal();
         }
 
@@ -356,10 +345,15 @@ namespace UnicontaClient.Pages.CustomPage
         private void leProject_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
         {
             string id = Convert.ToString(e.NewValue);
-            var projects = crudApi.CompanyEntity.GetCache(typeof(Uniconta.DataModel.Project));
-            var project = (Uniconta.DataModel.Project)projects?.Get(id) as ProjectClient;
+            projectCache = projectCache ?? crudApi.CompanyEntity.GetCache(typeof(Uniconta.DataModel.Project));
+            var project = (Uniconta.DataModel.Project)projectCache?.Get(id) as ProjectClient;
+            Project = project.Number;
+            SetProjectTask();
+
             if (project != null)
             {
+                RegistrationProject = internalProject ?? project.Number;
+
                 txtProjectName.Text = project._Name;
                 debtor = project.Debtor;
                 installation = project.InstallationRef;
@@ -403,6 +397,27 @@ namespace UnicontaClient.Pages.CustomPage
                 }
                 CalculateTotal();
                 CalulateMileage();
+            }
+        }
+
+        private void leWorkSpace_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
+        {
+            string id = Convert.ToString(e.NewValue);
+            WorkSpace = id;
+            SetProjectTask();
+        }
+
+        private void lePayType_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
+        {
+            string id = Convert.ToString(e.NewValue);
+            PayType = id;
+
+            if (PayType != null)
+            {
+                payrollCache = payrollCache ?? crudApi.GetCache(typeof(Uniconta.DataModel.EmpPayrollCategory));
+                catMileage = (Uniconta.DataModel.EmpPayrollCategory)payrollCache.Get(PayType);
+                internalProject = catMileage?._InternalProject;
+                RegistrationProject = internalProject ?? Project;
             }
         }
     }

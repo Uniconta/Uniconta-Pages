@@ -31,7 +31,7 @@ namespace UnicontaClient.Pages.CustomPage.GL.Reports
                         double sign = 1d;
                         if (v._VatOperation == 1) // v1
                         {
-                            model = v.Vat._ModelBoxId1;
+                            model = v.Vat._Box;
                             if (model == 0)
                                 continue;
                             sign = -1d;

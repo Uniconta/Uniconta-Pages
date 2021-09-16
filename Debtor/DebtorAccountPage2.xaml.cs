@@ -71,7 +71,6 @@ namespace UnicontaClient.Pages.CustomPage
         void InitPage(CrudAPI crudapi)
         {
             ribbonControl = frmRibbon;
-            BusyIndicator = busyIndicator;
             dAddress.Header = Uniconta.ClientTools.Localization.lookup("DeliveryAddr");
             layoutControl = layoutItems;
             cbDeliveryCountry.ItemsSource = cbCountry.ItemsSource = Enum.GetValues(typeof(Uniconta.Common.CountryCode));
@@ -79,7 +78,6 @@ namespace UnicontaClient.Pages.CustomPage
             Vatlookupeditior.api = VatOprlookupeditior.api = PriceListlookupeditior.api = Employeelookupeditor.api = leInvoiceAccount.api = leShipment.api =
             dim1lookupeditior.api = dim2lookupeditior.api = dim3lookupeditior.api = dim4lookupeditior.api = dim5lookupeditior.api = Paymentlookupeditior.api = grouplookupeditor.api = LayoutGrouplookupeditior.api = lePostingAccount.api = leCrmGroup.api = leDeliveryTerm.api = lePaymtFormat.api = crudapi;
 
-            AdjustLayout();
             Task t;
             if (crudapi.CompanyEntity.CRM)
                 t = GetInterestAndProduct();
@@ -105,7 +103,7 @@ namespace UnicontaClient.Pages.CustomPage
             txtCompanyRegNo.LostFocus += TxtCompanyRegNo_LostFocus;
         }
 
-        private async void TxtCompanyRegNo_LostFocus(object sender, RoutedEventArgs e)
+        private void TxtCompanyRegNo_LostFocus(object sender, RoutedEventArgs e)
         {
             var countryCode = CheckEuropeanVatInformation(editrow._LegalIdent, editrow._Country, cvrFound);
             if (countryCode != null && editrow._Country != countryCode)
@@ -198,11 +196,10 @@ namespace UnicontaClient.Pages.CustomPage
         async Task GetInterestAndProduct()
         {
             var api = this.api;
-            var Comp = api.CompanyEntity;
-            var crmInterestCache = Comp.GetCache(typeof(Uniconta.DataModel.CrmInterest)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.CrmInterest), api);
-            var crmProductCache = Comp.GetCache(typeof(Uniconta.DataModel.CrmProduct)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.CrmProduct), api);
-            cmbInterests.ItemsSource = crmInterestCache.GetKeyList();
-            cmbProducts.ItemsSource = crmProductCache.GetKeyList();
+            var cache = api.GetCache(typeof(Uniconta.DataModel.CrmInterest)) ?? await api.LoadCache(typeof(Uniconta.DataModel.CrmInterest));
+            cmbInterests.ItemsSource = cache.GetKeyList();
+            cache = api.GetCache(typeof(Uniconta.DataModel.CrmProduct)) ?? await api.LoadCache(typeof(Uniconta.DataModel.CrmProduct));
+            cmbProducts.ItemsSource = cache.GetKeyList();
         }
 
         private void frmRibbon_OnItemClicked(string ActionType)
@@ -220,11 +217,6 @@ namespace UnicontaClient.Pages.CustomPage
             return false;
         }
         protected override void OnLayoutCtrlLoaded()
-        {
-            AdjustLayout();
-        }
-
-        void AdjustLayout()
         {
             var Comp = api.CompanyEntity;
             if (!Comp._UseVatOperation)

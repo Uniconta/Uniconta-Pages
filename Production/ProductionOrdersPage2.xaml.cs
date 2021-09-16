@@ -59,6 +59,13 @@ namespace UnicontaClient.Pages.CustomPage
             InitPage(api, master, debtorOrder);
         }
 
+        public ProductionOrdersPage2(CrudAPI crudApi, UnicontaBaseEntity master, UnicontaBaseEntity debtorOrder, double Qty)
+          : base(crudApi, string.Empty)
+        {
+            InitializeComponent();
+            InitPage(api, master, debtorOrder, Qty);
+        }
+
         public ProductionOrdersPage2(UnicontaBaseEntity sourcedata)
             : base(sourcedata, true)
         {
@@ -74,12 +81,11 @@ namespace UnicontaClient.Pages.CustomPage
             FocusManager.SetFocusedElement(leProdItem, leProdItem);
 #endif
         }
-        void InitPage(CrudAPI crudapi, UnicontaBaseEntity master, UnicontaBaseEntity debtorOrder = null)
+        void InitPage(CrudAPI crudapi, UnicontaBaseEntity master, UnicontaBaseEntity debtorOrder = null, double Qty = 0)
         {
-            BusyIndicator = busyIndicator;
             layoutControl = layoutItems;
             cmbDim1.api = cmbDim2.api = cmbDim3.api = cmbDim4.api = cmbDim5.api = leGroup.api = leProject.api = lePrCategory.api = leEmployee.api
-           = leProdItem.api = leGroup.api = leAccount.api = cmbWarehouse.api = cmbLocation.api = prTasklookupeditor.api = crudapi;
+           = leProdItem.api = leGroup.api = leAccount.api = cmbWarehouse.api = cmbLocation.api = prTasklookupeditor.api = lePrWorkSpace.api= crudapi;
 
 #if SILVERLIGHT
             leRelatedOrder.api = api;
@@ -99,6 +105,8 @@ namespace UnicontaClient.Pages.CustomPage
                     editrow.SetMaster(debtorOrder);
                     editrow._EndDiscountPct = 0;
                     editrow._Storage = crudapi.CompanyEntity._PurchaseLineStorage;
+                    if (Qty != 0d)
+                        editrow._ProdQty = Qty;
                 }
             }
 

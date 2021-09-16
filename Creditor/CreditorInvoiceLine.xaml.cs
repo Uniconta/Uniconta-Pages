@@ -37,6 +37,18 @@ namespace UnicontaClient.Pages.CustomPage
     public partial class CreditorInvoiceLine : GridBasePage
     {
         private SynchronizeEntity syncEntity;
+
+        bool AddFilterAndSort;
+        DateTime filterDate;
+        protected override Filter[] DefaultFilters()
+        {
+            if (AddFilterAndSort)
+            {
+                Filter dateFilter = new Filter() { name = "Date", value = String.Format("{0:d}..", filterDate) };
+                return new Filter[] { dateFilter };
+            }
+            return base.DefaultFilters();
+        }
         public CreditorInvoiceLine(BaseAPI API)
             : base(API, string.Empty)
         {
@@ -74,8 +86,12 @@ namespace UnicontaClient.Pages.CustomPage
         {
             InitializeComponent();
             this.master = master;
+            AddFilterAndSort = (master == null);
             dgCrdInvLines.UpdateMaster(master);
             SetRibbonControl(localMenu, dgCrdInvLines);
+            filterDate = BasePage.GetFilterDate(api.CompanyEntity, master != null);
+            if (filterDate == DateTime.MinValue)
+                AddFilterAndSort = false;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgCrdInvLines.api = api;
             dgCrdInvLines.BusyIndicator = busyIndicator;
@@ -128,7 +144,8 @@ namespace UnicontaClient.Pages.CustomPage
             else
                 Warehouse.ShowInColumnChooser = true;
             if (!company.Project)
-                Project.Visible = Project.ShowInColumnChooser = false;
+                Project.Visible = Project.ShowInColumnChooser = WorkSpace.ShowInColumnChooser= WorkSpace.Visible=
+                    PrCategory.Visible= PrCategory.ShowInColumnChooser= false;
             else
                 Project.ShowInColumnChooser = true;
             if (!company.ProjectTask)

@@ -33,7 +33,19 @@ namespace UnicontaClient.Pages.CustomPage
     public partial class EmployeesPayrollPage : GridBasePage
     {
         public override string NameOfControl { get { return TabControls.EmployeesPayrollPage; } }
+
         public EmployeesPayrollPage(BaseAPI API) : base(API, string.Empty)
+        {
+            Init();
+        }
+
+        public EmployeesPayrollPage(BaseAPI api, string lookupKey)
+           : base(api, lookupKey)
+        {
+            Init();
+        }
+
+        void Init()
         {
             InitializeComponent();
             SetRibbonControl(localMenu, dgEmployeePayrollGrid);

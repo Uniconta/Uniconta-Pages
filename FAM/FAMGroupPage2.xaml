@@ -6,14 +6,12 @@ x:Class="UnicontaClient.Pages.CustomPage.FAMGroupPage2"
                         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                         xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
-                        xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
                         xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools" 
                         mc:Ignorable="d"
                         d:DesignHeight="300" d:DesignWidth="400">
     <UserControl.Resources>
         <Util:RowIndexConverter x:Key="RowIndexConverter" />
     </UserControl.Resources>
-    <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="0" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BusyMessage}">
         <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -84,5 +82,4 @@ x:Class="UnicontaClient.Pages.CustomPage.FAMGroupPage2"
                     </CorasauControls:CorasauLayoutGroup>
             </CorasauControls:CorasauLayoutControl>
         </Grid>
-    </CorasauControls:BusyIndicator>
 </Pages:FormBasePage>

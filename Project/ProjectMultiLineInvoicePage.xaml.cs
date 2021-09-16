@@ -38,6 +38,8 @@ namespace UnicontaClient.Pages.CustomPage
         public override Type TableType { get { return typeof(ProjectClient); } }
         public override bool SingleBufferUpdate { get { return false; } }
         public override bool Readonly { get { return false; } }
+        public override bool CanDelete { get { return false; } }
+        public override bool IsAutoSave { get { return false; } }
     }
     /// <summary>
     /// Interaction logic for ProjectMultiLinePage.xaml
@@ -62,39 +64,31 @@ namespace UnicontaClient.Pages.CustomPage
             switch (ActionType)
             {
                 case "EditRow":
-                    if (selectedItem == null)
-                        return;
-
-                    string projectHeader = string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("Project"), selectedItem._Number);
-                    if (dgProjectMultiLineGrid.masterRecords != null)
+                    if (selectedItem != null)
                     {
-                        object[] arr = new object[] { selectedItem, dgProjectMultiLineGrid.masterRecord };
-                        AddDockItem(TabControls.ProjectPage2, arr, projectHeader);
-                    }
-                    else
-                    {
-                        var param = new object[2] { selectedItem, true };
-                        AddDockItem(TabControls.ProjectPage2, param, projectHeader);
+                        string projectHeader = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Project"), selectedItem._Number);
+                        if (dgProjectMultiLineGrid.masterRecords != null)
+                            AddDockItem(TabControls.ProjectPage2, new object[] { selectedItem, dgProjectMultiLineGrid.masterRecord }, projectHeader);
+                        else
+                            AddDockItem(TabControls.ProjectPage2, new object[] { selectedItem, IdObject.get(true) }, projectHeader);
                     }
                     break;
                 case "DeleteRow":
-                    dgProjectMultiLineGrid.DeleteRow();
+                    dgProjectMultiLineGrid.RemoveFocusedRowFromGrid();
                     break;
                 case "GenerateInvoice":
                     GenerateInvoice();
                     break;
                 case "GenerateInvoice2":
-                    if (selectedItem == null) return;
-
-                    GenerateSelectedInvoice(selectedItem);
+                    if (selectedItem != null)
+                        GenerateSelectedInvoice(selectedItem);
                     break;
                 case "CreateOrder":
                     CreateMulitOrder();
                     break;
                 case "CreateOrder2":
-                    if (selectedItem == null) return;
-
-                    CreateMulitOrder(false);
+                    if (selectedItem != null)
+                        CreateMulitOrder(false);
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);

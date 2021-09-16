@@ -123,6 +123,8 @@ namespace UnicontaClient.Pages.CustomPage
                     if (tblHeader._Attachment)
                     {
                         var userTblType = Global.GetUserTable(comp, tblHeader);
+                        if (userTblType == null)
+                            continue;
                         listTypes.Add(new TableList(userTblType, string.Format("{0} ({1})", userTblType.Name, tblHeader._Prompt ?? tblHeader._Name) ));
                     }
                 }

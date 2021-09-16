@@ -37,21 +37,9 @@ using UnicontaClient.Pages;
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
-    public class DebtorDeliveryNoteLocal : DebtorDeliveryNoteClient
-    {
-        [Display(Name = "System Info")]
-        public string SystemInfo { get { return _SystemInfo; } }
-        public string _SystemInfo;
-
-        internal void NotifySystemInfoSet()
-        {
-            NotifyPropertyChanged("SystemInfo");
-        }
-    }
-
     public class PackNotesGrid : CorasauDataGridClient
     {
-        public override Type TableType { get { return typeof(DebtorDeliveryNoteLocal); } }
+        public override Type TableType { get { return typeof(DebtorDeliveryNoteClient); } }
         public override IComparer GridSorting { get { return new DCInvoiceSort(); } }
     }
 
@@ -106,6 +94,13 @@ namespace UnicontaClient.Pages.CustomPage
                 CostValue.HasDecimals = NetAmount.HasDecimals = TotalAmount.HasDecimals = Margin.HasDecimals = SalesValue.HasDecimals = false;
         }
 
+        public override bool CheckIfBindWithUserfield(out bool isReadOnly, out bool useBinding)
+        {
+            isReadOnly = true;
+            useBinding = true;
+            return true;
+        }
+
         protected override void OnLayoutLoaded()
         {
             base.OnLayoutLoaded();
@@ -132,7 +127,7 @@ namespace UnicontaClient.Pages.CustomPage
             var api = this.api;
             if (api.CompanyEntity.DeliveryAddress)
             {
-                var lst = dgPackNotesGrid.ItemsSource as IEnumerable<DebtorDeliveryNoteLocal>;
+                var lst = dgPackNotesGrid.ItemsSource as IEnumerable<DebtorDeliveryNoteClient>;
                 if (lst != null)
                 {
                     foreach (var rec in lst)
@@ -145,7 +140,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void localMenu_OnItemClicked(string ActionType)
         {
-            var selectedItem = dgPackNotesGrid.SelectedItem as DebtorDeliveryNoteLocal;
+            var selectedItem = dgPackNotesGrid.SelectedItem as DebtorDeliveryNoteClient;
             string salesHeader = string.Empty;
             if (selectedItem != null)
                 salesHeader = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Orders"), selectedItem._OrderNumber);
@@ -166,7 +161,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "ShowDeliveryNote":
                     if (selectedItem == null || dgPackNotesGrid.SelectedItems == null)
                         return;
-                    var selectedItems = dgPackNotesGrid.SelectedItems.Cast<DebtorDeliveryNoteLocal>();
+                    var selectedItems = dgPackNotesGrid.SelectedItems.Cast<DebtorDeliveryNoteClient>();
                     ShowDeliveryNote(selectedItems);
                     break;
                 case "SendDeliveryNote":
@@ -195,7 +190,7 @@ namespace UnicontaClient.Pages.CustomPage
         DCPreviousAddressClient[] previousAddressLookup;
         DebtorMessagesClient[] messagesLookup;
         bool hasLookups;
-        async private void ShowDeliveryNote(IEnumerable<DebtorDeliveryNoteLocal> debtorInvoices)
+        async private void ShowDeliveryNote(IEnumerable<DebtorDeliveryNoteClient> debtorInvoices)
         {
             busyIndicator.IsBusy = true;
             busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
@@ -498,7 +493,9 @@ namespace UnicontaClient.Pages.CustomPage
 
         public override void Utility_Refresh(string screenName, object argument = null)
         {
-            if (screenName == TabControls.StandardPrintReportPage)
+            if (screenName == TabControls.InvoicePage2)
+                dgPackNotesGrid.UpdateItemSource(argument);
+            else if (screenName == TabControls.StandardPrintReportPage)
             {
 #if !SILVERLIGHT
                 isGeneratingPacknote = false;

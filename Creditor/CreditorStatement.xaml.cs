@@ -274,7 +274,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         void SubstituteFilter(object sender, DevExpress.Data.SubstituteFilterEventArgs e)
         {
-            if (string.IsNullOrEmpty(ribbonControl.SearchControl.SearchText))
+            if (string.IsNullOrEmpty(ribbonControl?.SearchControl?.SearchText))
                 return;
             e.Filter = new GroupOperator(GroupOperatorType.Or, e.Filter, GetDetailFilter(ribbonControl.SearchControl.SearchText));
         }

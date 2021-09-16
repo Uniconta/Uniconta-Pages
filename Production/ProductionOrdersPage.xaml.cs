@@ -101,13 +101,11 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 Project.Visible = Project.ShowInColumnChooser = false;
                 PrCategory.Visible = PrCategory.ShowInColumnChooser = false;
+                WorkSpace.Visible = WorkSpace.ShowInColumnChooser = false;
             }
-            else
-                Project.ShowInColumnChooser = PrCategory.ShowInColumnChooser = true;
             if (!Comp.ProjectTask)
                 Task.ShowInColumnChooser = Task.Visible = false;
-            else
-                Task.ShowInColumnChooser = true;
+            
 #if !SILVERLIGHT
             Utility.SetupVariants(api, colVariant, VariantName, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
 #else
@@ -117,35 +115,25 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void localMenu_OnItemClicked(string ActionType)
         {
+            string header;
             var selectedItem = dgProductionOrders.SelectedItem as ProductionOrderClient;
-            string salesHeader = string.Empty;
             if (selectedItem != null)
-                salesHeader = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Production"), selectedItem._OrderNumber);
             switch (ActionType)
             {
                 case "AddRow":
                     if (dgProductionOrders.masterRecords != null)
-                    {
-                        object[] arr = new object[2] { api, dgProductionOrders.masterRecord };
-                        AddDockItem(TabControls.ProductionOrdersPage2, arr, Uniconta.ClientTools.Localization.lookup("Production"), "Add_16x16.png", true);
-                    }
+                        AddDockItem(TabControls.ProductionOrdersPage2, new object[2] { api, dgProductionOrders.masterRecord }, Uniconta.ClientTools.Localization.lookup("Production"), "Add_16x16.png", true);
                     else
-                    {
                         AddDockItem(TabControls.ProductionOrdersPage2, api, Uniconta.ClientTools.Localization.lookup("Production"), "Add_16x16.png", true);
-                    }
                     break;
                 case "EditRow":
                     if (selectedItem == null)
                         return;
+                    header = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Production"), selectedItem._OrderNumber);
                     if (dgProductionOrders.masterRecords != null)
-                    {
-                        object[] arr = new object[2] { selectedItem, dgProductionOrders.masterRecord };
-                        AddDockItem(TabControls.ProductionOrdersPage2, arr, salesHeader);
-                    }
+                        AddDockItem(TabControls.ProductionOrdersPage2, new object[2] { selectedItem, dgProductionOrders.masterRecord }, header);
                     else
-                    {
-                        AddDockItem(TabControls.ProductionOrdersPage2, selectedItem, salesHeader);
-                    }
+                        AddDockItem(TabControls.ProductionOrdersPage2, selectedItem, header);
                     break;
                 case "AddNote":
                     if (selectedItem != null)
@@ -158,8 +146,8 @@ namespace UnicontaClient.Pages.CustomPage
                 case "ProductionLines":
                     if (selectedItem != null)
                     {
-                        var olheader = string.Format("{0}: {1}, {2}", Uniconta.ClientTools.Localization.lookup("ProductionLines"), selectedItem._OrderNumber, selectedItem._DCAccount);
-                        AddDockItem(TabControls.ProductionOrderLines, dgProductionOrders.syncEntity, olheader);
+                        header = string.Format("{0}: {1}, {2}", Uniconta.ClientTools.Localization.lookup("ProductionLines"), selectedItem._OrderNumber, selectedItem._DCAccount);
+                        AddDockItem(TabControls.ProductionOrderLines, dgProductionOrders.syncEntity, header);
                     }
                     break;
                 case "CreateProductionLines":
@@ -191,12 +179,12 @@ namespace UnicontaClient.Pages.CustomPage
                 case "SaveGrid":
                     Save();
                     break;
-                case "ViewPhoto":
-                    if (selectedItem != null && selectedItem?.ProdItemRef != null)
+                case "ViewItemAttachments":
+                    if (selectedItem?.ProdItemRef != null)
                         AddDockItem(TabControls.UserDocsPage, selectedItem.ProdItemRef, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Documents"), selectedItem?.ProdItemRef?._Name));
                     break;
                 case "ViewNotes":
-                    if (selectedItem != null && selectedItem?.ProdItemRef != null)
+                    if (selectedItem?.ProdItemRef != null)
                         AddDockItem(TabControls.UserNotesPage, selectedItem.ProdItemRef, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Notes"), selectedItem?.ProdItemRef?._Name));
                     break;
                 case "DeleteRow":

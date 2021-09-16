@@ -115,6 +115,9 @@ namespace UnicontaClient.Pages.CustomPage
     {
         public override Type TableType { get { return typeof(CreditorTransPayment); } }
         public override bool Readonly { get { return false; } }
+        public override bool IsAutoSave { get { return false; } }
+        public override bool CanDelete { get { return false; } }
+        public override bool CanInsert { get { return false; } }
         protected override void OnPreviewKeyDown(KeyEventArgs e)
         {
             if (e.Key == Key.Delete && Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))

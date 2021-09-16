@@ -56,7 +56,6 @@ namespace UnicontaClient.Pages.CustomPage
                 editrow._Default = true;
             }
             layoutItems.DataContext = editrow;
-            BusyIndicator = busyIndicator;
             frmRibbon.OnItemClicked += FrmRibbon_OnItemClicked;
 
             var cache = api.GetCache(typeof(Uniconta.DataModel.CompanyDocumentLayout));

@@ -46,7 +46,7 @@ namespace UnicontaClient.Pages.CustomPage
             InitializeComponent();
             InitPage(api);
 
-            if(sourcedata == null)
+            if (sourcedata == null)
             {
 #if !SILVERLIGHT
                 FocusManager.SetFocusedElement(txtName, txtName);
@@ -59,13 +59,12 @@ namespace UnicontaClient.Pages.CustomPage
         void InitPage(CrudAPI crudapi)
         {
             txtCreditNote.api = txtInvoice.api = txtOffer.api = txtOrderConfirmation.api = txtPackNote.api = crudapi;
-            BusyIndicator = busyIndicator;
             layoutControl = layoutItems;
             SetSource();
             if (editrow == null && LoadedRow == null)
             {
-                frmRibbon.DisableButtons( "Delete" );
-                editrow =CreateNew() as DebtorLayoutGroupClient;
+                frmRibbon.DisableButtons("Delete");
+                editrow = CreateNew() as DebtorLayoutGroupClient;
             }
             layoutItems.DataContext = editrow;
             frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
@@ -76,7 +75,7 @@ namespace UnicontaClient.Pages.CustomPage
         async private void SetSource()
         {
 #if !SILVERLIGHT
-            cmbStRep.ItemsSource = await PrepareSource(typeof(StandardStatementReportClient)); 
+            cmbStRep.ItemsSource = await PrepareSource(typeof(StandardStatementReportClient));
             cmbStCurRep.ItemsSource = await PrepareSource(typeof(StandardStatementCurrencyReportClient));
             cmbInvRep.ItemsSource = await PrepareSource(typeof(StandardInvoiceReportClient));
             cmbColRep.ItemsSource = await PrepareSource(typeof(StandardCollectionReportClient));
@@ -95,7 +94,8 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var instance = Activator.CreateInstance(type) as UnicontaBaseEntity;
             var list = (IEnumerable<UserReportDevExpress>)await api.Query(instance, null, null);
-            return list?.Select(p => p._Name).ToArray();
+            var listCmpId = list?.Where(p => p._ForCompanyId == api.CompanyId || p._AllCompanies == true);
+            return listCmpId?.Select(p => p._Name).ToArray();
         }
 
         async void GetDebtorEmailSetup()
@@ -110,7 +110,7 @@ namespace UnicontaClient.Pages.CustomPage
             cmbOfferEmail.ItemsSource = emailList.Where(x => x._EmailType == DebtorEmailType.Offer).Select(x => x._Name).ToList();
             cmbStatementEmail.ItemsSource = emailList.Where(x => x._EmailType == DebtorEmailType.AccountStatement).Select(x => x._Name).ToList();
             cmbStatementCurEmail.ItemsSource = emailList.Where(x => x._EmailType == DebtorEmailType.AccountStatement).Select(x => x._Name).ToList();
-            cmbCollectionEmail.ItemsSource = emailList.Where(x => x._EmailType == DebtorEmailType.Collection || x._EmailType == DebtorEmailType.CollectionLetter1 || 
+            cmbCollectionEmail.ItemsSource = emailList.Where(x => x._EmailType == DebtorEmailType.Collection || x._EmailType == DebtorEmailType.CollectionLetter1 ||
             x._EmailType == DebtorEmailType.CollectionLetter2 || x._EmailType == DebtorEmailType.CollectionLetter3 || x._EmailType == DebtorEmailType.PaymentReminder).Select(x => x._Name).ToList();
             cmbInterestNoteEmail.ItemsSource = emailList.Where(x => x._EmailType == DebtorEmailType.InterestNote).Select(x => x._Name).ToList();
         }
@@ -121,7 +121,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
         public override void OnClosePage(object[] refreshParams)
         {
-           globalEvents.OnRefresh(NameOfControl, refreshParams);
+            globalEvents.OnRefresh(NameOfControl, refreshParams);
         }
     }
 }

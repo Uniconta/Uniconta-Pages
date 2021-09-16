@@ -317,7 +317,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         void SubstituteFilter(object sender, DevExpress.Data.SubstituteFilterEventArgs e)
         {
-            if (string.IsNullOrEmpty(ribbonControl.SearchControl.SearchText))
+            if (string.IsNullOrEmpty(ribbonControl?.SearchControl?.SearchText))
                 return;
             e.Filter = new GroupOperator(GroupOperatorType.Or, e.Filter, GetDetailFilter(ribbonControl.SearchControl.SearchText));
         }
@@ -758,9 +758,13 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var fromAccount = Convert.ToString(cmbFromAccount.EditValue);
             var toAccount = Convert.ToString(cmbToAccount.EditValue);
-            var lstDebtorTransLst = ((IEnumerable<DebtorStatementList>)dgDebtorTrans.ItemsSource);
+            var lstDebtorTransLst = (IEnumerable<DebtorStatementList>)dgDebtorTrans.ItemsSource;
+            var VisibleItems = dgDebtorTrans.VisibleItems;
 
-            if (!string.IsNullOrEmpty(toAccount) && fromAccount == toAccount)
+            if (VisibleItems.Count == 0)
+                return;
+
+            if (VisibleItems.Count == 1)
             {
                 var cwSendMail = new CWSendInvoice();
 #if !SILVERLIGHT
@@ -769,36 +773,57 @@ namespace UnicontaClient.Pages.CustomPage
                 cwSendMail.Closed += delegate
                   {
                       if (cwSendMail.DialogResult == true)
-                          DoSendAsEmail(lstDebtorTransLst, true, fromAccount, toAccount, cwSendMail.Emails, cwSendMail.sendOnlyToThisEmail);
+                      {
+                          var rec = (VisibleItems[0] as DebtorStatementList);
+                          DoSendAsEmail(new[] { rec }, true, rec.AccountNumber, rec.AccountNumber, cwSendMail.Emails, cwSendMail.sendOnlyToThisEmail);
+                      }
                   };
                 cwSendMail.Show();
             }
             else
             {
                 CWSendStatementEmail cw = new CWSendStatementEmail();
+                var visibleDebtTranLst = VisibleItems.Cast<DebtorStatementList>();
+                var visibleCount = VisibleItems.Count;
 #if !SILVERLIGHT
                 cw.DialogTableId = 2000000031;
-                cw.UpdateCount(lstDebtorTransLst.Count(), lstDebtorTransLst.Where(p => p.Mark == true).Count());
+                cw.UpdateCount(visibleCount, visibleDebtTranLst.Where(p => p.Mark == true).Count());
 #endif
                 cw.Closed += delegate
                 {
                     if (cw.DialogResult == true)
-                        DoSendAsEmail(lstDebtorTransLst, cw.SendAll, fromAccount, toAccount, null, false);
+                    {
+                        if (lstDebtorTransLst.Count() != visibleCount)
+                        {
+                            checkForMarked = false;
+                            if (cw.SendAll)
+                                foreach (var item in visibleDebtTranLst)
+                                    item._Mark = true;
+
+                            DoSendAsEmail(visibleDebtTranLst, false, fromAccount, toAccount, null, false);
+                        }
+                        else
+                        {
+                            checkForMarked = true;
+                            DoSendAsEmail(lstDebtorTransLst, cw.SendAll, fromAccount, toAccount, null, false);
+                        }
+                    }
                 };
                 cw.Show();
             }
         }
 
+        bool checkForMarked;
         async void DoSendAsEmail(IEnumerable<DebtorStatementList> lstDebtorTransLst, bool SendAll, string fromAccount, string toAccount, string emails, bool onlyThisEmail)
         {
             var transApi = new ReportAPI(api);
             DebtorStatement.SetDateTime(txtDateFrm, txtDateTo);
             DateTime fromDate = DebtorStatement.DefaultFromDate, toDate = DebtorStatement.DefaultToDate;
 
-            if (!SendAll)
+            if (!SendAll) 
             {
                 // lets check if we will send all anyway.
-                SendAll = true;
+                SendAll = checkForMarked;
                 foreach (var t in lstDebtorTransLst)
                 {
                     if (!t._Mark)

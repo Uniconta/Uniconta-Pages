@@ -32,43 +32,40 @@ namespace UnicontaClient.Pages.CustomPage
         VouchersClient voucherClientRow;
         VouchersClient[] multiVouchers;
         bool isFieldsAvailableForEdit;
-        string viewInbin = string.Empty;
+        string viewInbin;
 
         public override Type TableType { get { return typeof(VouchersClient); } }
+        protected override bool IsLayoutSaveRequired() { return false; }
 
         public override string NameOfControl { get { return TabControls.VouchersPage2; } }
         public override UnicontaBaseEntity ModifiedRow { get { return voucherClientRow; } set { voucherClientRow = (VouchersClient)value; } }
-        SQLCache PaymentCache, LedgerCache, GLTransTypeCache;
+        SQLCache PaymentCache, LedgerCache, glTransTypeCache, FolderCache;
 
         public VouchersPage2(UnicontaBaseEntity sourcedata, bool isEdit)
             : base(sourcedata, isEdit)
         {
-            InitializeComponent();
             isFieldsAvailableForEdit = isEdit;
-
+            viewInbin = string.Empty;
             InitPage(api);
         }
 
         public VouchersPage2(CrudAPI crudApi, string viewInBin)
             : base(crudApi, viewInBin)
         {
-            InitializeComponent();
             viewInbin = viewInBin;
             InitPage(crudApi);
 #if !SILVERLIGHT
             FocusManager.SetFocusedElement(cmbContentTypes, cmbContentTypes);
 #endif
         }
-        protected override bool IsLayoutSaveRequired()
-        {
-            return false;
-        }
         private void InitPage(CrudAPI crudApi)
         {
+            StartLoadCache();
+            InitializeComponent();
             leAccount.api = lePayAccount.api = leCostAccount.api = leVat.api = leVatOpenration.api = leTransType.api = leApprover1.api = leApprover2.api = leProject.api = leProjectcat.api = crudApi;
             layoutControl = layoutItems;
             cmbDim1.api = cmbDim2.api = cmbDim3.api = cmbDim4.api = cmbDim5.api = crudApi;
-
+            Loaded += VouchersPage2_Loaded;
             if (LoadedRow == null)
                 frmRibbon.DisableButtons("Delete");
 
@@ -104,18 +101,27 @@ namespace UnicontaClient.Pages.CustomPage
             txtUrl.LostFocus += txtUrl_LostFocus;
 #endif
             voucherClientRow.PropertyChanged += VoucherClientRow_PropertyChanged;
+        }
 
-            PaymentCache = Comp.GetCache(typeof(Uniconta.DataModel.PaymentTerm));
-            StartLoadCache();
+        private void VouchersPage2_Loaded(object sender, RoutedEventArgs e)
+        {
+            SetViewInFolderSource();
+        }
+
+        private void SetViewInFolderSource()
+        {
+            var appEnumFolderLst = new List<string>((FolderCache != null ? FolderCache.Count : 0) + AppEnums.ViewBin.Values.Length);
+            appEnumFolderLst.AddRange(AppEnums.ViewBin.Values);
+            FolderCache?.AppendKeyList(appEnumFolderLst);
+            cmbViewInFolder.ItemsSource = appEnumFolderLst;
         }
 
         protected override async void LoadCacheInBackGround()
         {
             var api = this.api;
-            this.LedgerCache = api.GetCache(typeof(Uniconta.DataModel.GLAccount)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLAccount)).ConfigureAwait(false);
-            if (PaymentCache == null)
-                PaymentCache = await api.LoadCache(typeof(Uniconta.DataModel.PaymentTerm)).ConfigureAwait(false);
-            this.GLTransTypeCache = api.GetCache(typeof(Uniconta.DataModel.GLTransType)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLTransType)).ConfigureAwait(false);
+            FolderCache = api.GetCache(typeof(Uniconta.DataModel.DocumentFolder)) ?? await api.LoadCache(typeof(Uniconta.DataModel.DocumentFolder)).ConfigureAwait(false);
+            PaymentCache = api.GetCache(typeof(Uniconta.DataModel.PaymentTerm)) ?? await api.LoadCache(typeof(Uniconta.DataModel.PaymentTerm)).ConfigureAwait(false);
+            LedgerCache = api.GetCache(typeof(Uniconta.DataModel.GLAccount)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLAccount)).ConfigureAwait(false);
             LoadType(new Type[] { typeof(Uniconta.DataModel.Creditor), typeof(Uniconta.DataModel.GLVat) });
         }
 
@@ -165,20 +171,20 @@ namespace UnicontaClient.Pages.CustomPage
             }
             else if (prop == "TransType")
             {
-                var glTransTYpe = (Uniconta.DataModel.GLTransType)GLTransTypeCache?.Get(rec._TransType);
-                if (glTransTYpe != null)
+                var glTransType = (Uniconta.DataModel.GLTransType)glTransTypeCache?.Get(rec._TransType);
+                if (glTransType != null)
                 {
-                    if (glTransTYpe._AccountType == GLJournalAccountType.Finans && glTransTYpe._Account != null)
+                    if (glTransType._AccountType == GLJournalAccountType.Finans && glTransType._Account != null)
                     {
-                        rec.Text = glTransTYpe._TransType;
-                        if (glTransTYpe._AccountType == 0 && glTransTYpe._Account != null)
-                            rec.CostAccount = glTransTYpe._Account;
-                        if (glTransTYpe._OffsetAccount != null)
+                        rec.Text = glTransType._TransType;
+                        if (glTransType._AccountType == 0 && glTransType._Account != null)
+                            rec.CostAccount = glTransType._Account;
+                        if (glTransType._OffsetAccount != null)
                         {
-                            if (glTransTYpe._OffsetAccountType == 0)
-                                rec.PayAccount = glTransTYpe._OffsetAccount;
-                            else if (glTransTYpe._OffsetAccountType == GLJournalAccountType.Creditor)
-                                rec.CreditorAccount = glTransTYpe._OffsetAccount;
+                            if (glTransType._OffsetAccountType == 0)
+                                rec.PayAccount = glTransType._OffsetAccount;
+                            else if (glTransType._OffsetAccountType == GLJournalAccountType.Creditor)
+                                rec.CreditorAccount = glTransType._OffsetAccount;
                         }
                     }
                 }
@@ -203,11 +209,17 @@ namespace UnicontaClient.Pages.CustomPage
                         if (voucher._Data != null)
                         {
 #if !SILVERLIGHT
-                            if (voucher._Fileextension == FileextensionsTypes.JPEG)
+                            if (voucher._Fileextension == FileextensionsTypes.JPEG ||
+                                voucher._Fileextension == FileextensionsTypes.BMP ||
+                                voucher._Fileextension == FileextensionsTypes.TIFF ||
+                                voucher._Fileextension == FileextensionsTypes.GIF)
                             {
                                 var imageBytes = FileBrowseControl.ImageResize(voucher._Data, ".jpg");
                                 if (imageBytes != null)
+                                {
                                     voucher._Data = imageBytes;
+                                    voucher._Fileextension = FileextensionsTypes.JPEG;
+                                }
                             }
 #endif
                             buffers[i] = voucher._Data;
@@ -237,11 +249,18 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 buf = voucherClientRow._Data;
 #if !SILVERLIGHT
-                if (buf != null && voucherClientRow._Fileextension == FileextensionsTypes.JPEG)
+                if (buf != null && buf.Length > 110000 && !voucherClientRow._NoCompress &&
+                       (voucherClientRow._Fileextension == FileextensionsTypes.JPEG ||
+                        voucherClientRow._Fileextension == FileextensionsTypes.BMP ||
+                        voucherClientRow._Fileextension == FileextensionsTypes.GIF ||
+                        voucherClientRow._Fileextension == FileextensionsTypes.TIFF))
                 {
                     buf = FileBrowseControl.ImageResize(buf, ".jpg");
                     if (buf != null)
+                    {
                         voucherClientRow._Data = buf;
+                        voucherClientRow._Fileextension = FileextensionsTypes.JPEG;
+                    }
                     else
                         buf = voucherClientRow._Data;
                 }
@@ -333,6 +352,8 @@ namespace UnicontaClient.Pages.CustomPage
                         if (fileInfo == null)
                             continue;
                         var vc = Activator.CreateInstance(voucherClientRow.GetType()) as VouchersClient;
+                        if (! browseControl.Compress)
+                            vc._NoCompress = true;
                         vc.SetMaster(api.CompanyEntity);
                         multiVouchers[iCtr++] = vc;
                         vc._Fileextension = DocumentConvert.GetDocumentType(fileInfo.FileExtension);
