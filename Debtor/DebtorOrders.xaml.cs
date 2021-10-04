@@ -208,8 +208,11 @@ namespace UnicontaClient.Pages.CustomPage
                     AddDockItem(TabControls.DebtorOrderLines, dgDebtorOrdersGrid.syncEntity, header);
                     break;
                 case "Invoices":
-                    header = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Orders"), selectedItem._OrderNumber);
-                    AddDockItem(TabControls.Invoices, selectedItem, header);
+                    if (selectedItem != null)
+                    {
+                        header = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Orders"), selectedItem._OrderNumber);
+                        AddDockItem(TabControls.Invoices, selectedItem, header);
+                    }
                     break;
                 case "AddNote":
                     if (selectedItem != null)
@@ -327,7 +330,7 @@ namespace UnicontaClient.Pages.CustomPage
                         Utility.ApproveOrder(api, selectedItem);
                     break;
                 case "PostProjectOrder":
-                    if(string.IsNullOrEmpty(selectedItem._Project))
+                    if (string.IsNullOrEmpty(selectedItem._Project))
                     {
                         UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("ProjectCannotBeBlank"), Uniconta.ClientTools.Localization.lookup("Message"));
                         return;

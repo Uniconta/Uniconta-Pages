@@ -952,6 +952,12 @@ namespace UnicontaClient.Pages.CustomPage
 
                 FillStatement(listTrans, OnlyOpen, toDate);
             }
+            else if (transApi.LastError != 0)
+            {
+                busyIndicator.IsBusy = false;
+                UtilDisplay.ShowErrorCode(transApi.LastError);
+            }
+
             dgDebtorTrans.Visibility = Visibility.Visible;
             busyIndicator.IsBusy = false;
 

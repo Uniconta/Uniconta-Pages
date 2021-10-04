@@ -337,11 +337,8 @@ namespace UnicontaClient.Pages.CustomPage
                         var fName = fieldName.Substring(fieldName.LastIndexOf('.') + 1);
                         if (fName == "Debit" || fName == "Credit" || fName == "Amount")
                         {
-                            var args = new object[2];
-                            args[0] = Acc;
-                            args[1] = true;
                             string header = string.Concat(Uniconta.ClientTools.Localization.lookup("AccountStatement"), "/", Acc._Account);
-                            var transactionReport = dockCtrl.AddDockItem(TabControls.TransactionReport, this.ParentControl, args, header) as TransactionReport;
+                            var transactionReport = dockCtrl?.AddDockItem(TabControls.TransactionReport, this.ParentControl, new object[] { Acc, IdObject.get(true) }, header) as TransactionReport;
                             if (transactionReport != null)
                                 transactionReport.SetControlsAndLoadGLTrans(criteria.FromDate, criteria.ToDate, criteria.Dim1, criteria.Dim2, criteria.Dim3, criteria.Dim4, criteria.Dim5, criteria.journal);
                         }
@@ -506,8 +503,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
 
             int Cols = 0;
-            bool first = true;
-            bool hiddenFound = false;
+            bool first = true, hiddenFound = false, errorShown = false;
             for (k = 0; (k < CriteriaList.Count); k++)
             {
                 Crit = CriteriaList[k];
@@ -549,8 +545,9 @@ namespace UnicontaClient.Pages.CustomPage
                         for (c = 0; (c < balance.Length); c++)
                             CreateBalanceRow(balance[c], Cols, first);
                     }
-                    else
+                    else if (!errorShown)
                     {
+                        errorShown = true;
                         if (inTrans && !string.IsNullOrEmpty(Crit.journal))
                             UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup(ErrorCodes.ErrorInJournal.ToString()) + "\n" + Uniconta.ClientTools.Localization.lookup(tranApi.LastError.ToString()), Uniconta.ClientTools.Localization.lookup("Error"), MessageBoxButton.OK);
                         else

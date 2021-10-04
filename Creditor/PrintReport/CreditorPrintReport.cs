@@ -8,6 +8,7 @@ using Uniconta.ClientTools.DataModel;
 using Uniconta.Common;
 using Uniconta.DataModel;
 using Uniconta.Reports.Utilities;
+using Uniconta.Common.Utility;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -157,10 +158,14 @@ namespace UnicontaClient.Pages.CustomPage
                 /*In case debtor order is null, fill from DCInvoice*/
                 if (CreditorOrder == null)
                 {
-                    var creditorOrderUserType = ReportUtil.GetUserType(typeof(CreditorOrderClient), Comp);
-                    var creditorOrderUser = Activator.CreateInstance(creditorOrderUserType) as CreditorOrderClient;
-                    creditorOrderUser.CopyFrom(creditorInvoiceClientUser, Creditor);
-                    CreditorOrder = creditorOrderUser;
+                    CreditorOrder = Comp.GetCache(typeof(Uniconta.DataModel.CreditorOrder))?.Get(NumberConvert.ToStringNull(creditorInvoiceClientUser._OrderNumber)) as CreditorOrderClient;
+                    if (CreditorOrder == null)
+                    {
+                        var creditorOrderUserType = ReportUtil.GetUserType(typeof(CreditorOrderClient), Comp);
+                        var creditorOrderUser = Activator.CreateInstance(creditorOrderUserType) as CreditorOrderClient;
+                        creditorOrderUser.CopyFrom(creditorInvoiceClientUser, Creditor);
+                        CreditorOrder = creditorOrderUser;
+                    }
                 }
 
                 Company = Utility.GetCompanyClientUserInstance(Comp);

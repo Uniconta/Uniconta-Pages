@@ -857,7 +857,7 @@ namespace UnicontaClient.Pages.CustomPage
                 DebtorPaymentStatementList masterDbPymtStatement = null;
                 List<DebtorTransPayment> dbTransClientChildList = new List<DebtorTransPayment>(20);
                 double SumAmount = 0d, SumAmountCur = 0d, CollectionAmount = 0d, SumFee = 0d;
-
+                Uniconta.ClientTools.Localization debtLocalize = null;
                 var listOpenTrans = visibleRows.OrderBy(p => p.Account);
                 foreach (var trans in listOpenTrans)
                 {
@@ -876,6 +876,9 @@ namespace UnicontaClient.Pages.CustomPage
 
                         currentItem = trans.Account;
                         var dbt = (Debtor)accountCache.Get(currentItem);
+                        var lan = UtilDisplay.GetLanguage(dbt, api.CompanyEntity);
+                        debtLocalize = Uniconta.ClientTools.Localization.GetLocalization(lan);
+
                         masterDbPymtStatement = new DebtorPaymentStatementList();
                         if (dbt != null)
                         {
@@ -885,6 +888,8 @@ namespace UnicontaClient.Pages.CustomPage
                         SumAmount = SumAmountCur = CollectionAmount = SumFee = 0d;
                         dbTransClientChildList.Clear();
                     }
+
+                    trans.Trans.LocOb = debtLocalize;
 
                     SumAmount += trans._AmountOpen;
                     trans._SumAmount = SumAmount;

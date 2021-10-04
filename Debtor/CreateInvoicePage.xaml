@@ -68,7 +68,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreateInvoicePage"
                             <CorasauControls:LookupEditor MaxWidth="170"  x:Name="LePostingAccount" EditValue="{Binding PostingAccount,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  Grid.Column="1"  Grid.Row="4" Margin="5,0,0,0"  />
 
                             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TransactionText}" Grid.Column="0" Grid.Row="6" />
-                            <CorasauControls:TextEditor MaxWidth="170"   x:Name="txtPostingText"  Text="{Binding PostingText,Mode=OneWay}"  Grid.Column="1" Grid.Row="6" Margin="5,0,0,0"  />
+                            <CorasauControls:TextEditor MaxWidth="170"   x:Name="txtPostingText"  Text="{Binding PostingText,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  Grid.Column="1" Grid.Row="6" Margin="5,0,0,0"  />
 
                             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LayoutGroup}"  Grid.Column="0" Grid.Row="8" />
                             <CorasauControls:LookupEditor MaxWidth="170"  x:Name="leLayoutGroup" EditValue="{Binding LayoutGroup,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  Grid.Column="1"  Grid.Row="8" Margin="5,0,0,0"  />

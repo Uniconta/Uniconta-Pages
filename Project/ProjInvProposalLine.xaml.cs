@@ -591,11 +591,12 @@ namespace UnicontaClient.Pages.CustomPage
                 case "DeleteRow":
                     dgProjInvProposedLineGrid.DeleteRow();
                     break;
+                case "ShowInvoice":
                 case "CreateInvoice":
                     if (Order != null)
                     {
                         if (Utility.HasControlRights("GenerateInvoice", api.CompanyEntity))
-                            GenerateInvoice(Order);
+                            GenerateInvoice(Order, ActionType == "ShowInvoice" ? true : false);
                         else
                             UtilDisplay.ShowControlAccessMsg("GenerateInvoice");
                     }
@@ -652,7 +653,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 var orderApi = new OrderAPI(api);
                                 var checkIfCreditNote = createOrderCW.chkIfCreditNote.IsChecked.HasValue ? createOrderCW.chkIfCreditNote.IsChecked.Value : false;
                                 var debtorInvoice = createOrderCW.dgCreateOrderGrid.SelectedItem as DebtorInvoiceClient;
-                                dgProjInvProposedLineGrid.PasteRows(createOrderCW.debtorOrderLines);
+                                dgProjInvProposedLineGrid.PasteRows(createOrderCW.DCOrderLines);
                             }
                         };
                         createOrderCW.Show();
@@ -689,7 +690,7 @@ namespace UnicontaClient.Pages.CustomPage
                 return base.IsDataChaged;
             }
         }
-        private void GenerateInvoice(ProjectInvoiceProposalClient dbOrder)
+        private void GenerateInvoice(ProjectInvoiceProposalClient dbOrder, bool showProformaInvoice)
         {
             var savetask = saveGridLocal();
             var curpanel = dockCtrl.Activpanel;
@@ -719,6 +720,12 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                     showSendByMail = (!string.IsNullOrEmpty(debtor._InvoiceEmail) || debtor._EmailDocuments);
                 }
+            }
+
+            if (showProformaInvoice)
+            {
+                ShowProformaInvoice(dbOrder);
+                return;
             }
 
             string debtorName = debtor?._Name ?? dbOrder._DCAccount;
@@ -771,6 +778,19 @@ namespace UnicontaClient.Pages.CustomPage
                 }
             };
             GenrateInvoiceDialog.Show();
+        }
+
+        async private void ShowProformaInvoice(ProjectInvoiceProposalClient order)
+        {
+            var invoicePostingResult = SetupInvoicePostingPrintGenerator(order, DateTime.Now, true, true, false, false, 0, false, false, false, null, false);
+
+            busyIndicator.IsBusy = true;
+            busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
+            var result = await invoicePostingResult.Execute();
+            busyIndicator.IsBusy = false;
+
+            if (!result)
+                Utility.ShowJournalError(invoicePostingResult.PostingResult.ledgerRes, dgProjInvProposedLineGrid);
         }
 
         private InvoicePostingPrintGenerator SetupInvoicePostingPrintGenerator(ProjectInvoiceProposalClient dbOrder, DateTime generateDate, bool isSimulation, bool showInvoice, bool postOnlyDelivered,

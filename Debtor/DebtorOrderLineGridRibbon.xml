@@ -52,7 +52,7 @@
   <RibbonItem>
     <RibbonItem Action="Storage" LocalizedNameKey="OnHand" Module="Storage" LargeGlyph="Storage_32x32.png"/>
     <RibbonItem Action="InvStockProfile" LocalizedNameKey="StockProfile" ControlName="InvStorageProfileReport" Module="Storage" LargeGlyph="Inventory_Trans_32x32.png"/>
-    <RibbonItem Action="Serial" LocalizedNameKey="SerialBatchNumbers" Module="SerialBatchNumbers" LargeGlyph="Account-statement_32x32.png" ShortcutKey="Shift+S"/>
+    <RibbonItem Action="Serial" LocalizedNameKey="SerialBatchNumbers" Module="SerialBatchNumbers" LargeGlyph="Account-statement_32x32.png" />
     <RibbonItem Action="ItemReference" LocalizedNameKey="ItemReference" LargeGlyph="Inventory_Trans_32x32.png">
       <RibbonItem Action="StockLines" LocalizedNameKey="InvTransactions" LargeGlyph="Inventory_Trans_32x32.png" Glyph="Marked_Inventory_from_Inventory_16x16.png"/>
       <RibbonItem Action="DebtorOrderLines" LocalizedNameKey="ShowOBJ" Parameter="OrdersLine" Module="Order" Glyph="Nested_16x16.png"/>

@@ -571,7 +571,10 @@ namespace UnicontaClient.Pages.CustomPage
             if (listTrans != null)
                 FillStatement(listTrans);
             else if (transApi.LastError != 0)
-                Uniconta.ClientTools.Util.UtilDisplay.ShowErrorCode(transApi.LastError);
+            {
+                busyIndicator.IsBusy = false;
+                UtilDisplay.ShowErrorCode(transApi.LastError);
+            }
             dgGLTrans.Visibility = Visibility.Visible;
             busyIndicator.IsBusy = false;
             SetExpandAndCollapse(IsCollapsed);

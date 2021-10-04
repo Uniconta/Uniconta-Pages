@@ -49,7 +49,10 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjInvProposalPage2"
                         <CorasauControls:CorasauLayoutItem FieldName="YourRef" x:Name="liYourRef">
                             <CorasauControls:TextEditor Text="{Binding YourRef,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
-                       <CorasauControls:CorasauLayoutItem FieldName="OurRef" x:Name="liOurRef">
+                        <CorasauControls:CorasauLayoutItem FieldName="Requisition" x:Name="liRequisition">
+                            <CorasauControls:TextEditor  Text="{Binding Requisition,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="OurRef" x:Name="liOurRef">
                             <CorasauControls:TextEditor  Text="{Binding OurRef,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="CustomsNo" x:Name="liCustomsNo">
@@ -66,6 +69,9 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjInvProposalPage2"
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="OrderNumber" x:Name="liOrderNumber">
                             <CorasauControls:IntegerEditor EditValue="{Binding OrderNumber,Mode=TwoWay}" SetMask="false"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="DeliveryDate" x:Name="liDeliveryDate">
+                            <CorasauControls:DateEditor x:Name="deDeLiveryDate" EditValue="{Binding DeliveryDate,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="EndDiscountPct" x:Name="liEndDiscountPct">
                             <CorasauControls:DoubleEditor FieldName="EndDiscountPct"/>

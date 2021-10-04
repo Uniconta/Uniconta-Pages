@@ -543,6 +543,12 @@ namespace UnicontaClient.Pages.CustomPage
 
                 FillStatement(listTrans, OnlyOpen, toDate);
             }
+            else if (transApi.LastError != 0)
+            {
+                busyIndicator.IsBusy = false;
+                UtilDisplay.ShowErrorCode(transApi.LastError);
+            }
+
             dgCreditorTrans.Visibility = Visibility.Visible;
             busyIndicator.IsBusy = false;
 

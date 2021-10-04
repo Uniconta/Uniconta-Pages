@@ -113,7 +113,7 @@ namespace UnicontaClient.Pages.CustomPage
                     return;
                 var argsArray = new object[1];
                 argsArray[0] = args;
-                globalEvents.OnRefresh(NameOfControl, argsArray);
+              //  globalEvents.OnRefresh(NameOfControl, argsArray);
             }
             if (args is CreditorOrderLineClient)
             {
@@ -125,7 +125,7 @@ namespace UnicontaClient.Pages.CustomPage
                     return;
                 var argsArray = new object[1];
                 argsArray[0] = args;
-                globalEvents.OnRefresh(NameOfControl, argsArray);
+              //  globalEvents.OnRefresh(NameOfControl, argsArray);
             }
             SetupMaster(args);
             SetHeader(args);
@@ -268,8 +268,12 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override async Task<ErrorCodes> saveGrid()
         {
-            var res = await dgLinkedGrid.SaveData();
-            LinkRows(true);
+            ErrorCodes res = ErrorCodes.Succes;
+            if (dgLinkedGrid.HasUnsavedData)
+            {
+                res = await dgLinkedGrid.SaveData();
+                LinkRows(true);
+            }
             return res;
         }
 
@@ -376,7 +380,6 @@ namespace UnicontaClient.Pages.CustomPage
             List<DCOrderLineSerieBatch> olSerieBatchList = new List<DCOrderLineSerieBatch>();
             foreach (var row in markedList)
             {
-                var olSerieBatch = new DCOrderLineSerieBatch();
                 double qty;
                 if (_UseSerial)
                     qty = dcorderlineMaster._Qty >= 0 ? 1d : -1d;
@@ -384,10 +387,6 @@ namespace UnicontaClient.Pages.CustomPage
                     qty = row._QtyMarked;
                 else
                     qty = dcorderlineMaster._Qty;
-                olSerieBatch._Qty = qty;
-                olSerieBatch.SetMaster(row);
-                olSerieBatch.SetMaster(dcorderlineMaster as UnicontaBaseEntity);
-                olSerieBatchList.Add(olSerieBatch);
                 if (row._Warehouse != null && (dcorderlineMaster._Warehouse != row._Warehouse || dcorderlineMaster._Location != row._Location))
                 {
                     if (orgMaster == null && dcorderlineMaster.RowId != 0)
@@ -413,6 +412,10 @@ namespace UnicontaClient.Pages.CustomPage
                         dcorderlineMaster.SerieBatch = newNr;
                     }
                 }
+                var olSerieBatch = new DCOrderLineSerieBatch() { _Qty = qty };
+                olSerieBatch.SetMaster(row);
+                olSerieBatch.SetMaster(dcorderlineMaster as UnicontaBaseEntity);
+                olSerieBatchList.Add(olSerieBatch);
             }
             ErrorCodes err;
             if (orgMaster != null)

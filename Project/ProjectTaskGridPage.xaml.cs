@@ -98,10 +98,9 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 var emp = (_master as Uniconta.DataModel.Employee);
                 if (emp != null)
-                {
                     Employee.Visible = false;   
-                    UtilDisplay.RemoveMenuCommand(rb, new string[] { "CreateTaskFromTask" });
-                }
+                    
+                UtilDisplay.RemoveMenuCommand(rb, new string[] { "CreateTaskFromTask" });
             }
         }
 
@@ -287,7 +286,7 @@ namespace UnicontaClient.Pages.CustomPage
                     var taskLst = (IEnumerable<Uniconta.DataModel.ProjectTask>)dgProjectTaskGrid.GetVisibleRows();
 
                     BudgetAPI budgetApi = new BudgetAPI(api);
-                    var result = await budgetApi.CreateTaskFromTask(CWCreateTaskFromTask.FromPrWorkSpace, CWCreateTaskFromTask.ToPrWorkSpace, cwCreateTask.ToProject, taskLst);
+                    var result = await budgetApi.CreateTaskFromTask(CWCreateTaskFromTask.FromPrWorkSpace, CWCreateTaskFromTask.ToPrWorkSpace, cwCreateTask.ToProject, cwCreateTask.BudgetTaskDatePrincip, cwCreateTask.NewDate, CWCreateTaskFromTask.AddYear, taskLst);
 
                     if (result != ErrorCodes.Succes)
                         UtilDisplay.ShowErrorCode(result);
@@ -302,11 +301,14 @@ namespace UnicontaClient.Pages.CustomPage
         private void CloseTask()
         {
             var projTaskLst = dgProjectTaskGrid.GetVisibleRows() as IList<Uniconta.ClientTools.DataModel.ProjectTaskClient>;
-            foreach (var projTask in projTaskLst)
+            if (projTaskLst != null)
             {
-                projTask.Ended = true;
+                foreach (var projTask in projTaskLst)
+                {
+                    projTask.Ended = true;
+                }
+                api.Update(projTaskLst);
             }
-            api.Update(projTaskLst);
         }
     }
 }

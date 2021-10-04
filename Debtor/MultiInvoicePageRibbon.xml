@@ -42,5 +42,6 @@
     <RibbonItem LocalizedNameKey="OrderConfirmation" Action="OrderConfirmation" LargeGlyph="Order_Confirmation_32x32.png" ShortcutKey="Ctrl+Q"></RibbonItem>
     <RibbonItem LocalizedNameKey="Packnote" Action="PackNote" LargeGlyph="Pack_Note_32x32.png" ShortcutKey="Ctrl+K"></RibbonItem>
     <RibbonItem LocalizedNameKey="PickingList" Action="PickList" LargeGlyph="Account-statement_32x32.png" ShortcutKey="Ctrl+H"></RibbonItem>
+	<RibbonItem Action="PostProjectOrder" LocalizedNameKey="PostProjectOrder" Module="Project" LargeGlyph="UserField_32x32.png" ShortcutKey="Ctrl+P"/>
  </RibbonItem>
 </root>

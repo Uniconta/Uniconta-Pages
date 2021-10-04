@@ -465,7 +465,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (project != null)
                 {
                     var tasks = project.Tasks ?? await project.LoadTasks(api);
-                    rec.taskSource = tasks.Where(s => s.Ended == false && (rec._WorkSpace == null || s._WorkSpace == rec._WorkSpace));
+                    rec.taskSource = tasks?.Where(s => s.Ended == false && (rec._WorkSpace == null || s._WorkSpace == rec._WorkSpace));
                 }
                 else
                 {

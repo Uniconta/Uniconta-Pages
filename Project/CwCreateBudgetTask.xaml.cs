@@ -42,18 +42,16 @@ namespace UnicontaClient.Pages.CustomPage
         public bool DeleteBudget { get; set; }
 
         [InputFieldData]
-        [Display(Name = "BudgetTaskPrincip", ResourceType = typeof(InputFieldDataText))]
-        public static BudgetTaskPrincip BudgetTaskPrincip { get; set; }
-
-        [InputFieldData]
         [Display(Name = "TaskHours", ResourceType = typeof(InputFieldDataText))]
         public static double TaskHours { get; set; }
 
-#if !SILVERLIGHT
+
         public int DialogTableId;
         protected override int DialogId { get { return DialogTableId; } }
         protected override bool ShowTableValueButton { get { return true; } }
-#endif
+
+        public static byte BudgetTaskPrincip;
+
         public CwCreateBudgetTask(CrudAPI crudApi, int dialogType = 0)
         {
             this.DataContext = this;
@@ -63,7 +61,7 @@ namespace UnicontaClient.Pages.CustomPage
             leGroup.api = leEmp.api = lePayroll.api = leWorkspace.api = crudApi;
 
             cmbBudgetTaskPrincip.ItemsSource = new string[] { Uniconta.ClientTools.Localization.lookup("SumLine"), Uniconta.ClientTools.Localization.lookup("Allocated") };
-            cmbBudgetTaskPrincip.SelectedIndex = (byte)BudgetTaskPrincip;
+            cmbBudgetTaskPrincip.SelectedIndex = BudgetTaskPrincip;
         }
 
         private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
@@ -89,12 +87,12 @@ namespace UnicontaClient.Pages.CustomPage
             switch (cmbBudgetTaskPrincip.SelectedIndex)
             {
                 case 0: 
-                    BudgetTaskPrincip = BudgetTaskPrincip.Princip1;
+                    BudgetTaskPrincip = 0;
                     lblTaskHours.IsEnabled = false;
                     deTaskHours.IsEnabled = false;
                     break;
                 case 1: 
-                    BudgetTaskPrincip = BudgetTaskPrincip.Princip2;
+                    BudgetTaskPrincip = 1;
                     lblTaskHours.IsEnabled = true;
                     deTaskHours.IsEnabled = true;
                     break;

@@ -198,7 +198,7 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     BudgetAPI budgetApi = new BudgetAPI(api);
                     var result = await budgetApi.CreateBudget(CwCreateUpdateBudget.FromDate, CwCreateUpdateBudget.ToDate, CwCreateUpdateBudget.Employee, CwCreateUpdateBudget.Payroll,
-                                                              CwCreateUpdateBudget.PrCategory, CwCreateUpdateBudget.Group, (byte)CwCreateUpdateBudget.BudgetMethod, CwCreateUpdateBudget.BudgetName,
+                                                              CwCreateUpdateBudget.PrCategory, CwCreateUpdateBudget.Group, CwCreateUpdateBudget.BudgetMethod, CwCreateUpdateBudget.BudgetName,
                                                                CwCreateUpdateBudget.PrWorkSpace, cwCreateBjt.DeleteBudget, cwCreateBjt.InclProjectTask, null);
 
                     if (result != ErrorCodes.Succes)
@@ -322,19 +322,6 @@ namespace UnicontaClient.Pages.CustomPage
                 workspaceCache = await api.LoadCache<Uniconta.DataModel.PrWorkSpace>().ConfigureAwait(false);
         }
     }
-
-    public enum BudgetMethod : byte
-    {
-        Month,
-        Week,
-        Day
-    };
-
-    public enum BudgetTaskPrincip : byte
-    {
-        Princip1,
-        Princip2
-    };
 }
 
 

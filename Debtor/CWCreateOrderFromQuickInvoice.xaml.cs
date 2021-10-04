@@ -23,13 +23,13 @@ using Uniconta.DataModel;
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
-   public class DCorderGrid : CorasauDataGridClient
+    public class DCorderGrid : CorasauDataGridClient
     {
         public override Type TableType
         {
             get
             {
-                return isOrder ? typeof(DebtorOrderLineClient): typeof(DebtorOrderLineClient);
+                return isOrder ? typeof(DebtorOrderLineClient) : typeof(DebtorOrderLineClient);
             }
         }
 
@@ -43,8 +43,7 @@ namespace UnicontaClient.Pages.CustomPage
         DCOrder dcOrder;
         CrudAPI api;
         SQLCache items;
-        public List<DebtorOrderLineClient> debtorOrderLines;
-        public List<DebtorOfferLineClient> debtorOfferLines;
+        public IEnumerable<UnicontaBaseEntity> DCOrderLines;
         bool disableOrderLineGrid = false;
         Company company;
         public CWCreateOrderFromQuickInvoice(CrudAPI _api, string account)
@@ -67,7 +66,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             this.DataContext = this;
             InitializeComponent();
-            dcOrderlineGrid.isOrder = isOrder ;
+            dcOrderlineGrid.isOrder = isOrder;
             ((TableView)dgCreateOrderGrid.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
             ((TableView)dcOrderlineGrid.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
             company = api.CompanyEntity;
@@ -83,7 +82,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (!this.dgCreateOrderGrid.ReuseCache(typeof(Uniconta.DataModel.DCInvoice)))
                 BindGrid();
             if (!company.ItemVariants)
-                colVariant.Visible =  false;
+                colVariant.Visible = false;
         }
 
         private void DgCreateOrderGrid_SelectedItemChanged(object sender, DevExpress.Xpf.Grid.SelectedItemChangedEventArgs e)
@@ -95,12 +94,15 @@ namespace UnicontaClient.Pages.CustomPage
 
         async void LoadOrderlines(DebtorInvoiceClient selectedItem)
         {
+            dcOrderlineGrid.ItemsSource = null;
             busyIndicator.IsBusy = true;
-            if (isOrder)
-                await CreateOrderLinesFromInvoice(dcOrder as DebtorOrderClient, selectedItem, (bool)chkIfCreditNote.IsChecked);
-            else
-                await CreateOfferLinesFromInvoice(dcOrder as DebtorOfferClient, selectedItem, (bool)chkIfCreditNote.IsChecked);
+
+            var lines = await CreateDCOrderLinesFromInvoice(dcOrder, selectedItem, (bool)chkIfCreditNote.IsChecked);
+
+            DCOrderLines = lines.Cast<UnicontaBaseEntity>();
             busyIndicator.IsBusy = false;
+            dcOrderlineGrid.ItemsSource = lines;
+            dcOrderlineGrid.Visibility = Visibility.Visible;
         }
 
         void CW_Loaded(object sender, RoutedEventArgs e)
@@ -141,9 +143,9 @@ namespace UnicontaClient.Pages.CustomPage
 
         private Task Filter(IEnumerable<PropValuePair> propValuePair)
         {
-            if(!string.IsNullOrWhiteSpace(Account))
-                propValuePair = new List<PropValuePair>(){ PropValuePair.GenereteWhereElements("Account", Account, CompareOperator.Equal) };
-            
+            if (!string.IsNullOrWhiteSpace(Account))
+                propValuePair = new List<PropValuePair>() { PropValuePair.GenereteWhereElements("Account", Account, CompareOperator.Equal) };
+
             return dgCreateOrderGrid.Filter(propValuePair);
         }
 
@@ -152,91 +154,36 @@ namespace UnicontaClient.Pages.CustomPage
             var t = Filter(null);
         }
 
-        async Task CreateOfferLinesFromInvoice(DebtorOfferClient order, DebtorInvoiceClient invoice, bool checkIfCreditNote)
+        async private Task<IEnumerable<DCOrderLineClient>> CreateDCOrderLinesFromInvoice(DCOrder dcOrder, DCInvoiceClient dcInvoiceClient, bool checkIfCreditNote)
         {
-            var offerlines = new List<DebtorOfferLineClient>();
-            order.OfferLines = offerlines;
-            var invoiceLines = await api.Query<DebtorInvoiceLines>(invoice);
+            var lstOrderlines = new List<DCOrderLineClient>();
+
+            var invoiceLines = await api.Query<DebtorInvoiceLines>(dcInvoiceClient);
             if (invoiceLines == null || invoiceLines.Length == 0)
-                return;
+                return null;
 
             Array.Sort(invoiceLines, new InvLineSort());
+            lstOrderlines.Capacity = invoiceLines.Length;
 
-            offerlines.Capacity = invoiceLines.Length;
             int lineNo = 0;
             double sign = checkIfCreditNote ? -1d : 1d;
             foreach (var invoiceline in invoiceLines)
             {
-                var line = new DebtorOfferLineClient();
-                line.SetMaster(order);
-
-                line._LineNumber = ++lineNo;
-                line._Item = invoiceline._Item;
-                line._DiscountPct = invoiceline._DiscountPct;
-                line._Discount = invoiceline._Discount;
-                line._Qty = invoiceline.InvoiceQty * sign;
-                line._Price = (invoiceline.CurrencyEnum != null ? invoiceline._PriceCur : invoiceline._Price);
-                if (line._Price != 0)
-                    line._Price += invoiceline._PriceVatPart;
-
-                if (line._Qty * line._Price == 0)
-                    line._AmountEntered = ((invoiceline.CurrencyEnum != null ? invoiceline._AmountCur : invoiceline._Amount) + invoiceline._PriceVatPart) * sign;
-                line._Dim1 = invoiceline._Dim1;
-                line._Dim2 = invoiceline._Dim2;
-                line._Dim3 = invoiceline._Dim3;
-                line._Dim4 = invoiceline._Dim4;
-                line._Dim5 = invoiceline._Dim5;
-                line._Employee = invoiceline._Employee;
-                line._Note = invoiceline._Note;
-                line._Text = invoiceline._Text;
-                line._Unit = invoiceline._Unit;
-                line._Variant1 = invoiceline._Variant1;
-                line._Variant2 = invoiceline._Variant2;
-                line._Variant3 = invoiceline._Variant3;
-                line._Variant4 = invoiceline._Variant4;
-                line._Variant5 = invoiceline._Variant5;
-                line._Warehouse = invoiceline._Warehouse;
-                line._Location = invoiceline._Location;
-                var selectedItem = (InvItem)items?.Get(invoiceline._Item);
-                if (selectedItem != null)
+                DCOrderLineClient line;
+                switch (dcOrder.__DCType())
                 {
-                    line._Item = selectedItem._Item;
-                    line._CostPriceLine = selectedItem._CostPrice;
-                    if (selectedItem._Unit != 0)
-                        line._Unit = selectedItem._Unit;
+                    case 1: line = api.CompanyEntity.CreateUserType<DebtorOrderLineClient>(); break;
+                    case 3: line = api.CompanyEntity.CreateUserType<DebtorOfferLineClient>(); break;
+                    case 6: line = api.CompanyEntity.CreateUserType<ProjectInvoiceProposalLineClient>(); break;
+                    default: line = api.CompanyEntity.CreateUserType<DebtorOrderLineClient>(); break;
                 }
-
-                offerlines.Add(line);
-            }
-            dcOrderlineGrid.ItemsSource = debtorOfferLines=null;
-            dcOrderlineGrid.ItemsSource = debtorOfferLines = offerlines;
-            dcOrderlineGrid.Visibility = Visibility.Visible;
-        }
-
-        async Task CreateOrderLinesFromInvoice(DebtorOrderClient order, DebtorInvoiceClient invoice, bool checkIfCreditNote)
-        {
-            var orderlines = new List<DebtorOrderLineClient>();
-            order.Lines = orderlines;
-            var invoiceLines = await api.Query<DebtorInvoiceLines>(invoice);
-            if (invoiceLines == null || invoiceLines.Length == 0)
-                return;
-
-            Array.Sort(invoiceLines, new InvLineSort());
-
-            orderlines.Capacity = invoiceLines.Length;
-            int lineNo = 0;
-            double sign = checkIfCreditNote ? -1d : 1d;
-            foreach (var invoiceline in invoiceLines)
-            {
-                var line = new DebtorOrderLineClient();
-                line.SetMaster(order);
-
+                line.SetMaster((UnicontaBaseEntity)dcOrder);
                 line._LineNumber = ++lineNo;
                 line._Item = invoiceline._Item;
                 line._DiscountPct = invoiceline._DiscountPct;
                 line._Discount = invoiceline._Discount;
                 line._Qty = invoiceline.InvoiceQty * sign;
-                line._Price = (invoiceline.CurrencyEnum != null ? invoiceline._PriceCur : invoiceline._Price);
+                line._Price = invoiceline.CurrencyEnum != null ? invoiceline._PriceCur : invoiceline._Price;
                 if (line._Price != 0)
                     line._Price += invoiceline._PriceVatPart;
 
@@ -269,29 +216,18 @@ namespace UnicontaClient.Pages.CustomPage
                         line._Unit = selectedItem._Unit;
                 }
 
-                orderlines.Add(line);
+                lstOrderlines.Add(line);
             }
-            dcOrderlineGrid.ItemsSource = debtorOrderLines =null;
-            dcOrderlineGrid.ItemsSource = debtorOrderLines = orderlines;
-            dcOrderlineGrid.Visibility = Visibility.Visible;
+            return lstOrderlines;
         }
-       
         private void chkIfCreditNote_Checked(object sender, RoutedEventArgs e)
         {
             var selectedItem = dgCreateOrderGrid.SelectedItem as DebtorInvoiceClient;
             if (selectedItem != null && !disableOrderLineGrid)
             {
                 double sign = (bool)chkIfCreditNote.IsChecked ? -1d : 1d;
-                if (isOrder)
-                {
-                    foreach (var line in dcOrderlineGrid.ItemsSource as List<DebtorOrderLineClient>)
-                        line.Qty = line.Qty > 0d ? line.Qty * sign : line.Qty * -1d;
-                }
-                else
-                {
-                    foreach (var line in dcOrderlineGrid.ItemsSource as List<DebtorOfferLineClient>)
-                        line.Qty = line.Qty > 0d ? line.Qty * sign : line.Qty * -1d;
-                }
+                foreach (var line in dcOrderlineGrid.ItemsSource as IEnumerable<DebtorCommonOrderLineClient>)
+                    line.Qty = line.Qty > 0d ? line.Qty * sign : line.Qty * -1d;
             }
         }
     }

@@ -166,13 +166,25 @@ namespace UnicontaClient.Pages.CustomPage
                 case "Transactions":
                     if (lin?.Account != null)
                     {
-                        var args = new object[2];
-                        args[0] = lin.Account;
-                        args[1] = true;
-                        string header = string.Concat(Uniconta.ClientTools.Localization.lookup("AccountStatement"), "/", lin.Account.AccountNumber);
-                        var transactionReport = dockCtrl.AddDockItem(TabControls.TransactionReport, this.ParentControl, args, header) as TransactionReport;
-                        if (transactionReport != null)
-                            transactionReport.SetControlsAndLoadGLTrans(fromDate, toDate, null,null, null, null, null, cmbJournal.Text);
+                        if (string.IsNullOrEmpty(cmbJournal.Text))
+                        {
+                            var dt = PropValuePair.GenereteWhereElements("Date", fromDate, CompareOperator.GreaterThanOrEqual);
+                            dt.OrList[0].SecundaryValue = NumberConvert.ToString(toDate.Ticks);
+                            var filter = new PropValuePair[]
+                            {
+                                dt,
+                                PropValuePair.GenereteWhereElements("Account", lin.AccountNumber, CompareOperator.Equal),
+                                PropValuePair.GenereteWhereElements("Vat", lin.Vat != null ? lin.Vat._Vat : "null", CompareOperator.Equal)
+                            };
+                            AddDockItem(TabControls.AccountsTransaction, new object[] { api, filter }, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Transactions"), lin.AccountNumber));
+                        }
+                        else
+                        {
+                            string header = string.Concat(Uniconta.ClientTools.Localization.lookup("AccountStatement"), "/", lin.Account.AccountNumber);
+                            var transactionReport = dockCtrl.AddDockItem(TabControls.TransactionReport, this.ParentControl, new object[] { lin.Account, IdObject.get(true) }, header) as TransactionReport;
+                            if (transactionReport != null)
+                                transactionReport.SetControlsAndLoadGLTrans(fromDate, toDate, null, null, null, null, null, cmbJournal.Text);
+                        }
                     }
                     break;
                 case "VatReportIceland":
@@ -180,9 +192,9 @@ namespace UnicontaClient.Pages.CustomPage
                         AddDockItem(TabControls.VatReportIceland, new object[] { vatReportSum, fromDate, toDate }, "VAT statement", null, closeIfOpened: true);
                     break;
                 default:
+                    gridRibbon_BaseActions(ActionType);
                     break;
             }
-            gridRibbon_BaseActions(ActionType);
         }
 
         void VatReport_Loaded(object sender, RoutedEventArgs e)

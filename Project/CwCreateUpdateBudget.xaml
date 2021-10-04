@@ -28,8 +28,8 @@ x:Class="UnicontaClient.Pages.CustomPage.CwCreateUpdateBudget"
                 <UnicontaControls:CorasauLayoutItem FieldName="Group" x:Name="lblGroup">
                     <UnicontaControls:LookupEditor x:Name="leGroup" Text="{Binding Group,Mode=TwoWay}"/>
                 </UnicontaControls:CorasauLayoutItem>
-                <UnicontaControls:CorasauLayoutItem FieldName="BudgetMethod" x:Name="lblBudgetMethod">
-                    <UnicontaControls:ComboBoxEditor x:Name="cmbBudgetMethod" Text="{Binding BudgetMethodString,Mode=TwoWay}" SelectedIndexChanged="cmbBudgetMethod_SelectedIndexChanged"/>
+                <UnicontaControls:CorasauLayoutItem x:Name="lblBudgetMethod" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BudgetMethod}">
+                    <UnicontaControls:DimComboBoxEditor x:Name="cmbBudgetMethod" SelectedIndexChanged="cmbBudgetMethod_SelectedIndexChanged" IsTextEditable="False" />
                 </UnicontaControls:CorasauLayoutItem>
                 <UnicontaControls:CorasauLayoutItem FieldName="BudgetName" x:Name="lblTxtName">
                     <UnicontaControls:TextEditor x:Name="txtName" Width="170" Text="{Binding BudgetName,Mode=TwoWay}"/>

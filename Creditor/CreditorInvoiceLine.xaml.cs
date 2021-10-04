@@ -190,7 +190,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "SeriesBatch":
                     if (selectedItem == null)
                         return;
-                    AddDockItem(TabControls.InvSeriesBatch, selectedItem, string.Format("{0}:{1}", Localization.lookup("SerialBatchNumbers"), selectedItem._InvoiceRowId));
+                    AddDockItem(TabControls.InvSeriesBatch, selectedItem, string.Format("{0}: {1}", Localization.lookup("SerialBatchNumbers"), selectedItem._Item));
                     break;
                 case "PostedBy":
                     if (selectedItem != null)

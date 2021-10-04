@@ -215,13 +215,13 @@ namespace UnicontaClient.Pages.CustomPage
 
             var minApproveDate = empCache.Where(x => x._TMApproveDate != DateTime.MinValue && x._Terminated == DateTime.MinValue).Min(x => x._TMApproveDate as DateTime?) ?? DateTime.MinValue;
             if (minApproveDate != DateTime.MinValue)
-                pairTM.Add(PropValuePair.GenereteWhereElements(nameof(TMJournalLineClient._Date), minApproveDate, CompareOperator.GreaterThanOrEqual));
+                pairTM.Add(PropValuePair.GenereteWhereElements(nameof(TMJournalLineClient.Date), minApproveDate, CompareOperator.GreaterThanOrEqual));
 
             var tmJourLines = await api.Query<TMJournalLineClient>(pairTM);
 
             var tmLines = tmJourLines.Where(s => (s._Project != null &&
                                                   s._PayrollCategory != null &&
-                                                  s._Date > empCache.First(z => z._Number == s._Employee)._TMApproveDate))
+                                                  s._Date > empCache.Get(s._Employee)._TMApproveDate))
                                                   .GroupBy(x => new { x._Employee, x._Project, x._PayrollCategory, x._Task, x._Date }).Select(x => new TMJournalLineClientLocal
                                                   {
                                                       Date = x.Key._Date,
@@ -648,7 +648,7 @@ namespace UnicontaClient.Pages.CustomPage
                         search.Task = x._Task;
                         search.Invoice = x._InvoicedOn;
                         pos = Array.BinarySearch(invOpeningArr, search, sort);
-                        if (pos >= 0 && pos < invOpeningArr.Length)
+                        if (pos >= 0)
                             invCostValueLst.Add(x);
                         else
                             invOpeningCostValueLst.Add(x);
@@ -692,7 +692,7 @@ namespace UnicontaClient.Pages.CustomPage
                         search.Task = y._Task;
                         search.Invoice = y._InvoicedOn;
                         pos = Array.BinarySearch(invBalanceArr, search, sort);
-                        if (pos >= 0 && pos < invBalanceArr.Length)
+                        if (pos >= 0)
                             invBalCostValueLst.Add(y);
                     }
 
@@ -986,11 +986,11 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         CreateOrder(selectedItem);
                     break;
-                case "SalesOrder":
+                case "ProjectInvoiceProposal":
                     if (selectedItem != null)
                     {
-                        var salesHeader = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("SalesOrder"), selectedItem.Debtor);
-                        AddDockItem(TabControls.DebtorOrders, selectedItem.ProjectRef, salesHeader);
+                        var salesHeader = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("InvoiceProposal"), selectedItem.Debtor);
+                        AddDockItem(TabControls.ProjInvProposal, selectedItem.ProjectRef, salesHeader);
                     }
                     break;
                 case "ZeroInvoice":
@@ -1054,7 +1054,7 @@ namespace UnicontaClient.Pages.CustomPage
                             var res = UnicontaMessageBox.Show(message, Uniconta.ClientTools.Localization.lookup("Message"), UnicontaMessageBox.YesNo);
                             if (res == MessageBoxResult.Yes)
                             {
-                                debtorOrderInstance.SetMaster(selectedItem);
+                                debtorOrderInstance.SetMaster(selectedItem.ProjectRef);
                                 debtorOrderInstance._PrCategory = CWCreateOrderFromProject.InvoiceCategory;
                                 debtorOrderInstance._NoItemUpdate = true;
                                 var er = await api.Insert(debtorOrderInstance);

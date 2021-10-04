@@ -76,7 +76,7 @@ namespace UnicontaClient.Pages.CustomPage
             dgGenerateOrder.UpdateMaster(args);
             var debtOrderMaster = dgGenerateOrder.masterRecord as Uniconta.DataModel.DCOrder;
             if (debtOrderMaster != null)
-                SetHeader(string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("RegenerateOrder"), debtOrderMaster._OrderNumber));
+                SetHeader(string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("RegenerateOrder"), debtOrderMaster._OrderNumber));
 
             BindGrid();
         }
@@ -136,6 +136,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
             busyIndicator.IsBusy = false;
             dgGenerateOrder.ItemsSource = newList;
+            api.ForcePrimarySQL = true;
         }
 
         async void RegenerateOrderFromProjectTrans()
@@ -171,6 +172,7 @@ namespace UnicontaClient.Pages.CustomPage
             busyIndicator.IsBusy = true;
             var result = await (new InvoiceAPI(api)).RegenerateOrderFromProject(master, excludedTransLst, includedTransLst);
             busyIndicator.IsBusy = false;
+            api.ForcePrimarySQL = true;
             UtilDisplay.ShowErrorCode(result);
             if (result == ErrorCodes.Succes)
             {

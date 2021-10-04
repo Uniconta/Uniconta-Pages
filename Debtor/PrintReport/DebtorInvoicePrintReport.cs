@@ -8,6 +8,7 @@ using Uniconta.ClientTools.DataModel;
 using Uniconta.Common;
 using Uniconta.DataModel;
 using Uniconta.Reports.Utilities;
+using Uniconta.Common.Utility;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -189,10 +190,14 @@ namespace UnicontaClient.Pages.CustomPage
                 /*In case debtor order is null, fill from DCInvoice*/
                 if (DebtorOrder == null)
                 {
-                    var debtorOrderUserType = ReportUtil.GetUserType(typeof(DebtorOrderClient), Comp);
-                    var debtorOrderUser = Activator.CreateInstance(debtorOrderUserType) as DebtorOrderClient;
-                    debtorOrderUser.CopyFrom(debtorInvoiceClientUser, debtorClientUser);
-                    DebtorOrder = debtorOrderUser;
+                    DebtorOrder = Comp.GetCache(typeof(Uniconta.DataModel.DebtorOrder))?.Get(NumberConvert.ToStringNull(debtorInvoiceClientUser._OrderNumber)) as DebtorOrderClient;
+                    if (DebtorOrder == null)
+                    {
+                        var debtorOrderUserType = ReportUtil.GetUserType(typeof(DebtorOrderClient), Comp);
+                        var debtorOrderUser = Activator.CreateInstance(debtorOrderUserType) as DebtorOrderClient;
+                        debtorOrderUser.CopyFrom(debtorInvoiceClientUser, debtorClientUser);
+                        DebtorOrder = debtorOrderUser;
+                    }
                 }
 
                 Company = Utility.GetCompanyClientUserInstance(Comp);
@@ -258,7 +263,7 @@ namespace UnicontaClient.Pages.CustomPage
         /// <summary>
         /// Setup lookup for DebtorMessageClients
         /// </summary>
-        internal void SetLookUpForDebtorMessageClients(DebtorMessagesClient[] debtorMessageClients)
+        public void SetLookUpForDebtorMessageClients(DebtorMessagesClient[] debtorMessageClients)
         {
             isMultipleInvoicePrint = true;
 
@@ -270,7 +275,7 @@ namespace UnicontaClient.Pages.CustomPage
         /// Setup lookup for PreviousAddress Clients
         /// </summary>
         /// <param name="preivousAddressClients"></param>
-        internal void SetLookUpForPreviousAddressClients(DCPreviousAddressClient[] preivousAddressClients)
+        public void SetLookUpForPreviousAddressClients(DCPreviousAddressClient[] preivousAddressClients)
         {
             isMultipleInvoicePrint = true;
             if (previousAddressLookup == null)

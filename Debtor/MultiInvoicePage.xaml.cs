@@ -163,10 +163,53 @@ namespace UnicontaClient.Pages.CustomPage
                 case "RecalculateOrderPrices":
                     RecalculateOrderPrices();
                     break;
+                case "PostProjectOrder":
+                    if (string.IsNullOrEmpty(selectedItem._Project))
+                    {
+                        UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("ProjectCannotBeBlank"), Uniconta.ClientTools.Localization.lookup("Message"));
+                        return;
+                    }
+                    PostProjectOrder(selectedItem);
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
+        }
+
+        void PostProjectOrder(DebtorOrderClient order)
+        {
+            var dialog = new CwPostProjectOrder();
+            dialog.DialogTableId = 2000000087;
+            dialog.Closed += async delegate
+            {
+                if (dialog.DialogResult == true)
+                {
+                    busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
+                    busyIndicator.IsBusy = true;
+                    var invApi = new Uniconta.API.DebtorCreditor.InvoiceAPI(api);
+                    var postingResult = await invApi.PostProjectOrder(order, null, dialog.Date, dialog.Simulation, new GLTransClientTotal(), null, dialog.PostOnlyDelivered);
+                    busyIndicator.IsBusy = false;
+                    busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("LoadingMsg");
+                    var ledgerRes = postingResult.ledgerRes;
+                    if (ledgerRes == null)
+                        return;
+                    if (ledgerRes.Err != ErrorCodes.Succes)
+                        Utility.ShowJournalError(ledgerRes, dgMultiInvGrid, false);
+                    else if (dialog.Simulation && ledgerRes.SimulatedTrans != null && ledgerRes.SimulatedTrans.Length > 0)
+                        AddDockItem(TabControls.SimulatedTransactions, ledgerRes.SimulatedTrans, Uniconta.ClientTools.Localization.lookup("SimulatedTransactions"), null, true);
+                    else
+                    {
+                        string msg;
+                        if (ledgerRes.JournalPostedlId != 0)
+                            msg = string.Format("{0} {1}={2}", Uniconta.ClientTools.Localization.lookup("JournalHasBeenPosted"), Uniconta.ClientTools.Localization.lookup("JournalPostedId"), ledgerRes.JournalPostedlId);
+                        else
+                            msg = Uniconta.ClientTools.Localization.lookup("JournalHasBeenPosted");
+                        UnicontaMessageBox.Show(msg, Uniconta.ClientTools.Localization.lookup("Message"));
+                    }
+                }
+            };
+            dialog.Show();
         }
 
 #if SILVERLIGHT

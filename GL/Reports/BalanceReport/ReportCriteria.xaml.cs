@@ -479,6 +479,8 @@ namespace UnicontaClient.Pages.CustomPage
                                  StreamingManager.Copy(objBalance, newItem);
                                  var name = newItem.Name;
                                  newItem._Name = name;
+                                 if (itemsBalance == null)
+                                     itemsBalance = new ObservableCollection<Balance>();
                                  itemsBalance.Add(newItem);
                                  cbBalance.SelectedItem = newItem;
                              }
@@ -687,6 +689,8 @@ namespace UnicontaClient.Pages.CustomPage
             busyIndicator.IsBusy = false;
             if (res == ErrorCodes.Succes)
             {
+                if (itemsBalance == null)
+                    itemsBalance = new ObservableCollection<Balance>();
                 itemsBalance.Add(newItem);
                 cbBalance.SelectedItem = newItem;
             }

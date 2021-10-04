@@ -28,8 +28,8 @@ namespace UnicontaClient.Pages.CustomPage
     }
     public partial class SubscriptionInvoiceLinePage : GridBasePage
     {
-        List<UnicontaBaseEntity> masterList;
         public override string NameOfControl { get { return TabControls.SubscriptionInvoiceLinePage.ToString(); } }
+
         public SubscriptionInvoiceLinePage(BaseAPI API)
             : base(API, string.Empty)
         {
@@ -61,13 +61,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void InitPage(UnicontaBaseEntity master)
         {
             InitializeComponent();
-            if (master != null)
-            {
-                masterList = new List<UnicontaBaseEntity>();
-                masterList.Add(master);
-                dgSubInvoiceslineGrid.masterRecords = masterList;
-            }
-
+            dgSubInvoiceslineGrid.UpdateMaster(master);
             SetRibbonControl(localMenu, dgSubInvoiceslineGrid);
             localMenu.dataGrid = dgSubInvoiceslineGrid;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
@@ -77,10 +71,10 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override Filter[] DefaultFilters()
         {
-            Filter dateFilter = new Filter();
-            dateFilter.name = "Date";
-            dateFilter.value = String.Format("{0:d}..", GetSystemDefaultDate().AddMonths(-1));
-            return new Filter[] { dateFilter };
+            if (dgSubInvoiceslineGrid.masterRecords == null)
+                return new[] { new Filter() { name = "Date", value = String.Format("{0:d}..", GetSystemDefaultDate().AddMonths(-1)) } };
+            else
+                return null;
         }
         void localMenu_OnItemClicked(string ActionType)
         {

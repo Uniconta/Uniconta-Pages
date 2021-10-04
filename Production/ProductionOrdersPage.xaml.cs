@@ -117,7 +117,6 @@ namespace UnicontaClient.Pages.CustomPage
         {
             string header;
             var selectedItem = dgProductionOrders.SelectedItem as ProductionOrderClient;
-            if (selectedItem != null)
             switch (ActionType)
             {
                 case "AddRow":

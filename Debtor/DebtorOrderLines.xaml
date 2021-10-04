@@ -112,7 +112,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrderLines"
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="CostValue" Visible="False" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Margin" Visible="False" Width="70" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="MarginRatio" Visible="False" Width="50" />
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="DoInvoice" Width="50" />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="DoInvoice" Width="50" HideHeaderCheck="False"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="QtyNow" Width="80" >
                                     <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                         <DataTemplate>

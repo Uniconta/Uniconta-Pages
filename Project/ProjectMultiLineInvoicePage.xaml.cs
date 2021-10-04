@@ -87,8 +87,7 @@ namespace UnicontaClient.Pages.CustomPage
                     CreateMulitOrder();
                     break;
                 case "CreateOrder2":
-                    if (selectedItem != null)
-                        CreateMulitOrder(false);
+                    CreateMulitOrder(false);
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);

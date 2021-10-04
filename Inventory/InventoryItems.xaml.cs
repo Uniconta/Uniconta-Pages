@@ -262,7 +262,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "EditRow":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.InventoryItemPage2, new object[2] { selectedItem, true }, string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("InventoryItems"), selectedItem.Item));
+                        AddDockItem(TabControls.InventoryItemPage2, new object[2] { selectedItem, true }, string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("InventoryItems"), selectedItem._Item));
                     break;
                 case "AddNote":
                     if (selectedItem != null)
@@ -270,11 +270,11 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "AddDoc":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.UserDocsPage, dgInventoryItemsGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Documents"), selectedItem._Name));
+                        AddDockItem(TabControls.UserDocsPage, dgInventoryItemsGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Documents"), selectedItem._Item));
                     break;
                 case "InvTrans":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.InventoryTransactions, dgInventoryItemsGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("InvTransactions"), selectedItem._Name));
+                        AddDockItem(TabControls.InventoryTransactions, dgInventoryItemsGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("InvTransactions"), selectedItem._Item));
                     break;
                 case "Statistics":
                     if (selectedItem != null)
@@ -310,15 +310,15 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "Storage":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.InvItemStoragePage, dgInventoryItemsGrid.syncEntity, true, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("OnHand"), selectedItem._Name));
+                        AddDockItem(TabControls.InvItemStoragePage, dgInventoryItemsGrid.syncEntity, true, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("OnHand"), selectedItem._Item));
                     break;
                 case "VariantCombi":
                     if (selectedItem != null && selectedItem._UseVariants)
-                        AddDockItem(TabControls.InvVariantCombiPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ItemVariants"), selectedItem._Name));
+                        AddDockItem(TabControls.InvVariantCombiPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ItemVariants"), selectedItem._Item));
                     break;
                 case "VariantDetails":
                     if (selectedItem != null && selectedItem._UseVariants)
-                        AddDockItem(TabControls.InvVariantDetailPage, dgInventoryItemsGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ItemVariants"), selectedItem._Name));
+                        AddDockItem(TabControls.InvVariantDetailPage, dgInventoryItemsGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ItemVariants"), selectedItem._Item));
                     break;
                 case "LanguageItemText":
                     if (selectedItem != null)
@@ -327,7 +327,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "InventorySeriesBatch":
                     if (selectedItem != null && selectedItem._UseSerialBatch)
                     {
-                        string header = string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("SerialBatchNumbers"), selectedItem._Name);
+                        string header = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("SerialBatchNumbers"), selectedItem._Item);
                         AddDockItem(TabControls.InvSeriesBatch, dgInventoryItemsGrid.syncEntity, header);
                     }
                     break;
@@ -348,7 +348,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "InvPurchaseAccounts":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.InvPurchaseAccountPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("PurchaseAccounts"), selectedItem._Name));
+                        AddDockItem(TabControls.InvPurchaseAccountPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("PurchaseAccounts"), selectedItem._Item));
                     break;
                 case "InvHierarichalBOM":
                     if (selectedItem != null)
@@ -361,12 +361,10 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         AddDockItem(TabControls.InvBOMExplodePage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ExplodedBOM"), selectedItem._Item));
                     break;
-#if !SILVERLIGHT
                 case "InvTransPivot":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.InvTransPivotPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Pivot"), selectedItem._Name));
+                        AddDockItem(TabControls.InvTransPivotPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Pivot"), selectedItem._Item));
                     break;
-#endif
                 case "InvStockProfile":
                     if (selectedItem != null)
                         AddDockItem(TabControls.InvStorageProfileReport, dgInventoryItemsGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("StockProfile"), selectedItem._Item));

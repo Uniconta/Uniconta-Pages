@@ -420,7 +420,7 @@ namespace UnicontaClient.Pages.CustomPage
                     while (pos < tmLines.Length)
                     {
                         var s = tmLines[pos++];
-                        if (s._Employee != rec.Employee)
+                        if (s._Employee != rec.Employee || s._Date != rec.Date)
                             break;
 
                         if (s.Total != 0)

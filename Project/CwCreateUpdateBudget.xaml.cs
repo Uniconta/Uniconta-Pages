@@ -45,10 +45,6 @@ namespace UnicontaClient.Pages.CustomPage
         public static string PrCategory { get; set; }
 
         [InputFieldData]
-        [Display(Name = "BudgetMethod", ResourceType = typeof(InputFieldDataText))]
-        public static BudgetMethod BudgetMethod { get; set; }
-
-        [InputFieldData]
         [Display(Name = "Name", ResourceType = typeof(InputFieldDataText))]
         public static string BudgetName { get; set; }
 
@@ -65,11 +61,12 @@ namespace UnicontaClient.Pages.CustomPage
         [Display(Name = "InclProjectTasks", ResourceType = typeof(InputFieldDataText))]
         public bool InclProjectTask { get; set; }
 
-#if !SILVERLIGHT
+
         public int DialogTableId;
         protected override int DialogId { get { return DialogTableId; } }
         protected override bool ShowTableValueButton { get { return true; } }
-#endif
+        public static byte BudgetMethod;
+
         public CwCreateUpdateBudget(CrudAPI crudApi, int dialogType = 0)
         {
             FromDate = FromDate != DateTime.MinValue ? FromDate : Uniconta.ClientTools.Page.BasePage.GetSystemDefaultDate();
@@ -109,7 +106,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             leGroup.api = leEmp.api = lePayroll.api = lePrCategory.api = leWorkspace.api = crudApi;
             cmbBudgetMethod.ItemsSource = new string[] { Uniconta.ClientTools.Localization.lookup("MonthView"), Uniconta.ClientTools.Localization.lookup("WeekView"), Uniconta.ClientTools.Localization.lookup("DayView") };
-            cmbBudgetMethod.SelectedIndex = (byte)BudgetMethod;
+            cmbBudgetMethod.SelectedIndex = BudgetMethod;
         }
 
         private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
@@ -132,12 +129,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void cmbBudgetMethod_SelectedIndexChanged(object sender, RoutedEventArgs e)
         {
-            switch (cmbBudgetMethod.SelectedIndex)
-            {
-                case 0: BudgetMethod = BudgetMethod.Month; break;
-                case 1: BudgetMethod = BudgetMethod.Week; break;
-                case 2: BudgetMethod = BudgetMethod.Day; break;
-            }
+            BudgetMethod = (byte)cmbBudgetMethod.SelectedIndex;
         }
 
         private void OKButton_Click(object sender, RoutedEventArgs e)

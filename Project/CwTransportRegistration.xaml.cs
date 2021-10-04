@@ -252,7 +252,7 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     var project = (Uniconta.DataModel.Project)projectCache?.Get(Project);
                     var tasks = project.Tasks ?? await project.LoadTasks(crudApi);
-                    leProjectTask.ItemsSource = tasks.Where(s => s.Ended == false && (WorkSpace == null || s._WorkSpace == WorkSpace));
+                    leProjectTask.ItemsSource = tasks?.Where(s => s.Ended == false && (WorkSpace == null || s._WorkSpace == WorkSpace));
                 }
                 else
                 {

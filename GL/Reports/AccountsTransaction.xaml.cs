@@ -179,6 +179,7 @@ namespace UnicontaClient.Pages.CustomPage
                 RemoveMenuItem();
             else
             {
+                api.ForcePrimarySQL = true;
                 var CountryId = Comp._CountryId;
                 if (CountryId == CountryCode.Iceland)
                 {
@@ -204,8 +205,7 @@ namespace UnicontaClient.Pages.CustomPage
             dgAccountsTransGrid.ShowTotalSummary();
             postingApiInv = new PostingAPI(api);
 
-            if (Comp.GetCache(typeof(GLAccount)) == null)
-                api.LoadCache(typeof(GLAccount));
+            api.LoadCacheInBackground(typeof(GLAccount));
         }
 
         public override bool CheckIfBindWithUserfield(out bool isReadOnly, out bool useBinding)

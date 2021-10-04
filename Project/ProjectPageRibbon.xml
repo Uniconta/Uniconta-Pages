@@ -57,7 +57,8 @@
       <RibbonItem Action="Invoices" LocalizedNameKey="PostedInvoices" ControlName="Invoices" Glyph="AccountInvoice_16x16.png" />
       <RibbonItem Action="OnAccountInvoicing" LocalizedNameKey="OnAccountInvoicing" ControlName="ProjectOnAccountInvoiceLinePage" Module="_ProjShowPctAcontoInvoice" Glyph="AccountInvoice_16x16.png" />
       <RibbonItem Action="QuickInvoice" LocalizedNameKey="QuickInvoice" ControlName="CreateInvoicePage" Module="_ProjOrderInvoice" Glyph="Invoice_16x16.png"/>
-      <RibbonItem Action="ProjectInvoiceProposal" LocalizedNameKey="InvoiceProposal" ControlName="ProjInvProposal" Glyph="Sales_16x16.png"/>
+      <RibbonItem Action="SalesOrder" LocalizedNameKey="SalesOrder" ControlName="DebtorOrders" Module="_ProjOrderInvoice" Glyph="Sales_16x16.png"/>
+      <RibbonItem Action="ProjectInvoiceProposal" LocalizedNameKey="InvoiceProposals" ControlName="ProjInvProposal" Glyph="Sales_16x16.png"/>
       <RibbonItem Action="PrintInvoice" LocalizedNameKey="PrintInvoice" Glyph="General_Ledger_16x16.png"/>
       <RibbonItem Action="CreateOrder" LocalizedNameKey="CreateOBJ" Parameter="InvoiceProposal" Glyph="AccountInvoice_16x16.png"/>
       <RibbonItem Action="ZeroInvoice" LocalizedNameKey="CreateOBJ" Parameter="ZeroInvoice" Module="_ProjZeroInvoice" Glyph="AccountInvoice_16x16.png"/>

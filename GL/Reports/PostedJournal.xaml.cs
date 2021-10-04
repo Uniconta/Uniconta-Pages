@@ -48,11 +48,11 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override Filter[] DefaultFilters()
         {
-            var today = BasePage.GetSystemDefaultDate();
-            var dif = today - this.api.CompanyEntity._Created;
-            if (dif.TotalDays < 365)
-                return null;
-
+            if (this.api.CompanyEntity._BackupFrom == 0)
+            {
+                if ((BasePage.GetSystemDefaultDate() - this.api.CompanyEntity._Created).TotalDays < 365)
+                    return null;
+            }
             return new Filter[] { new Filter()
             {
                 name = "Posted",

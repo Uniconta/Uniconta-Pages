@@ -453,7 +453,6 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 var stmtLines = bankStmtLines.Where(x => x._AmountCent >= 0).ToArray();
                 bankStmtLines = stmtLines;
-
             }
             else if (showAmountType == Uniconta.ClientTools.Localization.lookup("Credit"))
             {
@@ -462,7 +461,6 @@ namespace UnicontaClient.Pages.CustomPage
             }
 
             var listtran = (GLTransClientTotalBank[])await glTransTask;  // wait for gltrans
-            int llisttranLen = 0;
 
             busyIndicator.IsBusy = false;
 
@@ -471,8 +469,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 Array.Sort(listtran, new GLTransClientSort());
                 long Total = 0;
-                llisttranLen = listtran.Length;
-                for (int i = 0; (i < llisttranLen); i++)
+                for (int i = 0; (i < listtran.Length); i++)
                 {
                     var p = listtran[i];
                     Total += ShowCurrency ? p._AmountCurCent : p._AmountCent;
@@ -509,7 +506,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                         var BankStatementLineId = ((int)SmallDate.Pack(p._Date) << 16) + p.LineNumber;
 
-                        for (int n = startGLSearch; (n < llisttranLen); n++)
+                        for (int n = startGLSearch; (n < listtran.Length); n++)
                         {
                             var t = listtran[n];
                             if (t._Date < PostedDate)
@@ -533,7 +530,7 @@ namespace UnicontaClient.Pages.CustomPage
                                         {
                                             PostedDate = mark.Date;
                                             int cnt = startGLSearch;
-                                            while (++cnt < llisttranLen)
+                                            while (++cnt < listtran.Length)
                                             {
                                                 t = listtran[cnt];
                                                 if (t._Date == PostedDate)
@@ -564,10 +561,9 @@ namespace UnicontaClient.Pages.CustomPage
                                     foreach (var mark in p.MultiMark)
                                     {
                                         PostedDate = mark.Date;
-                                        int cnt = startGLSearch;
-                                        while (cnt < llisttranLen)
+                                        for (int cnt = startGLSearch; (cnt < listtran.Length); cnt++)
                                         {
-                                            t = listtran[cnt++];
+                                            t = listtran[cnt];
                                             if (t._Date == PostedDate)
                                             {
                                                 if (t.JournalId == mark.JournalId && t.JourRowId != 0 && t.JourRowId == mark.JourRowId)
@@ -731,17 +727,15 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "AddMapping":
                     if (selectedItem != null)
-                    {
-                        var bankImportMap = new CWAddBankImportMapping(api, master, selectedItem);
-                        bankImportMap.Show();
-                    }
+                        (new CWAddBankImportMapping(api, master, selectedItem)).Show();
                     break;
                 case "OffSetAccount":
-                    CallOffsetAccount(selectedItem);
+                    if (selectedItem != null)
+                        CallOffsetAccount(selectedItem);
                     break;
                 case "OpenTran":
-                    if (selectedItem == null) return;
-                    SettleOpenTransactionPage(selectedItem);
+                    if (selectedItem != null)
+                        SettleOpenTransactionPage(selectedItem);
                     break;
                 case "EditJournalLine":
                     var selectedGlTrans = dgAccountsTransGrid.SelectedItem as GLTransClientTotal;
@@ -781,8 +775,8 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     if (dragDropWindow.DialogResult == true)
                     {
-                        var fileInfo = dragDropWindow.FileInfoList?.SingleOrDefault();
                         var voucher = new VouchersClient();
+                        var fileInfo = dragDropWindow.FileInfoList[0];
                         voucher._Data = fileInfo.FileBytes;
                         voucher._Text = fileInfo.FileName;
                         voucher._Fileextension = DocumentConvert.GetDocumentType(fileInfo.FileExtension);

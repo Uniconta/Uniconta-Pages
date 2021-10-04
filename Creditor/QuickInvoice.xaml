@@ -65,18 +65,18 @@ x:Class="UnicontaClient.Pages.CustomPage.QuickInvoice"
 
                             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Name}" Grid.Column="0" Grid.Row="2" />
                             <CorasauControls:TextEditor MaxWidth="170"   x:Name="txtName" IsReadOnly="True"   Text="{Binding Name,Mode=OneWay}"  Grid.Column="1" Grid.Row="2" Margin="5,0,0,0"  />
-                          
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CostAccount}"  Grid.Column="0" Grid.Row="4" />
-                            <CorasauControls:LookupEditor MaxWidth="170"  x:Name="LePostingAccount" EditValue="{Binding PostingAccount,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  Grid.Column="1"  Grid.Row="4" Margin="5,0,0,0"  />
 
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TransactionText}" Grid.Column="0" Grid.Row="6" />
-                            <CorasauControls:TextEditor MaxWidth="170"   x:Name="txtPostingText"    Text="{Binding PostingText,Mode=OneWay}"  Grid.Column="1" Grid.Row="6" Margin="5,0,0,0"  />
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=InvoiceDate}"  Grid.Column="0" Grid.Row="4"/>
+                            <CorasauControls:DateEditor  MaxWidth="170" EditValue="{Binding InvoiceDate,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Grid.Column="1"  Grid.Row="4" Margin="5,0,0,0"  />
 
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=InvoiceDate}" Grid.Column="0" Grid.Row="8" />
-                            <CorasauControls:DateEditor  MaxWidth="170" EditValue="{Binding InvoiceDate,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" Grid.Row="8" Margin="5,0,0,0"  />
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=InvoiceNumber}" Grid.Column="0" Grid.Row="6" />
+                            <CorasauControls:TextEditor MaxWidth="170"  Text="{Binding InvoiceNumber,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" Grid.Row="6" Margin="5,0,0,0"  />
 
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=InvoiceNumber}" Grid.Column="0" Grid.Row="10" />
-                            <CorasauControls:TextEditor MaxWidth="170"  Text="{Binding InvoiceNumber,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" Grid.Row="10" Margin="5,0,0,0"  />
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CostAccount}"  Grid.Column="0" Grid.Row="8" />
+                            <CorasauControls:LookupEditor MaxWidth="170"  x:Name="LePostingAccount" EditValue="{Binding PostingAccount,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  Grid.Column="1" Grid.Row="8"  Margin="5,0,0,0"  />
+
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TransactionText}"  Grid.Column="0" Grid.Row="10" />
+                            <CorasauControls:TextEditor MaxWidth="170"   x:Name="txtPostingText"    Text="{Binding PostingText,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" Grid.Row="10"   Margin="5,0,0,0"  />
 
                             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=InvoiceAmount}" Grid.Column="3" Grid.Row="0" />
                             <CorasauControls:DoubleEditor MaxWidth="170"  FieldName="InvoiceAmount" Grid.Column="4" Grid.Row="0" Margin="5,0,0,0"  />

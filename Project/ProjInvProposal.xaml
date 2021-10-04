@@ -63,12 +63,14 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjInvProposal"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CurBalance" Width="80" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Overdue" Width="80" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CreditMax" Width="80" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Requisition" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="YourRef"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="OurRef"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Remark"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="EndDiscountPct" Width="50" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Payment" Width="70"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DueDate" Width="70" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryDate" Width="70" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ContactName" ReadOnly="True" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Employee" Width="70"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceEmail" Visible="False"/>

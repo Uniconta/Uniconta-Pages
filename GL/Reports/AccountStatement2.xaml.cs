@@ -514,7 +514,8 @@ namespace UnicontaClient.Pages.CustomPage
             }
             else if (transApi.LastError != 0)
             {
-                Uniconta.ClientTools.Util.UtilDisplay.ShowErrorCode(transApi.LastError);
+                busyIndicator.IsBusy = false;
+                UtilDisplay.ShowErrorCode(transApi.LastError);
             }
             busyIndicator.IsBusy = false;
             if (_master != null)

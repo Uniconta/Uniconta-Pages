@@ -220,7 +220,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (e.Key == Key.F8)
                 localMenu_OnItemClicked("AddItems");
-            if (e.Key == Key.S && Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
+            if (e.Key == Key.S && Keyboard.Modifiers.HasFlag(ModifierKeys.Shift) && dgDebtorOrderLineGrid.tableView.ActiveEditor == null)
                 localMenu_OnItemClicked("Serial");
         }
 
@@ -907,7 +907,7 @@ namespace UnicontaClient.Pages.CustomPage
                                var orderApi = new OrderAPI(api);
                                var checkIfCreditNote = createOrderCW.chkIfCreditNote.IsChecked.HasValue ? createOrderCW.chkIfCreditNote.IsChecked.Value : false;
                                var debtorInvoice = createOrderCW.dgCreateOrderGrid.SelectedItem as DebtorInvoiceClient;
-                               dgDebtorOrderLineGrid.PasteRows(createOrderCW.debtorOrderLines);
+                               dgDebtorOrderLineGrid.PasteRows(createOrderCW.DCOrderLines);
                            }
                        };
                         createOrderCW.Show();
@@ -1123,12 +1123,13 @@ namespace UnicontaClient.Pages.CustomPage
 
         async void LinkSerialNumber(DebtorOrderLineClient orderLine)
         {
+            var syncEntity = dgDebtorOrderLineGrid.syncEntity;
             var t = saveGridLocal();
             if (t != null && orderLine.RowId == 0)
                 await t;
             if (api.CompanyEntity.Warehouse)
                 dgDebtorOrderLineGrid.SetLoadedRow(orderLine); // serial page add warehouse and location
-            AddDockItem(TabControls.SerialToOrderLinePage, dgDebtorOrderLineGrid.syncEntity, string.Format("{0}:{1}/{2},{3}", Uniconta.ClientTools.Localization.lookup("SerialBatchNumbers"), orderLine.OrderRowId, orderLine._Item, orderLine.RowId));
+            AddDockItem(TabControls.SerialToOrderLinePage, syncEntity, string.Format("{0}:{1}/{2},{3}", Uniconta.ClientTools.Localization.lookup("SerialBatchNumbers"), orderLine.OrderRowId, orderLine._Item, orderLine.RowId));
         }
 
         async void RefreshGrid()

@@ -572,7 +572,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (project != null)
                 {
                     var tasks = project.Tasks ?? await project.LoadTasks(api);
-                    rec._projectTaskSource = tasks.Where(s => s.Ended == false && (rec._WorkSpace == null || s._WorkSpace == rec._WorkSpace));
+                    rec._projectTaskSource = tasks?.Where(s => s.Ended == false && (rec._WorkSpace == null || s._WorkSpace == rec._WorkSpace));
                 }
                 else
                 {
@@ -590,7 +590,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (project != null)
                 {
                     var tasks = project.Tasks ?? await project.LoadTasks(api);
-                    rec._mileageProjectTaskSource = tasks.Where(s => s.Ended == false && (rec._WorkSpace == null || s._WorkSpace == rec._WorkSpace));
+                    rec._mileageProjectTaskSource = tasks?.Where(s => s.Ended == false && (rec._WorkSpace == null || s._WorkSpace == rec._WorkSpace));
                 }
                 else
                 {
@@ -2611,8 +2611,8 @@ namespace UnicontaClient.Pages.CustomPage
                         }
                         else
                         {
-                            journalLine._Project = overtimeN._InternalProject;
-                            journalLine._PayrollCategory = overtimeN._Number;
+                            journalLine._Project = overtimeN?._InternalProject;
+                            journalLine._PayrollCategory = overtimeN?._Number;
                             journalLineLst.Add(journalLine);
                         }
 

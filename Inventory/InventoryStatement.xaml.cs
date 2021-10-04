@@ -234,11 +234,16 @@ namespace UnicontaClient.Pages.CustomPage
             var fromItem = Convert.ToString(cmbFromAccount.EditValue);
             var toItem = Convert.ToString(cmbToAccount.EditValue);
 
+            var transApi = new ReportAPI(api);
             busyIndicator.IsBusy = true;
-            var listtran = (InvTransClientTotal[])await (new ReportAPI(api)).GetInvTrans(new InvTransClientTotal(), FromDate, ToDate, fromItem, toItem);
+            var listtran = (InvTransClientTotal[])await transApi.GetInvTrans(new InvTransClientTotal(), FromDate, ToDate, fromItem, toItem);
             if (listtran != null)
                 FillStatement(listtran);
-
+            else if (transApi.LastError != 0)
+            {
+                busyIndicator.IsBusy = false;
+                UtilDisplay.ShowErrorCode(transApi.LastError);
+            }
             dgInvTran.Visibility = Visibility.Visible;
             busyIndicator.IsBusy = false;
         }

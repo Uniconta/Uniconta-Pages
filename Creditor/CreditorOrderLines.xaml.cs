@@ -931,6 +931,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         async void LinkSerialNumber(CreditorOrderLineClient orderLine)
         {
+            var syncEntity = dgCreditorOrderLineGrid.syncEntity;
             var item = (InvItem)items.Get(orderLine._Item);
             if (item == null || !item._UseSerialBatch)
                 return;
@@ -939,7 +940,7 @@ namespace UnicontaClient.Pages.CustomPage
                 await t;
             if (api.CompanyEntity.Warehouse)
                 dgCreditorOrderLineGrid.SetLoadedRow(orderLine); // serial page add warehouse and location
-            AddDockItem(TabControls.SerialToOrderLinePage, dgCreditorOrderLineGrid.syncEntity, string.Format("{0}:{1}/{2},{3}", Uniconta.ClientTools.Localization.lookup("SerialBatchNumbers"), orderLine.OrderRowId, orderLine._Item, orderLine.RowId));
+            AddDockItem(TabControls.SerialToOrderLinePage, syncEntity, string.Format("{0}:{1}/{2},{3}", Uniconta.ClientTools.Localization.lookup("SerialBatchNumbers"), orderLine.OrderRowId, orderLine._Item, orderLine.RowId));
         }
 
         async void RefreshGrid()

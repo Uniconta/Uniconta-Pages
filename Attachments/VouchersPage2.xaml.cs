@@ -245,10 +245,9 @@ namespace UnicontaClient.Pages.CustomPage
                 voucherClientRow = multiVouchers[0];
             }
             byte[] buf = null;
-            if (LoadedRow == null)
+            if (LoadedRow == null && voucherClientRow != null)
             {
                 buf = voucherClientRow._Data;
-#if !SILVERLIGHT
                 if (buf != null && buf.Length > 110000 && !voucherClientRow._NoCompress &&
                        (voucherClientRow._Fileextension == FileextensionsTypes.JPEG ||
                         voucherClientRow._Fileextension == FileextensionsTypes.BMP ||
@@ -264,7 +263,7 @@ namespace UnicontaClient.Pages.CustomPage
                     else
                         buf = voucherClientRow._Data;
                 }
-#endif
+
                 if (buf != null && buf.Length > 200000)
                     voucherClientRow._Data = null;
                 else
@@ -281,7 +280,7 @@ namespace UnicontaClient.Pages.CustomPage
                 else
                     voucherClientRow._Data = buf;
             }
-            else
+            else if (voucherClientRow != null)
                 VoucherCache.SetGlobalVoucherCache(voucherClientRow);
         }
 

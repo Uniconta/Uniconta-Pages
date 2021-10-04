@@ -217,6 +217,13 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         AddDockItem(TabControls.ProjectOnAccountInvoiceLinePage, dgProjectGrid.syncEntity);
                     break;
+                case "SalesOrder":
+                    if (selectedItem != null)
+                    {
+                        salesHeader = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("SalesOrder"), selectedItem._DCAccount);
+                        AddDockItem(TabControls.DebtorOrders, dgProjectGrid.syncEntity, salesHeader);
+                    }
+                    break;
                 case "ProjectInvoiceProposal":
                     if (selectedItem != null)
                     {
@@ -371,7 +378,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                     BudgetAPI budgetApi = new BudgetAPI(api);
                     var result = await budgetApi.CreateBudgetTask(CwCreateBudgetTask.Employee, CwCreateBudgetTask.Payroll, CwCreateBudgetTask.Group, 
-                                                                  CwCreateBudgetTask.PrWorkSpace, cwCreateBjtTask.DeleteBudget, (byte)CwCreateBudgetTask.BudgetTaskPrincip, 
+                                                                  CwCreateBudgetTask.PrWorkSpace, cwCreateBjtTask.DeleteBudget, CwCreateBudgetTask.BudgetTaskPrincip, 
                                                                   CwCreateBudgetTask.TaskHours, projLst);
 
                     if (result != ErrorCodes.Succes)
@@ -426,7 +433,7 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     var projLst = dgProjectGrid.GetVisibleRows() as IList<Uniconta.DataModel.Project>;
                     BudgetAPI budgetApi = new BudgetAPI(api);
-                    var result = await budgetApi.CreateTaskFromTask(CWCreateTaskFromTask.FromPrWorkSpace, CWCreateTaskFromTask.ToPrWorkSpace, CWCreateTaskFromTask.ProjectTemplate, projLst);
+                    var result = await budgetApi.CreateTaskFromTask(CWCreateTaskFromTask.FromPrWorkSpace, CWCreateTaskFromTask.ToPrWorkSpace, CWCreateTaskFromTask.ProjectTemplate, CWCreateTaskFromTask.AddYear, projLst);
 
                     if (result != ErrorCodes.Succes)
                         UtilDisplay.ShowErrorCode(result);

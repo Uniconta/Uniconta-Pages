@@ -113,7 +113,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "SeriesBatch":
                     if (selectedItem == null)
                         return;
-                    AddDockItem(TabControls.InvSeriesBatch, selectedItem, string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("SerialBatchNumbers"), selectedItem._Item));
+                    AddDockItem(TabControls.InvSeriesBatch, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("SerialBatchNumbers"), selectedItem._Item));
                     break;
                 case "AddEditNote":
                     if (selectedItem == null) return;

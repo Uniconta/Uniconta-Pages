@@ -22,8 +22,8 @@ x:Class="UnicontaClient.Pages.CustomPage.CwCreateBudgetTask"
                 <UnicontaControls:CorasauLayoutItem FieldName="PrWorkSpace" x:Name="lblWorkspace">
                     <UnicontaControls:LookupEditor x:Name="leWorkspace" Text="{Binding PrWorkSpace,Mode=TwoWay}"/>
                 </UnicontaControls:CorasauLayoutItem>
-                <UnicontaControls:CorasauLayoutItem FieldName="BudgetTaskPrincip" x:Name="lblBudgetTaskPrincip">
-                    <UnicontaControls:ComboBoxEditor x:Name="cmbBudgetTaskPrincip" Text="{Binding BudgetTaskPrincipString,Mode=TwoWay}" SelectedIndexChanged="cmbBudgetTaskPrincip_SelectedIndexChanged"/>
+                <UnicontaControls:CorasauLayoutItem x:Name="lblBudgetTaskPrincip" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Principle}">
+                    <UnicontaControls:DimComboBoxEditor x:Name="cmbBudgetTaskPrincip" SelectedIndexChanged="cmbBudgetTaskPrincip_SelectedIndexChanged" IsTextEditable="False"/>
                 </UnicontaControls:CorasauLayoutItem>
                 <UnicontaControls:CorasauLayoutItem FieldName="TaskHours" x:Name="lblTaskHours">
                     <UnicontaControls:DoubleEditor x:Name="deTaskHours" FieldName="TaskHours" />

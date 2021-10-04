@@ -706,7 +706,7 @@ namespace UnicontaClient.Pages.CustomPage
                                var orderApi = new OrderAPI(api);
                                var checkIfCreditNote = createOrderCW.chkIfCreditNote.IsChecked.HasValue ? createOrderCW.chkIfCreditNote.IsChecked.Value : false;
                                var debtorInvoice = createOrderCW.dgCreateOrderGrid.SelectedItem as DebtorInvoiceClient;
-                               dgDebtorOfferLineGrid.PasteRows(createOrderCW.debtorOfferLines);
+                               dgDebtorOfferLineGrid.PasteRows(createOrderCW.DCOrderLines);
                            }
                        };
                         createOrderCW.Show();
