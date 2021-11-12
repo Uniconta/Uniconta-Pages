@@ -85,11 +85,8 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var referenceTables = new List<string>(100);
             foreach (Type tabletype in Global.GetStandardRefTables())
-            {
-                if (tabletype == typeof(DebtorOrder) || tabletype == typeof(DebtorOffer) || tabletype == typeof(CreditorOrder) || tabletype == typeof(ProductionOrder))
-                    continue;
                 referenceTables.Add(tabletype.Name);
-            }
+
             referenceTables.Add("InvItemStorage");
             referenceTables.Sort();
             cmbTableTypes.ItemsSource = referenceTables;

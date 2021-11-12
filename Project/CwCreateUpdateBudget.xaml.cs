@@ -94,11 +94,16 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case 1:
                     Width = 400;
-                    Height = 400;
+                    Height = 450;
                     this.Title = string.Format(Uniconta.ClientTools.Localization.lookup("UpdateOBJ"), Uniconta.ClientTools.Localization.lookup("Prices"));
                     txtName.Visibility = Visibility.Collapsed;
                     lblTxtName.Visibility = Visibility.Collapsed;
-                    layoutGroupSettings.Visibility = Visibility.Collapsed;
+                    lblGroup.Visibility = Visibility.Visible;
+                    leGroup.Visibility = Visibility.Visible;
+                    lblTxtName.Visibility = Visibility.Collapsed;
+                    txtName.Visibility = Visibility.Collapsed;
+                    lblDeleteBudget.Visibility = Visibility.Collapsed;
+                    deleteBudget.Visibility = Visibility.Collapsed;
                     cmbBudgetMethod.Visibility = Visibility.Collapsed;
                     lblBudgetMethod.Visibility = Visibility.Collapsed;
                     break;

@@ -5,6 +5,18 @@
     <RibbonItem Action="AddRow" LocalizedNameKey="AddOBJ" Parameter="Table" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png"/>
     <RibbonItem Action="EditRow" ShortcutKey="Ctrl+E" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>
   </RibbonItem>
+	<RibbonItem>
+		<RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32.png">
+			<RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
+			<RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16.png" ShortcutKey="" />
+			<RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
+			<RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16.png" ShortcutKey=""/>
+			<RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16.png" ShortcutKey="CTRL+U"/>
+			<RibbonItem Action="ExportLayout" LocalizedNameKey="ExportLayout" EnableSeperator="True" Glyph="ExportLayout_16x16.png" LargeGlyph="ExportLayout_16x16.png" ShortcutKey=""/>
+			<RibbonItem Action="ImportLayout" LocalizedNameKey="ImportLayout" Glyph="Import_16x16.png" LargeGlyph="Import_16x16.png" ShortcutKey=""/>
+			<RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16.png" ShortcutKey=""/>
+		</RibbonItem>
+	</RibbonItem>
   <RibbonItem>
     <RibbonItem Action="Fields" LocalizedNameKey="Fields" LargeGlyph="UserField_32x32.png"/>
     <RibbonItem Action="CalculatedFields" LocalizedNameKey="CalculatedFields" LargeGlyph="UserFieldData_32x32.png"/>

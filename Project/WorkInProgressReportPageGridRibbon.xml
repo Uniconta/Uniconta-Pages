@@ -36,6 +36,7 @@
   <RibbonItem>
     <RibbonItem Action="InclZeroBalance" LocalizedNameKey="IncludeZeroBalance" IsCheckBox="True" />
     <RibbonItem Action="InclJournals" LocalizedNameKey="IncludeJournals" IsCheckBox="True" />
+    <RibbonItem Action="ShowWorkspace" LocalizedNameKey="ShowOBJ" Parameter="WorkSpace" IsCheckBox="True" />
     <RibbonItem Action="ShowTasks" LocalizedNameKey="ShowTasks" Module="ProjectTask" IsCheckBox="True" />
   </RibbonItem>
   <RibbonItem >

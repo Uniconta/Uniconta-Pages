@@ -72,9 +72,10 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override void SyncEntityMasterRowChanged(UnicontaBaseEntity args)
         {
-            var item = args as Uniconta.DataModel.InvItem;
-            if (item._ItemType < (byte)Uniconta.DataModel.ItemType.BOM)
+            var item = args as InvItemClient;
+            if (item == null || item._ItemType < (byte)Uniconta.DataModel.ItemType.BOM)
                 return;
+            Invitem = item;
             dgPartInvItemsGrid.UpdateMaster(args);
             SetHeader();
             InitQuery();
@@ -82,10 +83,13 @@ namespace UnicontaClient.Pages.CustomPage
 
         void SetHeader()
         {
-            var syncMaster = dgPartInvItemsGrid.masterRecord as Uniconta.DataModel.InvItem;
+            var syncMaster = dgPartInvItemsGrid.masterRecord as InvItemClient;
             string Item;
             if (syncMaster != null)
+            {
+                Invitem = syncMaster;
                 Item = syncMaster._Item;
+            }
             else
             {
                 var syncMaster2 = dgPartInvItemsGrid.masterRecord as IVariant;
@@ -196,8 +200,6 @@ namespace UnicontaClient.Pages.CustomPage
             if (invBom != null)
                 Invitem = invBom.InvItemMaster;
 
-            bool showFields = (Invitem != null && Invitem._ItemType >= (byte)Uniconta.DataModel.ItemType.BOM);
-
             if (Invitem != null && Invitem._ItemType == (byte)Uniconta.DataModel.ItemType.ProductionBOM)
                 this.UnfoldBOM.Visible = true;
 
@@ -210,7 +212,9 @@ namespace UnicontaClient.Pages.CustomPage
                 Warehouse.Visible = Warehouse.ShowInColumnChooser = false;
             else
                 Warehouse.ShowInColumnChooser = true;
-            MoveType.Visible = showFields;
+
+            bool showFields = (Invitem != null && Invitem._ItemType == (byte)Uniconta.DataModel.ItemType.BOM);
+
             ShowOnInvoice.Visible = showFields;
             ShowOnPacknote.Visible = showFields;
             InclValueOnInvoice.Visible = showFields;

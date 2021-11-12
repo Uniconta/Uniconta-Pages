@@ -293,8 +293,8 @@ namespace UnicontaClient.Pages.CustomPage
                     if (SetVariant2)
                     {
                         rec.variant2Source = invs2;
-                        if (!hasVariantValue)
-                            rec.Variant2 = null;
+                        //if (!hasVariantValue)
+                        //    rec.Variant2 = null;
                     }
                     else
                         rec.variant1Source = invs1;

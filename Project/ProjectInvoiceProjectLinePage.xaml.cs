@@ -116,10 +116,10 @@ namespace UnicontaClient.Pages.CustomPage
     public partial class ProjectInvoiceProjectLinePage : GridBasePage
     {
         public override string NameOfControl { get { return TabControls.ProjectInvoiceProjectLinePage; } }
+
         SQLCache ItemsCache, ProjectCache, CategoryCache, PrStandardCache;
         Dictionary<string, Uniconta.API.DebtorCreditor.FindPrices> dictPriceLookup;
         ProjectInvoiceProposal invoiceProposal;
-
         public ProjectInvoiceProjectLinePage(UnicontaBaseEntity master) : base(master)
         {
             InitPage(master);
@@ -155,8 +155,9 @@ namespace UnicontaClient.Pages.CustomPage
         public async override Task InitQuery()
         {
             await dgProjInvProjectLineGrid.Filter(null);
-            if (invoiceProposal != null)
-                await api.Read(invoiceProposal);
+            // do not reload, since lines has opdated order we pass, and then SQL version might not be up to date
+            //if (invoiceProposal != null)
+            //    await api.Read(invoiceProposal);
             var itemSource = (IList)dgProjInvProjectLineGrid.ItemsSource;
             if (itemSource == null || itemSource.Count == 0)
                 dgProjInvProjectLineGrid.AddFirstRow();
@@ -166,10 +167,12 @@ namespace UnicontaClient.Pages.CustomPage
         protected override void SyncEntityMasterRowChanged(UnicontaBaseEntity args)
         {
             dgProjInvProjectLineGrid.UpdateMaster(args);
-            var debtOrderMaster = dgProjInvProjectLineGrid.masterRecord as Uniconta.DataModel.DebtorOrder;
-            if (debtOrderMaster != null)
-                SetHeader(string.Concat(Uniconta.ClientTools.Localization.lookup("ProjectAdjustments"), ": ", NumberConvert.ToString(debtOrderMaster._OrderNumber)));
-
+            invoiceProposal = dgProjInvProjectLineGrid.masterRecord as ProjectInvoiceProposal;
+            if (invoiceProposal != null)
+            {
+                api.Read(invoiceProposal);
+                SetHeader(string.Concat(Uniconta.ClientTools.Localization.lookup("ProjectAdjustments"), ": ", NumberConvert.ToString(invoiceProposal._OrderNumber)));
+            }
             InitQuery();
         }
 
@@ -376,7 +379,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         void RecalculateAmount()
         {
-            var lst = dgProjInvProjectLineGrid.ItemsSource as List<ProjectInvoiceProjectLineLocal>;
+            var lst = dgProjInvProjectLineGrid.ItemsSource as IEnumerable<ProjectInvoiceProjectLineLocal>;
             if (lst == null)
                 return;
             double adjustment = invoiceProposal._OrderTotal - invoiceProposal._ProjectTotal;

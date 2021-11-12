@@ -77,7 +77,7 @@ namespace UnicontaClient.Pages.CustomPage
             return null;
         }
 
-        protected override void LoadCacheInBackGround()
+        protected override async void LoadCacheInBackGround()
         {
             LoadType(new Type[] { typeof(Uniconta.DataModel.Debtor), typeof(Uniconta.DataModel.Creditor), typeof(Uniconta.DataModel.InvGroup) });
         }
@@ -410,7 +410,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                 if (!Country2Language.IsEU(intraStat.Country) && intraStat.Country != CountryCode.Unknown)
                     continue;
-
+                
                 intraStat.DebtorRegNo = intraStat?.Debtor?._LegalIdent;
 
                 var fdebtorCVR = intraStat.DebtorRegNo;
@@ -427,6 +427,12 @@ namespace UnicontaClient.Pages.CustomPage
 
                     intraStat.fDebtorRegNo = fdebtorCVR;
                 }
+                else
+                {
+                    intraStat.DebtorRegNo = IntraHelper.UNKNOWN_CVRNO;
+                    intraStat.fDebtorRegNo = IntraHelper.UNKNOWN_CVRNO;
+                }
+
 
                 intraStat.CompanyRegNo = companyRegNo;
                 var salesAmount = intraStat._NetAmount() * factor;
@@ -543,6 +549,7 @@ namespace UnicontaClient.Pages.CustomPage
             Import = 1,
             Export = 2
         };
+
     }
 
     public class IntrastatClassText
@@ -597,7 +604,15 @@ namespace UnicontaClient.Pages.CustomPage
         private CountryCode _Country;
         [Display(Name = "Country", ResourceType = typeof(IntrastatClassText))]
         public CountryCode Country { get { return _Country; } set { _Country = value; NotifyPropertyChanged("Country"); } }
-        public string PartnerCountry { get { return ((CountryISOCode)_Country).ToString(); } }
+        public string PartnerCountry 
+        { 
+            get 
+            {
+                return _Country == CountryCode.UnitedKingdom ? "XU" :
+                       _Country == CountryCode.Greece ? "EL" : ((CountryISOCode)_Country).ToString();
+
+            } 
+        }
 
         private CountryCode _CountryOfOrigin;
         [Display(Name = "CountryOfOrigin", ResourceType = typeof(InventoryText))]
@@ -624,7 +639,8 @@ namespace UnicontaClient.Pages.CustomPage
                     return _CountryOfOriginUNK == IntraUnknownCountry.EUCountry ? "QV" :
                            _CountryOfOriginUNK == IntraUnknownCountry.ThirdCountry ? "QW" : "";
                 else
-                    return CountryOfOrigin == CountryCode.UnitedKingdom ? "XU" : ((CountryISOCode)CountryOfOrigin).ToString();
+                    return CountryOfOrigin == CountryCode.UnitedKingdom ? "XU" :
+                           CountryOfOrigin == CountryCode.Greece ? "EL" : ((CountryISOCode)CountryOfOrigin).ToString();
             } 
         }
 

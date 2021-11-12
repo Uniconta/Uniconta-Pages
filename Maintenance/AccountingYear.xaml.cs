@@ -32,8 +32,6 @@ namespace UnicontaClient.Pages.CustomPage
     {
         public override Type TableType { get { return typeof(CompanyFinanceYearClient); } }
         public override IComparer GridSorting { get { return new CompanyFinanceYearSort(); } }
-
-        public override bool Readonly { get { return false; } }
         public override bool IsAutoSave { get { return false; } }
         public override bool CanDelete { get { return false; } }
     }

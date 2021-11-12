@@ -165,6 +165,10 @@ namespace UnicontaClient.Pages.CustomPage
                 dgInvItemStorageClientGrid.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;
             this.items = api.GetCache(typeof(InvItem));
             this.warehouse = api.GetCache(typeof(InvWarehouse));
+
+            RibbonBase rb = (RibbonBase)localMenu.DataContext;
+            if (sourcedata == null)
+                UtilDisplay.RemoveMenuCommand(rb, "SetWarehouse");
         }
 
         void DataControl_CurrentItemChanged(object sender, DevExpress.Xpf.Grid.CurrentItemChangedEventArgs e)

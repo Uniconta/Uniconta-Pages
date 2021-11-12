@@ -1118,7 +1118,7 @@ namespace UnicontaClient.Pages.CustomPage
                 }
             }
             busyIndicator.IsBusy = false;
-            CompanyClient cmplClient = new CompanyClient();
+            CompanyClient cmplClient = api.CompanyEntity.CreateUserType<CompanyClient>();
             StreamingManager.Copy(api.CompanyEntity, cmplClient);
             hdrData.Company = cmplClient;
             hdrData.exportServiceUrl = CorasauDataGrid.GetExportServiceConnection(this.api);

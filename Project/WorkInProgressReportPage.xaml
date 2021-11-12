@@ -66,6 +66,7 @@ x:Class="UnicontaClient.Pages.CustomPage.WorkInProgressReportPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="DebtorName" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Project" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="ProjectName" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Workspace" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Task" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Phase" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="RootProject" Visible="False"/>
@@ -224,7 +225,7 @@ x:Class="UnicontaClient.Pages.CustomPage.WorkInProgressReportPage"
                             </ControlTemplate>
                         </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                     </local:CorasauDataGridTemplateColumnClient>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="OpenSalesOrder" AllowEditing="False" Visible="True" />                    
+                    <local:CorasauDataGridTemplateColumnClient x:Name="OpenInvoiceProposal" AllowEditing="False" Visible="True" />                    
                     <local:CorasauDataGridTemplateColumnClient x:Name="ErrorInfo" Visible="False" AllowEditing="False"/>
                 </local:WorkInProgressReportGrid.Columns>
                 <local:WorkInProgressReportGrid.GroupSummary >

@@ -226,6 +226,9 @@ namespace UnicontaClient.Pages.CustomPage
             var selectedItem = dgContactGrid.SelectedItem as ContactClient;
             if (selectedItem == null)
                 return;
+            var ribbonControl = this.ribbonControl;
+            if (ribbonControl == null)
+                return;
             if (selectedItem._DCType == 2)
             {
                 ribbonControl.EnableButtons("CreditorOrders");

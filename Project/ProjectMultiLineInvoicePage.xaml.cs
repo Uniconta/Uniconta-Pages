@@ -120,13 +120,13 @@ namespace UnicontaClient.Pages.CustomPage
                         projectList = dgProjectMultiLineGrid.GetVisibleRows();
 
                     var invoiceApi = new Uniconta.API.Project.InvoiceAPI(api);
-                    var debtorOrderType = api.CompanyEntity.GetUserTypeNotNull(typeof(DebtorOrderClient));
+                    var debtorOrderType = api.CompanyEntity.GetUserTypeNotNull(typeof(ProjectInvoiceProposalClient));
                     var errorlist = new List<string>();
-                    DebtorOrderClient debtorOrderInstance = null;
+                    ProjectInvoiceProposalClient debtorOrderInstance = null;
                     foreach (var proj in projectList)
                     {
                         var selectedItem = proj as ProjectClient;
-                        debtorOrderInstance = Activator.CreateInstance(debtorOrderType) as DebtorOrderClient;
+                        debtorOrderInstance = Activator.CreateInstance(debtorOrderType) as ProjectInvoiceProposalClient;
                         var result = await invoiceApi.CreateOrderFromProject(debtorOrderInstance, selectedItem._Number, CWCreateOrderFromProject.InvoiceCategory, CWCreateOrderFromProject.GenrateDate,
                             CWCreateOrderFromProject.FromDate, CWCreateOrderFromProject.ToDate);
 
@@ -149,17 +149,17 @@ namespace UnicontaClient.Pages.CustomPage
                         UnicontaMessageBox.Show(errorlist[0], Uniconta.ClientTools.Localization.lookup("Error"), MessageBoxButton.OK);
 
                     else
-                        UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("SalesOrderCreated"), Uniconta.ClientTools.Localization.lookup("Message"), MessageBoxButton.OK);
+                        UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("InvProposalCreated"), Uniconta.ClientTools.Localization.lookup("Message"), MessageBoxButton.OK);
                 }
             };
             cwCreateOrder.Show();
         }
 
-        private void ShowOrderLines(DebtorOrderClient order)
+        private void ShowOrderLines(ProjectInvoiceProposalClient order)
         {
             if (order == null) return;
 
-            var confrimationText = string.Format(" {0}. {1}:{2},{3}:{4}\r\n{5}", Uniconta.ClientTools.Localization.lookup("SalesOrderCreated"), Uniconta.ClientTools.Localization.lookup("OrderNumber"), order._OrderNumber,
+            var confrimationText = string.Format(" {0}. {1}:{2},{3}:{4}\r\n{5}", Uniconta.ClientTools.Localization.lookup("InvProposalCreated"), Uniconta.ClientTools.Localization.lookup("OrderNumber"), order._OrderNumber,
                 Uniconta.ClientTools.Localization.lookup("Account"), order._DCAccount, string.Concat(string.Format(Uniconta.ClientTools.Localization.lookup("GoTo"), Uniconta.ClientTools.Localization.lookup("Orderline")), " ?"));
 
             var confirmationBox = new CWConfirmationBox(confrimationText, string.Empty, false);
@@ -171,7 +171,7 @@ namespace UnicontaClient.Pages.CustomPage
                 switch (confirmationBox.ConfirmationResult)
                 {
                     case CWConfirmationBox.ConfirmationResultEnum.Yes:
-                        AddDockItem(TabControls.DebtorOrderLines, order, string.Format("{0}:{1},{2}", Uniconta.ClientTools.Localization.lookup("OrdersLine"), order._OrderNumber, order._DCAccount));
+                        AddDockItem(TabControls.ProjInvoiceProposalLine, order, string.Format("{0}:{1},{2}", Uniconta.ClientTools.Localization.lookup("OrdersLine"), order._OrderNumber, order._DCAccount));
                         break;
                     case CWConfirmationBox.ConfirmationResultEnum.No:
                         break;

@@ -25,6 +25,7 @@ namespace UnicontaClient.Pages.CustomPage
     {
         #region Constants
         public const string VALIDATE_OK = "Ok";
+        public const string UNKNOWN_CVRNO = "QV999999999999";
         #endregion
 
         #region Variables

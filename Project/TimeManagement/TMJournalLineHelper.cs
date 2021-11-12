@@ -173,17 +173,36 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
             var approveDate = employee._TMApproveDate;
             this.startDate = approveDate >= startDate ? approveDate.AddDays(1) : startDate;
             this.endDate = endDate;
-
+            string lastProjNo = null;
+            string lastPayroll = null;
+            string lastTaskId = null;
             foreach (var rec in lines)
             {
                 rec.ErrorInfo = string.Empty;
                 err = false;
 
-                payrollCat = (Uniconta.DataModel.EmpPayrollCategory)payrollCategoryCache.Get(rec._PayrollCategory);
-                prCategory = (Uniconta.DataModel.PrCategory)prCategoryCache.Get(payrollCat?._PrCategory);
-                proj = (Uniconta.DataModel.Project)projectCache.Get(rec.Project);
-                projGroup = (Uniconta.DataModel.ProjectGroup)projectGrpCache.Get(proj?._Group);
-                prTask = (Uniconta.DataModel.ProjectTask)prTaskCache.Get(rec._Task);
+                if (lastPayroll != rec.PayrollCategory)
+                {
+                    lastPayroll = rec.PayrollCategory;
+                    payrollCat = (EmpPayrollCategory)payrollCategoryCache.Get(lastPayroll);
+                    prCategory = (Uniconta.DataModel.PrCategory)prCategoryCache.Get(payrollCat?._PrCategory);
+                }
+
+                if (lastProjNo != rec._Project)
+                {
+                    lastProjNo = rec._Project;
+                    proj = (Uniconta.DataModel.Project)projectCache.Get(lastProjNo);
+                    projGroup = (Uniconta.DataModel.ProjectGroup)projectGrpCache.Get(proj?._Group);
+
+                    if (comp.ProjectTask && proj.Tasks == null)
+                        await proj.LoadTasks(api);
+                }
+
+                if (rec._Task != null && lastTaskId != string.Concat(rec._Project, rec._Task))
+                {
+                    lastTaskId = string.Concat(rec._Project, rec._Task);
+                    prTask = proj.Tasks != null ? proj.Tasks.FirstOrDefault(s => s.Task == rec.Task) : null;
+                }
 
                 ValidateGeneral(rec);
                 ValidateProject(rec);

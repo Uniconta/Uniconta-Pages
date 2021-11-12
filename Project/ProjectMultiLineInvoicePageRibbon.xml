@@ -30,6 +30,6 @@
   </RibbonItem>
  <RibbonItem>
    <RibbonItem LocalizedNameKey="CreateOBJ" Parameter="InvoiceProposal" Action="CreateOrder" LargeGlyph="Orders_32x32.png"></RibbonItem>
-   <RibbonItem LocalizedNameKey="CreateOBJ" Parameter="Order" Action="CreateOrder2" LargeGlyph="Copy_ToClipboard_32x32.png"></RibbonItem>
+   <RibbonItem LocalizedNameKey="GenerateInvProposalCurLine" Action="CreateOrder2" LargeGlyph="Copy_ToClipboard_32x32.png"></RibbonItem>
   </RibbonItem>
 </root>

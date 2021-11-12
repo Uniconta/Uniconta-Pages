@@ -85,10 +85,11 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 frmRibbon.DisableButtons("Delete");
                 if (!isCopiedRow)
+                {
                     editrow = CreateNew() as CreditorClient;
-                else
-                    editrow._D2CAccount = null;
-                editrow.Country = crudapi.CompanyEntity._CountryId;
+                    editrow.Country = crudapi.CompanyEntity._CountryId;
+                }
+                editrow._D2CAccount = null;
             }
 
             layoutItems.DataContext = editrow;

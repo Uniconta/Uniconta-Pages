@@ -242,13 +242,51 @@ namespace UnicontaClient.Pages.CustomPage
 
         public override Task InitQuery()
         {
-            PropValuePair[] propValuePair = null;
             if (master != null)
             {
+                PropValuePair[] propValuePair = null;
                 // we do this to select all lines. also the hidden ones.
                 propValuePair = new PropValuePair[] { PropValuePair.GenereteParameter("ShowAllTrans", typeof(int), "1") };
+                return dgInvLines.Filter(propValuePair);
             }
-            return dgInvLines.Filter(propValuePair);
+            else
+                return base.InitQuery();
+        }
+
+        protected override void LoadCacheInBackGround()
+        {
+            var Comp = api.CompanyEntity;
+            var lst = new List<Type>(20);
+            if (Comp.Warehouse)
+                lst.Add(typeof(Uniconta.DataModel.InvWarehouse));
+            if (Comp.NumberOfDimensions >= 1)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType1));
+            if (Comp.NumberOfDimensions >= 2)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType2));
+            if (Comp.NumberOfDimensions >= 3)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType3));
+            if (Comp.NumberOfDimensions >= 4)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType4));
+            if (Comp.NumberOfDimensions >= 5)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType5));
+            lst.Add(typeof(Uniconta.DataModel.GLVat));
+            lst.Add(typeof(Uniconta.DataModel.Employee));
+            lst.Add(typeof(Uniconta.DataModel.Debtor));
+            if (Comp.ItemVariants)
+            {
+                lst.Add(typeof(Uniconta.DataModel.InvVariant1));
+                lst.Add(typeof(Uniconta.DataModel.InvVariant2));
+                var n = Comp.NumberOfVariants;
+                if (n >= 3)
+                    lst.Add(typeof(Uniconta.DataModel.InvVariant3));
+                if (n >= 4)
+                    lst.Add(typeof(Uniconta.DataModel.InvVariant4));
+                if (n >= 5)
+                    lst.Add(typeof(Uniconta.DataModel.InvVariant5));
+                lst.Add(typeof(Uniconta.DataModel.InvStandardVariant));
+            }
+            lst.Add(typeof(Uniconta.DataModel.InvItem));
+            LoadType(lst);
         }
 
         public override string NameOfControl { get { return TabControls.DebtorInvoiceLines.ToString(); } }

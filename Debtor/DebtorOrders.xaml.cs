@@ -715,7 +715,17 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 var Debtorder = argument as DebtorOrderClient;
                 if (Debtorder == null)
+                {
+                    var orderDeletedargs = argument as object[];
+                    if (orderDeletedargs != null && orderDeletedargs.Length == 2)
+                    {
+                        var dborder = orderDeletedargs[0] as DebtorOrderClient;
+                        bool isDeleted = (bool)orderDeletedargs[1];
+                        if (dborder != null && isDeleted)
+                            dgDebtorOrdersGrid.UpdateItemSource(3, dborder);
+                    }
                     return;
+                }
                 var err = await api.Read(Debtorder);
                 if (err == ErrorCodes.CouldNotFind)
                     dgDebtorOrdersGrid.UpdateItemSource(3, Debtorder);

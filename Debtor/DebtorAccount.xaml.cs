@@ -142,7 +142,7 @@ namespace UnicontaClient.Pages.CustomPage
             dgDebtorAccountGrid.Readonly = true;
 
             var rb = (RibbonBase)localMenu.DataContext;
-            if(rb!= null && BasePage.session.User._Role != (byte)UserRoles.Accountant)
+            if (rb != null && BasePage.session.User._Role == (byte)UserRoles.Standard)
                 UtilDisplay.RemoveMenuCommand(rb, "AccountantClientInfo");
         }
 

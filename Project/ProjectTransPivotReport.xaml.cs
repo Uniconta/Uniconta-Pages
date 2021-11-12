@@ -65,19 +65,13 @@ namespace UnicontaClient.Pages.CustomPage
         private void PivotGridControl_CellDoubleClick(object sender, DevExpress.Xpf.PivotGrid.PivotCellEventArgs e)
         {
             var cell = pivotDgProjectTrans.FocusedCell;
-            if (e.ColumnField.GroupInterval == FieldGroupInterval.DateMonth && e.RowField.FieldName == "Employee")
+            if (e.ColumnField != null && e.ColumnField.GroupInterval == FieldGroupInterval.DateMonth && e.RowField?.FieldName == "Employee")
             {
-                object columnValue = pivotDgProjectTrans.GetFieldValue(e.ColumnField, cell.X);
-                object rowValue = pivotDgProjectTrans.GetFieldValue(e.RowField, cell.Y);
-
-                var monthNo = (int)columnValue;
-                string employee = (string)rowValue;
+                object MonthNo = pivotDgProjectTrans.GetFieldValue(e.ColumnField, cell.X);
+                object employee = pivotDgProjectTrans.GetFieldValue(e.RowField, cell.Y) as string;
 
                 string vheader = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("PrTransaction"), employee);
-                var param = new object[2];
-                param[0] = employee;
-                param[1] = monthNo;
-                AddDockItem(TabControls.EmployeeProjectTransactionPage, param, vheader);
+                AddDockItem(TabControls.EmployeeProjectTransactionPage, new object[] { employee, MonthNo }, vheader);
             }
         }
 

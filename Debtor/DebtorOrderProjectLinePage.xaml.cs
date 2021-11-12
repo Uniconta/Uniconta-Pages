@@ -26,7 +26,7 @@ using Uniconta.Common.Utility;
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
-    public class DebtorOrderProjectLineLocal : DebtorOrderProjectLineClient
+     public class DebtorOrderProjectLineLocal : DebtorOrderProjectLineClient
     {
         internal bool InsidePropChange;
         public double costPct, salesPct, costAmount, salesAmount;
@@ -68,10 +68,10 @@ namespace UnicontaClient.Pages.CustomPage
         public override void SetDefaultValues(UnicontaBaseEntity dataEntity, int selectedIndex)
         {
             var newRow = (DebtorOrderProjectLineLocal)dataEntity;
-            var header = this.masterRecord as Uniconta.DataModel.DebtorOrder;
+            var header = this.masterRecord as Uniconta.DataModel.DCOrder;
             if (header != null)
             {
-                newRow.SetMaster(header);
+                newRow.SetMaster((UnicontaBaseEntity)header);
                 newRow._Dim1 = header._Dim1;
                 newRow._Dim2 = header._Dim2;
                 newRow._Dim3 = header._Dim3;
@@ -119,7 +119,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         SQLCache ItemsCache, ProjectCache, CategoryCache, PrStandardCache;
         Dictionary<string, Uniconta.API.DebtorCreditor.FindPrices> dictPriceLookup;
-        DebtorOrder debtorOrder;
+        DCOrder debtorOrder;
         public DebtorOrderProjectLinePage(UnicontaBaseEntity master) : base(master)
         {
             InitPage(master);
@@ -143,7 +143,7 @@ namespace UnicontaClient.Pages.CustomPage
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgDebtorOrderProjectLineGrid.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;
             dictPriceLookup = new Dictionary<string, Uniconta.API.DebtorCreditor.FindPrices>();
-            debtorOrder = master as DebtorOrder;
+            debtorOrder = master as DCOrder;
         }
 
         protected override void OnLayoutLoaded()
@@ -155,8 +155,9 @@ namespace UnicontaClient.Pages.CustomPage
         public async override Task InitQuery()
         {
             await dgDebtorOrderProjectLineGrid.Filter(null);
-            if (debtorOrder != null)
-                await api.Read(debtorOrder);
+            // do not reload, since lines has opdated order we pass, and then SQL version might not be up to date
+            //if (debtorOrder != null)
+            //    await api.Read((UnicontaBaseEntity)debtorOrder);
             var itemSource = (IList)dgDebtorOrderProjectLineGrid.ItemsSource;
             if (itemSource == null || itemSource.Count == 0)
                 dgDebtorOrderProjectLineGrid.AddFirstRow();
@@ -166,10 +167,12 @@ namespace UnicontaClient.Pages.CustomPage
         protected override void SyncEntityMasterRowChanged(UnicontaBaseEntity args)
         {
             dgDebtorOrderProjectLineGrid.UpdateMaster(args);
-            var debtOrderMaster = dgDebtorOrderProjectLineGrid.masterRecord as Uniconta.DataModel.DebtorOrder;
-            if (debtOrderMaster != null)
-                SetHeader(string.Concat(Uniconta.ClientTools.Localization.lookup("ProjectAdjustments"), ": ", NumberConvert.ToString(debtOrderMaster._OrderNumber)));
-
+            debtorOrder = dgDebtorOrderProjectLineGrid.masterRecord as Uniconta.DataModel.DCOrder;
+            if (debtorOrder != null)
+            {
+                api.Read((UnicontaBaseEntity)debtorOrder);
+                SetHeader(string.Concat(Uniconta.ClientTools.Localization.lookup("ProjectAdjustments"), ": ", NumberConvert.ToString(debtorOrder._OrderNumber)));
+            }
             InitQuery();
         }
 
@@ -376,7 +379,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         void RecalculateAmount()
         {
-            var lst = dgDebtorOrderProjectLineGrid.ItemsSource as List<DebtorOrderProjectLineLocal>;
+            var lst = dgDebtorOrderProjectLineGrid.ItemsSource as IEnumerable<DebtorOrderProjectLineLocal>;
             if (lst == null)
                 return;
             double adjustment = debtorOrder._OrderTotal - debtorOrder._ProjectTotal;

@@ -1356,7 +1356,7 @@ namespace UnicontaClient.Pages.CustomPage
                         if (calLst != null)
                             calendarLineLst.AddRange(calLst);
                     }
-                    var secCalenderdates = calendarLineLst.Where(x => x.Calendar == calenders[1].Calendar && x.Date >= calenders[1].ValidFrom && x.Date <= calenders[1].ValidTo);
+                    var secCalenderdates = calendarLineLst.Where(x => x.Calendar == calenders[1].Calendar && x.Date >= calenders[1].ValidFrom && (calenders[1].ValidTo == DateTime.MinValue || x.Date <= calenders[1].ValidTo));
 
                     firstCalenderdates.AddRange(secCalenderdates);
                     var dateList = firstCalenderdates.Where(d => d.Date >= weekStartDate && d.Date <= weekEnddate).ToList(); // get 7 days hours
@@ -2486,7 +2486,13 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         var nextLineNumber = (int)tmLinesLst.Where(s => s._RegistrationType == RegistrationType.Hours).Max(x => x._LineNumber) + 1;
 
-                        var payrollCategoryArr = payrollCache.Where(s => s._InternalType == Uniconta.DataModel.InternalType.OverTime).OrderBy(s => s._Number).ToArray();
+                        EmpPayrollCategory[] payrollCategoryArr;
+                        payrollCategoryArr = payrollCache.Where(s => s._InternalType == Uniconta.DataModel.InternalType.OverTime).OrderBy(s => s._Number).ToArray();
+
+                        if (payrollCategoryArr.Length == 0)
+                            payrollCategoryArr = payrollCache.Where(s => s._InternalType == Uniconta.DataModel.InternalType.FlexTime).OrderBy(s => s._Number).ToArray();
+
+
                         var overtimeN = payrollCategoryArr.Length > 0 ? payrollCategoryArr[0] : null;
                         var overtime1 = payrollCategoryArr.Length > 1 ? payrollCategoryArr[1] : null;
 

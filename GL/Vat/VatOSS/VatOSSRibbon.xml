@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<root>
+  <RibbonItem TabId="0" LocalizedNameKey="Home">
+    <!---When we create a new group and a new TabPage -->
+    <RibbonItem Action="Search" LocalizedNameKey="Search" LargeGlyph="Validate_32x32.png" ShortcutKey="Ctrl+H" />
+    <RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="DiscardTransaction" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png"/>
+  </RibbonItem>
+
+  <RibbonItem>
+    <RibbonItem Action="Validate" LocalizedNameKey="Validate" LargeGlyph="Check_Journal_32x32.png"/>
+    <RibbonItem Action="Compress" LocalizedNameKey="Compress" LargeGlyph="Match_Add_32x32.png"/>
+    <RibbonItem Action="CreateFile" LocalizedNameKey="CreateOBJ" Parameter="File" LargeGlyph="Export_32x32.png"/>
+  </RibbonItem>
+  <RibbonItem>
+    <!---If we want to create a new group in same PageTab-->
+    <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32.png">
+      <!---If we want Inner menu-->
+      <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
+      <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16.png" ShortcutKey="" />
+      <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" Glyph="save-16x16.png" LargeGlyph="save-16x16.png" ShortcutKey=""/>
+      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteOBJ" Parameter="Layout" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png" ShortcutKey=""/>
+      <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16.png" LargeGlyph="Delete_32x32.png" ShortcutKey="Ctrl+U"/>
+      <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportLayout" EnableSeperator="True" Glyph="ExportLayout_16x16.png" LargeGlyph="ExportLayout_16x16.png" ShortcutKey=""/>
+      <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportLayout" Glyph="Import_16x16.png" LargeGlyph="Import_16x16.png" ShortcutKey=""/>
+      <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16.png" ShortcutKey=""/>
+    </RibbonItem>
+  </RibbonItem>
+
+</root>

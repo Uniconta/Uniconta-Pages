@@ -157,7 +157,7 @@ namespace UnicontaClient.Pages.CustomPage
                 this.LookupKey = lookupkey;
             master = masterRecord;
             dgTabledataGrid.UserTableType = thMaster.UserType;
-            dgTabledataGrid.IsEditable = thMaster._EditLines;
+            dgTabledataGrid.IsEditable = thMaster._EditLines && !thMaster._ReadOnly;
 
             // first call setUserFields after grid is setup correctly
             setUserFields(thMaster);
@@ -184,6 +184,8 @@ namespace UnicontaClient.Pages.CustomPage
                 UtilDisplay.RemoveMenuCommand(rb, new string[] { "AddItem", "EditItem" });
             else
                 UtilDisplay.RemoveMenuCommand(rb, new string[] { "AddRow", "CopyRow", "DeleteRow", "SaveGrid", "UndoDelete" });
+            if(this.thMaster._ReadOnly)
+                UtilDisplay.RemoveMenuCommand(rb, new string[] { "AddRow", "CopyRow", "DeleteRow", "SaveGrid", "UndoDelete", "AddItem", "EditItem"});
             dtlTables = Utilities.Utility.GetDefaultCompany().UserTables.Where(x => x._MasterTable == thMaster._Name).ToList();
             if (dtlTables.Count > 0)
             {

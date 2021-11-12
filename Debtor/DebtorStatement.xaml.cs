@@ -343,7 +343,8 @@ namespace UnicontaClient.Pages.CustomPage
             var iprintReportList = new List<IPrintReport>();
 
             //Get Company related details
-            var companyClient = new CompanyClient();
+
+            var companyClient = api.CompanyEntity.CreateUserType<CompanyClient>();
             StreamingManager.Copy(api.CompanyEntity, companyClient);
             byte[] getLogoBytes = await UtilDisplay.GetLogo(api);
             int rowHandle = -1;

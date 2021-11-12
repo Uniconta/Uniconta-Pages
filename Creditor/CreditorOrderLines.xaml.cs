@@ -292,7 +292,7 @@ namespace UnicontaClient.Pages.CustomPage
                 var orderLine = param[0] as CreditorOrderLineClient;
                 if (dgCreditorOrderLineGrid.HasUnsavedData)
                 {
-                    var t = saveGrid();
+                    var t = saveGridLocal();
                     if (t != null && orderLine.RowId == 0)
                         await t;
                 }
@@ -398,8 +398,8 @@ namespace UnicontaClient.Pages.CustomPage
                     if (SetVariant2)
                     {
                         rec.variant2Source = invs2;
-                        if (!hasVariantValue)
-                            rec.Variant2 = null;
+                        //if (!hasVariantValue)
+                        //    rec.Variant2 = null;
                     }
                     else
                         rec.variant1Source = invs1;
@@ -625,7 +625,7 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                     break;
                 case "SaveGrid":
-                    saveGrid();
+                    saveGridLocal();
                     break;
                 case "DeleteRow":
                     dgCreditorOrderLineGrid.DeleteRow();
@@ -658,7 +658,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "MarkOrderLineAgnstInvTrans":
                     if (selectedItem?._Item == null) return;
-                    saveGrid();
+                    saveGridLocal();
                     object[] param = new object[] { selectedItem };
                     AddDockItem(TabControls.InventoryTransactionsMarkedPage, param, true);
                     break;
@@ -828,7 +828,7 @@ namespace UnicontaClient.Pages.CustomPage
         static bool showInvPrintPreview = true;
         private void OrderConfirmation(CreditorOrderClient dbOrder, CompanyLayoutType doctype)
         {
-            var savetask = saveGrid();
+            var savetask = saveGridLocal();
             InvoiceAPI Invapi = new InvoiceAPI(api);
             var creditor = dbOrder.Creditor;
             bool showSendByMail = true;
@@ -935,7 +935,7 @@ namespace UnicontaClient.Pages.CustomPage
             var item = (InvItem)items.Get(orderLine._Item);
             if (item == null || !item._UseSerialBatch)
                 return;
-            var t = saveGrid();
+            var t = saveGridLocal();
             if (t != null && orderLine.RowId == 0)
                 await t;
             if (api.CompanyEntity.Warehouse)
@@ -945,7 +945,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         async void RefreshGrid()
         {
-            var savetask = saveGrid(); // we need to wait until it is saved, otherwise Storage is not updated
+            var savetask = saveGridLocal(); // we need to wait until it is saved, otherwise Storage is not updated
             if (savetask != null)
                 await savetask;
             gridRibbon_BaseActions("RefreshGrid");
@@ -953,7 +953,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         async void ViewStorage()
         {
-            var t = saveGrid();
+            var t = saveGridLocal();
             if (t != null)
                 await t;
             AddDockItem(TabControls.InvItemStoragePage, dgCreditorOrderLineGrid.syncEntity, true);
@@ -961,7 +961,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void GenerateInvoice(CreditorOrderClient dbOrder, bool showProformaInvoice)
         {
-            var savetask = saveGrid();
+            var savetask = saveGridLocal();
             var curpanel = dockCtrl.Activpanel;
 
             var dc = ClientHelper.GetRef(dbOrder.CompanyId, typeof(Uniconta.DataModel.Creditor), dbOrder._DCAccount) as DCAccount;
@@ -1006,7 +1006,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                     var isSimulated = GenrateInvoiceDialog.IsSimulation;
                     var invoicePostingResult = SetupInvoicePostingPrintGenerator(dbOrder, GenrateInvoiceDialog.GenrateDate, GenrateInvoiceDialog.InvoiceNumber, isSimulated, GenrateInvoiceDialog.ShowInvoice,
-                        GenrateInvoiceDialog.InvoiceQuickPrint, GenrateInvoiceDialog.NumberOfPages, !isSimulated && GenrateInvoiceDialog.SendByOutlook, GenrateInvoiceDialog.sendOnlyToThisEmail, GenrateInvoiceDialog.Emails);
+                        GenrateInvoiceDialog.InvoiceQuickPrint, GenrateInvoiceDialog.NumberOfPages, GenrateInvoiceDialog.SendByOutlook, GenrateInvoiceDialog.sendOnlyToThisEmail, GenrateInvoiceDialog.Emails);
                     invoicePostingResult.SetAdditionalOrders(GenrateInvoiceDialog.AdditionalOrders?.Cast<DCOrder>().ToList());
 
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
@@ -1017,8 +1017,18 @@ namespace UnicontaClient.Pages.CustomPage
                     if (result)
                     {
                         Task reloadTask = null;
-                        if (!isSimulated && dbOrder._DeleteLines)
-                            reloadTask = Filter(null);
+                        if (!isSimulated)
+                        {
+                            if (dbOrder._DeleteLines)
+                                reloadTask = Filter(null);
+
+                            if(invoicePostingResult.PostingResult.OrderDeleted)
+                            {
+                                object[] args = new object[] { dbOrder, true };
+                                globalEvents.OnRefresh(this.NameOfControl, args);
+                                dockCtrl?.JustClosePanel(curpanel);
+                            }
+                        }
 
                         if (reloadTask != null)
                             CloseOrderLineScreen(reloadTask, curpanel);
@@ -1080,16 +1090,27 @@ namespace UnicontaClient.Pages.CustomPage
                     dgCreditorOrderLineGrid.RefreshRow(ind);
             }
         }
+        Task<ErrorCodes> saveGridLocal()
+        {
+            var orderLine = dgCreditorOrderLineGrid.SelectedItem as DCOrderLine;
+            dgCreditorOrderLineGrid.SelectedItem = null;
+            dgCreditorOrderLineGrid.SelectedItem = orderLine;
+            return saveGrid();
+        }
 
         protected override async Task<ErrorCodes> saveGrid()
         {
-            ErrorCodes res = await base.saveGrid();
-            if (res == ErrorCodes.Succes)
+            if (dgCreditorOrderLineGrid.HasUnsavedData)
             {
-                DataChanged = false;
-                globalEvents.OnRefresh(NameOfControl, orderMaster);
+                ErrorCodes res = await dgCreditorOrderLineGrid.SaveData();
+                if (res == ErrorCodes.Succes)
+                {
+                    DataChanged = false;
+                    globalEvents.OnRefresh(NameOfControl, orderMaster);
+                }
+                return res;
             }
-            return res;
+            return ErrorCodes.Succes;
         }
 
         private Task Filter(IEnumerable<PropValuePair> propValuePair)

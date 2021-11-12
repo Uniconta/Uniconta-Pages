@@ -507,7 +507,7 @@ namespace UnicontaClient.Pages.CustomPage
                             sum = 0;
                             foreach (var s in empInternalTransLst)
                             {
-                                if (s._Date < startDateMonday && lstCatOverTime.Contains(s._PayrollCategory))
+                                if (s._Date <= startDateMonday && lstCatOverTime.Contains(s._PayrollCategory))
                                     sum += s._Qty;
                             }
                             overTimeYTD = -sum;
@@ -520,7 +520,7 @@ namespace UnicontaClient.Pages.CustomPage
                             sum = 0;
                             foreach (var s in empInternalTransLst)
                             {
-                                if (s._Date < startDateMonday && lstCatFlexTime.Contains(s._PayrollCategory))
+                                if (s._Date <= startDateMonday && lstCatFlexTime.Contains(s._PayrollCategory))
                                     sum += s._Qty;
                             }
                             flexTimeYTD = -sum;

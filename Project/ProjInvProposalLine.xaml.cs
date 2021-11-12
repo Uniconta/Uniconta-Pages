@@ -502,8 +502,8 @@ namespace UnicontaClient.Pages.CustomPage
                     if (SetVariant2)
                     {
                         rec.variant2Source = invs2;
-                        if (!hasVariantValue)
-                            rec.Variant2 = null;
+                        //if (!hasVariantValue)
+                        //    rec.Variant2 = null;
                     }
                     else
                         rec.variant1Source = invs1;
@@ -522,12 +522,16 @@ namespace UnicontaClient.Pages.CustomPage
 
         void RecalculateAmount()
         {
-            var ret = DebtorOfferLines.RecalculateLineSum(Order, (IEnumerable<DCOrderLineClient>)dgProjInvProposedLineGrid.ItemsSource, this.exchangeRate);
+            var ord = this.Order;
+            if (ord == null)
+                return;
+            var ret = DebtorOfferLines.RecalculateLineSum(ord, (IEnumerable<DCOrderLineClient>)dgProjInvProposedLineGrid.ItemsSource, this.exchangeRate);
             double Amountsum = ret.Item1;
             double Costsum = ret.Item2;
             double sales = ret.Item3;
-            if (Order != null && Order._EndDiscountPct != 0)
-                sales *= (100d - Order._EndDiscountPct) / 100d;
+            ord._OrderTotal = sales;
+            if (ord._EndDiscountPct != 0)
+                sales *= (100d - ord._EndDiscountPct) / 100d;
 
             RibbonBase rb = (RibbonBase)localMenu.DataContext;
             var groups = UtilDisplay.GetMenuCommandsByStatus(rb, true);
@@ -554,10 +558,7 @@ namespace UnicontaClient.Pages.CustomPage
                     grp.StatusValue = str;
                 }
                 else if (grp.Caption == strProjTotal)
-                {
-                    var projTotal = (Order != null && Order.ProjectTotal != 0d) ? Order.ProjectTotal : 0d;
-                    grp.StatusValue = projTotal.ToString("N2");
-                }
+                    grp.StatusValue = ord._ProjectTotal.ToString("N2");
                 else
                     grp.StatusValue = string.Empty;
             }
@@ -567,6 +568,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void localMenu_OnItemClicked(string ActionType)
         {
             ProjectInvoiceProposalLineClient row;
+            ProjectInvoiceProposalClient ord = this.Order;
             var selectedItem = dgProjInvProposedLineGrid.SelectedItem as ProjectInvoiceProposalLineClient;
             switch (ActionType)
             {
@@ -593,10 +595,10 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "ShowInvoice":
                 case "CreateInvoice":
-                    if (Order != null)
+                    if (ord != null)
                     {
                         if (Utility.HasControlRights("GenerateInvoice", api.CompanyEntity))
-                            GenerateInvoice(Order, ActionType == "ShowInvoice" ? true : false);
+                            GenerateInvoice(ord, ActionType == "ShowInvoice" ? true : false);
                         else
                             UtilDisplay.ShowControlAccessMsg("GenerateInvoice");
                     }
@@ -607,36 +609,33 @@ namespace UnicontaClient.Pages.CustomPage
                         row.Subtotal = true;
                     break;
                 case "AddItems":
-                    if (this.items == null)
-                        return;
-                    object[] paramArray = new object[3] { new InvItemSalesCacheFilter(this.items), dgProjInvProposedLineGrid.TableTypeUser, Order };
-                    AddDockItem(TabControls.AddMultipleInventoryItem, paramArray, true,
-                        string.Format(Uniconta.ClientTools.Localization.lookup("AddOBJ"), Uniconta.ClientTools.Localization.lookup("InventoryItems")), null, floatingLoc: Utility.GetDefaultLocation());
+                    if (this.items != null)
+                    {
+                        object[] paramArray = new object[3] { new InvItemSalesCacheFilter(this.items), dgProjInvProposedLineGrid.TableTypeUser, Order };
+                        AddDockItem(TabControls.AddMultipleInventoryItem, paramArray, true,
+                            string.Format(Uniconta.ClientTools.Localization.lookup("AddOBJ"), Uniconta.ClientTools.Localization.lookup("InventoryItems")), null, floatingLoc: Utility.GetDefaultLocation());
+                    }
                     break;
                 case "EditOrder":
-                    if (Order != null)
-                        AddDockItem(TabControls.ProjInvProposalPage2, Order, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Orders"), Order._OrderNumber));
+                    if (ord != null)
+                        AddDockItem(TabControls.ProjInvProposalPage2, ord, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Orders"), ord._OrderNumber));
                     break;
                 case "ProjectTransaction":
-                    if (Order != null)
+                    if (ord != null)
                     {
                         saveGridLocal();
-                        var o = Order;
-                        AddDockItem(TabControls.ProjectInvoiceProjectLinePage, o, string.Format("{0}: {1} ({2})", Uniconta.ClientTools.Localization.lookup("ProjectAdjustments"), o._OrderNumber, o._Project));
+                        AddDockItem(TabControls.ProjectInvoiceProjectLinePage, ord, string.Format("{0}: {1} ({2})", Uniconta.ClientTools.Localization.lookup("ProjectAdjustments"), ord._OrderNumber, ord._Project));
                     }
                     break;
                 case "RegenerateOrderFromProject":
-                    if (Order != null)
-                    {
-                        var o = Order;
-                        AddDockItem(TabControls.RegenerateOrderFromProjectPage, o, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("RegenerateOrder"), o._OrderNumber));
-                    }
+                    if (ord != null)
+                        AddDockItem(TabControls.RegenerateOrderFromProjectPage, ord, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("RegenerateOrder"), ord._OrderNumber));
                     break;
                 case "AddVariants":
                     var itm = selectedItem?.InvItem;
                     if (itm?._StandardVariant != null)
                     {
-                        var paramItem = new object[] { selectedItem, Order };
+                        var paramItem = new object[] { selectedItem, ord };
                         dgProjInvProposedLineGrid.SetLoadedRow(selectedItem);
                         AddDockItem(TabControls.ItemVariantAddPage, paramItem, true,
                         string.Format(Uniconta.ClientTools.Localization.lookup("AddOBJ"), Uniconta.ClientTools.Localization.lookup("Variants")), null, floatingLoc: Utility.GetDefaultLocation());
@@ -645,7 +644,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "CreateFromInvoice":
                     try
                     {
-                        CWCreateOrderFromQuickInvoice createOrderCW = new CWCreateOrderFromQuickInvoice(api, Order.Account, true, Order);
+                        CWCreateOrderFromQuickInvoice createOrderCW = new CWCreateOrderFromQuickInvoice(api, ord.Account, true, ord);
                         createOrderCW.Closing += delegate
                         {
                             if (createOrderCW.DialogResult == true)

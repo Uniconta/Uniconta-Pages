@@ -445,6 +445,54 @@ namespace UnicontaISO20022CreditTransfer
         }
 
         /// <summary>
+        /// Nordea: Reference quoted on statement. This reference will be presented on Creditor’s account statement. It may only be used for domestic payments. Only used by Norway, Denmark and Sweden.
+        /// Max 20 characters
+        /// </summary>
+        public override string RemittanceInfo(string externalAdvText, ISO20022PaymentTypes ISOPaymType, PaymentTypes paymentMethod)
+        {
+            string remittanceInfo = StandardPaymentFunctions.RegularExpressionReplace(externalAdvText, allowedCharactersRegEx, replaceCharactersRegEx);
+
+            if (remittanceInfo != string.Empty && ISOPaymType == ISO20022PaymentTypes.DOMESTIC)
+            {
+                switch (paymentMethod)
+                {
+                    case PaymentTypes.VendorBankAccount:
+                        if (remittanceInfo.Length > 20)
+                            remittanceInfo = remittanceInfo.Substring(0, 20);
+                        break;
+
+                    case PaymentTypes.IBAN:
+                        if (remittanceInfo.Length > 20)
+                            remittanceInfo = remittanceInfo.Substring(0, 20);
+                        break;
+
+                    case PaymentTypes.PaymentMethod3: //FIK71
+                        remittanceInfo = string.Empty;
+                        break;
+
+                    case PaymentTypes.PaymentMethod5: //FIK75
+                        remittanceInfo = string.Empty;
+                        break;
+
+                    case PaymentTypes.PaymentMethod4: //FIK73
+                        remittanceInfo = string.Empty;
+                        break;
+
+                    case PaymentTypes.PaymentMethod6: //FIK04
+                        remittanceInfo = string.Empty;
+                        break;
+                }
+            }
+            else
+            {
+                remittanceInfo = string.Empty;
+            }
+
+            return remittanceInfo;
+        }
+
+
+        /// <summary>
         /// Unstructured Remittance Information
         /// </summary>
         public override List<string> Ustrd(string externalAdvText, ISO20022PaymentTypes ISOPaymType, PaymentTypes paymentMethod, bool extendedText)

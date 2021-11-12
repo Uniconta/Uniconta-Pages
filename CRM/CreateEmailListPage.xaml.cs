@@ -120,16 +120,16 @@ namespace UnicontaClient.Pages.CustomPage
             var api = this.api;
             var Comp = api.CompanyEntity;
 
-            InterestCache = Comp.GetCache(typeof(Uniconta.DataModel.CrmInterest)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.CrmInterest), api);
-            cmbInterests.ItemsSource = InterestCache.GetKeyList();
+            InterestCache = Comp.GetCache(typeof(Uniconta.DataModel.CrmInterest)) ?? await api.LoadCache(typeof(Uniconta.DataModel.CrmInterest));
+            cmbInterests.ItemsSource = InterestCache?.GetKeyList();
 
-            ProductCache = Comp.GetCache(typeof(Uniconta.DataModel.CrmProduct)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.CrmProduct), api);
-            cmbProducts.ItemsSource = ProductCache.GetKeyList();
+            ProductCache = Comp.GetCache(typeof(Uniconta.DataModel.CrmProduct)) ?? await api.LoadCache(typeof(Uniconta.DataModel.CrmProduct));
+            cmbProducts.ItemsSource = ProductCache?.GetKeyList();
 
-            Debtors = Comp.GetCache(typeof(Uniconta.DataModel.Debtor))?? await Comp.LoadCache(typeof(Uniconta.DataModel.Debtor), api);
-            Prospects = Comp.GetCache(typeof(Uniconta.DataModel.CrmProspect)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.CrmProspect), api);
-            Creditors = Comp.GetCache(typeof(Uniconta.DataModel.Creditor)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.Creditor), api);
-            Contacts = Comp.GetCache(typeof(Uniconta.DataModel.Contact)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.Contact), api);
+            Debtors = Comp.GetCache(typeof(Uniconta.DataModel.Debtor))?? await api.LoadCache(typeof(Uniconta.DataModel.Debtor));
+            Prospects = Comp.GetCache(typeof(Uniconta.DataModel.CrmProspect)) ?? await api.LoadCache(typeof(Uniconta.DataModel.CrmProspect));
+            Creditors = Comp.GetCache(typeof(Uniconta.DataModel.Creditor)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Creditor));
+            Contacts = Comp.GetCache(typeof(Uniconta.DataModel.Contact)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Contact));
         }
 
         void localMenu_OnItemClicked(string ActionType)

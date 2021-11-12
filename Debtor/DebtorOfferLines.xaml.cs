@@ -469,8 +469,8 @@ namespace UnicontaClient.Pages.CustomPage
                     if (SetVariant2)
                     {
                         rec.variant2Source = invs2;
-                        if (!hasVariantValue)
-                            rec.Variant2 = null;
+                        //if (!hasVariantValue)
+                        //    rec.Variant2 = null;
                     }
                     else
                         rec.variant1Source = invs1;
@@ -594,6 +594,7 @@ namespace UnicontaClient.Pages.CustomPage
             double Amountsum = ret.Item1;
             double Costsum = ret.Item2;
             double sales = ret.Item3;
+            Order._OrderTotal = sales;
             if (Order._EndDiscountPct != 0)
                 sales *= (100d - Order._EndDiscountPct) / 100d;
 

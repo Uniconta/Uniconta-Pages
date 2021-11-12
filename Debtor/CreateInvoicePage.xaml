@@ -361,8 +361,8 @@ x:Class="UnicontaClient.Pages.CustomPage.CreateInvoicePage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="IgnoreBlocked" Width="50" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Week" Width="50" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Date" Width="90" Visible="False" />
-
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PostingAccount" Width="100" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PurchaseAccount" Width="100" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Vat" Width="50" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Employee" Width="50" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Variant1Name" Width="100" Visible="False"/>

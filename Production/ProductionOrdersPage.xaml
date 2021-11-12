@@ -120,6 +120,8 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionOrdersPage"
                             </DataTemplate>
                         </local:CorasauDataGridTemplateColumnClient.CellTemplate>
                     </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="OrderTotal" Width="80" ReadOnly="True" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="NoLines" Width="50" ReadOnly="True" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Project"  Visible="False" Width="100"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="PrCategory"  Visible="False" Width="100"/>
                     <local:CorasauDataGridForeignKeyColumnClient x:Name="Task" Visible="False"/>

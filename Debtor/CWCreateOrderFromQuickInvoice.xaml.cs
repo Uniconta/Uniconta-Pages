@@ -98,8 +98,8 @@ namespace UnicontaClient.Pages.CustomPage
             busyIndicator.IsBusy = true;
 
             var lines = await CreateDCOrderLinesFromInvoice(dcOrder, selectedItem, (bool)chkIfCreditNote.IsChecked);
-
-            DCOrderLines = lines.Cast<UnicontaBaseEntity>();
+            if (lines != null)
+                DCOrderLines = lines.Cast<UnicontaBaseEntity>();
             busyIndicator.IsBusy = false;
             dcOrderlineGrid.ItemsSource = lines;
             dcOrderlineGrid.Visibility = Visibility.Visible;
@@ -226,8 +226,12 @@ namespace UnicontaClient.Pages.CustomPage
             if (selectedItem != null && !disableOrderLineGrid)
             {
                 double sign = (bool)chkIfCreditNote.IsChecked ? -1d : 1d;
-                foreach (var line in dcOrderlineGrid.ItemsSource as IEnumerable<DebtorCommonOrderLineClient>)
-                    line.Qty = line.Qty > 0d ? line.Qty * sign : line.Qty * -1d;
+                var source = dcOrderlineGrid.ItemsSource as IEnumerable<DebtorCommonOrderLineClient>;
+                if (source != null)
+                {
+                    foreach (var line in source)
+                        line.Qty = line.Qty > 0d ? line.Qty * sign : line.Qty * -1d;
+                }
             }
         }
     }

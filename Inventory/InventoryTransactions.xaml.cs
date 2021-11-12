@@ -436,8 +436,23 @@ namespace UnicontaClient.Pages.CustomPage
         protected override void LoadCacheInBackGround()
         {
             var Comp = api.CompanyEntity;
-
-            var lst = new List<Type>(12) { typeof(Uniconta.DataModel.InvItem), typeof(Uniconta.DataModel.GLVat), typeof(Uniconta.DataModel.Employee) };
+            var lst = new List<Type>(20);
+            if (Comp.Warehouse)
+                lst.Add(typeof(Uniconta.DataModel.InvWarehouse));
+            if (Comp.NumberOfDimensions >= 1)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType1));
+            if (Comp.NumberOfDimensions >= 2)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType2));
+            if (Comp.NumberOfDimensions >= 3)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType3));
+            if (Comp.NumberOfDimensions >= 4)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType4));
+            if (Comp.NumberOfDimensions >= 5)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType5));
+            lst.Add(typeof(Uniconta.DataModel.GLVat));
+            lst.Add(typeof(Uniconta.DataModel.Employee));
+            lst.Add(typeof(Uniconta.DataModel.Debtor));
+            lst.Add(typeof(Uniconta.DataModel.Creditor));
             if (Comp.ItemVariants)
             {
                 lst.Add(typeof(Uniconta.DataModel.InvVariant1));
@@ -449,15 +464,9 @@ namespace UnicontaClient.Pages.CustomPage
                     lst.Add(typeof(Uniconta.DataModel.InvVariant4));
                 if (n >= 5)
                     lst.Add(typeof(Uniconta.DataModel.InvVariant5));
+                lst.Add(typeof(Uniconta.DataModel.InvStandardVariant));
             }
-            if (Comp.Warehouse)
-                lst.Add(typeof(Uniconta.DataModel.InvWarehouse));
-            if (Comp.Shipments)
-            {
-                lst.Add(typeof(Uniconta.DataModel.ShipmentType));
-                lst.Add(typeof(Uniconta.DataModel.DeliveryTerm));
-            }
-
+            lst.Add(typeof(Uniconta.DataModel.InvItem));
             LoadType(lst);
         }
 

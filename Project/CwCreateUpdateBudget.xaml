@@ -34,7 +34,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CwCreateUpdateBudget"
                 <UnicontaControls:CorasauLayoutItem FieldName="BudgetName" x:Name="lblTxtName">
                     <UnicontaControls:TextEditor x:Name="txtName" Width="170" Text="{Binding BudgetName,Mode=TwoWay}"/>
                 </UnicontaControls:CorasauLayoutItem>
-                <UnicontaControls:CorasauLayoutItem FieldName="DeleteBudget">
+                <UnicontaControls:CorasauLayoutItem FieldName="DeleteBudget" x:Name="lblDeleteBudget">
                     <UnicontaControls:CheckEditor x:Name="deleteBudget" IsChecked="{Binding DeleteBudget,Mode=TwoWay}"/>
                 </UnicontaControls:CorasauLayoutItem>
             </UnicontaControls:CorasauLayoutGroup>

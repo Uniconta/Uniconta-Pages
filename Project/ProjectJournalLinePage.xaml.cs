@@ -786,6 +786,8 @@ namespace UnicontaClient.Pages.CustomPage
         Task<ErrorCodes> saveGridLocal()
         {
             var prOrderLine = dgProjectJournalLinePageGrid.SelectedItem as ProjectJournalLineLocal;
+            dgProjectJournalLinePageGrid.SelectedItem = null;
+            dgProjectJournalLinePageGrid.SelectedItem = prOrderLine;
             refreshOnHand = prOrderLine != null && prOrderLine.RowId == 0;
             return saveGrid();
         }

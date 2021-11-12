@@ -439,7 +439,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         public override void Utility_Refresh(string screenName, object argument = null)
         {
-            if (TabControls.SettleOpenTransactionPage == screenName)
+            if (screenName == TabControls.SettleOpenTransactionPage)
             {
                 var obj = argument as object[];
                 if (obj != null && obj.Length == 6)
@@ -1059,7 +1059,7 @@ namespace UnicontaClient.Pages.CustomPage
             dgGLDailyJournalLine.SetLoadedRow(selectedItem);
             if (Currency != null)
             {
-                if (selectedItem.AmountCurSetBySystem || selectedItem.AmountCur == 0d || (masterRecord._AskOverwriteAmount && showDif(MarkedRemainingAmtCur, selectedItem.AmountCur, Offset)))
+                if (selectedItem.AmountCurSetBySystem || selectedItem.AmountCur == 0d || (masterRecord != null && masterRecord._AskOverwriteAmount && showDif(MarkedRemainingAmtCur, selectedItem.AmountCur, Offset)))
                 {
                     selectedItem.AmountCurSetBySystem = true;
                     if (Currency != null)
@@ -1070,7 +1070,7 @@ namespace UnicontaClient.Pages.CustomPage
                     selectedItem.AmountCur = Offset ? MarkedRemainingAmtCur : -MarkedRemainingAmtCur;
                 }
             }
-            else if (selectedItem.AmountSetBySystem || selectedItem.Amount == 0d || (masterRecord._AskOverwriteAmount && showDif(MarkedRemainingAmt, selectedItem.Amount, Offset)))
+            else if (selectedItem.AmountSetBySystem || selectedItem.Amount == 0d || (masterRecord != null && masterRecord._AskOverwriteAmount && showDif(MarkedRemainingAmt, selectedItem.Amount, Offset)))
             {
                 selectedItem.AmountSetBySystem = true;
                 selectedItem.Amount = Offset ? MarkedRemainingAmt : -MarkedRemainingAmt;
@@ -1085,7 +1085,7 @@ namespace UnicontaClient.Pages.CustomPage
                     ch = settlementStr[0];
                     settlementStr = settlementStr.Substring(pos + 1);
                 }
-                SettleValueType settleType =  (ch == 'V') ? SettleValueType.Voucher : ((ch == 'R') ?  SettleValueType.RowId : SettleValueType.Invoice);
+                SettleValueType settleType = (ch == 'V') ? SettleValueType.Voucher : ((ch == 'R') ? SettleValueType.RowId : SettleValueType.Invoice);
                 if (settleType == SettleValueType.Invoice && settlementStr.IndexOf(';') < 0)
                 {
                     selectedItem.Invoice = settlementStr;

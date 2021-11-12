@@ -103,8 +103,7 @@ namespace UnicontaClient.Pages.CustomPage
                     string salesHeader = string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("Orders"), selectedItem._OrderNumber);
                     if (dgMultiInvGrid.masterRecords != null)
                     {
-                        object[] arr = new object[2] { selectedItem, dgMultiInvGrid.masterRecord };
-                        AddDockItem(TabControls.DebtorOrdersPage2, arr, salesHeader);
+                        AddDockItem(TabControls.DebtorOrdersPage2, new object[] { selectedItem, dgMultiInvGrid.masterRecord }, salesHeader);
                     }
                     else
                     {
@@ -164,7 +163,7 @@ namespace UnicontaClient.Pages.CustomPage
                     RecalculateOrderPrices();
                     break;
                 case "PostProjectOrder":
-                    if (string.IsNullOrEmpty(selectedItem._Project))
+                    if (string.IsNullOrEmpty(selectedItem?._Project))
                     {
                         UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("ProjectCannotBeBlank"), Uniconta.ClientTools.Localization.lookup("Message"));
                         return;
