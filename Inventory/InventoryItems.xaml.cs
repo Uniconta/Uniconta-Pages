@@ -296,10 +296,13 @@ namespace UnicontaClient.Pages.CustomPage
                     dgInventoryItemsGrid.AddRow();
                     break;
                 case "CopyRow":
-                    if (copyRowIsEnabled)
-                        ClearValues(dgInventoryItemsGrid.CopyRow() as InvItem);
-                    else
-                        CopyRecord(selectedItem);
+                    if (selectedItem != null)
+                    {
+                        if (copyRowIsEnabled)
+                            ClearValues(dgInventoryItemsGrid.CopyRow() as InvItem);
+                        else
+                            CopyRecord(selectedItem);
+                    }
                     break;
                 case "DeleteRow":
                     if (selectedItem != null)

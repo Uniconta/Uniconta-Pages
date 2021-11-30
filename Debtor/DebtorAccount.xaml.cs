@@ -267,10 +267,13 @@ namespace UnicontaClient.Pages.CustomPage
                     dgDebtorAccountGrid.AddRow();
                     break;
                 case "CopyRow":
-                    if (copyRowIsEnabled)
-                        dgDebtorAccountGrid.CopyRow();
-                    else
-                        CopyRecord(selectedItem);
+                    if (selectedItem != null)
+                    {
+                        if (copyRowIsEnabled)
+                            dgDebtorAccountGrid.CopyRow();
+                        else
+                            CopyRecord(selectedItem);
+                    }
                     break;
                 case "DeleteRow":
                     dgDebtorAccountGrid.DeleteRow();

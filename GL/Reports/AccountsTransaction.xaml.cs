@@ -186,7 +186,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (api.session.User._Role < (byte)Uniconta.Common.User.UserRoles.Reseller)
                         RemoveDeleteVoucher();
                 }
-                else if ((CountryId == CountryCode.SouthAfrica || CountryId == CountryCode.UnitedKingdom || CountryId == CountryCode.Germany)
+                else if ((CountryId == CountryCode.Germany)
                      && api.session.User._Role < (byte)Uniconta.Common.User.UserRoles.Distributor)
                 {
                     RemoveDeleteVoucher();

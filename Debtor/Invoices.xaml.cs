@@ -762,8 +762,14 @@ namespace UnicontaClient.Pages.CustomPage
                     }
 
                     listOfXmlPath.Add(filename);
-
-                    result.Document.Save(filename);
+                    try
+                    {
+                        result.Document.Save(filename);
+                    }
+                    catch (Exception ex)
+                    {
+                        Uniconta.ClientTools.Controls.UnicontaMessageBox.Show(ex);
+                    }
                     await Invapi.MarkSendInvoiceOIO(invClient);
                     invClient.SendTimeOIO = BasePage.GetSystemDefaultDate();
                     invClient._SystemInfo = "Ok";

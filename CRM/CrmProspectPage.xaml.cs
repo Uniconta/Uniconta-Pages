@@ -128,10 +128,13 @@ namespace UnicontaClient.Pages.CustomPage
                     dgCrmProspectGrid.AddRow();
                     break;
                 case "CopyRow":
-                    if (copyRowIsEnabled)
-                        dgCrmProspectGrid.CopyRow();
-                    else
-                        CopyRecord(selectedItem);
+                    if (selectedItem != null)
+                    {
+                        if (copyRowIsEnabled)
+                            dgCrmProspectGrid.CopyRow();
+                        else
+                            CopyRecord(selectedItem);
+                    }
                     break;
                 case "ConvertToDebtor":
                     if (selectedItem != null)

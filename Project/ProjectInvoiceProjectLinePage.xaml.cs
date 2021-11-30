@@ -196,11 +196,87 @@ namespace UnicontaClient.Pages.CustomPage
                 case "UpdatePrices":
                     UpdatePrices();
                     break;
+                case "Adjustment":
+                    AdjustTransactionPerEmployee();
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
             RecalculateAmount();
+        }
+        async void AdjustTransactionPerEmployee()
+        {
+            // var propValuePair = new List<PropValuePair>() { PropValuePair.GenereteWhereElements("SendToOrder", invoiceProposal._OrderNumber, CompareOperator.Equal) };
+            var trans = await api.Query<ProjectTransClient>(invoiceProposal);
+            if (trans != null)
+            {
+                int n;
+                ProjectTransClient t;
+                double Amountsum = 0;
+                for (n = 0; (n < trans.Length); n++)
+                {
+                    t = trans[n];
+                    if (t._Employee != null && t._PrCategory != null && ((PrCategory)CategoryCache.Get(t._PrCategory))._CatType == CategoryType.Labour)
+                        Amountsum += t._SalesAmount;
+                    else
+                        trans[n] = null;
+                }
+                double adjustment = invoiceProposal._OrderTotal - invoiceProposal._ProjectTotal;
+                PrCategory adjustmentcategory = null;
+                foreach (var cat in (Uniconta.DataModel.PrCategory[])CategoryCache.GetNotNullArray)
+                {
+                    if (cat._CatType == CategoryType.Adjustment)
+                    {
+                        adjustmentcategory = cat;
+                        break;
+                    }
+                }
+
+                // we need to delete all rows in grid
+                dgProjInvProjectLineGrid.DeleteAllRows();
+
+                // Now all lines are deleted (not in SQL, just in corasauDataGrid)
+                // Now we will insert new lines in corasauDataGrid
+                // On 'save' old lines will be delete and new lines added.
+
+                double adjustmentAdded = 0;
+                int pos = 0;
+                ProjectInvoiceProjectLineLocal line = null;
+                for (n = 0; (n < trans.Length); n++)
+                {
+                    t = trans[n];
+                    if (t != null)
+                    {
+                        var price = Math.Round(adjustment / Amountsum * t._SalesAmount, 2);
+                        adjustmentAdded += price;
+                        line = ((IEnumerable<ProjectInvoiceProjectLineLocal>)dgProjInvProjectLineGrid.ItemsSource).Where(e => e.Employee == t.Employee).FirstOrDefault();
+                        if (line == null)
+                        {
+                            line = new ProjectInvoiceProjectLineLocal();
+                            line.PrCategory = adjustmentcategory?.KeyStr;
+                            line._Qty = 1;
+                            line._SalesPrice = price;
+                            line._Employee = t._Employee;
+                            line._Dim1 = t._Dim1;
+                            line._Dim2 = t._Dim2;
+                            line._Dim3 = t._Dim3;
+                            line._Dim4 = t._Dim4;
+                            line._Dim5 = t._Dim5;
+                            dgProjInvProjectLineGrid.InsertRow(line, pos++);
+                        }
+                        else
+                        {
+                            line.SalesPrice += price;
+                        }
+                    }
+                }
+                if (line != null)
+                    line.SalesPrice += (adjustment - adjustmentAdded);
+
+                dgProjInvProjectLineGrid.ShowTotalSummary();
+                RecalculateAmount();
+            }
         }
 
         private void DataControl_CurrentItemChanged(object sender, DevExpress.Xpf.Grid.CurrentItemChangedEventArgs e)

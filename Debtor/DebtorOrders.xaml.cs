@@ -293,8 +293,11 @@ namespace UnicontaClient.Pages.CustomPage
                     dgDebtorOrdersGrid.AddRow();
                     break;
                 case "CopyRow":
-                    selectedItem = dgDebtorOrdersGrid.CopyRow() as DebtorOrderClient;
-                    selectedItem.OrderNumber = 0;
+                    if (selectedItem != null)
+                    {
+                        selectedItem = dgDebtorOrdersGrid.CopyRow() as DebtorOrderClient;
+                        selectedItem.OrderNumber = 0;
+                    }
                     break;
                 case "DeleteRow":
                     dgDebtorOrdersGrid.DeleteRow();
@@ -380,29 +383,29 @@ namespace UnicontaClient.Pages.CustomPage
 
         async void TestDebtorReload(bool refresh, IEnumerable<DebtorOrder> lst)
         {
-            bool reload = false;
             if (lst != null && lst.Count() > 0)
             {
                 var cache = api.GetCache(typeof(Uniconta.DataModel.Debtor));
-                if (cache == null)
-                    return;
-
-                var Contacts = api.GetCache(typeof(Uniconta.DataModel.Contact));
-                foreach (var rec in lst)
+                if (cache != null)
                 {
-                    if (rec._DCAccount != null && cache.Get(rec._DCAccount) == null)
+                    bool reload = false;
+                    var Contacts = api.GetCache(typeof(Uniconta.DataModel.Contact));
+                    foreach (var rec in lst)
                     {
-                        reload = true;
-                        break;
+                        if (rec._DCAccount != null && cache.Get(rec._DCAccount) == null)
+                        {
+                            reload = true;
+                            break;
+                        }
+                        if (rec._ContactRef != 0 && Contacts != null && Contacts.Get(rec._ContactRef) == null)
+                        {
+                            Contacts = null;
+                            api.LoadCache(typeof(Uniconta.DataModel.Contact), true);
+                        }
                     }
-                    if (rec._ContactRef != 0 && Contacts != null && Contacts.Get(rec._ContactRef) == null)
-                    {
-                        Contacts = null;
-                        api.LoadCache(typeof(Uniconta.DataModel.Contact), true);
-                    }
+                    if (reload)
+                        await api.LoadCache(typeof(Uniconta.DataModel.Debtor), true);
                 }
-                if (reload)
-                    await api.LoadCache(typeof(Uniconta.DataModel.Debtor), true);
             }
             if (refresh)
                 gridRibbon_BaseActions("RefreshGrid");

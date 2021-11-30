@@ -415,7 +415,7 @@ namespace UnicontaClient.Pages.CustomPage
             var pairTrans = new PropValuePair[]
             {
                 PropValuePair.GenereteWhereElements(nameof(ProjectTransClient.Date), DefaultToDate, CompareOperator.LessThanOrEqual),
-                PropValuePair.GenereteWhereElements(nameof(ProjectTransClient.Invoiceable), typeof(bool), "1")
+                PropValuePair.GenereteWhereElements(nameof(ProjectTransClient.Invoiceable), typeof(bool), "1"),
             };
             var projTransLst = await api.Query<ProjectTransClient>(pairTrans);
             if (projTransLst == null || projTransLst.Length == 0)
@@ -533,8 +533,6 @@ namespace UnicontaClient.Pages.CustomPage
                         else
                         {
                             search.Project = x._Project;
-                            search.Task = x._Task;
-                            search.Workspace = x._WorkSpace;
                             search.Invoice = x._InvoicedOn;
                             pos = Array.BinarySearch(invBalanceArr, search, sort);
                             if (pos >= 0)
@@ -690,8 +688,6 @@ namespace UnicontaClient.Pages.CustomPage
                         else
                         {
                             search.Project = x._Project;
-                            search.Task = x._Task;
-                            search.Workspace = x._WorkSpace;
                             search.Invoice = x._InvoicedOn;
                             pos = Array.BinarySearch(invOpeningArr, search, sort);
                             if (pos >= 0)
@@ -743,8 +739,6 @@ namespace UnicontaClient.Pages.CustomPage
                         else
                         {
                             search.Project = y._Project;
-                            search.Workspace = y._WorkSpace;
-                            search.Task = y._Task;
                             search.Invoice = y._InvoicedOn;
                             pos = Array.BinarySearch(invBalanceArr, search, sort);
                             if (pos >= 0)

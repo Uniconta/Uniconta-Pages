@@ -276,6 +276,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 return;
                             }
                         }
+                        rec.CostPrice = 0;
                         var _priceLookup = this.PriceLookup;
                         this.PriceLookup = null; // avoid that we call priceupdated in property change on Qty
                         if (selectedItem._SalesQty != 0d)

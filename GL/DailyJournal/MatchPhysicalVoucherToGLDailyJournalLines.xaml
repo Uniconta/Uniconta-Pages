@@ -60,8 +60,8 @@ x:Class="UnicontaClient.Pages.CustomPage.MatchPhysicalVoucherToGLDailyJournalLin
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Approver1" Visible="False" Width="80"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Approver2" Visible="False" Width="80"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Approved2" Width="70" Visible="False"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="Folder" AllowEditing="False" Visible="False" Width="55" />
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="PayDate"  Width="85" Visible="False" />
+                        <localPage:CorasauDataGridTemplateColumnClient x:Name="ViewInFolder" AllowEditing="False" Visible="False" Width="100" />
+                        <localPage:CorasauDataGridTemplateColumnClient x:Name="PayDate" Width="85" Visible="False" />
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="VatOperation"  Visible="False"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="TransType"  Visible="False" />
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="PurchaseNumber" Width="85" Visible="False" />

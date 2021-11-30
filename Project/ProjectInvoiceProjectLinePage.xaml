@@ -39,7 +39,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectInvoiceProjectLinePage"
                     </local:CorasauDataGridForeignKeyColumnClient>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Qty" Width="80"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="CostPrice" Width="80" Visible="False"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="SalesPrice" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="SalesPrice" Width="80" Mask="N4"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="DiscountPct" Width="50" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="SalesAmount" Width="100"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="CostAmount" Width="100" Visible="False"/>
@@ -55,6 +55,9 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectInvoiceProjectLinePage"
                     <local:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension4" x:Name="coldim4"/>
                     <local:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension5" x:Name="coldim5"/>
                 </local:ProjectInvoiceProjectLineGrid.Columns>
+                <local:ProjectInvoiceProjectLineGrid.TotalSummary>
+                    <local:SumColumn FieldName="SalesPrice" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                </local:ProjectInvoiceProjectLineGrid.TotalSummary>
             </local:ProjectInvoiceProjectLineGrid>
         </CorasauControls:BusyIndicator>
         <dxn:NavBarControl  Grid.Row="2" x:Name="InputWindowOrder1"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch">

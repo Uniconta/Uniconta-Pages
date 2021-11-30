@@ -34,6 +34,11 @@ namespace UnicontaClient.Pages.CustomPage
         public override bool Readonly { get { return readOnly; } }
 
         internal bool readOnly;
+
+        protected override void DataLoaded(UnicontaBaseEntity[] Arr) 
+        {
+            InvItemStorageClient.UpdateOnHand((IEnumerable<InvItemStorage>)Arr, api);
+        }
     }
 
     public partial class InvItemStoragePage : GridBasePage

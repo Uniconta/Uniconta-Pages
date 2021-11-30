@@ -20,10 +20,10 @@ x:Class="UnicontaClient.Pages.CustomPage.CWCalculateCommission"
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <TextBlock Text="{Binding Converter={StaticResource  GlobalLocalizationValueConverter},ConverterParameter=FromDate, Mode=OneWay}" Margin="5,0,0,0" Grid.Row="0" Grid.Column="0"></TextBlock>
-            <CorasauControls:DateEditor Grid.Row="1" x:Name="fromDatePicker" Grid.Column="0" Text="{Binding FromDateTime,Mode=TwoWay}" Margin="5,0,0,0"></CorasauControls:DateEditor>
+            <CorasauControls:DateEditor Grid.Row="1" x:Name="fromDatePicker" Grid.Column="0" EditValue="{Binding FromDateTime,Mode=TwoWay}" Margin="5,0,0,0"></CorasauControls:DateEditor>
 
             <TextBlock Text="{Binding Converter={StaticResource  GlobalLocalizationValueConverter},ConverterParameter=ToDate,Mode=OneWay}" Margin="5,0,0,0" Grid.Row="0" Grid.Column="1"></TextBlock>
-            <CorasauControls:DateEditor Grid.Row="1" x:Name="toDatePicker" Grid.Column="1" Text="{Binding ToDateTime,Mode=TwoWay}" Margin="5,0,0,0"></CorasauControls:DateEditor>
+            <CorasauControls:DateEditor Grid.Row="1" x:Name="toDatePicker" Grid.Column="1" EditValue="{Binding ToDateTime,Mode=TwoWay}" Margin="5,0,0,0"></CorasauControls:DateEditor>
         </Grid>
         <StackPanel x:Name="actionButton" HorizontalAlignment="Right" Grid.Row="1" Orientation="Horizontal" Margin="0 10 0 0">
             <Button x:Name="OKButton" Click="OKButton_OnClick" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Calculate,Mode=OneWay}" MinWidth="75" Height="23" 

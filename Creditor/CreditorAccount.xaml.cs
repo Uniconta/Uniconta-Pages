@@ -143,10 +143,13 @@ namespace UnicontaClient.Pages.CustomPage
                     dgCreditorAccountGrid.AddRow();
                     break;
                 case "CopyRow":
-                    if (copyRowIsEnabled)
-                        dgCreditorAccountGrid.CopyRow();
-                    else
-                        CopyRecord(selectedItem);
+                    if (selectedItem != null)
+                    {
+                        if (copyRowIsEnabled)
+                            dgCreditorAccountGrid.CopyRow();
+                        else
+                            CopyRecord(selectedItem);
+                    }
                     break;
                 case "DeleteRow":
                         dgCreditorAccountGrid.DeleteRow();

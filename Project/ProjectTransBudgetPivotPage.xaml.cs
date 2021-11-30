@@ -877,6 +877,11 @@ namespace UnicontaClient.Pages.CustomPage
                 case "Check":
                     AddDockItem(TabControls.TMPlanningCheckPage, null);
                     break;
+                case "ImportPivotTableLayout":
+                case "LoadSavedLayout":
+                    controlRibbon_BaseActions(ActionType);
+                    pivotDgProjectPlanning.Visibility = Visibility.Visible;
+                    break;
                 default:
                     controlRibbon_BaseActions(ActionType);
                     break;

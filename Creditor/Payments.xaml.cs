@@ -450,11 +450,14 @@ namespace UnicontaClient.Pages.CustomPage
                                     lineclient._Account = cTOpenClient.Account;
                                     lineclient._OffsetAccount = cwLine.BankAccount;
                                     lineclient._Invoice = cTOpenClient.hasBeenMerged ? null : cTOpenClient.InvoiceAN;
-                                    lineclient._Dim1 = creditor._Dim1;
-                                    lineclient._Dim2 = creditor._Dim2;
-                                    lineclient._Dim3 = creditor._Dim3;
-                                    lineclient._Dim4 = creditor._Dim4;
-                                    lineclient._Dim5 = creditor._Dim5;
+                                    if (creditor != null)
+                                    {
+                                        lineclient._Dim1 = creditor._Dim1;
+                                        lineclient._Dim2 = creditor._Dim2;
+                                        lineclient._Dim3 = creditor._Dim3;
+                                        lineclient._Dim4 = creditor._Dim4;
+                                        lineclient._Dim5 = creditor._Dim5;
+                                    }
 
                                     if (cTOpenClient.settleTypeRowId)
                                     {

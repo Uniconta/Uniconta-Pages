@@ -26,7 +26,7 @@ using Uniconta.Common.Utility;
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
-     public class DebtorOrderProjectLineLocal : DebtorOrderProjectLineClient
+    public class DebtorOrderProjectLineLocal : DebtorOrderProjectLineClient
     {
         internal bool InsidePropChange;
         public double costPct, salesPct, costAmount, salesAmount;
@@ -144,6 +144,9 @@ namespace UnicontaClient.Pages.CustomPage
             dgDebtorOrderProjectLineGrid.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;
             dictPriceLookup = new Dictionary<string, Uniconta.API.DebtorCreditor.FindPrices>();
             debtorOrder = master as DCOrder;
+            RibbonBase rb = (RibbonBase)localMenu.DataContext;
+            if (rb != null)
+                UtilDisplay.RemoveMenuCommand(rb, "Adjustment");
         }
 
         protected override void OnLayoutLoaded()
@@ -187,8 +190,8 @@ namespace UnicontaClient.Pages.CustomPage
                     dgDebtorOrderProjectLineGrid.CopyRow();
                     break;
                 case "SaveGrid":
-                        saveGrid();
-                        CloseDockItem();
+                    saveGrid();
+                    CloseDockItem();
                     break;
                 case "DeleteRow":
                     dgDebtorOrderProjectLineGrid.DeleteRow();

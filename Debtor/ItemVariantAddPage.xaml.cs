@@ -37,7 +37,7 @@ namespace UnicontaClient.Pages.CustomPage
         InvStandardVariant stdVariant;
         DCOrderLineClient line;
         InvJournalLineClient journalLine;
-
+        SQLCache variants1, variants2, variants3, variants4, variants5;
         public ItemVariantAddPage(DCOrderLineClient line, DCOrder master) : base(null)
         {
             this.master = master;
@@ -74,6 +74,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         public async override Task InitQuery()
         {
+            busyIndicator.IsBusy = true;
             var master = stdVariant;
             if (master == null)
                 return;
@@ -82,15 +83,103 @@ namespace UnicontaClient.Pages.CustomPage
                 return;
             int desc = invItem._Decimals;
             var lst = new List<ItemVariantLocal>();
-            foreach(var rec in Combinations)
+            if (master._AllowAllCombinations)
             {
-                var r2 = new ItemVariantLocal(desc);
-                StreamingManager.Copy(rec, r2);
-                lst.Add(r2);
+                var t1 = api.LoadCache(typeof(Uniconta.DataModel.InvVariant1));
+                var t2 = api.LoadCache(typeof(Uniconta.DataModel.InvVariant2));
+                var t3 = api.LoadCache(typeof(Uniconta.DataModel.InvVariant3));
+                var t4 = api.LoadCache(typeof(Uniconta.DataModel.InvVariant4));
+                var t5 = api.LoadCache(typeof(Uniconta.DataModel.InvVariant5));
+                var tasks = Task.WhenAll(t1, t2, t3, t4, t5);
+                variants1 = t1.Result;
+                variants2 = t2.Result;
+                variants3 = t3.Result;
+                variants4 = t4.Result;
+                variants5 = t5.Result;
+                var v1Source = variants1.GetKeyStrRecords as IEnumerable<InvVariant1>;
+                var v2Source = variants2.GetKeyStrRecords as IEnumerable<InvVariant2>;
+                var v3Source = variants3.GetKeyStrRecords as IEnumerable<InvVariant3>;
+                var v4Source = variants4.GetKeyStrRecords as IEnumerable<InvVariant4>;
+                var v5Source = variants5.GetKeyStrRecords as IEnumerable<InvVariant5>;
+
+                var comp = api.CompanyEntity;
+                int n = stdVariant._Nvariants != 0 ? stdVariant._Nvariants : comp.NumberOfVariants;
+
+                if (n >= 1)
+                {
+                    foreach (var v1 in v1Source)
+                    {
+                        var variant1 = v1.KeyStr;
+                        if (n == 1)
+                        {
+                            var rec1 = new ItemVariantLocal() { _Variant1 = variant1 };
+                            lst.Add(rec1);
+                        }
+                        if (n >= 2)
+                        {
+                            foreach (var v2 in v2Source)
+                            {
+                                var variant2 = v2.KeyStr;
+                                if (n == 2)
+                                {
+                                    var rec2 = new ItemVariantLocal() { _Variant1 = variant1, _Variant2 = variant2 };
+                                    lst.Add(rec2);
+                                }
+                                if (n >= 3)
+                                {
+                                    foreach (var v3 in v3Source)
+                                    {
+                                        var variant3 = v3.KeyStr;
+                                        if (n == 3)
+                                        {
+                                            var rec3 = new ItemVariantLocal() { _Variant1 = variant1, _Variant2 = variant2, _Variant3 = variant3 };
+                                            lst.Add(rec3);
+                                        }
+                                        if (n >= 4)
+                                        {
+                                            foreach (var v4 in v4Source)
+                                            {
+                                                var variant4 = v4.KeyStr;
+                                                if (n == 4)
+                                                {
+                                                    var rec4 = new ItemVariantLocal() { _Variant1 = variant1, _Variant2 = variant2, _Variant3 = variant3, _Variant4 = variant4 };
+                                                    lst.Add(rec4);
+                                                }
+                                                if (n >= 5)
+                                                {
+                                                    foreach (var v5 in v5Source)
+                                                    {
+                                                        var variant5 = v5.KeyStr;
+                                                        var rec5 = new ItemVariantLocal() { _Variant1 = variant1, _Variant2 = variant2, _Variant3 = variant3, _Variant4 = variant4, _Variant5 = variant5 };
+                                                        lst.Add(rec5);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
-            lst.Sort(new ItemVariantLocalSort());
-            dgItemVariant.ItemsSource = lst;
-            dgItemVariant.Visibility = Visibility.Visible;
+            else
+            {
+                foreach (var rec in Combinations)
+                {
+                    var r2 = new ItemVariantLocal(desc);
+                    StreamingManager.Copy(rec, r2);
+                    lst.Add(r2);
+                }
+                lst.Sort(new ItemVariantLocalSort());
+            }
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                dgItemVariant.ItemsSource = lst;
+                dgItemVariant.Visibility = Visibility.Visible;
+            }));
+            busyIndicator.IsBusy = false;
+
         }
 
         public override bool IsDataChaged { get { return false; } }

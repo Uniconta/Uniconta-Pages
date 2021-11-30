@@ -59,7 +59,11 @@ namespace UnicontaClient.Pages.CustomPage
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgUserTable.SelectedItemChanged += DgUserTable_SelectedItemChanged;
         }
-
+        public override void PageClosing()
+        {
+            Controls.MenuControl.ForceOpen = true;
+            base.PageClosing();
+        }
         private void DgUserTable_SelectedItemChanged(object sender, DevExpress.Xpf.Grid.SelectedItemChangedEventArgs e)
         {
             var selectedItem = dgUserTable.SelectedItem as TableHeaderClient;

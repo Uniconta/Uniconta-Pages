@@ -152,9 +152,10 @@ namespace UnicontaClient.Pages.CustomPage
                     if (res != ErrorCodes.Succes)
                     { UtilDisplay.ShowErrorCode(res); }
                     else
-                    {  
+                    {
                         dgFinanceYearGrid.RemoveFocusedRowFromGrid();
-                        (dgFinanceYearGrid.View as TableView).FocusedRowHandle = 0; 
+                        if (dgFinanceYearGrid.GetVisibleRows()?.Count > 0)
+                            (dgFinanceYearGrid.View as TableView).FocusedRowHandle = 0;
                     }
                         
                 }

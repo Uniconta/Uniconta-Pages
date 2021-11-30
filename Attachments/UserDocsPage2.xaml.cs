@@ -62,10 +62,17 @@ namespace UnicontaClient.Pages.CustomPage
             frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
 
             var TableId = userDocsClientRow._TableId;
-            if (TableId != 71 && TableId != 72 && TableId != 73 && TableId != 77 && TableId != 78 && TableId != 79 && TableId != 205) // Sales Order, purchase order, Offer, Invoices, Production Order
+            if (TableId != 71 && TableId != 72 && TableId != 73 && TableId != 77 && TableId != 78 && TableId != 79 && TableId != 205 && TableId != 203) // Sales Order, purchase order, Offer, Invoices, Production Order, Project Invoice Proposal
                 groupInclude.Visibility = Visibility.Collapsed;
             else if (TableId != 72) /*Purchase Order */
                 layoutRequisition.Visibility = Visibility.Collapsed;
+            
+            if (TableId == 203) /* Project Invoice Proposal*/
+            {
+                layoutOffer.Visibility = Visibility.Collapsed;
+                layoutConfirmation.Visibility = Visibility.Collapsed;
+                layoutPacknote.Visibility = Visibility.Collapsed;
+            }
 
             if (TableId == 205) /*Production Order*/
             {

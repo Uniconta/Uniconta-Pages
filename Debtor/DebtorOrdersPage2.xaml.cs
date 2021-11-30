@@ -346,17 +346,20 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void leAccount_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
         {
-            string debAcc = Convert.ToString(e.OldValue);
-            string id = Convert.ToString(e.NewValue);
-            if (id != editrow._DCAccount ||
-                editrow.RowId == 0 ||
-                (!string.IsNullOrEmpty(debAcc) && debAcc != id) ||
-                ((LoadedRow as DCOrder)?._DCAccount != id))
+            if (editrow != null)
             {
-                if (leAccount.IsEnabled)
+                string debAcc = Convert.ToString(e.OldValue);
+                string id = Convert.ToString(e.NewValue);
+                if (id != editrow._DCAccount ||
+                    editrow.RowId == 0 ||
+                    (!string.IsNullOrEmpty(debAcc) && debAcc != id) ||
+                    ((LoadedRow as DCOrder)?._DCAccount != id))
                 {
-                    editrow.Installation = null;
-                    SetFieldFromDebtor(editrow, (Uniconta.DataModel.Debtor)api.GetCache(typeof(Uniconta.DataModel.Debtor))?.Get(id));
+                    if (leAccount.IsEnabled)
+                    {
+                        editrow.Installation = null;
+                        SetFieldFromDebtor(editrow, (Uniconta.DataModel.Debtor)api.GetCache(typeof(Uniconta.DataModel.Debtor))?.Get(id));
+                    }
                 }
             }
         }
