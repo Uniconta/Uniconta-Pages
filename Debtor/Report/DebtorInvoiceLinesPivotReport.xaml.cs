@@ -77,6 +77,14 @@ namespace UnicontaClient.Pages.CustomPage
             filterValues = filterSorthelper.GetPropValuePair(out errors);
         }
 
+        void SetDefaultFilter()
+        {
+            filterDate = BasePage.GetFilterDate(api.CompanyEntity, false);
+            var filterSorthelper = new FilterSortHelper(typeof(DebtorInvoiceLines), DefaultFilters(), null);
+            List<string> errors;
+            filterValues = filterSorthelper.GetPropValuePair(out errors);
+        }
+
         protected override void OnLayoutLoaded()
         {
             if (chartControl.Diagram != null)

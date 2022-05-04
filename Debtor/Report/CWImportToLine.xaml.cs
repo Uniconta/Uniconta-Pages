@@ -109,5 +109,12 @@ namespace UnicontaClient.Pages.CustomPage
             if (index == -1) return;
             PerAccount = index == 0 ? false : true;
         }
+
+        private void cmbtypeValue_SelectedIndexChanged(object sender, RoutedEventArgs e)
+        {
+            var index = cmbtypeValue.SelectedIndex;
+            if (index == -1) return;
+            PerAccount = index == 0 ? false : true;
+        }
     }
 }

@@ -67,11 +67,16 @@ namespace UnicontaClient.Pages.CustomPage
 
         public override void SetDefaultValues(UnicontaBaseEntity dataEntity, int selectedIndex)
         {
+<<<<<<<< HEAD:Project/ProjectInvoiceProjectLinePage.xaml.cs
             var newRow = (ProjectInvoiceProjectLineLocal)dataEntity;
             var header = this.masterRecord as Uniconta.DataModel.DebtorOrder;
+========
+            var newRow = (DebtorOrderProjectLineLocal)dataEntity;
+            var header = this.masterRecord as Uniconta.DataModel.DCOrder;
+>>>>>>>> 1ce1cb5446e7c9fec3f9092522f9f26e7a727d8e:Debtor/DebtorOrderProjectLinePage.xaml.cs
             if (header != null)
             {
-                newRow.SetMaster(header);
+                newRow.SetMaster((UnicontaBaseEntity)header);
                 newRow._Dim1 = header._Dim1;
                 newRow._Dim2 = header._Dim2;
                 newRow._Dim3 = header._Dim3;
@@ -119,6 +124,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         SQLCache ItemsCache, ProjectCache, CategoryCache, PrStandardCache;
         Dictionary<string, Uniconta.API.DebtorCreditor.FindPrices> dictPriceLookup;
+<<<<<<<< HEAD:Project/ProjectInvoiceProjectLinePage.xaml.cs
         ProjectInvoiceProposal invoiceProposal;
         public ProjectInvoiceProjectLinePage(UnicontaBaseEntity master) : base(master)
         {
@@ -127,6 +133,22 @@ namespace UnicontaClient.Pages.CustomPage
 
         public ProjectInvoiceProjectLinePage(SynchronizeEntity syncEntity)
           : base(syncEntity, true)
+        {
+            if (syncEntity != null)
+                InitPage(syncEntity.Row);
+        }
+
+        private void InitPage(UnicontaBaseEntity master)
+========
+        DCOrder debtorOrder;
+        public DebtorOrderProjectLinePage(UnicontaBaseEntity master) : base(master)
+>>>>>>>> 1ce1cb5446e7c9fec3f9092522f9f26e7a727d8e:Debtor/DebtorOrderProjectLinePage.xaml.cs
+        {
+            InitPage(master);
+        }
+
+        public DebtorOrderProjectLinePage(SynchronizeEntity syncEntity)
+           : base(syncEntity, true)
         {
             if (syncEntity != null)
                 InitPage(syncEntity.Row);
@@ -143,7 +165,14 @@ namespace UnicontaClient.Pages.CustomPage
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgProjInvProjectLineGrid.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;
             dictPriceLookup = new Dictionary<string, Uniconta.API.DebtorCreditor.FindPrices>();
+<<<<<<<< HEAD:Project/ProjectInvoiceProjectLinePage.xaml.cs
             invoiceProposal = master as ProjectInvoiceProposal;
+========
+            debtorOrder = master as DCOrder;
+            RibbonBase rb = (RibbonBase)localMenu.DataContext;
+            if (rb != null)
+                UtilDisplay.RemoveMenuCommand(rb, "Adjustment");
+>>>>>>>> 1ce1cb5446e7c9fec3f9092522f9f26e7a727d8e:Debtor/DebtorOrderProjectLinePage.xaml.cs
         }
 
         protected override void OnLayoutLoaded()
@@ -154,6 +183,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         public async override Task InitQuery()
         {
+<<<<<<<< HEAD:Project/ProjectInvoiceProjectLinePage.xaml.cs
             await dgProjInvProjectLineGrid.Filter(null);
             // do not reload, since lines has opdated order we pass, and then SQL version might not be up to date
             //if (invoiceProposal != null)
@@ -161,17 +191,35 @@ namespace UnicontaClient.Pages.CustomPage
             var itemSource = (IList)dgProjInvProjectLineGrid.ItemsSource;
             if (itemSource == null || itemSource.Count == 0)
                 dgProjInvProjectLineGrid.AddFirstRow();
+========
+            await dgDebtorOrderProjectLineGrid.Filter(null);
+            // do not reload, since lines has opdated order we pass, and then SQL version might not be up to date
+            //if (debtorOrder != null)
+            //    await api.Read((UnicontaBaseEntity)debtorOrder);
+            var itemSource = (IList)dgDebtorOrderProjectLineGrid.ItemsSource;
+            if (itemSource == null || itemSource.Count == 0)
+                dgDebtorOrderProjectLineGrid.AddFirstRow();
+>>>>>>>> 1ce1cb5446e7c9fec3f9092522f9f26e7a727d8e:Debtor/DebtorOrderProjectLinePage.xaml.cs
             RecalculateAmount();
         }
 
         protected override void SyncEntityMasterRowChanged(UnicontaBaseEntity args)
         {
+<<<<<<<< HEAD:Project/ProjectInvoiceProjectLinePage.xaml.cs
             dgProjInvProjectLineGrid.UpdateMaster(args);
             invoiceProposal = dgProjInvProjectLineGrid.masterRecord as ProjectInvoiceProposal;
             if (invoiceProposal != null)
             {
                 api.Read(invoiceProposal);
                 SetHeader(string.Concat(Uniconta.ClientTools.Localization.lookup("ProjectAdjustments"), ": ", NumberConvert.ToString(invoiceProposal._OrderNumber)));
+========
+            dgDebtorOrderProjectLineGrid.UpdateMaster(args);
+            debtorOrder = dgDebtorOrderProjectLineGrid.masterRecord as Uniconta.DataModel.DCOrder;
+            if (debtorOrder != null)
+            {
+                api.Read((UnicontaBaseEntity)debtorOrder);
+                SetHeader(string.Concat(Uniconta.ClientTools.Localization.lookup("ProjectAdjustments"), ": ", NumberConvert.ToString(debtorOrder._OrderNumber)));
+>>>>>>>> 1ce1cb5446e7c9fec3f9092522f9f26e7a727d8e:Debtor/DebtorOrderProjectLinePage.xaml.cs
             }
             InitQuery();
         }
@@ -360,7 +408,11 @@ namespace UnicontaClient.Pages.CustomPage
 
             var prcategory = (Uniconta.DataModel.PrCategory)CategoryCache.Get(Category);
             if (prcategory != null && prcategory._Forward)
+<<<<<<<< HEAD:Project/ProjectInvoiceProjectLinePage.xaml.cs
                 rec.ProjectForward = invoiceProposal._Project;
+========
+                rec.ProjectForward = debtorOrder._Project;
+>>>>>>>> 1ce1cb5446e7c9fec3f9092522f9f26e7a727d8e:Debtor/DebtorOrderProjectLinePage.xaml.cs
 
             var projCat = (from ct in Categories where ct._PrCategory == Category select ct).FirstOrDefault();
             if (projCat != null)
@@ -455,10 +507,17 @@ namespace UnicontaClient.Pages.CustomPage
 
         void RecalculateAmount()
         {
+<<<<<<<< HEAD:Project/ProjectInvoiceProjectLinePage.xaml.cs
             var lst = dgProjInvProjectLineGrid.ItemsSource as IEnumerable<ProjectInvoiceProjectLineLocal>;
             if (lst == null)
                 return;
             double adjustment = invoiceProposal._OrderTotal - invoiceProposal._ProjectTotal;
+========
+            var lst = dgDebtorOrderProjectLineGrid.ItemsSource as IEnumerable<DebtorOrderProjectLineLocal>;
+            if (lst == null)
+                return;
+            double adjustment = debtorOrder._OrderTotal - debtorOrder._ProjectTotal;
+>>>>>>>> 1ce1cb5446e7c9fec3f9092522f9f26e7a727d8e:Debtor/DebtorOrderProjectLinePage.xaml.cs
             double Amountsum = lst.Sum(x => x._SalesAmount);
             double difference = adjustment - Amountsum;
             RibbonBase rb = (RibbonBase)localMenu.DataContext;
@@ -503,7 +562,11 @@ namespace UnicontaClient.Pages.CustomPage
             var prCat = CategoryCache?.Get(le.EnteredText);
             if (prCat != null)
             {
+<<<<<<<< HEAD:Project/ProjectInvoiceProjectLinePage.xaml.cs
                 dgProjInvProjectLineGrid.SetLoadedRow(selectedItem);
+========
+                dgDebtorOrderProjectLineGrid.SetLoadedRow(selectedItem);
+>>>>>>>> 1ce1cb5446e7c9fec3f9092522f9f26e7a727d8e:Debtor/DebtorOrderProjectLinePage.xaml.cs
                 selectedItem.PrCategory = prCat.KeyStr;
                 le.EditValue = prCat.KeyStr;
             }
