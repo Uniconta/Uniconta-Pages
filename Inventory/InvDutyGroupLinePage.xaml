@@ -33,6 +33,9 @@ x:Class="UnicontaClient.Pages.CustomPage.InvDutyGroupLinePage"
                     <local:ComboBoxColumnClient x:Name="DutyShow" Width="150" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Sales" Width="70" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Purchase" Width="70" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ValidFrom" Width="70" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ValidTo" Width="70" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DeliveryDate" Width="100"/>
                 </local:InvDutyGroupLineGrid.Columns>
             </local:InvDutyGroupLineGrid>
         </CorasauControls:BusyIndicator>

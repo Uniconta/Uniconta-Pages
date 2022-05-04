@@ -22,11 +22,13 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryReservationReport"
                 <local:InvReservationReportGrid.Columns>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Item" Width="100"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="ItemName" Width="150"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="colVariant1" FieldName="Variant1" Width="80" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="colVariant2" FieldName="Variant2" Width="80" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="colVariant3" FieldName="Variant3" Width="80" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="colVariant4" FieldName="Variant4" Width="80" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="colVariant5" FieldName="Variant5" Width="80" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="colVariant" FieldName="Variant" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="VariantName" Width="100" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="colVariant1" FieldName="Variant1" Width="80" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="colVariant2" FieldName="Variant2" Width="80" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="colVariant3" FieldName="Variant3" Width="80" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="colVariant4" FieldName="Variant4" Width="80" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="colVariant5" FieldName="Variant5" Width="80" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Variant1Name" Width="100" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Variant2Name" Width="100" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Variant3Name" Width="100" Visible="False"/>
@@ -34,9 +36,9 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryReservationReport"
                     <local:CorasauDataGridTemplateColumnClient x:Name="Variant5Name" Width="100" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Warehouse" Width="80"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Location" Width="80"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="DCType" Width="100" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="OrderNumber"  Width="80"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="MoveType" Width="80" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DCType" Width="80" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="OrderNumber"  Width="80"/>   
+                    <local:CorasauDataGridTemplateColumnClient x:Name="MoveType" Width="80" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="QtyDelivered" Width="80">
                         <local:CorasauDataGridTemplateColumnClient.CellTemplate>
                             <DataTemplate>
@@ -72,6 +74,8 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryReservationReport"
                             </DataTemplate>
                         </local:CorasauDataGridTemplateColumnClient.CellTemplate>
                     </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="OrderDeliveryDate"  Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="LineDate"  Width="80"/>
                 </local:InvReservationReportGrid.Columns>
                 <local:InvReservationReportGrid.TotalSummary>
                     <local:SumColumn FieldName="QtyDelivered" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>

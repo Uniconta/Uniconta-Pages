@@ -11,8 +11,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ClosingSheet"
     xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
     d:DesignHeight="300" d:DesignWidth="400">
     <UserControl.Resources>
-        <SolidColorBrush x:Key="LayoutGridColor" Color="Transparent">
-        </SolidColorBrush>
+        <SolidColorBrush x:Key="LayoutGridColor" Color="Transparent" />
     </UserControl.Resources>
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
@@ -22,7 +21,11 @@ x:Class="UnicontaClient.Pages.CustomPage.ClosingSheet"
         <CorasauControls:CorasauRibbonControl x:Name="localMenu" XMLSourcePath=";component/Pages/GL/ClosingSheets/ClosingSheetGridRibbon.xml"/>
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <localPage:ClosingSheetGrid x:Name="dgClosingSheet" AutoGenerateColumns="None">
-                <localPage:ClosingSheetGrid.Columns>                  
+                <localPage:ClosingSheetGrid.Columns>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="HasNotes" Width="30" ReadOnly="True"  HeaderTemplate="{StaticResource NotesHeaderTemplate}"
+                                                                   CellDisplayTemplate="{StaticResource NotesDisplayTemplate}" Visible="True" ShowInColumnChooser="true"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="HasDocs" ReadOnly="True"  Width="30" HeaderTemplate="{StaticResource DocsHeaderTemplate}" 
+                                                                   CellDisplayTemplate="{StaticResource DocsDisplayTemplate}" Visible="True" ShowInColumnChooser="True" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" Width="200"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="FromDate" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ToDate"/>
@@ -35,6 +38,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ClosingSheet"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="OneVoucherForAll" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="GenerateVoucher" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Blocked" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="UseVATCodes" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="NumberSerie" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="TransType" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim1" Width="70" FieldName="Dimension1" />

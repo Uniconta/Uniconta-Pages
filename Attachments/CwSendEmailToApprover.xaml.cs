@@ -19,13 +19,13 @@ using Uniconta.ClientTools;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.Common;
 using UnicontaClient.Controls;
+using Uniconta.Common.Utility;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
     public partial class CwSendEmailToApprover : ChildWindow
-    {
-       
+    {      
         public string Approver { get; set; }
         [InputFieldData]
         [Display(Name = "Note", ResourceType = typeof(InputFieldDataText))]
@@ -44,9 +44,9 @@ namespace UnicontaClient.Pages.CustomPage
             this.Title = Uniconta.ClientTools.Localization.lookup("ResendToApprover");
             approverDic = new Dictionary<string, string>();
             if (document._Approver1 != null)
-                approverDic.Add(document._Approver1, string.Format("{0} ({1})", document._Approver1, document.Approver1Name));
+                approverDic.Add(document._Approver1, Util.ConcatParenthesis(document._Approver1, document.Approver1Name));
             if (document._Approver2 != null && document.Approver2 != document.Approver1)
-                approverDic.Add(document._Approver2, string.Format("{0} ({1})", document._Approver2, document.Approver2Name));
+                approverDic.Add(document._Approver2, Util.ConcatParenthesis(document._Approver2, document.Approver2Name));
             cmbEmployee.ItemsSource = approverDic;
             cmbEmployee.SelectedIndex = 0;
             this.Loaded += CwSendEmailToApprover_Loaded;
@@ -61,14 +61,14 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (e.Key == Key.Escape)
             {
-                this.DialogResult = false;
+                SetDialogResult(false);
             }
             else
                 if (e.Key == Key.Enter)
             {
                 if (CancelButton.IsFocused)
                 {
-                    this.DialogResult = false;
+                    SetDialogResult(false);
                     return;
                 }
                 OKButton_Click(null, null);
@@ -81,13 +81,13 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 Approver = approverDic.FirstOrDefault(x=>x.Value == cmbEmployee.SelectedText).Key;
                 Note = txtNote.Text;
-                this.DialogResult = true;
+                SetDialogResult(true);
             }
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = false;
+            SetDialogResult(false);
         }
     }
 }

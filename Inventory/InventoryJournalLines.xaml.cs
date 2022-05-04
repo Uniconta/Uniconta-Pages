@@ -141,16 +141,23 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (!company.Location || !company.Warehouse)
                 LocationTo.Visible = LocationTo.ShowInColumnChooser = Location.Visible = Location.ShowInColumnChooser = false;
+            else
+                LocationTo.ShowInColumnChooser = Location.ShowInColumnChooser = true;
             if (!company.Warehouse)
                 WarehouseTo.Visible = WarehouseTo.ShowInColumnChooser = Warehouse.Visible = Warehouse.ShowInColumnChooser = false;
+            else
+                WarehouseTo.ShowInColumnChooser = Warehouse.ShowInColumnChooser = true;
             if (!company.Warehouse)
                 Warehouse.Visible = Warehouse.ShowInColumnChooser = false;
+            else
+                Warehouse.ShowInColumnChooser = true;
             if (!company.InvBOM)
             {
                 ReportAsFinished.Visible = ReportAsFinished.ShowInColumnChooser = false;
                 ReportAsFinishedDeep.Visible = ReportAsFinishedDeep.ShowInColumnChooser = false;
             }
-
+            else
+                ReportAsFinished.ShowInColumnChooser = ReportAsFinishedDeep.ShowInColumnChooser = true;
             if (dgInvJournalLine.IsLoadedFromLayoutSaved)
             {
                 dgInvJournalLine.ClearSorting();
@@ -267,24 +274,27 @@ namespace UnicontaClient.Pages.CustomPage
                             if (cmb._Variant1 == vr1 && cmb._Variant2 != null)
                             {
                                 var v2 = (InvVariant2)variants2.Get(cmb._Variant2);
-                                invs2.Add(v2);
-                                if (var2Value == v2._Variant)
-                                    hasVariantValue = true;
-
+                                if (v2 != null)
+                                {
+                                    invs2.Add(v2);
+                                    if (var2Value == v2._Variant)
+                                        hasVariantValue = true;
+                                }
                             }
                         }
                         else if (LastVariant != cmb._Variant1)
                         {
                             LastVariant = cmb._Variant1;
                             var v1 = (InvVariant1)variants1.Get(cmb._Variant1);
-                            invs1.Add(v1);
+                            if (v1 != null)
+                                invs1.Add(v1);
                         }
                     }
                     if (SetVariant2)
                     {
                         rec.variant2Source = invs2;
-                        if (!hasVariantValue)
-                            rec.Variant2 = null;
+                        //if (!hasVariantValue)
+                        //    rec.Variant2 = null;
                     }
                     else
                         rec.variant1Source = invs1;
@@ -644,10 +654,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override async Task<ErrorCodes> saveGrid()
         {
-            var lin = dgInvJournalLine.SelectedItem;
-            dgInvJournalLine.SelectedItem = null;
-            dgInvJournalLine.SelectedItem = lin;
-            ErrorCodes res = await dgInvJournalLine.SaveData();
+            ErrorCodes res = await base.saveGrid();
             if (res == ErrorCodes.Succes)
                 DataChanged = false;
             return res;

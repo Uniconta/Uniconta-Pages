@@ -11,9 +11,11 @@ using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.Common;
+using Uniconta.Common.Utility;
 using Uniconta.DataModel;
-using UnicontaClient.Controls.Dialogs;
 using DevExpress.Data;
+using System.Linq;
+using Uniconta.ClientTools.Util;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -102,18 +104,35 @@ namespace UnicontaClient.Pages.CustomPage
                 case "ChangeStorage":
                     if (selectedItem == null)
                         return;
-                    var cwchangeStorage = new CWModiyStorage(api, selectedItem);
-                    cwchangeStorage.Closing += delegate
+                    var cwchangeStorage = new CWModiyStorage(api);
+                    cwchangeStorage.Closing += async delegate
                     {
                         if (cwchangeStorage.DialogResult == true)
-                            gridRibbon_BaseActions("RefreshGrid");
+                        {
+                            var newWarehouse = cwchangeStorage.Warehouse;
+                            var newLocation = cwchangeStorage.Location;
+                            var tranApi = new Uniconta.API.Inventory.TransactionsAPI(api);
+                            ErrorCodes result;
+                            if (cwchangeStorage.AllLines)
+                            {
+                                var visibleItems = dgProductionPostedTrans.VisibleItems.Cast<ProductionPostedTransClient>();
+                                result = await tranApi.ChangeStorage(visibleItems, newWarehouse, newLocation);
+                            }
+                            else
+                                result = await tranApi.ChangeStorage(selectedItem, newWarehouse, newLocation);
+
+                            if (result == ErrorCodes.Succes)
+                                gridRibbon_BaseActions("RefreshGrid");
+                            else
+                                UtilDisplay.ShowErrorCode(result);
+                        }
                     };
                     cwchangeStorage.Show();
                     break;
                 case "SeriesBatch":
                     if (selectedItem == null)
                         return;
-                    AddDockItem(TabControls.InvSeriesBatch, selectedItem, string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("SerialBatchNumbers"), selectedItem._Item));
+                    AddDockItem(TabControls.InvSeriesBatch, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("SerialBatchNumbers"), selectedItem._Item));
                     break;
                 case "AddEditNote":
                     if (selectedItem == null) return;
@@ -148,7 +167,7 @@ namespace UnicontaClient.Pages.CustomPage
                         arg = string.Format("{0} ({1})={2}", Uniconta.ClientTools.Localization.lookup("JournalPostedId"), Uniconta.ClientTools.Localization.lookup("Inventory"), selectedItem._InvJournalPostedId);
                     else
                         arg = string.Format("{0}={1}", Uniconta.ClientTools.Localization.lookup("Account"), selectedItem.AccountName);
-                    string vheader = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("VoucherTransactions"), arg);
+                    string vheader = Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("VoucherTransactions"), arg);
                     AddDockItem(TabControls.AccountsTransaction, dgProductionPostedTrans.syncEntity, vheader);
                     break;
                 case "AttachSerialBatch":
@@ -167,10 +186,15 @@ namespace UnicontaClient.Pages.CustomPage
             var comp = api.CompanyEntity;
             if (!comp.Location || !comp.Warehouse)
                 Location.Visible = Location.ShowInColumnChooser = false;
+            else
+                Location.ShowInColumnChooser = true;
             if (!comp.Warehouse)
                 Warehouse.Visible = Warehouse.ShowInColumnChooser = false;
-
-            Utility.SetupVariants(api, null, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
+            else
+                Warehouse.ShowInColumnChooser = true;
+            if (!comp.Project)
+                PrCategory.Visible = PrCategory.ShowInColumnChooser = false;
+            Utility.SetupVariants(api, colVariant, VariantName, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
             Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
         }
 

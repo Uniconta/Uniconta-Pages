@@ -86,14 +86,14 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (e.Key == Key.Escape)
             {
-                this.DialogResult = false;
+                SetDialogResult(false);
             }
             else if (e.Key == Key.Enter)
             {
                 if (OKButton.IsFocused)
                     OKButton_Click(null, null);
                 else if (CancelButton.IsFocused)
-                    this.DialogResult = false;
+                    SetDialogResult(false);
             }
         }
         private async void OKButton_Click(object sender, RoutedEventArgs e)
@@ -109,19 +109,19 @@ namespace UnicontaClient.Pages.CustomPage
                 res = await accessAPI.GiveAccountantAccess(selectedAcct, r);
             }
             UtilDisplay.ShowErrorCode(res);
-            this.DialogResult = true;
+            SetDialogResult(true);
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = false;
+            SetDialogResult(false);
         }
 
         private async void ClearButton_Click(object sender, RoutedEventArgs e)
         {
             ErrorCodes res = await accessAPI.GiveAccountantAccess(null, 0);
             UtilDisplay.ShowErrorCode(res);
-            this.DialogResult = true;
+            SetDialogResult(true);
         }
 
         private void cbAccountant_SelectedIndexChanged(object sender, RoutedEventArgs e)

@@ -24,6 +24,7 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryJournalPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="TransType" Width="200"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Blocked" Width="70"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="DeleteLines" Width="70"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="AllowNegativStock" Width="70"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="cldim1" Width="70" FieldName="Dimension1" ShowInColumnChooser="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="cldim2" Width="70" FieldName="Dimension2" ShowInColumnChooser="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="cldim3" Width="70" FieldName="Dimension3" ShowInColumnChooser="False"/>

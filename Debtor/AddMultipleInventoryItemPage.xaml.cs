@@ -171,7 +171,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             var param = new object[2] { InvItems , master._OrderNumber};
             globalEvents.OnRefresh(TabControls.AddMultipleInventoryItem, param);
-            dockCtrl.CloseDockItem();
+            CloseDockItem();
         }
 
         private void setMarked(bool markedState)

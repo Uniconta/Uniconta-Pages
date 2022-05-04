@@ -50,12 +50,35 @@ namespace UnicontaClient.Pages.CustomPage
         [Display(Name = "ToDate", ResourceType = typeof(InputFieldDataText))]
         static public DateTime ToDate { get; set; }
 
+        [ForeignKeyAttribute(ForeignKeyTable = typeof(Uniconta.DataModel.ProjectTask))]
+        [Display(Name = "Task", ResourceType = typeof(InputFieldDataText))]
+        public string ProjectTask { get; set; }
+
+        [InputFieldData]
+        [ForeignKeyAttribute(ForeignKeyTable = typeof(Uniconta.DataModel.PrWorkSpace))]
+        [Display(Name = "WorkSpace", ResourceType = typeof(InputFieldDataText))]
+        public string ProjectWorkspace { get; set; }
+
         CrudAPI api;
 #if !SILVERLIGHT
         public int DialogTableId;
         protected override int DialogId { get { return DialogTableId; } }
         protected override bool ShowTableValueButton { get { return true; } }
 #endif
+        public CWCreateOrderFromProject(CrudAPI crudApi, bool createOrder) : this(crudApi)
+        {
+            if (createOrder)
+                dpDate.DateTime = DateTime.MinValue;
+        }
+
+        public CWCreateOrderFromProject(CrudAPI crudApi, bool createOrder, ProjectClient project, ProjectTaskClient projTask = null) : this(crudApi, createOrder)
+        {
+            if (crudApi.CompanyEntity.ProjectTask && project != null)
+            {
+                setTask(project, projTask);
+                lblProjTask.Visibility = leProjTask.Visibility = Visibility.Visible;
+            }
+        }
 
         public CWCreateOrderFromProject(CrudAPI crudApi)
         {
@@ -65,7 +88,7 @@ namespace UnicontaClient.Pages.CustomPage
             this.Title = string.Format(Uniconta.ClientTools.Localization.lookup("CreateOBJ"), Uniconta.ClientTools.Localization.lookup("Order"));
             dpDate.DateTime = GenrateDate;
             api = crudApi;
-            cmbCategory.api = crudApi;
+            leProjWorkspace.api = cmbCategory.api = crudApi;
             Loaded += CWCreateOrderFromProject_Loaded;
             SetItemSource(crudApi);
 #if SILVERLIGHT
@@ -78,25 +101,31 @@ namespace UnicontaClient.Pages.CustomPage
             Dispatcher.BeginInvoke(new Action(() => { OKButton.Focus(); }));
         }
 
-        async void SetItemSource(QueryAPI api)
+        void SetItemSource(QueryAPI api)
         {
-            var prCache = api.GetCache(typeof(Uniconta.DataModel.PrCategory)) ?? await api.LoadCache(typeof(Uniconta.DataModel.PrCategory));
-            var cache = new PrCategoryRevenueFilter(prCache);
-            cmbCategory.cacheFilter = new PrCategoryRevenueFilter(prCache);
+            var prCache = api.GetCache(typeof(Uniconta.DataModel.PrCategory)) ?? api.LoadCache(typeof(Uniconta.DataModel.PrCategory)).GetAwaiter().GetResult();
+            cmbCategory.cacheFilter = new PrCategoryRevenueOnlyFilter(prCache);
+        }
+
+        async void setTask(ProjectClient project, ProjectTaskClient projTask)
+        {
+            leProjTask.ItemsSource = project.Tasks ?? await project.LoadTasks(api);
+            leProjTask.SelectedItem = projTask;
+            leProjTask.Focus();
         }
 
         private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
             {
-                this.DialogResult = false;
+                SetDialogResult(false);
             }
             else
                 if (e.Key == Key.Enter)
             {
                 if (CancelButton.IsFocused)
                 {
-                    this.DialogResult = false;
+                    SetDialogResult(false);
                     return;
                 }
                 OKButton_Click(null, null);
@@ -109,12 +138,12 @@ namespace UnicontaClient.Pages.CustomPage
             GenrateDate = dpDate.DateTime;
             FromDate = fromDate.DateTime;
             ToDate = toDate.DateTime;
-            this.DialogResult = true;
+            SetDialogResult(true);
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = false;
+            SetDialogResult(false);
         }
     }
 }

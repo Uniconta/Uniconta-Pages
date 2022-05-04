@@ -14,6 +14,7 @@ using System.Windows.Shapes;
 using System.Windows;
 using System.ComponentModel.DataAnnotations;
 using UnicontaClient.Controls;
+using Uniconta.Common.Utility;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -73,7 +74,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (e.Key == Key.Escape)
             {
-                this.DialogResult = false;
+                SetDialogResult(false);
             }
             else
                 if (e.Key == Key.Enter)
@@ -81,7 +82,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (OKButton.IsFocused)
                         OKButton_Click(null, null);
                     else if (CancelButton.IsFocused)
-                        this.DialogResult = false;
+                        SetDialogResult(false);
                 }
         }
         private void OKButton_Click(object sender, RoutedEventArgs e)
@@ -89,14 +90,13 @@ namespace UnicontaClient.Pages.CustomPage
             IsSimulation = chkSimulation.IsChecked.Value;
             PostedDate = dpPostingDate.DateTime;
             comments = txtComments.Text;
-            if (!string.IsNullOrEmpty(txtCode.Text))
-                Code = Convert.ToByte(txtCode.Text);
-            this.DialogResult = true;
+            Code = (byte)NumberConvert.ToInt(txtCode.Text);
+            SetDialogResult(true);
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = false;
+            SetDialogResult(false);
         }
     }
 }

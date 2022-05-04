@@ -18,6 +18,7 @@
                 <local:ProjectBudgetGroupGrid.Columns>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Number"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Name" Width="300"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="IsDefault" Width="50"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Blocked"/>
                 </local:ProjectBudgetGroupGrid.Columns>
             </local:ProjectBudgetGroupGrid>

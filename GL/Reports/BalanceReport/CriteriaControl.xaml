@@ -113,9 +113,14 @@ x:Class="UnicontaClient.Pages.CustomPage.CriteriaControl"
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock VerticalAlignment="Center" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FromDate}" Grid.Column="0" HorizontalAlignment="Right" Margin="0,0,25,0"/>
                         <CorasauControls:DateEditor Grid.Column="1" x:Name="dateFrom" MinWidth="120" EditValue="{Binding FromDate,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Tag="FromDate" LostFocus="dateFrom_LostFocus"/>
+                        <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="2" Margin="5,0,0,0">
+                            <TextBlock Text="P:" HorizontalAlignment="Right"  VerticalAlignment="Center"/>
+                            <CorasauControls:CheckEditor ToolTip="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=IncludePrimo}" x:Name="chkInclPrimo" HorizontalAlignment="Right"  VerticalAlignment="Center" IsChecked="{Binding InclPrimo,Mode=TwoWay}"  Margin="5,0,0,0"/>
+                        </StackPanel>
                         <TextBlock VerticalAlignment="Center" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ToDate}" Tag="ToDate" Grid.Row="2" Grid.Column="0" HorizontalAlignment="Right" Margin="0,0,25,0"/>
                         <CorasauControls:DateEditor x:Name="dateTo" Grid.Row="2" Grid.Column="1" MinWidth="120" LostFocus="dateTo_LostFocus" EditValue="{Binding ToDate,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                         <StackPanel Orientation="Horizontal" Grid.ColumnSpan="2" Grid.Row="4" HorizontalAlignment="Right">
@@ -149,33 +154,33 @@ x:Class="UnicontaClient.Pages.CustomPage.CriteriaControl"
                         <TextBlock x:Name="company" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,25,0"/>
                         <CorasauControls:ComboBoxEditor x:Name="cbCompany" EditValue="{Binding ForCompany, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" AutoComplete="True" AllowNullInput="True" Grid.Column="1" Width="170"  DisplayMember="Name" />
                         <TextBlock x:Name="dim1" Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,25,0"/>
-                        <CorasauControls:DimComboBoxEditor x:Name="cbdim1" EditValue="{Binding Dim1,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  Grid.Column="1" Grid.Row="2" Width="170" ShowCustomItems="False">
+                        <CorasauControls:DimComboBoxEditor x:Name="cbdim1" EditValue="{Binding Dim1,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  Grid.Column="1" Grid.Row="2" Width="170" ShowCustomItems="False" ShowClearButton="True">
                             <CorasauControls:DimComboBoxEditor.StyleSettings>
                                 <editor:CheckedComboBoxStyleSettings />
                             </CorasauControls:DimComboBoxEditor.StyleSettings>
                         </CorasauControls:DimComboBoxEditor>
                         <TextBlock x:Name="dim2" Grid.Column="0" Grid.Row="4" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,25,0"/>
-                        <CorasauControls:DimComboBoxEditor x:Name="cbdim2" EditValue="{Binding Dim2,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  Grid.Column="1" Grid.Row="4" Width="170" ShowCustomItems="False">
+                        <CorasauControls:DimComboBoxEditor x:Name="cbdim2" EditValue="{Binding Dim2,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  Grid.Column="1" Grid.Row="4" Width="170" ShowCustomItems="False" ShowClearButton="True">
                             <CorasauControls:DimComboBoxEditor.StyleSettings>
                                 <editor:CheckedComboBoxStyleSettings />
                             </CorasauControls:DimComboBoxEditor.StyleSettings>
                         </CorasauControls:DimComboBoxEditor>
-                            <TextBlock x:Name="dim3" Grid.Column="0" Grid.Row="6" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,25,0"/>
-                        <CorasauControls:DimComboBoxEditor x:Name="cbdim3" EditValue="{Binding Dim3,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  Grid.Row="6" Grid.Column="1" Width="170" ShowCustomItems="False">
+                        <TextBlock x:Name="dim3" Grid.Column="0" Grid.Row="6" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,25,0"/>
+                        <CorasauControls:DimComboBoxEditor x:Name="cbdim3" EditValue="{Binding Dim3,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  Grid.Row="6" Grid.Column="1" Width="170" ShowCustomItems="False" ShowClearButton="True">
                             <CorasauControls:DimComboBoxEditor.StyleSettings>
                                 <editor:CheckedComboBoxStyleSettings />
                             </CorasauControls:DimComboBoxEditor.StyleSettings>
                         </CorasauControls:DimComboBoxEditor>
                         <TextBlock x:Name="dim4" Grid.Column="0" Grid.Row="8" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,25,0"/>
-                        <CorasauControls:DimComboBoxEditor x:Name="cbdim4" EditValue="{Binding Dim4,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  Grid.Row="8" Grid.Column="1" Width="170" ShowCustomItems="False">
+                        <CorasauControls:DimComboBoxEditor x:Name="cbdim4" EditValue="{Binding Dim4,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  Grid.Row="8" Grid.Column="1" Width="170" ShowCustomItems="False" ShowClearButton="True">
                             <CorasauControls:DimComboBoxEditor.StyleSettings>
-                               <editor:CheckedComboBoxStyleSettings />
+                                <editor:CheckedComboBoxStyleSettings />
                             </CorasauControls:DimComboBoxEditor.StyleSettings>
                         </CorasauControls:DimComboBoxEditor>
                         <TextBlock x:Name="dim5" Grid.Column="0" Grid.Row="10" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,25,0"/>
-                        <CorasauControls:DimComboBoxEditor x:Name="cbdim5" EditValue="{Binding Dim5,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  Grid.Row="10" Grid.Column="1" Width="170" ShowCustomItems="False">
+                        <CorasauControls:DimComboBoxEditor x:Name="cbdim5" EditValue="{Binding Dim5,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  Grid.Row="10" Grid.Column="1" Width="170" ShowCustomItems="False" ShowClearButton="True">
                             <CorasauControls:DimComboBoxEditor.StyleSettings>
-                               <editor:CheckedComboBoxStyleSettings />
+                                <editor:CheckedComboBoxStyleSettings />
                             </CorasauControls:DimComboBoxEditor.StyleSettings>
                         </CorasauControls:DimComboBoxEditor>
                     </Grid>

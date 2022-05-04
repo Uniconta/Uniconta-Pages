@@ -24,6 +24,21 @@ namespace UnicontaClient.Pages.CustomPage
     {
         private CrudAPI api;
         Uniconta.DataModel.BankStatement master;
+
+        [ForeignKeyAttribute(ForeignKeyTable = typeof(GLDimType1))]
+        public string Dimension1 { get; set;  }
+
+        [ForeignKeyAttribute(ForeignKeyTable = typeof(GLDimType2))]
+        public string Dimension2 { get; set; }
+
+        [ForeignKeyAttribute(ForeignKeyTable = typeof(GLDimType3))]
+        public string Dimension3 { get; set; }
+
+        [ForeignKeyAttribute(ForeignKeyTable = typeof(GLDimType4))]
+        public string Dimension4 { get; set; }
+
+        [ForeignKeyAttribute(ForeignKeyTable = typeof(GLDimType5))]
+        public string Dimension5 { get; set; }
         public CWAddBankImportMapping(CrudAPI api, Uniconta.DataModel.BankStatement master, BankStatementLineClient bankStatement)
         {
             this.api = api;
@@ -46,9 +61,84 @@ namespace UnicontaClient.Pages.CustomPage
             else
                 SetBankFormats(true);
 
+            chkEqual.IsChecked = chkContains.IsChecked = ckkStartWith.IsChecked = true;
             txtAccountType.Text = bankStatement.AccountType;
             txtAccount.Text = bankStatement._Account;
             txtText.Text = bankStatement._Text;
+            BindDimension();
+        }
+
+        void BindDimension()
+        {
+            var c = api.CompanyEntity;
+            if (c == null)
+                return;
+            var noofDimensions = c.NumberOfDimensions;
+
+            if (noofDimensions < 5)
+            {
+                txtDim5.Visibility = leDim5.Visibility = Visibility.Collapsed;
+                rowDim5.Height = new GridLength(0);
+                double h = this.Height - 30;
+                this.Height = h;
+            }
+            else
+            {
+                leDim5.api= api;
+                txtDim5.Text= (string)c._Dim5;
+            }
+
+            if (noofDimensions < 4)
+            {
+                txtDim4.Visibility = leDim4.Visibility = Visibility.Collapsed;
+                rowDim4.Height = new GridLength(0);
+                double h = this.Height - 30;
+                this.Height = h;
+            }
+            else
+            {
+                leDim4.api= api;
+                txtDim4.Text= (string)c._Dim4;
+            }
+
+            if (noofDimensions < 3)
+            {
+                txtDim3.Visibility = leDim3.Visibility = Visibility.Collapsed;
+                rowDim3.Height = new GridLength(0);
+                double h = this.Height - 30;
+                this.Height = h;
+            }
+            else
+            {
+                leDim3.api= api;
+                txtDim3.Text= (string)c._Dim3;
+            }
+
+            if (noofDimensions < 2)
+            {
+                txtDim2.Visibility = leDim2.Visibility = Visibility.Collapsed;
+                rowDim2.Height = new GridLength(0);
+                double h = this.Height - 30;
+                this.Height = h;
+            }
+            else
+            {
+                leDim2.api= api;
+                txtDim2.Text= (string)c._Dim2;
+            }
+
+            if (noofDimensions < 1)
+            {
+                txtDim1.Visibility = leDim1.Visibility = Visibility.Collapsed;
+                rowDim1.Height = new GridLength(0);
+                double h = this.Height - 30;
+                this.Height = h;
+            }
+            else
+            {
+                leDim1.api= api;
+                txtDim1.Text= (string)c._Dim1;
+            }
         }
 
         async void SetBankFormats(bool initial)
@@ -79,11 +169,19 @@ namespace UnicontaClient.Pages.CustomPage
             bankImportMap._AccountType = (GLJournalAccountType)AppEnums.GLAccountType.IndexOf(txtAccountType.Text);
             bankImportMap._Account = txtAccount.Text;
             bankImportMap._Text = txtText.Text;
+            bankImportMap._Equal = (bool)chkEqual.IsChecked;
+            bankImportMap._StartsWith = (bool)ckkStartWith.IsChecked;
+            bankImportMap._Contains = (bool)chkContains.IsChecked;
+            bankImportMap._Dim1 = leDim1.Text;
+            bankImportMap._Dim2 = leDim2.Text;
+            bankImportMap._Dim3 = leDim3.Text;
+            bankImportMap._Dim4 = leDim4.Text;
+            bankImportMap._Dim5 = leDim5.Text;
             var err = await api.Insert(bankImportMap);
             if (err != ErrorCodes.Succes)
                 UtilDisplay.ShowErrorCode(err);
             else
-                this.DialogResult = true;
+                SetDialogResult(true);
         }
 
         BankImportFormatClient currentBankFormat;
@@ -95,7 +193,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = false;
+            SetDialogResult(false);
         }
 
         private void txtAccount_KeyDown(object sender, KeyEventArgs e)

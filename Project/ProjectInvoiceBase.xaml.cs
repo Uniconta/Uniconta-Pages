@@ -372,7 +372,7 @@ namespace UnicontaClient.Pages.CustomPage
                 var dict = new Dictionary<string, ProjectTransInvoiceClient>();
                 List<ProjectTransInvoiceClient> NoAggregate = null;
 
-                StringBuilder sb = new StringBuilder(300);
+                var sb = StringBuilderReuse.Create();
                 foreach (var rec in mainList)
                 {
                     if (!rec._canInvoice)
@@ -450,6 +450,8 @@ namespace UnicontaClient.Pages.CustomPage
                         dict.Add(key, val);
                     }
                 }
+                sb.Release();
+                sb = null;
 
                 lst = dict.Values;
                 foreach(var rec in lst)

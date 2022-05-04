@@ -57,6 +57,7 @@ x:Class="UnicontaClient.Pages.CustomPage.TimeSheetApprovalReport"
                     <local:CorasauDataGridTemplateColumnClient x:Name="OtherAbsence" Visible="False" Width="80"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="InvoiceableHours" Visible="True" Width="80"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="NotInvoiceableHours" Visible="True" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Production" Visible="True" Width="100"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="EfficiencyPercentage" Visible="True" Width="80"/>
                     
                     <local:CorasauDataGridTemplateColumnClient x:Name="TMClosedBy"  Visible="False" />
@@ -77,6 +78,7 @@ x:Class="UnicontaClient.Pages.CustomPage.TimeSheetApprovalReport"
                     <local:SumColumn FieldName="Total" SummaryType="Sum" ShowInGroupColumnFooter="Total"/>
                     <local:SumColumn FieldName="NormHours" SummaryType="Sum" ShowInGroupColumnFooter="NormHours"/>
                     <local:SumColumn FieldName="TotalHours" SummaryType="Sum" ShowInGroupColumnFooter="TotalHours"/>
+                    <local:SumColumn FieldName="Production" SummaryType="Sum" ShowInGroupColumnFooter="Production"/>
                     <local:SumColumn FieldName="Mileage" SummaryType="Sum" ShowInGroupColumnFooter="Mileage"/>
                     <local:SumColumn FieldName="Vacation" SummaryType="Sum" ShowInGroupColumnFooter="Vacation"/>
                     <local:SumColumn FieldName="VacationOther" SummaryType="Sum" ShowInGroupColumnFooter="VacationOther"/>
@@ -91,6 +93,7 @@ x:Class="UnicontaClient.Pages.CustomPage.TimeSheetApprovalReport"
                     <local:SumColumn FieldName="Total" SummaryType="Sum"/>
                     <local:SumColumn FieldName="NormHours" SummaryType="Sum"/>
                     <local:SumColumn FieldName="TotalHours" SummaryType="Sum"/>
+                    <local:SumColumn FieldName="Production" SummaryType="Sum"/>
                     <local:SumColumn FieldName="Mileage" SummaryType="Sum"/>
                     <local:SumColumn FieldName="Vacation" SummaryType="Sum"/>
                     <local:SumColumn FieldName="VacationOther" SummaryType="Sum"/>

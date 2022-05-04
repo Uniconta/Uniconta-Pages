@@ -36,13 +36,16 @@
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="Storage" LocalizedNameKey="OnHand" Module="Storage" LargeGlyph="Storage_32x32.png"/>
-    <RibbonItem Action="Serial" LocalizedNameKey="SerialBatchNumbers" LargeGlyph="Account-statement_32x32.png"/>
+    <RibbonItem Action="InvStockProfile" LocalizedNameKey="StockProfile" ControlName="InvStorageProfileReport" Module="Storage" LargeGlyph="Invoice_32x32.png"/>
+    <RibbonItem Action="Serial" LocalizedNameKey="SerialBatchNumbers" Module="SerialBatchNumbers" LargeGlyph="Account-statement_32x32.png"/>
     <RibbonItem Action="ItemReference" LocalizedNameKey="ItemReference" LargeGlyph="Inventory_Trans_32x32.png">
        <RibbonItem Action="StockLines" LocalizedNameKey="InvTransactions" LargeGlyph="Inventory_Trans_32x32.png" Glyph="Marked_Inventory_from_Inventory_16x16.png"/>
        <RibbonItem Action="DebtorOrderLines" LocalizedNameKey="ShowOBJ" Parameter="OrdersLine" Module="Order" Glyph="Nested_16x16.png"/>
        <RibbonItem Action="DebtorOfferLines" LocalizedNameKey="ShowOBJ" Parameter="OfferLine" Module="Order" Glyph="Offer_Lines_16x16.png"/>
        <RibbonItem Action="PurchaseOrderLines" LocalizedNameKey="ShowOBJ" Parameter="PurchaseLines" Module="Purchase" Glyph="Purchase_Lines_16x16.png"/>
        <RibbonItem Action="ProductionOrderLines" LocalizedNameKey="ShowOBJ" Parameter="ProductionLines" Module="Production" Glyph="Production_Lines_16x16.png"/>
+      <RibbonItem Action="ViewItemAttachments" LocalizedNameKey="ItemAttachments" Glyph="View_16x16.png" />
+      <RibbonItem Action="ViewNotes" LocalizedNameKey="ItemNotes" Glyph="Note_16x16.png" />
     </RibbonItem>
    
     <RibbonItem Action="PartInvItems" LocalizedNameKey="BOM" LargeGlyph="Order_Lines_Highlighted_32x32.png" ShortcutKey="ALT+L">
@@ -52,6 +55,8 @@
     <RibbonItem Module="Attachments" LocalizedNameKey="Attachments" LargeGlyph="Attachments_32x32.png">
       <RibbonItem Action="AddNote" ShortcutKey="Alt+N" ControlName="UserNotesPage" LocalizedNameKey="Note" Glyph="Note_16x16.png"/>
       <RibbonItem Action="AddDoc" LocalizedNameKey="Document" ControlName="UserDocsPage" Glyph="Document_Attachment_16x16.png" ShortcutKey=""/>
+      <RibbonItem Action="ViewPhoto" LocalizedNameKey="ItemAttachments" Glyph="View_16x16.png" />
+      <RibbonItem Action="ViewNotes" LocalizedNameKey="ItemNotes" Glyph="Note_16x16.png" />
     </RibbonItem>
   </RibbonItem>
   <RibbonItem>

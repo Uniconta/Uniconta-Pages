@@ -69,9 +69,9 @@ namespace UnicontaClient.Pages.CustomPage
             }
 
             Company = Comp as CompanyClient;
-            if (Company == null)
+            if (Company == null || Company.GetType() != Company.GetUserTypeNotNull(typeof(CompanyClient)))
             {
-                Company = new CompanyClient();
+                Company = Comp.CreateUserType<CompanyClient>();
                 StreamingManager.Copy(Comp, Company);
             }
 

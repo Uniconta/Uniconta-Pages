@@ -25,8 +25,8 @@ x:Class="UnicontaClient.Pages.CustomPage.GLVatPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="TypeSales" Width="50" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="TypeBuy" Width="50"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Method" Width="80" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Rate" Width="50"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Rate2" Width="50"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Rate" Width="50" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Rate2" Width="50" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Rate2PartOfBrutto" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Account" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="FollowAccount" Visible="False"/>
@@ -36,11 +36,15 @@ x:Class="UnicontaClient.Pages.CustomPage.GLVatPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="OffsetAccountRate2" Visible="False" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="UnrealizedAccount" Visible="False" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Date" Width="90"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="RateAfterDate" Width="50"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Rate2AfterDate" Width="50"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ModelBoxId" Width="50" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="RateAfterDate" Width="50" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Rate2AfterDate" Width="50" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ShowZeroOnInvoice" Width="50" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ExternalCode" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Id" Visible="False"/>
+                    <localPage:ComboBoxColumnClient x:Name="VatCountry" Visible="False"/>
+                    <localPage:ComboBoxColumnClient x:Name="BusinessCountry" Visible="False"/>
+                    <localPage:ComboBoxColumnClient x:Name="ShipmentCountry" Visible="False"/>
+                    <localPage:ComboBoxColumnClient x:Name="RateType" Visible="False"/>
+                    <localPage:ComboBoxColumnClient x:Name="MOSSType" Visible="False"/>
                 </localPage:GLVatGrid.Columns>
             </localPage:GLVatGrid>
         </CorasauControls:BusyIndicator>

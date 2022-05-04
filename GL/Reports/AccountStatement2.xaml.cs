@@ -29,6 +29,7 @@ using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
 using Uniconta.Common;
+using Uniconta.Common.Utility;
 using Uniconta.DataModel;
 #if !SILVERLIGHT
 using UnicontaClient.Pages;
@@ -311,6 +312,13 @@ namespace UnicontaClient.Pages.CustomPage
             LoadType(new Type[] { typeof(Uniconta.DataModel.Debtor), typeof(Uniconta.DataModel.Creditor) });
         }
 
+        public override bool CheckIfBindWithUserfield(out bool isReadOnly, out bool useBinding)
+        {
+            isReadOnly = true;
+            useBinding = true;
+            return true;
+        }
+
         void LocalMenu_OnItemClicked(string ActionType)
         {
             GLTransClientTotal selectedItem = dgGLTrans.View.MasterRootRowsContainer.FocusedView.DataControl.CurrentItem as GLTransClientTotal;
@@ -331,7 +339,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "VoucherTransactions":
                     if (selectedItem == null)
                         return;
-                    string vheader = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("VoucherTransactions"), selectedItem._Voucher);
+                    string vheader = Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("VoucherTransactions"), selectedItem._Voucher);
                     AddDockItem(TabControls.AccountsTransaction, selectedItem, vheader);
                     break;
                 case "ExpandAndCollapse":
@@ -507,7 +515,8 @@ namespace UnicontaClient.Pages.CustomPage
             }
             else if (transApi.LastError != 0)
             {
-                Uniconta.ClientTools.Util.UtilDisplay.ShowErrorCode(transApi.LastError);
+                busyIndicator.IsBusy = false;
+                UtilDisplay.ShowErrorCode(transApi.LastError);
             }
             busyIndicator.IsBusy = false;
             if (_master != null)

@@ -1,0 +1,53 @@
+<cw:ChildWindow xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.CwCreateBudgetTask"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:cw="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+        xmlns:ClientToolsControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+        xmlns:UnicontaControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"   
+        mc:Ignorable="d" Width="415" Height="400" 
+       d:DesignHeight="100" d:DesignWidth="380">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="40"/>
+        </Grid.RowDefinitions>
+        <UnicontaControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Vertical" Grid.Row="0" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
+            <UnicontaControls:CorasauLayoutGroup x:Name="layoutGroupSettings" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Settings}" Orientation="Vertical" UnicontaControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                <UnicontaControls:CorasauLayoutItem FieldName="Group" x:Name="lblGroup">
+                    <UnicontaControls:LookupEditor x:Name="leGroup" Text="{Binding Group,Mode=TwoWay}"/>
+                </UnicontaControls:CorasauLayoutItem>
+                <UnicontaControls:CorasauLayoutItem FieldName="PrWorkSpace" x:Name="lblWorkspace">
+                    <UnicontaControls:LookupEditor x:Name="leWorkspace" Text="{Binding PrWorkSpace,Mode=TwoWay}"/>
+                </UnicontaControls:CorasauLayoutItem>
+                <UnicontaControls:CorasauLayoutItem x:Name="lblBudgetTaskPrincip" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Principle}">
+                    <UnicontaControls:DimComboBoxEditor x:Name="cmbBudgetTaskPrincip" SelectedIndexChanged="cmbBudgetTaskPrincip_SelectedIndexChanged" IsTextEditable="False"/>
+                </UnicontaControls:CorasauLayoutItem>
+                <UnicontaControls:CorasauLayoutItem FieldName="TaskHours" x:Name="lblTaskHours">
+                    <UnicontaControls:DoubleEditor x:Name="deTaskHours" FieldName="TaskHours" />
+                </UnicontaControls:CorasauLayoutItem>
+                <UnicontaControls:CorasauLayoutItem FieldName="DeleteBudget">
+                    <UnicontaControls:CheckEditor x:Name="deleteBudget" IsChecked="{Binding DeleteBudget,Mode=TwoWay}"/>
+                </UnicontaControls:CorasauLayoutItem>
+            </UnicontaControls:CorasauLayoutGroup>
+
+            <UnicontaControls:CorasauLayoutGroup x:Name="layoutGroupAccountRange" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Range}" Orientation="Vertical" UnicontaControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                <UnicontaControls:CorasauLayoutItem FieldName="Employee" x:Name="lblEmployee">
+                    <UnicontaControls:LookupEditor x:Name="leEmp" Text="{Binding Employee,Mode=TwoWay}"/>
+                </UnicontaControls:CorasauLayoutItem>
+                <UnicontaControls:CorasauLayoutItem FieldName="Payroll" x:Name="lblPayroll">
+                    <UnicontaControls:LookupEditor x:Name="lePayroll" Text="{Binding Payroll,Mode=TwoWay}"/>
+                </UnicontaControls:CorasauLayoutItem>
+            </UnicontaControls:CorasauLayoutGroup>
+
+        </UnicontaControls:CorasauLayoutControl>
+        <StackPanel x:Name="actionButton" HorizontalAlignment="Right" Grid.Row="1" Orientation="Horizontal" Margin="0 10 0 0">
+            <Button x:Name="OKButton" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OK}" Click="OKButton_Click" MinWidth="75" Height="23"
+                    HorizontalAlignment="Right" Margin="0 0 3 0" />
+            <Button x:Name="CancelButton" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Cancel}" IsCancel="True" Click="CancelButton_Click" MinWidth="75" 
+                    Height="23" HorizontalAlignment="Right"  />
+        </StackPanel>
+    </Grid>
+</cw:ChildWindow>

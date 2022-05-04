@@ -24,9 +24,9 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOrderCostLinePage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="Amount" Width="100"/>
                     <local:ComboBoxColumnClient x:Name="Currency" Width="50"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Item" Width="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Disable" Width="100"/>
                 </local:CreditorOrderCostLineGrid.Columns>
             </local:CreditorOrderCostLineGrid>
-
         </Grid>
     </CorasauControls:BusyIndicator>
 </Pages:GridBasePage>

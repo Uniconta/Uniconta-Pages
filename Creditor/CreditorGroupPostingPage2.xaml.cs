@@ -16,6 +16,7 @@ using System.Windows.Shapes;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.Common;
+using Uniconta.Common.Utility;
 using Uniconta.API.System;
 using UnicontaClient.Utilities;
 
@@ -29,13 +30,14 @@ namespace UnicontaClient.Pages.CustomPage
     {
         DCGroupPostingClient editRow;
         public override string NameOfControl { get { return TabControls.CreditorGroupPostingPage2; } }
-
-        public CreditorGroupPostingPage2(UnicontaBaseEntity sourceData, bool isEdit = true) : base(sourceData, isEdit)
+        bool isGroupEnabled = true;
+        public CreditorGroupPostingPage2(UnicontaBaseEntity sourceData, UnicontaBaseEntity groupMaster,bool isEdit = true) : base(sourceData, isEdit)
         {
             InitializeComponent();
             if (!isEdit)
                 editRow = (DCGroupPostingClient)StreamingManager.Clone(sourceData);
-            InitPage(api);
+            isGroupEnabled = !isEdit;
+            InitPage(api, groupMaster);
         }
 
         public CreditorGroupPostingPage2(CrudAPI crudApi,UnicontaBaseEntity groupMaster):base(crudApi,null)
@@ -45,9 +47,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
         private void InitPage(CrudAPI crudApi, UnicontaBaseEntity groupMaster = null)
         {
-            BusyIndicator = busyIndicator;
             layoutControl = layoutItems;
-
             leRevenueAccount.api = leRevenueAccount1.api =leRevenueAccount2.api = leRevenueAccount3.api = leRevenueAccount4.api = leInvGroup.api = leGroup.api
                = leVat.api = leVat1.api = leVat2.api = leVat3.api = leVat4.api = crudApi;
 
@@ -71,12 +71,12 @@ namespace UnicontaClient.Pages.CustomPage
                 if (groupMaster is Uniconta.DataModel.DCGroup)
                 {
                     liGroup.Visibility = Visibility.Collapsed;
-                    leInvGroup.IsEnabled = true;
+                    leInvGroup.IsEnabled = isGroupEnabled;
                 }
                 else if (groupMaster is Uniconta.DataModel.InvGroup)
                 {
                     liInventoryGroup.Visibility = Visibility.Collapsed;
-                    leGroup.IsEnabled = true;
+                    leGroup.IsEnabled = isGroupEnabled;
                     leGroup.SetForeignKeyRef(typeof(CreditorGroupClient), 0);
                 }
             }
@@ -87,11 +87,11 @@ namespace UnicontaClient.Pages.CustomPage
         private void SetHeaders()
         {
             grpRevenueAccount.Header = Uniconta.ClientTools.Localization.lookup("PurchaseAccount");
-            liRevenueAccount.Label = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("PurchaseAccount"), Uniconta.ClientTools.Localization.lookup("Domestic"));
-            liRevenueAccount1.Label = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("PurchaseAccount"), Uniconta.ClientTools.Localization.lookup("EUMember"));
-            liRevenueAccount2.Label = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("PurchaseAccount"), Uniconta.ClientTools.Localization.lookup("Abroad"));
-            liRevenueAccount3.Label = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("PurchaseAccount"), Uniconta.ClientTools.Localization.lookup("NoVATRegistration"));
-            liRevenueAccount4.Label = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("PurchaseAccount"), Uniconta.ClientTools.Localization.lookup("ExemptVat"));
+            liRevenueAccount.Label = Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("PurchaseAccount"), Uniconta.ClientTools.Localization.lookup("Domestic"));
+            liRevenueAccount1.Label = Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("PurchaseAccount"), Uniconta.ClientTools.Localization.lookup("EUMember"));
+            liRevenueAccount2.Label = Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("PurchaseAccount"), Uniconta.ClientTools.Localization.lookup("Abroad"));
+            liRevenueAccount3.Label = Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("PurchaseAccount"), Uniconta.ClientTools.Localization.lookup("NoVATRegistration"));
+            liRevenueAccount4.Label = Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("PurchaseAccount"), Uniconta.ClientTools.Localization.lookup("ExemptVat"));
         }
 
         private void FrmRibbon_OnItemClicked(string ActionType)

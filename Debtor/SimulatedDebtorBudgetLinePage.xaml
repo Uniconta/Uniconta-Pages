@@ -1,0 +1,35 @@
+<Pages:GridBasePage xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.SimulatedDebtorBudgetLinePage"
+             xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
+             xmlns:UnicontaControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <UnicontaControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Debtor/SimulatedDebtorBudgetLineRibbon.xml" x:Name="localMenu"/>
+        <UnicontaControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <local:SimulateDebtorBudgetLineGrid x:Name="dgSimulatedDebtorBudgetLine" AutoGenerateColumns="None">
+                <local:SimulateDebtorBudgetLineGrid.Columns>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Date" Width="100" ReadOnly="True" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Account" ReadOnly="True"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="AccountName"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="AccountType"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Comment" Width="150" ReadOnly="True" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Amount" ReadOnly="True" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Debit" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Credit" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient FieldName="Dimension1" x:Name="coldim1"/>
+                    <local:CorasauDataGridTemplateColumnClient FieldName="Dimension2" x:Name="coldim2"/>
+                    <local:CorasauDataGridTemplateColumnClient FieldName="Dimension3" x:Name="coldim3"/>
+                    <local:CorasauDataGridTemplateColumnClient FieldName="Dimension4" x:Name="coldim4"/>
+                    <local:CorasauDataGridTemplateColumnClient FieldName="Dimension5" x:Name="coldim5"/>
+                </local:SimulateDebtorBudgetLineGrid.Columns>
+            </local:SimulateDebtorBudgetLineGrid>
+        </UnicontaControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

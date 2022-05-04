@@ -21,12 +21,13 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectTaskGridPage"
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <CorasauControls:CorasauRibbonControl x:Name="localMenu" XMLSourcePath=";component/Assets/EditableGridRibbon.xml" Grid.Row="0"/>
+        <CorasauControls:CorasauRibbonControl x:Name="localMenu" XMLSourcePath=";component/Pages/Project/ProjectTaskGridPageRibbon.xml" Grid.Row="0"/>
         <CorasauControls:BusyIndicator x:Name="busyIndicator" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}" Grid.Row="1">
             <local:ProjectTaskGridClient x:Name="dgProjectTaskGrid" AutoGenerateColumns="None">
                 <local:ProjectTaskGridClient.Columns>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Task" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Name" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Project" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="ProjectName" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="StartDate" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="EndDate" />
@@ -43,6 +44,12 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectTaskGridPage"
                         </local:CorasauDataGridForeignKeyColumnClient.CellTemplate>
                     </local:CorasauDataGridForeignKeyColumnClient>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Employee" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="WorkSpace" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Group" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PayrollCategory" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Qty" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Amount" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Ended" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="EmployeeName" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Description" Width="250">
                         <local:CorasauDataGridTemplateColumnClient.EditSettings>
@@ -50,6 +57,10 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectTaskGridPage"
                         </local:CorasauDataGridTemplateColumnClient.EditSettings>
                     </local:CorasauDataGridTemplateColumnClient>
                 </local:ProjectTaskGridClient.Columns>
+                <local:ProjectTaskGridClient.TotalSummary>
+                    <local:SumColumn FieldName="Task" SummaryType="Count" />
+                    <local:SumColumn FieldName="Qty" SummaryType="Sum" />
+                </local:ProjectTaskGridClient.TotalSummary>
             </local:ProjectTaskGridClient>
         </CorasauControls:BusyIndicator>
     </Grid>

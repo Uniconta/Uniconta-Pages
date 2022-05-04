@@ -34,6 +34,7 @@ namespace UnicontaClient.Pages.CustomPage
         public string Name { get; set; }
         public CrmFollowUpClient FollowUp { get; set; }
         public bool AddFollowUp { get; set; }
+        public bool IncludeAttachements { get; set; }
         CrudAPI api;
 
         public CwSendEmail(CrudAPI _api)
@@ -47,6 +48,11 @@ namespace UnicontaClient.Pages.CustomPage
             tbChkFollowUp.Text = string.Format(Uniconta.ClientTools.Localization.lookup("AddOBJ"), Uniconta.ClientTools.Localization.lookup("FollowUp"));
         }
 
+        public void ShowAttachments()
+        {
+            chkIncludeAttach.Visibility = tbChkIncludeAttach.Visibility = Visibility.Visible;
+        }
+
         private void CW_Loaded(object sender, RoutedEventArgs e)
         {
             Dispatcher.BeginInvoke(new Action(() => { leCompanySMTP.Focus(); }));
@@ -56,7 +62,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (e.Key == Key.Escape)
             {
-                this.DialogResult = false;
+                SetDialogResult(false);
             }
             else
                 if (e.Key == Key.Enter)
@@ -64,13 +70,13 @@ namespace UnicontaClient.Pages.CustomPage
                 if (OKButton.IsFocused)
                     OKButton_Click(null, null);
                 else if (CancelButton.IsFocused)
-                    this.DialogResult = false;
+                    SetDialogResult(false);
             }
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = false;
+            SetDialogResult(false);
         }
 
         private void OKButton_Click(object sender, RoutedEventArgs e)
@@ -83,7 +89,7 @@ namespace UnicontaClient.Pages.CustomPage
                 return;
             }
             else
-                this.DialogResult = true;
+                SetDialogResult(true);
         }
 
         private void leCompanySMTP_SelectedIndexChanged(object sender, RoutedEventArgs e)

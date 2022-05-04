@@ -76,6 +76,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void InitPage(UnicontaBaseEntity master)
         {
             InitializeComponent();
+            var Comp = api.CompanyEntity;
             LayoutControl = crmDetailControl.layoutItems;
             dgCrmFollowUpGrid.UpdateMaster(master);
             ((TableView)dgCrmFollowUpGrid.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
@@ -91,6 +92,7 @@ namespace UnicontaClient.Pages.CustomPage
             CreditorCache = api.GetCache(typeof(Uniconta.DataModel.Creditor));
             CrmProspectCache = api.GetCache(typeof(Uniconta.DataModel.CrmProspect));
             ContactCache = api.GetCache(typeof(Uniconta.DataModel.Contact));
+            ProjectCache = api.GetCache(typeof(Uniconta.DataModel.Project));
 
             ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "UndoDelete", "SaveGrid" });
             dgCrmFollowUpGrid.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;
@@ -100,6 +102,34 @@ namespace UnicontaClient.Pages.CustomPage
         protected override void OnLayoutCtrlLoaded()
         {
             crmDetailControl.api = api;
+        }
+
+        Filter defaultFilter;
+        protected override Filter[] DefaultFilters()
+        {
+            if (defaultFilter!= null)
+                return new Filter[] { defaultFilter };
+            else
+                return null;
+        }
+
+        public override void SetParameter(IEnumerable<ValuePair> Parameters)
+        {
+            string employee = null;
+            foreach (var rec in Parameters)
+            {
+                if (string.Compare(rec.Name, "Employee", StringComparison.CurrentCultureIgnoreCase) == 0)
+                    employee = rec.Value;
+            }
+            if (employee != null)
+            {
+                defaultFilter= new Filter();
+                defaultFilter.name = "Employee";
+                defaultFilter.value = employee;
+                SetHeader();
+            }
+
+            base.SetParameter(Parameters);
         }
 
         void DataControl_CurrentItemChanged(object sender, DevExpress.Xpf.Grid.CurrentItemChangedEventArgs e)
@@ -123,7 +153,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        SQLCache DebtorCache, CreditorCache, CrmProspectCache, ContactCache;
+        SQLCache DebtorCache, CreditorCache, CrmProspectCache, ContactCache, ProjectCache;
         protected override async void LoadCacheInBackGround()
         {
             var api = this.api;
@@ -135,6 +165,8 @@ namespace UnicontaClient.Pages.CustomPage
                 CrmProspectCache = api.GetCache(typeof(Uniconta.DataModel.CrmProspect)) ?? await api.LoadCache(typeof(Uniconta.DataModel.CrmProspect)).ConfigureAwait(false);
             if (ContactCache == null)
                 ContactCache = api.GetCache(typeof(Uniconta.DataModel.Contact)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Contact)).ConfigureAwait(false);
+            if (ProjectCache == null)
+                ProjectCache = api.GetCache(typeof(Uniconta.DataModel.Project)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Project)).ConfigureAwait(false);
         }
 
         private void SetAccountSource(CrmFollowUpClient record)
@@ -148,6 +180,7 @@ namespace UnicontaClient.Pages.CustomPage
                     case CrmCampaignMemberType.Creditor: cache = CreditorCache; break;
                     case CrmCampaignMemberType.Prospect: cache = CrmProspectCache; break;
                     case CrmCampaignMemberType.Contact: cache = ContactCache; break;
+                    case CrmCampaignMemberType.Project: cache = ProjectCache; break;
                     default: cache = null; break;
                 }
                 record.accntSource = cache;
@@ -188,6 +221,8 @@ namespace UnicontaClient.Pages.CustomPage
                 lookupStr = "Creditors";
             else if (masterRecord is DebtorOfferClient)
                 lookupStr = "Offers";
+            else if (masterRecord is ProjectClient)
+                lookupStr = "Projects";
             else
                 return Uniconta.ClientTools.Localization.lookup("FollowUp");
             return string.Format("{0}:{2} {1}", Uniconta.ClientTools.Localization.lookup("FollowUp"), Utility.GetHeaderString(masterRecord), Uniconta.ClientTools.Localization.lookup(lookupStr));
@@ -271,7 +306,8 @@ namespace UnicontaClient.Pages.CustomPage
 
         void CopyRecord(CrmFollowUpClient selectedItem)
         {
-            var followUp = StreamingManager.Clone(selectedItem) as CrmFollowUpClient;
+            var followUp = new CrmFollowUpClient();
+            CorasauDataGrid.CopyAndClearRowId(selectedItem, followUp);
             followUp.dc = selectedItem.dc;
             followUp.pros = selectedItem.pros;
             followUp.cont = selectedItem.cont;
@@ -279,7 +315,7 @@ namespace UnicontaClient.Pages.CustomPage
             followUp._Ended = DateTime.MinValue;
             if (followUp._Action == Uniconta.DataModel.FollowUpAction.Lost)
                 followUp._Action = 0;
-            var parms = new object[3] { followUp, false , dgCrmFollowUpGrid.masterRecord};
+            var parms = new object[3] { followUp, false, dgCrmFollowUpGrid.masterRecord };
             AddDockItem(TabControls.CrmFollowUpPage2, parms, Uniconta.ClientTools.Localization.lookup("FollowUp"), "Add_16x16.png");
         }
 
@@ -385,6 +421,10 @@ namespace UnicontaClient.Pages.CustomPage
                     var header = string.Format("{0}:{2} {1}", Uniconta.ClientTools.Localization.lookup("FollowUp"), selectedItem._Account, Uniconta.ClientTools.Localization.lookup("Contact"));
                     AddDockItem(TabControls.CrmFollowUpPage, selectedItem, header);
                     break;
+                case CrmCampaignMemberType.Project:
+                    if (selectedItem.Project == null) return;
+                    AddDockItem(TabControls.CrmFollowUpPage, selectedItem, GetHeaderName(selectedItem.Project));
+                    break;
             }
         }
 
@@ -414,6 +454,9 @@ namespace UnicontaClient.Pages.CustomPage
                         break;
                     case CrmCampaignMemberType.Prospect:
                         lookup.TableType = typeof(Uniconta.DataModel.CrmProspect);
+                        break;
+                    case CrmCampaignMemberType.Project:
+                        lookup.TableType = typeof(Uniconta.DataModel.Project);
                         break;
                 }
             }

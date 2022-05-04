@@ -6,6 +6,15 @@ using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.Common;
 using DevExpress.Xpf.Grid;
+using Uniconta.API.Project;
+using Uniconta.ClientTools.Util;
+using Uniconta.ClientTools.Controls;
+using UnicontaClient.Controls.Dialogs;
+using System.Collections.Generic;
+using Uniconta.API.Service;
+using Uniconta.ClientTools;
+using UnicontaClient.Utilities;
+using System.Linq;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -19,25 +28,110 @@ namespace UnicontaClient.Pages.CustomPage
     public class ProjectTaskGridClient : CorasauDataGridClient
     {
         public override Type TableType { get { return typeof(ProjectTaskClientLocal); } }
-        public override bool Readonly { get { return false; } }
     }
     
     public partial class ProjectTaskGridPage : GridBasePage
     {
         public override string NameOfControl { get { return TabControls.ProjectTaskGridPage; } }
         SQLCache ProjectCache;
+        Uniconta.DataModel.Project proj;
+
+        public override void Utility_Refresh(string screenName, object argument = null)
+        {
+            if (screenName == TabControls.ProjectTaskPage2)
+                dgProjectTaskGrid.UpdateItemSource(argument);
+        }
+        public ProjectTaskGridPage(SynchronizeEntity syncEntity) : base(syncEntity, true)
+        {
+            InitializeComponent();
+            InitPage(syncEntity.Row);
+            SetHeader();
+        }
+        protected override void SyncEntityMasterRowChanged(UnicontaBaseEntity args)
+        {
+            dgProjectTaskGrid.UpdateMaster(args);
+            SetHeader();
+            InitQuery();
+        }
+
+        public ProjectTaskGridPage(BaseAPI api, string lookupKey)
+       : base(api, lookupKey)
+        {
+            InitializeComponent();
+            InitPage(null);
+        }
+
+        private void SetHeader()
+        {
+            string key = Utility.GetHeaderString(dgProjectTaskGrid.masterRecord);
+            if (string.IsNullOrEmpty(key)) return;
+            string header = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Tasks"), key);
+            SetHeader(header);
+        }
         public ProjectTaskGridPage(UnicontaBaseEntity _master) : base(null)
         {
             InitializeComponent();
+            InitPage(_master);
+        }
+
+        public ProjectTaskGridPage(BaseAPI API) : base(API, string.Empty)
+        {
+            InitializeComponent();
+            InitPage(null);
+        }
+
+        void InitPage(UnicontaBaseEntity _master)
+        {
             ((TableView)dgProjectTaskGrid.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
             SetRibbonControl(localMenu, dgProjectTaskGrid);
+            RibbonBase rb = (RibbonBase)localMenu.DataContext;
             dgProjectTaskGrid.api = api;
             dgProjectTaskGrid.BusyIndicator = busyIndicator;
             dgProjectTaskGrid.UpdateMaster(_master);
             localMenu.OnItemClicked += LocalMenu_OnItemClicked;
-            var proj = (_master as Uniconta.DataModel.Project);
+            proj = (_master as Uniconta.DataModel.Project);
             if (proj != null)
+            {
+                Project.Visible = false;
                 proj.Tasks = null;
+            }
+            else
+            {
+                var emp = (_master as Uniconta.DataModel.Employee);
+                if (emp != null)
+                    Employee.Visible = false;   
+                    
+                UtilDisplay.RemoveMenuCommand(rb, new string[] { "CreateTaskFromTask" });
+            }
+            dgProjectTaskGrid.ShowTotalSummary();
+        }
+
+        Filter defaultFilter;
+        protected override Filter[] DefaultFilters()
+        {
+            if (defaultFilter!= null)
+                return new Filter[] { defaultFilter };
+            else
+                return null;
+        }
+
+        public override void SetParameter(IEnumerable<ValuePair> Parameters)
+        {
+            string employee = null;
+            foreach (var rec in Parameters)
+            {
+                if (string.Compare(rec.Name, "Employee", StringComparison.CurrentCultureIgnoreCase) == 0)
+                    employee = rec.Value;
+            }
+            if (employee != null)
+            {
+                defaultFilter= new Filter();
+                defaultFilter.name = "Employee";
+                defaultFilter.value = employee;
+                SetHeader();
+            }
+
+            base.SetParameter(Parameters);
         }
 
         public override bool CheckIfBindWithUserfield(out bool isReadOnly, out bool useBinding)
@@ -49,9 +143,32 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void LocalMenu_OnItemClicked(string ActionType)
         {
+            var selectedItem = dgProjectTaskGrid.SelectedItem as ProjectTaskClient;
+            var selectedTasks = dgProjectTaskGrid.SelectedItems?.Cast<ProjectTaskClientLocal>();
             switch (ActionType)
             {
+                case "EditAll":
+                    if (dgProjectTaskGrid.Visibility == Visibility.Visible)
+                        EditAll();
+                    break;
                 case "AddRow":
+                    var newItem = dgProjectTaskGrid.GetChildInstance();
+                    object[] param = new object[3];
+                    param[0] = newItem;
+                    param[1] = false;
+                    param[2] = dgProjectTaskGrid.masterRecord;
+                    AddDockItem(TabControls.ProjectTaskPage2, param, Uniconta.ClientTools.Localization.lookup("Task"), "Add_16x16.png");
+                    break;
+                case "EditRow":
+                    if (selectedItem == null)
+                        return;
+                    object[] para = new object[3];
+                    para[0] = selectedItem;
+                    para[1] = true;
+                    para[2] = dgProjectTaskGrid.masterRecord;
+                    AddDockItem(TabControls.ProjectTaskPage2, para, selectedItem.Name, null, true);
+                    break;
+                case "AddLine":
                     dgProjectTaskGrid.AddRow();
                     break;
                 case "DeleteRow":
@@ -60,12 +177,99 @@ namespace UnicontaClient.Pages.CustomPage
                 case "SaveGrid":
                     Save();
                     break;
+                case "CreateTaskFromTask":
+                    if (dgProjectTaskGrid.ItemsSource != null)
+                        CreateTaskFromTask();
+                    break;
+                case "CreateBudgetTask":
+                    if (selectedTasks != null)
+                        CreateBudgetTask(selectedTasks);
+                    break;
+                case "CloseTask":
+                    if (selectedTasks != null)
+                        CloseTask(selectedTasks);
+                    break;
+                case "FollowUp":
+                    if (selectedItem != null)
+                    {
+                        var header = string.Format("{0}:{2} {1}", Uniconta.ClientTools.Localization.lookup("FollowUp"), selectedItem._Name, Uniconta.ClientTools.Localization.lookup("Task"));
+                        AddDockItem(TabControls.CrmFollowUpPage, dgProjectTaskGrid.syncEntity, header);
+                    }
+                    break;
+                case "UndoDelete":
+                    dgProjectTaskGrid.UndoDeleteRow();
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
         }
 
+        bool editAllChecked;
+        private void EditAll()
+        {
+            RibbonBase rb = (RibbonBase)localMenu.DataContext;
+            var ibase = UtilDisplay.GetMenuCommandByName(rb, "EditAll");
+            if (ibase == null)
+                return;
+            if (dgProjectTaskGrid.Readonly)
+            {
+                api.AllowBackgroundCrud = false;
+                dgProjectTaskGrid.MakeEditable();
+                UserFieldControl.MakeEditable(dgProjectTaskGrid);
+                ibase.Caption = Uniconta.ClientTools.Localization.lookup("LeaveEditAll");
+                ribbonControl.EnableButtons(new string[] { "AddLine", "DeleteRow", "UndoDelete", "SaveGrid" });
+                editAllChecked = false;
+            }
+            else
+            {
+                if (IsDataChaged)
+                {
+                    string message = Uniconta.ClientTools.Localization.lookup("SaveChangesPrompt");
+                    CWConfirmationBox confirmationDialog = new CWConfirmationBox(message);
+                    confirmationDialog.Closing += async delegate
+                    {
+                        if (confirmationDialog.DialogResult == null)
+                            return;
+
+                        switch (confirmationDialog.ConfirmationResult)
+                        {
+                            case CWConfirmationBox.ConfirmationResultEnum.Yes:
+                                var err = await dgProjectTaskGrid.SaveData();
+                                if (err != 0)
+                                {
+                                    api.AllowBackgroundCrud = true;
+                                    return;
+                                }
+                                break;
+                            case CWConfirmationBox.ConfirmationResultEnum.No:
+                                break;
+                        }
+                        editAllChecked = true;
+                        dgProjectTaskGrid.Readonly = true;
+                        dgProjectTaskGrid.tableView.CloseEditor();
+                        ibase.Caption = Uniconta.ClientTools.Localization.lookup("EditAll");
+                        ribbonControl.DisableButtons(new string[] { "AddLine", "DeleteRow", "UndoDelete", "SaveGrid" });
+                    };
+                    confirmationDialog.Show();
+                }
+                else
+                {
+                    dgProjectTaskGrid.Readonly = true;
+                    dgProjectTaskGrid.tableView.CloseEditor();
+                    ibase.Caption = Uniconta.ClientTools.Localization.lookup("EditAll");
+                    ribbonControl.DisableButtons(new string[] { "AddLine", "DeleteRow", "UndoDelete", "SaveGrid" });
+                }
+            }
+
+        }
+        public override bool IsDataChaged
+        {
+            get
+            {
+                return editAllChecked ? false : dgProjectTaskGrid.HasUnsavedData;
+            }
+        }
         async private void Save()
         {
             SetBusy();
@@ -104,6 +308,73 @@ namespace UnicontaClient.Pages.CustomPage
                 }
                 rec.NotifyPropertyChanged("TaskSource");
             }
+        }
+
+        private void CreateTaskFromTask()
+        {
+            var cwCreateTask = new CWCreateTaskFromTask(api, proj?._Number);
+            cwCreateTask.DialogTableId = 2000000104;
+            cwCreateTask.Closed += async delegate
+            {
+                if (cwCreateTask.DialogResult == true)
+                {
+                    var taskLst = (IEnumerable<Uniconta.DataModel.ProjectTask>)dgProjectTaskGrid.GetVisibleRows();
+
+                    BudgetAPI budgetApi = new BudgetAPI(api);
+                    var result = await budgetApi.CreateTaskFromTask(CWCreateTaskFromTask.FromPrWorkSpace, CWCreateTaskFromTask.ToPrWorkSpace, cwCreateTask.ToProject, cwCreateTask.BudgetTaskDatePrincip, cwCreateTask.NewDate, CWCreateTaskFromTask.AddYear, taskLst);
+
+                    if (result != ErrorCodes.Succes)
+                        UtilDisplay.ShowErrorCode(result);
+                    else
+                        UnicontaMessageBox.Show(string.Concat(Uniconta.ClientTools.Localization.lookup("Tasks"), " ", Uniconta.ClientTools.Localization.lookup("Created").ToLower()),
+                            Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OK);
+                }
+            };
+            cwCreateTask.Show();
+        }
+
+        private void CreateBudgetTask(IEnumerable<ProjectTaskClientLocal> taskLst)
+        {
+            var cwCreateBjtTask = new CwCreateBudgetTask(api, 1, taskLst.Count());
+            cwCreateBjtTask.DialogTableId = 2000000180;
+            cwCreateBjtTask.Closed += async delegate
+            {
+                if (cwCreateBjtTask.DialogResult == true)
+                {
+                    BudgetAPI budgetApi = new BudgetAPI(api);
+                    var result = await budgetApi.CreateBudgetTask(CwCreateBudgetTask.Employee, CwCreateBudgetTask.Payroll, CwCreateBudgetTask.Group,
+                                                                  CwCreateBudgetTask.PrWorkSpace, cwCreateBjtTask.DeleteBudget, CwCreateBudgetTask.BudgetTaskPrincip,
+                                                                  CwCreateBudgetTask.TaskHours, null, taskLst);
+
+                    if (result != ErrorCodes.Succes)
+                        UtilDisplay.ShowErrorCode(result);
+                    else
+                        UnicontaMessageBox.Show(string.Concat(Uniconta.ClientTools.Localization.lookup("Budget"), " ", Uniconta.ClientTools.Localization.lookup("Created").ToLower()),
+                            Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OK);
+                }
+            };
+            cwCreateBjtTask.Show();
+        }
+
+        private void CloseTask(IEnumerable<ProjectTaskClientLocal> lst)
+        {
+            var icount = lst.Count();
+            var cwProjectTaskClose = new CWProjectTaskClose(icount);
+            cwProjectTaskClose.DialogTableId = 2000000089;
+            cwProjectTaskClose.Closed += delegate
+            {
+                if (cwProjectTaskClose.DialogResult == true)
+                {
+                    busyIndicator.IsBusy = true;
+                    foreach (var rec in lst)
+                    {
+                        rec.Ended = true;
+                    }
+                    api.Update(lst);
+                    busyIndicator.IsBusy = false;
+                }
+            };
+            cwProjectTaskClose.Show();
         }
     }
 }

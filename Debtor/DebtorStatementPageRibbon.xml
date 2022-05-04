@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <root>
-  <RibbonItem TabId="0" LocalizedNameKey="Home">
+  <RibbonItem  TabId="0" LocalizedNameKey="Home">
+    <RibbonItem Action="Search" LocalizedNameKey="Search" LargeGlyph="Validate_32x32.png" ShortcutKey="Ctrl+H" />
+  </RibbonItem>
+  <RibbonItem>
     <RibbonItem Action="ExpandAndCollapse" LocalizedNameKey="ExpandAll" ShortcutKey="CTRL+O" LargeGlyph="Expand_32x32.png" />
     <RibbonItem Action="ExpandCollapseCurrent" LocalizedNameKey="ExpandCurrent" LargeGlyph="Expand_32x32.png" />
   </RibbonItem>
@@ -11,7 +14,7 @@
   <RibbonItem>
     <RibbonItem Action="ViewDownloadRow" ShortcutKey="ALT+P" LocalizedNameKey="PhysicalVoucher" Glyph="View_Voucher_32x32.png" LargeGlyph="View_Voucher_32x32.png" />
     <RibbonItem Action="VoucherTransactions" ShortcutKey="ALT+T" LocalizedNameKey="VoucherTransactions" Glyph="Voucher_Transactions_32x32.png" LargeGlyph="Voucher_Transactions_32x32.png" />
-    <RibbonItem Action="ViewTransactions" LocalizedNameKey="Transactions" LargeGlyph="Account-statement_32x32.png" />
+    <RibbonItem Action="OpenTran" LocalizedNameKey="OpenTrans"  LargeGlyph="Open_Transaction_32x32.png" />
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32.png">

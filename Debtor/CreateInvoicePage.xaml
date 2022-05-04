@@ -67,23 +67,26 @@ x:Class="UnicontaClient.Pages.CustomPage.CreateInvoicePage"
                             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=RevenueAccount}"  Grid.Column="0" Grid.Row="4" />
                             <CorasauControls:LookupEditor MaxWidth="170"  x:Name="LePostingAccount" EditValue="{Binding PostingAccount,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  Grid.Column="1"  Grid.Row="4" Margin="5,0,0,0"  />
 
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LayoutGroup}"  Grid.Column="0" Grid.Row="6" />
-                            <CorasauControls:LookupEditor MaxWidth="170"  x:Name="leLayoutGroup" EditValue="{Binding LayoutGroup,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  Grid.Column="1"  Grid.Row="6" Margin="5,0,0,0"  />
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TransactionText}" Grid.Column="0" Grid.Row="6" />
+                            <CorasauControls:TextEditor MaxWidth="170"   x:Name="txtPostingText"  Text="{Binding PostingText,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  Grid.Column="1" Grid.Row="6" Margin="5,0,0,0"  />
 
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=PriceList}"  Grid.Column="0" Grid.Row="8" />
-                            <CorasauControls:LookupEditor MaxWidth="170"  x:Name="lePriceList" EditValue="{Binding PriceList,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" EditValueChanged="lePriceList_EditValueChanged"  Grid.Column="1"  Grid.Row="8" Margin="5,0,0,0"  />
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LayoutGroup}"  Grid.Column="0" Grid.Row="8" />
+                            <CorasauControls:LookupEditor MaxWidth="170"  x:Name="leLayoutGroup" EditValue="{Binding LayoutGroup,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  Grid.Column="1"  Grid.Row="8" Margin="5,0,0,0"  />
 
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CurBalance}"  Grid.Column="3" Grid.Row="0" />
-                            <CorasauControls:TextEditor MaxWidth="170" x:Name="txtCurBalance"  Text="{Binding CurBalance,Mode=OneWay}" IsReadOnly="True" Mask="N2" MaskType="Numeric" Grid.Column="4" Grid.Row="0" Margin="5,0,0,0" />
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=PriceList}" x:Name="tbPriceList"  Grid.Column="3" Grid.Row="0" />
+                            <CorasauControls:LookupEditor MaxWidth="170"  x:Name="lePriceList" EditValue="{Binding PriceList,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" EditValueChanged="lePriceList_EditValueChanged"  Grid.Column="4"  Grid.Row="0" Margin="5,0,0,0"  />
 
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Overdue}"  Grid.Column="3" Grid.Row="2" />
-                            <CorasauControls:TextEditor MaxWidth="170" x:Name="txtOverdue"  Text="{Binding Overdue,Mode=OneWay}" IsReadOnly="True" Mask="N2" MaskType="Numeric" Grid.Column="4" Grid.Row="2" Margin="5,0,0,0" />
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CurBalance}"  Grid.Column="3" Grid.Row="2" />
+                            <CorasauControls:TextEditor MaxWidth="170" x:Name="txtCurBalance"  Text="{Binding CurBalance,Mode=OneWay}" IsReadOnly="True" Mask="N2" MaskType="Numeric" Grid.Column="4" Grid.Row="2" Margin="5,0,0,0" />
 
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CreditMax}"  Grid.Column="3" Grid.Row="4" />
-                            <CorasauControls:TextEditor MaxWidth="170" x:Name="txtCreditMax"  Text="{Binding CreditMax,Mode=OneWay}" Mask="N2" MaskType="Numeric" IsReadOnly="True" Grid.Column="4" Grid.Row="4" Margin="5,0,0,0" />
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Overdue}"  Grid.Column="3" Grid.Row="4" />
+                            <CorasauControls:TextEditor MaxWidth="170" x:Name="txtOverdue"  Text="{Binding Overdue,Mode=OneWay}" IsReadOnly="True" Mask="N2" MaskType="Numeric" Grid.Column="4" Grid.Row="4" Margin="5,0,0,0" />
 
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=InvoiceAccount}"  Grid.Column="3" Grid.Row="6" />
-                            <CorasauControls:LookupEditor MaxWidth="170"  x:Name="leInvAccount" EditValue="{Binding InvoiceAccount,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  Grid.Column="4"  Grid.Row="6" Margin="5,0,0,0"  />
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CreditMax}"  Grid.Column="3" Grid.Row="6" />
+                            <CorasauControls:TextEditor MaxWidth="170" x:Name="txtCreditMax"  Text="{Binding CreditMax,Mode=OneWay}" Mask="N2" MaskType="Numeric" IsReadOnly="True" Grid.Column="4" Grid.Row="6" Margin="5,0,0,0" />
+
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=InvoiceAccount}"  Grid.Column="3" Grid.Row="8" />
+                            <CorasauControls:LookupEditor MaxWidth="170"  x:Name="leInvAccount" EditValue="{Binding InvoiceAccount,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  Grid.Column="4"  Grid.Row="8" Margin="5,0,0,0"  />
 
                         </Grid>
                     </dxn:NavBarGroup>
@@ -339,6 +342,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreateInvoicePage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Currency" Width="35" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CostPrice" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Width="100" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="WorkSpace" Width="100" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CategoryName" Width="100" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Warehouse" Width="100"/>
                     <localPage:CorasauDataGridForeignKeyColumnClient x:Name="Location" Width="100">
@@ -357,8 +361,8 @@ x:Class="UnicontaClient.Pages.CustomPage.CreateInvoicePage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="IgnoreBlocked" Width="50" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Week" Width="50" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Date" Width="90" Visible="False" />
-
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PostingAccount" Width="100" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PurchaseAccount" Width="100" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Vat" Width="50" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Employee" Width="50" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Variant1Name" Width="100" Visible="False"/>

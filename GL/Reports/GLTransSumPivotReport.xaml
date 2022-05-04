@@ -8,13 +8,24 @@ x:Class="UnicontaClient.Pages.CustomPage.GLTransSumPivotReport"
         xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
         xmlns:dxc="http://schemas.devexpress.com/winfx/2008/xaml/charts"
         xmlns:UnicontaControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
-    <Grid>
+    <Grid Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="2"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <UnicontaControls:CorasauRibbonControl x:Name="localMenu" XMLSourcePath=";component/Pages/Inventory/InvTransPivotPageRibbon.xml" Grid.Row="0"/>
-        <UnicontaControls:BusyIndicator x:Name="busyIndicator"  Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Row="1" Margin="0,12,0,10">
+            <TextBlock x:Name="tbGrdTtlRow" VerticalAlignment="Center" Margin="10,0,0,0"/>
+            <UnicontaControls:CheckEditor x:Name="chkGrdTtlRow" Margin="10,0,0,0" VerticalAlignment="Top" Checked="chkGrdTtlRow_Checked" Unchecked="chkGrdTtlRow_Checked" />
+            <TextBlock x:Name="tbGrdTtlCol" VerticalAlignment="Center" Margin="10,0,0,0"/>
+            <UnicontaControls:CheckEditor x:Name="chkGrdTtlCol" Margin="10,0,0,0" Checked="chkGrdTtlCol_Checked" VerticalAlignment="Top" Unchecked="chkGrdTtlCol_Checked" />
+            <TextBlock x:Name="tbTtlOnFlds" VerticalAlignment="Center" Margin="10,0,0,0"/>
+            <UnicontaControls:CheckEditor x:Name="chkTtlOnFlds" Margin="10,0,0,0" VerticalAlignment="Top" Checked="chkTtlOnFlds_Checked" Unchecked="chkTtlOnFlds_Checked"  />
+        </StackPanel>
+        <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{StaticResource WindowHeaderGradient}" />
+        <UnicontaControls:BusyIndicator x:Name="busyIndicator"  Grid.Row="3" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <UnicontaControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Vertical" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
                 <Grid>
                     <Grid.RowDefinitions>

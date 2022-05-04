@@ -35,7 +35,7 @@ namespace UnicontaClient.Pages.CustomPage
 
     public partial class InvVariantCombiPage : GridBasePage
     {
-        public InvVariantCombiPage(BaseAPI API):base(API, string.Empty)
+        public InvVariantCombiPage(BaseAPI API) : base(API, string.Empty)
         {
             InitializeComponent();
             InitControls();
@@ -59,8 +59,7 @@ namespace UnicontaClient.Pages.CustomPage
             dgStandardVariantLines.UpdateMaster(master);
             Utilities.Utility.SetupVariants(api, null, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, null, null, null, null, null);
             SetRibbonControl(localMenu, dgStandardVariantLines);
-            if (master != null)
-                RemoveMenuItem();
+            RemoveMenuItem(master);
 
             dgStandardVariantLines.api = api;
             dgStandardVariantLines.BusyIndicator = busyIndicator;
@@ -77,13 +76,48 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void LocalMenu_OnItemClicked(string ActionType)
         {
-            gridRibbon_BaseActions(ActionType);
+            var selectedItem = dgStandardVariantLines.SelectedItem as InvVariantCombiClient;
+            switch (ActionType)
+            {
+                case "InvBOMPartOfContains":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.PartInvItemsPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("BOM"), selectedItem._Item));
+                    break;
+                case "InvBOMPartOfWhereUsed":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.InvBOMPartOfPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("BOM"), selectedItem._Item));
+                    break;
+                case "InvBOMProductionPosted":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.ProductionPostedGridPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ProductionPosted"), selectedItem._Item));
+                    break;
+                case "InvHierarichalBOM":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.InventoryHierarchicalBOMStatement, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("HierarchicalBOM"), selectedItem._Item));
+                    break;
+                case "InvExplodeBOM":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.InvBOMExplodePage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ExplodedBOM"), selectedItem._Item));
+                    break;
+                default:
+                    gridRibbon_BaseActions(ActionType);
+                    break;
+            }
         }
 
-        void RemoveMenuItem()
+        void RemoveMenuItem(UnicontaBaseEntity master)
         {
             RibbonBase rb = (RibbonBase)localMenu.DataContext;
-            UtilDisplay.RemoveMenuCommand(rb, new string[] { "Filter", "ClearFilter" });
+
+            if (master != null)
+            {
+                UtilDisplay.RemoveMenuCommand(rb, new string[] { "Filter", "ClearFilter" });
+                var invItem = master as InvItemClient;
+                if (invItem != null && invItem._ItemType >= (byte)Uniconta.DataModel.ItemType.BOM)
+                    return;
+            }
+
+            UtilDisplay.RemoveMenuCommand(rb, new string[] { "PartInvItems" });
         }
     }
 }

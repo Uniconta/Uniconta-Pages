@@ -34,7 +34,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
 
             danishFields.ToAccountNumber = danishFields.ToAccountNumber == string.Empty ? danishFields.ReceiverIBAN : danishFields.ToAccountNumber;
 
-            danishFields.Amount = Math.Round(tran._PaymentAmount, 2);
+            danishFields.Amount = Math.Round(tran.PaymentAmount, 2);
 
             danishFields.CurencyOfEquivalentAmount = string.Empty;
 

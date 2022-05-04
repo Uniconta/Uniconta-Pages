@@ -43,7 +43,7 @@ namespace UnicontaClient.Pages.CustomPage
                 }
             }
         }
-     
+
         public override bool Readonly
         {
             get
@@ -67,10 +67,6 @@ namespace UnicontaClient.Pages.CustomPage
             BindDimensions();
         }
 
-        protected override bool IsLayoutSaveRequired()
-        {
-            return false;
-        }
 
         public override async void Utility_Refresh(string screenName, object argument = null)
         {
@@ -143,8 +139,34 @@ namespace UnicontaClient.Pages.CustomPage
                      };
                     cwJoinTwoDimension.Show();
                     break;
+                case "ReorganizeDim":
+                    ReOrganizeDimensions();
+                    break;
+                default:
+                    gridRibbon_BaseActions(type);
+                    break;
             }
         }
+
+#if !SILVERLIGHT
+
+        private void ReOrganizeDimensions()
+        {
+            var cwMoveDimensions = new CWMoveDimensions(api);
+            cwMoveDimensions.Closed += delegate
+            {
+                if (cwMoveDimensions.DialogResult == true)
+                {
+                    if (cwMoveDimensions.Result == ErrorCodes.Succes)
+                        dgDimension.Refresh();
+                    else
+                        UtilDisplay.ShowErrorCode(cwMoveDimensions.Result);
+                }
+            };
+            cwMoveDimensions.Show();
+        }
+
+#endif
 
         private async void Save(int NewDim)
         {

@@ -78,7 +78,10 @@ namespace UnicontaClient.Pages.CustomPage
         {
             InitializeComponent();
             dcorderlineMaster = master as DCOrderLineClient;
+            if (dcorderlineMaster == null)
+                throw new CustomException(CustomExceptionType.MandatoryMaster, typeof(DCOrderLineClient));
             Comp = api.CompanyEntity;
+            api.AllowBackgroundCrud = true;
             itemCache = Comp.GetCache(typeof(InvItem));
             invItemMaster = itemCache.Get(dcorderlineMaster._Item) as InvItem;
             SetRibbonControl(localMenu, dgLinkedGrid);
@@ -110,7 +113,7 @@ namespace UnicontaClient.Pages.CustomPage
                     return;
                 var argsArray = new object[1];
                 argsArray[0] = args;
-                globalEvents.OnRefresh(NameOfControl, argsArray);
+              //  globalEvents.OnRefresh(NameOfControl, argsArray);
             }
             if (args is CreditorOrderLineClient)
             {
@@ -122,7 +125,7 @@ namespace UnicontaClient.Pages.CustomPage
                     return;
                 var argsArray = new object[1];
                 argsArray[0] = args;
-                globalEvents.OnRefresh(NameOfControl, argsArray);
+              //  globalEvents.OnRefresh(NameOfControl, argsArray);
             }
             SetupMaster(args);
             SetHeader(args);
@@ -265,8 +268,12 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override async Task<ErrorCodes> saveGrid()
         {
-            var res = await dgLinkedGrid.SaveData();
-            LinkRows(true);
+            ErrorCodes res = ErrorCodes.Succes;
+            if (dgLinkedGrid.HasUnsavedData)
+            {
+                res = await dgLinkedGrid.SaveData();
+                LinkRows(true);
+            }
             return res;
         }
 
@@ -276,20 +283,31 @@ namespace UnicontaClient.Pages.CustomPage
             await dgLinkedGrid.SaveData();
             saveAndExit = true;
             await LinkRows(true);
-            dockCtrl?.CloseDockItem();
+            CloseDockItem();
         }
 
         private async void UnlinkRows()
         {
+            var dcorderlineMaster = this.dcorderlineMaster;
+            UnicontaBaseEntity orgMaster;
             dgLinkedGrid.SelectedItem = null;
             dgUnlinkedGrid.SelectedItem = null;
             var dcolSerieBatchList = new List<DCOrderLineSerieBatch>();
             var linkedRows = dgLinkedGrid.ItemsSource as List<SerialToOrderLineClient>;
-            if (linkedRows == null)
+            if (linkedRows == null || linkedRows.Count == 0)
             {
+                if (dcorderlineMaster._SerieBatchMarked && dcorderlineMaster.RowId != 0)
+                {
+                    orgMaster = StreamingManager.Clone((UnicontaBaseEntity)dcorderlineMaster);
+                    dcorderlineMaster.SerieBatch = null;
+                    dcorderlineMaster.SerieBatchMarked = false;
+                    api.UpdateNoResponse(orgMaster, (UnicontaBaseEntity)dcorderlineMaster);
+                }
+                dcorderlineMaster.SerieBatch = null;
                 dcorderlineMaster.SerieBatchMarked = false;
                 return;
             }
+
             bool AllRemoved = true;
             foreach (var row in linkedRows)
             {
@@ -304,12 +322,25 @@ namespace UnicontaClient.Pages.CustomPage
                 else
                     AllRemoved = false;
             }
-            var err = await api.Delete(dcolSerieBatchList);
+
+            ErrorCodes err;
+            if (dcorderlineMaster._SerieBatch != null && dcorderlineMaster.RowId != 0)
+            { 
+                orgMaster = StreamingManager.Clone((UnicontaBaseEntity)dcorderlineMaster);
+                dcorderlineMaster.SerieBatch = null;
+                if (AllRemoved)
+                    dcorderlineMaster.SerieBatchMarked = false;
+                var Updates = new Uniconta.API.System.CrudAPI.UpdatePair() { loaded = orgMaster, modified = (UnicontaBaseEntity)dcorderlineMaster };
+                err = await api.MultiCrud(null, new[] { Updates }, dcolSerieBatchList);
+            }
+            else
+                err = await api.Delete(dcolSerieBatchList);
             if (err != ErrorCodes.Succes)
                 UtilDisplay.ShowErrorCode(err);
             else
             {
                 InitQuery();
+                dcorderlineMaster.SerieBatch = null;
                 if (AllRemoved)
                     dcorderlineMaster.SerieBatchMarked = false;
             }
@@ -343,12 +374,12 @@ namespace UnicontaClient.Pages.CustomPage
                 return;
 
             UnicontaBaseEntity orgMaster = null;
+            var dcorderlineMaster = this.dcorderlineMaster;
 
             var _UseSerial = this.invItemMaster._UseSerial;
             List<DCOrderLineSerieBatch> olSerieBatchList = new List<DCOrderLineSerieBatch>();
             foreach (var row in markedList)
             {
-                var olSerieBatch = new DCOrderLineSerieBatch();
                 double qty;
                 if (_UseSerial)
                     qty = dcorderlineMaster._Qty >= 0 ? 1d : -1d;
@@ -356,20 +387,43 @@ namespace UnicontaClient.Pages.CustomPage
                     qty = row._QtyMarked;
                 else
                     qty = dcorderlineMaster._Qty;
-                olSerieBatch._Qty = qty;
+                if (row._Warehouse != null && (dcorderlineMaster._Warehouse != row._Warehouse || dcorderlineMaster._Location != row._Location))
+                {
+                    if (orgMaster == null && dcorderlineMaster.RowId != 0)
+                        orgMaster = StreamingManager.Clone((UnicontaBaseEntity)dcorderlineMaster);
+                    if (!dcorderlineMaster.SerieBatchMarked) //Cannot change warehouse/location if SeriesBatch is attached
+                    {
+                        dcorderlineMaster.Warehouse = row._Warehouse;
+                        dcorderlineMaster.Location = row._Location;
+                    }
+                    if (markedList.Count == 1)
+                        dcorderlineMaster.SerieBatch = row._Number;
+                    else
+                        dcorderlineMaster.SerieBatch = null;
+                }
+                else
+                {
+                    string nr = dcorderlineMaster._SerieBatch, newNr;
+                    if (markedList.Count == 1)
+                        newNr = row._Number;
+                    else
+                        newNr = null;
+                    if (newNr != nr)
+                    {
+                        if (orgMaster == null && dcorderlineMaster.RowId != 0)
+                            orgMaster = StreamingManager.Clone((UnicontaBaseEntity)dcorderlineMaster);
+                        dcorderlineMaster.SerieBatch = newNr;
+                    }
+                }
+                var olSerieBatch = new DCOrderLineSerieBatch() { _Qty = qty };
                 olSerieBatch.SetMaster(row);
                 olSerieBatch.SetMaster(dcorderlineMaster as UnicontaBaseEntity);
                 olSerieBatchList.Add(olSerieBatch);
-                if (row._Warehouse != null && (dcorderlineMaster._Warehouse != row._Warehouse || dcorderlineMaster._Location != row._Location))
-                {
-                    orgMaster = StreamingManager.Clone((UnicontaBaseEntity)dcorderlineMaster);
-                    dcorderlineMaster.Warehouse = row._Warehouse;
-                    dcorderlineMaster.Location = row._Location;
-                }
             }
             ErrorCodes err;
             if (orgMaster != null)
             {
+                dcorderlineMaster.SerieBatchMarked = true;
                 var Updates = new Uniconta.API.System.CrudAPI.UpdatePair() { loaded = orgMaster, modified = (UnicontaBaseEntity)dcorderlineMaster };
                 err = await api.MultiCrud(olSerieBatchList, new[] { Updates }, null);
             }
@@ -420,14 +474,16 @@ namespace UnicontaClient.Pages.CustomPage
             var company = api.CompanyEntity;
             if (!company.Location || !company.Warehouse)
             {
-//                Location.Visible = Location.ShowInColumnChooser = false;
                 LocationCol.Visible = LocationCol.ShowInColumnChooser = false;
             }
+            else
+                LocationCol.ShowInColumnChooser = true;
             if (!company.Warehouse)
             {
-//                Warehouse.Visible = Warehouse.ShowInColumnChooser = false;
                 WarehouseCol.Visible = WarehouseCol.ShowInColumnChooser = false;
             }
+            else
+                WarehouseCol.ShowInColumnChooser = true;
         }
 
         public override bool CheckIfBindWithUserfield(out bool isReadOnly, out bool useBinding)

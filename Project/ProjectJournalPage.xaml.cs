@@ -56,7 +56,8 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override void LoadCacheInBackGround()
         {
-            LoadType(new Type[] { typeof(Uniconta.DataModel.PrCategory), typeof(Uniconta.DataModel.Project), typeof(Uniconta.DataModel.Employee), typeof(Uniconta.DataModel.Creditor), typeof(Uniconta.DataModel.InvItem) });
+            LoadType(new Type[] { typeof(Uniconta.DataModel.PrType), typeof(Uniconta.DataModel.PaymentTerm), typeof(Uniconta.DataModel.ProjectGroup), typeof(Uniconta.DataModel.PrStandard),
+                typeof(Uniconta.DataModel.Employee), typeof(Uniconta.DataModel.Debtor), typeof(Uniconta.DataModel.WorkInstallation), typeof(Uniconta.DataModel.Project), typeof(Uniconta.DataModel.PrCategory), typeof(Uniconta.DataModel.Creditor), typeof(Uniconta.DataModel.InvItem) });
         }
 
         protected override void OnLayoutLoaded()
@@ -120,10 +121,10 @@ namespace UnicontaClient.Pages.CustomPage
         void OpenImportDataPage(ProjectJournalClient selectedItem)
         {
             var projectJournalLine = new ProjectJournalLineClient();
-            string header = selectedItem.Journal;
-            UnicontaBaseEntity[] baseEntityArray = new UnicontaBaseEntity[2] { projectJournalLine, selectedItem };
-            object[] param = new object[] { baseEntityArray, header };
-            AddDockItem(TabControls.ImportPage, param, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Import"), header));
+            projectJournalLine.SetMaster(selectedItem);
+            string header = selectedItem._Journal;
+            var baseEntityArray = new UnicontaBaseEntity[] { projectJournalLine, selectedItem };
+            AddDockItem(TabControls.ImportPage, new object[] { baseEntityArray, header }, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Import"), header));
         }
     }
 }

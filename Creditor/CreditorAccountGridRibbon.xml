@@ -41,7 +41,7 @@
     <RibbonItem Action="CreditorTran" LocalizedNameKey="Transactions" ControlName="CreditorTransactions" Glyph="Cover_16x16.png" LargeGlyph="Account-statement_32x32.png" ShortcutKey="CTRL+T"/>
     <RibbonItem Action="OpenTran" LocalizedNameKey="OpenTrans" ShortcutKey="F8" ControlName="CreditorOpenTransactions" LargeGlyph="Open_Transaction_32x32.png" />
     <RibbonItem Action="CreditorStatement" LocalizedNameKey="Statement" ControlName="CreditorStatement" LargeGlyph="Show_Invoice_32x32.png" />
-    <RibbonItem Action="InvTran" LocalizedNameKey="InvTransactions" ControlName="InvTransactions" LargeGlyph="Inventory_Trans_32x32.png" />
+    <RibbonItem Action="InvTran" LocalizedNameKey="InvTransactions" ControlName="CreditorInvoiceLine" LargeGlyph="Inventory_Trans_32x32.png" />
     <RibbonItem Action="CreditorTransPivot" LocalizedNameKey="PivotTable" ControlName="CreditorInvoiceLinesPivotReport" LargeGlyph="Category_Charge_32x32.png" />
   </RibbonItem> 
   <RibbonItem>

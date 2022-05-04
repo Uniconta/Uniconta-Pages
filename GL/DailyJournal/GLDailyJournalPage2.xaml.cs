@@ -51,7 +51,6 @@ namespace UnicontaClient.Pages.CustomPage
         }
         void InitPage(CrudAPI crudapi)
         {
-            BusyIndicator = busyIndicator;
             cbdefaultAccount.ItemsSource = cboffsetAccount.ItemsSource = AppEnums.GLAccountType.Values;
             cbVATCalcMethod.ItemsSource = AppEnums.VATCalcMethod.Values;
             cbDateFunction.ItemsSource = AppEnums.GLJournalDate.Values;
@@ -69,8 +68,37 @@ namespace UnicontaClient.Pages.CustomPage
             Utility.SetDimensions(api, lbldim1, lbldim2, lbldim3, lbldim4, lbldim5, dim1lookupeditior, dim2lookupeditior, dim3lookupeditior, dim4lookupeditior, dim5lookupeditior, useDim);
             frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
             AcItem.ButtonClicked += AcItem_ButtonClicked;
-
+            editrow.PropertyChanged += Editrow_PropertyChanged;
             StartLoadCache();
+        }
+
+        SQLCache GLTransTypeCache;
+        private void Editrow_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            var rec = sender as GLDailyJournalClient;
+            var prop = e.PropertyName;
+
+            if (prop == "TransType")
+            {
+                if(string.IsNullOrEmpty(rec.Account))
+                {
+                    var glTransTYpe = (Uniconta.DataModel.GLTransType)GLTransTypeCache?.Get(rec._TransType);
+                    if (rec._DefaultAccountType == glTransTYpe?._AccountType)
+                    {
+                        rec._Account = glTransTYpe._Account;
+                        rec.NotifyPropertyChanged("Account");
+                    }
+                }
+                if (string.IsNullOrEmpty(rec.OffsetAccount))
+                {
+                    var glTransTYpe = (Uniconta.DataModel.GLTransType)GLTransTypeCache?.Get(rec._TransType);
+                    if (rec._DefaultOffsetAccountType == glTransTYpe?._OffsetAccountType)
+                    {
+                        rec._OffsetAccount = glTransTYpe._OffsetAccount;
+                        rec.NotifyPropertyChanged("OffsetAccount");
+                    }
+                }
+            }
         }
 
         void AcItem_ButtonClicked(object sender)
@@ -141,6 +169,8 @@ namespace UnicontaClient.Pages.CustomPage
             var Cache = api.GetCache(typeof(Uniconta.DataModel.NumberSerie)) ?? await api.LoadCache(typeof(Uniconta.DataModel.NumberSerie)).ConfigureAwait(false);
             var numbers = new NumberSerieSQLCacheFilter(Cache, false);
             numSerielookupeditor.cacheFilter = numbers;
+
+            this.GLTransTypeCache = api.GetCache(typeof(Uniconta.DataModel.GLTransType)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLTransType)).ConfigureAwait(false);
 
             LoadType(new Type[] { typeof(Uniconta.DataModel.GLAccount), typeof(Uniconta.DataModel.GLVat) });
         }

@@ -41,6 +41,7 @@ namespace UnicontaClient.Pages.CustomPage
         CrudAPI newapi;
         UnicontaBaseEntity master;
         UnicontaBaseEntity masterWithCompanyId;
+        bool copyUserFields = false;
         public CWCopyUserFields(UnicontaBaseEntity sourcedata, CrudAPI api)
         {
             this.DataContext = this;
@@ -59,6 +60,7 @@ namespace UnicontaClient.Pages.CustomPage
             this.Loaded += CWCopyUserFields_Loaded;
             this.Height += 40;
             rowh.Height = new GridLength(270);
+            copyUserFields = true;
         }
 
         public CWCopyUserFields(CrudAPI api)
@@ -86,14 +88,14 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (e.Key == Key.Escape)
             {
-                this.DialogResult = false;
+                SetDialogResult(false);
             }
             else
                 if (e.Key == Key.Enter)
             {
                 if (CancelButton.IsFocused)
                 {
-                    this.DialogResult = false;
+                    SetDialogResult(false);
                     return;
                 }
                 OKButton_Click(null, null);
@@ -111,7 +113,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 if (table == null)
                 {
-                    this.DialogResult = false;
+                    SetDialogResult(false);
                     return;
                 }
                 table.SetMaster(API.CompanyEntity);
@@ -133,16 +135,16 @@ namespace UnicontaClient.Pages.CustomPage
                         return true;
                     });
                     res = await API.Insert(selected);
-                    this.DialogResult = true;
+                    SetDialogResult(true);
                 }
                 else
                 {
                     UtilDisplay.ShowErrorCode(res);
-                    this.DialogResult = false;
+                    SetDialogResult(false);
                 }
             }
             else
-                this.DialogResult = false;
+                SetDialogResult(false);
         }       
 
         private async System.Threading.Tasks.Task BindCompany()
@@ -155,7 +157,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = false;
+            SetDialogResult(false);
         }
 
         private async void cbCompany_SelectedIndexChanged(object sender, RoutedEventArgs e)
@@ -189,7 +191,8 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (masterList.Count == 0)
                 return;
-
+            if (cbtable.SelectedItem == null && !copyUserFields)
+                return; 
             var list = await newapi.Query<CustomTableFieldsClient>(masterList, null);
             if (list != null)
             {

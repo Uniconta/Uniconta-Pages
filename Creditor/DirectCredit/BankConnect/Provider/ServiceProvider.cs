@@ -1,6 +1,7 @@
 using System;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using Uniconta.Common.Utility;
 
 namespace SecuredClient.Provider
 {
@@ -12,13 +13,14 @@ namespace SecuredClient.Provider
 
         protected X509Certificate2 FromPemBlock(string pem)
         {
-            var builder = new StringBuilder(pem);
-            builder.Replace("\n", "");
-            builder.Replace("\r", "");
-            builder.Replace("-----BEGIN CERTIFICATE-----", "");
-            builder.Replace("-----END CERTIFICATE-----", "");
+            var builder = StringBuilderReuse.Create();
+            builder.Append(pem);
+            builder.Remove('\n');
+            builder.Remove('\r');
+            builder.Remove("-----BEGIN CERTIFICATE-----");
+            builder.Remove("-----END CERTIFICATE-----");
 
-            return new X509Certificate2(Convert.FromBase64String(builder.ToString()));
+            return new X509Certificate2(Convert.FromBase64String(builder.ToStringAndRelease()));
         }
     }
 }

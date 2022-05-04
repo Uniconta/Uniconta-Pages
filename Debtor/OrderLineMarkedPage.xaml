@@ -50,7 +50,8 @@ x:Class="UnicontaClient.Pages.CustomPage.OrderLineMarkedPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="Warehouse" Width="100"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Location" Width="100"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Storage" Width="100"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="IgnoreBlocked" Width="50"  />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="IgnoreBlocked" Width="50" Visible="False" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DeleteLine" Width="50" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="ReferenceNumber" Width="70" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Week" Width="100"  />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Date" Width="100" />

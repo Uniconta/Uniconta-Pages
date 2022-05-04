@@ -22,6 +22,11 @@ using Uniconta.ClientTools.Controls;
 using System.Collections;
 using System.Windows;
 using Uniconta.API.System;
+using Uniconta.ClientTools.Util;
+using Uniconta.API.Service;
+using System.Text;
+using Uniconta.Common.Utility;
+using UnicontaClient.Controls.Dialogs;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -29,17 +34,14 @@ namespace UnicontaClient.Pages.CustomPage
     public class DocumentInfoGrid : CorasauDataGridClient
     {
         public override Type TableType { get { return typeof(UserDocsClient); } }
-
-#if !SILVERLIGHT
         public override bool Readonly { get { return false; } }
         public override bool CanInsert { get { return false; } }
-#endif
+        public override bool IsAutoSave { get { return false; } }
         public override IComparer GridSorting { get { return new SortUserDocs(); } }
 
         async public override Task<ErrorCodes> SaveData()
         {
             SelectedItem = null;
-#if !SILVERLIGHT
             /*
              * Awaiting the save data as we need to have rowid
              * With row id we would be able to save the buffers seperately
@@ -56,11 +58,26 @@ namespace UnicontaClient.Pages.CustomPage
 
                 foreach (var row in addedRows)
                 {
-                    userDocs[iCtr] = row.DataItem as UserDocsClient;
-                    if (userDocs[iCtr]._Data != null)
+                    var doc = row.DataItem as UserDocsClient;
+                    userDocs[iCtr] = doc;
+                    if (doc._Data != null)
                     {
-                        buffers[iCtr] = userDocs[iCtr]._Data;
-                        userDocs[iCtr]._Data = null;
+                        if (doc._DocumentType == FileextensionsTypes.JPEG ||
+                            doc._DocumentType == FileextensionsTypes.BMP ||
+                            doc._DocumentType == FileextensionsTypes.GIF ||
+                            doc._DocumentType == FileextensionsTypes.TIFF)
+                        {
+                            var imageBytes = FileBrowseControl.ImageResize(doc._Data, ".jpg");
+                            if (imageBytes != null)
+                            {
+                                doc._Data = imageBytes;
+                                doc._NoCompression = (doc._DocumentType == FileextensionsTypes.JPEG);
+                                doc._DocumentType = FileextensionsTypes.JPEG;
+                            }
+                        }
+                        doc._SizeKB = (short)((doc._Data.Length + 512) >> 10);
+                        buffers[iCtr] = doc._Data;
+                        doc._Data = null;
                         iCtr++;
                     }
                 }
@@ -76,9 +93,6 @@ namespace UnicontaClient.Pages.CustomPage
             }
             else
                 return await base.SaveData();
-#else
-            return await base.SaveData();
-#endif
         }
 
         static void UpdateDocsBuffer(CrudAPI api, byte[][] buffers, UserDocsClient[] multiDocs, int Cnt)
@@ -118,7 +132,7 @@ namespace UnicontaClient.Pages.CustomPage
             org.Copy(vouchersClient);
 
             int cnt = 0;
-            retry:
+        retry:
 
             try
             {
@@ -174,6 +188,7 @@ namespace UnicontaClient.Pages.CustomPage
 
     public partial class UserDocsPage : GridBasePage
     {
+        private bool isDragDropAllowed = true;
         public UserDocsPage(UnicontaBaseEntity masterRecord)
             : base(masterRecord)
         {
@@ -195,7 +210,10 @@ namespace UnicontaClient.Pages.CustomPage
         private void InitPage(UnicontaBaseEntity masterRecord)
         {
             if (!isCompUserDoc)
+            {
                 dgDocsGrid.api = api;
+                isDragDropAllowed = masterRecord is CompanyClient ? false : true;
+            }
             else
                 dgDocsGrid.api = crudApi;
 
@@ -208,14 +226,38 @@ namespace UnicontaClient.Pages.CustomPage
 #if SILVERLIGHT
             RibbonBase rb = (RibbonBase)localMenu.DataContext;
             if (rb != null)
+            {
                 Uniconta.ClientTools.Util.UtilDisplay.RemoveMenuCommand(rb, new string[] { "Save" });
+                Uniconta.ClientTools.Util.UtilDisplay.RemoveMenuCommand(rb, "JoinPDF");
+            }
 #else
             dgDocsGrid.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;
-            dgDocsGrid.tableView.AllowDragDrop = true;
+            dgDocsGrid.tableView.AllowDragDrop = isDragDropAllowed;
             dgDocsGrid.tableView.DropRecord += dgDocsGrid_DropRecord;
             dgDocsGrid.tableView.DragRecordOver += dgDocsGrid_DragRecordOver;
 #endif
+            if (masterRecord is DebtorClient || masterRecord is CreditorClient || masterRecord is InvItemClient)
+            {
+                Invoice.Visible = Invoice.ShowInColumnChooser = false;
+                Offer.Visible = Offer.ShowInColumnChooser = false;
+                Confirmation.Visible = Confirmation.ShowInColumnChooser = false;
+                PackNote.Visible = PackNote.ShowInColumnChooser = false;
+                Requisition.Visible = Requisition.ShowInColumnChooser = false;
+            }
+            if (!api.CompanyEntity._AllowDocumentGuid)
+            {
+                DocumentGuid.Visible = DocumentGuid.ShowInColumnChooser = false;
+                HideMenuItems();
+            }
         }
+
+        private void HideMenuItems()
+        {
+            RibbonBase rb = (RibbonBase)localMenu.DataContext;
+            if (rb != null)
+                UtilDisplay.RemoveMenuCommand(rb, "ViewInWeb");
+        }
+
         UserDocsClient SelectedItem;
         private void DataControl_CurrentItemChanged(object sender, DevExpress.Xpf.Grid.CurrentItemChangedEventArgs e)
         {
@@ -257,7 +299,6 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void dgDocsGrid_DragRecordOver(object sender, DevExpress.Xpf.Core.DragRecordOverEventArgs e)
         {
-
             if (e.Data.GetFormats().Contains("FileName"))
                 e.Effects = DragDropEffects.Copy;
             else if (e.Data.GetFormats().Contains("FileGroupDescriptor"))
@@ -307,9 +348,8 @@ namespace UnicontaClient.Pages.CustomPage
         private void SetHeader()
         {
             string headerStr = Utility.GetHeaderString(dgDocsGrid.masterRecord);
-
-            if (string.IsNullOrEmpty(headerStr)) return;
-
+            if (string.IsNullOrEmpty(headerStr))
+                return;
             string header = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Documents"), headerStr);
             SetHeader(header);
         }
@@ -364,13 +404,222 @@ namespace UnicontaClient.Pages.CustomPage
                 case "Save":
                     dgDocsGrid.SaveData();
                     break;
+#if !SILVERLIGHT
+                case "JoinPDF":
+                    JoinPDFAttachments();
+                    break;
+#endif
+                case "ConvertToPDF":
+                    if (selectedItem != null)
+                        ImageToPdfConverter(selectedItem);
+                    break;
+                case "ViewInWeb":
+                    if (selectedItem == null || selectedItem._DocumentGuid == Guid.Empty)
+                        return;
+                    var url = string.Concat("https://web.uniconta.com/document/ViewAttachment?", selectedItem._DocumentGuid);
+                    if (BasePage.session.Connection.Target == APITarget.Demo)
+                        url = string.Concat("http://46.36.211.200:8080/document/ViewAttachment?", selectedItem._DocumentGuid);
+                    System.Diagnostics.Process.Start(url);
+                    break;
+                case "AttachInOutlook":
+                    if (dgDocsGrid.SelectedItems == null || selectedItem == null)
+                        return;
 
+                    OpenOutlook(dgDocsGrid.SelectedItems == null ? new UserDocsClient[1] { selectedItem } :
+                        dgDocsGrid.SelectedItems.Cast<UserDocsClient>().ToArray());
+                    break;
+                case "UpdateRow":
+                    if (selectedItem != null)
+                        UploadData(selectedItem);
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
         }
 
+        async private void OpenOutlook(UserDocsClient[] userDocClients)
+        {
+            string subject = null;
+            StringBuilderReuse filePath = null;
+            StringBuilderReuse body = null;
+            int index = 0;
+            var count = userDocClients.Length;
+            if (count != 0)
+            {
+                subject = count > 1 ? null : userDocClients[0].Text;
+                foreach (var userDocClient in userDocClients)
+                {
+                    var userDoc = await UtilDisplay.GetUserDocDataOrUrl(userDocClient, api);
+                    if (userDoc._Data != null)
+                    {
+                        var path = GetPath(userDoc._Data, userDoc.DocumentType, string.Format("{0}_{1}",
+                            Uniconta.ClientTools.Localization.lookup("Attachment"), ++index));
+
+                        if (string.IsNullOrEmpty(path))
+                            continue;
+
+                        if (filePath == null)
+                            filePath = StringBuilderReuse.Create().Append(path);
+                        else
+                            filePath.Append('|').Append(path);
+                    }
+                    else if (!string.IsNullOrEmpty(userDoc._Url))
+                    {
+                        if (body == null)
+                            body = StringBuilderReuse.Create().AppendLine(userDoc._Url);
+                        else
+                            body.AppendLine(userDoc._Url);
+                    }
+                }
+            }
+
+            string emailBody = body?.ToString();
+            string attachments = filePath?.ToString();
+
+            if(string.IsNullOrEmpty(emailBody) || string.IsNullOrEmpty(attachments))
+            {
+                UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("NoRecords"), Uniconta.ClientTools.Localization.lookup("Warning"));
+                return;
+            }
+
+            Utility.DisplayOutlookAsync(string.Empty, string.Empty, string.Empty, emailBody, subject, attachments, string.Empty, false);
+        }
+
+
+        private string GetPath(byte[] userDocData, FileextensionsTypes fileExt, string documentName)
+        {
+            var tempPath = System.IO.Path.GetTempPath();
+            var curFilePath = fileExt != FileextensionsTypes.UNK ? string.Concat(tempPath, documentName, ".", fileExt.ToString().ToLower()) :
+                   string.Concat(tempPath, documentName);
+
+            using (System.IO.Stream file = System.IO.File.OpenWrite(curFilePath))
+                file.Write(userDocData, 0, userDocData.Length);
+
+            return curFilePath;
+        }
+
+        private async void ImageToPdfConverter(UserDocsClient userDocClient)
+        {
+            if (userDocClient._DocumentType != FileextensionsTypes.JPEG || userDocClient._DocumentType != FileextensionsTypes.PNG)
+            {
+                if (UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("AreYouSureToContinue"),
+                    Uniconta.ClientTools.Localization.lookup("Confirmation"), MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
+                    return;
+
+                busyIndicator.IsBusy = true;
+                var userDoc = await UtilDisplay.GetUserDocDataOrUrl(userDocClient, api);
+                var pdfBytes = UtilDisplay.ConvertImageSourceToPDF(userDoc._Data);
+
+                if (pdfBytes == null || pdfBytes.Length == 0)
+                {
+                    busyIndicator.IsBusy = false;
+                    UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("PdfStreamfailed"), Uniconta.ClientTools.Localization.lookup("Error"));
+                    return;
+                }
+
+                //To save any information on the editable grid
+                saveGrid();
+
+                userDocClient._DocumentType = FileextensionsTypes.PDF;
+                userDocClient._Data = pdfBytes;
+                var result = await api.Update(userDocClient);
+
+                if (result != ErrorCodes.Succes)
+                    UtilDisplay.ShowErrorCode(result);
+                else
+                    dgDocsGrid.Filter(null);
+            }
+            else
+                UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("ConversionNotSupport"), Uniconta.ClientTools.Localization.lookup("Warning"));
+        }
+
+#if !SILVERLIGHT
+
+        async void JoinPDFAttachments()
+        {
+            UserDocsClient attachement1 = null, attachement2 = null;
+            CWJoinPDFDocument cwJoinPdfDoc = null;
+
+            if (dgDocsGrid.SelectedItems != null)
+            {
+                var attachements = dgDocsGrid.SelectedItems.Cast<UserDocsClient>().ToArray();
+                if (attachements.Length == 0)
+                    return;
+                if (attachements.Any(v => v._DocumentType != FileextensionsTypes.PDF))
+                {
+                    UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("InvalidFileFormat"), Uniconta.ClientTools.Localization.lookup("Error"), MessageBoxButton.OK);
+                    return;
+                }
+
+                if (attachements.Length >= 2)
+                    attachement2 = attachements[1];
+
+                attachement1 = attachements[0];
+
+                if (attachement1 != null && attachement1._Data == null)
+                    await api.Read(attachement1);
+
+                if (attachement2 != null && attachement2._Data == null)
+                    await api.Read(attachement2);
+            }
+
+            //To save any information on the editable grid
+            saveGrid();
+
+            if (attachement1 != null && attachement2 != null)
+                cwJoinPdfDoc = new CWJoinPDFDocument(attachement1._Data, attachement2._Data);
+            else if (attachement1 != null)
+                cwJoinPdfDoc = new CWJoinPDFDocument(attachement1._Data);
+            else if (attachement2 != null)
+                cwJoinPdfDoc = new CWJoinPDFDocument(null, attachement2._Data);
+            else
+                cwJoinPdfDoc = new CWJoinPDFDocument();
+
+            cwJoinPdfDoc.Closed += delegate
+           {
+               if (cwJoinPdfDoc.DialogResult == true)
+               {
+                   var mergedContents = cwJoinPdfDoc.MergedPDFContents;
+                   var deleteMsg = string.Empty;
+
+                   if (cwJoinPdfDoc.IsLeftPdfDelete)
+                       deleteMsg = string.Format(Uniconta.ClientTools.Localization.lookup("ConfirmDeleteOBJ"), string.Format("{0} {1}",
+                           Uniconta.ClientTools.Localization.lookup("Left"), Uniconta.ClientTools.Localization.lookup("Attachment")));
+                   else if (cwJoinPdfDoc.IsRightPdfDelete)
+                       deleteMsg = string.Format(Uniconta.ClientTools.Localization.lookup("ConfirmDeleteOBJ"), string.Format("{0} {1}",
+                          Uniconta.ClientTools.Localization.lookup("Right"), Uniconta.ClientTools.Localization.lookup("Attachment")));
+
+                   var deleteAttachment = !string.IsNullOrEmpty(deleteMsg) && attachement1.RowId > 0 && UnicontaMessageBox.Show(deleteMsg, Uniconta.ClientTools.Localization.lookup("Warning"), MessageBoxButton.YesNo)
+                          == MessageBoxResult.Yes ? true : false;
+
+                   if (cwJoinPdfDoc.IsLeftJoin)
+                       UpdateJoinedPDFContents(attachement1, attachement2, mergedContents, deleteAttachment);
+                   else
+                       UpdateJoinedPDFContents(attachement2, attachement1, mergedContents, deleteAttachment);
+               }
+           };
+
+            cwJoinPdfDoc.Show();
+        }
+
+        async private void UpdateJoinedPDFContents(UserDocsClient saveAttachment, UserDocsClient copiedAttachment, byte[] mergedContents, bool isDeleteAttachment)
+        {
+            saveAttachment._Data = mergedContents;
+            busyIndicator.IsBusy = true;
+
+            if (saveAttachment.RowId > 0)
+                api.UpdateNoResponse(saveAttachment);
+            else
+                await api.Insert(saveAttachment);
+
+            if (isDeleteAttachment && copiedAttachment != null)
+                await api.Delete(copiedAttachment);
+
+            await dgDocsGrid.Filter(null);
+            busyIndicator.IsBusy = false;
+        }
+#endif
 
         public override void Utility_Refresh(string screenName, object argument = null)
         {
@@ -404,6 +653,39 @@ namespace UnicontaClient.Pages.CustomPage
         public override string NameOfControl
         {
             get { return TabControls.UserDocsPage.ToString(); }
+        }
+
+        private void UploadData(UserDocsClient selectedItem)
+        {
+            var fileExt = selectedItem.DocumentType;
+            var cwUpdateFile = new CWUpdateFile(fileExt, Uniconta.ClientTools.Localization.lookup("Document"));
+            cwUpdateFile.Closed += async delegate
+            {
+                if (cwUpdateFile.DialogResult == true)
+                {
+                    byte[] buffer = cwUpdateFile.Contents;
+                    string url = cwUpdateFile.Url;
+                    if (selectedItem.RowId != 0 && (buffer != null || !string.IsNullOrEmpty(url)))
+                    {
+                        var org = new UserDocsClient();
+                        selectedItem._Data = null;
+                        org.Copy(selectedItem);
+                        selectedItem._Data = buffer;
+                        selectedItem._Url = url;
+                        selectedItem._NoCompression = cwUpdateFile.Compress;
+                        busyIndicator.IsBusy = true;
+                        await api.Update(org, selectedItem);
+                        busyIndicator.IsBusy = false;
+                        dgDocsGrid.UpdateItemSource(2, selectedItem);
+                    }
+                    else
+                    {
+                        UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("ViewerFailed"), Uniconta.ClientTools.Localization.lookup("Error"), MessageBoxButton.OK);
+                        return;
+                    }
+                }
+            };
+            cwUpdateFile.Show();
         }
     }
 }

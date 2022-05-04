@@ -32,6 +32,22 @@ namespace UnicontaClient.Pages.CustomPage
         public override Type TableType { get { return typeof(ProjectGroupClient); } }
         public override UnicontaBaseEntity ModifiedRow { get { return editrow; } set { editrow = (ProjectGroupClient)value; } }
 
+        public ProjectGroupPage2(UnicontaBaseEntity sourcedata, bool isEdit)
+           : base(sourcedata, isEdit)
+        {
+            InitializeComponent();
+            if (!isEdit)
+            {
+                editrow = (ProjectGroupClient)StreamingManager.Clone(sourcedata);
+                editrow.Group = string.Empty;
+                editrow.Name = string.Empty;
+                IdKey idkey = (IdKey)editrow;
+                if (idkey.KeyStr != null)
+                    idkey.KeyStr = null;
+            }
+            InitPage(api);
+        }
+
         public ProjectGroupPage2(UnicontaBaseEntity sourcedata)
             : base(sourcedata, true)
         {
@@ -57,7 +73,7 @@ namespace UnicontaClient.Pages.CustomPage
             leAdjustmentOffset.api = leInvoiceAdjustment.api = leInvoiceAdjustmentOffset.api = crudapi;
             cbUseCostInWIP.ItemsSource = AppEnums.WIPValue.Values;
 
-            if (LoadedRow == null)
+            if (editrow == null && LoadedRow == null)
             {
                 frmRibbon.DisableButtons("Delete");
                 editrow = CreateNew() as ProjectGroupClient;

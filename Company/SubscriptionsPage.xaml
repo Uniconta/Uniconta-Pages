@@ -9,7 +9,7 @@ x:Class="UnicontaClient.Pages.CustomPage.SubscriptionsPage"
     xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools" 
     xmlns:dxinteraction="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
     xmlns:Util="clr-namespace:UnicontaClient.Utilities"
-    xmlns:enumType ="clr-namespace:Uniconta.Common;assembly=Uniconta.Common"
+    xmlns:enumType ="clr-namespace:Uniconta.Common;assembly=Uniconta.WindowsAPI"
     d:DesignHeight="300" d:DesignWidth="400">
     <Pages:FormBasePage.Resources>
         <Util:AssemblyConverter x:Key="AssemblyConverter"></Util:AssemblyConverter>
@@ -157,6 +157,14 @@ x:Class="UnicontaClient.Pages.CustomPage.SubscriptionsPage"
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="Ended" >
                             <CorasauControls:DateEditor EditValue="{Binding Ended, Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                    </CorasauControls:CorasauLayoutGroup>
+                    <CorasauControls:CorasauLayoutGroup View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=AzureDetails}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                        <CorasauControls:CorasauLayoutItem FieldName="ADClientId" >
+                            <CorasauControls:TextEditor Text="{Binding ADClientId, Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="ADTenantId" >
+                            <CorasauControls:TextEditor Text="{Binding ADTenantId, Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
                 </CorasauControls:CorasauLayoutGroup>

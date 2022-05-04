@@ -7,7 +7,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CwTransportRegistration"
         xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
         xmlns:cw="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
         xmlns:UnicontaControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
-        Height="{StaticResource Height5}" Width="820">
+        Height="{StaticResource Height5}" Width="730">
     <Grid Margin="2" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
             <RowDefinition />
@@ -19,8 +19,9 @@ x:Class="UnicontaClient.Pages.CustomPage.CwTransportRegistration"
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="30"/>
                 <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
                 <RowDefinition Height="60"/>
-                <RowDefinition Height="90"/>
+                <RowDefinition Height="60"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
@@ -45,11 +46,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CwTransportRegistration"
             <TextBlock  Grid.Column="4" VerticalAlignment="Center" Grid.Row="0" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ProjectName}" />
             <UnicontaControls:TextEditor x:Name="txtProjectName" Grid.Column="6" IsReadOnly="True" Grid.ColumnSpan="2" Width="170" Grid.Row="0" Margin="5,5,5,5" HorizontalAlignment="Left" />
 
-            <Button Click="Button_Click" Grid.Column="8" Grid.ColumnSpan="2" Grid.Row="0" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=RouteCalculator}" Height="23">
-                <Button.Effect>
-                    <DropShadowEffect Color="Gray" Opacity="0.50" ShadowDepth="8"/>
-                </Button.Effect>
-            </Button>
+            <Button Click="Button_Click" Grid.Column="8" Grid.ColumnSpan="2" Grid.Row="0" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=RouteCalculator}" Height="23">  </Button>
 
             <TextBlock Height="25" Grid.Column="0" Grid.Row="1" VerticalAlignment="Top" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=From}" />
             <StackPanel Orientation="Vertical" Grid.Row="1" Grid.Column="2" Margin="5,5,5,5" HorizontalAlignment="Left">
@@ -60,6 +57,8 @@ x:Class="UnicontaClient.Pages.CustomPage.CwTransportRegistration"
             <StackPanel Grid.Column="8" Grid.Row="1" Orientation="Vertical">
                 <TextBlock HorizontalAlignment="Left"   Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=AvoidFerries}" />
                 <UnicontaControls:CheckEditor x:Name="chkAvdFerr"  IsChecked="True" HorizontalAlignment="Left" />
+                <TextBlock HorizontalAlignment="Left" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Returning}" />
+                <UnicontaControls:CheckEditor x:Name="chkReturning" EditValueChanged="chkReturning_EditValueChanged" Grid.Row="3" IsChecked="{Binding Returning, Mode=TwoWay}" HorizontalAlignment="Left" />
             </StackPanel>
           
             <TextBlock  Grid.Column="4" VerticalAlignment="Top" Grid.Row="1" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=To}" />
@@ -69,62 +68,56 @@ x:Class="UnicontaClient.Pages.CustomPage.CwTransportRegistration"
             </StackPanel>
 
             <TextBlock  Grid.Column="0" VerticalAlignment="Center" Grid.Row="2" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=PayrollCategory}" />
-            <UnicontaControls:LookupEditor x:Name="lePayType" Grid.Column="2" Width="170" Grid.Row="2" Text="{Binding PayType, Mode=TwoWay}" Margin="5,5,5,5" HorizontalAlignment="Left" />
+            <UnicontaControls:LookupEditor x:Name="lePayType" Grid.Column="2" Width="170" Grid.Row="2" Text="{Binding PayType, Mode=TwoWay}" Margin="5,5,5,5" HorizontalAlignment="Left" EditValueChanged="lePayType_EditValueChanged"/>
             <TextBlock  Grid.Column="4" Grid.Row="2" VerticalAlignment="Center" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Purpose}" />
             <UnicontaControls:TextEditor Grid.Column="6" Grid.ColumnSpan="2" Grid.Row="2"  Text="{Binding Purpose, Mode=TwoWay}" Width="170" Margin="5,5,5,5" HorizontalAlignment="Left"/>
-
-            <TextBlock Grid.Column="0" Grid.Row="3" VerticalAlignment="Center" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Returning}" />
-            <UnicontaControls:CheckEditor x:Name="chkReturning" EditValueChanged="chkReturning_EditValueChanged" Margin="5,5,5,5" Grid.Column="2" Grid.Row="3" IsChecked="{Binding Returning, Mode=TwoWay}" VerticalAlignment="Center" HorizontalAlignment="Left" />
+            <TextBlock  Grid.Column="0" VerticalAlignment="Center" Grid.Row="3" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Workspace}"/>
+            <UnicontaControls:LookupEditor x:Name="leWorkSpace" Grid.Column="2" Width="170" Grid.Row="3" Text="{Binding WorkSpace, Mode=TwoWay}" EditValueChanged="leWorkSpace_EditValueChanged"  Margin="5,5,5,5" HorizontalAlignment="Left" />
+            <TextBlock  Grid.Column="0" VerticalAlignment="Center" Grid.Row="4" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Task}"  x:Name="lblProjectTask"/>
+            <UnicontaControls:LookupEditor x:Name="leProjectTask" Grid.Column="2" Width="170" Grid.Row="4" Text="{Binding PrTask, Mode=TwoWay}" Margin="5,5,5,5" HorizontalAlignment="Left" />
             <TextBlock  Grid.Column="4" Grid.Row="3" VerticalAlignment="Center" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=VechicleRegNo}" />
-            <UnicontaControls:TextEditor Grid.Column="6" Grid.Row="3" Margin="5,5,5,5"  Text="{Binding VechicleRegNo,Mode=TwoWay}" Width="170" HorizontalAlignment="Left" />
+            <UnicontaControls:TextEditor x:Name="leVechicleRegNo" Grid.Column="6" Grid.Row="3" Margin="5,5,5,5"  Text="{Binding VechicleRegNo,Mode=TwoWay}" Width="170" HorizontalAlignment="Left" />
 
-            <Grid  Grid.Row="4" Grid.ColumnSpan="9" HorizontalAlignment="Left" >
+            <Grid  Grid.Row="5" Grid.ColumnSpan="9" HorizontalAlignment="Left" >
                 <StackPanel Orientation="Horizontal">
                     <StackPanel Margin="7,0,0,0">
                         <Label Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Monday}" />
-                        <UnicontaControls:NumericUpDownEditor  EditValueChanged="txtThuHrs_EditValueChanged"  Text="{Binding Day1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ApplyDefaultMask="False" IsFloatValue="True"       x:Name="txtMonHrs"  Width="80" Mask="N2" MaskType="Numeric"  />
+                        <UnicontaControls:NumericUpDownEditor  EditValueChanged="txtThuHrs_EditValueChanged"  Text="{Binding Day1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ApplyDefaultMask="False" IsFloatValue="True"       x:Name="txtMonHrs"  Width="80" Mask="N1" MaskType="Numeric"  />
                     </StackPanel>
                     <StackPanel Margin="7,0,0,0">
                         <Label Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Tuesday}"  />
-                        <UnicontaControls:NumericUpDownEditor  Text="{Binding Day2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" EditValueChanged="txtThuHrs_EditValueChanged" ApplyDefaultMask="False" IsFloatValue="True"   x:Name="txtTueHrs" Width="80" Mask="N2" MaskType="Numeric" />
+                        <UnicontaControls:NumericUpDownEditor  Text="{Binding Day2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" EditValueChanged="txtThuHrs_EditValueChanged" ApplyDefaultMask="False" IsFloatValue="True"   x:Name="txtTueHrs" Width="80" Mask="N1" MaskType="Numeric" />
                     </StackPanel>
 
                     <StackPanel Margin="7,0,0,0">
                         <Label Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Wednesday}"  />
-                        <UnicontaControls:NumericUpDownEditor  Text="{Binding Day3, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" EditValueChanged="txtThuHrs_EditValueChanged" ApplyDefaultMask="False" IsFloatValue="True"     x:Name="txtWedHrs" Width="80"  Mask="N2" MaskType="Numeric" />
+                        <UnicontaControls:NumericUpDownEditor  Text="{Binding Day3, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" EditValueChanged="txtThuHrs_EditValueChanged" ApplyDefaultMask="False" IsFloatValue="True"     x:Name="txtWedHrs" Width="80"  Mask="N1" MaskType="Numeric" />
                     </StackPanel>
 
                     <StackPanel Margin="7,0,0,0">
                         <Label Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Thursday}" />
-                        <UnicontaControls:NumericUpDownEditor EditValueChanged="txtThuHrs_EditValueChanged" Text="{Binding Day4, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ApplyDefaultMask="False" IsFloatValue="True"    x:Name="txtThuHrs"  Width="80"   Mask="N2" MaskType="Numeric" />
+                        <UnicontaControls:NumericUpDownEditor EditValueChanged="txtThuHrs_EditValueChanged" Text="{Binding Day4, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ApplyDefaultMask="False" IsFloatValue="True"    x:Name="txtThuHrs"  Width="80"   Mask="N1" MaskType="Numeric" />
                     </StackPanel>
 
                     <StackPanel Margin="7,0,0,0">
                         <Label Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Friday}"  />
-                        <UnicontaControls:NumericUpDownEditor EditValueChanged="txtThuHrs_EditValueChanged" Text="{Binding Day5, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ApplyDefaultMask="False" IsFloatValue="True"     x:Name="txtFriHrs"  Width="80"   Mask="N2" MaskType="Numeric" />
+                        <UnicontaControls:NumericUpDownEditor EditValueChanged="txtThuHrs_EditValueChanged" Text="{Binding Day5, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ApplyDefaultMask="False" IsFloatValue="True"     x:Name="txtFriHrs"  Width="80"   Mask="N1" MaskType="Numeric" />
                     </StackPanel>
 
                     <StackPanel Margin="7,0,0,0">
                         <Label Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Saturday}"  />
-                        <UnicontaControls:NumericUpDownEditor EditValueChanged="txtThuHrs_EditValueChanged" Text="{Binding Day6, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ApplyDefaultMask="False" IsFloatValue="True"    x:Name="txtSatHrs"  Width="80"  Mask="N2" MaskType="Numeric" />
+                        <UnicontaControls:NumericUpDownEditor EditValueChanged="txtThuHrs_EditValueChanged" Text="{Binding Day6, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ApplyDefaultMask="False" IsFloatValue="True"    x:Name="txtSatHrs"  Width="80"  Mask="N1" MaskType="Numeric" />
                     </StackPanel>
 
                     <StackPanel Margin="7,0,0,0">
                         <Label Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Sunday}" />
-                        <UnicontaControls:NumericUpDownEditor EditValueChanged="txtThuHrs_EditValueChanged" Text="{Binding Day7, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ApplyDefaultMask="False" IsFloatValue="True"  x:Name="txtSunHrs"  Width="80"  Mask="N2" MaskType="Numeric" />
-                    </StackPanel>
-
-                    <StackPanel Margin="7,0,0,0">
-                        <Label Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Total}" />
-                        <UnicontaControls:TextEditor IsPrintingMode="True" EditMode="InplaceInactive" x:Name="txtTotal"  Width="80" Mask="N2" MaskType="Numeric" MaskUseAsDisplayFormat="True" />
+                        <UnicontaControls:NumericUpDownEditor EditValueChanged="txtThuHrs_EditValueChanged" Text="{Binding Day7, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ApplyDefaultMask="False" IsFloatValue="True"  x:Name="txtSunHrs"  Width="80"  Mask="N1" MaskType="Numeric" />
                     </StackPanel>
                 </StackPanel>
             </Grid>
 
-            <Grid  Grid.Row="5" Grid.ColumnSpan="3" HorizontalAlignment="Left" >
+            <Grid  Grid.Row="6" Grid.ColumnSpan="3" HorizontalAlignment="Left" >
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="30"/>
-                    <RowDefinition Height="30" />
                     <RowDefinition Height="30"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
@@ -132,9 +125,8 @@ x:Class="UnicontaClient.Pages.CustomPage.CwTransportRegistration"
                     <ColumnDefinition Width="2"/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
-                <Label Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Status}" />
-                <TextBlock Height="23" Grid.Row="1" Grid.Column="0"  VerticalAlignment="Center" HorizontalAlignment="Left"  Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Mileage}" />
-                <UnicontaControls:TextEditor Height="23" Grid.Row="1" Grid.Column="2"  x:Name="txtMileageBal" Width="170" Margin="5,0,0,0"  IsReadOnly="True" HorizontalAlignment="Left" />
+                <TextBlock Height="23" Grid.Row="1" Grid.Column="0"  VerticalAlignment="Center" HorizontalAlignment="Left"  Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TotalMileage}" />
+                <UnicontaControls:TextEditor Height="23" Grid.Row="1" Grid.Column="2" x:Name="txtMileageBal" Width="170" Margin="5,0,0,0"  IsReadOnly="True" HorizontalAlignment="Left" />
             </Grid>
         </Grid>
         <StackPanel x:Name="actionButton" HorizontalAlignment="Right" Grid.Row="1" Orientation="Horizontal" Margin="0 10 0 0">

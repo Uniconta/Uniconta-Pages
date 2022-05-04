@@ -24,13 +24,12 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
         internal const string TRANSTYPE_CMBO = "CMBO";
         internal const string TRANSTYPE_CMUO = "CMUO";
 
-        public static void GenerateFile(IEnumerable<CreditorTransPayment> paymentList, IEnumerable<CreditorTransPayment> paymentListTotal, CrudAPI api, 
-                                        CreditorPaymentFormat paymentFormat, PaymentReference paymReference, SQLCache bankAccountCache, SQLCache creditorCache, bool glJournalGenerated = false)
+        public static bool GenerateFile(IEnumerable<CreditorTransPayment> paymentList, Company company, 
+                                        CreditorPaymentFormat paymentFormat, SQLCache bankAccountCache, SQLCache creditorCache, bool glJournalGenerated = false)
         {
             var bankStatement = (BankStatement)bankAccountCache.Get(paymentFormat._BankAccount);
             var fileFormat = new CreateDanskeBankFileFormatBase();
             var listofBankProperties = new List<DanishFormatFieldBase>();
-            var paymentReference = paymReference;
 
             foreach (var tran in paymentList)
             {
@@ -40,13 +39,13 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
 
                 if (countryCode != string.Empty && countryCode != BaseDocument.COUNTRY_DK)
                 {
-                    var newProp = fileFormat.CreateForeignFormatField(tran, paymentFormat, bankStatement, creditor, api.CompanyEntity, glJournalGenerated);
+                    var newProp = fileFormat.CreateForeignFormatField(tran, paymentFormat, bankStatement, creditor, company, glJournalGenerated);
                     if (newProp != null)
                         listofBankProperties.Add(newProp);
                 }
                 else
                 {
-                    var newProp = fileFormat.CreateDanishFormatField(tran, paymentFormat, bankStatement, creditor, api.CompanyEntity, glJournalGenerated);
+                    var newProp = fileFormat.CreateDanishFormatField(tran, paymentFormat, bankStatement, creditor, company, glJournalGenerated);
                     if (newProp != null)
                         listofBankProperties.Add(newProp);
                 }
@@ -60,7 +59,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
 
                 var userClickedSave = sfd.ShowDialog();
                 if (userClickedSave != true)
-                    return;
+                    return false;
 
                 try
                 {
@@ -75,9 +74,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
                         fileFormat.StreamToForeignFile(listofBankProperties, sw);
                         sw.Flush();
                     }
-
-                    paymentReference.InsertPaymentReferenceTask(paymentList.Where(s => s._ErrorInfo == BaseDocument.VALIDATE_OK).ToList(),
-                                                                paymentListTotal.Where(s => s._ErrorInfo == BaseDocument.VALIDATE_OK).ToList(), api, glJournalGenerated);
+                    return true;
                 }
                 catch (Exception ex)
                 {
@@ -88,6 +85,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
             {
                 UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("NoRecords"), Uniconta.ClientTools.Localization.lookup("Message"));
             }
+            return false;
         }
     }
 }

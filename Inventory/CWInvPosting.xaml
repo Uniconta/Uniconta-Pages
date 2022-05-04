@@ -3,11 +3,12 @@ x:Class="UnicontaClient.Pages.CustomPage.CWInvPosting"
            xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
            xmlns:cw="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
-           xmlns:controls="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls"
-           xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
            xmlns:ClientToolsControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
            xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
-           Width="{StaticResource Width31}" Height="{StaticResource Height17}" KeyDown="ChildWindow_KeyDown" SizeToContent="Width">
+           Width="{StaticResource Width31}" Height="{StaticResource Height17}" KeyDown="ChildWindow_KeyDown" SizeToContent="WidthAndHeight">
+    <cw:ChildWindow.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+    </cw:ChildWindow.Resources>
     <Grid x:Name="LayoutRoot" Margin="2" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
             <RowDefinition />
@@ -18,6 +19,8 @@ x:Class="UnicontaClient.Pages.CustomPage.CWInvPosting"
                 <RowDefinition Height="30" x:Name="rowComp"/>
                 <RowDefinition Height="30"/>
                 <RowDefinition  Height="30"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
                 <RowDefinition Height="30"/>
                 <RowDefinition Height="30"/>
                 <RowDefinition Height="30"/>
@@ -36,7 +39,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CWInvPosting"
             <TextBlock Grid.Row="2" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Comment}" VerticalAlignment="Center"></TextBlock>
             <CorasauControls:TextEditor x:Name="txtComment" Width="200" MaxLength="40" Grid.Row="2" HandleKeyDown="False" Text="{Binding Comment,Mode=TwoWay}" Grid.Column="2" Height="25" HorizontalAlignment="Left"/>
             <TextBlock Grid.Row="3" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=PostingDate}" VerticalAlignment="Center"></TextBlock>
-            <ClientToolsControls:DateEditor Width="200" x:Name="datePosting" EditValue="{Binding Date,Mode=TwoWay}" Height="25" ShowToday="True" Grid.Row="3" Grid.Column="2" HorizontalAlignment="Left"/>           
+            <ClientToolsControls:DateEditor Width="200" x:Name="datePosting" EditValue="{Binding Date,Mode=TwoWay}" Height="25" ShowToday="True" Grid.Row="3" Grid.Column="2" HorizontalAlignment="Left"/>
             <TextBlock Grid.Row="4" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Text}" VerticalAlignment="Center"/>
             <CorasauControls:TextEditor Width="200" MaxLength="40" Grid.Row="4" HandleKeyDown="False" Text="{Binding Text,Mode=TwoWay}" Grid.Column="2" Height="25" HorizontalAlignment="Left"/>
             <TextBlock Grid.Row="5" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TransType}" VerticalAlignment="Center"/>
@@ -45,9 +48,15 @@ x:Class="UnicontaClient.Pages.CustomPage.CWInvPosting"
             <CorasauControls:TextEditor Width="200" x:Name="txtFixedVoucher" HorizontalContentAlignment="Right" Mask="n0" MaskType="Numeric"  Height="25" Grid.Column="2"  Grid.Row="6" HorizontalAlignment="Left"/>
             <TextBlock Grid.Row="7" x:Name="txtNumberSerie" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=NumberSerie}" VerticalAlignment="Center"/>
             <CorasauControls:LookupEditor Width="200" x:Name="lookupNumberSeries" Text="{Binding NumberSeries,Mode=TwoWay}" Height="25" Grid.Column="2"  Grid.Row="7" HorizontalAlignment="Left"/>
-
+            <TextBlock Grid.Row="8" x:Name="txtReportPartiallyFinished" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=PartlyReportAsFinished}" 
+                       VerticalAlignment="Center" TextWrapping="Wrap"/>
+            <CorasauControls:CheckEditor x:Name="chkReportPartiallyFinished" IsChecked="{Binding IsPartlyFinished,Mode=TwoWay}"  Grid.Column="2" Grid.Row="8" HorizontalAlignment="Left"/>
+            <TextBlock Grid.Row="9" x:Name="txtQty" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Qty}" VerticalAlignment="Center" 
+                       Visibility="{Binding IsChecked,ElementName=chkReportPartiallyFinished,Converter={StaticResource BoolToVisibilityConverter}}"/>
+            <CorasauControls:DoubleEditor x:Name="deQty" FieldName="Quantity" Mask="#,##,##0.00###" ApplyMask="True" Grid.Row="9" Grid.Column="2"  VerticalAlignment="Center" 
+                                          Visibility="{Binding IsChecked,ElementName=chkReportPartiallyFinished,Converter={StaticResource BoolToVisibilityConverter}}" Width="200"/>
         </Grid>
-        <StackPanel x:Name="actionButton" HorizontalAlignment="Right" Grid.Row="1" Orientation="Horizontal" Margin="0 10 0 0">
+        <StackPanel x:Name="actionButton" HorizontalAlignment="Right" Grid.Row="1" Orientation="Horizontal" Margin="0 10 0 10">
             <Button x:Name="OKButton" IsDefault="True"  Click="OKButton_Click" MinWidth="75" Height="23" HorizontalAlignment="Right" Margin="0 0 3 0"  />
             <Button x:Name="CancelButton" IsCancel="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Cancel}" Click="CancelButton_Click" MinWidth="75" 
                     Height="23" HorizontalAlignment="Right"   />

@@ -65,6 +65,9 @@ namespace UnicontaClient.Pages.CustomPage
                 case "RefreshGrid":
                     InitQuery();
                     break;
+                case "Search":
+                    Search();
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -95,7 +98,7 @@ namespace UnicontaClient.Pages.CustomPage
             get { return TabControls.DebtorAccountStat; }
         }
 
-        private void btnSerach_Click(object sender, RoutedEventArgs e)
+        private void Search()
         {
             InitQuery();
         }

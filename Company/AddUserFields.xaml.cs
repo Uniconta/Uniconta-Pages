@@ -104,11 +104,15 @@ namespace UnicontaClient.Pages.CustomPage
                 }
                 else if (rowType == pageMasterType)
                     dgUserField.UpdateItemSource(argument);
-
+                api.CompanyEntity.UserTables = null;
                 session.OpenCompany(api.CompanyEntity.CompanyId, false);
             }
         }
-
+        public override void PageClosing()
+        {
+            Controls.MenuControl.ForceOpen = true;
+            base.PageClosing();
+        }
         private void localMenu_OnItemClicked(string ActionType)
         {
             var selectedItem = dgUserField.SelectedItem as TableFieldsClient;

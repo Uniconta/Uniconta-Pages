@@ -25,15 +25,15 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorSettlements"
             <localPage:CreditorSettlementGrid  x:Name="dgSettlements" AutoGenerateColumns="None">
                 <localPage:CreditorSettlementGrid.Columns>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="SettlementType"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Amount"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Remaining"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="SettleAmount" Width="90"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Amount" Width="90"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Remaining" Width="90" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Date" Width="90" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PostType"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceAN" Width="70"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Invoice" Width="60" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Text" Width="150" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Voucher" Width="80"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="SettleAmount" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Debit" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Credit" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Currency" Visible="False"/>

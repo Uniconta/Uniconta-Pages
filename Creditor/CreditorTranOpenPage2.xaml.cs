@@ -50,7 +50,6 @@ namespace UnicontaClient.Pages.CustomPage
         void InitPage(CrudAPI crudapi)
         {
             Paymentlookupeditior.api = lePaymtFormat.api = Vatlookupeditior.api = api;
-            BusyIndicator = busyIndicator;
             layoutControl = layoutItems;
             frmRibbon.DisableButtons("Delete");
             layoutItems.DataContext = editrow;

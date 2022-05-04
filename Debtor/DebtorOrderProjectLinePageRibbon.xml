@@ -3,11 +3,14 @@
   <RibbonItem TabId="0" LocalizedNameKey="Home">
     <!---When we create a new group and a new TabPage -->
     <RibbonItem Action="AddRow" LocalizedNameKey="AddOBJ" Parameter="JournalLines" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png"/>
-    <RibbonItem Action="CopyRow" LocalizedNameKey="CopyLine" LargeGlyph="Copy_32x32.png"/>    
-    <RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="Delete" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png"/>    
-    <RibbonItem Action="SaveGrid" ShortcutKey="CTRL+S" LocalizedNameKey="Save" Glyph="save-16x16.png" LargeGlyph="save-32x32.png"/>        
+    <RibbonItem Action="CopyRow" LocalizedNameKey="CopyLine" LargeGlyph="Copy_32x32.png"/>
+    <RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="Delete" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png"/>
+    <RibbonItem Action="SaveGrid" ShortcutKey="CTRL+S" LocalizedNameKey="SaveExit" Glyph="save-16x16.png" LargeGlyph="save-32x32.png"/>
   </RibbonItem>
   <RibbonItem>
+    <RibbonItem Action="Adjustment" LocalizedNameKey="AdjustmentPerEmployee" LargeGlyph="Transactions_32x32.png"/>
+  </RibbonItem>
+   <RibbonItem>   
     <!---next group-->
     <RibbonItem Action="Templates" LocalizedNameKey="Templates" LargeGlyph="Layout_32x32.png">
       <!---If we want Inner menu-->
@@ -34,9 +37,9 @@
   <RibbonItem>
     <RibbonItem Action="UpdatePrices" LocalizedNameKey="RecalculatePrices" LargeGlyph="Calculator_32x32.png"/>
   </RibbonItem>
-<RibbonItem>
+  <RibbonItem>
     <RibbonItem LocalizedNameKey="Adjustment" StatusValue=""></RibbonItem>
     <RibbonItem LocalizedNameKey="Total" StatusValue=""></RibbonItem>
-  <RibbonItem LocalizedNameKey="Diff" StatusValue=""></RibbonItem>
+    <RibbonItem LocalizedNameKey="Diff" StatusValue=""></RibbonItem>
   </RibbonItem>
 </root>

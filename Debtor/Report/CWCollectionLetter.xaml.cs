@@ -42,17 +42,17 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = false;
+            SetDialogResult(false);
         }
 
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
             if (cmbCollectionLtr.SelectedItem == null)
-                this.DialogResult = false;
+                SetDialogResult(false);
             else
             {
                 Result = cmbCollectionLtr.SelectedItem.ToString();
-                this.DialogResult = true;
+                SetDialogResult(true);
             }
         }
 
@@ -65,7 +65,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (e.Key == Key.Escape)
             {
-                this.DialogResult = false;
+                SetDialogResult(false);
             }
             else
                if (e.Key == Key.Enter)
@@ -73,7 +73,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (OKButton.IsFocused)
                     OKButton_Click(null, null);
                 else if (CancelButton.IsFocused)
-                    this.DialogResult = false;
+                    SetDialogResult(false);
             }
         }
     }

@@ -29,7 +29,6 @@ namespace UnicontaClient.Pages.CustomPage
         public InvVaraintSetupPage(UnicontaBaseEntity sourceData) : base(sourceData, true)
         {
             InitializeComponent();
-            BusyIndicator = busyIndicator;
             layoutControl = layoutItems;
             CompanyClient companyClient = new CompanyClient();
             StreamingManager.Copy(api.CompanyEntity, companyClient);

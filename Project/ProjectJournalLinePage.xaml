@@ -76,6 +76,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectJournalLinePage"
                         </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                     </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Width="70" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="WorkSpace" Width="80" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Qty" Width="80" AllowMath="True">
                         <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                             <DataTemplate>

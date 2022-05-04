@@ -47,21 +47,17 @@ namespace UnicontaClient.Pages.CustomPage
             cmbBankAPIFunction.ItemsSource = BankFunctionLst;
             Type = 0;
             cmbBank.SelectedIndex = 0;
-            this.Title = Uniconta.ClientTools.Localization.lookup("BankConnect");
+            this.Title = Uniconta.ClientTools.Localization.lookup("FinancialInstitution");
             this.Loaded += CW_Loaded;
             SetFields();
-#if !SILVERLIGHT
             this.Loaded += CWSelectCompany_Loaded;
-#endif
         }
 
         private void CW_Loaded(object sender, RoutedEventArgs e)
         {
-#if !SILVERLIGHT
             Dispatcher.BeginInvoke(new Action(() => { txtCustomerNo.Focus(); }));
-#endif
         }
-#if !SILVERLIGHT
+
         private void cbCompany_SelectedIndexChanged(object sender, RoutedEventArgs e)
         {
             if (cbCompany.SelectedItem != null)
@@ -85,26 +81,31 @@ namespace UnicontaClient.Pages.CustomPage
             switch (type)
             {
                 case 0:
-                    txtDescription.Text = "Tilmeld regnskabet til Bank Connect";
+                    txtDescription.Text = String.Concat("Tilmelding af regnskab til Bank", Environment.NewLine,
+                                                      "Bemærk følgende vedørende kundenummer:", Environment.NewLine,
+                                                      "Bank tilknyttet Bankdata: Kundenummer er 13 cifre", Environment.NewLine,
+                                                      "Bank tilknyttet BEC: Kundenummer er 11 cifre", Environment.NewLine,
+                                                      "Bank tilknyttet SDC: Kundenummer er 26 cifre", Environment.NewLine,
+                                                      "Nordea: Kundenummer er 10 cifre");
                     break;
                 case 1:
-                    txtDescription.Text = "Viser en log over al kommunikation med Bank Connect";
+                    txtDescription.Text = "Viser en log over al kommunikation med banken";
                     break;
                 case 2:
-                    txtDescription.Text = Uniconta.ClientTools.Localization.lookup("Tilknyt regnskabet til en eksisterende Bank Connect forbindelse");
+                    txtDescription.Text = Uniconta.ClientTools.Localization.lookup("Tilknyt regnskabet til en eksisterende forbindelse");
                     break;
                 case 3:
-                    txtDescription.Text = Uniconta.ClientTools.Localization.lookup("Afmeld Bank Connect forbindelsen");
+                    txtDescription.Text = Uniconta.ClientTools.Localization.lookup("Afmeld forbindelsen");
                     break;
             }
         }
-#endif
+
 
         private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
             {
-                this.DialogResult = false;
+                SetDialogResult(false);
             }
             else
                 if (e.Key == Key.Enter)
@@ -122,7 +123,7 @@ namespace UnicontaClient.Pages.CustomPage
                     errText = fieldCannotBeEmpty("FinancialInstitution");
                 else if (string.IsNullOrEmpty(CustomerNo))
                     errText = fieldCannotBeEmpty("CustomerNo");
-                else if (string.IsNullOrEmpty(ActivationCode))
+                else if (Bank != Bank.Nordea && string.IsNullOrEmpty(ActivationCode))
                     errText = fieldCannotBeEmpty("ActivationCode");
             }
             else
@@ -132,14 +133,14 @@ namespace UnicontaClient.Pages.CustomPage
             }
 
             if (errText == null)
-                this.DialogResult = true;
+                SetDialogResult(true);
             else
                 UnicontaMessageBox.Show(errText, Uniconta.ClientTools.Localization.lookup("Warning"));
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = false;
+            SetDialogResult(false);
         }
 
         private void BankAPIFunction_SelectedIndexChanged(object sender, RoutedEventArgs e)
@@ -147,11 +148,16 @@ namespace UnicontaClient.Pages.CustomPage
             SetFields();
         }
 
+        private void BankAPIBank_SelectedIndexChanged(object sender, RoutedEventArgs e)
+        {
+            Bank = cmbBank.SelectedIndex > 0 ? (Bank)cmbBank.SelectedIndex : Bank.None;
+            liActivationCode.Visibility = Bank == Bank.Nordea ? Visibility.Collapsed : Visibility.Visible;
+        }
+
         private void SetFields()
         {
             type = Type;
 
-#if !SILVERLIGHT
             SetDescription(Type);
 
             //Tilmeld=0, Status=1, Tilknyt=2, Afmeld=3
@@ -171,32 +177,6 @@ namespace UnicontaClient.Pages.CustomPage
                 liActivationCode.Visibility = Visibility.Collapsed;
                 liCompany.Visibility = Visibility.Visible;
             }
-#else
-            if (Type == 1 || Type == 3)
-            {
-                lblBank.Visibility = Visibility.Collapsed;
-                cmbBank.Visibility = Visibility.Collapsed;
-
-                lblActivationCode.Visibility = Visibility.Collapsed;
-                txtActivationCode.Visibility = Visibility.Collapsed;
-            }
-            else if (Type == 0)
-            {
-                lblBank.Visibility = Visibility.Visible;
-                cmbBank.Visibility = Visibility.Visible;
-
-                lblActivationCode.Visibility = Visibility.Visible;
-                txtActivationCode.Visibility = Visibility.Visible;
-            }
-            else if (Type == 2)
-            {
-                lblBank.Visibility = Visibility.Collapsed;
-                cmbBank.Visibility = Visibility.Collapsed;
-
-                lblActivationCode.Visibility = Visibility.Collapsed;
-                txtActivationCode.Visibility = Visibility.Collapsed;
-            }
-#endif
         }
 
         private static string fieldCannotBeEmpty(string field)

@@ -39,27 +39,27 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (e.Key == Key.Escape)
             {
-                this.DialogResult = false;
+                SetDialogResult(false);
             }
             else if (e.Key == Key.Enter)
             {
                 if (OKButton.IsFocused)
                     OKButton_Click(null, null);
                 else if (CancelButton.IsFocused)
-                    this.DialogResult = false;
+                    SetDialogResult(false);
             }
         }
         private async void OKButton_Click(object sender, RoutedEventArgs e)
         {
             ErrorCodes res = await BasePage.session.RequestCompanyAccess(txtCompanyName.Text, txtCompanyId.EditValue != null ? (int)txtCompanyId.EditValue:0);
             if (res == ErrorCodes.Succes)
-                this.DialogResult = true;
+                SetDialogResult(true);
             UtilDisplay.ShowErrorCode(res);             
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = false;
+            SetDialogResult(false);
         }
     }
 }

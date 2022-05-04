@@ -112,12 +112,12 @@ namespace UnicontaClient.Pages.CustomPage
             if (err != ErrorCodes.Succes)
                 UtilDisplay.ShowErrorCode(err);
             busyIndicator.IsBusy = false;
-            this.DialogResult = true;
+            SetDialogResult(true);
         }
         
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = false;
+            SetDialogResult(false);
         }
 
         private void txtTransType_KeyDown(object sender, KeyEventArgs e)

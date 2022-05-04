@@ -49,7 +49,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (e.Key == Key.Escape)
             {
-                this.DialogResult = false;
+                SetDialogResult(false);
             }
             else
                 if (e.Key == Key.Enter)
@@ -63,14 +63,14 @@ namespace UnicontaClient.Pages.CustomPage
             if (cbBalance.SelectedItem == null)
             {
                 Uniconta.ClientTools.Controls.UnicontaMessageBox.Show( string.Format(Uniconta.ClientTools.Localization.lookup("OBJisEmpty"), Uniconta.ClientTools.Localization.lookup("ReportBalance")), Uniconta.ClientTools.Localization.lookup("Error"));
-                this.DialogResult = false;
+                SetDialogResult(false);
             }
-            this.DialogResult = true;
+            SetDialogResult(true);
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = false;
+            SetDialogResult(false);
         }
 
         private async void cbCompany_SelectedIndexChanged(object sender, RoutedEventArgs e)

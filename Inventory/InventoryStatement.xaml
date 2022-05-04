@@ -42,14 +42,13 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryStatement"
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="5"/>
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>              
             </Grid.ColumnDefinitions>
             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FromDate}" Grid.Column="0" Grid.Row="0" Margin="3,3,3,3"/>
             <CorasauControls:DateEditor x:Name="txtDateFrm" Grid.Column="2" Grid.Row="0" Margin="0,3,3,3"/>
             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ToDate}" Grid.Column="0" Grid.Row="1" Margin="3,3,3,3"/>
             <CorasauControls:DateEditor x:Name="txtDateTo" Grid.Column="2" Grid.Row="1" Margin="0,3,3,3"/>
             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FromItem}" Grid.Column="0" Grid.Row="2" Margin="3,3,3,3"/>
-            <CorasauControls:LookupEditor x:Name="cmbFromAccount" Grid.Column="2" Grid.Row="2" Margin="0,3,3,3" Text="{Binding FromItem,Mode=TwoWay}"/>
+            <CorasauControls:LookupEditor x:Name="cmbFromAccount" Grid.Column="2" Grid.Row="2" Margin="0,3,3,3" Text="{Binding FromItem,Mode=TwoWay}" EditValueChanged="cmbFromAccount_EditValueChanged" />
             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ToItem}" Grid.Column="0" Grid.Row="3" Margin="3,3,3,3"/>
             <CorasauControls:LookupEditor x:Name="cmbToAccount" Grid.Column="2" Grid.Row="3" Margin="0,3,3,3" Text="{Binding ToItem,Mode=TwoWay}"/>
             
@@ -57,7 +56,6 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryStatement"
             <CheckBox x:Name="cbxAscending" Grid.Column="5" Grid.Row="0" Margin="0,3,3,3" IsChecked="False"/>
             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=SkipEmpty}" Grid.Column="3" Grid.Row="1" Margin="3,3,3,3"/>
             <CheckBox x:Name="cbxSkipBlank" Grid.Column="5" Grid.Row="1" Margin="0,3,3,3" IsChecked="true"/>
-            <Button x:Name="btnSerach" Grid.Column="6" Grid.Row="0" Margin="10,3,3,3" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Search}" Height="23" Width="80" Click="btnSerach_Click"/>
 
         </Grid>
         <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{StaticResource WindowHeaderGradient}" />
@@ -70,8 +68,8 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryStatement"
                 </localPage:AccountsStatementGrid.Columns>
                 <localPage:AccountsStatementGrid.DetailDescriptor>
                     <localPage:DataControlDetailDescriptorCls ItemsSourceBinding="{Binding ChildRecord}">
-                        <localPage:AccountsStatementGrid x:Name="childDgInvTrans" SelectionMode="None">
-                            <localPage:AccountsStatementGrid.Columns>
+                        <localPage:InventoryStatementGrid x:Name="childDgInvTrans" SelectionMode="None">
+                            <localPage:InventoryStatementGrid.Columns>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Date" Width="90" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Qty">
                                     <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
@@ -80,13 +78,25 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryStatement"
                                         </DataTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridTemplateColumnClient>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant" IsEditSettingSet="True" FieldName="Variant" Width="80" />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="VariantName" Width="100" Visible="False"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant1" IsEditSettingSet="True" FieldName="Variant1" Width="80" Visible="False"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant2" IsEditSettingSet="True" FieldName="Variant2" Width="80" Visible="False"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant3" IsEditSettingSet="True" FieldName="Variant3" Width="80" Visible="False"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant4" IsEditSettingSet="True" FieldName="Variant4" Width="80" Visible="False"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant5" IsEditSettingSet="True" FieldName="Variant5" Width="80" Visible="False"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Variant1Name" Width="100" Visible="False"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Variant2Name" Width="100" Visible="False"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Variant3Name" Width="100" Visible="False"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Variant4Name" Width="100" Visible="False"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Variant5Name" Width="100" Visible="False"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="SumQty" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="CostValue" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="SumCost" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="MovementType" />
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Total"  />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Total" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="DB"  />
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="CostPrice" />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="CostPrice"  />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="SalesPrice" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="DCAccount" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="AccountName" Width="150" Visible="False" />
@@ -107,13 +117,14 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryStatement"
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="HasSeriaBatch" Width="50" Visible="false"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Warehouse" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Location" />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="PrCategory"  Visible="false"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim1" Width="70" FieldName="Dimension1" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim2" Width="70" FieldName="Dimension2" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim3" Width="70" FieldName="Dimension3" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim4" Width="70" FieldName="Dimension4" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim5" Width="70" FieldName="Dimension5" />
-                            </localPage:AccountsStatementGrid.Columns>
-                        </localPage:AccountsStatementGrid>
+                            </localPage:InventoryStatementGrid.Columns>
+                        </localPage:InventoryStatementGrid>
                     </localPage:DataControlDetailDescriptorCls>
                 </localPage:AccountsStatementGrid.DetailDescriptor>
             </localPage:AccountsStatementGrid>

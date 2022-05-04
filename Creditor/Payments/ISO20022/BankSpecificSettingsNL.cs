@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.Common;
+using Uniconta.Common.Utility;
 using Uniconta.DataModel;
+using UnicontaClient.Pages;
 using UnicontaClient.Pages.Creditor.Payments;
 
 namespace UnicontaISO20022CreditTransfer
@@ -245,7 +247,7 @@ namespace UnicontaISO20022CreditTransfer
         /// <summary>
         /// Creditor Address
         /// </summary>
-        public override PostalAddress CreditorAddress(Uniconta.DataModel.Creditor creditor, PostalAddress creditorAddress)
+        public override PostalAddress CreditorAddress(Uniconta.DataModel.Creditor creditor, PostalAddress creditorAddress, ISO20022PaymentTypes paymentType, bool unstructured = false)
         {
             var adr1 = StandardPaymentFunctions.RegularExpressionReplace(creditor._Address1, allowedCharactersRegEx, replaceCharactersRegEx);
             var adr2 = StandardPaymentFunctions.RegularExpressionReplace(creditor._Address2, allowedCharactersRegEx, replaceCharactersRegEx);
@@ -261,15 +263,16 @@ namespace UnicontaISO20022CreditTransfer
             }
             else
             {
-                StringBuilder strB = new StringBuilder();
                 if (companyBankEnum == CompanyBankENUM.Rabobank) //Rabobank: Only two Addresslines are accepted
                 {
+                    var strB = StringBuilderReuse.Create();
                     var adr1_result = strB.Append(adr1).Append(AddSeparator(adr2)).Append(adr2).ToString();
                     creditorAddress.AddressLine1 = adr1_result.Length > 70 ? adr1_result.Substring(0, 70) : adr1_result;
                     strB.Clear();
                     var adr2_result = strB.Append(adr3).Append(AddSeparator(zipCode)).Append(zipCode).Append(AddSeparator(city)).Append(city).ToString();
                     creditorAddress.AddressLine2 = adr2_result.Length > 70 ? adr2_result.Substring(0, 70) : adr2_result;
                     creditorAddress.Unstructured = true;
+                    strB.Release();
                 }
                 else
                 {
@@ -341,7 +344,7 @@ namespace UnicontaISO20022CreditTransfer
         /// <summary>
         /// Unstructured Remittance Information
         /// </summary>
-        public override List<string> Ustrd(string externalAdvText, ISO20022PaymentTypes ISOPaymType, PaymentTypes paymentMethod, bool extendedText)
+        public override List<string> Ustrd(string externalAdvText, ISO20022PaymentTypes ISOPaymType, CreditorTransPayment trans, bool extendedText)
         {
             var ustrdText = StandardPaymentFunctions.RegularExpressionReplace(externalAdvText, allowedCharactersRegEx, replaceCharactersRegEx);
             

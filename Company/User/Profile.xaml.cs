@@ -21,6 +21,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using System.IO;
 using Corasau.Admin.API;
+using Uniconta.WindowsAPI.Service;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -56,11 +57,7 @@ namespace UnicontaClient.Pages.CustomPage
             this.DataContext = this;
             ShowXapBuildDate();
             layoutControl = layoutItems;
-#if SILVERLIGHT
-            cbUserNationality.ItemsSource = Utility.GetEnumItemsWithPascalToSpace(typeof(CountryCode)); 
-#else
             txtDotnetVersion.Text = System.Environment.Version.ToString();
-#endif
             if (LoadedRow == null)
             {
                 editrow = CreateNew() as UserClient;
@@ -69,17 +66,18 @@ namespace UnicontaClient.Pages.CustomPage
             layoutItems.DataContext = editrow;
             currentTheme = editrow._Theme;
             Curlanguage = editrow._Language;
-
-#if !SILVERLIGHT
+            
             cbDefaultPrinter.ItemsSource = UtilDisplay.GetInstalledPrinters();
+            CheckTwoFactorLogin(session.TwoFactorLoginUsed);
             RemoveMenu();
-#elif SILVERLIGHT
-            if (LoginPage.PCtype != LoginType.MAC_OOB)
-                RemoveMenu();
-#endif
             frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
         }
 
+        private void CheckTwoFactorLogin(bool twoFactorLoginUsed)
+        {
+            if (!twoFactorLoginUsed)
+                frmRibbon.DisableButtons("RemoveTwoFactorLogin");
+        }
         private void RemoveMenu()
         {
             RibbonBase rb = (RibbonBase)frmRibbon.DataContext;
@@ -121,7 +119,7 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         if (txtPassword.Password != txtConfirmPassword.Password)
                         {
-                            UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("PasswordMismatch"),Uniconta.ClientTools.Localization.lookup("Error"));
+                            UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("PasswordMismatch"), Uniconta.ClientTools.Localization.lookup("Error"));
                             return;
                         }
                         savePassword();
@@ -182,10 +180,28 @@ namespace UnicontaClient.Pages.CustomPage
                 case "PasswordOnEmail":
                     SetEmailPassowrd();
                     break;
+                case "ProgramModules":
+                    AddDockItem(TabControls.AppKeyPage, api.session.User, string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("AppKeys"), editrow._Name));
+                    break;
+                case "RemoveTwoFactorLogin":
+                    RemoveTwoFactorLogin();
+                    break;
                 default:
                     frmRibbon_BaseActions(ActionType);
                     break;
             }
+        }
+
+        async void RemoveTwoFactorLogin()
+        {
+            var userApi = new TwoFactorLogin(api.session);
+            var result = await userApi.RemoveTwoFactorLogin();
+            if (result == ErrorCodes.Succes)
+            {
+                session.TwoFactorLoginUsed = false;
+                CheckTwoFactorLogin(false);
+            }
+            UtilDisplay.ShowErrorCode(result);
         }
 
         async void SetEmailPassowrd()

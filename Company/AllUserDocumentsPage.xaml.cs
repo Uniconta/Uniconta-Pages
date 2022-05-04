@@ -102,7 +102,8 @@ namespace UnicontaClient.Pages.CustomPage
                 header = string.Format("{0} {1}", Uniconta.ClientTools.Localization.lookup("View"), Uniconta.ClientTools.Localization.lookup("PhysicalVoucher"));
             if (docViewer == null)
             {
-                docViewer = new DocumentViewerWindow(sourceData as SynchronizeEntity, this.api, header);
+                docViewer = new DocumentViewerWindow(api, header);
+                docViewer.InitViewer(sourceData);
                 docViewer.Owner = Application.Current.MainWindow;
                 docViewer.Closing += delegate { docViewer.Owner = null; };
                 docViewer.Closed += delegate { docViewer = null; };

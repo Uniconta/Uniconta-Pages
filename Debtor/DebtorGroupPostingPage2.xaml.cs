@@ -29,14 +29,15 @@ namespace UnicontaClient.Pages.CustomPage
     {
         DCGroupPostingClient editRow;
         public override string NameOfControl { get { return TabControls.DebtorGroupPostingPage2; } }
-
+        bool isGroupEnabled = true;
         /*For Edit*/
-        public DebtorGroupPostingPage2(UnicontaBaseEntity sourceData, bool isEdit = true) : base(sourceData, isEdit)
+        public DebtorGroupPostingPage2(UnicontaBaseEntity sourceData, UnicontaBaseEntity groupMaster, bool isEdit = true) : base(sourceData, isEdit)
         {
             InitializeComponent();
             if (!isEdit)
                 editRow = (DCGroupPostingClient)StreamingManager.Clone(sourceData);
-            InitPage(api);
+            isGroupEnabled = !isEdit;
+            InitPage(api, groupMaster);
         }
         public DebtorGroupPostingPage2(CrudAPI crudApi, UnicontaBaseEntity groupMaster) : base(crudApi, null)
         {
@@ -46,7 +47,6 @@ namespace UnicontaClient.Pages.CustomPage
         UnicontaBaseEntity groupMaster;
         private void InitPage(CrudAPI crudApi, UnicontaBaseEntity grMaster = null)
         {
-            BusyIndicator = busyIndicator;
             layoutControl = layoutItems;
             this.groupMaster = grMaster;
             leCostAccount.api = leCostAccount1.api = leCostAccount2.api = leCostAccount3.api = leCostAccount4.api = leRevenueAccount.api = leRevenueAccount1.api =
@@ -75,12 +75,12 @@ namespace UnicontaClient.Pages.CustomPage
                 if (groupMaster is Uniconta.DataModel.DCGroup)
                 {
                     liGroup.Visibility = Visibility.Collapsed;
-                    leInvGroup.IsEnabled = true;
+                    leInvGroup.IsEnabled = isGroupEnabled;
                 }
                 else if (groupMaster is Uniconta.DataModel.InvGroup)
                 {
                     liInventoryGroup.Visibility = Visibility.Collapsed;
-                    leGroup.IsEnabled = true;
+                    leGroup.IsEnabled = isGroupEnabled;
                     leGroup.SetForeignKeyRef(typeof(DebtorGroupClient), 0);
                 }
             }

@@ -74,7 +74,15 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem == null)
                         return;
                     AddDockItem(TabControls.GLAccountClosingSheetPage, selectedItem, string.Format("{0} - {1}", Uniconta.ClientTools.Localization.lookup("Accounts"), selectedItem.Name));
-                    break;               
+                    break;
+                case "AddNote":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.UserNotesPage, dgClosingSheet.syncEntity);
+                    break;
+                case "AddDoc":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.UserDocsPage, dgClosingSheet.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Documents"), selectedItem._Name));
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -85,6 +93,9 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (screenName == TabControls.ClosingSheetPage2)
                 dgClosingSheet.UpdateItemSource(argument);
+            else if (screenName == TabControls.UserNotesPage || screenName == TabControls.UserDocsPage && argument != null)
+                dgClosingSheet.UpdateItemSource(argument);
         }
+
     }
 }

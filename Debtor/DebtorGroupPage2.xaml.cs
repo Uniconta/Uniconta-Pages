@@ -62,7 +62,6 @@ namespace UnicontaClient.Pages.CustomPage
         }
         void InitPage(CrudAPI crudapi)
         {
-            BusyIndicator = busyIndicator;
             layoutControl = layoutItems;
             cbRevenueFollowDC.ItemsSource = AppEnums.FollowItemDebtor.Values;
             lookupEndDiscountAccount.api =
@@ -83,6 +82,9 @@ namespace UnicontaClient.Pages.CustomPage
             leAutoNumber.api = crudapi;
             layoutGroupLookupEditor.api = crudapi;
             itemNameGroupLookupEditor.api = crudapi;
+#if !SILVERLIGHT
+            invoiceSerieLookupEditor.api = crudapi;
+#endif
 
             if (!crudapi.CompanyEntity._UseVatOperation)
             {

@@ -52,7 +52,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (e.Key == Key.Escape)
             {
-                this.DialogResult = false;
+                SetDialogResult(false);
             }
             else
                 if (e.Key == Key.Enter)
@@ -60,23 +60,35 @@ namespace UnicontaClient.Pages.CustomPage
                 if (OKButton.IsFocused)
                     OKButton_Click(null, null);
                 else if (CancelButton.IsFocused)
-                    this.DialogResult = false;
+                    SetDialogResult(false);
             }
         }
 
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = true;
+            SetDialogResult(true);
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = false;
+            SetDialogResult(false);
         }
 
         private void cmbBank_SelectedIndexChanged(object sender, RoutedEventArgs e)
         {
-
+            switch (paymentFormatISOSE.Bank)
+            {
+                case seBank.Danske_Bank:
+                    lblTestMarked.Visibility = ceTestMarked.Visibility = Visibility.Visible;
+                    lblBatchBook.Visibility = ceBatchBooking.Visibility = Visibility.Visible;
+                    lblCode.Visibility = txtCode.Visibility = Visibility.Collapsed;
+                    break;
+                default:
+                    lblTestMarked.Visibility = ceTestMarked.Visibility = Visibility.Collapsed;
+                    lblBatchBook.Visibility = ceBatchBooking.Visibility = Visibility.Collapsed;
+                    lblCode.Visibility = txtCode.Visibility = Visibility.Collapsed;
+                    break;
+            }
         }
     }
 }

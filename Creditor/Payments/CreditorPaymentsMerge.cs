@@ -11,14 +11,33 @@ using UnicontaISO20022CreditTransfer;
 using ISO20022CreditTransfer;
 using System.Globalization;
 using Uniconta.ClientTools.Controls;
+using Uniconta.Common.Utility;
+using Uniconta.API.System;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
 {
     public class CreditorPaymentsMerge
     {
+        #region Variables
+        private CrudAPI crudAPI;
+        private Company company;
+        #endregion
+
+        #region Constants
         public const string MERGEID_SINGLEPAYMENT = "-";
-        public bool MergePayments(Company company, PaymentsGrid dgCreditorTranOpenGrid, CreditorPaymentFormat credPaymFormat, SQLCache bankAccountCache)
+        #endregion
+
+        /// <summary>
+        /// Default Constructor
+        /// </summary>
+        public CreditorPaymentsMerge(CrudAPI api)
+        {
+            crudAPI = api;
+            company = api.CompanyEntity;
+        }
+
+        public async Task<bool> MergePayments(PaymentsGrid dgCreditorTranOpenGrid, CreditorPaymentFormat credPaymFormat, SQLCache bankAccountCache)
         {
             string creditorAcc = string.Empty;
             string creditorOCRPaymentId = string.Empty;
@@ -30,7 +49,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
 
             var credCache = company.GetCache(typeof(Uniconta.DataModel.Creditor));
 
-            PaymentISO20022Validate paymentISO20022Validate = new PaymentISO20022Validate();
+            PaymentISO20022Validate paymentISO20022Validate = new PaymentISO20022Validate(crudAPI, credPaymFormat);
             BankSpecificSettings bankSpecific = BankSpecificSettings.BankSpecTypeInstance(credPaymFormat);
 
             try
@@ -40,30 +59,25 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
                 {
                     if (rec._PaymentFormat != credPaymFormat._Format || rec._OnHold || rec._Paid)
                     {
-                        rec._MergePaymId = Uniconta.ClientTools.Localization.lookup("Excluded"); 
-                        rec.NotifyMergePaymIdSet();
+                        rec.MergePaymId = Uniconta.ClientTools.Localization.lookup("Excluded"); 
                         continue;
                     }
 
                     //Validate payments >>
-                    paymentISO20022Validate.CompanyBank(credPaymFormat);  
-                    var validateRes = paymentISO20022Validate.ValidateISO20022(company, rec, bankAccountCache);
-
+                    var validateRes = await paymentISO20022Validate.ValidateISO20022(rec, bankAccountCache);
                     if (validateRes.HasErrors)
                     {
                         foreach (CheckError error in validateRes.CheckErrors)
                         {
-                            rec._ErrorInfo += rec._ErrorInfo == null ? error.ToString() : Environment.NewLine + rec._ErrorInfo;
+                            rec.ErrorInfo += rec.ErrorInfo == null ? error.ToString() : Environment.NewLine + rec.ErrorInfo;
                         }
-                        rec._MergePaymId = Uniconta.ClientTools.Localization.lookup("Excluded");
-                        rec.NotifyMergePaymIdSet();
+                        rec.MergePaymId = Uniconta.ClientTools.Localization.lookup("Excluded");
                         continue;
                     }
                     else
                     {
-                        rec._ErrorInfo = BaseDocument.VALIDATE_OK;
+                        rec.ErrorInfo = BaseDocument.VALIDATE_OK;
                     }
-                    rec.NotifyErrorSet();
                     //Validate payments <<
 
                     var creditor = (Uniconta.DataModel.Creditor)credCache.Get(rec.Account);
@@ -84,7 +98,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
                             break;
                     }
 
-                    StringBuilder mergePaymId = new StringBuilder();
+                    var mergePaymId = StringBuilderReuse.Create();
 
                     switch (rec._PaymentMethod)
                     {
@@ -93,13 +107,13 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
                             creditorOCRPaymentId = bankSpecific.CreditorRefNumber(rec._PaymentId);
                             creditorBIC = bankSpecific.CreditorBIC(rec._SWIFT);
                             if (creditorOCRPaymentId != string.Empty && creditorBIC != string.Empty)
-                                mergePaymId.Append(creditorNumber).Append('-').Append(creditorAcc).Append('-').Append(creditorOCRPaymentId).Append('-').Append(creditorBIC).Append('-').Append(rec._CurrencyLocal).Append('-').Append(paymGrpVal);
+                                mergePaymId.Append(creditorNumber).Append('-').Append(creditorAcc).Append('-').Append(creditorOCRPaymentId).Append('-').Append(creditorBIC).Append('-').Append(rec.CurrencyLocalStr).Append('-').Append(paymGrpVal);
                             else if (creditorOCRPaymentId != string.Empty)
-                                mergePaymId.Append(creditorNumber).Append('-').Append(creditorAcc).Append('-').Append(creditorOCRPaymentId).Append('-').Append(rec._CurrencyLocal).Append('-').Append(paymGrpVal);
+                                mergePaymId.Append(creditorNumber).Append('-').Append(creditorAcc).Append('-').Append(creditorOCRPaymentId).Append('-').Append(rec.CurrencyLocalStr).Append('-').Append(paymGrpVal);
                             else if (creditorBIC != string.Empty)
-                                mergePaymId.Append(creditorNumber).Append('-').Append(creditorAcc).Append('-').Append(creditorBIC).Append('-').Append(rec._CurrencyLocal).Append('-').Append(paymGrpVal);
+                                mergePaymId.Append(creditorNumber).Append('-').Append(creditorAcc).Append('-').Append(creditorBIC).Append('-').Append(rec.CurrencyLocalStr).Append('-').Append(paymGrpVal);
                             else
-                                mergePaymId.Append(creditorNumber).Append('-').Append(creditorAcc).Append('-').Append(rec._CurrencyLocal).Append('-').Append(paymGrpVal);
+                                mergePaymId.Append(creditorNumber).Append('-').Append(creditorAcc).Append('-').Append(rec.CurrencyLocalStr).Append('-').Append(paymGrpVal);
 
                             break;
 
@@ -108,32 +122,30 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
                             creditorBIC = bankSpecific.CreditorBIC(rec._SWIFT);
                             creditorOCRPaymentId = bankSpecific.CreditorRefNumberIBAN(rec._PaymentId, company._CountryId, creditor._Country);
 
-                            mergePaymId.Append(creditorNumber).Append('-').Append(creditorAcc).Append('-').Append(creditorBIC).Append('-').Append(rec._CurrencyLocal).Append('-').Append(paymGrpVal);
+                            mergePaymId.Append(creditorNumber).Append('-').Append(creditorAcc).Append('-').Append(creditorBIC).Append('-').Append(rec.CurrencyLocalStr).Append('-').Append(paymGrpVal);
                             break;
 
                         case PaymentTypes.PaymentMethod3: //FIK71
-                            var tuple71 = bankSpecific.CreditorFIK71(rec._PaymentId);
+                            var tuple71 = bankSpecific.CreditorFIK71(rec._PaymentId, creditor._PaymentId);
                             creditorOCRPaymentId = tuple71.Item1;
-                            creditorOCRPaymentId = BaseDocument.FIK71 + "/" + creditorOCRPaymentId;
                             creditorAcc = tuple71.Item2;
 
-                            mergePaymId.Append(creditorNumber).Append('-').Append(creditorOCRPaymentId).Append('-').Append(creditorAcc).Append('-').Append(rec._CurrencyLocal).Append('-').Append(paymGrpVal);
+                            mergePaymId.Append(creditorNumber).Append('-').Append(creditorOCRPaymentId).Append('-').Append(creditorAcc).Append('-').Append(rec.CurrencyLocalStr).Append('-').Append(paymGrpVal);
                             break;
 
                         case PaymentTypes.PaymentMethod5: //FIK75
-                            var tuple75 = bankSpecific.CreditorFIK75(rec._PaymentId);
+                            var tuple75 = bankSpecific.CreditorFIK75(rec._PaymentId, creditor._PaymentId);
                             creditorOCRPaymentId = tuple75.Item1;
-                            creditorOCRPaymentId = BaseDocument.FIK75 + "/" + creditorOCRPaymentId;
                             creditorAcc = tuple75.Item2;
 
-                            mergePaymId.Append(creditorNumber).Append('-').Append(creditorOCRPaymentId).Append('-').Append(creditorAcc).Append('-').Append(rec._CurrencyLocal).Append('-').Append(paymGrpVal);
+                            mergePaymId.Append(creditorNumber).Append('-').Append(creditorOCRPaymentId).Append('-').Append(creditorAcc).Append('-').Append(rec.CurrencyLocalStr).Append('-').Append(paymGrpVal);
                             break;
 
                         case PaymentTypes.PaymentMethod4: //FIK73
                             creditorOCRPaymentId = BaseDocument.FIK73 + "/";
                             creditorAcc = bankSpecific.CreditorFIK73(rec._PaymentId);
 
-                            mergePaymId.Append(creditorNumber).Append('-').Append(creditorOCRPaymentId).Append('-').Append(creditorAcc).Append('-').Append(rec._CurrencyLocal).Append('-').Append(paymGrpVal);
+                            mergePaymId.Append(creditorNumber).Append('-').Append(creditorOCRPaymentId).Append('-').Append(creditorAcc).Append('-').Append(rec.CurrencyLocalStr).Append('-').Append(paymGrpVal);
                             break;
 
                         case PaymentTypes.PaymentMethod6: //FIK04
@@ -142,30 +154,28 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
                             creditorOCRPaymentId = BaseDocument.FIK04 + "/" + creditorOCRPaymentId;
                             creditorAcc = tuple04.Item2;
 
-                            mergePaymId.Append(creditorNumber).Append('-').Append(creditorOCRPaymentId).Append('-').Append(creditorAcc).Append('-').Append(rec._CurrencyLocal).Append('-').Append(paymGrpVal);
+                            mergePaymId.Append(creditorNumber).Append('-').Append(creditorOCRPaymentId).Append('-').Append(creditorAcc).Append('-').Append(rec.CurrencyLocalStr).Append('-').Append(paymGrpVal);
                             break;
                     }
 
-                    if (mergePaymId.ToString().Substring(mergePaymId.Length - 1) == "-")
-                        mergePaymId.Remove(mergePaymId.Length - 1, 1);
+                    if (mergePaymId.Length > 0 && mergePaymId[mergePaymId.Length - 1] == '-')
+                        mergePaymId.Length--;
 
-                    rec._MergePaymId = mergePaymId.ToString();
-                    rec.NotifyMergePaymIdSet();
+                    rec.MergePaymId = mergePaymId.ToStringAndRelease();
                 }
 
-                var noDuplicates = grid.Where(x => x._MergePaymId != Uniconta.ClientTools.Localization.lookup("Excluded")).GroupBy(s => s._MergePaymId).Where(grp => grp.Count() == 1).SelectMany(x => x);
+                var noDuplicates = grid.Where(x => x.MergePaymId != Uniconta.ClientTools.Localization.lookup("Excluded")).GroupBy(s => s.MergePaymId).Where(grp => grp.Count() == 1).SelectMany(x => x);
 
                 foreach (var rec in noDuplicates)
                 {
-                    if (rec._PaymentAmount <= 0)
+                    if (rec.PaymentAmount <= 0)
                     {
-                        rec._MergePaymId = Uniconta.ClientTools.Localization.lookup("Excluded");
-                        rec._ErrorInfo = "Credit amount is not allowed";
-                        rec.NotifyErrorSet();
+                        rec.MergePaymId = Uniconta.ClientTools.Localization.lookup("Excluded");
+                        rec.ErrorInfo = string.Concat(Uniconta.ClientTools.Localization.lookup("PaymentAmount"), "< 0");
                     }
                     else
                     {
-                        rec._MergePaymId = MERGEID_SINGLEPAYMENT;
+                        rec.MergePaymId = MERGEID_SINGLEPAYMENT;
                     }
                 }
 

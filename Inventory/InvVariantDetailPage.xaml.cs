@@ -90,6 +90,13 @@ namespace UnicontaClient.Pages.CustomPage
             dgInvVariantDetailGrid.BusyIndicator = busyIndicator;
             dgInvVariantDetailGrid.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;
             Utility.SetupVariants(api, colVariant, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
+            HideMenuCommand(invMaster);
+        }
+
+        private void HideMenuCommand(InvItemClient invItem)
+        {
+            if (invItem == null || invItem._ItemType < (byte)Uniconta.DataModel.ItemType.BOM)
+                UtilDisplay.RemoveMenuCommand((RibbonBase)localMenu.DataContext, new string[] { "PartInvItems" });
         }
 
         void DataControl_CurrentItemChanged(object sender, DevExpress.Xpf.Grid.CurrentItemChangedEventArgs e)
@@ -151,7 +158,7 @@ namespace UnicontaClient.Pages.CustomPage
                     var cw = new CwSelectPhotoId(api, selectedItem);
                     cw.Closing += delegate
                       {
-                          if(cw.DialogResult== true)
+                          if (cw.DialogResult == true)
                           {
                               dgInvVariantDetailGrid.SetLoadedRow(selectedItem);
                               selectedItem.Photo = cw.Photo;
@@ -162,6 +169,46 @@ namespace UnicontaClient.Pages.CustomPage
                     cw.Show();
 #endif
                     break;
+                case "InvBOMPartOfContains":
+                    if (selectedItem != null)
+                    {
+                        if (dgInvVariantDetailGrid.HasUnsavedData)
+                            saveGrid();
+                        AddDockItem(TabControls.PartInvItemsPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("BOM"), selectedItem._Item));
+                    }
+                    break;
+                case "InvBOMPartOfWhereUsed":
+                    if (selectedItem != null)
+                    {
+                        if (dgInvVariantDetailGrid.HasUnsavedData)
+                            saveGrid();
+                        AddDockItem(TabControls.InvBOMPartOfPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("BOM"), selectedItem._Item));
+                    }
+                    break;
+                case "InvBOMProductionPosted":
+                    if (selectedItem != null)
+                    {
+                        if (dgInvVariantDetailGrid.HasUnsavedData)
+                            saveGrid();
+                        AddDockItem(TabControls.ProductionPostedGridPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ProductionPosted"), selectedItem._Item));
+                    }
+                    break;
+                case "InvHierarichalBOM":
+                    if (selectedItem != null)
+                    {
+                        if (dgInvVariantDetailGrid.HasUnsavedData)
+                            saveGrid();
+                        AddDockItem(TabControls.InventoryHierarchicalBOMStatement, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("HierarchicalBOM"), selectedItem._Item));
+                    }
+                    break;
+                case "InvExplodeBOM":
+                    if (selectedItem != null)
+                    {
+                        if (dgInvVariantDetailGrid.HasUnsavedData)
+                            saveGrid();
+                        AddDockItem(TabControls.InvBOMExplodePage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ExplodedBOM"), selectedItem._Item));
+                    }
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -170,10 +217,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override async Task<ErrorCodes> saveGrid()
         {
-            var lin = dgInvVariantDetailGrid.SelectedItem;
-            dgInvVariantDetailGrid.SelectedItem = null;
-            dgInvVariantDetailGrid.SelectedItem = lin;
-            ErrorCodes res = await dgInvVariantDetailGrid.SaveData();
+            ErrorCodes res = await base.saveGrid();
             if (res == ErrorCodes.Succes)
                 globalEvents.OnRefresh(NameOfControl, invMaster);
             return res;

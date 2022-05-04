@@ -136,6 +136,7 @@ namespace SecuredClient.XmlSecurity
             var transform = new XmlDsigExcC14NTransform();
             transform.LoadInput(stream);
             stream.Release();
+            stream = null;
 
             var signedInfoStream = (Stream) transform.GetOutput();
             var signedBytes = new byte[signedInfoStream.Length];

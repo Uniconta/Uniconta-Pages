@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<root>
+	<RibbonItem TabId="0" LocalizedNameKey="Home">
+		<RibbonItem Action="Search" LocalizedNameKey="Search" LargeGlyph="Validate_32x32.png" ShortcutKey="Ctrl+H"/>
+	</RibbonItem>
+	<RibbonItem >
+		<RibbonItem Action="GoToday" LocalizedNameKey="GoToday" LargeGlyph="GoToToday_32x32.png"/>
+	</RibbonItem>
+	<RibbonItem>
+		<RibbonItem Action="DayView" LocalizedNameKey="DayView" LargeGlyph="Day_View_32x32.png"/>
+		<RibbonItem Action="WorkWeekView" LocalizedNameKey="WorkWeekView" LargeGlyph="Work_View_32x32.png"/>
+		<RibbonItem Action="WeekView" LocalizedNameKey="WeekView" LargeGlyph="Week_View_32x32.png"/>
+		<RibbonItem Action="MonthView" LocalizedNameKey="MonthView" LargeGlyph="Month_View_32x32.png"/>
+	</RibbonItem>
+</root>

@@ -13,6 +13,7 @@
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="ViewPhoto" ShortcutKey="" LocalizedNameKey="ViewOBJ" Parameter="Photo" LargeGlyph="View_Highlighted_32x32.png"/>
+    <RibbonItem Action="SetWarehouse" LocalizedNameKey="SetOBJ" Parameter="Warehouse" Module="Warehouse" LargeGlyph="Storage_32x32.png"/>
   </RibbonItem>
   <RibbonItem>
     <!---If we want to create a new group in same PageTab-->
@@ -32,5 +33,6 @@
     <RibbonItem Action="OrderLines" LocalizedNameKey="OrdersLine" Glyph="Order_Lines_Highlighted_32x32.png" ShortcutKey="ALT+L" LargeGlyph="Order_Lines_Highlighted_32x32.png"/>
     <RibbonItem Action="PurchaseLines" LocalizedNameKey="PurchaseLines" Glyph="Purchase_Lines_32x32.png" LargeGlyph="Purchase_Lines_32x32.png"/>
     <RibbonItem Action="InvReservation" LocalizedNameKey="Reservations" LargeGlyph="Item_Number_32x32.png"/>
+    <RibbonItem Action="InvStockProfile" LocalizedNameKey="StockProfile" ControlName="InvStorageProfileReport" Module="Storage" LargeGlyph="Storage_32x32.png"/>
   </RibbonItem>
 </root>

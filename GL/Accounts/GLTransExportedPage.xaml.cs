@@ -61,7 +61,7 @@ namespace UnicontaClient.Pages.CustomPage
             switch (ActionType)
             {
                 case "NewExport":
-                    var today = System.DateTime.Today;
+                    var today = GetSystemDefaultDate();
                     var lst = (ICollection<GLTransExportedClient>)dgGLTransExported.ItemsSource;
                     var maxDate = (lst != null && lst.Count > 0) ? (from rec in lst select rec._ToDate).Max() : today.AddYears(-1).AddDays(-today.Day);
 

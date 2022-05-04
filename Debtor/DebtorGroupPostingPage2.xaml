@@ -3,9 +3,7 @@
 x:Class="UnicontaClient.Pages.CustomPage.DebtorGroupPostingPage2"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
              xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools" >
-    <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="0" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BusyMessage}">
         <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -97,5 +95,4 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorGroupPostingPage2"
                 </CorasauControls:CorasauLayoutGroup>
             </CorasauControls:CorasauLayoutControl>
         </Grid>
-    </CorasauControls:BusyIndicator>
 </Pages:FormBasePage>

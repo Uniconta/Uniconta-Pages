@@ -140,7 +140,7 @@ namespace UnicontaClient.Pages.CustomPage
                 liInvoiceNumber.Label = Uniconta.ClientTools.Localization.lookup("PackNoteNumber");
             else
                 liInvoiceNumber.Label = Uniconta.ClientTools.Localization.lookup("InvoiceNumber");
-            txtInvNumber.MaxLength = 17;
+            txtInvNumber.MaxLength = 20; 
             chkShowInvoice.IsChecked = showInvoice;
 #if SILVERLIGHT
             Utilities.Utility.SetThemeBehaviorOnChildWindow(this);
@@ -166,18 +166,23 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (e.Key == Key.Escape)
             {
-                this.DialogResult = false;
+                SetDialogResult(false);
             }
             else
                 if (e.Key == Key.Enter)
             {
                 if (CancelButton.IsFocused)
                 {
-                    this.DialogResult = false;
+                    SetDialogResult(false);
                     return;
                 }
                 OKButton_Click(null, null);
             }
+        }
+
+        public void SetSendAsEmailCheck(bool isChecked)
+        {
+            chkSendEmail.IsChecked = isChecked;
         }
 
         public void SetInvoiceNumber(long Number)
@@ -239,12 +244,12 @@ namespace UnicontaClient.Pages.CustomPage
             Emails = (string.IsNullOrEmpty(txtEmail.Text) || string.IsNullOrWhiteSpace(txtEmail.Text)) ? null : txtEmail.Text;
             sendOnlyToThisEmail = chkSendOnlyEmail.IsChecked.Value;
             PostOnlyDelivered = chkPostOnlyDel.IsChecked.Value;
-            this.DialogResult = true;
+            SetDialogResult(true);
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = false;
+            SetDialogResult(false);
         }
 
 #if !SILVERLIGHT

@@ -49,7 +49,6 @@ namespace UnicontaClient.Pages.CustomPage
         private void InitPage(CrudAPI api)
         {
             layoutControl = layoutItems;         
-            BusyIndicator = busyIndicator;
             layoutItems.DataContext = userNotesClientRow;
             if(LoadedRow== null)
                 frmRibbon.DisableButtons(new string[] { "Delete" });

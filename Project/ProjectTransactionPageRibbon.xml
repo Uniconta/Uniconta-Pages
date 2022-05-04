@@ -34,5 +34,6 @@
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="InclSubProjects" LocalizedNameKey="InclSubProjects" ButtonType="CheckBox" />
+    <RibbonItem Action="InclTimeJournals" LocalizedNameKey="IncludeJournals" ButtonType="CheckBox" />
   </RibbonItem>
 </root>

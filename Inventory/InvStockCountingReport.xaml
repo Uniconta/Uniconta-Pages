@@ -23,13 +23,14 @@ x:Class="UnicontaClient.Pages.CustomPage.InvStockCountingReport"
                 <local:InvStockAccountingReportGrid.Columns>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Item" Width="100"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="EAN" Visible="False" Width="100"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="colVariant" FieldName="Variant">
+                    <local:CorasauDataGridTemplateColumnClient x:Name="colVariant" FieldName="Variant" Width="80" >
                         <local:CorasauDataGridTemplateColumnClient.CellTemplate>
                             <DataTemplate>
                                 <local:VariantEditorClient x:Name="PART_Editor" EditValue="{Binding DataContext.RowData.Row.Variant,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" DataContext="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"></local:VariantEditorClient>
                             </DataTemplate>
                         </local:CorasauDataGridTemplateColumnClient.CellTemplate>
                     </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="VariantName" Width="100" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="colVariant1" IsEditSettingSet="True" FieldName="Variant1" Visible="False" ReadOnly="True"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="colVariant2" IsEditSettingSet="True" FieldName="Variant2" Visible="False" ReadOnly="True"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="colVariant3" IsEditSettingSet="True" FieldName="Variant3" Visible="False" ReadOnly="True"/>
@@ -58,7 +59,7 @@ x:Class="UnicontaClient.Pages.CustomPage.InvStockCountingReport"
                     <local:CorasauDataGridTemplateColumnClient x:Name="Unit" Width="60" AllowEditing="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="SerieBatch" Width="100" Visible="False" AllowEditing="false"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Qty" Width="80" AllowEditing="false">
-                            <local:CorasauDataGridTemplateColumnClient.CellTemplate>
+                        <local:CorasauDataGridTemplateColumnClient.CellTemplate>
                             <DataTemplate>
                                 <UnicontaControls:TextEditor  x:Name="PART_Editor" HorizontalContentAlignment="Right" Mask="{Binding Path=DataContext.RowData.Row.Decimals,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource MaskConverter},ConverterParameter=Decimals}" MaskUseAsDisplayFormat="True" MaskType="Numeric" EditValue="{Binding Path=DataContext.RowData.Row.Qty,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}"/>
                             </DataTemplate>
@@ -97,6 +98,9 @@ x:Class="UnicontaClient.Pages.CustomPage.InvStockCountingReport"
                     <local:CorasauDataGridTemplateColumnClient x:Name="MaxStockLevel" Width="80" AllowEditing="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="PurchaseAccount" Visible="False" AllowEditing="False"/>
                 </local:InvStockAccountingReportGrid.Columns>
+                <local:InvStockAccountingReportGrid.TotalSummary>
+                    <local:SumColumn FieldName="Quantity" SummaryType="Sum" DisplayFormat="{}{0:N2}"  />
+                </local:InvStockAccountingReportGrid.TotalSummary>
             </local:InvStockAccountingReportGrid>
         </UnicontaControls:BusyIndicator>
     </Grid>

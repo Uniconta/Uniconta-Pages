@@ -5,34 +5,41 @@ x:Class="UnicontaClient.Pages.CustomPage.AttachedVouchersPage2"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
-        xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
         xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
-    <CorasauControls:BusyIndicator x:Name="busyIndicator" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BusyMessage}">
-        <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <CorasauControls:CorasauRibbonControl x:Name="frmRibbon" XMLSourcePath=";component/Pages/Debtor/InvoicePage2Ribbon.xml" Grid.Row="0"/>
-            <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
-                <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="group">
-                    <CorasauControls:CorasauLayoutGroup x:Name="grpVoucher" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Voucher}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="400">
-                        <CorasauControls:CorasauLayoutItem FieldName="Approver1" x:Name="liApprover1">
-                            <CorasauControls:LookupEditor x:Name="leApprover1" Text="{Binding Approver1, Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="Approver2" x:Name="liApprover2">
-                            <CorasauControls:LookupEditor x:Name="leApprover2" Text="{Binding Approver2, Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="Text" x:Name="liText">
-                            <CorasauControls:TextEditor x:Name="txedVoucherComments" Text="{Binding Text,Mode=TwoWay}"  />
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="PostingInstruction" x:Name="liPostingInstruction">
-                            <CorasauControls:TextEditor x:Name="txtPostingInstruction" Text="{Binding PostingInstruction,Mode=TwoWay}"  />
-                        </CorasauControls:CorasauLayoutItem>
-                    </CorasauControls:CorasauLayoutGroup>
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl x:Name="frmRibbon" XMLSourcePath=";component/Pages/Debtor/InvoicePage2Ribbon.xml" Grid.Row="0"/>
+        <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Vertical" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
+            <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="group">
+                <CorasauControls:CorasauLayoutGroup x:Name="grpVoucher" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Voucher}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="400">
+                    <CorasauControls:CorasauLayoutItem FieldName="Approver1" x:Name="liApprover1">
+                        <CorasauControls:LookupEditor x:Name="leApprover1" Text="{Binding Approver1, Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Approver2" x:Name="liApprover2">
+                        <CorasauControls:LookupEditor x:Name="leApprover2" Text="{Binding Approver2, Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Content" x:Name="liContent">
+                        <CorasauControls:ComboBoxEditor x:Name="cmbContentTypes" SelectedItem="{Binding Content ,Mode=TwoWay}" />
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Text" x:Name="liText">
+                        <CorasauControls:TextEditor x:Name="txedVoucherComments" Text="{Binding Text,Mode=TwoWay}"  />
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="PostingInstruction" x:Name="liPostingInstruction">
+                        <CorasauControls:TextEditor x:Name="txtPostingInstruction" Text="{Binding PostingInstruction,Mode=TwoWay}"  />
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="ViewInFolder" x:Name="liViewInFolder">
+                        <CorasauControls:ComboBoxEditor x:Name="cmbViewInFolder" SelectedItem="{Binding ViewInFolder ,Mode=TwoWay}" />
+                    </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
-            </CorasauControls:CorasauLayoutControl>
-        </Grid>
-    </CorasauControls:BusyIndicator>
+            </CorasauControls:CorasauLayoutGroup>
+            <CorasauControls:CorasauLayoutGroup x:Name="grpURL" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Url}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="400">
+                <CorasauControls:CorasauLayoutItem FieldName="Url" x:Name="liUrl">
+                    <CorasauControls:TextEditor x:Name="txtUrl" Text="{Binding Url,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                </CorasauControls:CorasauLayoutItem>
+            </CorasauControls:CorasauLayoutGroup>
+        </CorasauControls:CorasauLayoutControl>
+    </Grid>
 </Pages:FormBasePage>

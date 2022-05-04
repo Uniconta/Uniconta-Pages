@@ -15,6 +15,7 @@ namespace UnicontaISO20022CreditTransfer
         private readonly CdtrAgt cdtrAgt;
         private readonly Cdtr cdtr;
         private readonly CdtrAcct cdtrAcct;
+        private readonly RgltryRptg rgltryRptg;
         private readonly RmtInf rmtInf;
 
         private const string HCDTTRFTXINF = "CdtTrfTxInf";
@@ -135,8 +136,9 @@ namespace UnicontaISO20022CreditTransfer
         /// <param name="cdtrAgt">Financial institution servicing an account for the creditor.</param> 
         /// <param name="cdtr">Party to which an amount of money is due.</param> 
         /// <param name="cdtrAcct">Unambiguous identification of the account of the creditor to which a credit entry will be posted as a result of the payment transaction.</param> 
+        /// <param name="rgltryRptg"></param> 
         /// <param name="rmtInf">Information that enables the matching, ie, reconciliation, of a payment with the items that the payment is intended to settle, eg, commercial invoices in an account receivable system.</param> 
-        public CdtTrfTxInf(string paymentInfoIdReference, string instructionId, string endToEndId, double amount, string currencyCode, CdtrAgt cdtrAgt, Cdtr cdtr, CdtrAcct cdtrAcct, RmtInf rmtInf, string chargeBearer = BaseDocument.CHRGBR_SHAR)
+        public CdtTrfTxInf(string paymentInfoIdReference, string instructionId, string endToEndId, double amount, string currencyCode, CdtrAgt cdtrAgt, Cdtr cdtr, CdtrAcct cdtrAcct, RgltryRptg rgltryRptg, RmtInf rmtInf, string chargeBearer = BaseDocument.CHRGBR_SHAR)
         {
             this.paymentInfoIdReference = paymentInfoIdReference;
             this.instructionId = instructionId;
@@ -147,6 +149,7 @@ namespace UnicontaISO20022CreditTransfer
             this.cdtrAgt = cdtrAgt;
             this.cdtr = cdtr;
             this.cdtrAcct = cdtrAcct;
+            this.rgltryRptg = rgltryRptg;
             this.rmtInf = rmtInf;
         }
 
@@ -166,6 +169,7 @@ namespace UnicontaISO20022CreditTransfer
             cdtrAgt.Append(baseDoc, doc, cdtTrfTxInf);
             cdtr.Append(baseDoc, doc, cdtTrfTxInf);
             cdtrAcct.Append(baseDoc, doc, cdtTrfTxInf);
+            rgltryRptg.Append(baseDoc, doc, cdtTrfTxInf);
             rmtInf.Append(baseDoc, doc, cdtTrfTxInf);
         }
     }

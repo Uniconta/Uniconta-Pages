@@ -9,7 +9,7 @@ x:Class="UnicontaClient.Pages.CustomPage.Profile"
     xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools" 
     xmlns:utilityfunction="clr-namespace:UnicontaClient.Utilities"
                     xmlns:dxinteraction="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
-                    xmlns:enumType ="clr-namespace:Uniconta.Common;assembly=Uniconta.Common"
+                    xmlns:enumType ="clr-namespace:Uniconta.Common;assembly=Uniconta.WindowsAPI"
     mc:Ignorable="d"
     d:DesignHeight="300" d:DesignWidth="400">
 

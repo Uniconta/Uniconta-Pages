@@ -27,7 +27,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Windows;
 using Uniconta.API.Plugin;
 using UnicontaClient.Creditor.Payments;
-using Microsoft.Win32;
 using Uniconta.API.System;
 using DevExpress.Xpf.Grid;
 using System.Text;
@@ -36,59 +35,90 @@ using UnicontaISO20022CreditTransfer;
 using UnicontaClient.Pages.Creditor.Payments;
 using Localization = Uniconta.ClientTools.Localization;
 using Uniconta.Common.Utility;
-#if !SILVERLIGHT
-using SecuredClient.Client;
-using SecuredClient.Provider;
-using SecuredClient.XmlSecurity;
+using DevExpress.CodeParser;
+using Uniconta.API.DebtorCreditor;
 using UnicontaClient.Pages.Creditor.Payments.Denmark;
 using ISO20022CreditTransfer;
 using DevExpress.XtraEditors.Filtering.Templates;
 using Microsoft.Win32;
 using Uniconta.DirectDebitPayment;
-#endif
+
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
-
     public class CreditorTransPayment : CreditorTransOpenClient
     {
-        [Display(Name = "UsedCachDiscount", ResourceType = typeof(GLDailyJournalLineText))]
-        public double UsedCachDiscount { get { return _UsedCachDiscount; } set { _UsedCachDiscount = value; NotifyPropertyChanged("UsedCachDiscount"); } }
-        public double _UsedCachDiscount;
+        [NoSQL]
+        [Display(Name = "Amount", ResourceType = typeof(GLDailyJournalText))]
+        public double TransAmount 
+        { 
+            get 
+            {
+                if (Trans._Currency != 0)
+                    return -Trans._AmountCur;
+                else
+                    return -Trans._Amount;
+            }
+        }
 
-        [Display(Name = "PaymentAmount", ResourceType = typeof(DCTransText))]
-        public double PaymentAmount { get { return _PaymentAmount; } set { _PaymentAmount = value; NotifyPropertyChanged("PaymentAmount"); } }
-        public double _PaymentAmount;
-
-        [Display(Name = "InvoiceAmount", ResourceType = typeof(DCTransText))]
-        public double InvoiceAmount { get { return _InvoiceAmount; } }
-        public double _InvoiceAmount;
-
+        [NoSQL]
         [Display(Name = "Remaining", ResourceType = typeof(DCTransText))]
-        public double RemainingAmount { get { return _RemainingAmount; } }
-        public double _RemainingAmount;
+        public double RemainingTransAmount
+        {
+            get
+            {
+                if (Trans._Currency != 0)
+                    return -_AmountOpenCur;
+                else
+                    return -_AmountOpen;
+            }
+        }
 
+        [NoSQL]
+        [Display(Name = "PaymentAmount", ResourceType = typeof(DCTransText))]
+        public double PaymentAmount
+        {
+            get
+            {
+                if (MergedAmount != 0)
+                    return MergedAmount;
+
+                if (_PartialPaymentAmount != 0)
+                    return _PartialPaymentAmount;
+
+                return RemainingTransAmount - _UsedCashDiscount;
+            }
+        }
+
+        [NoSQL]
+        [Display(Name = "CurBalance", ResourceType = typeof(DCAccountText))]
+        public double CurBalance
+        {
+            get
+            {
+                var c = Creditor;
+                return c != null ? - c._CurBalance : 0d;
+            }
+        }
+
+        private string _ErrorInfo;
         [Display(Name = "SystemInfo", ResourceType = typeof(DCTransText))]
-        public string ErrorInfo { get { return _ErrorInfo; } }
-        public string _ErrorInfo;
+        public string ErrorInfo { get { return _ErrorInfo; } set { _ErrorInfo = value; NotifyPropertyChanged("ErrorInfo"); } }
 
-        public void NotifyErrorSet()
-        {
-            NotifyPropertyChanged("ErrorInfo");
-        }
+        public string CurrencyLocalStr { get { return CurrencyUtil.GetStringFromId(Currency ?? (CompanyId != 0 ? CompanyRef._CurrencyId : Currencies.DKK)); } }
 
-        [Display(Name = "Currency", ResourceType = typeof(GLDailyJournalText))]
-        public string CurrencyLocal { get { return _CurrencyLocal; } }
-        public string _CurrencyLocal;
-
+        private string _MergePaymId;
         [Display(Name = "MergePaymId", ResourceType = typeof(DCTransText))]
-        public string MergePaymId { get { return _MergePaymId; } }
-        public string _MergePaymId;
+        public string MergePaymId { get { return _MergePaymId; } set { _MergePaymId = value; NotifyPropertyChanged("MergePaymId"); } }
 
-        public void NotifyMergePaymIdSet()
-        {
-            NotifyPropertyChanged("MergePaymId");
-        }
+        private int _RgltryRptgCode;
+        [Display(Name = "RegulatoryReportingCode", ResourceType = typeof(DCTransText))]
+        public int RgltryRptgCode { get { return _RgltryRptgCode; } set { _RgltryRptgCode = value; NotifyPropertyChanged("RgltryRptgCode"); } }
+
+        private string _RgltryRptgText;
+        [StringLength(35)]
+        [Display(Name = "RegulatoryReportingText", ResourceType = typeof(DCTransText))]
+        public string RgltryRptgText { get { return _RgltryRptgText; } set { _RgltryRptgText = value; NotifyPropertyChanged("RgltryRptgText"); } }
 
         public string ISOPaymentType;
         public bool internationalPayment;
@@ -96,12 +126,16 @@ namespace UnicontaClient.Pages.CustomPage
         public bool hasBeenMerged;
         public StringBuilder rowNumbers;
         public bool settleTypeRowId;
+        public double MergedAmount;
     }
 
     public class PaymentsGrid : CorasauDataGridClient
     {
         public override Type TableType { get { return typeof(CreditorTransPayment); } }
         public override bool Readonly { get { return false; } }
+        public override bool IsAutoSave { get { return false; } }
+        public override bool CanDelete { get { return false; } }
+        public override bool CanInsert { get { return false; } }
         protected override void OnPreviewKeyDown(KeyEventArgs e)
         {
             if (e.Key == Key.Delete && Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
@@ -110,12 +144,6 @@ namespace UnicontaClient.Pages.CustomPage
             }
             else
                 base.OnPreviewKeyDown(e);
-        }
-
-        protected override void DataLoaded(UnicontaBaseEntity[] Arr)
-        {
-            var page = this.Page as Payments;
-            page?.LoadPayments((IEnumerable<CreditorTransPayment>)Arr);
         }
     }
 
@@ -151,7 +179,7 @@ namespace UnicontaClient.Pages.CustomPage
             creditorTransPayList = list;
             InitPage();
             RibbonBase rb = (RibbonBase)localMenu.DataContext;
-            UtilDisplay.RemoveMenuCommand(rb, new string[] { "GenerateJournalLines", "SaveGrid", "RefreshGrid", "Filter", "ClearFilter" });
+            UtilDisplay.RemoveMenuCommand(rb, new string[] { "GenerateJournalLines", "SaveGrid", "RefreshGrid", "CreditorFilter", "ClearFilter" });
             rowSearch.Height = new GridLength(0d);
             Account.Visible = Name.Visible = false;
         }
@@ -170,7 +198,8 @@ namespace UnicontaClient.Pages.CustomPage
 
             txtDateTo.DateTime = toDate;
             txtDateFrm.DateTime = fromDate;
-       
+            SetCreditorFilterUserFields();
+
             GetMergeUnMergePaymMenuItem();
             GetExpandAndCollapseMenuItem();
             ribbonControl.DisableButtons("ExpandGroups");
@@ -178,15 +207,13 @@ namespace UnicontaClient.Pages.CustomPage
             if (glJournalGenerated)
                 ribbonControl.DisableButtons("MergeUnMergePaym");
 
-#if SILVERLIGHT
-            RibbonBase rb = (RibbonBase)localMenu.DataContext;
-            UtilDisplay.RemoveMenuCommand(rb, "ReadReceipt");
-#endif
             if (creditorTransPayList != null)
             {
                 dgCreditorTranOpenGrid.ItemsSource = creditorTransPayList;
                 dgCreditorTranOpenGrid.Visibility = Visibility.Visible;
             }
+
+            RemoveMenuItem();
 
             var Comp = api.CompanyEntity;
 
@@ -196,45 +223,22 @@ namespace UnicontaClient.Pages.CustomPage
             PaymentFormatCache = Comp.GetCache(typeof(Uniconta.DataModel.CreditorPaymentFormat));
         }
 
+        void RemoveMenuItem()
+        {
+            RibbonBase rb = (RibbonBase)localMenu.DataContext;
+            var Comp = api.CompanyEntity;
+
+            if (Comp._CountryId != CountryCode.Norway)
+            {
+                UtilDisplay.RemoveMenuCommand(rb, "ReadReceipt");
+                UtilDisplay.RemoveMenuCommand(rb, "PaymStatusReport");
+            }
+        }
+
         public override bool IsDataChaged { get { return false; } }
 
         static DateTime fromDate;
         static DateTime toDate;
-
-        protected override Filter[] DefaultFilters()
-        {
-            var arrFilter = new Filter[1];
-
-            if (fromDate == DateTime.MinValue && toDate == DateTime.MinValue)
-                return null;
-
-            if (fromDate != DateTime.MinValue || toDate != DateTime.MinValue)
-            {
-                var dateFilter = new Filter();
-                dateFilter.name = "DueDate";
-
-                string filter;
-                if (fromDate != DateTime.MinValue)
-                    filter = String.Format("{0:d}..", fromDate);
-                else
-                    filter = "..";
-                if (toDate != DateTime.MinValue)
-                    filter += String.Format("{0:d}", toDate);
-                dateFilter.value = filter;
-
-                arrFilter[0] = dateFilter;
-            }
-
-            return arrFilter.Where(element => element != null).Select(element => element).ToArray();
-        }
-
-
-        protected override SortingProperties[] DefaultSort()
-        {
-            SortingProperties dateSort = new SortingProperties("DueDate");
-            SortingProperties VoucherSort = new SortingProperties("Date");
-            return new SortingProperties[] { dateSort, VoucherSort };
-        }
 
         public Payments(BaseAPI api, string lookupKey)
             : base(api, lookupKey)
@@ -242,30 +246,51 @@ namespace UnicontaClient.Pages.CustomPage
             InitPage();
         }
 
+        TableField[] CreditorUserFields;
+        void SetCreditorFilterUserFields()
+        {
+            var Comp = api.CompanyEntity;
+            var creditorRow = new CreditorClient();
+            creditorRow.SetMaster(Comp);
+            var creditorUserField = creditorRow.UserFieldDef();
+            if (creditorUserField != null)
+            {
+                CreditorUserFields = creditorUserField;
+            }
+        }
+        CWServerFilter creditorFilterDialog = null;
+
         private void localMenu_OnItemClicked(string ActionType)
         {
             var selectedItem = dgCreditorTranOpenGrid.SelectedItem as CreditorTransPayment;
             var selectedItems = dgCreditorTranOpenGrid.SelectedItems;
 
-
             switch (ActionType)
             {
-                case "SaveGrid":
-                    dgCreditorTranOpenGrid.SelectedItem = null;
-                    dgCreditorTranOpenGrid.SaveData();
+                case "Search":
+                    BtnSearch();
                     break;
+
+                case "SaveGrid":
+                    saveGrid();
+                    break;
+
+                case "ClearFilter":
+                    gridRibbon_BaseActions(ActionType);
+                    setMergeUnMergePaym(false);
+                    break;
+
                 case "GeneratePaymentFile":
-                    if (dgCreditorTranOpenGrid.ItemsSource == null) return;
-                    GeneratePaymentFile();
+                    if (dgCreditorTranOpenGrid.ItemsSource != null)
+                        GeneratePaymentFile();
                     break;
                 case "ViewDownloadRow":
-                    if (selectedItem == null) return;
-                    DebtorTransactions.ShowVoucher(dgCreditorTranOpenGrid.syncEntity, api, busyIndicator);
+                    if (selectedItem != null)
+                        DebtorTransactions.ShowVoucher(dgCreditorTranOpenGrid.syncEntity, api, busyIndicator);
                     break;
-#if !SILVERLIGHT
                 case "Validate":
-                    if (dgCreditorTranOpenGrid.ItemsSource == null) return;
-                    CallValidatePayment();
+                    if (dgCreditorTranOpenGrid.ItemsSource != null)
+                        CallValidatePayment();
                     break;
 
                 case "ReadReceipt":
@@ -274,105 +299,80 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
 
                 case "PaymStatusReport":
-                    if (dgCreditorTranOpenGrid.ItemsSource == null) return;
-                    PaymStatusReport();
+                    if (dgCreditorTranOpenGrid.ItemsSource != null)
+                        PaymStatusReport();
                     break;
 
                 case "MergeUnMergePaym":
-                    if (dgCreditorTranOpenGrid.ItemsSource == null) return;
-                    MergePaym();
+                    if (dgCreditorTranOpenGrid.ItemsSource != null)
+                        MergePaym();
                     break;
 
                 case "ExpandGroups":
-                    if (dgCreditorTranOpenGrid.ItemsSource == null) return;
-                    ExpandGroups();
+                    if (dgCreditorTranOpenGrid.ItemsSource != null)
+                        ExpandGroups();
                     break;
 
                 case "CollapseGroups":
-                    if (dgCreditorTranOpenGrid.ItemsSource == null) return;
-                    CollapseGroups();
+                    if (dgCreditorTranOpenGrid.ItemsSource != null)
+                        CollapseGroups();
                     break;
 
                 case "UncheckAllPaid":
-                    var visibleAllRows = (IEnumerable<CreditorTransPayment>)dgCreditorTranOpenGrid.GetVisibleRows();
-                    if (visibleAllRows != null)
-                        UncheckPaid(visibleAllRows);
+                    selectedItems = dgCreditorTranOpenGrid.GetVisibleRows();
+                    if (selectedItems != null)
+                        UncheckPaid(selectedItems as IEnumerable<CreditorTransPayment>);
                     break;
 
                 case "UncheckMarkedPaid":
-                    var markedRows = selectedItems.Cast<CreditorTransPayment>();
-                    if (markedRows != null)
-                        UncheckPaid(markedRows);
+                    if (selectedItems != null)
+                        UncheckPaid(selectedItems as IEnumerable<CreditorTransPayment>);
                     break;
 
                 case "UncheckCurrentPaid":
-                    if (selectedItems != null)
-                    {
-                        var selectedRow = new CreditorTransPayment[] { (CreditorTransPayment)dgCreditorTranOpenGrid.SelectedItem };
-                        UncheckPaid(selectedRow);
-                    }
+                    if (selectedItem != null)
+                        UncheckPaid(new[] { selectedItem });
                     break;
 
                 case "CheckOnholdAll":
-                    var checkOnholdAllRows = (IEnumerable<CreditorTransPayment>)dgCreditorTranOpenGrid.GetVisibleRows();
-                    if (checkOnholdAllRows != null)
-                        CheckUncheckOnhold(checkOnholdAllRows, true); //TODO:Check om if i metode er nødvendig tester på antal
+                    selectedItems = dgCreditorTranOpenGrid.GetVisibleRows();
+                    if (selectedItems != null)
+                        CheckUncheckOnhold(selectedItems as IEnumerable<CreditorTransPayment>, true); 
                     break;
 
                 case "CheckOnholdMarked":
-                    var checkOnholdMarkedRows = selectedItems.Cast<CreditorTransPayment>();
-                    if (checkOnholdMarkedRows != null)
-                        CheckUncheckOnhold(checkOnholdMarkedRows, true);
+                    if (selectedItems != null)
+                        CheckUncheckOnhold(selectedItems as IEnumerable<CreditorTransPayment>, true);
                     break;
 
                 case "CheckOnholdCurrent":
-                    if (selectedItems != null)
-                    {
-                        var selectedRow = new CreditorTransPayment[] { (CreditorTransPayment)dgCreditorTranOpenGrid.SelectedItem };
-                        CheckUncheckOnhold(selectedRow, true);
-                    }
+                    if (selectedItem != null)
+                        CheckUncheckOnhold(new[] { selectedItem }, true);
                     break;
 
                 case "UncheckOnholdAll":
-                    var unCheckOnholdAllRows = (IEnumerable<CreditorTransPayment>)dgCreditorTranOpenGrid.GetVisibleRows();
-                    if (unCheckOnholdAllRows != null)
-                        CheckUncheckOnhold(unCheckOnholdAllRows, false); //TODO:Check om if i metode er nødvendig tester på antal
+                    selectedItems = dgCreditorTranOpenGrid.GetVisibleRows();
+                    if (selectedItems != null)
+                        CheckUncheckOnhold(selectedItems as IEnumerable<CreditorTransPayment>, false);
                     break;
 
                 case "UncheckOnholdMarked":
-                    var unCheckOnholdMarkedRows = selectedItems.Cast<CreditorTransPayment>();
-                    if (unCheckOnholdMarkedRows != null)
-                        CheckUncheckOnhold(unCheckOnholdMarkedRows, false);
+                    if (selectedItems != null)
+                        CheckUncheckOnhold(selectedItems as IEnumerable<CreditorTransPayment>, false);
                     break;
 
                 case "UncheckOnholdCurrent":
-                    if (selectedItems != null)
-                    {
-                        var selectedRow = new CreditorTransPayment[] { (CreditorTransPayment)dgCreditorTranOpenGrid.SelectedItem };
-                        CheckUncheckOnhold(selectedRow, false);
-                    }
+                    if (selectedItem != null)
+                        CheckUncheckOnhold(new[] { selectedItem }, false);
                     break;
 
-                //case "CheckOnhold":
-                //    if (dgCreditorTranOpenGrid.ItemsSource == null) return;
-                //    CheckUncheckOnhold(selectedItems, true);
-                //    break;
-
-                //case "UncheckOnhold":
-                //    if (dgCreditorTranOpenGrid.ItemsSource == null) return;
-                //    CheckUncheckOnhold(selectedItems, false);
-                //    break;
-
-#endif
+                #region Generate GL Journal
                 case "GenerateJournalLines":
                     if (dgCreditorTranOpenGrid.ItemsSource == null) return;
 
                     ImportToLine cwLine = new ImportToLine(api);
 
-
-#if !SILVERLIGHT
                     cwLine.DialogTableId = 2000000036;
-#endif
                     cwLine.Closed
                         += async delegate
                         {
@@ -388,32 +388,28 @@ namespace UnicontaClient.Pages.CustomPage
                                 int nextVoucherNumber = 0;
                               
                                 var DJclient = (Uniconta.DataModel.GLDailyJournal)JournalCache.Get(cwLine.Journal);
-                                var listLineClient = new List<Uniconta.DataModel.GLDailyJournalLine>();
 
                                 if (!DJclient._GenerateVoucher && !DJclient._ManualAllocation && cwLine.AddVoucherNumber)
                                     nextVoucherNumber = (int)await numberserieApi.ViewNextNumber(DJclient._NumberSerie);
 
-                                List<CreditorTransPayment> paymentListTransfer = null;
-                                var dictPaymTransfer = new Dictionary<int, CreditorTransPayment>();
-                                CreditorTransPayment mergePaymentRefId;
+                                var credTransPaymLst = dgCreditorTranOpenGrid.GetVisibleRows() as IList<CreditorTransPayment>;
+                                var dictPaymTransfer = new Dictionary<long, CreditorTransPayment>(credTransPaymLst.Count);
 
-                                int index = 0;
-                                foreach (var rec in (IEnumerable<CreditorTransPayment>)dgCreditorTranOpenGrid.ItemsSource) 
+                                foreach (var rec in credTransPaymLst.OrderBy(x => x.PaymentAmount)) 
                                 {
-                                    int rowHandle = dgCreditorTranOpenGrid.GetRowHandleByListIndex(index);
-                                    index++;
-                                    if (!dgCreditorTranOpenGrid.IsRowVisible(rowHandle) || rec._OnHold || (rec._PaymentAmount <= 0d && rec.PaymentRefId == 0))
+                                    if (rec._OnHold || (rec.PaymentAmount <= 0d && rec.PaymentRefId == 0))
                                         continue;
 
-                                    var paymRefId = rec.PaymentRefId != 0 && rec._UsedCachDiscount == 0 ? rec.PaymentRefId : -rec.PrimaryKeyId;
+                                    var includeCashDisc = rec._UsedCashDiscount != 0 && rec._PartialPaymentAmount == 0;
+                                    var paymRefId = rec.PaymentRefId != 0 && !includeCashDisc ? rec.PaymentRefId : -rec.PrimaryKeyId;
 
-                                    if (dictPaymTransfer.TryGetValue(paymRefId, out mergePaymentRefId)) 
+                                    CreditorTransPayment mergePaymentRefId;
+                                    if (dictPaymTransfer.TryGetValue(paymRefId, out mergePaymentRefId))
                                     {
-                                        mergePaymentRefId._PaymentAmount += rec._PaymentAmount;
-                                        mergePaymentRefId._UsedCachDiscount += rec._UsedCachDiscount;
-
+                                        mergePaymentRefId.MergedAmount += rec.PaymentAmount;
+                                        mergePaymentRefId._UsedCashDiscount += includeCashDisc ? rec._UsedCashDiscount : 0;
                                         mergePaymentRefId.settleTypeRowId = true;
-                                        mergePaymentRefId.rowNumbers.Append(';').Append(rec.PrimaryKeyId);
+                                        mergePaymentRefId.rowNumbers.Append(';').AppendNum(rec.PrimaryKeyId);
                                         mergePaymentRefId.invoiceNumbers.Append(';').Append(rec.InvoiceAN);
 
                                         mergePaymentRefId.hasBeenMerged = true;
@@ -422,28 +418,25 @@ namespace UnicontaClient.Pages.CustomPage
                                     {
                                         mergePaymentRefId = new CreditorTransPayment();
                                         StreamingManager.Copy(rec, mergePaymentRefId);
-                                        mergePaymentRefId._CurrencyLocal = rec._CurrencyLocal;
                                         mergePaymentRefId.PaymentRefId = paymRefId;
-                                        mergePaymentRefId._PaymentAmount = rec._PaymentAmount; 
-                                        mergePaymentRefId.invoiceNumbers = new StringBuilder();
-                                        mergePaymentRefId.invoiceNumbers.Append(rec.InvoiceAN);
-                                        
+                                        mergePaymentRefId.MergedAmount = rec.PaymentAmount; 
+                                        mergePaymentRefId.invoiceNumbers = new StringBuilder(rec.InvoiceAN);
                                         mergePaymentRefId.rowNumbers = new StringBuilder();
-                                        mergePaymentRefId.rowNumbers.Append(rec.PrimaryKeyId);
+                                        mergePaymentRefId.rowNumbers.AppendNum(rec.PrimaryKeyId);
                                         mergePaymentRefId.settleTypeRowId = true;
                                         
-                                        mergePaymentRefId._UsedCachDiscount = rec._UsedCachDiscount;
+                                        mergePaymentRefId._UsedCashDiscount = includeCashDisc ? rec._UsedCashDiscount : 0;
                                         dictPaymTransfer.Add(paymRefId, mergePaymentRefId);
                                     }
-                                    paymentListTransfer = dictPaymTransfer.Values.ToList();
                                 }
-                                if (paymentListTransfer == null)
+                                if (dictPaymTransfer.Count == 0)
                                 {
                                     busyIndicator.IsBusy = false;
                                     return;
                                 }
 
-                                foreach (var cTOpenClient in paymentListTransfer)
+                                var listLineClient = new List<Uniconta.DataModel.GLDailyJournalLine>(dictPaymTransfer.Count);
+                                foreach (var cTOpenClient in dictPaymTransfer.Values)
                                 {
                                     var creditor = cTOpenClient.Creditor;
                                     var lineclient = new GLDailyJournalLineClient();
@@ -456,11 +449,14 @@ namespace UnicontaClient.Pages.CustomPage
                                     lineclient._Account = cTOpenClient.Account;
                                     lineclient._OffsetAccount = cwLine.BankAccount;
                                     lineclient._Invoice = cTOpenClient.hasBeenMerged ? null : cTOpenClient.InvoiceAN;
-                                    lineclient._Dim1 = creditor._Dim1;
-                                    lineclient._Dim2 = creditor._Dim2;
-                                    lineclient._Dim3 = creditor._Dim3;
-                                    lineclient._Dim4 = creditor._Dim4;
-                                    lineclient._Dim5 = creditor._Dim5;
+                                    if (creditor != null)
+                                    {
+                                        lineclient._Dim1 = creditor._Dim1;
+                                        lineclient._Dim2 = creditor._Dim2;
+                                        lineclient._Dim3 = creditor._Dim3;
+                                        lineclient._Dim4 = creditor._Dim4;
+                                        lineclient._Dim5 = creditor._Dim5;
+                                    }
 
                                     if (cTOpenClient.settleTypeRowId)
                                     {
@@ -472,20 +468,20 @@ namespace UnicontaClient.Pages.CustomPage
                                         lineclient._Settlements = null;
                                     }
                                   
-                                    lineclient._UsedCachDiscount = cTOpenClient._UsedCachDiscount;
+                                    lineclient._UsedCachDiscount = cTOpenClient._UsedCashDiscount;
                                     lineclient._DocumentRef = cTOpenClient.DocumentRef;
                                     var curOpen = cTOpenClient._AmountOpenCur;
                                     if (curOpen != 0d && cTOpenClient.Currency.HasValue)
                                     {
                                         lineclient._Currency = (byte)cTOpenClient.Currency.Value;
-                                        lineclient.AmountCur = cTOpenClient._PaymentAmount;
-                                        if (cTOpenClient._PaymentAmount == -cTOpenClient._AmountOpen)
+                                        lineclient.AmountCur = cTOpenClient.PaymentAmount;
+                                        if (cTOpenClient.PaymentAmount == -cTOpenClient._AmountOpen)
                                             lineclient.Amount = -cTOpenClient._AmountOpen;
                                         else
-                                            lineclient.Amount = cTOpenClient._AmountOpen * cTOpenClient._PaymentAmount / curOpen; // payAmount different sign than curOpen, so no minus.
+                                            lineclient.Amount = cTOpenClient._AmountOpen * cTOpenClient.PaymentAmount / curOpen; // payAmount different sign than curOpen, so no minus.
                                     }
                                     else
-                                        lineclient.Amount = cTOpenClient._PaymentAmount;
+                                        lineclient.Amount = cTOpenClient.PaymentAmount;
 
                                     if (nextVoucherNumber != 0)
                                     {
@@ -504,7 +500,7 @@ namespace UnicontaClient.Pages.CustomPage
                                     else
                                     {
                                         if (nextVoucherNumber != 0)
-                                            numberserieApi.SetNumber(DJclient._NumberSerie, nextVoucherNumber-1);
+                                            numberserieApi.SetNumber(DJclient._NumberSerie, nextVoucherNumber - 1);
 
                                         var text = string.Concat(Uniconta.ClientTools.Localization.lookup("GenerateJournalLines"), "; ", Uniconta.ClientTools.Localization.lookup("Completed"),
                                             Environment.NewLine, string.Format(Uniconta.ClientTools.Localization.lookup("GoTo"), Uniconta.ClientTools.Localization.lookup("Journallines")), " ?");
@@ -522,21 +518,32 @@ namespace UnicontaClient.Pages.CustomPage
                          };
                     cwLine.Show();
                     break;
+                #endregion
                 case "RefreshGrid":
                     if (dgCreditorTranOpenGrid.HasUnsavedData)
                         Utility.ShowConfirmationOnRefreshGrid(dgCreditorTranOpenGrid);
 
-                    btnSerach_Click(null, null);
+                    BtnSearch();
                     setMergeUnMergePaym(false);
 
                     break;
 
-                case "Filter":
+                case "CreditorFilter":
                     if (dgCreditorTranOpenGrid.HasUnsavedData)
                         Utility.ShowConfirmationOnRefreshGrid(dgCreditorTranOpenGrid);
-
-                    gridRibbon_BaseActions(ActionType);
+                    if (creditorFilterDialog == null)
+                    {
+                        creditorFilterDialog = new CWServerFilter(api, typeof(CreditorClient), null, null, CreditorUserFields);
+                        creditorFilterDialog.Closing += creditorFilterDialog_Closing;
+                        creditorFilterDialog.Show();
+                    }
+                    else
+                        creditorFilterDialog.Show(true);
                     setMergeUnMergePaym(false);
+                    break;
+                case "ClearCreditorFilter":
+                    creditorFilterDialog = null;
+                    creditorFilterValues = null;
                     break;
 
                 default:
@@ -544,6 +551,18 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
             }
         }
+
+        public IEnumerable<PropValuePair> creditorFilterValues;
+        void creditorFilterDialog_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (creditorFilterDialog.DialogResult == true)
+            {
+                creditorFilterValues = creditorFilterDialog.PropValuePair;
+            }
+            e.Cancel = true;
+            creditorFilterDialog.Hide();
+        }
+
 
         protected override async void LoadCacheInBackGround()
         {
@@ -559,24 +578,8 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
 
-        public void CreateHeaderRow(StreamWriter Writer, List<string> dispProps, char seperator, char[] specialChar)
-        {
-            bool firstColumn = true;
-            foreach (var value in dispProps)
-            {
-                if (!firstColumn)
-                    Writer.Write(seperator);
-                else
-                    firstColumn = false;
-                CSVHelper.writeString(Writer, value, specialChar);
-            }
-            Writer.WriteLine();
-        }
-
-
         ItemBase ibaseExpandGroups;
         ItemBase ibaseCollapseGroups;
-
         void GetExpandAndCollapseMenuItem()
         {
             RibbonBase rb = (RibbonBase)localMenu.DataContext;
@@ -619,7 +622,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                 dgCreditorTranOpenGrid.GroupBy("MergePaymId");
                 var cols = dgCreditorTranOpenGrid.Columns;
-                cols.GetColumnByName("PaymentFormat").AllowFocus = false;
+                cols.GetColumnByName("PaymentFormat").AllowFocus = false; 
                 cols.GetColumnByName("PaymentMethod").AllowFocus = false;
                 cols.GetColumnByName("PaymentId").AllowFocus = false;
                 cols.GetColumnByName("SWIFT").AllowFocus = false;
@@ -634,7 +637,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (source != null)
                 { 
                     foreach (var rec in source)
-                        rec._MergePaymId = null;
+                        rec.MergePaymId = null;
                 }
 
                 ibaseMergePaym.Caption = Localization.lookup("MergePayments");
@@ -665,57 +668,14 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        public void ExportDataGrid(StreamWriter writer, char seperator)
-        {
-            var source = dgCreditorTranOpenGrid.GetVisibleRows();
-            if (source == null || source.Count == 0)
-                return;
-            List<string> Headers = new List<string>(15);
-            var propt = new List<PropertyInfo>(15);
-            var type = (CreditorTransOpenClient)source[0];
-
-            foreach (var prop in type.GetType().GetProperties())
-            {
-                var Name = prop.Name;
-                if (Name == "Account" || Name == "AmountOpen" || Name == "PaymentMethod" || Name == "PaymentId" ||
-                        Name == "DueDate" || Name == "Comment" || Name == "Voucher" || Name == "Invoice" || Name == "InvoiceAN" ||
-                        Name == "Amount" || Name == "TransType" || Name == "Currency" || Name == "PaymentDate" || Name == "Message")
-                {
-                    propt.Add(prop);
-                    Headers.Add(UtilFunctions.GetDisplayNameFromPropertyInfo(prop));
-                }
-            }
-
-            char[] specialChar = new char[] { '"', seperator, '\n' };
-            CreateHeaderRow(writer, Headers, seperator, specialChar);
-            //create row
-            foreach (CreditorTransOpenClient data in source)
-            {
-                var t = data.GetType();
-                bool firstColumn = true;
-                foreach (PropertyInfo prop in propt)
-                {
-                    string value = Convert.ToString(prop.GetValue(data, null));
-
-                    if (!firstColumn)
-                        writer.Write(seperator);
-                    else
-                        firstColumn = false;
-                    CSVHelper.writeString(writer, value, specialChar);
-                }
-                writer.WriteLine();
-            }
-        }
-
         private async void GeneratePaymentFile()
         {
-            CWImportPayment cwwin = new CWImportPayment(api);
-//TODO:Overvej hvor WPF skal sættes
-#if !SILVERLIGHT 
-            var paymentReference = new PaymentReference();
-            await paymentReference.PaymentRefSequence(api);
+            var savetask = saveGrid();
+            if (savetask != null)
+                await savetask;
 
-            cwwin.Closing += delegate
+            CWImportPayment cwwin = new CWImportPayment(api);
+            cwwin.Closing += async delegate
             {
                 if (cwwin.DialogResult != true)
                     return;
@@ -728,183 +688,120 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     ExpandCollapseAllGroups();
 
-                    List<CreditorTransPayment> ListCredTransPaym = new List<CreditorTransPayment>();
-                    int index = 0;
-                    foreach (var rec in (IEnumerable<CreditorTransPayment>)dgCreditorTranOpenGrid.ItemsSource)
-                    {
-                        int rowHandle = dgCreditorTranOpenGrid.GetRowHandleByListIndex(index);
-                        index++;
-                        if (!dgCreditorTranOpenGrid.IsRowVisible(rowHandle) || rec._OnHold || rec._Paid || (rec._PaymentAmount <= 0d && !doMergePaym) || rec._PaymentFormat != paymentFormat)
-                            continue;
-
-                        ListCredTransPaym.Add(rec);
-                    }
-
-                    if (ListCredTransPaym.Count == 0)
-                    {
-                        UnicontaMessageBox.Show(Localization.lookup("NoRecordSelected"), Uniconta.ClientTools.Localization.lookup("Error"));
-                        return;
-                    }
-
-                    IEnumerable<CreditorTransPayment> queryPaymentTrans = ListCredTransPaym.AsEnumerable();
-                    if (ValidatePayments(queryPaymentTrans, paymentFormatRec))
+                    var credTransPaymLst = dgCreditorTranOpenGrid.GetVisibleRows() as IList<CreditorTransPayment>;
+                    if (await ValidatePayments(credTransPaymLst, paymentFormatRec))
                     {
                         try
                         {
                             List<CreditorTransPayment> paymentListMerged = null;
                             var dictPaym = new Dictionary<String, CreditorTransPayment>();
-                            CreditorTransPayment mergePayment; 
-                            
-                            var paymNumSeqRefId = paymentReference.NumberSeqRefId;
+                            CreditorTransPayment mergePayment;
+
+                            var credTransPaymSelectedLst = credTransPaymLst.Where(s => s.ErrorInfo == BaseDocument.VALIDATE_OK);
+
+                            TransactionAPI tranApi = new TransactionAPI(api);
+                            var uniqueEndToEndId = (int)await tranApi.GetPaymentId(credTransPaymSelectedLst.Count());
+                            var uniqueFileId = uniqueEndToEndId;
 
                             if (doMergePaym)
-                                queryPaymentTrans = queryPaymentTrans.OrderBy(x => x.MergePaymId).ToList();
+                                credTransPaymSelectedLst = credTransPaymSelectedLst.OrderBy(x => x.MergePaymId).ToList();
 
-                            foreach (var rec in queryPaymentTrans.Where(s => s._ErrorInfo == BaseDocument.VALIDATE_OK)) 
+                            foreach (var rec in credTransPaymSelectedLst)
                             {
                                 if (doMergePaym)
                                 {
-                                    if (dictPaym.TryGetValue(rec._MergePaymId, out mergePayment))
+                                    if (dictPaym.TryGetValue(rec.MergePaymId, out mergePayment))
                                     {
-                                        mergePayment._PaymentAmount += rec._PaymentAmount;
+                                        mergePayment.MergedAmount += rec.PaymentAmount;
                                         mergePayment.invoiceNumbers.Append(',').Append(rec.InvoiceAN);
+
+                                        mergePayment.RgltryRptgCode = mergePayment.RgltryRptgCode == 0 ? rec.RgltryRptgCode : mergePayment.RgltryRptgCode;
+                                        mergePayment.RgltryRptgText = mergePayment.RgltryRptgText == null ? rec.RgltryRptgText : mergePayment.RgltryRptgText;
 
                                         if (paymentFormatRec._PaymentGrouping == PaymentGroupingType.All)
                                             mergePayment._PaymentDate = rec._PaymentDate < mergePayment._PaymentDate ? rec._PaymentDate : mergePayment._PaymentDate;
 
-                                        if (rec._MergePaymId == StandardPaymentFunctions.MERGEID_SINGLEPAYMENT)
+                                        if (rec.MergePaymId == StandardPaymentFunctions.MERGEID_SINGLEPAYMENT)
                                         {
-                                            paymNumSeqRefId++;
-                                            rec.PaymentRefId = paymNumSeqRefId;
+                                            uniqueEndToEndId++;
+                                            rec.PaymentRefId = uniqueEndToEndId;
                                         }
                                         else
-                                            rec.PaymentRefId = paymNumSeqRefId;
+                                            rec.PaymentRefId = mergePayment.PaymentRefId;
                                     }
                                     else
                                     {
-                                        paymNumSeqRefId++;
-                                        rec.PaymentRefId = paymNumSeqRefId;
+                                        uniqueEndToEndId++;
+                                        rec.PaymentRefId = uniqueEndToEndId;
 
                                         mergePayment = new CreditorTransPayment();
                                         StreamingManager.Copy(rec, mergePayment);
-                                        mergePayment._MergePaymId = rec._MergePaymId;
-                                        mergePayment._CurrencyLocal = rec._CurrencyLocal;
+                                        mergePayment.MergePaymId = rec.MergePaymId;
                                         mergePayment.ISOPaymentType = rec.ISOPaymentType;
                                         mergePayment.PaymentRefId = rec._PaymentRefId;
-                                        mergePayment.invoiceNumbers = new StringBuilder();
-                                        mergePayment.invoiceNumbers.Append(rec.InvoiceAN);
-                                        mergePayment._PaymentAmount = rec._PaymentAmount;
-                                        mergePayment._ErrorInfo = rec._ErrorInfo;
+                                        mergePayment.invoiceNumbers = new StringBuilder(rec.InvoiceAN);
+                                        mergePayment.MergedAmount = rec.PaymentAmount;
+                                        mergePayment.ErrorInfo = rec.ErrorInfo;
+                                        mergePayment.RgltryRptgCode = rec.RgltryRptgCode;
+                                        mergePayment.RgltryRptgText = rec.RgltryRptgText;
 
-                                        dictPaym.Add(rec._MergePaymId, mergePayment);
+
+                                        dictPaym.Add(rec.MergePaymId, mergePayment);
                                     }
-                                    paymentListMerged = dictPaym.Values.ToList();
                                 }
                                 else
-                                {
-                                    paymNumSeqRefId++;
-                                    rec.PaymentRefId = paymNumSeqRefId;
-                                }
+                                    rec.PaymentRefId = uniqueEndToEndId++;
                             }
+
+                            paymentListMerged = dictPaym.Values.ToList();
 
                             List<CreditorTransPayment> paymentList = null;
                             if (doMergePaym)
                             {
                                 foreach (var rec in paymentListMerged)
                                 {
-                                    if (rec._PaymentAmount <= 0)
+                                    if (rec.PaymentAmount <= 0)
                                     {
-                                        rec._MergePaymId = Localization.lookup("Excluded");
+                                        rec.MergePaymId = Localization.lookup("Excluded");
 
-                                        foreach (var recTrans in queryPaymentTrans.Where(s => s.PaymentRefId == rec.PaymentRefId))
+                                        foreach (var recTrans in credTransPaymSelectedLst.Where(s => s.PaymentRefId == rec.PaymentRefId))
                                         {
-                                            recTrans._ErrorInfo = "Merged amount is negative or zero";
-                                            recTrans._MergePaymId = Localization.lookup("Excluded");
-                                            recTrans.NotifyErrorSet();
+                                            recTrans.ErrorInfo = string.Concat(Localization.lookup("MergePayments"), " <= 0"); 
+                                            recTrans.MergePaymId = Localization.lookup("Excluded");
                                         }
                                     }
                                 }
 
-                                paymentList = paymentListMerged.Where(s => s._MergePaymId != Localization.lookup("Excluded") && s.MergePaymId != StandardPaymentFunctions.MERGEID_SINGLEPAYMENT).ToList();
-                                foreach (var s in queryPaymentTrans)
+                                paymentList = paymentListMerged.Where(s => s.MergePaymId != Localization.lookup("Excluded") && s.MergePaymId != StandardPaymentFunctions.MERGEID_SINGLEPAYMENT).ToList();
+                                foreach (var s in credTransPaymSelectedLst)
                                 {
                                     if (s.MergePaymId == StandardPaymentFunctions.MERGEID_SINGLEPAYMENT)
                                         paymentList.Add(s);
                                 }
                             }
                             else
-                            {
-                                paymentList = queryPaymentTrans.Where(s => s._ErrorInfo == BaseDocument.VALIDATE_OK).ToList();
-                            }
- 
-                            var paymentListTotal = queryPaymentTrans.Where(s => s._ErrorInfo == BaseDocument.VALIDATE_OK).ToList();
+                                paymentList = credTransPaymSelectedLst.ToList();
 
-                            if (paymMethod == ExportFormatType.CSV || paymMethod == ExportFormatType.NETS_Norge)
-                            {
-                                var sfd = UtilDisplay.LoadSaveFileDialog;
-                                if (cwwin.FileOption == "CSV")
-                                {
-                                    sfd.DefaultExt = "csv";
-                                    sfd.Filter = "CSV Files (*.csv)|*.csv|All files (*.*)|*.*";
-                                    sfd.FilterIndex = 1;
-                                }
-                                else
-                                    sfd.Filter = UtilFunctions.GetFilteredExtensions(FileextensionsTypes.TXT);
-
-                                bool? userClickedSave = sfd.ShowDialog();
-
-                                if (userClickedSave == true)
-                                {
-                                    using (Stream stream = File.Create(sfd.FileName))
-                                    {
-                                        var writer = new StreamWriter(stream);
-                                        switch (paymMethod)
-                                        {
-                                            case ExportFormatType.CSV:
-                                                char seperator = UtilFunctions.GetDefaultDeLimiter();
-                                                ExportDataGrid(writer, seperator);
-                                                break;
-                                            case ExportFormatType.NETS_Norge:
-                                                var err = NETSNorge.GenerateFile(api, CreditorCache, paymentList, paymentFormatRec, stream);
-                                                if (err != ErrorCodes.Succes)
-                                                    UtilDisplay.ShowErrorCode(err);
-                                                break;
-                                        }
-
-                                        writer.Flush();
-                                    }
-                                }
-                            }
+                            bool ret = false;
+                            if (paymMethod == ExportFormatType.CSV)
+                                ret = true;
                             else if (paymMethod == ExportFormatType.Nordea_CSV)
-                            {
-                                NordeaPaymentFormat.GenerateFile(paymentList, paymentListTotal, api, paymentFormatRec, paymentReference, BankAccountCache, CreditorCache, glJournalGenerated);
-                            }
+                                ret = NordeaPaymentFormat.GenerateFile(paymentList, api.CompanyEntity, paymentFormatRec, BankAccountCache, CreditorCache, glJournalGenerated);
                             else if (paymMethod == ExportFormatType.DanskeBank_CSV)
-                            {
-                                DanskeBankPayFormat.GenerateFile(paymentList, paymentListTotal, api, paymentFormatRec, paymentReference, BankAccountCache, CreditorCache, glJournalGenerated);
-                            }
+                                ret = DanskeBankPayFormat.GenerateFile(paymentList, api.CompanyEntity, paymentFormatRec, BankAccountCache, CreditorCache, glJournalGenerated);
                             else if (paymMethod == ExportFormatType.BankData)
-                            {
-                                BankDataPayFormat.GenerateFile(paymentList, paymentListTotal, api, paymentFormatRec, paymentReference, BankAccountCache, CreditorCache, glJournalGenerated);
-                            }
+                                ret = BankDataPayFormat.GenerateFile(paymentList, api.CompanyEntity, paymentFormatRec, BankAccountCache, CreditorCache, glJournalGenerated);
                             else if (paymMethod == ExportFormatType.SDC)
-                            {
-                                SDCPayFormat.GenerateFile(paymentList, paymentListTotal, api, paymentFormatRec, paymentReference, BankAccountCache, CreditorCache, glJournalGenerated);
-                            }
+                                ret = SDCPayFormat.GenerateFile(paymentList, api.CompanyEntity, paymentFormatRec, BankAccountCache, CreditorCache, glJournalGenerated);
                             else if (paymMethod == ExportFormatType.BEC_CSV)
-                            {
-                                BECPayFormat.GenerateFile(paymentList, paymentListTotal, api, paymentFormatRec, paymentReference, BankAccountCache, CreditorCache, glJournalGenerated);
-                            }
+                                ret = BECPayFormat.GenerateFile(paymentList, api.CompanyEntity, paymentFormatRec, BankAccountCache, CreditorCache, glJournalGenerated);
                             else if (paymMethod == ExportFormatType.ISO20022_DK || paymMethod == ExportFormatType.ISO20022_NL || paymMethod == ExportFormatType.ISO20022_NO || paymMethod == ExportFormatType.ISO20022_DE ||
-                                     paymMethod == ExportFormatType.ISO20022_EE || paymMethod == ExportFormatType.ISO20022_SE || paymMethod == ExportFormatType.ISO20022_UK || paymMethod == ExportFormatType.ISO20022_LT)
-                            {
-                                GeneratePaymentFileISO20022(paymentList, paymentListTotal, paymentFormatRec, paymentReference);
-                            }
-                            //else if (paymMethod == ExportFormatType.BankConnect)
-                            //{
-                            //    SendPaymentFileToBankConnect(paymentList, paymentListTotal, paymentFormatRec, paymentReference);
-                            //}
+                                     paymMethod == ExportFormatType.ISO20022_EE || paymMethod == ExportFormatType.ISO20022_SE || paymMethod == ExportFormatType.ISO20022_UK || paymMethod == ExportFormatType.ISO20022_LT ||
+                                     paymMethod == ExportFormatType.ISO20022_CH)
+                                ret = GeneratePaymentFileISO20022(paymentList, paymentFormatRec, uniqueFileId);
 
+                            if (ret == true)
+                                UpdateCreatedPayments(credTransPaymSelectedLst);
                         }
                         catch (Exception ex)
                         {
@@ -918,11 +815,9 @@ namespace UnicontaClient.Pages.CustomPage
                 }
                 };
                 cwwin.Show();
-#endif
 
         }
 
-#if !SILVERLIGHT
         void PaymStatusReport()
         {
             CWPaymStatusReport cwwin = new CWPaymStatusReport(api);
@@ -978,12 +873,12 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 CWMergePayment cwwin = new CWMergePayment(this.api);
 
-                cwwin.Closing += delegate
+                cwwin.Closing += async delegate
                 {
                     if (cwwin.DialogResult == true)
                     {
-                        CreditorPaymentsMerge CredPaymMerge = new CreditorPaymentsMerge();
-                        if (CredPaymMerge.MergePayments(api.CompanyEntity, dgCreditorTranOpenGrid, cwwin.PaymentFormat, BankAccountCache))
+                        CreditorPaymentsMerge CredPaymMerge = new CreditorPaymentsMerge(api);
+                        if (await CredPaymMerge.MergePayments(dgCreditorTranOpenGrid, cwwin.PaymentFormat, BankAccountCache))
                             setMergeUnMergePaym(doMergePaym);
                     }
                 };
@@ -1005,16 +900,14 @@ namespace UnicontaClient.Pages.CustomPage
             }
             return null;
         }
-#endif
+
         private async void GeneratePluginPaymentFile(CreditorPaymentFormat PaymentSetup, Uniconta.DataModel.UserPlugin userPlugin)
         {
             Type plugin = null;
             if (userPlugin == null)
                 return;
-#if !SILVERLIGHT
             else
                 plugin = await LoadPaymentPlugin(userPlugin, api);
-#endif
             if (plugin == null)
                 return;
             var paymentPluginObj = Activator.CreateInstance(plugin) as ICreditorPaymentFormatPlugin;
@@ -1039,11 +932,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 try
                 {
-#if !SILVERLIGHT
                     using (Stream stream = File.Create(sfd.FileName))
-#else
-                    using (Stream stream = sfd.OpenFile())
-#endif
                     {
                         var errorCode = paymentPluginObj.Generate(Trans, PaymentSetup, stream);
                         stream.Flush();
@@ -1063,53 +952,26 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-#if !SILVERLIGHT
-        private void CallValidatePayment()
+        private async void CallValidatePayment()
         {
+            var savetask = saveGrid();
+            if (savetask != null)
+                await savetask;
+
             CWValidatePayment cwwin = new CWValidatePayment(api);
 
             cwwin.Closing += delegate
             {
                 if (cwwin.DialogResult == true)
-                {
-                    ExpandCollapseAllGroups();
-
-                    List<CreditorTransPayment> ListCredTransPaym = new List<CreditorTransPayment>();
-                    int index = 0;
-                    foreach (var rec in (IEnumerable<CreditorTransPayment>)dgCreditorTranOpenGrid.ItemsSource)
-                    {
-                        int rowHandle = dgCreditorTranOpenGrid.GetRowHandleByListIndex(index);
-                        index++;
-                        rec._ErrorInfo = string.Empty;
-                        rec.NotifyErrorSet();
-                        if (!dgCreditorTranOpenGrid.IsRowVisible(rowHandle) || rec._OnHold || rec._Paid || (rec._PaymentAmount <= 0d && !doMergePaym) || rec._PaymentFormat != cwwin.PaymentFormat.Format)
-                            continue;
-
-                        ListCredTransPaym.Add(rec);
-                    }
-
-                    IEnumerable<CreditorTransPayment> queryPaymentTrans = ListCredTransPaym.AsEnumerable();
-
-                    ValidatePayments(queryPaymentTrans, cwwin.PaymentFormat, true);
-                }
+                    ValidatePayments(dgCreditorTranOpenGrid.GetVisibleRows() as IList<CreditorTransPayment>, cwwin.PaymentFormat, true);
             };
             cwwin.Show();
         }
 
-        private bool ValidatePayments(IEnumerable<CreditorTransPayment> queryPaymentTrans, CreditorPaymentFormat credPaymFormat, bool validateOnly = false)
+        private async Task<bool> ValidatePayments(IList<CreditorTransPayment> credTransPaymLst, CreditorPaymentFormat credPaymFormat, bool validateOnly = false)
         {
             var paymentISO20022PreValidate = new PaymentISO20022PreValidate();
-            var paymentISO20022Validate = new PaymentISO20022Validate();
-
-            var paymentformat = (ExportFormatType)credPaymFormat._ExportFormat;
-            if (glJournalGenerated && (paymentformat == ExportFormatType.ISO20022_DK || paymentformat == ExportFormatType.ISO20022_NL ||paymentformat == ExportFormatType.ISO20022_NO || paymentformat == ExportFormatType.ISO20022_DE ||
-                                       paymentformat == ExportFormatType.ISO20022_EE || paymentformat == ExportFormatType.ISO20022_SE || paymentformat == ExportFormatType.ISO20022_UK || paymentformat == ExportFormatType.ISO20022_LT))
-            {
-                UnicontaMessageBox.Show(string.Format("Payment format '{0}' is not available for GL Journal generated payments.", credPaymFormat._ExportFormat), Uniconta.ClientTools.Localization.lookup("Warning"));
-                return false;
-            }
-
-            var preValidateRes = paymentISO20022PreValidate.PreValidateISO20022(api.CompanyEntity, BankAccountCache, credPaymFormat);
+            var preValidateRes = paymentISO20022PreValidate.PreValidateISO20022(api.CompanyEntity, BankAccountCache, credPaymFormat, glJournalGenerated);
 
             if (preValidateRes.HasErrors)
             {
@@ -1129,40 +991,46 @@ namespace UnicontaClient.Pages.CustomPage
             else
             {
                 var countErr = 0;
-                paymentISO20022Validate.CompanyBank(credPaymFormat);
-
-                foreach (var rec in queryPaymentTrans)
+                var paymentISO20022Validate = new PaymentISO20022Validate(api, credPaymFormat);
+                busyIndicator.IsBusy = true;
+                foreach (var rec in credTransPaymLst)
                 {
-                    rec._ErrorInfo = string.Empty;
+                    rec.ErrorInfo = null;
+                    if (rec._OnHold || rec._Paid || (rec.PaymentAmount <= 0d && !doMergePaym) || rec._PaymentFormat != credPaymFormat._Format) 
+                        continue;
 
-                    if (doMergePaym && rec._MergePaymId == null)
+                    if (doMergePaym && rec.MergePaymId == null)
                     {
                         countErr++;
-                        rec._ErrorInfo = "Merge of payments has failed";
-                        rec.NotifyErrorSet();
+                        rec.ErrorInfo = "Merge of payments has failed";
                     }
                     else
                     {
-                        var validateRes = paymentISO20022Validate.ValidateISO20022(api.CompanyEntity, rec, BankAccountCache, glJournalGenerated);
-
-                        if (validateRes.HasErrors)
+                        if (credPaymFormat._ExportFormat != (byte)ExportFormatType.CSV)
                         {
-                            countErr++;
-                            foreach (CheckError error in validateRes.CheckErrors)
+                            var validateRes = await paymentISO20022Validate.ValidateISO20022(rec, BankAccountCache, glJournalGenerated);
+
+                            if (validateRes.HasErrors)
                             {
-                                rec._ErrorInfo += error.ToString() + "\n";
+                                countErr++;
+                                foreach (CheckError error in validateRes.CheckErrors)
+                                {
+                                    rec.ErrorInfo += rec.ErrorInfo != null ? Environment.NewLine : null;
+                                    rec.ErrorInfo += error.ToString();
+                                }
+                            }
+                            else
+                            {
+                                rec.ErrorInfo = BaseDocument.VALIDATE_OK;
                             }
                         }
                         else
-                        {
-                            rec._ErrorInfo = BaseDocument.VALIDATE_OK;
-                        }
+                            rec.ErrorInfo = BaseDocument.VALIDATE_OK;
                     }
-
-                    rec.NotifyErrorSet();
                 }
+                busyIndicator.IsBusy = false;
 
-                if (queryPaymentTrans.Where(s => s._ErrorInfo == BaseDocument.VALIDATE_OK).Any() == false && validateOnly == false)
+                if (!validateOnly && !credTransPaymLst.Any(s => s.ErrorInfo == BaseDocument.VALIDATE_OK))
                 {
                     UnicontaMessageBox.Show(Localization.lookup("NoRecordSelected"), Uniconta.ClientTools.Localization.lookup("Error"));
                     return false;
@@ -1180,13 +1048,11 @@ namespace UnicontaClient.Pages.CustomPage
             return true;
         }
 
-
-        private void GeneratePaymentFileISO20022(IEnumerable<CreditorTransPayment> paymentList, IEnumerable<CreditorTransPayment> paymentListTotal, CreditorPaymentFormat credPaymFormat, PaymentReference paymentReference)
+        private bool GeneratePaymentFileISO20022(IEnumerable<CreditorTransPayment> paymentList, CreditorPaymentFormat credPaymFormat, int uniqueFileId)
         {
             SaveFileDialog saveDialog = null;
-            var paymentISO20022 = new PaymentISO20022();
-      
-            var result = paymentISO20022.GenerateISO20022(api.CompanyEntity, paymentList, BankAccountCache, credPaymFormat, paymentReference.NumberSeqFileId, doMergePaym);
+            var paymentISO20022 = new PaymentISO20022(api);
+            var result = paymentISO20022.GenerateISO20022(paymentList, BankAccountCache, credPaymFormat, uniqueFileId, doMergePaym);
                     
             if (result.NumberOfPayments != 0)
             {
@@ -1196,31 +1062,46 @@ namespace UnicontaClient.Pages.CustomPage
                 bool? dialogResult = saveDialog.ShowDialog();
                 if (dialogResult == true)
                 {
-                    string filename = null;
-                    filename = saveDialog.FileName;
-                   
+                    var filename = saveDialog.FileName;
                     result.Document.DocumentElement.SetAttribute(BaseDocument.XMLNS_XSI, BaseDocument.XMLNS_XSI_VALUE);
-               
+
                     using (TextWriter sw = new StreamWriter(filename, false, result.Encoding))
                     {
                         result.Document.Save(sw);
                     }
-
-                    paymentReference.InsertPaymentReferenceTask(paymentList.Where(s => s._ErrorInfo == BaseDocument.VALIDATE_OK).ToList(),
-                                                                paymentListTotal.Where(s => s._ErrorInfo == BaseDocument.VALIDATE_OK).ToList(), api);
+                    return true;
                 }
             }
             else
             {
                 CWMessageBox cwMessage = new CWMessageBox("There are no payments!\nPlease check the System info column.");
                 cwMessage.Show();
+                return false;
             }
-        }
-#endif
 
-        private StringBuilder calculateFIKchecksum(string paymId)
+            return false;
+        }
+
+        void UpdateCreatedPayments(IEnumerable<CreditorTransPayment> paymentList)
         {
-            var sb = new StringBuilder(40);
+            var lstTransPaym = new List<CreditorTransPayment>();
+            foreach (var rec in paymentList)
+            {
+                if (rec.ErrorInfo != BaseDocument.VALIDATE_OK)
+                    continue;
+
+                rec.ErrorInfo = Uniconta.ClientTools.Localization.lookup("Paid");
+                rec.Paid = true;
+                lstTransPaym.Add(rec);
+            }
+            if (lstTransPaym.Count > 0)
+                api.Update(lstTransPaym);
+        }
+
+        #region Build FIK number
+        private StringBuilderReuse CalculateFIKchecksum(string paymId)
+        {
+            var sb = StringBuilderReuse.Create();
             sb.Append(paymId);
 
             int Id;
@@ -1240,12 +1121,12 @@ namespace UnicontaClient.Pages.CustomPage
             if (Id == 10)
                 Id = 0;
 
-            sb.Append(Id);
+            sb.AppendNum(Id);
 
             return sb;
         }
 
-        private void buildPaymentIdFIK(CreditorTransPayment rec, string transPaymentId, string creditorPaymId)
+        private void BuildPaymentIdFIK(CreditorTransPayment rec, string transPaymentId, string creditorPaymId)
         {
             if (transPaymentId != null && creditorPaymId != null)
             {
@@ -1287,44 +1168,26 @@ namespace UnicontaClient.Pages.CustomPage
                     removeLast = true;
                 }
 
-                StringBuilder FIKString;
-
                 var paymIdMask = string.Empty;
                 int accountIndex = OCRMask.IndexOf('+');
                 if (accountIndex > 0)
-                {
                     paymIdMask = OCRMask.Substring(0, accountIndex);
-                }
-                else
-                {
-                    rec._ErrorInfo = "The FIK mask doesn't have a valid format.";
-                    rec.NotifyErrorSet();
-                    return;
-                }
 
+                var invoiceNumberStr = NumberConvert.ToString(rec.Invoice);
                 int maskIndexStart = paymIdMask.IndexOf('N');
-                if (maskIndexStart == -1)
+                if (accountIndex <= 0 || maskIndexStart == -1 || invoiceNumberStr == "0")
                 {
-                    rec._ErrorInfo = "The FIK mask doesn't have a valid format.";
-                    rec.NotifyErrorSet();
+                    rec.ErrorInfo = Localization.lookup("FIKFormatNotValid");
                     return;
                 }
-
+                
                 var maskIndexEnd = 0;
                 for (int i = maskIndexStart; i < paymIdMask.Length; i++)
                 {
                     if (paymIdMask[i] == 'N')
                         maskIndexEnd = i;
                 }
-
-                var invoiceNumberStr = NumberConvert.ToString(rec.Invoice);
-                if (invoiceNumberStr == "0")
-                {
-                    rec._ErrorInfo = "The FIK payment id can't be build due to a missing invoice number.";
-                    rec.NotifyErrorSet();
-                    return;
-                }
-
+              
                 int invoiceMaskLength = maskIndexEnd - maskIndexStart + 1;
                 if (invoiceMaskLength < invoiceNumberStr.Length)
                 {
@@ -1339,7 +1202,7 @@ namespace UnicontaClient.Pages.CustomPage
                 invoiceNumberMask = invoiceNumberMask.PadLeft(invoiceMaskLength, 'N');
                 paymIdMask = paymIdMask.Replace(invoiceNumberMask, invoiceNumberStr);
 
-                FIKString = calculateFIKchecksum(paymIdMask);
+                var FIKString = CalculateFIKchecksum(paymIdMask);
                 var fikAccount = OCRMask.Remove(0, accountIndex + 1);
 
                 FIKString.Append(" +").Append(fikAccount);
@@ -1347,20 +1210,39 @@ namespace UnicontaClient.Pages.CustomPage
             }
             //FIK PaymentId mask is used <<
         }
+        #endregion
 
-
-        void LoadPayments() { LoadPayments((IEnumerable<CreditorTransPayment>)dgCreditorTranOpenGrid.ItemsSource); }
-        internal void LoadPayments(IEnumerable<CreditorTransPayment> lst)
+        private async void BtnSearch()
         {
+            SetBusy();
+
+            if (txtDateFrm.Text == string.Empty)
+                fromDate = DateTime.MinValue;
+            else
+                fromDate = txtDateFrm.DateTime.Date;
+
+            if (txtDateTo.Text == string.Empty)
+                toDate = DateTime.MinValue;
+            else
+                toDate = txtDateTo.DateTime.Date;
+
+            var rapi = new Uniconta.API.DebtorCreditor.ReportAPI(api);
+            var t = rapi.GetPaymentTrans(new CreditorTransPayment(), fromDate, toDate, creditorFilterValues);
+            var lst = (CreditorTransPayment[])await t;
+
             if (lst == null || CreditorCache == null)
+            {
+                ClearBusy();
                 return;
+            }
 
             var today = BasePage.GetSystemDefaultDate();
-            var company = api.CompanyEntity;
+            var company = rapi.CompanyEntity;
             var CountryId = company._CountryId;
 
             foreach (var rec in lst)
             {
+               
                 var cred = (Uniconta.DataModel.Creditor)CreditorCache.Get(rec.Account);
                 if (cred == null)
                     continue;
@@ -1384,7 +1266,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (paymFormatClient == null)
                     paymFormatClient = (CreditorPaymentFormat)PaymentFormatCache?.Get(rec._PaymentFormat);
 
-                if (CountryId == CountryCode.Norway || CountryId == CountryCode.Estonia)
+                if (paymFormatClient != null && (paymFormatClient._ExportFormat == (byte)ExportFormatType.ISO20022_SE || paymFormatClient._ExportFormat == (byte)ExportFormatType.ISO20022_NO || paymFormatClient._ExportFormat == (byte)ExportFormatType.ISO20022_EE))
                 {
                     if (cred != null)
                     {
@@ -1394,6 +1276,8 @@ namespace UnicontaClient.Pages.CustomPage
                                 creditorPaymId = string.Empty; //Norway PaymentId is used for Kid-No when PaymentType=VendorBankAccount
                             else if (cred._PaymentMethod == PaymentTypes.IBAN && CountryId == CountryCode.Estonia && cred._Country == CountryCode.Estonia)
                                 creditorPaymId = string.Empty; //Estonia PaymentId is used for Payment Reference for Domestic payments  
+                            else if ((cred._PaymentMethod == PaymentTypes.PaymentMethod3 || cred._PaymentMethod == PaymentTypes.PaymentMethod5) && CountryId == CountryCode.Sweden)
+                                creditorPaymId = string.Empty; //Norway PaymentId is used for OCR-No when PaymentType=PaymentMethod3
                             else
                                 creditorPaymId = cred._PaymentId;
 
@@ -1426,13 +1310,9 @@ namespace UnicontaClient.Pages.CustomPage
                     var transPaymentId = rec._PaymentId;
 
                     if (rec._PaymentMethod == PaymentTypes.PaymentMethod3 || rec._PaymentMethod == PaymentTypes.PaymentMethod4 || rec._PaymentMethod == PaymentTypes.PaymentMethod5 || rec._PaymentMethod == PaymentTypes.PaymentMethod6)
-                    {
-                        buildPaymentIdFIK(rec, transPaymentId, creditorPaymId);
-                    }
+                        BuildPaymentIdFIK(rec, transPaymentId, creditorPaymId);
                     else
-                    {
                         rec._PaymentId = (creditorPaymId != transPaymentId && transPaymentId != null) ? transPaymentId : creditorPaymId;
-                    }
                 }
 
                 if (rec._SWIFT == null)
@@ -1446,70 +1326,22 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     var paymDate = rec._PaymentDate == DateTime.MinValue ? rec._DueDate : rec._PaymentDate;
                     rec._PaymentDate = today > paymDate ? today : paymDate;
-#if !SILVERLIGHT
                     if (paymFormatClient != null && paymFormatClient._PaymentAction != NoneBankDayAction.None)
                             rec._PaymentDate = Uniconta.DirectDebitPayment.Common.AdjustToNextBankDay(CountryId, rec._PaymentDate, paymFormatClient._PaymentAction == NoneBankDayAction.After ? true : false);
-#endif
-                }
-                if (rec.Currency != null)
-                    rec._CurrencyLocal = AppEnums.Currencies.Values[(int)rec.Currency.Value];
-                else
-                    rec._CurrencyLocal = AppEnums.Currencies.Values[company._Currency];
-                rec.NotifyPropertyChanged("CurrencyLocal");
-
-                if (rec.Trans._Currency != 0)
-                {
-                    rec._PaymentAmount = -rec._AmountOpenCur;
-                    rec._RemainingAmount = -rec._AmountOpenCur;
-                    rec._InvoiceAmount = -rec.Trans._AmountCur;
-                }
-                else
-                {
-                    rec._PaymentAmount = -rec._AmountOpen;
-                    rec._RemainingAmount = -rec._AmountOpen;
-                    rec._InvoiceAmount = -rec.Trans._Amount;
                 }
 
                 if (rec._CashDiscount != 0d && today <= rec._CashDiscountDate)
                 {
-                    rec._UsedCachDiscount = rec._CashDiscount;
-                    rec._PaymentAmount -= Math.Abs(rec._UsedCachDiscount);
+                    rec._UsedCashDiscount = rec._UsedCashDiscount != 0 ? rec._UsedCashDiscount : rec._CashDiscount;
                     rec._PaymentDate = rec._CashDiscountDate;
-#if !SILVERLIGHT
                     if (paymFormatClient != null && paymFormatClient._PaymentAction != NoneBankDayAction.None)
                         rec._PaymentDate = Uniconta.DirectDebitPayment.Common.AdjustToNextBankDay(CountryId, rec._PaymentDate, false);
-#endif
                 }
-
-                rec.NotifyPropertyChanged("PaymentAmount");
-                rec.NotifyPropertyChanged("RemainingAmount");
-                rec.NotifyPropertyChanged("InvoiceAmount");
-                rec.NotifyPropertyChanged("PaymentFormat");
             }
-        }
 
-
-        public override bool HandledOnClearFilter()
-        {
-            setMergeUnMergePaym(false);
-            return true;
-        }
-
-        private async void btnSerach_Click(object sender, System.Windows.RoutedEventArgs e)
-        {
-            if (txtDateFrm.Text == string.Empty)
-                fromDate = DateTime.MinValue;
-            else
-                fromDate = txtDateFrm.DateTime.Date;
-
-            if (txtDateTo.Text == string.Empty)
-                toDate = DateTime.MinValue;
-            else
-                toDate = txtDateTo.DateTime.Date;
-
-            await Filter();
-            if (dgCreditorTranOpenGrid.ItemsSource == null)
-                return;
+            dgCreditorTranOpenGrid.ItemsSource = lst;
+            ClearBusy();
+            dgCreditorTranOpenGrid.Visibility = Visibility.Visible;
         }
     }
 }

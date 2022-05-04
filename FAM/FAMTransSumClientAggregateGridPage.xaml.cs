@@ -70,7 +70,7 @@ namespace UnicontaClient.Pages.CustomPage
                         break;
                     case (byte)FAMTransCodes.WriteOff:
                         cur._WriteOff = rec._Amount;
-                        cur._DepreciationPrimo += rec._Primo;
+                        //cur._Primo += rec._Primo;
                         break;
                     case (byte)FAMTransCodes.WriteUp:
                         cur._WriteUp = rec._Amount;
@@ -81,7 +81,15 @@ namespace UnicontaClient.Pages.CustomPage
                         cur._Primo += rec._Primo;
                         break;
                     case (byte)FAMTransCodes.Sale:
+                        cur._Sale = rec._Amount;
                         cur._Issue = rec._Amount;
+                        break;
+                    case (byte)FAMTransCodes.ReversedDepreciation:
+                        cur._DepreciationPrimo += rec._Primo;
+                        cur._ReversedDepreciation += rec._Amount;
+                        break;
+                    case (byte)FAMTransCodes.ReversedAcquisition:
+                        cur._ReversedAcquisition = rec._Amount;
                         cur._Primo += rec._Primo;
                         break;
                 }
@@ -130,7 +138,7 @@ namespace UnicontaClient.Pages.CustomPage
         public int _CompanyId;
         public string _Asset;
 
-        public long _Primo, _Receipt, _Issue, _DepreciationPrimo, _Depreciation, _WriteUp, _WriteOff, _WriteDown;
+        public long _Primo, _Receipt, _Issue, _DepreciationPrimo, _Depreciation, _WriteUp, _WriteOff, _WriteDown, _ReversedDepreciation, _ReversedAcquisition, _Sale;
 
         [Uniconta.Common.ForeignKeyAttribute(ForeignKeyTable = typeof(Uniconta.DataModel.FAM))]
         [Display(Name = "Asset", ResourceType = typeof(FamText))]
@@ -149,13 +157,19 @@ namespace UnicontaClient.Pages.CustomPage
         public double Issue { get { return _Issue / 100d; } }
 
         [Display(Name = "DepreciationBase", ResourceType = typeof(FamSumText))]
-        public double DepreciationBase { get { return (_Primo + _Receipt + _Issue + _WriteUp) / 100d; } }
+        public double DepreciationBase { get { return (_Primo + _Receipt + _WriteUp + _ReversedAcquisition) / 100d; } }
 
         [Display(Name = "DepreciationPrimo", ResourceType = typeof(FamSumText))]
         public double DepreciationPrimo { get { return _DepreciationPrimo / 100d; } }
 
         [Display(Name = "Depreciation", ResourceType = typeof(FamText))]
         public double Depreciation { get { return _Depreciation / 100d; } }
+
+        [Display(Name = "ReversedDepreciation", ResourceType = typeof(FamText))]
+        public double ReversedDepreciation { get { return _ReversedDepreciation / 100d; } }
+
+        [Display(Name = "ReversedAcquisition", ResourceType = typeof(FamText))]
+        public double ReversedAcquisition { get { return _ReversedAcquisition / 100d; } }
 
         [Display(Name = "WriteUp", ResourceType = typeof(FamText))]
         public double WriteUp { get { return _WriteUp / 100d; } }
@@ -167,10 +181,13 @@ namespace UnicontaClient.Pages.CustomPage
         public double WriteOff { get { return _WriteOff / 100d; } }
 
         [Display(Name = "DepreciationUltimo", ResourceType = typeof(FamSumText))]
-        public double DepreciationUltimo { get { return (_DepreciationPrimo + _Depreciation + _WriteOff + _WriteDown) / 100d; } }
+        public double DepreciationUltimo { get { return (_DepreciationPrimo + _Depreciation + _ReversedDepreciation + _WriteDown) / 100d; } }
 
         [Display(Name = "BookedValue", ResourceType = typeof(FamText))]
-        public double BookedValue { get { return (_Primo + _Receipt + _Issue + _DepreciationPrimo + _Depreciation + _WriteUp + _WriteOff + _WriteDown) / 100d; } }
+        public double BookedValue { get { return (_Primo + _Receipt + _DepreciationPrimo + _Depreciation + _ReversedDepreciation + _ReversedAcquisition + _WriteUp + _WriteDown) / 100d; } }
+
+        [Display(Name = "Sale", ResourceType = typeof(FamText))]
+        public double Sale { get { return _Sale / 100d; } }
 
         [ReportingAttribute]
         public FamClient AssetRef

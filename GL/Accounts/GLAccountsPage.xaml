@@ -72,6 +72,7 @@ x:Class="UnicontaClient.Pages.CustomPage.GLAccountsPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ThisYear" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PrevYear" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Lookup" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Comment" Width="100" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ExternalNo" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ExternalName" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ThisYearDebit" Visible="False"/>

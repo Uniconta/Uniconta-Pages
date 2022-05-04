@@ -20,6 +20,7 @@ using System.Windows.Shapes;
 using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.Util;
 using Uniconta.DataModel;
+using Uniconta.Common.Utility;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -65,7 +66,10 @@ namespace UnicontaClient.Pages.CustomPage
         public override void Utility_Refresh(string screenName, object argument = null)
         {
             if (screenName == TabControls.DebtorTranPage2)
+            {
+                api.ForcePrimarySQL = true;
                 dgDebtorTransOpen.UpdateItemSource(argument);
+            }
         }
         public DebtorTranOpen(BaseAPI api, string lookupKey)
             : base(api, lookupKey)
@@ -105,7 +109,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "VoucherTransactions":
                     if (selectedItem?.Trans == null)
                         return;
-                    string vheader = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("VoucherTransactions"), selectedItem.Trans._Voucher);
+                    string vheader = Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("VoucherTransactions"), selectedItem.Trans._Voucher);
                     AddDockItem(TabControls.AccountsTransaction, dgDebtorTransOpen.syncEntity, vheader);
                     break;
                 case "SaveGrid":

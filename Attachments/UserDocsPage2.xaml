@@ -6,11 +6,10 @@ x:Class="UnicontaClient.Pages.CustomPage.UserDocsPage2"
            xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
            xmlns:dxinteraction="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
-           xmlns:enumType ="clr-namespace:Uniconta.Common;assembly=Uniconta.Common"
+           xmlns:enumType ="clr-namespace:Uniconta.Common;assembly=Uniconta.WindowsAPI"
            xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
            mc:Ignorable="d"
            d:DesignWidth="640" d:DesignHeight="480">
-    <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="0" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BusyMessage}">
         <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -30,7 +29,7 @@ x:Class="UnicontaClient.Pages.CustomPage.UserDocsPage2"
                             <CorasauControls:TextEditor x:Name="txtUrl" Text="{Binding Url,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="DocumentType" x:Name="liDocumentType" Visibility="Collapsed">
-                            <CorasauControls:ComboBoxEditor x:Name="cmbDocType" EditValue="{Binding DocumentType,Mode=TwoWay}">
+                            <CorasauControls:ComboBoxEditor x:Name="cmbDocType" EditValue="{Binding DocumentType,Mode=TwoWay}" EditValueChanged="cmbDocType_EditValueChanged">
                                 <dxinteraction:Interaction.Behaviors>
                                     <dxinteraction:EnumItemsSourceBehavior EnumType="{x:Type enumType:FileextensionsTypes}" />
                                 </dxinteraction:Interaction.Behaviors>
@@ -71,5 +70,4 @@ x:Class="UnicontaClient.Pages.CustomPage.UserDocsPage2"
                 </CorasauControls:CorasauLayoutGroup>
             </CorasauControls:CorasauLayoutControl>
         </Grid>
-    </CorasauControls:BusyIndicator>
 </Pages:FormBasePage>

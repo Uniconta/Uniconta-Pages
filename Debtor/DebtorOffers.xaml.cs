@@ -93,12 +93,10 @@ namespace UnicontaClient.Pages.CustomPage
             SetRibbonControl(localMenu, dgDebtorOffers);
             dgDebtorOffers.api = api;
             dgDebtorOffers.BusyIndicator = busyIndicator;
-
             localMenu.OnItemClicked += localMenu_OnItemClicked;
-            InitialLoad();
             ribbonControl.DisableButtons(new string[] { "UndoDelete", "DeleteRow", "SaveGrid" });
         }
-
+       
         protected override void OnLayoutLoaded()
         {
             base.OnLayoutLoaded();
@@ -106,7 +104,8 @@ namespace UnicontaClient.Pages.CustomPage
             Account.Visible = showFields;
             Name.Visible = showFields;
             setDim();
-            if (!api.CompanyEntity.DeliveryAddress)
+            var Comp = api.CompanyEntity;
+            if (!Comp.DeliveryAddress)
             {
                 DeliveryName.Visible = false;
                 DeliveryAddress1.Visible = false;
@@ -117,21 +116,21 @@ namespace UnicontaClient.Pages.CustomPage
                 DeliveryCountry.Visible = false;
             }
             dgDebtorOffers.Readonly = true;
-        }
-
-        private void InitialLoad()
-        {
-            // load Debtor first, since we use Debtor name in grid
-            if (api.CompanyEntity.CRM)
-                LoadType(new Type[] { typeof(Uniconta.DataModel.Debtor), typeof(Uniconta.DataModel.CrmProspect) });
+            if (!Comp.Project)
+                Project.ShowInColumnChooser = Project.Visible = PrCategory.ShowInColumnChooser = PrCategory.Visible =
+                    Task.ShowInColumnChooser = Task.Visible = WorkSpace.ShowInColumnChooser = WorkSpace.Visible = false;
             else
-                LoadType(typeof(Uniconta.DataModel.Debtor));
+                Project.ShowInColumnChooser = PrCategory.ShowInColumnChooser = Task.ShowInColumnChooser = true;
+            if (!Comp.ProjectTask)
+                Task.ShowInColumnChooser = Task.Visible = false;
+            else
+                Task.ShowInColumnChooser = true;
         }
 
         protected override void LoadCacheInBackGround()
         {
             var Comp = api.CompanyEntity;
-            var lst = new List<Type>(12) { typeof(Uniconta.DataModel.InvItem), typeof(Uniconta.DataModel.Employee) };
+            var lst = new List<Type>(20) { typeof(Uniconta.DataModel.Debtor), typeof(Uniconta.DataModel.Employee) };
             if (Comp.Contacts)
                 lst.Add(typeof(Uniconta.DataModel.Contact));
             if (Comp.InvPrice)
@@ -151,6 +150,18 @@ namespace UnicontaClient.Pages.CustomPage
             }
             if (Comp.Warehouse)
                 lst.Add(typeof(Uniconta.DataModel.InvWarehouse));
+            lst.Add(typeof(Uniconta.DataModel.InvGroup));
+            if (Comp.NumberOfDimensions >= 1)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType1));
+            if (Comp.NumberOfDimensions >= 2)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType2));
+            if (Comp.NumberOfDimensions >= 3)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType3));
+            if (Comp.NumberOfDimensions >= 4)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType4));
+            if (Comp.NumberOfDimensions >= 5)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType5));
+            lst.Add(typeof(Uniconta.DataModel.InvItem));
             LoadType(lst);
         }
 
@@ -194,7 +205,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "OfferLine":
                     if (selectedItem == null)
                         return;
-                    var olheader = string.Format("{0}:{1},{2}", Uniconta.ClientTools.Localization.lookup("OfferLine"), selectedItem._OrderNumber, selectedItem.Name);
+                    var olheader = string.Format("{0}:{1},{2}", Uniconta.ClientTools.Localization.lookup("OfferLine"), selectedItem._OrderNumber, selectedItem._DCAccount);
                     AddDockItem(TabControls.DebtorOfferLines, dgDebtorOffers.syncEntity, olheader);
                     break;
                 case "AddNote":
@@ -235,7 +246,7 @@ namespace UnicontaClient.Pages.CustomPage
                             if (cwOrderFromOrder.DialogResult == true)
                             {
                                 var perSupplier = cwOrderFromOrder.orderPerPurchaseAccount;
-                                if (!perSupplier && string.IsNullOrEmpty(cwOrderFromOrder.Account))
+                                if (!perSupplier && string.IsNullOrEmpty(cwOrderFromOrder.Account) && cwOrderFromOrder.CreateNewOrder)
                                     return;
                                 busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
                                 busyIndicator.IsBusy = true;
@@ -245,6 +256,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 var copyAttachment = cwOrderFromOrder.copyAttachment;
                                 var copyDelAddress = cwOrderFromOrder.copyDeliveryAddress;
                                 var dcOrder = cwOrderFromOrder.dcOrder;
+                                dcOrder._DeliveryDate = cwOrderFromOrder.DeliveryDate;
                                 var reCalPrice = cwOrderFromOrder.reCalculatePrice;
                                 var result = await orderApi.CreateOrderFromOrder(selectedItem, dcOrder, account, inversign, CopyAttachments: copyAttachment, CopyDeliveryAddress: copyDelAddress, RecalculatePrices: reCalPrice, OrderPerPurchaseAccount: perSupplier);
                                 busyIndicator.IsBusy = false;

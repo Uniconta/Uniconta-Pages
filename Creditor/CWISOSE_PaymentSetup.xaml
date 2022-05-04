@@ -18,7 +18,8 @@ x:Class="UnicontaClient.Pages.CustomPage.CWISOSE_PaymentSetup"
             <Grid.RowDefinitions>
                 <RowDefinition Height="30"/>
                 <RowDefinition Height="30"/>
-                <RowDefinition Height="30"/>                
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
@@ -27,7 +28,13 @@ x:Class="UnicontaClient.Pages.CustomPage.CWISOSE_PaymentSetup"
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
             <TextBlock Text="{Binding Converter={StaticResource  GlobalLocalizationValueConverter},ConverterParameter=Bank,Mode=OneWay}" Margin="5,0,0,0" Grid.Column="0" Grid.Row="0" VerticalAlignment="Center"/>
-            <CorasauControls:ComboBoxEditor x:Name="cmbBank" SelectedItem="{Binding Bank,Mode=TwoWay}" Grid.Column="2"  Grid.Row="0" />
+            <CorasauControls:ComboBoxEditor x:Name="cmbBank" SelectedItem="{Binding Bank,Mode=TwoWay}" Grid.Column="2"  Grid.Row="0" SelectedIndexChanged="cmbBank_SelectedIndexChanged" />
+            <TextBlock x:Name="lblTestMarked" Text="{Binding Converter={StaticResource  GlobalLocalizationValueConverter},ConverterParameter=TestMarked,Mode=OneWay}" Margin="5,0,0,0" Grid.Column="0" Grid.Row="1" VerticalAlignment="Center"/>
+            <CorasauControls:CheckEditor x:Name="ceTestMarked" IsChecked="{Binding TestMarked,Mode=TwoWay}" Grid.Column="2" Grid.Row="1" Height="25"/>
+            <TextBlock x:Name="lblBatchBook" Text="{Binding Converter={StaticResource  GlobalLocalizationValueConverter},ConverterParameter=BatchBooking,Mode=OneWay}" Margin="5,0,0,0" Grid.Column="0" Grid.Row="2" VerticalAlignment="Center"/>
+            <CorasauControls:CheckEditor x:Name="ceBatchBooking" IsChecked="{Binding BatchBooking,Mode=TwoWay}" Grid.Column="2" Grid.Row="2" Height="25"/>
+            <TextBlock x:Name="lblCode" Text="{Binding Converter={StaticResource  GlobalLocalizationValueConverter},ConverterParameter=Code,Mode=OneWay}" Margin="5,0,0,0" Grid.Column="0" Grid.Row="3" VerticalAlignment="Center"/>
+            <CorasauControls:TextEditor x:Name="txtCode" HandleKeyDown="False" Text="{Binding Code,Mode=TwoWay}" Grid.Column="2"  Grid.Row="3" Height="25"/>
         </Grid>
         <StackPanel x:Name="actionButton" HorizontalAlignment="Right" Grid.Row="1" Orientation="Horizontal" Margin="0 10 0 0">
             <Button x:Name="OKButton" IsDefault="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OK,Mode=OneWay}" Click="OKButton_Click" MinWidth="75" Height="23" 

@@ -22,6 +22,8 @@ using UnicontaClient.Utilities;
 using Uniconta.DataModel;
 using System.Windows;
 using Uniconta.ClientTools.Controls;
+using Uniconta.Common.Utility;
+
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
@@ -100,7 +102,10 @@ namespace UnicontaClient.Pages.CustomPage
         public override void Utility_Refresh(string screenName, object argument = null)
         {
             if (screenName == TabControls.DebtorTranPage2)
+            {
+                api.ForcePrimarySQL = true;
                 dgDebtorTransOpen.UpdateItemSource(argument);
+            }
         }
 
         async void Settle()
@@ -131,7 +136,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "Settlements":
                     if (selectedItem != null)
                     {
-                        string header = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("Settlements"), selectedItem.Voucher);
+                        string header = Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("Settlements"), selectedItem.Voucher);
                         AddDockItem(TabControls.DebtorSettlements, selectedItem.Trans, header);
                     }
                     break;
@@ -140,8 +145,7 @@ namespace UnicontaClient.Pages.CustomPage
                         DebtorTransactions.ShowVoucher(dgDebtorTransOpen.syncEntity, api, busyIndicator);
                     break;
                 case "SaveGrid":
-                    dgDebtorTransOpen.SelectedItem = null;
-                    dgDebtorTransOpen.SaveData();
+                    saveGrid();
                     break;
                 case "ReopenAll":
                     ReOpenAllTrans();
@@ -152,7 +156,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "VoucherTransactions":
                     if (selectedItem != null)
                     {
-                        string vheader = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("VoucherTransactions"), selectedItem.Voucher);
+                        string vheader = Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("VoucherTransactions"), selectedItem.Voucher);
                         AddDockItem(TabControls.AccountsTransaction, dgDebtorTransOpen.syncEntity, vheader);
                     }
                     break;
@@ -172,7 +176,13 @@ namespace UnicontaClient.Pages.CustomPage
             DebtorEmailType emailType = DebtorEmailType.InterestNote;
             bool isInterest = false;
             if (postType != (byte)DCPostType.Collection && postType != (byte)DCPostType.CollectionLetter && postType != (byte)DCPostType.InterestFee && postType != (byte)DCPostType.PaymentCharge)
+            {
+                if (postType == (byte)DCPostType.Invoice || postType == (byte)DCPostType.Creditnote)
+                    AddDockItem(TabControls.Invoices, debtorTransOpen, string.Format("{0}: {1}", postType == (byte)DCPostType.Invoice ? Uniconta.ClientTools.Localization.lookup("Invoice") :
+                        Uniconta.ClientTools.Localization.lookup("Creditnote"), debtorTransOpen.Invoice));
+
                 return;
+            }
 
             if (postType == (byte)DCPostType.InterestFee)
                 isInterest = true;
@@ -198,7 +208,7 @@ namespace UnicontaClient.Pages.CustomPage
             cwSendInvoice.Closed += delegate
             {
                 var selectedRow = new DebtorTransOpenClient[] { debtorTransOpen };
-                var feelist = new [] { debtorTransOpen.Amount };
+                var feelist = new[] { debtorTransOpen.Amount };
 
                 if (cwSendInvoice.DialogResult == true)
                     DebtorPayments.ExecuteDebtorCollection(api, busyIndicator, selectedRow, feelist, null, false, emailType, cwSendInvoice.Emails,
@@ -353,7 +363,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override void LoadCacheInBackGround()
         {
-            LoadType(new [] { typeof(Uniconta.DataModel.GLVat), typeof(Uniconta.DataModel.PaymentTerm) });
+            LoadType(new[] { typeof(Uniconta.DataModel.GLVat), typeof(Uniconta.DataModel.PaymentTerm) });
         }
     }
 }

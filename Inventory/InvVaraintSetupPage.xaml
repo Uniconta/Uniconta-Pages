@@ -5,39 +5,37 @@ x:Class="UnicontaClient.Pages.CustomPage.InvVaraintSetupPage"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
              xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
-    <CorasauControls:BusyIndicator x:Name="busyIndicator" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BusyMessage}">
-        <Grid x:Name="LayoutRoot"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <CorasauControls:CorasauRibbonControl x:Name="frmRibbon"  XMLSourcePath=";component/Pages/Inventory/InvVariantSetupPageRibbon.xml" Grid.Row="0"/>
-            <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
-                <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="grpFirst">
-                    <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grp" MinWidth="250" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                        <CorasauControls:CorasauLayoutItem x:Name="liNumberOfVariants" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Variants}">
-                            <CorasauControls:NumericUpDownEditor Value="{Binding NumberOfVariants,Mode=TwoWay}" MaxValue="5" EditValueChanged="NumericUpDownEditor_EditValueChanged" />
-                        </CorasauControls:CorasauLayoutItem>
-                    </CorasauControls:CorasauLayoutGroup>
-                    <CorasauControls:CorasauLayoutGroup x:Name="grpVariants" View="GroupBox" Orientation="Vertical" MinWidth="250" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                        <CorasauControls:CorasauLayoutItem x:Name="lblVar1" CustomLabel="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Variant,StringFormat=\{0\}1}" >
-                            <CorasauControls:TextEditor x:Name="txtVar1" Text="{Binding Variant1,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem x:Name="lblVar2" CustomLabel="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Variant,StringFormat=\{0\}2}">
-                            <CorasauControls:TextEditor x:Name="txtVar2" Text="{Binding Variant2,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem  x:Name="lblVar3" CustomLabel="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Variant,StringFormat=\{0\}3}">
-                            <CorasauControls:TextEditor x:Name="txtVar3" Text="{Binding Variant3,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem x:Name="lblVar4" CustomLabel="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Variant,StringFormat=\{0\}4}">
-                            <CorasauControls:TextEditor x:Name="txtVar4" Text="{Binding Variant4,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem x:Name="lblVar5" CustomLabel="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Variant,StringFormat=\{0\}5}">
-                            <CorasauControls:TextEditor x:Name="txtVar5" Text="{Binding Variant5,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                    </CorasauControls:CorasauLayoutGroup>
+    <Grid x:Name="LayoutRoot"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl x:Name="frmRibbon"  XMLSourcePath=";component/Pages/Inventory/InvVariantSetupPageRibbon.xml" Grid.Row="0"/>
+        <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
+            <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="grpFirst">
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grp" MinWidth="250" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                    <CorasauControls:CorasauLayoutItem x:Name="liNumberOfVariants" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Variants}">
+                        <CorasauControls:NumericUpDownEditor Value="{Binding NumberOfVariants,Mode=TwoWay}" MaxValue="5" EditValueChanged="NumericUpDownEditor_EditValueChanged" />
+                    </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
-            </CorasauControls:CorasauLayoutControl>
-        </Grid>
-    </CorasauControls:BusyIndicator>
+                <CorasauControls:CorasauLayoutGroup x:Name="grpVariants" View="GroupBox" Orientation="Vertical" MinWidth="250" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                    <CorasauControls:CorasauLayoutItem x:Name="lblVar1" CustomLabel="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Variant,StringFormat=\{0\}1}" >
+                        <CorasauControls:TextEditor x:Name="txtVar1" Text="{Binding Variant1,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="lblVar2" CustomLabel="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Variant,StringFormat=\{0\}2}">
+                        <CorasauControls:TextEditor x:Name="txtVar2" Text="{Binding Variant2,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem  x:Name="lblVar3" CustomLabel="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Variant,StringFormat=\{0\}3}">
+                        <CorasauControls:TextEditor x:Name="txtVar3" Text="{Binding Variant3,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="lblVar4" CustomLabel="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Variant,StringFormat=\{0\}4}">
+                        <CorasauControls:TextEditor x:Name="txtVar4" Text="{Binding Variant4,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="lblVar5" CustomLabel="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Variant,StringFormat=\{0\}5}">
+                        <CorasauControls:TextEditor x:Name="txtVar5" Text="{Binding Variant5,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
+            </CorasauControls:CorasauLayoutGroup>
+        </CorasauControls:CorasauLayoutControl>
+    </Grid>
 </Pages:FormBasePage>

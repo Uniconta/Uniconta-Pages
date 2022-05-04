@@ -57,12 +57,8 @@ namespace UnicontaClient.Pages.CustomPage
         }
     }
 
-    /// <summary>
-    /// Interaction logic for FAMTransSumClientGridPage.xaml
-    /// </summary>
     public partial class FAMTransSumClientGridPage : GridBasePage
     {
-
         static DateTime fromDate, toDate;
         public FAMTransSumClientGridPage(BaseAPI Api) : base(Api, string.Empty)
         {
@@ -103,27 +99,15 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void LoadFAMTransactionPage()
         {
-            var param = new object[3];
             var selectedItem = dgFAMTransSumGrid.SelectedItem as FAMTransSumClient;
             if (selectedItem != null)
-            {
-                param[0] = selectedItem;
-                param[1] = fromDate;
-                param[2] = toDate;
-
-                AddDockItem(TabControls.FAMTransGridPage, param, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Asset"), selectedItem.Asset));
-            }
+                AddDockItem(TabControls.FAMTransGridPage, new object[3] { selectedItem, fromDate, toDate }, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Asset"), selectedItem.Asset));
         }
 
         private void ShowAggregatePage()
         {
-            object[] paramArr = new object[4];
-            paramArr[0] = api;
-            paramArr[1] = dgFAMTransSumGrid.GetVisibleRows();
-            paramArr[2] = FromDate.DateTime;
-            paramArr[3] = ToDate.DateTime;
-
-            AddDockItem(TabControls.FAMTransSumClientAggregateGridPage, paramArr);
+            AddDockItem(TabControls.FAMTransSumClientAggregateGridPage, 
+                new object[4] { api, dgFAMTransSumGrid.GetVisibleRows(), FromDate.DateTime,ToDate.DateTime } );
         }
 
         public override Task InitQuery()
@@ -164,14 +148,13 @@ namespace UnicontaClient.Pages.CustomPage
             var fromDate = FromDate.Text == string.Empty ? string.Empty : FromDate.DateTime.ToShortDateString();
             var toDate = ToDate.Text == string.Empty ? string.Empty : ToDate.DateTime.ToShortDateString();
 
-            var printData = new PageReportHeader()
+            return new PageReportHeader()
             {
                 CurDateTime = DateTime.Now.ToString("g"),
                 CompanyName = api.CompanyEntity._Name,
                 ReportName = Uniconta.ClientTools.Localization.lookup("Statement"),
                 Header = string.Format("({0} - {1})", fromDate, toDate),
             };
-            return printData;
         }
     }
 }

@@ -96,11 +96,16 @@ namespace UnicontaClient.Pages.CustomPage
         void InitPage(CrudAPI crudapi, UnicontaBaseEntity master)
         {
             RemoveMenuItem();
-            BusyIndicator = busyIndicator;
             dAddress.Header = Uniconta.ClientTools.Localization.lookup("DeliveryAddr");
             layoutControl = layoutItems;
             Employeelookupeditor.api = leAccount.api = lePayment.api = cmbDim1.api = cmbDim2.api = cmbDim3.api = cmbDim4.api = cmbDim5.api = leLayoutGroup.api = leInvoiceAccount.api = PriceListlookupeditior.api =
-                leGroup.api = leShipment.api = leDeliveryTerm.api = Projectlookupeditor.api = PrCategorylookupeditor.api = leDeliveryAddress.api = crudapi;
+               leGroup.api = leShipment.api = leDeliveryTerm.api = Projectlookupeditor.api = PrCategorylookupeditor.api = leDeliveryAddress.api = leVat.api = prTasklookupeditor.api = lePrWorkSpace.api = crudapi;
+
+#if SILVERLIGHT
+            leRelatedOrder.api = crudapi;
+#else
+            leRelatedOrder.CrudApi = crudapi;
+#endif
             cbDeliveryCountry.ItemsSource = Enum.GetValues(typeof(Uniconta.Common.CountryCode));
             AdjustLayout();
             if (editrow == null)
@@ -136,7 +141,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             layoutItems.DataContext = editrow;
             frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
-            
+
             AcItem.ButtonClicked += AcItem_ButtonClicked;
 
 #if !SILVERLIGHT
@@ -170,14 +175,19 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override void AfterTemplateSet(UnicontaBaseEntity row)
         {
-            base.AfterTemplateSet(row);
+            var editrow = (row as DebtorOfferClient);
+            if (this.editrow != null)
+            {
+                editrow._OrderNumber = this.editrow._OrderNumber;
+                editrow.RowId = this.editrow.RowId;
+            }
             if (this.Debtor != null)
-                (row as DebtorOfferClient).Account = Debtor.Account;
+                editrow.SetMaster(this.Debtor);
         }
 
         protected override void OnLayoutCtrlLoaded()
         {
-              AdjustLayout();
+            AdjustLayout();
         }
 
         void AdjustLayout()
@@ -190,12 +200,18 @@ namespace UnicontaClient.Pages.CustomPage
             if (!Comp.DeliveryAddress)
                 dAddress.Visibility = Visibility.Collapsed;
             if (!Comp.Project)
-            {
-                projectItem.Visibility = Visibility.Collapsed;
-                prCategoryItem.Visibility = Visibility.Collapsed;
-            }
+                grpProject.Visibility = Visibility.Collapsed;
             if (!Comp.SetupSizes)
                 grpSize.Visibility = Visibility.Collapsed;
+            if (!Comp.ProjectTask)
+                projectTask.Visibility = Visibility.Collapsed;
+            else if (editrow?._Project != null)
+            {
+                var project = Comp.GetCache(typeof(Uniconta.DataModel.Project))?.Get(editrow._Project) as ProjectClient;
+                setTask(project);
+            }
+            if (!Comp.InvPrice)
+                priceListLayoutItem.Visibility = Visibility.Collapsed;
         }
         public override bool BeforeSetUserField(ref CorasauLayoutGroup parentGroup)
         {
@@ -251,6 +267,8 @@ namespace UnicontaClient.Pages.CustomPage
                     leAccount.LoadItemSource();
                     var dc = args[3] as UnicontaBaseEntity;
                     editrow.SetMaster(dc);
+                    if (string.IsNullOrEmpty(leAccount.EditValue as string))
+                        leAccount.SelectedItem = dc;
                 }
             }
         }
@@ -319,19 +337,19 @@ namespace UnicontaClient.Pages.CustomPage
             var loadedOrder = LoadedRow as DCOrder;
             if (loadedOrder?._DCAccount == debtor._Account)
                 return;
-            editrow.Account = debtor._Account;
-            editrow.SetCurrency(debtor._Currency);
-            editrow.Payment = debtor._Payment;
-            editrow.PricesInclVat = debtor._PricesInclVat;
-            editrow.EndDiscountPct = debtor._EndDiscountPct;
-            editrow.PostingAccount = debtor._PostingAccount;
-            editrow.LayoutGroup = debtor._LayoutGroup;
-            editrow.Shipment = debtor._Shipment;
-            editrow.Employee = debtor._Employee;
-            editrow.DeliveryTerm = debtor._DeliveryTerm;
-            editrow.PriceList = debtor._PriceList;
             if (this.Prospect == null) // no master
+            {
                 editrow.SetMaster(debtor);
+                layoutItems.DataContext = null;
+                layoutItems.DataContext = editrow;
+            }
+            else
+            {
+                editrow.SetMaster(this.Prospect);
+                editrow.Account = debtor._Account;
+                editrow.SetCurrency(debtor._Currency);
+            }
+            editrow.PricesInclVat = debtor._PricesInclVat;
             if (!RecordLoadedFromTemplate || debtor._DeliveryAddress1 != null)
             {
                 editrow.DeliveryName = debtor._DeliveryName;
@@ -349,6 +367,7 @@ namespace UnicontaClient.Pages.CustomPage
                 else
                     editrow.DeliveryCountry = null;
             }
+
             TableField.SetUserFieldsFromRecord(debtor, editrow);
             if (ProjectCache != null)
             {
@@ -366,10 +385,9 @@ namespace UnicontaClient.Pages.CustomPage
             editrow.RefreshBalance();
         }
 
-        int contactRefId;
         void SetContactSource(SQLCache cache, Debtor debtor)
         {
-            cmbContactName.ItemsSource = ((IEnumerable<Uniconta.DataModel.Contact>)cache?.GetNotNullArray).Where(x => x._DCType == 1 && x._DCAccount == debtor._Account);
+            cmbContactName.ItemsSource = cache != null ? new ContactCacheFilter(cache, 1, debtor._Account) : null;
         }
 
         async void BindContact(Debtor debtor)
@@ -380,14 +398,16 @@ namespace UnicontaClient.Pages.CustomPage
             SetContactSource(cache, debtor);
             cmbContactName.DisplayMember = "KeyName";
 
-            contactRefId = editrow._ContactRef;
-            if (contactRefId != 0 && cache != null)
+            if (editrow == null) return;
+
+            var contactRefId = editrow._ContactRef;
+            if (contactRefId != 0)
             {
                 var contact = cache.Get(contactRefId);
                 if (contact == null)
                 {
                     cache = api.LoadCache(typeof(Uniconta.DataModel.Contact), true).GetAwaiter().GetResult();
-                    contact = cache.Get(contactRefId);
+                    contact = cache?.Get(contactRefId);
                     SetContactSource(cache, debtor);
                 }
                 cmbContactName.SelectedItem = contact;
@@ -403,23 +423,21 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (prospect == null)
             {
-                var list = new List<ContactClient>();
-                list.Add(Contact);
-                cmbContactName.ItemsSource = list;
+                cmbContactName.ItemsSource = new [] { Contact };
                 cmbContactName.DisplayMember = "KeyName";
-                cmbContactName.SelectedItem = list.FirstOrDefault();
+                cmbContactName.SelectedItem = Contact;
             }
             else
             {
-                contactRefId = editrow._ContactRef;
                 var cache = api.GetCache(typeof(Uniconta.DataModel.Contact)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Contact));
-                var items = (cache != null) ? ((IEnumerable<Uniconta.DataModel.Contact>)cache.GetNotNullArray).Where(x => x._DCType == 3 && x._DCAccount == prospect.KeyStr) : null;
-                cmbContactName.ItemsSource = items;
+                if (cache == null || cache.Count == 0) return;
+
+                cmbContactName.ItemsSource = new ContactCacheFilter(cache, 3, prospect.KeyStr);
                 cmbContactName.DisplayMember = "KeyName";
 
-                if (contactRefId != 0 && items != null)
+                if (editrow._ContactRef != 0)
                 {
-                    var contact = items.Where(x => x.RowId == contactRefId).FirstOrDefault();
+                    var contact = cache.Get(editrow._ContactRef);
                     cmbContactName.SelectedItem = contact;
                     if (contact == null)
                     {
@@ -444,6 +462,35 @@ namespace UnicontaClient.Pages.CustomPage
                 editrow.ContactName = null;
             }
         }
+
+        private void Projectlookupeditor_SelectedIndexChanged(object sender, RoutedEventArgs e)
+        {
+            if (ProjectCache != null)
+            {
+                var selectedItem = Projectlookupeditor.SelectedItem as ProjectClient;
+                setTask(selectedItem);
+            }
+        }
+
+        async private void setTask(ProjectClient master)
+        {
+            if (api.CompanyEntity.ProjectTask)
+            {
+                if (master != null)
+                    editrow.taskSource = master.Tasks ?? await master.LoadTasks(api);
+                else
+                    editrow.taskSource = api.GetCache(typeof(Uniconta.DataModel.ProjectTask));
+                editrow.NotifyPropertyChanged("TaskSource");
+                prTasklookupeditor.ItemsSource = editrow.TaskSource;
+            }
+        }
+
+        private void prTasklookupeditor_GotFocus(object sender, RoutedEventArgs e)
+        {
+            var selectedItem = Projectlookupeditor.SelectedItem as ProjectClient;
+            setTask(selectedItem);
+        }
+
 
 #if !SILVERLIGHT
         private void LiDeliveryZipCode_OnButtonClicked(object sender)

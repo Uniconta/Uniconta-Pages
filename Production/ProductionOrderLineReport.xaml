@@ -27,13 +27,14 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionOrderLineReport"
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <local:ProductionOrderLineReportGrid  x:Name="dgProductionOrderLineGrid" AutoGenerateColumns="None" HorizontalAlignment="Stretch">
                 <local:ProductionOrderLineReportGrid.Columns>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Note" Width="50" >
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Note" Width="50" AllowEditing="True">
                         <local:CorasauDataGridTemplateColumnClient.CellTemplate>
                             <DataTemplate>
                                 <CorasauControls:MemoEditor Name="PART_Editor" ShowIcon="{Binding DataContext.RowData.Row.HasNote, RelativeSource={RelativeSource TemplatedParent}}" MaxLength="1000"/>
                             </DataTemplate>
                         </local:CorasauDataGridTemplateColumnClient.CellTemplate>
                     </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="colNote" FieldName="Note" Width="150" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="OrderNumber" Width="70" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="LineNumber" Width="70" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Item" Width="100"/>
@@ -44,6 +45,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionOrderLineReport"
                             </DataTemplate>
                         </local:CorasauDataGridTemplateColumnClient.CellTemplate>
                     </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="VariantName" Width="100" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="colVariant1" IsEditSettingSet="True" FieldName="Variant1" Visible="False" ReadOnly="True"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="colVariant2" IsEditSettingSet="True" FieldName="Variant2" Visible="False" ReadOnly="True"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="colVariant3" IsEditSettingSet="True" FieldName="Variant3" Visible="False" ReadOnly="True"/>
@@ -106,7 +108,6 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionOrderLineReport"
                     <local:CorasauDataGridTemplateColumnClient x:Name="IgnoreBlocked" Width="50" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Unit" Width="50" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="PostingAccount" Width="100" Visible="False"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Vat" Width="50" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Employee" Width="50" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="cldim1" Width="70" FieldName="Dimension1" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="cldim2" Width="70" FieldName="Dimension2" Visible="False"/>

@@ -27,7 +27,13 @@
     </RibbonItem>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="TimeSheet" LocalizedNameKey="TimeRegistration" ControlName="TMJournalLinePage"  LargeGlyph="Schedule_Task_32x32.png"/>
+	 <RibbonItem Action="BudgetPanningSchedule" LocalizedNameKey="ProjectBudgetSchedule" ControlName="ProjectBudgetPlanningSchedulePage" Module="_ProjectPlanning" LargeGlyph="Schedule_Task_32x32.png"/>
+    <RibbonItem Action="TimeSheet" LocalizedNameKey="TimeRegistration" ControlName="TMJournalLinePage"  LargeGlyph="Timesheet_32x32.png"/>
+    <RibbonItem Action="ProjectTask" LocalizedNameKey="Tasks" Module="ProjectTask" LargeGlyph="GanttChart_32x32.png">
+      <RibbonItem Action="GridView" LocalizedNameKey="DataGrid" ControlName="ProjectTaskGridPage" Glyph="Multiple_16x16.png" />
+      <RibbonItem Action="ChartView" LocalizedNameKey="EnableChart" Glyph="Report_16x16.png" />
+    </RibbonItem>
+	<RibbonItem Action="DebtorBudgetLines" LocalizedNameKey="Budget" ControlName="DebtorBudgetLinePage" Module="_DebtorBudget" LargeGlyph="Budget_32x32.png"/>
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="QueriesandReports" LocalizedNameKey="QueriesandReports" LargeGlyph="Statistics_32x32.png">
@@ -35,12 +41,10 @@
     </RibbonItem>
   </RibbonItem>
   <RibbonItem>
+    <RibbonItem Action="Trans" LocalizedNameKey="Transactions" ControlName="ProjectTransactionPage" Glyph="Transactions_16x16.png" LargeGlyph="Transactions_32x32.png" ShortcutKey="CTRL+T"/>
     <RibbonItem Module="Attachments" LocalizedNameKey="Attachments" LargeGlyph="Attachments_32x32.png">
       <RibbonItem Action="AddNote" ShortcutKey="Alt+N" LocalizedNameKey="Note" ControlName="UserNotesPage" Glyph="Note_16x16.png" />
       <RibbonItem Action="AddDoc" LocalizedNameKey="Document" ControlName="UserDocsPage" Glyph="Document_Attachment_16x16.png" />
-    </RibbonItem>
-    <RibbonItem Action="History" LocalizedNameKey="History" LargeGlyph="History_32x32.png">
-      <RibbonItem Action="Trans" LocalizedNameKey="Transactions" ControlName="ProjectTransactionPage" Glyph="Transactions_16x16.png" LargeGlyph="Transactions_32x32.png"/>
     </RibbonItem>
     <RibbonItem Action="Settings" LocalizedNameKey="Settings" LargeGlyph="Settings_32x32.png">
       <RibbonItem Action="Commission" LocalizedNameKey="Commission" ControlName="EmployeeCommissionPage" Glyph="Budget_16x16.png" LargeGlyph="Budget_32x32.png"/>
@@ -50,6 +54,9 @@
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="ApproveDocument" LocalizedNameKey="ApproveDocument" ControlName="DocumentsApprovalPage" Glyph="View_Voucher_32x32.png" LargeGlyph="View_Voucher_32x32.png"/>
+  </RibbonItem>
+   <RibbonItem>
+    <RibbonItem Action="ProjectEmployee" LocalizedNameKey="Projects"  LargeGlyph="Folder_32x32.png" Module="MyProjects"/>
   </RibbonItem>
    <RibbonItem TabId="1" LocalizedNameKey="EditAll">
     <RibbonItem Action="EditAll"  LocalizedNameKey="EditAll" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>

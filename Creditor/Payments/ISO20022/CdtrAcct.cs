@@ -2,6 +2,7 @@ using System;
 using System.Xml;
 using Uniconta.Common;
 using Uniconta.DataModel;
+using UnicontaClient.Pages;
 
 namespace UnicontaISO20022CreditTransfer
 {
@@ -11,9 +12,8 @@ namespace UnicontaISO20022CreditTransfer
 
         private readonly bool isIBAN;
         private readonly bool isOCR;
-        private readonly string companyCountryId;
-
-
+        private readonly byte exportFormat;
+        private readonly CreditorTransPayment trans;
 
         private const string HCDTRACCT = "CdtrAcct";
         private const string ID = "Id";
@@ -23,6 +23,7 @@ namespace UnicontaISO20022CreditTransfer
         private const string PRTRY = "Prtry";
         private const string CD = "Cd";
         private const string OCR = "OCR";
+        private const string BGNR = "BGNR";
         private const string BBAN = "BBAN";
 
 
@@ -32,12 +33,13 @@ namespace UnicontaISO20022CreditTransfer
         /// <param name="AccountId">Either IBAN or BBAN account format.</param> 
         /// <param name="isIBAN">Is Account identifier a IBAN.</param>
         /// <param name="isOCR">Is OCR Creditor Number.</param>
-        public CdtrAcct(string accountId, bool isIBAN, bool isOCR, string companyCountryId)
+        public CdtrAcct(string accountId, bool isIBAN, bool isOCR, byte exportFormat, CreditorTransPayment trans)
         {
             this.accountId = accountId;
             this.isIBAN = isIBAN;
             this.isOCR = isOCR;
-            this.companyCountryId = companyCountryId;
+            this.exportFormat = exportFormat;
+            this.trans = trans;
         }
 
         internal virtual void Append(BaseDocument baseDoc, XmlDocument doc, XmlElement parent)
@@ -56,8 +58,10 @@ namespace UnicontaISO20022CreditTransfer
 
                 XmlElement schmeNm = baseDoc.AppendElement(doc, othr, SCHMENM);
 
-                if (isOCR && companyCountryId != CountryISOCode.NO.ToString())
+                if (isOCR && exportFormat == (byte)ExportFormatType.ISO20022_DK) 
                     baseDoc.AppendElement(doc, schmeNm, PRTRY, OCR);
+                else if (isOCR && exportFormat == (byte)ExportFormatType.ISO20022_SE && trans._PaymentMethod == PaymentTypes.PaymentMethod3)
+                    baseDoc.AppendElement(doc, schmeNm, PRTRY, BGNR);
                 else
                     baseDoc.AppendElement(doc, schmeNm, CD, BBAN);
             }

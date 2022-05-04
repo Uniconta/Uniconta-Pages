@@ -109,19 +109,18 @@ namespace UnicontaClient.Pages.CustomPage
             switch (ActionType)
             {
                 case "AddRow":
-                    TableValueClient objTableValue = new TableValueClient();
+                    var objTableValue = dgTableValueGrid.AddRow() as TableValueClient;
                     objTableValue.TableNo = tableId;
                     if (_fromDropDown)
                         objTableValue.ShowInDropdown = true;
-                    dgTableValueGrid.AddRow(objTableValue);
                     break;
                 case "DeleteRow":
                     dgTableValueGrid.DeleteRow();
                     break;
                 case "SaveGrid":
-                    dgTableValueGrid.SelectedItem = null;
-                    var t = dgTableValueGrid.SaveData();
-                    t.ContinueWith((e) => api.CompanyEntity.LoadTableValues(api));
+                    var t = saveGrid();
+                    if (t != null)
+                        t.ContinueWith((e) => api.CompanyEntity.LoadTableValues(api));
                     break;
                 case "RefreshGrid":
                     BindGrid();
@@ -197,6 +196,7 @@ namespace UnicontaClient.Pages.CustomPage
         public DataTemplate ForeignKeyTypeDataTemplate { get; set; }
         public DataTemplate IntergerTypeTemplate { get; set; }
         public DataTemplate DoubleTypeTemplate { get; set; }
+        public DataTemplate IntegerTypeTemplate { get; set; }
 
         /// <summary>
         /// Method Returns the Template
@@ -253,7 +253,7 @@ namespace UnicontaClient.Pages.CustomPage
             else if (property.PropertyType == typeof(double))
                 return CreateTemplateforDouble(property.PropertyType);
             else if (property.PropertyType == typeof(int))
-                    return GenericTypeTemplate;
+                return CreateTemplateforInteger(property.PropertyType);
 
             return base.SelectTemplate(item, container);
         }
@@ -338,6 +338,20 @@ namespace UnicontaClient.Pages.CustomPage
             return GetDoubleXamlString();
 #endif
         }
+
+#if !SILVERLIGHT
+        private DataTemplate CreateTemplateforInteger(Type integerTypeProperty)
+        {
+            IntegerTypeTemplate = new DataTemplate();
+            IntegerTypeTemplate.DataType = integerTypeProperty;
+            var integerEdit = new FrameworkElementFactory(typeof(IntegerEditor));
+            integerEdit.Name = "PART_Editor";
+            integerEdit.SetValue(DoubleEditor.MarginProperty, new Thickness(-20, 0, 0, 0));
+            IntegerTypeTemplate.VisualTree = integerEdit;
+            return IntegerTypeTemplate;
+        }
+#endif
+
 #if SILVERLIGHT
         private DataTemplate GetDoubleXamlString()
         {

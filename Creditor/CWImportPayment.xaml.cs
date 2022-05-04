@@ -102,7 +102,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (e.Key == Key.Escape)
             {
-                this.DialogResult = false;
+                SetDialogResult(false);
             }
             else
                 if (e.Key == Key.Enter)
@@ -110,7 +110,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (OKButton.IsFocused)
                     OKButton_Click(null, null);
                 else if (CancelButton.IsFocused)
-                    this.DialogResult = false;
+                    SetDialogResult(false);
             }
         }
         Uniconta.DataModel.UserPlugin[] plugins;
@@ -120,6 +120,12 @@ namespace UnicontaClient.Pages.CustomPage
             PaymentFormat = lePaymentFormat.SelectedItem as CreditorPaymentFormatClient;
             if (PaymentFormat != null)
             {
+                if (PaymentFormat._ExportFormat == (byte)ExportFormatType.NETS_Norge)
+                {
+                    UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("NotActive"), Uniconta.ClientTools.Localization.lookup("Warning"));
+                    return;
+                }
+
                 FormatType = PaymentFormat.PaymentMethod;
             }
             else
@@ -131,12 +137,12 @@ namespace UnicontaClient.Pages.CustomPage
                 if (plugins != null && FileOption != null)
                 userPlugin = plugins.FirstOrDefault(p => p._Prompt == FileOption);
 #endif
-            this.DialogResult = true;
+            SetDialogResult(true);
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = false;
+            SetDialogResult(false);
         }
 
     }

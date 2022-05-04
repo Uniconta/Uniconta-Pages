@@ -56,7 +56,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedVoucherClient.Fileextension == FileextensionsTypes.UNK)
                         documentViewer.Children.Add(Uniconta.ClientTools.Util.UtilDisplay.LoadMessage(Uniconta.ClientTools.Localization.lookup("InvalidDocSave")));
                     else
-                        documentViewer.Children.Add(Uniconta.ClientTools.Util.UtilDisplay.LoadControl(selectedVoucherClient.Buffer, selectedVoucherClient.Fileextension, false, false));
+                        documentViewer.Children.Add(Uniconta.ClientTools.Util.UtilDisplay.LoadControl(selectedVoucherClient, false, false));
                 }
                 catch (Exception ex)
                 {
@@ -71,9 +71,8 @@ namespace UnicontaClient.Pages.CustomPage
         async private void BindGrid()
         {
             busyIndicator.IsBusy = true;
-            var propValuePairFolder = PropValuePair.GenereteWhereElements("Folder", typeof(bool), "false");
             dgVouchersGrid.UpdateMaster(new DocumentNoRef());
-            await dgVouchersGrid.Filter(new List<PropValuePair>() { propValuePairFolder });
+            await dgVouchersGrid.Filter(new [] { PropValuePair.GenereteWhereElements("Envelope", typeof(bool), "0") } );
             busyIndicator.IsBusy = false;
         }
 

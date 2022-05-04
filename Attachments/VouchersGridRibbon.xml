@@ -1,34 +1,15 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <root>
-  <RibbonItem TabId="0" LocalizedNameKey="Home">
-    <!---When we create a new TabPage -->
-    <RibbonItem Action="AddRow" LocalizedNameKey="Add" LargeGlyph="Add_32x32.png"/>
-    <RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="Delete" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png"/>
-    <RibbonItem Action="RemoveFromInbox" LocalizedNameKey="RemoveFromInbox" LargeGlyph="Clear_32x32.png" />
-    <RibbonItem Action="Save" LocalizedNameKey="Save" LargeGlyph="save-32x32.png" ShortcutKey=""/>
-  </RibbonItem>
-  <RibbonItem>
-    <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh.png" LargeGlyph="refresh.png"/>
-  </RibbonItem>
-  <RibbonItem>
-    <RibbonItem Action="PageViewMode" ShortcutKey="" LocalizedNameKey="HideOBJ" Parameter="Folders"  LargeGlyph="Folder_32x32.png"/>
-  </RibbonItem>
-  <RibbonItem>
-    <RibbonItem Action="ViewDownloadRow" ShortcutKey="F7" LocalizedNameKey="View" LargeGlyph="View_Highlighted_32x32.png" />
-    <RibbonItem Action="GenerateJournalLines" LocalizedNameKey="GenerateJournalLines" LargeGlyph="Generate_32x32.png" ShortcutKey="Ctrl+G" />
-    <RibbonItem Action="ViewJournalLines" LocalizedNameKey="Journallines" LargeGlyph="Journal_Lines_32x32.png" />
-  </RibbonItem>
-  <RibbonItem LocalizedNameKey="Bilagscan">
-    <RibbonItem Action="BilagscanSendVouchers" LocalizedNameKey="BilagscanSend" Module="Bilagscan" LargeGlyph=";component/Assets/img/Export_32x32.png" />
-    <RibbonItem Action="BilagscanReadVouchers" LocalizedNameKey="BilagscanRead" Module="Bilagscan" LargeGlyph=";component/Assets/img/Import_32x32.png" />
-  </RibbonItem>
-  <RibbonItem>
-    <RibbonItem Action="SplitPDF" LocalizedNameKey="SplitPDF" LargeGlyph="Match_Remove_32x32.png" />
-    <RibbonItem Action="JoinPDF" LocalizedNameKey="JoinTwoOBJ" Parameter="pdfs" LargeGlyph="Match_Add_32x32.png" />
-  </RibbonItem>
-  <RibbonItem>
-    <!---If we want to create a new group in same PageTab-->
-     <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32.png">
+	<RibbonItem TabId="0" LocalizedNameKey="Home">
+		<!---When we create a new TabPage -->
+		<RibbonItem Action="AddRow" LocalizedNameKey="Add" LargeGlyph="Add_32x32.png"/>
+		<RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="Delete" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png"/>
+		<RibbonItem Action="RemoveFromInbox" LocalizedNameKey="RemoveFromInbox" LargeGlyph="Clear_32x32.png" />
+		<RibbonItem Action="Save" LocalizedNameKey="Save" LargeGlyph="save-32x32.png" ShortcutKey=""/>
+	</RibbonItem>
+	<RibbonItem>
+		<RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh.png" LargeGlyph="refresh.png"/>
+    <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32.png">
       <!---If we want Inner menu-->
       <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
       <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16.png" ShortcutKey="" />
@@ -41,21 +22,43 @@
       <RibbonItem Action="FieldSetting" LocalizedNameKey="FieldSetting" Glyph="Setup_16x16.png" ShortcutKey=""/>
     </RibbonItem>
   </RibbonItem>
-   <RibbonItem>
-    <RibbonItem Action="OffSetAccount" LocalizedNameKey="OffSetAccount"  LargeGlyph="Offset_Account_32x32.png"/>
-  </RibbonItem>
-   <RibbonItem>
+	<RibbonItem>
+		<RibbonItem Action="PageViewMode" ShortcutKey="" LocalizedNameKey="HideOBJ" Parameter="Folders"  LargeGlyph="Folder_32x32.png"/>
+	</RibbonItem>
+	<RibbonItem>
+		<RibbonItem Action="ViewDownloadRow" ShortcutKey="F7" LocalizedNameKey="View" LargeGlyph="View_Highlighted_32x32.png" />
+		<RibbonItem Action="GenerateJournalLines" LocalizedNameKey="GenerateJournalLines" LargeGlyph="Generate_32x32.png" ShortcutKey="Ctrl+J" />
+		<RibbonItem Action="ViewJournalLines" LocalizedNameKey="Journallines" LargeGlyph="Journal_Lines_32x32.png" />
+		<RibbonItem Action="GeneratePurchaseOrder" LocalizedNameKey="GeneratePurchaseOrder" LargeGlyph="Generate_32x32.png" ShortcutKey="Ctrl+G" />
+		<RibbonItem Action="CheckIfPosted" LocalizedNameKey="CheckIfPosted" LargeGlyph="Check_Journal_32x32.png"/>
+	</RibbonItem>
+	<RibbonItem LocalizedNameKey="Bilagscan">
+		<RibbonItem Action="BilagscanSend" LocalizedNameKey="BilagscanSend" Module="Bilagscan" LargeGlyph=";component/Assets/img/Export_32x32.png" />
+		<RibbonItem Action="BilagscanRead" LocalizedNameKey="BilagscanRead" Module="Bilagscan" LargeGlyph=";component/Assets/img/Import_32x32.png" />
+	</RibbonItem>
+	<RibbonItem>
     <RibbonItem Action="EnvelopeWizard" LocalizedNameKey="CreateOBJ" Parameter="Envelope" Glyph="Folder_32x32.png" LargeGlyph="Folder_32x32.png"/>
-  </RibbonItem>
-  <RibbonItem>
-    <RibbonItem Action="CopyOrMoveVoucher" LocalizedNameKey="CopyOrMoveOBJ" Parameter="Attachments" LargeGlyph="Job_Change_32x32.png" />
-  </RibbonItem>
-  <RibbonItem>
-    <RibbonItem Action="ResendToApprover" LocalizedNameKey="ResendToApprover" LargeGlyph="Email_Add_32x32.png" />
-    <RibbonItem Action="PendingApproval" LocalizedNameKey="PendingApproval" LargeGlyph="Validate_32x32.png" />
-  </RibbonItem>
-  <RibbonItem TabId="1" LocalizedNameKey="Envelopes">
-    <RibbonItem Action="AddEnvelope" LocalizedNameKey="Add" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png"/>
-    <RibbonItem Action="EditEnvelope" LocalizedNameKey="EditOBJ" Parameter="Content" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>
-  </RibbonItem>
+    <RibbonItem Action="PDFTools" LocalizedNameKey="PDFTools" LargeGlyph="PageTools_32x32.png">
+			<RibbonItem Action="SplitPDF" LocalizedNameKey="SplitPDF" Glyph="Match_Remove_16x16.png" />
+			<RibbonItem Action="JoinPDF" LocalizedNameKey="JoinTwoOBJ" Parameter="pdfs" Glyph="Match_Add_16x16.png" />
+			<RibbonItem Action="ConvertToPDF" LocalizedNameKey="ConvertToPDF" Glyph="Image_To_PDF_16x16.png" />
+		</RibbonItem>
+	</RibbonItem>
+	<RibbonItem>
+		<RibbonItem Action="OffSetAccount" LocalizedNameKey="OffSetAccount"  LargeGlyph="Offset_Account_32x32.png"/>
+	</RibbonItem>
+	<RibbonItem>
+		<RibbonItem Action="CopyOrMoveVoucher" LocalizedNameKey="CopyOrMoveOBJ" Parameter="Attachments" LargeGlyph="Job_Change_32x32.png" />
+		<RibbonItem Action="MoveToCompany" LocalizedNameKey="MoveToCompany" LargeGlyph="CopyUserTable_32x32.png" />
+	</RibbonItem>
+	<RibbonItem>
+		<RibbonItem Action="Approval" LocalizedNameKey="Approval" LargeGlyph="Validate_32x32.png">
+			<RibbonItem Action="ResendToApprover" LocalizedNameKey="ResendToApprover" Glyph="Add_Notes_16x16.png" />
+			<RibbonItem Action="PendingApproval" LocalizedNameKey="PendingApproval" Glyph="Tick_16x16.png" />
+		</RibbonItem>
+	</RibbonItem>
+	<RibbonItem TabId="1" LocalizedNameKey="Envelopes">
+		<RibbonItem Action="AddEnvelope" LocalizedNameKey="Add" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png"/>
+		<RibbonItem Action="EditEnvelope" LocalizedNameKey="EditOBJ" Parameter="Content" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>
+	</RibbonItem>
 </root>

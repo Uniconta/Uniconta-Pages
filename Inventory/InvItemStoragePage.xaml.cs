@@ -31,7 +31,14 @@ namespace UnicontaClient.Pages.CustomPage
         public override Type TableType { get { return typeof(InvItemStorageClientLocal); } }
         public override IComparer GridSorting { get { return new InvItemStorageClientSort(); } }
         public override bool SingleBufferUpdate { get { return false; } }
-        public override bool Readonly { get { return false; } }
+        public override bool Readonly { get { return readOnly; } }
+
+        internal bool readOnly;
+
+        protected override void DataLoaded(UnicontaBaseEntity[] Arr) 
+        {
+            InvItemStorageClient.UpdateOnHand((IEnumerable<InvItemStorage>)Arr, api);
+        }
     }
 
     public partial class InvItemStoragePage : GridBasePage
@@ -111,19 +118,18 @@ namespace UnicontaClient.Pages.CustomPage
                                     itemRec = masterRecord as Uniconta.DataModel.InvItem;
                             }
                         }
-
                     }
                 }
             }
 
             if (Item != null)
             {
-                var cache = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.InvItem));
+                var cache = api.GetCache(typeof(Uniconta.DataModel.InvItem));
                 if (cache != null)
                     itemRec = (Uniconta.DataModel.InvItem)cache.Get(Item);
                 else
                 {
-                    api.CompanyEntity.LoadCache(typeof(Uniconta.DataModel.InvItem), api);
+                    api.LoadCache(typeof(Uniconta.DataModel.InvItem));
                     itemRec = null;
                 }
             }
@@ -148,17 +154,26 @@ namespace UnicontaClient.Pages.CustomPage
         private void Init(UnicontaBaseEntity sourcedata = null)
         {
             InitializeComponent();
-            Utility.SetupVariants(api, colVariant, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
+            Utility.SetupVariants(api, colVariant, VariantName, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
             ((TableView)dgInvItemStorageClientGrid.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
             SetRibbonControl(localMenu, dgInvItemStorageClientGrid);
             dgInvItemStorageClientGrid.api = api;
             dgInvItemStorageClientGrid.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
-            dgInvItemStorageClientGrid.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;
             dgInvItemStorageClientGrid.ShowTotalSummary();
             if (sourcedata != null)
+            {
                 dgInvItemStorageClientGrid.UpdateMaster(sourcedata);
-            InitialLoad();
+                dgInvItemStorageClientGrid.readOnly = ! (sourcedata is InvItem);
+            }
+            else
+                dgInvItemStorageClientGrid.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;
+            this.items = api.GetCache(typeof(InvItem));
+            this.warehouse = api.GetCache(typeof(InvWarehouse));
+
+            RibbonBase rb = (RibbonBase)localMenu.DataContext;
+            if (sourcedata == null)
+                UtilDisplay.RemoveMenuCommand(rb, "SetWarehouse");
         }
 
         void DataControl_CurrentItemChanged(object sender, DevExpress.Xpf.Grid.CurrentItemChangedEventArgs e)
@@ -207,23 +222,12 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        private async void InitialLoad()
-        {
-            var Comp = api.CompanyEntity;
-            this.items = Comp.GetCache(typeof(InvItem));
-            this.warehouse = Comp.GetCache(typeof(InvWarehouse));
-        }
-
         protected override async void LoadCacheInBackGround()
         {
-            var api = this.api;
-            var Comp = api.CompanyEntity;
-
             if (this.items == null)
-                this.items = await Comp.LoadCache(typeof(Uniconta.DataModel.InvItem), api).ConfigureAwait(false);
-
-            if (Comp.Warehouse && this.warehouse == null)
-                this.warehouse = await Comp.LoadCache(typeof(Uniconta.DataModel.InvWarehouse), api).ConfigureAwait(false);
+                this.items = await api.LoadCache(typeof(Uniconta.DataModel.InvItem)).ConfigureAwait(false);
+            if (api.CompanyEntity.Warehouse && this.warehouse == null)
+                this.warehouse = await api.LoadCache(typeof(Uniconta.DataModel.InvWarehouse)).ConfigureAwait(false);
         }
 
         private void localMenu_OnItemClicked(string ActionType)
@@ -254,17 +258,23 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         AddDockItem(TabControls.InventoryReservationReport, dgInvItemStorageClientGrid.syncEntity, Uniconta.ClientTools.Localization.lookup("Reservations"));
                     break;
+                case "InvStockProfile":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.InvStorageProfileReport, dgInvItemStorageClientGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("StockProfile"), selectedItem._Item));
+                    break;
+                case "SetWarehouse":
+                    SetWarehouse();
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
         }
-        public override void PageClosing()
+        public void SetWarehouse()
         {
             var selected = dgInvItemStorageClientGrid.SelectedItem as Uniconta.DataModel.InvItemStorage;
             if (selected != null)
                 globalEvents.OnRefresh(TabControls.InvItemStoragePage, selected);
-            base.PageClosing();
         }
         private Task Filter(IEnumerable<PropValuePair> propValuePair)
         {
@@ -293,6 +303,5 @@ namespace UnicontaClient.Pages.CustomPage
     {
         internal object locationSource;
         public object LocationSource { get { return locationSource; } }
-
     }
 }

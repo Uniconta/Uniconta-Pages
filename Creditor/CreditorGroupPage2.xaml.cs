@@ -42,7 +42,6 @@ namespace UnicontaClient.Pages.CustomPage
         public CreditorGroupPage2(UnicontaBaseEntity sourcedata, bool isEdit = true)
             : base(sourcedata, isEdit)
         {
-            InitializeComponent();
             if (!isEdit)
             {
                 editrow = (CreditorGroupClient)StreamingManager.Clone(sourcedata);
@@ -55,7 +54,6 @@ namespace UnicontaClient.Pages.CustomPage
         public CreditorGroupPage2(CrudAPI crudApi, string dummy)
             : base(crudApi, dummy)
         {
-            InitializeComponent();
             InitPage(crudApi);
 #if !SILVERLIGHT
             FocusManager.SetFocusedElement(txtGroup, txtGroup);
@@ -63,7 +61,8 @@ namespace UnicontaClient.Pages.CustomPage
         }
         void InitPage(CrudAPI crudapi)
         {
-            BusyIndicator = busyIndicator;
+            InitializeComponent();
+            StartLoadCache();
             layoutControl = layoutItems;
             cbRevenueFollowDC.ItemsSource = AppEnums.FollowItemCreditor.Values;
             PriceListlookupeditior.api = layoutGroupLookupEditor.api = itemNameGroupLookupEditor.api =
@@ -85,8 +84,6 @@ namespace UnicontaClient.Pages.CustomPage
             }
             layoutItems.DataContext = editrow;
             frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
-
-            StartLoadCache();
         }
 
         private void frmRibbon_OnItemClicked(string ActionType)
@@ -97,22 +94,20 @@ namespace UnicontaClient.Pages.CustomPage
         protected override async void LoadCacheInBackGround()
         {
             var api = this.api;
-            var Comp = api.CompanyEntity;
 
-            var Cache = Comp.GetCache(typeof(Uniconta.DataModel.GLVat)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.GLVat), api).ConfigureAwait(false);
+            var Cache = api.GetCache(typeof(Uniconta.DataModel.GLVat)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLVat)).ConfigureAwait(false);
             var vatbuy = new VatCacheFilter(Cache, GLVatSaleBuy.Buy);
             lePurchaseVat.cacheFilter = lePurchaseVat1.cacheFilter = lePurchaseVat2.cacheFilter = lePurchaseVat3.cacheFilter = lePurchaseVat4.cacheFilter = vatbuy;
 
             if (api.CompanyEntity._UseVatOperation)
             {
-                Cache = Comp.GetCache(typeof(Uniconta.DataModel.GLVatType)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.GLVatType), api).ConfigureAwait(false);
+                Cache = api.GetCache(typeof(Uniconta.DataModel.GLVatType)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLVatType)).ConfigureAwait(false);
                 var vatbuyOpr = new VatTypeSQLCacheFilter(Cache, GLVatSaleBuy.Buy);
                 lePurchaseVatOpr.cacheFilter = lePurchaseVatOpr1.cacheFilter = lePurchaseVatOpr2.cacheFilter = lePurchaseVatOpr3.cacheFilter = lePurchaseVatOpr4.cacheFilter = vatbuyOpr;
             }
 
-            Cache = Comp.GetCache(typeof(Uniconta.DataModel.NumberSerie)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.NumberSerie), api).ConfigureAwait(false);
-            var numbers = new NumberSerieSQLCacheFilter(Cache, true);
-            leAutoNumber.cacheFilter = numbers;
+            Cache = api.GetCache(typeof(Uniconta.DataModel.NumberSerie)) ?? await api.LoadCache(typeof(Uniconta.DataModel.NumberSerie)).ConfigureAwait(false);
+            leAutoNumber.cacheFilter = new NumberSerieSQLCacheFilter(Cache, true);
 
             LoadType(typeof(Uniconta.DataModel.GLAccount));
         }

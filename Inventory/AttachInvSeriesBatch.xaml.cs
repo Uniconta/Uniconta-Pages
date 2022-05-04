@@ -74,7 +74,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (res != ErrorCodes.Succes)
                 UtilDisplay.ShowErrorCode(res);
             else
-                dockCtrl.CloseDockItem();
+                CloseDockItem();
         }
     }
 }

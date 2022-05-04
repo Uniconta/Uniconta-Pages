@@ -76,6 +76,9 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorDetailControl"
                     <CorasauControls:CorasauLayoutItem FieldName="EndDiscountPct" x:Name="liEndDiscountPct">
                         <CorasauControls:DoubleEditor FieldName="EndDiscountPct" IsReadOnly="True" />
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="LineDiscountPct" x:Name="liLineDiscountPct">
+                        <CorasauControls:DoubleEditor FieldName="LineDiscountPct" IsReadOnly="True" />
+                    </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="CreditMax" x:Name="liCreditMax">
                         <CorasauControls:DoubleEditor FieldName="CreditMax" IsReadOnly="True"/>
                     </CorasauControls:CorasauLayoutItem>
@@ -100,11 +103,20 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorDetailControl"
                     <CorasauControls:CorasauLayoutItem FieldName="BankAccount" x:Name="liBankAccount">
                         <CorasauControls:TextEditor Text="{Binding BankAccount}" IsReadOnly="True"/>
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="SWIFT" x:Name="liSWIFT">
+                        <CorasauControls:TextEditor Text="{Binding SWIFT}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="RefInPayment" x:Name="liRefInPayment">
                         <CorasauControls:TextEditor Text="{Binding RefInPayment}" IsReadOnly="True" />
                     </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="VatNumber" x:Name="liVatNumber">
-                        <CorasauControls:TextEditor Text="{Binding VatNumber}" IsReadOnly="True"/>
+                    <CorasauControls:CorasauLayoutItem FieldName="D2CAccount" x:Name="liD2CAccount">
+                        <CorasauControls:TextEditor  x:Name="txtD2CAccount" Text="{Binding D2CAccount,Mode=OneWay}" IsReadOnly="True" />
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="EEIsNotVatDeclOrg" x:Name="liEEIsNotVatDeclOrg">
+                        <CorasauControls:CheckEditor IsChecked="{Binding EEIsNotVatDeclOrg}" IsReadOnly="True" />
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Created" x:Name="liCreated">
+                        <CorasauControls:DateEditor x:Name="dteCreated"  EditValue="{Binding Created}" IsReadOnly="True" />
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
 
@@ -135,10 +147,16 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorDetailControl"
                         <CorasauControls:TextEditor Text="{Binding InvoiceEmail}" IsReadOnly="True"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="InvoiceInXML" x:Name="liInvoiceInXML">
-                        <CorasauControls:CheckEditor IsChecked="{Binding InvoiceInXML}" IsReadOnly="True" />
+                        <CorasauControls:TextEditor Text="{Binding InvoiceInXML}" IsReadOnly="True" />
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="EAN" x:Name="liEAN">
                         <CorasauControls:TextEditor Text="{Binding EAN}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="VatNumber" x:Name="liVatNumber">
+                        <CorasauControls:TextEditor Text="{Binding VatNumber}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="EORI" x:Name="liEORI">
+                        <CorasauControls:TextEditor  x:Name="txtEORI" Text="{Binding EORI}" IsReadOnly="True" />
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="PostingAccount" x:Name="liPostingAccount">
                         <CorasauControls:TextEditor x:Name="lePostingAccount" Text="{Binding PostingAccount}" IsReadOnly="True"/>

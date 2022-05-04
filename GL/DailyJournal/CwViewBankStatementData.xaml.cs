@@ -84,7 +84,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (propInfo.Name == "SkipLines")
                         continue;
 
-                    propertySource.Add(string.Format("{0} ({1})", propInfo.Name, UtilFunctions.GetDisplayNameFromPropertyInfo(propInfo)));
+                    propertySource.Add(Util.ConcatParenthesis(propInfo.Name, UtilFunctions.GetDisplayNameFromPropertyInfo(propInfo)));
                 }
             }
             return propertySource;
@@ -318,7 +318,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (e.Key == Key.Escape)
             {
-                this.DialogResult = false;
+                SetDialogResult(false);
             }
             else
                 if (e.Key == Key.Enter)

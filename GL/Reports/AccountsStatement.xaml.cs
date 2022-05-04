@@ -34,6 +34,7 @@ using System.Windows.Data;
 using DevExpress.Data.Filtering;
 using DevExpress.Xpf.Editors;
 using DevExpress.Mvvm.UI.Interactivity;
+using Uniconta.Common.Utility;
 #if !SILVERLIGHT
 using UnicontaClient.Pages;
 #endif
@@ -103,7 +104,7 @@ namespace UnicontaClient.Pages.CustomPage
         [Display(Name = "Currency", ResourceType = typeof(GLDailyJournalText))]
         public string Currency { get { return Acc._Currency > 0 ? Acc._Currency.ToString() : null; } }
 
-        public List<GLTransClientTotal> ChildRecords { get; set; }
+        public GLTransClientTotal[] ChildRecords { get; set; }
 
         public double _SumAmount;
         public double SumAmount { get { return _SumAmount; } }
@@ -131,10 +132,9 @@ namespace UnicontaClient.Pages.CustomPage
 
         SQLCache accountCache;
         ItemBase ibase, ibaseCurrent;
-        List<AccountStatementList> statementList;
         ReportAPI transApi;
         Uniconta.DataModel.GLAccount _master;
-        static bool pageBreak; 
+        static bool pageBreak;
         static public DateTime DefaultFromDate, DefaultToDate;
         static int setShowDimOnPrimoIndex = 0;
         static bool IsCollapsed = true;
@@ -213,7 +213,6 @@ namespace UnicontaClient.Pages.CustomPage
             cmbFromAccount.api = cmbToAccount.api = api;
             SetRibbonControl(localMenu, dgGLTrans);
             localMenu.OnItemClicked += LocalMenu_OnItemClicked;
-            statementList = new List<AccountStatementList>();
 
             if (AccountStatement.DefaultFromDate == DateTime.MinValue)
             {
@@ -226,6 +225,7 @@ namespace UnicontaClient.Pages.CustomPage
             cbxSkipBlank.IsChecked = Pref.Debtor_skipBlank;
 #if !SILVERLIGHT
             cbxPageBreak.IsChecked = pageBreak;
+            dgGLTrans.PageBreak = pageBreak;
 #endif
             cmbShowDimOnPrimo.ItemsSource = new string[] { Uniconta.ClientTools.Localization.lookup("OnePrimo"), Uniconta.ClientTools.Localization.lookup("PrimoPerDim"), Uniconta.ClientTools.Localization.lookup("NoPrimo") };
             cmbShowDimOnPrimo.SelectedIndex = setShowDimOnPrimoIndex;
@@ -301,11 +301,18 @@ namespace UnicontaClient.Pages.CustomPage
             return detail == null ? null : detail.View as TableView;
         }
 
+        public override bool CheckIfBindWithUserfield(out bool isReadOnly, out bool useBinding)
+        {
+            isReadOnly = true;
+            useBinding = true;
+            return true;
+        }
+
 #if !SILVERLIGHT
 
         void SubstituteFilter(object sender, DevExpress.Data.SubstituteFilterEventArgs e)
         {
-            if (string.IsNullOrEmpty(ribbonControl.SearchControl.SearchText))
+            if (string.IsNullOrEmpty(ribbonControl?.SearchControl?.SearchText))
                 return;
             e.Filter = new GroupOperator(GroupOperatorType.Or, e.Filter, GetDetailFilter(ribbonControl.SearchControl.SearchText));
         }
@@ -374,7 +381,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "VoucherTransactions":
                     if (selectedItem == null)
                         return;
-                    string vheader = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("VoucherTransactions"), selectedItem._Voucher);
+                    string vheader = Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("VoucherTransactions"), NumberConvert.ToString(selectedItem._Voucher));
                     AddDockItem(TabControls.AccountsTransaction, childDgGLTrans.syncEntity, vheader);
                     break;
                 case "ExpandAndCollapse":
@@ -495,10 +502,9 @@ namespace UnicontaClient.Pages.CustomPage
             ibaseCurrent = UtilDisplay.GetMenuCommandByName(rb, "ExpandCollapseCurrent");
         }
 
+        int dataRowCount;
         void ExpandAndCollapseAll(bool IsCollapseAll)
         {
-            int dataRowCount = statementList.Count;
-
             for (int iRow = 0; iRow < dataRowCount; iRow++)
                 if (!IsCollapseAll)
                     dgGLTrans.ExpandMasterRow(iRow);
@@ -519,7 +525,6 @@ namespace UnicontaClient.Pages.CustomPage
         {
             childDgGLTrans.ClearSorting();
             SetExpandAndCollapse(true);
-            statementList.Clear();
             List<int> dim1 = null, dim2 = null, dim3 = null, dim4 = null, dim5 = null;
 
             var NumberOfDimensions = api.CompanyEntity.NumberOfDimensions;
@@ -536,14 +541,8 @@ namespace UnicontaClient.Pages.CustomPage
             AccountStatement.SetDateTime(txtDateFrm, txtDateTo);
             DateTime fromDate = AccountStatement.DefaultFromDate, toDate = AccountStatement.DefaultToDate;
 
-            var isAscending = cbxAscending.IsChecked.Value;
-            var skipBlank = cbxSkipBlank.IsChecked.Value;
-
             var showDimOnPrimo = cmbShowDimOnPrimo.SelectedIndex;
 
-            var Pref = api.session.Preference;
-            Pref.TransactionReport_isAscending = isAscending;
-            Pref.TransactionReport_skipBlank = skipBlank;
 #if !SILVERLIGHT
             pageBreak = cbxPageBreak.IsChecked.Value;
 #endif
@@ -567,77 +566,96 @@ namespace UnicontaClient.Pages.CustomPage
 
             var dimensionParams = BalanceReport.SetDimensionParameters(dim1, dim2, dim3, dim4, dim5, true, true, true, true, true);
             var listTrans = (GLTransClientTotal[])await transApi.GetTransactions(new GLTransClientTotal(), journal, fromAccount, toAccount, fromDate, toDate, dimensionParams, showDimOnPrimo);
+            if (accountCache == null)
+                accountCache = await transApi.CompanyEntity.LoadCache(typeof(Uniconta.DataModel.GLAccount), api);
+
             if (listTrans != null)
-            {
-                string currentItem = string.Empty;
-                AccountStatementList masterDbStatement = null;
-                List<GLTransClientTotal> dbTransClientChildList = null;
-                long SumAmount = 0, SumAmountCur = 0;
-                byte currentCur = 0;
-                bool TransFound = false;
-                if (accountCache == null)
-                    accountCache = await transApi.CompanyEntity.LoadCache(typeof(Uniconta.DataModel.GLAccount), api);
-
-                foreach (var trans in listTrans)
-                {
-                    if (trans._Account != currentItem)
-                    {
-                        currentItem = trans._Account;
-
-                        if (TransFound)
-                        {
-                            masterDbStatement._SumAmount = SumAmount / 100d;
-                            masterDbStatement._SumAmountCur = SumAmountCur / 100d;
-                            statementList.Add(masterDbStatement);
-                        }
-
-                        masterDbStatement = new AccountStatementList((GLAccount)accountCache.Get(currentItem));
-                        dbTransClientChildList = new List<GLTransClientTotal>();
-                        masterDbStatement.ChildRecords = dbTransClientChildList;
-                        SumAmount = SumAmountCur = 0;
-                        currentCur = (byte)masterDbStatement.Acc._Currency;
-                        TransFound = !skipBlank;
-                    }
-
-                    if (!TransFound && !trans._PrimoTrans)
-                        TransFound = true;
-
-                    SumAmount += trans._AmountCent;
-                    trans._Total = SumAmount;
-                    masterDbStatement._SumAmount = SumAmount;
-
-                    if (trans._AmountCurCent != 0 && trans._Currency == currentCur)
-                    {
-                        SumAmountCur += trans._AmountCurCent;
-                        trans._TotalCur = SumAmountCur;
-                    }
-
-                    if (isAscending)
-                        dbTransClientChildList.Add(trans);
-                    else
-                        dbTransClientChildList.Insert(0, trans);
-                }
-
-                if (TransFound)
-                {
-                    masterDbStatement._SumAmount = SumAmount / 100d;
-                    masterDbStatement._SumAmountCur = SumAmountCur / 100d;
-                    statementList.Add(masterDbStatement);
-                }
-
-                if (statementList.Count > 0)
-                {
-                    dgGLTrans.ItemsSource = null;
-                    dgGLTrans.ItemsSource = statementList;
-                }
-                dgGLTrans.Visibility = Visibility.Visible;
-            }
+                FillStatement(listTrans);
             else if (transApi.LastError != 0)
             {
-                Uniconta.ClientTools.Util.UtilDisplay.ShowErrorCode(transApi.LastError);
+                busyIndicator.IsBusy = false;
+                UtilDisplay.ShowErrorCode(transApi.LastError);
             }
+            dgGLTrans.Visibility = Visibility.Visible;
             busyIndicator.IsBusy = false;
             SetExpandAndCollapse(IsCollapsed);
+        }
+
+        void FillStatement(GLTransClientTotal[] listTrans)
+        {
+            var isAscending = cbxAscending.IsChecked.Value;
+            var skipBlank = cbxSkipBlank.IsChecked.Value;
+
+            var Pref = api.session.Preference;
+            Pref.TransactionReport_isAscending = isAscending;
+            Pref.TransactionReport_skipBlank = skipBlank;
+
+            var statementList = new List<AccountStatementList>(Math.Min(20, dataRowCount));
+
+            string currentItem = string.Empty;
+            AccountStatementList masterDbStatement = null;
+            var tlst = new List<GLTransClientTotal>(1000);
+            long SumAmount = 0, SumAmountCur = 0;
+            byte currentCur = 0;
+            bool TransFound = false;
+
+            GLTransClientTotal trans;
+            for (int n = 0; (n < listTrans.Length); n++)
+            {
+                trans = listTrans[n];
+                if (trans._Account != currentItem)
+                {
+                    currentItem = trans._Account;
+
+                    if (TransFound)
+                    {
+                        masterDbStatement._SumAmount = SumAmount / 100d;
+                        masterDbStatement._SumAmountCur = SumAmountCur / 100d;
+                        masterDbStatement.ChildRecords = tlst.ToArray();
+                        statementList.Add(masterDbStatement);
+                        if (!isAscending)
+                            Array.Reverse(masterDbStatement.ChildRecords);
+                    }
+
+                    masterDbStatement = new AccountStatementList((GLAccount)accountCache.Get(currentItem));
+                    tlst.Clear();
+                    SumAmount = SumAmountCur = 0;
+                    currentCur = (byte)masterDbStatement.Acc._Currency;
+                    TransFound = !skipBlank;
+                }
+
+                if (!TransFound && !trans._PrimoTrans)
+                    TransFound = true;
+
+                SumAmount += trans._AmountCent;
+                trans._Total = SumAmount;
+                masterDbStatement._SumAmount = SumAmount;
+
+                if (trans._AmountCurCent != 0 && trans._Currency == currentCur)
+                {
+                    SumAmountCur += trans._AmountCurCent;
+                    trans._TotalCur = SumAmountCur;
+                }
+
+                tlst.Add(trans);
+            }
+
+            if (TransFound)
+            {
+                masterDbStatement._SumAmount = SumAmount / 100d;
+                masterDbStatement._SumAmountCur = SumAmountCur / 100d;
+                masterDbStatement.ChildRecords = tlst.ToArray();
+                statementList.Add(masterDbStatement);
+                if (!isAscending)
+                    Array.Reverse(masterDbStatement.ChildRecords);
+            }
+
+            dataRowCount = statementList.Count;
+            if (dataRowCount > 0)
+            {
+                dgGLTrans.ItemsSource = null;
+                dgGLTrans.ItemsSource = statementList;
+            }
         }
 
 
@@ -651,7 +669,6 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (!manualExpanded)
             {
-                int dataRowCount = statementList.Count;
                 for (int rowHandle = 0; rowHandle < dataRowCount; rowHandle++)
                     dgGLTrans.ExpandMasterRow(rowHandle);
             }

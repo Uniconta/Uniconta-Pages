@@ -35,13 +35,12 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
         internal const int FOREIGN_STANDARDTRANSFER = 53;
         internal const int FOREIGN_SEPATRANSFER = 97;
 
-        public static void GenerateFile(IEnumerable<CreditorTransPayment> paymentList, IEnumerable<CreditorTransPayment> paymentListTotal, CrudAPI api, 
-                                        CreditorPaymentFormat paymentFormat, PaymentReference paymReference, SQLCache bankAccountCache, SQLCache creditorCache, bool glJournalGenerated = false)
+        public static bool GenerateFile(IEnumerable<CreditorTransPayment> paymentList, Company company, 
+                                        CreditorPaymentFormat paymentFormat, SQLCache bankAccountCache, SQLCache creditorCache, bool glJournalGenerated = false)
         {
             var bankStatement = (BankStatement)bankAccountCache.Get(paymentFormat._BankAccount);
             var fileFormat = new CreateBankDataFileFormatBase();
             var listofBankProperties = new List<DanishFormatFieldBase>();
-            var paymentReference = paymReference;
 
             foreach (var tran in paymentList)
             {
@@ -49,17 +48,17 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
 
                 if (tran._PaymentMethod == PaymentTypes.IBAN)
                 {
-                    var newProp = fileFormat.CreateForeignFormatField(tran, paymentFormat, bankStatement, creditor, api.CompanyEntity, glJournalGenerated);
+                    var newProp = fileFormat.CreateForeignFormatField(tran, paymentFormat, bankStatement, creditor, company, glJournalGenerated);
                     if (newProp != null)
                         listofBankProperties.Add(newProp);
 
-                    var newProp2 = fileFormat.SecondaryCreateForeignFormatField(tran, paymentFormat, bankStatement, creditor, api.CompanyEntity, glJournalGenerated);
+                    var newProp2 = fileFormat.SecondaryCreateForeignFormatField(tran, paymentFormat, bankStatement, creditor, company, glJournalGenerated);
                     if (newProp != null)
                         listofBankProperties.Add(newProp2);
                 }
                 else if ((tran._PaymentMethod != PaymentTypes.IBAN) && (tran._PaymentMethod != PaymentTypes.VendorBankAccount))
                 {
-                    var newProp = fileFormat.CreateIndbetalingskortFormatField(tran, paymentFormat, bankStatement, creditor, api.CompanyEntity, glJournalGenerated);
+                    var newProp = fileFormat.CreateIndbetalingskortFormatField(tran, paymentFormat, bankStatement, creditor, company, glJournalGenerated);
 
                     if (newProp != null)
                         listofBankProperties.Add(newProp);
@@ -71,21 +70,21 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
 
                     if (countryCode != string.Empty && countryCode != BaseDocument.COUNTRY_DK)
                     {
-                        var newProp = fileFormat.CreateForeignFormatField(tran, paymentFormat, bankStatement, creditor, api.CompanyEntity, glJournalGenerated);
+                        var newProp = fileFormat.CreateForeignFormatField(tran, paymentFormat, bankStatement, creditor, company, glJournalGenerated);
                         if (newProp != null)
                             listofBankProperties.Add(newProp);
 
-                        var newProp2 = fileFormat.SecondaryCreateForeignFormatField(tran, paymentFormat, bankStatement, creditor, api.CompanyEntity, glJournalGenerated);
+                        var newProp2 = fileFormat.SecondaryCreateForeignFormatField(tran, paymentFormat, bankStatement, creditor, company, glJournalGenerated);
                         if (newProp != null)
                             listofBankProperties.Add(newProp2);
                     }
                     else
                     {
-                        var newProp = fileFormat.CreateDomesticFormatField(tran, paymentFormat, bankStatement, creditor, api.CompanyEntity, glJournalGenerated);
+                        var newProp = fileFormat.CreateDomesticFormatField(tran, paymentFormat, bankStatement, creditor, company, glJournalGenerated);
                         if (newProp != null)
                             listofBankProperties.Add(newProp);
 
-                        var newProp2 = fileFormat.SecondaryCreateDomesticFormatField(tran, paymentFormat, bankStatement, api.CompanyEntity, glJournalGenerated);
+                        var newProp2 = fileFormat.SecondaryCreateDomesticFormatField(tran, paymentFormat, bankStatement, company, glJournalGenerated);
                         if (newProp != null)
                             listofBankProperties.Add(newProp2);
                     }
@@ -99,7 +98,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
 
                 var userClickedSave = sfd.ShowDialog();
                 if (userClickedSave != true)
-                    return;
+                    return false;
 
                 try
                 {
@@ -119,9 +118,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
                         }
                         stream.Close();
                     }
-
-                    paymentReference.InsertPaymentReferenceTask(paymentList.Where(s => s._ErrorInfo == BaseDocument.VALIDATE_OK).ToList(), 
-                                                                paymentListTotal.Where(s => s._ErrorInfo == BaseDocument.VALIDATE_OK).ToList(), api, glJournalGenerated);
+                    return true;
                 }
                 catch (Exception ex)
                 {
@@ -132,6 +129,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
             {
                 UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("There are no payments!\nPlease check the System info column."), Uniconta.ClientTools.Localization.lookup("Warning"));
             }
+            return false;
         }
 
         public static void CreateStartAndEnd(List<DanishFormatFieldBase> listofBankProperties, StreamWriter sw, bool isStartOrEnd)

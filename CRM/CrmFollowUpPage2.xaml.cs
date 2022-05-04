@@ -40,12 +40,12 @@ namespace UnicontaClient.Pages.CustomPage
 
         UnicontaBaseEntity master;
         CrmCampaignClient campaignClient;
+        ProjectClient project;
         CrudAPI crudAPI;
         bool isCopiedRow = false;
         public CrmFollowUpPage2(UnicontaBaseEntity sourcedata, bool isEdit, UnicontaBaseEntity master = null)
             : base(sourcedata, isEdit)
         {
-            InitializeComponent();
             isCopiedRow = !isEdit;
             this.master = master;
             InitPage(api);
@@ -53,7 +53,6 @@ namespace UnicontaClient.Pages.CustomPage
         public CrmFollowUpPage2(CrudAPI crudApi, string dummy)
             : base(crudApi, dummy)
         {
-            InitializeComponent();
             InitPage(crudApi);
 #if !SILVERLIGHT
             FocusManager.SetFocusedElement(deCreated, deCreated);
@@ -64,19 +63,20 @@ namespace UnicontaClient.Pages.CustomPage
 
         public CrmFollowUpPage2(CrudAPI crudApi, UnicontaBaseEntity sourceData) : base(crudApi, null)
         {
-            InitializeComponent();
             campaignClient = sourceData as CrmCampaignClient;
+            project = master as ProjectClient;
             InitPage(crudApi);
         }
 
         void InitPage(CrudAPI crudapi)
         {
             crudAPI = crudapi;
-            BusyIndicator = busyIndicator;
+            var Comp = crudAPI.CompanyEntity;
+            InitializeComponent();
+            StartLoadCache();
             layoutControl = layoutItems;
             deCreated.IsReadOnly = true;
             deCreated.AllowDefaultButton = false;
-            StartLoadCache();
             if (campaignClient != null)
             {
                 RibbonBase rb = (RibbonBase)frmRibbon.DataContext;
@@ -84,7 +84,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (!isCopiedRow)
                 {
                     NewRow = CreateNew() as CrmFollowUpClient;
-                    NewRow.SetMaster(master ?? crudAPI.CompanyEntity);
+                    NewRow.SetMaster(master ?? crudapi.CompanyEntity);
                 }
             }
             if (editrow == null && LoadedRow == null && campaignClient == null)
@@ -93,7 +93,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (!isCopiedRow)
                 {
                     editrow = CreateNew() as CrmFollowUpClient;
-                    editrow.SetMaster(master ?? crudAPI.CompanyEntity);
+                    editrow.SetMaster(master ?? crudapi.CompanyEntity);
                 }
 
                 deCreated.IsReadOnly = false;
@@ -150,14 +150,11 @@ namespace UnicontaClient.Pages.CustomPage
 
         async void CreateFollowUps()
         {
-            busyIndicator.IsBusy = true;
-            var crmApi = new CrmAPI(crudAPI);
-            var err = await crmApi.CreateFollowUpMembers(campaignClient, NewRow);
-            busyIndicator.IsBusy = false;
+            var err = await (new CrmAPI(crudAPI)).CreateFollowUpMembers(campaignClient, NewRow);
             if (err != ErrorCodes.Succes)
                 UtilDisplay.ShowErrorCode(err);
             else
-                dockCtrl.CloseDockItem();
+                CloseDockItem();
         }
 
         private void lookupDCAccount_GotFocus(object sender, RoutedEventArgs e)
@@ -165,7 +162,7 @@ namespace UnicontaClient.Pages.CustomPage
             SetAccountSource();
         }
 
-        SQLCache DebtorCache, CreditorCache, CrmProspectCache, ContactCache;
+        SQLCache DebtorCache, CreditorCache, CrmProspectCache, ContactCache, ProjectCache;
         protected override async void LoadCacheInBackGround()
         {
             var api = this.api;
@@ -174,6 +171,8 @@ namespace UnicontaClient.Pages.CustomPage
             CreditorCache = Comp.GetCache(typeof(Uniconta.DataModel.Creditor)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.Creditor), api).ConfigureAwait(false);
             CrmProspectCache = Comp.GetCache(typeof(Uniconta.DataModel.CrmProspect)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.CrmProspect), api).ConfigureAwait(false);
             ContactCache = Comp.GetCache(typeof(Uniconta.DataModel.Contact)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.Contact), api).ConfigureAwait(false);
+            ProjectCache = Comp.GetCache(typeof(Uniconta.DataModel.Project)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.Project), api).ConfigureAwait(false);
+
 
             Dispatcher.BeginInvoke(new Action(() => SetAccountSource()));
         }
@@ -194,6 +193,7 @@ namespace UnicontaClient.Pages.CustomPage
                     case CrmCampaignMemberType.Creditor: cache = CreditorCache; break;
                     case CrmCampaignMemberType.Prospect: cache = CrmProspectCache; break;
                     case CrmCampaignMemberType.Contact: cache = ContactCache; break;
+                    case CrmCampaignMemberType.Project: cache = ProjectCache; break;
                     default: cache = null; break;
                 }
                 editrow.accntSource = cache;
@@ -208,6 +208,7 @@ namespace UnicontaClient.Pages.CustomPage
                     case CrmCampaignMemberType.Creditor: cache = CreditorCache; break;
                     case CrmCampaignMemberType.Prospect: cache = CrmProspectCache; break;
                     case CrmCampaignMemberType.Contact: cache = ContactCache; break;
+                    case CrmCampaignMemberType.Project: cache = ProjectCache; break;
                     default: cache = null; break;
                 }
                 NewRow.accntSource = cache;

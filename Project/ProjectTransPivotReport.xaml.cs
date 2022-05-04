@@ -16,6 +16,7 @@ using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.Common;
+using Uniconta.Common.Utility;
 using Uniconta.DataModel;
 using System.ComponentModel.DataAnnotations;
 using Uniconta.API.Service;
@@ -60,24 +61,22 @@ namespace UnicontaClient.Pages.CustomPage
             pivotDgProjectTrans.EndUpdate();
             localMenu.OnItemClicked += LocalMenu_OnItemClicked;
             pivotDgProjectTrans.CellDoubleClick += PivotGridControl_CellDoubleClick;
+            tbGrdTtlRow.Text = Uniconta.ClientTools.Localization.lookup("ShowRowGrandTotals");
+            tbGrdTtlCol.Text = Uniconta.ClientTools.Localization.lookup("ShowColumnGrandTotals");
+            tbTtlOnFlds.Text = Uniconta.ClientTools.Localization.lookup("ShowTotals");
+            chkGrdTtlCol.IsChecked = chkGrdTtlRow.IsChecked = chkTtlOnFlds.IsChecked = true;
         }
 
         private void PivotGridControl_CellDoubleClick(object sender, DevExpress.Xpf.PivotGrid.PivotCellEventArgs e)
         {
             var cell = pivotDgProjectTrans.FocusedCell;
-            if (e.ColumnField.GroupInterval == FieldGroupInterval.DateMonth && e.RowField.FieldName == "Employee")
+            if (e.ColumnField != null && e.ColumnField.GroupInterval == FieldGroupInterval.DateMonth && e.RowField?.FieldName == "Employee")
             {
-                object columnValue = pivotDgProjectTrans.GetFieldValue(e.ColumnField, cell.X);
-                object rowValue = pivotDgProjectTrans.GetFieldValue(e.RowField, cell.Y);
+                object MonthNo = pivotDgProjectTrans.GetFieldValue(e.ColumnField, cell.X);
+                object employee = pivotDgProjectTrans.GetFieldValue(e.RowField, cell.Y) as string;
 
-                var monthNo = (int)columnValue;
-                string employee = (string)rowValue;
-
-                string vheader = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("PrTransaction"), employee);
-                var param = new object[2];
-                param[0] = employee;
-                param[1] = monthNo;
-                AddDockItem(TabControls.EmployeeProjectTransactionPage, param, vheader);
+                string vheader = Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("PrTransaction"), employee);
+                AddDockItem(TabControls.EmployeeProjectTransactionPage, new object[] { employee, MonthNo }, vheader);
             }
         }
 
@@ -208,6 +207,27 @@ namespace UnicontaClient.Pages.CustomPage
                 pivotDgProjectTrans.BestFit();
                 pivotIsLoaded = true;
             }
+        }
+
+        private void chkGrdTtlRow_Checked(object sender, RoutedEventArgs e)
+        {
+            var value = (bool)chkGrdTtlRow.IsChecked;
+            pivotDgProjectTrans.ShowRowGrandTotalHeader = value;
+            pivotDgProjectTrans.ShowRowGrandTotals = value;
+        }
+
+        private void chkGrdTtlCol_Checked(object sender, RoutedEventArgs e)
+        {
+            var value = (bool)chkGrdTtlCol.IsChecked;
+            pivotDgProjectTrans.ShowColumnGrandTotalHeader = value;
+            pivotDgProjectTrans.ShowColumnGrandTotals = value;
+            pivotDgProjectTrans.ShowColumnTotals = value;
+        }
+
+        private void chkTtlOnFlds_Checked(object sender, RoutedEventArgs e)
+        {
+            var value = (bool)chkTtlOnFlds.IsChecked;
+            pivotDgProjectTrans.ShowRowTotals = value;
         }
     }
 }

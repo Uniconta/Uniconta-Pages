@@ -101,14 +101,14 @@ namespace UnicontaClient.Pages.CustomPage.GL.ChartOfAccount.Reports
         {
             if (e.Key == Key.Escape)
             {
-                this.DialogResult = false;
+                SetDialogResult(false);
             }
             else if (e.Key == Key.Enter)
             {
                 if (OKButton.IsFocused)
                     OKButton_Click(null, null);
                 else if (CancelButton.IsFocused)
-                    this.DialogResult = false;
+                    SetDialogResult(false);
             }
         }
         private void OKButton_Click(object sender, RoutedEventArgs e)
@@ -116,12 +116,12 @@ namespace UnicontaClient.Pages.CustomPage.GL.ChartOfAccount.Reports
             IsSimulation = chkSimulation.IsChecked.Value;
             PostedDate = dpPostingDate.DateTime;
             comments = txtComments.Text;
-            this.DialogResult = true;
+            SetDialogResult(true);
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = false;
+            SetDialogResult(false);
         }
     }
 }

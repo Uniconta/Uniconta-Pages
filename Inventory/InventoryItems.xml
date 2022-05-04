@@ -15,9 +15,10 @@
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="View" ShortcutKey="" LocalizedNameKey="View" LargeGlyph="View_Highlighted_32x32.png">
-    <RibbonItem Action="ViewPhoto" ShortcutKey="" LocalizedNameKey="Photo" Glyph="View_16x16.png"/>
-     <RibbonItem Action="ViewWeb" ShortcutKey="" LocalizedNameKey="Web" Glyph="View_16x16.png"/>
-  </RibbonItem>
+      <RibbonItem Action="ViewPhoto" ShortcutKey="" LocalizedNameKey="Photo" Glyph="View_16x16.png"/>
+      <RibbonItem Action="ViewWeb" ShortcutKey="" LocalizedNameKey="Web" Glyph="View_16x16.png"/>
+      <RibbonItem Action="ViewAttachment" ShortcutKey="" LocalizedNameKey="Attachment" Glyph="View_16x16.png"/>
+    </RibbonItem>
   </RibbonItem>
   <!---If we want to create a new group in same PageTab-->
   <RibbonItem>
@@ -53,6 +54,7 @@
     <RibbonItem Action="Statistics" LocalizedNameKey="Statistics" ControlName="InventoryTotals" LargeGlyph="Statistics_32x32.png"/>
     <RibbonItem Action="Storage" LocalizedNameKey="OnHand" Module="Storage" ControlName="InvItemStoragePage" LargeGlyph="Inventory_Trans_32x32.png"/>
     <RibbonItem Action="InvReservation" LocalizedNameKey="Reservations" ControlName="InventoryReservationReport" Module="Storage" LargeGlyph="Item_Number_32x32.png"/>
+    <RibbonItem Action="InvStockProfile" LocalizedNameKey="StockProfile" ControlName="InvStorageProfileReport" Module="Storage" LargeGlyph="Storage_32x32.png"/>
     <RibbonItem Action="VariantCombi" LocalizedNameKey="ItemVariants" Module="ItemVariants" LargeGlyph="Variants_Combination_32x32.png"/>
     <RibbonItem Action="VariantDetails" LocalizedNameKey="InvVariantDetail" Module="ItemVariants" LargeGlyph="Preview_32x32.png"/>
     <RibbonItem Action="InvTransPivot" LocalizedNameKey="PivotTable" ControlName="InvTransPivotPage" LargeGlyph="Category_Charge_32x32.png" />

@@ -20,6 +20,7 @@ using Uniconta.ClientTools.Controls.Reporting;
 using Uniconta.API.Service;
 using System.Windows.Input;
 using System.Windows.Controls;
+using UnicontaClient.Controls.Dialogs;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -59,7 +60,6 @@ namespace UnicontaClient.Pages.CustomPage
             SetRibbonControl(localMenu, dgProductionOrders);
             dgProductionOrders.api = api;
             dgProductionOrders.BusyIndicator = busyIndicator;
-
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgProductionOrders.RowDoubleClick += DgProductionOrders_RowDoubleClick;
             ribbonControl.DisableButtons(new string[] { "DeleteRow", "UndoDelete", "SaveGrid" });
@@ -91,47 +91,48 @@ namespace UnicontaClient.Pages.CustomPage
             var Comp = api.CompanyEntity;
             if (!Comp.Location || !Comp.Warehouse)
                 Location.Visible = Location.ShowInColumnChooser = false;
+            else
+                Location.ShowInColumnChooser = true;
             if (!Comp.Warehouse)
                 Warehouse.Visible = Warehouse.ShowInColumnChooser = false;
+            else
+                Warehouse.ShowInColumnChooser = true;
             if (!Comp.Project)
             {
                 Project.Visible = Project.ShowInColumnChooser = false;
                 PrCategory.Visible = PrCategory.ShowInColumnChooser = false;
+                WorkSpace.Visible = WorkSpace.ShowInColumnChooser = false;
             }
+            if (!Comp.ProjectTask)
+                Task.ShowInColumnChooser = Task.Visible = false;
+
+#if !SILVERLIGHT
+            Utility.SetupVariants(api, colVariant, VariantName, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
+#else
             Utility.SetupVariants(api, null, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
+#endif
         }
 
         private void localMenu_OnItemClicked(string ActionType)
         {
+            string header;
             var selectedItem = dgProductionOrders.SelectedItem as ProductionOrderClient;
-            string salesHeader = string.Empty;
-            if (selectedItem != null)
-                salesHeader = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Production"), selectedItem._OrderNumber);
             switch (ActionType)
             {
                 case "AddRow":
                     if (dgProductionOrders.masterRecords != null)
-                    {
-                        object[] arr = new object[2] { api, dgProductionOrders.masterRecord };
-                        AddDockItem(TabControls.ProductionOrdersPage2, arr, Uniconta.ClientTools.Localization.lookup("Production"), "Add_16x16.png", true);
-                    }
+                        AddDockItem(TabControls.ProductionOrdersPage2, new object[2] { api, dgProductionOrders.masterRecord }, Uniconta.ClientTools.Localization.lookup("Production"), "Add_16x16.png", true);
                     else
-                    {
                         AddDockItem(TabControls.ProductionOrdersPage2, api, Uniconta.ClientTools.Localization.lookup("Production"), "Add_16x16.png", true);
-                    }
                     break;
                 case "EditRow":
                     if (selectedItem == null)
                         return;
+                    header = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Production"), selectedItem._OrderNumber);
                     if (dgProductionOrders.masterRecords != null)
-                    {
-                        object[] arr = new object[2] { selectedItem, dgProductionOrders.masterRecord };
-                        AddDockItem(TabControls.ProductionOrdersPage2, arr, salesHeader);
-                    }
+                        AddDockItem(TabControls.ProductionOrdersPage2, new object[2] { selectedItem, dgProductionOrders.masterRecord }, header);
                     else
-                    {
-                        AddDockItem(TabControls.ProductionOrdersPage2, selectedItem, salesHeader);
-                    }
+                        AddDockItem(TabControls.ProductionOrdersPage2, selectedItem, header);
                     break;
                 case "AddNote":
                     if (selectedItem != null)
@@ -144,8 +145,8 @@ namespace UnicontaClient.Pages.CustomPage
                 case "ProductionLines":
                     if (selectedItem != null)
                     {
-                        var olheader = string.Format("{0}: {1}, {2}", Uniconta.ClientTools.Localization.lookup("ProductionLines"), selectedItem._OrderNumber, selectedItem._DCAccount);
-                        AddDockItem(TabControls.ProductionOrderLines, dgProductionOrders.syncEntity, olheader);
+                        header = string.Format("{0}: {1}, {2}", Uniconta.ClientTools.Localization.lookup("ProductionLines"), selectedItem._OrderNumber, selectedItem._DCAccount);
+                        AddDockItem(TabControls.ProductionOrderLines, dgProductionOrders.syncEntity, header);
                     }
                     break;
                 case "CreateProductionLines":
@@ -177,15 +178,55 @@ namespace UnicontaClient.Pages.CustomPage
                 case "SaveGrid":
                     Save();
                     break;
-                case "ViewPhoto":
-                    if (selectedItem != null && selectedItem?.ProdItemRef != null)
+                case "ViewItemAttachments":
+                    if (selectedItem?.ProdItemRef != null)
                         AddDockItem(TabControls.UserDocsPage, selectedItem.ProdItemRef, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Documents"), selectedItem?.ProdItemRef?._Name));
+                    break;
+                case "ViewNotes":
+                    if (selectedItem?.ProdItemRef != null)
+                        AddDockItem(TabControls.UserNotesPage, selectedItem.ProdItemRef, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Notes"), selectedItem?.ProdItemRef?._Name));
                     break;
                 case "DeleteRow":
                     dgProductionOrders.DeleteRow();
                     break;
                 case "UndoDelete":
                     dgProductionOrders.UndoDeleteRow();
+                    break;
+                case "CreateOrder":
+                    if (selectedItem != null)
+                    {
+                        CWOrderFromOrder cwOrderFromOrder = new CWOrderFromOrder(api);
+#if !SILVERLIGHT
+                        cwOrderFromOrder.DialogTableId = 2000000084;
+#endif
+                        cwOrderFromOrder.Closed += async delegate
+                        {
+                            if (cwOrderFromOrder.DialogResult == true)
+                            {
+                                var perSupplier = cwOrderFromOrder.orderPerPurchaseAccount;
+                                if (!perSupplier && string.IsNullOrEmpty(cwOrderFromOrder.Account) && cwOrderFromOrder.CreateNewOrder)
+                                    return;
+                                busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
+                                busyIndicator.IsBusy = true;
+                                var orderApi = new OrderAPI(api);
+                                var inversign = cwOrderFromOrder.InverSign;
+                                var account = cwOrderFromOrder.Account;
+                                var copyAttachment = cwOrderFromOrder.copyAttachment;
+                                var dcOrder = cwOrderFromOrder.dcOrder;
+                                dcOrder._DeliveryDate = cwOrderFromOrder.DeliveryDate;
+                                var copyDelAddress = cwOrderFromOrder.copyDeliveryAddress;
+                                var reCalPrice = cwOrderFromOrder.reCalculatePrice;
+                                var onlyItemsWthSupp = cwOrderFromOrder.onlyItemsWithSupplier;
+                                var result = await orderApi.CreateOrderFromOrder(selectedItem, dcOrder, account, inversign, CopyAttachments: copyAttachment, CopyDeliveryAddress: copyDelAddress, RecalculatePrices: reCalPrice, OrderPerPurchaseAccount: perSupplier, OnlyItemsWithSupplier: onlyItemsWthSupp);
+                                busyIndicator.IsBusy = false;
+                                if (result != ErrorCodes.Succes)
+                                    UtilDisplay.ShowErrorCode(result);
+                                else
+                                    CreditorOrders.ShowOrderLines(1, dcOrder, this, dgProductionOrders);
+                            }
+                        };
+                        cwOrderFromOrder.Show();
+                    }
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);
@@ -316,7 +357,8 @@ namespace UnicontaClient.Pages.CustomPage
                     busyIndicator.IsBusy = true;
                     var papi = new Uniconta.API.Inventory.ProductionAPI(api);
                     var postingResult = await papi.ReportAsFinished(dbOrder, invpostingDialog.Date, invpostingDialog.Text, invpostingDialog.TransType,
-                        invpostingDialog.Comment, invpostingDialog.FixedVoucher, invpostingDialog.Simulation, new GLTransClientTotal(), 0, invpostingDialog.NumberSeries);
+                        invpostingDialog.Comment, invpostingDialog.FixedVoucher, invpostingDialog.Simulation, new GLTransClientTotal(), 0, invpostingDialog.NumberSeries,
+                        invpostingDialog.IsPartlyFinished ? invpostingDialog.Quantity : 0);
                     busyIndicator.IsBusy = false;
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("LoadingMsg");
                     if (postingResult == null)
@@ -336,7 +378,13 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                     else
                     {
-                        dgProductionOrders.UpdateItemSource(3, dbOrder);
+                        if (!invpostingDialog.IsPartlyFinished)
+                            dgProductionOrders.UpdateItemSource(3, dbOrder);
+                        else
+                        {
+                            dbOrder._ProdQty -= invpostingDialog.Quantity;
+                            dgProductionOrders.UpdateItemSource(2, dbOrder);
+                        }
 
                         string msg;
                         if (postingResult.JournalPostedlId != 0)
@@ -352,7 +400,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         void CreateOrderLines(ProductionOrderClient productionOrder)
         {
-            CWProductionOrderLine dialog = new CWProductionOrderLine(api);
+            CWProductionOrderLine dialog = new CWProductionOrderLine(productionOrder, api, false, null);
 #if !SILVERLIGHT
             dialog.DialogTableId = 2000000078;
 #endif
@@ -361,7 +409,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (dialog.DialogResult == true)
                 {
                     var prodAPI = new ProductionAPI(api);
-                    var result = await prodAPI.CreateProductionLines(productionOrder, (StorageRegister)dialog.Storage, dialog.Force);
+                    var result = await prodAPI.CreateProductionLines(productionOrder, (StorageRegister)dialog.Storage, dialog.Force, dialog.ProductionTime);
                     UtilDisplay.ShowErrorCode(result);
                     //else
                     //    CreditorOrders.ShowOrderLines(4, productionOrder, this, dgProductionOrders);
@@ -372,8 +420,8 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override void LoadCacheInBackGround()
         {
-            var Comp = api.CompanyEntity;
             var lst = new List<Type>(4) { typeof(Uniconta.DataModel.InvItem), typeof(Uniconta.DataModel.Debtor) };
+            var Comp = api.CompanyEntity;
             if (Comp.Warehouse)
                 lst.Add(typeof(Uniconta.DataModel.InvWarehouse));
             if (Comp.Project)

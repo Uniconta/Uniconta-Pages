@@ -13,6 +13,7 @@ x:Class="UnicontaClient.Pages.CustomPage.AccountsTransaction"
     <UserControl.Resources>
         <Util:VisibilityBoolConverter x:Key="VisibilityBoolConverter" />
         <Util:ImageNameToImagesourceConverter x:Key="ImageNameToImagesourceConverter"/>
+        <Util:RowIndexConverter x:Key="RowIndexConverter" />
     </UserControl.Resources>
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
@@ -23,6 +24,12 @@ x:Class="UnicontaClient.Pages.CustomPage.AccountsTransaction"
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <localPage:AccountsTransactionGrid  x:Name="dgAccountsTransGrid" AutoGenerateColumns="None">
                 <localPage:AccountsTransactionGrid.Columns>
+                    <localPage:CorasauDataGridTemplateColumnClient FieldName="Image" Width="60" Visible="False">
+                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplateSelector >
+                            <localPage:VoucherThumbnailTemplateSelector PDFTemplate="{StaticResource VoucherPhotoPdfTemplate}" ImageTemplate="{StaticResource VoucherPhotoImageTemplate}" 
+                                                                            EmptyTemplate="{StaticResource VoucherPhotoEmptyTemplate}"/>
+                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplateSelector>
+                    </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Date" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Account" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" />

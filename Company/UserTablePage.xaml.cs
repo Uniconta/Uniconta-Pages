@@ -30,7 +30,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override void DataLoaded(UnicontaBaseEntity[] Arr)
         {
-            api.CompanyEntity.UserTables = ((TableHeader[])Arr).ToList();
+            api.CompanyEntity.UserTables = new List<TableHeader>((TableHeader[])Arr);
         }
     }
 
@@ -59,7 +59,11 @@ namespace UnicontaClient.Pages.CustomPage
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgUserTable.SelectedItemChanged += DgUserTable_SelectedItemChanged;
         }
-
+        public override void PageClosing()
+        {
+            Controls.MenuControl.ForceOpen = true;
+            base.PageClosing();
+        }
         private void DgUserTable_SelectedItemChanged(object sender, DevExpress.Xpf.Grid.SelectedItemChangedEventArgs e)
         {
             var selectedItem = dgUserTable.SelectedItem as TableHeaderClient;
@@ -97,10 +101,7 @@ namespace UnicontaClient.Pages.CustomPage
             switch (ActionType)
             {
                 case "AddRow":
-                    object[] param = new object[2];
-                    param[0] = api;
-                    param[1] = null;
-                    AddDockItem(TabControls.UserTablePage2, param, Uniconta.ClientTools.Localization.lookup("UserTables"), "Add_16x16.png");
+                    AddDockItem(TabControls.UserTablePage2, new object[] { api, null }, Uniconta.ClientTools.Localization.lookup("UserTables"), "Add_16x16.png");
                     break;
                 case "EditRow":
                     if (selectedItem != null && selectedItem._SharedFromCompanyId == 0)

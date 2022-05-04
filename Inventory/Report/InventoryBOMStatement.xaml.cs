@@ -90,43 +90,42 @@ namespace UnicontaClient.Pages.CustomPage
         protected override void OnLayoutLoaded()
         {
             base.OnLayoutLoaded();
-            Utility.SetupVariants(api, null, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
+            Utility.SetupVariants(api, colVariant, VariantName, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
         }
 
         private async void LoadInv()
         {
+            
             busyIndicator.IsBusy = true;
             var list = await api.LoadCache(typeof(Uniconta.DataModel.InvItem));
-            inventoryItemList = new List<InvItemClient>();
+            inventoryItemList = new List<InvItemClient>(list.Count >> 4);
             foreach (var rec in (Uniconta.DataModel.InvItem[])list.GetNotNullArray)
             {
                 if (rec._ItemType >= 2)
-                {
-                    var inv = new InvItemClient();
-                    StreamingManager.Copy(rec, inv);
-                    inventoryItemList.Add(inv);
-                }
+                    inventoryItemList.Add(StreamingManager.Clone(rec) as InvItemClient);
             }
-
-            var cache = new SQLCache(inventoryItemList.ToArray(), true);
 
             var invBomLst = await api.Query<InvBOMClient>();
-            InvItemClient master = null;
-            foreach (var invBom in invBomLst)
+            if (invBomLst != null)
             {
-                if (invBom._ItemMaster != master?._Item)
-                    master = (InvItemClient)cache.Get(invBom._ItemMaster);
-                if (master != null)
+                var cache = new SQLCache(inventoryItemList.ToArray(), true);
+
+                InvItemClient master = null;
+                foreach (var invBom in invBomLst)
                 {
-                    List<InvBOMClient> bomLst;
-                    if (master.BOMs != null)
-                        bomLst = (List<InvBOMClient>)master.BOMs;
-                    else
-                        master.BOMs = bomLst = new List<InvBOMClient>();
-                    bomLst.Add(invBom);
+                    if (invBom._ItemMaster != master?._Item)
+                        master = (InvItemClient)cache.Get(invBom._ItemMaster);
+                    if (master != null)
+                    {
+                        List<InvBOMClient> bomLst;
+                        if (master.BOMs != null)
+                            bomLst = (List<InvBOMClient>)master.BOMs;
+                        else
+                            master.BOMs = bomLst = new List<InvBOMClient>();
+                        bomLst.Add(invBom);
+                    }
                 }
             }
-
             if (inventoryItemList.Count > 0)
             {
                 dgInvItem.ItemsSource = null;

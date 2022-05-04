@@ -75,14 +75,14 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (e.Key == Key.Escape)
             {
-                this.DialogResult = false;
+                SetDialogResult(false);
             }
             else if (e.Key == Key.Enter)
             {
                 if (OKButton.IsFocused)
                     OKButton_Click(null, null);
                 else if (CancelButton.IsFocused)
-                    this.DialogResult = false;
+                    SetDialogResult(false);
             }
         }
 
@@ -132,7 +132,7 @@ namespace UnicontaClient.Pages.CustomPage
                         JoinResult = invApi.JoinTwoWarehouses(fromWareHouse, copyToWareHouse);
                     else
                         JoinResult = invApi.JoinTwoLocations(fromLocation, copyToWareHouse, copyToLocation);
-                    this.DialogResult = true;
+                    SetDialogResult(true);
                 }
 
             };

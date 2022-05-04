@@ -159,6 +159,14 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         AddDockItem(TabControls.GLBudgetBudgetPage, selectedItem, string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("SubModels"), selectedItem._Name));
                     break;
+                case "AddNote":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.UserNotesPage, dgGlBudget.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Notes"), selectedItem._Name));
+                    break;
+                case "AddDoc":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.UserDocsPage, dgGlBudget.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Documents"), selectedItem._Name));
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -175,6 +183,20 @@ namespace UnicontaClient.Pages.CustomPage
             }
             if (selectedItem.RowId != 0)
                 AddDockItem(TabControls.GLBudgetLinePage, selectedItem, string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("BudgetLines"), selectedItem._Name));
+        }
+
+        private void HasDocImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            var budget = (sender as Image).Tag as GLBudgetClient;
+            if (budget != null)
+                AddDockItem(TabControls.UserDocsPage, dgGlBudget.syncEntity);
+        }
+
+        private void HasNoteImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            var budget = (sender as Image).Tag as GLBudgetClient;
+            if (budget != null)
+                AddDockItem(TabControls.UserNotesPage, dgGlBudget.syncEntity);
         }
     }
 }

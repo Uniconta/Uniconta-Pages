@@ -48,7 +48,6 @@ namespace UnicontaClient.Pages.CustomPage
         }
         void InitPage(CrudAPI crudapi)
         {
-            BusyIndicator = busyIndicator;
             leAccount.api = leOffsetAccount.api = DebtorAccount.api = crudapi;
             layoutControl = layoutItems;
             if (LoadedRow == null)

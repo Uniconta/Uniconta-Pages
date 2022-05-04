@@ -29,13 +29,14 @@ x:Class="UnicontaClient.Pages.CustomPage.InvItemStoragePage"
             <localPage:InvItemStorageClientGrid  x:Name="dgInvItemStorageClientGrid" AutoGenerateColumns="None">
                 <localPage:InvItemStorageClientGrid.Columns>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Item" Width="100"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant" FieldName="Variant">
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant" FieldName="Variant" >
                         <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                             <DataTemplate>
                                 <localPage:VariantEditorClient x:Name="PART_Editor" EditValue="{Binding DataContext.RowData.Row.Variant,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" DataContext="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"></localPage:VariantEditorClient>
                             </DataTemplate>
                         </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                     </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="VariantName" Width="100" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant1" IsEditSettingSet="True" FieldName="Variant1" Visible="False" ReadOnly="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant2" IsEditSettingSet="True" FieldName="Variant2" Visible="False" ReadOnly="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant3" IsEditSettingSet="True" FieldName="Variant3" Visible="False" ReadOnly="True"/>

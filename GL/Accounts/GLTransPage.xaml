@@ -9,6 +9,9 @@ x:Class="UnicontaClient.Pages.CustomPage.GLTransPage"
     xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
     mc:Ignorable="d" xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
     d:DesignHeight="300" d:DesignWidth="400">
+    <UserControl.Resources>
+        <Util:RowIndexConverter x:Key="RowIndexConverter" />
+    </UserControl.Resources>
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>

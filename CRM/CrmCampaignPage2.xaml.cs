@@ -54,7 +54,6 @@ namespace UnicontaClient.Pages.CustomPage
         {
             ribbonControl = frmRibbon;
             var Comp = api.CompanyEntity;
-            BusyIndicator = busyIndicator;
             layoutControl = layoutItems;
             if (LoadedRow == null)
             {

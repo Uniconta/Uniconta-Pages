@@ -44,13 +44,13 @@ namespace UnicontaClient.Pages.CustomPage.Attachments
         {
             if (e.Key == Key.Escape)
             {
-                this.DialogResult = false;
+                SetDialogResult(false);
             }
             else if (e.Key == Key.Enter)
             {
                 if (CancelButton.IsFocused)
                 {
-                    this.DialogResult = false;
+                    SetDialogResult(false);
                     return;
                 }
                 SaveButton_Click(null, null);
@@ -61,12 +61,12 @@ namespace UnicontaClient.Pages.CustomPage.Attachments
         {
             FolderName = txtFolder.Text;
             ContentType = Convert.ToString(cmbContentTypes.EditValue);
-            this.DialogResult = true;
+            SetDialogResult(true);
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = false;
+            SetDialogResult(false);
         }
 
         private void txtFolder_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)

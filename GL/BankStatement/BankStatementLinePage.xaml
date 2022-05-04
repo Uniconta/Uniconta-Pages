@@ -108,6 +108,8 @@ x:Class="UnicontaClient.Pages.CustomPage.BankStatementLinePage"
                                 </localPage:CorasauDataGridTemplateColumnClient>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Vat" Width="60"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="VatOperation" Width="35"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Charge" Width="80"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="ChargeAmount" Width="80"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="IBAN" Width="100" Visible="False"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="TransType" Width="100" Visible="False"/>
                                 <localPage:ComboBoxColumnClient x:Name="SettleValue" Width="80" />

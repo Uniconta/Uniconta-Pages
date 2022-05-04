@@ -18,6 +18,9 @@ using System.Windows.Shapes;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.Common;
+using Uniconta.Common.Utility;
+using Uniconta.ClientTools.Controls;
+using Uniconta.ClientTools.Util;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -57,6 +60,7 @@ namespace UnicontaClient.Pages.CustomPage
                 HideColumns(false);
             else
                 HideColumns(true);
+            ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "UndoDelete", "SaveGrid" });
         }
 
         private void HideColumns(bool value)
@@ -67,11 +71,11 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void SetHeaders()
         {
-            RevenueAccount.Header = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("PurchaseAccount"), Uniconta.ClientTools.Localization.lookup("Domestic"));
-            RevenueAccount1.Header = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("PurchaseAccount"), Uniconta.ClientTools.Localization.lookup("EUMember"));
-            RevenueAccount2.Header = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("PurchaseAccount"), Uniconta.ClientTools.Localization.lookup("Abroad"));
-            RevenueAccount3.Header = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("PurchaseAccount"), Uniconta.ClientTools.Localization.lookup("NoVATRegistration"));
-            RevenueAccount4.Header = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("PurchaseAccount"), Uniconta.ClientTools.Localization.lookup("ExemptVat"));
+            RevenueAccount.Header = Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("PurchaseAccount"), Uniconta.ClientTools.Localization.lookup("Domestic"));
+            RevenueAccount1.Header = Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("PurchaseAccount"), Uniconta.ClientTools.Localization.lookup("EUMember"));
+            RevenueAccount2.Header = Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("PurchaseAccount"), Uniconta.ClientTools.Localization.lookup("Abroad"));
+            RevenueAccount3.Header = Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("PurchaseAccount"), Uniconta.ClientTools.Localization.lookup("NoVATRegistration"));
+            RevenueAccount4.Header = Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("PurchaseAccount"), Uniconta.ClientTools.Localization.lookup("ExemptVat"));
         }
 
         private void LocalMenu_OnItemClicked(string ActionType)
@@ -83,36 +87,108 @@ namespace UnicontaClient.Pages.CustomPage
                     object[] addParam = new object[2];
                     addParam[0] = api;
                     addParam[1] = dgCreditorGroupPosting.masterRecord;
-
                     AddDockItem(TabControls.CreditorGroupPostingPage2, addParam, Uniconta.ClientTools.Localization.lookup("CreditorPosting"), "Add_16x16.png");
                     break;
 
                 case "EditRow":
                     if (selectedItem == null) return;
                     string grpPostingHeader = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("CreditorPosting"), selectedItem._Group);
-                    object[] EditParam = new object[2];
+                    object[] EditParam = new object[3];
                     EditParam[0] = selectedItem;
-                    EditParam[1] = true;
-
+                    EditParam[1] = dgCreditorGroupPosting.masterRecord;
+                    EditParam[2] = true;
                     AddDockItem(TabControls.CreditorGroupPostingPage2, EditParam, grpPostingHeader, "Edit_16x16.png");
                     break;
-
-                case "CopyRow":
+                case "CopyRecord":
                     if (selectedItem == null) return;
-
-                    object[] copyParam = new object[2];
+                    object[] copyParam = new object[3];
                     copyParam[0] = selectedItem;
-                    copyParam[1] = false;
+                    copyParam[1] = dgCreditorGroupPosting.masterRecord;
+                    copyParam[2] = false;
                     string header = string.Format(Uniconta.ClientTools.Localization.lookup("CopyOBJ"), selectedItem.Group);
                     AddDockItem(TabControls.CreditorGroupPostingPage2, copyParam, header);
                     break;
-
+                case "CopyRow":
+                    dgCreditorGroupPosting.CopyRow();
+                    break;
+                case "EditAll":
+                    if (dgCreditorGroupPosting.Visibility == System.Windows.Visibility.Visible)
+                        EditAll();
+                    break;
+                case "DeleteRow":
+                    dgCreditorGroupPosting.DeleteRow();
+                    break;
+                case "UndoDelete":
+                    dgCreditorGroupPosting.UndoDeleteRow();
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
         }
 
+        bool editAllChecked;
+        private void EditAll()
+        {
+            RibbonBase rb = (RibbonBase)localMenu.DataContext;
+            var ibase = UtilDisplay.GetMenuCommandByName(rb, "EditAll");
+            if (ibase == null)
+                return;
+            if (dgCreditorGroupPosting.Readonly)
+            {
+                api.AllowBackgroundCrud = false;
+                dgCreditorGroupPosting.MakeEditable();
+                ibase.Caption = Uniconta.ClientTools.Localization.lookup("LeaveEditAll");
+                ribbonControl.EnableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "UndoDelete", "SaveGrid" });
+                editAllChecked = false;
+            }
+            else
+            {
+                if (IsDataChaged)
+                {
+                    string message = Uniconta.ClientTools.Localization.lookup("SaveChangesPrompt");
+                    CWConfirmationBox confirmationDialog = new CWConfirmationBox(message);
+                    confirmationDialog.Closing += async delegate
+                    {
+                        if (confirmationDialog.DialogResult == null)
+                            return;
+
+                        switch (confirmationDialog.ConfirmationResult)
+                        {
+                            case CWConfirmationBox.ConfirmationResultEnum.Yes:
+                                var err = await dgCreditorGroupPosting.SaveData();
+                                if (err != 0)
+                                {
+                                    api.AllowBackgroundCrud = true;
+                                    return;
+                                }
+                                break;
+                            case CWConfirmationBox.ConfirmationResultEnum.No:
+                                break;
+                        }
+                        editAllChecked = true;
+                        dgCreditorGroupPosting.tableView.CloseEditor();
+                        ibase.Caption = Uniconta.ClientTools.Localization.lookup("EditAll");
+                        ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "UndoDelete", "SaveGrid" });
+                    };
+                    confirmationDialog.Show();
+                }
+                else
+                {
+                    dgCreditorGroupPosting.Readonly = true;
+                    dgCreditorGroupPosting.tableView.CloseEditor();
+                    ibase.Caption = Uniconta.ClientTools.Localization.lookup("EditAll");
+                    ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "UndoDelete", "SaveGrid" });
+                }
+            }
+        }
+        public override bool IsDataChaged
+        {
+            get
+            {
+                return editAllChecked ? false : dgCreditorGroupPosting.HasUnsavedData;
+            }
+        }
         public override void Utility_Refresh(string screenName, object argument = null)
         {
             if (screenName == TabControls.CreditorGroupPostingPage2)

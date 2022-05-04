@@ -75,7 +75,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "OrderLine":
                     if (selectedItem == null)
                         return;
-                    var olheader = string.Format("{0}:{1},{2}", Uniconta.ClientTools.Localization.lookup("OrdersLine"), selectedItem._DCAccount, selectedItem._OrderNumber);
+                    var olheader = string.Format("{0}:{1},{2}", Uniconta.ClientTools.Localization.lookup("OrdersLine"), selectedItem._OrderNumber, selectedItem._DCAccount);
                     AddDockItem(TabControls.DebtorOrderLines, dgJoinMultiOrderGrid.syncEntity, olheader);
                     break;
                 case "JoinManyOrders":

@@ -54,7 +54,6 @@ namespace UnicontaClient.Pages.CustomPage
         }
         void InitPage(CrudAPI crudapi)
         {
-            BusyIndicator = busyIndicator;
             layoutControl = layoutItems;
             leAccount.api = lkJournal.api = cmbDim1.api = cmbDim2.api = cmbDim3.api = cmbDim4.api = cmbDim5.api = crudapi;
             if (crudapi.CompanyEntity.NumberOfDimensions == 0)
@@ -62,15 +61,19 @@ namespace UnicontaClient.Pages.CustomPage
             else
                 Utility.SetDimensions(crudapi, lbldim1, lbldim2, lbldim3, lbldim4, lbldim5, cmbDim1, cmbDim2, cmbDim3, cmbDim4, cmbDim5, usedim);
 
-            if (crudapi.CompanyEntity._DirectDebit == false)
-                grpBankConnect.Visibility = Visibility.Collapsed;
-
             if (LoadedRow == null)
             {
-                frmRibbon.DisableButtons(new string[] { "Delete" });
+                frmRibbon.DisableButtons( "Delete" );
                 editrow =CreateNew() as BankStatementClient;
                 editrow._DaysSlip = 3;
+                editrow._BankConnect2Journal = false;
             }
+            if (crudapi.CompanyEntity._DirectDebit == false)
+            {
+                grpBankConnect.Visibility = Visibility.Collapsed;
+                editrow._BankConnect2Journal = false;
+            }
+
             layoutItems.DataContext = editrow;
             frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
 
@@ -113,18 +116,9 @@ namespace UnicontaClient.Pages.CustomPage
         protected override async void LoadCacheInBackGround()
         {
             var api = this.api;
-            var Comp = api.CompanyEntity;
-
-            var Cache = Comp.GetCache(typeof(Uniconta.DataModel.GLAccount));
-            if (Cache == null)
-                Cache = await Comp.LoadCache(typeof(Uniconta.DataModel.GLAccount), api).ConfigureAwait(false);
-
-            BankStmtCache = Comp.GetCache(typeof(Uniconta.DataModel.BankStatement));
-            if (BankStmtCache == null)
-                BankStmtCache = await Comp.LoadCache(typeof(Uniconta.DataModel.BankStatement), api).ConfigureAwait(false);
-
-            var banks = new LedgerBankFilter(Cache);
-            leAccount.cacheFilter = banks;
+            var Cache = api.GetCache(typeof(Uniconta.DataModel.GLAccount)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLAccount)).ConfigureAwait(false);
+            leAccount.cacheFilter = new LedgerBankFilter(Cache);
+            BankStmtCache = api.GetCache(typeof(Uniconta.DataModel.BankStatement)) ?? await api.LoadCache(typeof(Uniconta.DataModel.BankStatement)).ConfigureAwait(false);
         }
     }
 }

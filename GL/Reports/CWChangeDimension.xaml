@@ -2,9 +2,7 @@
 x:Class="UnicontaClient.Pages.CustomPage.CWChangeDimension"
            xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
-           xmlns:controls="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls"
            xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
-           xmlns:ClientToolsControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
            xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
            Width="{StaticResource Width36}" Height="{StaticResource Height36}" KeyDown="ChildWindow_KeyDown">
     <Grid x:Name="LayoutRoot" Margin="2" Background="{StaticResource LayoutGridColor}">
@@ -29,7 +27,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CWChangeDimension"
                 <ColumnDefinition Width="5"/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-            <TextBlock Text="{Binding Converter={StaticResource  GlobalLocalizationValueConverter},ConverterParameter=Account}" Grid.Column="0" Grid.Row="0" VerticalAlignment="Center"/>
+            <TextBlock x:Name="lblAccount" Text="{Binding Converter={StaticResource  GlobalLocalizationValueConverter},ConverterParameter=Account}" Grid.Column="0" Grid.Row="0" VerticalAlignment="Center"/>
             <CorasauControls:LookupEditor x:Name="leAccount" DisplayMember="Account" SelectedIndexChanged="leAccount_SelectedIndexChanged" EditValue="{Binding Account}" Height="25" Grid.Column="2"  Grid.Row="0"/>
             <TextBlock x:Name="lblDim1" Grid.Column="0" Grid.Row="1" VerticalAlignment="Center"/>
             <CorasauControls:DimComboBoxEditor x:Name="lookupDim1" EditValue="{Binding Dimension1,Mode=TwoWay}" Height="25" Grid.Column="2"  Grid.Row="1"/>
@@ -41,11 +39,11 @@ x:Class="UnicontaClient.Pages.CustomPage.CWChangeDimension"
             <CorasauControls:DimComboBoxEditor x:Name="lookupDim4" EditValue="{Binding Dimension4,Mode=TwoWay}" Height="25" Grid.Column="2"  Grid.Row="4"/>
             <TextBlock x:Name="lblDim5" Grid.Column="0" Grid.Row="5" VerticalAlignment="Center"/>
             <CorasauControls:DimComboBoxEditor x:Name="lookupDim5" EditValue="{Binding Dimension5,Mode=TwoWay}" Height="25" Grid.Column="2"  Grid.Row="5"/>
-            <TextBlock Text="{Binding Converter={StaticResource  GlobalLocalizationValueConverter},ConverterParameter=Text}" Grid.Column="0" Grid.Row="6" VerticalAlignment="Center"/>
+            <TextBlock x:Name="lblText" Text="{Binding Converter={StaticResource  GlobalLocalizationValueConverter},ConverterParameter=Text}" Grid.Column="0" Grid.Row="6" VerticalAlignment="Center"/>
             <CorasauControls:TextEditor x:Name="txtText" Text="{Binding Text,Mode=TwoWay}"  Height="25" Grid.Column="2"  Grid.Row="6"/>
-            <TextBlock Text="{Binding Converter={StaticResource  GlobalLocalizationValueConverter},ConverterParameter=Qty}" Grid.Column="0" Grid.Row="7" VerticalAlignment="Center"/>
+            <TextBlock x:Name="lblQty" Text="{Binding Converter={StaticResource  GlobalLocalizationValueConverter},ConverterParameter=Qty}" Grid.Column="0" Grid.Row="7" VerticalAlignment="Center"/>
             <CorasauControls:DoubleEditor x:Name="deQuantity" FieldName="Quantity"  Height="25" Grid.Column="2"  Grid.Row="7"/>
-            <TextBlock Text="{Binding Converter={StaticResource  GlobalLocalizationValueConverter},ConverterParameter=AllLines}" Grid.Column="0" Grid.Row="8" VerticalAlignment="Center"/>
+            <TextBlock x:Name="lblLines" Text="{Binding Converter={StaticResource  GlobalLocalizationValueConverter},ConverterParameter=AllLines}" Grid.Column="0" Grid.Row="8" VerticalAlignment="Center"/>
             <CorasauControls:CheckEditor x:Name="chkAlllines" IsChecked="{Binding AllLine,Mode=TwoWay}"  Height="25" Grid.Column="2"  Grid.Row="8"/>
         </Grid>
         <StackPanel x:Name="actionButton" HorizontalAlignment="Right" Grid.Row="1" Orientation="Horizontal" Margin="0 10 0 0">

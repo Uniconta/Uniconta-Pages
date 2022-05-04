@@ -1,5 +1,5 @@
 <Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools" 
-   xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+    xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
 x:Class="UnicontaClient.Pages.CustomPage.GLDailyJournalLine"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -12,8 +12,9 @@ x:Class="UnicontaClient.Pages.CustomPage.GLDailyJournalLine"
     xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
     xmlns:dxn="http://schemas.devexpress.com/winfx/2008/xaml/navbar"
     xmlns:controlsToolkit="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Layout.Toolkit"
-   xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors">
+    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors">
     <UserControl.Resources>
+        <Util:RowIndexConverter x:Key="RowIndexConverter" />
         <Util:VisibilityBoolConverter x:Key="VisibilityBoolConverter" />
         <localPage:TraceSumConverter x:Key="TraceSumConverter"/>
         <LinearGradientBrush x:Key="LinearGradientColorStyle" StartPoint="0.5,0" EndPoint="0.5,1" >
@@ -186,12 +187,14 @@ x:Class="UnicontaClient.Pages.CustomPage.GLDailyJournalLine"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="SplitFromDate" Width="90" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="SplitToDate" Width="90" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Withholding" Width="40" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Charge" Width="80"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ChargeAmount" Width="80"/>
                     <localPage:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension1" x:Name="coldim1"/>
                     <localPage:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension2" x:Name="coldim2"/>
                     <localPage:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension3" x:Name="coldim3"/>
                     <localPage:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension4" x:Name="coldim4" />
                     <localPage:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension5" x:Name="coldim5"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="OnHold" Width="50"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="OnHold" Width="50" HideHeaderCheck="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="AccountName" ReadOnly="True" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="OffsetAccountName" ReadOnly="True" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DocumentDate" Width="85" Visible="False"/>
@@ -206,8 +209,9 @@ x:Class="UnicontaClient.Pages.CustomPage.GLDailyJournalLine"
                     <localPage:ComboBoxColumnClient x:Name="DCPostType" Visible="False" />
                     <localPage:ComboBoxColumnClient x:Name="PaymentMethod" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PaymentId" Width="150" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colProject" FieldName="Project"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colPrCategory" FieldName="PrCategory"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colProject" FieldName="Project" Width="100" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colPrCategory" FieldName="PrCategory" Width="80" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colWorkSpace" FieldName="WorkSpace" Width="80" />
                     <localPage:CorasauDataGridForeignKeyColumnClient x:Name="Task" Width="80">
                         <localPage:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
                             <ControlTemplate>
@@ -222,6 +226,15 @@ x:Class="UnicontaClient.Pages.CustomPage.GLDailyJournalLine"
                     </localPage:CorasauDataGridForeignKeyColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="colProjectText" FieldName="ProjectText" Width="150" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="LineNumber" Width="70" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="SWIFT" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PaymentFormat" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="HasBankMatch" Visible="False" Width="60" ReadOnly="True" AllowEditing="False">
+                        <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <Image Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Yellow.png}" Visibility="{Binding DataContext.RowData.Row.HasBankMatch,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource VisibilityBoolConverter}}" Width="16" Height="16" VerticalAlignment="Center"/>
+                            </ControlTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    </localPage:CorasauDataGridTemplateColumnClient>
                 </localPage:GLDailyJournalLineGrid.Columns>
             </localPage:GLDailyJournalLineGrid>
         </CorasauControls:BusyIndicator>

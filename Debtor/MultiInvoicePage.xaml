@@ -83,6 +83,7 @@ x:Class="UnicontaClient.Pages.CustomPage.MultiInvoicePage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="InvoiceAccount" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="PriceList" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Shipment" Visible="False" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DeliveryTerm" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="RelatedOrder" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="CustomsNo" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="ProjectTotal" Visible="False" />

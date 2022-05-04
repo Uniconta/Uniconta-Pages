@@ -61,7 +61,6 @@ namespace UnicontaClient.Pages.CustomPage
         void InitPage(CrudAPI crudapi)
         {
             var Comp = crudapi.CompanyEntity;
-            BusyIndicator = busyIndicator;
             layoutControl = layoutItems;
             if (LoadedRow == null)
             {

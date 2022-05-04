@@ -20,7 +20,7 @@ namespace UnicontaISO20022CreditTransfer
 
         public override string ToString()
         {
-            return string.Format("{0}", description);
+            return description;
         }
 
         public string Description

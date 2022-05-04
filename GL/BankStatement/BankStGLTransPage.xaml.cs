@@ -30,6 +30,7 @@ using UnicontaClient.Controls.Dialogs;
 using DevExpress.Xpf.Grid;
 using System.ComponentModel;
 using Uniconta.API.Service;
+using Uniconta.Common.Utility;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -41,8 +42,8 @@ namespace UnicontaClient.Pages.CustomPage
     public partial class BankStGLTransPage : GridBasePage
     {
         public override string NameOfControl { get { return TabControls.StatementLineTransPage; } }
-        static public DateTime fromDate { get; set; }
-        static public DateTime toDate { get; set; }
+        static public DateTime fromDate { get { return BankStatementPage.fromDate; } set { BankStatementPage.fromDate = value; } }
+        static public DateTime toDate { get { return BankStatementPage.toDate; } set { BankStatementPage.toDate = value; } }
         BankStatement master;
         bool ShowCurrency;
 
@@ -61,14 +62,6 @@ namespace UnicontaClient.Pages.CustomPage
 
         void Init()
         {
-            if (fromDate == DateTime.MinValue)
-            {
-                DateTime date = DateTime.Today;
-                var firstDayOfMonth = new DateTime(date.Year, date.Month, 1);
-                var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
-                fromDate = firstDayOfMonth;
-                toDate = lastDayOfMonth;
-            }
             InitializeComponent();
             this.DataContext = this;
 
@@ -77,8 +70,14 @@ namespace UnicontaClient.Pages.CustomPage
             dgAccountsTransGrid.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
 
-            RibbonBase rb = (RibbonBase)localMenu.DataContext;
-            ibase = UtilDisplay.GetMenuCommandByName(rb, "ShowHideGreenLines");
+            ibase = UtilDisplay.GetMenuCommandByName((RibbonBase)localMenu.DataContext, "ShowHideGreenLines");
+        }
+
+        public override bool CheckIfBindWithUserfield(out bool isReadOnly, out bool useBinding)
+        {
+            isReadOnly = true;
+            useBinding = true;
+            return true;
         }
 
         void UpdateMaster()
@@ -117,10 +116,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override Filter[] DefaultFilters()
         {
-            Filter dateFilter = new Filter();
-            dateFilter.name = "Date";
-            dateFilter.value = String.Format("{0:d}..{1:d}", fromDate, toDate);
-            return new Filter[] { dateFilter };
+            return new[] { new Filter() { name = "Date", value = string.Format("{0:d}..{1:d}", fromDate, toDate) } };
         }
 
         protected override void LoadCacheInBackGround()
@@ -133,7 +129,8 @@ namespace UnicontaClient.Pages.CustomPage
             base.OnLayoutLoaded();
             setDim();
             Debit.Visible = Credit.Visible = !ShowCurrency;
-            Currency.Visible = DebitCur.Visible = CreditCur.Visible = ShowCurrency;
+            if (ShowCurrency)
+                Currency.Visible = DebitCur.Visible = CreditCur.Visible = true;
         }
         protected override LookUpTable HandleLookupOnLocalPage(LookUpTable lookup, CorasauDataGrid dg)
         {
@@ -166,7 +163,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "VoucherTransactions":
                     if (selectedItem != null)
                     {
-                        string vheader = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("VoucherTransactions"), selectedItem._Voucher);
+                        string vheader = Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("VoucherTransactions"), selectedItem._Voucher);
                         AddDockItem(TabControls.AccountsTransaction, dgAccountsTransGrid.syncEntity, vheader);
                     }
                     break;
@@ -200,7 +197,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             busyIndicator.IsBusy = true;
             var tranApi = new Uniconta.API.GeneralLedger.ReportAPI(api);
-            var tsk =  tranApi.GetBank(new GLTransClientTotal(), master._Account, fromDate, toDate);
+            var tsk =  tranApi.GetBank(new GLTransClientTotal(), master._Account, fromDate, toDate, true);
             StartLoadCache(tsk);
 
             var listtran = (GLTransClientTotal[])await tsk;
@@ -210,13 +207,17 @@ namespace UnicontaClient.Pages.CustomPage
 
                 var ShowCurrency = this.ShowCurrency;
                 long Total = 0;
-                var l = listtran.Length;
-                for (int i = 0; (i < l); i++)
+                for (int i = 0; (i < listtran.Length); i++)
                 {
                     var p = listtran[i];
                     Total += ShowCurrency ? p._AmountCurCent : p._AmountCent;
                     p._Total = Total;
                 }
+            }
+            else
+            {
+                busyIndicator.IsBusy = false;
+                UtilDisplay.ShowErrorCode(tranApi.LastError);
             }
             dgAccountsTransGrid.SetSource(listtran);
         }

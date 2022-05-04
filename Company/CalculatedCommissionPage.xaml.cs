@@ -73,6 +73,7 @@ namespace UnicontaClient.Pages.CustomPage
     {
         public double _Commission;
         public int _InvoiceNumber;
+        public int _InvoiceRowId;
 
         [Display(Name = "Commission", ResourceType = typeof(EmployeeCommissionClientText))]
         public double Commission
@@ -85,6 +86,28 @@ namespace UnicontaClient.Pages.CustomPage
         public int InvoiceNumber
         {
             get { return _InvoiceNumber; }
+        }
+
+        [ReportingAttribute]
+        public DebtorInvoiceClient InvoiceRef
+        {
+            get
+            {
+                if (_InvoiceNumber != 0)
+                {
+                    var Comp = Company.Get(_CompanyId);
+                    if (Comp != null)
+                    {
+                        if (Comp.DebtorInvoices == null)
+                        {
+                            Comp.DebtorInvoices = new IRowIdCache<DebtorInvoiceClient>();
+                            Comp.DebtorInvoices.Load(new Uniconta.API.System.QueryAPI(BasePage.session, Comp));
+                        }
+                        return Comp.DebtorInvoices.Get(_InvoiceRowId);
+                    }
+                }
+                return null;
+            }
         }
     }
 

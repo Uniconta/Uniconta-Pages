@@ -61,8 +61,22 @@ namespace UnicontaClient.Pages.CustomPage
             dgFAMGrid.UpdateMaster(master);
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             ribbonControl.DisableButtons(new string[] { "DeleteRow", "SaveGrid" });
+
+            InsuranceAmount.HasDecimals =
+            NonDepreciableAmount.HasDecimals =
+            ResidualValue.HasDecimals =
+            DecommissionCost.HasDecimals =
+            ReversedDepreciation.HasDecimals =
+            WriteUp.HasDecimals =
+            WriteOff.HasDecimals =
+            WriteDown.HasDecimals =
+            Sale.HasDecimals =
+            CostValue.HasDecimals =
+            ReversedAcquisition.HasDecimals =
+            BookedValue.HasDecimals =
+            ManualDepreciation.HasDecimals = api.CompanyEntity.HasDecimals;
+
             dgFAMGrid.ShowTotalSummary();
-            //InsuranceAmount.HasDecimals = NonDepreciableAmount.HasDecimals = ResidualValue.HasDecimals = DecommissionCost.HasDecimals = false;
         }
 
         protected override void OnLayoutCtrlLoaded()
@@ -72,7 +86,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override void LoadCacheInBackGround()
         {
-            LoadType(new Type[] { typeof(Uniconta.DataModel.Employee), typeof(Uniconta.DataModel.FAMGroup) });
+            LoadType(new Type[] { typeof(Uniconta.DataModel.FAMGroup), typeof(Uniconta.DataModel.Employee) });
         }
 
         private void localMenu_OnItemClicked(string ActionType)
@@ -85,13 +99,11 @@ namespace UnicontaClient.Pages.CustomPage
                         EditAll();
                     break;
                 case "CopyRow":
-                    if (selectedItem == null)
-                        return;
-                    object[] copyParam = new object[2];
-                    copyParam[0] = selectedItem;
-                    copyParam[1] = false;
-                    string hdr = string.Format(Uniconta.ClientTools.Localization.lookup("CopyOBJ"), selectedItem._Asset);
-                    AddDockItem(TabControls.FAMPage2, copyParam, hdr);
+                    if (selectedItem != null)
+                    {
+                        AddDockItem(TabControls.FAMPage2, new object[2] { selectedItem, false },
+                            string.Format(Uniconta.ClientTools.Localization.lookup("CopyOBJ"), selectedItem._Asset));
+                    }
                     break;
                 case "DeleteRow":
                     dgFAMGrid.DeleteRow();
@@ -104,12 +116,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "EditRow":
                     if (selectedItem != null)
-                    {
-                        object[] EditParam = new object[2];
-                        EditParam[0] = selectedItem;
-                        EditParam[1] = true;
-                        AddDockItem(TabControls.FAMPage2, EditParam, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Asset"), selectedItem._Asset));
-                    }
+                        AddDockItem(TabControls.FAMPage2, new object[2] { selectedItem, true }, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Asset"), selectedItem._Asset));
                     break;
                 case "SubAsset":
                     if (selectedItem != null)
@@ -139,14 +146,102 @@ namespace UnicontaClient.Pages.CustomPage
                         AddDockItem(TabControls.FAMPrimoTransGridPage, selectedItem, string.Concat(Uniconta.ClientTools.Localization.lookup("PrimoTransactions"), " :",
                             Uniconta.ClientTools.Localization.lookup("AccountTypeFixedAsset"), "-", selectedItem._Asset));
                     break;
+                case "SaleOfAsset":
+                    if (selectedItem != null)
+                        SaleOfAsset(selectedItem);
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
         }
 
+        static Uniconta.DataModel.GLDailyJournalLine CreateLine(Uniconta.DataModel.GLDailyJournalLine org)
+        {
+            var to = new Uniconta.DataModel.GLDailyJournalLine();
+            to._Date = org._Date;
+            to._Text = org._Text;
+            to._Asset = org._Asset;
+            return to;
+        }
+
+        void SaleOfAsset(FamClient Asset)
+        {
+            LoadType(new Type[] { typeof(Uniconta.DataModel.GLDailyJournal), typeof(Uniconta.DataModel.GLAccount) });
+
+            var cw = new CwSaleOfAsset(api);
+            cw.DialogTableId = 2000000088;
+            cw.Closed += async delegate
+            {
+                if (cw.DialogResult == true)
+                {
+                    SQLCache Cache = api.GetCache(typeof(Uniconta.DataModel.GLDailyJournal));
+                    var jour = (Uniconta.DataModel.GLDailyJournal)Cache.Get(cw.Journal);
+                    if (jour != null)
+                    {
+                        Cache = api.GetCache(typeof(Uniconta.DataModel.FAMGroup));
+                        var grp = (Uniconta.DataModel.FAMGroup)Cache.Get(Asset._Group);
+
+                        Cache = api.GetCache(typeof(Uniconta.DataModel.GLAccount));
+
+                        var lst = new List<Uniconta.DataModel.GLDailyJournalLine>(4);
+                        var line = new Uniconta.DataModel.GLDailyJournalLine();
+                        line.SetMaster(jour);
+                        line._Date = cw.Date != DateTime.MinValue ? cw.Date : BasePage.GetSystemDefaultDate();
+                        line._Text = cw.Text;
+                        line._Asset = Asset._Asset;
+                        line._AssetPostType = FAMTransCodes.ReversedDepreciation;
+                        line._Debit = - Asset._Depreciation;
+                        line._Account = grp._DepreciationAccount;
+                        lst.Add(line);
+
+                        line = CreateLine(line);
+                        line.SetMaster(jour);
+                        line._AssetPostType = FAMTransCodes.ReversedAcquisition;
+                        line._Credit = Asset._CostValue;
+                        line._Account = grp._SalesAccount;
+                        lst.Add(line);
+
+                        line = CreateLine(line);
+                        line.SetMaster(jour);
+                        line._AssetPostType = FAMTransCodes.WriteOff;
+                        var val = cw.Amount - Asset.BookedValue;
+                        if (val > 0)
+                            line._Credit = val;
+                        else
+                            line._Debit = -val;
+                        line._Account = grp._WriteOffOffset;
+                        lst.Add(line);
+
+                        line = CreateLine(line);
+                        line.SetMaster(jour);
+                        line._AssetPostType = FAMTransCodes.Sale;
+                        line._Debit = cw.Amount;
+                        line._Account = cw.SalesAccount;
+                        lst.Add(line);
+
+                        ErrorCodes errorCode = await api.Insert(lst);
+                        if (errorCode != ErrorCodes.Succes)
+                            UtilDisplay.ShowErrorCode(errorCode);
+                        else
+                        {
+                            jour._NumberOfLines += 4;
+                            var text = string.Concat(Uniconta.ClientTools.Localization.lookup("GenerateJournalLines"), "; ", Uniconta.ClientTools.Localization.lookup("Completed"),
+                                Environment.NewLine, string.Format(Uniconta.ClientTools.Localization.lookup("GoTo"), Uniconta.ClientTools.Localization.lookup("Journallines")), " ?");
+                            var select = UnicontaMessageBox.Show(text, Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OKCancel);
+                            if (select == MessageBoxResult.OK)
+                                AddDockItem(TabControls.GL_DailyJournalLine, jour, null, null, true);
+                        }
+                    }
+                }
+            }; 
+            cw.ShowDialog();
+        }
+
         void GenerateDepreciation()
         {
+            LoadType(typeof(Uniconta.DataModel.GLDailyJournal));
+
             var famLst = dgFAMGrid.GetVisibleRows() as IEnumerable<FAM>;
             if (famLst.Count() == 0)
                 return;
@@ -171,8 +266,8 @@ namespace UnicontaClient.Pages.CustomPage
                         var select = UnicontaMessageBox.Show(text, Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.YesNo);
                         if (select == MessageBoxResult.Yes)
                         {
-                            var parms = new[] { new BasePage.ValuePair("Journal", journalName) };
-                            AddDockItem(TabControls.GL_DailyJournalLine, null, null, null, true, null, parms);
+                            var header = string.Concat(Uniconta.ClientTools.Localization.lookup("Journal"), ": ", journalName);
+                            AddDockItem(TabControls.GL_DailyJournalLine, null, header, null, true, null, new[] { new BasePage.ValuePair("Journal", journalName) });
                         }
                     }
                 }

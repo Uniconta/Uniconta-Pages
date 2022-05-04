@@ -59,6 +59,13 @@ namespace UnicontaClient.Pages.CustomPage
             InitPage(api, master, debtorOrder);
         }
 
+        public ProductionOrdersPage2(CrudAPI crudApi, UnicontaBaseEntity master, UnicontaBaseEntity debtorOrder, double Qty)
+          : base(crudApi, string.Empty)
+        {
+            InitializeComponent();
+            InitPage(api, master, debtorOrder, Qty);
+        }
+
         public ProductionOrdersPage2(UnicontaBaseEntity sourcedata)
             : base(sourcedata, true)
         {
@@ -74,12 +81,17 @@ namespace UnicontaClient.Pages.CustomPage
             FocusManager.SetFocusedElement(leProdItem, leProdItem);
 #endif
         }
-        void InitPage(CrudAPI crudapi, UnicontaBaseEntity master, UnicontaBaseEntity debtorOrder = null)
+        void InitPage(CrudAPI crudapi, UnicontaBaseEntity master, UnicontaBaseEntity debtorOrder = null, double Qty = 0)
         {
-            BusyIndicator = busyIndicator;
             layoutControl = layoutItems;
             cmbDim1.api = cmbDim2.api = cmbDim3.api = cmbDim4.api = cmbDim5.api = leGroup.api = leProject.api = lePrCategory.api = leEmployee.api
-           = leRelatedOrder.api = leProdItem.api = leGroup.api = leAccount.api = cmbWarehouse.api = cmbLocation.api = crudapi;
+           = leProdItem.api = leGroup.api = leAccount.api = cmbWarehouse.api = cmbLocation.api = prTasklookupeditor.api = lePrWorkSpace.api= crudapi;
+
+#if SILVERLIGHT
+            leRelatedOrder.api = api;
+#else
+            leRelatedOrder.CrudApi = api;
+#endif
 
             if (editrow == null)
             {
@@ -93,6 +105,8 @@ namespace UnicontaClient.Pages.CustomPage
                     editrow.SetMaster(debtorOrder);
                     editrow._EndDiscountPct = 0;
                     editrow._Storage = crudapi.CompanyEntity._PurchaseLineStorage;
+                    if (Qty != 0d)
+                        editrow._ProdQty = Qty;
                 }
             }
 
@@ -108,18 +122,13 @@ namespace UnicontaClient.Pages.CustomPage
         {
             AdjustLayout();
             var Comp = api.CompanyEntity;
-
             if (!Comp.Project)
-            {
-                liProject.Visibility = Visibility.Collapsed;
-                liPrCategory.Visibility = Visibility.Collapsed;
-            }
+                grpProject.Visibility = Visibility.Collapsed;
             if (!Comp.Location)
                 itemLocation.Visibility = Visibility.Collapsed;
 
             if (!Comp.Warehouse)
                 itemWarehouse.Visibility = Visibility.Collapsed;
-
             else if (editrow._Warehouse != null)
             {
                 var wareHouse = Comp.GetCache(typeof(Uniconta.DataModel.InvWarehouse))?.Get(editrow._Warehouse) as InvWarehouseClient;
@@ -127,6 +136,13 @@ namespace UnicontaClient.Pages.CustomPage
             }
             if (!Comp.ItemVariants)
                 liVariant.Visibility = Visibility.Collapsed;
+            if (!Comp.ProjectTask)
+                projectTask.Visibility = Visibility.Collapsed;
+            else if (editrow?._Project != null)
+            {
+                var project = Comp.GetCache(typeof(Uniconta.DataModel.Project))?.Get(editrow._Project) as ProjectClient;
+                setTask(project);
+            }
         }
 
         public override bool BeforeSetUserField(ref CorasauLayoutGroup parentGroup)
@@ -203,10 +219,10 @@ namespace UnicontaClient.Pages.CustomPage
             return res;
         }
 
-        async void UpdateLines(ProductionOrderClient productionOrder, StorageRegister Storage, bool OverwriteLines, bool goToLines)
+        async void UpdateLines(ProductionOrderClient productionOrder, StorageRegister Storage, bool OverwriteLines, bool goToLines, int prodTime = 0)
         {
             var prodAPI = new ProductionAPI(api);
-            var result = await prodAPI.CreateProductionLines(productionOrder, Storage, OverwriteLines);
+            var result = await prodAPI.CreateProductionLines(productionOrder, Storage, OverwriteLines, prodTime);
             if (result == ErrorCodes.Succes)
             {
                 prodQty = productionOrder._ProdQty;
@@ -226,7 +242,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         void CreateOrderLines(ProductionOrderClient productionOrder)
         {
-            CWProductionOrderLine dialog = new CWProductionOrderLine(api, rowId == 0);
+            CWProductionOrderLine dialog = new CWProductionOrderLine(productionOrder, api, rowId == 0);
 #if !SILVERLIGHT
             dialog.DialogTableId = 2000000077;
 #endif
@@ -235,9 +251,12 @@ namespace UnicontaClient.Pages.CustomPage
                 if (dialog.DialogResult == true)
                 {
                     var result = await Save();
-                    if (!result) return;
-
-                    UpdateLines(productionOrder, (StorageRegister)dialog.Storage, dialog.Force, true);
+                    if (result)
+                    {
+                        if (dialog.DeliveryDate != DateTime.MinValue)
+                            productionOrder._DeliveryDate = dialog.DeliveryDate;
+                        UpdateLines(productionOrder, (StorageRegister)dialog.Storage, dialog.Force, true, dialog.ProductionTime);
+                    }
                 }
             };
             dialog.Show();
@@ -323,7 +342,27 @@ namespace UnicontaClient.Pages.CustomPage
                 editrow.Account = project._DCAccount;
                 editrow.NotifyPropertyChanged("Account");
                 editrow.NotifyPropertyChanged("AccountName");
+                setTask(project);
             }
+        }
+
+        async private void setTask(ProjectClient master)
+        {
+            if (api.CompanyEntity.ProjectTask)
+            {
+                if (master != null)
+                    editrow.taskSource = master.Tasks ?? await master.LoadTasks(api);
+                else
+                    editrow.taskSource = api.GetCache(typeof(Uniconta.DataModel.ProjectTask));
+                editrow.NotifyPropertyChanged("TaskSource");
+                prTasklookupeditor.ItemsSource = editrow.TaskSource;
+            }
+        }
+
+        private void prTasklookupeditor_GotFocus(object sender, RoutedEventArgs e)
+        {
+            var selectedItem = leProject.SelectedItem as ProjectClient;
+            setTask(selectedItem);
         }
     }
 }

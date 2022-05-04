@@ -18,7 +18,7 @@ x:Class="UnicontaClient.Pages.CustomPage.UserCompaniesGridPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="CompanyName" Width="250" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Id" Width="100" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="PrimaryKeyId" Width="70" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="OwnerUid" Width="50" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="OwnerUid" Width="60" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="ClientId" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Country" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Currency" Visible="False"/>
@@ -55,6 +55,9 @@ x:Class="UnicontaClient.Pages.CustomPage.UserCompaniesGridPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="UseVatOperation" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="TransCount" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="UseUnrealizedVat" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="LastBankTrans" Visible="False" Width="90"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="LastPosting" Visible="False"  Width="90"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="NInbox" Visible="False" Width="60"/>
                 </local:UserCompaniesGridClient.Columns>
             </local:UserCompaniesGridClient>
         </CorasauControls:BusyIndicator>

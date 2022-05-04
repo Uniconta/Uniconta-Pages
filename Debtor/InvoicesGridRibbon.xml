@@ -36,11 +36,12 @@
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="SendUBL" LocalizedNameKey="SendInvoicebyUBL" Module="_OIOUBLSendOnServer" LargeGlyph="SendInvoiceMail_32x32.png" />
-    <RibbonItem LocalizedNameKey="GenerateOBJ" Parameter="OIOUBL" LargeGlyph="Account-statement_32x32.png">
+    <RibbonItem LocalizedNameKey="GenerateOBJ" Parameter="einvoice" LargeGlyph="Account-statement_32x32.png">
       <RibbonItem Action="GenerateOioXml" LocalizedNameKey="CurrentRecord" Glyph="Attachments_16x16.png"/>
       <RibbonItem Action="GenerateMarkedOioXml" LocalizedNameKey="SelectedRows" Glyph="Item_Number_16x16.png"/>
       <RibbonItem Action="GenerateAllOioXml" LocalizedNameKey="All" Glyph="Reseller_16x16.png"/>
     </RibbonItem>
+    <RibbonItem Action="DocSendLog" LocalizedNameKey="Log" ControlName="DocsSendLogGridPage" LargeGlyph="Server_Count_32x32.png" />
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="CreateOrder" LocalizedNameKey="CreateOBJ" Parameter="Order" LargeGlyph="Orders_32x32.png"/>

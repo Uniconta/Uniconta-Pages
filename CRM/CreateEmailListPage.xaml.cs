@@ -26,6 +26,7 @@ using UnicontaClient.Models;
 using Uniconta.API.Service;
 using Uniconta.API.Crm;
 using Uniconta.API.System;
+using Uniconta.API.Inventory;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -62,6 +63,16 @@ namespace UnicontaClient.Pages.CustomPage
         SortingProperties[] creditorDefaultSort;
         Filter[] creditorDefaultFilters;
         TableField[] CreditorUserFields { get; set; }
+
+        CWServerFilter invItemFilterDialog = null;
+        bool invItemFilterCleared;
+        SortingProperties[] invItemDefaultSort;
+        Filter[] invItemDefaultFilters;
+
+        CWServerFilter invTransFilterDialog = null;
+        bool invTransFilterCleared;
+        SortingProperties[] invTransDefaultSort;
+        Filter[] invTransDefaultFilters;
 
         UnicontaBaseEntity master;
 
@@ -120,16 +131,16 @@ namespace UnicontaClient.Pages.CustomPage
             var api = this.api;
             var Comp = api.CompanyEntity;
 
-            InterestCache = Comp.GetCache(typeof(Uniconta.DataModel.CrmInterest)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.CrmInterest), api);
-            cmbInterests.ItemsSource = InterestCache.GetKeyList();
+            InterestCache = Comp.GetCache(typeof(Uniconta.DataModel.CrmInterest)) ?? await api.LoadCache(typeof(Uniconta.DataModel.CrmInterest));
+            cmbInterests.ItemsSource = InterestCache?.GetKeyList();
 
-            ProductCache = Comp.GetCache(typeof(Uniconta.DataModel.CrmProduct)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.CrmProduct), api);
-            cmbProducts.ItemsSource = ProductCache.GetKeyList();
+            ProductCache = Comp.GetCache(typeof(Uniconta.DataModel.CrmProduct)) ?? await api.LoadCache(typeof(Uniconta.DataModel.CrmProduct));
+            cmbProducts.ItemsSource = ProductCache?.GetKeyList();
 
-            Debtors = Comp.GetCache(typeof(Uniconta.DataModel.Debtor))?? await Comp.LoadCache(typeof(Uniconta.DataModel.Debtor), api);
-            Prospects = Comp.GetCache(typeof(Uniconta.DataModel.CrmProspect)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.CrmProspect), api);
-            Creditors = Comp.GetCache(typeof(Uniconta.DataModel.Creditor)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.Creditor), api);
-            Contacts = Comp.GetCache(typeof(Uniconta.DataModel.Contact)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.Contact), api);
+            Debtors = Comp.GetCache(typeof(Uniconta.DataModel.Debtor))?? await api.LoadCache(typeof(Uniconta.DataModel.Debtor));
+            Prospects = Comp.GetCache(typeof(Uniconta.DataModel.CrmProspect)) ?? await api.LoadCache(typeof(Uniconta.DataModel.CrmProspect));
+            Creditors = Comp.GetCache(typeof(Uniconta.DataModel.Creditor)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Creditor));
+            Contacts = Comp.GetCache(typeof(Uniconta.DataModel.Contact)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Contact));
         }
 
         void localMenu_OnItemClicked(string ActionType)
@@ -154,15 +165,10 @@ namespace UnicontaClient.Pages.CustomPage
                         else
                             debtorFilterDialog = new CWServerFilter(api, typeof(DebtorClient), debtorDefaultFilters, debtorDefaultSort, DebtorUserFields);
                         debtorFilterDialog.Closing += debtorFilterDialog_Closing;
-#if !SILVERLIGHT
                         debtorFilterDialog.Show();
                     }
                     else
                         debtorFilterDialog.Show(true);
-#elif SILVERLIGHT
-                    }
-                    debtorFilterDialog.Show();
-#endif
                     break;
 
                 case "ClearDebtorFilter":
@@ -180,15 +186,10 @@ namespace UnicontaClient.Pages.CustomPage
                         else
                             prospectFilterDialog = new CWServerFilter(api, typeof(CrmProspectClient), prospectDefaultFilters, prospectDefaultSort, ProspectUserFields);
                         prospectFilterDialog.Closing += prospectFilterDialog_Closing;
-#if !SILVERLIGHT
                         prospectFilterDialog.Show();
                     }
                     else
                         prospectFilterDialog.Show(true);
-#elif SILVERLIGHT
-                    }
-                    prospectFilterDialog.Show();
-#endif
                     break;
 
                 case "ClearProspectFilter":
@@ -206,17 +207,11 @@ namespace UnicontaClient.Pages.CustomPage
                         else
                             contactFilterDialog = new CWServerFilter(api, typeof(ContactClient), contactDefaultFilters, contactDefaultSort, ContactUserFields);
                         contactFilterDialog.Closing += contactFilterDialog_Closing;
-#if !SILVERLIGHT
                         contactFilterDialog.Show();
                     }
                     else
                         contactFilterDialog.Show(true);
-#elif SILVERLIGHT
-                    }
-                    contactFilterDialog.Show();
-#endif
                     break;
-
                 case "ClearContactFilter":
                     contactFilterDialog = null;
                     contactFilterValues = null;
@@ -232,23 +227,52 @@ namespace UnicontaClient.Pages.CustomPage
                         else
                             creditorFilterDialog = new CWServerFilter(api, typeof(CreditorClient), creditorDefaultFilters, creditorDefaultSort, CreditorUserFields);
                         creditorFilterDialog.Closing += CreditorFilterDialog_Closing;
-#if !SILVERLIGHT
                         creditorFilterDialog.Show();
                     }
                     else
                         creditorFilterDialog.Show(true);
-#elif SILVERLIGHT
-                    }
-                    creditorFilterDialog.Show();
-#endif
                     break;
-
                 case "ClearCreditorFilter":
                     creditorFilterDialog = null;
                     creditorFilterValues = null;
                     creditorFilterCleared = true;
                     break;
-
+                case "InvItemFilter":
+                    if (invItemFilterDialog == null)
+                    {
+                        if (invItemFilterCleared)
+                            invItemFilterDialog = new CWServerFilter(api, typeof(InvItemClient), null, invItemDefaultSort, null);
+                        else
+                            invItemFilterDialog = new CWServerFilter(api, typeof(InvItemClient), invItemDefaultFilters, invItemDefaultSort, null);
+                        invItemFilterDialog.Closing += invItemFilterDialog_Closing;
+                        invItemFilterDialog.Show();
+                    }
+                    else
+                        invItemFilterDialog.Show(true);
+                    break;
+                case "ClearInvItemFilter":
+                    invItemFilterDialog = null;
+                    invItemFilterValues = null;
+                    invItemFilterCleared = true;
+                    break;
+                case "InvTransFilter":
+                    if (invTransFilterDialog == null)
+                    {
+                        if (invTransFilterCleared)
+                            invTransFilterDialog = new CWServerFilter(api, typeof(InvTransClient), null, invTransDefaultSort, null);
+                        else
+                            invTransFilterDialog = new CWServerFilter(api, typeof(InvTransClient), invTransDefaultFilters, invTransDefaultSort, null);
+                        invTransFilterDialog.Closing += invTransFilterDialog_Closing;
+                        invTransFilterDialog.Show();
+                    }
+                    else
+                        invTransFilterDialog.Show(true);
+                    break;
+                case "ClearInvTransFilter":
+                    invTransFilterDialog = null;
+                    invTransFilterValues = null;
+                    invTransFilterCleared = true;
+                    break;
                 case "SaveAndExit":
                     SaveEmailList();
                     break;
@@ -303,7 +327,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
             var result = await api.Insert(lst);
             if (result == ErrorCodes.Succes)
-                this.dockCtrl.CloseDockItem();
+                this.CloseDockItem();
             else
                 UtilDisplay.ShowErrorCode(result);
         }
@@ -350,10 +374,8 @@ namespace UnicontaClient.Pages.CustomPage
                 contactFilterValues = contactFilterDialog.PropValuePair;
                 contactPropSort = contactFilterDialog.PropSort;
             }
-#if !SILVERLIGHT
             e.Cancel = true;
             contactFilterDialog.Hide();
-#endif
         }
 
         public IEnumerable<PropValuePair> creditorFilterValues;
@@ -365,10 +387,36 @@ namespace UnicontaClient.Pages.CustomPage
                 creditorFilterValues = creditorFilterDialog.PropValuePair;
                 creditortPropSort = creditorFilterDialog.PropSort;
             }
-#if !SILVERLIGHT
             e.Cancel = true;
             creditorFilterDialog.Hide();
-#endif
+        }
+
+        public IEnumerable<PropValuePair> invItemFilterValues;
+        public FilterSorter invItemPropSort;
+
+        void invItemFilterDialog_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (invItemFilterDialog.DialogResult == true)
+            {
+                invItemFilterValues = invItemFilterDialog.PropValuePair;
+                invItemPropSort = invItemFilterDialog.PropSort;
+            }
+            e.Cancel = true;
+            invItemFilterDialog.Hide();
+        }
+
+        public IEnumerable<PropValuePair> invTransFilterValues;
+        public FilterSorter invTransPropSort;
+
+        void invTransFilterDialog_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (invTransFilterDialog.DialogResult == true)
+            {
+                invTransFilterValues = invTransFilterDialog.PropValuePair;
+                invTransPropSort = invTransFilterDialog.PropSort;
+            }
+            e.Cancel = true;
+            invTransFilterDialog.Hide();
         }
 
         public void SetFilterDefaultFields()
@@ -377,6 +425,8 @@ namespace UnicontaClient.Pages.CustomPage
             prospectDefaultFilters = null;
             contactDefaultFilters = null;
             creditorDefaultFilters = null;
+            invItemDefaultFilters= null;
+            invTransDefaultFilters= null;
         }
         public void SetFilterSortFields()
         {
@@ -384,6 +434,8 @@ namespace UnicontaClient.Pages.CustomPage
             prospectDefaultSort = null;
             contactDefaultSort = null;
             creditorDefaultSort = null;
+            invItemDefaultSort=null;
+            invTransDefaultSort= null;
         }
 
         static bool HasMatch(long maskUser, long mask, bool MatchAll)
@@ -398,7 +450,6 @@ namespace UnicontaClient.Pages.CustomPage
 
         async void LoadEmails()
         {
-            var emailList = new List<CrmCampaignMemberClient>();
             busyIndicator.IsBusy = true;
             var CompanyId = api.CompanyId;
 
@@ -408,7 +459,7 @@ namespace UnicontaClient.Pages.CustomPage
             var AllInterests = cmbInterestMatch.SelectedIndex == 1;
             var AllProducts = cmbProductsMatch.SelectedIndex == 1;
 
-            var emailLst = new List<CrmCampaignMemberClient>();
+            var emailLst = new List<CrmCampaignMemberClient>(1050);
 
             var CampaignMaster = this.master;
             CrmCampaignMemberClient objEmailList;
@@ -425,10 +476,16 @@ namespace UnicontaClient.Pages.CustomPage
             else
                 dublicatePhoneCheck = null;
 
+            HashSet<int> accountWithTrans;
+            if (cbxSearchInvLines.IsChecked == true)
+                accountWithTrans = await (new Uniconta.API.Inventory.TransactionsAPI(api)).FindAccountsWithTrans(invItemFilterValues, invTransFilterValues, txtDateFrm.DateTime, txtDateTo.DateTime);
+            else
+                accountWithTrans = null;
+
             if (cbxDebtor.IsChecked == true)
             {
                 IEnumerable<Debtor> debtorEntity;
-                if (Debtors != null && (debtorFilterValues == null || !debtorFilterValues.Any()))
+                if (Debtors != null && (debtorFilterValues == null || debtorFilterValues.Count() == 0))
                     debtorEntity = (IEnumerable<Debtor>)Debtors.GetNotNullArray;
                 else
                     debtorEntity = await api.Query<DebtorClient>(debtorFilterValues);
@@ -440,10 +497,12 @@ namespace UnicontaClient.Pages.CustomPage
                             continue;
                         if (!HasMatch(debtor._Products, Products, AllProducts))
                             continue;
-                        if (dublicateEmailCheck != null && (debtor._ContactEmail == null || !dublicateEmailCheck.Add(debtor._ContactEmail)))
+                        if (accountWithTrans != null && !accountWithTrans.Contains(debtor.RowId))
                             continue;
                         if (dublicatePhoneCheck != null)
                         {
+                            if (dublicateEmailCheck != null && (debtor._ContactEmail == null || dublicateEmailCheck.Contains(debtor._ContactEmail)))
+                                continue;
                             if (debtor._Phone != null)
                             {
                                 if (!dublicatePhoneCheck.Add(debtor._Phone))
@@ -452,6 +511,9 @@ namespace UnicontaClient.Pages.CustomPage
                             else if (debtor._MobilPhone == null || !dublicatePhoneCheck.Add(debtor._MobilPhone))
                                 continue;
                         }
+                        if (dublicateEmailCheck != null && (debtor._ContactEmail == null || !dublicateEmailCheck.Add(debtor._ContactEmail)))
+                            continue;
+
                         objEmailList = new CrmCampaignMemberClient();
                         objEmailList.dc = debtor;
                         objEmailList.SetMaster(debtor);
@@ -462,10 +524,52 @@ namespace UnicontaClient.Pages.CustomPage
                 }
             }
 
+            if (cbxCreditor.IsChecked == true)
+            {
+                IEnumerable<Uniconta.DataModel.Creditor> creditorEntity;
+                if (Creditors != null && (creditorFilterValues == null || creditorFilterValues.Count() == 0))
+                    creditorEntity = (IEnumerable<Uniconta.DataModel.Creditor>)Creditors.GetNotNullArray;
+                else
+                    creditorEntity = await api.Query<CreditorClient>(creditorFilterValues);
+                if (creditorEntity != null)
+                {
+                    foreach (var creditor in creditorEntity)
+                    {
+                        if (!HasMatch(creditor._Interests, Interests, AllInterests))
+                            continue;
+                        if (!HasMatch(creditor._Products, Products, AllProducts))
+                            continue;
+                        if (accountWithTrans != null && !accountWithTrans.Contains(creditor.RowId))
+                            continue;
+                        if (dublicatePhoneCheck != null)
+                        {
+                            if (dublicateEmailCheck != null && (creditor._ContactEmail == null || dublicateEmailCheck.Contains(creditor._ContactEmail)))
+                                continue;
+                            if (creditor._Phone != null)
+                            {
+                                if (!dublicatePhoneCheck.Add(creditor._Phone))
+                                    continue;
+                            }
+                            else if (creditor._MobilPhone == null || !dublicatePhoneCheck.Add(creditor._MobilPhone))
+                                continue;
+                        }
+                        if (dublicateEmailCheck != null && (creditor._ContactEmail == null || !dublicateEmailCheck.Add(creditor._ContactEmail)))
+                            continue;
+
+                        objEmailList = new CrmCampaignMemberClient();
+                        objEmailList.dc = creditor;
+                        objEmailList.SetMaster(creditor);
+                        if (CampaignMaster != null)
+                            objEmailList.SetMaster(CampaignMaster);
+                        emailLst.Add(objEmailList);
+                    }
+                }
+            }
+
             if (cbxProspects.IsChecked == true)
             {
                 IEnumerable<CrmProspect> prospectEntity;
-                if (Prospects != null && (prospectFilterValues == null || !prospectFilterValues.Any()))
+                if (Prospects != null && (prospectFilterValues == null || prospectFilterValues.Count() == 0))
                     prospectEntity = (IEnumerable<CrmProspect>)Prospects.GetNotNullArray;
                 else
                     prospectEntity = await api.Query<CrmProspectClient>(prospectFilterValues);
@@ -477,10 +581,10 @@ namespace UnicontaClient.Pages.CustomPage
                             continue;
                         if (!HasMatch(prospect._Products, Products, AllProducts))
                             continue;
-                        if (dublicateEmailCheck != null && (prospect._ContactEmail == null || !dublicateEmailCheck.Add(prospect._ContactEmail)))
-                            continue;
                         if (dublicatePhoneCheck != null)
                         {
+                            if (dublicateEmailCheck != null && (prospect._ContactEmail == null || dublicateEmailCheck.Contains(prospect._ContactEmail)))
+                                continue;
                             if (prospect._Phone != null)
                             {
                                 if (!dublicatePhoneCheck.Add(prospect._Phone))
@@ -489,6 +593,8 @@ namespace UnicontaClient.Pages.CustomPage
                             else if (prospect._MobilPhone == null || !dublicatePhoneCheck.Add(prospect._MobilPhone))
                                 continue;
                         }
+                        if (dublicateEmailCheck != null && (prospect._ContactEmail == null || !dublicateEmailCheck.Add(prospect._ContactEmail)))
+                            continue;
                         objEmailList = new CrmCampaignMemberClient();
                         objEmailList.pros = prospect;
                         objEmailList.SetMaster(prospect);
@@ -502,7 +608,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (cbxContact.IsChecked == true)
             {
                 IEnumerable<Contact> contactEntity;
-                if (Contacts != null && (contactFilterValues == null || !contactFilterValues.Any()))
+                if (Contacts != null && (contactFilterValues == null || contactFilterValues.Count() == 0))
                     contactEntity = (IEnumerable<Contact>)Contacts.GetNotNullArray;
                 else
                     contactEntity = await api.Query<ContactClient>(contactFilterValues);
@@ -514,71 +620,47 @@ namespace UnicontaClient.Pages.CustomPage
                             continue;
                         if (!HasMatch(contact._Products, Products, AllProducts))
                             continue;
-                        if (dublicateEmailCheck != null && (contact._Email == null || !dublicateEmailCheck.Add(contact._Email)))
+                        if (dublicateEmailCheck != null && (contact._Email == null || dublicateEmailCheck.Contains(contact._Email)))
                             continue;
-                        if (dublicatePhoneCheck != null && (contact._Mobil == null || !dublicatePhoneCheck.Add(contact._Mobil)))
+                        if (dublicatePhoneCheck != null && (contact._Mobil == null || dublicatePhoneCheck.Contains(contact._Mobil)))
                             continue;
-                        objEmailList = new CrmCampaignMemberClient();
-                        objEmailList.cont = contact;
-                        objEmailList.SetMaster(contact);
-                        if (CampaignMaster != null)
-                            objEmailList.SetMaster(CampaignMaster);
 
                         // if contact is also a Debtor, Creditor or Prospect we also set that, so we have adresss information
-                        IdKey rec;
+                        IdKey rec = null;
                         switch (contact._DCType)
                         {
                             case 1:
                                 rec = Debtors.Get(contact._DCAccount);
                                 if (rec != null)
-                                    objEmailList.dc = (DCAccount)rec;
+                                {
+                                    if (accountWithTrans != null && !accountWithTrans.Contains(rec.RowId))
+                                        continue;
+                                }
                                 break;
                             case 2:
                                 rec = Creditors.Get(contact._DCAccount);
                                 if (rec != null)
-                                    objEmailList.dc = (DCAccount)rec;
+                                {
+                                    if (accountWithTrans != null && !accountWithTrans.Contains(rec.RowId))
+                                        continue;
+                                }
                                 break;
                             case 3:
                                 rec = Prospects.Get(contact._DCAccount);
-                                if (rec != null)
-                                    objEmailList.pros = (CrmProspect)rec;
                                 break;
                         }
-                        emailLst.Add(objEmailList);
-                    }
-                }
-            }
+                        if (dublicateEmailCheck != null && (contact._Email == null || !dublicateEmailCheck.Add(contact._Email)))
+                            continue;
+                        if (dublicatePhoneCheck != null && (contact._Mobil == null || !dublicatePhoneCheck.Add(contact._Mobil)))
+                            continue;
 
-            if (cbxCreditor.IsChecked == true)
-            {
-                IEnumerable<Uniconta.DataModel.Creditor> creditorEntity;
-                if (Creditors != null && (creditorFilterValues == null || !creditorFilterValues.Any()))
-                    creditorEntity = (IEnumerable<Uniconta.DataModel.Creditor>)Creditors.GetNotNullArray;
-                else
-                    creditorEntity = await api.Query<CreditorClient>(creditorFilterValues);
-                if (creditorEntity != null)
-                {
-                    foreach (var creditor in creditorEntity)
-                    {
-                        if (!HasMatch(creditor._Interests, Interests, AllInterests))
-                            continue;
-                        if (!HasMatch(creditor._Products, Products, AllProducts))
-                            continue;
-                        if (dublicateEmailCheck != null && (creditor._ContactEmail == null || !dublicateEmailCheck.Add(creditor._ContactEmail)))
-                            continue;
-                        if (dublicatePhoneCheck != null)
-                        {
-                            if (creditor._Phone != null)
-                            {
-                                if (!dublicatePhoneCheck.Add(creditor._Phone))
-                                    continue;
-                            }
-                            else if (creditor._MobilPhone == null || !dublicatePhoneCheck.Add(creditor._MobilPhone))
-                                continue;
-                        }
                         objEmailList = new CrmCampaignMemberClient();
-                        objEmailList.dc = creditor;
-                        objEmailList.SetMaster(creditor);
+                        if (contact._DCType <= 2)
+                            objEmailList.dc = rec as DCAccount;
+                        else
+                            objEmailList.pros = rec as CrmProspect;
+                        objEmailList.cont = contact;
+                        objEmailList.SetMaster(contact);
                         if (CampaignMaster != null)
                             objEmailList.SetMaster(CampaignMaster);
                         emailLst.Add(objEmailList);
@@ -586,10 +668,12 @@ namespace UnicontaClient.Pages.CustomPage
                 }
             }
 
+            if (emailLst.Count == 0)
+                UtilDisplay.ShowErrorCode(ErrorCodes.NoLinesFound);
+            else
+                emailLst.Sort(new CrmCampaignMemberSort());
             dgCreateEmailList.ItemsSource = null;
-
-            emailList = emailLst.OrderBy(x => x.Name).ToList();
-            dgCreateEmailList.ItemsSource = emailList;
+            dgCreateEmailList.ItemsSource = emailLst;
 
             busyIndicator.IsBusy = false;
             dgCreateEmailList.Visibility = Visibility.Visible;

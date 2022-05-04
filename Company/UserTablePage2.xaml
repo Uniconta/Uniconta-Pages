@@ -24,17 +24,6 @@ x:Class="UnicontaClient.Pages.CustomPage.UserTablePage2"
             <CorasauControls:CorasauRibbonControl x:Name="frmRibbon" XMLSourcePath=";component/Pages/Company/UserTablePage2Ribbon.xml" Grid.Row="0"/>
             <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
                 <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="grpFirst">
-                    <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpKey" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Key}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                        <CorasauControls:CorasauLayoutItem FieldName="HasPrimaryKey" x:Name="liHasPrimaryKey">
-                            <CorasauControls:CheckEditor IsChecked="{Binding HasPrimaryKey,Mode=TwoWay}" Checked="CheckEditor_Checked" Unchecked="CheckEditor_Unchecked"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="PKprompt" x:Name="liPKprompt">
-                            <CorasauControls:TextEditor Text="{Binding PKprompt,Mode=TwoWay}" x:Name="pkPrompt" />
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="AutoKey" x:Name="liAutoKey">
-                            <CorasauControls:CheckEditor IsChecked="{Binding AutoKey,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                    </CorasauControls:CorasauLayoutGroup>
                     <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpDescription" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Description}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                         <CorasauControls:CorasauLayoutItem FieldName="Name" x:Name="liName">
                             <CorasauControls:TextEditor Text="{Binding Name,Mode=TwoWay}" Mask="[a-zA-Z0-9]+" MaskType="RegEx"/>
@@ -78,15 +67,29 @@ x:Class="UnicontaClient.Pages.CustomPage.UserTablePage2"
                             <CorasauControls:CheckEditor IsChecked="{Binding EditLines,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
-                    <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpSql" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=SQL}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                    <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpKey" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=UniqueId}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                        <CorasauControls:CorasauLayoutItem FieldName="HasPrimaryKey" x:Name="liHasPrimaryKey">
+                            <CorasauControls:CheckEditor IsChecked="{Binding HasPrimaryKey,Mode=TwoWay}" Checked="CheckEditor_Checked" Unchecked="CheckEditor_Unchecked"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="PKprompt" x:Name="liPKprompt">
+                            <CorasauControls:TextEditor Text="{Binding PKprompt,Mode=TwoWay}" x:Name="pkPrompt" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="AutoKey" x:Name="liAutoKey">
+                            <CorasauControls:CheckEditor IsChecked="{Binding AutoKey,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="AutoNumber" x:Name="liAutoNumber">
                             <CorasauControls:LookupEditor Text="{Binding AutoNumber,Mode=TwoWay}" x:Name="leAutoNumber"/>
                         </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="SQLIdent" x:Name="liSQLIdent">
-                            <CorasauControls:CheckEditor IsChecked="{Binding SQLIdent,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutGroup>
+                    <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpSharedToCom" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=SharedToCompany}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                        <CorasauControls:CorasauLayoutItem FieldName="DataOnlyInMainCompany" x:Name="liDataOnlyInMainCompanye">
+                            <CorasauControls:CheckEditor IsChecked="{Binding DataOnlyInMainCompany,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="OnlyMainCompanyCanEdit" x:Name="liOnlyMainCompanyCanEdit">
+                            <CorasauControls:CheckEditor IsChecked="{Binding OnlyMainCompanyCanEdit,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
-                </CorasauControls:CorasauLayoutGroup>
+                 </CorasauControls:CorasauLayoutGroup>
             </CorasauControls:CorasauLayoutControl>
         </Grid>
     </CorasauControls:BusyIndicator>

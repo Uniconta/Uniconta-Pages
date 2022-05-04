@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <root>
-  <RibbonItem TabId="0" LocalizedNameKey="Home">    
+  <RibbonItem TabId="0" LocalizedNameKey="Home">
+    <RibbonItem Action="Search" LocalizedNameKey="Search" LargeGlyph="Validate_32x32.png" ShortcutKey="Ctrl+H" />
+  </RibbonItem>
+  <RibbonItem>
     <RibbonItem Action="VatReportSpain" LocalizedNameKey="Modelo 303" LargeGlyph="Generate_32x32.png" ShortcutKey="Ctrl+G"/>
-   <RibbonItem Action="VatReportNorway" LocalizedNameKey="Mva skattemeldingen" LargeGlyph="Add_Menu_32x32.png"/>
+    <RibbonItem Action="VatReportNorway" LocalizedNameKey="Mva skattemeldingen" LargeGlyph="Add_Menu_32x32.png"/>
     <RibbonItem Action="VatReportDenmark" LocalizedNameKey="Momsopgørelse" LargeGlyph="Generate_32x32.png" ShortcutKey="Ctrl+G"/>
     <RibbonItem Action="VatReportHolland" LocalizedNameKey="BTW Aangifte" LargeGlyph="Generate_32x32.png" ShortcutKey="Ctrl+G"/>
     <RibbonItem Action="VatReportEstonia" LocalizedNameKey="KM avaldus" LargeGlyph="Generate_32x32.png" ShortcutKey="Ctrl+G"/>
-  <RibbonItem Action="VatReportIceland" LocalizedNameKey="VSK skýrsla" LargeGlyph="Generate_32x32.png" ShortcutKey="Ctrl+G"/>
+    <RibbonItem Action="VatReportIceland" LocalizedNameKey="VSK skýrsla" LargeGlyph="Generate_32x32.png" ShortcutKey="Ctrl+G"/>
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="Transactions" ShortcutKey="Alt+T" LocalizedNameKey="Transactions" LargeGlyph="Voucher_Transactions_32x32.png" />

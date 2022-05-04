@@ -32,24 +32,18 @@ using System.ComponentModel;
 using UnicontaClient.Pages;
 using Uniconta.Common.Utility;
 using Uniconta.API.Service;
+using Localization = Uniconta.ClientTools.Localization;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
     public class BankStatementLineGrid : CorasauDataGridClient
     {
-#if !SILVERLIGHT
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
             tableView.RowStyle = Application.Current.Resources["MatchingRowStyle"] as Style;
         }
-#else
-        protected override DataTemplate RowTemplate()
-        {
-            return Application.Current.Resources["customDataRowTemplate"] as DataTemplate;
-        }
-#endif
         public override Type TableType { get { return typeof(BankStatementLineGridClient); } }
         public override IComparer GridSorting { get { return new BankStatementLineSort(); } }
         public override bool Readonly { get { return false; } }
@@ -61,18 +55,14 @@ namespace UnicontaClient.Pages.CustomPage
 
     public class TransGrid : CorasauDataGridClient
     {
-#if !SILVERLIGHT
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
             tableView.RowStyle = Application.Current.Resources["MatchingRowStyle"] as Style;
         }
-#else
-        protected override DataTemplate RowTemplate()
-        {
-            return Application.Current.Resources["customDataRowTemplate"] as DataTemplate;
-        }
-#endif
+        public override bool Readonly { get { return false; } }
+        public override bool CanInsert { get { return false; } }
+        public override bool CanDelete { get { return false; } }
         public override Type TableType { get { return typeof(GLTransClientTotalBank); } }
     }
 
@@ -113,12 +103,12 @@ namespace UnicontaClient.Pages.CustomPage
         void Init()
         {
             InitializeComponent();
-            bankStatCaption = Uniconta.ClientTools.Localization.lookup("BankStatement");
-            transactionCaption = Uniconta.ClientTools.Localization.lookup("Transactions");
+            bankStatCaption = Localization.lookup("BankStatement");
+            transactionCaption = Localization.lookup("Transactions");
 
             if (fromDate == DateTime.MinValue)
             {
-                DateTime date = DateTime.Today;
+                DateTime date = GetSystemDefaultDate();
                 var firstDayOfMonth = new DateTime(date.Year, date.Month, 1);
                 toDate = firstDayOfMonth.AddMonths(1).AddDays(-1);
                 fromDate = firstDayOfMonth.AddMonths(-2);
@@ -134,8 +124,8 @@ namespace UnicontaClient.Pages.CustomPage
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgBankStatementLine.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;
             dgAccountsTransGrid.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged1;
-            State.Header = 
-            StateCol.Header = Uniconta.ClientTools.Localization.lookup("Status");
+            State.Header =
+            StateCol.Header = Localization.lookup("Status");
             SetStatusText();
             Mark.Visible = MarkCol.Visible = true;
             GetShowHideGreenMenuItem();
@@ -143,7 +133,7 @@ namespace UnicontaClient.Pages.CustomPage
             orient = api.session.Preference.BankStatementHorisontal ? Orientation.Horizontal : Orientation.Vertical;
             lGroup.Orientation = orient;
 
-            this.showAmountType = Uniconta.ClientTools.Localization.lookup("All");
+            this.showAmountType = Localization.lookup("All");
             dgBankStatementLine.View.SearchControl = localMenu.SearchControl;
             ribbonControl.lowerSearchGrid = dgAccountsTransGrid;
             ribbonControl.UpperSearchNullText = bankStatCaption;
@@ -230,6 +220,10 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 localMenu_OnItemClicked("OpenTran");
             }
+            else if (e.Key == Key.F9)
+            {
+                localMenu_OnItemClicked("VoidTransaction");
+            }
         }
 
         private void DataControl_CurrentItemChanged1(object sender, CurrentItemChangedEventArgs e)
@@ -248,7 +242,8 @@ namespace UnicontaClient.Pages.CustomPage
             base.OnLayoutLoaded();
             setDim();
             Amountcol.Visible = !this.ShowCurrency;
-            AmountCur.Visible = this.ShowCurrency;
+            if (this.ShowCurrency)
+                AmountCur.Visible = true;
         }
 
         protected override LookUpTable HandleLookupOnLocalPage(LookUpTable lookup, CorasauDataGrid dg)
@@ -270,13 +265,14 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        SQLCache LedgerCache, DebtorCache, CreditorCache;
+        SQLCache LedgerCache, DebtorCache, CreditorCache, ChargeGrp;
         protected override async void LoadCacheInBackGround()
         {
             var api = this.api;
             LedgerCache = api.GetCache(typeof(Uniconta.DataModel.GLAccount)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLAccount)).ConfigureAwait(false);
             DebtorCache = api.GetCache(typeof(Uniconta.DataModel.Debtor)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Debtor)).ConfigureAwait(false);
             CreditorCache = api.GetCache(typeof(Uniconta.DataModel.Creditor)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Creditor)).ConfigureAwait(false);
+            ChargeGrp = api.GetCache(typeof(Uniconta.DataModel.GLChargeGroup)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLChargeGroup)).ConfigureAwait(false);
         }
 
         CorasauGridLookupEditorClient prevAccount;
@@ -368,7 +364,7 @@ namespace UnicontaClient.Pages.CustomPage
                         val = (from t in lstAct where t._Mark select t._AmountCent).Sum();
                     transAmt = (val / 100d);
                     this.layOutTrans.Caption = string.Format("'{0:N2}'    '({1:N2})'", transAmt, bankStatAmt - transAmt);
-                   
+
                     break;
             }
         }
@@ -418,12 +414,16 @@ namespace UnicontaClient.Pages.CustomPage
                         }
                     }
                     break;
+                case "Charge":
+                    var grp = (GLChargeGroup)ChargeGrp?.Get(rec._Charge);
+                    rec.ChargeAmount = grp != null ? Math.Round(grp._Amount + (Math.Abs(rec.Amount) + grp._Amount) * grp._Pct / Math.Max(100 - grp._Pct, 1), 2) : 0;
+                    break;
                 case "Mark":
                     var lstBst = ((IEnumerable<BankStatementLineGridClient>)dgBankStatementLine.ItemsSource);
                     var val = (from t in lstBst where t._Mark select t._AmountCent).Sum();
                     bankStatAmt = (val / 100d);
                     this.layOutBankStat.Caption = string.Format("'{0:N2}'", bankStatAmt);
-                    this.layOutTrans.Caption = string.Format("'{0:N2}'    '({1:N2})'", transAmt , bankStatAmt - transAmt);
+                    this.layOutTrans.Caption = string.Format("'{0:N2}'    '({1:N2})'", transAmt, bankStatAmt - transAmt);
                     break;
             }
         }
@@ -444,20 +444,18 @@ namespace UnicontaClient.Pages.CustomPage
 
             var bankStmtLines = (BankStatementLineGridClient[])await bankTransApi.GetTransactions(new BankStatementLineGridClient(), master, fromDate, toDate, true);
 
-            if (showAmountType == Uniconta.ClientTools.Localization.lookup("Debit"))
+            if (showAmountType == Localization.lookup("Debit"))
             {
                 var stmtLines = bankStmtLines.Where(x => x._AmountCent >= 0).ToArray();
                 bankStmtLines = stmtLines;
-
             }
-            else if (showAmountType == Uniconta.ClientTools.Localization.lookup("Credit"))
+            else if (showAmountType == Localization.lookup("Credit"))
             {
                 var stmtLines = bankStmtLines.Where(x => x._AmountCent <= 0).ToArray();
                 bankStmtLines = stmtLines;
             }
 
             var listtran = (GLTransClientTotalBank[])await glTransTask;  // wait for gltrans
-            int llisttranLen = 0;
 
             busyIndicator.IsBusy = false;
 
@@ -466,8 +464,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 Array.Sort(listtran, new GLTransClientSort());
                 long Total = 0;
-                llisttranLen = listtran.Length;
-                for (int i = 0; (i < llisttranLen); i++)
+                for (int i = 0; (i < listtran.Length); i++)
                 {
                     var p = listtran[i];
                     Total += ShowCurrency ? p._AmountCurCent : p._AmountCent;
@@ -487,7 +484,7 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     var p = bankStmtLines[i];
                     if (p._Primo)
-                        p._Text = Uniconta.ClientTools.Localization.lookup("Primo");
+                        p._Text = Localization.lookup("Primo");
                     //if (! p._Void)
                     {
                         Total += p._AmountCent;
@@ -504,7 +501,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                         var BankStatementLineId = ((int)SmallDate.Pack(p._Date) << 16) + p.LineNumber;
 
-                        for (int n = startGLSearch; (n < llisttranLen); n++)
+                        for (int n = startGLSearch; (n < listtran.Length); n++)
                         {
                             var t = listtran[n];
                             if (t._Date < PostedDate)
@@ -528,7 +525,7 @@ namespace UnicontaClient.Pages.CustomPage
                                         {
                                             PostedDate = mark.Date;
                                             int cnt = startGLSearch;
-                                            while (++cnt < llisttranLen)
+                                            while (++cnt < listtran.Length)
                                             {
                                                 t = listtran[cnt];
                                                 if (t._Date == PostedDate)
@@ -559,10 +556,9 @@ namespace UnicontaClient.Pages.CustomPage
                                     foreach (var mark in p.MultiMark)
                                     {
                                         PostedDate = mark.Date;
-                                        int cnt = startGLSearch;
-                                        while (cnt < llisttranLen)
+                                        for (int cnt = startGLSearch; (cnt < listtran.Length); cnt++)
                                         {
-                                            t = listtran[cnt++];
+                                            t = listtran[cnt];
                                             if (t._Date == PostedDate)
                                             {
                                                 if (t.JournalId == mark.JournalId && t.JourRowId != 0 && t.JourRowId == mark.JourRowId)
@@ -678,13 +674,13 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem._DocumentRef != 0)
                         selectedItem.VoucherReference = 0;
                     else
-                        UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("NoVoucherExist"), Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OK);
+                        UnicontaMessageBox.Show(Localization.lookup("NoVoucherExist"), Localization.lookup("Information"), MessageBoxButton.OK);
                     break;
                 case "VoucherTransactions":
                     var selected = dgAccountsTransGrid.SelectedItem as GLTransClientTotalBank;
                     if (selected == null)
                         return;
-                    string vheader = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("VoucherTransactions"), selected._Voucher);
+                    string vheader = Util.ConcatParenthesis(Localization.lookup("VoucherTransactions"), selected._Voucher);
                     AddDockItem(TabControls.AccountsTransaction, dgAccountsTransGrid.syncEntity, vheader);
                     break;
                 case "AddMatch":
@@ -702,7 +698,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedTrans != null)
                         ChangeVoidState(selectedTrans);
                     break;
-                 case "ChangeOrientation":
+                case "ChangeOrientation":
                     orient = 1 - orient;
                     lGroup.Orientation = orient;
                     api.session.Preference.BankStatementHorisontal = (orient == Orientation.Horizontal);
@@ -726,17 +722,15 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "AddMapping":
                     if (selectedItem != null)
-                    {
-                        var bankImportMap = new CWAddBankImportMapping(api, master, selectedItem);
-                        bankImportMap.Show();
-                    }
+                        (new CWAddBankImportMapping(api, master, selectedItem)).Show();
                     break;
                 case "OffSetAccount":
-                    CallOffsetAccount(selectedItem);
+                    if (selectedItem != null)
+                        CallOffsetAccount(selectedItem);
                     break;
                 case "OpenTran":
-                    if (selectedItem == null) return;
-                    SettleOpenTransactionPage(selectedItem);
+                    if (selectedItem != null)
+                        SettleOpenTransactionPage(selectedItem);
                     break;
                 case "EditJournalLine":
                     var selectedGlTrans = dgAccountsTransGrid.SelectedItem as GLTransClientTotal;
@@ -747,8 +741,97 @@ namespace UnicontaClient.Pages.CustomPage
                     SetStatusText();
                     saveGrid(true);
                     break;
+                case "AccountsTransaction":
+                    if (selectedItem != null)
+                        OpenTranscation(selectedItem);
+                    break;
+                case "Adjustment":
+                    Adjustment();
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
+                    break;
+            }
+        }
+
+        async void Adjustment()
+        {
+            var lstbsl = ((IEnumerable<BankStatementLineGridClient>)dgBankStatementLine.ItemsSource);
+            if (lstbsl == null)
+                return;
+            var lstAct = ((List<GLTransClientTotalBank>)dgAccountsTransGrid.ItemsSource);
+            if (lstAct == null)
+                return;
+            var markedbstList = lstbsl.Where(bl => bl.Mark == true && bl.State == (byte)1).ToList();
+            var markedactList = lstAct.Where(ac => ac.Mark == true && ac.State == (byte)1).ToList();
+            if (markedbstList.Count != 1 || markedactList.Count != 1)
+            {
+                UtilDisplay.ShowErrorCode(ErrorCodes.TooManyLinesSelected);
+                return;
+            }
+
+            string labl1, labl2;
+            var glTran = markedactList[0];
+            if (glTran._JournalPostedId == 0)
+            {
+                UnicontaMessageBox.Show(Localization.lookup("CannotUseMethod") + Environment.NewLine + Localization.lookup("JournalLinesIncluded"), Localization.lookup("Information"), MessageBoxButton.OK);
+                return;
+            }
+            if (glTran._Currency == 0)
+            {
+                labl1 = "CreatePennyDif";
+                labl2 = "PennyDif";
+            }
+            else
+            {
+                labl1 = "CreateExchangeRegulation";
+                labl2 = "ExchangeRegulated";
+            }
+            var bnk = markedbstList[0];
+            var dif = bnk._AmountCent - glTran._AmountCent;
+
+            if (dif != 0 && UnicontaMessageBox.Show(string.Concat(Localization.lookup(labl1), "? ", Localization.lookup("Amount"), " = ", (dif / 100d).ToString("N2")),
+                     Localization.lookup(labl2), MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            {
+                busyIndicator.IsBusy = true;
+                var rec = new GLTransClientTotalBank();
+                var err = await new PostingAPI(api).BalanceAdjustment(glTran, rec, dif);
+                busyIndicator.IsBusy = false;
+
+                if (err != 0)
+                    UtilDisplay.ShowErrorCode(err);
+                else
+                {
+                    rec._DCAccount = (from r in (IEnumerable<GLAccount>)LedgerCache.GetNotNullArray where r._SystemAccount == (glTran._Currency != 0 ? (byte)SystemAccountTypes.ExchangeDif : (byte)SystemAccountTypes.PennyDif) select r).FirstOrDefault()?._Account;
+                    rec._Mark = true;
+                    lstAct.Insert(lstAct.IndexOf(glTran) + 1, rec);
+                    dgAccountsTransGrid.RefreshData();
+                    this.layOutTrans.Caption = string.Format("'{0:N2}'    '({1:N2})'", bnk.Amount, 0d);
+
+                    AddMatch();
+                }
+            }
+        }
+
+        void OpenTranscation(BankStatementLineGridClient rec)
+        {
+            IdKey Acc;
+            switch (rec._AccountType)
+            {
+                case (byte)GLJournalAccountType.Finans:
+                    Acc = LedgerCache?.Get(rec.Account);
+                    if (Acc != null)
+                        AddDockItem(TabControls.AccountsTransaction, Acc, string.Concat(Localization.lookup("AccountsTransaction"), "/", Acc.KeyStr));
+                    break;
+                case (byte)GLJournalAccountType.Debtor:
+                    Acc = DebtorCache?.Get(rec.Account);
+                    if (Acc != null)
+                        AddDockItem(TabControls.DebtorTransactions, Acc, string.Concat(Localization.lookup("DebtorTransactions"), "/", Acc.KeyStr));
+                    break;
+                case (byte)GLJournalAccountType.Creditor:
+                    Acc = CreditorCache?.Get(rec.Account);
+                    if (Acc != null)
+                        AddDockItem(TabControls.CreditorTransactions, Acc, string.Concat(Localization.lookup("CreditorTransactions"), "/", Acc.KeyStr));
                     break;
             }
         }
@@ -762,7 +845,7 @@ namespace UnicontaClient.Pages.CustomPage
                 glDlyJournalLine.Journal = NumberConvert.ToString(selectedGlTrans.JournalId);
                 var err = await api.Read(glDlyJournalLine);
                 if (err == ErrorCodes.Succes)
-                    AddDockItem(TabControls.GLDailyJournalLinePage2, glDlyJournalLine, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Journalline"), selectedGlTrans.JournalId));
+                    AddDockItem(TabControls.GLDailyJournalLinePage2, glDlyJournalLine, string.Format("{0}: {1}", Localization.lookup("Journalline"), selectedGlTrans.JournalId));
             }
         }
 
@@ -776,8 +859,8 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     if (dragDropWindow.DialogResult == true)
                     {
-                        var fileInfo = dragDropWindow.FileInfoList?.SingleOrDefault();
                         var voucher = new VouchersClient();
+                        var fileInfo = dragDropWindow.FileInfoList[0];
                         voucher._Data = fileInfo.FileBytes;
                         voucher._Text = fileInfo.FileName;
                         voucher._Fileextension = DocumentConvert.GetDocumentType(fileInfo.FileExtension);
@@ -890,7 +973,7 @@ namespace UnicontaClient.Pages.CustomPage
                 }
                 else
                 {
-                    if(settleType!= bankStatementLine._SettleValue)
+                    if (settleType != bankStatementLine._SettleValue)
                     {
                         bankStatementLine._SettleValue = settleType;
                         bankStatementLine.NotifyPropertyChanged("SettleValue");
@@ -934,12 +1017,12 @@ namespace UnicontaClient.Pages.CustomPage
                 return;
             if (hideGreen)
             {
-                ibase.Caption = string.Format(Uniconta.ClientTools.Localization.lookup("ShowOBJ"), Uniconta.ClientTools.Localization.lookup("Green"));
+                ibase.Caption = string.Format(Localization.lookup("ShowOBJ"), Localization.lookup("Green"));
                 ibase.LargeGlyph = Utilities.Utility.GetGlyph("ShowGreen_32x32.png");
             }
             else
             {
-                ibase.Caption = string.Format(Uniconta.ClientTools.Localization.lookup("HideOBJ"), Uniconta.ClientTools.Localization.lookup("Green"));
+                ibase.Caption = string.Format(Localization.lookup("HideOBJ"), Localization.lookup("Green"));
                 ibase.LargeGlyph = Utilities.Utility.GetGlyph("HideGreen_32x32.png");
             }
         }
@@ -951,7 +1034,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 trans._Void = !trans._Void;
                 trans.UpdateVoid();
-                UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup(trans._Void ? "TransactionWasReconciled" : "Unreconciled"), Uniconta.ClientTools.Localization.lookup("Message"));
+                UnicontaMessageBox.Show(Localization.lookup(trans._Void ? "TransactionWasReconciled" : "Unreconciled"), Localization.lookup("Message"));
             }
             else
                 UtilDisplay.ShowErrorCode(res);
@@ -972,13 +1055,14 @@ namespace UnicontaClient.Pages.CustomPage
                     var res = await pApi.TransferBankStatementToJournal(master, winTransfer.FromDate, winTransfer.ToDate, winTransfer.BankAsOffset, winTransfer.isMarkLine, winTransfer.AddVoucherNumber);
                     if (res == ErrorCodes.Succes)
                     {
-                        string strmsg = string.Format("{0}; {1}! {2} ?", Uniconta.ClientTools.Localization.lookup("GenerateJournalLines"), Uniconta.ClientTools.Localization.lookup("Completed"),
-                            string.Format(Uniconta.ClientTools.Localization.lookup("GoTo"), Uniconta.ClientTools.Localization.lookup("JournalLines")));
-                        var select = UnicontaMessageBox.Show(strmsg, Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OKCancel);
+                        string strmsg = string.Format("{0}; {1}! {2} ?", Localization.lookup("GenerateJournalLines"), Localization.lookup("Completed"),
+                            string.Format(Localization.lookup("GoTo"), Localization.lookup("JournalLines")));
+                        var select = UnicontaMessageBox.Show(strmsg, Localization.lookup("Information"), MessageBoxButton.OKCancel);
                         if (select == MessageBoxResult.OK)
                         {
                             var parms = new[] { new BasePage.ValuePair("Journal", winTransfer.Journal) };
-                            AddDockItem(TabControls.GL_DailyJournalLine, null, null, null, true, null, parms);
+                            var header = string.Concat(Localization.lookup("Journal"), ": ", winTransfer.Journal);
+                            AddDockItem(TabControls.GL_DailyJournalLine, null, header, null, true, null, parms);
                         }
                     }
                     else
@@ -1013,30 +1097,30 @@ namespace UnicontaClient.Pages.CustomPage
 
         void AutoMatch()
         {
-            if (dgBankStatementLine.ItemsSource == null || dgAccountsTransGrid.ItemsSource == null)
-                return;
-            var days = DaysSlip;
-            var cnt = AutoMatchOne2One(days);
-            cnt += AutoMatchOne2Many(days);
-            cnt += AutoMatchMany2One(days);
-            UnicontaMessageBox.Show(string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("NumberOfRecords"), cnt), Uniconta.ClientTools.Localization.lookup("Message"));
-        }
-
-        int AutoMatchOne2One(int slip)
-        {
-            int cnt = 0;
             var lstbsl = ((IEnumerable<BankStatementLineGridClient>)dgBankStatementLine.ItemsSource);
+            if (lstbsl == null)
+                return;
             var bstList = lstbsl.Where(bl => bl.Mark == false && bl.State == (byte)1).ToList();
             var lstAct = ((IEnumerable<GLTransClientTotalBank>)dgAccountsTransGrid.ItemsSource);
+            if (lstAct == null)
+                return;
             var actList = lstAct.Where(ac => ac.Mark == false && ac.State == (byte)1).ToList();
+            var days = DaysSlip;
+            var cnt = AutoMatchOne2One(bstList, actList, days);
+            cnt += AutoMatchOne2Many(bstList, actList, days);
+            cnt += AutoMatchMany2One(bstList, actList, days);
+            UnicontaMessageBox.Show(string.Format("{0}: {1}", Localization.lookup("NumberOfRecords"), cnt), Localization.lookup("Message"));
+        }
+
+        int AutoMatchOne2One(List<BankStatementLineGridClient> bstList, List<GLTransClientTotalBank> actList, int slip)
+        {
+            int cnt = 0;
 
             for (int OffsetDays = 0; (OffsetDays <= slip); OffsetDays++)
             {
-                foreach (var bst in bstList)
+                for (var b = 0; (b < bstList.Count); b++)
                 {
-                    if (bst.State != 1)
-                        continue;
-
+                    var bst = bstList[b];
                     var MinDate = bst.Date;
                     var MaxDate = MinDate;
                     if (OffsetDays > 0)
@@ -1045,22 +1129,26 @@ namespace UnicontaClient.Pages.CustomPage
                         MaxDate = MaxDate.AddDays(OffsetDays);
                     }
                     var Amount = bst._AmountCent;
-                    foreach (var act in actList)
+                    for (var a = 0; (a < actList.Count); a++)
                     {
+                        var act = actList[a];
                         if (act._Date > MaxDate)
                             break;
 
-                        var TransAcmount = ShowCurrency ? act._AmountCurCent : act._AmountCent;
-                        if (Amount == TransAcmount && act._Date >= MinDate && act._Date <= MaxDate && act.State == 1)
+                        var TransAmount = !ShowCurrency ? act._AmountCent : act._AmountCurCent;
+                        if (Amount == TransAmount && act._Date >= MinDate)
                         {
                             Join(bst, act);
-                            bst.Trans = new List<GLTransClientTotalBank>() { act };
+                            bst.Trans = new List<GLTransClientTotalBank>(1) { act };
                             act._Reconciled = true;
                             act.Mark = false;
                             act._IsMatched = true;
-                            act.StatementLines = new List<BankStatementLineGridClient>() { bst };
+                            act.StatementLines = new List<BankStatementLineGridClient>(1) { bst };
                             act.UpdateState();
                             cnt++;
+                            bstList.RemoveAt(b);
+                            b--;
+                            actList.RemoveAt(a);
                             break;
                         }
                     }
@@ -1069,22 +1157,16 @@ namespace UnicontaClient.Pages.CustomPage
             return cnt;
         }
 
-        int AutoMatchOne2Many(int slip)
+        int AutoMatchOne2Many(List<BankStatementLineGridClient> bstList, List<GLTransClientTotalBank> actList, int slip)
         {
             int cnt = 0;
-            var lstbsl = ((IEnumerable<BankStatementLineGridClient>)dgBankStatementLine.ItemsSource);
-            var bstList = lstbsl.Where(bl => bl.Mark == false && bl.State == (byte)1).ToList();
-            var lstAct = ((IEnumerable<GLTransClientTotalBank>)dgAccountsTransGrid.ItemsSource);
-            var actList = lstAct.Where(ac => ac.Mark == false && ac.State == (byte)1).ToArray();
-            int actlen = actList.Length;
+            var actlen = actList.Count;
 
             for (int OffsetDays = 0; (OffsetDays <= slip); OffsetDays++)
             {
-                foreach (var bst in bstList)
+                for (var b = 0; (b < bstList.Count); b++)
                 {
-                    if (bst.State != 1)
-                        continue;
-
+                    var bst = bstList[b];
                     var MinDate = bst.Date;
                     var MaxDate = MinDate;
                     if (OffsetDays > 0)
@@ -1109,21 +1191,21 @@ namespace UnicontaClient.Pages.CustomPage
                         while (n < actlen)
                         {
                             var act2 = actList[n++];
-                            if (act2._Date > MaxDate || act2.State != 1)
+                            if (act2._Date > MaxDate)
                                 break;
 
-                            var newAmount = ShowCurrency ? act2._AmountCurCent : act2._AmountCent;
+                            var newAmount = !ShowCurrency ? act2._AmountCent : act2._AmountCurCent;
                             if ((sumTrans > 0 && newAmount < 0) || (sumTrans < 0 && newAmount > 0))
                                 break;
                             sumTrans += newAmount;
                             if (sumTrans == Amount)
                             {
-                                var bstLink = new List<BankStatementLineGridClient>() { bst };
+                                var bstLink = new List<BankStatementLineGridClient>(1) { bst };
                                 Join(bst, act);
-                                bst.Trans = new List<GLTransClientTotalBank>();
-                                for (int i = startIdx; (i < n); i++)
+                                bst.Trans = new List<GLTransClientTotalBank>(n - startIdx);
+                                while (startIdx < n)
                                 {
-                                    act = actList[i];
+                                    act = actList[startIdx];
                                     bst.Trans.Add(act);
                                     act._Reconciled = true;
                                     act.Mark = false;
@@ -1131,8 +1213,15 @@ namespace UnicontaClient.Pages.CustomPage
                                     act.StatementLines = bstLink;
                                     act.UpdateState();
                                     cnt++;
+
+                                    actList.RemoveAt(startIdx);
+                                    n--;
+                                    actlen--;
                                 }
                                 startIdx = actlen; // we will exit
+
+                                bstList.RemoveAt(b);
+                                b--;
                                 break;
                             }
                             if (Math.Abs(sumTrans) > Math.Abs(Amount))
@@ -1145,22 +1234,15 @@ namespace UnicontaClient.Pages.CustomPage
             return cnt;
         }
 
-        int AutoMatchMany2One(int slip)
+        int AutoMatchMany2One(List<BankStatementLineGridClient> bstList, List<GLTransClientTotalBank> actList, int slip)
         {
             int cnt = 0;
-            var lstbsl = ((IEnumerable<BankStatementLineGridClient>)dgBankStatementLine.ItemsSource);
-            var bstList = lstbsl.Where(bl => bl.Mark == false && bl.State == (byte)1).ToArray();
-            int bstlen = bstList.Length;
-            var lstAct = ((IEnumerable<GLTransClientTotalBank>)dgAccountsTransGrid.ItemsSource);
-            var actList = lstAct.Where(ac => ac.Mark == false && ac.State == (byte)1).ToList();
-
+            var bstlen = bstList.Count;
             for (int OffsetDays = 0; (OffsetDays <= slip); OffsetDays++)
             {
-                foreach (var act in lstAct)
+                for (var a = 0; (a < actList.Count); a++)
                 {
-                    if (act.State != 1)
-                        continue;
-
+                    var act = actList[a];
                     var MinDate = act.Date;
                     var MaxDate = MinDate;
                     if (OffsetDays > 0)
@@ -1168,7 +1250,7 @@ namespace UnicontaClient.Pages.CustomPage
                         MinDate = MinDate.AddDays(-OffsetDays);
                         MaxDate = MaxDate.AddDays(OffsetDays);
                     }
-                    var Amount = ShowCurrency ? act._AmountCurCent : act._AmountCent;
+                    var Amount = !ShowCurrency ? act._AmountCent : act._AmountCurCent;
 
                     int startIdx = 0;
                     while (startIdx < bstlen && bstList[startIdx]._Date < MinDate)
@@ -1185,7 +1267,7 @@ namespace UnicontaClient.Pages.CustomPage
                         while (n < bstlen)
                         {
                             var bst2 = bstList[n++];
-                            if (bst2._Date > MaxDate || bst2.State != 1)
+                            if (bst2._Date > MaxDate)
                                 break;
 
                             var newAmount = bst2._AmountCent;
@@ -1194,21 +1276,28 @@ namespace UnicontaClient.Pages.CustomPage
                             sumTrans += newAmount;
                             if (sumTrans == Amount)
                             {
-                                var actLink = new List<GLTransClientTotalBank>() { act };
+                                var actLink = new List<GLTransClientTotalBank>(1) { act };
                                 act._Reconciled = true;
                                 act.Mark = false;
                                 act._IsMatched = true;
                                 act.UpdateState();
-                                act.StatementLines = new List<BankStatementLineGridClient>();
-                                for (int i = startIdx; (i < n); i++)
+                                act.StatementLines = new List<BankStatementLineGridClient>(n - startIdx);
+                                while (startIdx < n)
                                 {
-                                    bst = bstList[i];
+                                    bst = bstList[startIdx];
                                     act.StatementLines.Add(bst);
                                     Join(bst, act);
                                     bst.Trans = actLink;
                                     cnt++;
+
+                                    bstList.RemoveAt(startIdx);
+                                    n--;
+                                    bstlen--;
                                 }
                                 startIdx = bstlen; // we will exit
+
+                                actList.RemoveAt(a);
+                                a--;
                                 break;
                             }
                             if (Math.Abs(sumTrans) > Math.Abs(Amount))
@@ -1231,6 +1320,11 @@ namespace UnicontaClient.Pages.CustomPage
                 return false;
             var markedbstList = lstbsl.Where(bl => bl.Mark == true && bl.State == (byte)1).ToList();
             var markedactList = lstAct.Where(ac => ac.Mark == true && ac.State == (byte)1).ToList();
+            if (markedbstList.Count > 100 && markedactList.Count > 100)
+            {
+                UtilDisplay.ShowErrorCode(ErrorCodes.TooManyLinesSelected);
+                return false;
+            }
             if (markedbstList.Count == 0 && markedactList.Count == 0)
             {
                 /* take selected item */
@@ -1247,13 +1341,6 @@ namespace UnicontaClient.Pages.CustomPage
                     markedactList.Add(ac);
                 }
             }
-            /*
-            if (markedbstList.Count > 1 && markedactList.Count > 1)
-            {
-                UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("TooManyLinesSelected"), Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OK);
-                return false;
-            }
-            */
             var ShowCurrency = this.ShowCurrency;
 
             if (markedbstList.Count > 0 && markedactList.Count > 0)
@@ -1271,10 +1358,10 @@ namespace UnicontaClient.Pages.CustomPage
 
                 if (Math.Abs(sum1 - sum2) > this.master._AllowedDifInMatch * 100d)
                 {
-                    UnicontaMessageBox.Show(string.Format("{0}. {1}={2} {3}={4}", Uniconta.ClientTools.Localization.lookup("ReconcileSumErr"),
-                        Uniconta.ClientTools.Localization.lookup("BankStatement"), (sum1 / 100d).ToString("N2"),
-                        Uniconta.ClientTools.Localization.lookup("Transactions"), (sum2 / 100d).ToString("N2")),
-                        Uniconta.ClientTools.Localization.lookup("Error"), MessageBoxButton.OK);
+                    UnicontaMessageBox.Show(string.Format("{0}. {1}={2} {3}={4}", Localization.lookup("ReconcileSumErr"),
+                        Localization.lookup("BankStatement"), (sum1 / 100d).ToString("N2"),
+                        Localization.lookup("Transactions"), (sum2 / 100d).ToString("N2")),
+                        Localization.lookup("Error"), MessageBoxButton.OK);
                     return false;
                 }
 
@@ -1329,22 +1416,79 @@ namespace UnicontaClient.Pages.CustomPage
                 else
                 {
                     bool first = true;
-                    foreach (var bst in markedbstList)
+                    for (var i = 0; (i < markedbstList.Count); i++)
                     {
+                        var bst = markedbstList[i];
                         bst.Updated = true;
                         bst.Mark = false;
                         bst.Trans = markedactList;
-                        foreach (var act in markedactList)
+                        for (var n = 0; (n < markedactList.Count); n++)
                         {
+                            var act = markedactList[n];
+
+                            if (n == 0 && markedactList.Count > 1)
+                            {
+                                // lets see if we can find a one to one match
+                                int match = -1;
+                                for (var j = 0; (j < markedactList.Count); j++)
+                                {
+                                    var act2 = markedactList[j];
+                                    if (bst._AmountCent != 0 && bst._AmountCent == (!ShowCurrency ? act2._AmountCent : act2._AmountCurCent))
+                                    {
+                                        if (match < 0)
+                                            match = j;
+                                        else
+                                        {
+                                            if (act2._Text != markedactList[match]._Text)
+                                            {
+                                                if (act2._Text == bst._Text)
+                                                {
+                                                    match = j;
+                                                    continue;
+                                                }
+                                                if (markedactList[match]._Text == bst._Text)
+                                                    continue;
+                                            }
+                                            var dm = Math.Abs((bst.Date - markedactList[match].Date).Days);
+                                            var d2 = Math.Abs((bst.Date - act2.Date).Days);
+                                            if (d2 < dm)
+                                            {
+                                                match = j;
+                                                continue;
+                                            }
+                                            if (d2 > dm)
+                                                continue;
+                                            match = -1;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (match >= 0)
+                                {
+                                    act = markedactList[match];
+                                    act.StatementLines = new List<BankStatementLineGridClient>(1) { bst };
+                                    bst.Trans = new List<GLTransClientTotalBank>(1) { act };
+                                    act._Reconciled = true;
+                                    act.Mark = false;
+                                    act.IsMatched = true;
+                                    Join(bst, act, true);
+
+                                    markedactList.RemoveAt(match);
+                                    markedbstList.RemoveAt(i);
+                                    i--;
+                                    break;
+                                }
+                            }
+
+                            act.StatementLines = markedbstList;
+                            act._Reconciled = true;
+                            act.Mark = false;
+                            act.IsMatched = true;
                             if (first)
                             {
                                 first = false;
                                 Join(bst, act, true);
                             }
-                            act.StatementLines = markedbstList;
-                            act._Reconciled = true;
-                            act.Mark = false;
-                            act.IsMatched = true;
                         }
                     }
                 }
@@ -1421,7 +1565,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         void setInterval()
         {
-            CWInterval winInterval = new CWInterval(fromDate, toDate, DaysSlip,hideVoucher:true);
+            CWInterval winInterval = new CWInterval(fromDate, toDate, DaysSlip, hideVoucher: true);
             winInterval.Closed += delegate
             {
                 if (winInterval.DialogResult == true)
@@ -1438,7 +1582,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         void SetFilter(int step)
         {
-            showAmountType = Uniconta.ClientTools.Localization.lookup("All");
+            showAmountType = Localization.lookup("All");
             fromDate = fromDate.AddMonths(step);
             var td = toDate.AddMonths(step);
             toDate = td.AddDays(DateTime.DaysInMonth(td.Year, td.Month) - td.Day);
@@ -1469,7 +1613,7 @@ namespace UnicontaClient.Pages.CustomPage
                 bank.Updated = false;
 
                 var _Trans = bank._Trans;
-                if (_Trans != null && _Trans.Count == 1 && _Trans[0].StatementLines.Count > 1)
+                if (_Trans != null && _Trans.Count == 1 && _Trans[0].StatementLines != null && _Trans[0].StatementLines.Count > 1)
                 {
                     if (multiSettleBank == null)
                         multiSettleBank = new List<BankStatementAPI.TransSettle>();
@@ -1560,13 +1704,13 @@ namespace UnicontaClient.Pages.CustomPage
 
             foreach (var grp in groups)
             {
-                if (grp.StatusValue == "a" || grp.Caption == Uniconta.ClientTools.Localization.lookup("FromDate"))
+                if (grp.StatusValue == "a" || grp.Caption == Localization.lookup("FromDate"))
                 {
                     grp.StatusValue = fromDate.ToString("d");
                     continue;
                 }
                 else
-                if (grp.StatusValue == "b" || grp.Caption == Uniconta.ClientTools.Localization.lookup("ToDate"))
+                if (grp.StatusValue == "b" || grp.Caption == Localization.lookup("ToDate"))
                 {
                     grp.StatusValue = toDate.ToString("d");
                 }
@@ -1710,7 +1854,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (line != null)
             {
                 dgBankStatementLine.SetLoadedRow(line);
-                var header = string.Format("{0}:{1} {2}", Uniconta.ClientTools.Localization.lookup("OffsetAccountTemplate"), Uniconta.ClientTools.Localization.lookup("BankStatement"), line._Account);
+                var header = string.Format("{0}:{1} {2}", Localization.lookup("OffsetAccountTemplate"), Localization.lookup("BankStatement"), line._Account);
                 AddDockItem(TabControls.GLOffsetAccountTemplate, line, header: header);
             }
         }

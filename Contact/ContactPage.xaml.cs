@@ -96,6 +96,7 @@ namespace UnicontaClient.Pages.CustomPage
             var load = new List<Type>();
             if (api.CompanyEntity.CRM)
             {
+                CrmProspectCache = api.GetCache(typeof(Uniconta.DataModel.CrmProspect));
                 load.Add(typeof(Uniconta.DataModel.CrmInterest));
                 load.Add(typeof(Uniconta.DataModel.CrmProduct));
                 if (master == null)
@@ -113,6 +114,9 @@ namespace UnicontaClient.Pages.CustomPage
             }
             if (load.Count != 0)
                 LoadType(load.ToArray());
+
+            DebtorCache = api.GetCache(typeof(Uniconta.DataModel.Debtor));
+            CreditorCache = api.GetCache(typeof(Uniconta.DataModel.Creditor));
 
             dgContactGrid.SelectedItemChanged += DgContactGrid_SelectedItemChanged;
             dgContactGrid.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;
@@ -222,6 +226,9 @@ namespace UnicontaClient.Pages.CustomPage
             var selectedItem = dgContactGrid.SelectedItem as ContactClient;
             if (selectedItem == null)
                 return;
+            var ribbonControl = this.ribbonControl;
+            if (ribbonControl == null)
+                return;
             if (selectedItem._DCType == 2)
             {
                 ribbonControl.EnableButtons("CreditorOrders");
@@ -256,9 +263,11 @@ namespace UnicontaClient.Pages.CustomPage
                 AccountName.ShowInColumnChooser = DCType.ShowInColumnChooser = DCAccount.ShowInColumnChooser = false;
             }
 
-            bool showIntProdCol = api.CompanyEntity.CRM;
-            Interests.Visible = showIntProdCol;
-            Products.Visible = showIntProdCol;
+            if (!api.CompanyEntity.CRM)
+            {
+                Interests.Visible = false;
+                Products.Visible = false;
+            }
             base.OnLayoutLoaded();
         }
 
@@ -347,14 +356,13 @@ namespace UnicontaClient.Pages.CustomPage
 
         async protected override void LoadCacheInBackGround()
         {
-            var comp = api.CompanyEntity;
-
+            var api = this.api;
             if (DebtorCache == null)
-                DebtorCache = comp.GetCache(typeof(Debtor)) ?? await api.LoadCache(typeof(Debtor)).ConfigureAwait(false);
+                DebtorCache = api.GetCache(typeof(Debtor)) ?? await api.LoadCache(typeof(Debtor)).ConfigureAwait(false);
             if (CreditorCache == null)
-                CreditorCache = comp.GetCache(typeof(Uniconta.DataModel.Creditor)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Creditor)).ConfigureAwait(false);
-            if (CrmProspectCache == null)
-                CrmProspectCache = comp.GetCache(typeof(CrmProspect)) ?? await api.LoadCache(typeof(CrmProspect)).ConfigureAwait(false);
+                CreditorCache = api.GetCache(typeof(Uniconta.DataModel.Creditor)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Creditor)).ConfigureAwait(false);
+            if (CrmProspectCache == null && api.CompanyEntity.CRM)
+                CrmProspectCache = api.GetCache(typeof(CrmProspect)) ?? await api.LoadCache(typeof(CrmProspect)).ConfigureAwait(false);
         }
         private async void Save()
         {
@@ -451,9 +459,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void SetAccountSource(ContactClient rec)
         {
-            var act = rec._DCType;
-            SQLCache cache = GetCache(act);
-
+            var cache = GetCache(rec._DCType);
             if (cache != null)
             {
                 rec.accntSource = cache.GetNotNullArray;

@@ -16,6 +16,8 @@ x:Class="UnicontaClient.Pages.CustomPage.CWCreateOrderFromProject"
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
@@ -33,6 +35,13 @@ x:Class="UnicontaClient.Pages.CustomPage.CWCreateOrderFromProject"
 
             <TextBlock Grid.Row="3" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Category,Mode=OneWay}" VerticalAlignment="Center" Margin="0 0 0 10" />
             <ClientToolsControls:LookupEditor x:Name="cmbCategory" Text="{Binding InvoiceCategory, Mode=TwoWay}" Grid.Column="2" Grid.Row="3" HorizontalAlignment="Stretch" Height="25" Margin="0 0 0 10"/>
+        
+            <TextBlock Grid.Row="4" x:Name="lblProjTask" Visibility="Collapsed" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Task,Mode=OneWay}" VerticalAlignment="Center" Margin="0 0 0 10" />
+            <ClientToolsControls:LookupEditor x:Name="leProjTask" Visibility="Collapsed" Text="{Binding ProjectTask, Mode=TwoWay}" Grid.Column="2" Grid.Row="4" HorizontalAlignment="Stretch" Height="25" Margin="0 0 0 10"/>
+
+            <TextBlock Grid.Row="5" x:Name="lblProjWorkspace" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Workspace,Mode=OneWay}" VerticalAlignment="Center" Margin="0 0 0 10" />
+            <ClientToolsControls:LookupEditor x:Name="leProjWorkspace" Text="{Binding ProjectWorkspace, Mode=TwoWay}" Grid.Column="2" Grid.Row="5" HorizontalAlignment="Stretch" Height="25" Margin="0 0 0 10"/>
+
         </Grid>
         <StackPanel x:Name="actionButton" HorizontalAlignment="Right" Grid.Row="1" Orientation="Horizontal" Margin="0 10 0 0">
             <Button x:Name="OKButton" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Create}" Click="OKButton_Click" MinWidth="75" Height="23"

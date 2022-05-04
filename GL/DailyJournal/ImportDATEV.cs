@@ -152,6 +152,7 @@ namespace UnicontaClient.Pages.CustomPage
                 _Text = line[13],
                 _Dim1 = line[36],
                 _Dim2 = line[37],
+                _Invoice = line[10]
             };
 
             var amount = NumberConvert.ToDoubleNoThousandSeperator(line[0]);

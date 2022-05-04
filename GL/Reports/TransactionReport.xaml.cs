@@ -4,6 +4,7 @@ using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.Common;
+using Uniconta.Common.Utility;
 using Uniconta.API.GeneralLedger;
 using Uniconta.DataModel;
 using System;
@@ -132,9 +133,16 @@ namespace UnicontaClient.Pages.CustomPage
             var selectedItem = dgGLTran.SelectedItem as GLTransClientTotal;
             if (selectedItem != null)
             {
-                string vheader = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("VoucherTransactions"), selectedItem._Voucher);
+                string vheader = Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("VoucherTransactions"), selectedItem._Voucher);
                 AddDockItem(TabControls.AccountsTransaction, selectedItem, vheader);
             }
+        }
+
+        public override bool CheckIfBindWithUserfield(out bool isReadOnly, out bool useBinding)
+        {
+            isReadOnly = true;
+            useBinding = true;
+            return true;
         }
 
         public override Task InitQuery()
@@ -196,7 +204,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "VoucherTransactions":
                     if (selectedItem == null)
                         return;
-                    string vheader = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("VoucherTransactions"), selectedItem._Voucher);
+                    string vheader = Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("VoucherTransactions"), selectedItem._Voucher);
                     AddDockItem(TabControls.AccountsTransaction, dgGLTran.syncEntity, vheader);
                     break;
                 case "ViewTransactions":
@@ -329,7 +337,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (cache != null && cache.Count > 0)
             {
                 foreach (GLDimType dim in cache.GetKeyStrRecords)
-                    lst.Add(new KeyNamePair() { _RowId = dim.RowId, _KeyStr = string.Format("{0} ({1})", dim.KeyStr, dim.KeyName) });
+                    lst.Add(new KeyNamePair() { _RowId = dim.RowId, _KeyStr = Util.ConcatParenthesis(dim.KeyStr, dim.KeyName) });
             }
 
             cb.ItemsSource = lst;
@@ -502,6 +510,7 @@ namespace UnicontaClient.Pages.CustomPage
             cbdim5.EditValue = Dim5;
             cmbJournal.Text = journals;
             this.NoPrimo = true;
+            cmbShowDimOnPrimo.SelectedIndex = 2;
             LoadGlTran();
         }
     }

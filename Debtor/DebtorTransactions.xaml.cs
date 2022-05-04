@@ -25,6 +25,7 @@ using Uniconta.API.System;
 using Uniconta.ClientTools.Util;
 using Uniconta.API.Service;
 using Uniconta.Client.Pages;
+using Uniconta.Common.Utility;
 
 #if !SILVERLIGHT
 using UnicontaClient.Pages;
@@ -130,6 +131,7 @@ namespace UnicontaClient.Pages.CustomPage
                 UtilDisplay.RemoveMenuCommand(rb, "SaveGrid");
             }
             dgDebtorTran.Readonly = showFields;
+            FromCreditor.Visible = ((master as Uniconta.DataModel.Debtor)?._D2CAccount != null);
         }
 
         private void localMenu_OnItemClicked(string ActionType)
@@ -144,14 +146,14 @@ namespace UnicontaClient.Pages.CustomPage
                 case "Settlements":
                     if (selectedItem != null)
                     {
-                        string header = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("Settlements"), selectedItem._Voucher);
+                        string header = Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("Settlements"), selectedItem._Voucher);
                         AddDockItem(TabControls.DebtorSettlements, dgDebtorTran.syncEntity, true, header);
                     }
                     break;
                 case "VoucherTransactions":
                     if (selectedItem != null)
                     {
-                        string vheader = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("VoucherTransactions"), selectedItem._Voucher);
+                        string vheader = Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("VoucherTransactions"), selectedItem._Voucher);
                         AddDockItem(TabControls.AccountsTransaction, dgDebtorTran.syncEntity, vheader);
                     }
                     break;
@@ -378,7 +380,9 @@ namespace UnicontaClient.Pages.CustomPage
                 if (iprintReport.Report != null)
                     return iprintReport;
 
+                //Call LayoutInvoice
                 var layoutReport = new LayoutPrintReport(crudapi, debtorInvoice);
+                layoutReport.SetupLayoutPrintFields(debtorInvoicePrint);
                 await layoutReport.InitializePrint();
                 return layoutReport;
             }

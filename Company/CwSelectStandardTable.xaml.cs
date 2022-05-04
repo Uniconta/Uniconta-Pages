@@ -14,6 +14,7 @@ using System.Windows.Shapes;
 using Uniconta.API.System;
 using Uniconta.ClientTools;
 using Uniconta.ClientTools.DataModel;
+using Uniconta.Common.Utility;
 using Uniconta.DataModel;
 
 using UnicontaClient.Pages;
@@ -50,7 +51,7 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     var attr = (ClientTableAttribute)clientTableAttr[0];
                     if (attr.CanUpdate)
-                        xlist.Add(new TableList(type , string.Format("{0} ({1})", type.Name, Uniconta.ClientTools.Localization.lookup(attr.LabelKey))));
+                        xlist.Add(new TableList(type , Util.ConcatParenthesis(type.Name, Uniconta.ClientTools.Localization.lookup(attr.LabelKey))));
                 }
                 else
                     xlist.Add(new TableList(type, type.Name));
@@ -71,7 +72,7 @@ namespace UnicontaClient.Pages.CustomPage
                         continue;
                     var attr = (ClientTableAttribute)clientTableAttr[0];
                     if (attr.CanUpdate)
-                        xlist.Add(new TableList(type, string.Format("{0} ({1})", type.Name, Uniconta.ClientTools.Localization.lookup(attr.LabelKey))));
+                        xlist.Add(new TableList(type, Util.ConcatParenthesis(type.Name, Uniconta.ClientTools.Localization.lookup(attr.LabelKey))));
                 }
                 else
                     xlist.Add(new TableList(type, type.Name));
@@ -87,14 +88,14 @@ namespace UnicontaClient.Pages.CustomPage
             var selectedTable = cmbStdTables.SelectedItem as TableList;
             table = selectedTable?.Type;
             if (selectedTable != null || defaultAll)
-                this.DialogResult = true;
+                SetDialogResult(true);
             else
-                this.DialogResult = false;
+                SetDialogResult(false);
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = false;
+            SetDialogResult(false);
         }
     }
 

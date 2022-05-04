@@ -6,6 +6,7 @@
     <RibbonItem Action="CopyRow" LocalizedNameKey="CopyRow" LargeGlyph="Copy_32x32.png"/>
     <RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="DeleteRow" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png"/>
     <RibbonItem Action="SaveGrid" ShortcutKey="CTRL+S" LocalizedNameKey="Save" Glyph="save-16x16.png" LargeGlyph="save-32x32.png"/>
+     <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh.png" LargeGlyph="refresh.png"/>
   </RibbonItem>
    <RibbonItem>
     <RibbonItem Action="Filter" ShortcutKey="Ctrl+I" LocalizedNameKey="Filter" Glyph="Filter_16x16.png" LargeGlyph="Filter_32x32.png"/>
@@ -28,6 +29,15 @@
       <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportLayout" EnableSeperator="True" Glyph="ExportLayout_16x16.png" LargeGlyph="ExportLayout_16x16.png"/>
      <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportLayout" Glyph="Import_16x16.png" LargeGlyph="Import_16x16.png"/>
       <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16.png" />
+    </RibbonItem>
+  </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="PartInvItems" LocalizedNameKey="BOM" Module="InvBOMVariant" LargeGlyph="Order_Lines_Highlighted_32x32.png" >
+      <RibbonItem Action="InvBOMPartOfContains" LocalizedNameKey="Contains" ControlName="PartInvItemsPage" Glyph="Multiple_16x16.png"/>
+      <RibbonItem Action="InvBOMPartOfWhereUsed" LocalizedNameKey="WhereUsed" ControlName="InvBOMPartOfPage" Glyph="Single_16x16.png"/>
+      <RibbonItem Action="InvBOMProductionPosted" LocalizedNameKey="ProductionPosted" ControlName="ProductionPostedGridPage" Glyph="Tick_16x16.png"/>
+      <RibbonItem Action="InvHierarichalBOM" LocalizedNameKey="HierarchicalBOM" ControlName="InventoryHierarchicalBOMStatement" Glyph="Distributor_16x16.png"/>
+      <RibbonItem Action="InvExplodeBOM" LocalizedNameKey="ExplodedBOM" ControlName="InvBOMExplodePage" Glyph="Customer_Group_16x16.png"/>
     </RibbonItem>
   </RibbonItem>
 </root>

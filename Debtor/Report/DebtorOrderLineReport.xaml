@@ -26,13 +26,14 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrderLineReport"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Name"  Width="70" ReadOnly="True" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="OrderNumber" Width="70" AllowEditing="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="LineNumber" Width="70" Visible="False" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Note" Width="50" >
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Note" Width="50" AllowEditing="True" >
                         <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                             <DataTemplate>
                                 <CorasauControls:MemoEditor Name="PART_Editor" ShowIcon="{Binding DataContext.RowData.Row.HasNote, RelativeSource={RelativeSource TemplatedParent}}" MaxLength="1000"/>
                             </DataTemplate>
                         </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                     </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colNote" FieldName="Note" Width="150" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Item" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant" FieldName="Variant">
                         <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
@@ -110,12 +111,15 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrderLineReport"
                     </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:ComboBoxColumnClient x:Name="Storage" Width="100" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="IgnoreBlocked" Width="50" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DeleteLine" Width="50" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ReferenceNumber" Width="70" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Week" Width="80" Visible="False" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Date" Width="80" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Date" Width="80" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Project" Width="80" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Width="80" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="WorkSpace" Width="80" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PostingAccount" Width="80" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PurchaseAccount" Width="100" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Vat" Width="80" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Employee" Width="50" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="UpdatedAt"   Visible="False">

@@ -64,6 +64,12 @@ namespace UnicontaClient.Pages.CustomPage
             CreditorCache = Comp.GetCache(typeof(Uniconta.DataModel.Creditor));
         }
 
+        protected override void OnLayoutLoaded()
+        {
+            base.OnLayoutLoaded();
+            UnicontaClient.Utilities.Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
+        }
+
         void DataControl_CurrentItemChanged(object sender, DevExpress.Xpf.Grid.CurrentItemChangedEventArgs e)
         {
             BankImportMapGridClient oldselectedItem = e.OldItem as BankImportMapGridClient;

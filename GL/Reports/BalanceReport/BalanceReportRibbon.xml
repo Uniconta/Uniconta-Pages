@@ -16,6 +16,12 @@
     <RibbonItem Action="MoveColumnDown" LocalizedNameKey="MoveColumnDown" LargeGlyph="Import_32x32.png"/>
   </RibbonItem>
   <RibbonItem>
+    <RibbonItem  LocalizedNameKey="AddOBJ" Parameter="Period" LargeGlyph="Day_View_32x32.png">
+      <RibbonItem Action="AddMonth" LocalizedNameKey="Month" Parameter="Period" Glyph="Column_Head_16x16.png"/>
+      <RibbonItem Action="AddDate" LocalizedNameKey="Date" Parameter="Period" Glyph="Column_Head_16x16.png"/>
+    </RibbonItem>
+  </RibbonItem>
+  <RibbonItem>
     <RibbonItem Action="SetFrontPage" LocalizedNameKey="FrontPage" LargeGlyph="Add_Menu_32x32.png"/>
   </RibbonItem>
   <RibbonItem>    

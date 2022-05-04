@@ -8,7 +8,6 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOpenTrans"
     xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage"
     mc:Ignorable="d"   xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
     d:DesignHeight="300" d:DesignWidth="400">
-
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -16,8 +15,8 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOpenTrans"
         </Grid.RowDefinitions>
         <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Creditor/Creditor-DebtorOpenTransRibbon.xml" x:Name="localMenu"/>
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
-            <localPage:CreditorTransOpenGrid  x:Name="dgCreditorTranOpenGrid" AutoGenerateColumns="None">
-                <localPage:CreditorTransOpenGrid.Columns>
+            <localPage:CreditorOpenTransGrid  x:Name="dgCreditorTranOpenGrid" AutoGenerateColumns="None">
+                <localPage:CreditorOpenTransGrid.Columns>
                     <localPage:CorasauDataGridTemplateColumnClient IsSmart="True" ShowInColumnChooser="False" Width="60" AllowSorting="False" AllowColumnFiltering="False">
                         <localPage:CorasauDataGridTemplateColumnClient.HeaderTemplate>
                             <DataTemplate>
@@ -58,6 +57,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOpenTrans"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PaymentMethod" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PaymentId" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Payment" Width="60"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PaymentFormat" Width="60"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CashDiscount" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CashDiscountDate" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Vat" Width="60" Visible="False"/>
@@ -74,8 +74,9 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOpenTrans"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="YourRef" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Message" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DocumentRef" Visible="False"/>
-                </localPage:CreditorTransOpenGrid.Columns>
-                <localPage:CreditorTransOpenGrid.TotalSummary>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="FromDebtor" Visible="False" ShowCheckBoxInHeader="False"/>
+                </localPage:CreditorOpenTransGrid.Columns>
+                <localPage:CreditorOpenTransGrid.TotalSummary>
                     <localPage:SumColumn FieldName="Amount" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                     <localPage:SumColumn FieldName="AmountOpen" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                     <localPage:SumColumn FieldName="Overdue" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
@@ -86,8 +87,8 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOpenTrans"
                     <localPage:SumColumn FieldName="OverdueCur" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                     <localPage:SumColumn FieldName="DebitCur" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                     <localPage:SumColumn FieldName="CreditCur" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
-                </localPage:CreditorTransOpenGrid.TotalSummary>
-            </localPage:CreditorTransOpenGrid>
+                </localPage:CreditorOpenTransGrid.TotalSummary>
+            </localPage:CreditorOpenTransGrid>
         </CorasauControls:BusyIndicator>
     </Grid>
 </Pages:GridBasePage>

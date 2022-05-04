@@ -41,6 +41,8 @@ x:Class="UnicontaClient.Pages.CustomPage.UserTablePage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="AutoNumber" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="SQLIdent" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="SharedFromCompanyId" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DataOnlyInMainCompany"  Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="OnlyMainCompanyCanEdit" Visible="False"/>
                 </localPage:UserTableGrid.Columns>
             </localPage:UserTableGrid>
         </CorasauControls:BusyIndicator>

@@ -1,5 +1,6 @@
 using DevExpress.XtraSpreadsheet.Commands;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,6 +16,8 @@ using System.Windows.Shapes;
 using Uniconta.API.Service;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
+using Uniconta.Common;
+using Uniconta.DataModel;
 using UnicontaClient.Models;
 
 using UnicontaClient.Pages;
@@ -36,6 +39,18 @@ namespace UnicontaClient.Pages.CustomPage
             localMenu.OnItemClicked += LocalMenu_OnItemClicked;
         }
 
+        public async override Task InitQuery()
+        {
+            await Filter();
+            var source = dgProdCatalog.ItemsSource as IList;
+            var prods = await api.Query<ProdCompany>();
+            var ProdIds = prods.Select(p => p._ProdId).ToList();
+            foreach (ProdCatalogClient pc in source)
+            {
+                if (ProdIds.Contains(pc.RowId))
+                    pc.Selected = true;
+            }
+        }
         private void LocalMenu_OnItemClicked(string ActionType)
         {
             var selectedItem = dgProdCatalog.SelectedItem as ProdCatalogClient;
@@ -76,12 +91,42 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         AddDockItem(TabControls.ProdItemPage, selectedItem, string.Format("{0}:{1}/{2}", string.Format(Uniconta.ClientTools.Localization.lookup("ProductOBJ"), Uniconta.ClientTools.Localization.lookup("Item")), selectedItem.RowId, selectedItem._Name));
                     break;
+                case "Select":
+                    Select(selectedItem);
+                    break;
+                case "Unselect":
+                    Unselect(selectedItem);
+                    break;
+                case "RefreshGrid":
+                    InitQuery();
+                    break; 
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
         }
-
+        public async void Select(ProdCatalogClient selectedItem)
+        {
+            if (selectedItem?.Selected == false)
+            {
+                var res = await api.Insert(new ProdCompany() { _CompanyId = api.CompanyId, _ProdId = selectedItem.RowId });
+                if (res != ErrorCodes.Succes)
+                   Uniconta.ClientTools.Util.UtilDisplay.ShowErrorCode(res);
+                else
+                    selectedItem.Selected = true;
+            }
+        }
+        public async void Unselect(ProdCatalogClient selectedItem)
+        {
+            if (selectedItem?.Selected == true)
+            {
+                var res = await api.Delete(new ProdCompany() { _CompanyId = api.CompanyId, _ProdId = selectedItem.RowId });
+                if (res != ErrorCodes.Succes)
+                    Uniconta.ClientTools.Util.UtilDisplay.ShowErrorCode(res);
+                else
+                    selectedItem.Selected = false;
+            }
+        }
         public override void Utility_Refresh(string screenName, object argument = null)
         {
             if (screenName == TabControls.ProdCatalogPage2)

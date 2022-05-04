@@ -98,6 +98,8 @@ namespace UnicontaClient.Pages.CustomPage
 
         void Init()
         {
+            var t = api.Query<Balance>();
+            StartLoadCache(t);
             this.DataContext = this;
             InitializeComponent();
 #if !SILVERLIGHT
@@ -109,6 +111,8 @@ namespace UnicontaClient.Pages.CustomPage
             frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
             objCriteria = new Criteria();
             objCriteria.selectedCriteria = new List<SelectedCriteria>();
+            GetCompanyList();
+            defaultCriteria.companyList = companyList;
             defaultCriteria.API = api;
             var itemdataContext = defaultCriteria.DataContext as SelectedCriteria;
             SetDefaultDate(itemdataContext);
@@ -116,8 +120,7 @@ namespace UnicontaClient.Pages.CustomPage
             setColNameAndNumber(itemdataContext, 1);
             string[] strPrintOrientation = new string[] { Uniconta.ClientTools.Localization.lookup("Landscape"), Uniconta.ClientTools.Localization.lookup("Portrait") };
             cbPrintOrientation.ItemsSource = strPrintOrientation;
-            txtColWidth.Text = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("ColumnWidth"), Uniconta.ClientTools.Localization.lookup("Printout"));
-            LoadBalance();
+            txtColWidth.Text = Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("ColumnWidth"), Uniconta.ClientTools.Localization.lookup("Printout"));
 #if SILVERLIGHT
             RibbonBase rb = (RibbonBase)frmRibbon.DataContext;
             if (rb != null)
@@ -130,18 +133,19 @@ namespace UnicontaClient.Pages.CustomPage
             cmbAccountType.ItemsSource = new string[] { Uniconta.ClientTools.Localization.lookup("All"), Uniconta.ClientTools.Localization.lookup("AccountTypePL"), Uniconta.ClientTools.Localization.lookup("AccountTypeBalance") };
             cmbAccountType.IsEditable = false;
             this.BeforeClose += ReportCriteria_BeforeClose;
+            LoadBalance(t);
         }
 
         private void ReportCriteria_BeforeClose()
         {
-            if(BasePage.session.User._AutoSave)
+            if (BasePage.session.User._AutoSave)
             {
                 var hasMissignModel = objCriteria.selectedCriteria.Any(p => p.balcolMethod == BalanceColumnMethod.FromBudget && string.IsNullOrEmpty(p.budgetModel));
 
                 if (!hasMissignModel && !string.IsNullOrEmpty(txtbalanceName.Text))
                 {
                     if (objBalance == null || objBalance.CompanyId != api.CompanyId /* For balance copy from other company */)
-                        SaveBalance(false);
+                        SaveBalance();
                     else
                         update();
                 }
@@ -159,38 +163,32 @@ namespace UnicontaClient.Pages.CustomPage
         void setColNameAndNumber(SelectedCriteria Selectedcol, int colnum)
         {
             Selectedcol.ColNo = colnum;
-            Selectedcol.ColNameNumber = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("Name"), colnum);
+            Selectedcol.ColNameNumber = string.Concat(Uniconta.ClientTools.Localization.lookup("Name"), " (", NumberConvert.ToString(colnum), ")");
         }
-        async void LoadBalance()
+        async void LoadBalance(Task<Balance[]> balTsk)
         {
             busyIndicator.IsBusy = true;
-            Company[] compList = await BasePage.session.GetCompanies();
-            companies = compList;
-            var lstEntity = await api.Query<Balance>();
+            companies = CWDefaultCompany.loadedCompanies;
+            var lstEntity = await balTsk;
             if (lstEntity != null && lstEntity.Length > 0)
             {
                 itemsBalance = new ObservableCollection<Balance>(lstEntity);
                 cbBalance.ItemsSource = itemsBalance;
                 if (LastGeneratedBalance != null)
-                {
-                    var lastSelBalance = itemsBalance.Where(x => x.RowId == LastGeneratedBalance.RowId).FirstOrDefault();
-                    cbBalance.SelectedItem = lastSelBalance;
-                }
+                    cbBalance.SelectedItem = lstEntity.Where(x => x.RowId == LastGeneratedBalance.RowId).FirstOrDefault();
                 else
                     cbBalance.SelectedIndex = 0;
             }
             else
-            {
-                itemsBalance = new ObservableCollection<Balance>();
-                cbBalance.ItemsSource = itemsBalance;
-            }
+                cbBalance.ItemsSource = new ObservableCollection<Balance>();
+
             busyIndicator.IsBusy = false;
         }
 
         protected override void LoadCacheInBackGround()
         {
             var noofDimensions = api.CompanyEntity.NumberOfDimensions;
-            var lst = new List<Type>(2 + noofDimensions) { typeof(Uniconta.DataModel.GLBudget), typeof(Uniconta.DataModel.GLAccount) };
+            var lst = new List<Type>(noofDimensions + 3) { typeof(Uniconta.DataModel.GLAccount) };
             if (noofDimensions >= 1)
                 lst.Add(typeof(Uniconta.DataModel.GLDimType1));
             if (noofDimensions >= 2)
@@ -201,9 +199,28 @@ namespace UnicontaClient.Pages.CustomPage
                 lst.Add(typeof(Uniconta.DataModel.GLDimType4));
             if (noofDimensions >= 5)
                 lst.Add(typeof(Uniconta.DataModel.GLDimType5));
+            lst.Add(typeof(Uniconta.DataModel.GLBudget));
+            lst.Add(typeof(Uniconta.DataModel.GLDailyJournal));
             LoadType(lst);
         }
-
+        List<Company> companyList = null;
+        List<Company> GetCompanyList()
+        {
+            if (companyList == null)
+            {
+                List<Company> compList = new List<Company>();
+                var companies = CWDefaultCompany.loadedCompanies;
+                if (companies != null)
+                {
+                    compList.Capacity = companies.Length + 1;
+                    compList.Add(new Company() { _Name = "" });
+                    compList.AddRange(companies);
+                    compList.Sort(SQLCache.KeyStrSorter);
+                }
+                companyList = compList;
+            }
+            return companyList;
+        }
         private void populateValue(Balance obBalance)
         {
             balanceCollist = obBalance.ColumnList;
@@ -235,11 +252,12 @@ namespace UnicontaClient.Pages.CustomPage
                         Crit.balanceColumnMethod = colBalance.ColumnMethodEnum;
                         Crit.ShowDebitCredit = colBalance._ShowDebitCredit;
                         Crit.InvertSign = colBalance._InvertSign;
+                        Crit.InclPrimo = colBalance._InclPrimo;
                         Crit.ColA = colBalance._ColA;
                         Crit.ColB = colBalance._ColB;
                         Crit.Account100 = colBalance._Account100;
                         if (colBalance._ForCompanyId > 0)
-                            Crit.ForCompany = companies?.Where(x => x.CompanyId == colBalance._ForCompanyId).FirstOrDefault() as Company;
+                            Crit.ForCompany = companies?.Where(x => x.CompanyId == colBalance._ForCompanyId).FirstOrDefault();
                         else
                             Crit.ForCompany = null;
                         Crit.Hide = colBalance._Hide;
@@ -249,9 +267,10 @@ namespace UnicontaClient.Pages.CustomPage
                     else
                     {
                         CriteriaControl crControl = new CriteriaControl();
+                        crControl.companyList = companyList;
                         crControl.API = api;
                         crControl.MouseLeftButtonDown += CrControl_MouseLeftButtonDown;
-                        ControlContainer.RowDefinitions.Add(new RowDefinition() { Height= GridLength.Auto});
+                        ControlContainer.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
                         Grid.SetRow(crControl, ControlContainer.Children.Count);
                         ControlContainer.Children.Add(crControl);
                         objCriteria.selectedCriteria.Add(SetCriteriaControlValue(colBalance, crControl));
@@ -301,9 +320,12 @@ namespace UnicontaClient.Pages.CustomPage
                         setColNameAndNumber(selCtrlCriteria, selCtrlCriteria.ColNo - 1);
 
                     var crit = objCriteria.selectedCriteria;
-                    var col = crit[oldIndex];
-                    crit.RemoveAt(oldIndex);
-                    crit.Insert(oldIndex - 1, col);
+                    if (crit?.ElementAtOrDefault(oldIndex) != null)
+                    {
+                        var col = crit[oldIndex];
+                        crit.RemoveAt(oldIndex);
+                        crit.Insert(oldIndex - 1, col);
+                    }
                 }
             }
         }
@@ -371,6 +393,7 @@ namespace UnicontaClient.Pages.CustomPage
             objSelectedCriteria.balanceColumnMethod = objBalanceColumn.ColumnMethodEnum;
             objSelectedCriteria.ShowDebitCredit = objBalanceColumn._ShowDebitCredit;
             objSelectedCriteria.InvertSign = objBalanceColumn._InvertSign;
+            objSelectedCriteria.InclPrimo = objBalanceColumn._InclPrimo;
             objSelectedCriteria.ColA = objBalanceColumn._ColA;
             objSelectedCriteria.ColB = objBalanceColumn._ColB;
             objSelectedCriteria.Account100 = objBalanceColumn._Account100;
@@ -392,7 +415,14 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "SaveBalance":
                     if (ValidateBalanceBudgetField())
-                        SaveBalance(true);
+                    {
+                        if (string.IsNullOrEmpty(txtbalanceName.Text))
+                        {
+                            UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("CannotBeBlank"), Uniconta.ClientTools.Localization.lookup("Name")), Uniconta.ClientTools.Localization.lookup("Warning"));
+                            return;
+                        }
+                        SaveBalance();
+                    }
                     break;
                 case "DeleteBalance":
                     DeleteBalance();
@@ -400,6 +430,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "NewColumn":
 
                     CriteriaControl crControl = new CriteriaControl();
+                    crControl.companyList = companyList;
                     crControl.API = api;
                     var numberOfChild = ControlContainer.Children.Count;
                     if (numberOfChild >= ControlContainer.RowDefinitions.Count)
@@ -448,6 +479,8 @@ namespace UnicontaClient.Pages.CustomPage
                                  StreamingManager.Copy(objBalance, newItem);
                                  var name = newItem.Name;
                                  newItem._Name = name;
+                                 if (itemsBalance == null)
+                                     itemsBalance = new ObservableCollection<Balance>();
                                  itemsBalance.Add(newItem);
                                  cbBalance.SelectedItem = newItem;
                              }
@@ -455,6 +488,21 @@ namespace UnicontaClient.Pages.CustomPage
                      };
                     childWindow.Show();
                     break;
+                case "AddMonth":
+                    var addMonthsDialog = new CWAddMonths();
+                    addMonthsDialog.Closing += delegate
+                          {
+                              if (addMonthsDialog.DialogResult == true)
+                              {
+                                  AddMonths(objBalance, addMonthsDialog.NumberOfMonths);
+                              }
+                          };
+                    addMonthsDialog.Show();
+                    break;
+                case "AddDate":
+                    AddDates(objBalance);
+                    break;
+
             }
         }
 
@@ -480,7 +528,7 @@ namespace UnicontaClient.Pages.CustomPage
         void RunBalance()
         {
             if (objBalance == null || objBalance.CompanyId != api.CompanyId /* For balance copy from other company */)
-                SaveBalance(false);
+                SaveBalance();
             else
                 update();
             if (objBalance == null)
@@ -522,7 +570,8 @@ namespace UnicontaClient.Pages.CustomPage
             ClearcolumnList();
             ClearGrid();
             var Crit = objCriteria.selectedCriteria[0];
-            Crit._ShowDebitCredit = true;
+            Crit._ShowDebitCredit = Crit._InclPrimo = true;
+            Crit.NotifyPropertyChanged("InclPrimo");
             Crit.balcolFormat = BalanceColumnFormat.Decimal2;
             SetDefaultDate(Crit);
             objCriteria.dim1details = objCriteria.dim2details = objCriteria.dim3details = objCriteria.dim4details = objCriteria.dim5details = false;
@@ -535,7 +584,7 @@ namespace UnicontaClient.Pages.CustomPage
         void SaveNewCritera()
         {
             if (objBalance == null)
-                SaveBalance(false);
+                SaveBalance();
             else
             {
                 var ColNo = objCriteria.selectedCriteria.Count - 1;
@@ -550,7 +599,7 @@ namespace UnicontaClient.Pages.CustomPage
                 var deleteRow = balanceCollist[balanceCollist.Count - 1];
                 api.DeleteNoResponse(deleteRow);
                 balanceCollist.RemoveAt(balanceCollist.Count - 1);
-                objCriteria.selectedCriteria.Remove(objCriteria.selectedCriteria.Last());
+                objCriteria.selectedCriteria.Remove(objCriteria.selectedCriteria[objCriteria.selectedCriteria.Count - 1]);
 #if !SILVERLIGHT
                 ControlContainer.Children.RemoveAt(ControlContainer.Children.Count - 1);
 #else
@@ -597,18 +646,8 @@ namespace UnicontaClient.Pages.CustomPage
                 rowdim1.Height = GridLength.Auto;
             }
         }
-        public async void SaveBalance(bool showError)
+        public void SaveBalance()
         {
-            if (showError && string.IsNullOrEmpty(txtbalanceName.Text))
-            {
-                UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("CannotBeBlank"), Uniconta.ClientTools.Localization.lookup("Name")), Uniconta.ClientTools.Localization.lookup("Warning"));
-                return;
-            }
-
-            ErrorCodes res = 0;
-            if (showError)
-                busyIndicator.IsBusy = true;
-
             if (objBalance == null || objBalance.RowId == 0 || objBalance.CompanyId != api.CompanyId /* For balance copy from other company */)
             {
                 if (itemsBalance == null)
@@ -623,38 +662,25 @@ namespace UnicontaClient.Pages.CustomPage
                 SetBalanceDimUsed(objBalance);
                 // if we can't save it, we still generate the colums, so he can run it
                 balanceCollist = null;
-                var cols = new List<BalanceColumn>();
+                var cols = new List<BalanceColumn>(objCriteria.selectedCriteria.Count);
                 int i = 0;
                 foreach (var crit in objCriteria.selectedCriteria)
-                {
-                    var col = CreateCriteraColumn(crit, i++);
-                    cols.Add(col);
-                }
+                    cols.Add(CreateCriteraColumn(crit, i++));
+
                 cbBalance.SelectedIndex = itemsBalance.Count - 1;
                 objBalance.ColumnList = cols;
 
-                if (objBalance._Name != null)
-                    res = await api.Insert(objBalance);
-                else
-                    res = ErrorCodes.FieldCannotBeBlank;
+                if (objBalance._Name == null)
+                    objBalance._Name = Uniconta.ClientTools.Localization.lookup("Balance") + NumberConvert.ToString(itemsBalance.Count);
 
-                if (res == ErrorCodes.Succes && objBalance.CompanyId != api.CompanyId)
-                    UpdateBalancelist(cbBalance.SelectedIndex);
+                objBalance.SetMaster(api.CompanyEntity);
+                api.InsertNoResponse(objBalance);
+                UpdateBalancelist(cbBalance.SelectedIndex);
             }
             else
             {
-                var t = update();
-                if (showError && t != null)
-                    res = await t;
-                if (res == ErrorCodes.Succes)
-                    UpdateBalancelist(cbBalance.SelectedIndex);
-            }
-
-            if (showError)
-            {
-                busyIndicator.IsBusy = false;
-                if (res != ErrorCodes.Succes)
-                    UtilDisplay.ShowErrorCode(res);
+                update();
+                UpdateBalancelist(cbBalance.SelectedIndex);
             }
         }
 
@@ -678,6 +704,8 @@ namespace UnicontaClient.Pages.CustomPage
             busyIndicator.IsBusy = false;
             if (res == ErrorCodes.Succes)
             {
+                if (itemsBalance == null)
+                    itemsBalance = new ObservableCollection<Balance>();
                 itemsBalance.Add(newItem);
                 cbBalance.SelectedItem = newItem;
             }
@@ -729,6 +757,7 @@ namespace UnicontaClient.Pages.CustomPage
             row.ColumnMethodEnum = objColCriteria.balcolMethod;
             row._ShowDebitCredit = objColCriteria._ShowDebitCredit;
             row._InvertSign = objColCriteria._InvertSign;
+            row._InclPrimo = objColCriteria._InclPrimo;
             row._ColA = (byte)objColCriteria.colA;
             row._ColB = (byte)objColCriteria.colB;
             row.Dims1 = objColCriteria.dimval1;
@@ -794,19 +823,19 @@ namespace UnicontaClient.Pages.CustomPage
             updaterow.LeftMargin = (byte)NumberConvert.ToInt(txtLeftMargin.Text);
             return updaterow;
         }
-        Task<ErrorCodes> update()
+        void update()
         {
             Balance bal;
             var idx = cbBalance.SelectedIndex;
             if (idx < 0)
             {
                 if (itemsBalance != null && itemsBalance.Count > 0)
-                    bal = (Balance)itemsBalance[0];
+                    bal = itemsBalance[0];
                 else
                     bal = null;
             }
             else if (idx < itemsBalance.Count)
-                bal = (Balance)itemsBalance[idx];
+                bal = itemsBalance[idx];
             else
                 bal = null;
 
@@ -815,21 +844,12 @@ namespace UnicontaClient.Pages.CustomPage
                 setbalanceFields(bal);
                 SetBalanceDimUsed(bal);
 
-                bal.ColumnList = new List<BalanceColumn>();
+                bal.ColumnList = new List<BalanceColumn>(objCriteria.selectedCriteria.Count);
                 foreach (var crit in objCriteria.selectedCriteria)
-                {
-                    var modifiedRow = CreateUpdateRow(crit, new BalanceColumn());
-                    bal.ColumnList.Add(modifiedRow);
-                }
-                return api.Update(bal);
+                    bal.ColumnList.Add(CreateUpdateRow(crit, new BalanceColumn()));
+
+                api.UpdateNoResponse(bal);
             }
-#if !SILVERLIGHT
-            return Task.FromResult(ErrorCodes.CannotUpdateRecord);
-#elif SILVERLIGHT
-            var taskSource = new TaskCompletionSource<ErrorCodes>();
-            taskSource.SetResult(ErrorCodes.CannotUpdateRecord);
-            return taskSource.Task;
-#endif
         }
 
         void SetBalanceDimUsed(Balance objBalance)
@@ -906,6 +926,72 @@ namespace UnicontaClient.Pages.CustomPage
                 ChildCount--;
                 ControlContainer.Children.RemoveAt(ChildCount);
             }
+        }
+
+        private void AddMonths(Balance obBalance, int numberOfMonths)
+        {
+            balanceCollist = obBalance.ColumnList;
+            if (balanceCollist != null)
+            {
+                int i = 0;
+                foreach (var colBalance in balanceCollist)
+                {
+                    var Crit = objCriteria.selectedCriteria[i];
+
+                    if (Crit.balcolMethod == BalanceColumnMethod.FromTrans || Crit.balcolMethod == BalanceColumnMethod.FromBudget || Crit.balcolMethod == BalanceColumnMethod.TransQty || Crit.balcolMethod == BalanceColumnMethod.BudgetQty)
+                    {
+                        Crit.FromDate = Crit.FromDate.AddMonths(numberOfMonths);
+                        Crit.ToDate = Crit.ToDate.AddMonths(numberOfMonths);
+                    }
+                    i++;
+                }
+            }
+        }
+
+        async private void AddDates(Balance objBalance)
+        {
+            var columnListCount = objBalance.ColumnList.Count;
+            var balanceColFromToList = new List<BalanceFromToDateList>(columnListCount);
+            var glBudgetCache = api.CompanyEntity.GetCache(typeof(GLBudget)) ?? await api.CompanyEntity.LoadCache(typeof(GLBudget), api);
+            var glBudgetModels = new List<string>();
+            if (glBudgetCache != null)
+            {
+                glBudgetModels.Capacity = glBudgetCache.Count;
+                foreach (var rec in glBudgetCache.GetKeyStrRecords)
+                    glBudgetModels.Add(rec.KeyStr);
+            }
+
+            var addToFromDate = new CWAddToFromDates(glBudgetModels, objCriteria.selectedCriteria);
+            addToFromDate.Closing += delegate
+            {
+                if (addToFromDate.DialogResult == true)
+                {
+                    var balanceColDateList = addToFromDate.BalanceFromToDate;
+                    balanceCollist = objBalance.ColumnList;
+                    if (balanceCollist != null)
+                    {
+                        for (int i = 0; i < columnListCount; i++)
+                        {
+                            var Crit = objCriteria.selectedCriteria[i];
+                            var balColumnToDateObj = balanceColDateList.Where(p => p.ColumnIndex == i + 1).FirstOrDefault();
+
+                            if (balColumnToDateObj == null)
+                                continue;
+
+                            if (balColumnToDateObj.FromDate != DateTime.MinValue)
+                                Crit.FromDate = balColumnToDateObj.FromDate;
+                            if (balColumnToDateObj.ToDate != DateTime.MinValue)
+                                Crit.ToDate = balColumnToDateObj.ToDate;
+
+                            Crit.CriteriaName = balColumnToDateObj.TypedName;
+                            Crit.BudgetModel = balColumnToDateObj.BudgetModel;
+
+                        }
+                    }
+                }
+            };
+            addToFromDate.Show();
+
         }
     }
 }

@@ -33,20 +33,20 @@ namespace UnicontaClient.Pages.CustomPage
         private void oneFileButton_Click(object sender, RoutedEventArgs e)
         {
             OneOrMultiple = true;
-            this.DialogResult = true;
+            SetDialogResult(true);
         }
 
         private void multipleFilesButton_Click(object sender, RoutedEventArgs e)
         {
             OneOrMultiple = false;
-            this.DialogResult = true;
+            SetDialogResult(true);
         }
 
         private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
             {
-                this.DialogResult = false;
+                SetDialogResult(false);
             }
             else
             {

@@ -64,9 +64,15 @@ namespace UnicontaClient.Pages.CustomPage
             invClient = baseEntity as InvItem;
             if (invClient == null)
             {
-                invBom = baseEntity as InvBOMClient;
-                if (invBom != null)
-                    Quantity = invBom._Qty;
+                var syncMaster2 = baseEntity as IVariant;
+                if (syncMaster2 != null)
+                    invClient = api.GetCache(typeof(Uniconta.DataModel.InvItem))?.Get(syncMaster2.Item) as InvItemClient;
+                else
+                {
+                    invBom = baseEntity as InvBOMClient;
+                    if (invBom != null)
+                        Quantity = invBom._Qty;
+                }
             }
 #if !SILVERLIGHT
             dgInvBomclientGrid.tableView.RowStyle = this.Resources["MatchingRowStyle"] as Style;

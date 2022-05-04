@@ -5,10 +5,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorPaymentFormatPage2"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
-        xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
         xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools" >
-    <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="0" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BusyMessage}">
         <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -64,5 +61,4 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorPaymentFormatPage2"
             </CorasauControls:CorasauLayoutControl>
             <Button x:Name="btnOptions" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Options}" Click="btnOptions_Click" Grid.Row="2" Width="390" HorizontalAlignment="Left" Margin="10 0 0 0"/>
         </Grid>
-    </CorasauControls:BusyIndicator>
 </Pages:FormBasePage>

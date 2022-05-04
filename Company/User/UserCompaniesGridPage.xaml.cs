@@ -22,6 +22,7 @@ using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
 using Uniconta.Common;
 using Uniconta.DataModel;
+using DevExpress.Xpf.Docking;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -30,18 +31,6 @@ namespace UnicontaClient.Pages.CustomPage
     {
         public override Type TableType { get { return typeof(CompanyClient); } }
         public override bool Readonly { get { return true; } }
-#if SILVERLIGHT
-        protected override void OnPreviewKeyDown(KeyEventArgs e)
-        {
-            if (e.Key == Key.Enter)
-            {
-                e.Handled = true;
-                this.Page?.ribbonControl?.PerformRibbonAction("JumpTo");
-            }
-            else
-                base.OnPreviewKeyDown(e);
-        }
-#endif
     }
 
     /// <summary>
@@ -75,23 +64,8 @@ namespace UnicontaClient.Pages.CustomPage
             localMenu.OnItemClicked += LocalMenu_OnItemClicked;
             dgUserCompaniesGridClient.RowDoubleClick += DgUserCompaniesGridClient_RowDoubleClick;
             dgUserCompaniesGridClient.Loaded += DgUserCompaniesGridClient_Loaded;
-#if SILVERLIGHT
-            RibbonBase rb = (RibbonBase)localMenu.DataContext;
-            var Comp = api.CompanyEntity;
-            UtilDisplay.RemoveMenuCommand(rb, "OpenNewWindow");
-#endif
         }
-#if SILVERLIGHT
-        public override bool CheckIfBindWithUserfield(out bool isReadOnly, out bool useBinding)
-        {
-            isReadOnly = false;
-            useBinding = false;
 
-            return false;
-        }
-#endif
-
-#if !SILVERLIGHT
         protected override void OnPreviewKeyDown(KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
@@ -102,7 +76,52 @@ namespace UnicontaClient.Pages.CustomPage
             else
                 base.OnPreviewKeyDown(e);
         }
-#endif
+
+        static Point position = new Point();
+        static double pageHeight = 600.0d, pageWidth = 900.0d;
+        protected override void OnLayoutLoaded()
+        {
+            if(BasePage.session.User._Role >= (byte)Uniconta.Common.User.UserRoles.Accountant)
+            {
+                var currPanel = dockCtrl?.Activpanel;
+                if (currPanel != null && currPanel.IsFloating)
+                {
+                    SetFloatGroup();
+                    currPanel.Parent.FloatSize = new Size(pageWidth, pageHeight);
+                    currPanel.SizeChanged += CurrPanel_SizeChanged;
+                    currPanel.UpdateLayout();
+                }
+
+                this.NInbox.Visible = this.NInbox.ShowInColumnChooser = true;
+                this.LastBankTrans.Visible= this.LastBankTrans.ShowInColumnChooser = true;
+                this.LastPosting.Visible= this.LastPosting.ShowInColumnChooser = true;
+            }
+            base.OnLayoutLoaded();
+        }
+
+        private void SetFloatGroup()
+        {
+            var floatgrp = GetFloatGroup();
+            if (floatgrp != null)
+                floatgrp.FloatLocation = position;
+        }
+
+        private FloatGroup GetFloatGroup()
+        {
+            var curPanel = dockCtrl?.Activpanel;
+
+            if (curPanel != null && curPanel.IsFloating && curPanel.Parent is FloatGroup)
+                return curPanel.Parent as FloatGroup;
+
+            return null;
+        }
+
+        private void CurrPanel_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            var size = e.NewSize;
+            pageHeight = size.Height;
+            pageWidth = size.Width;
+        }
         private void DgUserCompaniesGridClient_Loaded(object sender, RoutedEventArgs e)
         {
             localMenu.SearchControl.KeyUp += SearchControl_KeyUp;
@@ -182,13 +201,12 @@ namespace UnicontaClient.Pages.CustomPage
                         if (!selectedItem._Delete)
                         {
                             globalEvents?.NotifyCompanyChange(this, new Uniconta.ClientTools.Util.CompanyEventArgs(selectedItem));
-                            dockCtrl?.CloseDockItem();
+                            CloseDockItem();
                         }
                         else
                             UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("CompanyDeleted"), Uniconta.ClientTools.Localization.lookup("Warning"), MessageBoxButton.OK);
                     }
                     break;
-#if !SILVERLIGHT
                 case "OpenNewWindow":
                     if (selectedItem != null)
                     {
@@ -196,15 +214,14 @@ namespace UnicontaClient.Pages.CustomPage
                         {
                             var mainWindow = new HomePage(selectedItem.CompanyId, null);
                             mainWindow.Show();
-                            dockCtrl?.CloseDockItem();
+                            CloseDockItem();
                         }
                         else
                             UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("CompanyDeleted"), Uniconta.ClientTools.Localization.lookup("Warning"), MessageBoxButton.OK);
                     }
                     break;
-#endif
                 case "Cancel":
-                    dockCtrl?.CloseDockItem();
+                    CloseDockItem();
                     break;
                 case "RefreshGrid":
                     GetCompanies(true);

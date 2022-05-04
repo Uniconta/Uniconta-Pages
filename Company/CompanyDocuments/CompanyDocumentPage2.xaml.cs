@@ -13,6 +13,7 @@ using System.Windows.Navigation;
 using Uniconta.ClientTools.Page;
 using UnicontaClient.Models;
 using Uniconta.Common;
+using Uniconta.Common.Utility;
 using Uniconta.ClientTools.DataModel;
 using UnicontaClient.Utilities;
 using Uniconta.API.System;
@@ -61,7 +62,6 @@ namespace UnicontaClient.Pages.CustomPage
                 cmbDocumentUse.ItemsSource = AppEnums.CompanyDoc.Values;
                 cmbDocumentUse.SelectedItem = companyDocumentClientRow.DocumentUseFor;
             }
-            BusyIndicator = busyIndicator;
             layoutItems.DataContext = companyDocumentClientRow;
             frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
 
@@ -118,7 +118,7 @@ namespace UnicontaClient.Pages.CustomPage
                 else if (companyDocumentClientRow.UseFor == CompanyDocumentUse.CompanyLogo)
                     companyClient.Logo = null;
             }
-            dockCtrl.CloseDockItem();
+            CloseDockItem();
         }
         async void DeleteDoc()
         {
@@ -187,7 +187,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (fileBytes != null && fileBytes.Length > 100 * 1024)
                 {
                     isSucess = false;
-                    UnicontaMessageBox.Show(string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("MaxFileSizeLimit"), "100KB"),Uniconta.ClientTools.Localization.lookup("Error"));
+                    UnicontaMessageBox.Show(Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("MaxFileSizeLimit"), "100KB"),Uniconta.ClientTools.Localization.lookup("Error"));
                 }
             }
             return isSucess;

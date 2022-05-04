@@ -1,0 +1,33 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
+      xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.TMJournalLineStartStop"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+      xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage">
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Project/TMjournalLineStartStopRibbon.xml" x:Name="localMenu"/>
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <localPage:TMJournalLineStartStopGrid x:Name="dgJournalLineStartStopPageGrid" AutoGenerateColumns="None" HorizontalAlignment="Stretch">
+                <localPage:CorasauDataGridTemplateColumnClient x:Name="Text" Width="150" />
+                <localPage:CorasauDataGridTemplateColumnClient x:Name="Project" Width="80"/>
+                <localPage:CorasauDataGridTemplateColumnClient x:Name="ProjectName" Width="80" />
+                <localPage:CorasauDataGridTemplateColumnClient x:Name="Task" Width="80" />
+                <localPage:CorasauDataGridTemplateColumnClient x:Name="Item" Width="100" />
+                <localPage:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Width="80" />
+                <localPage:CorasauDataGridTemplateColumnClient x:Name="CategoryName" Width="100" />
+                <localPage:CorasauDataGridTemplateColumnClient x:Name="PayrollCategory" Width="70" />
+                <localPage:CorasauDataGridTemplateColumnClient x:Name="PayrollCategoryName" Width="100" />
+                <localPage:CorasauDataGridTemplateColumnClient x:Name="WorkSpace" Width="80" />
+                <localPage:CorasauDataGridTemplateColumnClient x:Name="TimeFrom" Width="80" ShowTimeElapsed="True" />
+                <localPage:CorasauDataGridTemplateColumnClient x:Name="TimeTo" Width="80" ShowTimeElapsed="True" />
+            </localPage:TMJournalLineStartStopGrid>
+        </CorasauControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

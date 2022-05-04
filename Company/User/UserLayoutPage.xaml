@@ -16,12 +16,12 @@ x:Class="UnicontaClient.Pages.CustomPage.UserLayoutPage"
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <local:UserLayoutPageGrid  x:Name="dgUseyLayoutGrid" AutoGenerateColumns="None">
                 <local:UserLayoutPageGrid.Columns>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Name" ReadOnly="True" Width="220"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="SubName" ReadOnly="True" Width="200"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="SubID" ReadOnly="True" Width="100"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="LayoutType" ReadOnly="True"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="UserExtraLayout" ReadOnly="True"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Default" ReadOnly="True"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Name" ReadOnly="True" AllowEditing="False"  Width="220"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="SubName" ReadOnly="True" AllowEditing="False" Width="200"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="SubID" ReadOnly="True" AllowEditing="False" Width="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="LayoutType" AllowEditing="False" ReadOnly="True"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="UserExtraLayout" AllowEditing="False" ReadOnly="True"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="AllUsers" AllowEditing="True" HideHeaderCheck="True" Width="75"/>
                 </local:UserLayoutPageGrid.Columns>
             </local:UserLayoutPageGrid>
         </CorasauControls:BusyIndicator>

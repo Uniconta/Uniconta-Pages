@@ -90,6 +90,9 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorAccount"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Www" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PostingAccount" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="MobilPhone" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CrmGroup" Width="100" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Interests" Width="100" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Products" Width="100" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Payment" Width="50"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PaymentFormat" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PaymentMethod" Visible="False"/>
@@ -120,6 +123,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorAccount"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim3" FieldName="Dimension3" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim4" FieldName="Dimension4" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim5" FieldName="Dimension5" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="EAN" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PriceList" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="LastInvoice" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ContactEmail" Width="150" Visible="False">
@@ -133,20 +137,22 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorAccount"
                         </localPage:CorasauDataGridTemplateColumnClient.EditSettings>
                     </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="EndDiscountPct" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="LineDiscountPct" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Shipment" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryTerm" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="LayoutGroup" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="VatNumber" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="RefInPayment" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Created" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="D2CAccount" Visible="False" />
                     <localPage:ComboBoxColumnClient x:Name="BalanceMethod" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="EORI" Visible="False"/>
                 </localPage:CreditorAccountGrid.Columns>
-                
                 <localPage:CreditorAccountGrid.TotalSummary>
                     <localPage:SumColumn FieldName="CurBalance" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                     <localPage:SumColumn FieldName="Overdue" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                 </localPage:CreditorAccountGrid.TotalSummary>
-             
             </localPage:CreditorAccountGrid>
         </CorasauControls:BusyIndicator>
         <localPage:CreditorDetailControl Visible="Collapsed" Grid.Row="1" x:Name="detailControl"></localPage:CreditorDetailControl>

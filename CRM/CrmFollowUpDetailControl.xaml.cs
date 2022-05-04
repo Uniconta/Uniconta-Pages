@@ -23,8 +23,6 @@ namespace UnicontaClient.Pages.CustomPage
             {
 
                 _api = value;
-                var Comp = _api.CompanyEntity;
-                setUserFields();
             }
         }
 
@@ -46,15 +44,7 @@ namespace UnicontaClient.Pages.CustomPage
                     layoutItems.DataContext = dataContext;
             }
         }
-
-        void setUserFields()
-        {
-            var row = new CrmFollowUpClient();
-            row.SetMaster(api.CompanyEntity);
-            var UserFieldDef = row.UserFieldDef();
-            if (UserFieldDef != null)
-                UserFieldControl.CreateUserFieldOnPage2(layoutItems, UserFieldDef, (RowIndexConverter)this.Resources["RowIndexConverter"], this.api, this, true, grpLast);
-        }
+       
 
 #if !SILVERLIGHT
 

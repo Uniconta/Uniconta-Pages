@@ -124,6 +124,7 @@ namespace UnicontaClient.Pages.CustomPage
             var filterFldValue = filterFld[1];
             inputs = new List<PropValuePair>();
             inputs.Add(PropValuePair.GenereteWhereElements(filterFldName, typeof(string), filterFldValue));
+            inputs.Add(PropValuePair.GenereteWhereElements(nameof(ProjectBudgetLine._AnchorBudget), typeof(bool), 0));
 
             if (BudgetGroupCache == null)
                 BudgetGroupCache = await api.LoadCache(typeof(Uniconta.DataModel.ProjectBudgetGroup));
@@ -269,11 +270,15 @@ namespace UnicontaClient.Pages.CustomPage
                 Task.Visible = false;
                 Task.ShowInColumnChooser = false;
             }
+            else
+                Task.ShowInColumnChooser = true;
             if (!Comp.Payroll)
             {
                 PayrollCategory.Visible = false;
                 PayrollCategory.ShowInColumnChooser = false;
             }
+            else
+                PayrollCategory.ShowInColumnChooser = true;
         }
 
         private void SelectedItem_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)

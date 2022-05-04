@@ -76,14 +76,14 @@ namespace UnicontaClient.Pages.CustomPage.GL.ChartOfAccount.Reports
         {
             if (e.Key == Key.Escape)
             {
-                this.DialogResult = false;
+                SetDialogResult(false);
             }
             else
                 if (e.Key == Key.Enter)
             {
                 if (CancelButton.IsFocused)
                 {
-                    this.DialogResult = false;
+                    SetDialogResult(false);
                     return;
                 }
                 OKButton_Click(null, null);
@@ -104,12 +104,12 @@ namespace UnicontaClient.Pages.CustomPage.GL.ChartOfAccount.Reports
         {
             this.Comments = txtEditor.Text;
             this.Date = dtDefaultDate.DateTime;
-            this.DialogResult = true;
+            SetDialogResult(true);
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = false;
+            SetDialogResult(false);
         }
     }
 }

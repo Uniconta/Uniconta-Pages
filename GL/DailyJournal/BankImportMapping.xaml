@@ -46,6 +46,14 @@ x:Class="UnicontaClient.Pages.CustomPage.BankImportMapping"
                             </DataTemplate>
                         </localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
                     </localPage:CorasauDataGridForeignKeyColumnClient>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Equal" ShowCheckBoxInHeader="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="StartsWith" ShowCheckBoxInHeader="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Contains" ShowCheckBoxInHeader="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim1" Width="70" FieldName="Dimension1" />
+                    <localPage:CorasauDataGridTemplateColumnClient  x:Name="cldim2" Width="70" FieldName="Dimension2" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim3" Width="70" FieldName="Dimension3" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim4" Width="70" FieldName="Dimension4" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim5" Width="70" FieldName="Dimension5" />
                 </localPage:BankImportMappingGrid.Columns>
                 </localPage:BankImportMappingGrid>
         </UnicontaControls:BusyIndicator>

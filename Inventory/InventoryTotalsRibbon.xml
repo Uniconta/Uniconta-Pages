@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <root>
   <RibbonItem TabId="0" LocalizedNameKey="Home">
+    <RibbonItem Action="Search" LocalizedNameKey="Search" LargeGlyph="Validate_32x32.png" ShortcutKey="Ctrl+H" />
+  </RibbonItem>
+  <RibbonItem>
     <RibbonItem Action="ItemFilter" LocalizedNameKey="Filter" Glyph="Filter_16x16.png" LargeGlyph="Filter_32x32.png" ShortcutKey="CTRL+I"/>
     <RibbonItem Action="ClearItemFilter" LocalizedNameKey="ClearFilter" Glyph="Filter_Clear_32x32.png" LargeGlyph="Filter_Clear_32x32.png" ShortcutKey="CTRL+K"/>
   </RibbonItem>
@@ -17,9 +20,6 @@
       <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportLayout" Glyph="Import_16x16.png" LargeGlyph="Import_16x16.png" ShortcutKey=""/>
       <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16.png" ShortcutKey=""/>
     </RibbonItem>
-  </RibbonItem>
-  <RibbonItem>
-    <RibbonItem Action="Search" LocalizedNameKey="Search" LargeGlyph="Validate_32x32.png" ShortcutKey="Ctrl+H" />
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="Aggregate" LocalizedNameKey="Aggregate" LargeGlyph="Variants_Combination_32x32.png" />

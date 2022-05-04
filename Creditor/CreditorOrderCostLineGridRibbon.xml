@@ -23,6 +23,15 @@
       <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16.png" ShortcutKey=""/>
     </RibbonItem>
   </RibbonItem>
+   <RibbonItem>
+    <!---next group-->
+    <RibbonItem Action="Templates" LocalizedNameKey="Templates" LargeGlyph="Layout_32x32.png">
+      <!---If we want Inner menu-->
+      <RibbonItem Action="LoadTemplate" LocalizedNameKey="Load" Glyph="Edit_16x16.png" ShortcutKey="CTRL+O" />
+      <RibbonItem Action="SaveTemplate" LocalizedNameKey="SaveAs" Glyph="save-16x16.png" ShortcutKey="CTRL+B" />
+      <RibbonItem Action="DeleteTemplate" LocalizedNameKey="Delete" Glyph="Delete_16x16.png" />
+    </RibbonItem>
+  </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="PostCost" LocalizedNameKey="PostCost" LargeGlyph="Posted_Journal_32x32.png"/>
   </RibbonItem>

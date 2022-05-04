@@ -6,45 +6,58 @@ x:Class="UnicontaClient.Pages.CustomPage.CwCreateUpdateBudget"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:cw="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
         xmlns:ClientToolsControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
-        SizeToContent="Height" Width="340" KeyDown="ChildWindow_KeyDown" IsTabStop="True">
-    <Grid x:Name="LayoutRoot" Margin="5">
+        xmlns:UnicontaControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"   
+        mc:Ignorable="d" Width="425" Height="540" 
+       d:DesignHeight="100" d:DesignWidth="380">
+    <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition />
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="40"/>
         </Grid.RowDefinitions>
-        <Grid HorizontalAlignment="Stretch">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="2"/>
-                <ColumnDefinition/>
-            </Grid.ColumnDefinitions>
-            <TextBlock Grid.Row="0" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FromDate,Mode=OneWay}" VerticalAlignment="Center"  />
-            <ClientToolsControls:DateEditor  Height="25" x:Name="fromDate" EditValue="{Binding FromDate, Mode=TwoWay}" Grid.Row="0" Grid.Column="2" Margin="5,5,0,0" HorizontalAlignment="Stretch"  />
+        <UnicontaControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Vertical" Grid.Row="0" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
+            <UnicontaControls:CorasauLayoutGroup x:Name="layoutGroupBudget" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Period}" Orientation="Vertical" UnicontaControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                <UnicontaControls:CorasauLayoutItem FieldName="FromDate">
+                    <UnicontaControls:DateEditor Text="{Binding FromDate,Mode=TwoWay}" x:Name="fromDate"/>
+                </UnicontaControls:CorasauLayoutItem>
+                <UnicontaControls:CorasauLayoutItem FieldName="ToDate">
+                    <UnicontaControls:DateEditor Text="{Binding ToDate,Mode=TwoWay}" x:Name="toDate"/>
+                </UnicontaControls:CorasauLayoutItem>
+            </UnicontaControls:CorasauLayoutGroup>
 
-            <TextBlock Grid.Row="1" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ToDate,Mode=OneWay}" VerticalAlignment="Center" />
-            <ClientToolsControls:DateEditor  Height="25" x:Name="toDate" EditValue="{Binding ToDate, Mode=TwoWay}" Grid.Row="1" Grid.Column="2" HorizontalAlignment="Stretch" Margin="5,5,0,0"   />
+            <UnicontaControls:CorasauLayoutGroup x:Name="layoutGroupSettings" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Settings}" Orientation="Vertical" UnicontaControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                <UnicontaControls:CorasauLayoutItem FieldName="Group" x:Name="lblGroup">
+                    <UnicontaControls:LookupEditor x:Name="leGroup" Text="{Binding Group,Mode=TwoWay}"/>
+                </UnicontaControls:CorasauLayoutItem>
+                <UnicontaControls:CorasauLayoutItem x:Name="lblBudgetMethod" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BudgetMethod}">
+                    <UnicontaControls:DimComboBoxEditor x:Name="cmbBudgetMethod" SelectedIndexChanged="cmbBudgetMethod_SelectedIndexChanged" IsTextEditable="False" />
+                </UnicontaControls:CorasauLayoutItem>
+                <UnicontaControls:CorasauLayoutItem FieldName="BudgetName" x:Name="lblTxtName">
+                    <UnicontaControls:TextEditor x:Name="txtName" Width="170" Text="{Binding BudgetName,Mode=TwoWay}"/>
+                </UnicontaControls:CorasauLayoutItem>
+                <UnicontaControls:CorasauLayoutItem FieldName="DeleteBudget" x:Name="lblDeleteBudget">
+                    <UnicontaControls:CheckEditor x:Name="deleteBudget" IsChecked="{Binding DeleteBudget,Mode=TwoWay}"/>
+                </UnicontaControls:CorasauLayoutItem>
+            </UnicontaControls:CorasauLayoutGroup>
 
-            <TextBlock Grid.Row="2" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Group,Mode=OneWay}" VerticalAlignment="Center" />
-            <ClientToolsControls:LookupEditor x:Name="leGroup" Text="{Binding Group, Mode=TwoWay}" Grid.Column="2" Grid.Row="2" HorizontalAlignment="Stretch" Margin="5,5,0,0" Height="25" />
+            <UnicontaControls:CorasauLayoutGroup x:Name="layoutGroupAccountRange" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Range}" Orientation="Vertical" UnicontaControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                <UnicontaControls:CorasauLayoutItem FieldName="Employee" x:Name="lblEmployee">
+                    <UnicontaControls:LookupEditor x:Name="leEmp" Text="{Binding Employee,Mode=TwoWay}"/>
+                </UnicontaControls:CorasauLayoutItem>
+                <UnicontaControls:CorasauLayoutItem FieldName="PrCategory" x:Name="lblPrCategory">
+                    <UnicontaControls:LookupEditor x:Name="lePrCategory" Text="{Binding PrCategory,Mode=TwoWay}"/>
+                </UnicontaControls:CorasauLayoutItem>
+                <UnicontaControls:CorasauLayoutItem FieldName="Payroll" x:Name="lblPayroll">
+                    <UnicontaControls:LookupEditor x:Name="lePayroll" Text="{Binding Payroll,Mode=TwoWay}"/>
+                </UnicontaControls:CorasauLayoutItem>
+                <UnicontaControls:CorasauLayoutItem FieldName="PrWorkSpace" x:Name="lblWorkspace">
+                    <UnicontaControls:LookupEditor x:Name="leWorkspace" Text="{Binding PrWorkSpace,Mode=TwoWay}"/>
+                </UnicontaControls:CorasauLayoutItem>
+                <UnicontaControls:CorasauLayoutItem FieldName="InclProjectTask" x:Name="lblInclProjectTask">
+                    <UnicontaControls:CheckEditor x:Name="inclProjectTask" IsChecked="{Binding InclProjectTask,Mode=TwoWay}"/>
+                </UnicontaControls:CorasauLayoutItem>
+            </UnicontaControls:CorasauLayoutGroup>
 
-            <TextBlock Grid.Row="3" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Employee,Mode=OneWay}" VerticalAlignment="Center"  />
-            <ClientToolsControls:LookupEditor x:Name="leEmp" Text="{Binding Employee, Mode=TwoWay}" Grid.Column="2" Grid.Row="3" HorizontalAlignment="Stretch" Margin="5,5,0,0" Height="25" />
-
-            <TextBlock Grid.Row="4" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Project,Mode=OneWay}" VerticalAlignment="Center"  />
-            <ClientToolsControls:LookupEditor x:Name="leProject" Text="{Binding Project, Mode=TwoWay}" Grid.Column="2" Grid.Row="4" HorizontalAlignment="Stretch" Margin="5,5,0,0" Height="25" />
-
-            <TextBlock Grid.Row="5" x:Name="lblTxtCommment" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Comment,Mode=OneWay}" VerticalAlignment="Center" />
-            <ClientToolsControls:TextEditor x:Name="txtComment" Text="{Binding Comment, Mode=TwoWay}" Grid.Column="2" Grid.Row="5" HorizontalAlignment="Stretch" Margin="5,5,0,0" Height="25" />
-
-        </Grid>
+        </UnicontaControls:CorasauLayoutControl>
         <StackPanel x:Name="actionButton" HorizontalAlignment="Right" Grid.Row="1" Orientation="Horizontal" Margin="0 10 0 0">
             <Button x:Name="OKButton" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OK}" Click="OKButton_Click" MinWidth="75" Height="23"
                     HorizontalAlignment="Right" Margin="0 0 3 0" />

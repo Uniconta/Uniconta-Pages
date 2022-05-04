@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using Uniconta.API.System;
 using Uniconta.Common;
 using System.Windows;
+using Uniconta.ClientTools.Controls;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -106,23 +107,19 @@ namespace UnicontaClient.Pages.CustomPage
             if (dataContext != null && dataContext is InvItemClient)
             {
                 var invItem = dataContext as InvItemClient;
-                ShowViewer(invItem, invItem._Photo, Uniconta.ClientTools.Localization.lookup("Photo"));
+                ShowViewer(invItem, invItem._Photo, Uniconta.ClientTools.Localization.lookup("Photo"), ViewerType.Photo);
             }
         }
 
-        private async void ShowViewer(InvItemClient invItem, int rowId, string header)
+        private void ShowViewer(InvItemClient invItem, int rowId, string header, ViewerType docViewerType)
         {
             if (rowId == 0)
                 return;
 
-            var userDocsClient = new UserDocsClient();
-            userDocsClient.SetMaster(invItem);
-            userDocsClient.RowId = rowId;
-            await api.Read(userDocsClient);
-#if !SILVERLIGHT
-            var newDocumentViewer = new Uniconta.ClientTools.Controls.DocumentViewerWindow(userDocsClient, api, header);
+            var newDocumentViewer = new DocumentViewerWindow(api, header);
+            newDocumentViewer.DocumentViewerType = docViewerType;
+            newDocumentViewer.InitViewer(invItem);
             newDocumentViewer.Show();
-#endif
         }
 
         private void liURL_ButtonClicked(object sender)
@@ -132,7 +129,18 @@ namespace UnicontaClient.Pages.CustomPage
             if (dataContext != null && dataContext is InvItemClient)
             {
                 var invItem = dataContext as InvItemClient;
-                ShowViewer(invItem, invItem._URL, Uniconta.ClientTools.Localization.lookup("Url"));
+                ShowViewer(invItem, invItem._URL, Uniconta.ClientTools.Localization.lookup("Url"), ViewerType.Url);
+            }
+        }
+
+        private void liInvoiceAttachment_ButtonClicked(object sender)
+        {
+            var layoutItem = sender as Uniconta.ClientTools.Controls.CorasauLayoutItem;
+            var dataContext = layoutItem.DataContext;
+            if (dataContext != null && dataContext is InvItemClient)
+            {
+                var invItem = dataContext as InvItemClient;
+                ShowViewer(invItem, invItem._URL, Uniconta.ClientTools.Localization.lookup("Attachment"), ViewerType.Attachment);
             }
         }
     }

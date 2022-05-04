@@ -21,13 +21,14 @@ x:Class="UnicontaClient.Pages.CustomPage.DashBoardViewerPage"
     </UserControl.Resources>
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"></RowDefinition>
-            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <StackPanel Orientation="Horizontal" Grid.Row="0">
+        <StackPanel Orientation="Horizontal" Grid.Row="0" x:Name="rowFilter">
             <Button Height="35" Width="45" ToolTip="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Filter}" ContentTemplate="{StaticResource FilterButtonTemplate}" HorizontalAlignment="Left"   x:Name="btnFilter" Cursor="Hand" Click="Button_Click"  />
             <Button Height="35" Width="45" ToolTip="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ClearFilter}" ContentTemplate="{StaticResource ClearFilterButtonTemplate}" HorizontalAlignment="Left"  x:Name="btnClearFilter" Cursor="Hand" Click="btnClearFilter_Click"  />
             <Button Height="35" Width="45" ToolTip="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Refresh}" ContentTemplate="{StaticResource RefeshButtonTemplate}" HorizontalAlignment="Left"  x:Name="btnRefresh" Cursor="Hand" Click="btnRefresh_Click"  />
+            <Button Height="35" Width="45" ToolTip="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=WindowSetting}" ContentTemplate="{StaticResource WinSettgButtonTemplate}" HorizontalAlignment="Left"  x:Name="btnWinSettg" Cursor="Hand" Click="btnWinSettg_Click"  />
         </StackPanel>
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BusyMessage}">
             <CorasauControls:UnicontaDashboardControl Grid.Row="1" x:Name="dashboardViewerUniconta" AllowInspectAggregatedData="True"
@@ -41,7 +42,6 @@ x:Class="UnicontaClient.Pages.CustomPage.DashBoardViewerPage"
                 <CorasauControls:UnicontaDashboardControl.PivotItemStyle>
                     <Style TargetType="dxdash:PivotDashboardLayoutItem">
                         <Setter Property="ContentTemplate" Value="{StaticResource pivotTemplate}" />
-                        <EventSetter Event="MouseUp" Handler="DashboardLayoutItem_MouseUp"/>
                     </Style>
                 </CorasauControls:UnicontaDashboardControl.PivotItemStyle>
             </CorasauControls:UnicontaDashboardControl>

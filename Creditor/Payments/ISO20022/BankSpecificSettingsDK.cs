@@ -7,7 +7,9 @@ using System.Threading.Tasks;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.Common;
+using Uniconta.Common.Utility;
 using Uniconta.DataModel;
+using UnicontaClient.Pages;
 using UnicontaClient.Pages.Creditor.Payments;
 
 namespace UnicontaISO20022CreditTransfer
@@ -298,7 +300,7 @@ namespace UnicontaISO20022CreditTransfer
         /// <summary>
         /// Danish Inpayment Form FIK71
         /// </summary>
-        public override Tuple<string, string> CreditorFIK71(String ocrLine)
+        public override Tuple<string, string> CreditorFIK71(String ocrLine, string creditorPaymId)
         {
             ocrLine = ocrLine ?? string.Empty;
 
@@ -318,6 +320,8 @@ namespace UnicontaISO20022CreditTransfer
                     paymID = paymID.Substring(0, BaseDocument.FIK71LENGTH);
                 else
                     paymID = paymID.PadLeft(BaseDocument.FIK71LENGTH, '0');
+
+                paymID = BaseDocument.FIK71 + "/" + paymID;
 
                 creditorAccount = ocrLine.Remove(0, index + 1);
             }
@@ -346,7 +350,7 @@ namespace UnicontaISO20022CreditTransfer
         /// <summary>
         /// Danish Inpayment Form FIK75
         /// </summary>
-        public override Tuple<string, string> CreditorFIK75(string ocrLine)
+        public override Tuple<string, string> CreditorFIK75(string ocrLine, string creditorPaymId)
         {
             ocrLine = ocrLine ?? string.Empty;
 
@@ -366,6 +370,8 @@ namespace UnicontaISO20022CreditTransfer
                     paymID = paymID.Substring(0, BaseDocument.FIK75LENGTH);
                 else
                     paymID = paymID.PadLeft(BaseDocument.FIK75LENGTH, '0');
+
+                paymID = BaseDocument.FIK75 + "/" + paymID;
 
                 creditorAccount = ocrLine.Remove(0, index + 1);
             }
@@ -415,12 +421,110 @@ namespace UnicontaISO20022CreditTransfer
                     }
             }
         }
-        
+
+        public override PostalAddress CreditorAddress(Uniconta.DataModel.Creditor creditor, PostalAddress creditorAddress, ISO20022PaymentTypes paymentType, bool unstructured = false)
+        {
+            var adr1 = StandardPaymentFunctions.RegularExpressionReplace(creditor._Address1, allowedCharactersRegEx, replaceCharactersRegEx);
+            var adr2 = StandardPaymentFunctions.RegularExpressionReplace(creditor._Address2, allowedCharactersRegEx, replaceCharactersRegEx);
+            var adr3 = StandardPaymentFunctions.RegularExpressionReplace(creditor._Address3, allowedCharactersRegEx, replaceCharactersRegEx);
+            var zipCode = StandardPaymentFunctions.RegularExpressionReplace(creditor._ZipCode, allowedCharactersRegEx, replaceCharactersRegEx);
+            var city = StandardPaymentFunctions.RegularExpressionReplace(creditor._City, allowedCharactersRegEx, replaceCharactersRegEx);
+
+            if (paymentType != ISO20022PaymentTypes.DOMESTIC && (companyBankEnum == CompanyBankENUM.Nordea_DK || companyBankEnum == CompanyBankENUM.Nordea_NO || companyBankEnum == CompanyBankENUM.Nordea_SE))
+            {
+                int maxLines = 2;
+                int maxStrLen = 35;
+
+                if (paymentType == ISO20022PaymentTypes.SEPA)
+                    maxLines = 3;
+
+                var adrText = StringBuilderReuse.Create().Append(adr1).Append(adr2 != null ? ", " : null).Append(adr2).Append(adr3 != null ? ", " : null).Append(adr3). Append(zipCode != null ? ", " : null).Append(zipCode).Append(city != null ? ", " : null).Append(city).ToStringAndRelease();
+                if (adrText.Length > maxLines * maxStrLen)
+                    adrText = adrText.Substring(0, maxLines * maxStrLen);
+
+                var resultList = adrText.Select((x, i) => i)
+                            .Where(i => i % maxStrLen == 0)
+                            .Select(i => adrText.Substring(i, adrText.Length - i >= maxStrLen ? maxStrLen : adrText.Length - i)).ToArray();
+
+                var len = resultList.Length;
+                adr1 = len > 0 ? resultList[0].Trim() : null;
+                adr2 = len > 1 ? resultList[1].Trim() : null;
+                adr3 = len > 2 ? resultList[2].Trim() : null;
+
+                unstructured = true;
+            }
+
+            if (zipCode != null && !unstructured)
+            {
+                creditorAddress.ZipCode = zipCode;
+                creditorAddress.CityName = city;
+                creditorAddress.StreetName = adr1;
+            }
+            else
+            {
+                creditorAddress.AddressLine1 = adr1;
+                creditorAddress.AddressLine2 = adr2;
+                creditorAddress.AddressLine3 = adr3;
+                creditorAddress.Unstructured = true;
+            }
+
+            creditorAddress.CountryId = ((CountryISOCode)creditor._Country).ToString();
+
+            return creditorAddress;
+        }
+
+        /// <summary>
+        /// Nordea: Reference quoted on statement. This reference will be presented on Creditor’s account statement. It may only be used for domestic payments. Only used by Norway, Denmark and Sweden.
+        /// Max 20 characters
+        /// </summary>
+        public override string RemittanceInfo(string externalAdvText, ISO20022PaymentTypes ISOPaymType, PaymentTypes paymentMethod)
+        {
+            string remittanceInfo = StandardPaymentFunctions.RegularExpressionReplace(externalAdvText, allowedCharactersRegEx, replaceCharactersRegEx);
+
+            if (remittanceInfo != string.Empty && ISOPaymType == ISO20022PaymentTypes.DOMESTIC)
+            {
+                switch (paymentMethod)
+                {
+                    case PaymentTypes.VendorBankAccount:
+                        if (remittanceInfo.Length > 20)
+                            remittanceInfo = remittanceInfo.Substring(0, 20);
+                        break;
+
+                    case PaymentTypes.IBAN:
+                        if (remittanceInfo.Length > 20)
+                            remittanceInfo = remittanceInfo.Substring(0, 20);
+                        break;
+
+                    case PaymentTypes.PaymentMethod3: //FIK71
+                        remittanceInfo = string.Empty;
+                        break;
+
+                    case PaymentTypes.PaymentMethod5: //FIK75
+                        remittanceInfo = string.Empty;
+                        break;
+
+                    case PaymentTypes.PaymentMethod4: //FIK73
+                        remittanceInfo = string.Empty;
+                        break;
+
+                    case PaymentTypes.PaymentMethod6: //FIK04
+                        remittanceInfo = string.Empty;
+                        break;
+                }
+            }
+            else
+            {
+                remittanceInfo = string.Empty;
+            }
+
+            return remittanceInfo;
+        }
+
 
         /// <summary>
         /// Unstructured Remittance Information
         /// </summary>
-        public override List<string> Ustrd(string externalAdvText, ISO20022PaymentTypes ISOPaymType, PaymentTypes paymentMethod, bool extendedText)
+        public override List<string> Ustrd(string externalAdvText, ISO20022PaymentTypes ISOPaymType, CreditorTransPayment trans, bool extendedText)
          {
 
             var ustrdText = StandardPaymentFunctions.RegularExpressionReplace(externalAdvText, allowedCharactersRegEx, replaceCharactersRegEx);
@@ -450,16 +554,16 @@ namespace UnicontaISO20022CreditTransfer
                     if (ISOPaymType == ISO20022PaymentTypes.DOMESTIC)
                         return resultList;
 
-                    maxLines = 4;
-                    maxStrLen = 35;
-                    if (paymentMethod == PaymentTypes.PaymentMethod6 || paymentMethod == PaymentTypes.PaymentMethod3) //Not allowed for FIK71 and Giro04 
+                    maxLines = 10;
+                    maxStrLen = 140;
+                    if (trans._PaymentMethod == PaymentTypes.PaymentMethod6 || trans._PaymentMethod == PaymentTypes.PaymentMethod3) //Not allowed for FIK71 and Giro04 
                         return resultList;
                     break;
 
                 case CompanyBankENUM.Handelsbanken:
                     maxLines = 1;
                     maxStrLen = 140;
-                    if (paymentMethod == PaymentTypes.PaymentMethod6 || paymentMethod == PaymentTypes.PaymentMethod3) //Not allowed for FIK71 and Giro04 
+                    if (trans._PaymentMethod == PaymentTypes.PaymentMethod6 || trans._PaymentMethod == PaymentTypes.PaymentMethod3) //Not allowed for FIK71 and Giro04 
                         return resultList;
                     break;
 

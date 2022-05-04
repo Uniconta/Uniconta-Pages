@@ -34,7 +34,6 @@ namespace UnicontaClient.Pages.CustomPage
             : base(sourceData, true)
         {
             InitializeComponent();
-            BusyIndicator = busyIndicator;
             layoutControl = layoutItems;
             CompanyClient compClient = new CompanyClient();
             StreamingManager.Copy(api.CompanyEntity, compClient);

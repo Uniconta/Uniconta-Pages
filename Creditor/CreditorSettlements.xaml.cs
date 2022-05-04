@@ -17,6 +17,8 @@ using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using Uniconta.ClientTools.Util;
 using Uniconta.ClientTools;
+using Uniconta.Common.Utility;
+
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
@@ -50,7 +52,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (syncMaster == null)
                 return;
             StreamingManager.Copy(syncMaster as UnicontaBaseEntity, this.master);
-            string header = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("Settlements"), syncMaster.Voucher);
+            string header = Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("Settlements"), syncMaster.Voucher);
             SetHeader(header);
         }
 

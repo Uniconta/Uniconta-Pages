@@ -4,7 +4,7 @@ x:Class="UnicontaClient.Pages.CustomPage.Attachments.CWAddEditFolder"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
              xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
-             Width="300" Height="100" >
+             Width="300" Height="100" SizeToContent="Height" >
     <Grid x:Name="LayoutRoot" Margin="2" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
             <RowDefinition />

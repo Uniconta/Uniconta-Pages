@@ -54,7 +54,6 @@ namespace UnicontaClient.Pages.CustomPage
         }
         void InitPage(CrudAPI crudapi)
         {
-            BusyIndicator = busyIndicator;
             leBaseBudget.api = crudapi;
             layoutControl = layoutItems;
             if (LoadedRow == null)

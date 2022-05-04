@@ -27,7 +27,6 @@ x:Class="UnicontaClient.Pages.CustomPage.Payments"
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <Button x:Name="btnSerach" Grid.Column="6" Grid.Row="0" Margin="10,3,3,3" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Search}" Height="23" Width="80" Click="btnSerach_Click"/>
             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DueDate}" Grid.Column="0" Grid.Row="0" Margin="10,3,3,3" VerticalAlignment="Center"/>
             <CorasauControls:DateEditor x:Name="txtDateFrm" Grid.Column="1" Grid.Row="0" Margin="10,3,3,3" Height="23"/>
             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=To}" Grid.Column="2" Grid.Row="0" Margin="10,3,3,3" VerticalAlignment="Center"/>
@@ -46,13 +45,14 @@ x:Class="UnicontaClient.Pages.CustomPage.Payments"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Text" Width="120"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceAN" Width="70"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Invoice" Width="60" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceAmount"  Width="100"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="RemainingAmount"  Width="100"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="UsedCachDiscount" Visible="False" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CashDiscount" Visible="False" />                    
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="TransAmount"  Width="100"/>                    
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="RemainingTransAmount"  Width="100"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PartialPaymentAmount"  Width="100"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="UsedCashDiscount" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PaymentAmount"  Width="100"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CurrencyLocal" Width="40"/>
-
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CashDiscount" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Currency" Width="40"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CurBalance" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="NumberSerie" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="VoucherX"  Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PostType" />
@@ -84,6 +84,9 @@ x:Class="UnicontaClient.Pages.CustomPage.Payments"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="AmountOpenCur" Visible="False" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="JournalPostedId" AllowThousandMask="false" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DocumentRef" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="FromDebtor" Visible="False" ShowCheckBoxInHeader="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="RgltryRptgCode" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="RgltryRptgText" Visible="False"/>
                 </localPage:PaymentsGrid.Columns>
                 <localPage:PaymentsGrid.TotalSummary>
                     <localPage:SumColumn FieldName="Debit" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
@@ -92,9 +95,12 @@ x:Class="UnicontaClient.Pages.CustomPage.Payments"
                     <localPage:SumColumn FieldName="AmountOpen" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                     <localPage:SumColumn FieldName="AmountCur" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                     <localPage:SumColumn FieldName="AmountOpenCur" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
-                    <localPage:SumColumn FieldName="RemainingAmount" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="TransAmount" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="RemainingTransAmount" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                     <localPage:SumColumn FieldName="PaymentAmount" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                     <localPage:SumColumn FieldName="UsedCachDiscount" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="PartialPaymentAmount" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="InvoiceAN" SummaryType="Count"/>
                 </localPage:PaymentsGrid.TotalSummary>
             </localPage:PaymentsGrid>
         </CorasauControls:BusyIndicator>

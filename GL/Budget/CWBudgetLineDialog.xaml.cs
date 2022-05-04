@@ -90,12 +90,12 @@ namespace UnicontaClient.Pages.CustomPage
             fromAccount = fromAccountlookupeditior.Text;
             toAccount = toAccountlookupeditior.Text;
 
-            this.DialogResult = true;
+            SetDialogResult(true);
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = false;
+            SetDialogResult(false);
         }
     }
 }

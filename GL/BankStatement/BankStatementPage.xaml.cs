@@ -26,6 +26,7 @@ using System.Text;
 using UnicontaClient.Utilities;
 using UnicontaClient.Pages.Maintenance;
 using Uniconta.API.Service;
+using UnicontaClient.Pages.GL.BankStatement;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -37,6 +38,8 @@ namespace UnicontaClient.Pages.CustomPage
     public partial class BankStatementPage : GridBasePage
     {
         public override string NameOfControl { get { return TabControls.BankStatementPage; } }
+        static public DateTime fromDate;
+        static public DateTime toDate;
 
         public BankStatementPage(BaseAPI API) : base(API, string.Empty)
         {
@@ -57,6 +60,15 @@ namespace UnicontaClient.Pages.CustomPage
             dgBankStatement.RowDoubleClick += dgBankStatement_RowDoubleClick;
 
             RemoveMenuItem();
+
+            if (fromDate == DateTime.MinValue)
+            {
+                DateTime date = GetSystemDefaultDate();
+                var firstDayOfMonth = new DateTime(date.Year, date.Month, 1);
+                var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
+                fromDate = firstDayOfMonth;
+                toDate = lastDayOfMonth;
+            }
         }
         protected override void OnLayoutLoaded()
         {
@@ -75,7 +87,8 @@ namespace UnicontaClient.Pages.CustomPage
             var Comp = api.CompanyEntity;
 
 #if !SILVERLIGHT
-            if (Comp._CountryId != CountryCode.Denmark)
+            if (Comp._CountryId != CountryCode.Denmark && Comp._CountryId != CountryCode.Greenland && Comp._CountryId != CountryCode.FaroeIslands &&
+                Comp._CountryId != CountryCode.Sweden && Comp._CountryId != CountryCode.Norway && Comp._CountryId != CountryCode.Finland)
                 UtilDisplay.RemoveMenuCommand(rb, "ConnectToBank");
 #else
             UtilDisplay.RemoveMenuCommand(rb, "ConnectToBank");
@@ -125,18 +138,22 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "RemoveSettlements":
                 case "DeleteStatement":
-                    if (selectedItem == null) return;
-
-                    RemoveBankStatmentOrSettelements(ActionType, selectedItem);
+                    if (selectedItem != null)
+                        RemoveBankStatmentOrSettelements(ActionType, selectedItem);
                     break;
+                case "ReconciliationReport":
+                    if (selectedItem != null)
+                        GeneratePollReport(selectedItem);
+                    break;
+
 #if WPF
                 case "ConnectToBank":
                     if (selectedItem == null) return;
-                  
+
                     CWBankAPI cwBank = new CWBankAPI(api);
                     cwBank.Closing += async delegate
                     {
-                        if(cwBank.DialogResult== true)
+                        if (cwBank.DialogResult == true)
                             await BankAPI(cwBank.Type, cwBank.CustomerNo, cwBank.Bank, cwBank.ActivationCode, cwBank.Company);
                     };
                     cwBank.Show();
@@ -147,8 +164,106 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
             }
         }
+        void GeneratePollReport(BankStatementClient selectedItem)
+        {
+            var toFromDateDialog = new CWCalculateCommission(api, fromDate, toDate);
+            toFromDateDialog.Title = Uniconta.ClientTools.Localization.lookup("Reconciliation");
+            toFromDateDialog.OKButton.Content = Uniconta.ClientTools.Localization.lookup("Generate");
+            toFromDateDialog.Closing += async delegate
+            {
+                if (toFromDateDialog.DialogResult == true)
+                {
+                    fromDate = toFromDateDialog.FromDateTime;
+                    toDate = toFromDateDialog.ToDateTime;
+                    var source = await CreatePollReportSource(selectedItem);
+                    var report = new PollReport();
+                    report.DataSource = new PollReportSource[] { source };
+                    var dockName = string.Concat(Uniconta.ClientTools.Localization.lookup("BankReconciliation"), ":", selectedItem._Account, ", ", selectedItem._Name);
+                    AddDockItem(UnicontaTabs.StandardPrintReportPage, new object[] { report }, dockName);
+                }
+            };
+            toFromDateDialog.Show();
+        }
 
-        #if WPF
+        async Task<PollReportSource> CreatePollReportSource(BankStatementClient master)
+        {
+            busyIndicator.IsBusy = true;
+            var bankTransApi = new BankStatementAPI(api);
+            var bankStmtLines = (BankStatementLineGridClient[])await bankTransApi.GetTransactions(new BankStatementLineGridClient(), master, fromDate, toDate, true);
+
+            var src = new List<TextAmount>();
+            long BankTotalNoMatch = 0, Total = 0, Void = 0;
+            if (bankStmtLines != null)
+            {
+                if (bankStmtLines.Length > 0)
+                    bankStmtLines[0]._AmountCent += Uniconta.Common.Utility.NumberConvert.ToLong(100d * master._StartBalance);
+                for (int i = 0; (i < bankStmtLines.Length); i++)
+                {
+                    var p = bankStmtLines[i];
+                    if (!p._Void)
+                    {
+                        Total += p._AmountCent;
+                        p._Total = Total;
+                        if (p.State == 1) // red
+                        {
+                            BankTotalNoMatch += p._AmountCent;
+                            src.Add(new TextAmount() { Date = p._Date, AmountCent = p._AmountCent, Text = p.Text }); // use Text property
+                        }
+                    }
+                    else
+                        Void += p._AmountCent;
+                }
+            }
+
+            var pollsrc = new PollReportSource();
+            pollsrc.FromDate = fromDate;
+            pollsrc.Date = toDate;
+            pollsrc.BankAcc = master;
+            pollsrc.BankTotal = (Total + Void) / 100d;
+            pollsrc.BankVoid = Void / 100d;
+            pollsrc.Source2 = src;
+
+            src = new List<TextAmount>();
+            Total = 0;
+            Void = 0;
+            BankTotalNoMatch = 0;
+
+            var tranApi = new Uniconta.API.GeneralLedger.ReportAPI(api);
+            var listtran = (GLTransClientTotal[])await tranApi.GetBank(new GLTransClientTotal(), master._Account, fromDate, toDate, true);
+            if (listtran != null)
+            {
+                Array.Sort(listtran, new GLTransClientSort());
+                bool ShowCurrency = (!tranApi.CompanyEntity.SameCurrency(master._Currency));
+
+                for (int i = 0; (i < listtran.Length); i++)
+                {
+                    var p = listtran[i];
+                    var AmountCent = ShowCurrency ? p._AmountCurCent : p._AmountCent;
+                    if (!p._Void)
+                    {
+                        Total += AmountCent;
+                        p._Total = Total;
+
+                        if (p.State == 1) // red
+                        {
+                            BankTotalNoMatch += p._AmountCent;
+                            src.Add(new TextAmount() { Date = p._Date, Voucher = p._Voucher, Text = p.Text, AmountCent = AmountCent }); // use Text property
+                        }
+                    }
+                    else
+                        Void += p._AmountCent;
+                }
+            }
+
+            pollsrc.PostedTotal = (Total + Void) / 100d;
+            pollsrc.PostedVoid = Void / 100d;
+            pollsrc.Source3 = src;
+
+            busyIndicator.IsBusy = false;
+
+            return pollsrc;
+        }
+
         async Task BankAPI(int type, string functionId, Bank bank, string activationCode, Company masterBCCompany)
         {
             busyIndicator.IsBusy = true;
@@ -162,42 +277,36 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 case 0:
                     err = await bankApi.ActivateBankConnect(functionId, (byte)bank, activationCode);
+                    var bankAPIName = bank == Bank.Nordea ? " Nordea" : " Bank Connect";
                     switch (err)
                     {
                         case ErrorCodes.Succes:
-                            dialogText = string.Concat(Uniconta.ClientTools.Localization.lookup("ConnectedTo"), " Bank Connect");
+                            dialogText = string.Concat(Uniconta.ClientTools.Localization.lookup("ConnectedTo"), bankAPIName);
                             break;
                         case ErrorCodes.IgnoreUpdate:
                         case ErrorCodes.CouldNotCreate:
                         case ErrorCodes.NoSucces:
-                            dialogText = string.Concat(Uniconta.ClientTools.Localization.lookup("UnableToConnectTo"), " Bank Connect");
+                            dialogText = string.Concat(Uniconta.ClientTools.Localization.lookup("UnableToConnectTo"), bankAPIName);
                             break;
                         case ErrorCodes.KeyExists:
                         case ErrorCodes.RecordExists:
-                            dialogText = string.Concat(Uniconta.ClientTools.Localization.lookup("AlreadyConnectedTo"), " Bank Connect");
+                            dialogText = string.Concat(Uniconta.ClientTools.Localization.lookup("AlreadyConnectedTo"), bankAPIName);
                             break;
                         default:
-                            dialogText = Uniconta.ClientTools.Localization.lookup(err.ToString()); 
+                            dialogText = Uniconta.ClientTools.Localization.lookup(err.ToString());
                             break;
                     }
                     break;
-                case 1: 
+                case 1:
                     logText = await bankApi.ShowBankConnect(functionId);
-
-                    if (logText == ErrorCodes.IgnoreUpdate.ToString())
+                    if (logText == null)
                     {
-                        dialogText = string.Concat(Uniconta.ClientTools.Localization.lookup("UnableToConnectTo"), " Bank Connect");
-                        logText = null;
-                    }
-                    else if (logText == ErrorCodes.FileDoesNotExist.ToString())
-                    {
-                        dialogText = string.Concat(Uniconta.ClientTools.Localization.lookup("NoDataCollected"),". ",
-                                     Uniconta.ClientTools.Localization.lookup("CustomerNo"),": ", functionId);
+                        dialogText = string.Concat(Uniconta.ClientTools.Localization.lookup("UnableToConnectTo"), " bank");
                         logText = null;
                     }
                     break;
                 case 2:
-                    
+
                     err = await bankApi.AddBankConnect(functionId, masterBCCompany.CompanyId, 1);
 
                     switch (err)
@@ -208,26 +317,26 @@ namespace UnicontaClient.Pages.CustomPage
                         case ErrorCodes.IgnoreUpdate:
                         case ErrorCodes.CouldNotCreate:
                         case ErrorCodes.NoSucces:
-                            dialogText = string.Format("{0} {1}: ({2}) {3}",Uniconta.ClientTools.Localization.lookup("UnableToConnectTo"), Uniconta.ClientTools.Localization.lookup("Company"), masterBCCompany.CompanyId, masterBCCompany.Name);
+                            dialogText = string.Format("{0} {1}: ({2}) {3}", Uniconta.ClientTools.Localization.lookup("UnableToConnectTo"), Uniconta.ClientTools.Localization.lookup("Company"), masterBCCompany.CompanyId, masterBCCompany.Name);
                             break;
                         case ErrorCodes.KeyExists:
                         case ErrorCodes.RecordExists:
-                            dialogText = string.Concat(Uniconta.ClientTools.Localization.lookup("AlreadyConnectedTo"), " Bank Connect");
+                            dialogText = string.Concat(Uniconta.ClientTools.Localization.lookup("AlreadyConnectedTo"), bank == Bank.Nordea ? " Nordea" : " Bank Connect");
                             break;
                         default:
                             dialogText = Uniconta.ClientTools.Localization.lookup(err.ToString());
                             break;
                     }
                     break;
-                case 3: 
-                    err = await bankApi.AddBankConnect(functionId, masterBCCompany.CompanyId, 2); 
+                case 3:
+                    err = await bankApi.AddBankConnect(functionId, masterBCCompany.CompanyId, 2);
 
                     switch (err)
                     {
                         case ErrorCodes.Succes:
-                            dialogText = string.Concat(Uniconta.ClientTools.Localization.lookup("Unregistered"), " Bank Connect");
+                            dialogText = string.Concat(Uniconta.ClientTools.Localization.lookup("Unregistered"), " bank");
                             break;
-                        case ErrorCodes.IgnoreUpdate: 
+                        case ErrorCodes.IgnoreUpdate:
                             dialogText = string.Format("{0} {1}: ({2}) {3}", Uniconta.ClientTools.Localization.lookup("UnableToConnectTo"), Uniconta.ClientTools.Localization.lookup("Company"), masterBCCompany.CompanyId, masterBCCompany.Name);
                             break;
                         case ErrorCodes.NoSubscription:
@@ -252,12 +361,12 @@ namespace UnicontaClient.Pages.CustomPage
                 UnicontaMessageBox.Show(dialogText, Uniconta.ClientTools.Localization.lookup("Information"));
             }
         }
-#endif
+
         private void RemoveBankStatmentOrSettelements(string ActionType, BankStatementClient selectedItem)
         {
             var text = string.Format("{0}: {1}, {2}", Uniconta.ClientTools.Localization.lookup("BankStatement"), selectedItem._Account, selectedItem._Name);
             var defaultdate = BasePage.GetSystemDefaultDate().Date;
-            CWInterval Wininterval = new CWInterval(defaultdate, defaultdate, showJrPostId:true);
+            CWInterval Wininterval = new CWInterval(defaultdate, defaultdate, showJrPostId: true);
             Wininterval.Closing += delegate
             {
                 if (Wininterval.DialogResult == true)
@@ -283,6 +392,23 @@ namespace UnicontaClient.Pages.CustomPage
                 }
             };
             Wininterval.Show();
+        }
+
+        protected override void LoadCacheInBackGround()
+        {
+            var lst = new List<Type>(12) { typeof(Uniconta.DataModel.GLAccount), typeof(Uniconta.DataModel.GLVat), typeof(Uniconta.DataModel.Debtor), typeof(Uniconta.DataModel.Creditor), typeof(Uniconta.DataModel.GLTransType), typeof(Uniconta.DataModel.NumberSerie), typeof(Uniconta.DataModel.PaymentTerm), typeof(Uniconta.DataModel.GLTransType), typeof(Uniconta.DataModel.GLChargeGroup) };
+            var noofDimensions = api.CompanyEntity.NumberOfDimensions;
+            if (noofDimensions >= 1)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType1));
+            if (noofDimensions >= 2)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType2));
+            if (noofDimensions >= 3)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType3));
+            if (noofDimensions >= 4)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType4));
+            if (noofDimensions >= 5)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType5));
+            LoadType(lst);
         }
     }
 }

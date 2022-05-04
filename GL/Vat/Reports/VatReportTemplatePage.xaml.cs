@@ -65,7 +65,9 @@ namespace UnicontaClient.Pages.CustomPage
             ((DevExpress.Xpf.Printing.LinkBase)(link)).Margins.Left = 40;
             ((DevExpress.Xpf.Printing.LinkBase)(link)).Margins.Right = 20;
             link.PageHeaderData = ReportHeaderDataContext;
-            //link.p
+#if !SILVERLIGHT
+            link.PaperKind = System.Drawing.Printing.PaperKind.A4;
+#endif
             link.PageHeaderTemplate = PageHeaderTemplate;
             link.DetailTemplate = DetailTemplate;
             link.DetailCount = 1;
@@ -91,7 +93,7 @@ namespace UnicontaClient.Pages.CustomPage
             //sourcedata.exportUri = CorasauDataGrid.GetExportServiceConnection(api);
             VatPrintBaseModule printbase = new VatPrintBaseModule();
             printbase.DetailTemplate = (DataTemplate)this.Resources["detailTemplate"];
-            printbase.ReportHeaderDataContext = (VatTemplateReportHeader)sourcedata;            
+            printbase.ReportHeaderDataContext = (VatTemplateReportHeader)sourcedata;
             printbase.SapinVatArray = vatArray;
             custPrint.DataContext = printbase;
         }

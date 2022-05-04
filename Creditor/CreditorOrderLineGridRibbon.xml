@@ -5,11 +5,11 @@
     <RibbonItem Action="AddRow" LocalizedNameKey="AddNewRow" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png"/>
     <RibbonItem Action="AddItems" LocalizedNameKey="AddOBJ" Parameter="InventoryItems" LargeGlyph="Add_Menu_32x32.png"/>
     <RibbonItem Action="AddVariants" LocalizedNameKey="AddOBJ" Parameter="Variants" Module="ItemVariants" LargeGlyph="GanttChart_32x32.png"/>
-    <RibbonItem Action="CopyRow" LocalizedNameKey="CopyRow" LargeGlyph="Copy_32x32.png"/>    
+    <RibbonItem Action="CopyRow" LocalizedNameKey="CopyRow" LargeGlyph="Copy_32x32.png"/>
     <RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="DeleteRow" LargeGlyph="Delete_32x32.png"/>
-    <RibbonItem Action="EditOrder" LocalizedNameKey="EditOBJ" Parameter="Order" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>        
+    <RibbonItem Action="EditOrder" LocalizedNameKey="EditOBJ" Parameter="Order" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>
   </RibbonItem>
-   <RibbonItem>
+  <RibbonItem>
     <RibbonItem Action="SaveGrid" ShortcutKey="CTRL+S" LocalizedNameKey="Save" Glyph="save-16x16.png" LargeGlyph="save-32x32.png"/>
     <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh.png" LargeGlyph="refresh.png"/>
   </RibbonItem>
@@ -41,32 +41,35 @@
     </RibbonItem>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem LocalizedNameKey="GenerateInvoice" Action="GenerateInvoice" LargeGlyph="Generate_32x32.png" ShortcutKey="Ctrl+G"></RibbonItem>
     <RibbonItem Action="Storage" LocalizedNameKey="OnHand" Module="Storage" LargeGlyph="Storage_32x32.png"/>
-    <RibbonItem Action="Serial" LocalizedNameKey="SerialBatchNumbers" LargeGlyph="Account-statement_32x32.png"/>
+    <RibbonItem Action="InvStockProfile" LocalizedNameKey="StockProfile" ControlName="InvStorageProfileReport" Module="Storage" LargeGlyph="Inventory_Trans_32x32.png"/>
+    <RibbonItem Action="Serial" LocalizedNameKey="SerialBatchNumbers" Module="SerialBatchNumbers" LargeGlyph="Account-statement_32x32.png"/>
     <RibbonItem Action="ItemReference" LocalizedNameKey="ItemReference" LargeGlyph="Inventory_Trans_32x32.png">
-       <RibbonItem Action="StockLines" LocalizedNameKey="InvTransactions" LargeGlyph="Inventory_Trans_32x32.png" Glyph="Marked_Inventory_from_Inventory_16x16.png"/>
-        <RibbonItem Action="DebtorOrderLines" LocalizedNameKey="ShowOBJ" Parameter="OrdersLine" Module="Order" Glyph="Nested_16x16.png"/>
-       <RibbonItem Action="DebtorOfferLines" LocalizedNameKey="ShowOBJ" Parameter="OfferLine" Module="Order" Glyph="Offer_Lines_16x16.png"/>
-       <RibbonItem Action="PurchaseOrderLines" LocalizedNameKey="ShowOBJ" Parameter="PurchaseLines" Module="Purchase" Glyph="Purchase_Lines_16x16.png"/>
-       <RibbonItem Action="ProductionOrderLines" LocalizedNameKey="ShowOBJ" Parameter="ProductionLines" Module="Production" Glyph="Production_Lines_16x16.png"/>
+      <RibbonItem Action="StockLines" LocalizedNameKey="InvTransactions" LargeGlyph="Inventory_Trans_32x32.png" Glyph="Marked_Inventory_from_Inventory_16x16.png"/>
+      <RibbonItem Action="DebtorOrderLines" LocalizedNameKey="ShowOBJ" Parameter="OrdersLine" Module="Order" Glyph="Nested_16x16.png"/>
+      <RibbonItem Action="DebtorOfferLines" LocalizedNameKey="ShowOBJ" Parameter="OfferLine" Module="Order" Glyph="Offer_Lines_16x16.png"/>
+      <RibbonItem Action="PurchaseOrderLines" LocalizedNameKey="ShowOBJ" Parameter="PurchaseLines" Module="Purchase" Glyph="Purchase_Lines_16x16.png"/>
+      <RibbonItem Action="ProductionOrderLines" LocalizedNameKey="ShowOBJ" Parameter="ProductionLines" Module="Production" Glyph="Production_Lines_16x16.png"/>
+      <RibbonItem Action="ViewItemAttachments" LocalizedNameKey="ItemAttachments" Glyph="View_16x16.png" />
+      <RibbonItem Action="ViewNotes" LocalizedNameKey="ItemNotes" Glyph="Note_16x16.png" />
     </RibbonItem>
-   
+
   </RibbonItem>
-   <RibbonItem>
-  <RibbonItem Action="PrintDocument" LocalizedNameKey="UpdateOBJ" Parameter="Document" LargeGlyph="Order_Confirmation_32x32.png">
+  <RibbonItem>
+    <RibbonItem LocalizedNameKey="GenerateInvoice" Action="CreateInvoice" LargeGlyph="Generate_32x32.png" ShortcutKey="Ctrl+M"/>
+    <RibbonItem Action="PrintDocument" LocalizedNameKey="UpdateOBJ" Parameter="Document" LargeGlyph="Order_Confirmation_32x32.png">
       <RibbonItem Action="UpdateRequisition" LocalizedNameKey="Requisition" Glyph="AccountInvoice_16x16.png" ShortcutKey="Ctrl+H"/>
       <RibbonItem Action="UpdatePurchaseOrder" LocalizedNameKey="PurchaseOrder" Glyph="Sales_16x16.png" ShortcutKey="Ctrl+Q"/>
       <RibbonItem Action="UpdateDeliveryNote" LocalizedNameKey="CreditorPackNote" Glyph="Note_16x16.png" ShortcutKey="Ctrl+K"/>
-      <RibbonItem Action="CreateInvoice" LocalizedNameKey="Invoice" Glyph="Invoice_16x16.png" ShortcutKey="Ctrl+M"/>
+      <RibbonItem Action="ShowInvoice" LocalizedNameKey="ShowInvoice"  Glyph="Invoice_16x16.png" ShortcutKey="F7" />
     </RibbonItem>
   </RibbonItem>
   <RibbonItem>
-      <RibbonItem Action="UnfoldBOM" LocalizedNameKey="UnfoldBOM"  LargeGlyph="Order_Lines_Highlighted_32x32.png"/>
-    </RibbonItem>
+    <RibbonItem Action="UnfoldBOM" LocalizedNameKey="UnfoldBOM"  LargeGlyph="Order_Lines_Highlighted_32x32.png"/>
+  </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="MarkSales" LocalizedNameKey="MarkSales" LargeGlyph="Check_Journal_32x32.png">
-       <RibbonItem Action="MarkOrderLine" LocalizedNameKey="OrderLine" Glyph="Marked_OrderLine_16x16.png" />
+      <RibbonItem Action="MarkOrderLine" LocalizedNameKey="OrderLine" Glyph="Marked_OrderLine_16x16.png" />
       <RibbonItem Action="MarkInvTrans" LocalizedNameKey="InvTransactions" Glyph="Marked_Inventory_16x16.png"  />
       <RibbonItem Action="MarkOrderLineAgnstInvTrans" LocalizedNameKey="MarkOBJ" Parameter="InvTransactions" Glyph="Marked_Inventory_from_Inventory_16x16.png" />
     </RibbonItem>

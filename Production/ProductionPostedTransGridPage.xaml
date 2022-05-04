@@ -29,11 +29,13 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionPostedTransGridPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="AccountName" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Item"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="ItemName" Visible="False"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="colVariant1" IsEditSettingSet="True" FieldName="Variant1" Width="80" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="colVariant2" IsEditSettingSet="True" FieldName="Variant2" Width="80" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="colVariant3" IsEditSettingSet="True" FieldName="Variant3" Width="80" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="colVariant4" IsEditSettingSet="True" FieldName="Variant4" Width="80" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="colVariant5" IsEditSettingSet="True" FieldName="Variant5" Width="80" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="colVariant" FieldName="Variant"  Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="VariantName" Width="100" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="colVariant1" IsEditSettingSet="True" FieldName="Variant1" Width="80" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="colVariant2" IsEditSettingSet="True" FieldName="Variant2" Width="80" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="colVariant3" IsEditSettingSet="True" FieldName="Variant3" Width="80" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="colVariant4" IsEditSettingSet="True" FieldName="Variant4" Width="80" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="colVariant5" IsEditSettingSet="True" FieldName="Variant5" Width="80" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Variant1Name" Width="100" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Variant2Name" Width="100" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Variant3Name" Width="100" Visible="False"/>
@@ -74,6 +76,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionPostedTransGridPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="ReferenceNumber" Width="70" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="CostValue" Visible="false"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="HasSeriaBatch" Width="50" Visible="false"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="cldim1" Width="70" FieldName="Dimension1" Visible="false" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="cldim2" Width="70" FieldName="Dimension2" Visible="false" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="cldim3" Width="70" FieldName="Dimension3" Visible="false"/>

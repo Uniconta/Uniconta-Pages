@@ -43,6 +43,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void InitPage()
         {
+            LoadNow(typeof(Uniconta.DataModel.CreditorGroup));
             InitializeComponent();
             dgCreditorAccountGrid.RowDoubleClick += dgCreditorAccountGrid_RowDoubleClick;
             dgCreditorAccountGrid.BusyIndicator = busyIndicator;
@@ -62,7 +63,6 @@ namespace UnicontaClient.Pages.CustomPage
             this.PreviewKeyDown += RootVisual_KeyDown;
 #endif
             this.BeforeClose += CreditorAccount_BeforeClose;
-            LoadNow(typeof(Uniconta.DataModel.CreditorGroup));
         }
 
         private void CreditorAccount_BeforeClose()
@@ -111,6 +111,12 @@ namespace UnicontaClient.Pages.CustomPage
                 DeliveryCity.Visible = false;
                 DeliveryCountry.Visible = false;
             }
+            if (!api.CompanyEntity.CRM)
+            {
+                CrmGroup.Visible = false;
+                Interests.Visible = false;
+                Products.Visible = false;
+            }
             dgCreditorAccountGrid.Readonly = true;
         }
 
@@ -137,10 +143,13 @@ namespace UnicontaClient.Pages.CustomPage
                     dgCreditorAccountGrid.AddRow();
                     break;
                 case "CopyRow":
-                    if (copyRowIsEnabled)
-                        dgCreditorAccountGrid.CopyRow();
-                    else
-                        CopyRecord(selectedItem);
+                    if (selectedItem != null)
+                    {
+                        if (copyRowIsEnabled)
+                            dgCreditorAccountGrid.CopyRow();
+                        else
+                            CopyRecord(selectedItem);
+                    }
                     break;
                 case "DeleteRow":
                         dgCreditorAccountGrid.DeleteRow();
@@ -258,9 +267,10 @@ namespace UnicontaClient.Pages.CustomPage
             if (selectedItem == null)
                 return;
             var creditor = Activator.CreateInstance(selectedItem.GetType()) as CreditorClient;
-            StreamingManager.Copy(selectedItem, creditor);
-            var parms = new object[2] { creditor, false };
-            AddDockItem(TabControls.CreditorAccountPage2, parms, Uniconta.ClientTools.Localization.lookup("Creditorsaccount"), "Add_16x16.png");
+            CorasauDataGrid.CopyAndClearRowId(selectedItem, creditor);
+            creditor._Created = DateTime.MinValue;
+            creditor._D2CAccount = null;
+            AddDockItem(TabControls.CreditorAccountPage2, new object[2] { creditor, IdObject.get(false) }, Uniconta.ClientTools.Localization.lookup("Creditorsaccount"), "Add_16x16.png");
         }
 
         bool copyRowIsEnabled = false;
@@ -355,6 +365,25 @@ namespace UnicontaClient.Pages.CustomPage
         private Task BindGrid()
         {
             return dgCreditorAccountGrid.Filter(null);
+        }
+
+        protected override void LoadCacheInBackGround()
+        {
+            var Comp = api.CompanyEntity;
+            var lst = new List<Type>(12) { typeof(Uniconta.DataModel.Employee), typeof(Uniconta.DataModel.GLVat), typeof(Uniconta.DataModel.CreditorGroup), typeof(Uniconta.DataModel.PaymentTerm), typeof(Uniconta.DataModel.CreditorLayoutGroup) };
+            if (Comp.CreditorPrice)
+                lst.Add(typeof(Uniconta.DataModel.CreditorPriceList));
+            if (Comp.NumberOfDimensions >= 1)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType1));
+            if (Comp.NumberOfDimensions >= 2)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType2));
+            if (Comp.NumberOfDimensions >= 3)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType3));
+            if (Comp.NumberOfDimensions >= 4)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType4));
+            if (Comp.NumberOfDimensions >= 5)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType5));
+            LoadType(lst);
         }
 
         private void HasDocImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

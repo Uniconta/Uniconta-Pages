@@ -87,6 +87,10 @@ x:Class="UnicontaClient.Pages.CustomPage.ContactPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ReferenceId" Width="80" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Interests" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Products"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Packnote"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Confirmation"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Offer"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="GetEmailIfContact"/>
                 </localPage:ContactGrid.Columns>
             </localPage:ContactGrid>
         </CorasauControls:BusyIndicator>

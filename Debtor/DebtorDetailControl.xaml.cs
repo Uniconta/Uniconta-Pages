@@ -74,12 +74,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
         void setUserFields()
         {
-            var row = new DebtorClient();
-            row.SetMaster(api.CompanyEntity);
-            var UserFieldDef = row.UserFieldDef();
-            if (UserFieldDef != null)
-                UserFieldControl.CreateUserFieldOnPage2(layoutItems, UserFieldDef, (RowIndexConverter)this.Resources["RowIndexConverter"], this.api, this, true, lastGroup);
-            var Comp = api.CompanyEntity;
+           var Comp = api.CompanyEntity;
             if (Comp.CRM)
             {
                 crmGroup.Visibility = Visibility.Visible;
@@ -97,6 +92,10 @@ namespace UnicontaClient.Pages.CustomPage
                 usedim.Visibility = Visibility.Collapsed;
             if (!Comp.DeliveryAddress)
                 dAddress.Visibility = Visibility.Collapsed;
+#if !SILVERLIGHT
+            if (Comp._CountryId != CountryCode.Estonia)
+                liEEIsNotVatDeclOrg.Visibility = Visibility.Collapsed;
+#endif
         }
 
 #if !SILVERLIGHT

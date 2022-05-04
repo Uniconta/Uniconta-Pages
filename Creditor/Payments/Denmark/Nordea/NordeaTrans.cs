@@ -165,7 +165,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
 
             danishFields.Blanks = string.Empty;
 
-            danishFields.Amount = Math.Round(tran._PaymentAmount, 2);
+            danishFields.Amount = Math.Round(tran.PaymentAmount, 2);
 
             danishFields.NotUsed04 = new List<string>()
             {

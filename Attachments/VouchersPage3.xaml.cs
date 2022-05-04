@@ -89,6 +89,7 @@ namespace UnicontaClient.Pages.CustomPage
             int RowId = VoucherCache.GetDocumentRowId(corasauMaster);
             if (RowId == 0)
             {
+                voucherClient = null;
                 NoVoucherLoadMessage();
                 return;
             }
@@ -121,12 +122,17 @@ namespace UnicontaClient.Pages.CustomPage
                             VoucherCache.SetGlobalVoucherCache(voucherClient);
                     }
                 }
+
                 if (voucherClient._Data == null)
                 {
                     busyIndicator.IsBusy = true;
-                    await api.Read(voucherClient);
-                    if (voucherClient._Data != null)
-                        VoucherCache.SetGlobalVoucherCache(voucherClient);
+                    var result = await UtilDisplay.GetData(voucherClient, api);
+                    if (result != 0)
+                    {
+                        busyIndicator.IsBusy = false;
+                        UtilDisplay.ShowErrorCode(result);
+                        return;
+                    }
                 }
 
                 this.documentViewer.Children.Clear();
@@ -160,7 +166,7 @@ namespace UnicontaClient.Pages.CustomPage
                 else
                 {
                     busyIndicator.IsBusy = false;
-                    this.documentViewer.Children.Add(UtilDisplay.LoadControl(voucherClient.Buffer, voucherClient._Fileextension, false, setFocus));
+                    this.documentViewer.Children.Add(UtilDisplay.LoadControl(voucherClient, false, setFocus));
                 }
             }
             catch (Exception ex)
@@ -186,8 +192,20 @@ namespace UnicontaClient.Pages.CustomPage
             this.voucherClient = vc;
             if (vc != null)
             {
-                metaInfoCtrl.SetlValues(vc._Text, vc.Created.ToString("g"), vc._Fileextension.ToString(), vc._UserName, vc.Content, vc.PostingInstruction, vc.Approver1, vc.Approver2);
+                metaInfoCtrl.ContentInfo = vc.Content;
+                metaInfoCtrl.Comment = vc._Text;
+                metaInfoCtrl.PostingNote = vc.PostingInstruction;
+                var approver1Name = !string.IsNullOrEmpty(vc.Approver1Name) ? string.Format("{0} ({1})", vc.Approver1Name, vc.Approver1) : vc.Approver1;
+                var approver1 = vc.Approved1Date != DateTime.MinValue ? string.Concat(approver1Name, " ", vc.Approved1Date) : approver1Name;
+                metaInfoCtrl.Approver1 = approver1;
+                var approver2Name = !string.IsNullOrEmpty(vc.Approver2Name) ? string.Format("{0} ({1})", vc.Approver2Name, vc.Approver2) : vc.Approver2;
+                var approver2 = vc.Approved2Date != DateTime.MinValue ? string.Concat(approver2Name, " ", vc.Approved2Date) : approver2Name;
+                metaInfoCtrl.Approver2 = approver2;
+                metaInfoCtrl.CreateDateNUser = string.Concat(vc.Created.ToString("g"), " ", string.Format(Uniconta.ClientTools.Localization.lookup("ByUserOBJ"), vc._UserName));
+                metaInfoCtrl.DocumentType = vc._Fileextension.ToString();
+                metaInfoCtrl.UniqueId = vc.RowId;
                 metaInfoCtrl.Visibility = Visibility.Visible;
+                metaInfoCtrl.NotifyPropertyChange();
             }
         }
 
@@ -247,18 +265,9 @@ namespace UnicontaClient.Pages.CustomPage
                 if (vClient._Data != null)
                     VoucherCache.SetGlobalVoucherCache(vClient);
                 else
-                {
-                    var cacheClient = VoucherCache.GetGlobalVoucherCache(vClient.CompanyId, vClient.RowId);
-                    if (cacheClient != null)
-                        vClient = cacheClient;
-                    else
-                    {
-                        await api.Read(vClient);
-                        if (vClient._Data != null)
-                            VoucherCache.SetGlobalVoucherCache(vClient);
-                    }
-                }
-                this.documentViewer.Children.Add(UtilDisplay.LoadControl(vClient.Buffer, vClient._Fileextension, false, setFocus));
+                    await UtilDisplay.GetData(vClient, api);
+
+                this.documentViewer.Children.Add(UtilDisplay.LoadControl(vClient, false, setFocus));
             }
             catch (Exception ex)
             {

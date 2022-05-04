@@ -73,13 +73,14 @@ namespace UnicontaClient.Pages.CustomPage
             accountantItem.ButtonClicked += AcItem_ButtonClicked;
             txtCompanyRegNo.EditValueChanged += TxtCVR_EditValueChanged;
             var country = Comp._CountryId;
+
             if (country != CountryCode.Denmark &&
                 country != CountryCode.Greenland &&
                 country != CountryCode.FaroeIslands &&
                 country != CountryCode.Norway)
                 liPymtCodeOpt.Visibility = Visibility.Collapsed;
 
-            if (country != CountryCode.Denmark && country != CountryCode.FaroeIslands && country != CountryCode.Greenland)
+            if (!Enum.IsDefined(typeof(PeppolSupportedCountries), (byte)country))
             {
                 liPymtCodeOpt.Visibility = Visibility.Collapsed;
                 liOIOUBLSendOnServer.Visibility = Visibility.Collapsed;
@@ -133,23 +134,15 @@ namespace UnicontaClient.Pages.CustomPage
                         if (address != null)
                         {
                             onlyRunOnce = true;
-                            if (editrow._Address1 == null)
-                            {
-                                editrow.Address1 = address.CompleteStreet;
-                                editrow.Address2 = address.ZipCity;
-                                editrow.Country = address.Country;
-                            }
-                            else
+                            if (editrow._Address1 != null)
                             {
                                 var result = UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("UpdateAddress"), Uniconta.ClientTools.Localization.lookup("Information"), UnicontaMessageBox.YesNo);
                                 if (result != UnicontaMessageBox.Yes)
                                     return;
-                                {
-                                    editrow.Address1 = address.CompleteStreet;
-                                    editrow.Address2 = address.ZipCity;
-                                    editrow.Country = address.Country;
-                                }
                             }
+                            editrow.Address1 = address.CompleteStreet;
+                            editrow.Address2 = address.ZipCity;
+                            editrow.Country = address.Country;
                         }
 
                         if (string.IsNullOrWhiteSpace(editrow._Name))
@@ -306,7 +299,7 @@ namespace UnicontaClient.Pages.CustomPage
                 UtilDisplay.ShowErrorCode(result);
             else
             {
-                dockCtrl.CloseDockItem();
+                CloseDockItem();
                 UnicontaMessageBox.Show(string.Format("{0}. {1}", Uniconta.ClientTools.Localization.lookup(message), api.CompanyEntity._Name),
                     Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OK);
             }
@@ -338,7 +331,7 @@ namespace UnicontaClient.Pages.CustomPage
                         else
                             globalEvents.OnRefresh(TabControls.CreateCompany, companiesTemp.FirstOrDefault());
 
-                        dockCtrl.CloseAllDocuments(true);
+                        dockCtrl?.CloseAllDocuments(true);
                     }
                 }
             };
@@ -350,7 +343,6 @@ namespace UnicontaClient.Pages.CustomPage
             EraseYearWindow EraseYearWindowDialog = new EraseYearWindow(editrow.CompanyName, false);
             EraseYearWindowDialog.Closed += delegate
             {
-
                 if (EraseYearWindowDialog.DialogResult == true)
                 {
                     EnterPasswordWindow passwordConfirmationDailog = new EnterPasswordWindow();
@@ -358,13 +350,21 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         if (passwordConfirmationDailog.DialogResult == true)
                         {
-                            CompanyAPI compApi = new CompanyAPI(api);
-                            var res = await compApi.EraseAllTransactions(passwordConfirmationDailog.Password);
-                            if (res != ErrorCodes.Succes)
-                                UtilDisplay.ShowErrorCode(res);
-                            else
+                            if (UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("ConfirmDeleteTrans"), editrow.CompanyName), Uniconta.ClientTools.Localization.lookup("Confirmation"),
+#if !SILVERLIGHT
+                        MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+#else
+                        MessageBoxButton.OKCancel) == MessageBoxResult.OK)
+#endif
                             {
-                                UtilDisplay.ShowErrorCode(res);
+                                CompanyAPI compApi = new CompanyAPI(api);
+                                var res = await compApi.EraseAllTransactions(passwordConfirmationDailog.Password);
+                                if (res != ErrorCodes.Succes)
+                                    UtilDisplay.ShowErrorCode(res);
+                                else
+                                {
+                                    UtilDisplay.ShowErrorCode(res);
+                                }
                             }
                         }
                     };
@@ -373,7 +373,6 @@ namespace UnicontaClient.Pages.CustomPage
                 }
             };
             EraseYearWindowDialog.Show();
-
         }
 
         async void save()

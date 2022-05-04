@@ -37,6 +37,9 @@ x:Class="UnicontaClient.Pages.CustomPage.InvItemDetailControl"
                     <CorasauControls:CorasauLayoutItem FieldName="URL" x:Name="liURL" Style="{StaticResource LayoutItemsstyle}" ButtonContent="&#x1f441;" ButtonClicked="liURL_ButtonClicked">
                         <CorasauControls:IntegerEditor Text="{Binding URL}" IsReadOnly="True" />
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="InvoiceAttachment" x:Name="liInvoiceAttachment" Style="{StaticResource LayoutItemsstyle}" ButtonContent="&#x1f441;" ButtonClicked="liInvoiceAttachment_ButtonClicked">
+                        <CorasauControls:IntegerEditor Text="{Binding InvoiceAttachment}" IsReadOnly="True" />
+                    </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
 
                 <CorasauControls:CorasauLayoutGroup View="GroupBox" Width="400" x:Name="grpPrices" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Prices}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
@@ -185,25 +188,15 @@ x:Class="UnicontaClient.Pages.CustomPage.InvItemDetailControl"
                 </CorasauControls:CorasauLayoutGroup>
 
                 <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpSize" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Size}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-
-                    <CorasauControls:CorasauLayoutItem FieldName="Weight" x:Name="liWeight">
-                        <StackPanel Orientation="Horizontal">
-                            <CorasauControls:DoubleEditor Text="{Binding Weight, Mode=OneWay}" IsReadOnly="True" Mask="n3" MaskType="Numeric" MaskUseAsDisplayFormat="True" BindningIsSet="True"/>
-                        </StackPanel>
+                    <CorasauControls:CorasauLayoutItem FieldName="Weight" x:Name="liWeigt">
+                        <CorasauControls:DoubleEditor FieldName="Weight" ApplyMask="false" IsReadOnly="True" />
                     </CorasauControls:CorasauLayoutItem>
-
                     <CorasauControls:CorasauLayoutItem FieldName="Volume" x:Name="liVolume">
-                        <StackPanel Orientation="Horizontal">
-                            <CorasauControls:DoubleEditor FieldName="Volume" IsReadOnly="True"/>
-                        </StackPanel>
+                        <CorasauControls:DoubleEditor FieldName="Volume" ApplyMask="false" IsReadOnly="True" />
                     </CorasauControls:CorasauLayoutItem>
-
                     <CorasauControls:CorasauLayoutItem FieldName="Cartons" x:Name="liCartons">
-                        <StackPanel Orientation="Horizontal">
-                            <CorasauControls:DoubleEditor FieldName="Cartons" IsReadOnly="True"/>
-                        </StackPanel>
+                        <CorasauControls:DoubleEditor FieldName="Cartons"  ApplyMask="false" IsReadOnly="True"/>
                     </CorasauControls:CorasauLayoutItem>
-
                 </CorasauControls:CorasauLayoutGroup>
 
                 <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpBrand" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Brand}"  Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">

@@ -73,7 +73,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "OrderLine":
                     if (selectedItem == null)
                         return;
-                    var olheader = string.Format("{0}:{1},{2}", Uniconta.ClientTools.Localization.lookup("PurchaseLine"), selectedItem._OrderNumber, selectedItem.Name);
+                    var olheader = string.Format("{0}:{1},{2}", Uniconta.ClientTools.Localization.lookup("PurchaseLine"), selectedItem._OrderNumber, selectedItem._DCAccount);
                     AddDockItem(TabControls.CreditorOrderLines, dgJoinMultiPurchaseGrid.syncEntity, olheader);
                     break;
                 default:

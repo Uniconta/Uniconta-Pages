@@ -37,6 +37,18 @@ namespace UnicontaClient.Pages.CustomPage
     public partial class CreditorInvoiceLine : GridBasePage
     {
         private SynchronizeEntity syncEntity;
+
+        bool AddFilterAndSort;
+        DateTime filterDate;
+        protected override Filter[] DefaultFilters()
+        {
+            if (AddFilterAndSort)
+            {
+                Filter dateFilter = new Filter() { name = "Date", value = String.Format("{0:d}..", filterDate) };
+                return new Filter[] { dateFilter };
+            }
+            return base.DefaultFilters();
+        }
         public CreditorInvoiceLine(BaseAPI API)
             : base(API, string.Empty)
         {
@@ -74,8 +86,12 @@ namespace UnicontaClient.Pages.CustomPage
         {
             InitializeComponent();
             this.master = master;
+            AddFilterAndSort = (master == null);
             dgCrdInvLines.UpdateMaster(master);
             SetRibbonControl(localMenu, dgCrdInvLines);
+            filterDate = BasePage.GetFilterDate(api.CompanyEntity, master != null);
+            if (filterDate == DateTime.MinValue)
+                AddFilterAndSort = false;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgCrdInvLines.api = api;
             dgCrdInvLines.BusyIndicator = busyIndicator;
@@ -121,13 +137,21 @@ namespace UnicontaClient.Pages.CustomPage
             var company = api.CompanyEntity;
             if (!company.Location || !company.Warehouse)
                 Location.Visible = Location.ShowInColumnChooser = false;
+            else
+                Location.ShowInColumnChooser = true;
             if (!company.Warehouse)
                 Warehouse.Visible = Warehouse.ShowInColumnChooser = false;
+            else
+                Warehouse.ShowInColumnChooser = true;
             if (!company.Project)
-                Project.Visible = Project.ShowInColumnChooser = false;
+                Project.Visible = Project.ShowInColumnChooser = WorkSpace.ShowInColumnChooser= WorkSpace.Visible=
+                    PrCategory.Visible= PrCategory.ShowInColumnChooser= false;
+            else
+                Project.ShowInColumnChooser = true;
             if (!company.ProjectTask)
                 Task.Visible = Task.ShowInColumnChooser = false;
-
+            else
+                Task.ShowInColumnChooser = true;
             if (this.master != null)
                 colAccount.Visible = AccountName.Visible = false;
 
@@ -155,18 +179,35 @@ namespace UnicontaClient.Pages.CustomPage
                 case "ChangeStorage":
                     if (selectedItem == null)
                         return;
-                    var cwchangeStorage = new CWModiyStorage(api, selectedItem);
-                    cwchangeStorage.Closing += delegate
+                    var cwchangeStorage = new CWModiyStorage(api);
+                    cwchangeStorage.Closing += async delegate
                     {
                         if (cwchangeStorage.DialogResult == true)
-                            gridRibbon_BaseActions("RefreshGrid");
+                        {
+                            var newWarehouse = cwchangeStorage.Warehouse;
+                            var newLocation = cwchangeStorage.Location;
+                            var tranApi = new Uniconta.API.Inventory.TransactionsAPI(api);
+                            ErrorCodes result;
+                            if (cwchangeStorage.AllLines)
+                            {
+                                var visibleItems = dgCrdInvLines.VisibleItems.Cast<InvTransClient>();
+                                result = await tranApi.ChangeStorage(visibleItems, newWarehouse, newLocation);
+                            }
+                            else
+                                result = await tranApi.ChangeStorage(selectedItem, newWarehouse, newLocation);
+
+                            if (result == ErrorCodes.Succes)
+                                gridRibbon_BaseActions("RefreshGrid");
+                            else
+                                UtilDisplay.ShowErrorCode(result);
+                        }
                     };
                     cwchangeStorage.Show();
                     break;
                 case "SeriesBatch":
                     if (selectedItem == null)
                         return;
-                    AddDockItem(TabControls.InvSeriesBatch, selectedItem, string.Format("{0}:{1}", Localization.lookup("SerialBatchNumbers"), selectedItem._InvoiceRowId));
+                    AddDockItem(TabControls.InvSeriesBatch, selectedItem, string.Format("{0}: {1}", Localization.lookup("SerialBatchNumbers"), selectedItem._Item));
                     break;
                 case "PostedBy":
                     if (selectedItem != null)

@@ -46,11 +46,10 @@ namespace UnicontaClient.Pages.CustomPage
         {
             InitializeComponent();
             ribbonControl = frmRibbon;
-            BusyIndicator = busyIndicator;
             layoutControl = layoutItems;
             layoutItems.DataContext = editrow;
             cmbDelCountry.ItemsSource = Enum.GetValues(typeof(Uniconta.Common.CountryCode));
-            leDeliveryTerm.api = lePayment.api = leShipment.api = leInstallation.api = leOrderGroup.api = api;
+            leDeliveryTerm.api = lePayment.api = leShipment.api = leInstallation.api = leOrderGroup.api = leEmployee.api = api;
             frmRibbon.OnItemClicked += FrmRibbon_OnItemClicked;
         }
 

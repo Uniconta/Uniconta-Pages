@@ -25,6 +25,7 @@ using System.Threading.Tasks;
 using Uniconta.API.Service;
 using System.Windows.Data;
 using DevExpress.Data.Filtering;
+using Uniconta.Common.Utility;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -51,13 +52,19 @@ namespace UnicontaClient.Pages.CustomPage
         {
             this.cred = cred ?? new Uniconta.DataModel.Creditor();
         }
-        Uniconta.DataModel.Creditor cred;
+        public readonly Uniconta.DataModel.Creditor cred;
 
         [Display(Name = "CAccount", ResourceType = typeof(GLTableText))]
-        public string AccountNumber { get { return cred._Account; } }
+        public string Account { get { return cred._Account; } }
 
         [Display(Name = "Name", ResourceType = typeof(GLTableText))]
         public string Name { get { return cred._Name; } }
+
+        [Display(Name = "Address1", ResourceType = typeof(DCAccountText))]
+        public string Address1 { get { return cred._Address1; } }
+
+        [Display(Name = "City", ResourceType = typeof(DCAccountText))]
+        public string City { get { return cred._City; } }
 
         public CreditorTransClientTotal[] ChildRecords { get; set; }
 
@@ -70,8 +77,7 @@ namespace UnicontaClient.Pages.CustomPage
 
     public class CreditorTransClientTotal : CreditorTransClient
     {
-        public double _SumAmount;
-        public double _SumAmountCur;
+        public double _SumAmount, _SumAmountCur, _OverDue, _OverDueCur;
 
         [Display(Name = "Total", ResourceType = typeof(GLDailyJournalText))]
         public double SumAmount { get { return _SumAmount; } }
@@ -86,9 +92,17 @@ namespace UnicontaClient.Pages.CustomPage
         [NoSQL]
         public double AmountOpen { get { return _AmountOpen; } }
 
+        [Display(Name = "OverDue", ResourceType = typeof(DCTransText))]
+        [NoSQL]
+        public double OverDue { get { return _OverDue; } }
+
         [Display(Name = "RemainingCur", ResourceType = typeof(DCTransText))]
         [NoSQL]
         public double AmountOpenCur { get { return _AmountOpenCur; } }
+
+        [Display(Name = "OverDueCur", ResourceType = typeof(DCTransText))]
+        [NoSQL]
+        public double OverDueCur { get { return _OverDueCur; } }
     }
 
     public partial class CreditorStatement : GridBasePage
@@ -101,16 +115,15 @@ namespace UnicontaClient.Pages.CustomPage
 
         SQLCache accountCache;
         ItemBase ibase, ibaseCurrent;
-        List<CreditorStatementList> statementList;
 
         static public DateTime DefaultFromDate, DefaultToDate;
         static bool IsCollapsed = true;
-
+        static int transaction;
         CWServerFilter creditorFilterDialog = null;
         bool creditorFilterCleared;
         TableField[] CreditorUserFields { get; set; }
         IEnumerable<PropValuePair> creditorFilterValues;
-
+        bool OnlyOpen, OnlyDue = false;
         public static void SetDateTime(DateEditor frmDateeditor, DateEditor todateeditor)
         {
             if (frmDateeditor.Text == string.Empty)
@@ -177,7 +190,6 @@ namespace UnicontaClient.Pages.CustomPage
             cmbFromAccount.api = cmbToAccount.api = api;
             SetRibbonControl(localMenu, dgCreditorTrans);
             localMenu.OnItemClicked += LocalMenu_OnItemClicked;
-            statementList = new List<CreditorStatementList>();
 
             if (CreditorStatement.DefaultFromDate == DateTime.MinValue)
             {
@@ -189,11 +201,11 @@ namespace UnicontaClient.Pages.CustomPage
             var Pref = api.session.Preference;
             cbxAscending.IsChecked = Pref.Debtor_isAscending;
             cbxSkipBlank.IsChecked = Pref.Debtor_skipBlank;
-            cbxOnlyOpen.IsChecked = Pref.Debtor_OnlyOpen;
 
             txtDateTo.DateTime = CreditorStatement.DefaultToDate;
             txtDateFrm.DateTime = CreditorStatement.DefaultFromDate;
-
+            cmbTrasaction.ItemsSource = AppEnums.TransToShow.Values;
+            cmbTrasaction.SelectedIndex = transaction;
             GetMenuItem();
 
             var Comp = api.CompanyEntity;
@@ -211,9 +223,6 @@ namespace UnicontaClient.Pages.CustomPage
             dgCreditorTrans.SelectedItemChanged += DgCreditorTrans_SelectedItemChanged;
             dgCreditorTrans.MasterRowExpanded += DgCreditorTrans_MasterRowExpanded;
             dgCreditorTrans.MasterRowCollapsed += DgCreditorTrans_MasterRowCollapsed;
-#if SILVERLIGHT
-            dgChildCreditorTrans.CurrentItemChanged += ChildDgCreditorTrans_CurrentItemChanged;
-#endif
         }
 
         private void DgCreditorTrans_MasterRowCollapsed(object sender, RowEventArgs e)
@@ -228,13 +237,8 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void DgCreditorTrans_SelectedItemChanged(object sender, SelectedItemChangedEventArgs e)
         {
-#if SILVERLIGHT
-            if(dgCreditorTrans.SelectedItem==null || dgCreditorTrans.Visibility == Visibility.Collapsed)
-#else
             if (dgCreditorTrans.SelectedItem == null || !dgCreditorTrans.IsVisible)
-#endif
                 return;
-
             SetExpandAndCollapseCurrent(false, false);
         }
 
@@ -259,11 +263,9 @@ namespace UnicontaClient.Pages.CustomPage
             return detail == null ? null : detail.View as TableView;
         }
 
-#if !SILVERLIGHT
-
         void SubstituteFilter(object sender, DevExpress.Data.SubstituteFilterEventArgs e)
         {
-            if (string.IsNullOrEmpty(ribbonControl.SearchControl.SearchText))
+            if (string.IsNullOrEmpty(ribbonControl?.SearchControl?.SearchText))
                 return;
             e.Filter = new GroupOperator(GroupOperatorType.Or, e.Filter, GetDetailFilter(ribbonControl.SearchControl.SearchText));
         }
@@ -283,7 +285,7 @@ namespace UnicontaClient.Pages.CustomPage
                 detailOperator.Operands.Add(new FunctionOperator(FunctionOperatorType.Contains, op, new OperandValue(searchString)));
             return new AggregateOperand("ChildRecords", Aggregate.Exists, detailOperator);
         }
-#endif
+
         public override Task InitQuery()
         {
             return null;
@@ -330,15 +332,15 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         DebtorTransactions.ShowVoucher(dgChildCreditorTrans.syncEntity, api, busyIndicator);
                     break;
-                case "ViewTransactions":
-                    var item = dgChildCreditorTrans.SelectedItem as CreditorTransClientTotal;
-                    if (item != null)
-                        AddDockItem(TabControls.AccountsTransaction, item, string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("CreditorTransactions"), item._Account));
+                case "OpenTran":
+                    var dc = (dgChildCreditorTrans.SelectedItem as CreditorTransClientTotal)?.Creditor ?? (dgCreditorTrans.SelectedItem as CreditorStatementList)?.cred;
+                    if (dc != null)
+                        AddDockItem(TabControls.CreditorOpenTransactions, dc, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("OpenTrans"), dc._Account));
                     break;
                 case "VoucherTransactions":
                     var selItem = dgChildCreditorTrans.SelectedItem as CreditorTransClientTotal;
                     if (selItem != null)
-                        AddDockItem(TabControls.AccountsTransaction, dgChildCreditorTrans.syncEntity, string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("VoucherTransactions"), selItem._Voucher));
+                        AddDockItem(TabControls.AccountsTransaction, dgChildCreditorTrans.syncEntity, Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("VoucherTransactions"), selItem._Voucher));
                     break;
                 case "CreditorFilter":
                     if (creditorFilterDialog == null)
@@ -348,15 +350,10 @@ namespace UnicontaClient.Pages.CustomPage
                         else
                             creditorFilterDialog = new CWServerFilter(api, typeof(CreditorClient), null, null, CreditorUserFields);
                         creditorFilterDialog.Closing += creditorFilterDialog_Closing;
-#if !SILVERLIGHT
                         creditorFilterDialog.Show();
                     }
                     else
                         creditorFilterDialog.Show(true);
-#elif SILVERLIGHT
-                    }
-                    creditorFilterDialog.Show();
-#endif
                     break;
                 case "ClearCreditorFilter":
                     creditorFilterDialog = null;
@@ -368,6 +365,9 @@ namespace UnicontaClient.Pages.CustomPage
                         SetExpandAndCollapseCurrent(true, false);
                     else if (dgChildCreditorTrans.SelectedItem != null)
                         SetExpandAndCollapseCurrent(true, true);
+                    break;
+                case "Search":
+                    LoadDCTrans();
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);
@@ -386,8 +386,8 @@ namespace UnicontaClient.Pages.CustomPage
             if (!IsChild)
             {
                 var selectedRowHandle = dgCreditorTrans.GetSelectedRowHandles();
-                selectedMasterRowhandle = selectedRowHandle.FirstOrDefault();
-                expandState = dgCreditorTrans.IsMasterRowExpanded(selectedRowHandle.FirstOrDefault());
+                selectedMasterRowhandle = selectedRowHandle.Length > 0 ? selectedRowHandle[0] : 0;
+                expandState = dgCreditorTrans.IsMasterRowExpanded(selectedMasterRowhandle);
             }
             else
                 selectedMasterRowhandle = ((TableView)dgCreditorTrans.View.MasterRootRowsContainer.FocusedView).Grid.GetMasterRowHandle();
@@ -446,20 +446,10 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 creditorFilterValues = creditorFilterDialog.PropValuePair;
             }
-#if !SILVERLIGHT
             e.Cancel = true;
             creditorFilterDialog.Hide();
-#endif
         }
 
-#if SILVERLIGHT
-        private void ChildDgCreditorTrans_CurrentItemChanged(object sender, CurrentItemChangedEventArgs e)
-        {
-            var detailsSelectedItem = e.NewItem as CreditorTransClientTotal;
-            dgChildCreditorTrans.SelectedItem = detailsSelectedItem;
-            dgChildCreditorTrans.syncEntity.Row = detailsSelectedItem;
-        }
-#endif
         private void btnSerach_Click(object sender, RoutedEventArgs e)
         {
             LoadDCTrans();
@@ -491,8 +481,6 @@ namespace UnicontaClient.Pages.CustomPage
 
         void ExpandAndCollapseAll(bool IsCollapseAll)
         {
-            int dataRowCount = statementList.Count;
-
             for (int iRow = 0; iRow < dataRowCount; iRow++)
                 if (!IsCollapseAll)
                     dgCreditorTrans.ExpandMasterRow(iRow);
@@ -500,98 +488,132 @@ namespace UnicontaClient.Pages.CustomPage
                     dgCreditorTrans.CollapseMasterRow(iRow);
         }
 
+        private void cmbTrasaction_SelectedIndexChanged(object sender, RoutedEventArgs e)
+        {
+            if (cmbTrasaction.SelectedIndex == 0)
+                OnlyOpen = OnlyDue = false;
+            else if (cmbTrasaction.SelectedIndex == 1)
+            {
+                OnlyOpen = true;
+                OnlyDue = false;
+            }
+            else if (cmbTrasaction.SelectedIndex == 2)
+                OnlyOpen = OnlyDue = true;
+        }
+
         async void LoadDCTrans()
         {
             SetExpandAndCollapse(true);
-            statementList.Clear();
 
             CreditorStatement.SetDateTime(txtDateFrm, txtDateTo);
             DateTime fromDate = CreditorStatement.DefaultFromDate, toDate = CreditorStatement.DefaultToDate;
-            var isAscending = cbxAscending.IsChecked.Value;
-            var skipBlank = cbxSkipBlank.IsChecked.Value;
-            var OnlyOpen = cbxOnlyOpen.IsChecked.Value;
-
-            var Pref = api.session.Preference;
-            Pref.Debtor_isAscending = isAscending;
-            Pref.Debtor_skipBlank = skipBlank;
-            Pref.Debtor_OnlyOpen = OnlyOpen;
+            transaction = cmbTrasaction.SelectedIndex;
 
             var fromAccount = Convert.ToString(cmbFromAccount.EditValue);
             var toAccount = Convert.ToString(cmbToAccount.EditValue);
 
             busyIndicator.IsBusy = true;
             var transApi = new ReportAPI(api);
-            var listTrans = (CreditorTransClientTotal[])await transApi.GetTransWithPrimo(new CreditorTransClientTotal(), fromDate, toDate, fromAccount, toAccount, OnlyOpen, PropWhere: creditorFilterValues);
+            var listTrans = (CreditorTransClientTotal[])await transApi.GetTransWithPrimo(new CreditorTransClientTotal(), fromDate, toDate, fromAccount, toAccount, OnlyOpen, null, creditorFilterValues, OnlyDue);
             if (listTrans != null)
             {
                 if (accountCache == null)
                     accountCache = await api.LoadCache(typeof(Uniconta.DataModel.Creditor));
 
-                string currentItem = string.Empty;
-                CreditorStatementList masterCredStatement = null;
-                List<CreditorTransClientTotal> credTransClientChildList = new List<CreditorTransClientTotal>(100);
-                double SumAmount = 0d, SumAmountCur = 0d;
-
-                foreach (var trans in listTrans)
-                {
-                    if (trans._Account != currentItem)
-                    {
-                        currentItem = trans._Account;
-
-                        if (masterCredStatement != null)
-                        {
-                            if (!skipBlank || SumAmount != 0 || credTransClientChildList.Count > 1)
-                            {
-                                statementList.Add(masterCredStatement);
-                                masterCredStatement.ChildRecords = credTransClientChildList.ToArray();
-                                if (!isAscending)
-                                    masterCredStatement.ChildRecords.Reverse();
-                            }
-                        }
-
-                        masterCredStatement = new CreditorStatementList((Uniconta.DataModel.Creditor)accountCache.Get(currentItem));
-                        credTransClientChildList.Clear();
-                        SumAmount = SumAmountCur = 0d;
-                        if (trans._Text == null && trans._Primo)
-                            trans._Text = Uniconta.ClientTools.Localization.lookup("Primo");
-                    }
-                    SumAmount += OnlyOpen ? trans._AmountOpen : trans._Amount;
-                    trans._SumAmount = SumAmount;
-                    masterCredStatement._SumAmount = SumAmount;
-
-                    SumAmountCur += OnlyOpen ? trans._AmountOpenCur : trans._AmountCur;
-                    trans._SumAmountCur = SumAmountCur;
-                    masterCredStatement._SumAccountCur = SumAmountCur;
-
-                    credTransClientChildList.Add(trans);
-                }
-
-                if (masterCredStatement != null)
-                {
-                    if (!skipBlank || SumAmount != 0 || credTransClientChildList.Count > 1)
-                    {
-                        statementList.Add(masterCredStatement);
-                        masterCredStatement.ChildRecords = credTransClientChildList.ToArray();
-                        if (!isAscending)
-                            masterCredStatement.ChildRecords.Reverse();
-                    }
-                }
-
-                if (statementList.Count > 0)
-                {
-                    dgCreditorTrans.ItemsSource = null;
-                    dgCreditorTrans.ItemsSource = statementList;
-                }
-                dgCreditorTrans.Visibility = Visibility.Visible;
-                busyIndicator.IsBusy = false;
+                FillStatement(listTrans, OnlyOpen, toDate);
             }
+            else if (transApi.LastError != 0)
+            {
+                busyIndicator.IsBusy = false;
+                UtilDisplay.ShowErrorCode(transApi.LastError);
+            }
+
+            dgCreditorTrans.Visibility = Visibility.Visible;
+            busyIndicator.IsBusy = false;
 
             if (_master != null)
                 SetExpandAndCollapse(false);
             else
                 SetExpandAndCollapse(IsCollapsed);
         }
-#if !SILVERLIGHT
+
+        void FillStatement(CreditorTransClientTotal[] listTrans, bool OnlyOpen, DateTime toDate)
+        {
+            var isAscending = cbxAscending.IsChecked.Value;
+            var skipBlank = cbxSkipBlank.IsChecked.Value;
+
+            var Pref = api.session.Preference;
+            Pref.Debtor_isAscending = isAscending;
+            Pref.Debtor_skipBlank = skipBlank;
+            Pref.Debtor_OnlyOpen = OnlyOpen;
+
+            var statementList = new List<CreditorStatementList>(Math.Min(20, dataRowCount));
+
+            string currentItem = string.Empty;
+            CreditorStatementList masterCredStatement = null;
+            var tlst = new List<CreditorTransClientTotal>(100);
+            double SumAmount = 0d, SumAmountCur = 0d;
+
+            for (int n = 0; (n < listTrans.Length); n++)
+            {
+                var trans = listTrans[n];
+                if (trans._Account != currentItem)
+                {
+                    currentItem = trans._Account;
+
+                    if (masterCredStatement != null)
+                    {
+                        if (!skipBlank || SumAmount != 0 || tlst.Count > 1)
+                        {
+                            statementList.Add(masterCredStatement);
+                            masterCredStatement.ChildRecords = tlst.ToArray();
+                            if (!isAscending)
+                                Array.Reverse(masterCredStatement.ChildRecords);
+                        }
+                    }
+
+                    masterCredStatement = new CreditorStatementList((Uniconta.DataModel.Creditor)accountCache.Get(currentItem));
+                    tlst.Clear();
+                    SumAmount = SumAmountCur = 0d;
+                    if (trans._Text == null && trans._Primo)
+                        trans._Text = Uniconta.ClientTools.Localization.lookup("Primo");
+                }
+                SumAmount += OnlyOpen ? trans._AmountOpen : trans._Amount;
+                trans._SumAmount = SumAmount;
+                masterCredStatement._SumAmount = SumAmount;
+
+                SumAmountCur += OnlyOpen ? trans._AmountOpenCur : trans._AmountCur;
+                trans._SumAmountCur = SumAmountCur;
+                masterCredStatement._SumAccountCur = SumAmountCur;
+
+                if (trans._DueDate <= toDate)
+                {
+                    trans._OverDue = trans._AmountOpen;
+                    trans._OverDueCur = trans._AmountOpenCur;
+                }
+
+                tlst.Add(trans);
+            }
+
+            if (masterCredStatement != null)
+            {
+                if (!skipBlank || SumAmount != 0 || tlst.Count > 1)
+                {
+                    statementList.Add(masterCredStatement);
+                    masterCredStatement.ChildRecords = tlst.ToArray();
+                    if (!isAscending)
+                        Array.Reverse(masterCredStatement.ChildRecords);
+                }
+            }
+
+            dataRowCount = statementList.Count;
+            if (dataRowCount > 0)
+            {
+                dgCreditorTrans.ItemsSource = null;
+                dgCreditorTrans.ItemsSource = statementList;
+            }
+        }
+
         private void cbxPageBreak_Click(object sender, RoutedEventArgs e)
         {
             var tableView = (CustomTableView)dgCreditorTrans.View;
@@ -600,18 +622,17 @@ namespace UnicontaClient.Pages.CustomPage
             else
                 tableView.HasPageBreak = false;
         }
-#endif
 
         private void cmbFromAccount_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
         {
             cmbToAccount.SelectedItem = cmbFromAccount.SelectedItem;
         }
 
+        int dataRowCount;
         public override object GetPrintParameter()
         {
             if (!manualExpanded)
             {
-                int dataRowCount = statementList.Count;
                 for (int rowHandle = 0; rowHandle < dataRowCount; rowHandle++)
                     dgCreditorTrans.ExpandMasterRow(rowHandle);
             }

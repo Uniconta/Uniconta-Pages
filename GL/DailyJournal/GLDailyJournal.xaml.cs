@@ -27,6 +27,7 @@ using System.Windows;
 using System.Text;
 using System.Text.RegularExpressions;
 using Uniconta.Common.Utility;
+using Localization = Uniconta.ClientTools.Localization;
 #if !SILVERLIGHT
 using Bilagscan;
 using System.Net.Http;
@@ -74,11 +75,9 @@ namespace UnicontaClient.Pages.CustomPage
 
         void RemoveMenuItem()
         {
-            RibbonBase rb = (RibbonBase)localMenu.DataContext;
             var Comp = api.CompanyEntity;
-
             if (Comp._CountryId != CountryCode.Denmark && Comp._CountryId != CountryCode.Iceland && Comp._CountryId != CountryCode.Netherlands && Comp._CountryId != CountryCode.Austria)
-                UtilDisplay.RemoveMenuCommand(rb, "BilagscanReadVouchers");
+                UtilDisplay.RemoveMenuCommand((RibbonBase)localMenu.DataContext, "BilagscanReadVouchers");
         }
 
         void dgGldailyJournal_RowDoubleClick()
@@ -90,7 +89,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override void LoadCacheInBackGround()
         {
-            var lst = new List<Type>(12) { typeof(Uniconta.DataModel.GLAccount), typeof(Uniconta.DataModel.GLVat), typeof(Uniconta.DataModel.Debtor), typeof(Uniconta.DataModel.Creditor), typeof(Uniconta.DataModel.PaymentTerm), typeof(Uniconta.DataModel.GLTransType), typeof(Uniconta.DataModel.NumberSerie) };
+            var lst = new List<Type>(15) { typeof(Uniconta.DataModel.GLAccount), typeof(Uniconta.DataModel.GLVat), typeof(Uniconta.DataModel.Debtor), typeof(Uniconta.DataModel.Creditor), typeof(Uniconta.DataModel.GLTransType), typeof(Uniconta.DataModel.NumberSerie), typeof(Uniconta.DataModel.PaymentTerm), typeof(Uniconta.DataModel.GLTransType), typeof(Uniconta.DataModel.GLChargeGroup), typeof(Uniconta.DataModel.PaymentTerm) };
             var noofDimensions = api.CompanyEntity.NumberOfDimensions;
             if (noofDimensions >= 1)
                 lst.Add(typeof(Uniconta.DataModel.GLDimType1));
@@ -102,6 +101,12 @@ namespace UnicontaClient.Pages.CustomPage
                 lst.Add(typeof(Uniconta.DataModel.GLDimType4));
             if (noofDimensions >= 5)
                 lst.Add(typeof(Uniconta.DataModel.GLDimType5));
+            if (api.CompanyEntity.Project)
+            {
+                lst.Add(typeof(Uniconta.DataModel.PrCategory));
+                lst.Add(typeof(Uniconta.DataModel.PrWorkSpace));
+                lst.Add(typeof(Uniconta.DataModel.Project));
+            }
             LoadType(lst);
         }
         public override void Utility_Refresh(string screenName, object argument = null)
@@ -116,32 +121,28 @@ namespace UnicontaClient.Pages.CustomPage
             switch (ActionType)
             {
                 case "AddRow":
-                    AddDockItem(TabControls.GLDailyJournalPage2, api, Uniconta.ClientTools.Localization.lookup("Posting"), "Add_16x16.png");
+                    AddDockItem(TabControls.GLDailyJournalPage2, api, Localization.lookup("Posting"), "Add_16x16.png");
                     break;
                 case "EditRow":
-                    if (selectedItem == null)
-                        return;
-                    AddDockItem(TabControls.GLDailyJournalPage2, selectedItem);
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.GLDailyJournalPage2, selectedItem);
                     break;
                 case "GLDailyJournalLine":
-                    if (selectedItem == null)
-                        return;
-                    AddDockItem(TabControls.GL_DailyJournalLine, selectedItem);
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.GL_DailyJournalLine, selectedItem);
                     break;
                 case "GLDailyJournalPosted":
-                    if (selectedItem == null)
-                        return;
-                    AddDockItem(TabControls.PostedJournals, selectedItem);
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.PostedJournals, selectedItem);
                     break;
                 case "MatchVoucherToJournalLines":
-                    if (selectedItem == null)
-                        return;
-                    AddDockItem(TabControls.MatchPhysicalVoucherToGLDailyJournalLines, selectedItem);
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.MatchPhysicalVoucherToGLDailyJournalLines, selectedItem);
                     break;
                 case "DeleteAllJournalLines":
                     if (selectedItem == null)
                         return;
-                    var text = string.Format(Uniconta.ClientTools.Localization.lookup("JournalContainsLines"), selectedItem._Name);
+                    var text = string.Format(Localization.lookup("JournalContainsLines"), selectedItem._Name);
                     EraseYearWindow EraseYearWindowDialog = new EraseYearWindow(text, false);
                     EraseYearWindowDialog.Closed += async delegate
                     {
@@ -157,116 +158,135 @@ namespace UnicontaClient.Pages.CustomPage
                     EraseYearWindowDialog.Show();
                     break;
                 case "ImportBankStatement":
-                    if (selectedItem == null)
-                        return;
-                    AddDockItem(TabControls.ImportGLDailyJournal, selectedItem, string.Concat(string.Format(Uniconta.ClientTools.Localization.lookup("ImportOBJ"),
-                            Uniconta.ClientTools.Localization.lookup("BankStatement")), " : ", selectedItem._Journal), null, true);
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.ImportGLDailyJournal, selectedItem, string.Concat(string.Format(Localization.lookup("ImportOBJ"),
+                            Localization.lookup("BankStatement")), " : ", selectedItem._Journal), null, true);
                     break;
                 case "TransType":
-                    AddDockItem(TabControls.GLTransTypePage, null, Uniconta.ClientTools.Localization.lookup("TransTypes"));
+                    AddDockItem(TabControls.GLTransTypePage, null, Localization.lookup("TransTypes"));
                     break;
                 case "AppendTransType":
                     CWAppendEnumeratedLabel dialog = new CWAppendEnumeratedLabel(api);
                     dialog.Show();
                     break;
                 case "ImportData":
-                    if (selectedItem == null)
-                        return;
-                    OpenImportDataPage(selectedItem);
+                    if (selectedItem != null)
+                        OpenImportDataPage(selectedItem);
                     break;
                 case "GLOffSetAccountTemplate":
-                    AddDockItem(TabControls.GLOffsetAccountTemplate, null, Uniconta.ClientTools.Localization.lookup("OffsetAccountTemplates"));
+                    AddDockItem(TabControls.GLOffsetAccountTemplate, null, Localization.lookup("OffsetAccountTemplates"));
                     break;
                 case "AccountActivity":
-                    if (selectedItem == null) return;
-
-                    AddDockItem(TabControls.GLTransLogPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("GLTransLog"), selectedItem._Journal));
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.GLTransLogPage, selectedItem, string.Format("{0}: {1}", Localization.lookup("GLTransLog"), selectedItem._Journal));
                     break;
-
                 case "BilagscanReadVouchers":
                     ReadFromBilagscan(selectedItem);
                     break;
-
+                case "MoveJournalLines":
+                    if (selectedItem != null)
+                        MoveJournalLines(selectedItem);
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
         }
 
-        void OpenImportDataPage(GLDailyJournalClient selectedItem)
+        void MoveJournalLines(GLDailyJournalClient journal)
         {
-            var dailyJournals = new GLDailyJournalLineClient();
-            string header = selectedItem.Journal;
-            UnicontaBaseEntity[] baseEntityArray = new UnicontaBaseEntity[2] { dailyJournals, selectedItem };
-            object[] param = new object[2];
-            param[0] = baseEntityArray;
-            param[1] = header;
-            AddDockItem(TabControls.ImportPage, param, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Import"), header));
+            CwMoveJournalLines cwWin = new CwMoveJournalLines(api);
+            cwWin.Closed += async delegate
+            {
+                if (cwWin.DialogResult == true && cwWin.GLDailyJournal != null)
+                {
+                    busyIndicator.IsBusy = true;
+                    var result = await (new Uniconta.API.GeneralLedger.PostingAPI(api)).MoveJournalLines(journal, cwWin.GLDailyJournal);
+                    busyIndicator.IsBusy = false;
+                    UtilDisplay.ShowErrorCode(result);
+                    if (result == 0)
+                    {
+                        foreach (var lin in (IEnumerable<GLDailyJournalClient>)dgGldailyJournal.ItemsSource)
+                            if (lin.RowId == cwWin.GLDailyJournal.RowId)
+                            {
+                                lin.NumberOfLines = lin._NumberOfLines + journal._NumberOfLines;
+                                journal.NumberOfLines = 0;
+                                break;
+                            }
+                    }
+                }
+            };
+            cwWin.Show();
         }
 
-        private bool readingFromBilagscan = false;
-        private async void ReadFromBilagscan(UnicontaBaseEntity selectedItem)
+        void OpenImportDataPage(GLDailyJournalClient selectedItem)
         {
-#if !SILVERLIGHT
+            string header = selectedItem._Journal;
+            UnicontaBaseEntity[] baseEntityArray = new UnicontaBaseEntity[2] { new GLDailyJournalLineClient(), selectedItem };
+            AddDockItem(TabControls.ImportPage, new object[] { baseEntityArray, header }, string.Format("{0}: {1}", Localization.lookup("Import"), header));
+        }
 
-            if (!readingFromBilagscan)
+        bool readingFromBilagscan;
+        void ReadFromBilagscan(UnicontaBaseEntity selectedItem)
+        {
+            if (readingFromBilagscan)
+                UnicontaMessageBox.Show(Localization.lookup("UpdateInBackground"), Localization.lookup("Information"), MessageBoxButton.OK);
+            else
+                _ReadFromBilagscan(selectedItem);
+        }
+        async void _ReadFromBilagscan(UnicontaBaseEntity selectedItem)
+        {
+            var journal = dgGldailyJournal.SelectedItem as GLDailyJournalClient;
+            var noOfVouchers = 0;
+            try
             {
                 readingFromBilagscan = true;
 
-                bool processLines = false;
-                var accessToken = await Bilagscan.Account.GetBilagscanAccessToken(api);
-                var noOfVouchers = 0;
-                var companySettings = await api.Query<CompanySettingsClient>();
-                var orgNo = companySettings.FirstOrDefault()._OrgNumber;
-
-                var journal = dgGldailyJournal.SelectedItem as GLDailyJournalClient;
-
-              //  UnicontaBaseEntity[] baseEntityArray = new UnicontaBaseEntity[1] { selectedItem };
+                busyIndicator.IsBusy = true;
+                CompanySettingsClient companySettings = new CompanySettingsClient();
+                await api.Read(companySettings);
+                var orgNo = NumberConvert.ToStringNull(companySettings._OrgNumber);
+                if (orgNo == null)
+                {
+                    busyIndicator.IsBusy = false;
+                    UnicontaMessageBox.Show(string.Format(Localization.lookup("CannotBeBlank"), Localization.lookup("OrgNumber")), Localization.lookup("Paperflow"), MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                    return;
+                }
+                var accessToken = Bilagscan.Account.GetBilagscanAccessToken(api);
 
                 using (var client = new HttpClient())
                 {
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-                    var response = await client.GetAsync($"https://api.bilagscan.dk/v1/organizations/" + orgNo.ToString() + "/vouchers?seen=false&count=100&offset=0&sorts=-upload_date&status=successful");
+                    var response = await client.GetAsync($"https://api.bilagscan.dk/v1/organizations/" + orgNo + "/vouchers?seen=false&count=100&offset=0&sorts=-upload_date&status=successful");
                     var content = await response.Content.ReadAsStringAsync();
                     var vouchers = Bilagscan.Voucher.GetVouchers(content);
 
                     var credCache = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.Creditor)) ?? await api.CompanyEntity.LoadCache(typeof(Uniconta.DataModel.Creditor), api);
                     var offsetCache = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.GLAccount)) ?? await api.CompanyEntity.LoadCache(typeof(Uniconta.DataModel.GLAccount), api);
-                    var vouchersSeen = new CommaDelimitedStringCollection();
 
-                    var master = new List<UnicontaBaseEntity>
-                    {
-                        journal
-                    };
-
-                    var newLines = new List<UnicontaBaseEntity>();
-                    var updateCreditor = new List<UnicontaBaseEntity>();
-
-                    if (vouchers?.data != null)
+                    if (vouchers?.data != null && vouchers.data.Length > 0)
                     {
                         var creditors = credCache.GetKeyStrRecords as Uniconta.DataModel.Creditor[];
 
+                        var newLines = new List<GLDailyJournalLineClient>(vouchers.data.Length);
+                        var updateCreditor = new List<Uniconta.DataModel.Creditor>();
+
                         foreach (var voucher in vouchers.data)
                         {
-                            vouchersSeen.Add(NumberConvert.ToString(voucher.id));
-                            var journalLine = new GLDailyJournalLineClient()
-                            {
-                                Approved = false,
-                                ForceSettlement = false
-                            };
+                            var journalLine = new GLDailyJournalLineClient();
+                            journalLine.SetMaster(journal);
 
                             var postingType = BilagscanVoucherType.Invoice;
-
                             var hint = Bilagscan.Voucher.GetHint(voucher.note);
 
                             var bilagscanRefID = voucher.id;
-                            journalLine.ReferenceNumber = bilagscanRefID != 0 ? NumberConvert.ToString(bilagscanRefID) : null;
+                            journalLine._ReferenceNumber = bilagscanRefID != 0 ? NumberConvert.ToString(bilagscanRefID) : null;
 
-                            var bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "voucher_number", true) == 0).FirstOrDefault();
+                            var bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "voucher_number", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
                             if (bsItem != null)
-                                journalLine.Invoice = bsItem.value;
+                                journalLine._Invoice = bsItem.value;
 
-                            bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "voucher_type", true) == 0).FirstOrDefault();
+                            bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "voucher_type", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
                             if (bsItem != null)
                             {
                                 switch (bsItem.value)
@@ -278,11 +298,11 @@ namespace UnicontaClient.Pages.CustomPage
                             }
 
                             var creditorCVR = string.Empty;
-                            bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "company_vat_reg_no", true) == 0).FirstOrDefault();
+                            bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "company_vat_reg_no", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
                             if (bsItem != null)
                                 creditorCVR = bsItem.value;
 
-                            bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "total_amount_incl_vat", true) == 0).FirstOrDefault();
+                            bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "total_amount_incl_vat", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
                             if (bsItem != null)
                             {
                                 journalLine.Amount = Math.Abs(NumberConvert.ToDoubleNoThousandSeperator(bsItem.value));
@@ -292,7 +312,7 @@ namespace UnicontaClient.Pages.CustomPage
                             }
 
                             CountryCode countryCode = CountryCode.Denmark;
-                            bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "country", true) == 0).FirstOrDefault();
+                            bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "country", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
                             if (bsItem != null)
                             {
                                 CountryISOCode countryISO;
@@ -301,24 +321,18 @@ namespace UnicontaClient.Pages.CustomPage
                                     countryCode = (CountryCode)countryISO;
                             }
 
-                            bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "invoice_date", true) == 0).FirstOrDefault();
+                            bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "invoice_date", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
                             if (bsItem != null)
                             {
-                                var invoiceDate = bsItem.value == string.Empty ? DateTime.Today : StringSplit.DateParse(bsItem.value, DateFormat.ymd);
-                                journalLine.Date = invoiceDate;
-
-                                if (journalLine.Date == DateTime.MinValue)
-                                    journalLine.Date = DateTime.Today;
+                                var invoiceDate = bsItem.value == string.Empty ? DateTime.MinValue : StringSplit.DateParse(bsItem.value, DateFormat.ymd);
+                                journalLine._Date = invoiceDate != DateTime.MinValue ? invoiceDate : GetSystemDefaultDate();
                             }
 
-                            bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_date", true) == 0).FirstOrDefault();
+                            bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_date", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
                             if (bsItem != null)
-                            {
-                                var paymentDate = bsItem.value == string.Empty ? DateTime.MinValue : StringSplit.DateParse(bsItem.value, DateFormat.ymd);
-                                journalLine._DueDate = paymentDate;
-                            }
+                                journalLine._DueDate = bsItem.value == string.Empty ? DateTime.MinValue : StringSplit.DateParse(bsItem.value, DateFormat.ymd);
 
-                            bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "currency", true) == 0).FirstOrDefault();
+                            bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "currency", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
                             if (bsItem != null)
                             {
                                 Currencies currencyISO;
@@ -329,37 +343,37 @@ namespace UnicontaClient.Pages.CustomPage
                             }
 
                             string bbanAcc = null;
-                            bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_account_number", true) == 0).FirstOrDefault();
+                            bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_account_number", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
                             if (bsItem != null)
                                 bbanAcc = bsItem.value;
 
                             string bbanRegNum = null;
-                            bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_reg_number", true) == 0).FirstOrDefault();
+                            bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_reg_number", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
                             if (bsItem != null)
                                 bbanRegNum = bsItem.value;
 
                             string ibanNo = null;
-                            bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_iban", true) == 0).FirstOrDefault();
+                            bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_iban", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
                             if (bsItem != null)
                                 ibanNo = bsItem.value;
 
                             string swiftNo = null;
-                            bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_swift_bic", true) == 0).FirstOrDefault();
+                            bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_swift_bic", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
                             if (bsItem != null)
                                 swiftNo = bsItem.value;
 
                             string paymentCodeId = null;
-                            bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_code_id", true) == 0).FirstOrDefault();
+                            bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_code_id", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
                             if (bsItem != null)
                                 paymentCodeId = bsItem.value;
 
                             string paymentId = null;
-                            bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_id", true) == 0).FirstOrDefault();
+                            bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_id", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
                             if (bsItem != null)
                                 paymentId = bsItem.value;
 
                             string jointPaymentId = null;
-                            bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "joint_payment_id", true) == 0).FirstOrDefault();
+                            bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "joint_payment_id", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
                             if (bsItem != null)
                                 jointPaymentId = bsItem.value;
 
@@ -389,7 +403,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 journalLine._PaymentId = ibanNo;
                             }
 
-                            journalLine.SettleValue = "Voucher";
+                            journalLine._SettleValue = SettleValueType.Voucher;
 
                             Uniconta.DataModel.Creditor creditor = null;
 
@@ -412,13 +426,12 @@ namespace UnicontaClient.Pages.CustomPage
                             journalLine._AccountType = 2;
 
                             var creditorCVRNum = Regex.Replace(creditorCVR, "[^0-9]", string.Empty);
-
                             if (creditorCVRNum != string.Empty)
                                 creditor = creditors.Where(s => (Regex.Replace(s._LegalIdent ?? string.Empty, "[^0-9.]", "") == creditorCVRNum)).FirstOrDefault();
 
                             if (creditorCVRNum == string.Empty)
                             {
-                                journalLine.Text = Uniconta.ClientTools.Localization.lookup("NotValidVatNo");
+                                journalLine._Text = Localization.lookup("NotValidVatNo");
                             }
                             else if (creditor == null)
                             {
@@ -436,11 +449,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 {
                                     companyInformation = await CVR.CheckCountry(creditorCVR, countryCode);
                                 }
-                                catch (Exception ex)
-                                {
-                                    UnicontaMessageBox.Show(ex);
-                                    return;
-                                }
+                                catch { }
 
                                 if (companyInformation != null)
                                 {
@@ -449,7 +458,8 @@ namespace UnicontaClient.Pages.CustomPage
 
                                     if (companyInformation.address != null)
                                     {
-                                        newCreditor._Address1 = companyInformation.address.CompleteStreet;
+                                        newCreditor._Address1 = companyInformation.address.CompleteStreet;                                      
+                                        newCreditor._Address2 = companyInformation.address.street2;                                        
                                         newCreditor._ZipCode = companyInformation.address.zipcode;
                                         newCreditor._City = companyInformation.address.cityname;
                                         newCreditor._Country = companyInformation.address.Country;
@@ -465,33 +475,31 @@ namespace UnicontaClient.Pages.CustomPage
                                 }
                                 else
                                 {
-                                    newCreditor.Name = Uniconta.ClientTools.Localization.lookup("NotValidVatNo");
+                                    newCreditor.Name = Localization.lookup("NotValidVatNo");
                                 }
 
                                 await api.Insert(newCreditor);
-                                journalLine.Account = creditorCVR;
+                                journalLine._Account = creditorCVR;
                             }
                             else
                             {
-                                if (!string.IsNullOrEmpty(creditor._PostingAccount))
+                                if (creditor._PostingAccount != null)
                                 {
                                     var account = (GLAccountClient)offsetCache.Get(creditor._PostingAccount);
-                                    if (!string.IsNullOrEmpty(account.Vat))
+                                    if (account?._Vat != null)
                                     {
-                                        var dailyJournal = (GLDailyJournalClient)master[0];
-                                        if (dailyJournal.TwoVatCodes)
-                                            journalLine._OffsetVat = account.Vat;
+                                        if (journal._TwoVatCodes)
+                                            journalLine._OffsetVat = account._Vat;
                                         else
-                                            journalLine._Vat = account.Vat;
+                                            journalLine._Vat = account._Vat;
                                     }
 
                                     journalLine._OffsetAccount = creditor._PostingAccount;
                                 }
                                 else
                                 {
-                                    journalLine.Vat = creditor._Vat;
+                                    journalLine._Vat = creditor._Vat;
                                 }
-
 
                                 if (journalLine._DueDate == DateTime.MinValue && creditor._Payment != string.Empty)
                                 {
@@ -499,12 +507,10 @@ namespace UnicontaClient.Pages.CustomPage
                                     var paymentTerm = (PaymentTerm)paymentTermsCache.Get(creditor._Payment);
 
                                     if (paymentTerm != null)
-                                        journalLine._DueDate = paymentTerm.GetDueDate(journalLine.DueDate);
+                                        journalLine._DueDate = paymentTerm.GetDueDate(journalLine._DueDate);
                                 }
 
-                                journalLine.Account = creditor._Account;
-                                journalLine.Text = creditor._Name;
-
+                                journalLine._Account = creditor._Account;
                                 if (creditor._SWIFT == null && swiftNo != null)
                                 {
                                     creditor._SWIFT = swiftNo;
@@ -512,40 +518,41 @@ namespace UnicontaClient.Pages.CustomPage
                                 }
                             }
 
-                            journalLine.SetMaster(master[0]);
                             newLines.Add(journalLine);
-                           
-                            noOfVouchers += 1;
                         }
-                    }
-                    var errorCode = await api.Insert(newLines);
-                    api.UpdateNoResponse(updateCreditor);
 
-                    if (vouchersSeen.Count != 0)
-                    {
-                        // Mark voucher as seen
-                        string serializedRequest = "{ \"vouchers\": [ " + vouchersSeen.ToString() + " ] }";
-                        var vContent = new StringContent(serializedRequest, Encoding.UTF8, "application/json");
-                        response = await client.PostAsync($"https://api.bilagscan.dk/v1/organizations/" + NumberConvert.ToString(orgNo) + "/vouchers/seen", vContent);
-                        var res = await response.Content.ReadAsStringAsync();
+                        noOfVouchers = newLines.Count;
+                        var errorCode = await api.Insert(newLines);
+                        api.UpdateNoResponse(updateCreditor);
+
+                        var sb = StringBuilderReuse.Create("{ \"vouchers\": [ ");
+                        foreach (var voucher in vouchers.data)
+                            sb.AppendNum(voucher.id).Append(',');
+                        sb.Length = sb.Length - 1; // remove last comma
+                        sb.Append(" ] }");
+                        var vContent = new StringContent(sb.ToStringAndRelease(), Encoding.UTF8, "application/json");
+                        response = await client.PostAsync($"https://api.bilagscan.dk/v1/organizations/" + orgNo + "/vouchers/seen", vContent);
+                        await response.Content.ReadAsStringAsync();
                     }
                 }
-
-                if (noOfVouchers == 0)
-                    UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("StillProcessingTryAgain"), Uniconta.ClientTools.Localization.lookup("Bilagscan")), Uniconta.ClientTools.Localization.lookup("Bilagscan"), MessageBoxButton.OK, MessageBoxImage.Information);
-                else
-                {
-                    var messageText = string.Concat(string.Format("{0} {1}", Uniconta.ClientTools.Localization.lookup("NumberOfImportedVouchers"), noOfVouchers),
-                    Environment.NewLine, Environment.NewLine,
-                    string.Format(Uniconta.ClientTools.Localization.lookup("GoTo"), Uniconta.ClientTools.Localization.lookup("Journallines")), "?");
-                    if (UnicontaMessageBox.Show(messageText, Uniconta.ClientTools.Localization.lookup("BilagscanRead"), MessageBoxButton.OKCancel, MessageBoxImage.Information) == MessageBoxResult.OK)
-                    {
-                        AddDockItem(TabControls.GL_DailyJournalLine, journal, null, null, true);
-                    }
-                }
-                readingFromBilagscan = false;
             }
-#endif
+            finally
+            {
+                readingFromBilagscan = false;
+                busyIndicator.IsBusy = false;
+            }
+
+            if (noOfVouchers == 0)
+                UnicontaMessageBox.Show(string.Format(Localization.lookup("StillProcessingTryAgain"), Localization.lookup("Bilagscan")), Localization.lookup("Bilagscan"), MessageBoxButton.OK, MessageBoxImage.Information);
+            else
+            {
+                var messageText = string.Concat(Localization.lookup("NumberOfImportedVouchers"), ": ", NumberConvert.ToString(noOfVouchers), Environment.NewLine, Environment.NewLine,
+                        string.Format(Localization.lookup("GoTo"), Localization.lookup("Journallines")), "?");
+                if (UnicontaMessageBox.Show(messageText, Localization.lookup("BilagscanRead"), MessageBoxButton.OKCancel, MessageBoxImage.Information) == MessageBoxResult.OK)
+                {
+                    AddDockItem(TabControls.GL_DailyJournalLine, journal, null, null, true);
+                }
+            }
         }
     }
 

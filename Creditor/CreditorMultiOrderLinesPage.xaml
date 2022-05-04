@@ -99,6 +99,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorMultiOrderLinesPage"
                     </local:CorasauDataGridForeignKeyColumnClient>
                     <local:ComboBoxColumnClient x:Name="Storage" Width="100"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="IgnoreBlocked" Width="50" Visible="False" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DeleteLine" Width="50" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="ReferenceNumber" Width="70" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Week" Width="50" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Date" Width="90" Visible="False" />

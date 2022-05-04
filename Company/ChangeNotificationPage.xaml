@@ -18,6 +18,11 @@ x:Class="UnicontaClient.Pages.CustomPage.ChangeNotificationPage"
             <CorasauControls:CorasauRibbonControl x:Name="localMenu" XMLSourcePath=";component/Pages/CRM/CrmModuleEditableGridRibbon.xml"/>
             <local:ChangeNotificationDataGrid x:Name="dgChangeNotification" AutoGenerateColumns="None" Grid.Row="1">
                 <local:ChangeNotificationDataGrid.Columns>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Job" Width="120">
+                        <local:CorasauDataGridTemplateColumnClient.EditSettings>
+                            <editor:ComboBoxEditSettings x:Name="cmbJobs" AutoComplete="True" IncrementalFiltering="True" />
+                        </local:CorasauDataGridTemplateColumnClient.EditSettings>
+                    </local:CorasauDataGridTemplateColumnClient>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Table" Width="150">
                         <local:CorasauDataGridTemplateColumnClient.EditSettings>
                             <editor:ComboBoxEditSettings x:Name="cmbTableTypes" AutoComplete="True" IncrementalFiltering="True" ></editor:ComboBoxEditSettings>

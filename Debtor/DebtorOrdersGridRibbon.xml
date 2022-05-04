@@ -30,6 +30,7 @@
       <RibbonItem Action="PickList" LocalizedNameKey="PickingList" Glyph="AccountInvoice_16x16.png" ShortcutKey="Ctrl+H"/>
       <RibbonItem Action="PackNote" LocalizedNameKey="Packnote" Glyph="Note_16x16.png" ShortcutKey="Ctrl+K" />
       <RibbonItem Action="CreateInvoice" LocalizedNameKey="Invoice" Glyph="Invoice_16x16.png" ShortcutKey="Ctrl+M"/>
+	  <RibbonItem Action="PostProjectOrder" LocalizedNameKey="PostProjectOrder" Module="Project" Glyph="Accounts_Statement_Report_16x16.png" ShortcutKey="Ctrl+P"/>
     </RibbonItem>
   </RibbonItem>
   <RibbonItem>
@@ -45,10 +46,6 @@
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="CreateOrder" LocalizedNameKey="CopyOBJ" Parameter="PurchaseSalesOrder" Glyph="refresh.png" LargeGlyph="Orders_32x32.png"/>
-  </RibbonItem>
-  <RibbonItem LocalizedNameKey="Project" Module="Project">
-    <RibbonItem Action="ProjectTransaction" LocalizedNameKey="Adjustments" LargeGlyph="Transactions_32x32.png"/>
-    <RibbonItem Action="RegenerateOrderFromProject" LocalizedNameKey="TransactionOrigin" LargeGlyph="Add_Menu_32x32.png" ShortcutKey="CTRL+T"/>
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="ApproveOrder" LocalizedNameKey="Approve" LargeGlyph="Allow_32x32.png"/>

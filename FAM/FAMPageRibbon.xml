@@ -32,6 +32,7 @@
     <RibbonItem Action="FAMTrans" LocalizedNameKey="Transactions" ControlName="CreditorTransactions" Glyph="Cover_16x16.png" LargeGlyph="Account-statement_32x32.png"></RibbonItem>
     <RibbonItem Action="GenerateDepreciation" LocalizedNameKey="GenerateOBJ" Parameter="Depreciation" LargeGlyph="Inventory_Trans_32x32.png"/>
     <RibbonItem Action="FAMTransPrimo" LocalizedNameKey="PrimoTransactions" LargeGlyph="Copy_ToClipboard_32x32.png" />
+	<RibbonItem Action="SaleOfAsset" LocalizedNameKey="SaleOfAsset" LargeGlyph="PriceTag_32x32.png" />
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Module="Attachments" LocalizedNameKey="Attachments" LargeGlyph="Attachments_32x32.png">

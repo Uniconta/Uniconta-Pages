@@ -9,7 +9,7 @@ x:Class="UnicontaClient.Pages.CustomPage.EditCompany"
     xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools" 
     xmlns:dxinteraction="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
     xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors"
-    xmlns:enumType ="clr-namespace:Uniconta.Common;assembly=Uniconta.Common"
+    xmlns:enumType ="clr-namespace:Uniconta.Common;assembly=Uniconta.WindowsAPI"
     d:DesignHeight="300" d:DesignWidth="400">
     <CorasauControls:BusyIndicator x:Name="busyIndicator" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
         <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
@@ -61,6 +61,9 @@ x:Class="UnicontaClient.Pages.CustomPage.EditCompany"
                         <CorasauControls:CorasauLayoutItem FieldName="ScanMail">
                             <CorasauControls:TextEditor Text="{Binding ScanMail,Mode=OneWay}" IsReadOnly="True"/>
                         </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="ForwardEmail">
+                            <CorasauControls:TextEditor Text="{Binding ForwardEmail,Mode=TwoWay}" MaskType="RegEx" Mask="{StaticResource EmailValidationRegx}" />
+                        </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="PrimaryKeyId">
                             <CorasauControls:TextEditor Text="{Binding PrimaryKeyId,Mode=OneWay}" IsReadOnly="True"/>
                         </CorasauControls:CorasauLayoutItem>
@@ -72,6 +75,9 @@ x:Class="UnicontaClient.Pages.CustomPage.EditCompany"
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="Created">
                             <CorasauControls:DateEditor Text="{Binding Created,Mode=OneWay}" IsReadOnly="True" IsEnabled="False"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="TransCount">
+                            <CorasauControls:IntegerEditor Text="{Binding TransCount,Mode=OneWay}" IsReadOnly="True" />
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="CompanyType" >
                             <CorasauControls:ComboBoxEditor x:Name="cmbCompanyType" SelectedItem="{Binding CompanyType,Mode=TwoWay}" />
@@ -118,6 +124,9 @@ x:Class="UnicontaClient.Pages.CustomPage.EditCompany"
                         <CorasauControls:CorasauLayoutItem FieldName="IBAN">
                             <CorasauControls:TextEditor Text="{Binding IBAN,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="MobilePay">
+                            <CorasauControls:TextEditor Text="{Binding MobilePay,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
 
                     <CorasauControls:CorasauLayoutGroup View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FIKCode}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" MinWidth="420">
@@ -148,6 +157,9 @@ x:Class="UnicontaClient.Pages.CustomPage.EditCompany"
                         <CorasauControls:CorasauLayoutItem FieldName="AutoSettlement">
                             <CorasauControls:ComboBoxEditor SelectedItem="{Binding AutoSettlement,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="RestateCostPerWarehouse" x:Name="liRestateCostPerWarehouse">
+                            <CorasauControls:CheckEditor IsChecked="{Binding RestateCostPerWarehouse,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="RestateCostPerLocation" x:Name="liRestateCostPerLocation">
                             <CorasauControls:CheckEditor IsChecked="{Binding RestateCostPerLocation,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
@@ -163,7 +175,9 @@ x:Class="UnicontaClient.Pages.CustomPage.EditCompany"
                         <CorasauControls:CorasauLayoutItem FieldName="OIOUBLSendOnServer" x:Name="liOIOUBLSendOnServer">
                             <CorasauControls:CheckEditor IsChecked="{Binding OIOUBLSendOnServer,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
-
+                        <CorasauControls:CorasauLayoutItem FieldName="AllowDocumentGuid" x:Name="liAllowDocumentGuid">
+                            <CorasauControls:CheckEditor IsChecked="{Binding AllowDocumentGuid,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="ApprovalReminders" x:Name="liApprovalReminders">
                             <CorasauControls:ComboBoxEditor x:Name="cmbSendAppRemdr" Text="{Binding ApprovalReminders, Mode=TwoWay}">
                                 <CorasauControls:ComboBoxEditor.StyleSettings>

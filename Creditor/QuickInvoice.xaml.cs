@@ -30,6 +30,7 @@ using System.Windows.Threading;
 using DevExpress.Xpf.Grid;
 using UnicontaClient.Controls.Dialogs;
 using Microsoft.Win32;
+using Uniconta.Common.Utility;
 #if !SILVERLIGHT
 using UnicontaClient.Pages;
 #endif
@@ -52,17 +53,16 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         SQLCache items, warehouse, creditors, standardVariants, variants1, variants2, ProjectCache;
-        CreditorOrderClient Order;
+        public CreditorOrderClient Order;
         byte OrderCurrency;
         byte CompCurrency;
         double exchangeRate;
         Uniconta.API.DebtorCreditor.FindPrices PriceLookup;
         CreditorOrderClient initialOrder;
-
+        bool hasEmail;
         private void InitPage()
         {
             InitializeComponent();
-            var api = this.api;
             var Comp = api.CompanyEntity;
             CompCurrency = (byte)Comp._CurrencyId;
 
@@ -100,10 +100,14 @@ namespace UnicontaClient.Pages.CustomPage
 
             this.creditors = Comp.GetCache(typeof(Uniconta.DataModel.Creditor));
             this.items = Comp.GetCache(typeof(InvItem));
-            this.warehouse = Comp.GetCache(typeof(InvWarehouse));
-            this.variants1 = Comp.GetCache(typeof(InvVariant1));
-            this.variants2 = Comp.GetCache(typeof(InvVariant2));
-            this.standardVariants = Comp.GetCache(typeof(InvStandardVariant));
+            if (Comp.Warehouse)
+                this.warehouse = Comp.GetCache(typeof(InvWarehouse));
+            if (Comp.ItemVariants)
+            {
+                this.variants1 = Comp.GetCache(typeof(InvVariant1));
+                this.variants2 = Comp.GetCache(typeof(InvVariant2));
+                this.standardVariants = Comp.GetCache(typeof(InvStandardVariant));
+            }
             RemoveMenuItem();
             dgCreditorOrderLineGrid.allowSave = false;
 #if SILVERLIGHT
@@ -166,10 +170,13 @@ namespace UnicontaClient.Pages.CustomPage
             var company = api.CompanyEntity;
             if (!company.Location || !company.Warehouse)
                 Location.Visible = Location.ShowInColumnChooser = false;
+            else
+                Location.ShowInColumnChooser = true;
             if (!company.Warehouse)
                 Warehouse.Visible = Warehouse.ShowInColumnChooser = false;
-            if (!company.Warehouse)
-                Warehouse.Visible = Warehouse.ShowInColumnChooser = false;
+            else
+                Warehouse.ShowInColumnChooser = true;
+
             if (!company.DeliveryAddress)
                 delAddNavBar.IsVisible = false;
             if (!company.Shipments)
@@ -182,9 +189,13 @@ namespace UnicontaClient.Pages.CustomPage
                 Task.Visible = false;
                 Task.ShowInColumnChooser = false;
             }
-
+            else
+                Task.ShowInColumnChooser = true;
             if (!company.Project)
+            {
                 tbProject.Visibility = tbPrCategory.Visibility = Projectlookupeditor.Visibility = PrCategorylookupeditor.Visibility = Visibility.Collapsed;
+                WorkSpace.ShowInColumnChooser = WorkSpace.Visible = false; 
+            }
             if (company.NumberOfDimensions == 0)
                 barGrpDimension.IsVisible = false;
             Utility.SetupVariants(api, colVariant, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
@@ -247,6 +258,16 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     var invItems = param[0] as List<UnicontaBaseEntity>;
                     dgCreditorOrderLineGrid.PasteRows(invItems);
+                }
+            }
+            if (screenName == TabControls.CreditorAccountPage2 && argument != null)
+            {
+                var args = argument as object[];
+                if (args[2] == this.ParentControl)
+                {
+                    LeAccount.LoadItemSource();
+                    if (string.IsNullOrEmpty(LeAccount.EditValue as string))
+                        LeAccount.SelectedItem = args[3];
                 }
             }
         }
@@ -346,8 +367,8 @@ namespace UnicontaClient.Pages.CustomPage
                     if (SetVariant2)
                     {
                         rec.variant2Source = invs2;
-                        if (!hasVariantValue)
-                            rec.Variant2 = null;
+                        //if (!hasVariantValue)
+                        //    rec.Variant2 = null;
                     }
                     else
                         rec.variant1Source = invs1;
@@ -397,14 +418,19 @@ namespace UnicontaClient.Pages.CustomPage
                                 return;
                             }
                         }
+                        var _priceLookup = this.PriceLookup;
+                        this.PriceLookup = null; // avoid that we call priceupdated in property change on Qty
                         var Comp = api.CompanyEntity;
                         if (selectedItem._PurchaseQty != 0d)
                             rec.Qty = selectedItem._PurchaseQty;
                         else if (Comp._PurchaseLineOne)
                             rec.Qty = 1d;
                         rec.SetItemValues(selectedItem, Comp._PurchaseLineStorage);
-                        if (this.PriceLookup != null)
-                            this.PriceLookup.SetPriceFromItem(rec, selectedItem);
+                        if (_priceLookup != null)
+                        {
+                            this.PriceLookup = _priceLookup;
+                            _priceLookup.SetPriceFromItem(rec, selectedItem);
+                        }
                         else if (selectedItem._PurchasePrice != 0 && Comp.SameCurrency(selectedItem._PurchaseCurrency, (byte)this.Order._Currency))
                             rec.Price = selectedItem._PurchasePrice;
                         else
@@ -508,11 +534,12 @@ namespace UnicontaClient.Pages.CustomPage
                 case "Storage":
                     AddDockItem(TabControls.InvItemStoragePage, dgCreditorOrderLineGrid.syncEntity, true);
                     break;
+                case "ShowInvoice":
                 case "GenerateInvoice":
                     if (!string.IsNullOrEmpty(Order.Account))
                     {
                         if (Utility.HasControlRights("GenerateInvoice", api.CompanyEntity))
-                            GenerateInvoice(Order);
+                            GenerateInvoice(Order, ActionType == "ShowInvoice" ? true: false);
                         else
                             UtilDisplay.ShowControlAccessMsg("GenerateInvoice");
                     }
@@ -531,7 +558,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                     AddDockItem(TabControls.AttachVoucherGridPage, new object[1] { _refferedVouchers }, true);
                     break;
-                case "ViewVoucher":
+                case "ShowVoucher":
                     busyIndicator.IsBusy = true;
                     ViewVoucher(TabControls.VouchersPage3, Order);
                     busyIndicator.IsBusy = false;
@@ -629,6 +656,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             Order = StreamingManager.Clone(initialOrder) as CreditorOrderClient;
             Order.PropertyChanged += Editrow_PropertyChanged;
+            ChildWindow.SetTablePropertiesValue(api, Order, Order.ClassId(), page: this);
             this.DataContext = Order;
             dgCreditorOrderLineGrid.UpdateMaster(Order);
             dgCreditorOrderLineGrid.ItemsSource = null;
@@ -638,16 +666,14 @@ namespace UnicontaClient.Pages.CustomPage
 
         static bool showInvoice = true;
 
-        private void GenerateInvoice(CreditorOrderClient dbOrder)
+        private void GenerateInvoice(CreditorOrderClient dbOrder, bool showProformaInvoice)
         {
             var lines = (IEnumerable<DCOrderLineClient>)dgCreditorOrderLineGrid.ItemsSource;
             if (lines == null || lines.Count() == 0)
                 return;
             var dc = dbOrder.Creditor;
-            if (dc == null)
+            if (dc == null || !Utility.IsExecuteWithBlockedAccount(dc))
                 return;
-            if (!Utility.IsExecuteWithBlockedAccount(dc)) return;
-
             if (!api.CompanyEntity.SameCurrency(dbOrder._Currency, dc._Currency))
             {
                 var confirmationMsgBox = UnicontaMessageBox.Show(string.Format("{0}.\n{1}", string.Format(Uniconta.ClientTools.Localization.lookup("CurrencyMismatch"), dc.Currency, dbOrder.Currency),
@@ -662,7 +688,13 @@ namespace UnicontaClient.Pages.CustomPage
                     rec._QtyNow = rec._Qty;
             }
 
-            CWGenerateInvoice GenrateInvoiceDialog = new CWGenerateInvoice(true, string.Empty, true);
+            if(showProformaInvoice)
+            {
+                ShowProformaInvoice(dbOrder, lines);
+                return;
+            }
+
+            CWGenerateInvoice GenrateInvoiceDialog = new CWGenerateInvoice(true, string.Empty, true, true, showNoEmailMsg: !hasEmail);
 #if !SILVERLIGHT
             GenrateInvoiceDialog.DialogTableId = 2000000004;
 #endif
@@ -670,6 +702,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (dbOrder._InvoiceDate != DateTime.MinValue)
                 GenrateInvoiceDialog.SetInvoiceDate(dbOrder._InvoiceDate);
             GenrateInvoiceDialog.SetInvPrintPreview(showInvoice);
+            GenrateInvoiceDialog.SetSendAsEmailCheck(false);
             GenrateInvoiceDialog.Closed += async delegate
             {
                 if (GenrateInvoiceDialog.DialogResult == true)
@@ -682,10 +715,10 @@ namespace UnicontaClient.Pages.CustomPage
                         return;
                     }
 
-                    var invoicePostingResult = new InvoicePostingPrintGenerator(api, this);
-                    invoicePostingResult.SetUpInvoicePosting(dbOrder, lines, CompanyLayoutType.PurchaseInvoice, GenrateInvoiceDialog.GenrateDate, GenrateInvoiceDialog.InvoiceNumber, isSimulated, GenrateInvoiceDialog.ShowInvoice,
-                        GenrateInvoiceDialog.PostOnlyDelivered, GenrateInvoiceDialog.InvoiceQuickPrint, GenrateInvoiceDialog.NumberOfPages, false, !isSimulated && GenrateInvoiceDialog.SendByOutlook,
-                        GenrateInvoiceDialog.sendOnlyToThisEmail, GenrateInvoiceDialog.Emails, false, documents, false);
+                    var invoicePostingResult = SetupInvoicePostingPrintGenerator(dbOrder, lines, GenrateInvoiceDialog.GenrateDate, GenrateInvoiceDialog.InvoiceNumber, isSimulated, GenrateInvoiceDialog.ShowInvoice,
+                        GenrateInvoiceDialog.PostOnlyDelivered, GenrateInvoiceDialog.InvoiceQuickPrint, GenrateInvoiceDialog.NumberOfPages, GenrateInvoiceDialog.SendByEmail, !isSimulated && GenrateInvoiceDialog.SendByOutlook,
+                        GenrateInvoiceDialog.sendOnlyToThisEmail, GenrateInvoiceDialog.Emails, documents);
+
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
                     busyIndicator.IsBusy = true;
                     var result = await invoicePostingResult.Execute();
@@ -699,7 +732,6 @@ namespace UnicontaClient.Pages.CustomPage
                             documents = null;
                             if (attachDocMenu != null)
                                 attachDocMenu.Caption = string.Format(Uniconta.ClientTools.Localization.lookup("AttachOBJ"), Uniconta.ClientTools.Localization.lookup("Documents"));
-
                         }
 
                         if (invoicePostingResult.IsInvoiceGenerated)
@@ -719,6 +751,29 @@ namespace UnicontaClient.Pages.CustomPage
             GenrateInvoiceDialog.Show();
         }
 
+        private InvoicePostingPrintGenerator SetupInvoicePostingPrintGenerator(CreditorOrderClient crOrder, IEnumerable<DCOrderLineClient> lines, DateTime generateDate, string invoiceNumber, bool isSimulated, bool showInvoice,
+            bool postOnlyDelivered, bool isQuickPrint, int printPageCount, bool sendInvoiceByEmail, bool sendInvoiceByOutlook, bool sendOnlyToEmail, string SendOnlyEmailList, List<TableAddOnData> documents)
+        {
+            var invoicePostingResult = new InvoicePostingPrintGenerator(api, this);
+            invoicePostingResult.SetUpInvoicePosting(crOrder, lines, CompanyLayoutType.PurchaseInvoice, generateDate, invoiceNumber, isSimulated, showInvoice,
+                        postOnlyDelivered, isQuickPrint, printPageCount, sendInvoiceByEmail, sendInvoiceByOutlook, sendOnlyToEmail, SendOnlyEmailList, false, documents, false);
+
+            return invoicePostingResult;
+        }
+
+        async private void ShowProformaInvoice(CreditorOrderClient crOrder, IEnumerable<DCOrderLineClient> orderLines)
+        {
+            var invoicePostingResult = SetupInvoicePostingPrintGenerator(crOrder, orderLines, DateTime.Now, null, true, true, false, false, 0, false, false, false, null, null);
+
+            busyIndicator.IsBusy = true;
+            busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
+            var result = await invoicePostingResult.Execute();
+            busyIndicator.IsBusy = false;
+
+            if (!result)
+                Utility.ShowJournalError(invoicePostingResult.PostingResult.ledgerRes, dgCreditorOrderLineGrid);
+        }
+
         void leAccount_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
         {
             if (readingOIOUBL)
@@ -727,8 +782,7 @@ namespace UnicontaClient.Pages.CustomPage
             var crdtor = (Uniconta.DataModel.Creditor)creditors?.Get(id);
             if (crdtor != null)
             {
-                Order.Account = crdtor._Account;
-                Order.SetCurrency(crdtor._Currency);
+                Order.SetMaster(crdtor);
                 Order.DeliveryName = crdtor._DeliveryName;
                 Order.DeliveryAddress1 = crdtor._DeliveryAddress1;
                 Order.DeliveryAddress2 = crdtor._DeliveryAddress2;
@@ -737,16 +791,11 @@ namespace UnicontaClient.Pages.CustomPage
                 Order.DeliveryZipCode = crdtor._DeliveryZipCode;
                 if (crdtor._DeliveryCountry != 0)
                     Order.DeliveryCountry = crdtor._DeliveryCountry;
-                Order.Payment = crdtor._Payment;
-                Order.EndDiscountPct = crdtor._EndDiscountPct;
-                Order.PostingAccount = crdtor._PostingAccount;
-                Order._PaymentMethod = crdtor._PaymentMethod;
-                Order.Shipment = crdtor._Shipment;
-                Order.DeliveryTerm = crdtor._DeliveryTerm;
-                Order.SetMaster(crdtor);
+                hasEmail = crdtor._InvoiceEmail != null || crdtor._EmailDocuments;
                 if (OrderCurrency != 0 && OrderCurrency != CompCurrency)
                     loadExchange();
-
+                this.DataContext = null;
+                this.DataContext = Order;
                 IEnumerable<DCOrderLineClient> lines = (IEnumerable<DCOrderLineClient>)dgCreditorOrderLineGrid.ItemsSource;
                 lines?.FirstOrDefault()?.SetMaster(Order);
                 PriceLookup?.OrderChanged(Order);
@@ -764,7 +813,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         bool readingOIOUBL;
-        public async void ReadOIOUBL()
+        async void ReadOIOUBL()
         {
             readingOIOUBL = true;
 #if !SILVERLIGHT
@@ -780,10 +829,9 @@ namespace UnicontaClient.Pages.CustomPage
                 using (var stream = File.Open(sfd.FileName, FileMode.Open, FileAccess.Read, FileShare.Read))
                 {
                     var sr = new StreamReader(stream);
-                    var oioublText = await sr.ReadToEndAsync();
+                    var oioublText = sr.ReadToEnd();
 
                     var order = await OIOUBL.ReadInvoiceCreditNoteOrOrder(oioublText, creditors, api, true);
-
                     if (order == null)
                     {
                         ClearFields(initialOrder);
@@ -793,32 +841,29 @@ namespace UnicontaClient.Pages.CustomPage
                     order.SetMaster(api.CompanyEntity);
                     //PriceLookup?.OrderChanged(order);
 
-                    if (order != null)
+                    var orderLines = order.Lines;
+                    order.Lines = null;
+
+                    ClearFields(order);
+
+                    int countLine = 0;
+                    foreach (var line in orderLines)
                     {
-                        var orderLines = order.Lines;
-                        order.Lines = null;
-
-                        ClearFields(order);
-
-                        int countLine = 0;
-                        foreach (var line in orderLines)
-                        {
-                            line.SetMaster(order);
-                            line._LineNumber = ++countLine;
-                        }
-
-                        dgCreditorOrderLineGrid.ItemsSource = orderLines;
-
-                        if (order.DocumentRef != 0)
-                            UpdateVoucher(Order);
+                        line.SetMaster(order);
+                        line._LineNumber = ++countLine;
                     }
+
+                    dgCreditorOrderLineGrid.ItemsSource = orderLines;
+
+                    if (order.DocumentRef != 0)
+                        UpdateVoucher(Order);
                 }
                 readingOIOUBL = false;
             }
             catch (Exception e)
             {
                 readingOIOUBL = false;
-                if (e.StackTrace.ToLower().Contains("xmlserializer"))
+                if (e.StackTrace.IndexOf("xmlserializer", StringComparison.CurrentCultureIgnoreCase) >= 0)
                     UnicontaMessageBox.Show("The file is not a valid XSD schemas. For more information (validation info) use www.oioubl.net/validator/", Uniconta.ClientTools.Localization.lookup("Information"));
                 else
                     UnicontaMessageBox.Show(e, Uniconta.ClientTools.Localization.lookup("Information"));
@@ -940,10 +985,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void btnAccount_Click(object sender, RoutedEventArgs e)
         {
-            object[] param = new object[2];
-            param[0] = api;
-            param[1] = null;
-            AddDockItem(TabControls.CreditorAccountPage2, param, Uniconta.ClientTools.Localization.lookup("Creditorsaccount"), "Add_16x16.png");
+            AddDockItem(TabControls.CreditorAccountPage2, new object[2] { api, null }, Uniconta.ClientTools.Localization.lookup("Creditorsaccount"), "Add_16x16.png");
         }
 
         List<TableAddOnData> documents;
@@ -977,7 +1019,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 var rb = (RibbonBase)localMenu.DataContext;
                 attachDocMenu = UtilDisplay.GetMenuCommandByName(rb, "AttachDoc");
-                attachDocMenu.Caption = string.Format("{0} ({1})", string.Format(Uniconta.ClientTools.Localization.lookup("AttachOBJ"), Uniconta.ClientTools.Localization.lookup("Documents")), documents.Count);
+                attachDocMenu.Caption = Util.ConcatParenthesis(string.Format(Uniconta.ClientTools.Localization.lookup("AttachOBJ"), Uniconta.ClientTools.Localization.lookup("Documents")), documents.Count);
             }
         }
 

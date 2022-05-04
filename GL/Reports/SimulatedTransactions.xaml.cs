@@ -137,6 +137,13 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
+        public override bool CheckIfBindWithUserfield(out bool isReadOnly, out bool useBinding)
+        {
+            isReadOnly = true;
+            useBinding = true;
+            return true;
+        }
+
         public override Task InitQuery() { return null; }
 
         protected override void OnLayoutLoaded()

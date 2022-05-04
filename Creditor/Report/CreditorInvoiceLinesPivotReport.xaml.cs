@@ -10,6 +10,7 @@ using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.Common;
 using Uniconta.DataModel;
+using System;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -19,6 +20,13 @@ namespace UnicontaClient.Pages.CustomPage
         CWServerFilter filterDialog = null;
         bool filterCleared;
         TableField[] UserFields { get; set; }
+        DateTime filterDate;
+        Filter[] DefaultFilters()
+        {
+
+            Filter dateFilter = new Filter() { name = "Date", value = String.Format("{0:d}..", filterDate) };
+            return new Filter[] { dateFilter };
+        }
         public override string NameOfControl { get { return TabControls.CreditorInvoiceLinesPivotReport; } }
         bool pivotIsLoaded = false;
         public CreditorInvoiceLinesPivotReport(UnicontaBaseEntity master) : base(master)
@@ -44,6 +52,8 @@ namespace UnicontaClient.Pages.CustomPage
             pivotDgCreditorInvLines.api = api;
             pivotDgCreditorInvLines.TableType = typeof(CreditorInvoiceLines);
             pivotDgCreditorInvLines.UpdateMaster(master);
+            if (master == null)
+                SetDefaultFilter();
             BindGrid();
             pivotDgCreditorInvLines.EndUpdate();
             localMenu.OnItemClicked += LocalMenu_OnItemClicked;
@@ -51,8 +61,19 @@ namespace UnicontaClient.Pages.CustomPage
                 fieldWarehouse.Visible = false;
             else if (!api.CompanyEntity.Location)
                 fieldLocation.Visible = false;
+            tbGrdTtlRow.Text = Uniconta.ClientTools.Localization.lookup("ShowRowGrandTotals");
+            tbGrdTtlCol.Text = Uniconta.ClientTools.Localization.lookup("ShowColumnGrandTotals");
+            tbTtlOnFlds.Text = Uniconta.ClientTools.Localization.lookup("ShowTotals");
+            chkGrdTtlCol.IsChecked = chkGrdTtlRow.IsChecked = chkTtlOnFlds.IsChecked = true;
         }
 
+        void SetDefaultFilter()
+        {
+            filterDate = BasePage.GetFilterDate(api.CompanyEntity, false);
+            var filterSorthelper = new FilterSortHelper(typeof(DebtorInvoiceLines), DefaultFilters(), null);
+            List<string> errors;
+            filterValues = filterSorthelper.GetPropValuePair(out errors);
+        }
         private Task Filter(bool refreshData)
         {
             return pivotDgCreditorInvLines.Filter(refreshData ? null : filterValues);
@@ -89,7 +110,7 @@ namespace UnicontaClient.Pages.CustomPage
                         if (filterCleared)
                             filterDialog = new CWServerFilter(api, typeof(CreditorInvoiceLines), null, null, UserFields);
                         else
-                            filterDialog = new CWServerFilter(api, typeof(CreditorInvoiceLines), null, null, UserFields);
+                            filterDialog = new CWServerFilter(api, typeof(CreditorInvoiceLines), DefaultFilters(), null, UserFields);
                         filterDialog.Closing += filterDialog_Closing;
                         filterDialog.Show();
                     }
@@ -185,6 +206,27 @@ namespace UnicontaClient.Pages.CustomPage
         private void pivotDgCreditorInvLines_Loaded(object sender, RoutedEventArgs e)
         {
             pivotDgCreditorInvLines.BestFit();
+        }
+
+        private void chkGrdTtlRow_Checked(object sender, RoutedEventArgs e)
+        {
+            var value = (bool)chkGrdTtlRow.IsChecked;
+            pivotDgCreditorInvLines.ShowRowGrandTotalHeader = value;
+            pivotDgCreditorInvLines.ShowRowGrandTotals = value;
+        }
+
+        private void chkGrdTtlCol_Checked(object sender, RoutedEventArgs e)
+        {
+            var value = (bool)chkGrdTtlCol.IsChecked;
+            pivotDgCreditorInvLines.ShowColumnGrandTotalHeader = value;
+            pivotDgCreditorInvLines.ShowColumnGrandTotals = value;
+            pivotDgCreditorInvLines.ShowColumnTotals = value;
+        }
+
+        private void chkTtlOnFlds_Checked(object sender, RoutedEventArgs e)
+        {
+            var value = (bool)chkTtlOnFlds.IsChecked;
+            pivotDgCreditorInvLines.ShowRowTotals = value;
         }
     }
 }

@@ -68,18 +68,20 @@ x:Class="UnicontaClient.Pages.CustomPage.FAMPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Manufacturer" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Model" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="InsuranceNo" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="InsuranceAmount" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="NonDepreciableAmount" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DepreciationPercent" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ResidualValue" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DecommissionCost" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Depresiation" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Adjustment" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="WriteUp" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="WriteOff" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="WriteDown" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CostValue" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Sale" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="InsuranceAmount" Width="90" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="NonDepreciableAmount" Width="90" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DepreciationPercent" Width="90" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ResidualValue" Width="90" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DecommissionCost" Width="90" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Depresiation" Width="90" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ReversedDepreciation" Width="90" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Adjustment" Width="90" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="WriteUp" Width="90" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="WriteOff" Width="90" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="WriteDown" Width="90" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CostValue" Width="90" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ReversedAcquisition" Width="90" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Sale" Width="90" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="BookedValue" Width="90" />
 
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PurchaseDate" Visible="False"/>
@@ -87,7 +89,7 @@ x:Class="UnicontaClient.Pages.CustomPage.FAMPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DisposalDate" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="LastDepreciation"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Years" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ManualDepreciation" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ManualDepreciation" Width="90" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Blocked" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim1" Width="70" FieldName="Dimension1" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim2" Width="70" FieldName="Dimension2" Visible="False"/>
@@ -98,15 +100,16 @@ x:Class="UnicontaClient.Pages.CustomPage.FAMPage"
                 <localPage:FAMGrid.TotalSummary>
                     <localPage:SumColumn FieldName="InsuranceAmount" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                     <localPage:SumColumn FieldName="NonDepreciableAmount" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
-                    <localPage:SumColumn FieldName="DepreciationPercent" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                     <localPage:SumColumn FieldName="ResidualValue" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                     <localPage:SumColumn FieldName="DecommissionCost" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
-                    <localPage:SumColumn FieldName="CostValue" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                     <localPage:SumColumn FieldName="Depreciation" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="ReversedDepreciation" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                     <localPage:SumColumn FieldName="WriteUp" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                     <localPage:SumColumn FieldName="WriteOff" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                     <localPage:SumColumn FieldName="WriteDown" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                     <localPage:SumColumn FieldName="Sale" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="CostValue" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="ReversedAcquisition" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                     <localPage:SumColumn FieldName="BookedValue" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                     <localPage:SumColumn FieldName="ManualDepreciation" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                 </localPage:FAMGrid.TotalSummary>

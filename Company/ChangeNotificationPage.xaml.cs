@@ -18,6 +18,7 @@ using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.Common;
 using Uniconta.DataModel;
+using Corasau.API.Admin;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -31,13 +32,13 @@ namespace UnicontaClient.Pages.CustomPage
     public class TableChangeEventLocalClient : TableChangeEventClient
     {
         public string _table;
-        
+
         [Display(Name = "Table", ResourceType = typeof(TableChangeEventClientText))]
-        public string Table { get { return GetTableName(_TableId); } set { _table = value;  _TableId = GetClassId(_table);} }
+        public string Table { get { return GetTableName(_TableId); } set { _table = value; _TableId = GetClassId(_table); } }
 
         static string GetTableName(int id)
         {
-            if (id != 0) 
+            if (id != 0)
             {
                 foreach (var type in Global.GetStandardRefTables())
                 {
@@ -79,20 +80,28 @@ namespace UnicontaClient.Pages.CustomPage
             SetRibbonControl(localMenu, dgChangeNotification);
             localMenu.OnItemClicked += LocalMenu_OnItemClicked;
             BindRefTable();
+            BindJobs();
         }
 
         private void BindRefTable()
         {
             var referenceTables = new List<string>(100);
             foreach (Type tabletype in Global.GetStandardRefTables())
-            {
-                if (tabletype == typeof(DebtorOrder) || tabletype == typeof(DebtorOffer) || tabletype == typeof(CreditorOrder) || tabletype == typeof(ProductionOrder))
-                    continue;
                 referenceTables.Add(tabletype.Name);
-            }
+
             referenceTables.Add("InvItemStorage");
             referenceTables.Sort();
             cmbTableTypes.ItemsSource = referenceTables;
+        }
+
+        async private void BindJobs()
+        {
+            var jobApi = new JobAPI(api);
+            var jobs = (JobsQueueClient[])await jobApi.GetJobQueueInfo(new JobsQueueClient());
+            if (jobs == null || jobs.Length == 0)
+                return;
+
+            cmbJobs.ItemsSource = jobs.Select(p => p.Name).ToList();
         }
 
         private void LocalMenu_OnItemClicked(string ActionType)

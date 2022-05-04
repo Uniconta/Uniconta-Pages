@@ -2,6 +2,7 @@ using UnicontaClient.Models;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.Common;
+using Uniconta.Common.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -280,17 +281,24 @@ namespace UnicontaClient.Pages.CustomPage
             var company = api.CompanyEntity;
             if (!company.Location || !company.Warehouse)
                 Location.Visible = Location.ShowInColumnChooser = false;
+            else
+                Location.ShowInColumnChooser = true;
             if (!company.Warehouse)
                 Warehouse.Visible = Warehouse.ShowInColumnChooser = false;
-            if(!company.Project)
+            else
+                Warehouse.ShowInColumnChooser = true;
+            if (!company.Project)
             {
                 Project.Visible = Project.ShowInColumnChooser = false;
                 ProjectName.Visible = ProjectName.ShowInColumnChooser = false;
+                WorkSpace.Visible = WorkSpace.ShowInColumnChooser = false;
+                PrCategory.Visible = PrCategory.ShowInColumnChooser = false;
             }
+            
             if (!company.ProjectTask)
                 Task.Visible = Task.ShowInColumnChooser = false;
-
-            Utilities.Utility.SetupVariants(api, null, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
+            
+            Utilities.Utility.SetupVariants(api, colVariant, VariantName, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
             Utilities.Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
         }
 
@@ -323,11 +331,29 @@ namespace UnicontaClient.Pages.CustomPage
                 case "ChangeStorage":
                     if (selectedItem == null)
                         return;
-                    var cwchangeStorage = new CWModiyStorage(api, selectedItem);
-                    cwchangeStorage.Closing += delegate
+                    var cwchangeStorage = new CWModiyStorage(api);
+                    cwchangeStorage.Closing += async delegate
                     {
                         if (cwchangeStorage.DialogResult == true)
-                            gridRibbon_BaseActions("RefreshGrid");
+                        {
+                            var newWarehouse = cwchangeStorage.Warehouse;
+                            var newLocation = cwchangeStorage.Location;
+                            var tranApi = new Uniconta.API.Inventory.TransactionsAPI(api);
+                            ErrorCodes result;
+                            if (cwchangeStorage.AllLines)
+                            {
+                                var visibleItems = dgInvTransGrid.VisibleItems.Cast<InvTransClient>();
+                                result = await tranApi.ChangeStorage(visibleItems, newWarehouse, newLocation);
+                            }
+                            else
+                                result = await tranApi.ChangeStorage(selectedItem, newWarehouse, newLocation);
+
+                            if (result == ErrorCodes.Succes)
+                                gridRibbon_BaseActions("RefreshGrid");
+                            else
+                                UtilDisplay.ShowErrorCode(result);
+                        }
+
                     };
                     cwchangeStorage.Show();
                     break;
@@ -343,20 +369,20 @@ namespace UnicontaClient.Pages.CustomPage
                         arg = string.Format("{0} ({1})={2}", Uniconta.ClientTools.Localization.lookup("JournalPostedId"), Uniconta.ClientTools.Localization.lookup("Inventory"), selectedItem._InvJournalPostedId);
                     else
                         arg = string.Format("{0}={1}", Uniconta.ClientTools.Localization.lookup("Account"), selectedItem.AccountName);
-                    string vheader = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("VoucherTransactions"), arg);
+                    string vheader = Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("VoucherTransactions"), arg);
                     AddDockItem(TabControls.AccountsTransaction, dgInvTransGrid.syncEntity, vheader);
                     break;
                 case "TransInBOM":
                     if (selectedItem != null && selectedItem._MovementType == (byte)InvMovementType.ReportAsFinished)
                     {
-                        string header = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("TransInBOM"), selectedItem._Item);
+                        string header = Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("TransInBOM"), selectedItem._Item);
                         AddDockItem(TabControls.InventoryTransactions, dgInvTransGrid.syncEntity, header);
                     }
                     break;
                 case "SeriesBatchInBom":
                     if (selectedItem != null && selectedItem._MovementType == (byte)InvMovementType.ReportAsFinished)
                     {
-                        string header = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("SeriesBatchInBom"), selectedItem._Item);
+                        string header = Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("SeriesBatchInBom"), selectedItem._Item);
                         AddDockItem(TabControls.InventoryTransactionStatement, selectedItem, header);
                     }
                     break;
@@ -368,12 +394,12 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem == null) return;
                     if (selectedItem._MovementType == (byte)InvMovementType.Debtor)
                     {
-                        var debtHeader = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("DebtorInvoice"), selectedItem._Item);
+                        var debtHeader = Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("DebtorInvoice"), selectedItem._Item);
                         AddDockItem(TabControls.Invoices, selectedItem, debtHeader);
                     }
                     else if (selectedItem._MovementType == (byte)InvMovementType.Creditor)
                     {
-                        var credHeader = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("CreditorInvoice"), selectedItem._Item);
+                        var credHeader = Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("CreditorInvoice"), selectedItem._Item);
                         AddDockItem(TabControls.CreditorInvoice, selectedItem, credHeader);
                     }
                     break;
@@ -388,6 +414,11 @@ namespace UnicontaClient.Pages.CustomPage
                 case "PostedBy":
                     if (selectedItem != null)
                         JournalPosted(selectedItem);
+                    break;
+                case "MarkOrderLineAgnstInvTrans":
+                    if (selectedItem?._Item == null) return;
+                    object[] param = new object[] { selectedItem };
+                    AddDockItem(TabControls.InventoryTransactionsMarkedPage, param, true);
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);
@@ -424,8 +455,23 @@ namespace UnicontaClient.Pages.CustomPage
         protected override void LoadCacheInBackGround()
         {
             var Comp = api.CompanyEntity;
-
-            var lst = new List<Type>(12) { typeof(Uniconta.DataModel.InvItem), typeof(Uniconta.DataModel.GLVat), typeof(Uniconta.DataModel.Employee) };
+            var lst = new List<Type>(20);
+            if (Comp.Warehouse)
+                lst.Add(typeof(Uniconta.DataModel.InvWarehouse));
+            if (Comp.NumberOfDimensions >= 1)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType1));
+            if (Comp.NumberOfDimensions >= 2)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType2));
+            if (Comp.NumberOfDimensions >= 3)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType3));
+            if (Comp.NumberOfDimensions >= 4)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType4));
+            if (Comp.NumberOfDimensions >= 5)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType5));
+            lst.Add(typeof(Uniconta.DataModel.GLVat));
+            lst.Add(typeof(Uniconta.DataModel.Employee));
+            lst.Add(typeof(Uniconta.DataModel.Debtor));
+            lst.Add(typeof(Uniconta.DataModel.Creditor));
             if (Comp.ItemVariants)
             {
                 lst.Add(typeof(Uniconta.DataModel.InvVariant1));
@@ -437,15 +483,9 @@ namespace UnicontaClient.Pages.CustomPage
                     lst.Add(typeof(Uniconta.DataModel.InvVariant4));
                 if (n >= 5)
                     lst.Add(typeof(Uniconta.DataModel.InvVariant5));
+                lst.Add(typeof(Uniconta.DataModel.InvStandardVariant));
             }
-            if (Comp.Warehouse)
-                lst.Add(typeof(Uniconta.DataModel.InvWarehouse));
-            if (Comp.Shipments)
-            {
-                lst.Add(typeof(Uniconta.DataModel.ShipmentType));
-                lst.Add(typeof(Uniconta.DataModel.DeliveryTerm));
-            }
-
+            lst.Add(typeof(Uniconta.DataModel.InvItem));
             LoadType(lst);
         }
 

@@ -11,6 +11,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using Uniconta.API.System;
 using Uniconta.ClientTools;
+using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.Common;
 using Uniconta.DataModel;
@@ -24,6 +25,8 @@ namespace UnicontaClient.Pages.CustomPage.Attachments
         public byte Action;
         CrudAPI api;
         SQLCache folderCache;
+        bool _validateFolderName;
+        
         public CWAddEditFolder(CrudAPI api, string folderName, byte action)
         {
             InitializeComponent();
@@ -51,6 +54,11 @@ namespace UnicontaClient.Pages.CustomPage.Attachments
             folderCache = this.api.CompanyEntity.GetCache(typeof(DocumentFolder));
         }
 
+        public CWAddEditFolder(CrudAPI api, string folderName, byte action, bool validateFolderName) : this(api, folderName, action)
+        {
+            _validateFolderName = validateFolderName;
+        }
+
         private void CWCreateFolder_Loaded(object sender, RoutedEventArgs e)
         {
             Dispatcher.BeginInvoke(new System.Action(() =>
@@ -66,13 +74,13 @@ namespace UnicontaClient.Pages.CustomPage.Attachments
         {
             if (e.Key == Key.Escape)
             {
-                this.DialogResult = false;
+                SetDialogResult(false);
             }
             else if (e.Key == Key.Enter)
             {
                 if (CancelButton.IsFocused)
                 {
-                    this.DialogResult = false;
+                    SetDialogResult(false);
                     return;
                 }
                 SaveButton_Click(null, null);
@@ -87,32 +95,42 @@ namespace UnicontaClient.Pages.CustomPage.Attachments
             if (FolderName != null)
                 folder = folderCache.Get(FolderName) as DocumentFolder;
             FolderName = txtFolder.Text;
+
+            if (_validateFolderName && Utilities.Utility.HasSpecialCharacters(FolderName))
+            {
+                UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("Invalid"), Uniconta.ClientTools.Localization.lookup("Error"));
+                return;
+            }
+            ErrorCodes result = ErrorCodes.NoSucces;
             switch (Action)
             {
                 case 0:
                     var folderClient = new DocumentFolderClient();
                     folderClient._Name = FolderName;
-                    api.Insert(folderClient).GetAwaiter().GetResult();
+                    result = api.Insert(folderClient).GetAwaiter().GetResult();
                     break;
                 case 1:
                     if (folder != null)
                     {
                         folder._Name = FolderName;
-                        api.Update(folder).GetAwaiter().GetResult();
+                        result = api.Update(folder).GetAwaiter().GetResult();
                     }
                     break;
                 case 2:
                     if (folder != null)
-                        api.Delete(folder).GetAwaiter().GetResult();
+                        result = api.Delete(folder).GetAwaiter().GetResult();
                     break;
             }
 
-            this.DialogResult = true;
+            if (result != ErrorCodes.Succes)
+                Uniconta.ClientTools.Util.UtilDisplay.ShowErrorCode(result);
+
+            SetDialogResult(true);
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = false;
+            SetDialogResult(false);
         }
     }
 }

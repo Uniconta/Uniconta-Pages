@@ -1,18 +1,21 @@
-<Pages:GridBasePage
-   xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+<Pages:GridBasePage xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
 x:Class="UnicontaClient.Pages.CustomPage.ProjectBudgetLinePage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage"
-     xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
+    xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
     xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
     xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
-    mc:Ignorable="d"
-    d:DesignHeight="300" d:DesignWidth="300">
+    xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors">
     <UserControl.Resources>
+        <Style x:Key="StyleRow" TargetType="dxg:RowControl">
+            <Setter Property="Height" Value="Auto"/>
+        </Style>
         <Util:MaskConverter x:Key="MaskConverter" />
+        <Util:RowIndexConverter x:Key="RowIndexConverter" />
     </UserControl.Resources>
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
@@ -39,6 +42,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectBudgetLinePage"
                             </DataTemplate>
                         </localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
                     </localPage:CorasauDataGridForeignKeyColumnClient>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="WorkSpace" Width="80" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Employee" Width="70"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="EmployeeName" Width="100" Visible="False"/>                    
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Width="80" />
@@ -79,12 +83,18 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectBudgetLinePage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="SalesPrice" Width="80"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Cost" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Sales" Width="90"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="AnchorBudget" AllowEditing="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Margin" Width="90" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="MarginRatio" Width="50" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Completed" Width="50" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CreditorAccount" Width="70" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CreditorName" Width="100" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ReferenceNumber" Width="100" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Comment" Width="300">
+                        <localPage:CorasauDataGridTemplateColumnClient.EditSettings>
+                            <editor:TextEditSettings TextWrapping="Wrap" AcceptsReturn="True"/>
+                        </localPage:CorasauDataGridTemplateColumnClient.EditSettings>
+                    </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension1" x:Name="coldim1" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension2" x:Name="coldim2" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension3" x:Name="coldim3" Visible="False"/>
@@ -98,8 +108,8 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectBudgetLinePage"
                 </localPage:ProjectBudgetLinePageGrid.Columns>
                 <localPage:ProjectBudgetLinePageGrid.TotalSummary>
                     <localPage:SumColumn FieldName="Qty" SummaryType="Sum" DisplayFormat="{}{0:N2}" />
-                    <localPage:SumColumn FieldName="Cost" SummaryType="Sum" DisplayFormat="{}{0:N0}"/>
-                    <localPage:SumColumn FieldName="Sales" SummaryType="Sum" DisplayFormat="{}{0:N0}"/>
+                    <localPage:SumColumn FieldName="Cost" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="Sales" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                     <localPage:SumColumn FieldName="Margin" SummaryType="Sum" DisplayFormat="{}{0:N0}"/>
                     <localPage:SumColumn FieldName="MarginRatio" SummaryType="Custom" DisplayFormat="{}{0:N2}" />
                 </localPage:ProjectBudgetLinePageGrid.TotalSummary>

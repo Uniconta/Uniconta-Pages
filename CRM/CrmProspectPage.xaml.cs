@@ -128,10 +128,13 @@ namespace UnicontaClient.Pages.CustomPage
                     dgCrmProspectGrid.AddRow();
                     break;
                 case "CopyRow":
-                    if (copyRowIsEnabled)
-                        dgCrmProspectGrid.CopyRow();
-                    else
-                        CopyRecord(selectedItem);
+                    if (selectedItem != null)
+                    {
+                        if (copyRowIsEnabled)
+                            dgCrmProspectGrid.CopyRow();
+                        else
+                            CopyRecord(selectedItem);
+                    }
                     break;
                 case "ConvertToDebtor":
                     if (selectedItem != null)
@@ -159,7 +162,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (selectedItem == null)
                 return;
             var prospect = Activator.CreateInstance(selectedItem.GetType()) as CrmProspectClient;
-            StreamingManager.Copy(selectedItem, prospect);
+            CorasauDataGrid.CopyAndClearRowId(selectedItem, prospect);
             var parms = new object[2] { prospect, false };
             AddDockItem(TabControls.CrmProspectPage2, parms, Uniconta.ClientTools.Localization.lookup("Prospects"), "Add_16x16.png");
         }

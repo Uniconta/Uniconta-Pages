@@ -5,10 +5,11 @@
     <RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="DiscardTransaction" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png" />
   </RibbonItem>
   <RibbonItem >
+    <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh.png" LargeGlyph="refresh.png"/>
     <RibbonItem Action="Filter" ShortcutKey="Ctrl+I" LocalizedNameKey="Filter" Glyph="Filter_16x16.png" LargeGlyph="Filter_32x32.png"/>
     <RibbonItem Action="ClearFilter" ShortcutKey="Ctrl+K" LocalizedNameKey="ClearFilter" Glyph="Filter_Clear_32x32.png" LargeGlyph="Filter_Clear_32x32.png"/>
-    <RibbonItem Action="PerWarehouse" LocalizedNameKey="PerOBJ" Parameter="Warehouse" ButtonType="CheckBox" />
-    <RibbonItem Action="PerLocation" LocalizedNameKey="PerOBJ" Parameter="Location" ButtonType="CheckBox" />
+    <RibbonItem Action="PerWarehouse" LocalizedNameKey="PerOBJ" Parameter="Warehouse" Module="Warehouse" ButtonType="CheckBox" />
+    <RibbonItem Action="PerLocation" LocalizedNameKey="PerOBJ" Parameter="Location" Module="Location" ButtonType="CheckBox" />
   </RibbonItem>
   <RibbonItem>
     <!---next group in same Tab-->
@@ -28,15 +29,16 @@
     <RibbonItem Action="InvTrans" LocalizedNameKey="Transactions" LargeGlyph="Transactions_32x32.png"/>
     <RibbonItem Action="OrderLines" LocalizedNameKey="OrdersLine" Glyph="Order_Lines_Highlighted_32x32.png" LargeGlyph="Order_Lines_Highlighted_32x32.png" ShortcutKey="ALT+L"/>
     <RibbonItem Action="PurchaseLines" LocalizedNameKey="PurchaseLines" Glyph="Purchase_Lines_32x32.png" LargeGlyph="Purchase_Lines_32x32.png"/>
-    <RibbonItem Action="ProductionLines" LocalizedNameKey="ProductionLines" Glyph="Production_Lines_32x32.png" LargeGlyph="Production_Lines_32x32.png"/>
-    <RibbonItem Action="ProductionOrders" LocalizedNameKey="ProductionOrders" Glyph="Production_32x32.png" LargeGlyph="Production_32x32.png"/>
+    <RibbonItem Action="ProductionLines" LocalizedNameKey="ProductionLines" Module="Production" Glyph="Production_Lines_32x32.png" LargeGlyph="Production_Lines_32x32.png"/>
+    <RibbonItem Action="ProductionOrders" LocalizedNameKey="ProductionOrders" Module="Production" Glyph="Production_32x32.png" LargeGlyph="Production_32x32.png"/>
+    <RibbonItem Action="InvStockProfile" LocalizedNameKey="StockProfile" ControlName="InvStorageProfileReport" Module="Storage" LargeGlyph="Storage_32x32.png"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="UnfoldBOM" LocalizedNameKey="UnfoldBOM"  Glyph="CopyUserTable_16x16.png" LargeGlyph="CopyUserTable_16x16.png"/>
+    <RibbonItem Action="UnfoldBOM" LocalizedNameKey="UnfoldBOM" Module="InvBOM"  Glyph="CopyUserTable_16x16.png" LargeGlyph="CopyUserTable_16x16.png"/>
     <RibbonItem Action="CreateOrder" LocalizedNameKey="CreateOBJ" Parameter="CreditorOrders" LargeGlyph="Orders_32x32.png" />
-    <RibbonItem Action="CreateProductionOrder" LocalizedNameKey="CreateOBJ" Parameter="ProductionOrder" LargeGlyph="Pack_Note_32x32.png" />
-    <RibbonItem Action="ReportAsFinished" LocalizedNameKey="ReportAsFinished" LargeGlyph="Order_Lines_Highlighted_32x32.png" />
-    <RibbonItem Action="MoveFromWarehouse" LocalizedNameKey="MoveFromWarehouse" LargeGlyph="Journal_Lines_Highlighted_32x32.png" />
+    <RibbonItem Action="CreateProductionOrder" LocalizedNameKey="CreateOBJ" Parameter="ProductionOrder" Module="Production" LargeGlyph="Pack_Note_32x32.png" />
+    <RibbonItem Action="ReportAsFinished" LocalizedNameKey="ReportAsFinished" Module="InvBOM" LargeGlyph="Order_Lines_Highlighted_32x32.png" />
+    <RibbonItem Action="MoveFromWarehouse" LocalizedNameKey="MoveFromWarehouse" Module="Warehouse" LargeGlyph="Journal_Lines_Highlighted_32x32.png" />
     <RibbonItem Action="Storage" LocalizedNameKey="OnHand" LargeGlyph="Storage_32x32.png"/>
   </RibbonItem>
 </root>

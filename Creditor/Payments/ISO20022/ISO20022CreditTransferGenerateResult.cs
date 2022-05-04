@@ -32,13 +32,13 @@ namespace ISO20022CreditTransfer
             this.checkErrors = checkErrors;
         }
 
-        public XMLDocumentGenerateResult(XmlDocument document, bool hasErrors, int payments, IEnumerable<CheckError> checkErrors, Encoding encoding, string fileName)
+        public XMLDocumentGenerateResult(XmlDocument document, bool hasErrors, CreditTransferDocument doc, IEnumerable<CheckError> checkErrors, string fileName)
         {
             this.document = document;
             this.hasErrors = hasErrors;
-            this.numberOfPayments = payments;
+            this.numberOfPayments = doc.HeaderNumberOfTrans;
             this.checkErrors = checkErrors;
-            this.encoding = encoding;
+            this.encoding = doc.EncodingFormat;
             this.fileName = fileName;
         }
 

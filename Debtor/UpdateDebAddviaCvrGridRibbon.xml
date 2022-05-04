@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<root>
+  <RibbonItem TabId="0" LocalizedNameKey="Home">
+    <RibbonItem Action="Search" LocalizedNameKey="Search" LargeGlyph="Validate_32x32.png" ShortcutKey="Ctrl+H" />
+  </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="SaveGrid" LocalizedNameKey="UpdateOBJ" Parameter="Address"  LargeGlyph="save-32x32.png" ShortcutKey="CTRL+N"/>
+    <RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="Remove" LargeGlyph="Delete_32x32.png"/>
+  </RibbonItem>
+  <RibbonItem>
+      <RibbonItem LocalizedNameKey="New" StatusValue="" />
+      <RibbonItem LocalizedNameKey="Total" StatusValue="" />
+      <RibbonItem LocalizedNameKey="Available" StatusValue="" />
+  </RibbonItem>
+</root>

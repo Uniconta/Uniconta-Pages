@@ -6,7 +6,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CWForAllTrans"
            xmlns:controls="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls"
            xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
            xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
-           Width="400" SizeToContent="Height" KeyDown="ChildWindow_KeyDown">   
+           Width="300" SizeToContent="Height" KeyDown="ChildWindow_KeyDown">   
     <Grid x:Name="LayoutRoot" Margin="2">
         <Grid.RowDefinitions>
             <RowDefinition />
@@ -21,12 +21,10 @@ x:Class="UnicontaClient.Pages.CustomPage.CWForAllTrans"
         <TextBlock Text="{Binding Converter={StaticResource  GlobalLocalizationValueConverter},ConverterParameter=ForAllTransactionsOnVoucher}" Grid.Column="0" Grid.Row="0" VerticalAlignment="Center"/>
         <CorasauControls:CheckEditor x:Name="chkForAllTransactions" IsChecked="{Binding ForAllTransactions,Mode=TwoWay}"  Height="25" Grid.Column="2"  Grid.Row="0"/>
         <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=PhysicalVoucher}" Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" />
-        <ComboBox Grid.Column="2" Grid.Row="1" VerticalAlignment="Center" x:Name="cmbPhysicalvoucher"  HorizontalAlignment="Stretch" Height="25">
-            <ComboBox.Items>
-                <ComboBoxItem Content="{Binding Converter={StaticResource  GlobalLocalizationValueConverter},ConverterParameter=Replace}" />
-                <ComboBoxItem Content="{Binding Converter={StaticResource  GlobalLocalizationValueConverter},ConverterParameter=Append}" />
-            </ComboBox.Items>
-        </ComboBox>
+        <StackPanel Grid.Column="2" Grid.Row="1" Height="25" Orientation="Horizontal">
+            <RadioButton x:Name="rdbReplace" IsChecked="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Replace}"   />
+            <RadioButton x:Name="rdbAppend" Margin="5,0,0,0" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Append}"  />
+        </StackPanel>
         <StackPanel x:Name="actionButton" HorizontalAlignment="Right" Grid.Row="2"  Grid.ColumnSpan="3" Orientation="Horizontal" Margin="0 10 0 0">
             <Button x:Name="OKButton" IsDefault="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OK}" Click="OKButton_Click" MinWidth="75" Height="23" 
                     HorizontalAlignment="Right" Margin="0 0 3 0" />

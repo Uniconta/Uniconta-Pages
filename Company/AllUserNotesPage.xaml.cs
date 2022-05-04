@@ -68,5 +68,13 @@ public partial class AllUserNotesPage : GridBasePage
             var Comp = api.CompanyEntity;
             UtilDisplay.RemoveMenuCommand(rb, new string[] { "ViewDownloadRow"});
         }
+
+        protected override LookUpTable HandleLookupOnLocalPage(LookUpTable lookup, CorasauDataGrid dg)
+        {
+            var note = dg.SelectedItem as UserNotesClient;
+            if (note != null && dg.CurrentColumn?.Name == "KeyStr")
+                lookup.TableType = Global.ClassId2BaseType(note.CompanyId, note._TableId);
+            return lookup;
+        }
     }
 }

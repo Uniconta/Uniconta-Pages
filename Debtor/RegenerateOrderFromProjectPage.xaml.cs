@@ -20,6 +20,7 @@ using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
 using Uniconta.Common;
+using Uniconta.ClientTools;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -34,11 +35,22 @@ namespace UnicontaClient.Pages.CustomPage
     {
         public override string NameOfControl { get { return TabControls.RegenerateOrderFromProjectPage; } }
 
-        Uniconta.DataModel.DebtorOrder master;
+        Uniconta.DataModel.DCOrder master;
 
-        public RegenerateOrderFromProjectPage(UnicontaBaseEntity master): base(master)
+        public RegenerateOrderFromProjectPage(UnicontaBaseEntity master) : base(master)
         {
-            this.master = master as Uniconta.DataModel.DebtorOrder;
+            InitPage(master);
+        }
+
+        public RegenerateOrderFromProjectPage(SynchronizeEntity syncEntity) : base(syncEntity, true)
+        {
+            if (syncEntity != null)
+                InitPage(syncEntity.Row);
+        }
+
+        private void InitPage(UnicontaBaseEntity master)
+        {
+            this.master = master as Uniconta.DataModel.DCOrder;
             InitializeComponent();
             SetRibbonControl(localMenu, dgGenerateOrder);
             dgGenerateOrder.UpdateMaster(master);
@@ -57,6 +69,21 @@ namespace UnicontaClient.Pages.CustomPage
             Utility.SetupVariants(api, null, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
             dgGenerateOrder.Readonly = true;
             Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
+        }
+
+        protected override void SyncEntityMasterRowChanged(UnicontaBaseEntity args)
+        {
+            dgGenerateOrder.UpdateMaster(args);
+            var debtOrderMaster = dgGenerateOrder.masterRecord as Uniconta.DataModel.DCOrder;
+            if (debtOrderMaster != null)
+                SetHeader(string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("RegenerateOrder"), debtOrderMaster._OrderNumber));
+
+            BindGrid();
+        }
+
+        private Task BindGrid()
+        {
+            return dgGenerateOrder.Filter(null);
         }
 
         private void LocalMenu_OnItemClicked(string ActionType)
@@ -86,9 +113,8 @@ namespace UnicontaClient.Pages.CustomPage
         {
             busyIndicator.IsBusy = true;
 
-            var invApi = new InvoiceAPI(api);
-            var lst = (ProjectTransClientLocal[])await invApi.GetTransNotOnOrder(master, fromdate, todate, new ProjectTransClientLocal());
-            if (lst == null || lst.Length == 0)
+            var lst = (ProjectTransClientLocal[])await (new InvoiceAPI(api)).GetTransNotOnOrder(master, fromdate, todate, new ProjectTransClientLocal());
+            if (lst == null)
             {
                 busyIndicator.IsBusy = false;
                 UtilDisplay.ShowErrorCode(ErrorCodes.NoLinesFound);
@@ -97,7 +123,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             var orgList = dgGenerateOrder.ItemsSource as ICollection<ProjectTransClientLocal>;
             var newList = new List<ProjectTransClientLocal>(orgList.Count + lst.Length);
-            foreach(var rec in orgList)
+            foreach (var rec in orgList)
             {
                 if (rec._SendToOrder != 0)
                     newList.Add(rec);
@@ -110,6 +136,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
             busyIndicator.IsBusy = false;
             dgGenerateOrder.ItemsSource = newList;
+            api.ForcePrimarySQL = true;
         }
 
         async void RegenerateOrderFromProjectTrans()
@@ -119,7 +146,7 @@ namespace UnicontaClient.Pages.CustomPage
             var transLst = dgGenerateOrder.GetVisibleRows() as IEnumerable<ProjectTransClientLocal>;
             if (transLst == null)
                 return;
-            foreach(var x in transLst)
+            foreach (var x in transLst)
             {
                 if (x._remove)
                 {
@@ -143,14 +170,14 @@ namespace UnicontaClient.Pages.CustomPage
                 return;
             }
             busyIndicator.IsBusy = true;
-            var invApi = new InvoiceAPI(api);
-            var result = await invApi.RegenerateOrderFromProject(master, excludedTransLst, includedTransLst);
+            var result = await (new InvoiceAPI(api)).RegenerateOrderFromProject(master, excludedTransLst, includedTransLst);
             busyIndicator.IsBusy = false;
+            api.ForcePrimarySQL = true;
             UtilDisplay.ShowErrorCode(result);
             if (result == ErrorCodes.Succes)
             {
                 globalEvents.OnRefresh(NameOfControl, null);
-                dockCtrl?.CloseDockItem();
+                CloseDockItem();
             }
         }
     }
@@ -159,6 +186,8 @@ namespace UnicontaClient.Pages.CustomPage
     {
         [Display(Name = "Include", ResourceType = typeof(ProjectTransClientText))]
         internal bool _remove;
+       
+        [Display(Name = "Check", ResourceType = typeof(ProjectTransClientText))]
         public bool Check { get { return !_remove; } set { _remove = !value; } }
     }
 }

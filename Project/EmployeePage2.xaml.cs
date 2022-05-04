@@ -58,9 +58,8 @@ namespace UnicontaClient.Pages.CustomPage
 
         void InitPage(CrudAPI crudapi)
         {
-            BusyIndicator = busyIndicator;
             layoutControl = layoutItems;
-            cmbDim1.api = cmbDim2.api = cmbDim3.api = cmbDim4.api = cmbDim5.api = leEmpGroup.api = lePayrollCategory.api = leApprover.api = leApprover2.api = crudapi;
+            cmbDim1.api = cmbDim2.api = cmbDim3.api = cmbDim4.api = cmbDim5.api = leEmpGroup.api = lePayrollCategory.api = leApprover.api = leApprover2.api = leWarehouse.api= crudapi;
             Utility.SetDimensions(crudapi, lbldim1, lbldim2, lbldim3, lbldim4, lbldim5, cmbDim1, cmbDim2, cmbDim3, cmbDim4, cmbDim5, usedim);
             if (LoadedRow == null && editrow == null)
             {
@@ -98,14 +97,27 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override void OnLayoutCtrlLoaded()
         {
-            if (!api.CompanyEntity.TimeManagement)
+            var comp = api.CompanyEntity;
+            if (!comp.TimeManagement)
                 grpTM.Visibility = Visibility.Collapsed;
+            if (!comp.Warehouse)
+                liWarehouse.Visibility = Visibility.Collapsed;
         }
-
+    
 #if !SILVERLIGHT
         private void Email_ButtonClicked(object sender)
         {
-            var mail = string.Concat("mailto:", txtEmail.Text);
+            OpenEmail(txtEmail.Text);
+        }
+
+        private void PrivateEmail_ButtonClicked(object sender)
+        {
+            OpenEmail(txtPrivateEmail.Text);
+        }
+
+        void OpenEmail(string email)
+        {
+            var mail = string.Concat("mailto:", email);
             System.Diagnostics.Process proc = new System.Diagnostics.Process();
             proc.StartInfo.FileName = mail;
             proc.Start();

@@ -45,8 +45,7 @@ namespace ISO20022CreditTransfer
                     var grid = dgCreditorTranOpenGrid.GetVisibleRows() as IEnumerable<CreditorTransPayment>;
                     foreach (var rec in grid)
                     {
-                        rec._ErrorInfo = string.Empty;
-                        rec.NotifyErrorSet();
+                        rec.ErrorInfo = null;
                     }
                     //Clear SystemInfo field<<
 
@@ -75,8 +74,7 @@ namespace ISO20022CreditTransfer
                                 foreach (var rec in queryPaymentTrans)
                                 {
                                     string statusDescription = paymStatusRec.TransStatusCodeAdd == string.Empty ? paymStatusRec.TransStatusDescription : paymStatusRec.TransStatusCodeAdd;
-                                    rec._ErrorInfo = string.Format("{0}\n{1}", paymStatusRec.TransStatusDescriptionShort, statusDescription);
-                                    rec.NotifyErrorSet();
+                                    rec.ErrorInfo = string.Format("{0}\n{1}", paymStatusRec.TransStatusDescriptionShort, statusDescription);
 
                                     if (paymStatusRec.TransStatus == PAYMSTATUSID_ACSC)//The payment has been executed
                                     {

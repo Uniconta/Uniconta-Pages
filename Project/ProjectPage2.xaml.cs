@@ -73,11 +73,11 @@ namespace UnicontaClient.Pages.CustomPage
 
         void InitPage(CrudAPI crudapi)
         {
-            BusyIndicator = busyIndicator;            
-			dAddress.Header = Localization.lookup("DeliveryAddr");
+            StartLoadCache();
+            dAddress.Header = Localization.lookup("DeliveryAddr");
             layoutControl = layoutItems;
             cbCountry.ItemsSource = Enum.GetValues(typeof(Uniconta.Common.CountryCode));
-            lePersonInCharge.api = lePurchaser.api = lePrStandard.api =  leAccount.api = lePayment.api = leVat.api = cmbDim1.api = cmbDim2.api = cmbDim3.api = cmbDim4.api = cmbDim5.api = leGroup.api = leMasterProject.api = lePrType.api= leInstallation.api= crudapi;
+            lePersonInCharge.api = lePurchaser.api = lePrStandard.api = leAccount.api = lePayment.api = leVat.api = cmbDim1.api = cmbDim2.api = cmbDim3.api = cmbDim4.api = cmbDim5.api = leGroup.api = leMasterProject.api = lePrType.api = leInstallation.api = crudapi;
             Utility.SetDimensions(crudapi, lbldim1, lbldim2, lbldim3, lbldim4, lbldim5, cmbDim1, cmbDim2, cmbDim3, cmbDim4, cmbDim5, usedim);
             if (LoadedRow == null)
             {
@@ -97,14 +97,12 @@ namespace UnicontaClient.Pages.CustomPage
             layoutItems.DataContext = editrow;
             frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
             editrow.PropertyChanged += Editrow_PropertyChanged;
-            StartLoadCache();
         }
 
         protected override void AfterTemplateSet(UnicontaBaseEntity row)
         {
-            base.AfterTemplateSet(row);
             if (this.Debtor != null)
-                (row as ProjectClient).Account = Debtor._Account;
+                (row as ProjectClient).SetMaster(this.Debtor);
         }
 
         private void frmRibbon_OnItemClicked(string ActionType)
@@ -149,7 +147,15 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var debtors = api.GetCache(typeof(Uniconta.DataModel.Debtor));
             var debtor = (Uniconta.DataModel.Debtor)debtors?.Get(Convert.ToString(e.NewValue));
-            if (debtor != null && installationCache != null)
+            if (debtor == null)
+                return;
+            if (debtor._Blocked)
+            {
+                UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("AccountIsBlocked"), Uniconta.ClientTools.Localization.lookup("Information"));
+                return;
+            }
+            editrow?.SetMaster(debtor);
+            if (installationCache != null)
             {
                 leInstallation.cacheFilter = new AccountCacheFilter(installationCache, 1, debtor._Account);
                 leInstallation.InvalidCache();
@@ -164,7 +170,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (api.CompanyEntity.DeliveryAddress)
             {
                 installationCache = api.GetCache(typeof(Uniconta.DataModel.WorkInstallation)) ?? await api.LoadCache(typeof(Uniconta.DataModel.WorkInstallation)).ConfigureAwait(false);
-                if (editrow._DCAccount != null)
+                if (editrow?._DCAccount != null)
                     leInstallation.cacheFilter = new AccountCacheFilter(installationCache, 1, editrow._DCAccount);
             }
             LoadType(typeof(Uniconta.DataModel.Debtor));

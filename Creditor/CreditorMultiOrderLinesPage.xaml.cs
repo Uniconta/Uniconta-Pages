@@ -1,28 +1,18 @@
-using UnicontaClient.Models;
-using UnicontaClient.Pages;
-using UnicontaClient.Utilities;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using Uniconta.API.Service;
 using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
 using Uniconta.Common;
-using Uniconta.DataModel;
 using Uniconta.Common.Utility;
+using Uniconta.DataModel;
+using UnicontaClient.Models;
+using UnicontaClient.Utilities;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -178,6 +168,11 @@ namespace UnicontaClient.Pages.CustomPage
                 PrCategory.Visible = PrCategory.ShowInColumnChooser = false;
                 Project.Visible = Project.ShowInColumnChooser = false;
             }
+            else
+            {
+                PrCategory.ShowInColumnChooser = true;
+                Project.ShowInColumnChooser = true;
+            }
             if (!company.Storage)
             {
                 Storage.Visible = Storage.ShowInColumnChooser = false;
@@ -185,13 +180,23 @@ namespace UnicontaClient.Pages.CustomPage
             }
             else if (!company._OrderLineEditDelivered)
                 QtyDelivered.Visible = QtyDelivered.ShowInColumnChooser = false;
+            else
+            {
+                Storage.ShowInColumnChooser = true;
+                QtyDelivered.ShowInColumnChooser = true;
+            }
             if (!company.Location || !company.Warehouse)
                 Location.Visible = Location.ShowInColumnChooser = false;
+            else
+                Location.ShowInColumnChooser = true;
             if (!company.Warehouse)
                 Warehouse.Visible = Warehouse.ShowInColumnChooser = false;
+            else
+                Warehouse.ShowInColumnChooser = true;
             if (!company.SerialBatchNumbers)
                 SerieBatch.Visible = SerieBatch.ShowInColumnChooser = false;
-
+            else
+                SerieBatch.ShowInColumnChooser = true;
             Utility.SetupVariants(api, colVariant, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
             Utility.SetDimensionsGrid(api, colDim1, colDim2, colDim3, colDim4, colDim5);
         }
@@ -240,6 +245,9 @@ namespace UnicontaClient.Pages.CustomPage
                                 return;
                             }
                         }
+                        var lookup = SetPriceLookup(rec);
+                        if (lookup != null)
+                            lookup.UseCustomerPrices = false;
                         if (selectedItem._SalesQty != 0d)
                             rec.Qty = selectedItem._SalesQty;
                         else if (api.CompanyEntity._PurchaseLineOne)
@@ -247,9 +255,11 @@ namespace UnicontaClient.Pages.CustomPage
                         if (api.CompanyEntity._InvoiceUseQtyNowCre)
                             rec.QtyNow = rec._Qty;
                         rec.SetItemValues(selectedItem, api.CompanyEntity._PurchaseLineStorage);
-                        var lookup = SetPriceLookup(rec);
                         if (lookup != null)
+                        {
+                            lookup.UseCustomerPrices = true;
                             lookup.SetPriceFromItem(rec, selectedItem);
+                        }
                         else if (selectedItem._PurchasePrice != 0)
                             rec.Price = selectedItem._PurchasePrice;
                         else

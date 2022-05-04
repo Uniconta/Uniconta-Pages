@@ -19,6 +19,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.Util;
+using Uniconta.Common.Utility;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -67,7 +68,10 @@ namespace UnicontaClient.Pages.CustomPage
         public override void Utility_Refresh(string screenName, object argument = null)
         {
             if (screenName == TabControls.CreditorTranOpenPage2)
+            {
+                api.ForcePrimarySQL = true;
                 dgCreditorTranOpenGrid.UpdateItemSource(argument);
+            }
         }
         public CreditorTranOpen(BaseAPI api, string lookupKey)
             : base(api, lookupKey)
@@ -109,7 +113,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "VoucherTransactions":
                     if (selectedItem == null || selectedItem.Trans == null)
                         return;
-                    string vheader = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("VoucherTransactions"), selectedItem.Trans._Voucher);
+                    string vheader = Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("VoucherTransactions"), selectedItem.Trans._Voucher);
                     AddDockItem(TabControls.AccountsTransaction, dgCreditorTranOpenGrid.syncEntity, vheader);
                     break;
                 case "SaveGrid":

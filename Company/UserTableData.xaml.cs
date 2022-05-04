@@ -115,11 +115,9 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     if (master._Name == tablename)
                     {
-                        var tableHeaderClient = new TableHeaderClient();
-                        StreamingManager.Copy(master, tableHeaderClient);
-                        string header = master._Prompt == null ? master._Name : master._Prompt;
+                        string header = master._Prompt != null ? UserFieldControl.LocalizePrompt(master._Prompt) : master._Name;
                         this.SetHeader(header);
-                        this.thMaster = tableHeaderClient;
+                        this.thMaster = master;
                         Layout._SubId = api.CompanyId;
                         this.layoutname = header;
                         if (!isInitialized)
@@ -153,13 +151,13 @@ namespace UnicontaClient.Pages.CustomPage
             if (header != null)
                 SetHeader(header);
         }
-        private void Initialize(TableHeader thMaster, UnicontaBaseEntity masterRecord, string lookupkey=null)
+        private void Initialize(TableHeader thMaster, UnicontaBaseEntity masterRecord, string lookupkey = null)
         {
             if (lookupkey != null)
                 this.LookupKey = lookupkey;
             master = masterRecord;
             dgTabledataGrid.UserTableType = thMaster.UserType;
-            dgTabledataGrid.IsEditable = thMaster._EditLines;
+            dgTabledataGrid.IsEditable = thMaster._EditLines && !thMaster._ReadOnly;
 
             // first call setUserFields after grid is setup correctly
             setUserFields(thMaster);
@@ -185,7 +183,9 @@ namespace UnicontaClient.Pages.CustomPage
             if (dgTabledataGrid.IsEditable)
                 UtilDisplay.RemoveMenuCommand(rb, new string[] { "AddItem", "EditItem" });
             else
-                UtilDisplay.RemoveMenuCommand(rb, new string[] { "AddRow", "CopyRow", "DeleteRow", "SaveGrid" });
+                UtilDisplay.RemoveMenuCommand(rb, new string[] { "AddRow", "CopyRow", "DeleteRow", "SaveGrid", "UndoDelete" });
+            if (this.thMaster._ReadOnly)
+                UtilDisplay.RemoveMenuCommand(rb, new string[] { "AddRow", "CopyRow", "DeleteRow", "SaveGrid", "UndoDelete", "AddItem", "EditItem" });
             dtlTables = Utilities.Utility.GetDefaultCompany().UserTables.Where(x => x._MasterTable == thMaster._Name).ToList();
             if (dtlTables.Count > 0)
             {
@@ -246,6 +246,8 @@ namespace UnicontaClient.Pages.CustomPage
                     UserFieldControl.CreateKeyFieldsOnGrid(dgTabledataGrid, thMaster._PKprompt);
                 if (thMaster._TableType == TableBaseType.Transaction)
                     UserFieldControl.CreateDateFieldOnGrid(dgTabledataGrid);
+                if (thMaster._Attachment)
+                    UserFieldControl.CreateAttachmentFieldsOnGrid(dgTabledataGrid, row);
                 if (UserFieldDef != null)
                     UserFieldControl.CreateUserFieldOnGrid(dgTabledataGrid, UserFieldDef, (RowIndexConverter)this.Resources["RowIndexConverter"], api, !dgTabledataGrid.IsEditable, useBinding: false);
                 Layout._SubId = api.CompanyId;
@@ -302,9 +304,13 @@ namespace UnicontaClient.Pages.CustomPage
                 if (selectedItem == null)
                     return;
                 var sender = ribbonControl.senderRibbonButton;
-                var tabName = sender?.Content;
+                if (sender == null)
+                    return;
+                var tabName = sender.Content;
                 var tableName = (sender.Tag as string)?.Split(';')[1];
                 var userTable = dtlTables.Where(x => x._Name == tableName).FirstOrDefault();
+                if (userTable == null)
+                    return;
                 object[] parmtbldata = new object[3];
                 parmtbldata[0] = userTable;
                 parmtbldata[1] = string.Concat(tableName, ";", tabName);
@@ -316,22 +322,11 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 case "AddItem":
                     if (this.thMaster?.UserType != null)
-                    {
-                        object[] param = new object[3];
-                        param[0] = api;
-                        param[1] = this.thMaster;
-                        param[2] = this.master;
-                        AddDockItem(TabControls.UserTableDataPage2, param, (this.thMaster as TableHeader)?._Name, "Add_16x16.png");
-                    }
+                        AddDockItem(TabControls.UserTableDataPage2, new object[] { api, this.thMaster, this.master }, (this.thMaster as TableHeader)?._Name, "Add_16x16.png");
                     break;
                 case "EditItem":
                     if (selectedItem != null)
-                    {
-                        object[] parameter = new object[2];
-                        parameter[0] = selectedItem;
-                        parameter[1] = this.thMaster;
-                        AddDockItem(TabControls.UserTableDataPage2, parameter, (this.thMaster as TableHeader)?._Name, "Edit_16x16.png");
-                    }
+                        AddDockItem(TabControls.UserTableDataPage2, new object[] { selectedItem, this.thMaster }, (this.thMaster as TableHeader)?._Name, "Edit_16x16.png");
                     break;
                 case "AddNote":
                     if (selectedItem != null)
@@ -357,6 +352,9 @@ namespace UnicontaClient.Pages.CustomPage
                 case "DeleteRow":
                     dgTabledataGrid.DeleteRow();
                     break;
+                case "UndoDelete":
+                    dgTabledataGrid.UndoDeleteRow();
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -371,6 +369,11 @@ namespace UnicontaClient.Pages.CustomPage
                 localMenu_OnItemClicked("RefreshGrid");
                 if (dgTabledataGrid.Visibility == Visibility.Collapsed)
                     detailControl.Refresh(argument, dgTabledataGrid.SelectedItem);
+            }
+            else if (screenName == TabControls.UserNotesPage || screenName == TabControls.UserDocsPage && argument != null)
+            {
+                dgTabledataGrid.UpdateItemSource(argument);
+                localMenu_OnItemClicked("RefreshGrid"); localMenu_OnItemClicked("RefreshGrid");
             }
         }
     }

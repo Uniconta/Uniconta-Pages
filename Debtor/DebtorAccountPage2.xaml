@@ -9,7 +9,6 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorAccountPage2"
     <UserControl.Resources>
         <Util:RowIndexConverter x:Key="RowIndexConverter" />
     </UserControl.Resources>
-    <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="0" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BusyMessage}">
         <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -82,6 +81,9 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorAccountPage2"
                         <CorasauControls:CorasauLayoutItem FieldName="EndDiscountPct" x:Name="liEndDiscountPct">
                             <CorasauControls:DoubleEditor FieldName="EndDiscountPct" />
                         </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="LineDiscountPct" x:Name="liLineDiscountPct">
+                            <CorasauControls:DoubleEditor FieldName="LineDiscountPct" />
+                        </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="CreditMax" x:Name="liCreditMax">
                             <CorasauControls:DoubleEditor FieldName="CreditMax" />
                         </CorasauControls:CorasauLayoutItem>
@@ -112,14 +114,16 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorAccountPage2"
                         <CorasauControls:CorasauLayoutItem FieldName="RefInPayment" x:Name="liRefInPayment">
                             <CorasauControls:TextEditor Text="{Binding RefInPayment,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="VatNumber" x:Name="liVatNumber">
-                            <CorasauControls:TextEditor Text="{Binding VatNumber,Mode=TwoWay}"/>
+                        <CorasauControls:CorasauLayoutItem FieldName="D2CAccount" x:Name="liD2CAccount">
+                            <CorasauControls:TextEditor  x:Name="txtD2CAccount" Text="{Binding D2CAccount,Mode=OneWay}" IsReadOnly="True" />
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="EEIsNotVatDeclOrg" x:Name="liEEIsNotVatDeclOrg">
                             <CorasauControls:CheckEditor IsChecked="{Binding EEIsNotVatDeclOrg,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="Created" x:Name="liCreated">
+                            <CorasauControls:DateEditor x:Name="dteCreated"  EditValue="{Binding Created,Mode=TwoWay}"  />
+                        </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
-
                     <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="crmGroup" Visibility="Collapsed"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CRM}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="400">
                         <CorasauControls:CorasauLayoutItem FieldName="CrmGroup" x:Name="liCrmGroup">
                             <CorasauControls:LookupEditor x:Name="leCrmGroup" Text="{Binding CrmGroup,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
@@ -150,13 +154,19 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorAccountPage2"
                             <CorasauControls:CheckEditor IsChecked="{Binding EmailDocuments,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="InvoiceInXML" x:Name="liInvoiceInXML">
-                            <CorasauControls:CheckEditor IsChecked="{Binding InvoiceInXML,Mode=TwoWay}" />
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="BalanceMethod" x:Name="liBalanceMethod">
-                            <CorasauControls:ComboBoxEditor SelectedItem="{Binding BalanceMethod,Mode=TwoWay}"/>
+                            <CorasauControls:ComboBoxEditor SelectedItem="{Binding InvoiceInXML,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="EAN" x:Name="liEAN">
                             <CorasauControls:TextEditor x:Name="txtEAN" Text="{Binding EAN,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="VatNumber" x:Name="liVatNumber">
+                            <CorasauControls:TextEditor Text="{Binding VatNumber,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="EORI" x:Name="liEORI">
+                            <CorasauControls:TextEditor  x:Name="txtEORI" Text="{Binding EORI,Mode=TwoWay}"  />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="BalanceMethod" x:Name="liBalanceMethod">
+                            <CorasauControls:ComboBoxEditor SelectedItem="{Binding BalanceMethod,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="PostingAccount" x:Name="liPostingAccount">
                             <CorasauControls:LookupEditor x:Name="lePostingAccount" Text="{Binding PostingAccount,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
@@ -249,5 +259,4 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorAccountPage2"
                 </CorasauControls:CorasauLayoutGroup>
             </CorasauControls:CorasauLayoutControl>
         </Grid>
-    </CorasauControls:BusyIndicator>
 </Pages:FormBasePage>

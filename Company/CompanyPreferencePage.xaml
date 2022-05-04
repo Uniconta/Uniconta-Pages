@@ -7,7 +7,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CompanyPreferencePage"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
         xmlns:CientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
-        xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools" >
+        xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
     <CorasauControls:BusyIndicator x:Name="busyIndicator" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
         <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
             <Grid.RowDefinitions>
@@ -38,6 +38,9 @@ x:Class="UnicontaClient.Pages.CustomPage.CompanyPreferencePage"
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="InvoiceShowEmptyLines">
                             <CorasauControls:CheckEditor IsChecked="{Binding InvoiceShowEmptyLines,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="PacknoteShowEmptyLines">
+                            <CorasauControls:CheckEditor IsChecked="{Binding PacknoteShowEmptyLines,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="UseActualCostPrice">
                             <CorasauControls:CheckEditor IsChecked="{Binding UseActualCostPrice,Mode=TwoWay}" />
@@ -70,10 +73,16 @@ x:Class="UnicontaClient.Pages.CustomPage.CompanyPreferencePage"
                             <CorasauControls:ComboBoxEditor x:Name="cmbAccOnInvTrans" SelectedIndexChanged="cmbAccOnInvTrans_SelectedIndexChanged" />
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="AllowNegativStock">
-                            <CorasauControls:CheckEditor IsChecked="{Binding AllowNegativStock,Mode=TwoWay}" />
+                            <CorasauControls:CheckEditor x:Name="chkAllowNegativStock"  IsChecked="{Binding AllowNegativStock,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liChkWarehouse" FieldName="CheckWarehouse" >
+                            <CorasauControls:CheckEditor x:Name="chkChkWarehouse" IsReadOnly="{Binding ElementName=chkAllowNegativStock, Path=IsChecked}" IsChecked="{Binding CheckWarehouse,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="UpdateCostOnPurchase">
                             <CorasauControls:CheckEditor IsChecked="{Binding UpdateCostOnPurchase,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="UpdatePurchasePrice">
+                            <CorasauControls:CheckEditor IsChecked="{Binding UpdatePurchasePrice,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="SetupSizesInvGrp">
                             <CorasauControls:CheckEditor IsChecked="{Binding SetupSizesInvGrp,Mode=TwoWay}" />
@@ -81,10 +90,25 @@ x:Class="UnicontaClient.Pages.CustomPage.CompanyPreferencePage"
                         <CorasauControls:CorasauLayoutItem FieldName="LoadVariantsInCounting">
                             <CorasauControls:CheckEditor IsChecked="{Binding LoadVariantsInCounting,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="UpdateDeliveryDate">
+                            <CorasauControls:CheckEditor IsChecked="{Binding UpdateDeliveryDate,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
                     <CorasauControls:CorasauLayoutGroup View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Project}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" MinWidth="420">
                         <CorasauControls:CorasauLayoutItem FieldName="DimFromProject">
                             <CorasauControls:CheckEditor IsChecked="{Binding DimFromProject,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="ProjShowPctAcontoInvoice">
+                            <CorasauControls:CheckEditor IsChecked="{Binding ProjShowPctAcontoInvoice,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="ProjZeroInvoice">
+                            <CorasauControls:CheckEditor IsChecked="{Binding ProjZeroInvoice,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="ProjOrderInvoice">
+                            <CorasauControls:CheckEditor IsChecked="{Binding ProjOrderInvoice,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="ProjQuickInvoice">
+                            <CorasauControls:CheckEditor IsChecked="{Binding ProjQuickInvoice,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
                     </CorasauControls:CorasauLayoutGroup>

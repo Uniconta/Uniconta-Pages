@@ -42,7 +42,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CWGenerateInvoice"
                             <ClientToolsControls:DateEditor x:Name="dpDate" EditValue="{Binding GenrateDate,Mode=TwoWay}"/>
                         </ClientToolsControls:CorasauLayoutItem>
                         <ClientToolsControls:CorasauLayoutItem x:Name="liInvoiceNumber" LabelTemplate="{StaticResource PrimaryLableTemplate}">
-                            <ClientToolsControls:TextEditor x:Name="txtInvNumber" Text="{Binding InvoiceNumber,Mode=TwoWay}" MaxLength="17"/>
+                            <ClientToolsControls:TextEditor x:Name="txtInvNumber" Text="{Binding InvoiceNumber,Mode=TwoWay}" MaxLength="20"/>
                         </ClientToolsControls:CorasauLayoutItem>
                         <ClientToolsControls:CorasauLayoutItem FieldName="IsSimulation" x:Name="liIsSimulation" LabelTemplate="{StaticResource PrimaryLableTemplate}">
                             <ClientToolsControls:CheckEditor x:Name="chkSimulation" IsChecked="{Binding IsSimulation,Mode=TwoWay}"/>
@@ -64,7 +64,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CWGenerateInvoice"
                             </DataTemplate>
                         </ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
                         <ClientToolsControls:CorasauLayoutItem FieldName="AdditionalOrders" x:Name="liAdditionalOrders" LabelTemplate="{StaticResource PrimaryLableTemplate}">
-                            <ClientToolsControls:DimComboBoxEditor x:Name="cbOrders" DisplayMember="KeyStr" EditValue="{Binding AdditionalOrders}"  ShowCustomItems="False">
+                            <ClientToolsControls:DimComboBoxEditor x:Name="cbOrders" DisplayMember="KeyStr" EditValue="{Binding AdditionalOrders}">
                                 <ClientToolsControls:DimComboBoxEditor.StyleSettings>
                                     <editor:CheckedComboBoxStyleSettings  />
                                 </ClientToolsControls:DimComboBoxEditor.StyleSettings>

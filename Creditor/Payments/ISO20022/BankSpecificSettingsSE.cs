@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.Common;
 using Uniconta.DataModel;
+using UnicontaClient.Pages;
 using UnicontaClient.Pages.Creditor.Payments;
 
 namespace UnicontaISO20022CreditTransfer
@@ -35,6 +36,12 @@ namespace UnicontaISO20022CreditTransfer
                 case seBank.SEB:
                     companyBankEnum = CompanyBankENUM.SEB;
                     return companyBankEnum;
+                case seBank.Nordea:
+                    companyBankEnum = CompanyBankENUM.Nordea_SE;
+                    return companyBankEnum;
+                case seBank.Danske_Bank:
+                    companyBankEnum = CompanyBankENUM.DanskeBank_SE;
+                    return companyBankEnum;
                 default:
                     return CompanyBankENUM.None;
             }
@@ -49,6 +56,10 @@ namespace UnicontaISO20022CreditTransfer
             {
                 case CompanyBankENUM.SEB:
                     return "SEB";
+                case CompanyBankENUM.DanskeBank_SE:
+                    return "Danske Bank";
+                case CompanyBankENUM.Nordea_SE:
+                    return "Nordea";
                 default:
                     return string.Empty;
             }
@@ -62,6 +73,50 @@ namespace UnicontaISO20022CreditTransfer
             return BaseDocument.CCYSEK;
         }
 
+        /// <summary>
+        /// Identifies whether a single entry per individual transaction or a batch entry for the sum of the amounts of all transactions 
+        /// in the message is requested 
+        /// </summary>
+        public override string BatchBooking()
+        {
+            switch (companyBankEnum)
+            {
+                case CompanyBankENUM.DanskeBank_SE:
+                    return CredPaymFormat.BatchBooking ? TRUE_VALUE : FALSE_VALUE;
+
+                default:
+                    return string.Empty;
+            }
+        }
+
+        /// <summary>
+        /// Test marked payment
+        /// </summary>
+        public override bool TestMarked()
+        {
+            switch (companyBankEnum)
+            {
+                case CompanyBankENUM.DanskeBank_SE:
+                    return CredPaymFormat.TestMarked;
+
+                default:
+                    return false;
+            }
+        }
+
+        /// <summary>
+        /// DANSKE BANK: It's only used by Danske Bank
+        /// </summary>
+        public override string AuthstnCodeFeedback()
+        {
+            switch (companyBankEnum)
+            {
+                case CompanyBankENUM.DanskeBank_SE:
+                    return string.Format("Feedback={0}", "XDY"); //XDY is default - need a parameter if user should have the possibility to change the value
+                default:
+                    return string.Empty;
+            }
+        }
 
         /// <summary>
         /// Identification assigned by an institution.
@@ -75,7 +130,9 @@ namespace UnicontaISO20022CreditTransfer
 
             switch (companyBankEnum)
             {
+             
                 case CompanyBankENUM.SEB:
+                case CompanyBankENUM.DanskeBank_SE:
                     identificationId = companyCVR.Replace(" ", String.Empty);
                     return identificationId;
                 default:
@@ -94,7 +151,10 @@ namespace UnicontaISO20022CreditTransfer
             switch (companyBankEnum)
             {
                 case CompanyBankENUM.SEB:
-                    return "BANK"; //Default value for SEB
+                case CompanyBankENUM.DanskeBank_SE:
+                    return "BANK";
+                case CompanyBankENUM.Nordea_SE:
+                    return "CUST"; //Nordea only accept the code CUST
                 default:
                     return "BANK";
             }
@@ -111,11 +171,42 @@ namespace UnicontaISO20022CreditTransfer
             switch (companyBankEnum)
             {
                 case CompanyBankENUM.SEB:
-                    return "ONCL"; //Default value for SEB
+                case CompanyBankENUM.DanskeBank_SE:
+                    return "ONCL";
+                case CompanyBankENUM.Nordea_SE:
+                    return string.Empty;
                 default:
                     return "ONCL";
             }
         }
+
+        public override string DebtorIdentificationCode(string debtorId)
+        {
+            debtorId = debtorId ?? string.Empty;
+
+            switch (companyBankEnum)
+            {
+                //Service code given by Nordea is mandatory
+                case CompanyBankENUM.Nordea_SE:
+                    return debtorId;
+
+                default:
+                    return string.Empty;
+            }
+        }
+
+
+        /// <summary>
+        /// Exclude section CdtrAgt
+        /// </summary>
+        public override bool ExcludeSectionCdtrAgt(ISO20022PaymentTypes ISOPaymType, string creditorSWIFT)
+        {
+            if (companyBankEnum == CompanyBankENUM.Nordea_SE && creditorSWIFT == string.Empty)
+                return true;
+
+            return false;
+        }
+
 
         /// <summary>
         /// ITS NOT ALIGNED FOR SWEDEN - WAIT FOR TEST
@@ -140,13 +231,51 @@ namespace UnicontaISO20022CreditTransfer
             return regNum + bban;
         }
 
+        /// <summary>
+        /// Swedish BankGirot
+        /// </summary>
+        public override Tuple<string, string> CreditorFIK71(string ocrLine, string creditorPaymId)
+        {
+            ocrLine = ocrLine != null ? Regex.Replace(ocrLine, "[^0-9]", "") : string.Empty;
+            creditorPaymId = creditorPaymId != null ? Regex.Replace(creditorPaymId, "[^0-9]", "") : string.Empty;
+
+            return new Tuple<string, string>(ocrLine, creditorPaymId);
+        }
+
+        /// <summary>
+        /// Swedish PlusGirot
+        /// </summary>
+        public override Tuple<string, string> CreditorFIK75(string ocrLine, string creditorPaymId)
+        {
+            ocrLine = ocrLine != null ? Regex.Replace(ocrLine, "[^0-9]", "") : string.Empty;
+            creditorPaymId = creditorPaymId != null ? Regex.Replace(creditorPaymId, "[^0-9]", "") : string.Empty;
+
+            return new Tuple<string, string>(ocrLine, creditorPaymId);
+        }
+
 
         /// <summary>
         /// Unstructured Remittance Information
+        /// SE: Ustrd allowed for BankGirot when there's no OCR
         /// </summary>
-        public override List<string> Ustrd(string externalAdvText, ISO20022PaymentTypes ISOPaymType, PaymentTypes paymentMethod, bool extendedText)
+        public override List<string> Ustrd(string externalAdvText, ISO20022PaymentTypes ISOPaymType, CreditorTransPayment trans, bool extendedText)
          {
             var ustrdText = StandardPaymentFunctions.RegularExpressionReplace(externalAdvText, allowedCharactersRegEx, replaceCharactersRegEx);
+
+            if (ustrdText == null)
+                return null;
+
+            //Extended notification
+            if (ISOPaymType == ISO20022PaymentTypes.DOMESTIC)
+            {
+                if (extendedText)
+                {
+                    if (ustrdText.Length <= 20)
+                        return null;
+                }
+                else
+                    return null;
+            }
 
             int maxLines = 0;
             int maxStrLen = 0;
@@ -154,7 +283,28 @@ namespace UnicontaISO20022CreditTransfer
 
             switch (companyBankEnum)
             {
-                case CompanyBankENUM.SEB:  //Setup as Danske Bank
+                case CompanyBankENUM.Nordea_SE:
+                    if ((trans._PaymentMethod == PaymentTypes.PaymentMethod3 || (trans._PaymentMethod == PaymentTypes.PaymentMethod5)) && !string.IsNullOrEmpty(trans._PaymentId))
+                        return resultList;
+
+                    if (ISOPaymType == ISO20022PaymentTypes.DOMESTIC)
+                    {
+                        maxLines = 50;
+                        maxStrLen = 75;
+                    }
+                    else if (ISOPaymType == ISO20022PaymentTypes.SEPA)
+                    {
+                        maxLines = 1;
+                        maxStrLen = 140;
+                    }
+                    else
+                    {
+                        maxLines = 1;
+                        maxStrLen = 105;
+                    }
+                    break;
+                    
+                case CompanyBankENUM.DanskeBank_SE:
                     maxLines = 4;
                     maxStrLen = 35;
                     break;
@@ -177,5 +327,6 @@ namespace UnicontaISO20022CreditTransfer
 
             return resultList;
         }
+
     }
 }

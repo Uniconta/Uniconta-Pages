@@ -24,6 +24,7 @@ using System.Windows.Shapes;
 using System.Collections;
 using Uniconta.ClientTools.Controls;
 using Uniconta.DataModel;
+using Uniconta.Common.User;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -35,6 +36,7 @@ namespace UnicontaClient.Pages.CustomPage
     }
     public partial class DebtorAccount : GridBasePage
     {
+        SQLCache interestCache, productsCache;
         public override string NameOfControl
         {
             get { return TabControls.DebtorAccount.ToString(); }
@@ -51,6 +53,12 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void InitPage()
         {
+            var Comp = api.CompanyEntity;
+            if (Comp.CRM)
+                LoadType(new Type[] { typeof(Uniconta.DataModel.DebtorGroup), typeof(Uniconta.DataModel.CrmInterest), typeof(Uniconta.DataModel.CrmProduct) });
+            else
+                LoadNow(typeof(Uniconta.DataModel.DebtorGroup));
+
             InitializeComponent();
             dgDebtorAccountGrid.RowDoubleClick += dgDebtorAccountGrid_RowDoubleClick;
             localMenu.dataGrid = dgDebtorAccountGrid;
@@ -62,13 +70,8 @@ namespace UnicontaClient.Pages.CustomPage
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "UndoDelete", "SaveGrid" });
 
-            var Comp = api.CompanyEntity;
             if (Comp.RoundTo100)
                 CurBalance.HasDecimals = Overdue.HasDecimals = false;
-            if (Comp.CRM)
-                LoadType(new Type[] { typeof(Uniconta.DataModel.DebtorGroup), typeof(Uniconta.DataModel.CrmInterest), typeof(Uniconta.DataModel.CrmProduct) });
-            else
-                LoadNow(typeof(Uniconta.DataModel.DebtorGroup));
 
             dgDebtorAccountGrid.ShowTotalSummary();
 
@@ -137,7 +140,12 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 PaymentFormat.Visible = false;
             }
+
             dgDebtorAccountGrid.Readonly = true;
+
+            var rb = (RibbonBase)localMenu.DataContext;
+            if (rb != null && BasePage.session.User._Role == (byte)UserRoles.Standard)
+                UtilDisplay.RemoveMenuCommand(rb, "AccountantClientInfo");
         }
 
         void dgDebtorAccountGrid_RowDoubleClick()
@@ -261,10 +269,13 @@ namespace UnicontaClient.Pages.CustomPage
                     dgDebtorAccountGrid.AddRow();
                     break;
                 case "CopyRow":
-                    if (copyRowIsEnabled)
-                        dgDebtorAccountGrid.CopyRow();
-                    else
-                        CopyRecord(selectedItem);
+                    if (selectedItem != null)
+                    {
+                        if (copyRowIsEnabled)
+                            dgDebtorAccountGrid.CopyRow();
+                        else
+                            CopyRecord(selectedItem);
+                    }
                     break;
                 case "DeleteRow":
                     dgDebtorAccountGrid.DeleteRow();
@@ -303,23 +314,39 @@ namespace UnicontaClient.Pages.CustomPage
                 case "UndoDelete":
                     dgDebtorAccountGrid.UndoDeleteRow();
                     break;
+                case "DocSendLog":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.DocsSendLogGridPage, dgDebtorAccountGrid.syncEntity);
+                    break;
+                case "TaskGroups":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.DebtorProjTaskGroup, dgDebtorAccountGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("TaskGroups"), selectedItem._Name));
+                    break;
+                case "AccountantClientInfo":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.AccountantClientInfo, selectedItem, string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("AccountantClientInfo"), selectedItem._Account));
+                    break;
+                case "Budget":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.DebtorBudgetLinePage, dgDebtorAccountGrid.syncEntity);
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
-        }
+        }   
 
         void CopyRecord(DebtorClient selectedItem)
         {
             if (selectedItem == null)
                 return;
             var debtor = Activator.CreateInstance(selectedItem.GetType()) as DebtorClient;
-            StreamingManager.Copy(selectedItem, debtor);
-            var parms = new object[2] { debtor, false };
-            AddDockItem(TabControls.DebtorAccountPage2, parms, Uniconta.ClientTools.Localization.lookup("DebtorAccount"), "Add_16x16.png");
+            CorasauDataGrid.CopyAndClearRowId(selectedItem, debtor);
+            debtor._Created = DateTime.MinValue;
+            debtor._D2CAccount = null;
+            AddDockItem(TabControls.DebtorAccountPage2, new object[2] { debtor, IdObject.get(false) }, Uniconta.ClientTools.Localization.lookup("DebtorAccount"), "Add_16x16.png");
         }
 
-#if !SILVERLIGHT
         async void CreateMandates(IList debtors)
         {
             var mandateCache = api.GetCache(typeof(Uniconta.DataModel.DebtorPaymentMandate)) ?? await api.LoadCache(typeof(Uniconta.DataModel.DebtorPaymentMandate));
@@ -367,7 +394,6 @@ namespace UnicontaClient.Pages.CustomPage
             };
             cwwin.Show();
         }
-#endif
 
         bool copyRowIsEnabled = false;
         bool editAllChecked;
@@ -463,6 +489,31 @@ namespace UnicontaClient.Pages.CustomPage
             return dgDebtorAccountGrid.Filter(null);
         }
 
+        protected async override void LoadCacheInBackGround()
+        {
+            var Comp = api.CompanyEntity;
+            var lst = new List<Type>(12) { typeof(Uniconta.DataModel.Employee), typeof(Uniconta.DataModel.GLVat), typeof(Uniconta.DataModel.DebtorGroup), typeof(Uniconta.DataModel.PaymentTerm), typeof(Uniconta.DataModel.DebtorLayoutGroup) };
+            if (Comp.InvPrice)
+                lst.Add(typeof(Uniconta.DataModel.DebtorPriceList));
+            if (Comp.NumberOfDimensions >= 1)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType1));
+            if (Comp.NumberOfDimensions >= 2)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType2));
+            if (Comp.NumberOfDimensions >= 3)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType3));
+            if (Comp.NumberOfDimensions >= 4)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType4));
+            if (Comp.NumberOfDimensions >= 5)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType5));
+            LoadType(lst);
+
+            if (Comp.CRM)
+            {
+                interestCache = Comp.GetCache(typeof(Uniconta.DataModel.CrmInterest)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.CrmInterest), api).ConfigureAwait(false);
+                productsCache = Comp.GetCache(typeof(Uniconta.DataModel.CrmProduct)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.CrmProduct), api).ConfigureAwait(false);
+            }
+        }
+
         private void HasDocImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             var debtorAccount = (sender as Image).Tag as DebtorClient;
@@ -476,7 +527,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (debtorAccount != null)
                 AddDockItem(TabControls.UserNotesPage, dgDebtorAccountGrid.syncEntity);
         }
-#if !SILVERLIGHT
+
         private void HasEmailImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             var debtorAccount = (sender as TextBlock).Tag as DebtorClient;
@@ -494,6 +545,19 @@ namespace UnicontaClient.Pages.CustomPage
             var debtorAccount = (sender as TextBlock).Tag as DebtorClient;
             Utility.OpenWebSite(debtorAccount._Www);
         }
-#endif
+
+        private void cmbInterests_GotFocus(object sender, RoutedEventArgs e)
+        {
+            var cmb = sender as ComboBoxEditor;
+            if (cmb != null)
+                cmb.ItemsSource = interestCache.GetKeyList();
+        }
+
+        private void cmbProducts_GotFocus(object sender, RoutedEventArgs e)
+        {
+            var cmb = sender as ComboBoxEditor;
+            if (cmb != null)
+                cmb.ItemsSource = productsCache.GetKeyList();
+        }
     }
 }

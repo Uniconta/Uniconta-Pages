@@ -36,14 +36,14 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = false;
+            SetDialogResult(false);
         }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrEmpty(txtAccount.Text) || string.IsNullOrWhiteSpace(txtAccount.Text)) return;
             offSetAccountName = txtAccount.Text;
-            this.DialogResult = true;
+            SetDialogResult(true);
         }
 
         private void txtAccount_KeyDown(object sender, KeyEventArgs e)

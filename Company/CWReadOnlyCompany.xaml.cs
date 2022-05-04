@@ -36,6 +36,10 @@ namespace UnicontaClient.Pages.CustomPage
             this.Loaded += CWReadOnlyCompany_Loaded;
         }
 
+        public CWReadOnlyCompany(Company[] objcompanies, string title): this(objcompanies)
+        {
+            this.Title = Uniconta.ClientTools.Localization.lookup(title);
+        }
         void CWReadOnlyCompany_Loaded(object sender, RoutedEventArgs e)
         {
             BindCompany();
@@ -45,14 +49,14 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (e.Key == Key.Escape)
             {
-                this.DialogResult = false;
+                SetDialogResult(false);
             }
             else
                 if (e.Key == Key.Enter)
                 {
                     if (CancelButton.IsFocused)
                     {
-                        this.DialogResult = false;
+                        SetDialogResult(false);
                         return;
                     }
                     OKButton_Click(null, null);
@@ -69,15 +73,15 @@ namespace UnicontaClient.Pages.CustomPage
             if (cbCompany.SelectedItem != null)
             {
                 selectedCompany = cbCompany.SelectedItem as Company;
-                this.DialogResult = true;
+                SetDialogResult(true);
             }
             else
-                this.DialogResult = false;
+                SetDialogResult(false);
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = false;
+            SetDialogResult(false);
         }
     }
 }

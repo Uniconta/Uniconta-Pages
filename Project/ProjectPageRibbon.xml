@@ -30,13 +30,23 @@
   <RibbonItem LocalizedNameKey="Reports">
     <RibbonItem Action="PrTrans" LocalizedNameKey="Transactions" ControlName="ProjectTransactionPage" LargeGlyph="Transactions_32x32.png" ShortcutKey="CTRL+T"/>
     <RibbonItem Action="ProjectTransSum" LocalizedNameKey="ProjectCategorySum" ControlName="ProjectTransCategorySumPage" LargeGlyph="Invoice_32x32.png"/>
-    <RibbonItem Action="Budget" LocalizedNameKey="Budget" ControlName="ProjectBudgetPage" Module="ProjectBudget" LargeGlyph="Budget_32x32.png"/>
-    <RibbonItem Action="ProjectCategory" LocalizedNameKey="CostMarkup" ControlName="ProjectCategoryPage" LargeGlyph="Item_Number_32x32.png"/>
-    <RibbonItem Action="ProjectTask" LocalizedNameKey="Plan" Module="ProjectTask" LargeGlyph="GanttChart_32x32.png">
-      <RibbonItem Action="ChartView" LocalizedNameKey="EnableChart" Glyph="Report_16x16.png" />
-      <RibbonItem Action="GridView" LocalizedNameKey="DataGrid" ControlName="ProjectTaskGridPage" Glyph="Multiple_16x16.png" />
+	 <RibbonItem Action="BudgetPanningSchedule" LocalizedNameKey="ProjectBudgetSchedule" ControlName="ProjectBudgetPlanningSchedulePage" Module="_ProjectPlanning" LargeGlyph="Schedule_Task_32x32.png"/>
+    <RibbonItem Action="Budgets" LocalizedNameKey="Budget" Module="ProjectBudget" LargeGlyph="Budget_32x32.png">
+      <RibbonItem Action="Budget" LocalizedNameKey="Budget" ControlName="ProjectBudgetPage" Module="ProjectBudget" Glyph="Budget_32x32.png" LargeGlyph="Budget_32x32.png"/>
+      <RibbonItem Action="CreateBudget" LocalizedNameKey="CreateBudgetRealized" Module="ProjectBudget"  Glyph="Add_Menu_32x32.png" LargeGlyph="Add_Menu_32x32.png" ShortcutKey=""/>
+      <RibbonItem Action="CreateBudgetTask" LocalizedNameKey="CreateBudgetTask" Module="ProjectBudget"  Glyph="Add_Menu_32x32.png" LargeGlyph="Add_Menu_32x32.png" ShortcutKey=""/>
+      <RibbonItem Action="UpdatePrices" LocalizedNameKey="UpdateOBJ" Parameter="Prices" Module="ProjectBudget" Glyph="Update_32x32.png" LargeGlyph="Update_32x32.png" ShortcutKey=""/>
     </RibbonItem>
+    
+    <RibbonItem Action="ProjectCategory" LocalizedNameKey="CostMarkup" ControlName="ProjectCategoryPage" LargeGlyph="Item_Number_32x32.png"/>
+    <RibbonItem Action="ProjectTask" LocalizedNameKey="Tasks" Module="ProjectTask" LargeGlyph="GanttChart_32x32.png">
+      <RibbonItem Action="GridView" LocalizedNameKey="DataGrid" ControlName="ProjectTaskGridPage" Glyph="Multiple_16x16.png" />
+      <RibbonItem Action="ChartView" LocalizedNameKey="EnableChart" Glyph="Report_16x16.png" />
+      <RibbonItem Action="CreateTaskFromTask" LocalizedNameKey="CopyOBJ" Parameter="Tasks" Glyph="Copy_32x32.png" LargeGlyph="Copy_32x32.png" ShortcutKey=""/>
+    </RibbonItem>
+    <RibbonItem Action="FollowUp" LocalizedNameKey="FollowUp" ControlName="CrmFollowUpPage" Module="CRM" LargeGlyph="CrmFollowUp.png"/>
     <RibbonItem Action="PrTransPivot" LocalizedNameKey="PivotTable" ControlName="ProjectTransPivotReport" LargeGlyph="Category_Charge_32x32.png" />
+    <RibbonItem Action="Contacts" LocalizedNameKey="Contacts" ControlName="ContactPage" Module="Contacts" LargeGlyph="Contacts_32x32.png"/>
     <RibbonItem Module="Attachments" LocalizedNameKey="Attachments" LargeGlyph="Attachments_32x32.png">
       <RibbonItem Action="AddNote" ShortcutKey="Alt+N" LocalizedNameKey="Note" ControlName="UserNotesPage" Glyph="Note_16x16.png" />
       <RibbonItem Action="AddDoc" LocalizedNameKey="Document" ControlName="UserDocsPage" Glyph="Document_Attachment_16x16.png" />
@@ -45,14 +55,18 @@
   <RibbonItem LocalizedNameKey="Sales">
     <RibbonItem Action="Offers" LocalizedNameKey="Offers" ControlName="DebtorOffers" LargeGlyph="Offer_32x32.png"/>
     <RibbonItem LocalizedNameKey="Invoices" LargeGlyph="Invoice_32x32.png">
-      <RibbonItem Action="Invoices" LocalizedNameKey="Invoices" ControlName="Invoices" Glyph="AccountInvoice_16x16.png" />
-      <RibbonItem Action="OnAccountInvoicing" LocalizedNameKey="OnAccountInvoicing" ControlName="ProjectOnAccountInvoiceLinePage" Glyph="AccountInvoice_16x16.png" />
-      <RibbonItem Action="QuickInvoice" LocalizedNameKey="QuickInvoice" ControlName="CreateInvoicePage" Glyph="Invoice_16x16.png"/>
-      <RibbonItem Action="SalesOrder" LocalizedNameKey="SalesOrder" ControlName="DebtorOrders" Glyph="Sales_16x16.png"/>
+      <RibbonItem Action="Invoices" LocalizedNameKey="PostedInvoices" ControlName="Invoices" Glyph="AccountInvoice_16x16.png" />
+      <RibbonItem Action="OnAccountInvoicing" LocalizedNameKey="OnAccountInvoicing" ControlName="ProjectOnAccountInvoiceLinePage" Module="_ProjShowPctAcontoInvoice" Glyph="AccountInvoice_16x16.png" />
+      <RibbonItem Action="QuickInvoice" LocalizedNameKey="QuickInvoice" ControlName="CreateInvoicePage" Module="_ProjQuickInvoice" Glyph="Invoice_16x16.png"/>
+      <RibbonItem Action="SalesOrder" LocalizedNameKey="SalesOrder" ControlName="DebtorOrders" Module="_ProjOrderInvoice" Glyph="Sales_16x16.png"/>
+      <RibbonItem Action="ProjectInvoiceProposal" LocalizedNameKey="InvoiceProposals" ControlName="ProjInvProposal" Glyph="Sales_16x16.png"/>
       <RibbonItem Action="PrintInvoice" LocalizedNameKey="PrintInvoice" Glyph="General_Ledger_16x16.png"/>
-      <RibbonItem Action="CreateOrder" LocalizedNameKey="CreateOBJ" Parameter="Order" Glyph="Add_Notes_16x16.png"/>
-     <RibbonItem Action="ZeroInvoice" LocalizedNameKey="CreateOBJ" Parameter="ZeroInvoice" Glyph="Add_Notes_16x16.png"/>
+      <RibbonItem Action="CreateOrder" LocalizedNameKey="CreateOBJ" Parameter="InvoiceProposal" Glyph="AccountInvoice_16x16.png"/>
+      <RibbonItem Action="ZeroInvoice" LocalizedNameKey="CreateOBJ" Parameter="ZeroInvoice" Module="_ProjZeroInvoice" Glyph="AccountInvoice_16x16.png"/>
     </RibbonItem>
+  </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="ProjectEmployee" LocalizedNameKey="Employees"  LargeGlyph="Debitor_Group_32x32.png" Module="MyProjects"/>
   </RibbonItem>
   <RibbonItem TabId="1" LocalizedNameKey="EditAll">
     <RibbonItem Action="EditAll"  LocalizedNameKey="EditAll" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>

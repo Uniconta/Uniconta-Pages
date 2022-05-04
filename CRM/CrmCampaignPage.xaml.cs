@@ -125,6 +125,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "SendEmail":
                     if (selectedItem == null) return;
                     var cwSendEmail = new CwSendEmail(api);
+                    cwSendEmail.ShowAttachments();
                     cwSendEmail.Closed += async delegate
                     {
                         if (cwSendEmail.DialogResult == true && cwSendEmail.CompanySMTP != null)
@@ -132,9 +133,9 @@ namespace UnicontaClient.Pages.CustomPage
                             var crmAPI = new CrmAPI(api);
                             ErrorCodes res;
                             if (cwSendEmail.SendTestEmail)
-                                res = await crmAPI.SendMailTest(cwSendEmail.CompanySMTP, cwSendEmail.Email, cwSendEmail.Name);
+                                res = await crmAPI.SendMailTest(cwSendEmail.CompanySMTP, cwSendEmail.Email, cwSendEmail.Name, selectedItem, cwSendEmail.IncludeAttachements);
                             else
-                                res = await crmAPI.SendMail(cwSendEmail.CompanySMTP, selectedItem, cwSendEmail.FollowUp);
+                                res = await crmAPI.SendMail(cwSendEmail.CompanySMTP, selectedItem, cwSendEmail.FollowUp, cwSendEmail.IncludeAttachements);
                             UtilDisplay.ShowErrorCode(res);
                         }
                     };

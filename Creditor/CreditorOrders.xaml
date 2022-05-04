@@ -6,7 +6,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOrders"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage"
-    xmlns:toolkit="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Toolkit"
+    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
     xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
     mc:Ignorable="d"   xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
     d:DesignHeight="300" d:DesignWidth="400">
@@ -53,6 +53,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOrders"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Group"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="OrderNumber" AllowThousandMask="false" Width="70"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryDate"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryDateConfirmed" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="NoLines" Width="50" ReadOnly="True" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="OrderTotal" Width="80" ReadOnly="True" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Currency" Width="50" ReadOnly="True"  />
@@ -72,6 +73,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOrders"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryZipCode" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryCity" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryCountry" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PaymentFormat" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PaymentMethod" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CashDiscountDate" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CashDiscount" Visible="False"/>
@@ -81,6 +83,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOrders"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceNumber" Visible="False" AllowThousandMask="false" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PostingAccount" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Shipment" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryTerm" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceAccount"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PriceList"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Created"/>
@@ -93,7 +96,21 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOrders"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Requisition" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Country" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="UpdatedAt" Visible="False" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="RelatedOrder"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="RelatedOrder" IsEditSettingSet="True">
+                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <CorasauControls:UnicontaPopupBaseEdit x:Name="PART_Editor" FocusPopupOnOpen="True" ValidateOnTextInput="False" ValidateOnEnterKeyPressed="False"  
+                                                                       DataContext="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}">
+                                    <CorasauControls:UnicontaPopupBaseEdit.PopupContentTemplate>
+                                        <ControlTemplate>
+                                            <CorasauControls:UnicontaEditableLookupControl x:Name="editableLookup" UseBindingValue="True" Width="Auto"  LookupBindingValue="{Binding RelatedOrder,RelativeSource={RelativeSource TemplatedParent}}"
+                                                                                        LookupEditValue="{Binding Path=(dxe:BaseEdit.OwnerEdit).EditValue, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" Margin="2" />
+                                        </ControlTemplate>
+                                    </CorasauControls:UnicontaPopupBaseEdit.PopupContentTemplate>
+                                </CorasauControls:UnicontaPopupBaseEdit>
+                            </DataTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                    </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Discount" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="TotalBeforeVAT" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Contact" Visible="False" />
@@ -101,6 +118,8 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOrders"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ProjectName" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CategoryName" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="WorkSpace" Visible="False" />
+                    <localPage:CorasauDataGridForeignKeyColumnClient x:Name="Task" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim1" Width="70" FieldName="Dimension1"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim2" Width="70" FieldName="Dimension2" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim3" Width="70" FieldName="Dimension3" />
@@ -115,6 +134,8 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOrders"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Volume" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Cartons" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Vat" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PurchaseValue" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PostingText" Visible="False" />
                 </localPage:CreditorOrdersGrid.Columns>
             </localPage:CreditorOrdersGrid>
         </CorasauControls:BusyIndicator>

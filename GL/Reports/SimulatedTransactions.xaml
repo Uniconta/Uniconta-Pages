@@ -5,11 +5,9 @@ x:Class="UnicontaClient.Pages.CustomPage.SimulatedTransactions"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage" 
-    xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
-    mc:Ignorable="d"   
+    xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools" 
     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors" 
-    xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
-    d:DesignHeight="300" d:DesignWidth="400">
+    xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
     <UserControl.Resources>
        <DataTemplate x:Key="ReportFooterTemplate">
             <Grid>
@@ -69,8 +67,8 @@ x:Class="UnicontaClient.Pages.CustomPage.SimulatedTransactions"
                 <dxe:TextEdit Grid.Row="3" Grid.Column="12"  EditValue="{Binding Content.TraceSum6,Mode=OneWay}" HorizontalAlignment="Right" MaskType="Numeric" DisplayFormatString="N2" />
                 <dxe:TextEdit Grid.Row="2" Grid.Column="12"  EditValue="{Binding Content.Movement6,Mode=OneWay}" HorizontalAlignment="Right" MaskType="Numeric" DisplayFormatString="N2" />
             </Grid>
-
         </DataTemplate>
+        <Util:RowIndexConverter x:Key="RowIndexConverter" />
     </UserControl.Resources>
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
             <Grid.RowDefinitions>

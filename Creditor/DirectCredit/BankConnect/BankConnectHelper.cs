@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using Uniconta.Common.Utility;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage.Creditor.DirectCredit.BankConnect
@@ -57,13 +58,14 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.DirectCredit.BankConnect
 
         protected X509Certificate2 FromPemBlock(string pem)
         {
-            var builder = new StringBuilder(pem);
-            builder.Replace("\n", "");
-            builder.Replace("\r", "");
-            builder.Replace("-----BEGIN CERTIFICATE-----", "");
-            builder.Replace("-----END CERTIFICATE-----", "");
+            var builder = StringBuilderReuse.Create();
+            builder.Append(pem);
+            builder.Remove('\n');
+            builder.Remove('\r');
+            builder.Remove("-----BEGIN CERTIFICATE-----");
+            builder.Remove("-----END CERTIFICATE-----");
 
-            return new X509Certificate2(Convert.FromBase64String(builder.ToString()));
+            return new X509Certificate2(Convert.FromBase64String(builder.ToStringAndRelease()));
         }
     }
 }

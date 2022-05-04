@@ -4,30 +4,17 @@
     <RibbonItem Action="Search" LocalizedNameKey="Search" LargeGlyph="Validate_32x32.png" ShortcutKey="Ctrl+H" />   
   </RibbonItem>
   <RibbonItem>
-      <RibbonItem Action="GroupByDebtor" LocalizedNameKey="GroupByOBJ" Parameter="Debtor" LargeGlyph="Employee_32x32.png" />
-      <RibbonItem Action="GroupByPersonInCharge"  LocalizedNameKey="GroupByOBJ" Parameter="PersonInCharge" LargeGlyph="UsresOf_32x32.png"/>
-      <RibbonItem Action="GroupByRootProject"  LocalizedNameKey="GroupByOBJ" Parameter="RootProject" LargeGlyph="Project_32x32.png"/>    
-      <RibbonItem Action="GroupByDimension1"  LargeGlyph="Group_by_32x32.png"/>
-      <RibbonItem Action="GroupByDimension2"  LargeGlyph="Group_by_32x32.png"/>
-      <RibbonItem Action="GroupByDimension3"  LargeGlyph="Group_by_32x32.png"/>
-      <RibbonItem Action="GroupByDimension4"  LargeGlyph="Group_by_32x32.png"/>
-      <RibbonItem Action="GroupByDimension5"  LargeGlyph="Group_by_32x32.png"/>
-      <RibbonItem Action="UnGroupAll" LocalizedNameKey="ClearOBJ" Parameter="MenuColumnGroup" LargeGlyph="Group_by_Clear_32x32.png"/>
-    </RibbonItem>  
-  <RibbonItem >
-   <RibbonItem Action="Transactions" LocalizedNameKey="Transactions"  LargeGlyph="Account-statement_32x32.png" ShortcutKey="CTRL+T"/>
-  </RibbonItem>
-  <RibbonItem >
-    <RibbonItem Action="SalesOrder" LocalizedNameKey="GenerateOnAccountInvoice" LargeGlyph="Orders_32x32.png"/>  
-    <RibbonItem Action="CreateOrder" LocalizedNameKey="GenerateFinalInvoice" LargeGlyph="AccountInvoice_16x16.png"/>
-    <RibbonItem Action="ZeroInvoice" LocalizedNameKey="CreateOBJ" Parameter="ZeroInvoice" LargeGlyph="Blank_32x32.png"/>
-  </RibbonItem>
-  <RibbonItem >
-    <RibbonItem Action="DebtorAccount" LocalizedNameKey="DebtorAccount" LargeGlyph="Contacts_32x32.png"/>
-  </RibbonItem>
-  <RibbonItem>
-    <RibbonItem Action="InclZeroBalance" LocalizedNameKey="IncludeZeroBalance" IsCheckBox="True" />
-    <RibbonItem Action="InclJournals" LocalizedNameKey="IncludeJournals" IsCheckBox="True" />
+    <RibbonItem Action="GroupBy" LocalizedNameKey="Groups" LargeGlyph="Group_by_32x32.png">
+      <RibbonItem Action="GroupByDebtor" LocalizedNameKey="GroupByOBJ" Parameter="Debtor" Glyph="Employee_32x32.png" ShortcutKey=""/>
+      <RibbonItem Action="GroupByPersonInCharge"  LocalizedNameKey="GroupByOBJ" Parameter="PersonInCharge" Glyph="UsresOf_32x32.png" ShortcutKey=""/>
+      <RibbonItem Action="GroupByRootProject"  LocalizedNameKey="GroupByOBJ" Parameter="RootProject" Glyph="Project_32x32.png" ShortcutKey=""/>
+      <RibbonItem Action="GroupByDimension1"  Glyph="Group_by_32x32.png" ShortcutKey=""/>
+      <RibbonItem Action="GroupByDimension2"  Glyph="Group_by_32x32.png" ShortcutKey=""/>
+      <RibbonItem Action="GroupByDimension3"  Glyph="Group_by_32x32.png" ShortcutKey=""/>
+      <RibbonItem Action="GroupByDimension4"  Glyph="Group_by_32x32.png" ShortcutKey=""/>
+      <RibbonItem Action="GroupByDimension5"  Glyph="Group_by_32x32.png" ShortcutKey=""/>      
+      <RibbonItem Action="UnGroupAll" LocalizedNameKey="ClearOBJ" Parameter="MenuColumnGroup" Glyph="Group_by_Clear_32x32.png" ShortcutKey=""/>
+    </RibbonItem>
   </RibbonItem>
   <RibbonItem>
     <!---If we want to create a new group in same PageTab-->
@@ -42,5 +29,25 @@
       <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportLayout" Glyph="Import_16x16.png" LargeGlyph="Import_16x16.png" ShortcutKey=""/>
       <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16.png" ShortcutKey=""/>
     </RibbonItem>
+  </RibbonItem>
+  <RibbonItem >
+    <RibbonItem Action="DebtorAccount" LocalizedNameKey="DebtorAccount" LargeGlyph="Contacts_32x32.png"/>
+  </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="InclZeroBalance" LocalizedNameKey="IncludeZeroBalance" IsCheckBox="True" />
+    <RibbonItem Action="InclJournals" LocalizedNameKey="IncludeJournals" IsCheckBox="True" />
+    <RibbonItem Action="ShowWorkspace" LocalizedNameKey="ShowOBJ" Parameter="WorkSpace" IsCheckBox="True" />
+    <RibbonItem Action="ShowTasks" LocalizedNameKey="ShowTasks" Module="ProjectTask" IsCheckBox="True" />
+  </RibbonItem>
+  <RibbonItem >
+    <RibbonItem Action="Transactions" LocalizedNameKey="Transactions"  LargeGlyph="Account-statement_32x32.png" ShortcutKey="CTRL+T"/>
+  </RibbonItem>
+  <RibbonItem >
+    <RibbonItem Action="ViewNotes" LocalizedNameKey="ProjectNotes" LargeGlyph="Note_32x32.png" ShortcutKey="CTRL+N"/>
+  </RibbonItem>
+  <RibbonItem >
+    <RibbonItem Action="ProjectInvoiceProposal" LocalizedNameKey="InvoiceProposals" ControlName="ProjInvProposal" LargeGlyph="Orders_32x32.png"/>
+    <RibbonItem Action="CreateOrder" LocalizedNameKey="CreateOBJ" Parameter="InvoiceProposal" LargeGlyph="Invoice_32x32.png"/>
+    <RibbonItem Action="ZeroInvoice" LocalizedNameKey="CreateOBJ" Parameter="ZeroInvoice" Module="_ProjZeroInvoice" LargeGlyph="Blank_32x32.png"/>
   </RibbonItem>
 </root>

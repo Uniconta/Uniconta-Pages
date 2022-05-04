@@ -1,0 +1,45 @@
+<Pages:GridBasePage xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.TMPlanningCheckPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+             xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage">
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Project/TMPlanningCheckPageRibbon.xml" x:Name="localMenu"/>
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <Grid Grid.Row="1" Margin="5">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BudgetGroup}" Grid.Column="0" Grid.Row="0" Margin="10,3,3,3"/>
+            <CorasauControls:LookupEditor x:Name="cmbBudgetGroup" Grid.Column="1" Grid.Row="0" Margin="10,3,3,3" Text="{Binding BudgetGroup,Mode=TwoWay}"  />
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=WorkSpace}" x:Name="lblWorkSpace" Grid.Column="2" Grid.Row="0" Margin="10,3,3,3"/>
+            <CorasauControls:LookupEditor x:Name="cmbWorkSpace" Grid.Column="3" Grid.Row="0" Margin="10,3,3,3" Text="{Binding PrWorkSpace,Mode=TwoWay}"  />
+            </Grid>
+        </CorasauControls:BusyIndicator>
+        <localPage:TMPlanningCheckGridClient x:Name="dgTMPlanningCheckGrid" AutoGenerateColumns="None" Grid.Row="2">
+            <localPage:TMPlanningCheckGridClient.Columns>
+                <localPage:CorasauDataGridTemplateColumnClient x:Name="Debtor" Width="100" />
+                <localPage:CorasauDataGridTemplateColumnClient x:Name="DebtorName" Width="200"/>
+                <localPage:CorasauDataGridTemplateColumnClient x:Name="Project" Width="100"/>
+                <localPage:CorasauDataGridTemplateColumnClient x:Name="ProjectName" Width="200"/>
+                <localPage:CorasauDataGridTemplateColumnClient x:Name="ErrorInfo" Width="250"/>
+            </localPage:TMPlanningCheckGridClient.Columns>
+            <localPage:TMPlanningCheckGridClient.TotalSummary>
+                <localPage:SumColumn FieldName="Debtor" SummaryType="Count"/>
+            </localPage:TMPlanningCheckGridClient.TotalSummary>
+        </localPage:TMPlanningCheckGridClient>
+    </Grid>
+</Pages:GridBasePage>

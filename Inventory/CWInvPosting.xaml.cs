@@ -44,13 +44,24 @@ namespace UnicontaClient.Pages.CustomPage
         [InputFieldData]
         [Display(Name = "LedgerVoucher", ResourceType = typeof(InputFieldDataText))]
         public int FixedVoucher { get; set; }
+
         [InputFieldData]
         [Display(Name = "Simulation", ResourceType = typeof(InputFieldDataText))]
         public bool Simulation { get; set; }
 
+        [InputFieldData]
+        [Display(Name = "PartlyReportAsFinished", ResourceType = typeof(InputFieldDataText))]
+        public bool IsPartlyFinished { get; set; }
+
+        [InputFieldData]
+        [DisplayFormat(DataFormatString = "{0:#,##,##0.00###}", ApplyFormatInEditMode = true)]
+        [Display(Name = "Qty", ResourceType = typeof(InputFieldDataText))]
+        public double Quantity { get; set; }
+
+
         static DateTime postDte;
         string header { get; set; }
-        public bool showCompanyName= false;
+        public bool showCompanyName = false;
 #if !SILVERLIGHT
         protected override int DialogId { get { return DialogTableId; } }
         public int DialogTableId { get; set; }
@@ -78,11 +89,22 @@ namespace UnicontaClient.Pages.CustomPage
             this.DataContext = this;
             txtCompName.Text = api.CompanyEntity.Name;
             this.Loaded += CW_Loaded;
+            if (header == "ReportAsFinished")
+            {
+                txtReportPartiallyFinished.Visibility = Visibility.Visible;
+                chkReportPartiallyFinished.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                txtReportPartiallyFinished.Visibility = Visibility.Collapsed;
+                chkReportPartiallyFinished.Visibility = Visibility.Collapsed;
+                chkReportPartiallyFinished.IsChecked = false;
+            }
         }
 
         void CW_Loaded(object sender, RoutedEventArgs e)
         {
-            Dispatcher.BeginInvoke(new Action(() => 
+            Dispatcher.BeginInvoke(new Action(() =>
             {
                 if (string.IsNullOrWhiteSpace(txtComment.Text))
                     txtComment.Focus();
@@ -102,13 +124,13 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (e.Key == Key.Escape)
             {
-                this.DialogResult = false;
+                SetDialogResult(false);
             }
             else if (e.Key == Key.Enter)
             {
                 if (CancelButton.IsFocused)
                 {
-                    this.DialogResult = false;
+                    SetDialogResult(false);
                     return;
                 }
                 OKButton_Click(null, null);
@@ -119,14 +141,14 @@ namespace UnicontaClient.Pages.CustomPage
             int fxdVoucher;
             int.TryParse(txtFixedVoucher.Text, out fxdVoucher);
             FixedVoucher = fxdVoucher;
-            this.DialogResult = true;
+            SetDialogResult(true);
             if (Date != BasePage.GetSystemDefaultDate())
                 postDte = Date;
         }
 
         private void CancelButton_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            this.DialogResult = false;
+            SetDialogResult(false);
         }
     }
 }

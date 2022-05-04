@@ -56,6 +56,10 @@ namespace UnicontaClient.Pages.CustomPage
             pivotDgGLTransSum.EndUpdate();
             localMenu.OnItemClicked += LocalMenu_OnItemClicked;
             SetDimension();
+            tbGrdTtlRow.Text = Uniconta.ClientTools.Localization.lookup("ShowRowGrandTotals");
+            tbGrdTtlCol.Text = Uniconta.ClientTools.Localization.lookup("ShowColumnGrandTotals");
+            tbTtlOnFlds.Text = Uniconta.ClientTools.Localization.lookup("ShowTotals");
+            chkGrdTtlCol.IsChecked = chkGrdTtlRow.IsChecked = chkTtlOnFlds.IsChecked = true;
         }
 
         protected override void OnLayoutLoaded()
@@ -208,6 +212,27 @@ namespace UnicontaClient.Pages.CustomPage
                 pivotDgGLTransSum.BestFit();
                 pivotIsLoaded = true;
             }
+        }
+
+        private void chkGrdTtlRow_Checked(object sender, RoutedEventArgs e)
+        {
+            var value = (bool)chkGrdTtlRow.IsChecked;
+            pivotDgGLTransSum.ShowRowGrandTotalHeader = value;
+            pivotDgGLTransSum.ShowRowGrandTotals = value;
+        }
+
+        private void chkGrdTtlCol_Checked(object sender, RoutedEventArgs e)
+        {
+            var value = (bool)chkGrdTtlCol.IsChecked;
+            pivotDgGLTransSum.ShowColumnGrandTotalHeader = value;
+            pivotDgGLTransSum.ShowColumnGrandTotals = value;
+            pivotDgGLTransSum.ShowColumnTotals = value;
+        }
+
+        private void chkTtlOnFlds_Checked(object sender, RoutedEventArgs e)
+        {
+            var value = (bool)chkTtlOnFlds.IsChecked;
+            pivotDgGLTransSum.ShowRowTotals = value;
         }
     }
 }

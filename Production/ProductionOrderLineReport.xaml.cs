@@ -28,6 +28,7 @@ namespace UnicontaClient.Pages.CustomPage
     public class ProductionOrderLineReportGrid : CorasauDataGridClient
     {
         public override Type TableType { get { return typeof(ProductionOrderLineClient); } }
+        public override bool SingleBufferUpdate { get { return false; } }
     }
 
     public partial class ProductionOrderLineReport : GridBasePage
@@ -70,10 +71,17 @@ namespace UnicontaClient.Pages.CustomPage
             var company = api.CompanyEntity;
             if (!company.Location || !company.Warehouse)
                 Location.Visible = Location.ShowInColumnChooser = false;
+            else
+                Location.ShowInColumnChooser = true;
             if (!company.Warehouse)
                 Warehouse.Visible = Warehouse.ShowInColumnChooser = false;
-
+            else
+                Warehouse.ShowInColumnChooser = true;
+#if !SILVERLIGHT
+            Utility.SetupVariants(api, colVariant, VariantName, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
+#else
             Utility.SetupVariants(api, null, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
+#endif
             UnicontaClient.Utilities.Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
         }
 

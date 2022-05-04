@@ -62,6 +62,12 @@ x:Class="UnicontaClient.Pages.CustomPage.Vouchers"
                 </localControls:AccordionAppEnumView>
                 <localPage:VouchersGrid x:Name="dgVoucherGrid" AutoGenerateColumns="None" Grid.Column="1">
                     <localPage:VouchersGrid.Columns>
+                        <localPage:CorasauDataGridTemplateColumnClient FieldName="Image" Width="60" Visible="False">
+                            <localPage:CorasauDataGridTemplateColumnClient.CellTemplateSelector >
+                                <localPage:VoucherThumbnailTemplateSelector PDFTemplate="{StaticResource VoucherPhotoPdfTemplate}" ImageTemplate="{StaticResource VoucherPhotoImageTemplate}" 
+                                                                            EmptyTemplate="{StaticResource VoucherPhotoEmptyTemplate}"/>
+                            </localPage:CorasauDataGridTemplateColumnClient.CellTemplateSelector>
+                        </localPage:CorasauDataGridTemplateColumnClient>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="PostingInstruction" Width="50" >
                             <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 <DataTemplate>
@@ -164,7 +170,7 @@ x:Class="UnicontaClient.Pages.CustomPage.Vouchers"
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="CategoryName" Visible="False"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Qty" Visible="False" AllowThousandMask="True" Mask="N2"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="SizeKB" Visible="False"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="OnHold" />
+                        <localPage:CorasauDataGridTemplateColumnClient x:Name="OnHold" HideHeaderCheck="False"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Reference" Visible="False" />
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="ViewInFolder" Visible="False" ColumnFilterMode="DisplayText" ReadOnly="True"/>
 

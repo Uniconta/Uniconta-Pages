@@ -42,7 +42,6 @@ namespace UnicontaClient.Pages.CustomPage
         }
         private void InitPage()
         {
-            BusyIndicator = busyIndicator;
             layoutControl = layoutItems;
             if (LoadedRow == null)
             {

@@ -25,6 +25,7 @@ x:Class="UnicontaClient.Pages.CustomPage.AdminAccess"
                     <localPage:CorasauDataGridTemplateColumnClient FieldName="UserLoginId" IsSmart="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient FieldName="ServerUser" Width="100" IsSmart="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient FieldName="Role" IsSmart="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient FieldName="HasTwoFactor" IsSmart="True" Width="70"/>
                 </localPage:AdminAccessGrid.Columns>
             </localPage:AdminAccessGrid>
         </CorasauControls:BusyIndicator>

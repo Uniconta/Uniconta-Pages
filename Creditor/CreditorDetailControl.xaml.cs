@@ -32,7 +32,6 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 _api = value;
                 Utility.SetDimensions(api, lbldim1, lbldim2, lbldim3, lbldim4, lbldim5, dim1lookupeditior, dim2lookupeditior, dim3lookupeditior, dim4lookupeditior, dim5lookupeditior, usedim);
-                setUserFields();
                 var Comp = _api.CompanyEntity;
                 if (_api.CompanyEntity.NumberOfDimensions == 0)
                     usedim.Visibility = Visibility.Collapsed;
@@ -48,6 +47,10 @@ namespace UnicontaClient.Pages.CustomPage
                     shipmentItem.Visibility = Visibility.Collapsed;
                 if (!Comp.Project)
                     liPrCategory.Visibility = Visibility.Collapsed;
+#if !SILVERLIGHT
+                if (Comp._CountryId != CountryCode.Estonia)
+                    liEEIsNotVatDeclOrg.Visibility = Visibility.Collapsed;
+#endif
             }
         }
         public Visibility Visible { get { return this.Visibility; } set { this.Visibility = value; this.layoutItems.Visibility = value; } }
@@ -71,14 +74,7 @@ namespace UnicontaClient.Pages.CustomPage
                 }
             }
         }
-        void setUserFields()
-        {
-            var row = new CreditorClient();
-            row.SetMaster(api.CompanyEntity);
-            var UserFieldDef = row.UserFieldDef();
-            if (UserFieldDef != null)
-                UserFieldControl.CreateUserFieldOnPage2(layoutItems, UserFieldDef, (RowIndexConverter)this.Resources["RowIndexConverter"], this.api, this, true, lastGroup);
-        }
+        
 #if !SILVERLIGHT
         private void Email_ButtonClicked(object sender)
         {

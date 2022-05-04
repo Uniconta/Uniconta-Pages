@@ -34,17 +34,20 @@
     <RibbonItem Action="CreateMandates" LocalizedNameKey="CreateOBJ" Parameter="Mandates" Module="_DirectDebit" LargeGlyph="Contacts_32x32.png" ShortcutKey=""/>
     <RibbonItem Action="Prices" LocalizedNameKey="SalesPricesAndDiscounts" ControlName="CustomerPriceListLinePage" Module="InvPrice" LargeGlyph="PriceTag_32x32.png"/>
     <RibbonItem Action="FollowUp" LocalizedNameKey="FollowUp" ControlName="CrmFollowUpPage" Module="CRM" LargeGlyph="CrmFollowUp.png"/>
+    <RibbonItem Action="Budget" LocalizedNameKey="Budget" ControlName="DebtorBudgetLinePage" Module="_DebtorBudget" LargeGlyph="Budget_32x32.png"/>
     <RibbonItem Module="Attachments" LocalizedNameKey="Attachments" LargeGlyph="Attachments_32x32.png">
       <RibbonItem Action="AddNote" ShortcutKey="Alt+N" ControlName="UserNotesPage" LocalizedNameKey="Note" Glyph="Note_16x16.png"/>
       <RibbonItem Action="AddDoc" LocalizedNameKey="Document" ControlName="UserDocsPage" Glyph="Document_Attachment_16x16.png" ShortcutKey=""/>
     </RibbonItem>
+	<RibbonItem Action="AccountantClientInfo" LocalizedNameKey="AccountantClientInfo" ControlName="AccountantClientInfo" LargeGlyph="Accountant_32x32.png"/> 
   </RibbonItem>
-  <RibbonItem LocalizedNameKey="Reports">
+	<RibbonItem LocalizedNameKey="Reports">
     <RibbonItem Action="DebtorTran" LocalizedNameKey="Transactions" Glyph="Cover_16x16.png" LargeGlyph="Account-statement_32x32.png" ShortcutKey="CTRL+T"/>
     <RibbonItem Action="OpenTran" LocalizedNameKey="OpenTrans" ShortcutKey="F8" LargeGlyph="Open_Transaction_32x32.png"/>
     <RibbonItem Action="DebtorStatement" LocalizedNameKey="Statement" ControlName="DebtorStatement" LargeGlyph="Show_Invoice_32x32.png"/>
-    <RibbonItem Action="InvTran" LocalizedNameKey="InvTransactions" ControlName="InvTransactions" LargeGlyph="Inventory_Trans_32x32.png"/>
+    <RibbonItem Action="InvTran" LocalizedNameKey="InvTransactions" ControlName="DebtorInvoiceLines" LargeGlyph="Inventory_Trans_32x32.png"/>  
     <RibbonItem Action="DebtorTransPivot" LocalizedNameKey="PivotTable" ControlName="DebtorInvoiceLinesPivotReport" LargeGlyph="Category_Charge_32x32.png" />
+    <RibbonItem Action="DocSendLog" LocalizedNameKey="Log" ControlName="DocsSendLogGridPage" LargeGlyph="Server_Count_32x32.png" />
   </RibbonItem>
   <RibbonItem LocalizedNameKey="Sales">
     <RibbonItem Action="Orders" LocalizedNameKey="Orders" ControlName="DebtorOrdersMultiple" Module="Order" LargeGlyph="Orders_32x32.png"/>
@@ -54,6 +57,7 @@
        <RibbonItem Action="Invoices" LocalizedNameKey="Invoices" ControlName="Invoices" Glyph="AccountInvoice_16x16.png" />
        <RibbonItem Action="QuickInvoice" LocalizedNameKey="CreateOBJ" Parameter="Invoice" ControlName="CreateInvoicePage" Glyph="Invoice_16x16.png" />
     </RibbonItem>
+	 <RibbonItem Action="TaskGroups" LocalizedNameKey="TaskGroups" ControlName="DebtorProjTaskGroupPage" Module="ProjectTask" LargeGlyph="Group_by_32x32.png"/>
   </RibbonItem>
   <RibbonItem>    
     <RibbonItem Action="QueriesandReports" LocalizedNameKey="QueriesandReports" LargeGlyph="Statistics_32x32.png">      

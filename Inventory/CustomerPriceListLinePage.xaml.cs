@@ -37,29 +37,13 @@ namespace UnicontaClient.Pages.CustomPage
         protected override List<string> GridSkipFields { get { return new List<string>(2) { "Name", "ItemGroupName" }; } }
         protected override bool SetValuesOnPaste { get { return true; } }
         public override bool SingleBufferUpdate { get { return false; } }
+        public override bool IsAutoSave { get { return false; } }
 
         internal byte FixedDCType;
         public override void SetDefaultValues(UnicontaBaseEntity dataEntity, int selectedIndex)
         {
-            var rec = (InvPriceListLineClient)dataEntity;
-            rec.ExchangeRate = this.ExchangeRate;
             if (FixedDCType != 0)
-                rec._DCType = FixedDCType;
-        }
-
-        internal double ExchangeRate;
-        protected override void DataLoaded(UnicontaBaseEntity[] Arr)
-        {
-            var ExchangeRate = this.ExchangeRate;
-            if (ExchangeRate == 0d)
-                return;
-
-            var lst = Arr as IEnumerable<InvPriceListLineClient>;
-            if (lst != null)
-            {
-                foreach (var rec in lst)
-                    rec.ExchangeRate = ExchangeRate;
-            }
+                ((Uniconta.DataModel.InvPriceListLine)dataEntity)._DCType = FixedDCType;
         }
 
         public override IEnumerable<UnicontaBaseEntity> ConvertPastedRows(IEnumerable<UnicontaBaseEntity> copyFromRows)
@@ -81,9 +65,11 @@ namespace UnicontaClient.Pages.CustomPage
             }
             else if (row.GetType() == type)
             {
+                /*
+                Give problems setting Exchange rate
                 foreach (var inv in copyFromRows)
                    ((InvPriceListLineClient)inv).ExchangeRate = this.ExchangeRate;
-
+                */
                 return copyFromRows;
             }
             return null;
@@ -117,7 +103,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             string key = Utility.GetHeaderString(dgInvPriceListLineClientGrid.masterRecord);
             if (string.IsNullOrEmpty(key)) return;
-            string header = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("SalesPricesAndDiscounts"), key);
+            string header = string.Concat(Uniconta.ClientTools.Localization.lookup("SalesPricesAndDiscounts"), ": ", key);
             SetHeader(header);
         }
 
@@ -138,41 +124,9 @@ namespace UnicontaClient.Pages.CustomPage
             dgInvPriceListLineClientGrid.RowDoubleClick += DgInvPriceListLineClientGrid_RowDoubleClick;
         }
 
-        public override Task InitQuery()
-        {
-            return BindGrid();
-        }
-
-        async Task BindGrid()
+        Task BindGrid()
         { 
-            Currencies PriceCurrency;
-            var Comp = api.CompanyEntity;
-            var master = dgInvPriceListLineClientGrid.masterRecords?.First();
-
-            var priceList = master as Uniconta.DataModel.InvPriceList;
-            if (priceList != null)
-                PriceCurrency = (Currencies)priceList._Currency;
-            else
-            {
-                var dc = master as Uniconta.DataModel.DCAccount;
-                if (dc != null)
-                    PriceCurrency = dc._Currency;
-                else
-                    PriceCurrency = 0;
-            }
-
-            double ExchangeRate;
-            if (! Comp.SameCurrency(PriceCurrency))
-            {
-                ExchangeRate = await api.session.ExchangeRate(PriceCurrency, (Currencies)Comp._Currency, DateTime.Now, Comp);
-                if (ExchangeRate == 1d)
-                    ExchangeRate = 0d;
-            }
-            else
-                ExchangeRate = 0d;
-
-            dgInvPriceListLineClientGrid.ExchangeRate = ExchangeRate;
-            await dgInvPriceListLineClientGrid.Filter(null);
+            return dgInvPriceListLineClientGrid.Filter(null);
         }
 
         protected override void OnLayoutLoaded()
@@ -223,25 +177,19 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void localMenu_OnItemClicked(string ActionType)
         {
-            var selectedItem = dgInvPriceListLineClientGrid.SelectedItem as InvPriceListLineClient;
-            InvPriceListLineClient rec;
             switch (ActionType)
             {
                 case "AddRow":
-                    rec = dgInvPriceListLineClientGrid.AddRow() as InvPriceListLineClient;
-                    if (rec != null)
-                        rec.ExchangeRate = dgInvPriceListLineClientGrid.ExchangeRate;
+                    dgInvPriceListLineClientGrid.AddRow();
                     break;
                 case "CopyRow":
-                    rec = dgInvPriceListLineClientGrid.CopyRow() as InvPriceListLineClient;
-                    if (rec != null)
-                        rec.ExchangeRate = dgInvPriceListLineClientGrid.ExchangeRate;
+                    dgInvPriceListLineClientGrid.CopyRow();
                     break;
                 case "SaveGrid":
                     saveGrid();
                     break;
                 case "DeleteRow":
-                    if (selectedItem != null)
+                    if (dgInvPriceListLineClientGrid.SelectedItem != null)
                         dgInvPriceListLineClientGrid.DeleteRow();
                     break;
                 default:

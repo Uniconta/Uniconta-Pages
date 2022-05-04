@@ -8,7 +8,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CWSendStatementEmail"
         xmlns:cw="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"    
         xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
         xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
-        Width="220" Height="{StaticResource Height19}"  KeyDown="ChildWindow_KeyDown">
+        Width="{StaticResource Width26}" Height="{StaticResource Height26}"  KeyDown="ChildWindow_KeyDown">
     <Grid Margin="4" x:Name="LayoutRoot" >
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -18,6 +18,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CWSendStatementEmail"
             <Grid.RowDefinitions>
                 <RowDefinition Height="30"/>
                 <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
@@ -25,9 +26,10 @@ x:Class="UnicontaClient.Pages.CustomPage.CWSendStatementEmail"
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=All}" Grid.Column="0" Grid.Row="0" Margin="5,0,0,0" VerticalAlignment="Center"/>
-            <CorasauControls:CheckEditor Checked="cbxAll_Checked" IsChecked="{Binding SendAll, Mode=TwoWay}" Unchecked="cbxAll_Checked" x:Name="cbxAll" Grid.Column="2" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <RadioButton Checked="AllChecked" IsChecked="{Binding SendAll, Mode=TwoWay}" Unchecked="UnChecked" GroupName="EmailGrp"  x:Name="cbxAll" Grid.Column="2" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=SelectedRows}"  Grid.Column="0" Grid.Row="1" Margin="5,0,0,0" VerticalAlignment="Center"/>
-            <CorasauControls:CheckEditor x:Name="cbxMarked" IsChecked="{Binding SendOnlyMarked, Mode=TwoWay}" Grid.Column="2" Grid.Row="1" HorizontalAlignment="Center"  VerticalAlignment="Center"/>
+            <RadioButton x:Name="cbxMarked" IsChecked="{Binding SendOnlyMarked, Mode=TwoWay}" Checked="MarkedChecked" Unchecked="UnChecked" GroupName="EmailGrp" Grid.Column="2" Grid.Row="1" HorizontalAlignment="Center"  VerticalAlignment="Center"/>
+            <TextBlock x:Name="emailsendMsg" Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="2" Margin="5,0,0,0" VerticalAlignment="Center" Visibility="Collapsed" />
         </Grid>
         <StackPanel x:Name="actionButton" HorizontalAlignment="Right" Grid.Row="1" Orientation="Horizontal" Margin="0 10 0 0">
             <Button x:Name="OKButton" IsDefault="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OK}" Click="OKButton_Click" MinWidth="75" Height="23" 

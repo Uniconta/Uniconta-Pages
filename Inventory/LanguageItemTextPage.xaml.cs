@@ -22,6 +22,7 @@ using Uniconta.ClientTools.Page;
 using Uniconta.Common;
 using Uniconta.Common.Utility;
 using Uniconta.DataModel;
+using Uniconta.API.System;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -45,6 +46,13 @@ namespace UnicontaClient.Pages.CustomPage
     public partial class LanguageItemTextPage : GridBasePage
     {
         SQLCache items;
+
+
+        public LanguageItemTextPage(CrudAPI api) : base(api, string.Empty)
+        {
+            InitializeComponent();
+        }
+
         public LanguageItemTextPage(UnicontaBaseEntity master) : base(master)
         {
             InitializeComponent();
@@ -71,6 +79,25 @@ namespace UnicontaClient.Pages.CustomPage
             if (string.IsNullOrEmpty(key)) return;
             string header = string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("LanguageItemText"), key);
             SetHeader(header);
+        }
+
+        public override void SetParameter(IEnumerable<ValuePair> Parameters)
+        {
+            string masterValue = null;
+            foreach (var rec in Parameters)
+            {
+                if (string.Compare(rec.Name, "MasterName", StringComparison.CurrentCultureIgnoreCase) == 0)
+                    masterValue = rec.Value;
+            }
+
+            if (masterValue != null)
+            {
+                var cache = api.GetCache(typeof(Uniconta.DataModel.InvItemNameGroup)) ?? api.LoadCache(typeof(Uniconta.DataModel.InvItemNameGroup)).GetAwaiter().GetResult();
+                var master = cache.Get<InvItemNameGroup>(masterValue);
+                InitPage(master);
+            }
+
+            base.SetParameter(Parameters);
         }
 
         void InitPage(UnicontaBaseEntity masterRecord)

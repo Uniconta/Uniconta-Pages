@@ -64,7 +64,6 @@ namespace UnicontaClient.Pages.CustomPage
 
         void InitPage(CrudAPI crudapi)
         {
-            BusyIndicator = busyIndicator;
             layoutControl = layoutItems;
             deCreated.IsReadOnly = true;
             deCreated.AllowDefaultButton = false;

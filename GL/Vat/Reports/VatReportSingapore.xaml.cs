@@ -63,6 +63,9 @@ namespace UnicontaClient.Pages.CustomPage
             link.PageHeaderData = ReportHeaderDataContext;
             link.PageHeaderTemplate = PageHeaderTemplate;
             link.DetailTemplate = DetailTemplate;
+#if !SILVERLIGHT
+            link.PaperKind = System.Drawing.Printing.PaperKind.A4;
+#endif
             link.DetailCount = 1;
             link.CreateDetail += link_CreateDetail;
             return link;

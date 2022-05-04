@@ -5,16 +5,15 @@ x:Class="UnicontaClient.Pages.CustomPage.TransactionReport"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"   
-    mc:Ignorable="d"
     xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
     xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage" 
     xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools" 
-    xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors"   
-    d:DesignHeight="300" d:DesignWidth="400">
+    xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors">
     <UserControl.Resources>
         <SolidColorBrush x:Key="LayoutGridColor" Color="Transparent" />
         <Util:VisibilityBoolConverter x:Key="VisibilityBoolConverter" />
         <Util:ImageNameToImagesourceConverter x:Key="ImageNameToImagesourceConverter"/>
+        <Util:RowIndexConverter x:Key="RowIndexConverter" />
     </UserControl.Resources>
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
@@ -52,31 +51,31 @@ x:Class="UnicontaClient.Pages.CustomPage.TransactionReport"
             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ToDate}" Grid.Column="0" Grid.Row="1" Margin="3,3,3,3"/>
             <CorasauControls:DateEditor x:Name="txtDateTo" Grid.Column="2" Grid.Row="1" Margin="0,3,3,3"/>
             <TextBlock x:Name="lblDim1" Grid.Column="4" Grid.Row="0" Margin="10,3,3,3"/>
-            <CorasauControls:DimComboBoxEditor Width="200" x:Name="cbdim1" Grid.Column="6" Grid.Row="0" Margin="10,3,3,3" ShowCustomItems="False">
+            <CorasauControls:DimComboBoxEditor Width="200" x:Name="cbdim1" Grid.Column="6" Grid.Row="0" Margin="10,3,3,3" ShowCustomItems="False" ShowClearButton="True">
                 <CorasauControls:DimComboBoxEditor.StyleSettings>
                     <editor:CheckedComboBoxStyleSettings />
                 </CorasauControls:DimComboBoxEditor.StyleSettings>
             </CorasauControls:DimComboBoxEditor>
             <TextBlock x:Name="lblDim2" Grid.Column="4" Grid.Row="1" Margin="10,3,3,3"/>
-            <CorasauControls:DimComboBoxEditor Width="200" x:Name="cbdim2" Grid.Column="6" Grid.Row="1" Margin="10,3,3,3" ShowCustomItems="False">
+            <CorasauControls:DimComboBoxEditor Width="200" x:Name="cbdim2" Grid.Column="6" Grid.Row="1" Margin="10,3,3,3" ShowCustomItems="False" ShowClearButton="True">
                 <CorasauControls:DimComboBoxEditor.StyleSettings>
                     <editor:CheckedComboBoxStyleSettings />
                 </CorasauControls:DimComboBoxEditor.StyleSettings>
             </CorasauControls:DimComboBoxEditor>
             <TextBlock x:Name="lblDim3" Grid.Column="4" Grid.Row="2" Margin="10,3,3,3"/>
-            <CorasauControls:DimComboBoxEditor Width="200" x:Name="cbdim3" Grid.Column="6" Grid.Row="2" Margin="10,3,3,3" ShowCustomItems="False">
+            <CorasauControls:DimComboBoxEditor Width="200" x:Name="cbdim3" Grid.Column="6" Grid.Row="2" Margin="10,3,3,3" ShowCustomItems="False" ShowClearButton="True">
                 <CorasauControls:DimComboBoxEditor.StyleSettings>
                     <editor:CheckedComboBoxStyleSettings />
                 </CorasauControls:DimComboBoxEditor.StyleSettings>
             </CorasauControls:DimComboBoxEditor>
             <TextBlock x:Name="lblDim4" Grid.Column="4" Grid.Row="3" Margin="10,3,3,3"/>
-            <CorasauControls:DimComboBoxEditor Width="200" x:Name="cbdim4" Grid.Column="6" Grid.Row="3" Margin="10,3,3,3" ShowCustomItems="False">
+            <CorasauControls:DimComboBoxEditor Width="200" x:Name="cbdim4" Grid.Column="6" Grid.Row="3" Margin="10,3,3,3" ShowCustomItems="False" ShowClearButton="True">
                 <CorasauControls:DimComboBoxEditor.StyleSettings>
                     <editor:CheckedComboBoxStyleSettings />
                 </CorasauControls:DimComboBoxEditor.StyleSettings>
             </CorasauControls:DimComboBoxEditor>
             <TextBlock x:Name="lblDim5" Grid.Column="4" Grid.Row="4" Margin="10,3,3,3"/>
-            <CorasauControls:DimComboBoxEditor Width="200" x:Name="cbdim5" Grid.Column="6" Grid.Row="4" Margin="10,3,3,3" ShowCustomItems="False">
+            <CorasauControls:DimComboBoxEditor Width="200" x:Name="cbdim5" Grid.Column="6" Grid.Row="4" Margin="10,3,3,3" ShowCustomItems="False" ShowClearButton="True">
                 <CorasauControls:DimComboBoxEditor.StyleSettings>
                     <editor:CheckedComboBoxStyleSettings />
                 </CorasauControls:DimComboBoxEditor.StyleSettings>

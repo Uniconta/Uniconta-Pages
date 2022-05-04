@@ -19,5 +19,13 @@
       <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16.png" ShortcutKey=""/>
     </RibbonItem>
   </RibbonItem>
-
+  <RibbonItem>
+    <RibbonItem Action="PartInvItems" LocalizedNameKey="BOM" Module="InvBOMVariant" LargeGlyph="Order_Lines_Highlighted_32x32.png" >
+      <RibbonItem Action="InvBOMPartOfContains" LocalizedNameKey="Contains" ControlName="PartInvItemsPage" Glyph="Multiple_16x16.png"/>
+      <RibbonItem Action="InvBOMPartOfWhereUsed" LocalizedNameKey="WhereUsed" ControlName="InvBOMPartOfPage" Glyph="Single_16x16.png"/>
+      <RibbonItem Action="InvBOMProductionPosted" LocalizedNameKey="ProductionPosted" ControlName="ProductionPostedGridPage" Glyph="Tick_16x16.png"/>
+      <RibbonItem Action="InvHierarichalBOM" LocalizedNameKey="HierarchicalBOM" ControlName="InventoryHierarchicalBOMStatement" Glyph="Distributor_16x16.png"/>
+      <RibbonItem Action="InvExplodeBOM" LocalizedNameKey="ExplodedBOM" ControlName="InvBOMExplodePage" Glyph="Customer_Group_16x16.png"/>
+    </RibbonItem>
+  </RibbonItem>
 </root>

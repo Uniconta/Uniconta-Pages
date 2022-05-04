@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.Common;
 using Uniconta.DataModel;
+using UnicontaClient.Pages;
 using UnicontaClient.Pages.Creditor.Payments;
 
 namespace UnicontaISO20022CreditTransfer
@@ -154,6 +155,8 @@ namespace UnicontaISO20022CreditTransfer
             {
                 case CompanyBankENUM.DanskeBank_NO:
                     return "BANK"; //Default value for Danske Bank Norge
+                case CompanyBankENUM.Nordea_NO:
+                    return "CUST"; //Nordea only accept the code CUST
                 default:
                     return "BANK";
             }
@@ -272,9 +275,24 @@ namespace UnicontaISO20022CreditTransfer
         /// <summary>
         /// Unstructured Remittance Information
         /// </summary>
-        public override List<string> Ustrd(string externalAdvText, ISO20022PaymentTypes ISOPaymType, PaymentTypes paymentMethod, bool extendedText)
+        public override List<string> Ustrd(string externalAdvText, ISO20022PaymentTypes ISOPaymType, CreditorTransPayment trans, bool extendedText)
         {
             var ustrdText = StandardPaymentFunctions.RegularExpressionReplace(externalAdvText, allowedCharactersRegEx, replaceCharactersRegEx);
+
+            if (ustrdText == null)
+                return null;
+
+            //Extended notification
+            if (ISOPaymType == ISO20022PaymentTypes.DOMESTIC)
+            {
+                if (extendedText)
+                {
+                    if (ustrdText.Length <= 20)
+                        return null;
+                }
+                else
+                    return null;
+            }
 
             int maxLines = 0;
             int maxStrLen = 0;
@@ -286,8 +304,8 @@ namespace UnicontaISO20022CreditTransfer
                     if (ISOPaymType == ISO20022PaymentTypes.DOMESTIC)
                         return resultList;
 
-                    maxLines = 4;
-                    maxStrLen = 35;
+                    maxLines = 5;
+                    maxStrLen = 70;
                     break;
                           
                 case CompanyBankENUM.DanskeBank_NO:

@@ -38,6 +38,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionOrderLines"
                                         </DataTemplate>
                                     </local:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </local:CorasauDataGridTemplateColumnClient>
+                                <local:CorasauDataGridTemplateColumnClient x:Name="colNote" FieldName="Note" Width="150" Visible="False"/>
                                 <local:CorasauDataGridTemplateColumnClient x:Name="Item" Width="100"/>
                                 <local:CorasauDataGridTemplateColumnClient x:Name="colVariant" FieldName="Variant">
                                     <local:CorasauDataGridTemplateColumnClient.CellTemplate>
@@ -89,7 +90,18 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionOrderLines"
                                     </local:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </local:CorasauDataGridTemplateColumnClient>
                                 <local:CorasauDataGridTemplateColumnClient x:Name="CostPrice" Visible="False" />
-                                <local:CorasauDataGridTemplateColumnClient x:Name="Warehouse" Width="100"/>
+                                <local:CorasauDataGridForeignKeyColumnClient x:Name="Warehouse" Width="100">
+                                    <local:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
+                                        <ControlTemplate>
+                                            <TextBlock Margin="2" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.Warehouse,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"></TextBlock>
+                                        </ControlTemplate>
+                                    </local:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
+                                    <local:CorasauDataGridForeignKeyColumnClient.CellTemplate>
+                                        <DataTemplate>
+                                            <local:CorasauGridLookupEditorClient  x:Name="PART_Editor" EditValueChanged="Warehouse_EditValueChanged"  />
+                                        </DataTemplate>
+                                    </local:CorasauDataGridForeignKeyColumnClient.CellTemplate>
+                                </local:CorasauDataGridForeignKeyColumnClient>
                                 <local:CorasauDataGridForeignKeyColumnClient x:Name="Location" Width="100">
                                     <local:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
                                         <ControlTemplate>
@@ -98,7 +110,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionOrderLines"
                                     </local:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
                                     <local:CorasauDataGridForeignKeyColumnClient.CellTemplate>
                                         <DataTemplate>
-                                            <local:CorasauGridLookupEditorClient HasCustomLookUp="true" GotFocus="PART_Editor_GotFocus" x:Name="PART_Editor" ItemsSource="{Binding DataContext.RowData.Row.LocationSource,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" />
+                                            <local:CorasauGridLookupEditorClient HasCustomLookUp="true" EditValueChanged="Location_EditValueChanged" GotFocus="Location_GotFocus" x:Name="PART_Editor" ItemsSource="{Binding DataContext.RowData.Row.LocationSource,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" />
                                         </DataTemplate>
                                     </local:CorasauDataGridForeignKeyColumnClient.CellTemplate>
                                 </local:CorasauDataGridForeignKeyColumnClient>
@@ -107,10 +119,11 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionOrderLines"
                                 <local:CorasauDataGridTemplateColumnClient x:Name="ReportAsFinishedDeep" Width="70"/>
                                 <local:CorasauDataGridTemplateColumnClient x:Name="IgnoreBlocked" Width="50" Visible="False" />
                                 <local:ComboBoxColumnClient x:Name="Unit" Width="50" Visible="False" />
+                                <local:CorasauDataGridTemplateColumnClient x:Name="Week" Visible="False" />
+                                <local:CorasauDataGridTemplateColumnClient x:Name="Date" Visible="False" />
                                 <local:CorasauDataGridTemplateColumnClient x:Name="ReferenceNumber" Visible="False" />
                                 <local:CorasauDataGridTemplateColumnClient x:Name="PostingAccount" Width="100" Visible="False"/>
                                 <local:CorasauDataGridTemplateColumnClient x:Name="SerieBatchMarked" Width="90" HideHeaderCheck="true" Visible="False"/>
-                                <local:CorasauDataGridTemplateColumnClient x:Name="Vat" Width="50" Visible="False"/>
                                 <local:CorasauDataGridTemplateColumnClient x:Name="Employee" Width="50" Visible="False"/>
                                 <local:CorasauDataGridTemplateColumnClient x:Name="EmployeeName" Visible="False"/>
                                 <local:CorasauDataGridTemplateColumnClient x:Name="Remaining" Width="80" Visible="False" >

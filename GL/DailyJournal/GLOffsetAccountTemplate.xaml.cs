@@ -24,6 +24,7 @@ namespace UnicontaClient.Pages.CustomPage
         public override bool Readonly { get { return false; } }
         protected override List<string> GridSkipFields { get { return new List<string>() { "AccountName" }; } }
         protected override bool RenderAllColumns { get { return true; } }
+        public override bool IsAutoSave { get { return false; } }
     }
 
     public partial class GLOffsetAccountTemplate : GridBasePage
@@ -167,11 +168,18 @@ namespace UnicontaClient.Pages.CustomPage
                 bankStatementLine?.SetOffsetAccount(lines);
                 vouchersClient?.SetOffsetAccount(lines);
             }
-            dockCtrl?.CloseDockItem();
+            CloseDockItem();
         }
 
         protected override void OnLayoutLoaded()
         {
+            if(!api.CompanyEntity.Project)
+            {
+                this.Project.Visible = this.Project.ShowInColumnChooser = false;
+                this.PrCategory.Visible = this.PrCategory.ShowInColumnChooser = false;
+                this.WorkSpace.Visible = this.WorkSpace.ShowInColumnChooser = false;
+                this.Qty.Visible = this.Qty.ShowInColumnChooser = false; 
+            }
             base.OnLayoutLoaded();
             setDim();
         }
@@ -369,7 +377,7 @@ namespace UnicontaClient.Pages.CustomPage
             else if (bankStatementLine != null)
                 Amount = bankStatementLine.Amount;
             else if (vouchersClient != null)
-                Amount = vouchersClient.Amount;
+                Amount = - vouchersClient._Amount;
             else
                 Amount = 0d;
             if (Amount != 0d)
@@ -421,7 +429,7 @@ namespace UnicontaClient.Pages.CustomPage
                 else if (bankStatementLine != null)
                     amount = bankStatementLine.Amount;
                 else if (vouchersClient != null)
-                    amount = vouchersClient.Amount;
+                    amount = - vouchersClient._Amount;
                 else
                     amount = 0d;
                 SetStatusText(amount, offSetAccAmountSum);

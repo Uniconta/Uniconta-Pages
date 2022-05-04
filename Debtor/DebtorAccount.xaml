@@ -5,21 +5,24 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorAccount"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
     xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage"
     mc:Ignorable="d"   xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
     xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
     xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
+    xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors"
     d:DesignHeight="300" d:DesignWidth="400">
     <UserControl.Resources>
         <Util:RowIndexConverter x:Key="RowIndexConverter" />
         <Util:VisibilityBoolConverter x:Key="VisibilityBoolConverter" />
         <Util:VisibilityTextConverter x:Key="VisibilityTextConverter" />
         <Util:ImageNameToImagesourceConverter x:Key="ImageNameToImagesourceConverter"/>
+        <Util:ListStringConverter x:Key="ListToStringConverter"/>
     </UserControl.Resources>
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>         
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Debtor/DebtorAccountGridRibbon.xml" x:Name="localMenu"/>
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
@@ -96,8 +99,31 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorAccount"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceInXML" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PricesInclVat" Width="60"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CrmGroup" Width="100" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Interests" Width="100" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Products" Width="100" />
+
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Interests" Binding="{Binding Path=Interests, Mode=TwoWay, Converter={StaticResource ListToStringConverter}}" Width="100" >
+                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <CorasauControls:ComboBoxEditor GotFocus="cmbInterests_GotFocus"  x:Name="PART_Editor">
+                                    <editor:ComboBoxEdit.StyleSettings>
+                                        <editor:CheckedComboBoxStyleSettings />
+                                    </editor:ComboBoxEdit.StyleSettings>
+                                </CorasauControls:ComboBoxEditor>
+                            </DataTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                    </localPage:CorasauDataGridTemplateColumnClient>
+
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Products" Binding="{Binding Path=Products, Mode=TwoWay, Converter={StaticResource ListToStringConverter}}" Width="100" >
+                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <CorasauControls:ComboBoxEditor GotFocus="cmbProducts_GotFocus"  x:Name="PART_Editor">
+                                    <editor:ComboBoxEdit.StyleSettings>
+                                        <editor:CheckedComboBoxStyleSettings />
+                                    </editor:ComboBoxEdit.StyleSettings>
+                                </CorasauControls:ComboBoxEditor>
+                            </DataTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                    </localPage:CorasauDataGridTemplateColumnClient>
+
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PostingAccount" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Payment" Width="50"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PaymentFormat" Visible="False"/>
@@ -136,11 +162,15 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorAccount"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="BankAccount" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="LastInvoice" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="EndDiscountPct" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="LineDiscountPct" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Shipment" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryTerm" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="VatNumber" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="RefInPayment" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Created" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="D2CAccount" Visible="False" />
                     <localPage:ComboBoxColumnClient x:Name="BalanceMethod" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="EORI" Visible="False"/>
                 </localPage:DebtorAccountGrid.Columns>
                 <localPage:DebtorAccountGrid.TotalSummary>
                     <localPage:SumColumn FieldName="CurBalance" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>

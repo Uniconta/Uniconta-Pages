@@ -53,13 +53,13 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryItems"
                     </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Item" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" Width="200"/>
-                    <localPage:ComboBoxColumnClient x:Name="ItemType" Width="90" />
-                    <localPage:ComboBoxColumnClient x:Name="CostModel" Width="90" />
+                    <localPage:ComboBoxColumnClient x:Name="ItemType" Width="90"/>
+                    <localPage:ComboBoxColumnClient x:Name="CostModel" Width="90" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CostPrice" Width="70"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="SalesPrice1" Width="70"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="SalesPrice2" Width="70"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="SalesPrice3" Width="70"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PurchasePrice" Width="70"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="SalesPrice3" Width="70" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PurchasePrice" Width="70" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Qty" Width="70">
                         <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                             <DataTemplate>
@@ -67,12 +67,12 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryItems"
                             </DataTemplate>
                         </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                     </localPage:CorasauDataGridTemplateColumnClient>
-                    <localPage:ComboBoxColumnClient x:Name="Unit" />
+                    <localPage:ComboBoxColumnClient x:Name="Unit" Width="50" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Decimals" Width="30"/>
-                    <localPage:ComboBoxColumnClient x:Name="Currency1" Width="35" />
-                    <localPage:ComboBoxColumnClient x:Name="Currency2" Width="35"/>
-                    <localPage:ComboBoxColumnClient x:Name="Currency3" Width="35"/>
-                    <localPage:ComboBoxColumnClient x:Name="PurchaseCurrency" Width="35"/>
+                    <localPage:ComboBoxColumnClient x:Name="Currency1" Width="35" Visible="False"/>
+                    <localPage:ComboBoxColumnClient x:Name="Currency2" Width="35" Visible="False"/>
+                    <localPage:ComboBoxColumnClient x:Name="Currency3" Width="35" Visible="False"/>
+                    <localPage:ComboBoxColumnClient x:Name="PurchaseCurrency" Width="35" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="AverageCost" Width="70"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CostValue" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="UseStorage" Visible="False" Width="90"/>
@@ -81,6 +81,7 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryItems"
                     <localPage:ComboBoxColumnClient x:Name="UseAlternative" Visible="False" Width="70" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="AlternativeItem" Visible="False" Width="90" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="TariffNumber" Visible="False" Width="90"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="IntraUnit" Visible="False" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="StockPosition" Visible="False" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Weight" Visible="False" Width="90" AllowThousandMask="True" Mask="n3"  />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Volume" Visible="False" Width="90"/>
@@ -91,10 +92,10 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryItems"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PurchaseAccount" Visible="False" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PayrollCategory" Visible="False" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Visible="False" Width="90"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Group" Width="90"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Cartons" Width="50"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Group" Width="80"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Cartons" Width="50" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim1" Width="70" FieldName="Dimension1" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient  x:Name="cldim2" Width="70" FieldName="Dimension2" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim2" Width="70" FieldName="Dimension2" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim3" Width="70" FieldName="Dimension3" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim4" Width="70" FieldName="Dimension4" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim5" Width="70" FieldName="Dimension5" Visible="False"/>

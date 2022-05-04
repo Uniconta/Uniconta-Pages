@@ -8,7 +8,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CWBankAPI"
            xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
             xmlns:dxinteraction="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
                     xmlns:enumType ="clr-namespace:Uniconta.DataModel;assembly=Uniconta.WindowsAPI"
-           Width="400"  KeyDown="ChildWindow_KeyDown" SizeToContent="Height">
+           Width="450"  KeyDown="ChildWindow_KeyDown" SizeToContent="Height">
     <Grid x:Name="LayoutRoot" Margin="2" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
             <RowDefinition />
@@ -43,7 +43,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CWBankAPI"
                         </DataTemplate>
                     </ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
                     <ClientToolsControls:CorasauLayoutItem x:Name="liBank" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FinancialInstitution}">
-                        <CorasauControls:ComboBoxEditor x:Name="cmbBank" Height="25" HorizontalAlignment="Stretch" >
+                        <CorasauControls:ComboBoxEditor x:Name="cmbBank" Height="25" HorizontalAlignment="Stretch" SelectedIndexChanged="BankAPIBank_SelectedIndexChanged">
                             <dxinteraction:Interaction.Behaviors>
                                 <dxinteraction:EnumItemsSourceBehavior EnumType="{x:Type enumType:Bank}" />
                             </dxinteraction:Interaction.Behaviors>
@@ -62,7 +62,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CWBankAPI"
                             <Image Source="/UnicontaPages;component/Assets/img/group-file_16x16.png" Width="16" Height="16" Stretch="UniformToFill" HorizontalAlignment="Left" />
                         </DataTemplate>
                     </ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
-                    <ClientToolsControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Description}">
+                    <ClientToolsControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Description}" LabelVerticalAlignment="Top">
                         <TextBlock x:Name="txtDescription" TextWrapping="Wrap" HorizontalAlignment="Stretch" />
                     </ClientToolsControls:CorasauLayoutItem>
                 </ClientToolsControls:CorasauLayoutGroup>

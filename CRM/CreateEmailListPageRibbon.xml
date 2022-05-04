@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <root>
   <RibbonItem TabId="0" LocalizedNameKey="Home">
+    <RibbonItem Action="Search" LocalizedNameKey="Search" LargeGlyph="Validate_32x32.png" ShortcutKey="Ctrl+H" />
+  </RibbonItem>
+  <RibbonItem>
     <RibbonItem Action="SaveAndExit" LocalizedNameKey="SaveExit" Glyph="CreateExit_32x32.png" LargeGlyph="CreateExit_32x32.png" />
   </RibbonItem>
   <RibbonItem >
@@ -22,6 +25,14 @@
     <RibbonItem Action="ContactFilter" LocalizedNameKey="FilterOBJ" Parameter="Contacts" Glyph="Filter_16x16.png" LargeGlyph="Filter_32x32.png"/>
     <RibbonItem Action="ClearContactFilter" LocalizedNameKey="ClearFilter" Glyph="Filter_Clear_32x32.png" LargeGlyph="Filter_Clear_32x32.png"/>
   </RibbonItem>
+	<RibbonItem>
+		<RibbonItem Action="InvItemFilter" LocalizedNameKey="FilterOBJ" Parameter="Item" Glyph="Filter_16x16.png" LargeGlyph="Filter_32x32.png"/>
+		<RibbonItem Action="ClearInvItemFilter" LocalizedNameKey="ClearFilter" Glyph="Filter_Clear_32x32.png" LargeGlyph="Filter_Clear_32x32.png"/>
+	</RibbonItem>
+	<RibbonItem>
+		<RibbonItem Action="InvTransFilter" LocalizedNameKey="FilterOBJ" Parameter="MovementType" Glyph="Filter_16x16.png" LargeGlyph="Filter_32x32.png"/>
+		<RibbonItem Action="ClearInvTransFilter" LocalizedNameKey="ClearFilter" Glyph="Filter_Clear_32x32.png" LargeGlyph="Filter_Clear_32x32.png"/>
+	</RibbonItem>
   <RibbonItem>
     <!---If we want to create a new group in same PageTab-->
     <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32.png">
@@ -36,8 +47,7 @@
       <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16.png" ShortcutKey=""/>
     </RibbonItem>
   </RibbonItem>
-	<RibbonItem>
-		<RibbonItem Action="Search" LocalizedNameKey="Search" LargeGlyph="Validate_32x32.png" ShortcutKey="Ctrl+H" />
+  <RibbonItem>
     <RibbonItem Action="SendEmail" LocalizedNameKey="EmailDocuments" LargeGlyph="Email_32x32.png"/>
-	</RibbonItem>
+  </RibbonItem>
 </root>

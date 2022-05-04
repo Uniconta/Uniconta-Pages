@@ -68,7 +68,6 @@ namespace UnicontaClient.Pages.CustomPage
         void InitPage(CrudAPI crudapi)
         {
             ribbonControl = frmRibbon;
-            BusyIndicator = busyIndicator;
             layoutControl = layoutItems;
             cbCountry.ItemsSource = Enum.GetValues(typeof(Uniconta.Common.CountryCode));
             DebGroupLookUpEditor.api = ItemNameGrouplookupeditior.api = PriceListlookupeditior.api = Employeelookupeditor.api = dim1lookupeditior.api = dim2lookupeditior.api =
@@ -199,25 +198,17 @@ namespace UnicontaClient.Pages.CustomPage
                                 return; // we wil not override since address has not changed
 
                             onlyRunOnce = true;
-                            if (editrow._Address1 == null)
-                            {
-                                editrow.Address1 = address.CompleteStreet;
-                                editrow.ZipCode = address.zipcode;
-                                editrow.City = address.cityname;
-                                editrow.Country = address.Country;
-                            }
-                            else
+                            if (editrow._Address1 != null)
                             {
                                 var result = UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("UpdateAddress"), Uniconta.ClientTools.Localization.lookup("Information"), UnicontaMessageBox.YesNo);
                                 if (result != UnicontaMessageBox.Yes)
                                     return;
-                                {
-                                    editrow.Address1 = address.CompleteStreet;
-                                    editrow.ZipCode = address.zipcode;
-                                    editrow.City = address.cityname;
-                                    editrow.Country = address.Country;
-                                }
                             }
+                            editrow.Address1 = streetAddress;
+                            editrow.Address2 = address.street2;
+                            editrow.ZipCode = address.zipcode;
+                            editrow.City = address.cityname;
+                            editrow.Country = address.Country;
                         }
 
                         if (string.IsNullOrWhiteSpace(editrow._Name))

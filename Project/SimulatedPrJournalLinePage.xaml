@@ -56,6 +56,7 @@ x:Class="UnicontaClient.Pages.CustomPage.SimulatedPrJournalLinePage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Employee" Width="70"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Voucher"  Width="80" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="TransType" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="WorkSpace" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Approved" Width="50"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="OnHold" Width="50"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Invoiceable" Width="50" />

@@ -63,12 +63,15 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         bool hasEmail;
-        DebtorOrderClient Order;
+        public DebtorOrderClient Order;
         Uniconta.API.DebtorCreditor.FindPrices PriceLookup;
         SQLCache items, warehouse, debtors, standardVariants, variants1, variants2;
         DebtorOrderClient initialOrder;
         double exchangeRate;
-        bool linesFromProjectInvoice = false;
+        bool linesFromProjectInvoice;
+        ProjectClient ProjectMaster;
+        public string userWarehouse;
+
         private void InitPage(UnicontaBaseEntity master, DebtorOrderLineClient[] orderLines = null)
         {
             InitializeComponent();
@@ -84,7 +87,11 @@ namespace UnicontaClient.Pages.CustomPage
                 if (master is DebtorOrder)
                     StreamingManager.Copy(master, initialOrder);
                 else
+                {
+                    ProjectMaster = (master as ProjectClient);
+                    initialOrder.SetMaster(ProjectMaster?.Debtor);
                     initialOrder.SetMaster(master);
+                }
                 LeAccount.IsEnabled = false;
                 lePrCategory.api = api;
                 InputWindowOrder1.ActiveGroup = navGroupOrders;
@@ -106,14 +113,18 @@ namespace UnicontaClient.Pages.CustomPage
             cbDeliveryCountry.ItemsSource = Enum.GetValues(typeof(Uniconta.Common.CountryCode));
             txtName.IsEnabled = false;
             dgDebtorOrderLineGrid.Visibility = Visibility.Visible;
-
-#if !SILVERLIGHT
             btnAccount.ToolTip = string.Format(Uniconta.ClientTools.Localization.lookup("CreateOBJ"), Uniconta.ClientTools.Localization.lookup("Debtor"));
-#endif
+            this.debtors = Comp.GetCache(typeof(Debtor));
+            this.items = Comp.GetCache(typeof(InvItem));
+            this.warehouse = Comp.GetCache(typeof(InvWarehouse));
+            this.variants1 = Comp.GetCache(typeof(InvVariant1));
+            this.variants2 = Comp.GetCache(typeof(InvVariant2));
+            this.standardVariants = Comp.GetCache(typeof(InvStandardVariant));
+
             ShowCustomCloseConfiramtion = true;
 
             // we setup first order
-            ClearFields();
+            ClearFields(master);
 
             if (dgDebtorOrderLineGrid.IsLoadedFromLayoutSaved)
             {
@@ -121,12 +132,6 @@ namespace UnicontaClient.Pages.CustomPage
                 dgDebtorOrderLineGrid.IsLoadedFromLayoutSaved = false;
             }
 
-            this.debtors = Comp.GetCache(typeof(Debtor));
-            this.items = Comp.GetCache(typeof(InvItem));
-            this.warehouse = Comp.GetCache(typeof(InvWarehouse));
-            this.variants1 = Comp.GetCache(typeof(InvVariant1));
-            this.variants2 = Comp.GetCache(typeof(InvVariant2));
-            this.standardVariants = Comp.GetCache(typeof(InvStandardVariant));
             if (orderLines != null)
             {
                 linesFromProjectInvoice = true;
@@ -169,16 +174,27 @@ namespace UnicontaClient.Pages.CustomPage
             }
             if (!company.Location || !company.Warehouse)
                 Location.Visible = Location.ShowInColumnChooser = false;
+            else
+                Location.ShowInColumnChooser = true;
             if (!company.Warehouse)
                 Warehouse.Visible = Warehouse.ShowInColumnChooser = false;
+            else
+                Warehouse.ShowInColumnChooser = true;
             if (!company.SerialBatchNumbers)
                 SerieBatch.Visible = SerieBatch.ShowInColumnChooser = false;
+            else
+                SerieBatch.ShowInColumnChooser = true;
             if (!company.DeliveryAddress)
                 delAddNavBar.IsVisible = false;
             if (!company.Project)
-                tbProject.Visibility = tbPrCategory.Visibility = Projectlookupeditor.Visibility= PrCategorylookupeditor.Visibility =  Visibility.Collapsed;
+            {
+                tbProject.Visibility = tbPrCategory.Visibility = Projectlookupeditor.Visibility = PrCategorylookupeditor.Visibility = Visibility.Collapsed;
+                WorkSpace.ShowInColumnChooser = WorkSpace.Visible = false;
+            }
             if (company.NumberOfDimensions == 0)
                 barGrpDimension.IsVisible = false;
+            if (!company.InvPrice)
+                tbPriceList.Visibility = lePriceList.Visibility = Visibility.Collapsed;
 
             Utility.SetupVariants(api, colVariant, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
             Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
@@ -306,6 +322,16 @@ namespace UnicontaClient.Pages.CustomPage
                     dgDebtorOrderLineGrid.PasteRows(invItems);
                 }
             }
+            if (screenName == TabControls.DebtorAccountPage2 && argument != null)
+            {
+                var args = argument as object[];
+                if (args[2] == this.ParentControl)
+                {
+                    LeAccount.LoadItemSource();
+                    if (string.IsNullOrEmpty(LeAccount.EditValue as string))
+                        LeAccount.SelectedItem = args[3];
+                }
+            }
         }
         public override bool IsDataChaged
         {
@@ -356,12 +382,17 @@ namespace UnicontaClient.Pages.CustomPage
                                 return;
                             }
                         }
+
+                        var _priceLookup = this.PriceLookup;
+                        this.PriceLookup = null; // avoid that we call priceupdated in property change on Qty
                         if (selectedItem._SalesQty != 0d)
                             rec.Qty = selectedItem._SalesQty;
                         else if (api.CompanyEntity._OrderLineOne)
                             rec.Qty = 1d;
                         rec.SetItemValues(selectedItem, api.CompanyEntity._OrderLineStorage);
-                        this.PriceLookup?.SetPriceFromItem(rec, selectedItem);
+                        this.PriceLookup = _priceLookup;
+                        _priceLookup?.SetPriceFromItem(rec, selectedItem);
+
                         if (selectedItem._StandardVariant != rec.standardVariant)
                         {
                             rec.Variant1 = null;
@@ -371,6 +402,8 @@ namespace UnicontaClient.Pages.CustomPage
                         }
                         setVariant(rec, false);
                         TableField.SetUserFieldsFromRecord(selectedItem, rec);
+                        if (rec._Warehouse == null)
+                            rec.Warehouse = this.userWarehouse;
                         if (selectedItem._Blocked)
                             UtilDisplay.ShowErrorCode(ErrorCodes.ItemIsOnHold, null);
                     }
@@ -384,10 +417,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "Warehouse":
                     if (warehouse != null)
-                    {
-                        var selected = (InvWarehouse)warehouse.Get(rec._Warehouse);
-                        setLocation(selected, (DebtorOrderLineClient)rec);
-                    }
+                        setLocation((InvWarehouse)warehouse.Get(rec._Warehouse), (DebtorOrderLineClient)rec);
                     break;
                 case "Location":
                     if (string.IsNullOrEmpty(rec._Warehouse))
@@ -472,6 +502,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "DeleteRow":
                     dgDebtorOrderLineGrid.DeleteRow();
                     break;
+                case "ShowInvoice":
                 case "GenerateInvoice":
                     if (!string.IsNullOrEmpty(Order._DCAccount))
                     {
@@ -491,7 +522,7 @@ namespace UnicontaClient.Pages.CustomPage
                                         return;
                                 }
                             }
-                            GenerateInvoice(Order);
+                            GenerateInvoice(Order, ActionType == "ShowInvoice" ? true : false);
                         }
                         else
                             UtilDisplay.ShowControlAccessMsg("GenerateInvoice");
@@ -516,7 +547,7 @@ namespace UnicontaClient.Pages.CustomPage
                     loadOrderTemplate = false;
                     gridRibbon_BaseActions("LoadTemplate");
                     break;
-                case "ViewVoucher":
+                case "ShowVoucher":
                     busyIndicator.IsBusy = true;
                     ViewVoucher(TabControls.VouchersPage3, Order);
                     busyIndicator.IsBusy = false;
@@ -653,6 +684,8 @@ namespace UnicontaClient.Pages.CustomPage
             if (invoiceLines == null || invoiceLines.Length == 0)
                 return;
 
+            Array.Sort(invoiceLines, new InvLineSort());
+
             orderlines.Capacity = invoiceLines.Length;
             int lineNo = 0;
             double sign = checkIfCreditNote ? -1d : 1d;
@@ -703,9 +736,14 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        void ClearFields()
+        void ClearFields(UnicontaBaseEntity master = null)
         {
+            if (Order?._DCAccount != initialOrder._DCAccount)
+                cmbContactName.SelectedItem = null;
             Order = StreamingManager.Clone(initialOrder) as DebtorOrderClient;
+            if (master== null)
+                ChildWindow.SetTablePropertiesValue(api, Order, Order.ClassId(), page: this);
+            this.SetMaster(Order._DCAccount);
             Order.PropertyChanged += Editrow_PropertyChanged;
             this.DataContext = Order;
             dgDebtorOrderLineGrid.UpdateMaster(Order);
@@ -715,14 +753,14 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         static bool showInvPrintPrv = true;
-        private void GenerateInvoice(DebtorOrderClient dbOrder)
+        private void GenerateInvoice(DebtorOrderClient dbOrder, bool showProformaInvoice)
         {
             var lines = (IEnumerable<DCOrderLineClient>)dgDebtorOrderLineGrid.ItemsSource;
             if (lines == null || lines.Count() == 0)
                 return;
             var dc = dbOrder.Debtor;
-            if (!Utility.IsExecuteWithBlockedAccount(dc)) return;
-
+            if (dc == null || !Utility.IsExecuteWithBlockedAccount(dc))
+                return;
             if (!api.CompanyEntity.SameCurrency(dbOrder._Currency, dc._Currency))
             {
                 var confirmationMsgBox = UnicontaMessageBox.Show(string.Format("{0}.\n{1}", string.Format(Uniconta.ClientTools.Localization.lookup("CurrencyMismatch"), dc.Currency, dbOrder.Currency),
@@ -737,9 +775,17 @@ namespace UnicontaClient.Pages.CustomPage
                     rec._QtyNow = rec._Qty;
             }
 
+            if (showProformaInvoice)
+            {
+                ShowProformaInvoice(dbOrder, lines);
+                return;
+            }
+
             string debtorName = dbOrder.Debtor?.Name ?? dbOrder._DCAccount;
-            bool invoiceInXML = dc?.InvoiceInXML ?? false;
-            var accountName = string.Format("{0} ({1})", dbOrder._DCAccount, dbOrder.Name);
+            
+            bool invoiceInXML = dc != null && dc.IsPeppolSupported && dc._einvoice;
+
+            var accountName = Util.ConcatParenthesis(dbOrder._DCAccount, dbOrder.Name);
             CWGenerateInvoice GenrateInvoiceDialog = new CWGenerateInvoice(true, string.Empty, false, askForEmail: true, showNoEmailMsg: !hasEmail, debtorName: debtorName, isOrderOrQuickInv: true, isDebtorOrder: true, InvoiceInXML: invoiceInXML, AccountName: accountName);
 #if !SILVERLIGHT
             GenrateInvoiceDialog.DialogTableId = 2000000005;
@@ -756,10 +802,10 @@ namespace UnicontaClient.Pages.CustomPage
                     showInvPrintPrv = GenrateInvoiceDialog.ShowInvoice;
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
                     var isSimulated = GenrateInvoiceDialog.IsSimulation;
-                    var invoicePostingResult = new InvoicePostingPrintGenerator(api, this);
-                    invoicePostingResult.SetUpInvoicePosting(dbOrder, lines, CompanyLayoutType.Invoice, GenrateInvoiceDialog.GenrateDate, null, isSimulated, GenrateInvoiceDialog.ShowInvoice,
+
+                    var invoicePostingResult = SetupInvoicePostingPrintGenerator(dbOrder, lines, GenrateInvoiceDialog.GenrateDate, isSimulated, GenrateInvoiceDialog.ShowInvoice,
                         GenrateInvoiceDialog.PostOnlyDelivered, GenrateInvoiceDialog.InvoiceQuickPrint, GenrateInvoiceDialog.NumberOfPages, GenrateInvoiceDialog.SendByEmail,
-                        !isSimulated && GenrateInvoiceDialog.SendByOutlook, GenrateInvoiceDialog.sendOnlyToThisEmail, GenrateInvoiceDialog.Emails, GenrateInvoiceDialog.GenerateOIOUBLClicked,
+                        GenrateInvoiceDialog.SendByOutlook, GenrateInvoiceDialog.sendOnlyToThisEmail, GenrateInvoiceDialog.Emails, GenrateInvoiceDialog.GenerateOIOUBLClicked,
                         documents, false);
 
                     busyIndicator.IsBusy = true;
@@ -786,14 +832,48 @@ namespace UnicontaClient.Pages.CustomPage
             GenrateInvoiceDialog.Show();
         }
 
+        private InvoicePostingPrintGenerator SetupInvoicePostingPrintGenerator(DebtorOrderClient dbOrder, IEnumerable<DCOrderLineClient> lines, DateTime generateDate, bool isSimulation, bool showInvoice, bool postOnlyDelivered,
+            bool isQuickPrint, int pagePrintCount, bool invoiceSendByEmail, bool invoiceSendByOutlook, bool sendOnlyToEmail, string sendOnlyToEmailList, bool OIOUBLgenerate, IEnumerable<TableAddOnData> attachedDocs, bool returnAsPdf)
+        {
+            var invoicePostingResult = new InvoicePostingPrintGenerator(api, this);
+            invoicePostingResult.SetUpInvoicePosting(dbOrder, lines, CompanyLayoutType.Invoice, generateDate, null, isSimulation, showInvoice, postOnlyDelivered, isQuickPrint, pagePrintCount,
+                invoiceSendByEmail, !isSimulation && invoiceSendByOutlook, sendOnlyToEmail, sendOnlyToEmailList, OIOUBLgenerate, documents, returnAsPdf);
+
+
+            return invoicePostingResult;
+        }
+
+        async private void ShowProformaInvoice(DebtorOrderClient order, IEnumerable<DCOrderLineClient> orderLines)
+        {
+            var invoicePostingResult = SetupInvoicePostingPrintGenerator(order, orderLines, DateTime.Now, true, true, false, false, 0, false, false, false, null, false, null, false);
+
+            busyIndicator.IsBusy = true;
+            busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
+            var result = await invoicePostingResult.Execute();
+            busyIndicator.IsBusy = false;
+
+            if (!result)
+                Utility.ShowJournalError(invoicePostingResult.PostingResult.ledgerRes, dgDebtorOrderLineGrid);
+        }
+
         void leAccount_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
         {
-            string id = Convert.ToString(e.NewValue);
-            var Debtor = (Debtor)debtors?.Get(id);
+            SetMaster(Convert.ToString(e.NewValue));
+            this.DataContext = null;
+            this.DataContext = Order;
+        }
+        void SetMaster(string Account)
+        { 
+            var Debtor = (Debtor)debtors?.Get(Account);
             if (Debtor != null)
             {
-                Order.Account = Debtor._Account;
-                Order.SetCurrency(Debtor._Currency);
+                var Order = this.Order;
+                Order.SetMaster(Debtor);
+                if (this.ProjectMaster != null)
+                    Order.SetMaster(this.ProjectMaster);
+                else
+                    Order.PricesInclVat = Debtor._PricesInclVat;
+
                 Order.DeliveryName = Debtor._DeliveryName;
                 Order.DeliveryAddress1 = Debtor._DeliveryAddress1;
                 Order.DeliveryAddress2 = Debtor._DeliveryAddress2;
@@ -802,16 +882,7 @@ namespace UnicontaClient.Pages.CustomPage
                 Order.DeliveryZipCode = Debtor._DeliveryZipCode;
                 if (Debtor._DeliveryCountry != 0)
                     Order.DeliveryCountry = Debtor._DeliveryCountry;
-                Order.Payment = Debtor._Payment;
-                Order.PricesInclVat = Debtor._PricesInclVat;
-                Order.EndDiscountPct = Debtor._EndDiscountPct;
-                Order.PostingAccount = Debtor._PostingAccount;
-                Order.Shipment = Debtor._Shipment;
-                Order.LayoutGroup = Debtor._LayoutGroup;
-                Order.Employee = Debtor._Employee;
-                Order.DeliveryTerm = Debtor._DeliveryTerm;
-                if (Order._Project == null)
-                    Order.SetMaster(Debtor);
+
                 hasEmail = Debtor._InvoiceEmail != null || Debtor._EmailDocuments;
                 PriceLookup?.OrderChanged(Order);
                 BindContact(Debtor);
@@ -894,8 +965,8 @@ namespace UnicontaClient.Pages.CustomPage
                     if (SetVariant2)
                     {
                         rec.variant2Source = invs2;
-                        if (!hasVariantValue)
-                            rec.Variant2 = null;
+                        //if (!hasVariantValue)
+                        //    rec.Variant2 = null;
                     }
                     else
                         rec.variant1Source = invs1;
@@ -983,8 +1054,28 @@ namespace UnicontaClient.Pages.CustomPage
             if (this.items == null)
                 this.items = Comp.GetCache(typeof(Uniconta.DataModel.InvItem)) ?? await api.LoadCache(typeof(Uniconta.DataModel.InvItem)).ConfigureAwait(false);
 
-            if (Comp.Warehouse && this.warehouse == null)
-                this.warehouse = await api.LoadCache(typeof(Uniconta.DataModel.InvWarehouse)).ConfigureAwait(false);
+            if (api.GetCache(typeof(Uniconta.DataModel.Employee)) == null)
+                await api.LoadCache(typeof(Uniconta.DataModel.Employee)).ConfigureAwait(false);
+
+            var UserEmp = EmployeeClient.GetUserEmployee(api);
+            if (UserEmp != null && Order._Employee == null)
+            {
+                Order._Employee = UserEmp._Number;
+                initialOrder._Employee = UserEmp._Number;
+                if (Order._Dim1 == null) Order._Dim1 = UserEmp._Dim1;
+                if (Order._Dim2 == null) Order._Dim2 = UserEmp._Dim2;
+                if (Order._Dim3 == null) Order._Dim3 = UserEmp._Dim3;
+                if (Order._Dim4 == null) Order._Dim4 = UserEmp._Dim4;
+                if (Order._Dim5 == null) Order._Dim5 = UserEmp._Dim5;
+            }
+
+            if (Comp.Warehouse)
+            {
+                if (this.warehouse == null)
+                    this.warehouse = await api.LoadCache(typeof(Uniconta.DataModel.InvWarehouse)).ConfigureAwait(false);
+
+                userWarehouse = UserEmp?._Warehouse;
+            }
 
             if (Comp.ItemVariants)
             {
@@ -998,6 +1089,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (Comp.DeliveryAddress)
                 installationCache = Comp.GetCache(typeof(Uniconta.DataModel.WorkInstallation)) ?? await api.LoadCache(typeof(Uniconta.DataModel.WorkInstallation)).ConfigureAwait(false);
+
 
             PriceLookup = new Uniconta.API.DebtorCreditor.FindPrices(Order, api);
             if (this.PriceLookup != null)
@@ -1081,25 +1173,22 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 var rb = (RibbonBase)localMenu.DataContext;
                 attachDocMenu = UtilDisplay.GetMenuCommandByName(rb, "AttachDoc");
-                attachDocMenu.Caption = string.Format("{0} ({1})", string.Format(Uniconta.ClientTools.Localization.lookup("AttachOBJ"), Uniconta.ClientTools.Localization.lookup("Documents")), documents.Count);
+                attachDocMenu.Caption = Util.ConcatParenthesis(string.Format(Uniconta.ClientTools.Localization.lookup("AttachOBJ"), Uniconta.ClientTools.Localization.lookup("Documents")), documents.Count);
             }
         }
 
-        int contactRefId;
         async void BindContact(Debtor debtor)
         {
             if (debtor == null)
                 return;
 
-            contactRefId = Order._ContactRef;
             var cache = api.GetCache(typeof(Uniconta.DataModel.Contact)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Contact));
-            var items = ((IEnumerable<Uniconta.DataModel.Contact>)cache?.GetNotNullArray)?.Where(x => x._DCType == 1 && x._DCAccount == debtor._Account);
-            cmbContactName.ItemsSource = items;
+            cmbContactName.ItemsSource = new ContactCacheFilter(cache, 1, debtor._Account);
             cmbContactName.DisplayMember = "KeyName";
 
-            if (contactRefId != 0 && items != null)
+            if (Order._ContactRef != 0)
             {
-                var contact = items.Where(x => x.RowId == contactRefId).FirstOrDefault();
+                var contact = cache.Get(Order._ContactRef);
                 cmbContactName.SelectedItem = contact;
                 if (contact == null)
                 {

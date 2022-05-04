@@ -20,7 +20,7 @@ x:Class="UnicontaClient.Pages.CustomPage.RegenerateOrderFromProjectPage"
         <CorasauControls:BusyIndicator  x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <local:RegenerateOrderFromProjectPageGridClient x:Name="dgGenerateOrder" AutoGenerateColumns="None">
                 <local:RegenerateOrderFromProjectPageGridClient.Columns>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Check" AllowEditing="True" Width="100" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Check" AllowEditing="True" Width="100" HideHeaderCheck="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Date" Width="90" AllowEditing="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="ProjectCol" FieldName="Project" Width="80"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Task" Width="80" AllowEditing="False"/>

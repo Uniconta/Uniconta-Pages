@@ -50,6 +50,9 @@ namespace UnicontaClient.Pages.CustomPage
             SetStorage(editrow.Storage);
             if (api.session.User._Role < (byte)Uniconta.Common.User.UserRoles.Accountant)
                 Loaded += ConfigureFunctionalityPage_Loaded;
+
+            if (!Enum.IsDefined(typeof(PeppolSupportedCountries), (byte)api.CompanyEntity._Country))
+                cbPeppol.Visibility = Visibility.Collapsed;
         }
 
         private void ConfigureFunctionalityPage_Loaded(object sender, RoutedEventArgs e)

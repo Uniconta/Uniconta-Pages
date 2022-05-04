@@ -74,7 +74,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             try
             {
-                this.documentViewer.Children.Add(UtilDisplay.LoadControl(userDocClient.UserDocument, userDocClient.DocumentType, false, setFocus));
+                this.documentViewer.Children.Add(UtilDisplay.LoadControl(userDocClient, false, setFocus));
             }
             catch
             {
@@ -83,9 +83,12 @@ namespace UnicontaClient.Pages.CustomPage
             SetMetaInfo(userDocClient);
         }
 
-        private void SetMetaInfo(UserDocsClient userDocsClient)
+        private void SetMetaInfo(UserDocsClient userDocClient)
         {
-            metaInfoCtrl.SetlValues(userDocClient.Text, userDocClient.Created.ToString("g"), userDocClient.DocumentType.ToString(), userDocClient.UserName);
+            metaInfoCtrl.Comment = userDocClient._Text;
+            metaInfoCtrl.CreateDateNUser = string.Concat(userDocClient.Created.ToString("g"), " ", string.Format(Uniconta.ClientTools.Localization.lookup("ByUserOBJ"), userDocClient._UserName));
+            metaInfoCtrl.DocumentType = userDocClient._DocumentType.ToString();
+            metaInfoCtrl.NotifyPropertyChange();
         }
 
         public override Type TableType { get { return typeof(UserDocsClient); } }

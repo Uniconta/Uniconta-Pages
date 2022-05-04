@@ -44,7 +44,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
             return base.DefaultFilters();
         }
-
+        UnicontaBaseEntity pageMaster;
         public TableChangeLogPage(UnicontaBaseEntity rec, CrudAPI api) : base(api, string.Empty)
         {
             InitializeComponent();
@@ -52,6 +52,7 @@ namespace UnicontaClient.Pages.CustomPage
             SetRibbonControl(localMenu, dgTableChangeLog);
             dgTableChangeLog.api = this.api;
             filterDate = BasePage.GetSystemDefaultDate().AddMonths(-3);
+            pageMaster = rec;
             dgTableChangeLog.UpdateMaster(rec);
             dgTableChangeLog.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
@@ -65,7 +66,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "ShowFieldChanges":
                     if (selectedItem != null)
                     {
-                        var param  = new object[2] { selectedItem, api };
+                        var param  = new object[3] { pageMaster, selectedItem, api };
                         AddDockItem(TabControls.FieldChangeLogPage, param, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("FieldChangeLog"), selectedItem.KeyName));
                     }
                     break;

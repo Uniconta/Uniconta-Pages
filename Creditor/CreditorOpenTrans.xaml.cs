@@ -21,10 +21,17 @@ using System.Windows.Shapes;
 using UnicontaClient.Utilities;
 using Uniconta.DataModel;
 using Uniconta.ClientTools.Controls;
+using Uniconta.Common.Utility;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
+    public class CreditorOpenTransGrid : CorasauDataGridClient
+    {
+        public override Type TableType { get { return typeof(CreditorTransOpenClient); } }
+        public override bool Readonly { get { return false; } }
+    }
+
     public partial class CreditorOpenTrans : GridBasePage
     {
         public override string NameOfControl
@@ -61,7 +68,6 @@ namespace UnicontaClient.Pages.CustomPage
             SetRibbonControl(localMenu, dgCreditorTranOpenGrid);
             dgCreditorTranOpenGrid.api = api;
             dgCreditorTranOpenGrid.BusyIndicator = busyIndicator;
-            dgCreditorTranOpenGrid.api = api;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgCreditorTranOpenGrid.UpdateMaster(pageMaster = master);
             dgCreditorTranOpenGrid.ShowTotalSummary();
@@ -103,7 +109,10 @@ namespace UnicontaClient.Pages.CustomPage
         public override void Utility_Refresh(string screenName, object argument = null)
         {
             if (screenName == TabControls.CreditorTranOpenPage2)
+            {
+                api.ForcePrimarySQL = true;
                 dgCreditorTranOpenGrid.UpdateItemSource(argument);
+            }
         }
         CreditorTransOpenClient transOpenMaster;
         List<CreditorTransOpenClient> settles;
@@ -137,7 +146,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "Settlements":
                     if (selectedItem == null)
                         return;
-                    string header = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("Settlements"), selectedItem.Voucher);
+                    string header = Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("Settlements"), selectedItem.Voucher);
                     AddDockItem(TabControls.CreditorSettlements, selectedItem.Trans, header);
                     break;
                 case "ViewDownloadRow":
@@ -146,8 +155,7 @@ namespace UnicontaClient.Pages.CustomPage
                     DebtorTransactions.ShowVoucher(dgCreditorTranOpenGrid.syncEntity, api, busyIndicator);
                     break;
                 case "SaveGrid":
-                    dgCreditorTranOpenGrid.SelectedItem = null;
-                    dgCreditorTranOpenGrid.SaveData();
+                    saveGrid();
                     break;
                 case "ReopenAll":
                     ReOpenAllTrans();
@@ -158,7 +166,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "VoucherTransactions":
                     if (selectedItem != null)
                     {
-                        string vheader = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("VoucherTransactions"), selectedItem.Voucher);
+                        string vheader = Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("VoucherTransactions"), selectedItem.Voucher);
                         AddDockItem(TabControls.AccountsTransaction, dgCreditorTranOpenGrid.syncEntity, vheader);
                     }
                     break;
@@ -224,7 +232,7 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     transOpenMaster = null;
                     settles = null;
-                    var openTrans = dgCreditorTranOpenGrid.ItemsSource as CreditorTransOpenClient[];
+                    var openTrans = dgCreditorTranOpenGrid.ItemsSource as List<CreditorTransOpenClient>;
                     foreach (CreditorTransOpenClient openTran in openTrans)
                     {
                         openTran.IsSettled = false;

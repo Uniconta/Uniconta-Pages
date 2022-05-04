@@ -26,9 +26,6 @@ using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
 using Uniconta.Common;
 using Uniconta.DataModel;
-#if !SILVERLIGHT
-using UnicontaClient.Pages;
-#endif
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -46,13 +43,7 @@ namespace UnicontaClient.Pages.CustomPage
         public override bool SingleBufferUpdate { get { return false; } }
         public override IComparer GridSorting { get { return new DCOrderLineSort(); } }
         public override string LineNumberProperty { get { return "_LineNumber"; } }
-        public override bool AllowSort
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public override bool AllowSort { get { return false; } }
         public override bool Readonly { get { return false; } }
         public override bool AddRowOnPageDown()
         {
@@ -174,13 +165,50 @@ namespace UnicontaClient.Pages.CustomPage
             dgProductionOrderLineGrid.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgProductionOrderLineGrid.SelectedItemChanged += DgProductionOrderLineGrid_SelectedItemChanged;
-
             layOutDebtorOrderLine.Caption = Uniconta.ClientTools.Localization.lookup("OrdersLine");
             layOutInvItemStorage.Caption = Uniconta.ClientTools.Localization.lookup("OnHand");
             OnHandScreenInOrder = api.CompanyEntity._OnHandScreenInOrder;
             layOutInvItemStorage.Visibility = OnHandScreenInOrder ? Visibility.Visible : Visibility.Collapsed;
             InitialLoad();
         }
+
+        private void Warehouse_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
+        {
+            if (dgProductionOrderLineGrid.CurrentColumn == Warehouse)
+            {
+                if (Validate(Convert.ToString(e.NewValue), Convert.ToString(e.OldValue)))
+                    e.Handled=true;
+            }
+        }
+
+        private void Location_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
+        {
+            if (dgProductionOrderLineGrid.CurrentColumn == Location)
+            {
+                if (Validate(Convert.ToString(e.NewValue), Convert.ToString(e.OldValue)))
+                    e.Handled=true;
+            }
+        }
+
+        bool Validate(string oldValue, string newValue)
+        {
+            var selectedItem = dgProductionOrderLineGrid.SelectedItem as ProductionOrderLineClient;
+            if (selectedItem == null)
+                return false;
+            if (selectedItem._SerieBatchMarked)
+            {
+                if (string.IsNullOrWhiteSpace(newValue) || string.IsNullOrWhiteSpace(oldValue))
+                    return false;
+                if (newValue != oldValue)
+                {
+                    UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("ChangeWareHousLoc"), Uniconta.ClientTools.Localization.lookup("Warning"));
+                    (dgProductionOrderLineGrid.tableView).CancelRowEdit();
+                    return true;
+                }
+            }
+            return false;
+        }
+
         public async override Task InitQuery()
         {
             await base.InitQuery();
@@ -361,7 +389,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        private void PART_Editor_GotFocus(object sender, RoutedEventArgs e)
+        private void Location_GotFocus(object sender, RoutedEventArgs e)
         {
             if (warehouse == null)
                 return;
@@ -449,14 +477,12 @@ namespace UnicontaClient.Pages.CustomPage
                 case "MarkOrderLineAgnstOL":
                     if (selectedItem?._Item == null) return;
                     saveGridLocal();
-                    object[] paramArr = new object[] { selectedItem };
-                    AddDockItem(TabControls.CreditorOrderLineMarkedPage, paramArr, true);
+                    AddDockItem(TabControls.CreditorOrderLineMarkedPage, new object[] { selectedItem }, true);
                     break;
                 case "MarkOrderLineAgnstInvTrans":
                     if (selectedItem?._Item == null) return;
                     saveGridLocal();
-                    object[] param = new object[] { selectedItem };
-                    AddDockItem(TabControls.InventoryTransactionsMarkedPage, param, true);
+                    AddDockItem(TabControls.InventoryTransactionsMarkedPage, new object[] { selectedItem }, true);
                     break;
                 case "AddNote":
                 case "AddDoc":
@@ -483,6 +509,18 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem?.InvItem != null)
                         AddDockItem(TabControls.ProductionOrderLineReport, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ProductionLines"), selectedItem._Item));
                     break;
+                case "InvStockProfile":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.InvStorageProfileReport, dgProductionOrderLineGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("StockProfile"), selectedItem._Item));
+                    break;
+                case "ViewItemAttachments":
+                    if (selectedItem?.InvItem != null && selectedItem?.Item != null)
+                        AddDockItem(TabControls.UserDocsPage, selectedItem.InvItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Documents"), selectedItem?.InvItem?._Name));
+                    break;
+                case "ViewNotes":
+                    if (selectedItem?.InvItem != null && selectedItem?.Item != null)
+                        AddDockItem(TabControls.UserNotesPage, selectedItem.InvItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Notes"), selectedItem?.InvItem?._Name));
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -491,17 +529,9 @@ namespace UnicontaClient.Pages.CustomPage
 
         async void AddAttachment(string actionType, ProductionOrderLineClient productionOrderLineClient)
         {
-            var filter = new[] { PropValuePair.GenereteParameter("ItemPart", typeof(string), "1") };
-            var invBomResult = await api.Query<InvBOMClient>(productionOrderLineClient, filter);
+            var invBomResult = await api.Query<InvBOMClient>(productionOrderLineClient, new[] { PropValuePair.GenereteParameter("ItemPart", typeof(string), "1") });
             if (invBomResult != null && invBomResult.Length > 0)
-            {
-                var invBom = invBomResult.FirstOrDefault();
-
-                if (actionType == "AddNote")
-                    AddDockItem(TabControls.UserNotesPage, invBom);
-                else if (actionType == "AddDoc")
-                    AddDockItem(TabControls.UserDocsPage, invBom);
-            }
+                AddDockItem(actionType == "AddNote" ? TabControls.UserNotesPage : TabControls.UserDocsPage, invBomResult[0]);
         }
 
         async void CreateProductionOrder(ProductionOrderLineClient orderLine)
@@ -510,8 +540,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (t != null && orderLine.RowId == 0)
                 await t;
 
-            object[] arr = new object[2] { api, orderLine };
-            AddDockItem(TabControls.ProductionOrdersPage2, arr, Uniconta.ClientTools.Localization.lookup("Production"), "Add_16x16.png");
+            AddDockItem(TabControls.ProductionOrdersPage2, new object[2] { api, orderLine }, Uniconta.ClientTools.Localization.lookup("Production"), "Add_16x16.png");
         }
 
         async void UnfoldBOM(ProductionOrderLineClient selectedItem)
@@ -590,10 +619,7 @@ namespace UnicontaClient.Pages.CustomPage
             var res = await orderApi.GetMarkedOrderLine(selectedItem, orderLineMarked);
             busyIndicator.IsBusy = false;
             if (res == ErrorCodes.Succes)
-            {
-                object[] paramArr = new object[] { api, orderLineMarked };
-                AddDockItem(TabControls.OrderLineMarkedPage, paramArr, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("PurchaseLines"), orderLineMarked._OrderNumber));
-            }
+                AddDockItem(TabControls.OrderLineMarkedPage, new object[] { api, orderLineMarked }, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("PurchaseLines"), orderLineMarked._OrderNumber));
             else
                 UtilDisplay.ShowErrorCode(res);
         }
@@ -606,10 +632,7 @@ namespace UnicontaClient.Pages.CustomPage
             var res = await orderApi.GetMarkedInvTrans(selectedItem, invTrans);
             busyIndicator.IsBusy = false;
             if (res == ErrorCodes.Succes)
-            {
-                object[] paramArr = new object[] { api, invTrans };
-                AddDockItem(TabControls.InvTransMarkedPage, paramArr, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("InvTransactions"), invTrans._OrderNumber));
-            }
+                AddDockItem(TabControls.InvTransMarkedPage, new object[] { api, invTrans }, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("InvTransactions"), invTrans._OrderNumber));
             else
                 UtilDisplay.ShowErrorCode(res);
         }
@@ -709,11 +732,8 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override async void LoadCacheInBackGround()
         {
-            var api = this.api;
-
             if (this.items == null)
                 this.items = await api.LoadCache(typeof(Uniconta.DataModel.InvItem)).ConfigureAwait(false);
-
             if (api.CompanyEntity.Warehouse && this.warehouse == null)
                 this.warehouse = await api.LoadCache(typeof(Uniconta.DataModel.InvWarehouse)).ConfigureAwait(false);
         }

@@ -1,0 +1,28 @@
+<Pages:GridBasePage xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.GLChargeGroupPage"
+             xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
+             xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
+    <Grid x:Name="LayoutRoot" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Assets/EditableGridRibbon.xml" x:Name="localMenu"/>
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <local:GLChargeGroupClientGrid x:Name="dgChargeGroupClient" AutoGenerateColumns="None">
+                <local:GLChargeGroupClientGrid.Columns>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Code" IsSmart="True" Width="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Name" IsSmart="True" Width="200"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Account" IsSmart="True" Width="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="AccountName" IsSmart="True" ReadOnly="True" Width="200"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Amount" Width="90" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Pct" Width="50" />
+                </local:GLChargeGroupClientGrid.Columns>
+            </local:GLChargeGroupClientGrid>
+        </CorasauControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

@@ -16,6 +16,7 @@ using Uniconta.API.System;
 using Uniconta.ClientTools;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.Common;
+using Uniconta.Common.Utility;
 using Uniconta.DataModel;
 
 using UnicontaClient.Pages;
@@ -50,19 +51,19 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     var attr = (ClientTableAttribute)clientTableAttr[0];
                     if (attr.CanUpdate)
-                        xlist.Add(new TableList(type, string.Format("{0} ({1})", type.Name, Uniconta.ClientTools.Localization.lookup(attr.LabelKey))));
+                        xlist.Add(new TableList(type, Util.ConcatParenthesis(type.Name, Uniconta.ClientTools.Localization.lookup(attr.LabelKey))));
                 }
                 else
                     xlist.Add(new TableList(type, type.Name));
             }
             GetUserTableList(xlist);
-            xlist.Add(new TableList(typeof(DebtorInvoiceClient), string.Format("{0} ({1})", "DebtorInvoiceClient", Uniconta.ClientTools.Localization.lookup("DebtorInvoice"))));
-            xlist.Add(new TableList(typeof(CreditorInvoiceClient), string.Format("{0} ({1})", "CreditorInvoiceClient", Uniconta.ClientTools.Localization.lookup("CreditorInvoice")) ));
-            xlist.Add(new TableList(typeof(DebtorDeliveryNoteClient), string.Format("{0} ({1})", "DebtorDeliveryNoteClient", Uniconta.ClientTools.Localization.lookup("Packnotes"))));
-            xlist.Add(new TableList(typeof(CreditorDeliveryNoteClient), string.Format("{0} ({1})", "CreditorDeliveryNoteClient", Uniconta.ClientTools.Localization.lookup("CreditorPackNotes")) ));
-            xlist.Add(new TableList(typeof(InvBOMClient), string.Format("{0} ({1})", "InvBOMClient", Uniconta.ClientTools.Localization.lookup("BOM")) ));
-            xlist.Add(new TableList(typeof(ProductionPostedClient), string.Format("{0} ({1})", "ProductionPostedClient", Uniconta.ClientTools.Localization.lookup("ProductionPosted"))));
-            xlist.Add(new TableList(typeof(InvSerieBatchClient), string.Format("{0} ({1})", "InvSerieBatchClient", Uniconta.ClientTools.Localization.lookup("SerialBatchNumbers")) ));
+            xlist.Add(new TableList(typeof(DebtorInvoiceClient), Util.ConcatParenthesis("DebtorInvoiceClient", Uniconta.ClientTools.Localization.lookup("DebtorInvoice"))));
+            xlist.Add(new TableList(typeof(CreditorInvoiceClient), Util.ConcatParenthesis("CreditorInvoiceClient", Uniconta.ClientTools.Localization.lookup("CreditorInvoice")) ));
+            xlist.Add(new TableList(typeof(DebtorDeliveryNoteClient), Util.ConcatParenthesis("DebtorDeliveryNoteClient", Uniconta.ClientTools.Localization.lookup("Packnotes"))));
+            xlist.Add(new TableList(typeof(CreditorDeliveryNoteClient), Util.ConcatParenthesis("CreditorDeliveryNoteClient", Uniconta.ClientTools.Localization.lookup("CreditorPackNotes")) ));
+            xlist.Add(new TableList(typeof(InvBOMClient), Util.ConcatParenthesis("InvBOMClient", Uniconta.ClientTools.Localization.lookup("BOM")) ));
+            xlist.Add(new TableList(typeof(ProductionPostedClient), Util.ConcatParenthesis("ProductionPostedClient", Uniconta.ClientTools.Localization.lookup("ProductionPosted"))));
+            xlist.Add(new TableList(typeof(InvSerieBatchClient), Util.ConcatParenthesis("InvSerieBatchClient", Uniconta.ClientTools.Localization.lookup("SerialBatchNumbers")) ));
             xlist.Sort(new TableList.Sort());
             xlist.Insert(0, new TableList(null, Uniconta.ClientTools.Localization.lookup("AllDocuments")));
             dgTables.ItemsSource = xlist;
@@ -91,9 +92,9 @@ namespace UnicontaClient.Pages.CustomPage
             else
                 CreateTableList(dgTables.SelectedItem);
             if (dgTables.ItemsSource != null)
-                this.DialogResult = true;
+                SetDialogResult(true);
             else
-                this.DialogResult = false;
+                SetDialogResult(false);
         }
 
         void CreateTableList(object table)
@@ -108,7 +109,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = false;
+            SetDialogResult(false);
         }
 
         private void GetUserTableList(List<TableList> listTypes)
@@ -123,7 +124,9 @@ namespace UnicontaClient.Pages.CustomPage
                     if (tblHeader._Attachment)
                     {
                         var userTblType = Global.GetUserTable(comp, tblHeader);
-                        listTypes.Add(new TableList(userTblType, string.Format("{0} ({1})", userTblType.Name, tblHeader._Prompt ?? tblHeader._Name) ));
+                        if (userTblType == null)
+                            continue;
+                        listTypes.Add(new TableList(userTblType, Util.ConcatParenthesis(userTblType.Name, tblHeader._Prompt ?? tblHeader._Name) ));
                     }
                 }
             }

@@ -80,7 +80,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (result != ErrorCodes.Succes)
                 UtilDisplay.ShowErrorCode(result);
             else
-                dockCtrl.CloseDockItem();
+                CloseDockItem();
         }
 
         private void treeListView_ShowingEditor(object sender, DevExpress.Xpf.Grid.TreeList.TreeListShowingEditorEventArgs e)

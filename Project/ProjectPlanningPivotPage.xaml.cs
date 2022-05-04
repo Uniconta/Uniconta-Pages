@@ -16,6 +16,7 @@ using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.Common;
+using Uniconta.Common.Utility;
 using Uniconta.DataModel;
 using System.ComponentModel.DataAnnotations;
 using Uniconta.API.Service;
@@ -72,7 +73,7 @@ namespace UnicontaClient.Pages.CustomPage
                 var monthNo = (int)columnValue;
                 string employee = (string)rowValue;
 
-                string vheader = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("PrTransaction"), employee);
+                string vheader = Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("PrTransaction"), employee);
                 var param = new object[2];
                 param[0] = employee;
                 param[1] = monthNo;

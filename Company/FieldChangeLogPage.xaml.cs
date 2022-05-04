@@ -23,6 +23,7 @@ using System.ComponentModel;
 using System.Reflection;
 using Uniconta.ClientTools.Controls;
 using System.Collections;
+using Uniconta.Common.Utility;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -48,27 +49,32 @@ namespace UnicontaClient.Pages.CustomPage
             return base.DefaultFilters();
         }
 
-        public FieldChangeLogPage(UnicontaBaseEntity rec, CrudAPI api) : base(api, string.Empty)
+        public FieldChangeLogPage(UnicontaBaseEntity table, CrudAPI api) : this(table, null, api) { }
+        public FieldChangeLogPage(UnicontaBaseEntity table, Uniconta.DataModel.TableChangeLog log, CrudAPI api) : base(api, string.Empty)
         {
             InitializeComponent();
             localMenu.dataGrid = dgFieldChangeLog;
             SetRibbonControl(localMenu, dgFieldChangeLog);
             dgFieldChangeLog.api = api;
-            filterDate = BasePage.GetSystemDefaultDate().AddMonths(-3);
-            dgFieldChangeLog.UpdateMaster(rec);
+            if (log != null)
+                filterDate = log._Time;
+            else
+                filterDate = BasePage.GetSystemDefaultDate().AddMonths(-3);
+            dgFieldChangeLog.UpdateMaster(table);
             dgFieldChangeLog.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += gridRibbon_BaseActions;
-            if (rec is IdKey)
-                api.LoadCacheInBackground(rec.BaseEntityType());
+            if (table is IdKey)
+                api.LoadCacheInBackground(table.BaseEntityType());
         }
 
         protected override LookUpTable HandleLookupOnLocalPage(LookUpTable lookup, CorasauDataGrid dg)
         {
             var selectedItem = dg.SelectedItem as TableFieldChangeLogClientLocal;
-            if (selectedItem == null)
-                return lookup;
-            var tableType = dgFieldChangeLog.masterRecord.GetType();
-            lookup.TableType = tableType;
+            if (selectedItem != null)
+            {
+                var tableType = dgFieldChangeLog.masterRecord.GetType();
+                lookup.TableType = tableType;
+            }
             return lookup;
         }
     }
@@ -90,7 +96,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 return CheckProperty(oldRecord, newRecord, IsNewValue, prop);
             }
-            StringBuilder values = null;
+            StringBuilderReuse values = null;
             string singleVal = null;
             foreach (var RecProperty in oldRecord.GetType().GetProperties())
             {
@@ -103,14 +109,14 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         if (values == null)
                         {
-                            values = new StringBuilder();
+                            values =  StringBuilderReuse.Create();
                             values.Append(singleVal);
                         }
                         values.Append(';').Append(val);
                     }
                 }
             }
-            return (values != null) ? values.ToString() : singleVal;
+            return (values != null) ? values.ToStringAndRelease() : singleVal;
         }
 
         string CheckProperty(UnicontaBaseEntity oldRecord, UnicontaBaseEntity newRecord, bool IsNewValue, PropertyInfo RecProperty)

@@ -67,7 +67,6 @@ namespace UnicontaClient.Pages.CustomPage
 
         void InitPage(CrudAPI crudapi)
         {
-            BusyIndicator = busyIndicator;
             layoutControl = layoutItems;
             cmbPaymentMethod.ItemsSource = Enum.GetValues(typeof(ExportFormatType));
             cmbPaymentGrpg.ItemsSource = AppEnums.PaymentGroupingType.Values;
@@ -181,6 +180,15 @@ namespace UnicontaClient.Pages.CustomPage
                             StreamingManager.Copy(dialogISOLT.paymentFormatISOLT, editrow);
                     };
                     dialogISOLT.Show();
+                    break;
+                case ExportFormatType.ISO20022_CH:
+                    CWISOCH_PaymentSetup dialogISOCH = new CWISOCH_PaymentSetup(this.api, editrow);
+                    dialogISOCH.Closing += delegate
+                    {
+                        if (dialogISOCH.DialogResult == true)
+                            StreamingManager.Copy(dialogISOCH.paymentFormatISOCH, editrow);
+                    };
+                    dialogISOCH.Show();
                     break;
 #endif
                 default:

@@ -107,10 +107,10 @@ namespace ISO20022CreditTransfer
         /// <summary>
         /// Pre-validate general settings before generating the payment file in the XML format Credit Transfer ISO20022 pain003.
         /// </summary>
-        /// <param name="xxx">xxx.</param> //TODO:Mangler at specificere parametre
+        /// <param name="xxx">xxx.</param> 
         /// <param name="xxx">xxx.</param>
         /// <returns>An XML payment file</returns>
-        public XMLDocumentGenerateResult PreValidateISO20022(Company company, SQLCache bankAccountCache, CreditorPaymentFormat credPaymFormat, bool schemaValidation = true)
+        public XMLDocumentGenerateResult PreValidateISO20022(Company company, SQLCache bankAccountCache, CreditorPaymentFormat credPaymFormat, bool glJournalGenerated = false, bool schemaValidation = true)
         {
             XmlDocument dummyDoc = new XmlDocument();
 
@@ -133,7 +133,11 @@ namespace ISO20022CreditTransfer
                     var paymentformat = (ExportFormatType)credPaymFormat._ExportFormat;
 
                     formatTypeISO = paymentformat == ExportFormatType.ISO20022_DK || paymentformat == ExportFormatType.ISO20022_NL || paymentformat == ExportFormatType.ISO20022_NO ||
-                                    paymentformat == ExportFormatType.ISO20022_DE || paymentformat == ExportFormatType.ISO20022_SE || paymentformat == ExportFormatType.ISO20022_UK || paymentformat == ExportFormatType.ISO20022_LT;
+                                    paymentformat == ExportFormatType.ISO20022_DE || paymentformat == ExportFormatType.ISO20022_SE || paymentformat == ExportFormatType.ISO20022_UK || 
+                                    paymentformat == ExportFormatType.ISO20022_LT || paymentformat == ExportFormatType.ISO20022_CH;
+
+                    if (glJournalGenerated && formatTypeISO) 
+                        PreCheckErrors.Add(new PreCheckError(string.Format("Payment format '{0}' is not available for GL Journal generated payments", credPaymFormat._ExportFormat))); //TODO:Opret label
 
                     CompanyBankName(paymentformat);
                     CustomerIdentificationId(bankAccount._BankCompanyId, paymentformat);
@@ -273,6 +277,8 @@ namespace ISO20022CreditTransfer
                 {
                     //Customer identification (Signer) as agreed with(or assigned by) Nordea.If provided by Nordea the identification consists of maximum 13 digits.
                     case CompanyBankENUM.Nordea_DK:
+                    case CompanyBankENUM.Nordea_NO:
+                    case CompanyBankENUM.Nordea_SE:
                         if (string.IsNullOrEmpty(customerIdentificationId) || (customerIdentificationId.Length < 10 || customerIdentificationId.Length > 18))
                             preCheckErrors.Add(new PreCheckError(String.Format("The customer Identification Id is mandatory for '{0}'. (Min 10 and Max 18 characters may be allowed)", companyBankEnum)));
                         break;
@@ -293,6 +299,8 @@ namespace ISO20022CreditTransfer
                 {
                     //Unique identification of Corporate Cash Management agreement with Nordea. Customer agreement identification with Nordea is mandatory (BANK)and the identification consist of minimum 10 and maximum 18 digits.
                     case CompanyBankENUM.Nordea_DK:
+                    case CompanyBankENUM.Nordea_SE:
+                    case CompanyBankENUM.Nordea_NO:
                     case CompanyBankENUM.Handelsbanken:
                         if (string.IsNullOrEmpty(bankIdentificationId) || (bankIdentificationId.Length < 10 || bankIdentificationId.Length > 18))
                             preCheckErrors.Add(new PreCheckError(String.Format("The Bank Identification Id is mandatory for '{0}'.  (Min 10 and Max 18 characters may be allowed)", companyBankEnum)));

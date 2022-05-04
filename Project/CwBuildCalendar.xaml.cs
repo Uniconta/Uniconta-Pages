@@ -41,13 +41,13 @@ namespace UnicontaClient.Pages.CustomPage
             else
             {
                 CreateData();
-                this.DialogResult = true;
+                SetDialogResult(true);
             }
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = false;
+            SetDialogResult(false);
         }
 
         DateTime fromDte, toDte;

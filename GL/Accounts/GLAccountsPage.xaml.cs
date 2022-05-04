@@ -3,6 +3,7 @@ using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.Common;
+using Uniconta.Common.Utility;
 using Uniconta.DataModel;
 using System;
 using System.Collections.Generic;
@@ -72,7 +73,7 @@ namespace UnicontaClient.Pages.CustomPage
                 ThisYear.HasDecimals = ThisYearDebit.HasDecimals = ThisYearCredit.HasDecimals = false;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
 
-            if (Comp._CountryId != CountryCode.Germany)
+            if (Comp?._CountryId != CountryCode.Germany)
                 DATEVAuto.ShowInColumnChooser = false;
 
             dgGLTable.BusyIndicator = busyIndicator;
@@ -117,10 +118,13 @@ namespace UnicontaClient.Pages.CustomPage
                         dgGLTable.AddRow();
                     break;
                 case "CopyRow":
-                    if (copyRowIsEnabled)
-                        dgGLTable.CopyRow();
-                    else
-                        CopyRecord(selectedItem);
+                    if (selectedItem != null)
+                    {
+                        if (copyRowIsEnabled)
+                            dgGLTable.CopyRow();
+                        else
+                            CopyRecord(selectedItem);
+                    }
                     break;
                 case "DeleteRow":
                     dgGLTable.DeleteRow();
@@ -138,7 +142,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "Trans":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.AccountsTransaction, dgGLTable.syncEntity, string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("AccountsTransaction"), selectedItem._Name));
+                        AddDockItem(TabControls.AccountsTransaction, dgGLTable.syncEntity, Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("AccountsTransaction"), selectedItem._Name));
                     break;
                 case "Budget":
                     if (selectedItem != null)
@@ -177,7 +181,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (selectedItem == null)
                 return;
             var glAccount = Activator.CreateInstance(selectedItem.GetType()) as GLAccountClient;
-            StreamingManager.Copy(selectedItem, glAccount);
+            CorasauDataGrid.CopyAndClearRowId(selectedItem, glAccount);
             var parms = new object[2] { glAccount, false };
             AddDockItem(TabControls.GLAccountPage2, parms, Uniconta.ClientTools.Localization.lookup("Accounts"), "Add_16x16.png");
         }
@@ -261,6 +265,23 @@ namespace UnicontaClient.Pages.CustomPage
         {
             UnicontaClient.Utilities.Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
             UnicontaClient.Utilities.Utility.SetDimensionsGrid(api, clNewDim1, clNewDim2, clNewDim3, clNewDim4, clNewDim5);
+        }
+
+        protected override void LoadCacheInBackGround()
+        {
+            var Comp = api.CompanyEntity;
+            var lst = new List<Type>(Comp.NumberOfDimensions + 1) { typeof(Uniconta.DataModel.GLVat) };
+            if (Comp.NumberOfDimensions >= 1)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType1));
+            if (Comp.NumberOfDimensions >= 2)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType2));
+            if (Comp.NumberOfDimensions >= 3)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType3));
+            if (Comp.NumberOfDimensions >= 4)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType4));
+            if (Comp.NumberOfDimensions >= 5)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType5));
+            LoadType(lst);
         }
 
         private void HasDocImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

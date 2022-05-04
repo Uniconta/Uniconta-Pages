@@ -80,14 +80,14 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (e.Key == Key.Escape)
             {
-                this.DialogResult = false;
+                SetDialogResult(false);
             }
             else
                 if (e.Key == Key.Enter)
             {
                 if (CancelButton.IsFocused)
                 {
-                    this.DialogResult = false;
+                    SetDialogResult(false);
                     return;
                 }
                 OKButton_Click(null, null);
@@ -129,12 +129,12 @@ namespace UnicontaClient.Pages.CustomPage
             MaintableAPI tableApi = new MaintableAPI(api);
             ErrorCodes res = await tableApi.JoinTwoAccounts(fromAccount, toAccount);
             if (res == ErrorCodes.Succes)
-                this.DialogResult = true;
+                SetDialogResult(true);
             UtilDisplay.ShowErrorCode(res);
         }
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = false;
+            SetDialogResult(false);
         }
     }
 }

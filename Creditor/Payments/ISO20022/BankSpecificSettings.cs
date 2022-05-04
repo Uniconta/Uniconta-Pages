@@ -10,6 +10,7 @@ using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.Common;
 using Uniconta.DataModel;
+using UnicontaClient.Pages;
 using UnicontaClient.Pages.Creditor.Payments;
 
 namespace UnicontaISO20022CreditTransfer
@@ -60,7 +61,6 @@ namespace UnicontaISO20022CreditTransfer
         }
         #endregion
 
-
         static public BankSpecificSettings BankSpecTypeInstance(CreditorPaymentFormat credPaymFormat)
         {
             switch (credPaymFormat._ExportFormat)
@@ -81,6 +81,8 @@ namespace UnicontaISO20022CreditTransfer
                     return new BankSpecificSettingsUK(credPaymFormat);
                 case (byte)ExportFormatType.ISO20022_LT:
                     return new BankSpecificSettingsLT(credPaymFormat);
+                case (byte)ExportFormatType.ISO20022_CH:
+                    return new BankSpecificSettingsCH(credPaymFormat);
                 default:
                     return new BankSpecificSettingsDK(credPaymFormat); //This is active for all the proprietary bank formats - In a future version Test class has to be differentiated
             }
@@ -117,6 +119,14 @@ namespace UnicontaISO20022CreditTransfer
         {
             replaceCharactersRegEx = null;
             return replaceCharactersRegEx;
+        }
+
+        /// <summary>
+        /// XML Attribute NS
+        /// </summary>
+        public virtual string XMLAttributeNS()
+        {
+            return BaseDocument.XMLNS_PAIN003;
         }
 
         /// <summary>
@@ -290,7 +300,7 @@ namespace UnicontaISO20022CreditTransfer
         /// </summary>
         public virtual string GenerateFileName(int fileID, int companyID)
         {
-            return string.Format("{0}_{1}_{2}", "ISO20022", fileID.ToString().PadLeft(5, '0'), companyID);
+            return string.Format("{0}_{1}_{2}", "ISO20022", fileID, companyID);
         }
 
         /// <summary>
@@ -560,7 +570,7 @@ namespace UnicontaISO20022CreditTransfer
         /// <summary>
         /// Danish Inpayment Form FIK71
         /// </summary>
-        public virtual Tuple<string, string> CreditorFIK71(String ocrLine)
+        public virtual Tuple<string, string> CreditorFIK71(String ocrLine, string creditorPaymId)
         {
             ocrLine = ocrLine ?? string.Empty;
             string paymID = string.Empty;
@@ -583,7 +593,7 @@ namespace UnicontaISO20022CreditTransfer
         /// <summary>
         /// Danish Inpayment Form FIK75
         /// </summary>
-        public virtual Tuple<string, string> CreditorFIK75(string ocrLine)
+        public virtual Tuple<string, string> CreditorFIK75(string ocrLine, string creditorPaymId)
         {
             ocrLine = ocrLine ?? string.Empty;
             string paymID = string.Empty;
@@ -637,7 +647,7 @@ namespace UnicontaISO20022CreditTransfer
         /// <summary>
         /// Creditor Address
         /// </summary>
-        public virtual PostalAddress CreditorAddress(Uniconta.DataModel.Creditor creditor, PostalAddress creditorAddress)
+        public virtual PostalAddress CreditorAddress(Uniconta.DataModel.Creditor creditor, PostalAddress creditorAddress, ISO20022PaymentTypes paymentType, bool unstructured = false)
         {
             var adr1 = StandardPaymentFunctions.RegularExpressionReplace(creditor._Address1, allowedCharactersRegEx, replaceCharactersRegEx);
             var adr2 = StandardPaymentFunctions.RegularExpressionReplace(creditor._Address2, allowedCharactersRegEx, replaceCharactersRegEx);
@@ -645,7 +655,7 @@ namespace UnicontaISO20022CreditTransfer
             var zipCode = StandardPaymentFunctions.RegularExpressionReplace(creditor._ZipCode, allowedCharactersRegEx, replaceCharactersRegEx);
             var city = StandardPaymentFunctions.RegularExpressionReplace(creditor._City, allowedCharactersRegEx, replaceCharactersRegEx);
 
-            if (creditor._ZipCode != null)
+            if (creditor._ZipCode != null && !unstructured)
             {
                 creditorAddress.ZipCode = zipCode;
                 creditorAddress.CityName =city;
@@ -784,7 +794,7 @@ namespace UnicontaISO20022CreditTransfer
         /// <summary>
         /// Unstructured Remittance Information
         /// </summary>
-        public virtual List<string> Ustrd(string externalAdvText, ISO20022PaymentTypes ISOPaymType, PaymentTypes paymentMethod, bool extendedText)
+        public virtual List<string> Ustrd(string externalAdvText, ISO20022PaymentTypes ISOPaymType, CreditorTransPayment trans, bool extendedText)
         {
             var ustrdText = StandardPaymentFunctions.RegularExpressionReplace(externalAdvText, allowedCharactersRegEx, replaceCharactersRegEx);
             

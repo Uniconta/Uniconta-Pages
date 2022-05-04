@@ -77,7 +77,6 @@ namespace UnicontaClient.Pages.CustomPage
 
         void InitPage(CrudAPI crudapi)
         {
-            BusyIndicator = busyIndicator;
             layoutControl = layoutItems;
             leEmployee.api = leGroup.api = leInsurer.api = leSoldTo.api = leParent.api = crudapi;
 

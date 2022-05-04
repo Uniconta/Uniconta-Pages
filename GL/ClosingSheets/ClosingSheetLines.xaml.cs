@@ -20,6 +20,8 @@ using Uniconta.ClientTools.Controls;
 using UnicontaClient.Utilities;
 using Uniconta.ClientTools.Util;
 using System.ComponentModel.DataAnnotations;
+using Uniconta.DataModel;
+using Uniconta.Common.Utility;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -97,7 +99,7 @@ namespace UnicontaClient.Pages.CustomPage
         SQLCache AccountListCache;
         double primo;
         DateTime postingDate;
-        bool anyChange;
+        bool anyChange, UseVATCodes;
 
         protected override Filter[] DefaultFilters()
         {
@@ -131,7 +133,10 @@ namespace UnicontaClient.Pages.CustomPage
 
             var ClosingMaster = master1 as Uniconta.DataModel.GLClosingSheet;
             if (ClosingMaster != null)
+            {
                 postingDate = ClosingMaster._ToDate;
+                UseVATCodes = ClosingMaster._UseVATCodes;
+            }
             else
                 postingDate = BasePage.GetSystemDefaultDate();
 
@@ -148,17 +153,16 @@ namespace UnicontaClient.Pages.CustomPage
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgAccountsTransGrid.RowDoubleClick += DgAccountsTransGrid_RowDoubleClick;
             dgClosingSheetLine.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;
+            this.BeforeClose += ClosingSheetLines_BeforeClose;
             var Comp = api.CompanyEntity;
             RoundTo100 = Comp.RoundTo100;
             if (RoundTo100)
                 Debit.HasDecimals = Credit.HasDecimals = Amount.HasDecimals = false;
-            this.BeforeClose += ClosingSheetLines_BeforeClose;
         }
 
         public override Task InitQuery()
         {
-            var acc = syncEntity.Row as GLAccountClosingSheetClient;
-            BindClosingSheet(acc);
+            BindClosingSheet(syncEntity.Row as GLAccountClosingSheetClient);
             var t = BindTransactionGrid();
             StartLoadCache(t);
             RecalculateSum();
@@ -168,9 +172,9 @@ namespace UnicontaClient.Pages.CustomPage
         private void DgAccountsTransGrid_RowDoubleClick()
         {
             var trans = dgAccountsTransGrid.SelectedItem as GLTransClient;
-            if(trans != null)
+            if (trans != null)
             {
-                string vheader = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("VoucherTransactions"), trans._Voucher);
+                string vheader = Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("VoucherTransactions"), trans._Voucher);
                 AddDockItem(TabControls.AccountsTransaction, dgAccountsTransGrid.syncEntity, vheader);
             }
         }
@@ -184,7 +188,7 @@ namespace UnicontaClient.Pages.CustomPage
                 var Account = acc._Account;
                 dgClosingSheetLine.MasterAccount = Account;
 
-                List<GLClosingSheetLineLocal> lst = new List<GLClosingSheetLineLocal>();
+                var lst = new List<GLClosingSheetLineLocal>();
                 if (acc.Lines != null)
                 {
                     foreach (var l in acc.Lines)
@@ -244,11 +248,12 @@ namespace UnicontaClient.Pages.CustomPage
         internal void RecalculateSum()
         {
             var gridItems = (IEnumerable<GLClosingSheetLineLocal>)dgClosingSheetLine.ItemsSource;
-            if (gridItems == null)
-                return;
-            var sum = RecalculateSum(gridItems, dgClosingSheetLine.MasterAccount, this.postingDate, this.RoundTo100, VatCache);
-            SetStatusText(this.primo, sum / 100d);
-            masterAccount.setChangeAndNewBalance(sum);
+            if (gridItems != null)
+            {
+                var sum = RecalculateSum(gridItems, dgClosingSheetLine.MasterAccount, this.postingDate, this.RoundTo100, VatCache);
+                SetStatusText(this.primo, sum / 100d);
+                masterAccount.setChangeAndNewBalance(sum);
+            }
         }
 
         static internal long RecalculateSum(IEnumerable<GLClosingSheetLineLocal> lines, string Account, DateTime postingDate, bool RoundTo100, SQLCache VatCache)
@@ -306,11 +311,8 @@ namespace UnicontaClient.Pages.CustomPage
         SQLCache TextTypes, VatCache;
         protected override async void LoadCacheInBackGround()
         {
-            var api = this.api;
-            var Comp = api.CompanyEntity;
-
-            VatCache = Comp.GetCache(typeof(Uniconta.DataModel.GLVat)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.GLVat), api).ConfigureAwait(false);
-            TextTypes = Comp.GetCache(typeof(Uniconta.DataModel.GLTransType)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.GLTransType), api).ConfigureAwait(false);
+            VatCache = api.GetCache(typeof(Uniconta.DataModel.GLVat)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLVat)).ConfigureAwait(false);
+            TextTypes = api.GetCache(typeof(Uniconta.DataModel.GLTransType)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLTransType)).ConfigureAwait(false);
         }
 
         void DataControl_CurrentItemChanged(object sender, DevExpress.Xpf.Grid.CurrentItemChangedEventArgs e)
@@ -326,6 +328,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         void JournalLineGridClient_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
+            GLAccount Acc;
             Uniconta.DataModel.GLTransType t;
             var rec = sender as GLClosingSheetLineLocal;
             switch (e.PropertyName)
@@ -352,11 +355,38 @@ namespace UnicontaClient.Pages.CustomPage
                             rec.Account = t._OffsetAccount;
                     }
                     break;
+
+                case "Account":
+                    if (UseVATCodes)
+                    {
+                        Acc = (GLAccount)AccountListCache.Get(rec._Account);
+                        if (Acc != null)
+                        {
+                            if (Acc._MandatoryTax == VatOptions.NoVat)
+                                rec.Vat = null;
+                            else
+                                rec.Vat = Acc._Vat;
+                        }
+                    }
+                    RecalculateSum();
+                    break;
+                case "OffsetAccount":
+                    if (UseVATCodes)
+                    {
+                        Acc = (GLAccount)AccountListCache.Get(rec._OffsetAccount);
+                        if (Acc != null)
+                        {
+                            if (Acc._MandatoryTax == VatOptions.NoVat)
+                                rec.OffsetVat = null;
+                            else
+                                rec.OffsetVat = Acc._Vat;
+                        }
+                    }
+                    RecalculateSum();
+                    break;
                 case "Amount":
                 case "Debit":
                 case "Credit":
-                case "Account":
-                case "OffsetAccount":
                 case "Vat":
                 case "OffsetVat":
                     RecalculateSum();
@@ -382,7 +412,19 @@ namespace UnicontaClient.Pages.CustomPage
             switch (ActionType)
             {
                 case "AddRow":
-                    dgClosingSheetLine.AddRow();
+                    var row = dgClosingSheetLine.AddRow() as GLClosingSheetLineLocal;
+                    if (UseVATCodes)
+                    {
+                        var Acc = (GLAccount)AccountListCache.Get(row._Account);
+                        if (Acc != null)
+                        {
+                            if (Acc._MandatoryTax == VatOptions.NoVat)
+                                row.Vat = null;
+                            else
+                                row.Vat = Acc._Vat;
+                        }
+                    }
+
                     break;
                 case "CopyRow":
                     dgClosingSheetLine.CopyRow();
@@ -398,7 +440,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "VoucherTransactions":
                     if (trans == null)
                         return;
-                    string vheader = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("VoucherTransactions"), trans._Voucher);
+                    string vheader = Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("VoucherTransactions"),trans._Voucher);
                     AddDockItem(TabControls.AccountsTransaction, dgAccountsTransGrid.syncEntity, vheader);
                     break;
                 case "ReverseVoucher":
@@ -414,6 +456,8 @@ namespace UnicontaClient.Pages.CustomPage
                     closingLine.Dimension4 = trans._Dimension4;
                     closingLine.Dimension5 = trans._Dimension5;
                     closingLine.Amount = -trans._Amount;
+                    if (UseVATCodes)
+                        closingLine.Vat = trans._Vat;
                     dgClosingSheetLine.AddRow(closingLine);
                     RecalculateSum();
                     break;
@@ -550,11 +594,16 @@ namespace UnicontaClient.Pages.CustomPage
 
             var offsetName = Uniconta.ClientTools.Localization.lookup("OffsetAccount");
             var c = api.CompanyEntity;
-            colOffsetdim1.Header = string.Format("{1} ({0})", offsetName, c._Dim1);
-            colOffsetdim2.Header = string.Format("{1} ({0})", offsetName, c._Dim2);
-            colOffsetdim3.Header = string.Format("{1} ({0})", offsetName, c._Dim3);
-            colOffsetdim4.Header = string.Format("{1} ({0})", offsetName, c._Dim4);
-            colOffsetdim5.Header = string.Format("{1} ({0})", offsetName, c._Dim5);
+            colOffsetdim1.Header = Util.ConcatParenthesis(c._Dim1, offsetName);
+            colOffsetdim2.Header = Util.ConcatParenthesis(c._Dim2, offsetName);
+            colOffsetdim3.Header = Util.ConcatParenthesis(c._Dim3, offsetName);
+            colOffsetdim4.Header = Util.ConcatParenthesis(c._Dim4, offsetName);
+            colOffsetdim5.Header = Util.ConcatParenthesis(c._Dim5, offsetName);
+            if (UseVATCodes)
+            {
+                Vat.Visible = true;
+                OffsetVat.Visible = true;
+            }
         }
     }
 }

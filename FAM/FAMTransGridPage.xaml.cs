@@ -29,6 +29,8 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using Uniconta.Client.Pages;
 using Uniconta.API.Service;
+using Uniconta.Common.Utility;
+using Localization = Uniconta.ClientTools.Localization;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -114,7 +116,7 @@ namespace UnicontaClient.Pages.CustomPage
             var masterClient = dgFamTransGrid.masterRecord as FamClient;
             if (masterClient == null)
                 return;
-            string header = string.Format("{0}/{1}", Uniconta.ClientTools.Localization.lookup("Asset"), masterClient.Asset);
+            string header = string.Format("{0}/{1}", Localization.lookup("Asset"), masterClient._Asset);
             SetHeader(header);
         }
 
@@ -122,7 +124,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             InitializeComponent();
             var Comp = this.api.CompanyEntity;
-            filterDate = BasePage.GetFilterDate(Comp, master != null);
+            filterDate = BasePage.GetFilterDate(Comp, master != null, 4);
             localMenu.dataGrid = dgFamTransGrid;
             SetRibbonControl(localMenu, dgFamTransGrid);
             dgFamTransGrid.UpdateMaster(master);
@@ -146,7 +148,7 @@ namespace UnicontaClient.Pages.CustomPage
             var selectedItem = dgFamTransGrid.SelectedItem as GLTransClient;
             if (selectedItem != null)
             {
-                string vheader = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("VoucherTransactions"), selectedItem._Voucher);
+                string vheader = Util.ConcatParenthesis(Localization.lookup("VoucherTransactions"), selectedItem._Voucher);
                 AddDockItem(TabControls.AccountsTransaction, selectedItem, vheader);
             }
         }
@@ -165,33 +167,33 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void localMenu_OnItemClicked(string ActionType)
         {
-            var selectedItem = dgFamTransGrid.SelectedItem as GLTransClient;
+            string header;
+            var selectedItem = dgFamTransGrid.SelectedItem as FAMTransClient;
             switch (ActionType)
             {
                 case "PostedTransaction":
-                    if (selectedItem == null)
-                        return;
-                    string header = string.Format("{0} / {1}", Uniconta.ClientTools.Localization.lookup("PostedTransactions"), selectedItem._JournalPostedId);
-                    AddDockItem(TabControls.PostedTransactions, selectedItem, header);
-                    break;
-                case "ViewDownloadRow":
-                    if (selectedItem == null)
-                        return;
-                    DebtorTransactions.ShowVoucher(dgFamTransGrid.syncEntity, api, busyIndicator);
-                    break;
-                case "VoucherTransactions":
-                    if (selectedItem == null)
-                        return;
-                    string vheader = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("VoucherTransactions"), selectedItem._Voucher);
-                    AddDockItem(TabControls.AccountsTransaction, dgFamTransGrid.syncEntity, vheader);
-                    break;
-                case "AccountsTransaction":
                     if (selectedItem != null)
                     {
-                        var glAccount = selectedItem.Master;
-                        if (glAccount == null) return;
-                        string accHeader = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("AccountsTransaction"), selectedItem._Account);
-                        AddDockItem(TabControls.AccountsTransaction, glAccount, accHeader);
+                        header = string.Format("{0} / {1}", Localization.lookup("PostedTransactions"), selectedItem._JournalPostedId);
+                        AddDockItem(TabControls.PostedTransactions, selectedItem, header);
+                    }
+                    break;
+                case "ViewDownloadRow":
+                    if (selectedItem != null)
+                        DebtorTransactions.ShowVoucher(dgFamTransGrid.syncEntity, api, busyIndicator);
+                    break;
+                case "VoucherTransactions":
+                    if (selectedItem != null)
+                    {
+                        header = Util.ConcatParenthesis(Localization.lookup("VoucherTransactions"), selectedItem._Voucher);
+                        AddDockItem(TabControls.AccountsTransaction, dgFamTransGrid.syncEntity, header);
+                    }
+                    break;
+                case "AccountsTransaction":
+                    if (selectedItem?.Master != null)
+                    {
+                        header = Util.ConcatParenthesis(Localization.lookup("AccountsTransaction"), selectedItem._Account);
+                        AddDockItem(TabControls.AccountsTransaction, selectedItem.Master, header);
                     }
                     break;
                 case "PostedBy":
@@ -204,7 +206,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        async private void JournalPosted(GLTransClient selectedItem)
+        async private void JournalPosted(FAMTransClient selectedItem)
         {
             var result = await api.Query(new GLDailyJournalPostedClient(), new UnicontaBaseEntity[] { selectedItem }, null);
             if (result != null && result.Length == 1)
@@ -226,7 +228,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         static public LookUpTable HandleLookupOnLocalPage(CorasauDataGrid grid, LookUpTable lookup)
         {
-            var trans = grid.SelectedItem as Uniconta.DataModel.GLTrans;
+            var trans = grid.SelectedItem as FAMTransClient;
             if (trans == null)
                 return lookup;
             if (grid.CurrentColumn?.Name == "DCAccount")
@@ -244,6 +246,9 @@ namespace UnicontaClient.Pages.CustomPage
                         break;
                 }
             }
+            else if (grid.CurrentColumn?.Name == "Asset")
+                lookup.TableType = typeof(Uniconta.DataModel.FAM);
+
             return lookup;
         }
 
@@ -256,7 +261,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void PART_Editor_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var glTrans = dgFamTransGrid.syncEntity.LoadedRow as FAMTransClient;
+            var glTrans = dgFamTransGrid.syncEntity.Row as FAMTransClient;
             if (glTrans._HasNote)
             {
                 CWAddEditNote cwAddEditNote = new CWAddEditNote(api, null, glTrans, true);

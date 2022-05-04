@@ -72,6 +72,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             switch(ActionType)
             {
+                case "Search":
                 case "RefreshGrid":
                     InitQuery();
                     break;
@@ -101,11 +102,6 @@ namespace UnicontaClient.Pages.CustomPage
         public override string NameOfControl
         {
             get { return TabControls.InventoryStatistics; }
-        }
-
-        private void btnSerach_Click(object sender, RoutedEventArgs e)
-        {
-            InitQuery();
         }
     }
 }

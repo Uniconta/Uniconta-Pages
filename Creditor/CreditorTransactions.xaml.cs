@@ -21,6 +21,7 @@ using Uniconta.ClientTools.Util;
 using Uniconta.API.Service;
 using System.Windows;
 using Uniconta.Client.Pages;
+using Uniconta.Common.Utility;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -121,7 +122,18 @@ namespace UnicontaClient.Pages.CustomPage
                 RibbonBase rb = (RibbonBase)localMenu.DataContext;
                 UtilDisplay.RemoveMenuCommand(rb, "SaveGrid");
             }
-            dgCreditorTrans.Readonly = showFields;
+            var credMaster = master as Uniconta.DataModel.Creditor;
+            if (credMaster != null)
+            {
+#if !SILVERLIGHT
+                FromDebtor.Visible =
+#endif
+                dgCreditorTrans.Readonly = (credMaster._D2CAccount != null);
+            }
+            else
+            {
+                dgCreditorTrans.Readonly = showFields;
+            }
         }
 
         private void localMenu_OnItemClicked(string ActionType)
@@ -136,14 +148,14 @@ namespace UnicontaClient.Pages.CustomPage
                 case "Settlements":
                     if (selectedItem != null)
                     {
-                        string header = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("Settlements"), selectedItem._Voucher);
+                        string header = Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("Settlements"), selectedItem._Voucher);
                         AddDockItem(TabControls.CreditorSettlements, dgCreditorTrans.syncEntity, true, header);
                     }
                     break;
                 case "VoucherTransactions":
                     if (selectedItem != null)
                     {
-                        string vheader = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("VoucherTransactions"), selectedItem._Voucher);
+                        string vheader = Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("VoucherTransactions"), selectedItem._Voucher);
                         AddDockItem(TabControls.AccountsTransaction, dgCreditorTrans.syncEntity, vheader);
                     }
                     break;
@@ -178,7 +190,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var creditorInvoice = await api.Query<CreditorInvoiceClient>(new UnicontaBaseEntity[] { creditorTrans }, null);
             if (creditorInvoice != null && creditorInvoice.Length > 0)
-            { 
+            {
                 var credInv = creditorInvoice[0];
                 AddDockItem(TabControls.CreditorInvoiceLine, credInv, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("InvoiceNumber"), credInv.InvoiceNum));
             }

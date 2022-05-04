@@ -27,47 +27,47 @@ namespace UnicontaClient.Pages.CustomPage
     /// </summary>
     public partial class CWCalculateCommission : ChildWindow
     {
-        static readonly DateTime FirstOfMonth = new DateTime(BasePage.GetSystemDefaultDate().Year, BasePage.GetSystemDefaultDate().Month, 01);
+        static DateTime _FromDateTime, _ToDateTime;
+        public DateTime FromDateTime { get { return _FromDateTime; } set { _FromDateTime = value; } }
+        public DateTime ToDateTime { get { return _ToDateTime; } set { _ToDateTime = value; } }
 
-        public DateTime FromDateTime { get; set; } = FirstOfMonth;
-        public DateTime ToDateTime { get; set; } = BasePage.GetSystemDefaultDate();
-        CrudAPI Capi;
-
-        public CWCalculateCommission(CrudAPI api)
+        public CWCalculateCommission(CrudAPI api) : this(api, _FromDateTime, _ToDateTime) { }
+        public CWCalculateCommission(CrudAPI api, DateTime _FromTime, DateTime _ToTime)
         {
-            Capi = api;
+            if (_ToTime == DateTime.MinValue)
+                _ToTime = BasePage.GetSystemDefaultDate();
+            if (_FromTime == DateTime.MinValue)
+                _FromTime = new DateTime(_ToTime.Year, _ToTime.Month, 01);
+            _FromDateTime = _FromTime;
+            _ToDateTime = _ToTime;
             this.DataContext = this;
             InitializeComponent();
             this.Title = Uniconta.ClientTools.Localization.lookup("CalculateCommission");
-
-#if SILVERLIGHT
-            Utility.SetThemeBehaviorOnChildWindow(this);
-#endif
             this.Loaded += CW_Loaded;
         }
 
         private void OKButton_OnClick(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = true;
+            SetDialogResult(true);
         }
 
         private void CancelButton_OnClick(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = false;
+            SetDialogResult(false);
         }
 
         private void CWCalculateCommission_OnKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
             {
-                this.DialogResult = false;
+                SetDialogResult(false);
             }
             else if (e.Key == Key.Enter)
             {
                 if (OKButton.IsFocused)
                     OKButton_OnClick(null, null);
                 else if (CancelButton.IsFocused)
-                    this.DialogResult = false;
+                    SetDialogResult(false);
             }
         }
 

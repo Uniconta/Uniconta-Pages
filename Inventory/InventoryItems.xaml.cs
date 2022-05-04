@@ -51,6 +51,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void Init()
         {
+            StartLoadCache();
             InitializeComponent();
             SetVariants();
             LayoutControl = detailControl.layoutItems;
@@ -67,7 +68,6 @@ namespace UnicontaClient.Pages.CustomPage
             this.PreviewKeyDown += RootVisual_KeyDown;
 #endif
             this.BeforeClose += DebtorAccount_BeforeClose;
-            LoadNow(typeof(InvGroup));
         }
 
         private void RootVisual_KeyDown(object sender, KeyEventArgs e)
@@ -87,13 +87,8 @@ namespace UnicontaClient.Pages.CustomPage
 
         public override Task InitQuery()
         {
-            Task t = null;
             if (!this.dgInventoryItemsGrid.ReuseCache(typeof(Uniconta.DataModel.InvItem)))
-            {
-                t = Filter(null);
-                StartLoadCache(t);
-                return t;
-            }
+                return Filter(null);
             return null;
         }
 
@@ -104,10 +99,7 @@ namespace UnicontaClient.Pages.CustomPage
                 oldselectedItem.PropertyChanged -= DgInventoryItemsGrid_PropertyChanged;
             var selectedItem = e.NewItem as InvItemClient;
             if (selectedItem != null)
-            {
                 selectedItem.PropertyChanged += DgInventoryItemsGrid_PropertyChanged;
-
-            }
         }
 
         private void DgInventoryItemsGrid_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -163,12 +155,17 @@ namespace UnicontaClient.Pages.CustomPage
         }
         protected override async void LoadCacheInBackGround()
         {
-            var lst = new List<Type>(3) { typeof(Uniconta.DataModel.InvGroup) };
+            var lst = new List<Type>(10) { typeof(Uniconta.DataModel.InvGroup) };
             var Comp = api.CompanyEntity;
             if (Comp.ItemVariants)
                 lst.Add(typeof(Uniconta.DataModel.InvStandardVariant));
             if (Comp.Warehouse)
                 lst.Add(typeof(Uniconta.DataModel.InvWarehouse));
+            lst.Add(typeof(Uniconta.DataModel.InvBrandGroup));
+            lst.Add(typeof(Uniconta.DataModel.InvCategoryGroup));
+            lst.Add(typeof(Uniconta.DataModel.InvDiscountGroup));
+            if (Comp.InvDuty)
+                lst.Add(typeof(Uniconta.DataModel.InvDutyGroup));
             LoadType(lst);
 
             if (Comp.Warehouse && this.warehouse == null)
@@ -181,24 +178,38 @@ namespace UnicontaClient.Pages.CustomPage
             var Comp = api.CompanyEntity;
             if (!Comp.Storage || Comp.StorageOnAll)
                 UseStorage.Visible = UseStorage.ShowInColumnChooser = false;
+            else
+                UseStorage.ShowInColumnChooser = true;
             if (!Comp.SerialBatchNumbers)
                 SerialOrBatch.Visible = SerialOrBatch.ShowInColumnChooser = false;
+            else
+                SerialOrBatch.ShowInColumnChooser = true;
             if (!Comp.ItemVariants)
             {
                 clStandardVariant.Visible = clStandardVariant.ShowInColumnChooser = false;
                 UseVariants.Visible = UseVariants.ShowInColumnChooser = false;
             }
+            else
+                clStandardVariant.ShowInColumnChooser = UseVariants.ShowInColumnChooser = true;
             if (!Comp.Project)
             {
                 PayrollCategory.Visible = PayrollCategory.ShowInColumnChooser = false;
                 PrCategory.Visible = PrCategory.ShowInColumnChooser = false;
             }
+            else
+                PayrollCategory.ShowInColumnChooser = PrCategory.ShowInColumnChooser = true;
             if (!Comp.Location || !Comp.Warehouse)
                 Location.Visible = Location.ShowInColumnChooser = false;
+            else
+                Location.ShowInColumnChooser = true;
             if (!Comp.Warehouse)
                 Warehouse.Visible = Warehouse.ShowInColumnChooser = false;
+            else
+                Warehouse.ShowInColumnChooser = true;
             if (!Comp.InvPrice)
                 DiscountGroup.Visible = DiscountGroup.ShowInColumnChooser = false;
+            else
+                DiscountGroup.ShowInColumnChooser = true;
             if (!Comp.Storage)
             {
                 QtyReserved.Visible = QtyReserved.ShowInColumnChooser = false;
@@ -206,15 +217,22 @@ namespace UnicontaClient.Pages.CustomPage
                 Available.Visible = Available.ShowInColumnChooser = false;
                 AvailableForReservation.Visible = AvailableForReservation.ShowInColumnChooser = false;
             }
+            else
+            {
+                QtyReserved.ShowInColumnChooser = QtyOrdered.ShowInColumnChooser = Available.ShowInColumnChooser = AvailableForReservation.ShowInColumnChooser = true;
+            }
             if (!Comp.UnitConversion)
             {
                 SalesUnit.Visible = SalesUnit.ShowInColumnChooser = false;
                 PurchaseUnit.Visible = PurchaseUnit.ShowInColumnChooser = false;
                 UnitGroup.Visible = UnitGroup.ShowInColumnChooser = false;
             }
+            else
+                SalesUnit.ShowInColumnChooser = PurchaseUnit.ShowInColumnChooser = UnitGroup.ShowInColumnChooser = true;
             if (!Comp.InvDuty)
                 DutyGroup.Visible = DutyGroup.ShowInColumnChooser = false;
-
+            else
+                DutyGroup.ShowInColumnChooser = true;
             setDim();
             dgInventoryItemsGrid.Readonly = true;
         }
@@ -244,10 +262,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "EditRow":
                     if (selectedItem != null)
-                    {
-                        var parms = new object[2] { selectedItem, true };
-                        AddDockItem(TabControls.InventoryItemPage2, parms, string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("InventoryItems"), selectedItem.Item));
-                    }
+                        AddDockItem(TabControls.InventoryItemPage2, new object[2] { selectedItem, true }, string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("InventoryItems"), selectedItem._Item));
                     break;
                 case "AddNote":
                     if (selectedItem != null)
@@ -255,11 +270,11 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "AddDoc":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.UserDocsPage, dgInventoryItemsGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Documents"), selectedItem._Name));
+                        AddDockItem(TabControls.UserDocsPage, dgInventoryItemsGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Documents"), selectedItem._Item));
                     break;
                 case "InvTrans":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.InventoryTransactions, dgInventoryItemsGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("InvTransactions"), selectedItem._Name));
+                        AddDockItem(TabControls.InventoryTransactions, dgInventoryItemsGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("InvTransactions"), selectedItem._Item));
                     break;
                 case "Statistics":
                     if (selectedItem != null)
@@ -281,10 +296,13 @@ namespace UnicontaClient.Pages.CustomPage
                     dgInventoryItemsGrid.AddRow();
                     break;
                 case "CopyRow":
-                    if (copyRowIsEnabled)
-                        dgInventoryItemsGrid.CopyRow();
-                    else
-                        CopyRecord(selectedItem);
+                    if (selectedItem != null)
+                    {
+                        if (copyRowIsEnabled)
+                            ClearValues(dgInventoryItemsGrid.CopyRow() as InvItem);
+                        else
+                            CopyRecord(selectedItem);
+                    }
                     break;
                 case "DeleteRow":
                     if (selectedItem != null)
@@ -295,15 +313,15 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "Storage":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.InvItemStoragePage, dgInventoryItemsGrid.syncEntity, true, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("OnHand"), selectedItem._Name));
+                        AddDockItem(TabControls.InvItemStoragePage, dgInventoryItemsGrid.syncEntity, true, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("OnHand"), selectedItem._Item));
                     break;
                 case "VariantCombi":
                     if (selectedItem != null && selectedItem._UseVariants)
-                        AddDockItem(TabControls.InvVariantCombiPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ItemVariants"), selectedItem._Name));
+                        AddDockItem(TabControls.InvVariantCombiPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ItemVariants"), selectedItem._Item));
                     break;
                 case "VariantDetails":
                     if (selectedItem != null && selectedItem._UseVariants)
-                        AddDockItem(TabControls.InvVariantDetailPage, dgInventoryItemsGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ItemVariants"), selectedItem._Name));
+                        AddDockItem(TabControls.InvVariantDetailPage, dgInventoryItemsGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ItemVariants"), selectedItem._Item));
                     break;
                 case "LanguageItemText":
                     if (selectedItem != null)
@@ -312,7 +330,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "InventorySeriesBatch":
                     if (selectedItem != null && selectedItem._UseSerialBatch)
                     {
-                        string header = string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("SerialBatchNumbers"), selectedItem._Name);
+                        string header = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("SerialBatchNumbers"), selectedItem._Item);
                         AddDockItem(TabControls.InvSeriesBatch, dgInventoryItemsGrid.syncEntity, header);
                     }
                     break;
@@ -333,7 +351,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "InvPurchaseAccounts":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.InvPurchaseAccountPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("PurchaseAccounts"), selectedItem._Name));
+                        AddDockItem(TabControls.InvPurchaseAccountPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("PurchaseAccounts"), selectedItem._Item));
                     break;
                 case "InvHierarichalBOM":
                     if (selectedItem != null)
@@ -346,32 +364,47 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         AddDockItem(TabControls.InvBOMExplodePage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ExplodedBOM"), selectedItem._Item));
                     break;
-#if !SILVERLIGHT
                 case "InvTransPivot":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.InvTransPivotPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Pivot"), selectedItem._Name));
+                        AddDockItem(TabControls.InvTransPivotPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Pivot"), selectedItem._Item));
                     break;
-#endif
+                case "InvStockProfile":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.InvStorageProfileReport, dgInventoryItemsGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("StockProfile"), selectedItem._Item));
+                    break;
+                case "ViewAttachment":
+                    if (selectedItem != null)
+                        ViewDocument(UnicontaTabs.UserDocsPage3, dgInventoryItemsGrid.syncEntity, string.Format(Uniconta.ClientTools.Localization.lookup("ViewOBJ"), Uniconta.ClientTools.Localization.lookup("Attachment")), ViewerType.Attachment);
+                    break;
+                case "ViewWeb":
+                    if (selectedItem != null)
+                        ViewDocument(UnicontaTabs.UserDocsPage3, dgInventoryItemsGrid.syncEntity, string.Format(Uniconta.ClientTools.Localization.lookup("ViewOBJ"), Uniconta.ClientTools.Localization.lookup("Url")), ViewerType.Url);
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
         }
 
+        static void ClearValues(InvItem item)
+        {
+            item._EAN = null;
+            item._Qty = 0;
+            item._CostValue = 0;
+            item._qtyOnStock = 0;
+            item._qtyOrdered = 0;
+            item._qtyReserved = 0;
+            item.HasNotes = false;
+            item.HasDocs = false;
+        }
         void CopyRecord(InvItemClient selectedItem)
         {
             if (selectedItem == null)
                 return;
-            var invItem = Activator.CreateInstance(selectedItem.GetType()) as InvItemClient;
-            StreamingManager.Copy(selectedItem, invItem);
-            invItem._EAN = null;
-            invItem._Qty = 0;
-            invItem._CostValue = 0;
-            invItem._qtyOnStock = 0;
-            invItem._qtyOrdered = 0;
-            invItem._qtyReserved = 0;
-            var parms = new object[2] { invItem, false };
-            AddDockItem(TabControls.InventoryItemPage2, parms, Uniconta.ClientTools.Localization.lookup("InventoryItems"), "Add_16x16.png");
+            var item = Activator.CreateInstance(selectedItem.GetType()) as InvItemClient;
+            CorasauDataGrid.CopyAndClearRowId(selectedItem, item);
+            ClearValues(item);
+            AddDockItem(TabControls.InventoryItemPage2, new object[] { item, false }, Uniconta.ClientTools.Localization.lookup("InventoryItems"), "Add_16x16.png");
         }
 
         bool copyRowIsEnabled;

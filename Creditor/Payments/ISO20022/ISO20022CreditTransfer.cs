@@ -28,6 +28,20 @@ namespace ISO20022CreditTransfer
     /// </summary>
     public class PaymentISO20022
     {
+        #region Variables
+        private CrudAPI crudAPI;
+        private Company company;
+        #endregion
+
+        /// <summary>
+        /// Default Constructor
+        /// </summary>
+        public PaymentISO20022(CrudAPI api)
+        {
+            crudAPI = api;
+            company = api.CompanyEntity;
+        }
+
         static public string UnicontaCountryToISO(CountryCode code)
         {
             return ((CountryISOCode)code).ToString();
@@ -48,11 +62,11 @@ namespace ISO20022CreditTransfer
         /// <param name="Company">Uniconta company</param> 
         /// <param name="xxx">xxx.</param>
         /// <returns>An XML payment file</returns>                                                                                                                                                              
-        public XMLDocumentGenerateResult GenerateISO20022(Company company, IEnumerable<CreditorTransPayment> queryPaymentTrans, SQLCache bankAccountCache, CreditorPaymentFormat credPaymFormat, int maxFileId, bool doMergePayment, bool schemaValidation = true)
+        public XMLDocumentGenerateResult GenerateISO20022(IEnumerable<CreditorTransPayment> queryPaymentTrans, SQLCache bankAccountCache, CreditorPaymentFormat credPaymFormat, int uniqueFileId, bool doMergePayment, bool schemaValidation = true)
         {
             CreditTransferDocument doc = new CreditTransferDocument();
             BankSpecificSettings bankSpecific = BankSpecificSettings.BankSpecTypeInstance(credPaymFormat);
-            PaymentISO20022Validate paymentISO20022Validate = new PaymentISO20022Validate();
+            PaymentISO20022Validate paymentISO20022Validate = new PaymentISO20022Validate(crudAPI, credPaymFormat);
 
             List<PreCheckError> preCheckErrors = new List<PreCheckError>();
             List<CheckError> checkErrors = new List<CheckError>();
@@ -84,11 +98,13 @@ namespace ISO20022CreditTransfer
             doc.CompanyCountryId = UnicontaCountryToISO(company._CountryId);
             bankSpecific.CompanyCountryId = doc.CompanyCountryId;
             doc.EncodingFormat = bankSpecific.EncodingFormat();
-           
+
+            doc.XMLAttributeNS = bankSpecific.XMLAttributeNS();
+
             doc.ChargeBearer = bankSpecific.ChargeBearerDebtor();
 
             doc.CompanyID = company.CompanyId;
-            doc.NumberSeqPaymentFileId = maxFileId;
+            doc.NumberSeqPaymentFileId = uniqueFileId;
 
             string companyAccountId = string.Empty;
             string companyBIC = string.Empty;
@@ -109,11 +125,9 @@ namespace ISO20022CreditTransfer
             //Update ISO PaymentType >>
             foreach (var rec in queryPaymentTrans)
             {
-                string currency = rec._CurrencyLocal;
-                currency = string.IsNullOrEmpty(currency) ? doc.CompanyCcy : currency;
-
+                var currency = rec.CurrencyLocalStr;
                 double amount = 0;
-                amount = rec._PaymentAmount;
+                amount = rec.PaymentAmount;
 
                 var BICnumber = "";
                 var IBANnumber = "";
@@ -138,12 +152,9 @@ namespace ISO20022CreditTransfer
             if (doMergePayment)
                 queryPaymentTransSorted = from s in queryPaymentTrans orderby s._PaymentRefId select s;
             else
-                queryPaymentTransSorted = from s in queryPaymentTrans orderby s._PaymentDate, s.ISOPaymentType, s._PaymentMethod, s._CurrencyLocal select s;
-
-            paymentISO20022Validate.CompanyBank(credPaymFormat);
+                queryPaymentTransSorted = from s in queryPaymentTrans orderby s._PaymentDate, s.ISOPaymentType, s._PaymentMethod, s.Currency select s;
 
             List<string> paymentInfoIdLst = new List<string>();
-
             foreach (var rec in queryPaymentTransSorted)
             {
                 bankSpecific.AllowedCharactersRegEx(rec.internationalPayment);
@@ -151,13 +162,13 @@ namespace ISO20022CreditTransfer
                 doc.HeaderNumberOfTrans++;
                 doc.PmtInfNumberOfTransActive = bankSpecific.PmtInfNumberOfTransActive();
 
-                doc.HeaderCtrlSum += bankSpecific.HeaderCtrlSum(rec._PaymentAmount);
+                doc.HeaderCtrlSum += bankSpecific.HeaderCtrlSum(rec.PaymentAmount);
 
                 doc.PmtInfCtrlSumActive = bankSpecific.PmtInfCtrlSumActive();
 
                 doc.RequestedExecutionDate = bankSpecific.RequestedExecutionDate(doc.CompanyIBAN, rec._PaymentDate);
 
-                string currency = rec._CurrencyLocal;
+                string currency = rec.CurrencyLocalStr;
                 currency = string.IsNullOrEmpty(currency) ? doc.CompanyCcy : currency;
 
                 doc.EndToEndId = bankSpecific.EndtoendId(rec.PaymentEndToEndId);
@@ -182,7 +193,7 @@ namespace ISO20022CreditTransfer
                 string instructionId = bankSpecific.InstructionId(internalAdvText);
 
                 PostalAddress creditorAddress = new PostalAddress();
-                creditorAddress = bankSpecific.CreditorAddress(creditor, creditorAddress);
+                creditorAddress = bankSpecific.CreditorAddress(creditor, creditorAddress, doc.ISOPaymentType);
 
                 string credBankName = string.Empty;
                 string credBankCountryId = UnicontaCountryToISO(creditor._Country);  
@@ -215,16 +226,14 @@ namespace ISO20022CreditTransfer
                         break;
 
                     case PaymentTypes.PaymentMethod3: //FIK71
-                        var tuple71 = bankSpecific.CreditorFIK71(rec._PaymentId);
+                        var tuple71 = bankSpecific.CreditorFIK71(rec._PaymentId, creditor._PaymentId);
                         creditorOCRPaymentId = tuple71.Item1;
-                        creditorOCRPaymentId = BaseDocument.FIK71 + "/" + creditorOCRPaymentId;
                         creditorAcc = tuple71.Item2;
                         break;
 
                     case PaymentTypes.PaymentMethod5: //FIK75
-                        var tuple75 = bankSpecific.CreditorFIK75(rec._PaymentId);
+                        var tuple75 = bankSpecific.CreditorFIK75(rec._PaymentId, creditor._PaymentId);
                         creditorOCRPaymentId = tuple75.Item1;
-                        creditorOCRPaymentId = BaseDocument.FIK75 + "/" + creditorOCRPaymentId;
                         creditorAcc = tuple75.Item2;
                         break;
 
@@ -242,7 +251,7 @@ namespace ISO20022CreditTransfer
                 }
 
                 double amount = 0;
-                amount = rec._PaymentAmount;
+                amount = rec.PaymentAmount;
 
                 doc.ISOPaymentType = bankSpecific.ISOPaymentType(currency, bankAccount._IBAN, isPaymentTypeIBAN ? creditorAcc : string.Empty, creditorBIC, credBankCountryId, doc.CompanyCountryId);
                 doc.ExtServiceCode = bankSpecific.ExtServiceCode(doc.ISOPaymentType); 
@@ -258,7 +267,7 @@ namespace ISO20022CreditTransfer
 
                 string remittanceInfo = bankSpecific.RemittanceInfo(externalAdvText, doc.ISOPaymentType, rec._PaymentMethod);
 
-                List<string> unstructuredPaymInfoList = bankSpecific.Ustrd(externalAdvText, doc.ISOPaymentType, rec._PaymentMethod, credPaymFormat._ExtendedText);
+                List<string> unstructuredPaymInfoList = bankSpecific.Ustrd(externalAdvText, doc.ISOPaymentType, rec, credPaymFormat._ExtendedText);
 
                 if (!paymentInfoIdLst.Contains(doc.PaymentInfoId))
                 {
@@ -275,7 +284,8 @@ namespace ISO20022CreditTransfer
                 doc.CdtTrfTxInfList.Add(new CdtTrfTxInf(doc.PaymentInfoId, instructionId, doc.EndToEndId, amount, currency,
                     new CdtrAgt(creditorBIC, credBankName, cdtrAgtCountryId, doc.ExcludeSectionCdtrAgt),
                     new Cdtr(credName, creditorAddress),
-                    new CdtrAcct(creditorAcc, isPaymentTypeIBAN, isOCRPayment, doc.CompanyCountryId),
+                    new CdtrAcct(creditorAcc, isPaymentTypeIBAN, isOCRPayment, credPaymFormat._ExportFormat, rec),
+                    new RgltryRptg(credPaymFormat._ExportFormat, doc.ISOPaymentType, rec.RgltryRptgCode, rec.RgltryRptgText),
                     new RmtInf(unstructuredPaymInfoList, remittanceInfo, creditorOCRPaymentId, isOCRPayment), chargeBearer));
             }
 
@@ -284,7 +294,7 @@ namespace ISO20022CreditTransfer
 
             XmlDocument creditTransferDoc = doc.CreateXmlDocument();
             
-            return new XMLDocumentGenerateResult(creditTransferDoc, (preCheckErrors.Count > 0 || checkErrors.Count > 0), doc.HeaderNumberOfTrans, checkErrors, doc.EncodingFormat, generatedFileName);
+            return new XMLDocumentGenerateResult(creditTransferDoc, (preCheckErrors.Count > 0 || checkErrors.Count > 0), doc, checkErrors, generatedFileName);
         }
     }
 }

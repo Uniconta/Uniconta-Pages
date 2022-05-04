@@ -46,11 +46,18 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         public AttachedVouchers(UnicontaBaseEntity master)
-            : base(null)
+            : base(master)
         {
             InitPage(master);
         }
         object cache;
+
+        public AttachedVouchers(UnicontaBaseEntity[] lst, BaseAPI API)
+            : base(API, string.Empty)
+        {
+            InitPage(null);
+            dgAttachedVoucherGrid.SetSource(lst);
+        }
 
         private void InitPage(UnicontaBaseEntity master)
         {
@@ -60,9 +67,31 @@ namespace UnicontaClient.Pages.CustomPage
             SetRibbonControl(localMenu, dgAttachedVoucherGrid);
             dgAttachedVoucherGrid.BusyIndicator = busyIndicator;
             dgAttachedVoucherGrid.api = api;
+            dgAttachedVoucherGrid.UpdateMaster(master);
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgAttachedVoucherGrid.RowDoubleClick += dgAttachedVoucherGrid_RowDoubleClick;
             this.BeforeClose += Vouchers_BeforeClose;
+        }
+
+        public override Task InitQuery() 
+        {
+            if (dgAttachedVoucherGrid.ItemsSource == null)
+                return base.InitQuery();
+            else
+                return null; 
+        }
+
+        public override void SetParameter(IEnumerable<ValuePair> Parameters)
+        {
+            foreach (var rec in Parameters)
+            {
+                if (string.Compare(rec.Name, "PrimaryKeyId", StringComparison.CurrentCultureIgnoreCase) == 0)
+                {
+                    dgAttachedVoucherGrid.FilterString = $"[{rec.Name}] = {rec.Value}";
+                    break;
+                }
+            }
+            base.SetParameter(Parameters);
         }
 
         void Vouchers_BeforeClose()
@@ -85,24 +114,9 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (selectedItem._Data == null)
             {
-                var voucherClient = VoucherCache.GetGlobalVoucherCache(selectedItem);
-                if (voucherClient != null)
-                    selectedItem._Data = voucherClient._Data;
-                else
-                {
-                    //Getting Contents for the Document Viewer
-                    busyIndicator.IsBusy = true;
-                    var res = await api.Read(selectedItem);
-                    if (res != ErrorCodes.Succes)
-                    {
-                        busyIndicator.IsBusy = false;
-                        UtilDisplay.ShowErrorCode(res);
-                        return;
-                    }
-                    VoucherCache.SetGlobalVoucherCache(selectedItem);
-                }
+                busyIndicator.IsBusy = true;
+                await UtilDisplay.GetData(selectedItem, api);
             }
-
             ViewVoucher(TabControls.VouchersPage3, dgAttachedVoucherGrid.syncEntity);
             busyIndicator.IsBusy = false;
         }
@@ -115,7 +129,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 case "UpdateRow":
                     if (selectedItem != null)
-                        UploadData(selectedItem);   
+                        UploadData(selectedItem);
                     break;
                 case "ViewDownloadRow":
                     if (selectedItem != null)
@@ -128,8 +142,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "ExportVouchers":
                     var vouchers = (IEnumerable<VouchersClient>)dgAttachedVoucherGrid.GetVisibleRows();
-                    object[] param = new object[] { vouchers };
-                    AddDockItem(TabControls.VoucherExportPage, param, Uniconta.ClientTools.Localization.lookup("ExportVouchers"));
+                    AddDockItem(TabControls.VoucherExportPage, new object[] { vouchers }, Uniconta.ClientTools.Localization.lookup("ExportVouchers"));
                     break;
                 case "ShowInInbox":
                     if (selectedItem != null)
@@ -141,7 +154,7 @@ namespace UnicontaClient.Pages.CustomPage
                     object[] EditParam = new object[2];
                     EditParam[0] = selectedItem;
                     EditParam[1] = true;
-                    AddDockItem(TabControls.AttachedVouchersPage2, EditParam, string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("Voucher"), selectedItem.RowId));
+                    AddDockItem(TabControls.AttachedVouchersPage2, EditParam, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Voucher"), selectedItem.RowId));
                     break;
                 case "PendingApproval":
                     if (selectedItem != null)
@@ -153,8 +166,8 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        public override bool IsDataChaged { get{ return false; } }
-       
+        public override bool IsDataChaged { get { return false; } }
+
         async void UpdateInBox(VouchersClient selectedItem)
         {
             var rec = new DocumentNoRef();
@@ -173,17 +186,22 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 if (cwUpdateFile.DialogResult == true)
                 {
-                    if (cwUpdateFile.Contents != null)
+                    byte[] buffer = cwUpdateFile.Contents;
+                    string url = cwUpdateFile.Url;
+                    if (selectedItem.RowId != 0 && (buffer != null || !string.IsNullOrEmpty(url)))
                     {
-                        byte[] buffer = cwUpdateFile.Contents;
-                        if (buffer != null && selectedItem.RowId != 0)
-                        {
-                            selectedItem._Data = buffer;
-                            VoucherCache.SetGlobalVoucherCache(selectedItem);
-                            busyIndicator.IsBusy = true;
-                            await api.Update(selectedItem);
-                            busyIndicator.IsBusy = false;
-                        }
+                        var org = new VouchersClient();
+                        selectedItem._Data = null;
+                        selectedItem._LoadedData = null;
+                        StreamingManager.Copy(selectedItem, org);
+
+                        selectedItem.SetNewBuffer(buffer);
+                        selectedItem._Url = url;
+                        selectedItem._NoCompress = !cwUpdateFile.Compress;
+                        VoucherCache.SetGlobalVoucherCache(selectedItem);
+                        busyIndicator.IsBusy = true;
+                        await api.Update(org, selectedItem);
+                        busyIndicator.IsBusy = false;
                     }
                     else
                     {
@@ -238,9 +256,7 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     zippedMemoryStream.SecureSize();
                     if (voucher._Data == null)
-                    {
-                        await api.Read(voucher);
-                    }
+                        await UtilDisplay.GetData(voucher, api);
                     byte[] attachment = voucher.Buffer;
                     zippedMemoryStream.SecureSize(attachment.Length);
                     // Write the data to the ZIP file  

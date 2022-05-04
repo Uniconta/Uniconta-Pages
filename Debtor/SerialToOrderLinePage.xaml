@@ -57,7 +57,7 @@ x:Class="UnicontaClient.Pages.CustomPage.SerialToOrderLinePage"
                                         </DataTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridTemplateColumnClient>
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="QtyOpen" MinWidth="90">
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="QtyOpen" MinWidth="90" ReadOnly="True">
                                     <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                         <DataTemplate>
                                             <CorasauControls:TextEditor x:Name="PART_Editor" HorizontalContentAlignment="Right" Mask="{Binding Path=DataContext.RowData.Row.Decimals,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource MaskConverter},ConverterParameter=Decimals}" MaskUseAsDisplayFormat="True" MaskType="Numeric" 
@@ -72,7 +72,7 @@ x:Class="UnicontaClient.Pages.CustomPage.SerialToOrderLinePage"
                     <docking:LayoutPanel Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Unlinked}" FloatOnDoubleClick="False" AllowDrag="False" AllowDock="False" AllowClose="False" AllowContextMenu="False" AllowMaximize="False" AllowDockToDocumentGroup="False" ShowCloseButton="False"  ShowPinButton="False">
                         <localPage:SerialToOrderlineGrid   x:Name="dgUnlinkedGrid" AutoGenerateColumns="None">
                             <localPage:SerialToOrderlineGrid.Columns>
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="MarkCol" ShowCheckBoxInHeader="True" FieldName="Mark" ShowInColumnChooser="False" Header=""  Width="50"  ReadOnly="False" AllowEditing="True">
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="MarkCol" HideHeaderCheck="False" FieldName="Mark" ShowInColumnChooser="False" Header=""  Width="50"  ReadOnly="False" AllowEditing="True">
                                     <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                         <DataTemplate>
                                             <CorasauControls:CheckEditor Margin="5,0" EditValue="{Binding DataContext.RowData.Row.Mark,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent},UpdateSourceTrigger=PropertyChanged}" IsEnabled="True"/>

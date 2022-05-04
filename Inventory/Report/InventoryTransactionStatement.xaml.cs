@@ -182,7 +182,6 @@ namespace UnicontaClient.Pages.CustomPage
                         {
                             var child = detail as InvSerieBatchClient;
                             var child1 = new InvSeriesBatchTotal();
-                            UserMenuClientList userMenu = new UserMenuClientList();
                             StreamingManager.Copy(child, child1);
                             child._Item = curItem;
                             var costLine = (child._CostPrice * child._Qty);

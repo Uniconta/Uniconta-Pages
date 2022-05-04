@@ -36,6 +36,9 @@ namespace UnicontaClient.Pages.CustomPage
         public override IComparer GridSorting { get { return new DCOrderSort(); } }
         public override bool SingleBufferUpdate { get { return false; } }
         public override bool Readonly { get { return false; } }
+        public override bool CanDelete { get { return false; } }
+        public override bool CanInsert { get { return false; } }
+        public override bool IsAutoSave { get { return false; } }
     }
 
     /// <summary>
@@ -109,7 +112,7 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                     break;
                 case "DeleteRow":
-                    dgMultiInvGrid.DeleteRow();
+                    dgMultiInvGrid.RemoveFocusedRowFromGrid();
                     break;
                 case "OrderLine":
                     if (selectedItem == null)
@@ -194,28 +197,45 @@ namespace UnicontaClient.Pages.CustomPage
             attachedVoucher._Data = buf;
         }
 
+        bool IsMassUpdateTaskInProgress = false;
+
         private void GenerateInvoice()
         {
+
+            if (IsMassUpdateTaskInProgress)
+            {
+                UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("TaskAlreadyRunning"), Uniconta.ClientTools.Localization.lookup("Warning"));
+                return;
+            }
+
             UnicontaClient.Pages.CWGenerateInvoice GenrateInvoiceDialog = new UnicontaClient.Pages.CWGenerateInvoice(true, string.Empty, false, true, true, false, isQuickPrintVisible: false);
-#if !SILVERLIGHT
             GenrateInvoiceDialog.DialogTableId = 2000000000;
             GenrateInvoiceDialog.HideOutlookOption(true);
-#endif
             GenrateInvoiceDialog.Closed += async delegate
             {
                 if (GenrateInvoiceDialog.DialogResult == true)
                 {
-                    busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
-                    busyIndicator.IsBusy = true;
+                    try
+                    {
+                        busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
+                        busyIndicator.IsBusy = true;
+                        MultiDocumentTaskProgress(true, CompanyLayoutType.PurchaseInvoice);
+                        var crVisibleOrders = dgMultiInvGrid.GetVisibleRows() as IEnumerable<CreditorOrderClient>;
 
-                    var crVisibleOrders = dgMultiInvGrid.GetVisibleRows() as IEnumerable<CreditorOrderClient>;
-
-                    var postingprintGenerator = new InvoicePostingPrintGenerator(api, this);
-                    postingprintGenerator.SetUpInvoicePosting(crVisibleOrders, GenrateInvoiceDialog.GenrateDate, GenrateInvoiceDialog.IsSimulation, CompanyLayoutType.PurchaseInvoice, false, false, false,
-                        GenrateInvoiceDialog.SendByEmail, GenrateInvoiceDialog.sendOnlyToThisEmail, GenrateInvoiceDialog.Emails, false);
-
-                    await postingprintGenerator.Execute();
-                    busyIndicator.IsBusy = false;
+                        var postingprintGenerator = new InvoicePostingPrintGenerator(api, this);
+                        postingprintGenerator.SetUpInvoicePosting(crVisibleOrders, GenrateInvoiceDialog.GenrateDate, GenrateInvoiceDialog.IsSimulation, CompanyLayoutType.PurchaseInvoice, false, false, false,
+                            GenrateInvoiceDialog.SendByEmail, GenrateInvoiceDialog.sendOnlyToThisEmail, GenrateInvoiceDialog.Emails, false);
+                        await postingprintGenerator.Execute();
+                        busyIndicator.IsBusy = false;
+                    }
+                    catch (Exception ex)
+                    {
+                        UnicontaMessageBox.Show(ex.Message, Uniconta.ClientTools.Localization.lookup("Exception"));
+                    }
+                    finally
+                    {
+                        MultiDocumentTaskProgress(false, CompanyLayoutType.PurchaseInvoice);
+                    }
                 }
             };
             GenrateInvoiceDialog.Show();
@@ -223,30 +243,77 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void UpdateDocument(CompanyLayoutType documentType)
         {
+
+            if (IsMassUpdateTaskInProgress)
+            {
+                UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("TaskAlreadyRunning"), Uniconta.ClientTools.Localization.lookup("Warning"));
+                return;
+            }
+
             bool showUpdateInv = api.CompanyEntity.Storage;
             var generateDoc = new CWGenerateInvoice(false, documentType.ToString(), false, true, true, false, isQuickPrintVisible: false, isShowUpdateInv: showUpdateInv);
-#if !SILVERLIGHT
             generateDoc.DialogTableId = 2000000000;
             generateDoc.HideOutlookOption(true);
-#endif
             generateDoc.Closed += async delegate
              {
                  if (generateDoc.DialogResult == true)
                  {
-                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
-                     busyIndicator.IsBusy = true;
+                     try
+                     {
+                         busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
+                         busyIndicator.IsBusy = true;
+                         MultiDocumentTaskProgress(true, documentType);
 
-                     var crVisibleOrders = dgMultiInvGrid.GetVisibleRows() as IEnumerable<CreditorOrderClient>;
+                         var crVisibleOrders = dgMultiInvGrid.GetVisibleRows() as IEnumerable<CreditorOrderClient>;
+                         var invoicePostingPrintGenerator = new InvoicePostingPrintGenerator(api, this);
+                         invoicePostingPrintGenerator.SetUpInvoicePosting(crVisibleOrders, generateDoc.GenrateDate, !generateDoc.UpdateInventory, documentType, false, false, false,
+                             generateDoc.SendByEmail, generateDoc.sendOnlyToThisEmail, generateDoc.Emails, false);
 
-                     var invoicePostingPrintGenerator = new InvoicePostingPrintGenerator(api, this);
-                     invoicePostingPrintGenerator.SetUpInvoicePosting(crVisibleOrders, generateDoc.GenrateDate, !generateDoc.UpdateInventory, documentType, false, false, false,
-                         generateDoc.SendByEmail, generateDoc.sendOnlyToThisEmail, generateDoc.Emails, false);
-
-                     await invoicePostingPrintGenerator.Execute();
-                     busyIndicator.IsBusy = false;
+                         await invoicePostingPrintGenerator.Execute();
+                         busyIndicator.IsBusy = false;
+                     }
+                     catch (Exception ex)
+                     {
+                         UnicontaMessageBox.Show(ex.Message, Uniconta.ClientTools.Localization.lookup("Exception"));
+                     }
+                     finally
+                     {
+                         MultiDocumentTaskProgress(false, documentType);
+                     }
                  }
              };
             generateDoc.Show();
+        }
+
+        private void MultiDocumentTaskProgress(bool status, CompanyLayoutType documentType)
+        {
+            IsMassUpdateTaskInProgress = status;
+
+            string actionButton;
+            switch (documentType)
+            {
+                case CompanyLayoutType.PurchaseOrder:
+                    IsMassUpdateTaskInProgress = status;
+                    actionButton = "UpdatePurchaseOrder";
+                    break;
+                case CompanyLayoutType.PurchasePacknote:
+                    IsMassUpdateTaskInProgress = status;
+                    actionButton = "UpdateDeliveryNote";
+                    break;
+                case CompanyLayoutType.Requisition:
+                    IsMassUpdateTaskInProgress = status;
+                    actionButton = "UpdateRequisition";
+                    break;
+                default:
+                    IsMassUpdateTaskInProgress = status;
+                    actionButton = "GenerateInvoice";
+                    break;
+            }
+
+            if (status)
+                ribbonControl?.DisableButtons(new string[] { actionButton });
+            else
+                ribbonControl?.EnableButtons(new string[] { actionButton });
         }
 
         void setDim()

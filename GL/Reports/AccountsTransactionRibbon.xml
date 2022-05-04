@@ -26,19 +26,29 @@
     </RibbonItem>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="CancelVoucher" LocalizedNameKey="CancelVoucher" Glyph="Cancel_Voucher_32x32.png" LargeGlyph="Cancel_Voucher_32x32.png" />
-    <RibbonItem Action="DeleteVoucher" LocalizedNameKey="Delete" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png"/>
-    <RibbonItem Action="InvertSign" LocalizedNameKey="InvertSign" Glyph="Invert_Sign_32x32.png" LargeGlyph="Invert_Sign_32x32.png" />
-    <RibbonItem Action="PhyslVoucher" LocalizedNameKey="PhysicalVoucher" Glyph="Cover_16x16.png" LargeGlyph="View_Voucher_32x32.png" >
+    <RibbonItem Action="EditTransaction" LocalizedNameKey="EditOBJ" Parameter="Transaction" LargeGlyph="Edit_32x32.png">
+      <RibbonItem Action="CancelVoucher" LocalizedNameKey="CancelVoucher" Glyph="Cancel_Voucher_32x32.png" />
+      <RibbonItem Action="DeleteVoucher" LocalizedNameKey="Delete" Glyph="Import_16x16.png" />
+      <RibbonItem Action="InvertSign" LocalizedNameKey="InvertSign" Glyph="Invert_Sign_16x16.png" />
+      <RibbonItem Action="ChangeDimension" LocalizedNameKey="ChangeDimension" Glyph="Reseller_16x16.png" />
+      <RibbonItem Action="SetNewDcAccount" LocalizedNameKey="ChangeOBJ" Parameter="DebtorAndCreditor" Glyph="Offset_Account_16x16.png" />
+      <RibbonItem Action="ChangeText" LocalizedNameKey="ChangeText"  Glyph="Edit_16x16.png" />
+      <RibbonItem Action="ChangeReference" LocalizedNameKey="EditOBJ" Parameter="Reference"  Glyph="Edit_16x16.png" />
+      <RibbonItem Action="ChangeDate" LocalizedNameKey="ChangeOBJ" Parameter="Date" Glyph="Month_View_32x32.png" />
+      <RibbonItem Action="RemoveVat" LocalizedNameKey="RemoveOBJ" Parameter="Vat" Glyph="Close_16x16.png" />
+      <RibbonItem Action="AddVat" LocalizedNameKey="AddOBJ" Parameter="Vat" Glyph="Grid_Add_16x16.png" />
+      <RibbonItem Action="ChangeQuantity" LocalizedNameKey="ChangeOBJ" Parameter="Qty" Glyph="Import_16x16.png" />
+    </RibbonItem>
+      <RibbonItem Action="PhyslVoucher" LocalizedNameKey="PhysicalVoucher" Glyph="Cover_16x16.png" LargeGlyph="View_Voucher_32x32.png" >
       <RibbonItem Action="RefVoucher" LocalizedNameKey="Attach" Glyph="Attachments_16x16.png" LargeGlyph="Attachments_32x32.png" />
       <RibbonItem Action="ImportVoucher" LocalizedNameKey="ImportFile" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png" />
       <RibbonItem Action="RemoveVoucher" LocalizedNameKey="Remove" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png" />
       <RibbonItem Action="DragDrop" LocalizedNameKey="DragAndDrop" Glyph="DragDrop_File_16x16.png" ShortcutKey="CTRL+G"/>
     </RibbonItem>
-    <RibbonItem Action="ChangeDimension" LocalizedNameKey="ChangeDimension" LargeGlyph="Default_Values_32x32.png" />
-    <RibbonItem Action="ChangeText" LocalizedNameKey="ChangeText" LargeGlyph="Transfer_32x32.png" />
-    <RibbonItem Action="ChangeQuantity" LocalizedNameKey="ChangeOBJ" Parameter="Qty" LargeGlyph="ImportExport_32x32.png" />
-    <RibbonItem Action="ChangeDate" LocalizedNameKey="ChangeOBJ" Parameter="Date" LargeGlyph="Month_View_32x32.png" />
+    <RibbonItem Action="CopyVoucherToJournal" LocalizedNameKey="CopyVoucherToJournal" LargeGlyph="Install_32x32.png"/>
+  </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="ExportVouchers" LocalizedNameKey="ExportVouchers" LargeGlyph="Upload_32x32.png" />
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="AddEditNote" LocalizedNameKey="AddEditOBJ" Parameter="Note" LargeGlyph="AddUpdate_32x32.png"/>
