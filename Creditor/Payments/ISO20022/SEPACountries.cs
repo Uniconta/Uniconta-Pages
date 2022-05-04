@@ -35,6 +35,7 @@ namespace UnicontaISO20022CreditTransfer
         SI = 31,
         ES = 32,
         SE = 33,
-        CH = 34
+        CH = 34,
+        GB = 35
     }
 }
