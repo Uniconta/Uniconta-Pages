@@ -215,7 +215,7 @@ namespace UnicontaClient.Pages.CustomPage
                 }
             }
 
-            AddDockItem(TabControls.SimulatedDebtorBudgetLine, new object[] { lst }, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Simulate"), ((Debtor)master)?.KeyName));
+            AddDockItem(TabControls.SimulatedDebtorBudgetLine, new object[] { lst }, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Simulate"), ((IdKey)master)?.KeyStr));
         }
 
         protected override void LoadCacheInBackGround()

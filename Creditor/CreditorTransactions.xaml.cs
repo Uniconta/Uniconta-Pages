@@ -22,6 +22,7 @@ using Uniconta.API.Service;
 using System.Windows;
 using Uniconta.Client.Pages;
 using Uniconta.Common.Utility;
+using UnicontaClient.Utilities;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -149,7 +150,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                     {
                         string header = Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("Settlements"), selectedItem._Voucher);
-                        AddDockItem(TabControls.CreditorSettlements, dgCreditorTrans.syncEntity, true, header);
+                        AddDockItem(TabControls.CreditorSettlements, dgCreditorTrans.syncEntity, true, header, null, floatingLoc: Utility.GetDefaultLocation());
                     }
                     break;
                 case "VoucherTransactions":

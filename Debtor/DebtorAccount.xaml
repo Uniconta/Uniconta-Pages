@@ -96,7 +96,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorAccount"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="MobilPhone" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceEmail" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="EmailDocuments" Visible="False" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceInXML" Visible="False"/>
+                    <localPage:ComboBoxColumnClient x:Name="InvoiceInXML" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PricesInclVat" Width="60"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CrmGroup" Width="100" />
 

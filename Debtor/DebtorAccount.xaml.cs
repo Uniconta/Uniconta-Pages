@@ -247,19 +247,15 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "InvTran":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.InvTransactions, dgDebtorAccountGrid.syncEntity);
+                        AddDockItem(TabControls.DebtorInvoiceLines, dgDebtorAccountGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("InvTransactions"), selectedItem._Account));
                     break;
                 case "AccountStat":
                     if (selectedItem != null)
                         AddDockItem(TabControls.InventoryTotals, selectedItem, string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("AccountStat"), selectedItem._Account));
                     break;
                 case "AccountStatDate":
-                    if (selectedItem == null)
-                        return;
-                    object[] obj = new object[2];
-                    obj[0] = selectedItem;
-                    obj[1] = true;
-                    AddDockItem(TabControls.DebtorAccountStat, obj, string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("AccountStat"), selectedItem._Account));
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.DebtorAccountStat, new object[2] { selectedItem, true }, string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("AccountStat"), selectedItem._Account));
                     break;
                 case "RefreshGrid":
                     if (gridControl.Visibility == Visibility.Visible)

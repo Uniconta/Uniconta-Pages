@@ -60,7 +60,7 @@ namespace UnicontaISO20022CreditTransfer
 
                 if (isOCR && exportFormat == (byte)ExportFormatType.ISO20022_DK) 
                     baseDoc.AppendElement(doc, schmeNm, PRTRY, OCR);
-                else if (isOCR && exportFormat == (byte)ExportFormatType.ISO20022_SE && trans._PaymentMethod == PaymentTypes.PaymentMethod3)
+                else if (exportFormat == (byte)ExportFormatType.ISO20022_SE && trans._PaymentMethod == PaymentTypes.PaymentMethod3)
                     baseDoc.AppendElement(doc, schmeNm, PRTRY, BGNR);
                 else
                     baseDoc.AppendElement(doc, schmeNm, CD, BBAN);

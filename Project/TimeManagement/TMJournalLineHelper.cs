@@ -192,7 +192,8 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
                 {
                     lastProjNo = rec._Project;
                     proj = (Uniconta.DataModel.Project)projectCache.Get(lastProjNo);
-                    projGroup = (Uniconta.DataModel.ProjectGroup)projectGrpCache.Get(proj?._Group);
+                    if (proj?._Group != null)
+                        projGroup = (Uniconta.DataModel.ProjectGroup)projectGrpCache.Get(proj._Group);
 
                     if (proj != null && comp.ProjectTask && proj.Tasks == null)
                         await proj.LoadTasks(api);

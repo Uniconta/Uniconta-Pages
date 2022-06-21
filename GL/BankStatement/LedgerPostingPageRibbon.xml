@@ -27,8 +27,8 @@
     <RibbonItem LocalizedNameKey="PhysicalVoucher" Glyph="Cover_16x16.png" LargeGlyph="View_Voucher_32x32.png" >
       <RibbonItem Action="ViewVoucher" LocalizedNameKey="View" Glyph="View_16x16.png" LargeGlyph="View_32x32.png" />
       <RibbonItem Action="RefVoucher" LocalizedNameKey="Attach" Glyph="Attachments_16x16.png" LargeGlyph="Attachments_32x32.png" />
-      <RibbonItem Action="ImportVoucher" LocalizedNameKey="ImportFile" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png" />
-      <RibbonItem Action="RemoveVoucher" LocalizedNameKey="Remove" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png" />
+      <RibbonItem Action="ImportVoucher" LocalizedNameKey="ImportFile" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png" ShortcutKey="Ctrl+J"/>
+      <RibbonItem Action="RemoveVoucher" LocalizedNameKey="Remove" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png" ShortcutKey="Ctrl+I"/>
     </RibbonItem>
   </RibbonItem>
   <RibbonItem>

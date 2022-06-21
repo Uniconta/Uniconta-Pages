@@ -192,7 +192,6 @@ namespace UnicontaClient.Pages.CustomPage
                     lst.Add(new JournalLineGridClient()
                     {
                         _Date = tr._Date,
-                        _DocumentDate = tr._DocumentDate,
                         _Account = tr._Account,
                         _Voucher = tr._Voucher,
                         _Invoice = NumberConvert.ToStringNull(tr._Invoice),
@@ -828,7 +827,7 @@ namespace UnicontaClient.Pages.CustomPage
                             if (showOpen)
                             {
                                 var lst = GetOtherMarked(selectedItem, Ac, (byte)AcType);
-                                AddDockItem(TabControls.SettleOpenTransactionPage, new object[] { AccountObj, IdObject.get((byte)AcType), selectedItem, IdObject.get(Offset), lst }, true);
+                                AddDockItem(TabControls.SettleOpenTransactionPage, new object[] { AccountObj, IdObject.get((byte)AcType), selectedItem, IdObject.get(Offset), lst }, true, null, floatingLoc: Utility.GetDefaultLocation());
                             }
                             else
                                 AddDockItem(AcType == GLJournalAccountType.Debtor ? TabControls.DebtorTransactions : TabControls.CreditorTransactions, AccountObj, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("AccountsTransaction"), Ac));

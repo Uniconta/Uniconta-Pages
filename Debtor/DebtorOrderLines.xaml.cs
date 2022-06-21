@@ -1530,5 +1530,19 @@ namespace UnicontaClient.Pages.CustomPage
                 row.NotifyPropertyChanged("SerieBatches");
             }
         }
+
+        protected override bool LoadTemplateHandledLocally(IEnumerable<UnicontaBaseEntity> templateRows)
+        {
+            foreach (var _it in templateRows)
+            {
+                var row = _it as DCOrderLineClient;
+                row._CostPrice = 0;
+                row.ClearRef();
+                var item = (Uniconta.DataModel.InvItem)this.items.Get(row._Item);
+                if (item != null)
+                    row.SetCostFromItem(item);
+            }
+            return false;
+        }
     }
 }

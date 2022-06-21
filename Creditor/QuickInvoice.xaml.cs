@@ -498,7 +498,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         void RecalculateAmount()
         {
-            var ret = DebtorOfferLines.RecalculateLineSum((IList)dgCreditorOrderLineGrid.ItemsSource, this.exchangeRate);
+            var ret = DebtorOfferLines.RecalculateLineSum(Order,(IEnumerable<DCOrderLineClient>)dgCreditorOrderLineGrid.ItemsSource, this.exchangeRate);
             double Amountsum = ret.Item1;
             double Costsum = ret.Item2;
             double AmountsumCompCur = ret.Item3;

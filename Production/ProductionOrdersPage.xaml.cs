@@ -213,6 +213,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 var account = cwOrderFromOrder.Account;
                                 var copyAttachment = cwOrderFromOrder.copyAttachment;
                                 var dcOrder = cwOrderFromOrder.dcOrder;
+                                bool NewOrder = (dcOrder.RowId == 0);
                                 dcOrder._DeliveryDate = cwOrderFromOrder.DeliveryDate;
                                 var copyDelAddress = cwOrderFromOrder.copyDeliveryAddress;
                                 var reCalPrice = cwOrderFromOrder.reCalculatePrice;
@@ -222,7 +223,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 if (result != ErrorCodes.Succes)
                                     UtilDisplay.ShowErrorCode(result);
                                 else
-                                    CreditorOrders.ShowOrderLines(1, dcOrder, this, dgProductionOrders);
+                                    CreditorOrders.ShowOrderLines(NewOrder ? (byte)4 : (byte)0, dcOrder, this, dgProductionOrders);
                             }
                         };
                         cwOrderFromOrder.Show();

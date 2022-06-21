@@ -65,13 +65,12 @@ namespace UnicontaClient.Pages.CustomPage
             this.xrReportFooterPostedSum = new DevExpress.XtraReports.UI.XRLabel();
             this.xrLineDetailReportPosted = new DevExpress.XtraReports.UI.XRLine();
             this.ReportHeader = new DevExpress.XtraReports.UI.ReportHeaderBand();
+            this.xrBankAccountValue = new DevExpress.XtraReports.UI.XRLabel();
+            this.xrBankTotalVoid = new DevExpress.XtraReports.UI.XRLabel();
+            this.xrPostedTotalVoid = new DevExpress.XtraReports.UI.XRLabel();
+            this.xrVoidItems = new DevExpress.XtraReports.UI.XRLabel();
             this.xrPageInfo1 = new DevExpress.XtraReports.UI.XRPageInfo();
-            this.xrDifferencePanel = new DevExpress.XtraReports.UI.XRPanel();
-            this.xrLine1 = new DevExpress.XtraReports.UI.XRLine();
-            this.xrNewBalanceValue = new DevExpress.XtraReports.UI.XRLabel();
-            this.xrDifferenceValue = new DevExpress.XtraReports.UI.XRLabel();
-            this.xrNewBalance = new DevExpress.XtraReports.UI.XRLabel();
-            this.xrDifference = new DevExpress.XtraReports.UI.XRLabel();
+            this.xrLineReportHeader3 = new DevExpress.XtraReports.UI.XRLine();
             this.xrReportHeaderLine3 = new DevExpress.XtraReports.UI.XRLine();
             this.xrLineReportHeader1 = new DevExpress.XtraReports.UI.XRLine();
             this.xrBankReconciled = new DevExpress.XtraReports.UI.XRLabel();
@@ -88,10 +87,6 @@ namespace UnicontaClient.Pages.CustomPage
             this.xrHeading1 = new DevExpress.XtraReports.UI.XRLabel();
             this.calBankTotalNonReco = new DevExpress.XtraReports.UI.CalculatedField();
             this.calPostedTotalNonReco = new DevExpress.XtraReports.UI.CalculatedField();
-            this.xrLineReportHeader3 = new DevExpress.XtraReports.UI.XRLine();
-            this.xrVoidItems = new DevExpress.XtraReports.UI.XRLabel();
-            this.xrBankTotalVoid = new DevExpress.XtraReports.UI.XRLabel();
-            this.xrPostedTotalVoid = new DevExpress.XtraReports.UI.XRLabel();
             ((System.ComponentModel.ISupportInitialize)(this)).BeginInit();
             // 
             // TopMargin
@@ -438,11 +433,11 @@ namespace UnicontaClient.Pages.CustomPage
             // ReportHeader
             // 
             this.ReportHeader.Controls.AddRange(new DevExpress.XtraReports.UI.XRControl[] {
+            this.xrBankAccountValue,
             this.xrBankTotalVoid,
             this.xrPostedTotalVoid,
             this.xrVoidItems,
             this.xrPageInfo1,
-            this.xrDifferencePanel,
             this.xrLineReportHeader3,
             this.xrReportHeaderLine3,
             this.xrLineReportHeader1,
@@ -461,6 +456,51 @@ namespace UnicontaClient.Pages.CustomPage
             this.ReportHeader.HeightF = 289.5833F;
             this.ReportHeader.Name = "ReportHeader";
             // 
+            // xrBankAccountValue
+            // 
+            this.xrBankAccountValue.LocationFloat = new DevExpress.Utils.PointFloat(10.00009F, 38.00001F);
+            this.xrBankAccountValue.Name = "xrBankAccountValue";
+            this.xrBankAccountValue.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
+            this.xrBankAccountValue.SizeF = new System.Drawing.SizeF(490.4166F, 23F);
+            this.xrBankAccountValue.StylePriority.UseTextAlignment = false;
+            this.xrBankAccountValue.Text = "[BankAccount]";
+            this.xrBankAccountValue.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleLeft;
+            // 
+            // xrBankTotalVoid
+            // 
+            this.xrBankTotalVoid.LocationFloat = new DevExpress.Utils.PointFloat(239.7083F, 210.0833F);
+            this.xrBankTotalVoid.Multiline = true;
+            this.xrBankTotalVoid.Name = "xrBankTotalVoid";
+            this.xrBankTotalVoid.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
+            this.xrBankTotalVoid.SizeF = new System.Drawing.SizeF(200F, 23F);
+            this.xrBankTotalVoid.StylePriority.UseTextAlignment = false;
+            this.xrBankTotalVoid.Text = "[BankTotalVoid]";
+            this.xrBankTotalVoid.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleRight;
+            this.xrBankTotalVoid.TextFormatString = "{0:n2}";
+            // 
+            // xrPostedTotalVoid
+            // 
+            this.xrPostedTotalVoid.LocationFloat = new DevExpress.Utils.PointFloat(440F, 209.9583F);
+            this.xrPostedTotalVoid.Multiline = true;
+            this.xrPostedTotalVoid.Name = "xrPostedTotalVoid";
+            this.xrPostedTotalVoid.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
+            this.xrPostedTotalVoid.SizeF = new System.Drawing.SizeF(200F, 23F);
+            this.xrPostedTotalVoid.StylePriority.UseTextAlignment = false;
+            this.xrPostedTotalVoid.Text = "[PostedTotalVoid]";
+            this.xrPostedTotalVoid.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleRight;
+            this.xrPostedTotalVoid.TextFormatString = "{0:n2}";
+            // 
+            // xrVoidItems
+            // 
+            this.xrVoidItems.LocationFloat = new DevExpress.Utils.PointFloat(10.00009F, 210.0833F);
+            this.xrVoidItems.Multiline = true;
+            this.xrVoidItems.Name = "xrVoidItems";
+            this.xrVoidItems.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
+            this.xrVoidItems.SizeF = new System.Drawing.SizeF(217.7083F, 23F);
+            this.xrVoidItems.StylePriority.UseTextAlignment = false;
+            this.xrVoidItems.Text = "[VoidTransactions]";
+            this.xrVoidItems.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleLeft;
+            // 
             // xrPageInfo1
             // 
             this.xrPageInfo1.Font = new System.Drawing.Font("Arial", 8.75F);
@@ -474,87 +514,29 @@ namespace UnicontaClient.Pages.CustomPage
             this.xrPageInfo1.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleRight;
             this.xrPageInfo1.TextFormatString = "{0:g}";
             // 
-            // xrDifferencePanel
+            // xrLineReportHeader3
             // 
-            this.xrDifferencePanel.Controls.AddRange(new DevExpress.XtraReports.UI.XRControl[] {
-            this.xrLine1,
-            this.xrNewBalanceValue,
-            this.xrDifferenceValue,
-            this.xrNewBalance,
-            this.xrDifference});
-            this.xrDifferencePanel.LocationFloat = new DevExpress.Utils.PointFloat(10.00001F, 215.5833F);
-            this.xrDifferencePanel.Name = "xrDifferencePanel";
-            this.xrDifferencePanel.SizeF = new System.Drawing.SizeF(629.7083F, 71.875F);
-            // 
-            // xrLine1
-            // 
-            this.xrLine1.LocationFloat = new DevExpress.Utils.PointFloat(429.4167F, 57.00009F);
-            this.xrLine1.Name = "xrLine1";
-            this.xrLine1.SizeF = new System.Drawing.SizeF(200F, 10.99998F);
-            // 
-            // xrNewBalanceValue
-            // 
-            this.xrNewBalanceValue.LocationFloat = new DevExpress.Utils.PointFloat(429.7083F, 33.95828F);
-            this.xrNewBalanceValue.Multiline = true;
-            this.xrNewBalanceValue.Name = "xrNewBalanceValue";
-            this.xrNewBalanceValue.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
-            this.xrNewBalanceValue.SizeF = new System.Drawing.SizeF(199.7083F, 23F);
-            this.xrNewBalanceValue.StylePriority.UseTextAlignment = false;
-            this.xrNewBalanceValue.Text = "[NewBalance]";
-            this.xrNewBalanceValue.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleRight;
-            this.xrNewBalanceValue.TextFormatString = "{0:n2}";
-            // 
-            // xrDifferenceValue
-            // 
-            this.xrDifferenceValue.LocationFloat = new DevExpress.Utils.PointFloat(429.7083F, 10F);
-            this.xrDifferenceValue.Multiline = true;
-            this.xrDifferenceValue.Name = "xrDifferenceValue";
-            this.xrDifferenceValue.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
-            this.xrDifferenceValue.SizeF = new System.Drawing.SizeF(199.7083F, 23F);
-            this.xrDifferenceValue.StylePriority.UseTextAlignment = false;
-            this.xrDifferenceValue.Text = "[Diff]";
-            this.xrDifferenceValue.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleRight;
-            this.xrDifferenceValue.TextFormatString = "{0:n2}";
-            // 
-            // xrNewBalance
-            // 
-            this.xrNewBalance.LocationFloat = new DevExpress.Utils.PointFloat(6.29425E-05F, 33.95828F);
-            this.xrNewBalance.Multiline = true;
-            this.xrNewBalance.Name = "xrNewBalance";
-            this.xrNewBalance.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
-            this.xrNewBalance.SizeF = new System.Drawing.SizeF(217.7083F, 23F);
-            this.xrNewBalance.StylePriority.UseTextAlignment = false;
-            this.xrNewBalance.Text = "[New Balance]";
-            this.xrNewBalance.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleLeft;
-            // 
-            // xrDifference
-            // 
-            this.xrDifference.LocationFloat = new DevExpress.Utils.PointFloat(0F, 10F);
-            this.xrDifference.Multiline = true;
-            this.xrDifference.Name = "xrDifference";
-            this.xrDifference.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
-            this.xrDifference.SizeF = new System.Drawing.SizeF(217.7083F, 23F);
-            this.xrDifference.StylePriority.UseTextAlignment = false;
-            this.xrDifference.Text = "[Diff]";
-            this.xrDifference.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleLeft;
+            this.xrLineReportHeader3.LocationFloat = new DevExpress.Utils.PointFloat(240.0001F, 273.3333F);
+            this.xrLineReportHeader3.Name = "xrLineReportHeader3";
+            this.xrLineReportHeader3.SizeF = new System.Drawing.SizeF(400F, 6.25F);
             // 
             // xrReportHeaderLine3
             // 
             this.xrReportHeaderLine3.BorderDashStyle = DevExpress.XtraPrinting.BorderDashStyle.Double;
-            this.xrReportHeaderLine3.LocationFloat = new DevExpress.Utils.PointFloat(239.7083F, 203.0833F);
+            this.xrReportHeaderLine3.LocationFloat = new DevExpress.Utils.PointFloat(239.7083F, 267.0833F);
             this.xrReportHeaderLine3.Name = "xrReportHeaderLine3";
             this.xrReportHeaderLine3.SizeF = new System.Drawing.SizeF(400F, 6.25F);
             this.xrReportHeaderLine3.StylePriority.UseBorderDashStyle = false;
             // 
             // xrLineReportHeader1
             // 
-            this.xrLineReportHeader1.LocationFloat = new DevExpress.Utils.PointFloat(239.7083F, 169.0833F);
+            this.xrLineReportHeader1.LocationFloat = new DevExpress.Utils.PointFloat(239.7083F, 233.0833F);
             this.xrLineReportHeader1.Name = "xrLineReportHeader1";
             this.xrLineReportHeader1.SizeF = new System.Drawing.SizeF(400F, 10.99998F);
             // 
             // xrBankReconciled
             // 
-            this.xrBankReconciled.LocationFloat = new DevExpress.Utils.PointFloat(239.7083F, 180.0833F);
+            this.xrBankReconciled.LocationFloat = new DevExpress.Utils.PointFloat(239.7083F, 244.0833F);
             this.xrBankReconciled.Multiline = true;
             this.xrBankReconciled.Name = "xrBankReconciled";
             this.xrBankReconciled.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -566,7 +548,7 @@ namespace UnicontaClient.Pages.CustomPage
             // 
             // xrPostedReconciled
             // 
-            this.xrPostedReconciled.LocationFloat = new DevExpress.Utils.PointFloat(440F, 180.0833F);
+            this.xrPostedReconciled.LocationFloat = new DevExpress.Utils.PointFloat(440F, 244.0833F);
             this.xrPostedReconciled.Multiline = true;
             this.xrPostedReconciled.Name = "xrPostedReconciled";
             this.xrPostedReconciled.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -578,7 +560,7 @@ namespace UnicontaClient.Pages.CustomPage
             // 
             // xrBankTotalNonReconciled
             // 
-            this.xrBankTotalNonReconciled.LocationFloat = new DevExpress.Utils.PointFloat(239.7083F, 123.0833F);
+            this.xrBankTotalNonReconciled.LocationFloat = new DevExpress.Utils.PointFloat(239.7083F, 187.0833F);
             this.xrBankTotalNonReconciled.Multiline = true;
             this.xrBankTotalNonReconciled.Name = "xrBankTotalNonReconciled";
             this.xrBankTotalNonReconciled.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -590,7 +572,7 @@ namespace UnicontaClient.Pages.CustomPage
             // 
             // xrPostedTotalNonReconciled
             // 
-            this.xrPostedTotalNonReconciled.LocationFloat = new DevExpress.Utils.PointFloat(440F, 122.9583F);
+            this.xrPostedTotalNonReconciled.LocationFloat = new DevExpress.Utils.PointFloat(440F, 186.9583F);
             this.xrPostedTotalNonReconciled.Multiline = true;
             this.xrPostedTotalNonReconciled.Name = "xrPostedTotalNonReconciled";
             this.xrPostedTotalNonReconciled.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -602,7 +584,7 @@ namespace UnicontaClient.Pages.CustomPage
             // 
             // xrPostedTotal
             // 
-            this.xrPostedTotal.LocationFloat = new DevExpress.Utils.PointFloat(440F, 99.95833F);
+            this.xrPostedTotal.LocationFloat = new DevExpress.Utils.PointFloat(440F, 163.9583F);
             this.xrPostedTotal.Multiline = true;
             this.xrPostedTotal.Name = "xrPostedTotal";
             this.xrPostedTotal.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -614,7 +596,7 @@ namespace UnicontaClient.Pages.CustomPage
             // 
             // xrBankTotal
             // 
-            this.xrBankTotal.LocationFloat = new DevExpress.Utils.PointFloat(239.7083F, 100.0834F);
+            this.xrBankTotal.LocationFloat = new DevExpress.Utils.PointFloat(239.7083F, 164.0834F);
             this.xrBankTotal.Multiline = true;
             this.xrBankTotal.Name = "xrBankTotal";
             this.xrBankTotal.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -627,7 +609,7 @@ namespace UnicontaClient.Pages.CustomPage
             // xrBank
             // 
             this.xrBank.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Bold);
-            this.xrBank.LocationFloat = new DevExpress.Utils.PointFloat(239.7083F, 72.54166F);
+            this.xrBank.LocationFloat = new DevExpress.Utils.PointFloat(239.7083F, 136.5417F);
             this.xrBank.Multiline = true;
             this.xrBank.Name = "xrBank";
             this.xrBank.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -640,7 +622,7 @@ namespace UnicontaClient.Pages.CustomPage
             // xrPosted
             // 
             this.xrPosted.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Bold);
-            this.xrPosted.LocationFloat = new DevExpress.Utils.PointFloat(440F, 72.54166F);
+            this.xrPosted.LocationFloat = new DevExpress.Utils.PointFloat(440F, 136.5417F);
             this.xrPosted.Multiline = true;
             this.xrPosted.Name = "xrPosted";
             this.xrPosted.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -652,7 +634,7 @@ namespace UnicontaClient.Pages.CustomPage
             // 
             // xrReconciliation
             // 
-            this.xrReconciliation.LocationFloat = new DevExpress.Utils.PointFloat(10.00001F, 180.0833F);
+            this.xrReconciliation.LocationFloat = new DevExpress.Utils.PointFloat(10.00001F, 244.0833F);
             this.xrReconciliation.Multiline = true;
             this.xrReconciliation.Name = "xrReconciliation";
             this.xrReconciliation.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -663,7 +645,7 @@ namespace UnicontaClient.Pages.CustomPage
             // 
             // xrNonreconciledItems
             // 
-            this.xrNonreconciledItems.LocationFloat = new DevExpress.Utils.PointFloat(10.00001F, 123.0833F);
+            this.xrNonreconciledItems.LocationFloat = new DevExpress.Utils.PointFloat(10.00001F, 187.0833F);
             this.xrNonreconciledItems.Multiline = true;
             this.xrNonreconciledItems.Name = "xrNonreconciledItems";
             this.xrNonreconciledItems.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -674,7 +656,7 @@ namespace UnicontaClient.Pages.CustomPage
             // 
             // xrBalancePr
             // 
-            this.xrBalancePr.LocationFloat = new DevExpress.Utils.PointFloat(10.00001F, 99.95833F);
+            this.xrBalancePr.LocationFloat = new DevExpress.Utils.PointFloat(10.00001F, 163.9583F);
             this.xrBalancePr.Multiline = true;
             this.xrBalancePr.Name = "xrBalancePr";
             this.xrBalancePr.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -705,47 +687,6 @@ namespace UnicontaClient.Pages.CustomPage
             // 
             this.calPostedTotalNonReco.DisplayName = "Posted Total Non-Reconciled";
             this.calPostedTotalNonReco.Name = "calPostedTotalNonReco";
-            // 
-            // xrLineReportHeader3
-            // 
-            this.xrLineReportHeader3.LocationFloat = new DevExpress.Utils.PointFloat(240.0001F, 209.3333F);
-            this.xrLineReportHeader3.Name = "xrLineReportHeader3";
-            this.xrLineReportHeader3.SizeF = new System.Drawing.SizeF(400F, 6.25F);
-            // 
-            // xrVoidItems
-            // 
-            this.xrVoidItems.LocationFloat = new DevExpress.Utils.PointFloat(10.00009F, 146.0833F);
-            this.xrVoidItems.Multiline = true;
-            this.xrVoidItems.Name = "xrVoidItems";
-            this.xrVoidItems.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
-            this.xrVoidItems.SizeF = new System.Drawing.SizeF(217.7083F, 23F);
-            this.xrVoidItems.StylePriority.UseTextAlignment = false;
-            this.xrVoidItems.Text = "[VoidTransactions]";
-            this.xrVoidItems.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleLeft;
-            // 
-            // xrBankTotalVoid
-            // 
-            this.xrBankTotalVoid.LocationFloat = new DevExpress.Utils.PointFloat(239.7083F, 146.0833F);
-            this.xrBankTotalVoid.Multiline = true;
-            this.xrBankTotalVoid.Name = "xrBankTotalVoid";
-            this.xrBankTotalVoid.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
-            this.xrBankTotalVoid.SizeF = new System.Drawing.SizeF(200F, 23F);
-            this.xrBankTotalVoid.StylePriority.UseTextAlignment = false;
-            this.xrBankTotalVoid.Text = "[BankTotalVoid]";
-            this.xrBankTotalVoid.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleRight;
-            this.xrBankTotalVoid.TextFormatString = "{0:n2}";
-            // 
-            // xrPostedTotalVoid
-            // 
-            this.xrPostedTotalVoid.LocationFloat = new DevExpress.Utils.PointFloat(440F, 145.9583F);
-            this.xrPostedTotalVoid.Multiline = true;
-            this.xrPostedTotalVoid.Name = "xrPostedTotalVoid";
-            this.xrPostedTotalVoid.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
-            this.xrPostedTotalVoid.SizeF = new System.Drawing.SizeF(200F, 23F);
-            this.xrPostedTotalVoid.StylePriority.UseTextAlignment = false;
-            this.xrPostedTotalVoid.Text = "[PostedTotalVoid]";
-            this.xrPostedTotalVoid.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleRight;
-            this.xrPostedTotalVoid.TextFormatString = "{0:n2}";
             // 
             // PollReport
             // 
@@ -818,17 +759,12 @@ namespace UnicontaClient.Pages.CustomPage
         private DevExpress.XtraReports.UI.XRLabel xrReportFooterPostedSum;
         private DevExpress.XtraReports.UI.XRLine xrLineDetailReportPosted;
         private DevExpress.XtraReports.UI.CalculatedField calPostedTotalNonReco;
-        private DevExpress.XtraReports.UI.XRLabel xrNewBalance;
-        private DevExpress.XtraReports.UI.XRLabel xrDifference;
-        private DevExpress.XtraReports.UI.XRLabel xrNewBalanceValue;
-        private DevExpress.XtraReports.UI.XRLabel xrDifferenceValue;
-        private DevExpress.XtraReports.UI.XRLine xrLine1;
-        private DevExpress.XtraReports.UI.XRPanel xrDifferencePanel;
         private DevExpress.XtraReports.UI.XRPageInfo xrPageInfo1;
         private DevExpress.XtraReports.UI.XRPageInfo xrPageInfo2;
         private DevExpress.XtraReports.UI.XRLabel xrBankTotalVoid;
         private DevExpress.XtraReports.UI.XRLabel xrPostedTotalVoid;
         private DevExpress.XtraReports.UI.XRLabel xrVoidItems;
         private DevExpress.XtraReports.UI.XRLine xrLineReportHeader3;
+        private DevExpress.XtraReports.UI.XRLabel xrBankAccountValue;
     }
 }

@@ -79,6 +79,7 @@ x:Class="UnicontaClient.Pages.CustomPage.SettleOpenTransactionPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="Open" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Name" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Account" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DocumentRef" Visible="False"/>
                 </local:OpenTransactionGrid.Columns>
             </local:OpenTransactionGrid>
         </Grid>

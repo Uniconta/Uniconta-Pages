@@ -154,7 +154,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorAccountPage2"
                             <CorasauControls:CheckEditor IsChecked="{Binding EmailDocuments,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="InvoiceInXML" x:Name="liInvoiceInXML">
-                            <CorasauControls:ComboBoxEditor SelectedItem="{Binding InvoiceInXML,Mode=TwoWay}" />
+                        <CorasauControls:ComboBoxEditor SelectedItem="{Binding InvoiceInXML,Mode=TwoWay}" x:Name="cmbEinvoice"  SelectedIndexChanged="cmbEinvoice_SelectedIndexChanged"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="EAN" x:Name="liEAN">
                             <CorasauControls:TextEditor x:Name="txtEAN" Text="{Binding EAN,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>

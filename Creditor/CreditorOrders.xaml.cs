@@ -246,6 +246,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 var account = cwOrderFromOrder.Account;
                                 var copyAttachment = cwOrderFromOrder.copyAttachment;
                                 var dcOrder = cwOrderFromOrder.dcOrder;
+                                bool NewOrder = (dcOrder.RowId == 0);
                                 dcOrder._DeliveryDate = cwOrderFromOrder.DeliveryDate;
                                 var copyDelAddress = cwOrderFromOrder.copyDeliveryAddress;
                                 var reCalPrice = cwOrderFromOrder.reCalculatePrice;
@@ -254,7 +255,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 if (result != ErrorCodes.Succes)
                                     UtilDisplay.ShowErrorCode(result);
                                 else
-                                    ShowOrderLines(2, dcOrder, this, dgCreditorOrdersGrid);
+                                    ShowOrderLines(NewOrder ? (byte)2 : (byte)0, dcOrder, this, dgCreditorOrdersGrid);
                             }
                         };
                         cwOrderFromOrder.Show();
@@ -294,9 +295,12 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                     {
                         selectedItem = dgCreditorOrdersGrid.CopyRow() as CreditorOrderClient;
-                        selectedItem.InvoiceAmount = 0;
-                        selectedItem.InvoiceNumber = null;
-                        selectedItem.OrderNumber = 0;
+                        if (selectedItem != null)
+                        {
+                            selectedItem.InvoiceAmount = 0;
+                            selectedItem.InvoiceNumber = null;
+                            selectedItem.OrderNumber = 0;
+                        }
                     }
                     break;
                 case "DeleteRow":

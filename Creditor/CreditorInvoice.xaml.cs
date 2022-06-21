@@ -637,7 +637,7 @@ namespace UnicontaClient.Pages.CustomPage
                 standardPreviewPrintPage = null;
 #endif
             }
-            if (screenName == TabControls.InvoicePage2)
+            if (screenName == TabControls.CreditorInvoicePage2)
                 dgCrdInvoicesGrid.UpdateItemSource(argument);
         }
     }

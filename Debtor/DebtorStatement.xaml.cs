@@ -546,6 +546,7 @@ namespace UnicontaClient.Pages.CustomPage
                     OpenOutlook();
                     break;
                 case "Search":
+                    childDgDebtorTrans.SelectedItem = null;
                     LoadDCTrans();
                     break;
                 default:

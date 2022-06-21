@@ -70,7 +70,7 @@ x:Class="UnicontaClient.Pages.CustomPage.QuickInvoice"
                             <CorasauControls:DateEditor  MaxWidth="170" EditValue="{Binding InvoiceDate,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Grid.Column="1"  Grid.Row="4" Margin="5,0,0,0"  />
 
                             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=InvoiceNumber}" Grid.Column="0" Grid.Row="6" />
-                            <CorasauControls:TextEditor MaxWidth="170"  Text="{Binding InvoiceNumber,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" Grid.Row="6" Margin="5,0,0,0"  />
+                            <CorasauControls:TextEditor MaxWidth="170" MaxLength="20" Text="{Binding InvoiceNumber,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" Grid.Row="6" Margin="5,0,0,0"  />
 
                             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CostAccount}"  Grid.Column="0" Grid.Row="8" />
                             <CorasauControls:LookupEditor MaxWidth="170"  x:Name="LePostingAccount" EditValue="{Binding PostingAccount,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  Grid.Column="1" Grid.Row="8"  Margin="5,0,0,0"  />

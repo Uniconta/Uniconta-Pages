@@ -31,6 +31,8 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectTaskGridPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="ProjectName" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="StartDate" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="EndDate" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="TimeFrom" ShowTimeElapsed="True"  />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="TimeTo"  ShowTimeElapsed="True" />
                     <local:CorasauDataGridForeignKeyColumnClient x:Name="Follows" Width="80">
                         <local:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
                             <ControlTemplate>

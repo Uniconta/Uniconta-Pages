@@ -523,6 +523,8 @@ namespace UnicontaClient.Pages.CustomPage
         bool SimulatedVisible;
         async void LoadGLTrans()
         {
+            childDgGLTrans.SelectedItem = null;
+
             childDgGLTrans.ClearSorting();
             SetExpandAndCollapse(true);
             List<int> dim1 = null, dim2 = null, dim3 = null, dim4 = null, dim5 = null;

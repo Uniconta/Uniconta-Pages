@@ -292,11 +292,7 @@ namespace UnicontaClient.Pages.CustomPage
             dgBalanceReport.api = api;
             SetRibbonControl(null, dgBalanceReport);
             dgBalanceReport.PrintClick += dgBalanceReport_PrintClick;
-#if SILVERLIGHT
-            Application.Current.RootVisual.KeyDown += Page_KeyDown;
-#else
             this.KeyDown += Page_KeyDown;
-#endif
             dgBalanceReport.RowDoubleClick += dgBalanceReport_RowDoubleClick;
 
         }
@@ -1124,22 +1120,17 @@ namespace UnicontaClient.Pages.CustomPage
             hdrData.exportServiceUrl = CorasauDataGrid.GetExportServiceConnection(this.api);
             string header = ParentControl.Caption.ToString();
             hdrData.BalanceName = header;
-            var frontpageText = string.Empty;
-#if !SILVERLIGHT
             DevExpress.XtraReports.UI.XtraReport frontPageReport = null;
-#endif
             if (PassedCriteria.ObjBalance._PrintFrontPage)
             {
-                frontpageText = PassedCriteria.ObjBalance._FrontPage;
-#if !SILVERLIGHT
-                frontPageReport = await GetFrontPageXtraReport(cmplClient, frontpageText, PassedCriteria?.ObjBalance?._ReportFrontPage);
-#endif
+                var frontpageText = PassedCriteria.ObjBalance._FrontPage;
+                var frontPageData = PassedCriteria.ObjBalance.FrontPageData;
+                frontPageReport = await GetFrontPageXtraReport(cmplClient, frontpageText, PassedCriteria?.ObjBalance?._ReportFrontPage, frontPageData);
             }
+
             if (!string.IsNullOrEmpty(PassedCriteria.Template))
             {
-#if !SILVERLIGHT
                 templateReportData[3] = frontPageReport;
-#endif
                 AddDockItem(TabControls.BalanceReportTemplatePrint, templateReportData, string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("ReportCriteria"), header), null, true);//new templated report                         
             }
             else
@@ -1148,21 +1139,20 @@ namespace UnicontaClient.Pages.CustomPage
                 ob[0] = hdrData;
                 ob[1] = listdata;
                 ob[2] = PassedCriteria.ObjBalance;
-#if !SILVERLIGHT
                 ob[3] = frontPageReport;
-#endif
                 AddDockItem(TabControls.BalanceReportPrint, ob, string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("ReportCriteria"), header), null, true);
             }
         }
 
-#if !SILVERLIGHT
-        async private Task<DevExpress.XtraReports.UI.XtraReport> GetFrontPageXtraReport(CompanyClient company, string frontPageText, string frontPageTemplate)
+        async private Task<DevExpress.XtraReports.UI.XtraReport> GetFrontPageXtraReport(CompanyClient company, string frontPageText, string frontPageTemplate, object frontPageData)
         {
             var cmpClientUser = Utilities.Utility.GetCompanyClientUserInstance(company);
-            DevExpress.XtraReports.UI.XtraReport balanceFrontPageReport = null;
-            var userReportApi = new UserReportAPI(api);
             busyIndicator.IsBusy = true;
             busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("LoadingMsg");
+
+            DevExpress.XtraReports.UI.XtraReport balanceFrontPageReport = null;
+            var userReportApi = new UserReportAPI(api);
+            
             if (!string.IsNullOrEmpty(frontPageTemplate))
             {
                 var dataBytes = await userReportApi.LoadForRun(frontPageTemplate, 50);
@@ -1172,14 +1162,25 @@ namespace UnicontaClient.Pages.CustomPage
                 if (balanceFrontPageReport != null)
                 {
                     var logoBytes = await UtilDisplay.GetLogo(api);
-                    balanceFrontPageReport.DataSource = new IStandardBalanceReportClient[1] { new BalanceFrontPageReportClient(cmpClientUser, logoBytes, Uniconta.ClientTools.Localization.lookup("CoverPage"), frontPageText) };
+                    var accountantClient = session.User._Role == (byte)Uniconta.Common.User.UserRoles.Accountant ? await api.Query<AccountantClient>() : null;
+                    var accountantInfoClient = await api.Query<AccountantClientInfoClient>(api.CompanyEntity);
+                    balanceFrontPageReport.DataSource = new IStandardBalanceReportClient[1]
+                    {
+                        /* parameters for BalanceFrontPageReportClient
+                         * 1. Text
+                         * 2. ReportData
+                         * 3. AccountantClient
+                         * 4. AccountantInfoClient
+                         */
+                        new BalanceFrontPageReportClient(cmpClientUser, logoBytes, Uniconta.ClientTools.Localization.lookup("FrontPageReport"), frontPageText,frontPageData,
+                        accountantClient?.FirstOrDefault(),accountantInfoClient?.FirstOrDefault())
+                    };
                 }
             }
             busyIndicator.IsBusy = false;
 
             return balanceFrontPageReport;
         }
-#endif
     }
 
     public class AccountTextDecorationTypeConverter : IValueConverter

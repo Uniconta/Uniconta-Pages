@@ -4,7 +4,7 @@
     <!---When we create a new TabPage -->
      <RibbonItem Action="AddRow" LocalizedNameKey="AddNewRow" ControlName="PartnerProspectFollowUpPage2"  LargeGlyph="Add_32x32.png"/>
     <RibbonItem Action="EditRow" ShortcutKey="Ctrl+E" LocalizedNameKey="Edit"  LargeGlyph="Edit_32x32.png"/>
-    <RibbonItem Action="CopyRow" LocalizedNameKey="Copy"  LargeGlyph="Copy_32x32.png" LargeShortcutKey="Shift+F2"/>
+    <RibbonItem Action="CopyRow" LocalizedNameKey="Copy"  LargeGlyph="Copy_32x32.png" ShortcutKey="Shift+F2"/>
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh.png" LargeGlyph="refresh.png"/>

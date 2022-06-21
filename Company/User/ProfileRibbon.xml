@@ -30,7 +30,7 @@
   <RibbonItem Action="ProgramModules" LocalizedNameKey="AppKeys" LargeGlyph="Generate_32x32.png"/>
   </RibbonItem>
 	<RibbonItem>
-		<RibbonItem Action="RemoveTwoFactorLogin" LocalizedNameKey="RemoveTwoFactorLogin" LargeGlyph="Job_Change_32x32.png"/>
+    <RibbonItem Action="RemoveTwoFactorLogin" LocalizedNameKey="RemoveOBJ" Parameter="TwoFactorLogin" LargeGlyph="Job_Change_32x32.png"/>
 	</RibbonItem>
   <RibbonItem>
     <RibbonItem Action="UserLayout" LocalizedNameKey="UserLayout" LargeGlyph="UserFieldData_32x32.png"/>

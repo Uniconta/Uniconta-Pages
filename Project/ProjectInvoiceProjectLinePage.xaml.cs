@@ -187,6 +187,11 @@ namespace UnicontaClient.Pages.CustomPage
                     dgProjInvProjectLineGrid.CopyRow();
                     break;
                 case "SaveGrid":
+                    if (RecalculateAmount() != 0)
+                    {
+                        UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("SumNotZero"), Uniconta.ClientTools.Localization.lookup("Information"));
+                        return;
+                    }
                     saveGrid();
                     CloseDockItem();
                     break;
@@ -204,6 +209,17 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
             }
             RecalculateAmount();
+        }
+
+        public override bool IsDataChaged
+        {
+            get
+            {
+                if (RecalculateAmount() != 0)
+                    return false;
+                else
+                    return base.IsDataChaged;
+            }
         }
         async void AdjustTransactionPerEmployee()
         {
@@ -453,14 +469,14 @@ namespace UnicontaClient.Pages.CustomPage
             PrStandardCache = api.GetCache(typeof(Uniconta.DataModel.PrStandard)) ?? await api.LoadCache(typeof(Uniconta.DataModel.PrStandard)).ConfigureAwait(false);
         }
 
-        void RecalculateAmount()
+        double RecalculateAmount()
         {
             var lst = dgProjInvProjectLineGrid.ItemsSource as IEnumerable<ProjectInvoiceProjectLineLocal>;
             if (lst == null)
-                return;
+                return 0;
             double adjustment = invoiceProposal._OrderTotal - invoiceProposal._ProjectTotal;
             double Amountsum = lst.Sum(x => x._SalesAmount);
-            double difference = adjustment - Amountsum;
+            double difference = Math.Round(adjustment - Amountsum, 2);
             RibbonBase rb = (RibbonBase)localMenu.DataContext;
             var groups = UtilDisplay.GetMenuCommandsByStatus(rb, true);
             var adjust = Uniconta.ClientTools.Localization.lookup("Adjustment");
@@ -470,11 +486,12 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 if (grp.Caption == adjust)
                     grp.StatusValue = adjustment.ToString("N2");
-                if (grp.Caption == strTotal)
+                else if (grp.Caption == strTotal)
                     grp.StatusValue = Amountsum.ToString("N2");
-                if (grp.Caption == diff)
+                else if (grp.Caption == diff)
                     grp.StatusValue = difference.ToString("N2");
             }
+            return difference;
         }
 
         private void SetPrCategorySource(ProjectInvoiceProjectLineLocal rec)

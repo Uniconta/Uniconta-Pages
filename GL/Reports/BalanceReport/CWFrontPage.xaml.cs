@@ -21,23 +21,129 @@ namespace UnicontaClient.Pages.CustomPage
 {
     public partial class CWFrontPage : ChildWindow
     {
-        public string RichEditText { get; set; }
-        public string FrontPageTemplate { get; set; }
+        public string FrontPageText { get; set; }
+        public string FrontPageReport { get; set; }
+
+        [ForeignKeyAttribute(ForeignKeyTable = typeof(Uniconta.DataModel.GLAccount))]
+        public string FromAccount
+        {
+            get { return reportDataClient?.FromAccount; }
+            set
+            {
+                if (reportDataClient?.FromAccount != value)
+                    reportDataClient.FromAccount = value;
+            }
+        }
+
+        [ForeignKeyAttribute(ForeignKeyTable = typeof(Uniconta.DataModel.GLAccount))]
+        public string ToAccount
+        {
+            get { return reportDataClient?.ToAccount; }
+            set
+            {
+                if (reportDataClient?.ToAccount != value)
+                    reportDataClient.ToAccount = value;
+            }
+        }
+
+        public bool SkipEmptyAccount
+        {
+            get { return reportDataClient?.SkipEmptyAccount ?? false; }
+            set
+            {
+                if (reportDataClient?.SkipEmptyAccount != value)
+                    reportDataClient.SkipEmptyAccount = value;
+            }
+        }
+
+        public string SumAccount
+        {
+            get { return reportDataClient?.SumAccount; }
+            set
+            {
+                if (reportDataClient?.SumAccount != value)
+                    reportDataClient.SumAccount = value;
+            }
+        }
+
+        public string AccountType
+        {
+            get { return reportDataClient?.AccountType; }
+            set
+            {
+                if (reportDataClient?.AccountType != value)
+                    reportDataClient.AccountType = value;
+            }
+        }
+
+        public bool UseExternalName
+        {
+            get { return reportDataClient?.UseExternalName ?? false; }
+            set
+            {
+                if (reportDataClient?.UseExternalName != value)
+                    reportDataClient.UseExternalName = value;
+            }
+        }
+
+        public DateTime FromDate
+        {
+            get { return reportDataClient?.FromDate ?? DateTime.Now; }
+            set
+            {
+                if (reportDataClient?.FromDate != value)
+                    reportDataClient.FromDate = value;
+            }
+        }
+
+        public DateTime ToDate
+        {
+            get { return reportDataClient?.ToDate ?? DateTime.Now; }
+            set
+            {
+                if (reportDataClient?.ToDate != value)
+                    reportDataClient.ToDate = value;
+            }
+        }
+
+        public string BalanceMethod
+        {
+            get { return reportDataClient?.BalanceMethod; }
+            set
+            {
+                if (reportDataClient?.BalanceMethod != value)
+                    reportDataClient.BalanceMethod = value;
+            }
+        }
+
+        [ForeignKeyAttribute(ForeignKeyTable = typeof(Uniconta.DataModel.GLReportTemplate))]
+        public string CompanyAccountTemplate
+        {
+            get { return reportDataClient?.Template; }
+            set
+            {
+                if (reportDataClient?.Template != value)
+                    reportDataClient.Template = value;
+            }
+        }
 
         private CrudAPI Api;
-        public CWFrontPage(CrudAPI api, string title, string text, string template)
+        private BalanceFrontPageReportDataClient reportDataClient;
+        public CWFrontPage(CrudAPI api, string title, string text, string report, BalanceFrontPageReportDataClient balanceFrontPageReportData)
         {
-            RichEditText = text;
-            FrontPageTemplate = template;
+            FrontPageText = text;
+            FrontPageReport = report;
+            reportDataClient = balanceFrontPageReportData;
             this.DataContext = this;
             InitializeComponent();
             Api = api;
             this.Title = title;
-            this.txtCoverPageTemplate.Text = string.Format("{0} {1}:", Uniconta.ClientTools.Localization.lookup("FrontPage"), Uniconta.ClientTools.Localization.lookup("Templates"));
-#if SILVERLIGHT
-            Utilities.Utility.SetThemeBehaviorOnChildWindow(this);
-#endif
-            this.Loaded += CW_Loaded;
+            cbFromAccount.api = cbToAccount.api = cbTemplate.api = api;
+            cmbSumAccount.ItemsSource = new string[] { Uniconta.ClientTools.Localization.lookup("Show"), Uniconta.ClientTools.Localization.lookup("Hide"), Uniconta.ClientTools.Localization.lookup("OnlyShow") }; ;
+            cmbSumAccount.IsEditable = false;
+
+            cmbAccountType.ItemsSource = new string[] { Uniconta.ClientTools.Localization.lookup("All"), Uniconta.ClientTools.Localization.lookup("AccountTypePL"), Uniconta.ClientTools.Localization.lookup("AccountTypeBalance") };
+            cmbAccountType.IsEditable = false;
             LoadTemplates();
         }
 
@@ -53,17 +159,6 @@ namespace UnicontaClient.Pages.CustomPage
             }
             else
                 cmbCoverPageTemplate.ItemsSource = null;
-        }
-
-        void CW_Loaded(object sender, RoutedEventArgs e)
-        {
-            Dispatcher.BeginInvoke(new Action(() =>
-            {
-                if (string.IsNullOrWhiteSpace(txtEditor.Text))
-                    txtEditor.Focus();
-                else
-                    OKButton.Focus();
-            }));
         }
 
         private void ChildWindow_KeyDown(object sender, KeyEventArgs e)

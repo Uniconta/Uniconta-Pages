@@ -589,6 +589,13 @@ namespace UnicontaClient.Pages.CustomPage
                     rec.Dimension4 = proj._Dim4;
                 if (proj._Dim5 != null)
                     rec.Dimension5 = proj._Dim5;
+                if (proj._PersonInCharge != null)
+                {
+                    if (rec._Approver1 == null)
+                        rec.Approver1 = proj._PersonInCharge;
+                    else if (rec._Approver1 != proj._PersonInCharge)
+                        rec.Approver2 = proj._PersonInCharge;
+                }
             }
         }
 
@@ -828,10 +835,37 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         CheckIfPosted(selectedItem);
                     break;
+                case "CopyRecord":
+                    if (selectedItem != null && !selectedItem.Envelope)
+                        CopyRecord(selectedItem);
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
+        }
+
+        async void CopyRecord(VouchersClient selectedItem)
+        {
+            if (selectedItem._Data == null)
+                await api.Read(selectedItem);
+            var _Data = selectedItem._Data;
+            selectedItem._Data = null;
+            var voucher = Activator.CreateInstance(selectedItem.GetType()) as VouchersClient;
+            CorasauDataGrid.CopyAndClearRowId(selectedItem, voucher);
+            voucher._Created = DateTime.MinValue;
+            voucher._Data = selectedItem._Data = _Data;
+            voucher._Approved = voucher._Approved2 = false;
+            voucher._Approver1 = voucher._Approver2 = null;
+            voucher._PurchaseNumber = 0;
+            voucher._Amount = 0;
+            voucher._CreditorAccount = null;
+            voucher._Project = null;
+            voucher._InJournal = false;
+            voucher._SentToBilagscan = false;
+            dgVoucherGrid.InsertRow(voucher, dgVoucherGrid.View.FocusedRowHandle < 0 ? -1 : dgVoucherGrid.View.FocusedRowHandle);
+            dgVoucherGrid.SelectedItem = null;
+            dgVoucherGrid.SelectedItem = voucher;
         }
 
         async void CheckIfPosted(VouchersClient selectedItem)
@@ -849,18 +883,20 @@ namespace UnicontaClient.Pages.CustomPage
                 return;
             }
 
-            var filter = new List<PropValuePair>()
+            var filter = new List<PropValuePair>(5)
             {
                 PropValuePair.GenereteWhereElements("Invoice", selectedItem._Invoice, CompareOperator.Equal),
                 PropValuePair.GenereteWhereElements("CreditorAccount", selectedItem._CreditorAccount, CompareOperator.Equal),
-                PropValuePair.GenereteWhereElements("RowId", selectedItem.RowId, CompareOperator.NotEqual) // we do not want ourself
+                PropValuePair.GenereteWhereElements("InEnvelope", "0", CompareOperator.Equal),
             };
             if (selectedItem.RowId > 3000) // we just search in the last 3000
                 filter.Add(PropValuePair.GenereteWhereElements("RowId", NumberConvert.ToString(selectedItem.RowId - 3000), CompareOperator.GreaterThanOrEqual));
+            // should be added after first RowId
+            filter.Add(PropValuePair.GenereteWhereElements("RowId", selectedItem.RowId, CompareOperator.NotEqual)); // we do not want ourself
 
             busyIndicator.IsBusy = true;
             var lst = await api.Query(api.CompanyEntity.CreateUserType<VouchersClient>(), null, filter);
-            if (lst != null && lst.Length > 0)
+            if (lst != null && lst.Length > 0 && (lst.Length > 1 || lst[0].RowId != selectedItem.RowId))
             {
                 var header = string.Concat(Localization.lookup("CreditorsAccount"), ": ", selectedItem._CreditorAccount, ", ", Localization.lookup("Invoice"), ": ", selectedItem._Invoice);
                 AddDockItem(TabControls.AttachedVouchers, new object[] { lst, api }, header, null, true);
@@ -896,7 +932,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private async void ImageToPdfConverter(VouchersClient voucherClient)
         {
-            if (voucherClient._Fileextension != FileextensionsTypes.JPEG || voucherClient.Fileextension != FileextensionsTypes.PNG)
+            if (voucherClient._Fileextension == FileextensionsTypes.JPEG || voucherClient.Fileextension == FileextensionsTypes.PNG)
             {
                 if (UnicontaMessageBox.Show(Localization.lookup("AreYouSureToContinue"),
                     Localization.lookup("Confirmation"), MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
@@ -1424,6 +1460,9 @@ namespace UnicontaClient.Pages.CustomPage
             try
             {
                 IsSending = true;
+                Save();
+
+                var accessToken = Account.GetBilagscanAccessToken(api);
 
                 // Verify organization
                 CompanySettingsClient companySettings = new CompanySettingsClient();
@@ -1431,10 +1470,22 @@ namespace UnicontaClient.Pages.CustomPage
                 var orgNo = NumberConvert.ToStringNull(companySettings._OrgNumber);
                 if (orgNo == null)
                 {
-                    UnicontaMessageBox.Show(string.Format(Localization.lookup("CannotBeBlank"), Localization.lookup("OrgNumber")), Localization.lookup("Paperflow"), MessageBoxButton.OK, MessageBoxImage.Exclamation);
-                    return;
+                    if (string.IsNullOrEmpty(api.CompanyEntity._Id))
+                    {
+                        UnicontaMessageBox.Show(string.Format(Localization.lookup("CannotBeBlank"), Localization.lookup("CompanyRegNo")), Localization.lookup("Paperflow"), MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                        return;
+                    }
+
+                    if (UnicontaMessageBox.Show(Localization.lookup("BilagscanTerms"), Localization.lookup("Paperflow"), MessageBoxButton.OKCancel, MessageBoxImage.Question) != MessageBoxResult.OK)
+                        return;
+
+                    orgNo = await Account.CreateOrganization(api, accessToken, companySettings);
+                    if (orgNo == null)
+                    {
+                        UnicontaMessageBox.Show(string.Format(Localization.lookup("CannotBeBlank"), Localization.lookup("OrgNumber")), Localization.lookup("Paperflow"), MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                        return;
+                    }
                 }
-                var accessToken = Account.GetBilagscanAccessToken(api);
                 switch (await Account.VerifyOrganization(orgNo, accessToken))
                 {
                     case "NOCOMPANY":
@@ -1443,18 +1494,6 @@ namespace UnicontaClient.Pages.CustomPage
                     case "NOTABLE":
                         //Tools.CreateUserTable(api);
                         //await Account.CreateOrganization(api, Globals.access_token);
-                        break;
-                    case "NODATA":
-                        if (string.IsNullOrEmpty(api.CompanyEntity._Id))
-                        {
-                            UnicontaMessageBox.Show(string.Format(Localization.lookup("CannotBeBlank"), Localization.lookup("CompanyRegNo")), Localization.lookup("Paperflow"), MessageBoxButton.OK, MessageBoxImage.Exclamation);
-                            return;
-                        }
-
-                        if (UnicontaMessageBox.Show(Localization.lookup("BilagscanTerms"), Localization.lookup("Paperflow"), MessageBoxButton.OKCancel, MessageBoxImage.Question) != MessageBoxResult.OK)
-                            return;
-
-                        await Account.CreateOrganization(api, accessToken);
                         break;
                     case "NOORGANIZATION":
                         UnicontaMessageBox.Show("Plug-in'en kan ikke finde din organisation hos Paperflow.", "Overfør til Paperflow");
@@ -1527,8 +1566,9 @@ namespace UnicontaClient.Pages.CustomPage
             try
             {
                 readingFromBilagscan = true;
-
                 busyIndicator.IsBusy = true;
+                Save();
+
                 var accessToken = Bilagscan.Account.GetBilagscanAccessToken(api);
                 CompanySettingsClient companySettings = new CompanySettingsClient();
                 await api.Read(companySettings);
@@ -1544,23 +1584,27 @@ namespace UnicontaClient.Pages.CustomPage
                     if (vouchers?.data != null && vouchers.data.Length > 0)
                     {
                         var updateLines = new List<UnicontaBaseEntity>(vouchers.data.Length);
+                        List<Uniconta.DataModel.Creditor> CreList = null;
                         var search = new DocumentNoRef();
                         foreach (var voucher in vouchers.data)
                         {
                             var hint = Bilagscan.Voucher.GetHint(voucher.note);
                             if (hint != null)
                             {
-                                search._DocumentRef = hint.RowId;
-                                var loadedVoucher = await api.Query<VouchersClient>(search);
-                                if (loadedVoucher == null || loadedVoucher.Length == 0)
-                                    continue;
-                                var originalVoucher = loadedVoucher[0];
-
-                                originalVoucher._Reference = NumberConvert.ToStringNull(voucher.id);
+                                var originalVoucher = ((IEnumerable<VouchersClient>)dgVoucherGrid.ItemsSource)?.Where(r => r.RowId == hint.RowId).FirstOrDefault();
+                                if (originalVoucher == null)
+                                {
+                                    search._DocumentRef = hint.RowId;
+                                    var loadedVoucher = await api.Query<VouchersClient>(search);
+                                    if (loadedVoucher == null || loadedVoucher.Length == 0)
+                                        continue;
+                                    originalVoucher = loadedVoucher[0];
+                                }
+                                originalVoucher.Reference = NumberConvert.ToStringNull(voucher.id);
 
                                 var bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "voucher_number", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
                                 if (bsItem != null)
-                                    originalVoucher._Invoice = bsItem.value;
+                                    originalVoucher.Invoice = bsItem.value;
 
                                 bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "voucher_type", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
                                 if (bsItem != null)
@@ -1571,6 +1615,7 @@ namespace UnicontaClient.Pages.CustomPage
                                         case "creditnote": originalVoucher._Content = ContentTypes.CreditNote; break;
                                         case "receipt": originalVoucher._Content = ContentTypes.Receipt; break;
                                     }
+                                    originalVoucher.NotifyPropertyChanged("Content");
                                 }
 
                                 var creditorCVR = string.Empty;
@@ -1581,10 +1626,10 @@ namespace UnicontaClient.Pages.CustomPage
                                 bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "total_amount_incl_vat", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
                                 if (bsItem != null)
                                 {
-                                    originalVoucher._Amount = Math.Abs(NumberConvert.ToDoubleNoThousandSeperator(bsItem.value));
+                                    originalVoucher.Amount = Math.Abs(NumberConvert.ToDoubleNoThousandSeperator(bsItem.value));
 
                                     if (originalVoucher._Content == ContentTypes.CreditNote)
-                                        originalVoucher._Amount = -originalVoucher._Amount;
+                                        originalVoucher.Amount = -originalVoucher._Amount;
                                 }
 
                                 CountryCode countryCode = CountryCode.Denmark;
@@ -1601,14 +1646,14 @@ namespace UnicontaClient.Pages.CustomPage
                                 if (bsItem != null)
                                 {
                                     var invoiceDate = bsItem.value == string.Empty ? DateTime.Today : StringSplit.DateParse(bsItem.value, DateFormat.ymd);
-                                    originalVoucher._PostingDate = invoiceDate;
+                                    originalVoucher.PostingDate = invoiceDate;
                                 }
 
                                 bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_date", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
                                 if (bsItem != null)
                                 {
                                     var paymentDate = bsItem.value == string.Empty ? DateTime.MinValue : StringSplit.DateParse(bsItem.value, DateFormat.ymd);
-                                    originalVoucher._PayDate = paymentDate;
+                                    originalVoucher.PayDate = paymentDate;
                                 }
 
                                 bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "purchase_order_number", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
@@ -1617,7 +1662,7 @@ namespace UnicontaClient.Pages.CustomPage
                                     var purchaseNumber = bsItem.value;
                                     purchaseNumber = Regex.Replace(purchaseNumber, "[^0-9]", string.Empty);
                                     int tmpNumber = int.TryParse(purchaseNumber, out tmpNumber) ? tmpNumber : 0;
-                                    originalVoucher._PurchaseNumber = tmpNumber;
+                                    originalVoucher.PurchaseNumber = tmpNumber;
                                 }
 
                                 bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "currency", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
@@ -1628,6 +1673,8 @@ namespace UnicontaClient.Pages.CustomPage
                                         currencyISO = Currencies.DKK; //default
 
                                     originalVoucher._Currency = (byte)currencyISO;
+                                    originalVoucher.NotifyPropertyChanged("Currency");
+
                                 }
 
                                 Uniconta.DataModel.Creditor creditor = null;
@@ -1635,42 +1682,28 @@ namespace UnicontaClient.Pages.CustomPage
                                 if (creditorCVRNum != string.Empty)
                                     creditor = (CreditorCache.GetKeyStrRecords as Uniconta.DataModel.Creditor[]).Where(s => (Regex.Replace(s._LegalIdent ?? string.Empty, "[^0-9.]", "") == creditorCVRNum)).FirstOrDefault();
 
-                                string swiftNo = null;
                                 bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_swift_bic", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
-                                if (bsItem != null)
-                                    swiftNo = bsItem.value;
+                                var swiftNo = bsItem?.value;
 
                                 if (originalVoucher._PaymentId == null && creditor?._PaymentId == null)
                                 {
-                                    string bbanAcc = null;
                                     bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_account_number", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
-                                    if (bsItem != null)
-                                        bbanAcc = bsItem.value;
+                                    var bbanAcc = bsItem?.value;
 
-                                    string bbanRegNum = null;
                                     bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_reg_number", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
-                                    if (bsItem != null)
-                                        bbanRegNum = bsItem.value;
+                                    var bbanRegNum = bsItem?.value;
 
-                                    string ibanNo = null;
                                     bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_iban", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
-                                    if (bsItem != null)
-                                        ibanNo = bsItem.value;
+                                    var ibanNo = bsItem?.value;
 
-                                    string paymentCodeId = null;
                                     bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_code_id", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
-                                    if (bsItem != null)
-                                        paymentCodeId = bsItem.value;
+                                    var paymentCodeId = bsItem?.value;
 
-                                    string paymentId = null;
                                     bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_id", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
-                                    if (bsItem != null)
-                                        paymentId = bsItem.value;
+                                    var paymentId = bsItem?.value;
 
-                                    string jointPaymentId = null;
                                     bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "joint_payment_id", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
-                                    if (bsItem != null)
-                                        jointPaymentId = bsItem.value;
+                                    var jointPaymentId = bsItem?.value;
 
                                     var paymentMethod = PaymentTypes.VendorBankAccount;
                                     switch (paymentCodeId)
@@ -1685,18 +1718,19 @@ namespace UnicontaClient.Pages.CustomPage
                                     if (paymentMethod != PaymentTypes.VendorBankAccount && (paymentId != null || jointPaymentId != null))
                                     {
                                         originalVoucher._PaymentMethod = paymentMethod;
-                                        originalVoucher._PaymentId = string.Format("{0} +{1}", paymentId, jointPaymentId);
+                                        originalVoucher.PaymentId = string.Format("{0} +{1}", paymentId, jointPaymentId);
                                     }
                                     else if (bbanRegNum != null && bbanAcc != null)
                                     {
                                         originalVoucher._PaymentMethod = PaymentTypes.VendorBankAccount;
-                                        originalVoucher._PaymentId = string.Format("{0}-{1}", bbanRegNum, bbanAcc);
+                                        originalVoucher.PaymentId = string.Format("{0}-{1}", bbanRegNum, bbanAcc);
                                     }
                                     else if (swiftNo != null && ibanNo != null)
                                     {
                                         originalVoucher._PaymentMethod = PaymentTypes.IBAN;
-                                        originalVoucher._PaymentId = ibanNo;
+                                        originalVoucher.PaymentId = ibanNo;
                                     }
+                                    originalVoucher.NotifyPropertyChanged("PaymentMethod");
                                 }
 
                                 if (creditorCVRNum == string.Empty)
@@ -1740,8 +1774,6 @@ namespace UnicontaClient.Pages.CustomPage
                                             newCreditor._Phone = companyInformation.contact.phone;
                                             newCreditor._ContactEmail = companyInformation.contact.email;
                                         }
-
-                                        originalVoucher._Text = newCreditor.Name;
                                     }
                                     else
                                     {
@@ -1749,34 +1781,37 @@ namespace UnicontaClient.Pages.CustomPage
                                     }
 
                                     await api.Insert(newCreditor);
-                                    originalVoucher._CreditorAccount = creditorCVR;
+                                    originalVoucher.CreditorAccount = creditorCVR;
                                 }
                                 else
                                 {
                                     if (!string.IsNullOrEmpty(creditor._PostingAccount))
                                     {
-                                        originalVoucher._CostAccount = creditor._PostingAccount;
+                                        originalVoucher.CostAccount = creditor._PostingAccount;
                                         var acc = (Uniconta.DataModel.GLAccount)LedgerCache?.Get(creditor._PostingAccount);
                                         if (acc != null && acc._Vat != null)
-                                            originalVoucher._Vat = acc._Vat;
+                                            originalVoucher.Vat = acc._Vat;
                                     }
 
                                     originalVoucher.CreditorAccount = creditor._Account;
-                                    originalVoucher._Text = creditor._Name;
 
-                                    if (creditor._SWIFT == null && swiftNo != null)
+                                    if (!string.IsNullOrEmpty(swiftNo) && creditor._PaymentMethod == PaymentTypes.IBAN && creditor._SWIFT == null)
                                     {
                                         creditor._SWIFT = swiftNo;
-                                        updateLines.Add(creditor);
+                                        if (CreList == null)
+                                            CreList = new List<Uniconta.DataModel.Creditor>();
+                                        CreList.Add(creditor);
                                     }
                                 }
 
                                 updateLines.Add(originalVoucher);
+                                noOfVouchers++; ;
                             }
                         }
 
-                        noOfVouchers = updateLines.Count;
                         api.UpdateNoResponse(updateLines);
+                        if (CreList != null)
+                            api.UpdateNoResponse(CreList);
 
                         // Mark vouchers as seen
                         var sb = StringBuilderReuse.Create("{ \"vouchers\": [ ");
@@ -1801,7 +1836,7 @@ namespace UnicontaClient.Pages.CustomPage
             else
             {
                 UnicontaMessageBox.Show(string.Concat(Localization.lookup("NumberOfImportedVouchers"), ": ", NumberConvert.ToString(noOfVouchers)), Localization.lookup("Paperflow"), MessageBoxButton.OK, MessageBoxImage.Information);
-                localMenu_OnItemClicked("RefreshGrid");
+                //localMenu_OnItemClicked("RefreshGrid");
             }
         }
 

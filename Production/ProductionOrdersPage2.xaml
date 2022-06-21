@@ -95,7 +95,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionOrdersPage2"
             </CorasauControls:CorasauLayoutGroup>
 
             <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="lastGroup">
-                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpReference" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Reference}"  Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpReference" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Reference}"  Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="300">
                     <CorasauControls:CorasauLayoutItem FieldName="Account" x:Name="liAccount">
                         <CorasauControls:LookupEditor x:Name="leAccount" Text="{Binding Account,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                     </CorasauControls:CorasauLayoutItem>
@@ -118,11 +118,11 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionOrdersPage2"
                         <CorasauControls:UnicontaEditableLookupControl  x:Name="leRelatedOrder" LookupEditValue="{Binding RelatedOrder,Mode=TwoWay}" />
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="Remark" LabelVerticalAlignment="Top" x:Name="liRemark">
-                        <CorasauControls:TextEditor  Text="{Binding Remark,Mode=TwoWay}"  Width="{Binding ActualWidth, ElementName=txtOurRef}" AcceptsReturn="True" VerticalContentAlignment="Top" TextWrapping="Wrap" MinHeight="60"/>
+                        <CorasauControls:TextEditor  Text="{Binding Remark,Mode=TwoWay}"  Width="{Binding ActualWidth, ElementName=Requisition}" AcceptsReturn="True" VerticalContentAlignment="Top" TextWrapping="Wrap" MinHeight="60"/>
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
 
-                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="usedim"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Dimensions}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="usedim"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Dimensions}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="300">
                     <CorasauControls:CorasauLayoutItem x:Name="lbldim1">
                         <CorasauControls:LookupEditor x:Name="cmbDim1" Text="{Binding Dimension1,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
@@ -139,7 +139,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionOrdersPage2"
                         <CorasauControls:LookupEditor x:Name="cmbDim5" Text="{Binding Dimension5,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
-                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpProject"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Project}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" >
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpProject"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Project}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="300">
                     <CorasauControls:CorasauLayoutItem x:Name="liProject" FieldName="Project">
                         <CorasauControls:LookupEditor x:Name="leProject" Text="{Binding Project,Mode=TwoWay}" SelectedIndexChanged="leProject_SelectedIndexChanged"/>
                     </CorasauControls:CorasauLayoutItem>

@@ -34,6 +34,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
 
         internal const int FOREIGN_STANDARDTRANSFER = 53;
         internal const int FOREIGN_SEPATRANSFER = 97;
+        internal const int FOREIGN_ACCOUNTTRANSFER = 83; //Overførsel fra konti i udlandet
 
         public static bool GenerateFile(IEnumerable<CreditorTransPayment> paymentList, Company company, 
                                         CreditorPaymentFormat paymentFormat, SQLCache bankAccountCache, SQLCache creditorCache, bool glJournalGenerated = false)

@@ -28,6 +28,7 @@ using System.Diagnostics;
 using System.Text;
 using UnicontaClient.Controls.Dialogs;
 using Uniconta.Common.Enums;
+using DevExpress.Xpf.Editors;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -110,6 +111,20 @@ namespace UnicontaClient.Pages.CustomPage
             var countryCode = CheckEuropeanVatInformation(editrow._LegalIdent, editrow._Country, cvrFound);
             if (countryCode != null && editrow._Country != countryCode)
                 editrow.Country = countryCode.Value;
+        }
+
+        int prevSelectedIndex = 0;
+        private void cmbEinvoice_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            ComboBoxEdit edit = sender as ComboBoxEdit;
+            if (edit.SelectedIndex == prevSelectedIndex) return;
+            if (!api.CompanyEntity._Peppol && editrow._InvoiceInPepPol)
+            {
+                edit.SelectedIndex = prevSelectedIndex;
+                UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("PeppolNotActive"), Uniconta.ClientTools.Localization.lookup("Warning"));
+            }
+            else
+                prevSelectedIndex = edit.SelectedIndex;
         }
 
         public static CountryCode? CheckEuropeanVatInformation(string cvr, CountryCode country, bool cvrFound)

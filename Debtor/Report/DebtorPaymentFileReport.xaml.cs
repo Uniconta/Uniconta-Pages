@@ -64,10 +64,8 @@ namespace UnicontaClient.Pages.CustomPage
             SetRibbonControl(localMenu, dgDebtorPaymentFileReportGrid);
             dgDebtorPaymentFileReportGrid.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += LocalMenu_OnItemClicked;
-#if !SILVERLIGHT
             GetShowHideStatusInfoSection();
             SetShowHideStatusInfoSection(true);
-#endif
         }
 
 
@@ -85,7 +83,6 @@ namespace UnicontaClient.Pages.CustomPage
             var selectedItems = dgDebtorPaymentFileReportGrid.SelectedItems;
             switch (ActionType)
             {
-#if !SILVERLIGHT
                 case "EnableStatusInfoSection":
                     hideStatusInfoSection = !hideStatusInfoSection;
                     SetShowHideStatusInfoSection(hideStatusInfoSection);
@@ -99,21 +96,15 @@ namespace UnicontaClient.Pages.CustomPage
                     ImportFile();
                     break;
                 case "ViewFile":
-                    if (selectedItem != null && selectedItem._Data != null)
-                    {
-                        CWShowDebPaymentFileText cw = new CWShowDebPaymentFileText(selectedItem._Data);
-                        cw.Show();
-                    }
+                    if (selectedItem != null)
+                        ViewFile(selectedItem);
                     break;
-
-#endif
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
         }
 
-#if !SILVERLIGHT
         ItemBase ibase;
         bool hideStatusInfoSection = true;
         void GetShowHideStatusInfoSection()
@@ -164,7 +155,6 @@ namespace UnicontaClient.Pages.CustomPage
 
                 foreach (var rec in qrFiles)
                 {
-#if !SILVERLIGHT
                     countFiles++;
 
                     if (folderBrowserDialog == null)
@@ -174,6 +164,8 @@ namespace UnicontaClient.Pages.CustomPage
                         if (dialogResult != System.Windows.Forms.DialogResult.OK)
                             break;
                     }
+                    if (rec._Data == null)
+                        await api.Read(rec);
 
                     var filepath = folderBrowserDialog.SelectedPath;
 
@@ -217,7 +209,6 @@ namespace UnicontaClient.Pages.CustomPage
                         rec.Status = AppEnums.DebtorPaymentStatus.ToString((int)DebtorPaymentStatus.Ok);
                         lstUpdate.Add(rec);
                     }
-#endif
                 }
 
                 if (lstUpdate != null && lstUpdate.Count > 0)
@@ -231,6 +222,16 @@ namespace UnicontaClient.Pages.CustomPage
                 UnicontaMessageBox.Show(ex.Message, Uniconta.ClientTools.Localization.lookup("Exception"));
             }
         }
+
+        async void ViewFile(DebtorPaymentFileClient selectedItem)
+        {
+            if (selectedItem._Data == null)
+                await api.Read(selectedItem);
+
+            CWShowDebPaymentFileText cw = new CWShowDebPaymentFileText(selectedItem._Data);
+            cw.Show();
+        }
+
 
         async void ImportFile()
         {
@@ -296,6 +297,5 @@ namespace UnicontaClient.Pages.CustomPage
         {
             Uniconta.DirectDebitPayment.Common.ChangeStatusFileArchive(api, lstTransPaym, changeToStatus);
         }
-#endif 
     }
 }

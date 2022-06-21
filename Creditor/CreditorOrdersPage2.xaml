@@ -67,7 +67,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOrdersPage2"
                         <CorasauControls:TextEditor  Text="{Binding CustomsNo,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="Remark" x:Name="liRemark" LabelVerticalAlignment="Top">
-                        <CorasauControls:TextEditor  Text="{Binding Remark,Mode=TwoWay}"  Width="{Binding ActualWidth, ElementName=txtOurRef}"  AcceptsReturn="True" VerticalContentAlignment="Top" TextWrapping="Wrap" MinHeight="60"/>
+                        <CorasauControls:TextEditor  Text="{Binding Remark,Mode=TwoWay}"  Width="{Binding ActualWidth, ElementName=Requisition}"  AcceptsReturn="True" VerticalContentAlignment="Top" TextWrapping="Wrap" MinHeight="60"/>
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
                 <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpOrders" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Orders}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="475">

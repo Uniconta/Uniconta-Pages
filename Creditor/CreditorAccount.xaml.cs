@@ -152,7 +152,7 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                     break;
                 case "DeleteRow":
-                        dgCreditorAccountGrid.DeleteRow();
+                    dgCreditorAccountGrid.DeleteRow();
                     break;
                 case "SaveGrid":
                     Save();
@@ -209,7 +209,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                     {
                         string hdr = string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("UserNotesInfo"), selectedItem._Account);
-                        AddDockItem(TabControls.UserNotesPage, dgCreditorAccountGrid.syncEntity,hdr);
+                        AddDockItem(TabControls.UserNotesPage, dgCreditorAccountGrid.syncEntity, hdr);
                     }
                     break;
                 case "AddDoc":
@@ -218,7 +218,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "InvTran":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.InvTransactions, dgCreditorAccountGrid.syncEntity);
+                        AddDockItem(TabControls.CreditorInvoiceLine, dgCreditorAccountGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("InvTransactions"), selectedItem._Account));
                     break;
                 case "Invoices":
                     if (selectedItem == null) return;

@@ -118,9 +118,9 @@ x:Class="UnicontaClient.Pages.CustomPage.ConfigureFunctionalityPage"
                     <CorasauControls:CorasauLayoutItem  Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Packnote}">
                         <CorasauControls:CheckEditor IsChecked="{Binding CreditorPacknote,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem  Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CreditorBudget}">
+                    <!--CorasauControls:CorasauLayoutItem  Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CreditorBudget}">
                         <CorasauControls:CheckEditor IsChecked="{Binding CreditorBudget,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
+                    </CorasauControls:CorasauLayoutItem-->
                 </CorasauControls:CorasauLayoutGroup>
 
                 <CorasauControls:CorasauLayoutGroup View="GroupBox" Orientation="Vertical" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Project}"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">

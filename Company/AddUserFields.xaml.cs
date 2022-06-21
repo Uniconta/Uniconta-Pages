@@ -119,10 +119,7 @@ namespace UnicontaClient.Pages.CustomPage
             switch (ActionType)
             {
                 case "AddRow":
-                    object[] param = new object[2];
-                    param[0] = api;
-                    param[1] = dgUserField.masterRecord;
-                    AddDockItem(TabControls.AddUserFieldsPage2, param, Uniconta.ClientTools.Localization.lookup("UserFields"), "Add_16x16.png");
+                    AddDockItem(TabControls.AddUserFieldsPage2, new object[2] { api, dgUserField.masterRecord }, Uniconta.ClientTools.Localization.lookup("UserFields"), "Add_16x16.png");
                     break;
                 case "EditRow":
                     if (selectedItem == null)
@@ -148,10 +145,12 @@ namespace UnicontaClient.Pages.CustomPage
                     winUserFields.Show();
                     break;
                 case "BaseClass":
-                    GenerateClassCode(master, true);
+                    if (master != null)
+                        GenerateClassCode(master, true);
                     break;
                 case "ClientClass":
-                    GenerateClassCode(master, false);
+                    if (master != null)
+                        GenerateClassCode(master, false);
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);

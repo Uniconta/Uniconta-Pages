@@ -342,7 +342,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (includeZeroBalance)
             {
                 filterString = filterString.Replace(FILTERVALUE_ZEROBALANCE, string.Empty).Trim();
-                if (filterString != string.Empty && filterString.IndexOf(AND_OPERATOR, 0, 3) != -1)
+                if (filterString != string.Empty && filterString.StartsWith(AND_OPERATOR, true, null))
                     filterString = filterString.Substring(3).Trim();
                 else if (filterString != string.Empty && filterString.IndexOf(AND_OPERATOR, filterString.Length - 3) != -1)
                     filterString = filterString.Substring(0, filterString.IndexOf(AND_OPERATOR, filterString.Length - 3)).Trim();
@@ -1028,9 +1028,8 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                     break;
                 case "ZeroInvoice":
-                    var markedRows = selectedItems.Cast<ProjectTransLocalClient>();
-                    if (markedRows != null && markedRows.Count() > 0)
-                        CreateZeroInvoice(markedRows);
+                    if (selectedItem != null)
+                        CreateZeroInvoice(selectedItem);
                     break;
                 case "DebtorAccount":
                     if (selectedItem != null)
@@ -1106,91 +1105,59 @@ namespace UnicontaClient.Pages.CustomPage
             cwCreateOrder.Show();
         }
 
-        void CreateZeroInvoice(IEnumerable<ProjectTransLocalClient> projList)
-        {
-            dgWorkInProgressRpt.Columns.GetColumnByName("ErrorInfo").Visible = true;
-            var cntProjects = projList.Count();
-            var cntOK = 0;
 
-            var cwCreateZeroInvoice = new UnicontaClient.Pages.CwCreateZeroInvoice(api);
-#if !SILVERLIGHT
+        void CreateZeroInvoice(ProjectTransLocalClient selectedItem)
+        {
+            var project = (ProjectClient)projCache.Get(selectedItem.Project);
+            var cwCreateZeroInvoice = new UnicontaClient.Pages.CwCreateZeroInvoice(api, project);
             cwCreateZeroInvoice.DialogTableId = 2000000067;
-#endif
-            cwCreateZeroInvoice.Closed += async delegate
+
+            cwCreateZeroInvoice.Closed += delegate
             {
                 if (cwCreateZeroInvoice.DialogResult == true)
                 {
-                    if (cwCreateZeroInvoice.Simulate && cntProjects > 1)
-                    {
-                        UnicontaMessageBox.Show("Simulation not possible", Uniconta.ClientTools.Localization.lookup("Simulation"), MessageBoxButton.OK, MessageBoxImage.Information);
-                        return;
-                    }
-
-                    foreach (var rec in projList)
-                    {
-                        rec.ErrorInfo = TMJournalLineHelper.VALIDATE_OK;
-
-                        busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
-                        busyIndicator.IsBusy = true;
-                        var invoiceApi = new Uniconta.API.Project.InvoiceAPI(api);
-                        if (!cwCreateZeroInvoice.IsCreateInvoiceProposal)
-                        {
-                            var result = await invoiceApi.CreateZeroInvoice(rec.Project, cwCreateZeroInvoice.InvoiceCategory, cwCreateZeroInvoice.AdjustmentCategory, cwCreateZeroInvoice.Employee, cwCreateZeroInvoice.ProjectTask, cwCreateZeroInvoice.ProjectWorkspace, 
-                                cwCreateZeroInvoice.InvoiceDate, cwCreateZeroInvoice.ToDate, cwCreateZeroInvoice.Simulate, new GLTransClientTotal());
-                            busyIndicator.IsBusy = false;
-                            busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("LoadingMsg");
-                            var ledgerRes = result.ledgerRes;
-                            if (ledgerRes == null)
-                                return;
-
-                            if (result.Err != ErrorCodes.Succes)
-                            {
-                                rec.ErrorInfo = Uniconta.ClientTools.Localization.lookup(result.Err.ToString());
-                            }
-                            else if (cwCreateZeroInvoice.Simulate && ledgerRes.SimulatedTrans != null)
-                                AddDockItem(TabControls.SimulatedTransactions, ledgerRes.SimulatedTrans, Uniconta.ClientTools.Localization.lookup("SimulatedTransactions"), null, true);
-                            else
-                            {
-                                cntOK++;
-                                var msg = string.Format("{0} {1}={2}", Uniconta.ClientTools.Localization.lookup("JournalHasBeenPosted"), Uniconta.ClientTools.Localization.lookup("JournalPostedId"), ledgerRes.JournalPostedlId);
-                                rec.ErrorInfo = msg;
-                            }
-                        }
-                        else
-                        {
-                            var debtorOrderInstance = api.CompanyEntity.CreateUserType<ProjectInvoiceProposalClient>();
-                            var resultErr = await invoiceApi.CreateZeroInvoiceOrder(debtorOrderInstance, rec.Project, cwCreateZeroInvoice.InvoiceCategory, cwCreateZeroInvoice.InvoiceDate, cwCreateZeroInvoice.ToDate,
-                                cwCreateZeroInvoice.AdjustmentCategory, cwCreateZeroInvoice.Employee, cwCreateZeroInvoice.ProjectTask, cwCreateZeroInvoice.ProjectWorkspace);
-
-                            if (resultErr != ErrorCodes.Succes)
-                                rec.ErrorInfo = Uniconta.ClientTools.Localization.lookup(resultErr.ToString());
-                            else
-                            {
-                                cntOK++;
-                                var msg = string.Format(Uniconta.ClientTools.Localization.lookup("CreatedOBJ"), Uniconta.ClientTools.Localization.lookup("InvoiceProposal"));
-                                var recText = string.Format(" {0}. {1}:{2},{3}:{4}", msg, Uniconta.ClientTools.Localization.lookup("OrderNumber"), debtorOrderInstance._OrderNumber,
-                                    Uniconta.ClientTools.Localization.lookup("Account"), debtorOrderInstance._DCAccount);
-                                rec.ErrorInfo = recText;
-
-                                if (cntProjects == 1)
-                                    ShowOrderLines(debtorOrderInstance);
-
-                            }
-                        }
-                    }
-
-                    var cntErr = cntProjects - cntOK;
-                    string msgText = null;
-
-                    msgText = cntOK != 0 ? string.Format("{0}: {1} {2}", Uniconta.ClientTools.Localization.lookup("ZeroInvoice"), cntOK, cwCreateZeroInvoice.IsCreateInvoiceProposal ? string.Format(Uniconta.ClientTools.Localization.lookup("CreatedOBJ"),
-                        Uniconta.ClientTools.Localization.lookup("InvoiceProposal")) : Uniconta.ClientTools.Localization.lookup("Posted")) : msgText;
-                    msgText = cntErr != 0 && msgText != null ? Environment.NewLine : msgText;
-                    msgText = cntErr != 0 ? string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("HasError"), cntErr) : msgText;
-
-                    UnicontaMessageBox.Show(msgText, Uniconta.ClientTools.Localization.lookup("ZeroInvoice"), MessageBoxButton.OK, MessageBoxImage.Information);
+                    busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
+                    busyIndicator.IsBusy = true;
+                    if (cwCreateZeroInvoice.Simulate || !cwCreateZeroInvoice.IsCreateInvoiceProposal)
+                        CreateZeroInvoice(project._Number, cwCreateZeroInvoice.InvoiceCategory, cwCreateZeroInvoice.AdjustmentCategory, cwCreateZeroInvoice.Employee, cwCreateZeroInvoice.ProjectTask, cwCreateZeroInvoice.ProjectWorkspace,
+                            cwCreateZeroInvoice.InvoiceDate, cwCreateZeroInvoice.ToDate, cwCreateZeroInvoice.Simulate);
+                    else
+                        CreateZeroInvoiceOrder(project._Number, cwCreateZeroInvoice.InvoiceCategory, cwCreateZeroInvoice.InvoiceDate, cwCreateZeroInvoice.ToDate,
+                            cwCreateZeroInvoice.AdjustmentCategory, cwCreateZeroInvoice.Employee, cwCreateZeroInvoice.ProjectTask, cwCreateZeroInvoice.ProjectWorkspace);
                 }
             };
             cwCreateZeroInvoice.Show();
+        }
+
+        private async void CreateZeroInvoice(string projectNumber, string invoiceCategory, string invoiceAdjustmentCategory, string employee, string Task, string WorkSpace, DateTime invoiceDate, DateTime toDate, bool isSimulate)
+        {
+            var result = await new Uniconta.API.Project.InvoiceAPI(api).CreateZeroInvoice(projectNumber, invoiceCategory, invoiceAdjustmentCategory, employee, Task, WorkSpace, invoiceDate, toDate, isSimulate, new GLTransClientTotal());
+            busyIndicator.IsBusy = false;
+
+            var ledgerRes = result.ledgerRes;
+            if (ledgerRes == null)
+                return;
+            if (result.Err != ErrorCodes.Succes)
+                Utility.ShowJournalError(ledgerRes, dgWorkInProgressRpt);
+            else if (isSimulate && ledgerRes.SimulatedTrans != null)
+                AddDockItem(TabControls.SimulatedTransactions, ledgerRes.SimulatedTrans, Uniconta.ClientTools.Localization.lookup("SimulatedTransactions"), null, true);
+            else
+            {
+                var msg = string.Format("{0} {1}={2}", Uniconta.ClientTools.Localization.lookup("JournalHasBeenPosted"), Uniconta.ClientTools.Localization.lookup("JournalPostedId"), ledgerRes.JournalPostedlId);
+                UnicontaMessageBox.Show(msg, Uniconta.ClientTools.Localization.lookup("Message"));
+            }
+        }
+
+        private async void CreateZeroInvoiceOrder(string Project, string InvoiceCategory, DateTime InvoiceDate, DateTime ToDate, string AdjustmentCategory, string Employee, string Task, string WorkSpace)
+        {
+            var debtorOrderInstance = api.CompanyEntity.CreateUserType<ProjectInvoiceProposalClient>();
+            var result = await new Uniconta.API.Project.InvoiceAPI(api).CreateZeroInvoiceOrder(debtorOrderInstance, Project, InvoiceCategory, InvoiceDate, ToDate, AdjustmentCategory, Employee, Task, WorkSpace);
+
+            busyIndicator.IsBusy = false;
+            if (result != ErrorCodes.Succes)
+                UtilDisplay.ShowErrorCode(result);
+            else
+                ShowOrderLines(debtorOrderInstance);
         }
 
         private void ShowOrderLines(ProjectInvoiceProposalClient order)

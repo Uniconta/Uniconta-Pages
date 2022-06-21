@@ -21,6 +21,7 @@ x:Class="UnicontaClient.Pages.CustomPage.GLChargeGroupPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="AccountName" IsSmart="True" ReadOnly="True" Width="200"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Amount" Width="90" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Pct" Width="50" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="IsDefault" Width="70" />
                 </local:GLChargeGroupClientGrid.Columns>
             </local:GLChargeGroupClientGrid>
         </CorasauControls:BusyIndicator>

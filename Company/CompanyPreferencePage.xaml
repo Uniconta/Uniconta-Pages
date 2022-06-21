@@ -73,7 +73,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CompanyPreferencePage"
                             <CorasauControls:ComboBoxEditor x:Name="cmbAccOnInvTrans" SelectedIndexChanged="cmbAccOnInvTrans_SelectedIndexChanged" />
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="AllowNegativStock">
-                            <CorasauControls:CheckEditor x:Name="chkAllowNegativStock"  IsChecked="{Binding AllowNegativStock,Mode=TwoWay}" />
+                            <CorasauControls:CheckEditor x:Name="chkAllowNegativStock" IsReadOnly="{Binding ElementName=chkChkWarehouse, Path=IsChecked}"  IsChecked="{Binding AllowNegativStock,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem x:Name="liChkWarehouse" FieldName="CheckWarehouse" >
                             <CorasauControls:CheckEditor x:Name="chkChkWarehouse" IsReadOnly="{Binding ElementName=chkAllowNegativStock, Path=IsChecked}" IsChecked="{Binding CheckWarehouse,Mode=TwoWay}" />

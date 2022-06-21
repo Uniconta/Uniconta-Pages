@@ -212,7 +212,9 @@ namespace UnicontaClient.Pages.CustomPage
             sb.Append(voucher._Text).Replace('/', '-').Replace('\\', '-');
             sb.Append('.').Append(Enum.GetName(typeof(FileextensionsTypes), IdObject.get((byte)voucher._Fileextension)));
             var name = sb.ToStringAndRelease();
-            zipOutputStream.PutNextEntry(new ZipEntry(name));
+            var zipEntry= new ZipEntry(name);
+            zipEntry.IsUnicodeText = true;
+            zipOutputStream.PutNextEntry(zipEntry);
             zipOutputStream.Write(attachment, 0, attachment.Length);
             WriteLogLine(string.Format(Uniconta.ClientTools.Localization.lookup("ExportingFile"), name));
         }

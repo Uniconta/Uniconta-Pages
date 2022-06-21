@@ -25,6 +25,7 @@ using DevExpress.Xpf.Grid;
 using DevExpress.Data;
 using Uniconta.API.Service;
 using Uniconta.Client.Pages;
+using Uniconta.Common.Utility;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -74,10 +75,17 @@ namespace UnicontaClient.Pages.CustomPage
         }
         void SetHeader()
         {
-            var syncMaster = dgCrdInvLines.masterRecord as CreditorInvoiceClient;
-            if (syncMaster == null)
+            string header;
+            if (dgCrdInvLines.masterRecord is CreditorInvoiceClient dCInvoice)
+            {
+                header = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("InvoiceNumber"), dCInvoice._InvoiceNumber);
+            }
+            else if (dgCrdInvLines.masterRecord is DCAccount dcAccount)
+            {
+                header = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("InvTransactions"), dcAccount._Account);
+            }
+            else
                 return;
-            string header = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("InvoiceNumber"), syncMaster.InvoiceNumber);
             SetHeader(header);
         }
 
@@ -212,6 +220,30 @@ namespace UnicontaClient.Pages.CustomPage
                 case "PostedBy":
                     if (selectedItem != null)
                         JournalPosted(selectedItem);
+                    break;
+                case "Invoice":
+                    if (selectedItem == null) return;
+                        var credHeader = Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("CreditorInvoice"), selectedItem._Item);
+                        AddDockItem(TabControls.CreditorInvoice, selectedItem, credHeader);
+                    break;
+                case "ViewDownloadRow":
+                    if (selectedItem != null)
+                        DebtorTransactions.ShowVoucher(dgCrdInvLines.syncEntity, api, busyIndicator);
+                    break;
+                case "VoucherTransactions":
+                    if (selectedItem == null)
+                        return;
+                    string arg;
+                    if (selectedItem._JournalPostedId != 0)
+                        arg = string.Format("{0}={1}", Uniconta.ClientTools.Localization.lookup("JournalPostedId"), selectedItem._JournalPostedId);
+                    else if (selectedItem._InvoiceNumber != 0)
+                        arg = string.Format("{0}={1}", Uniconta.ClientTools.Localization.lookup("Invoice"), selectedItem._InvoiceNumber);
+                    else if (selectedItem._InvJournalPostedId != 0)
+                        arg = string.Format("{0} ({1})={2}", Uniconta.ClientTools.Localization.lookup("JournalPostedId"), Uniconta.ClientTools.Localization.lookup("Inventory"), selectedItem._InvJournalPostedId);
+                    else
+                        arg = string.Format("{0}={1}", Uniconta.ClientTools.Localization.lookup("Account"), selectedItem.AccountName);
+                    string vheader = Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("VoucherTransactions"), arg);
+                    AddDockItem(TabControls.AccountsTransaction, dgCrdInvLines.syncEntity, vheader);
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);

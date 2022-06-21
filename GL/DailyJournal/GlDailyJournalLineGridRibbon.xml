@@ -47,8 +47,8 @@
     <RibbonItem LocalizedNameKey="PhysicalVoucher" Glyph="Cover_16x16.png" LargeGlyph="View_Voucher_32x32.png" >
       <RibbonItem Action="ViewVoucher" LocalizedNameKey="View" ShortcutKey="F7" Glyph="View_16x16.png" LargeGlyph="View_32x32.png" />
       <RibbonItem Action="RefVoucher" LocalizedNameKey="Attach" ShortcutKey="Ctrl+B" Glyph="Attachments_16x16.png" LargeGlyph="Attachments_32x32.png" />
-      <RibbonItem Action="ImportVoucher" LocalizedNameKey="ImportFile" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png" />
-      <RibbonItem Action="RemoveVoucher" LocalizedNameKey="Remove" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png" />
+      <RibbonItem Action="ImportVoucher" LocalizedNameKey="ImportFile" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png" ShortcutKey="Ctrl+J"/>
+      <RibbonItem Action="RemoveVoucher" LocalizedNameKey="Remove" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png" ShortcutKey="Ctrl+I"/>
       <RibbonItem Action="DragDrop" LocalizedNameKey="DragAndDrop" Glyph="DragDrop_File_16x16.png" ShortcutKey="CTRL+G"/>
     </RibbonItem>
     <RibbonItem Action="Transactions" LocalizedNameKey="Transactions" LargeGlyph="Transactions_32x32.png">
@@ -70,7 +70,7 @@
       <RibbonItem Action="SetAmountZero" LocalizedNameKey="SetOBJ" Parameter="AmountToZero" Glyph="Budget_16x16.png" LargeGlyph=""/>
       <RibbonItem Action="RemoveAllVouchers" LocalizedNameKey="RemoveOBJ" Parameter="Attachments" Glyph="Delete_16x16.png"  LargeGlyph=""/>
     </RibbonItem>
-    <RibbonItem Action="OffSetAccount" LocalizedNameKey="OffSetAccount"  LargeGlyph="Offset_Account_32x32.png"/>
+    <RibbonItem Action="OffSetAccount" LocalizedNameKey="OffSetAccount" ShortcutKey="Ctrl+M" LargeGlyph="Offset_Account_32x32.png"/>
   </RibbonItem>
   <RibbonItem>
     <RibbonItem LocalizedNameKey="Debit" StatusValue=""></RibbonItem>

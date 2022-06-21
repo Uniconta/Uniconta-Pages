@@ -22,7 +22,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorInvoicePage2"
                     <CorasauControls:LookupEditor x:Name="leOrderGroup" EditValue="{Binding OrderGroup,Mode=TwoWay}"/>
                 </CorasauControls:CorasauLayoutItem>
                 <CorasauControls:CorasauLayoutItem FieldName="InvoiceAN" x:Name="liInvoiceAN">
-                    <CorasauControls:TextEditor x:Name="txtInvoiceAN" Text="{Binding InvoiceAN,Mode=OneWay}" IsEnabled="False"/>
+                    <CorasauControls:TextEditor x:Name="txtInvoiceAN" Text="{Binding InvoiceAN,Mode=TwoWay}" />
                 </CorasauControls:CorasauLayoutItem>
                 <CorasauControls:CorasauLayoutItem FieldName="Payment" x:Name="liPayment">
                     <CorasauControls:LookupEditor x:Name="lePayment" EditValue="{Binding Payment,Mode=TwoWay}"/>

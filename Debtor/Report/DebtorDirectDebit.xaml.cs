@@ -765,7 +765,7 @@ namespace UnicontaClient.Pages.CustomPage
             };
 
             var debtorPaymFile = await api.Query<DebtorPaymentFileClient>(pairFile);
-            var dialogInfo = Common.GetReturnFiles(api, listDebTransPaym, DebtorCache, MandateCache, PaymentFormatCache, debtorPaymFile);
+            var dialogInfo = await Common.GetReturnFiles(api, listDebTransPaym, DebtorCache, MandateCache, PaymentFormatCache, debtorPaymFile);
 
             busyIndicator.IsBusy = false;
 
@@ -870,6 +870,7 @@ namespace UnicontaClient.Pages.CustomPage
                     DebtorTransDirectDebit mergePaymentRefId;
 
                     var netsBS = false;
+                    var bsPrincipRemaining = false;
                     int index = 0;
                     foreach (var rec in (IEnumerable<DebtorTransDirectDebit>)dgDebtorTranOpenGrid.ItemsSource)
                     {
@@ -882,13 +883,23 @@ namespace UnicontaClient.Pages.CustomPage
                         {
                             var paymFormatClient = (DebtorPaymentFormat)PaymentFormatCache.Get(rec.PaymentFormat);
                             netsBS = paymFormatClient._ExportFormat == (byte)DebtorPaymFormatType.NetsBS;
+                            if (netsBS)
+                            {
+                                DebtorPaymentFormatClientNets paymentFormatNets = new DebtorPaymentFormatClientNets();
+                                StreamingManager.Copy(paymFormatClient, paymentFormatNets);
+                                bsPrincipRemaining = paymentFormatNets._CollectionPrinciple == 1;
+                            }
                         }
 
                         var paymRefId = rec._PaymentRefId != 0 ? rec._PaymentRefId : -rec.PrimaryKeyId;
 
+                        double bsAmount = 0;
+                        if (netsBS)
+                            bsAmount = bsPrincipRemaining ? rec.AmountOpen : rec.Amount;
+
                         if (dictPaymTransfer.TryGetValue(paymRefId, out mergePaymentRefId))
                         {
-                            mergePaymentRefId.MergedAmount += netsBS ? rec.Amount : rec.PaymentAmount;
+                            mergePaymentRefId.MergedAmount += netsBS ? bsAmount : rec.PaymentAmount;
                             mergePaymentRefId.UsedCachDiscount += rec.UsedCachDiscount;
                             mergePaymentRefId.settleTypeRowId = true;
                             mergePaymentRefId.rowNumbers.Append(';').AppendNum(rec.PrimaryKeyId);
@@ -899,7 +910,7 @@ namespace UnicontaClient.Pages.CustomPage
                             mergePaymentRefId = new DebtorTransDirectDebit();
                             StreamingManager.Copy(rec, mergePaymentRefId);
                             mergePaymentRefId._PaymentRefId = paymRefId;
-                            mergePaymentRefId.MergedAmount = netsBS ? rec.Amount : rec.PaymentAmount;
+                            mergePaymentRefId.MergedAmount = netsBS ? bsAmount : rec.PaymentAmount;
                             mergePaymentRefId.rowNumbers = new StringBuilder();
                             mergePaymentRefId.rowNumbers.AppendNum(rec.PrimaryKeyId);
                             mergePaymentRefId.settleTypeRowId = true;

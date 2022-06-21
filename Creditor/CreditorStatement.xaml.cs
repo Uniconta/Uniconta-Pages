@@ -367,6 +367,7 @@ namespace UnicontaClient.Pages.CustomPage
                         SetExpandAndCollapseCurrent(true, true);
                     break;
                 case "Search":
+                    dgChildCreditorTrans.SelectedItem = null;
                     LoadDCTrans();
                     break;
                 default:

@@ -65,6 +65,14 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
 
             danishFields.TransferType = paymentType == UnicontaISO20022CreditTransfer.ISO20022PaymentTypes.SEPA ? BankDataPayFormat.FOREIGN_SEPATRANSFER : BankDataPayFormat.FOREIGN_STANDARDTRANSFER;
 
+            if (bankAccount._IBAN != null && bankAccount._IBAN.Length > 1)
+            {
+                var ctry = bankAccount._IBAN.Substring(0, 2);
+                if (Enum.IsDefined(typeof(CountryISOCode), ctry) && ctry != CountryISOCode.DK.ToString())
+                    danishFields.TransferType = BankDataPayFormat.FOREIGN_ACCOUNTTRANSFER;
+            }
+
+
             if (glJournalGenerated)
             {
                 danishFields.NameOfReceiver = NETSNorge.processString(string.Empty, 35, false);

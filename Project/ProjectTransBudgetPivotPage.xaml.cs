@@ -82,8 +82,8 @@ namespace UnicontaClient.Pages.CustomPage
     
     public partial class ProjectTransBudgetPivotPage :  PivotBasePage
     {
-        [ForeignKeyAttribute(ForeignKeyTable = typeof(Uniconta.DataModel.ProjectBudgetGroup))] 
-        public ProjectBudgetGroup BudgetGroup { get; set; }
+        [ForeignKeyAttribute(ForeignKeyTable = typeof(Uniconta.DataModel.ProjectBudgetGroup))]
+        public string BudgetGroup { get; set; }
 
         ItemBase iIncludeSubProBase;
         static bool showBudget = true;
@@ -112,6 +112,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (!pivotIsLoaded)
             {
                 pivotDgProjectPlanning.BestFit();
+                SetBudgetGroup();
                 pivotIsLoaded = true;
             }
         }
@@ -136,14 +137,12 @@ namespace UnicontaClient.Pages.CustomPage
             pivotDgProjectPlanning.api = api;
             pivotDgProjectPlanning.TableType = typeof(ProjectTransPivotClientLocal);
             localMenu.OnItemClicked += LocalMenu_OnItemClicked;
-            Loaded+=ProjectTransBudgetPivotPage_Loaded;
             cmbBudgetGroup.api = api;
             localMenu.OnChecked += LocalMenu_OnChecked;
             pivotDgProjectPlanning.CellDoubleClick += PivotGridControl_CellDoubleClick;
             GetMenuItem();
             txtFromDate.DateTime = fromDate == DateTime.MinValue ? GetSystemDefaultDate() : fromDate;
             txtToDate.DateTime = toDate == DateTime.MinValue ? GetSystemDefaultDate() : toDate;
-            cmbBudgetGroup.Text = budgetGroup;
             chkGroupWeek.IsChecked = grpWeek;
             chkGroupPrevYear.IsChecked = grpPrevYear;
             pivotDgProjectPlanning.CellClick += PivotDgProjectPlanning_CellClick;
@@ -171,11 +170,7 @@ namespace UnicontaClient.Pages.CustomPage
             tbGrdTtlCol.Text = Uniconta.ClientTools.Localization.lookup("ShowColumnGrandTotals");
             tbTtlOnFlds.Text = Uniconta.ClientTools.Localization.lookup("ShowTotals");
             chkGrdTtlCol.IsChecked = chkGrdTtlRow.IsChecked = chkTtlOnFlds.IsChecked = true;
-        }
-
-        private void ProjectTransBudgetPivotPage_Loaded(object sender, RoutedEventArgs e)
-        {
-            SetBudgetGroup();
+            this.DataContext = this;
         }
 
         PivotGridField[] selectedCellColumnFields;
@@ -313,9 +308,17 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (ProjBgtGroupCache == null)
                 ProjBgtGroupCache = await api.LoadCache(typeof(Uniconta.DataModel.ProjectBudgetGroup));
-            cmbBudgetGroup.ItemsSource= ProjBgtGroupCache;
-            var budgetGroup = ((ProjectBudgetGroup[])ProjBgtGroupCache?.GetRecords)?.Where(x => x._Default==true)?.FirstOrDefault();
-            cmbBudgetGroup.SelectedItem = budgetGroup;
+            cmbBudgetGroup.ItemsSource = ProjBgtGroupCache;
+            if (string.IsNullOrEmpty(budgetGroup))
+            {
+                var bgtGroup = ((ProjectBudgetGroup[])ProjBgtGroupCache?.GetRecords)?.Where(x => x._Default == true)?.FirstOrDefault();
+                cmbBudgetGroup.SelectedItem = bgtGroup;
+            }
+            else
+            {
+                var bgtGroup = ((ProjectBudgetGroup[])ProjBgtGroupCache?.GetRecords)?.Where(x => x.KeyStr == budgetGroup)?.FirstOrDefault();
+                cmbBudgetGroup.SelectedItem = bgtGroup;
+            }
         }
 
         private void LocalMenu_OnChecked(string actionType, bool IsChecked)

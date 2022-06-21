@@ -609,12 +609,18 @@ namespace UnicontaClient.Pages.CustomPage
             busyIndicator.IsBusy = true;
 
             if (saveAttachment.RowId > 0)
+            {
+                api.CompanyEntity.AttachmentCacheSet(saveAttachment);
                 api.UpdateNoResponse(saveAttachment);
+            }
             else
                 await api.Insert(saveAttachment);
 
             if (isDeleteAttachment && copiedAttachment != null)
+            {
+                api.CompanyEntity.AttachmentCacheDelete(copiedAttachment);
                 await api.Delete(copiedAttachment);
+            }
 
             await dgDocsGrid.Filter(null);
             busyIndicator.IsBusy = false;

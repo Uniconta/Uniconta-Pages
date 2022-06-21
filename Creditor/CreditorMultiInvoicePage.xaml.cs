@@ -201,10 +201,9 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void GenerateInvoice()
         {
-
             if (IsMassUpdateTaskInProgress)
             {
-                UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("TaskAlreadyRunning"), Uniconta.ClientTools.Localization.lookup("Warning"));
+                UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("UpdateInBackground"), Uniconta.ClientTools.Localization.lookup("Warning"));
                 return;
             }
 
@@ -246,7 +245,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (IsMassUpdateTaskInProgress)
             {
-                UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("TaskAlreadyRunning"), Uniconta.ClientTools.Localization.lookup("Warning"));
+                UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("UpdateInBackground"), Uniconta.ClientTools.Localization.lookup("Warning"));
                 return;
             }
 

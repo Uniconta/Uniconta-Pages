@@ -83,7 +83,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             switch (ActionType)
             {
-                case "DeleteRow":
+                case "Remove":
                     dgUpdateDebtorAddress.RemoveFocusedRowFromGrid();
                     break;
                 case "Search":
@@ -117,7 +117,6 @@ namespace UnicontaClient.Pages.CustomPage
                         Account.Visible = false;
                         dgUpdateDebtorAddress.DCtype = 2;
                         SetHeader(string.Concat(Uniconta.ClientTools.Localization.lookup("Prospect"), ": ", Uniconta.ClientTools.Localization.lookup("UpdateAddress")));
-
                     }
                 }
             }
@@ -126,7 +125,6 @@ namespace UnicontaClient.Pages.CustomPage
 
         public override Task InitQuery()
         {
-            LoadGrid();
             return null;
         }
 
@@ -143,6 +141,17 @@ namespace UnicontaClient.Pages.CustomPage
             ClearBusy();
         }
 
+        static bool Equal(string s1, string s2)
+        {
+            if (s1 != null)
+            {
+                s1 = s1.Trim();
+                if (s1.Length == 0)
+                    s1 = null;
+            }
+            return s1 == s2;
+        }
+
         async void LoadDebtorList()
         {
             var filter = new[] { PropValuePair.GenereteWhereElements("LegalIdent", typeof(string), "!null") };
@@ -156,17 +165,21 @@ namespace UnicontaClient.Pages.CustomPage
                 var cvr = debtor._LegalIdent;
                 if (cvr == null || cvr.Length < 5)
                     continue;
-                SetBusy();
-                var ci = await CVR.CheckCountry(cvr, debtor._Country);
-                ClearBusy();
+                busyIndicator.IsBusy = true;
+                CompanyInfo ci = null;
+                try
+                {
+                    ci = await CVR.CheckCountry(cvr, debtor._Country);
+                }
+                catch { }
 
                 if (!string.IsNullOrWhiteSpace(ci?.life?.name))
                 {
                     counterFound++;
                     var address = ci.address;
                     var streetAddress = address.CompleteStreet;
-                    if (streetAddress == debtor._Address1 && address.street2 == debtor._Address2 &&
-                               address.zipcode == debtor._ZipCode)
+                    if (Equal(ci.life.name, debtor._Name) && Equal(streetAddress, debtor._Address1) && Equal(address.street2, debtor._Address2) &&
+                               Equal(address.zipcode, debtor._ZipCode))
                         continue;
 
                     var newDebtor = debtor;
@@ -174,9 +187,13 @@ namespace UnicontaClient.Pages.CustomPage
                     newDebtor.NewAddress2 = address.street2;
                     newDebtor.NewZipCode = address.zipcode;
                     newDebtor.NewCity = address.cityname;
+                    newDebtor.NewName = ci.life.name;
                     newDebList.Add(newDebtor);
+                    busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("Loading") + " " + NumberConvert.ToString(newDebList.Count);
+                    busyIndicator.IsBusy = false;
                 }
             }
+            ClearBusy();
             dgUpdateDebtorAddress.ItemsSource = newDebList;
             SetStatusText(debtorList.Length, counterFound, newDebList.Count);
         }
@@ -194,17 +211,20 @@ namespace UnicontaClient.Pages.CustomPage
                 var cvr = creditor._LegalIdent;
                 if (cvr == null || cvr.Length < 5)
                     continue;
-                SetBusy();
-                var ci = await CVR.CheckCountry(cvr, creditor._Country);
-                ClearBusy();
-
+                busyIndicator.IsBusy = true;
+                CompanyInfo ci = null;
+                try
+                {
+                    ci = await CVR.CheckCountry(cvr, creditor._Country);
+                }
+                catch { }
                 if (!string.IsNullOrWhiteSpace(ci?.life?.name))
                 {
                     counterFound++;
                     var address = ci.address;
                     var streetAddress = address.CompleteStreet;
-                    if (ci.life.name == creditor._Name && streetAddress == creditor._Address1 &&
-                               address.zipcode == creditor._ZipCode)
+                    if (Equal(ci.life.name, creditor._Name) && Equal(streetAddress, creditor._Address1) && Equal(address.street2, creditor._Address2) &&
+                               Equal(address.zipcode, creditor._ZipCode))
                         continue;
 
                     var newCreditor = creditor;
@@ -212,9 +232,13 @@ namespace UnicontaClient.Pages.CustomPage
                     newCreditor.NewAddress2 = address.street2;
                     newCreditor.NewZipCode = address.zipcode;
                     newCreditor.NewCity = address.cityname;
+                    newCreditor.NewName = ci.life.name;
                     newCredList.Add(newCreditor);
+                    busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("Loading") + " " + NumberConvert.ToString(newCredList.Count);
+                    busyIndicator.IsBusy = false;
                 }
             }
+            ClearBusy();
             dgUpdateDebtorAddress.ItemsSource = newCredList;
             SetStatusText(lst.Length, counterFound, newCredList.Count);
         }
@@ -232,17 +256,20 @@ namespace UnicontaClient.Pages.CustomPage
                 var cvr = prospect._LegalIdent;
                 if (cvr == null || cvr.Length < 5)
                     continue;
-                SetBusy();
-                var ci = await CVR.CheckCountry(cvr, prospect._Country);
-                ClearBusy();
-
+                busyIndicator.IsBusy = true;
+                CompanyInfo ci = null;
+                try
+                {
+                    ci = await CVR.CheckCountry(cvr, prospect._Country);
+                }
+                catch { }
                 if (!string.IsNullOrWhiteSpace(ci?.life?.name))
                 {
                     counterFound++;
                     var address = ci.address;
                     var streetAddress = address.CompleteStreet;
-                    if (ci.life.name == prospect._Name && streetAddress == prospect._Address1 &&
-                               address.zipcode == prospect._ZipCode)
+                    if (Equal(ci.life.name, prospect._Name) && Equal(streetAddress, prospect._Address1) && Equal(address.street2, prospect._Address2) &&
+                            Equal(address.zipcode, prospect._ZipCode))
                         continue;
 
                     var newProspect = prospect;
@@ -250,9 +277,13 @@ namespace UnicontaClient.Pages.CustomPage
                     newProspect.NewAddress2 = address.street2;
                     newProspect.NewZipCode = address.zipcode;
                     newProspect.NewCity = address.cityname;
+                    newProspect.NewName = ci.life.name;
                     newProsList.Add(newProspect);
+                    busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("Loading") + " " + NumberConvert.ToString(newProsList.Count);
+                    busyIndicator.IsBusy = false;
                 }
             }
+            ClearBusy();
             dgUpdateDebtorAddress.ItemsSource = newProsList;
             SetStatusText(lst.Length, counterFound, newProsList.Count);
         }
@@ -273,7 +304,6 @@ namespace UnicontaClient.Pages.CustomPage
                 ClearBusy();
                 UtilDisplay.ShowErrorCode(err);
                 dgUpdateDebtorAddress.ItemsSource = null;
-                LoadGrid();
             }
             else
                 ClearBusy();
@@ -294,6 +324,7 @@ namespace UnicontaClient.Pages.CustomPage
                 item._Address2 = item.NewAddress2;
                 item._ZipCode = item.NewZipCode;
                 item._City = item.NewCity;
+                item._Name = item.NewName;
                 lst2[i] = item;
                 i++;
             }
@@ -366,7 +397,7 @@ namespace UnicontaClient.Pages.CustomPage
 
     public class DebtorClientLocal : DebtorClient
     {
-        private string _address, _address2, _city, _zipCode;
+        private string _address, _address2, _city, _zipCode, _name;
         [StringLength(60)]
         [Display(Name = "NewAddress", ResourceType = typeof(DCAccountText))]
         public string NewAddress { get { return _address; } set { _address = value; NotifyPropertyChanged("NewAddress1"); } }
@@ -382,11 +413,15 @@ namespace UnicontaClient.Pages.CustomPage
         [StringLength(30)]
         [Display(Name = "NewCity", ResourceType = typeof(DCAccountText))]
         public string NewCity { get { return _city; } set { _city = value; NotifyPropertyChanged("NewCity"); } }
+
+        [Display(Name = "NewName", ResourceType = typeof(DCAccountText))]
+        public string NewName { get { return _name; } set { _name = value; NotifyPropertyChanged("NewName"); } }
+
     }
 
     public class CreditorClientLocal : CreditorClient
     {
-        private string _address, _address2, _city, _zipCode;
+        private string _address, _address2, _city, _zipCode, _name;
         [StringLength(60)]
         [Display(Name = "NewAddress", ResourceType = typeof(DCAccountText))]
         public string NewAddress { get { return _address; } set { _address = value; NotifyPropertyChanged("NewAddress1"); } }
@@ -402,11 +437,15 @@ namespace UnicontaClient.Pages.CustomPage
         [StringLength(30)]
         [Display(Name = "NewCity", ResourceType = typeof(DCAccountText))]
         public string NewCity { get { return _city; } set { _city = value; NotifyPropertyChanged("NewCity"); } }
+
+        [Display(Name = "NewName", ResourceType = typeof(DCAccountText))]
+        public string NewName { get { return _name; } set { _name = value; NotifyPropertyChanged("NewName"); } }
+
     }
 
     public class CrmProspectClientLocal : CrmProspectClient
     {
-        private string _address, _address2, _city, _zipCode;
+        private string _address, _address2, _city, _zipCode, _name;
         [StringLength(60)]
         [Display(Name = "NewAddress", ResourceType = typeof(DCAccountText))]
         public string NewAddress { get { return _address; } set { _address = value; NotifyPropertyChanged("NewAddress1"); } }
@@ -422,6 +461,9 @@ namespace UnicontaClient.Pages.CustomPage
         [StringLength(30)]
         [Display(Name = "NewCity", ResourceType = typeof(DCAccountText))]
         public string NewCity { get { return _city; } set { _city = value; NotifyPropertyChanged("NewCity"); } }
+
+        [Display(Name = "NewName", ResourceType = typeof(DCAccountText))]
+        public string NewName { get { return _name; } set { _name = value; NotifyPropertyChanged("NewName"); } }
     }
 }
 

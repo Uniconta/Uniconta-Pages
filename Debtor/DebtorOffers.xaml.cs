@@ -256,6 +256,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 var copyAttachment = cwOrderFromOrder.copyAttachment;
                                 var copyDelAddress = cwOrderFromOrder.copyDeliveryAddress;
                                 var dcOrder = cwOrderFromOrder.dcOrder;
+                                bool NewOrder = (dcOrder.RowId == 0);
                                 dcOrder._DeliveryDate = cwOrderFromOrder.DeliveryDate;
                                 var reCalPrice = cwOrderFromOrder.reCalculatePrice;
                                 var result = await orderApi.CreateOrderFromOrder(selectedItem, dcOrder, account, inversign, CopyAttachments: copyAttachment, CopyDeliveryAddress: copyDelAddress, RecalculatePrices: reCalPrice, OrderPerPurchaseAccount: perSupplier);
@@ -263,7 +264,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 if (result != ErrorCodes.Succes)
                                     UtilDisplay.ShowErrorCode(result);
                                 else
-                                    CreditorOrders.ShowOrderLines(3, dcOrder, this, dgDebtorOffers);
+                                    CreditorOrders.ShowOrderLines(NewOrder ? (byte)3 : (byte)0, dcOrder, this, dgDebtorOffers);
                             }
                         };
                         cwOrderFromOrder.Show();

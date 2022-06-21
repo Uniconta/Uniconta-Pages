@@ -220,7 +220,7 @@ namespace UnicontaClient.Pages.CustomPage
             pollsrc.Date = toDate;
             pollsrc.BankAcc = master;
             pollsrc.BankTotal = (Total + Void) / 100d;
-            pollsrc.BankVoid = Void / 100d;
+            pollsrc.BankVoid = Void / -100d;
             pollsrc.Source2 = src;
 
             src = new List<TextAmount>();
@@ -256,7 +256,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
 
             pollsrc.PostedTotal = (Total + Void) / 100d;
-            pollsrc.PostedVoid = Void / 100d;
+            pollsrc.PostedVoid = Void / -100d;
             pollsrc.Source3 = src;
 
             busyIndicator.IsBusy = false;

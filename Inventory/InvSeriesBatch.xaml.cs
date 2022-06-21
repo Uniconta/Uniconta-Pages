@@ -113,16 +113,26 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override void OnLayoutLoaded()
         {
+            var itm = pageMaster as InvItem;
+            bool ShowWh = itm != null && itm._UseSerial;
             base.OnLayoutLoaded();
             var Comp = api.CompanyEntity;
             if (!Comp.Location || !Comp.Warehouse)
                 Location.Visible = Location.ShowInColumnChooser = false;
             else
+            {
                 Location.ShowInColumnChooser = true;
+                if (ShowWh)
+                    Location.Visible = true;
+            }
             if (!Comp.Warehouse)
                 Warehouse.Visible = Warehouse.ShowInColumnChooser = false;
             else
+            {
                 Warehouse.ShowInColumnChooser = true;
+                if (ShowWh)
+                    Warehouse.Visible = true;
+            }
         }
 
         async protected override void LoadCacheInBackGround()

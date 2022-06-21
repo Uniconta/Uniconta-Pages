@@ -34,7 +34,6 @@ namespace UnicontaClient.Pages.CustomPage
         public string PrintBalanceReportPageFormat;
         public override object GetPrintParameter()
         {
-#if !SILVERLIGHT
             switch (PrintBalanceReportPageFormat)
             {
                 case "Excel":
@@ -50,7 +49,6 @@ namespace UnicontaClient.Pages.CustomPage
                     custPrint.Print();
                     break;
             }
-#endif
             return base.GetPrintParameter();
         }
         public override string NameOfControl
@@ -72,7 +70,7 @@ namespace UnicontaClient.Pages.CustomPage
             headerdata.LeftMargin = new Thickness(bal.LeftMargin, 0, 0, 0);
             headerdata.DimColWidth = bal.ColumnSizeDim == (byte)0 ? 90 : bal.ColumnSizeDim;
             headerdata.DClblWidth = bal.ColumnSizeAmount == (byte)0 ? 100 : bal.ColumnSizeAmount;
-#if !SILVERLIGHT
+
             List<List<BalanceReportdata>> simpleLinkItems = new List<List<BalanceReportdata>>();
             var currentItems = ((LineDetailsData)sourceLineData).BalanceReportlist;
             List<BalanceReportdata> currentLinkItems = new List<BalanceReportdata>();
@@ -124,23 +122,8 @@ namespace UnicontaClient.Pages.CustomPage
                 ps.Pages.AddRange(link.PrintingSystem.Pages);
             }
             custPrint.DocumentSource = ps;
-#endif
-
-#if SILVERLIGHT
-            PrintBaseModule printbase = new PrintBaseModule();
-            printbase.PageHeaderTemplate = (DataTemplate)this.Resources["pageHeaderTemplate"];
-            printbase.DetailTemplate = (DataTemplate)this.Resources["detailTemplate"];
-            printbase.ReportHeaderTemplateDataContext = headerdata;
-            printbase.ReportDetailsTemplateDataContext = (LineDetailsData)sourceLineData;
-            printbase.ReportHeaderTemplateDataContext._Landscape = ((Balance)objBalance)._Landscape;
-            if (!((Balance)objBalance)._Landscape)
-                printbase.ReportHeaderTemplateDataContext.HeaderMargins = new Thickness(390, 0, 0, 0);
-            else
-                printbase.ReportHeaderTemplateDataContext.HeaderMargins = new Thickness(590, 0, 0, 0);
-            custPrint.DataContext = printbase;
-#endif
         }
-#if !SILVERLIGHT
+
         List<BalanceReportdata> obdata;
         private void link_CreateDetail(object sender, DevExpress.Xpf.Printing.CreateAreaEventArgs e)
         {
@@ -203,8 +186,6 @@ namespace UnicontaClient.Pages.CustomPage
             link.PageHeaderTemplate = headerTemplate;
             return link;
         }
-#endif
-
     }
     public class FrontPageData
     {
@@ -454,13 +435,10 @@ namespace UnicontaClient.Pages.CustomPage
         protected override TemplatedLink CreateLink()
         {
             SimpleLink link = new SimpleLink();
-#if SILVERLIGHT
-            link.ExportServiceUri = ReportHeaderTemplateDataContext.exportServiceUrl;
-#else
             link.PaperKind = System.Drawing.Printing.PaperKind.A4;
             if (!string.IsNullOrEmpty(BasePage.session.User._Printer))
                 link.PrintingSystem.PageSettings.PrinterName = BasePage.session.User._Printer;
-#endif
+
             link.PrintingSystem.ExportOptions.Html.EmbedImagesInHTML = true;
             ExportOptions options = link.PrintingSystem.ExportOptions;
             ExportOptionKind[] OptionsKinds = new ExportOptionKind[]{

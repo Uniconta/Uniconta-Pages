@@ -122,9 +122,9 @@ namespace UnicontaClient.Pages.CustomPage
             if (e.NewItem != null && e.NewItem is ProjectInvoiceProposalClient projectInvProposalClient)
             {
                 if (projectInvProposalClient.PrCategoryRef._CatType == CategoryType.OnAccountInvoicing)
-                    ribbonControl.DisableButtons(new string[] { "RegenerateOrderFromProject" });
+                    ribbonControl.DisableButtons(new string[] { "RegenerateOrderFromProject", "ProjectTransaction" });
                 else
-                    ribbonControl.EnableButtons(new string[] { "RegenerateOrderFromProject" });
+                    ribbonControl.EnableButtons(new string[] { "RegenerateOrderFromProject", "ProjectTransaction" });
             }
         }
 

@@ -40,7 +40,6 @@ namespace UnicontaClient.Pages.CustomPage
         public override string NameOfControl { get { return TabControls.VouchersPage2; } }
         public override UnicontaBaseEntity ModifiedRow { get { return voucherClientRow; } set { voucherClientRow = (VouchersClient)value; } }
         SQLCache PaymentCache, LedgerCache, glTransTypeCache, FolderCache;
-
         public VouchersPage2(UnicontaBaseEntity sourcedata, bool isEdit)
             : base(sourcedata, isEdit)
         {
@@ -74,7 +73,8 @@ namespace UnicontaClient.Pages.CustomPage
                 usedim.Visibility = Visibility.Collapsed;
             else
                 Utility.SetDimensions(crudApi, lbldim1, lbldim2, lbldim3, lbldim4, lbldim5, cmbDim1, cmbDim2, cmbDim3, cmbDim4, cmbDim5, usedim);
-            if (LoadedRow == null)
+           
+            if (LoadedRow == null)  
                 voucherClientRow = CreateNew() as VouchersClient;
 
             if (!string.IsNullOrEmpty(viewInbin))
@@ -90,7 +90,8 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (isFieldsAvailableForEdit)
                 browseCtrlColumn.Visibility = Visibility.Collapsed;
-            BusyIndicator = busyIndicator;
+
+            BusyIndicator = busyIndicator; 
             layoutItems.DataContext = voucherClientRow;
             frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
 

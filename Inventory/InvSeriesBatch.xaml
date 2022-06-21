@@ -51,7 +51,7 @@ x:Class="UnicontaClient.Pages.CustomPage.InvSeriesBatch"
                         <local:CorasauDataGridTemplateColumnClient.CellTemplate>
                             <DataTemplate>
                                 <UnicontaControls:TextEditor x:Name="PART_Editor" HorizontalContentAlignment="Right" Mask="{Binding Path=DataContext.RowData.Row.Decimals,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource MaskConverter},ConverterParameter=Decimals}" MaskUseAsDisplayFormat="True" MaskType="Numeric" 
-                                                                        EditValue="{Binding Path=DataContext.RowData.Row.Qty,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"/>
+                                                                        EditValue="{Binding Path=DataContext.RowData.Row.Qty,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}"/>
                             </DataTemplate>
                         </local:CorasauDataGridTemplateColumnClient.CellTemplate>
                     </local:CorasauDataGridTemplateColumnClient>
@@ -67,7 +67,7 @@ x:Class="UnicontaClient.Pages.CustomPage.InvSeriesBatch"
                         <local:CorasauDataGridTemplateColumnClient.CellTemplate>
                             <DataTemplate>
                                 <UnicontaControls:TextEditor x:Name="PART_Editor" HorizontalContentAlignment="Right" Mask="{Binding Path=DataContext.RowData.Row.Decimals,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource MaskConverter},ConverterParameter=Decimals}" MaskUseAsDisplayFormat="True" MaskType="Numeric" 
-                                                                        EditValue="{Binding Path=DataContext.RowData.Row.QtySold,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"/>
+                                                                        EditValue="{Binding Path=DataContext.RowData.Row.QtySold,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}"/>
                             </DataTemplate>
                         </local:CorasauDataGridTemplateColumnClient.CellTemplate>
                     </local:CorasauDataGridTemplateColumnClient>

@@ -43,6 +43,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorSettlements"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Open" Width="50"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="JournalPostedId" Width="80"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryAccount" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DocumentRef" Visible="False"/>
                 </localPage:CreditorSettlementGrid.Columns>
             </localPage:CreditorSettlementGrid>
         </CorasauControls:BusyIndicator>

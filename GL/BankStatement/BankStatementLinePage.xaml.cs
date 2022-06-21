@@ -890,7 +890,7 @@ namespace UnicontaClient.Pages.CustomPage
                 param[3] = false;
                 param[4] = lst;
 
-                AddDockItem(TabControls.SettleOpenTransactionPage, param, true);
+                AddDockItem(TabControls.SettleOpenTransactionPage, param, true, null, floatingLoc: Utility.GetDefaultLocation());
             }
         }
 

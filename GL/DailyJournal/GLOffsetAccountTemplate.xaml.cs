@@ -48,6 +48,7 @@ namespace UnicontaClient.Pages.CustomPage
         VouchersClient vouchersClient;
         UnicontaBaseEntity _master;
         int Decimals;
+        double MasterAmount;
         void InitPage(UnicontaBaseEntity master)
         {
             InitializeComponent();
@@ -75,18 +76,27 @@ namespace UnicontaClient.Pages.CustomPage
                 Debit.HasDecimals = Credit.HasDecimals = Amount.HasDecimals = false;
             else
                 Decimals = 2;
-            if (_master != null)
+            if (master != null)
             {
                 dgGlOffSetAccountTplt.UpdateMaster(master);
                 var glOffSetAccLines = new List<GLOffsetAccountLineGridClient>();
 
                 GLOffsetAccountLine[] glOffsetLines;
                 if (glDailyJournalLine != null)
+                {
+                    MasterAmount = glDailyJournalLine.AmountCur == 0 ? glDailyJournalLine.Amount : glDailyJournalLine.AmountCur;
                     glOffsetLines = glDailyJournalLine.GetOffsetAccount(typeof(GLOffsetAccountLineGridClient));
+                }
                 else if (bankStatementLine != null)
+                {
+                    MasterAmount = bankStatementLine.AmountCur ?? bankStatementLine.Amount;
                     glOffsetLines = bankStatementLine.GetOffsetAccount(typeof(GLOffsetAccountLineGridClient));
+                }
                 else if (vouchersClient != null)
+                {
+                    MasterAmount = -vouchersClient._Amount;
                     glOffsetLines = vouchersClient.GetOffsetAccount(typeof(GLOffsetAccountLineGridClient));
+                }
                 else
                     glOffsetLines = null;
                 if (glOffsetLines != null)
@@ -371,16 +381,7 @@ namespace UnicontaClient.Pages.CustomPage
         private async void BindGrid()
         {
             await dgGlOffSetAccountTplt.Filter(null);
-            double Amount;
-            if (glDailyJournalLine != null)
-                Amount = glDailyJournalLine.Amount;
-            else if (bankStatementLine != null)
-                Amount = bankStatementLine.Amount;
-            else if (vouchersClient != null)
-                Amount = - vouchersClient._Amount;
-            else
-                Amount = 0d;
-            if (Amount != 0d)
+            if (MasterAmount != 0d)
             {
                 var gridItems = (IEnumerable<GLOffsetAccountLineGridClient>)dgGlOffSetAccountTplt.ItemsSource;
                 if (gridItems != null)
@@ -388,7 +389,7 @@ namespace UnicontaClient.Pages.CustomPage
                     foreach (var lin in gridItems)
                     {
                         if (lin._Pct != 0 && lin._Amount == 0)
-                            lin._Amount = Math.Round(Amount * lin.Pct / -100d, this.Decimals);
+                            lin._Amount = Math.Round(MasterAmount * lin.Pct / -100d, this.Decimals);
                     }
                     RecalculateSum();
                 }
@@ -417,46 +418,32 @@ namespace UnicontaClient.Pages.CustomPage
 
         internal void RecalculateSum()
         {
-            if (_master != null)
+            if (MasterAmount != 0)
             {
                 var gridItems = (IEnumerable<GLOffsetAccountLineGridClient>)dgGlOffSetAccountTplt.ItemsSource;
-                if (gridItems == null)
-                    return;
-                var offSetAccAmountSum = gridItems.Select(x => x.Amount).Sum();
-                double amount;
-                if (glDailyJournalLine != null)
-                    amount = glDailyJournalLine.Amount;
-                else if (bankStatementLine != null)
-                    amount = bankStatementLine.Amount;
-                else if (vouchersClient != null)
-                    amount = - vouchersClient._Amount;
-                else
-                    amount = 0d;
-                SetStatusText(amount, offSetAccAmountSum);
-            }
-        }
-
-        void SetStatusText(double journalAmount, double sumOffsetAmt)
-        {
-            double diff = 0d;
-            string format = "N2";
-            RibbonBase rb = (RibbonBase)localMenu.DataContext;
-            var groups = UtilDisplay.GetMenuCommandsByStatus(rb, true);
-            var jrnlAmttxt = Uniconta.ClientTools.Localization.lookup("Amount");
-            var offSetAmtSum = Uniconta.ClientTools.Localization.lookup("Sum");
-            var diftxt = Uniconta.ClientTools.Localization.lookup("Dif");
-            foreach (var grp in groups)
-            {
-                if (grp.Caption == jrnlAmttxt)
-                    grp.StatusValue = journalAmount.ToString(format);
-                else if (grp.Caption == offSetAmtSum)
-                    grp.StatusValue = sumOffsetAmt.ToString(format);
-                else if (grp.Caption == diftxt)
+                if (gridItems != null)
                 {
-                    diff = journalAmount + sumOffsetAmt;
-                    grp.StatusValue = diff.ToString(format);
+                    var sumOffsetAmt = gridItems.Select(x => x._Amount).Sum();
+                    const string format = "N2";
+                    RibbonBase rb = (RibbonBase)localMenu.DataContext;
+                    var groups = UtilDisplay.GetMenuCommandsByStatus(rb, true);
+                    var jrnlAmttxt = Uniconta.ClientTools.Localization.lookup("Amount");
+                    var offSetAmtSum = Uniconta.ClientTools.Localization.lookup("Sum");
+                    var diftxt = Uniconta.ClientTools.Localization.lookup("Dif");
+                    foreach (var grp in groups)
+                    {
+                        if (grp.Caption == jrnlAmttxt)
+                            grp.StatusValue = MasterAmount.ToString(format);
+                        else if (grp.Caption == offSetAmtSum)
+                            grp.StatusValue = sumOffsetAmt.ToString(format);
+                        else if (grp.Caption == diftxt)
+                        {
+                            var diff = MasterAmount + sumOffsetAmt;
+                            grp.StatusValue = diff.ToString(format);
+                        }
+                        else grp.StatusValue = string.Empty;
+                    }
                 }
-                else grp.StatusValue = string.Empty;
             }
         }
     }

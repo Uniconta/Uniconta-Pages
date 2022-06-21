@@ -4,6 +4,7 @@ using System.Collections;
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
+using Uniconta.Common.Utility;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -34,7 +35,7 @@ namespace UnicontaClient.Pages.CustomPage
             xrDetailReportBankTextValue.ExpressionBindings.Add(Expression("[Text]"));
             xrDetailReportBankTotalValue.ExpressionBindings.Add(Expression("[Amount]"));
             xrReportFooterBankSum.Summary = Summary();
-            xrReportFooterBankSum.ExpressionBindings.Add(Expression(string.Format("sumSum({0})", "Amount")));
+            xrReportFooterBankSum.ExpressionBindings.Add(Expression("sumSum(Amount)"));
         }
 
         private void SetupBankDetailReport()
@@ -50,7 +51,7 @@ namespace UnicontaClient.Pages.CustomPage
             xrDetailReportPostedVoucherValue.ExpressionBindings.Add(Expression("[Voucher]"));
             xrDetailReportPostedTotalValue.ExpressionBindings.Add(Expression("Amount"));
             xrReportFooterPostedSum.Summary = Summary();
-            xrReportFooterPostedSum.ExpressionBindings.Add(Expression(string.Format("sumSum({0})", "Amount")));
+            xrReportFooterPostedSum.ExpressionBindings.Add(Expression("sumSum(Amount)"));
         }
 
         private void SetupReportHeader()
@@ -64,19 +65,19 @@ namespace UnicontaClient.Pages.CustomPage
             xrReconciliation.ExpressionBindings.Add(Expression("[Reconciliation]"));
             xrBankTotal.ExpressionBindings.Add(Expression("[BankTotal]"));
             xrPostedTotal.ExpressionBindings.Add(Expression("[PostedTotal]"));
-            xrBankTotalNonReconciled.ExpressionBindings.Add(Expression("Iif(IsNull([Source2].Sum([Amount])),0,[Source2].Sum([Amount]))"));
-            xrPostedTotalNonReconciled.ExpressionBindings.Add(Expression("Iif(IsNull([Source3].Sum([Amount])),0,[Source3].Sum([Amount]))"));
-            xrBankTotalVoid.ExpressionBindings.Add(Expression("Iif(IsNull([BankVoid]),0,[BankVoid])"));
-            xrPostedTotalVoid.ExpressionBindings.Add(Expression("Iif(IsNull([PostedVoid]),0,[PostedVoid])"));
-            xrBankReconciled.ExpressionBindings.Add(Expression("[BankTotal]-Iif(IsNull([Source2].Sum([Amount])),0,[Source2].Sum([Amount]))-" +
-                "Iif(IsNull([BankVoid]),0,[BankVoid])"));
-            xrPostedReconciled.ExpressionBindings.Add(Expression("[PostedTotal]-Iif(IsNull([Source3].Sum([Amount])),0,[Source3].Sum([Amount]))-" +
-                "Iif(IsNull([PostedVoid]),0,[PostedVoid])"));
-            xrDifferencePanel.ExpressionBindings.Add(new ExpressionBinding("BeforePrint", "Visible", "Iif([Source2].Sum([Amount])-[Source3].Sum([Amount]) > '0',True,False)"));
-            xrDifference.ExpressionBindings.Add(Expression("[Difference]"));
-            xrNewBalance.ExpressionBindings.Add(Expression("[NewBalance]"));
-            xrDifferenceValue.ExpressionBindings.Add(Expression("[Source2].Sum([Amount])-[Source3].Sum([Amount])"));
-            xrNewBalanceValue.ExpressionBindings.Add(Expression("[PostedTotal]-[Source3].Sum([Amount])+[Source2].Sum([Amount])-[Source3].Sum([Amount])"));
+            xrBankTotalNonReconciled.ExpressionBindings.Add(Expression("Iif(IsNull([Source2].Sum([Amount])),0,-[Source2].Sum([Amount]))"));
+            xrPostedTotalNonReconciled.ExpressionBindings.Add(Expression("Iif(IsNull([Source3].Sum([Amount])),0,-[Source3].Sum([Amount]))"));
+            xrBankTotalVoid.ExpressionBindings.Add(Expression("[BankVoid]"));
+            xrPostedTotalVoid.ExpressionBindings.Add(Expression("[PostedVoid]"));
+            xrBankReconciled.ExpressionBindings.Add(Expression("[BankTotal]-Iif(IsNull([Source2].Sum([Amount])),0,[Source2].Sum([Amount]))+[BankVoid]"));
+            xrPostedReconciled.ExpressionBindings.Add(Expression("[PostedTotal]-Iif(IsNull([Source3].Sum([Amount])),0,[Source3].Sum([Amount]))+[PostedVoid]"));
+            xrBankAccountValue.ExpressionBindings.Add(Expression(GetExpressionForConcatenateProperty("[BankAccountLabel]", "[RegNo]","[Account]")));
+
+            //xrDifferencePanel.ExpressionBindings.Add(new ExpressionBinding("BeforePrint", "Visible", "Iif([Source2].Sum([Amount])-[Source3].Sum([Amount]) > '0',True,False)"));
+            //xrDifference.ExpressionBindings.Add(Expression("[Difference]"));
+            //xrNewBalance.ExpressionBindings.Add(Expression("[NewBalance]"));
+            //xrDifferenceValue.ExpressionBindings.Add(Expression("[Source2].Sum([Amount])-[Source3].Sum([Amount])"));
+            //xrNewBalanceValue.ExpressionBindings.Add(Expression("[PostedTotal]-[Source3].Sum([Amount])+[Source2].Sum([Amount])-[Source3].Sum([Amount])"));
         }
 
         private ExpressionBinding Expression(string expression)
@@ -87,6 +88,21 @@ namespace UnicontaClient.Pages.CustomPage
         private XRSummary Summary()
         {
             return new XRSummary() { Running = SummaryRunning.Report, Func = SummaryFunc.Sum, FormatString = "{0:n2}" };
+        }
+
+        private string GetExpressionForConcatenateProperty(params string[] propertyNames)
+        {
+            if (propertyNames != null && propertyNames.Length > 0)
+            {
+                var strBuilder = StringBuilderReuse.Create("FormatString('{0}: {1}-{2}'");
+                for (int i = 0; (i < propertyNames.Length); i++)
+                    strBuilder.Append(',').Append(propertyNames[i]);
+                strBuilder.Append(')');
+
+                return strBuilder.ToStringAndRelease();
+            }
+
+            return string.Empty;
         }
     }
 }

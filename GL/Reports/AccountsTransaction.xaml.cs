@@ -543,7 +543,6 @@ namespace UnicontaClient.Pages.CustomPage
                         gljournaLine.Text = string.IsNullOrEmpty(CWCopyVoucherToJrnl.Comment) ? trans.Text : CWCopyVoucherToJrnl.Comment;
                         gljournaLine.TransType = string.IsNullOrEmpty(CWCopyVoucherToJrnl.TransType) ? trans.TransType : CWCopyVoucherToJrnl.TransType;
 
-                        gljournaLine._DocumentDate = trans._DocumentDate;
                         gljournaLine._Account = trans._Account;
                         gljournaLine._Vat = trans._Vat;
                         gljournaLine._VatOperation = trans._VatOperation;

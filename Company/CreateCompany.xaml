@@ -49,6 +49,9 @@ x:Class="UnicontaClient.Pages.CustomPage.CreateCompany"
                                 <CorasauControls:CorasauLayoutItem FieldName="Currency" >
                                     <CorasauControls:ComboBoxEditor x:Name="cmbCurrency" SelectedItem="{Binding Currency,Mode=TwoWay}"/>
                                 </CorasauControls:CorasauLayoutItem>
+                                <CorasauControls:CorasauLayoutItem FieldName="Www">
+                                    <CorasauControls:TextEditor Text="{Binding Www ,Mode=TwoWay}" MaskType="RegEx" Mask="{StaticResource UrlValidationRegx}"/>
+                                </CorasauControls:CorasauLayoutItem>
                                 <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TopLogo}" >
                                     <CorasauControls:FileBrowseControl x:Name="browseTopLogo" />
                                 </CorasauControls:CorasauLayoutItem>

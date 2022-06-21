@@ -92,6 +92,9 @@ x:Class="UnicontaClient.Pages.CustomPage.ImportGLDailyJournalPage2"
                     <CorasauControls:CorasauLayoutItem FieldName="PhysPos" x:Name="liPhysPos">
                         <CorasauControls:TextEditor Text="{Binding PhysPos,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="FeePos" x:Name="liFeePos">
+                        <CorasauControls:TextEditor Text="{Binding FeePos,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
             </CorasauControls:CorasauLayoutGroup>
         </CorasauControls:CorasauLayoutControl>

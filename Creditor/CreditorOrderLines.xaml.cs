@@ -542,7 +542,7 @@ namespace UnicontaClient.Pages.CustomPage
                     DebtorOfferLines.FindOnEAN(rec, this.items, api, this.PriceLookup);
                     break;
                 case "Total":
-                    RecalculateAmount();
+                    Dispatcher.BeginInvoke(new Action(() => { RecalculateAmount(); }));
                     break;
                 case "Variant1":
                     if (rec._Variant1 != null)
@@ -598,7 +598,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         void RecalculateAmount()
         {
-            var ret = DebtorOfferLines.RecalculateLineSum((IList)dgCreditorOrderLineGrid.ItemsSource, this.exchangeRate);
+            var ret = DebtorOfferLines.RecalculateLineSum(orderMaster, (IEnumerable<DCOrderLineClient>)dgCreditorOrderLineGrid.ItemsSource, this.exchangeRate);
             double Amountsum = ret.Item1;
             double Costsum = ret.Item2;
             double AmountsumCompCur = ret.Item3;
@@ -1023,7 +1023,7 @@ namespace UnicontaClient.Pages.CustomPage
                             if (dbOrder._DeleteLines)
                                 reloadTask = Filter(null);
 
-                            if(invoicePostingResult.PostingResult.OrderDeleted)
+                            if (invoicePostingResult.PostingResult.OrderDeleted)
                             {
                                 object[] args = new object[] { dbOrder, true };
                                 globalEvents.OnRefresh(this.NameOfControl, args);
@@ -1252,6 +1252,19 @@ namespace UnicontaClient.Pages.CustomPage
                 }
                 rec.NotifyPropertyChanged("TaskSource");
             }
+        }
+        protected override bool LoadTemplateHandledLocally(IEnumerable<UnicontaBaseEntity> templateRows)
+        {
+            foreach (var _it in templateRows)
+            {
+                var row = _it as DCOrderLineClient;
+                row._CostPrice = 0;
+                row.ClearRef();
+                var item = (Uniconta.DataModel.InvItem)this.items.Get(row._Item);
+                if (item != null)
+                    row.SetCostFromItem(item);
+            }
+            return false;
         }
     }
 }

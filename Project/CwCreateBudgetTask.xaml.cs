@@ -90,16 +90,16 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (budgetGrpCache != null)
             {
-                var budGrp = budgetGrpCache.FirstOrDefault(s => s._Default);
+                var budGrp = (ProjectBudgetGroup)budgetGrpCache.FirstOrDefault(s => s._Default);
                 leGroup.SelectedItem = budGrp;
-                Group = budGrp?.KeyName;
+                Group = budGrp?.Number;
             }
 
             if (workspaceCache != null)
             {
-                var wrkspace = workspaceCache.FirstOrDefault(s => s._Default);
+                var wrkspace = (PrWorkSpace)workspaceCache.FirstOrDefault(s => s._Default);
                 leWorkspace.SelectedItem = wrkspace;
-                PrWorkSpace = wrkspace.KeyName;
+                PrWorkSpace = wrkspace?.Number;
             }
         }
 

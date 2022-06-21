@@ -63,7 +63,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrdersPage2"
                         <CorasauControls:TextEditor  Text="{Binding CustomsNo,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="Remark" LabelVerticalAlignment="Top" x:Name="liRemark">
-                        <CorasauControls:TextEditor  EditValue="{Binding Remark,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="{Binding ActualWidth, ElementName=txtOurRef}" AcceptsReturn="True" 
+                        <CorasauControls:TextEditor  EditValue="{Binding Remark,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="{Binding ActualWidth, ElementName=Requisition}" AcceptsReturn="True" 
                                                      VerticalContentAlignment="Top" TextWrapping="Wrap" MinHeight="60" />
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>

@@ -235,7 +235,6 @@ namespace UnicontaClient.Pages.CustomPage
         public string PrintBalanceReportPageFormat;
         public override object GetPrintParameter()
         {
-#if !SILVERLIGHT
             switch (PrintBalanceReportPageFormat)
             {
                 case "Excel":
@@ -251,7 +250,6 @@ namespace UnicontaClient.Pages.CustomPage
                     custPrint.Print();
                     break;
             }
-#endif
             return base.GetPrintParameter();
         }
         public override string NameOfControl
@@ -273,7 +271,6 @@ namespace UnicontaClient.Pages.CustomPage
             headerdata.DClblWidth = bal.ColumnSizeAmount == (byte)0 ? 100 : bal.ColumnSizeAmount;
             headerdata.FontSize = bal.FontSize == 0 ? 12 : bal.FontSize;
             headerdata.AmountSize = bal.ColumnSizeAmount == (byte)0 ? 100 : bal.ColumnSizeAmount;
-#if !SILVERLIGHT
             List<List<TemplateDataItems>> simpleLinkItems = new List<List<TemplateDataItems>>();
             var currentItems = ((TemplateDataContext)sourceData).TemplateReportlist;
             List<TemplateDataItems> currentLinkItems = new List<TemplateDataItems>();
@@ -321,18 +318,8 @@ namespace UnicontaClient.Pages.CustomPage
                 ps.Pages.AddRange(link.PrintingSystem.Pages);
             }
             custPrint.DocumentSource = ps;
-#endif
-#if SILVERLIGHT
-            TemplatePrintBaseModule printbase = new TemplatePrintBaseModule();
-            printbase.PageHeaderTemplate = (DataTemplate)this.Resources["pageHeaderTemplate"];
-            printbase.DetailTemplate = (DataTemplate)this.Resources["detailTemplate"];
-            printbase.HeaderTemplateDataContext = headerdata;
-            printbase.DetailsTemplateDataContext = (TemplateDataContext)sourceData;          
-            printbase.HeaderTemplateDataContext._Landscape = ((Balance)objBalance)._Landscape;
-            this.DataContext = printbase;
-#endif
         }
-#if !SILVERLIGHT
+
         List<TemplateDataItems> obdata;
         private void link_CreateDetail(object sender, DevExpress.Xpf.Printing.CreateAreaEventArgs e)
         {
@@ -369,7 +356,6 @@ namespace UnicontaClient.Pages.CustomPage
             link.CreateDetail += link_CreateDetail;
             return link;
         }
-#endif
     }
 
     public class TemplatePrintBaseModule : BaseModulel
@@ -382,9 +368,6 @@ namespace UnicontaClient.Pages.CustomPage
         {
 
             SimpleLink link = new SimpleLink();
-#if SILVERLIGHT
-            link.ExportServiceUri = HeaderTemplateDataContext.exportServiceUrl;
-#endif
             link.PrintingSystem.ExportOptions.Html.EmbedImagesInHTML = true;
             ExportOptions options = link.PrintingSystem.ExportOptions;
             ExportOptionKind[] OptionsKinds = new ExportOptionKind[]{

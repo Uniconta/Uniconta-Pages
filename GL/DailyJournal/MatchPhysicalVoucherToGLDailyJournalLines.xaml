@@ -6,6 +6,7 @@ x:Class="UnicontaClient.Pages.CustomPage.MatchPhysicalVoucherToGLDailyJournalLin
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
                     xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors"
              xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+                    xmlns:docking="http://schemas.devexpress.com/winfx/2008/xaml/docking"
     xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage" 
     xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools">
     <Grid x:Name="LayoutRoot"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
@@ -15,141 +16,147 @@ x:Class="UnicontaClient.Pages.CustomPage.MatchPhysicalVoucherToGLDailyJournalLin
         </Grid.RowDefinitions>
         <CorasauControls:CorasauRibbonControl x:Name="localMenu" XMLSourcePath=";component/Pages/GL/DailyJournal/MatchPhysicalVoucherGLDailyJournalLinesRibbon.xml"/>
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
-            <Grid x:Name="layoutGrid">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*"  />
-                    <RowDefinition Height="10" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*"  />
-                </Grid.RowDefinitions>
-                <TextBlock Margin="3,0,0,3" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=PhysicalVoucher}" HorizontalAlignment="Left" VerticalAlignment="Bottom" />
-                <localPage:VouchersGridLocal x:Name="dgvoucherGrid" Grid.Row="1" AutoGenerateColumns="None">
-                    <localPage:VouchersGridLocal.Columns>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="IsAttached" Width="60"  />
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="PrimaryKeyId" Width="70"  />
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="PostingDate" Width="80"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="Created" ShowTime="True"  Width="120" AllowSorting="True" Visible="False" >
-                            <localPage:CorasauDataGridTemplateColumnClient.EditSettings>
-                                <editor:TextEditSettings DisplayFormat="g" MaskType="DateTime" />
-                            </localPage:CorasauDataGridTemplateColumnClient.EditSettings>
-                        </localPage:CorasauDataGridTemplateColumnClient>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="UserName"  Width="100" Visible="False" />
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="UserLogidId" Width="100" Visible="False"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="ApproverName" Width="100" Visible="False"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="ApproverLogidId" Width="100" Visible="False"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="DocumentDate" Width="85" Visible="False"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="Approved" Width="70" />
-                        <localPage:CorasauDataGridForeignKeyColumnClient x:Name="CreditorAccount"  Width="90" />
-                        <localPage:CorasauDataGridForeignKeyColumnClient x:Name="CreditorName" Visible="False" />
-                        <localPage:CorasauDataGridTemplateColumnClient FieldName="Text" x:Name="vcText" Width="250" />
-                        <localPage:CorasauDataGridTemplateColumnClient FieldName="Debit" x:Name="colDebit" AllowEditing="True" Width="85" Visible="False"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="Credit" AllowEditing="True" Width="85" Visible="False"/>
-                        <localPage:CorasauDataGridTemplateColumnClient FieldName="Amount" x:Name="vcAmount" AllowEditing="True" Width="90" />
-                        <localPage:CorasauDataGridTemplateColumnClient FieldName="Currency" x:Name="vcCurrency" Width="35" Visible="False" />
-                        <localPage:CorasauDataGridTemplateColumnClient FieldName="Invoice" x:Name="vcInvoice" AllowEditing="True" Width="80" />
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="Fileextension" Width="55" />
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="Content" />
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="CostAccount" Visible="False"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="PayAccount"  Visible="False"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="Vat"  Visible="False"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="Project" Visible="False" Width="90"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Visible="False" Width="90"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="PaymentMethod" Width="80" Visible="False"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="PaymentId" Visible="False" MinWidth="100"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="Approver1" Visible="False" Width="80"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="Approver2" Visible="False" Width="80"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="Approved2" Width="70" Visible="False"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="ViewInFolder" AllowEditing="False" Visible="False" Width="100" />
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="PayDate" Width="85" Visible="False" />
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="VatOperation"  Visible="False"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="TransType"  Visible="False" />
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="PurchaseNumber" Width="85" Visible="False" />
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="clDim1" Width="70" FieldName="Dimension1" Visible="False" />
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="clDim2" Width="70" FieldName="Dimension2" Visible="False" />
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="clDim3" Width="70" FieldName="Dimension3" Visible="False" />
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="clDim4" Width="70" FieldName="Dimension4" Visible="False" />
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="clDim5" Width="70" FieldName="Dimension5" Visible="False" />
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="CostAccountName" Visible="False"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="PayAccountName" Visible="False"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="Approver1Name" Visible="False" />
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="Approver2Name" Visible="False" />
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="ProjectName" Visible="False"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="CategoryName" Visible="False"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="Qty" Visible="False" Mask="N2"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="Reference" Visible="False" />
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="PostingInstruction" MinWidth="300" />
-                    </localPage:VouchersGridLocal.Columns>
-                </localPage:VouchersGridLocal>
-                <Border Grid.Row="2" HorizontalAlignment="Stretch" Height="10" VerticalAlignment="Center" Background="{StaticResource WindowHeaderGradient}" />
-                <TextBlock Margin="3,0,0,3" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Journallines}" Grid.Row="3" HorizontalAlignment="Left" VerticalAlignment="Bottom" />
-                <localPage:GLDailyJournalLineGridLocal x:Name="dgGldailyJournalLinesGrid" AutoGenerateColumns="None" Grid.Row="4">
-                    <localPage:GLDailyJournalLineGridLocal.Columns>
-                        <localPage:CorasauDataGridTemplateColumnClient FieldName="HasVoucher" ShowInColumnChooser="True" Width="60" ReadOnly="True" />
-                        <localPage:CorasauDataGridTemplateColumnClient FieldName="DocumentRef" Width="70" ReadOnly="True" />
-                        <localPage:CorasauDataGridTemplateColumnClient FieldName="Date" x:Name="colDate" Width="80" ReadOnly="True"/>
-                        <localPage:CorasauDataGridTemplateColumnClient FieldName="Voucher" x:Name="colVoucher" Visible="false" Width="80" ReadOnly="True"/>
-                        <localPage:ComboBoxColumnClient x:Name="AccountType" Width="70" />
-                        <localPage:CorasauDataGridForeignKeyColumnClient x:Name="Account" Width="100">
-                            <localPage:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
-                                <ControlTemplate>
-                                    <TextBlock Margin="2" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.Account,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"></TextBlock>
-                                </ControlTemplate>
-                            </localPage:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
-                            <localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
-                                <DataTemplate>
-                                    <localPage:CorasauGridLookupEditorClient HasCustomLookUp="true"  GotFocus="Account_GotFocus" x:Name="PART_Editor" ItemsSource="{Binding DataContext.RowData.Row.AccountSource,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" LostFocus="Account_LostFocus"/>
-                                </DataTemplate>
-                            </localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
-                        </localPage:CorasauDataGridForeignKeyColumnClient>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="colTransType"  FieldName="TransType" ReadOnly="True" Visible="False" />
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="Text" Width="250"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="Amount" Width="90"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="Debit"  ReadOnly="True" Visible="False"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="colCredit" FieldName="Credit" ReadOnly="True" Visible="False"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="Invoice" Width="80" ReadOnly="True"/>
-                        <localPage:ComboBoxColumnClient x:Name="OffsetAccountType"  Width="70"/>
-                        <localPage:CorasauDataGridForeignKeyColumnClient x:Name="OffsetAccount" Width="100">
-                            <localPage:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
-                                <ControlTemplate>
-                                    <TextBlock Margin="2" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.OffsetAccount,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"></TextBlock>
-                                </ControlTemplate>
-                            </localPage:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
-                            <localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
-                                <DataTemplate>
-                                    <localPage:CorasauGridLookupEditorClient HasCustomLookUp="true" GotFocus="OffsetAccount_GotFocus" x:Name="PART_Editor" ItemsSource="{Binding DataContext.RowData.Row.OffsetAccountSource,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" LostFocus="OffsetAccount_LostFocus"/>
-                                </DataTemplate>
-                            </localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
-                        </localPage:CorasauDataGridForeignKeyColumnClient>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="colVat" FieldName="Vat" Width="60" ReadOnly="True"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="colVatOperation" FieldName="VatOperation" Width="50" ReadOnly="True"/>
-                        <localPage:CorasauDataGridForeignKeyColumnClient x:Name="OffsetVat" Width="60" ReadOnly="True"/>
-                        <localPage:CorasauDataGridForeignKeyColumnClient x:Name="VatOffsetOperation" Width="50" ReadOnly="True"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="Currency" Width="35" ReadOnly="True"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="DebitCur" ReadOnly="True"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="CreditCur" ReadOnly="True"/>
-                        <localPage:CorasauDataGridForeignKeyColumnClient x:Name="Payment"  ReadOnly="True"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="Settlements"  ReadOnly="True"/>
-                        <localPage:CorasauDataGridForeignKeyColumnClient x:Name="Split" Visible="False" ReadOnly="True"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="SplitDate" Width="90" Visible="False" ReadOnly="True"/>
-                        <localPage:CorasauDataGridForeignKeyColumnClient x:Name="Withholding" AllowEditing="False" Visible="False" ReadOnly="True"/>
-                        <localPage:CorasauDataGridForeignKeyColumnClient Width="70" FieldName="Dimension1" x:Name="coldim1" ReadOnly="True"/>
-                        <localPage:CorasauDataGridForeignKeyColumnClient Width="70" FieldName="Dimension2" x:Name="coldim2" ReadOnly="True"/>
-                        <localPage:CorasauDataGridForeignKeyColumnClient Width="70" FieldName="Dimension3" x:Name="coldim3" ReadOnly="True"/>
-                        <localPage:CorasauDataGridForeignKeyColumnClient Width="70" FieldName="Dimension4" x:Name="coldim4" ReadOnly="True"/>
-                        <localPage:CorasauDataGridForeignKeyColumnClient Width="70" FieldName="Dimension5" x:Name="coldim5" ReadOnly="True"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="AccountName" ReadOnly="True" Visible="False" />
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="OffsetAccountName" ReadOnly="True" Visible="False" />
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="VatAmount" ReadOnly="True" Visible="False" />
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="AmountCur" Visible="False" ReadOnly="True"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="DCPostType" Visible="False" ReadOnly="True"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="colQty" FieldName="Qty" Width="70" Visible="False" ReadOnly="True"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="colPaymentId" FieldName="PaymentId" Width="150" Visible="False" ReadOnly="True"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="colProject" FieldName="Project" Visible="False" ReadOnly="True"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="colPrCategory" FieldName="PrCategory" Visible="False" ReadOnly="True"/>
-                    </localPage:GLDailyJournalLineGridLocal.Columns>
-                </localPage:GLDailyJournalLineGridLocal>
-            </Grid>
+            <docking:DockLayoutManager x:Name="DockingControl" AllowCustomization="False">
+                <docking:LayoutGroup x:Name="lGroup" AllowDrag="False" AllowDock="False" AllowFloat="False" Orientation="Vertical" AllowContextMenu="False" >
+                    <docking:LayoutPanel x:Name="layOutPhysicalVoucher" FloatOnDoubleClick="False" AllowDrag="False" AllowDock="False" AllowClose="False" AllowContextMenu="False" AllowMaximize="False" AllowDockToDocumentGroup="False" ShowCloseButton="False"  ShowPinButton="False">
+                        <docking:LayoutPanel.CaptionTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=PhysicalVoucher}" />
+                            </DataTemplate>
+                        </docking:LayoutPanel.CaptionTemplate>
+                        <localPage:VouchersGridLocal x:Name="dgvoucherGrid" AutoGenerateColumns="None" HorizontalAlignment="Stretch">
+                            <localPage:VouchersGridLocal.Columns>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="IsAttached" Width="60"  />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="PrimaryKeyId" Width="70"  />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="PostingDate" Width="80"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Created" ShowTime="True"  Width="120" AllowSorting="True" Visible="False" >
+                                    <localPage:CorasauDataGridTemplateColumnClient.EditSettings>
+                                        <editor:TextEditSettings DisplayFormat="g" MaskType="DateTime" />
+                                    </localPage:CorasauDataGridTemplateColumnClient.EditSettings>
+                                </localPage:CorasauDataGridTemplateColumnClient>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="UserName"  Width="100" Visible="False" />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="UserLogidId" Width="100" Visible="False"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="ApproverName" Width="100" Visible="False"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="ApproverLogidId" Width="100" Visible="False"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="DocumentDate" Width="85" Visible="False"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Approved" Width="70" />
+                                <localPage:CorasauDataGridForeignKeyColumnClient x:Name="CreditorAccount"  Width="90" />
+                                <localPage:CorasauDataGridForeignKeyColumnClient x:Name="CreditorName" Visible="False" />
+                                <localPage:CorasauDataGridTemplateColumnClient FieldName="Text" x:Name="vcText" Width="250" />
+                                <localPage:CorasauDataGridTemplateColumnClient FieldName="Debit" x:Name="colDebit" AllowEditing="True" Width="85" Visible="False"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Credit" AllowEditing="True" Width="85" Visible="False"/>
+                                <localPage:CorasauDataGridTemplateColumnClient FieldName="Amount" x:Name="vcAmount" AllowEditing="True" Width="90" />
+                                <localPage:CorasauDataGridTemplateColumnClient FieldName="Currency" x:Name="vcCurrency" Width="35" Visible="False" />
+                                <localPage:CorasauDataGridTemplateColumnClient FieldName="Invoice" x:Name="vcInvoice" AllowEditing="True" Width="80" />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Fileextension" Width="55" />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Content" />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="CostAccount" Visible="False"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="PayAccount"  Visible="False"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Vat"  Visible="False"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Project" Visible="False" Width="90"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Visible="False" Width="90"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="PaymentMethod" Width="80" Visible="False"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="PaymentId" Visible="False" MinWidth="100"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Approver1" Visible="False" Width="80"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Approver2" Visible="False" Width="80"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Approved2" Width="70" Visible="False"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="ViewInFolder" AllowEditing="False" Visible="False" Width="100" />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="PayDate" Width="85" Visible="False" />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="VatOperation"  Visible="False"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="TransType"  Visible="False" />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="PurchaseNumber" Width="85" Visible="False" />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="clDim1" Width="70" FieldName="Dimension1" Visible="False" />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="clDim2" Width="70" FieldName="Dimension2" Visible="False" />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="clDim3" Width="70" FieldName="Dimension3" Visible="False" />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="clDim4" Width="70" FieldName="Dimension4" Visible="False" />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="clDim5" Width="70" FieldName="Dimension5" Visible="False" />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="CostAccountName" Visible="False"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="PayAccountName" Visible="False"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Approver1Name" Visible="False" />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Approver2Name" Visible="False" />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="ProjectName" Visible="False"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="CategoryName" Visible="False"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Qty" Visible="False" Mask="N2"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Reference" Visible="False" />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="PostingInstruction" MinWidth="300" />
+                            </localPage:VouchersGridLocal.Columns>
+                        </localPage:VouchersGridLocal>
+                    </docking:LayoutPanel>
+                    <docking:LayoutPanel x:Name="layOutJournalLines" FloatOnDoubleClick="False" AllowDrag="False" AllowDock="False" AllowClose="False" AllowContextMenu="False" AllowMaximize="False" AllowDockToDocumentGroup="False" ShowCloseButton="False"  ShowPinButton="False">
+                        <docking:LayoutPanel.CaptionTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Journallines}" />
+                            </DataTemplate>
+                        </docking:LayoutPanel.CaptionTemplate>
+                        <localPage:GLDailyJournalLineGridLocal x:Name="dgGldailyJournalLinesGrid" AutoGenerateColumns="None" HorizontalAlignment="Stretch">
+                            <localPage:GLDailyJournalLineGridLocal.Columns>
+                                <localPage:CorasauDataGridTemplateColumnClient FieldName="HasVoucher" ShowInColumnChooser="True" Width="60" ReadOnly="True" />
+                                <localPage:CorasauDataGridTemplateColumnClient FieldName="DocumentRef" Width="70" ReadOnly="True" />
+                                <localPage:CorasauDataGridTemplateColumnClient FieldName="Date" x:Name="colDate" Width="80" ReadOnly="True"/>
+                                <localPage:CorasauDataGridTemplateColumnClient FieldName="Voucher" x:Name="colVoucher" Visible="false" Width="80" ReadOnly="True"/>
+                                <localPage:ComboBoxColumnClient x:Name="AccountType" Width="70" />
+                                <localPage:CorasauDataGridForeignKeyColumnClient x:Name="Account" Width="100">
+                                    <localPage:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
+                                        <ControlTemplate>
+                                            <TextBlock Margin="2" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.Account,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"></TextBlock>
+                                        </ControlTemplate>
+                                    </localPage:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
+                                    <localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
+                                        <DataTemplate>
+                                            <localPage:CorasauGridLookupEditorClient HasCustomLookUp="true"  GotFocus="Account_GotFocus" x:Name="PART_Editor" ItemsSource="{Binding DataContext.RowData.Row.AccountSource,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" LostFocus="Account_LostFocus"/>
+                                        </DataTemplate>
+                                    </localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
+                                </localPage:CorasauDataGridForeignKeyColumnClient>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="colTransType"  FieldName="TransType" ReadOnly="True" Visible="False" />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Text" Width="250"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Amount" Width="90"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Debit"  ReadOnly="True" Visible="False"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="colCredit" FieldName="Credit" ReadOnly="True" Visible="False"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Invoice" Width="80" ReadOnly="True"/>
+                                <localPage:ComboBoxColumnClient x:Name="OffsetAccountType"  Width="70"/>
+                                <localPage:CorasauDataGridForeignKeyColumnClient x:Name="OffsetAccount" Width="100">
+                                    <localPage:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
+                                        <ControlTemplate>
+                                            <TextBlock Margin="2" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.OffsetAccount,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"></TextBlock>
+                                        </ControlTemplate>
+                                    </localPage:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
+                                    <localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
+                                        <DataTemplate>
+                                            <localPage:CorasauGridLookupEditorClient HasCustomLookUp="true" GotFocus="OffsetAccount_GotFocus" x:Name="PART_Editor" ItemsSource="{Binding DataContext.RowData.Row.OffsetAccountSource,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" LostFocus="OffsetAccount_LostFocus"/>
+                                        </DataTemplate>
+                                    </localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
+                                </localPage:CorasauDataGridForeignKeyColumnClient>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="colVat" FieldName="Vat" Width="60" ReadOnly="True"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="colVatOperation" FieldName="VatOperation" Width="50" ReadOnly="True"/>
+                                <localPage:CorasauDataGridForeignKeyColumnClient x:Name="OffsetVat" Width="60" ReadOnly="True"/>
+                                <localPage:CorasauDataGridForeignKeyColumnClient x:Name="VatOffsetOperation" Width="50" ReadOnly="True"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Currency" Width="35" ReadOnly="True"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="DebitCur" ReadOnly="True"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="CreditCur" ReadOnly="True"/>
+                                <localPage:CorasauDataGridForeignKeyColumnClient x:Name="Payment"  ReadOnly="True"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Settlements"  ReadOnly="True"/>
+                                <localPage:CorasauDataGridForeignKeyColumnClient x:Name="Split" Visible="False" ReadOnly="True"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="SplitDate" Width="90" Visible="False" ReadOnly="True"/>
+                                <localPage:CorasauDataGridForeignKeyColumnClient x:Name="Withholding" AllowEditing="False" Visible="False" ReadOnly="True"/>
+                                <localPage:CorasauDataGridForeignKeyColumnClient Width="70" FieldName="Dimension1" x:Name="coldim1" ReadOnly="True"/>
+                                <localPage:CorasauDataGridForeignKeyColumnClient Width="70" FieldName="Dimension2" x:Name="coldim2" ReadOnly="True"/>
+                                <localPage:CorasauDataGridForeignKeyColumnClient Width="70" FieldName="Dimension3" x:Name="coldim3" ReadOnly="True"/>
+                                <localPage:CorasauDataGridForeignKeyColumnClient Width="70" FieldName="Dimension4" x:Name="coldim4" ReadOnly="True"/>
+                                <localPage:CorasauDataGridForeignKeyColumnClient Width="70" FieldName="Dimension5" x:Name="coldim5" ReadOnly="True"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="AccountName" ReadOnly="True" Visible="False" />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="OffsetAccountName" ReadOnly="True" Visible="False" />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="VatAmount" ReadOnly="True" Visible="False" />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="AmountCur" Visible="False" ReadOnly="True"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="DCPostType" Visible="False" ReadOnly="True"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="colQty" FieldName="Qty" Width="70" Visible="False" ReadOnly="True"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="colPaymentId" FieldName="PaymentId" Width="150" Visible="False" ReadOnly="True"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="colProject" FieldName="Project" Visible="False" ReadOnly="True"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="colPrCategory" FieldName="PrCategory" Visible="False" ReadOnly="True"/>
+                            </localPage:GLDailyJournalLineGridLocal.Columns>
+                        </localPage:GLDailyJournalLineGridLocal>
+                    </docking:LayoutPanel>
+                </docking:LayoutGroup>
+            </docking:DockLayoutManager>
         </CorasauControls:BusyIndicator>
     </Grid>
 </Pages:GridBasePage>

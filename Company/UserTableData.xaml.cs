@@ -37,12 +37,11 @@ namespace UnicontaClient.Pages.CustomPage
     }
     public partial class UserTableData : GridBasePage
     {
-        public override string LayoutName { get { return string.Format("TableData_{0}", layoutname != null ? layoutname : this.thMaster?._Name); } }
+        public override string LayoutName { get { return string.Concat("TableData_", layoutname != null ? layoutname : this.thMaster?._Name); } }
 
         public override string NameOfControl { get { return TabControls.UserTableData; } }
 
         TableHeader thMaster;
-        bool isTableDataWithKey;
         string layoutname;
         UnicontaBaseEntity master;
         string mastertabName;
@@ -134,6 +133,14 @@ namespace UnicontaClient.Pages.CustomPage
             dgTabledataGrid.UpdateMaster(args);
             SetHeader(args);
             InitQuery();
+        }
+
+        public override Task InitQuery()
+        {
+            var rec = Activator.CreateInstance(this.dgTabledataGrid.UserTableType) as Uniconta.DataModel.TableDataWithKey;
+            if (rec != null && this.dgTabledataGrid.ReuseCache(rec))
+                return null;
+            return base.InitQuery();
         }
 
         void SetHeader(UnicontaBaseEntity args)

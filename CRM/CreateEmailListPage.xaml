@@ -51,7 +51,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreateEmailListPage"
             <CheckBox x:Name="cbxContact" Grid.Column="2" Grid.Row="3"  IsChecked="True" Margin="0,3,3,3"/>
 
             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=SearchInInvLines}" Grid.Column="0" Grid.Row="4" Margin="3,3,3,3"/>
-            <CheckBox x:Name="cbxSearchInvLines" Grid.Column="2" Grid.Row="4"  IsChecked="False" Margin="0,3,3,3"/>
+            <CheckBox x:Name="cbxSearchInvLines" Grid.Column="2" Grid.Row="4" Checked="cbxSearchInvLines_Checked"  IsChecked="False" Margin="0,3,3,3"/>
 
             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Interests}" Grid.Column="4" Grid.Row="0" Margin="3,3,3,3"/>
 

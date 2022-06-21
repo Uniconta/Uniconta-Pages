@@ -221,7 +221,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (IsInvoiceTaskInProgress)
             {
-                UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("TaskAlreadyRunning"), Uniconta.ClientTools.Localization.lookup("Warning"));
+                UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("UpdateInBackground"), Uniconta.ClientTools.Localization.lookup("Warning"));
                 return;
             }
 

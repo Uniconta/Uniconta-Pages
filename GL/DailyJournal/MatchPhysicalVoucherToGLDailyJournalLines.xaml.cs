@@ -30,6 +30,13 @@ namespace UnicontaClient.Pages.CustomPage
     }
     public class GLDailyJournalLineGridLocal : GLDailyJournalLineGrid
     {
+        public GLDailyJournalLineGridLocal()
+        {
+            CustomTableView tableView = new CustomTableView();
+            tableView.ShowGroupPanel = false;
+            SetTableViewStyle(tableView);
+            this.View = tableView;
+        }
         public override bool SingleBufferUpdate { get { return false; } }
     }
     public partial class MatchPhysicalVoucherToGLDailyJournalLines : GridBasePage

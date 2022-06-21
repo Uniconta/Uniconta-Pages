@@ -523,7 +523,6 @@ namespace UnicontaClient.Pages.CustomPage
             double lastTotal = 0d, lastCost = 0d;
             double Amountsum = 0d;
             double Costsum = 0d;
-            double vat = 0d;
             string VatCode = null;
             var inclVat = (order != null) ? order._PricesInclVat : false;
             if (source != null)
@@ -537,11 +536,15 @@ namespace UnicontaClient.Pages.CustomPage
                         inclVat = false;
                 }
 
+                double qty = 0d;
+                int i = 0;
                 foreach (var lin in source)
                 {
+                    i++;
                     var orderLine = (DCOrderLineClient)lin;
                     if (!orderLine._Subtotal)
                     {
+                        qty += orderLine._Qty;
                         var cost = orderLine.costvalue();
                         Costsum += cost;
                         var sales = orderLine._Amount;
@@ -574,7 +577,13 @@ namespace UnicontaClient.Pages.CustomPage
                         lastCost = Costsum;
                     }
                 }
+                if (order != null)
+                {
+                    order.NoLines = i;
+                    order.TotalQty = Math.Round(qty, 10);
+                }
             }
+            Amountsum = Math.Round(Amountsum, 2);
             double AmountsumCur = exRate == 0d ? Amountsum : Math.Round(Amountsum / exRate, 2);
 
             if (inclVat && VatCode != null)
@@ -584,6 +593,15 @@ namespace UnicontaClient.Pages.CustomPage
                     AmountsumCur = Math.Round(AmountsumCur * 100 / (100 + vatRef._Rate), 2);
             }
             Costsum = Math.Round(Costsum, 2);
+            if (order != null && (order._OrderTotal != Amountsum || order._CostValue != Costsum))
+            {
+                order._CostValue = Costsum;
+                order._OrderTotal = Amountsum;
+                order.NotifyPropertyChanged("OrderTotal");
+                order.NotifyPropertyChanged("CostValue");
+                order.NotifyPropertyChanged("Margin");
+                order.NotifyPropertyChanged("MarginRatio");
+            }
             return Tuple.Create(Amountsum, Costsum, AmountsumCur);
         }
 
@@ -935,7 +953,9 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override async Task<ErrorCodes> saveGrid()
         {
+            var offerLine = dgDebtorOfferLineGrid.SelectedItem as DCOrderLine;
             dgDebtorOfferLineGrid.SelectedItem = null;
+            dgDebtorOfferLineGrid.SelectedItem = offerLine;
             if (dgDebtorOfferLineGrid.HasUnsavedData)
             {
                 ErrorCodes res = await dgDebtorOfferLineGrid.SaveData();
@@ -1039,6 +1059,19 @@ namespace UnicontaClient.Pages.CustomPage
             var editor = (CorasauGridLookupEditorClient)sender;
             prevVariant2 = editor;
             editor.isValidate = true;
+        }
+        protected override bool LoadTemplateHandledLocally(IEnumerable<UnicontaBaseEntity> templateRows)
+        {
+            foreach (var _it in templateRows)
+            {
+                var row = _it as DCOrderLineClient;
+                row._CostPrice = 0;
+                row.ClearRef();
+                var item = (Uniconta.DataModel.InvItem)this.items.Get(row._Item);
+                if (item != null)
+                    row.SetCostFromItem(item);
+            }
+            return false;
         }
     }
 }

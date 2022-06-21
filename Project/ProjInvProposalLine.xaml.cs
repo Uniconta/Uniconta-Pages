@@ -156,7 +156,8 @@ namespace UnicontaClient.Pages.CustomPage
             if (!company.Production)
                 UtilDisplay.RemoveMenuCommand(rb, "CreateProduction");
             if (IsOnAccountInvoicing(master))
-                UtilDisplay.RemoveMenuCommand(rb, "RegenerateOrderFromProject");
+                UtilDisplay.RemoveMenuCommand(rb, new string[] { "RegenerateOrderFromProject", "ProjectTransaction" });
+
             InitialLoad();
             dgProjInvProposedLineGrid.ShowTotalSummary();
             dgProjInvProposedLineGrid.CustomSummary += dgProjInvProposedLineGrid_CustomSummary;

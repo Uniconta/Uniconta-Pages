@@ -27,13 +27,14 @@ using Uniconta.API.Service;
 using Uniconta.API.Crm;
 using Uniconta.API.System;
 using Uniconta.API.Inventory;
+using System.Collections.ObjectModel;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
     public class CreateEmailLisGrid : CorasauDataGridClient
     {
-        public override Type TableType { get { return typeof(CrmCampaignMemberClient); }}
+        public override Type TableType { get { return typeof(CrmCampaignMemberClient); } }
         public override bool CanInsert { get { return false; } }
         public override bool Readonly { get { return false; } }
     }
@@ -77,6 +78,11 @@ namespace UnicontaClient.Pages.CustomPage
         UnicontaBaseEntity master;
 
         SQLCache InterestCache, ProductCache, Debtors, Creditors, Prospects, Contacts;
+
+        static bool isDebtor, isCreditor, isProspect, isContact, isSearchInInvLns, isOnlyRcdsWthEmail, isTelephone, isDefaultValIsSet;
+        static DateTime fromDate, toDate;
+        static int interestMatchg, ProdMatchg;
+        static ObservableCollection<object> interestValues, productValues;
         public override string NameOfControl
         {
             get { return TabControls.CreateEmailListPage.ToString(); }
@@ -122,6 +128,30 @@ namespace UnicontaClient.Pages.CustomPage
                 UtilDisplay.RemoveMenuCommand(rb, "SaveAndExit");
             }
             dgCreateEmailList.ShowTotalSummary();
+
+            SetDefaultValuesToSearchFilterControls();
+        }
+
+        void SetDefaultValuesToSearchFilterControls()
+        {
+            if (isDefaultValIsSet)
+            {
+                cbxDebtor.IsChecked = isDebtor;
+                cbxCreditor.IsChecked = isCreditor;
+                cbxProspects.IsChecked = isProspect;
+                cbxContact.IsChecked = isContact;
+                cbxSearchInvLines.IsChecked = isSearchInInvLns;
+                cbxOnlyEmails.IsChecked = isOnlyRcdsWthEmail;
+                cbxOnlyTelephone.IsChecked = isTelephone;
+                if (fromDate.Date != DateTime.MinValue)
+                    txtDateFrm.DateTime = fromDate.Date;
+                if (toDate.Date != DateTime.MinValue)
+                    txtDateTo.DateTime = toDate.Date;
+                cmbInterestMatch.SelectedIndex = interestMatchg;
+                cmbProductsMatch.SelectedIndex = ProdMatchg;
+                cmbInterests.EditValue = interestValues;
+                cmbProducts.EditValue = productValues;
+            }
         }
 
         public override Task InitQuery() { return null; }
@@ -137,10 +167,28 @@ namespace UnicontaClient.Pages.CustomPage
             ProductCache = Comp.GetCache(typeof(Uniconta.DataModel.CrmProduct)) ?? await api.LoadCache(typeof(Uniconta.DataModel.CrmProduct));
             cmbProducts.ItemsSource = ProductCache?.GetKeyList();
 
-            Debtors = Comp.GetCache(typeof(Uniconta.DataModel.Debtor))?? await api.LoadCache(typeof(Uniconta.DataModel.Debtor));
+            Debtors = Comp.GetCache(typeof(Uniconta.DataModel.Debtor)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Debtor));
             Prospects = Comp.GetCache(typeof(Uniconta.DataModel.CrmProspect)) ?? await api.LoadCache(typeof(Uniconta.DataModel.CrmProspect));
             Creditors = Comp.GetCache(typeof(Uniconta.DataModel.Creditor)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Creditor));
             Contacts = Comp.GetCache(typeof(Uniconta.DataModel.Contact)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Contact));
+        }
+
+        void GetDafaultSearchFilterValues()
+        {
+            isDefaultValIsSet = true;
+            isDebtor = (bool)cbxDebtor.IsChecked;
+            isCreditor = (bool)cbxCreditor.IsChecked;
+            isProspect = (bool)cbxProspects.IsChecked;
+            isContact = (bool)cbxContact.IsChecked;
+            isSearchInInvLns = (bool)cbxSearchInvLines.IsChecked;
+            isOnlyRcdsWthEmail = (bool)cbxOnlyEmails.IsChecked;
+            isTelephone = (bool)cbxOnlyTelephone.IsChecked;
+            fromDate = txtDateFrm.DateTime;
+            toDate = txtDateTo.DateTime;
+            interestMatchg = cmbInterestMatch.SelectedIndex;
+            ProdMatchg = cmbProductsMatch.SelectedIndex;
+            interestValues = cmbInterests.SelectedItems ;
+            productValues = cmbProducts.SelectedItems ;
         }
 
         void localMenu_OnItemClicked(string ActionType)
@@ -149,11 +197,12 @@ namespace UnicontaClient.Pages.CustomPage
             switch (ActionType)
             {
                 case "Search":
+                    GetDafaultSearchFilterValues();
                     LoadEmails();
                     break;
                 case "DeleteRow":
-                    if (selectedItem != null);
-                        dgCreateEmailList.DeleteRow();
+                    if (selectedItem != null) ;
+                    dgCreateEmailList.DeleteRow();
                     break;
 
                 case "DebtorFilter":
@@ -394,6 +443,12 @@ namespace UnicontaClient.Pages.CustomPage
         public IEnumerable<PropValuePair> invItemFilterValues;
         public FilterSorter invItemPropSort;
 
+        private void cbxSearchInvLines_Checked(object sender, RoutedEventArgs e)
+        {
+            var isProspectSel = (bool)cbxSearchInvLines.IsChecked;
+            cbxProspects.IsChecked = !isProspectSel;
+        }
+
         void invItemFilterDialog_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             if (invItemFilterDialog.DialogResult == true)
@@ -425,8 +480,8 @@ namespace UnicontaClient.Pages.CustomPage
             prospectDefaultFilters = null;
             contactDefaultFilters = null;
             creditorDefaultFilters = null;
-            invItemDefaultFilters= null;
-            invTransDefaultFilters= null;
+            invItemDefaultFilters = null;
+            invTransDefaultFilters = null;
         }
         public void SetFilterSortFields()
         {
@@ -434,8 +489,8 @@ namespace UnicontaClient.Pages.CustomPage
             prospectDefaultSort = null;
             contactDefaultSort = null;
             creditorDefaultSort = null;
-            invItemDefaultSort=null;
-            invTransDefaultSort= null;
+            invItemDefaultSort = null;
+            invTransDefaultSort = null;
         }
 
         static bool HasMatch(long maskUser, long mask, bool MatchAll)

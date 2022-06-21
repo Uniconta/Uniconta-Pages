@@ -268,8 +268,8 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         var creditors = credCache.GetKeyStrRecords as Uniconta.DataModel.Creditor[];
 
-                        var newLines = new List<GLDailyJournalLineClient>(vouchers.data.Length);
-                        var updateCreditor = new List<Uniconta.DataModel.Creditor>();
+                        var updateLines = new List<GLDailyJournalLineClient>(vouchers.data.Length);
+                        List<Uniconta.DataModel.Creditor> CreList = null;
 
                         foreach (var voucher in vouchers.data)
                         {
@@ -297,10 +297,8 @@ namespace UnicontaClient.Pages.CustomPage
                                 }
                             }
 
-                            var creditorCVR = string.Empty;
                             bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "company_vat_reg_no", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
-                            if (bsItem != null)
-                                creditorCVR = bsItem.value;
+                            var creditorCVR = bsItem?.value ?? string.Empty;
 
                             bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "total_amount_incl_vat", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
                             if (bsItem != null)
@@ -342,40 +340,28 @@ namespace UnicontaClient.Pages.CustomPage
                                 journalLine._Currency = (byte)currencyISO;
                             }
 
-                            string bbanAcc = null;
                             bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_account_number", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
-                            if (bsItem != null)
-                                bbanAcc = bsItem.value;
+                            var bbanAcc = bsItem?.value;
 
-                            string bbanRegNum = null;
                             bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_reg_number", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
-                            if (bsItem != null)
-                                bbanRegNum = bsItem.value;
+                            var bbanRegNum = bsItem?.value;
 
-                            string ibanNo = null;
                             bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_iban", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
-                            if (bsItem != null)
-                                ibanNo = bsItem.value;
+                            var ibanNo = bsItem?.value;
 
-                            string swiftNo = null;
                             bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_swift_bic", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
-                            if (bsItem != null)
-                                swiftNo = bsItem.value;
+                            var swiftNo = bsItem?.value;
 
                             string paymentCodeId = null;
                             bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_code_id", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
                             if (bsItem != null)
                                 paymentCodeId = bsItem.value;
 
-                            string paymentId = null;
                             bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_id", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
-                            if (bsItem != null)
-                                paymentId = bsItem.value;
+                            var paymentId = bsItem?.value;
 
-                            string jointPaymentId = null;
                             bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "joint_payment_id", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
-                            if (bsItem != null)
-                                jointPaymentId = bsItem.value;
+                            var jointPaymentId = bsItem?.value;
 
                             var paymentMethod = PaymentTypes.VendorBankAccount;
                             switch (paymentCodeId)
@@ -511,19 +497,22 @@ namespace UnicontaClient.Pages.CustomPage
                                 }
 
                                 journalLine._Account = creditor._Account;
-                                if (creditor._SWIFT == null && swiftNo != null)
+                                if (creditor._SWIFT == null && !string.IsNullOrEmpty(swiftNo))
                                 {
                                     creditor._SWIFT = swiftNo;
-                                    updateCreditor.Add(creditor);
+                                    if (CreList == null)
+                                        CreList = new List<Uniconta.DataModel.Creditor>();
+                                    CreList.Add(creditor);
                                 }
                             }
 
-                            newLines.Add(journalLine);
+                            updateLines.Add(journalLine);
                         }
 
-                        noOfVouchers = newLines.Count;
-                        var errorCode = await api.Insert(newLines);
-                        api.UpdateNoResponse(updateCreditor);
+                        noOfVouchers = updateLines.Count;
+                        var errorCode = await api.Insert(updateLines);
+                        if (CreList != null)
+                            api.UpdateNoResponse(CreList);
 
                         var sb = StringBuilderReuse.Create("{ \"vouchers\": [ ");
                         foreach (var voucher in vouchers.data)

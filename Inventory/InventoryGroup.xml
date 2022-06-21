@@ -3,8 +3,8 @@
   <RibbonItem TabId="0" LocalizedNameKey="Home">
     <!---When we create a new TabPage -->
     <RibbonItem Action="AddRow" LocalizedNameKey="AddOBJ" Parameter="InventoryGroup" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png">
-      <RibbonItem Action="AddRow" LocalizedNameKey="AddOBJ" Parameter="InventoryGroup" ControlName="InventoryGroupPage2" Glyph="Add_16x16.png" LargeShortcutKey="CTRL+N"/>
-      <RibbonItem Action="CopyRecord" LocalizedNameKey="CopyOBJ" Parameter="InventoryGroup" Glyph="Copy_16x16.png" LargeShortcutKey="Shift+F2"/>
+      <RibbonItem Action="AddRow" LocalizedNameKey="AddOBJ" Parameter="InventoryGroup" ControlName="InventoryGroupPage2" Glyph="Add_16x16.png" ShortcutKey="CTRL+N"/>
+      <RibbonItem Action="CopyRecord" LocalizedNameKey="CopyOBJ" Parameter="InventoryGroup" Glyph="Copy_16x16.png" ShortcutKey="Shift+F2"/>
     </RibbonItem>
     <RibbonItem Action="EditRow" ShortcutKey="Ctrl+E" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>
   </RibbonItem>

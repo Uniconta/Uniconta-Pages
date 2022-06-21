@@ -19,6 +19,8 @@ namespace UnicontaClient.Pages.CustomPage.GL.BankStatement
         public double BankVoid { get; set; }
         public double PostedTotal { get; set; }
         public double PostedVoid { get; set; }
+        public string RegNo { get { return BankAcc._BankAccountPart1; } }
+        public string Account { get { return BankAcc._BankAccountPart2; } }
 
         public string Heading1 { get { return string.Concat(Localization.lookup("BankReconciliation"), " ",
                 FromDate.ToShortDateString(), " - ", Date.ToShortDateString()," ", BankAcc._Account, " ", BankAcc._Name); } }
@@ -37,6 +39,8 @@ namespace UnicontaClient.Pages.CustomPage.GL.BankStatement
         public string TextLabel { get { return Localization.lookup("Text"); } }
         public string AmountLabel { get { return Localization.lookup("Amount"); } }
         public string VoidTransactions { get { return Localization.lookup("VoidedLines"); } }
+        public string RegNumberLabel { get { return Localization.lookup("Regnr"); } }
+        public string BankAccountLabel { get { return Localization.lookup("BankAccount"); } }
     }
 
     public class TextAmount

@@ -172,9 +172,13 @@ namespace UnicontaClient.Pages.CustomPage
             XElement data = e.Dashboard.UserData;
             if (data != null)
             {
-                var state = data.Element("DashboardState");
-                if (state != null)
-                    dState.LoadFromXml(XDocument.Parse(state.Value));
+                try
+                {
+                    var state = data.Element("DashboardState");
+                    if (state != null)
+                        dState.LoadFromXml(XDocument.Parse(state.Value));
+                }
+                catch { }
 
                 var fixedComps = data.Element("FixedCompanies");
                 if (fixedComps != null)
@@ -657,8 +661,13 @@ namespace UnicontaClient.Pages.CustomPage
                                     var compApi = new CrudAPI(BasePage.session, comp);
                                     data = Query(!IsDashBoardTableTYpe ? typeofTable : dashbaordTableType, compApi, masterRecords, filterValues).GetAwaiter().GetResult();
                                 }
+
                                 if (lstOfSorters != null && lstOfSorters.ContainsKey(e.DataSourceComponentName))
-                                    Array.Sort(data.ToArray(), lstOfSorters[e.DataSourceComponentName]); 
+                                    Array.Sort(data.ToArray(), lstOfSorters[e.DataSourceComponentName]);
+
+                                if (typeofTable.Equals(typeof(CompanyDocumentClient)))
+                                    ReadData(data,api).GetAwaiter().GetResult(); // if there is image in property it will load again;
+
                                 e.Data = data;
                             }
                             else 
@@ -676,6 +685,23 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 MessageBox.Show(ex.Message, Uniconta.ClientTools.Localization.lookup("Exception"));
             }
+        }
+        public static Task<bool> ReadData(UnicontaBaseEntity[] data, CrudAPI api)
+        {
+            return Task.Run(async () =>
+            {
+                foreach (UnicontaBaseEntity row in data)
+                {
+                    foreach (PropertyInfo propertyInfo in row.GetType().GetProperties())
+                    {
+                        if (propertyInfo.PropertyType == typeof(byte[]))
+                        {
+                            await api.Read(row);
+                        }
+                    }
+                }
+                return true;
+            });
         }
 
         List<UnicontaBaseEntity> GetMasterRecords(Type TableTYpe)

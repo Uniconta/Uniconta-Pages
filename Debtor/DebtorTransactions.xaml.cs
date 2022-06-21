@@ -26,6 +26,7 @@ using Uniconta.ClientTools.Util;
 using Uniconta.API.Service;
 using Uniconta.Client.Pages;
 using Uniconta.Common.Utility;
+using UnicontaClient.Utilities;
 
 #if !SILVERLIGHT
 using UnicontaClient.Pages;
@@ -147,7 +148,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                     {
                         string header = Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("Settlements"), selectedItem._Voucher);
-                        AddDockItem(TabControls.DebtorSettlements, dgDebtorTran.syncEntity, true, header);
+                        AddDockItem(TabControls.DebtorSettlements, dgDebtorTran.syncEntity, true, header, null, floatingLoc: Utility.GetDefaultLocation());
                     }
                     break;
                 case "VoucherTransactions":

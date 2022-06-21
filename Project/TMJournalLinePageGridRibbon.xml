@@ -35,13 +35,6 @@
 	</RibbonItem>
 	<RibbonItem>
 		<RibbonItem Action="ValidateJournal" LocalizedNameKey="Validate"  LargeGlyph="Check_Journal_32x32.png"/>
-		<RibbonItem Action="Reports" LocalizedNameKey="Reports" LargeGlyph="Item_Number_32x32.png">
-			<RibbonItem Action="KmRegnskab" LocalizedNameKey="Km Regnskab" Glyph="Item_Number_16x16.png" />
-			<RibbonItem Action="FerieogFlex" LocalizedNameKey="Ferie og Flex"  Glyph="Item_Number_16x16.png"/>
-			<RibbonItem Action="Produktion" LocalizedNameKey="Produktion" Glyph="Item_Number_16x16.png" />
-			<RibbonItem Action="CrmFollowUp" LocalizedNameKey="FollowUp" ControlName="CrmFollowUpPage" Module="CRM" Glyph="Item_Number_16x16.png"/>
-			<RibbonItem Action="Task" LocalizedNameKey="Tasks" ControlName="ProjectTaskGridPage" Module="ProjectTask" Glyph="Item_Number_16x16.png"/>
-		</RibbonItem>
 	</RibbonItem>
 	<RibbonItem>
 		<RibbonItem Action="Close" LocalizedNameKey="ReportAsReady"   LargeGlyph="Order_Confirmation_32x32.png"/>
@@ -52,6 +45,15 @@
 	</RibbonItem>
 	<RibbonItem>
 		<RibbonItem Action="RemainingBudget" LocalizedNameKey="RemainingBudget" Module="ProjectBudget" LargeGlyph="Budget_32x32.png"/>
+	</RibbonItem>
+    <RibbonItem>
+	  <RibbonItem Action="Reports" LocalizedNameKey="Reports" LargeGlyph="Item_Number_32x32.png">
+		<RibbonItem Action="KmRegnskab" LocalizedNameKey="Km Regnskab" Glyph="Item_Number_16x16.png" />
+		<RibbonItem Action="FerieogFlex" LocalizedNameKey="Ferie og Flex"  Glyph="Item_Number_16x16.png"/>
+		<RibbonItem Action="Produktion" LocalizedNameKey="Produktion" Glyph="Item_Number_16x16.png" />
+		<RibbonItem Action="CrmFollowUp" LocalizedNameKey="FollowUp" ControlName="CrmFollowUpPage" Module="CRM" Glyph="Item_Number_16x16.png"/>
+		<RibbonItem Action="Task" LocalizedNameKey="Tasks" ControlName="ProjectTaskGridPage" Module="ProjectTask" Glyph="Item_Number_16x16.png"/>
+	  </RibbonItem>
 	</RibbonItem>
 	<RibbonItem>
 		<RibbonItem Action="EfficiencyPercentage" LocalizedNameKey="EfficiencyPercentage" StatusValue=""/>

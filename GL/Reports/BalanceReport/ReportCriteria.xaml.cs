@@ -85,6 +85,8 @@ namespace UnicontaClient.Pages.CustomPage
         UnicontaBaseEntity master;
         Company[] companies;
         static Balance LastGeneratedBalance;
+        BalanceFrontPageReportDataClient balanceFrontPageReportData;
+
         public ReportCriteria(UnicontaBaseEntity sourceData) : base(sourceData)
         {
             master = sourceData;
@@ -462,7 +464,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "SetFrontPage":
                     SetFrontPage();
                     break;
-                case "CopyBalance":
+                case "CopyRecord":
                     if (ValidateBalanceBudgetField())
                         CopyBalance();
                     break;
@@ -506,33 +508,53 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        string frontpageText = null;
-        string frontPageTemplate = null;
         private void SetFrontPage()
         {
-#if !SILVERLIGHT
-            frontpageText = objBalance?._FrontPage;
-            frontPageTemplate = objBalance?._ReportFrontPage;
-            CWFrontPage frontPageDialog = new CWFrontPage(api, Uniconta.ClientTools.Localization.lookup("FrontPage"), frontpageText, frontPageTemplate);
+            balanceFrontPageReportData = GetBalanceFrontPageReportData();
+            var frontPageDialog = new CWFrontPage(api, Uniconta.ClientTools.Localization.lookup("FrontPage"), objBalance?._FrontPage, objBalance?._ReportFrontPage, balanceFrontPageReportData);
             frontPageDialog.Closing += delegate
             {
                 if (frontPageDialog.DialogResult == true)
                 {
-                    frontpageText = frontPageDialog.RichEditText;
-                    frontPageTemplate = frontPageDialog.FrontPageTemplate;
+                    objBalance._FrontPage = frontPageDialog.FrontPageText;
+                    objBalance._ReportFrontPage = frontPageDialog.FrontPageReport;
                 }
             };
             frontPageDialog.Show();
-#endif
+        }
+
+        private BalanceFrontPageReportDataClient GetBalanceFrontPageReportData()
+        {
+            var balanceFrontPageReportData = new BalanceFrontPageReportDataClient();
+            balanceFrontPageReportData.FromAccount = cbFromAccount.Text;
+            balanceFrontPageReportData.ToAccount = cbToAccount.Text;
+            balanceFrontPageReportData.SkipEmptyAccount = (bool)chk0Account.IsChecked;
+            balanceFrontPageReportData.AccountType = Convert.ToString(cmbAccountType.SelectedItem);
+            balanceFrontPageReportData.SumAccount = Convert.ToString(cmbSumAccount.SelectedItem);
+            balanceFrontPageReportData.UseExternalName = (bool)chkUseExternal.IsChecked;
+            balanceFrontPageReportData.Template = cbTemplate.Text;
+            var criteria = objCriteria.selectedCriteria.FirstOrDefault();
+            balanceFrontPageReportData.BalanceMethod = criteria.BalanceMethod;
+            balanceFrontPageReportData.FromDate = criteria.FromDate;
+            balanceFrontPageReportData.ToDate = criteria.ToDate;
+            balanceFrontPageReportData.IsInitialized = true;
+            return balanceFrontPageReportData;
         }
         void RunBalance()
         {
+            if (balanceFrontPageReportData == null || !balanceFrontPageReportData.IsInitialized)
+                balanceFrontPageReportData = GetBalanceFrontPageReportData();
+
+            balanceFrontPageReportData.IsInitialized = false;
+
             if (objBalance == null || objBalance.CompanyId != api.CompanyId /* For balance copy from other company */)
                 SaveBalance();
             else
                 update();
             if (objBalance == null)
                 return;
+
+            objBalance.FrontPageData = balanceFrontPageReportData;
             objCriteria.dim1details = (bool)chkdim1.IsChecked;
             objCriteria.dim2details = (bool)chkdim2.IsChecked;
             objCriteria.dim3details = (bool)chkdim3.IsChecked;
@@ -783,12 +805,6 @@ namespace UnicontaClient.Pages.CustomPage
 
         Balance setbalanceFields(Balance updaterow)
         {
-#if !SILVERLIGHT
-            if (frontpageText != null)
-                updaterow._FrontPage = frontpageText;
-
-            updaterow._ReportFrontPage = frontPageTemplate;
-#endif
             updaterow._FromAccount = cbFromAccount.Text;
             updaterow._ToAccount = cbToAccount.Text;
             updaterow._Skip0Accounts = (bool)chk0Account.IsChecked;
@@ -815,12 +831,11 @@ namespace UnicontaClient.Pages.CustomPage
             updaterow.ColumnSizeName = (byte)NumberConvert.ToInt(txtColoumnSizeName.Text);
             updaterow.ColumnSizeDim = (byte)NumberConvert.ToInt(txtColoumnSizeDim.Text);
             updaterow.ColumnSizeAmount = (byte)NumberConvert.ToInt(txtColoumnSizeAmount.Text);
-#if !SILVERLIGHT
             updaterow._PrintFrontPage = (bool)chkPrintFrtPage.IsChecked;
-#endif
             updaterow.LineSpace = (byte)NumberConvert.ToInt(txtLineSpace.Text);
             updaterow.FontSize = (byte)NumberConvert.ToInt(txtFontSize.Text);
             updaterow.LeftMargin = (byte)NumberConvert.ToInt(txtLeftMargin.Text);
+
             return updaterow;
         }
         void update()
@@ -907,6 +922,7 @@ namespace UnicontaClient.Pages.CustomPage
                 objBalance._Name = txtbalanceName.Text;
                 cbPrintOrientation.SelectedIndex = objBalance._Landscape ? 0 : 1;
                 populateValue(objBalance);
+                balanceFrontPageReportData = null;
             }
         }
         void ClearcolumnList()

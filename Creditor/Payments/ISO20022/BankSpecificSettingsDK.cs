@@ -433,7 +433,7 @@ namespace UnicontaISO20022CreditTransfer
             if (paymentType != ISO20022PaymentTypes.DOMESTIC && (companyBankEnum == CompanyBankENUM.Nordea_DK || companyBankEnum == CompanyBankENUM.Nordea_NO || companyBankEnum == CompanyBankENUM.Nordea_SE))
             {
                 int maxLines = 2;
-                int maxStrLen = 35;
+                int maxStrLen = 34;
 
                 if (paymentType == ISO20022PaymentTypes.SEPA)
                     maxLines = 3;
