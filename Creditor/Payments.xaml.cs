@@ -1266,7 +1266,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (paymFormatClient == null)
                     paymFormatClient = (CreditorPaymentFormat)PaymentFormatCache?.Get(rec._PaymentFormat);
 
-                if (paymFormatClient != null && (paymFormatClient._ExportFormat == (byte)ExportFormatType.ISO20022_SE || paymFormatClient._ExportFormat == (byte)ExportFormatType.ISO20022_NO || paymFormatClient._ExportFormat == (byte)ExportFormatType.ISO20022_EE))
+                if (paymFormatClient != null && (paymFormatClient._ExportFormat == (byte)ExportFormatType.ISO20022_SE || paymFormatClient._ExportFormat == (byte)ExportFormatType.ISO20022_NO || paymFormatClient._ExportFormat == (byte)ExportFormatType.ISO20022_EE || paymFormatClient._ExportFormat == (byte)ExportFormatType.ISO20022_CH))
                 {
                     if (cred != null)
                     {
@@ -1274,8 +1274,8 @@ namespace UnicontaClient.Pages.CustomPage
                         {
                             if (cred._PaymentMethod == PaymentTypes.VendorBankAccount && CountryId == CountryCode.Norway)
                                 creditorPaymId = string.Empty; //Norway PaymentId is used for Kid-No when PaymentType=VendorBankAccount
-                            else if (cred._PaymentMethod == PaymentTypes.IBAN && CountryId == CountryCode.Estonia && cred._Country == CountryCode.Estonia)
-                                creditorPaymId = string.Empty; //Estonia PaymentId is used for Payment Reference for Domestic payments  
+                            else if (cred._PaymentMethod == PaymentTypes.IBAN && ((CountryId == CountryCode.Estonia && cred._Country == CountryCode.Estonia) || (CountryId == CountryCode.Switzerland && cred._Country == CountryCode.Switzerland)))
+                                creditorPaymId = string.Empty; //Estonia and Switzerland PaymentId is used for Payment Reference for Domestic payments  
                             else if ((cred._PaymentMethod == PaymentTypes.PaymentMethod3 || cred._PaymentMethod == PaymentTypes.PaymentMethod5) && CountryId == CountryCode.Sweden)
                                 creditorPaymId = string.Empty; //Norway PaymentId is used for OCR-No when PaymentType=PaymentMethod3
                             else

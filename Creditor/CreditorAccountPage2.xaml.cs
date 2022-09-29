@@ -313,6 +313,8 @@ namespace UnicontaClient.Pages.CustomPage
                             editrow.Phone = contact.phone;
                             editrow.ContactEmail = contact.email;
                         }
+                        if (!string.IsNullOrEmpty(ci.vat))
+                            editrow.VatNumber = ci.vat;
                     }
                 }
                 else

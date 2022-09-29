@@ -493,16 +493,16 @@ namespace UnicontaClient.Pages.CustomPage
                 case "AddMonth":
                     var addMonthsDialog = new CWAddMonths();
                     addMonthsDialog.Closing += delegate
-                          {
-                              if (addMonthsDialog.DialogResult == true)
-                              {
-                                  AddMonths(objBalance, addMonthsDialog.NumberOfMonths);
-                              }
-                          };
+                    {
+                        if (addMonthsDialog.DialogResult == true)
+                        {
+                            AddMonths(addMonthsDialog.NumberOfMonths);
+                        }
+                    };
                     addMonthsDialog.Show();
                     break;
                 case "AddDate":
-                    AddDates(objBalance);
+                    AddDates();
                     break;
 
             }
@@ -944,27 +944,37 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        private void AddMonths(Balance obBalance, int numberOfMonths)
+        private void AddMonths(int numberOfMonths)
         {
-            balanceCollist = obBalance.ColumnList;
-            if (balanceCollist != null)
+            var Crits = objCriteria?.selectedCriteria;
+            if (Crits != null)
             {
-                int i = 0;
-                foreach (var colBalance in balanceCollist)
+                for (int i = 0; (i < Crits.Count); i++)
                 {
-                    var Crit = objCriteria.selectedCriteria[i];
-
+                    var Crit = Crits[i];
                     if (Crit.balcolMethod == BalanceColumnMethod.FromTrans || Crit.balcolMethod == BalanceColumnMethod.FromBudget || Crit.balcolMethod == BalanceColumnMethod.TransQty || Crit.balcolMethod == BalanceColumnMethod.BudgetQty)
                     {
-                        Crit.FromDate = Crit.FromDate.AddMonths(numberOfMonths);
-                        Crit.ToDate = Crit.ToDate.AddMonths(numberOfMonths);
+                        Crit.FromDate = GetMonth(Crit.FromDate, numberOfMonths);
+                        Crit.ToDate = GetMonth(Crit.ToDate, numberOfMonths);
                     }
-                    i++;
                 }
             }
         }
 
-        async private void AddDates(Balance objBalance)
+        static DateTime GetMonth(DateTime date, int months)
+        {
+            var lastDay = DateTime.DaysInMonth(date.Year, date.Month);
+            var newDate = date.AddMonths(months);
+            if (date.Day == lastDay)
+            {
+                var newDateLastDay = DateTime.DaysInMonth(newDate.Year, newDate.Month);
+                newDate = new DateTime(newDate.Year, newDate.Month, newDateLastDay);
+            }
+            return newDate;
+        }
+
+
+        async private void AddDates()
         {
             var columnListCount = objBalance.ColumnList.Count;
             var balanceColFromToList = new List<BalanceFromToDateList>(columnListCount);
@@ -983,17 +993,16 @@ namespace UnicontaClient.Pages.CustomPage
                 if (addToFromDate.DialogResult == true)
                 {
                     var balanceColDateList = addToFromDate.BalanceFromToDate;
-                    balanceCollist = objBalance.ColumnList;
-                    if (balanceCollist != null)
+                    var Crits = objCriteria?.selectedCriteria;
+                    if (Crits != null)
                     {
-                        for (int i = 0; i < columnListCount; i++)
+                        for (int i = 0; (i < Crits.Count); i++)
                         {
-                            var Crit = objCriteria.selectedCriteria[i];
                             var balColumnToDateObj = balanceColDateList.Where(p => p.ColumnIndex == i + 1).FirstOrDefault();
-
                             if (balColumnToDateObj == null)
                                 continue;
 
+                            var Crit = Crits[i];
                             if (balColumnToDateObj.FromDate != DateTime.MinValue)
                                 Crit.FromDate = balColumnToDateObj.FromDate;
                             if (balColumnToDateObj.ToDate != DateTime.MinValue)
@@ -1001,7 +1010,6 @@ namespace UnicontaClient.Pages.CustomPage
 
                             Crit.CriteriaName = balColumnToDateObj.TypedName;
                             Crit.BudgetModel = balColumnToDateObj.BudgetModel;
-
                         }
                     }
                 }

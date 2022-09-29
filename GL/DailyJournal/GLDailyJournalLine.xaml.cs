@@ -768,7 +768,6 @@ namespace UnicontaClient.Pages.CustomPage
                 case "ImportVoucher":
                     if (selectedItem != null)
                     {
-                        dgGLDailyJournalLine.SetLoadedRow(selectedItem);
                         AddVoucher(selectedItem, ActionType);
                     }
                     break;
@@ -1977,6 +1976,9 @@ namespace UnicontaClient.Pages.CustomPage
                 case "Task":
                     if (string.IsNullOrEmpty(rec._Project))
                         rec._Task = null;
+                    break;
+                case "DocumentRef":
+                    dgGLDailyJournalLine.SetLoadedRow(rec);
                     break;
                 case "Asset":
                 case "AssetPostType":

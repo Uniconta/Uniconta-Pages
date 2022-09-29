@@ -34,7 +34,7 @@ namespace UnicontaClient.Pages.CustomPage
         public override string LineNumberProperty { get { return "_LineNumber"; } }
         public override bool AllowSort { get { return false; } }
         public override bool Readonly { get { return false; } }
-        public override bool IsAutoSave { get { return true; } }
+        public override bool IsAutoSave { get { return false; } }
         public DateTime FromDate { get; set; }
         public override bool AddRowOnPageDown()
         {
@@ -89,6 +89,8 @@ namespace UnicontaClient.Pages.CustomPage
         int monthNumber, quarterNo, year;
         double normQty, budgetQty;
         DateTime fromDate, toDate;
+        
+        Uniconta.API.Project.FindPricesEmpl priceLookup;
         public ProjectBudgetPlaningLinePage(string[] filterFld, int[] filterDateValues,double[] qtyValues, DateTime[] dates, CrudAPI api, string budgetGroup)
             : base(api, string.Empty)
         {
@@ -218,29 +220,26 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        double sumMargin, sumSales, sumMarginRatio;
+        double sumCost, sumSales;
         private void dgProjectBudgetLinePageGrid_CustomSummary(object sender, DevExpress.Data.CustomSummaryEventArgs e)
         {
             var fieldName = ((GridSummaryItem)e.Item).FieldName;
             switch (e.SummaryProcess)
             {
                 case CustomSummaryProcess.Start:
-                    sumMargin = sumSales = 0d;
+                    sumCost = sumSales = 0d;
                     break;
                 case CustomSummaryProcess.Calculate:
                     var row = e.Row as ProjectBudgetLineLocal;
                     if (row != null)
                     {
                         sumSales += row.Sales;
-                        sumMargin += row.Margin;
+                        sumCost += row.Cost;
                     }
                     break;
                 case CustomSummaryProcess.Finalize:
                     if (fieldName == "MarginRatio" && sumSales > 0)
-                    {
-                        sumMarginRatio = 100 * sumMargin / sumSales;
-                        e.TotalValue = sumMarginRatio;
-                    }
+                        e.TotalValue = Math.Round((sumSales - sumCost) * 100d / sumSales, 2);
                     break;
             }
         }
@@ -286,11 +285,16 @@ namespace UnicontaClient.Pages.CustomPage
             var rec = (ProjectBudgetLineLocal)sender;
             switch (e.PropertyName)
             {
+                case "Date":
+                case "Project":
+                    GetEmplPrice(rec);
+                    break;
                 case "Item":
                     if (!rec.InsidePropChange)
                     {
                         rec.InsidePropChange = true;
                         SetItem(rec);
+                        GetEmplPrice(rec);
                         rec.InsidePropChange = false;
                     }
                     break;
@@ -304,6 +308,7 @@ namespace UnicontaClient.Pages.CustomPage
                         {
                             rec.InsidePropChange = true;
                             PayrollCat(rec, true);
+                            GetEmplPrice(rec);
                             rec.InsidePropChange = false;
                         }
                     }
@@ -315,6 +320,7 @@ namespace UnicontaClient.Pages.CustomPage
                         {
                             rec.InsidePropChange = true;
                             PayrollCat(rec, true);
+                            GetEmplPrice(rec);
                             rec.InsidePropChange = false;
                         }
                     }
@@ -343,7 +349,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         void CalculateSum()
         {
-            var lst = dgProjectBgtPlangLine.ItemsSource as List<ProjectBudgetLineLocal>;
+            var lst = dgProjectBgtPlangLine.ItemsSource as IEnumerable<ProjectBudgetLineLocal>;
             var QtySum = lst.Sum(x => x._Qty);
             SetStatusText(QtySum);
         }
@@ -434,6 +440,12 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
+
+        void GetEmplPrice(ProjectBudgetLineLocal rec)
+        {
+            priceLookup.GetEmployeePrice(rec);
+        }
+       
         async void PayrollCat(ProjectBudgetLineLocal rec, bool AddItem)
         {
             double costPrice = 0, salesPrice = 0;
@@ -551,6 +563,9 @@ namespace UnicontaClient.Pages.CustomPage
                 PayrollCache = await api.LoadCache(typeof(Uniconta.DataModel.EmpPayrollCategory)).ConfigureAwait(false);
             if (BudgetGroupCache == null)
                 BudgetGroupCache = await api.LoadCache(typeof(Uniconta.DataModel.ProjectBudgetGroup)).ConfigureAwait(false);
+            
+            if (this.priceLookup == null)
+                priceLookup = new Uniconta.API.Project.FindPricesEmpl(api);
         }
     }
 }

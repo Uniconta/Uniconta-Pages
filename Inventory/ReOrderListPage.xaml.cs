@@ -162,7 +162,7 @@ namespace UnicontaClient.Pages.CustomPage
         [Display(Name = "Added", ResourceType = typeof(InventoryText))]
         public bool Added { get { return _Expanded; } }
 
-        string invPurchaseAccount;
+        internal string invPurchaseAccount;
         [Display(Name = "InvPurchaseAccount", ResourceType = typeof(InventoryText))]
         public String InvPurchaseAccount { get { return invPurchaseAccount; }  set { invPurchaseAccount = value; NotifyPropertyChanged("InvPurchaseAccount"); } }
 
@@ -419,7 +419,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 var Comp = api.CompanyEntity;
                 var cache = Comp.GetCache(typeof(InvItem));
-                if (cache == null || (ReservedTask == null && (DateTime.UtcNow - cache.Loaded).TotalMinutes > 10))
+                if (cache == null || (ReservedTask == null && (DateTime.UtcNow - cache.Loaded).TotalSeconds > 60))
                     cache = await Comp.LoadCache(typeof(InvItem), api, true);
                 this.items = cache;
                 lstEntity = (IEnumerable<InvItem>)cache?.GetKeyStrRecords;
@@ -839,7 +839,7 @@ namespace UnicontaClient.Pages.CustomPage
             var rows = dgReOrderList.GetVisibleRows() as ICollection<ReOrderListPageGridClient>;
             if (rows == null || rows.Count == 0)
                 return;
-            var accounts = (from rec in rows where rec._PurchaseAccount != null select rec._PurchaseAccount).Distinct().ToList();
+            var accounts = (from rec in rows where rec._Quantity > 0d && (rec.PurchaseAccount != null || rec.invPurchaseAccount != null) select rec.invPurchaseAccount ?? rec.PurchaseAccount).Distinct().ToList();
 
             var Comp = api.CompanyEntity;
             var defaultStorage = Comp._PurchaseLineStorage;
@@ -896,7 +896,8 @@ namespace UnicontaClient.Pages.CustomPage
                 var PriceLookup = new Uniconta.API.DebtorCreditor.FindPrices(api);
                 var _InvoiceUseQtyNowCre = Comp._InvoiceUseQtyNowCre;
 
-                var orderList = new List<CreditorOrderLineClient>(creditorOrders.Count * 2);
+                int LineStart = 0;
+                var orderList = new List<CreditorOrderLineClient>(rows.Count);
                 foreach (var order in creditorOrders)
                 {
                     await PriceLookup.OrderChanged(order);
@@ -906,7 +907,7 @@ namespace UnicontaClient.Pages.CustomPage
                     int line = 0;
                     foreach (var item in rows)
                     {
-                        if (item._Quantity > 0d && item._PurchaseAccount == acc)
+                        if (item._Quantity > 0d && (item.invPurchaseAccount ?? item._PurchaseAccount) == acc)
                         {
                             if (HasWarehouse && (!PrWarehouse || !PrLocation))
                             {
@@ -954,8 +955,9 @@ namespace UnicontaClient.Pages.CustomPage
                         }
                     }
                     DCOrderLine last = null;
-                    foreach(var lin in orderList)
+                    while(LineStart < orderList.Count)
                     {
+                        var lin = orderList[LineStart++];
                         var item = (InvItem)items.Get(lin._Item);
                         if (item == null)
                             continue;
@@ -1159,7 +1161,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         async void SetInvPurAccountSource(ReOrderListPageGridClient rec)
         {
-            if (api.CompanyEntity.PurchaseAccounts)
+            if (api.CompanyEntity.PurchaseAccounts && rec.invPurchaseAccSource == null)
             {
                 rec.invPurchaseAccSource = await api.Query<InvPurchaseAccountClient>(rec);
                 rec.NotifyPropertyChanged("InvPurchaseAccSource");

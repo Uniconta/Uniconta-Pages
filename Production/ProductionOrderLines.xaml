@@ -133,7 +133,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionOrderLines"
                                         </DataTemplate>
                                     </local:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </local:CorasauDataGridTemplateColumnClient>
-                                <local:CorasauDataGridTemplateColumnClient x:Name="LineNumber" Width="70" Visible="False"/>
+                                <local:CorasauDataGridTemplateColumnClient x:Name="LineNumber" Mask="" Width="70" Visible="False"/>
                                 <local:CorasauDataGridTemplateColumnClient x:Name="UpdatedAt"   Visible="False">
                                     <local:CorasauDataGridTemplateColumnClient.CellTemplate>
                                         <DataTemplate>

@@ -296,6 +296,33 @@ namespace UnicontaISO20022CreditTransfer
         }
 
         /// <summary>
+        /// Activate Tp section in Structured Remittance info
+        /// </summary>
+        public virtual bool RmtInfStrdTpActive()
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// Activate DebtorAcct Currency
+        /// </summary>
+        public virtual bool CompanyCcyActive()
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// Insert Paymnent type OCR or QRR (Swiss QR bill)
+        /// </summary>
+        public virtual string OCRPaymentType(string creditorOCRPaymentId)
+        {
+            if (!string.IsNullOrEmpty(creditorOCRPaymentId))
+                return BaseDocument.OCR;
+
+            return null;
+        }
+
+        /// <summary>
         /// Generate filename
         /// </summary>
         public virtual string GenerateFileName(int fileID, int companyID)

@@ -393,7 +393,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (dgDocsGrid.HasUnsavedData)
                         Utility.ShowConfirmationOnRefreshGrid(dgDocsGrid);
                     else
-                        dgDocsGrid.Filter(null, null, true);
+                        gridRibbon_BaseActions(ActionType);
                     break;
 
                 case "ViewDownloadRow":
@@ -477,7 +477,7 @@ namespace UnicontaClient.Pages.CustomPage
             string emailBody = body?.ToString();
             string attachments = filePath?.ToString();
 
-            if(string.IsNullOrEmpty(emailBody) || string.IsNullOrEmpty(attachments))
+            if(string.IsNullOrEmpty(emailBody) && string.IsNullOrEmpty(attachments))
             {
                 UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("NoRecords"), Uniconta.ClientTools.Localization.lookup("Warning"));
                 return;

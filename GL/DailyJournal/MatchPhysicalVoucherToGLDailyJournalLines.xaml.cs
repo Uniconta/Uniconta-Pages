@@ -405,7 +405,8 @@ namespace UnicontaClient.Pages.CustomPage
                 if (!voucher.IsAttached && voucher._Amount != 0)
                 {
                     var amount = Math.Abs(voucher._Amount);
-                    var date = voucher._PostingDate != DateTime.MinValue ? voucher._PostingDate : voucher.Created.Date;
+                    var date = voucher._PostingDate != DateTime.MinValue ? voucher._PostingDate : 
+                             (voucher._DocumentDate != DateTime.MinValue ? voucher._DocumentDate : voucher.Created.Date);
                     foreach (var p in journalLines)
                         if (p._Date == date && Math.Abs(p.Amount) == amount)
                         {

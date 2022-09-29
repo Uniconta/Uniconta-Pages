@@ -19,29 +19,16 @@ using System.Windows;
 using Uniconta.API.Service;
 using Uniconta.Client.Pages;
 using System.ComponentModel.DataAnnotations;
+using Uniconta.Common.Utility;
 #if !SILVERLIGHT
 using UnicontaClient.Pages;
 #endif
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
-
-    public class CreditorInvoiceLocal : CreditorInvoiceClient
-    {
-        [Display(Name = "System Info")]
-        public string SystemInfo { get { return _SystemInfo; } }
-        public string _SystemInfo;
-
-        internal void NotifySystemInfoSet()
-        {
-            NotifyPropertyChanged("SystemInfo");
-        }
-    }
-
-
     public class CreditorInvoicesGrid : CorasauDataGridClient
     {
-        public override Type TableType { get { return typeof(CreditorInvoiceLocal); } }
+        public override Type TableType { get { return typeof(CreditorInvoiceClient); } }
         public override IComparer GridSorting { get { return new DCInvoiceSort(); } }
         protected override void DataLoaded(UnicontaBaseEntity[] Arr)
         {
@@ -51,7 +38,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 foreach (var rec in Arr)
                 {
-                    var dcInvoice = rec as CreditorInvoiceLocal;
+                    var dcInvoice = rec as CreditorInvoiceClient;
                     DebtorOrders.SetDeliveryAdress(dcInvoice, dcInvoice.Creditor, api);
                 }
             }
@@ -200,7 +187,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void localMenu_OnItemClicked(string ActionType)
         {
-            var selectedItem = dgCrdInvoicesGrid.SelectedItem as CreditorInvoiceLocal;
+            var selectedItem = dgCrdInvoicesGrid.SelectedItem as CreditorInvoiceClient;
             string salesHeader = string.Empty;
             if (selectedItem != null)
                 salesHeader = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Orders"), selectedItem._OrderNumber);
@@ -258,7 +245,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "Trans":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.PostedTransactions, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Transactions"), selectedItem.InvoiceNum));
+                        AddDockItem(TabControls.AccountsTransaction, selectedItem, Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("VoucherTransactions"), selectedItem._Voucher));
                     break;
                 case "PurchaseCharges":
                     if (selectedItem == null)
@@ -273,7 +260,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "SendInvoice":
                     if (dgCrdInvoicesGrid.SelectedItem == null || dgCrdInvoicesGrid.SelectedItems == null)
                         return;
-                    var selectedInvoiceEmails = dgCrdInvoicesGrid.SelectedItems.Cast<CreditorInvoiceLocal>();
+                    var selectedInvoiceEmails = dgCrdInvoicesGrid.SelectedItems.Cast<CreditorInvoiceClient>();
                     SendInvoice(selectedInvoiceEmails);
                     break;
                 case "AddDoc":
@@ -292,7 +279,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        void SendInvoice(IEnumerable<CreditorInvoiceLocal> invoiceEmails)
+        void SendInvoice(IEnumerable<CreditorInvoiceClient> invoiceEmails)
         {
             int icount = invoiceEmails.Count();
             UnicontaClient.Pages.CWSendInvoice cwSendInvoice = new UnicontaClient.Pages.CWSendInvoice();
@@ -337,7 +324,7 @@ namespace UnicontaClient.Pages.CustomPage
             cwSendInvoice.Show();
         }
 
-        async private void JournalPosted(CreditorInvoiceLocal selectedItem)
+        async private void JournalPosted(CreditorInvoiceClient selectedItem)
         {
             var result = await api.Query(new GLDailyJournalPostedClient(), new UnicontaBaseEntity[] { selectedItem }, null);
             if (result != null && result.Length == 1)
@@ -353,7 +340,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             try
             {
-                var selectedItems = dgCrdInvoicesGrid.SelectedItems.Cast<CreditorInvoiceLocal>();
+                var selectedItems = dgCrdInvoicesGrid.SelectedItems.Cast<CreditorInvoiceClient>();
 #if !SILVERLIGHT
                 busyIndicator.IsBusy = true;
                 busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
@@ -470,7 +457,7 @@ namespace UnicontaClient.Pages.CustomPage
 
 
 #if SILVERLIGHT
-        private void DefaultPrint(CreditorInvoiceLocal creditorInvoiceClient, bool isFloat, Point position)
+        private void DefaultPrint(CreditorInvoiceClient creditorInvoiceClient, bool isFloat, Point position)
         {
             object[] ob = new object[2];
             ob[0] = creditorInvoiceClient;
@@ -478,7 +465,7 @@ namespace UnicontaClient.Pages.CustomPage
             AddDockItem(TabControls.ProformaInvoice, ob, isFloat, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Invoice"), creditorInvoiceClient.InvoiceNum), floatingLoc: position);
         }
 
-        private void DefaultPrint(CreditorInvoiceLocal creditorInvoiceClient)
+        private void DefaultPrint(CreditorInvoiceClient creditorInvoiceClient)
         {
             object[] ob = new object[2];
             ob[0] = creditorInvoiceClient;
@@ -489,7 +476,7 @@ namespace UnicontaClient.Pages.CustomPage
 
 #if !SILVERLIGHT
 
-        async private void OpenOutLook(CreditorInvoiceLocal invClient)
+        async private void OpenOutLook(CreditorInvoiceClient invClient)
         {
             try
             {
@@ -510,7 +497,7 @@ namespace UnicontaClient.Pages.CustomPage
         bool IsGeneratingDocument;
         StandardPrintReportPage standardPreviewPrintPage;
 
-        private async Task<IPrintReport> PrintInvoice(CreditorInvoiceLocal creditorInvoice)
+        private async Task<IPrintReport> PrintInvoice(CreditorInvoiceClient creditorInvoice)
         {
             var creditorInvoicePrint = new CreditorPrintReport(creditorInvoice, api, CompanyLayoutType.PurchaseInvoice);
 
@@ -552,7 +539,7 @@ namespace UnicontaClient.Pages.CustomPage
             creditorInvoicePrint.SetLookUpForMessageClient(messagesLookup);
         }
 
-        private async Task<IPrintReport> PrintPackNote(CreditorInvoiceLocal creditorInvoice)
+        private async Task<IPrintReport> PrintPackNote(CreditorInvoiceClient creditorInvoice)
         {
             var packnote = Uniconta.ClientTools.Controls.Reporting.StandardReports.PurchasePackNote;
             var creditorInvoicePrint = new UnicontaClient.Pages.CreditorPrintReport(creditorInvoice, api, CompanyLayoutType.Packnote);

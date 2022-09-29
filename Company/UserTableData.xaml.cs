@@ -250,7 +250,11 @@ namespace UnicontaClient.Pages.CustomPage
             if (dgTabledataGrid.Columns.Count == 0)
             {
                 if (thMaster._HasPrimaryKey)
+                {
                     UserFieldControl.CreateKeyFieldsOnGrid(dgTabledataGrid, thMaster._PKprompt);
+                    if (thMaster._AutoKey)
+                        dgTabledataGrid.tableView.VisibleColumns.Where(x => x.FieldName == "KeyStr").FirstOrDefault().ReadOnly = true;
+                }
                 if (thMaster._TableType == TableBaseType.Transaction)
                     UserFieldControl.CreateDateFieldOnGrid(dgTabledataGrid);
                 if (thMaster._Attachment)

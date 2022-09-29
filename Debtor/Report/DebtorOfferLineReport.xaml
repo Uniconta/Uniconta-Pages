@@ -22,7 +22,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOfferLineReport"
                     <local:CorasauDataGridTemplateColumnClient x:Name="Account"  Width="70"  AllowEditing="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Name"  Width="70" ReadOnly="True" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="OrderNumber" Width="70" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="LineNumber" Width="70" Visible="False" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="LineNumber" Mask="" Width="70" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Note" Width="50" AllowEditing="True">
                         <local:CorasauDataGridTemplateColumnClient.CellTemplate>
                             <DataTemplate>

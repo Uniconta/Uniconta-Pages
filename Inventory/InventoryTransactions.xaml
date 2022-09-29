@@ -77,7 +77,7 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryTransactions"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="MovementType"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="SalesPriceCur" Visible="false"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceNumber" Width="70"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="LineNumber" Visible="false"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="LineNumber" Mask="" Visible="false"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="InvJournalPostedId" Visible="false"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="JournalPostedId" Visible="false"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CostPosted" Width="50" Visible="false"/>

@@ -99,7 +99,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectPostWIP"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="VoucherX" Visible="False" AllowEditing="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Margin" Width="60" Visible="False" AllowEditing="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="MarginRatio" Width="60" Visible="False" AllowEditing="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="LineNumber" Width="60" Visible="False" AllowEditing="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="LineNumber" Mask="" Width="60" Visible="False" AllowEditing="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="NumberSerie" Width="35" Visible="False" AllowEditing="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DocumentRef" Width="50" Visible="False" AllowEditing="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant1" FieldName="Variant1" Width="80" ReadOnly="True"/>

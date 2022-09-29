@@ -120,7 +120,8 @@ namespace UnicontaISO20022CreditTransfer
         protected InitgPty initgPty;
         protected PmtInf pmtInf;
         protected Dbtr dbtr;
-
+        protected bool companyCcyActive;
+        protected bool paymentSoftware;
 
         protected DateTime dueDate;
         protected bool excludeSectionCdtrAgt;
@@ -223,8 +224,18 @@ namespace UnicontaISO20022CreditTransfer
             }
         }
 
+        public bool CompanyCcyActive
+        {
+            get
+            {
+                return companyCcyActive;
+            }
 
-
+            set
+            {
+                companyCcyActive = value;
+            }
+        }
 
         public bool PmtInfNumberOfTransActive
         {
@@ -852,8 +863,6 @@ namespace UnicontaISO20022CreditTransfer
                 chargeBearer = value;
             }
         }
-
-
         #endregion
 
         #region Methods

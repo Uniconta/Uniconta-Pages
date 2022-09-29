@@ -1,5 +1,6 @@
 using System;
 using System.Xml;
+using Uniconta.ClientTools.Page;
 
 namespace UnicontaISO20022CreditTransfer
 {
@@ -18,6 +19,7 @@ namespace UnicontaISO20022CreditTransfer
         private const string HOTHR = "Othr";
         private const string HSCHMENM = "SchmeNm";
         private const string CD = "Cd";
+        private const string CTCTDTLS = "CtctDtls";
 
 
         /// <summary>
@@ -53,27 +55,17 @@ namespace UnicontaISO20022CreditTransfer
             }
         }
 
-        public InitgPty(string companyName, string identificationId, string identificationCode)// , PostalAddress postalAddress)  //TODO:Address er ikke mandatory
+        public InitgPty(string companyName, string identificationId, string identificationCode)
         {
-           // this.postalAddress = postalAddress;
             this.companyName = companyName;
             this.identificationId = identificationId;
             this.identificationCode = identificationCode;
         }
 
-        /*
-        protected virtual void AppendPostalAddress(BaseDocument baseDoc, XmlDocument doc, XmlElement parent, string addressName, PostalAddress address)
-        {
-            address.Append(baseDoc, doc, parent, addressName);
-        }
-        */
-
         internal virtual void Append(BaseDocument baseDoc, XmlDocument doc, XmlElement parent)
         {
             XmlElement initgPty = baseDoc.AppendElement(doc, parent, HINITGPTY);
             baseDoc.AppendElement(doc, initgPty, NAME, companyName);
-
-            //  AppendPostalAddress(baseDoc, doc, initgPty, PSTLADR, this.PostalAddress);
 
             if (!string.IsNullOrEmpty(identificationId) || !string.IsNullOrEmpty(identificationCode))
             {

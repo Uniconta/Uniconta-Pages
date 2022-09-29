@@ -541,6 +541,9 @@ namespace UnicontaClient.Pages.CustomPage
             DefaultImp = checkImport.IsChecked.Value;
             DefaultExp = checkExport.IsChecked.Value;
 
+            var ws = spreadSheet.Document.Worksheets[0];
+            ws.Clear(ws.GetUsedRange());
+
             GetInvoiceLinesToIntraStat(txtDateFrm.DateTime, txtDateTo.DateTime, checkImport.IsChecked.Value, checkExport.IsChecked.Value);
         }
 
@@ -615,7 +618,9 @@ namespace UnicontaClient.Pages.CustomPage
             get 
             {
                 return _Country == CountryCode.UnitedKingdom ? "XU" :
-                       _Country == CountryCode.Greece ? "EL" : ((CountryISOCode)_Country).ToString();
+                       _Country == CountryCode.Greece ? "EL" :
+                       _Country == CountryCode.Serbia ? "XS" :
+                       ((CountryISOCode)_Country).ToString();
 
             } 
         }
@@ -654,7 +659,9 @@ namespace UnicontaClient.Pages.CustomPage
                            _CountryOfOriginUNK == IntraUnknownCountry.ThirdCountry ? "QW" : "";
                 else
                     return CountryOfOrigin == CountryCode.UnitedKingdom ? "XU" :
-                           CountryOfOrigin == CountryCode.Greece ? "EL" : ((CountryISOCode)CountryOfOrigin).ToString();
+                           CountryOfOrigin == CountryCode.Greece ? "EL" :
+                           CountryOfOrigin == CountryCode.Serbia ? "XS" :
+                           ((CountryISOCode)CountryOfOrigin).ToString();
             } 
         }
 

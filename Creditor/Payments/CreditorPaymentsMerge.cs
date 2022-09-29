@@ -122,7 +122,12 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
                             creditorBIC = bankSpecific.CreditorBIC(rec._SWIFT);
                             creditorOCRPaymentId = bankSpecific.CreditorRefNumberIBAN(rec._PaymentId, company._CountryId, creditor._Country);
 
-                            mergePaymId.Append(creditorNumber).Append('-').Append(creditorAcc).Append('-').Append(creditorBIC).Append('-').Append(rec.CurrencyLocalStr).Append('-').Append(paymGrpVal);
+                            if (creditorOCRPaymentId != string.Empty)
+                                creditorOCRPaymentId = String.Concat(creditorOCRPaymentId, "-");
+                            else
+                                creditorOCRPaymentId = null;
+
+                            mergePaymId.Append(creditorNumber).Append('-').Append(creditorAcc).Append('-').Append(creditorBIC).Append('-').Append(creditorOCRPaymentId).Append(rec.CurrencyLocalStr).Append('-').Append(paymGrpVal);
                             break;
 
                         case PaymentTypes.PaymentMethod3: //FIK71

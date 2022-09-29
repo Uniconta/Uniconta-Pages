@@ -59,7 +59,6 @@ namespace UnicontaClient.Pages.CustomPage
         void InitPage(CrudAPI crudapi)
         {
             itemCache = api.GetCache(typeof(Uniconta.DataModel.InvItem));
-            StartLoadCache();
 
             layoutControl = layoutItems;
             cbCountry.ItemsSource = Enum.GetValues(typeof(Uniconta.Common.CountryCode));
@@ -75,6 +74,8 @@ namespace UnicontaClient.Pages.CustomPage
             }
             layoutItems.DataContext = editrow;
             frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
+
+            StartLoadCache();
         }
 
         protected override void BeforeTemplateSet(UnicontaBaseEntity row)
@@ -180,6 +181,16 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 var prCatCache = api.GetCache(typeof(Uniconta.DataModel.PrCategory)) ?? await api.LoadCache(typeof(Uniconta.DataModel.PrCategory)).ConfigureAwait(false);
                 cmbPrCategory.cacheFilter = new PrCategoryCostFilter(prCatCache);
+            }
+            if (editrow != null && editrow.RowId != 0)
+            {
+                //await api.Read(editrow).ConfigureAwait(false);
+
+                //Dispatcher.BeginInvoke(new Action(() => {
+                //    object[] editParams = new object[2];
+                //    editParams[0] = 2;
+                //    editParams[1] = LoadedRow ?? ModifiedRow;
+                //    globalEvents.OnRefresh(TabControls.InventoryItemPage2, editParams); }));
             }
         }
 

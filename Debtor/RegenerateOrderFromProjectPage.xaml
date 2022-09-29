@@ -56,7 +56,7 @@ x:Class="UnicontaClient.Pages.CustomPage.RegenerateOrderFromProjectPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="VoucherX" Visible="False" AllowEditing="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Margin" Width="60" Visible="False" AllowEditing="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="MarginRatio" Width="60" Visible="False" AllowEditing="False"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="LineNumber" Width="60" Visible="False" AllowEditing="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="LineNumber" Mask="" Width="60" Visible="False" AllowEditing="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="NumberSerie" Width="35" Visible="False" AllowEditing="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="HasVoucher" Width="35" AllowEditing="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="DocumentRef" Width="50" Visible="False" AllowEditing="False"/>

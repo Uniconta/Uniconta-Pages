@@ -225,7 +225,7 @@ x:Class="UnicontaClient.Pages.CustomPage.GLDailyJournalLine"
                         </localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
                     </localPage:CorasauDataGridForeignKeyColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="colProjectText" FieldName="ProjectText" Width="150" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="LineNumber" Width="70" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="LineNumber" Mask="" Width="70" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="SWIFT" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PaymentFormat" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="HasBankMatch" Visible="False" Width="60" ReadOnly="True" AllowEditing="False">

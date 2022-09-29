@@ -425,6 +425,9 @@ namespace UnicontaClient.Pages.CustomPage
                     this.layOutBankStat.Caption = string.Format("'{0:N2}'", bankStatAmt);
                     this.layOutTrans.Caption = string.Format("'{0:N2}'    '({1:N2})'", transAmt, bankStatAmt - transAmt);
                     break;
+                case "DocumentRef":
+                    dgBankStatementLine.SetLoadedRow(rec);
+                    break;
             }
         }
 
@@ -663,7 +666,6 @@ namespace UnicontaClient.Pages.CustomPage
                 case "ImportVoucher":
                     if (selectedItem != null)
                     {
-                        dgBankStatementLine.SetLoadedRow(selectedItem);
                         AddVoucher(selectedItem, ActionType);
                     }
                     break;

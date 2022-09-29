@@ -128,7 +128,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOfferLines"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Vat" Width="100" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Employee" Width="50" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="EmployeeName" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="LineNumber" Width="70" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="LineNumber" Mask="" Width="70" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="OrderNumber" Width="70" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="UpdatedAt"   Visible="False">
                         <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>

@@ -112,7 +112,18 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOrderLines"
                     </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="QtyInvoiced" Width="80" Visible="false"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Currency" Width="50" Visible="False" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Warehouse" Width="100"/>
+                    <localPage:CorasauDataGridForeignKeyColumnClient x:Name="Warehouse" Width="100">
+                        <localPage:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <TextBlock Margin="2" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.Warehouse,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"></TextBlock>
+                            </ControlTemplate>
+                        </localPage:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
+                        <localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <localPage:CorasauGridLookupEditorClient  x:Name="PART_Editor"/>
+                            </DataTemplate>
+                        </localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
+                    </localPage:CorasauDataGridForeignKeyColumnClient>
                     <localPage:CorasauDataGridForeignKeyColumnClient x:Name="Location" Width="100">
                         <localPage:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
                             <ControlTemplate>
@@ -162,7 +173,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOrderLines"
                         </localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
                     </localPage:CorasauDataGridForeignKeyColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="OrderNumber" Width="70" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="LineNumber" Width="70" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="LineNumber" Mask="" Width="70" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="UpdatedAt"   Visible="False">
                         <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                             <DataTemplate>

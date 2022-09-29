@@ -178,6 +178,9 @@ namespace ISO20022CreditTransfer
             if (trans.MergePaymId == Uniconta.ClientTools.Localization.lookup("Excluded") && trans.PaymentAmount <= 0)
                 checkErrors.Add(new CheckError(string.Concat(Uniconta.ClientTools.Localization.lookup("PaymentAmount"), "< 0")));
 
+            var countryCode = glJournalGenerated ? (CountryCode)company._Country : creditor._Country;
+            ISOPaymentType(trans.CurrencyLocalStr, bankAccount._IBAN, trans._PaymentMethod, UnicontaCountryToISO(countryCode));
+
             switch (trans._PaymentMethod)
             {
                 case PaymentTypes.VendorBankAccount:
@@ -206,10 +209,7 @@ namespace ISO20022CreditTransfer
                     PaymentMethodFIK04(trans._PaymentId);
                     break;
             }
-
-            var countryCode = glJournalGenerated ? (CountryCode)company._Country : creditor._Country;
-
-            ISOPaymentType(trans.CurrencyLocalStr, bankAccount._IBAN, trans._PaymentMethod, UnicontaCountryToISO(countryCode));
+          
             await RegulatoryReporting(trans);
             
             //Validations <<
@@ -380,13 +380,13 @@ namespace ISO20022CreditTransfer
         /// <summary>
         /// Validate Payment method IBAN
         /// </summary>
-        private void PaymentMethodIBAN(Creditor creditor, Company company, String iban)
+        private void PaymentMethodIBAN(Creditor creditor, Company company, string iban)
         {
-            //ESTONIA: PaymentId can be used for Payment Reference when PaymentType = IBAN 
+            //Estonia and Switzerland: PaymentId can be used for Payment Reference when PaymentType = IBAN 
             //IBAN will be retrieved from Creditor
-            if (exportFormat == ExportFormatType.ISO20022_EE)
+            if (exportFormat == ExportFormatType.ISO20022_EE || exportFormat == ExportFormatType.ISO20022_CH)
             {
-                var paymRefNumber = iban ?? string.Empty;
+                var paymRefNumber = iban;
                 iban = glJournalGenerated ? string.Empty : creditor._PaymentId ?? string.Empty;
 
                 //Validate Creditor IBAN >>
@@ -397,30 +397,27 @@ namespace ISO20022CreditTransfer
                 else
                 {
                     creditorIBAN = Regex.Replace(iban, "[^\\w\\d]", "");
-
                     if (!StandardPaymentFunctions.ValidateIBAN(creditorIBAN))
-                    {
                         checkErrors.Add(new CheckError(Uniconta.ClientTools.Localization.lookup("PaymentIdInvalid")));
-                    }
-                    else
-                    {
-                        string countryId = string.Empty;
-
-                        if (iban.Length >= 2)
-                            countryId = iban.Substring(0, 2);
-
-                        if (glJournalGenerated && countryId != BaseDocument.COUNTRY_DK)
-                            checkErrors.Add(new CheckError(String.Format("Creditor information is required for foreign payments and they're not available.")));
-                    }
                 }
                 //Validate Creditor BBAN <<
 
-                //Validate Estonia Payment Reference >>
-                if (paymRefNumber != string.Empty)
+                //Validate Estonia and Switzerland Payment Reference >>
+                if (paymRefNumber != null)
                 {
-                    //Need information from Estonia to implement
+                    if (exportFormat == ExportFormatType.ISO20022_CH && isoPaymentType == ISO20022PaymentTypes.DOMESTIC)
+                    {
+                        //Validate QRR-number >>
+                        if (paymRefNumber.Length != 27)
+                            checkErrors.Add(new CheckError(String.Format("The QRR-number lenght is not valid")));
+                        else if (QRRCheckDigitCheck(paymRefNumber) == false)
+                            checkErrors.Add(new CheckError(String.Format("The QRR-number failed the modulus check")));
+                        //Validate QRR-number <<
+
+                        //Need information from Estonia to implement
+                    }
+                    //Validate Estonia and Switzerland Payment Reference <<
                 }
-                //Validate Estonia Payment Reference <<
             }
             else
             {
@@ -926,6 +923,25 @@ namespace ISO20022CreditTransfer
                 checkCifferCalc -= 10;
 
             return (checkCiffer == checkCifferCalc);
+        }
+
+        /// <summary>
+        /// Switzerland QRR code check digit validation
+        /// </summary>
+        private  bool QRRCheckDigitCheck(string number)
+        {
+            int[] tabelle = { 0, 9, 4, 6, 8, 2, 7, 1, 3, 5 };
+            int uebertrag = 0;
+
+            var sb = StringBuilderReuse.Create(number);
+            sb.Length = 26;
+
+            for (int i = 0; i < sb.Length; i++)
+                uebertrag = tabelle[(uebertrag + sb[i] - '0') % 10];
+
+            sb.Append((10 - uebertrag) % 10);
+
+            return string.Compare(sb.ToStringAndRelease(), number) == 0;
         }
     }
 }

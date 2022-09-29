@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.Common;
 using Uniconta.DataModel;
+using UnicontaClient.Pages;
 using UnicontaClient.Pages.Creditor.Payments;
 
 namespace UnicontaISO20022CreditTransfer
@@ -55,7 +56,7 @@ namespace UnicontaISO20022CreditTransfer
         /// </summary>
         public override string LocalCurrency()
         {
-            return BaseDocument.CCYEUR;
+            return BaseDocument.CCYCHF;
         }
 
         /// <summary>
@@ -71,6 +72,15 @@ namespace UnicontaISO20022CreditTransfer
                 default:
                     return Encoding.GetEncoding("ISO-8859-1");
             }
+        }
+
+        public override string ExtServiceCode(ISO20022PaymentTypes paymentType)
+        {
+            if (paymentType == ISO20022PaymentTypes.SEPA)
+                return BaseDocument.EXTSERVICECODE_SEPA;
+
+            return null;
+
         }
 
         /// <summary>
@@ -197,6 +207,69 @@ namespace UnicontaISO20022CreditTransfer
             return string.Empty;
         }
 
+        public override string InstructionPriority()
+        {
+            switch (CredPaymFormat.Bank)
+            {
+                case chBank.CreditSuisse:
+                    return null;
+                default: return BaseDocument.INSTRUCTIONPRIORITY_NORM;
+            }
+        }
+
+        /// <summary>
+        /// Switzerland Creditor Payment Reference Number used for Domestic payments
+        /// </summary>
+        public override string CreditorRefNumberIBAN(String refNumber, CountryCode companyCountryId, CountryCode credCountryId)
+        {
+            refNumber = refNumber ?? string.Empty;
+
+            //Domestic payment
+            if (companyCountryId == CountryCode.Switzerland && credCountryId == CountryCode.Switzerland)
+                refNumber = Regex.Replace(refNumber, "[^0-9]", "");
+            else
+                refNumber = string.Empty;
+
+            return refNumber;
+        }
+
+        /// <summary>
+        /// Number (IBAN) - identifier used internationally by financial institutions to uniquely identify the account of a customer. 
+        /// Domestic Payments: IBAN will be retrieved from Creditor table because CreditorTransPayment.PaymentId will be reserved for Creditor Payment Reference
+        /// Cross border Payments: There will be no Payment Reference. IBAN and SWIFT from Payments-table will be used
+        /// </summary>
+        public override string CreditorIBAN(String recIBAN, String credIBAN, CountryCode companyCountryId, CountryCode credCountryId)
+        {
+            credIBAN = credIBAN ?? string.Empty;
+            recIBAN = recIBAN ?? string.Empty;
+
+            var ibanNumber = string.Empty;
+            //Domestic payment
+            if (companyCountryId == CountryCode.Switzerland && credCountryId == CountryCode.Switzerland)
+                ibanNumber = credIBAN;
+            else
+                ibanNumber = recIBAN;
+
+            if (ibanNumber != string.Empty)
+            {
+                ibanNumber = Regex.Replace(ibanNumber, "[^\\w\\d]", "");
+                ibanNumber = ibanNumber.ToUpper();
+            }
+
+            return ibanNumber;
+        }
+
+
+        /// <summary>
+        ///This reference will be presented on Creditor’s account statement. 
+        /// Max 20 characters
+        /// Estonia: Not used
+        /// </summary>
+        public override string RemittanceInfo(string externalAdvText, ISO20022PaymentTypes ISOPaymType, PaymentTypes paymentMethod)
+        {
+            return string.Empty;
+        }
+
         /// <summary>
         /// Valid codes:
         /// CRED (Creditor)
@@ -234,5 +307,24 @@ namespace UnicontaISO20022CreditTransfer
         {
             return string.Empty;
         }
+
+        public override bool RmtInfStrdTpActive()
+        {
+            return false;
+        }
+
+        public override bool CompanyCcyActive()
+        {
+            return false;
+        }
+
+        public override string OCRPaymentType(string creditorOCRPaymentId)
+        {
+            if (!string.IsNullOrEmpty(creditorOCRPaymentId))
+                return BaseDocument.QRR;
+
+            return null;
+        }
+
     }
 }

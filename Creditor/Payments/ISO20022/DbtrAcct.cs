@@ -8,8 +8,7 @@ namespace UnicontaISO20022CreditTransfer
         private readonly string accountId;
         private readonly string bic;
         private readonly string ccy;
-
-      //  private readonly bool isBBAN;
+        private readonly bool companyCcyActive;
 
         private const string HDBTRACCT = "DbtrAcct";
         private const string ID = "Id";
@@ -37,11 +36,12 @@ namespace UnicontaISO20022CreditTransfer
         /// <param name="currencyCode">Identification of the currency in which the account is held.</param> 
         /// <param name="accountId">IBAN account format</param> 
         /// <param name="bic">BIC</param> 
-        public DbtrAcct(string ccy, string accountId, string bic)
+        public DbtrAcct(string ccy, string accountId, string bic, bool companyCcyActive)
         {
             this.ccy = ccy;
             this.accountId = accountId;
             this.bic = bic;
+            this.companyCcyActive = companyCcyActive;
         }
 
 
@@ -63,7 +63,8 @@ namespace UnicontaISO20022CreditTransfer
                 baseDoc.AppendElement(doc, id, IBAN, accountId);
             }
 
-            baseDoc.AppendElement(doc, dbtrAcct, CCY, ccy);
+            if (companyCcyActive)
+                baseDoc.AppendElement(doc, dbtrAcct, CCY, ccy);
         }
     }
 }

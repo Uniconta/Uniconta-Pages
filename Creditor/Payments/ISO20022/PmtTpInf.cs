@@ -72,11 +72,14 @@ namespace UnicontaISO20022CreditTransfer
         {
             XmlElement pmtTpInf = baseDoc.AppendElement(doc, parent, HPMTTPINF);
 
-            if (instructionPriority != string.Empty)
+            if (instructionPriority != null)
                 baseDoc.AppendElement(doc, pmtTpInf, INSTRPRTY, instructionPriority);
 
-            XmlElement svcLvl = baseDoc.AppendElement(doc, pmtTpInf, HSVCLVL);
-            baseDoc.AppendElement(doc, svcLvl, CD, extServiceCode);
+            if (extServiceCode != null)
+            {
+                XmlElement svcLvl = baseDoc.AppendElement(doc, pmtTpInf, HSVCLVL);
+                baseDoc.AppendElement(doc, svcLvl, CD, extServiceCode);
+            }
 
             if (externalLocalInstrument != string.Empty || extProprietaryCode != string.Empty)
             {

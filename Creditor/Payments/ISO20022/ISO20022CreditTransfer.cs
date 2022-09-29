@@ -91,7 +91,8 @@ namespace ISO20022CreditTransfer
             doc.CompanyName = bankSpecific.CompanyName(company.Name);
             doc.CompanyBBAN = bankSpecific.CompanyBBAN(bankAccount._BankAccountPart1, bankAccount._BankAccountPart2);
             doc.CompanyIBAN = bankSpecific.CompanyIBAN(bankAccount._IBAN);
-            doc.CompanyCcy = UnicontaCurrencyISO(company, bankAccount); 
+            doc.CompanyCcy = UnicontaCurrencyISO(company, bankAccount);
+            doc.CompanyCcyActive = bankSpecific.CompanyCcyActive();
             
             doc.CompanyBIC = bankSpecific.CompanyBIC(bankAccount._SWIFT);
             doc.CompanyBankName = bankSpecific.CompanyBankName();
@@ -199,9 +200,8 @@ namespace ISO20022CreditTransfer
                 string credBankCountryId = UnicontaCountryToISO(creditor._Country);  
                 string creditorAcc = string.Empty;
                 string creditorBIC = string.Empty;
-                string creditorOCRPaymentId = string.Empty;
+                string creditorOCRPaymentId = null;
                 bool isPaymentTypeIBAN = false;
-                bool isOCRPayment = false;
 
                 switch (rec._PaymentMethod)
                 {
@@ -261,7 +261,7 @@ namespace ISO20022CreditTransfer
                 doc.ExtProprietaryCode = bankSpecific.ExtProprietaryCode();
                 doc.ExcludeSectionCdtrAgt = bankSpecific.ExcludeSectionCdtrAgt(doc.ISOPaymentType, creditorBIC);
 
-                isOCRPayment = string.IsNullOrEmpty(creditorOCRPaymentId) ? false : true;
+                var OCRPaymentType = bankSpecific.OCRPaymentType(creditorOCRPaymentId);
 
                 var externalAdvText = UnicontaClient.Pages.Creditor.Payments.StandardPaymentFunctions.ExternalMessage(credPaymFormat._Message, rec, company, creditor);
 
@@ -275,7 +275,7 @@ namespace ISO20022CreditTransfer
                     doc.PmtInfList.Add(new PmtInf(doc,
                         new PmtTpInf(doc.ExtServiceCode, doc.ExternalLocalInstrument, doc.ExtCategoryPurpose, doc.InstructionPriority, doc.ExtProprietaryCode),
                         new Dbtr(doc.CompanyName, debtorAddress, doc.DebtorIdentificationCode),
-                        new DbtrAcct(doc.CompanyCcy, companyAccountId, companyBIC),
+                        new DbtrAcct(doc.CompanyCcy, companyAccountId, companyBIC, doc.CompanyCcyActive),
                         new DbtrAgt(doc.CompanyBIC, doc.CompanyBankName), doc.ChargeBearer));
                 }
 
@@ -284,9 +284,9 @@ namespace ISO20022CreditTransfer
                 doc.CdtTrfTxInfList.Add(new CdtTrfTxInf(doc.PaymentInfoId, instructionId, doc.EndToEndId, amount, currency,
                     new CdtrAgt(creditorBIC, credBankName, cdtrAgtCountryId, doc.ExcludeSectionCdtrAgt),
                     new Cdtr(credName, creditorAddress),
-                    new CdtrAcct(creditorAcc, isPaymentTypeIBAN, isOCRPayment, credPaymFormat._ExportFormat, rec),
+                    new CdtrAcct(creditorAcc, isPaymentTypeIBAN, OCRPaymentType, credPaymFormat._ExportFormat, rec),
                     new RgltryRptg(credPaymFormat._ExportFormat, doc.ISOPaymentType, rec.RgltryRptgCode, rec.RgltryRptgText),
-                    new RmtInf(unstructuredPaymInfoList, remittanceInfo, creditorOCRPaymentId, isOCRPayment), chargeBearer));
+                    new RmtInf(unstructuredPaymInfoList, remittanceInfo, creditorOCRPaymentId, OCRPaymentType), chargeBearer));
             }
 
             var generatedFileName = bankSpecific.GenerateFileName(doc.NumberSeqPaymentFileId, doc.CompanyID);

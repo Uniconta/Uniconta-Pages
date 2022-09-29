@@ -84,7 +84,18 @@ namespace UnicontaClient.Pages.CustomPage
         void CreateUserField()
         {
             if (tableheadermaster._HasPrimaryKey)
+            {
                 UserFieldControl.CreateKeyFieldsGroupOnPage2(layoutItems, tableheadermaster._PKprompt);
+                if (tableheadermaster._AutoKey)
+                {
+                    var group = TablePropertyControl.GetGroupByName(layoutItems, Uniconta.ClientTools.Localization.lookup("Description"));
+                    var layoutItm =group?.Children?.OfType<CorasauLayoutItem>()?
+                        .Where(x => x.Label?.ToString() == Uniconta.ClientTools.Localization.lookup("Key") || x.Label.ToString() == tableheadermaster._PKprompt)
+                        .FirstOrDefault();
+                    if (layoutItm != null)
+                      layoutItm.IsEnabled = false;
+                }
+            }
             if(tableheadermaster._TableType == TableBaseType.Transaction)
                 UserFieldControl.CreateDateFieldGroupOnPage2(layoutItems);
             var UserFieldDef = editrow.UserFieldDef();

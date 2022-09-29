@@ -48,7 +48,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectInvoiceProjectLinePage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="ProjectForwardName" Width="120" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="TransType" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="ReferenceNumber" Visible="False"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="LineNumber" Width="70" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="LineNumber" Mask="" Width="70" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension1" x:Name="coldim1"/>
                     <local:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension2" x:Name="coldim2"/>
                     <local:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension3" x:Name="coldim3"/>

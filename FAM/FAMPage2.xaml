@@ -121,10 +121,10 @@ x:Class="UnicontaClient.Pages.CustomPage.FAMPage2"
                         <CorasauControls:DateEditor  EditValue="{Binding CapitalizationDate,Mode=TwoWay}" />
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="DisposalDate" x:Name="liDisposalDate">
-                        <CorasauControls:DateEditor  EditValue="{Binding DisposalDate,Mode=OneWay}" />
+                        <CorasauControls:DateEditor  EditValue="{Binding DisposalDate,Mode=TwoWay}" />
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="LastDepreciation" x:Name="liLastDepreciation">
-                        <CorasauControls:DateEditor EditValue="{Binding LastDepreciation,Mode=OneWay}" />
+                        <CorasauControls:DateEditor EditValue="{Binding LastDepreciation,Mode=TwoWay}" />
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
                 <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpDepreciation" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Depreciation}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">

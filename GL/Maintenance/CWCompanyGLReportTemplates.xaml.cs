@@ -75,11 +75,10 @@ namespace UnicontaClient.Pages.CustomPage
         {
             busyIndicator.IsBusy = true;
             var comp = cbCompany.SelectedItem as Company;
-
             if (comp == null)
                 return;
 
-            Company = await BasePage.session.OpenCompany(comp.RowId, true, new CompanyClient());
+            Company = await BasePage.session.OpenCompany(comp.RowId, true);
             companyAPI = new CrudAPI(BasePage.session, Company);
             var lstEntity = await companyAPI.Query<GLReportTemplate>();
             cbGLReportTemplate.ItemsSource = null;

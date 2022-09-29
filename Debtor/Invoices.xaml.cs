@@ -278,7 +278,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "Trans":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.PostedTransactions, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Transactions"), selectedItem.InvoiceNum));
+                        AddDockItem(TabControls.AccountsTransaction, selectedItem, Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("VoucherTransactions"), selectedItem._Voucher));
                     break;
                 case "SendInvoice":
                     if (dgInvoicesGrid.SelectedItem == null || dgInvoicesGrid.SelectedItems == null)

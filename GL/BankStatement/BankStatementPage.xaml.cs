@@ -189,7 +189,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             busyIndicator.IsBusy = true;
             var bankTransApi = new BankStatementAPI(api);
-            var bankStmtLines = (BankStatementLineGridClient[])await bankTransApi.GetTransactions(new BankStatementLineGridClient(), master, fromDate, toDate, true);
+            var bankStmtLines = (BankStatementLineGridClient[])await bankTransApi.GetTransactions(new BankStatementLineGridClient(), master, fromDate, toDate, false);
 
             var src = new List<TextAmount>();
             long BankTotalNoMatch = 0, Total = 0, Void = 0;
@@ -229,7 +229,7 @@ namespace UnicontaClient.Pages.CustomPage
             BankTotalNoMatch = 0;
 
             var tranApi = new Uniconta.API.GeneralLedger.ReportAPI(api);
-            var listtran = (GLTransClientTotal[])await tranApi.GetBank(new GLTransClientTotal(), master._Account, fromDate, toDate, true);
+            var listtran = (GLTransClientTotal[])await tranApi.GetBank(new GLTransClientTotal(), master._Account, fromDate, toDate, true, false);
             if (listtran != null)
             {
                 Array.Sort(listtran, new GLTransClientSort());

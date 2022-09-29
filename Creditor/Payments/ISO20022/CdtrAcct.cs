@@ -11,7 +11,7 @@ namespace UnicontaISO20022CreditTransfer
         private readonly string accountId;
 
         private readonly bool isIBAN;
-        private readonly bool isOCR;
+        private readonly string ocrPaymentType;
         private readonly byte exportFormat;
         private readonly CreditorTransPayment trans;
 
@@ -23,6 +23,8 @@ namespace UnicontaISO20022CreditTransfer
         private const string PRTRY = "Prtry";
         private const string CD = "Cd";
         private const string OCR = "OCR";
+        private const string QRR = "QRR";
+
         private const string BGNR = "BGNR";
         private const string BBAN = "BBAN";
 
@@ -33,11 +35,11 @@ namespace UnicontaISO20022CreditTransfer
         /// <param name="AccountId">Either IBAN or BBAN account format.</param> 
         /// <param name="isIBAN">Is Account identifier a IBAN.</param>
         /// <param name="isOCR">Is OCR Creditor Number.</param>
-        public CdtrAcct(string accountId, bool isIBAN, bool isOCR, byte exportFormat, CreditorTransPayment trans)
+        public CdtrAcct(string accountId, bool isIBAN, string ocrPaymentType, byte exportFormat, CreditorTransPayment trans)
         {
             this.accountId = accountId;
             this.isIBAN = isIBAN;
-            this.isOCR = isOCR;
+            this.ocrPaymentType = ocrPaymentType;
             this.exportFormat = exportFormat;
             this.trans = trans;
         }
@@ -58,7 +60,7 @@ namespace UnicontaISO20022CreditTransfer
 
                 XmlElement schmeNm = baseDoc.AppendElement(doc, othr, SCHMENM);
 
-                if (isOCR && exportFormat == (byte)ExportFormatType.ISO20022_DK) 
+                if (ocrPaymentType == OCR && exportFormat == (byte)ExportFormatType.ISO20022_DK) 
                     baseDoc.AppendElement(doc, schmeNm, PRTRY, OCR);
                 else if (exportFormat == (byte)ExportFormatType.ISO20022_SE && trans._PaymentMethod == PaymentTypes.PaymentMethod3)
                     baseDoc.AppendElement(doc, schmeNm, PRTRY, BGNR);

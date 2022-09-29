@@ -79,7 +79,7 @@ namespace UnicontaClient.Pages.CustomPage
                 return;
            
             busyIndicator.IsBusy = true;
-            Company = await BasePage.session.OpenCompany(Company.RowId, true, new CompanyClient());
+            Company = await BasePage.session.OpenCompany(Company.RowId, true);
             var copyCompanyAPI = new CrudAPI(BasePage.session, Company);
             var lstEntity = await copyCompanyAPI.Query<Balance>();
             if (lstEntity != null && lstEntity.Length > 0)

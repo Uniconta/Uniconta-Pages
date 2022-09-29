@@ -14,6 +14,7 @@ using Uniconta.ClientTools;
 using UnicontaClient.Utilities;
 using Uniconta.ClientTools.Util;
 using DevExpress.Xpf.Grid;
+using Uniconta.Common.Utility;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -90,7 +91,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "PostedTransaction":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.PostedTransactions, dgProductionPostedGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("PostedTransactions"), selectedItem._Item));
+                        AddDockItem(TabControls.AccountsTransaction, selectedItem, Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("VoucherTransactions"), selectedItem._Voucher));
                     break;
                 case "DeleteProduction":
                     if (selectedItem != null)

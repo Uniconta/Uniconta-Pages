@@ -75,9 +75,8 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectBudgetPlaningLinePage"
                         </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                     </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Unit" Width="50" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CostPrice" Width="80"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CostPrice" Width="80" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="SalesPrice" Width="80"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Cost" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Sales" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Margin" Width="90" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="MarginRatio" Width="50" Visible="False"/>
@@ -98,7 +97,6 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectBudgetPlaningLinePage"
                 </localPage:ProjectBudgetPlaningLinePageGrid.Columns>
                 <localPage:ProjectBudgetPlaningLinePageGrid.TotalSummary>
                     <localPage:SumColumn FieldName="Qty" SummaryType="Sum" DisplayFormat="{}{0:N2}" />
-                    <localPage:SumColumn FieldName="Cost" SummaryType="Sum" DisplayFormat="{}{0:N0}"/>
                     <localPage:SumColumn FieldName="Sales" SummaryType="Sum" DisplayFormat="{}{0:N0}"/>
                     <localPage:SumColumn FieldName="Margin" SummaryType="Sum" DisplayFormat="{}{0:N0}"/>
                     <localPage:SumColumn FieldName="MarginRatio" SummaryType="Custom" DisplayFormat="{}{0:N2}" />

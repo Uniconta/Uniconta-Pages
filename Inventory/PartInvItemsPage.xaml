@@ -49,7 +49,7 @@ x:Class="UnicontaClient.Pages.CustomPage.PartInvItemsPage"
                             </ControlTemplate>
                         </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                     </localPage:CorasauDataGridTemplateColumnClient>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="LineNumber" Width="50" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="LineNumber" Mask="" Width="50" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ItemPart" Width="100"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" Width="150" ReadOnly="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ItemType" Width="80" ReadOnly="True"/>

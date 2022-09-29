@@ -551,9 +551,6 @@ namespace UnicontaISO20022CreditTransfer
             switch (companyBankEnum)
             {
                 case CompanyBankENUM.Nordea_DK:
-                    if (ISOPaymType == ISO20022PaymentTypes.DOMESTIC)
-                        return resultList;
-
                     maxLines = 10;
                     maxStrLen = 140;
                     if (trans._PaymentMethod == PaymentTypes.PaymentMethod6 || trans._PaymentMethod == PaymentTypes.PaymentMethod3) //Not allowed for FIK71 and Giro04 

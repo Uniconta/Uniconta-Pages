@@ -71,7 +71,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionPostedTransGridPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="EndDiscountPct" Width="35" Visible="false"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="MovementType" Visible="false"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="SalesPriceCur" Visible="false"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="LineNumber" Visible="false"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="LineNumber" Mask="" Visible="false"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="InvoiceNumber" Visible="false"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="ReferenceNumber" Width="70" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="CostValue" Visible="false"/>

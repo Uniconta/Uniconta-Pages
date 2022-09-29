@@ -28,7 +28,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionPostedGridPage"
                             </DataTemplate>
                         </local:CorasauDataGridTemplateColumnClient.CellTemplate>
                     </local:CorasauDataGridTemplateColumnClient>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="LineNumber" Visible="False" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="LineNumber" Mask="" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="OrderNumber" Width="60" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="JournalPostedId" Width="60"  />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Voucher" Width="60" />

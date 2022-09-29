@@ -55,12 +55,12 @@ x:Class="UnicontaClient.Pages.CustomPage.BankStatementLinePage"
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Mark" ShowInColumnChooser="False" Header=""  Width="30"  ReadOnly="False" AllowEditing="True" AllowSorting="False" AllowColumnFiltering="False">
                                     <localPage:CorasauDataGridTemplateColumnClient.HeaderTemplate>
                                         <DataTemplate>
-                                            <CorasauControls:CheckEditor Checked="CheckEditor_Checked" Unchecked="CheckEditor_Unchecked"  IsEnabled="True"></CorasauControls:CheckEditor>
+                                            <CorasauControls:CheckEditor  Checked="CheckEditor_Checked" Unchecked="CheckEditor_Unchecked"  IsEnabled="True"></CorasauControls:CheckEditor>
                                         </DataTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.HeaderTemplate>
                                     <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                         <DataTemplate>
-                                            <CorasauControls:CheckEditor Margin="5,0" EditValue="{Binding DataContext.RowData.Row.Mark,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent},UpdateSourceTrigger=PropertyChanged}" IsEnabled="True"/>
+                                            <CorasauControls:CheckEditor Name="PART_Editor" Margin="5,0" EditValue="{Binding DataContext.RowData.Row.Mark,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent},UpdateSourceTrigger=PropertyChanged}" IsEnabled="True"/>
                                         </DataTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridTemplateColumnClient>
@@ -169,7 +169,7 @@ x:Class="UnicontaClient.Pages.CustomPage.BankStatementLinePage"
                                     </localPage:CorasauDataGridTemplateColumnClient.HeaderTemplate>
                                     <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                         <DataTemplate>
-                                            <CorasauControls:CheckEditor Margin="5,0" EditValue="{Binding DataContext.RowData.Row.Mark,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent},UpdateSourceTrigger=PropertyChanged}" IsEnabled="True"/>
+                                            <CorasauControls:CheckEditor Name="PART_Editor" Margin="5,0" EditValue="{Binding DataContext.RowData.Row.Mark,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent},UpdateSourceTrigger=PropertyChanged}" IsEnabled="True"/>
                                         </DataTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridTemplateColumnClient>

@@ -59,12 +59,8 @@ namespace UnicontaClient.Pages.CustomPage
             base.OnLayoutLoaded();
             UnicontaClient.Utilities.Utility.SetDimensionsGrid(api, coldim1, coldim2, coldim3, coldim4, coldim5);
 
-            var Comp = api.CompanyEntity;
-
-            if (Comp.TimeManagement)
+            if (api.CompanyEntity.TimeManagement)
             {
-                Item.Visible = false;
-                ItemName.Visible = false;
                 SalesPrice.Visible = true;
                 PrCategory.Visible = true;
                 CategoryName.Visible = true;

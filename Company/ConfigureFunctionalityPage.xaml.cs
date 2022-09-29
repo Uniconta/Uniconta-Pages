@@ -51,8 +51,14 @@ namespace UnicontaClient.Pages.CustomPage
             if (api.session.User._Role < (byte)Uniconta.Common.User.UserRoles.Accountant)
                 Loaded += ConfigureFunctionalityPage_Loaded;
 
-            if (!Enum.IsDefined(typeof(PeppolSupportedCountries), (byte)api.CompanyEntity._Country))
+            if (!Enum.IsDefined(typeof(PeppolSupportedCountries), (byte)editrow._Country))
                 cbPeppol.Visibility = Visibility.Collapsed;
+
+            grpOnlyPosting.IsCollapsed = editrow.FullPackage;
+
+            if (BasePage.GetSystemDefaultDate() < new DateTime(2022, 8, 15))
+                grpOnlyPosting.Visibility = Visibility.Collapsed;
+            
         }
 
         private void ConfigureFunctionalityPage_Loaded(object sender, RoutedEventArgs e)

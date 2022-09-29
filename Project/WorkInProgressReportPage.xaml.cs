@@ -62,7 +62,7 @@ namespace UnicontaClient.Pages.CustomPage
         bool hasWorkspace;
 
         private const string AND_OPERATOR = "And";
-        private const string FILTERVALUE_ZEROBALANCE = @"[ClosingBalance] <> 0";
+        private const string FILTERVALUE_ZEROBALANCE = @"([OnAccount] <> 0.0 Or [ClosingBalance] <> 0.0)";
 
         SQLTableCache<Uniconta.DataModel.Employee> empCache;
         SQLTableCache<Uniconta.DataModel.Project> projCache;
@@ -104,6 +104,8 @@ namespace UnicontaClient.Pages.CustomPage
             showTask = api.CompanyEntity.ProjectTask && showTask;
             iShowTask.IsChecked = showTask;
             iShowTask.isEditLayout = api.CompanyEntity.ProjectTask;
+            cmbProject.api = api;
+            SetProjectSource();
 
             hasWorkspace = workSpaceCache != null;
             Task.Visible = showTask;
@@ -142,6 +144,12 @@ namespace UnicontaClient.Pages.CustomPage
                 DefaultToDate = previouslastDayOfTheYear;
             else
                 DefaultToDate = todateeditor.DateTime.Date;
+        }
+
+        async private void SetProjectSource()
+        {
+            projCache = projCache ?? await this.api.LoadCache<Uniconta.DataModel.Project>();
+            cmbProject.ItemsSource = projCache;
         }
 
         protected override void OnLayoutLoaded()
@@ -241,7 +249,8 @@ namespace UnicontaClient.Pages.CustomPage
             if (minApproveDate != DateTime.MinValue)
                 pairTM.Add(PropValuePair.GenereteWhereElements(nameof(TMJournalLineClient.Date), minApproveDate, CompareOperator.GreaterThanOrEqual));
 
-            var tmJourLines = await api.Query<TMJournalLineClient>(pairTM);
+            var projMaster = projCache.Get(cmbProject.Text);
+            var tmJourLines = await api.Query<TMJournalLineClient>(projMaster, pairTM);
 
             var tmLines = tmJourLines.Where(s => (s._Project != null &&
                                                   s._PayrollCategory != null &&
@@ -291,7 +300,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                     foreach (var rec in localtmLines)
                     {
-                        var lookupValue = string.Concat(rec._Project, rec._WorkSpace, rec._Task);
+                        var lookupValue = showWorkspace || showTask ? string.Concat(rec._Project, rec._WorkSpace, rec._Task) : rec._Project ;
 
                         TmpprojectSum lineWIP;
                         if (tmLinesWIP.TryGetValue(lookupValue, out lineWIP))
@@ -319,7 +328,7 @@ namespace UnicontaClient.Pages.CustomPage
             foreach (var rec in wipLst)
             {
                 TmpprojectSum lineWIP;
-                var lookupValue = string.Concat(rec._Project, rec._Workspace, rec._Task);
+                var lookupValue = showWorkspace || showTask ? string.Concat(rec._Project, rec._Workspace, rec._Task) : rec._Project;
 
                 if (tmLinesWIP.TryGetValue(lookupValue, out lineWIP))
                 {
@@ -397,6 +406,7 @@ namespace UnicontaClient.Pages.CustomPage
         async void LoadGrid()
         {
             SetDateTime(txtDateFrm, txtDateTo);
+            var projMaster = projCache.Get(cmbProject.Text);
             var transList = new List<ProjectTransLocalClient>();
             var secTransLst = new List<ProjectTransLocalClient>();
             List<ProjectTransLocalClient> newLst;
@@ -417,7 +427,7 @@ namespace UnicontaClient.Pages.CustomPage
                 PropValuePair.GenereteWhereElements(nameof(ProjectTransClient.Date), DefaultToDate, CompareOperator.LessThanOrEqual),
                 PropValuePair.GenereteWhereElements(nameof(ProjectTransClient.Invoiceable), typeof(bool), "1"),
             };
-            var projTransLst = await api.Query<ProjectTransClient>(pairTrans);
+            var projTransLst = await api.Query<ProjectTransClient>(projMaster, pairTrans);
             if (projTransLst == null || projTransLst.Length == 0)
             {
                 busyIndicator.IsBusy = false;

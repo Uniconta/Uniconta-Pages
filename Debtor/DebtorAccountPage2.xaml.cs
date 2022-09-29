@@ -377,6 +377,8 @@ namespace UnicontaClient.Pages.CustomPage
                             editrow.ContactEmail = contact.email;
                             editrow.Www = contact.www;
                         }
+                        if (!string.IsNullOrEmpty(ci.vat))
+                            editrow.VatNumber = ci.vat;
                     }
                 }
                 else

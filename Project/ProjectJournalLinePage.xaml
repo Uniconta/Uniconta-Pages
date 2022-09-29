@@ -115,7 +115,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectJournalLinePage"
                             </DataTemplate>
                         </localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
                     </localPage:CorasauDataGridForeignKeyColumnClient>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="LineNumber" Width="70" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="LineNumber" Mask="" Width="70" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension1" x:Name="coldim1"/>
                     <localPage:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension2" x:Name="coldim2"/>
                     <localPage:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension3" x:Name="coldim3"/>

@@ -104,6 +104,7 @@ namespace UnicontaISO20022CreditTransfer
         public const string CCYSEK = "SEK";
         public const string CCYNOK = "NOK";
         public const string CCYGBP = "GBP";
+        public const string CCYCHF = "CHF";
 
         public const string FIK71 = "71";
         public const string FIK73 = "73";
@@ -125,10 +126,11 @@ namespace UnicontaISO20022CreditTransfer
         public const string CHRGBR_SHAR = "SHAR";
         public const string CHRGBR_SLEV = "SLEV";
 
-
+        public const string OCR = "OCR";
+        public const string QRR = "QRR";
         #endregion
 #if !SILVERLIGHT
-#region Member variables
+        #region Member variables
 
         protected readonly DocumentType documentType;
       //  protected readonly Profile profile;

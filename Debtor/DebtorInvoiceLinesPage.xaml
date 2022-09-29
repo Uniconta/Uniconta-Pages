@@ -76,7 +76,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorInvoiceLinesPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="EndDiscountPct" Width="35" Visible="false"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="MovementType" Visible="false"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="SalesPriceCur" Visible="false"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="LineNumber" Visible="false"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="LineNumber" Mask="" Visible="false"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceNumber" Visible="false"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ReferenceNumber" Width="70" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CostValue" Visible="false"/>

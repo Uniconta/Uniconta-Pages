@@ -304,7 +304,7 @@ x:Class="UnicontaClient.Pages.CustomPage.TMJournalLinePage"
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="ErrorInfo" Visible="False" AllowEditing="False"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="InternalType" Visible="False" AllowEditing="False"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="JournalPostedId" Visible="False" AllowEditing="False"/>
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="LineNumber" Width="70" Visible="False"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="LineNumber" Mask="" Width="70" Visible="False"/>
                             </localPage:TMJournalLinePageGrid.Columns>
                             <localPage:TMJournalLinePageGrid.TotalSummary >
                                 <localPage:SumColumn SerializableTag="Sum"  FieldName="Project" SummaryType="Custom" />

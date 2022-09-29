@@ -1057,6 +1057,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void CopyOrMoveAttachement(VouchersClient selectedItem)
         {
+            Save();
             var cwAttachedVouchers = new CWAttachedVouchers(api, selectedItem);
             cwAttachedVouchers.Closed += async delegate
             {
@@ -1574,6 +1575,7 @@ namespace UnicontaClient.Pages.CustomPage
                 await api.Read(companySettings);
                 var orgNo = NumberConvert.ToString(companySettings._OrgNumber);
 
+                System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;
                 using (var client = new HttpClient())
                 {
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
@@ -1820,6 +1822,7 @@ namespace UnicontaClient.Pages.CustomPage
                         sb.Length = sb.Length - 1; // remove last comma
                         sb.Append(" ] }");
                         var vContent = new StringContent(sb.ToStringAndRelease(), Encoding.UTF8, "application/json");
+                        System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;
                         response = await client.PostAsync($"https://api.bilagscan.dk/v1/organizations/" + orgNo + "/vouchers/seen", vContent);
                         await response.Content.ReadAsStringAsync();
                     }

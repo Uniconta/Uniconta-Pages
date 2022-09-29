@@ -186,7 +186,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrderLines"
                                         </DataTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridTemplateColumnClient>
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="LineNumber" Width="70" Visible="False"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="LineNumber" Mask="" Width="70" Visible="False"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="OrderNumber" Width="70" Visible="False"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="UpdatedAt"   Visible="False">
                                     <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>

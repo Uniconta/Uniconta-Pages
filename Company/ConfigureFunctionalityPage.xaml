@@ -18,30 +18,36 @@ x:Class="UnicontaClient.Pages.CustomPage.ConfigureFunctionalityPage"
             <CorasauControls:CorasauRibbonControl x:Name="frmRibbon" XMLSourcePath=";component/Pages/Company/ConfigureFunctionalityPageRibbon.xml" Grid.Row="0"/>
            
             <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
-                <CorasauControls:CorasauLayoutGroup View="GroupBox" Orientation="Vertical" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Modules}"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                    <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Ledger}">
-                        <CorasauControls:CheckEditor IsChecked="{Binding Ledger,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem  Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BankStatement}">
-                        <CorasauControls:CheckEditor IsChecked="{Binding BankStatement,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem  Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=PhysicalVoucher}">
-                        <CorasauControls:CheckEditor IsChecked="{Binding PhycicalVoucher,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem  Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Contacts}">
-                        <CorasauControls:CheckEditor IsChecked="{Binding Contacts,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem  Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Debtor}">
-                        <CorasauControls:CheckEditor IsChecked="{Binding Debtor,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                     <CorasauControls:CorasauLayoutItem  Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Creditor}">
-                        <CorasauControls:CheckEditor IsChecked="{Binding Creditor,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem  Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Inventory}">
-                        <CorasauControls:CheckEditor IsChecked="{Binding Inventory,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
+                <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="grpFirst">
+                    <CorasauControls:CorasauLayoutGroup View="GroupBox" Orientation="Vertical" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Modules}"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                        <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Ledger}">
+                            <CorasauControls:CheckEditor IsChecked="{Binding Ledger,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem  Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BankStatement}">
+                            <CorasauControls:CheckEditor IsChecked="{Binding BankStatement,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem  Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=PhysicalVoucher}">
+                            <CorasauControls:CheckEditor IsChecked="{Binding PhycicalVoucher,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem  Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Contacts}">
+                            <CorasauControls:CheckEditor IsChecked="{Binding Contacts,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem  Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Debtor}">
+                            <CorasauControls:CheckEditor IsChecked="{Binding Debtor,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem  Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Creditor}">
+                            <CorasauControls:CheckEditor IsChecked="{Binding Creditor,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem  Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Inventory}">
+                            <CorasauControls:CheckEditor IsChecked="{Binding Inventory,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                    </CorasauControls:CorasauLayoutGroup>
+                    <CorasauControls:CorasauLayoutGroup x:Name="grpOnlyPosting" View="GroupBox" Orientation="Vertical" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OnlyPosting}" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                        <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OnlyPosting}">
+                            <CorasauControls:CheckEditor IsChecked="{Binding OnlyPosting,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                    </CorasauControls:CorasauLayoutGroup>
                 </CorasauControls:CorasauLayoutGroup>
-
                 <CorasauControls:CorasauLayoutGroup View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LogisticModule}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                     <CorasauControls:CorasauLayoutItem  Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BOM}">
                         <CorasauControls:CheckEditor IsChecked="{Binding InvBOM,Mode=TwoWay}"/>
