@@ -41,30 +41,30 @@ namespace UnicontaClient.Pages.CustomPage
 
         async private void dgVouchersGrid_CurrentItemChanged(object sender, DevExpress.Xpf.Grid.CurrentItemChangedEventArgs e)
         {
-            VoucherExtendedClient selectedVoucherClient = e.NewItem as VoucherExtendedClient;
-            if (selectedVoucherClient != null)
+            VoucherExtendedClient voucherClient = e.NewItem as VoucherExtendedClient;
+            if (voucherClient != null)
             {
                 busyIndicator.IsBusy = true;
 
-                if (selectedVoucherClient._Data == null)
-                    await _api.Read(selectedVoucherClient);
+                if (voucherClient._Data == null)
+                    await _api.Read(voucherClient);
 
                 documentViewer.Children.Clear();
 
                 try
                 {
-                    if (selectedVoucherClient.Fileextension == FileextensionsTypes.UNK)
+                    if (voucherClient.Fileextension == FileextensionsTypes.UNK)
                         documentViewer.Children.Add(Uniconta.ClientTools.Util.UtilDisplay.LoadMessage(Uniconta.ClientTools.Localization.lookup("InvalidDocSave")));
                     else
-                        documentViewer.Children.Add(Uniconta.ClientTools.Util.UtilDisplay.LoadControl(selectedVoucherClient, false, false));
+                        documentViewer.Children.Add(Uniconta.ClientTools.Util.UtilDisplay.LoadControl(voucherClient, false, false));
                 }
                 catch (Exception ex)
                 {
                     documentViewer.Children.Add(Uniconta.ClientTools.Util.UtilDisplay.LoadDefaultControl(string.Format("{0}. \n{1} : {2}", Uniconta.ClientTools.Localization.lookup("InvalidDocSave"),
                     Uniconta.ClientTools.Localization.lookup("ViewerFailed"), ex.Message)));
+                    Uniconta.ClientTools.Page.BasePage.session.ReportException(ex, "VoucherPage3", voucherClient.CompanyId);
                 }
                 finally { busyIndicator.IsBusy = false; }
-
             }
         }
 

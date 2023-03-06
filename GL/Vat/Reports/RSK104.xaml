@@ -1,0 +1,63 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools" 
+   xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.RSK104"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+    xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage" 
+    xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+    xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+    xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
+    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"                    
+    mc:Ignorable="d"
+    d:DesignHeight="300" d:DesignWidth="400">
+
+    <UserControl.Resources>
+        <Util:VisibilityBoolConverter x:Key="VisibilityBoolConverter" />
+        <Util:RowIndexConverter x:Key="RowIndexConverter" />
+        <Util:ImageNameToImagesourceConverter x:Key="ImageNameToImagesourceConverter"/>
+    </UserControl.Resources>
+
+    <Grid x:Name="LayoutRoot" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        
+        <CorasauControls:CorasauRibbonControl x:Name="localMenu" XMLSourcePath=";component/Pages/GL/Vat/Reports/RSK104Ribbon.xml"/>
+
+        <Grid Grid.Row="2" Margin="5" x:Name="gridHeaderParam">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="50" />
+                <ColumnDefinition Width="70" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*" />
+            </Grid.RowDefinitions>
+            <Button x:Name="btnTXT" Click="btnTXT_OnClick">TXT</Button>
+            <TextBlock VerticalAlignment="Center" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Year}"
+                       Grid.Column="1" Grid.Row="0" Margin="16,3,3,3" x:Name="Arid" IsEnabled="False" />
+            <CorasauControls:DateEditor Mask="yyyy" x:Name="txtYearValue" Grid.Column="1" Grid.Row="0" Margin="35,3,2,3" MaxWidth="4" EditValueChanged="TxtYearValue_OnEditValueChanged">
+                <CorasauControls:DateEditor.StyleSettings>
+                    <dxe:DateEditPickerStyleSettings></dxe:DateEditPickerStyleSettings>
+                </CorasauControls:DateEditor.StyleSettings>
+            </CorasauControls:DateEditor>            
+        </Grid>
+
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="3" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <localPage:RSK104Grid x:Name="dgGLTable2" AutoGenerateColumns="None">
+                <localPage:RSK104Grid.Columns>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ExternalNo" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Account" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" Width="330"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PrevYear" />
+                    <localPage:ComboBoxColumnClient x:Name="AccountType" Visible="False"/>
+                </localPage:RSK104Grid.Columns>
+            </localPage:RSK104Grid>
+        </CorasauControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

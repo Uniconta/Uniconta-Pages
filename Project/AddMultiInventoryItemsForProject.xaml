@@ -1,0 +1,35 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools" 
+                    xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.AddMultiInventoryItemsForProject"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:converter="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
+             xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
+             xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
+    <Pages:GridBasePage.Resources>
+        <converter:MaskConverter x:Key="MaskConverter" />
+    </Pages:GridBasePage.Resources>
+    <Grid x:Name="LayoutRoot" Margin="2" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Debtor/AddInventoryItemsGridRibbon.xml" x:Name="localMenu"/>
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1"  BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <local:MultipleInventoryItemGrid x:Name="dgMultipleInventoryItems" AutoGenerateColumns="None">
+                <local:MultipleInventoryItemGrid.Columns>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Quantity" >
+                        <local:CorasauDataGridTemplateColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <CorasauControls:TextEditor  x:Name="PART_Editor" HorizontalContentAlignment="Right" Mask="{Binding Path=DataContext.RowData.Row.Decimals,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource MaskConverter},ConverterParameter=Decimals}" 
+                                 MaskUseAsDisplayFormat="True" MaskType="Numeric" EditValue="{Binding Path=DataContext.RowData.Row.Quantity,RelativeSource={RelativeSource TemplatedParent}}"/>
+                            </DataTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.CellTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Item" Width="90" AllowEditing="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Name" Width="200" AllowEditing="False"/>
+                </local:MultipleInventoryItemGrid.Columns>
+            </local:MultipleInventoryItemGrid>
+        </CorasauControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

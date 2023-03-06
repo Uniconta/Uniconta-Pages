@@ -117,7 +117,8 @@ namespace UnicontaClient.Pages.CustomPage
             Employeelookupeditor.api = leAccount.api = lePayment.api = cmbDim1.api = cmbDim2.api =
             cmbDim3.api = cmbDim4.api = cmbDim5.api = leTransType.api = leGroup.api = lePostingAccount.api
             = leLayoutGroup.api = leInvoiceAccount.api = 
-            leDeliveryAddress.api = leApprover.api = leSplit.api = leVat.api = prTasklookupeditor.api = lePrWorkSpace.api= crudapi;
+            leDeliveryAddress.api = leApprover.api = leSplit.api = leVat.api = prTasklookupeditor.api = lePrWorkSpace.api=
+            leDeliveryTerm.api = leShipment.api = crudapi;
 
             cbDeliveryCountry.ItemsSource = Enum.GetValues(typeof(Uniconta.Common.CountryCode));
             AdjustLayout();
@@ -199,6 +200,8 @@ namespace UnicontaClient.Pages.CustomPage
                 Utility.SetDimensions(api, lbldim1, lbldim2, lbldim3, lbldim4, lbldim5, cmbDim1, cmbDim2, cmbDim3, cmbDim4, cmbDim5, usedim);
             if (!Comp.DeliveryAddress)
                 dAddress.Visibility = Visibility.Collapsed;
+            if (!Comp.Shipments)
+                shipmentItem.Visibility = Visibility.Collapsed;
             if (!Comp.Contacts)
                 cmbContactName.Visibility = Visibility.Collapsed;
             if (!Comp.ApproveSalesOrders)
@@ -464,7 +467,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         SQLCache installationCache;
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             var api = this.api;
             var Comp = api.CompanyEntity;

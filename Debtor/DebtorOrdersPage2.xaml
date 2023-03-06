@@ -172,6 +172,15 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrdersPage2"
                     <CorasauControls:CorasauLayoutItem FieldName="DeliveryCountry" x:Name="liDeliveryCountry">
                         <CorasauControls:ComboBoxEditor x:Name="cbDeliveryCountry" SelectedItem="{Binding DeliveryCountry,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="DeliveryContactPerson" x:Name="liDeliveryContactPerson">
+                        <CorasauControls:TextEditor  Text="{Binding DeliveryContactPerson,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="DeliveryPhone" x:Name="liDeliveryPhone">
+                        <CorasauControls:TextEditor  Text="{Binding DeliveryPhone,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="DeliveryContactEmail" x:Name="liDeliveryContactEmail">
+                        <CorasauControls:TextEditor  Text="{Binding DeliveryContactEmail,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="ConfirmPrinted" x:Name="liConfirmPrinted">
                         <CorasauControls:DateEditor x:Name="deConfirmPrinted" EditValue="{Binding ConfirmPrinted,Mode=OneWay}" IsReadOnly="True" IsEnabled="False"/>
                     </CorasauControls:CorasauLayoutItem>

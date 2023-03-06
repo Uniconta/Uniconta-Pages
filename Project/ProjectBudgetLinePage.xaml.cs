@@ -27,6 +27,8 @@ using Uniconta.ClientTools;
 using DevExpress.Xpf.Grid;
 using DevExpress.Data;
 using Uniconta.ClientTools.Util;
+using System.ComponentModel.DataAnnotations;
+using Uniconta.Common.Utility;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -37,6 +39,62 @@ namespace UnicontaClient.Pages.CustomPage
         internal object taskSource;
         public object TaskSource { get { return taskSource; } }
         public PrCategoryCacheFilter PrCategorySource { get; internal set; }
+
+        string _invPurchaseAccount;
+        [Display(Name = "InvPurchaseAccount", ResourceType = typeof(InventoryText))]
+        public String InvPurchaseAccount
+        {
+            get
+            {
+                return _invPurchaseAccount ?? _CreditorAccount ?? _itm._PurchaseAccount;
+            }
+            set { _invPurchaseAccount = value; NotifyPropertyChanged("InvPurchaseAccount"); }
+        }
+
+        internal object invPurchaseAccSource;
+        public object InvPurchaseAccSource { get { return invPurchaseAccSource; } }
+
+        int _PurchaseNumber;
+        [ForeignKeyAttribute(ForeignKeyTable = typeof(CreditorOrder))]
+        [Display(Name = "PurchaseNumber", ResourceType = typeof(VouchersClientText))]
+        public int PurchaseNumber { get { return _PurchaseNumber; } set { _PurchaseNumber = value; NotifyPropertyChanged("PurchaseNumber"); } }
+
+        InvItem _itm;
+        internal InvItem itm
+        {
+            get
+            {
+                if (_itm != null && _itm._Item == _Item)
+                    return _itm;
+                return (_itm = this.InvItem);
+            }
+        }
+
+        [AppEnumAttribute(EnumName = "ItemType")]
+        [Display(Name = "ItemType", ResourceType = typeof(InventoryText)), Required]
+        public string ItemType { get { return itm != null ? AppEnums.ItemType.ToString(itm._ItemType) : null; } }
+
+        public double _Quantity;
+
+        [Display(Name = "ToOrder", ResourceType = typeof(DCOrderText))]
+        [NoSQL]
+        public double Quantity { get { return _Quantity; } set { _Quantity = value; NotifyPropertyChanged("Quantity"); } }
+
+        [Display(Name = "QtyReserved", ResourceType = typeof(InvItemStorageClientText))]
+        [NoSQL]
+        public double QtyResv { get { return itm._qtyReserved; } }
+
+        [Display(Name = "QtyOrdered", ResourceType = typeof(InvItemStorageClientText))]
+        [NoSQL]
+        public double QtyOdr { get { return itm._qtyOrdered; } }
+
+        [Display(Name = "InStock", ResourceType = typeof(InventoryText))]
+        [NoSQL]
+        public double QtyStock { get { return itm._qtyOnStock; } }
+
+        [Display(Name = "Available", ResourceType = typeof(InvItemStorageClientText))]
+        [NoSQL]
+        public double QtyAvailable { get { return itm._qtyOnStock + itm._qtyOrdered - itm._qtyReserved; } }
     }
 
     public class ProjectBudgetLinePageGrid : CorasauDataGridClient
@@ -47,7 +105,7 @@ namespace UnicontaClient.Pages.CustomPage
         public override bool AllowSort { get { return false; } }
         public override bool Readonly { get { return false; } }
         public override bool IsAutoSave { get { return true; } }
-      
+
         public override bool AddRowOnPageDown()
         {
             var selectedItem = (ProjectBudgetLineLocal)this.SelectedItem;
@@ -96,12 +154,7 @@ namespace UnicontaClient.Pages.CustomPage
         public override string NameOfControl { get { return TabControls.ProjectBudgetLinePage; } }
         SQLCache ProjectCache, EmployeeCache, ItemCache, PayrollCache;
         int PriceGrp;
-
-        bool showAnchorBudget;
-        ItemBase iShowAnchorBudget;
-
-        private const string AND_OPERATOR = "And";
-        private const string FILTERVALUE_ANCHORBUDGET = @"[AnchorBudget] = False";
+        UnicontaBaseEntity _master;
 
         public ProjectBudgetLinePage(UnicontaBaseEntity master)
             : base(master)
@@ -136,45 +189,45 @@ namespace UnicontaClient.Pages.CustomPage
             ((TableView)dgProjectBudgetLinePageGrid.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
             localMenu.dataGrid = dgProjectBudgetLinePageGrid;
             dgProjectBudgetLinePageGrid.api = api;
+            _master = master;
             dgProjectBudgetLinePageGrid.UpdateMaster(master);
             SetRibbonControl(localMenu, dgProjectBudgetLinePageGrid);
             dgProjectBudgetLinePageGrid.BusyIndicator = busyIndicator;
-            localMenu.OnChecked += LocalMenu_OnChecked;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
 
             dgProjectBudgetLinePageGrid.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;
             dgProjectBudgetLinePageGrid.ShowTotalSummary();
             dgProjectBudgetLinePageGrid.CustomSummary += dgProjectBudgetLinePageGrid_CustomSummary;
             dgProjectBudgetLinePageGrid.tableView.ShowGroupFooters = true;
-
-            GetMenuItem();
-            iShowAnchorBudget.IsChecked = showAnchorBudget;
         }
 
-        double sumMargin, sumSales, sumMarginRatio;
+        double sumCost, sumSales;
         private void dgProjectBudgetLinePageGrid_CustomSummary(object sender, DevExpress.Data.CustomSummaryEventArgs e)
         {
             var fieldName = ((GridSummaryItem)e.Item).FieldName;
             switch (e.SummaryProcess)
             {
                 case CustomSummaryProcess.Start:
-                    sumMargin = sumSales = 0d;
+                    sumCost = sumSales = 0d;
                     break;
                 case CustomSummaryProcess.Calculate:
                     var row = e.Row as ProjectBudgetLineLocal;
-                    sumSales += row.Sales;
-                    sumMargin += row.Margin;
+                    if (!row._Disable && !row._Header)
+                    {
+                        sumSales += row.Sales;
+                        sumCost += row.Cost;
+                    }
                     break;
                 case CustomSummaryProcess.Finalize:
                     if (fieldName == "MarginRatio" && sumSales > 0)
                     {
-                        sumMarginRatio = 100 * sumMargin / sumSales;
-                        e.TotalValue = sumMarginRatio;
+                        e.TotalValue = Math.Round((sumSales - sumCost) * 100d / sumSales, 2);
                     }
                     break;
             }
         }
-        protected override async void LoadCacheInBackGround()
+
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             var api = this.api;
             var Comp = api.CompanyEntity;
@@ -202,12 +255,6 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        void GetMenuItem()
-        {
-            RibbonBase rb = (RibbonBase)localMenu.DataContext;
-            iShowAnchorBudget = UtilDisplay.GetMenuCommandByName(rb, "ShowAnchorBudget");
-        }
-
         protected override void OnLayoutLoaded()
         {
             base.OnLayoutLoaded();
@@ -233,8 +280,13 @@ namespace UnicontaClient.Pages.CustomPage
             }
             else
                 PayrollCategory.ShowInColumnChooser = true;
-
-            SetIncludeFilter();
+            if (!Comp.Warehouse)
+            {
+                Warehouse.Visible = false;
+                Warehouse.ShowInColumnChooser = false;
+            }
+            else
+                Warehouse.ShowInColumnChooser = true;
         }
 
         private void DataControl_CurrentItemChanged(object sender, DevExpress.Xpf.Grid.CurrentItemChangedEventArgs e)
@@ -489,48 +541,83 @@ namespace UnicontaClient.Pages.CustomPage
                 case "DeleteRow":
                     dgProjectBudgetLinePageGrid.DeleteRow();
                     break;
+                case "AddItems":
+                    if (ItemCache == null)
+                        return;
+                    object[] paramArray = new object[3] { new InvItemSalesCacheFilter(ItemCache), dgProjectBudgetLinePageGrid.TableTypeUser, _master };
+                    AddDockItem(TabControls.AddMultiInventoryItemsForProject, paramArray, true,
+                        string.Format(Uniconta.ClientTools.Localization.lookup("AddOBJ"), Uniconta.ClientTools.Localization.lookup("InventoryItems")), null, floatingLoc: Utility.GetDefaultLocation());
+                    break;
+                case "UnfoldBOM":
+                    var selectedItem = dgProjectBudgetLinePageGrid.SelectedItem as ProjectBudgetLineLocal;
+                    if (selectedItem != null)
+                        UnfoldBOM(selectedItem);
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
         }
-        
-        private void LocalMenu_OnChecked(string actionType, bool IsChecked)
+
+        async void UnfoldBOM(ProjectBudgetLineLocal selectedItem)
         {
-            switch (actionType)
+            var items = this.ItemCache;
+            var item = (InvItem)items.Get(selectedItem._Item);
+            if (item == null || item._ItemType < (byte)Uniconta.DataModel.ItemType.BOM)
+                return;
+
+            busyIndicator.IsBusy = true;
+            busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("LoadingMsg");
+            var list = await api.Query<InvBOM>(selectedItem);
+            if (list != null && list.Length > 0)
             {
-                case "ShowAnchorBudget":
-                    showAnchorBudget = IsChecked;
-                    iShowAnchorBudget.IsChecked = showAnchorBudget;
-                    SetIncludeFilter();
-                    break;
-                default:
-                    gridRibbon_BaseActions(actionType);
-                    break;
+                Array.Sort(list, new InvBOMSort());
+                var lst = new List<UnicontaBaseEntity>(list.Length);
+                foreach (var bom in list)
+                {
+                    item = (InvItem)items.Get(bom._ItemPart);
+                    if (item == null)
+                        continue;
+                    var projBudgetLine = new ProjectBudgetLineLocal();
+                    projBudgetLine._Item = bom._ItemPart;
+                    projBudgetLine._Project = selectedItem._Project;
+                    projBudgetLine._Date = selectedItem._Date;
+                    projBudgetLine._Dim1 = selectedItem._Dim1;
+                    projBudgetLine._Dim2 = selectedItem._Dim2;
+                    projBudgetLine._Dim3 = selectedItem._Dim3;
+                    projBudgetLine._Dim4 = selectedItem._Dim4;
+                    projBudgetLine._Dim5 = selectedItem._Dim5;
+                    projBudgetLine._Employee = selectedItem._Employee;
+                    projBudgetLine._Task = selectedItem._Task;
+                    projBudgetLine._Variant1 = bom._Variant1;
+                    projBudgetLine._Variant2 = bom._Variant2;
+                    projBudgetLine._Variant3 = bom._Variant3;
+                    projBudgetLine._Variant4 = bom._Variant4;
+                    projBudgetLine._Variant5 = bom._Variant5;
+                    projBudgetLine._PrCategory = item._PrCategory ?? selectedItem._PrCategory;
+                    projBudgetLine._PayrollCategory = item._PayrollCategory ?? selectedItem._PayrollCategory;
+                    projBudgetLine._Warehouse = bom._Warehouse ?? item._Warehouse ?? selectedItem._Warehouse;
+                    projBudgetLine._Location = bom._Location ?? item._Location ?? selectedItem._Location;
+                    projBudgetLine._CostPrice = item._CostPrice;
+                    projBudgetLine._Qty = Math.Round(bom.GetBOMQty(selectedItem._Qty), item._Decimals);
+                    SetItem(projBudgetLine);
+                    lst.Add(projBudgetLine);
+                }
+                dgProjectBudgetLinePageGrid.PasteRows(lst);
+                this.DataChanged = true;
             }
+            busyIndicator.IsBusy = false;
         }
 
-        private void SetIncludeFilter()
+        bool DataChanged;
+        public override bool IsDataChaged
         {
-            string filterString = dgProjectBudgetLinePageGrid.FilterString ?? string.Empty;
-
-            if (showAnchorBudget)
+            get
             {
-                filterString = filterString.Replace(FILTERVALUE_ANCHORBUDGET, string.Empty).Trim();
-                if (filterString != string.Empty && filterString.IndexOf(AND_OPERATOR, 0, 3) != -1)
-                    filterString = filterString.Substring(3).Trim();
-                else if (filterString != string.Empty && filterString.IndexOf(AND_OPERATOR, filterString.Length - 3) != -1)
-                    filterString = filterString.Substring(0, filterString.IndexOf(AND_OPERATOR, filterString.Length - 3)).Trim();
+                if (DataChanged)
+                    return true;
+                return base.IsDataChaged;
             }
-            else
-            {
-                if (filterString == string.Empty)
-                    filterString = FILTERVALUE_ANCHORBUDGET;
-                else
-                    filterString += filterString.IndexOf(FILTERVALUE_ANCHORBUDGET) == -1 ? string.Format(" {0} {1}", AND_OPERATOR, FILTERVALUE_ANCHORBUDGET) : string.Empty;
-            }
-
-            dgProjectBudgetLinePageGrid.FilterString = filterString;
         }
 
         private void Task_GotFocus(object sender, RoutedEventArgs e)
@@ -552,6 +639,43 @@ namespace UnicontaClient.Pages.CustomPage
             isReadOnly = false;
             useBinding = true;
             return true;
+        }
+
+        public override void Utility_Refresh(string screenName, object argument = null)
+        {
+            var param = argument as object[];
+            if (param != null)
+            {
+                if (screenName == TabControls.AddMultiInventoryItemsForProject)
+                {
+                    var budgetId = (int)NumberConvert.ToInt(Convert.ToString(param[1]));
+                    if (_master is ProjectBudget projectBudget && projectBudget.RowId == budgetId)
+                    {
+                        var selectedItem = dgProjectBudgetLinePageGrid.SelectedItem as ProjectBudgetLineLocal;
+                        if (dgProjectBudgetLinePageGrid.isDefaultFirstRow)
+                        {
+                            dgProjectBudgetLinePageGrid.DeleteRow();
+                            dgProjectBudgetLinePageGrid.isDefaultFirstRow = false;
+                        }
+                        var lst = param[0] as List<UnicontaBaseEntity>;
+                        if (dgProjectBudgetLinePageGrid.PasteRows(lst))
+                        {
+                            foreach (var r in lst)
+                            {
+                                var rec = (ProjectBudgetLineLocal)r; 
+                                if (selectedItem != null)
+                                {
+                                    rec.Date = selectedItem._Date;
+                                    rec.Project = selectedItem._Project;
+                                    rec.PrCategory = selectedItem._PrCategory;
+                                    rec.PrCategorySource = selectedItem.PrCategorySource;
+                                }
+                                SetItem(rec);
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

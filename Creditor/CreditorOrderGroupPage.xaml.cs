@@ -56,9 +56,6 @@ namespace UnicontaClient.Pages.CustomPage
                 case "SaveGrid":
                     dgCreditorOrderGroup.SaveData();
                     break;
-                case "RefreshGrid":
-                    InitQuery();
-                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;

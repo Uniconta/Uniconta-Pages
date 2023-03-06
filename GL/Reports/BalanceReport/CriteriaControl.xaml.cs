@@ -118,6 +118,7 @@ namespace UnicontaClient.Pages.CustomPage
             cbformat.ItemsSource = AppEnums.BalanceFormat.Values;
             txtColA.IsEnabled = txtColB.IsEnabled = false;
             this.MouseLeftButtonDown += CriteriaControl_MouseLeftButtonDown;
+            defaultTextColor = dateTo.Foreground;
         }
 
         private void CriteriaControl_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -283,13 +284,20 @@ namespace UnicontaClient.Pages.CustomPage
         {
             setDateTime(sender, "FromDate");
         }
-
+        Brush defaultTextColor;
         private void setDateTime(object sender, string valueFor)
         {
             DateEditor de = (DateEditor)sender;
+            SelectedCriteria ob = (SelectedCriteria)this.DataContext;
+            if (ob != null)
+            {
+                if (ob.frmdateval > ob.todateval)
+                    dateTo.Foreground = new SolidColorBrush(Colors.Red);
+                else
+                    dateTo.Foreground = defaultTextColor;
+            }
             if (de.EditValue == null || de.DateTime == DateTime.MinValue)
             {
-                SelectedCriteria ob = (SelectedCriteria)this.DataContext;
                 if (valueFor == "FromDate")
                 {
                     ob.frmdateval = BasePage.GetSystemDefaultDate();

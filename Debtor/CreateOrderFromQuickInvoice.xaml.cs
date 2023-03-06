@@ -17,8 +17,10 @@ using Uniconta.API.System;
 using Uniconta.ClientTools;
 using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.DataModel;
+using Uniconta.ClientTools.Page;
 using Uniconta.Common;
 using Uniconta.DataModel;
+using UnicontaClient.Models;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -36,7 +38,7 @@ namespace UnicontaClient.Pages.CustomPage
         public bool isOrder { get; set; }
     }
 
-    public partial class CWCreateOrderFromQuickInvoice : ChildWindow
+    public partial class CreateOrderFromQuickInvoice : GridBasePage
     {
         public string Account { get; set; }
         bool isOrder;
@@ -46,14 +48,31 @@ namespace UnicontaClient.Pages.CustomPage
         public IEnumerable<UnicontaBaseEntity> DCOrderLines;
         bool disableOrderLineGrid = false;
         Company company;
-        public CWCreateOrderFromQuickInvoice(CrudAPI _api, string account)
+        static double pageHeight = 650.0d, pageWidth = 700.0d;
+        static Point position = new Point();
+        public override string NameOfControl => TabControls.CreateOrderFromQuickInvoice;
+        public bool IsDeleteLines { get; set; }
+        public override void PageClosing()
+        {
+            if (dgCreateOrderGrid.SelectedItem != null && createbuttonclicked)
+            {
+                var args = new object[4];
+                args[0] = dgCreateOrderGrid.SelectedItem;
+                args[1] = chkIfCreditNote.IsChecked.HasValue ? chkIfCreditNote.IsChecked.Value : false;
+                args[2] = DCOrderLines;
+                args[3] = IsDeleteLines;
+                globalEvents.OnRefresh(NameOfControl, args);
+            }
+            position = AttachVoucherGridPage.GetPosition(dockCtrl);
+        }
+        public CreateOrderFromQuickInvoice(CrudAPI _api, string account) : base(_api, string.Empty)
         {
             api = _api;
             this.Account = account;
             disableOrderLineGrid = true;
             InitPage();
         }
-        public CWCreateOrderFromQuickInvoice(CrudAPI _api, string account, bool _isOrder, DCOrder _dcOrder)
+        public CreateOrderFromQuickInvoice(CrudAPI _api, string account, bool _isOrder, DCOrder _dcOrder) : base(_api, string.Empty)
         {
             api = _api;
             this.Account = account;
@@ -66,23 +85,33 @@ namespace UnicontaClient.Pages.CustomPage
         {
             this.DataContext = this;
             InitializeComponent();
+            if (dcOrder is ProjectInvoiceProposalClient)
+                chkDelete.Visibility = Visibility.Visible;
             dcOrderlineGrid.isOrder = isOrder;
             ((TableView)dgCreateOrderGrid.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
             ((TableView)dcOrderlineGrid.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
             company = api.CompanyEntity;
             this.items = company.GetCache(typeof(InvItem));
-            this.Title = String.Format(Uniconta.ClientTools.Localization.lookup("CopyOBJ"), Uniconta.ClientTools.Localization.lookup("Invoice"));
+            this.SetHeader(String.Format(Uniconta.ClientTools.Localization.lookup("CopyOBJ"), Uniconta.ClientTools.Localization.lookup("Invoice")));
             this.Loaded += CW_Loaded;
             dgCreateOrderGrid.BusyIndicator = busyIndicator;
             dgCreateOrderGrid.api = api;
-            localMenu.dataGrid = dgCreateOrderGrid;
+            SetRibbonControl(localMenu, dgCreateOrderGrid);
             dgCreateOrderGrid.SelectedItemChanged += DgCreateOrderGrid_SelectedItemChanged;
             if (disableOrderLineGrid)
                 layOutOrderline.Visibility = Visibility.Collapsed;
-            if (!this.dgCreateOrderGrid.ReuseCache(typeof(Uniconta.DataModel.DCInvoice)))
-                BindGrid();
             if (!company.ItemVariants)
                 colVariant.Visible = false;
+            localMenu.OnItemClicked += LocalMenu_OnItemClicked;
+        }
+        private void LocalMenu_OnItemClicked(string ActionType)
+        {
+            switch (ActionType)
+            {
+                default:
+                    gridRibbon_BaseActions(ActionType);
+                    break;
+            }
         }
 
         private void DgCreateOrderGrid_SelectedItemChanged(object sender, DevExpress.Xpf.Grid.SelectedItemChangedEventArgs e)
@@ -114,44 +143,45 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (e.Key == Key.Escape)
             {
-                SetDialogResult(false);
+                dgCreateOrderGrid.SelectedItem = null;
+                this.dockCtrl.JustClosePanel(dockCtrl.Activpanel);
             }
             else if (e.Key == Key.Enter)
             {
                 if (CreateButton.IsFocused)
                     CreateButton_Click(null, null);
                 else if (CancelButton.IsFocused)
-                    SetDialogResult(false);
+                {
+                    dgCreateOrderGrid.SelectedItem = null;
+                    this.dockCtrl.JustClosePanel(dockCtrl.Activpanel);
+                }
             }
         }
-
+        bool createbuttonclicked;
         private void CreateButton_Click(object sender, RoutedEventArgs e)
         {
+            createbuttonclicked = true;
             if (dgCreateOrderGrid.SelectedItem == null)
             {
                 UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("RecordNotSelected"), Uniconta.ClientTools.Localization.lookup("Warning"));
                 return;
             }
             else
-                SetDialogResult(true);
+                this.dockCtrl.JustClosePanel(dockCtrl.Activpanel);
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            SetDialogResult(false);
+            dgCreateOrderGrid.SelectedItem = null;
+            this.dockCtrl.JustClosePanel(dockCtrl.Activpanel);
         }
-
-        private Task Filter(IEnumerable<PropValuePair> propValuePair)
+        protected override Filter[] DefaultFilters()
         {
-            if (!string.IsNullOrWhiteSpace(Account))
-                propValuePair = new List<PropValuePair>() { PropValuePair.GenereteWhereElements("Account", Account, CompareOperator.Equal) };
+            Filter fileExtensionFilter = new Filter();
+            fileExtensionFilter.name = "Account";
+            fileExtensionFilter.value = Account;
+            return new Filter[] { fileExtensionFilter };
 
-            return dgCreateOrderGrid.Filter(propValuePair);
-        }
-
-        private void BindGrid()
-        {
-            var t = Filter(null);
         }
 
         async private Task<IEnumerable<DCOrderLineClient>> CreateDCOrderLinesFromInvoice(DCOrder dcOrder, DCInvoiceClient dcInvoiceClient, bool checkIfCreditNote)
@@ -234,5 +264,11 @@ namespace UnicontaClient.Pages.CustomPage
                 }
             }
         }
+        protected override void OnLayoutLoaded()
+        {
+            AttachVoucherGridPage.SetFloatingHeightAndWidth(dockCtrl, position, NameOfControl);
+            base.OnLayoutLoaded();
+        }
+
     }
 }

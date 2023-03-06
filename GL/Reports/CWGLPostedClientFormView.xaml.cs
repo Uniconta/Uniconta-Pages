@@ -23,11 +23,12 @@ namespace Uniconta.Client.Pages
     /// </summary>
     public partial class CWGLPostedClientFormView : ChildWindow
     {
+
         public CWGLPostedClientFormView(GLDailyJournalPostedClient journalPostedClient)
         {
             this.DataContext = this;
             InitializeComponent();
-            Title = string.Format(Uniconta.ClientTools.Localization.lookup("ViewOBJ"), UtilDisplay.ClientTypeTableAttributeName(typeof(GLDailyJournalPostedClient)));
+            Title = string.Format(Uniconta.ClientTools.Localization.lookup("ViewOBJ"), UnicontaClient.Utilities.UtilCommon.ClientTypeTableAttributeName(typeof(GLDailyJournalPostedClient)));
             layoutItems.DataContext = journalPostedClient;
             this.Loaded += CWGLPostedClientFormView_Loaded;
         }

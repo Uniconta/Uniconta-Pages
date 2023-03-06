@@ -1,0 +1,42 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
+        xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.UpdateDebAddressViaCvr_Iceland"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage"
+        xmlns:UnicontaControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <UnicontaControls:CorasauRibbonControl x:Name="localMenu" XMLSourcePath=";component/Pages/Debtor/UpdateDebAddviaCvrGridRibbon.xml"/>
+        <UnicontaControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <localPage:UpdateDebAddressViaCvrGrid_Iceland  x:Name="dgUpdateDebtorAddress_Iceland" AutoGenerateColumns="None">
+                <localPage:UpdateDebAddressViaCvrGrid_Iceland.Columns>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Account" ReadOnly="True" Width="100" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" ReadOnly="True" Width="100"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Address1" ReadOnly="True" Width="150"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Address2" ReadOnly="True" Width="150"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ZipCode" ReadOnly="True" Width="80"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="City" Width="50" ReadOnly="True"/>
+
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceInXML" Width="150" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="VatNumber" Width="150" ReadOnly="True"/>
+
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="NewName" ReadOnly="True" Width="100"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="NewAddress"  Width="150"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="NewAddress2"  Width="150"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="NewZipCode" Width="120"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="NewCity" />
+
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="NewInvoiceInXML" Width="150" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="NewVatNumber" Width="150" />
+
+                </localPage:UpdateDebAddressViaCvrGrid_Iceland.Columns>
+            </localPage:UpdateDebAddressViaCvrGrid_Iceland>
+        </UnicontaControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

@@ -20,7 +20,20 @@ x:Class="UnicontaClient.Pages.CustomPage.GLSplitTemplatePage"
         <CorasauControls:BusyIndicator x:Name="busyIndicatorFinanceYearGrid" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <localPage:SplittemplateGrid  x:Name="dgSplittemplateGrid" AutoGenerateColumns="None">
                 <localPage:SplittemplateGrid.Columns>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" />                    
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Name">
+                        <localPage:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Margin="5,0,0,0" TextDecorations="Underline" Cursor="Hand" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.Name,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" PreviewMouseDown="Name_PreviewMouseDown"></TextBlock>
+                                    <TextBlock Grid.Column="1"></TextBlock>
+                                </Grid>
+                            </DataTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                    </localPage:CorasauDataGridTemplateColumnClient>                 
                 </localPage:SplittemplateGrid.Columns>
             </localPage:SplittemplateGrid>
         </CorasauControls:BusyIndicator>

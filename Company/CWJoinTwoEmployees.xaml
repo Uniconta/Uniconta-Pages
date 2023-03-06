@@ -1,0 +1,36 @@
+<cw:ChildWindow xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.CWJoinTwoEmployees"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
+        xmlns:cw="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+        xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+        xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+        Width="{StaticResource Width18}" Height="{StaticResource Height18}" KeyDown="ChildWindow_KeyDown" SizeToContent="WidthAndHeight">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="40"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="5"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FromOBJ;Employee}" Grid.Column="0" Grid.Row="0" Margin="3,3,3,3"/>
+        <CorasauControls:LookupEditor x:Name="cmbFromEmployee" Grid.Column="2" Grid.Row="0" Margin="0,3,3,3" HasCustomLookUp="True" Text="{Binding FromEmployee,Mode=TwoWay}"/>
+        <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=WillBeDeleted}" TextWrapping="Wrap" Grid.Column="3" Grid.Row="0" Margin="3,3,3,3"/>
+        <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ToOBJ;Employee}" Grid.Column="0" Grid.Row="1" Margin="3,3,3,3"/>
+        <CorasauControls:LookupEditor x:Name="cmbToEmployee" Grid.Column="2" Grid.Row="1" Margin="0,3,3,3" HasCustomLookUp="True" Text="{Binding ToEmployee,Mode=TwoWay}"/>
+        <StackPanel x:Name="actionButton" HorizontalAlignment="Right" Grid.Row="2" Grid.Column="2" Orientation="Horizontal" Margin="0 10 0 0" Grid.ColumnSpan="2">
+            <Button x:Name="OKButton" IsDefault="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OK}" Click="OKButton_Click" MinWidth="75" Height="23"
+                    HorizontalAlignment="Right" Margin="0 0 3 0"   />
+            <Button x:Name="CancelButton" IsCancel="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Cancel}" Click="CancelButton_Click" MinWidth="75" 
+                    Height="23" HorizontalAlignment="Right"/>
+        </StackPanel>
+    </Grid>
+</cw:ChildWindow>

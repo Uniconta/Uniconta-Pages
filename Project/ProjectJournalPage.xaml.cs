@@ -53,11 +53,15 @@ namespace UnicontaClient.Pages.CustomPage
             if (selectedItem != null)
                 AddDockItem(TabControls.ProjectJournalLinePage, selectedItem, string.Format("{0} {1} : {2}", Uniconta.ClientTools.Localization.lookup("Project"), Uniconta.ClientTools.Localization.lookup("Journal"), selectedItem.Journal));
         }
-
+        private void Name_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            DgProjectJournal_RowDoubleClick();
+        }
         protected override void LoadCacheInBackGround()
         {
             LoadType(new Type[] { typeof(Uniconta.DataModel.PrType), typeof(Uniconta.DataModel.PaymentTerm), typeof(Uniconta.DataModel.ProjectGroup), typeof(Uniconta.DataModel.PrStandard),
-                typeof(Uniconta.DataModel.Employee), typeof(Uniconta.DataModel.Debtor), typeof(Uniconta.DataModel.WorkInstallation), typeof(Uniconta.DataModel.Project), typeof(Uniconta.DataModel.PrCategory), typeof(Uniconta.DataModel.Creditor), typeof(Uniconta.DataModel.InvItem) });
+                typeof(Uniconta.DataModel.Employee), typeof(Uniconta.DataModel.Debtor), typeof(Uniconta.DataModel.WorkInstallation), 
+                typeof(Uniconta.DataModel.Project), typeof(Uniconta.DataModel.PrCategory), typeof(Uniconta.DataModel.Creditor), typeof(Uniconta.DataModel.InvItem), typeof(Uniconta.DataModel.ProjectTask) });
         }
 
         protected override void OnLayoutLoaded()

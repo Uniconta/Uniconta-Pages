@@ -86,13 +86,6 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        public override Task InitQuery()
-        {
-            if (!this.dgCreditorAccountGrid.ReuseCache(typeof(Uniconta.DataModel.Creditor)))
-                return BindGrid();
-            return null;
-        }
-
         protected override void OnLayoutCtrlLoaded()
         {
             detailControl.api = api;
@@ -270,6 +263,8 @@ namespace UnicontaClient.Pages.CustomPage
             CorasauDataGrid.CopyAndClearRowId(selectedItem, creditor);
             creditor._Created = DateTime.MinValue;
             creditor._D2CAccount = null;
+            creditor._lastPayment = DateTime.MinValue;
+            creditor._LastInvoice = DateTime.MinValue;
             AddDockItem(TabControls.CreditorAccountPage2, new object[2] { creditor, IdObject.get(false) }, Uniconta.ClientTools.Localization.lookup("Creditorsaccount"), "Add_16x16.png");
         }
 
@@ -360,11 +355,6 @@ namespace UnicontaClient.Pages.CustomPage
             if (screenName == TabControls.UserNotesPage || screenName == TabControls.UserDocsPage && argument != null)
                 dgCreditorAccountGrid.UpdateItemSource(argument);
 
-        }
-
-        private Task BindGrid()
-        {
-            return dgCreditorAccountGrid.Filter(null);
         }
 
         protected override void LoadCacheInBackGround()

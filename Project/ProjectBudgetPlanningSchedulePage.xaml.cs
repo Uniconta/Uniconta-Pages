@@ -302,7 +302,20 @@ namespace UnicontaClient.Pages.CustomPage
                 }
             }
         }
+        public DateTime startupStartDate;
+        public string startupView;
 
+        public override void SetParameter(IEnumerable<ValuePair> Parameters)
+        {
+            foreach (var rec in Parameters)
+            {
+                if (string.Compare(rec.Name, "startupStartDate", StringComparison.CurrentCultureIgnoreCase) == 0)
+                    startupStartDate = DateTime.Parse(rec.Value);
+                if (string.Compare(rec.Name, "startupView", StringComparison.CurrentCultureIgnoreCase) == 0)
+                    startupView = rec.Value;
+            }
+            base.SetParameter(Parameters);
+        }
         private void ProjBudgetPlanScheduler_Loaded(object sender, RoutedEventArgs e)
         {
             LoadDefaultFilter();
@@ -328,7 +341,10 @@ namespace UnicontaClient.Pages.CustomPage
                 if (!string.IsNullOrEmpty(DefaultViewAction))
                     FrmRibbon_OnItemClicked(DefaultViewAction);
             }
-
+            if(startupStartDate != DateTime.MinValue)
+                projBudgetPlanScheduler.Start = startupStartDate;
+            if (!string.IsNullOrEmpty(startupView))
+                FrmRibbon_OnItemClicked(startupView);
             projBudgetPlanScheduler.Loaded -= ProjBudgetPlanScheduler_Loaded;
         }
 
@@ -534,12 +550,12 @@ namespace UnicontaClient.Pages.CustomPage
                     masters.Add(proj);
             }
 
-            if (Employee!= null)
+            if (Employee != null)
             {
                 if (!string.IsNullOrEmpty(leBudgetGroup.Text))
                 {
                     var selBugetGroup = (Uniconta.DataModel.ProjectBudgetGroup)ProjBgtGroupCache.Get(leBudgetGroup.Text);
-                    if (selBugetGroup!= null)
+                    if (selBugetGroup != null)
                         masters.Add(selBugetGroup);
                 }
                 masters.Add(Employee);
@@ -549,19 +565,19 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (Employee == null)
                 budgetLinesLst = new ObservableCollection<ProjectBudgetLineClient>(projBudgetLinesLst?.Where(x => employeeLst.Any(y => y.Employee == x.Employee)));
-            else
+            else if (projBudgetLinesLst != null)
                 budgetLinesLst = new ObservableCollection<ProjectBudgetLineClient>(projBudgetLinesLst);
 
             schedulerDataSource.AppointmentsSource = budgetLinesLst;
-            schedulerDataSource.ResourcesSource = employeeLst?.Count() > 0 ? employeeLst.ToArray() : new List<EmployeeLocal> { new EmployeeLocal { Employee = Employee?._Number, EmployeeName= Employee?._Name } }.ToArray();
+            schedulerDataSource.ResourcesSource = employeeLst?.Count() > 0 ? employeeLst.ToArray() : new List<EmployeeLocal> { new EmployeeLocal { Employee = Employee?._Number, EmployeeName = Employee?._Name } }.ToArray();
             projBudgetPlanScheduler.DataSource = schedulerDataSource;
 
             if (budgetLinesLst != null)
-                budgetLinesLst.CollectionChanged +=_budgetLinesLst_CollectionChanged;
+                budgetLinesLst.CollectionChanged += _budgetLinesLst_CollectionChanged;
 
             busyIndicator.IsBusy = false;
             SetMondayAsFirstDay();
-            projBudgetPlanScheduler.Visibility= Visibility.Visible;
+            projBudgetPlanScheduler.Visibility = Visibility.Visible;
         }
 
         private void _budgetLinesLst_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -679,13 +695,15 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
 
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             var api = this.api;
             EmployeeCache = api.GetCache(typeof(Uniconta.DataModel.Employee)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Employee)).ConfigureAwait(false);
             ProjectCache = api.GetCache(typeof(Uniconta.DataModel.Project)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Project)).ConfigureAwait(false);
             EmpGroupCache = api.GetCache(typeof(Uniconta.DataModel.EmployeeGroup)) ?? await api.LoadCache(typeof(Uniconta.DataModel.EmployeeGroup)).ConfigureAwait(false);
             ProjBgtGroupCache = api.GetCache(typeof(Uniconta.DataModel.ProjectBudgetGroup)) ?? await api.LoadCache(typeof(Uniconta.DataModel.ProjectBudgetGroup)).ConfigureAwait(false);
+
+            LoadType(new Type[] { typeof(Uniconta.DataModel.ProjectTask) });
         }
 
         internal class EmployeeLocal

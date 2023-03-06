@@ -64,7 +64,9 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorTranOpen"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="YourRef" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Message" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DocumentRef" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="FromDebtor" Visible="False" ShowCheckBoxInHeader="False"/>                    
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="FromDebtor" Visible="False" ShowCheckBoxInHeader="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="OrderNumber" Width="60" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ReferenceNumber" Visible="False" />
                 </localPage:CreditorTransOpenGrid.Columns>
                 <localPage:CreditorTransOpenGrid.TotalSummary>
                     <localPage:SumColumn FieldName="Amount" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
@@ -78,6 +80,18 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorTranOpen"
                     <localPage:SumColumn FieldName="DebitCur" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                     <localPage:SumColumn FieldName="CreditCur" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                 </localPage:CreditorTransOpenGrid.TotalSummary>
+                <localPage:CreditorTransOpenGrid.GroupSummary>
+                    <localPage:SumColumn FieldName="Amount" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="AmountOpen" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="Overdue" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="Debit" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="Credit" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="AmountCur" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="AmountOpenCur" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="OverdueCur" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="DebitCur" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="CreditCur" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                </localPage:CreditorTransOpenGrid.GroupSummary>
             </localPage:CreditorTransOpenGrid>
         </CorasauControls:BusyIndicator>
     </Grid>

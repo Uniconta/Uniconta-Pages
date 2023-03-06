@@ -176,7 +176,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             var api = this.api;
             if (DebtorCache == null)
@@ -374,7 +374,7 @@ namespace UnicontaClient.Pages.CustomPage
                 }
             }
 
-            CWShowDebPaymentFileText cw = new CWShowDebPaymentFileText(trans.TransactionText);
+            CWPreviewTextViewer cw = new CWPreviewTextViewer(trans.TransactionText);
             cw.Show();
         }
 

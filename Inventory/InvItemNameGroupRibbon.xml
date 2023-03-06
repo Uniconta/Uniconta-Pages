@@ -31,6 +31,6 @@
     </RibbonItem>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="Lines" LocalizedNameKey="Lines"  LargeGlyph="Journal_Lines_32x32.png"/>
+    <RibbonItem Action="Lines" LocalizedNameKey="Lines" LargeGlyph="Journal_Lines_Highlighted_32x32.png"/>
   </RibbonItem>
 </root>

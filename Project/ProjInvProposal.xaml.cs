@@ -199,7 +199,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
         void dgProjInvProposalGrid_RowDoubleClick()
         {
-            localMenu_OnItemClicked("ProjInvPropposalLine");
+            localMenu_OnItemClicked("ProjInvProposalLine");
         }
         private void localMenu_OnItemClicked(string ActionType)
         {
@@ -282,11 +282,12 @@ namespace UnicontaClient.Pages.CustomPage
                 case "SaveGrid":
                     Save();
                     break;
+                case "CreatePacknote":
                 case "CreateInvoice":
                     if (selectedItem != null)
                     {
                         if (Utility.HasControlRights("GenerateInvoice", api.CompanyEntity))
-                            GenerateInvoice(selectedItem);
+                            GenerateInvoice(selectedItem, ActionType == "CreatePacknote" ? CompanyLayoutType.Packnote : CompanyLayoutType.Invoice);
                         else
                             UtilDisplay.ShowControlAccessMsg("GenerateInvoice");
                     }
@@ -453,10 +454,12 @@ namespace UnicontaClient.Pages.CustomPage
             }
             lst.Add(typeof(Uniconta.DataModel.InvGroup));
             lst.Add(typeof(Uniconta.DataModel.InvItem));
+            lst.Add(typeof(Uniconta.DataModel.ProjectTask));
+
             LoadType(lst);
         }
 
-        private void GenerateInvoice(ProjectInvoiceProposalClient projInvProp)
+        private void GenerateInvoice(ProjectInvoiceProposalClient projInvProp, CompanyLayoutType companyLayout)
         {
             InvoiceAPI Invapi = new InvoiceAPI(api);
             bool showSendByMail = false;
@@ -489,13 +492,33 @@ namespace UnicontaClient.Pages.CustomPage
             else
                 api.LoadCache(typeof(Debtor), true);
 
-            string debtorName = debtor?._Name ?? projInvProp._DCAccount;
-            bool invoiceInXML = debtor != null && debtor.IsPeppolSupported && debtor._einvoice;
+            bool invoiceInXml, showUpdateInv, isOrderOrQuickUpdate, showSimulation;
+            string docType;
+            int dialogId;
+            if (companyLayout != CompanyLayoutType.Packnote)
+            {
+                docType = string.Empty;
+                showSimulation = true;
+                invoiceInXml = debtor != null && debtor.IsPeppolSupported && debtor._einvoice;
+                showUpdateInv = false;
+                isOrderOrQuickUpdate = true;
+                dialogId = 2000000085;
+            }
+            else
+            {
+                docType = companyLayout.ToString();
+                showSimulation = false;
+                invoiceInXml = false;
+                showUpdateInv = api.CompanyEntity.Storage || api.CompanyEntity.Packnote;
+                isOrderOrQuickUpdate = false;
+                dialogId = 2000000104;
+            }
 
+            string debtorName = debtor?._Name ?? projInvProp._DCAccount;
             var accountName = Util.ConcatParenthesis(projInvProp._DCAccount, projInvProp.Name);
-            CWGenerateInvoice GenrateInvoiceDialog = new CWGenerateInvoice(true, string.Empty, false, true, true, showNoEmailMsg: !showSendByMail, debtorName: debtorName, isOrderOrQuickInv: true, isDebtorOrder: true,
-                InvoiceInXML: invoiceInXML, AccountName: accountName);
-            GenrateInvoiceDialog.DialogTableId = 2000000085;
+            CWGenerateInvoice GenrateInvoiceDialog = new CWGenerateInvoice(showSimulation, docType, false, true, true, showNoEmailMsg: !showSendByMail, debtorName: debtorName,
+                isOrderOrQuickInv: isOrderOrQuickUpdate, isShowUpdateInv: showUpdateInv, isDebtorOrder: true, InvoiceInXML: invoiceInXml, AccountName: accountName);
+            GenrateInvoiceDialog.DialogTableId = dialogId;
             if (projInvProp._InvoiceDate != DateTime.MinValue)
                 GenrateInvoiceDialog.SetInvoiceDate(projInvProp._InvoiceDate);
             var additionalOrdersList = Utility.GetAdditionalOrders(api, projInvProp);
@@ -511,7 +534,7 @@ namespace UnicontaClient.Pages.CustomPage
                     busyIndicator.IsBusy = true;
                     var isSimulated = GenrateInvoiceDialog.IsSimulation;
                     var invoicePostingResult = new InvoicePostingPrintGenerator(api, this);
-                    invoicePostingResult.SetUpInvoicePosting(projInvProp, null, CompanyLayoutType.Invoice, GenrateInvoiceDialog.GenrateDate, null, isSimulated, GenrateInvoiceDialog.ShowInvoice, GenrateInvoiceDialog.PostOnlyDelivered,
+                    invoicePostingResult.SetUpInvoicePosting(projInvProp, null, companyLayout, GenrateInvoiceDialog.GenrateDate, null, isSimulated, GenrateInvoiceDialog.ShowInvoice, GenrateInvoiceDialog.PostOnlyDelivered,
                         GenrateInvoiceDialog.InvoiceQuickPrint, GenrateInvoiceDialog.NumberOfPages, GenrateInvoiceDialog.SendByEmail, !isSimulated && GenrateInvoiceDialog.SendByOutlook, GenrateInvoiceDialog.sendOnlyToThisEmail,
                         GenrateInvoiceDialog.Emails, GenrateInvoiceDialog.GenerateOIOUBLClicked, null, false);
                     invoicePostingResult.SetAdditionalOrders(GenrateInvoiceDialog.AdditionalOrders?.Cast<DCOrder>().ToList());
@@ -530,6 +553,10 @@ namespace UnicontaClient.Pages.CustomPage
                 }
             };
             GenrateInvoiceDialog.Show();
+        }
+        private void ProjectName_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            dgProjInvProposalGrid_RowDoubleClick();
         }
 
         private void HasDocImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

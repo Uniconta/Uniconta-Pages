@@ -75,7 +75,7 @@ namespace UnicontaClient.Pages.CustomPage
             cmbViewInFolder.ItemsSource = appEnumFolderLst;
         }
 
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             var api = this.api;
             FolderCache = api.GetCache(typeof(Uniconta.DataModel.DocumentFolder)) ?? await api.LoadCache(typeof(Uniconta.DataModel.DocumentFolder)).ConfigureAwait(false);

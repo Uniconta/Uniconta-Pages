@@ -12,11 +12,22 @@ x:Class="UnicontaClient.Pages.CustomPage.UserProfileUserPage"
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Company/User/UserProfileControlGridRibbon.xml" x:Name="localMenu"/>
+        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Assets/EditableGridRibbon.xml" x:Name="localMenu"/>
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <local:UserProfileUserPageGrid  x:Name="dgUserProfileUser" AutoGenerateColumns="None" HorizontalAlignment="Stretch">
                 <local:UserProfileUserPageGrid.Columns>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Profile" ReadOnly="True"/>
+                    <local:CorasauDataGridForeignKeyColumnClient x:Name="Profile">
+                        <local:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <TextBlock Margin="2" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.Profile,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"></TextBlock>
+                            </ControlTemplate>
+                        </local:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
+                        <local:CorasauDataGridForeignKeyColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <local:CorasauGridLookupEditorClient  x:Name="PART_Editor"/>
+                            </DataTemplate>
+                        </local:CorasauDataGridForeignKeyColumnClient.CellTemplate>
+                    </local:CorasauDataGridForeignKeyColumnClient>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Uid" ReadOnly="True"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="UserName" ReadOnly="True"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="LoginId" ReadOnly="True"/>

@@ -69,6 +69,9 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorDeliveryNotes"
                     <local:CorasauDataGridTemplateColumnClient x:Name="DeliveryCity" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="DeliveryCountry" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="DeliveryDate" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DeliveryContactPerson" Visible="False" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DeliveryPhone" Visible="False" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DeliveryContactEmail" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Installation" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="YourRef" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="OurRef" />

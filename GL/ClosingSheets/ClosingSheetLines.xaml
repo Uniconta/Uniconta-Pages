@@ -49,11 +49,14 @@ x:Class="UnicontaClient.Pages.CustomPage.ClosingSheetLines"
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Correction" Visible="False"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Vat" Width="60" Visible="False"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="OffsetVat" Width="60" Visible="False"/>
+                        <localPage:CorasauDataGridTemplateColumnClient x:Name="HasVoucher" Width="40" Visible="False"/>
+                        <localPage:CorasauDataGridTemplateColumnClient x:Name="DocumentRef" Width="60" Visible="False"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Split"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="SplitFromDate" Width="90" />
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="SplitToDate" Width="90" />
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="OffsetText" />
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="OffsetTransType" Visible="False"/>
+                        <localPage:CorasauDataGridTemplateColumnClient x:Name="Qty" Width="90" Visible="False"/>
                         <localPage:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension1" x:Name="coldim1"/>
                         <localPage:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension2" x:Name="coldim2"/>
                         <localPage:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension3" x:Name="coldim3"/>
@@ -102,13 +105,15 @@ x:Class="UnicontaClient.Pages.CustomPage.ClosingSheetLines"
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="TransTypeCol" FieldName="TransType" Visible="False"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="AmountCol" FieldName="Amount"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="JournalPostedId" Width="70"/>
+                        <localPage:CorasauDataGridTemplateColumnClient x:Name="Origin" Width="100" />
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="VatCol" FieldName="Vat" Width="60" />
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="VatOperation" Width="30" Visible="False" />
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="AmountVat"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Currency" Width="35" />
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="AmountCur"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="AmountBase" Visible="False" />
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="HasVoucher"  Width="60"/>
+                        <localPage:CorasauDataGridTemplateColumnClient x:Name="HasVoucherCol" FieldName="HasVoucher" Width="40"/>
+                        <localPage:CorasauDataGridTemplateColumnClient x:Name="DocumentRefCol" FieldName="DocumentRef" Width="60" Visible="False"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="DCType" Width="50" />
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="DCAccount"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="DCName"/>
@@ -120,11 +125,8 @@ x:Class="UnicontaClient.Pages.CustomPage.ClosingSheetLines"
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Name"  Visible="False"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="CorrectionCol" FieldName="Correction" Width="50" Visible="False"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Canceled" Width="50" Visible="False"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="Accrual" Width="50" Visible="False" />
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Accrued" Width="50" Visible="False" />
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="Allocation" Width="50" Visible="False" />
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Allocated" Width="50" Visible="False" />
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="YearTransfer" Width="50" Visible="False" />
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="VatEntered" Width="50" Visible="False" />
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim1" Width="70" FieldName="Dimension1" ShowInColumnChooser="False"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim2" Width="70" FieldName="Dimension2" ShowInColumnChooser="False"/>

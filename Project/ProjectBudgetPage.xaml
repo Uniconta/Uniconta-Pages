@@ -20,11 +20,14 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectBudgetPage"
             <localPage:ProjectBudgetGrid  x:Name="dgProjectBudgetGrid" AutoGenerateColumns="None" HorizontalAlignment="Stretch">
                 <localPage:ProjectBudgetGrid.Columns>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PrimaryKeyId" Width="70" Visible="False" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Project" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Group" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Project" Width="100" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Group" Width="100"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" Width="200"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Created" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Current" />                    
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Current" Width="60"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="AnchorBudget" Width="60"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Comment" Width="300"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Created" Width="100" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="AnchorRowId" Width="70" Visible="False"/>
                 </localPage:ProjectBudgetGrid.Columns>
             </localPage:ProjectBudgetGrid>
         </CorasauControls:BusyIndicator>

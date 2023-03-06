@@ -10,7 +10,10 @@
     <RibbonItem Action="DetailView" LocalizedNameKey="DetailView" Glyph="Detailed_View_32x32.png" LargeGlyph="Detailed_View_32x32.png"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh.png" LargeGlyph="refresh.png"/>
+    <RibbonItem LocalizedNameKey="Refresh" Action="RefreshGrid" ShortcutKey="Ctrl+R" LargeGlyph="refresh.png">
+      <!--<RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="UseFilter" Glyph="Filter_16x16.png"/>
+      <RibbonItem Action="ClearFilter" LocalizedNameKey="ClearFilter" ShortcutKey="Ctrl+K" Glyph="Delete_16x16.png"/>-->
+    </RibbonItem>
     <RibbonItem Action="Filter" ShortcutKey="Ctrl+I" LocalizedNameKey="Filter" LargeGlyph="Filter_32x32.png"/>
   </RibbonItem>
   <RibbonItem>

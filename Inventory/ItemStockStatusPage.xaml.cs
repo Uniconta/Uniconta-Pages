@@ -46,7 +46,8 @@ namespace UnicontaClient.Pages.CustomPage
         CWServerFilter itemFilterDialog;
         bool itemFilterCleared;
         public TableField[] ItemUserFields { get; set; }
-
+        static bool useWarehouse = true, useLocation = true;
+        ItemBase iUseWarehouse, iUseLocation;
         public ItemStockStatusPage(BaseAPI API) : base(API, string.Empty)
         {
             InitPage(null);
@@ -69,10 +70,44 @@ namespace UnicontaClient.Pages.CustomPage
             ToDate.DateTime = balDate;
             dgItemStockStatusGrid.ShowTotalSummary();
             localMenu.OnItemClicked += localMenu_OnItemClicked;
-            RibbonBase rb = (RibbonBase)localMenu.DataContext;
-            UtilDisplay.RemoveMenuCommand(rb, "Aggregate" );
+            GetMenuItem();
         }
 
+        private void LocalMenu_OnChecked(string ActionType, bool IsChecked)
+        {
+            switch (ActionType)
+            {
+                case "PerWarehouse":
+                    useWarehouse = iUseWarehouse.IsChecked = Warehouse.Visible = IsChecked;
+                    if (!IsChecked)
+                        useLocation = Location.Visible = false;
+                    LoadData();
+                    break;
+                case "PerLocation":
+                    useLocation = iUseLocation.IsChecked = Location.Visible = IsChecked;
+                    LoadData();
+                    break;
+                default:
+                    gridRibbon_BaseActions(ActionType);
+                    break;
+            }
+        }
+
+        void GetMenuItem()
+        {
+            RibbonBase rb = (RibbonBase)localMenu.DataContext;
+            iUseLocation = UtilDisplay.GetMenuCommandByName(rb, "PerLocation");
+            if (iUseLocation != null)
+                iUseLocation.IsChecked = useLocation;
+            iUseWarehouse = UtilDisplay.GetMenuCommandByName(rb, "PerWarehouse");
+            if (iUseWarehouse != null)
+                iUseWarehouse.IsChecked = useWarehouse;
+            if (!useWarehouse)
+                Warehouse.Visible = Location.Visible = false;
+            else if (!useLocation)
+                Location.Visible = false;
+            localMenu.OnChecked += LocalMenu_OnChecked;//add this handler later so that LocalMenu_OnChecked event is not fired on page open
+        }
         public override Task InitQuery()
         {
             return null;
@@ -82,11 +117,20 @@ namespace UnicontaClient.Pages.CustomPage
         {
             base.OnLayoutLoaded();
             var Comp = api.CompanyEntity;
+            RibbonBase rb = (RibbonBase)localMenu.DataContext;
+            UtilDisplay.RemoveMenuCommand(rb, "Aggregate");
             if (!Comp.Warehouse)
-                Location.Visible = Warehouse.Visible = false;
-            else if (!Comp.Location)
+            {
+                UtilDisplay.RemoveMenuCommand(rb, "PerWarehouse");
+                UtilDisplay.RemoveMenuCommand(rb, "PerLocation");
+                Warehouse.Visible = false;
                 Location.Visible = false;
-
+            }
+            else if (!Comp.Location)
+            {
+                UtilDisplay.RemoveMenuCommand(rb, "PerLocation");
+                Location.Visible = false;
+            }
             Utility.SetupVariants(api, colVariant, VariantName, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
             Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
             LoadType(typeof(Uniconta.DataModel.InvItem));
@@ -103,16 +147,15 @@ namespace UnicontaClient.Pages.CustomPage
                             itemFilterDialog = new CWServerFilter(api, typeof(InvStockStatus), null, null, ItemUserFields);
                         else
                             itemFilterDialog = new CWServerFilter(api, typeof(InvStockStatus), null, null, ItemUserFields);
+                        itemFilterDialog.GridSource = dgItemStockStatusGrid.ItemsSource as IList<UnicontaBaseEntity>;
                         itemFilterDialog.Closing += itemFilterDialog_Closing;
-#if !SILVERLIGHT
                         itemFilterDialog.Show();
                     }
                     else
+                    {
+                        itemFilterDialog.GridSource = dgItemStockStatusGrid.ItemsSource as IList<UnicontaBaseEntity>;
                         itemFilterDialog.Show(true);
-#elif SILVERLIGHT
                     }
-                    itemFilterDialog.Show();
-#endif
                     break;
                 case "ClearItemFilter":
                     itemFilterDialog = null;
@@ -122,6 +165,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "Search":
                     LoadData();
                     break;
+
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -138,26 +182,25 @@ namespace UnicontaClient.Pages.CustomPage
                 itemFilterValues = itemFilterDialog.PropValuePair;
                 itemPropSort = itemFilterDialog.PropSort;
             }
-#if !SILVERLIGHT
             e.Cancel = true;
             itemFilterDialog.Hide();
-#endif
         }
 
-        private void LoadData()
+        private Task LoadData()
         {
             dgItemStockStatusGrid.PrintReportName = string.Format("{0} {1} ({2:d})", Uniconta.ClientTools.Localization.lookup("ItemStockStatus"), Uniconta.ClientTools.Localization.lookup("Report"), ToDate.DateTime);
-            var inputs = new List<PropValuePair>();
-            inputs.Add(PropValuePair.GenereteParameter("ToDate", typeof(DateTime), String.Format("{0:d}", ToDate.DateTime)));
-
+            var inputs = new List<PropValuePair>
+            {
+                PropValuePair.GenereteParameter("ToDate", typeof(DateTime), String.Format("{0:d}", ToDate.DateTime))
+            };
+            if (!useWarehouse)
+                inputs.Add(PropValuePair.GenereteParameter("UseWarehouse", typeof(string), "0"));
+            else if (!useLocation)
+                inputs.Add(PropValuePair.GenereteParameter("UseLocation", typeof(string), "0"));
             if (itemFilterValues != null)
                 inputs.AddRange(itemFilterValues);
-            var t = Filter(inputs);
-        }
 
-        private Task Filter(IEnumerable<PropValuePair> propValuePair)
-        {
-            return dgItemStockStatusGrid.Filter(propValuePair);
+            return dgItemStockStatusGrid.Filter(inputs, itemPropSort);
         }
     }
 }

@@ -452,15 +452,14 @@ namespace UnicontaClient.Pages.CustomPage
                 if (dictPriceLookup.ContainsKey(proj._DCAccount))
                     return dictPriceLookup[proj._DCAccount];
 
-                var order = new DebtorOrder() { _DCAccount = proj._DCAccount };
-                var priceLookup = new Uniconta.API.DebtorCreditor.FindPrices(order, api);
+                var priceLookup = new Uniconta.API.DebtorCreditor.FindPrices(proj, api);
                 dictPriceLookup.Add(proj._DCAccount, priceLookup);
                 return priceLookup;
             }
             return null;
         }
 
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             var api = this.api;
             CategoryCache = api.GetCache(typeof(Uniconta.DataModel.PrCategory)) ?? await api.LoadCache(typeof(Uniconta.DataModel.PrCategory)).ConfigureAwait(false);

@@ -23,6 +23,7 @@ x:Class="UnicontaClient.Pages.CustomPage.InvTransMarkedPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="DCAccount" Width="100"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="AccountName" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Text" Visible="False" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Note" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Qty"  Width="90"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Unit" Width="50" Visible="false"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Week" Width="50" Visible="false"/>

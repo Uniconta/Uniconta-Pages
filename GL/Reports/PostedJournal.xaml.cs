@@ -20,6 +20,7 @@ using Uniconta.API.GeneralLedger;
 using Uniconta.ClientTools.Util;
 using Uniconta.ClientTools.Controls;
 using Uniconta.API.Service;
+using Uniconta.Common.Utility;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -84,8 +85,9 @@ namespace UnicontaClient.Pages.CustomPage
             }
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgPostedJournal.BusyIndicator = busyIndicator;
+            dgPostedJournal.RowDoubleClick += DgPostedJournal_RowDoubleClick;
         }
-
+  
         void RemoveMenuItemDelete()
         {
             RibbonBase rb = (RibbonBase)localMenu.DataContext;
@@ -96,7 +98,14 @@ namespace UnicontaClient.Pages.CustomPage
         {
             LoadType(new Type[] { typeof(Uniconta.DataModel.GLDailyJournal), typeof(Uniconta.DataModel.NumberSerie), typeof(Uniconta.DataModel.Debtor), typeof(Uniconta.DataModel.Creditor), typeof(Uniconta.DataModel.GLAccount) });
         }
-
+        private void DgPostedJournal_RowDoubleClick()
+        {
+            localMenu_OnItemClicked("PostedTransaction");
+        }
+        private void Name_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            localMenu_OnItemClicked("PostedTransaction");
+        }
         private void localMenu_OnItemClicked(string ActionType)
         {
             GLDailyJournalPostedClient selectedItem = dgPostedJournal.SelectedItem as GLDailyJournalPostedClient;
@@ -105,7 +114,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "PostedTransaction":
                     if (selectedItem == null)
                         return;
-                    string header = string.Format("{0} / {1}", Uniconta.ClientTools.Localization.lookup("PostedTransactions"), selectedItem.RowId);
+                    string header = string.Format("{0} / {1}", Uniconta.ClientTools.Localization.lookup("PostedTransactions"), NumberConvert.ToString(selectedItem.RowId));
                     AddDockItem(TabControls.PostedTransactions, selectedItem, header);
                     break;
                 case "Delete":
@@ -114,7 +123,11 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "AccountActivity":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.GLTransLogPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("GLTransLog"), selectedItem.RowId));
+                        AddDockItem(TabControls.GLTransLogPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("GLTransLog"), NumberConvert.ToString(selectedItem.RowId)));
+                    break;
+                case "DeletedTransactions":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.GLTransDeletedReport, dgPostedJournal.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("DeletedTransactions"), NumberConvert.ToString(selectedItem.RowId)));
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);

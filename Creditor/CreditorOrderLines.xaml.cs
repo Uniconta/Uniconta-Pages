@@ -75,8 +75,10 @@ namespace UnicontaClient.Pages.CustomPage
                 foreach (var _it in copyFromRows)
                 {
                     var it = (DCOrderLine)_it;
-                    lst.Add(CreateNewOrderLine(it._Item, it._Qty, it._Text, it._Price, it._AmountEntered, it._DiscountPct, it._Variant1, it._Variant2, it._Variant3, it._Variant4, it._Variant5,
-                        it._Warehouse, it._Location, it._Unit, it._Date, it._Week, it._Note, it._Discount));
+                    var line = CreateNewOrderLine(it._Item, it._Qty, it._Text, it._Price, it._AmountEntered, it._DiscountPct, it._Variant1, it._Variant2, it._Variant3, it._Variant4, it._Variant5,
+                        it._Warehouse, it._Location, it._Unit, it._Date, it._Week, it._Note, it._Discount);
+                    TableField.SetUserFieldsFromRecord(it, line);
+                    lst.Add(line);
                 }
             }
             else if (row is InvItem)
@@ -174,11 +176,17 @@ namespace UnicontaClient.Pages.CustomPage
 
         async void SetupMaster(UnicontaBaseEntity args)
         {
-            PriceLookup = null;
             var OrderId = orderMaster?.RowId;
             dgCreditorOrderLineGrid.UpdateMaster(args);
-            if (orderMaster.RowId != OrderId && api.CompanyEntity.CreditorPrice)
-                PriceLookup = new Uniconta.API.DebtorCreditor.FindPrices(orderMaster, api);
+            if (orderMaster?.RowId != OrderId)
+            {
+                if (orderMaster == null)
+                    PriceLookup = null;
+                else if (PriceLookup == null)
+                    PriceLookup = new Uniconta.API.DebtorCreditor.FindPrices(orderMaster, api);
+                else
+                    PriceLookup.OrderChanged(orderMaster);
+            }
         }
 
         void SetHeader()
@@ -735,7 +743,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "RefreshGrid":
                     RefreshGrid();
-                    break;
+                    return; // RecalculateAmount called in refresh method
                 case "InvStockProfile":
                     if (selectedItem != null)
                         AddDockItem(TabControls.InvStorageProfileReport, dgCreditorOrderLineGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("StockProfile"), selectedItem._Item));
@@ -949,7 +957,10 @@ namespace UnicontaClient.Pages.CustomPage
             var savetask = saveGridLocal(); // we need to wait until it is saved, otherwise Storage is not updated
             if (savetask != null)
                 await savetask;
-            gridRibbon_BaseActions("RefreshGrid");
+            await dgCreditorOrderLineGrid.RefreshTask();
+            RecalculateAmount();
+            if (this.items.CacheAge.TotalMinutes > 10d)
+                this.items = await api.LoadCache(typeof(Uniconta.DataModel.InvItem), true);
         }
 
         async void ViewStorage()
@@ -960,7 +971,7 @@ namespace UnicontaClient.Pages.CustomPage
             AddDockItem(TabControls.InvItemStoragePage, dgCreditorOrderLineGrid.syncEntity, true);
         }
 
-        private void GenerateInvoice(CreditorOrderClient dbOrder, bool showProformaInvoice)
+        async private void GenerateInvoice(CreditorOrderClient dbOrder, bool showProformaInvoice)
         {
             var savetask = saveGridLocal();
             var curpanel = dockCtrl.Activpanel;
@@ -993,7 +1004,9 @@ namespace UnicontaClient.Pages.CustomPage
             var additionalOrdersList = Utility.GetAdditionalOrders(api, dbOrder);
             if (additionalOrdersList != null)
                 GenrateInvoiceDialog.SetAdditionalOrders(additionalOrdersList);
-
+            var voucherList = await Utility.GetVoucherReferenceList(api, dbOrder);
+            if (voucherList != null)
+                GenrateInvoiceDialog.SetVoucherClients(voucherList);
             GenrateInvoiceDialog.Closed += async delegate
             {
                 if (GenrateInvoiceDialog.DialogResult == true)
@@ -1009,7 +1022,7 @@ namespace UnicontaClient.Pages.CustomPage
                     var invoicePostingResult = SetupInvoicePostingPrintGenerator(dbOrder, GenrateInvoiceDialog.GenrateDate, GenrateInvoiceDialog.InvoiceNumber, isSimulated, GenrateInvoiceDialog.ShowInvoice,
                         GenrateInvoiceDialog.InvoiceQuickPrint, GenrateInvoiceDialog.NumberOfPages, GenrateInvoiceDialog.SendByOutlook, GenrateInvoiceDialog.sendOnlyToThisEmail, GenrateInvoiceDialog.Emails);
                     invoicePostingResult.SetAdditionalOrders(GenrateInvoiceDialog.AdditionalOrders?.Cast<DCOrder>().ToList());
-
+                    invoicePostingResult.SetDocumentRef(GenrateInvoiceDialog.PhysicalVoucherRef);
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
                     busyIndicator.IsBusy = true;
                     var result = await invoicePostingResult.Execute();
@@ -1146,7 +1159,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             var api = this.api;
             var Comp = api.CompanyEntity;

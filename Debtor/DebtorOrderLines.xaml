@@ -29,7 +29,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrderLines"
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <docking:DockLayoutManager x:Name="DockingControl" AllowCustomization="False">
                 <docking:LayoutGroup x:Name="lGroup" AllowDrag="False" AllowDock="False" AllowFloat="False" Orientation="Vertical" AllowContextMenu="False" >
-                    <docking:LayoutPanel x:Name="layOutDebtorOrderLine" FloatOnDoubleClick="False" AllowDrag="False" AllowDock="False" AllowClose="False" AllowContextMenu="False" AllowMaximize="False" AllowDockToDocumentGroup="False" ShowCloseButton="False"  ShowPinButton="False">
+                    <docking:LayoutPanel x:Name="layOutDebtorOrderLine" FloatOnDoubleClick="False" AllowDrag="False" AllowDock="False" AllowClose="False" AllowContextMenu="False" AllowMaximize="False" AllowDockToDocumentGroup="False" ShowCloseButton="False"  ShowPinButton="False" ItemHeight="7*">
                         <localPage:DebtorOrderLineGrid  x:Name="dgDebtorOrderLineGrid" AutoGenerateColumns="None" HorizontalAlignment="Stretch">
                             <localPage:DebtorOrderLineGrid.Columns>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Subtotal" Width="50" ReadOnly="True" Visible="False"/>
@@ -41,7 +41,18 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrderLines"
                                     </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridTemplateColumnClient>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="colNote" FieldName="Note" Width="150" Visible="False"/>
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Item" Width="100"/>
+                                <localPage:CorasauDataGridForeignKeyColumnClient x:Name="Item" Width="100">
+                                    <localPage:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
+                                        <ControlTemplate>
+                                            <TextBlock Margin="2" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.Item,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"></TextBlock>
+                                        </ControlTemplate>
+                                    </localPage:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
+                                    <localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
+                                        <DataTemplate>
+                                            <localPage:CorasauGridLookupEditorClient  x:Name="PART_Editor" EditValueChanged="Item_EditValueChanged"  />
+                                        </DataTemplate>
+                                    </localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
+                                </localPage:CorasauDataGridForeignKeyColumnClient>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant" FieldName="Variant">
                                     <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                         <DataTemplate>
@@ -206,7 +217,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrderLines"
                             </localPage:DebtorOrderLineGrid.TotalSummary>
                         </localPage:DebtorOrderLineGrid>
                     </docking:LayoutPanel>
-                    <docking:LayoutPanel x:Name="layOutInvItemStorage" FloatOnDoubleClick="False" AllowDrag="False" AllowDock="False" AllowClose="False" AllowContextMenu="False" AllowMaximize="False" AllowDockToDocumentGroup="False" ShowCloseButton="False"  ShowPinButton="False">
+                    <docking:LayoutPanel x:Name="layOutInvItemStorage" FloatOnDoubleClick="False" AllowDrag="False" AllowDock="False" AllowClose="False" AllowContextMenu="False" AllowMaximize="False" AllowDockToDocumentGroup="False" ShowCloseButton="False"  ShowPinButton="False" ItemHeight="3*">
                         <docking:LayoutPanel.CaptionTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
@@ -239,6 +250,13 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrderLines"
                                     <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                         <DataTemplate>
                                             <CorasauControls:TextEditor  x:Name="PART_Editor" HorizontalContentAlignment="Right" Mask="{Binding Path=DataContext.RowData.Row.Decimals,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource MaskConverter},ConverterParameter=Decimals}" MaskUseAsDisplayFormat="True" MaskType="Numeric" EditValue="{Binding Path=DataContext.RowData.Row.Available,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}"/>
+                                        </DataTemplate>
+                                    </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                                </localPage:CorasauDataGridTemplateColumnClient>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="AvailableForReservation" Width="80" AllowEditing="false" Visible="False">
+                                    <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                                        <DataTemplate>
+                                            <CorasauControls:TextEditor  x:Name="PART_Editor" HorizontalContentAlignment="Right" Mask="{Binding Path=DataContext.RowData.Row.Decimals,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource MaskConverter},ConverterParameter=Decimals}" MaskUseAsDisplayFormat="True" MaskType="Numeric" EditValue="{Binding Path=DataContext.RowData.Row.AvailableForReservation,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}"/>
                                         </DataTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridTemplateColumnClient>

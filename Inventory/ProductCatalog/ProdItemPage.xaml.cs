@@ -96,7 +96,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             var api = this.api;
             prodSupplierCache = api.GetCache(typeof(Uniconta.DataModel.ProdSupplier)) ?? await api.LoadCache(typeof(Uniconta.DataModel.ProdSupplier)).ConfigureAwait(false);

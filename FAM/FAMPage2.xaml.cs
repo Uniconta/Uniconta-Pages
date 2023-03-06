@@ -29,7 +29,6 @@ namespace UnicontaClient.Pages.CustomPage
     public partial class FAMPage2 : FormBasePage
     {
         FamClient editrow;
-        private string parentName;
 
         public override void OnClosePage(object[] RefreshParams)
         {
@@ -57,17 +56,12 @@ namespace UnicontaClient.Pages.CustomPage
                 if (idkey.KeyStr != null)
                     idkey.KeyStr = null;
             }
-            if (!string.IsNullOrWhiteSpace(editrow._Parent))
-                this.parentName = editrow._Parent;
             InitPage(api);
         }
 
         public FAMPage2(CrudAPI crudApi, string dummy) : base(crudApi, dummy)
         {
             InitializeComponent();
-
-            if (!string.IsNullOrWhiteSpace(dummy))
-                this.parentName = dummy;
 
             InitPage(crudApi);
 #if !SILVERLIGHT
@@ -89,19 +83,6 @@ namespace UnicontaClient.Pages.CustomPage
 
             layoutItems.DataContext = editrow;
             frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
-
-            if (!string.IsNullOrWhiteSpace(parentName))
-            {
-                liParent.Visibility = Visibility.Visible;
-                leParent.Visibility = Visibility.Visible;
-                editrow._Parent = parentName;
-                leParent.IsReadOnly = true;
-            }
-            else
-            {
-                liParent.Visibility = Visibility.Collapsed;
-                leParent.Visibility = Visibility.Collapsed;
-            }
 
             dim1lookupeditior.api = dim2lookupeditior.api = dim3lookupeditior.api = dim4lookupeditior.api = dim5lookupeditior.api = api;
             //cbAssetLifeCycle.ItemsSource  = Enum.GetValues(typeof(AssetStatus));

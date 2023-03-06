@@ -72,7 +72,7 @@ namespace UnicontaClient.Pages.CustomPage
                Vatlookupeditior.api = VatOprlookupeditior.api = Employeelookupeditor.api = leInvoiceAccount.api =
                dim1lookupeditior.api = dim2lookupeditior.api = dim3lookupeditior.api = dim4lookupeditior.api = dim5lookupeditior.api =
                Paymentlookupeditior.api = grouplookupeditor.api = PriceListlookupeditior.api = lePostingAccount.api = lePaymtFormat.api =
-               leShipment.api = leDeliveryTerm.api = LayoutGrouplookupeditior.api = prCategoryLookUpeditor.api = leD2CAccount.api = leCrmGroup.api = crudapi;
+               leShipment.api = leDeliveryTerm.api = LayoutGrouplookupeditior.api = prCategoryLookUpeditor.api = leD2CAccount.api = leCrmGroup.api= leTransType.api = crudapi;
 
             Task t;
             if (crudapi.CompanyEntity.CRM)
@@ -160,7 +160,7 @@ namespace UnicontaClient.Pages.CustomPage
             return true;
         }
 
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             var api = this.api;
             var Comp = api.CompanyEntity;
@@ -242,8 +242,8 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         private bool onlyRunOnce;
-        bool cvrFound = false;
-        bool hasValueChanged = false;
+        bool cvrFound;
+        bool hasValueChanged;
         private async void TxtCVR_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
         {
             var s = sender as TextEditor;
@@ -282,7 +282,7 @@ namespace UnicontaClient.Pages.CustomPage
                         if (address != null)
                         {
                             var streetAddress = address.CompleteStreet;
-                            if (ci.life.name == editrow._Name && streetAddress == editrow._Address1 &&
+                            if (string.Compare(ci.life.name, editrow._Name, StringComparison.CurrentCultureIgnoreCase) == 0 && streetAddress == editrow._Address1 &&
                                 address.zipcode == editrow._ZipCode)
                                 return; // we wil not override since address has not changed
 
@@ -293,6 +293,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 if (result != UnicontaMessageBox.Yes)
                                     return;
                             }
+                            editrow.Name = ci.life.name;
                             editrow.Address1 = streetAddress;
                             editrow.Address2 = address.street2;
                             if (editrow.ZipCode != address.zipcode)
@@ -357,6 +358,10 @@ namespace UnicontaClient.Pages.CustomPage
         private void liWww_ButtonClicked(object sender)
         {
             Utility.OpenWebSite(editrow._Www);
+        }
+        private void liCompanyRegNo_ButtonClicked(object sender)
+        {
+            Utility.OpenCVR(editrow._Country, editrow._LegalIdent);
         }
     }
 }

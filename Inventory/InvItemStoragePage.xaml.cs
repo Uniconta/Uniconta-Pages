@@ -84,42 +84,18 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var masterRecord = dgInvItemStorageClientGrid.masterRecord;
             Uniconta.DataModel.InvItem itemRec = null;
-            string Item = null;
+            string Item;
 
-            var storage = masterRecord as Uniconta.DataModel.InvItemStorage;
-            if (storage != null)
-                Item = storage._Item;
+            var prop = masterRecord.GetType().GetProperty("Item");
+            if (prop != null)
+                Item = (string)prop.GetValue(masterRecord, null);
             else
             {
-                var orderline = masterRecord as Uniconta.DataModel.DCOrderLine;
-                if (orderline != null)
-                    Item = orderline._Item;
+                var invBom = masterRecord as Uniconta.DataModel.InvBOM;
+                if (invBom != null)
+                    Item = invBom._ItemPart;
                 else
-                {
-                    var jourline = masterRecord as Uniconta.DataModel.InvJournalLine;
-                    if (jourline != null)
-                        Item = jourline._Item;
-                    else
-                    {
-                        var invtran = masterRecord as Uniconta.DataModel.InvTrans;
-                        if (invtran != null)
-                            Item = invtran._Item;
-                        else
-                        {
-                            var invBom = masterRecord as Uniconta.DataModel.InvBOM;
-                            if (invBom != null)
-                                Item = invBom._ItemPart;
-                            else
-                            {
-                                var invSerieBatch = masterRecord as Uniconta.DataModel.InvSerieBatch;
-                                if (invSerieBatch != null)
-                                    Item = invSerieBatch._Item;
-                                else
-                                    itemRec = masterRecord as Uniconta.DataModel.InvItem;
-                            }
-                        }
-                    }
-                }
+                    Item = null;
             }
 
             if (Item != null)
@@ -222,7 +198,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             if (this.items == null)
                 this.items = await api.LoadCache(typeof(Uniconta.DataModel.InvItem)).ConfigureAwait(false);

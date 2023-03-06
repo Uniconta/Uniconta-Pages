@@ -451,7 +451,7 @@ namespace UnicontaClient.Pages.CustomPage
                         #region Vacation
                         if (lstCatVacation != null)
                         {
-                            var vacationStartDate = startDate < new DateTime(2021, 1, 1) ? new DateTime(2020, 5, 1) : new DateTime(startDate.Year, 1, 1);
+                            var vacationStartDate = startDate < new DateTime(2023, 1, 1) ? new DateTime(startDate.Year, 1, 1) : new DateTime(2023, 1, 1);
 
                             if (startDate < vacationStartDate)
                                 vacationStartDate = vacationStartDate.AddYears(-1);
@@ -478,7 +478,7 @@ namespace UnicontaClient.Pages.CustomPage
                         #region Other vacation
                         if (lstCatOtherVacation != null)
                         {
-                            var otherVacationStartDate = startDate < new DateTime(2021, 1, 1) ? new DateTime(2020, 5, 1) : new DateTime(startDate.Year, 1, 1);
+                            var otherVacationStartDate = startDate < new DateTime(2023, 1, 1) ? new DateTime(startDate.Year, 1, 1) : new DateTime(2023, 1, 1);
 
                             if (startDate < otherVacationStartDate)
                                 otherVacationStartDate = otherVacationStartDate.AddYears(-1);
@@ -1364,14 +1364,13 @@ namespace UnicontaClient.Pages.CustomPage
             var proj = (Uniconta.DataModel.Project)projCache.Get(rec._Project);
             if (proj != null)
             {
-                var order = new DebtorOrder() { _DCAccount = proj._DCAccount };
-                var priceLookup = new Uniconta.API.DebtorCreditor.FindPrices(order, api);
+                var priceLookup = new Uniconta.API.DebtorCreditor.FindPrices(proj, api);
                 return priceLookup;
             }
             return null;
         }
 
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             projCache = projCache ?? await api.LoadCache<Uniconta.DataModel.Project>().ConfigureAwait(false);
             payrollCache = payrollCache ?? await api.LoadCache<Uniconta.DataModel.EmpPayrollCategory>().ConfigureAwait(false);

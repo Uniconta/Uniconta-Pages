@@ -4,14 +4,16 @@ x:Class="UnicontaClient.Pages.CustomPage.GLTransLogPage"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
              xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
-             xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage" 
-             xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools">
+             xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage">
+    <UserControl.Resources>
+        <local:UnderlineConverter x:Key="UnderlineConverter" />
+    </UserControl.Resources>
     <Grid x:Name="LayoutRoot" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
-        <CorasauControls:CorasauRibbonControl x:Name="localMenu"  XMLSourcePath=";component/Assets/GridRibbonReadOnlyLayout.xml"/>
+        <CorasauControls:CorasauRibbonControl x:Name="localMenu"  XMLSourcePath=";component/Pages/GL/Accounts/GLTransLogPageRibbon.xml"/>
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <local:GLTransLogGridClient x:Name="dgGLTranLogGridClient" AutoGenerateColumns="None">
                 <local:GLTransLogGridClient.Columns>
@@ -23,7 +25,20 @@ x:Class="UnicontaClient.Pages.CustomPage.GLTransLogPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="Amount" Width="80"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Voucher" Width="60"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Invoice" Width="60"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Action" Width="150"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Action" Width="150">
+                        <local:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Margin="5,0,0,0" TextDecorations="{Binding DataContext.RowData.Row.Action,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource UnderlineConverter}}" Cursor="Hand" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.Action,RelativeSource={RelativeSource TemplatedParent}}" PreviewMouseDown="Name_PreviewMouseDown"></TextBlock>
+                                    <TextBlock Grid.Column="1"></TextBlock>
+                                </Grid>
+                            </DataTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Comment" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="TransText" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="JournalType" />

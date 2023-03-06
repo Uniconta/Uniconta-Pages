@@ -135,26 +135,20 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         View(selectedItem);
                     break;
-
                 case "ViewTransactions":
                     if (selectedItem != null)
                         AddDockItem(TabControls.AccountsTransaction, dgAttachedVoucherGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("VoucherTransactions"), selectedItem.RowId));
                     break;
                 case "ExportVouchers":
-                    var vouchers = (IEnumerable<VouchersClient>)dgAttachedVoucherGrid.GetVisibleRows();
-                    AddDockItem(TabControls.VoucherExportPage, new object[] { vouchers }, Uniconta.ClientTools.Localization.lookup("ExportVouchers"));
+                    AddDockItem(TabControls.VoucherExportPage, new object[] { dgAttachedVoucherGrid.GetVisibleRows() }, Uniconta.ClientTools.Localization.lookup("ExportVouchers"));
                     break;
                 case "ShowInInbox":
                     if (selectedItem != null)
                         UpdateInBox(selectedItem);
                     break;
                 case "EditRow":
-                    if (selectedItem == null)
-                        return;
-                    object[] EditParam = new object[2];
-                    EditParam[0] = selectedItem;
-                    EditParam[1] = true;
-                    AddDockItem(TabControls.AttachedVouchersPage2, EditParam, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Voucher"), selectedItem.RowId));
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.AttachedVouchersPage2, new object[] { selectedItem, true }, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Voucher"), selectedItem.RowId));
                     break;
                 case "PendingApproval":
                     if (selectedItem != null)
@@ -198,10 +192,13 @@ namespace UnicontaClient.Pages.CustomPage
                         selectedItem.SetNewBuffer(buffer);
                         selectedItem._Url = url;
                         selectedItem._NoCompress = !cwUpdateFile.Compress;
-                        VoucherCache.SetGlobalVoucherCache(selectedItem);
                         busyIndicator.IsBusy = true;
-                        await api.Update(org, selectedItem);
+                        var err = await api.Update(org, selectedItem);
                         busyIndicator.IsBusy = false;
+                        if (err == 0)
+                            VoucherCache.SetGlobalVoucherCache(selectedItem);
+                        else
+                            UtilDisplay.ShowErrorCode(err);
                     }
                     else
                     {
@@ -275,15 +272,12 @@ namespace UnicontaClient.Pages.CustomPage
 
         public override string NameOfControl
         {
-            get { return TabControls.AttachedVouchers.ToString(); }
+            get { return TabControls.AttachedVouchers; }
         }
 
         protected override Filter[] DefaultFilters()
         {
-            Filter dateFilter = new Filter();
-            dateFilter.name = "Created";
-            dateFilter.value = String.Format("{0:d}..", BasePage.GetSystemDefaultDate().AddYears(-1).Date);
-            return new Filter[] { dateFilter };
+            return new Filter[] { new Filter() { name = "Created", value = String.Format("{0:d}..", BasePage.GetSystemDefaultDate().AddYears(-1).Date) } };
         }
 
         public override void Utility_Refresh(string screenName, object argument = null)
@@ -292,6 +286,11 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 dgAttachedVoucherGrid.UpdateItemSource(argument);
             }
+        }
+
+        private void PrimaryKeyId_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            localMenu_OnItemClicked("ViewDownloadRow");
         }
     }
 }

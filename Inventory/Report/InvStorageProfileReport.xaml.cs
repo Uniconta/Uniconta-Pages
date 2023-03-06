@@ -140,25 +140,30 @@ namespace UnicontaClient.Pages.CustomPage
 
         void SetPageHeader()
         {
-            string header;
+            string item;
             var syncMaster = dgInvStorageProfileGrid.masterRecord as InvItem;
             if (syncMaster != null)
-                header = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("StockProfile"), syncMaster._Item);
+                item = syncMaster._Item;
             else
             {
                 var syncMaster2 = dgInvStorageProfileGrid.masterRecord as InvItemStorage;
                 if (syncMaster2 != null)
-                    header = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("StockProfile"), syncMaster2._Item);
-
+                    item = syncMaster2._Item;
                 else
                 {
                     var syncMaster3 = dgInvStorageProfileGrid.masterRecord as DCOrderLine;
                     if (syncMaster3 != null)
-                        header = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("StockProfile"), syncMaster3._Item);
-                    else return;
-
+                        item = syncMaster3._Item;
+                    else
+                    {
+                        var syncMaster4 = dgInvStorageProfileGrid.masterRecord as ProjectBudgetLine;
+                        if (syncMaster4 != null)
+                            item = syncMaster4._Item;
+                        else return;
+                    }
                 }
             }
+            var header = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("StockProfile"), item);
             SetHeader(header);
         }
 

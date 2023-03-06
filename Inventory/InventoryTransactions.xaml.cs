@@ -420,6 +420,9 @@ namespace UnicontaClient.Pages.CustomPage
                     object[] param = new object[] { selectedItem };
                     AddDockItem(TabControls.InventoryTransactionsMarkedPage, param, true);
                     break;
+                case "ChangeCostValue":
+                    DebtorInvoiceLinesPage.ChangeCostValue(selectedItem, dgInvTransGrid);
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;

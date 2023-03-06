@@ -72,7 +72,7 @@ namespace UnicontaClient.Pages.CustomPage
             frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
         }
 
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             ProjectCache = crudApi.GetCache(typeof(Uniconta.DataModel.Project)) ?? await crudApi.LoadCache(typeof(Uniconta.DataModel.Project)).ConfigureAwait(false);
             JournalCache = crudApi.GetCache(typeof(Uniconta.DataModel.PrJournal)) ?? await crudApi.LoadCache(typeof(Uniconta.DataModel.PrJournal)).ConfigureAwait(false);
@@ -94,40 +94,35 @@ namespace UnicontaClient.Pages.CustomPage
 
         void TimeFromRounding(ProjectJournalLineLocal lineClient)
         {
-            var roundingEnum = AppEnums.TMRounding.IndexOf(companySettings.RoundingStart);
-            switch (roundingEnum)
+            switch (companySettings._RoundingStart)
             {
                 case 0:
                 case 1:
                 case 2:
                 case 3:
-                    lineClient.TimeFrom = Utility.RoundUp(roundingEnum, DateTime.Now);
+                    lineClient.TimeFrom = Utility.RoundUp(companySettings._RoundingStart, DateTime.Now);
                     break;
                 case 4:
                 case 5:
                 case 6:
                 case 7:
-                    lineClient.TimeFrom = Utility.RoundDown(roundingEnum, DateTime.Now);
+                    lineClient.TimeFrom = Utility.RoundDown(companySettings._RoundingStart, DateTime.Now);
                     break;
             }
         }
 
         private void leProject_SelectedIndexChanged(object sender, RoutedEventArgs e)
         {
-            var selectedItem = leProject.SelectedItem as ProjectClient;
-            setTask(selectedItem);
+            setTask(leProject.SelectedItem as ProjectClient);
         }
 
         private async void leTask_GotFocus(object sender, RoutedEventArgs e)
         {
-            if(ProjectCache==null)
+            if (ProjectCache==null)
                 ProjectCache = api.GetCache(typeof(Uniconta.DataModel.Project)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Project));
             
             if (editrow?._Project != null)
-            {
-                var selected = (ProjectClient)ProjectCache.Get(editrow._Project);
-                setTask(selected);
-            }
+                setTask((ProjectClient)ProjectCache.Get(editrow._Project));
         }
 
         private void leItem_SelectedIndexChanged(object sender, RoutedEventArgs e)
@@ -173,6 +168,5 @@ namespace UnicontaClient.Pages.CustomPage
                     return (pay._InternalType == Uniconta.DataModel.InternalType.Mileage);
             }
         }
-
     }
 }

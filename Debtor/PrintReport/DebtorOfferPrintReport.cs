@@ -75,7 +75,7 @@ namespace UnicontaClient.Pages.CustomPage
                 StreamingManager.Copy(Comp, Company);
             }
 
-            CompanyLogo = await Uniconta.ClientTools.Util.UtilDisplay.GetLogo(crudApi);
+            CompanyLogo = await UnicontaClient.Utilities.UtilCommon.GetLogo(crudApi);
         }
     }
 }

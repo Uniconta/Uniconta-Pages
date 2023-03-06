@@ -42,6 +42,9 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorInvoicenumberseries"
                     <CorasauControls:CorasauLayoutItem FieldName="MaxPennyDif" x:Name="liMaxPennyDif">
                         <CorasauControls:TextEditor Text="{Binding MaxPennyDif,Mode=TwoWay}" MaskType="Numeric" Mask="N2"/>
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="GraceDays" x:Name="liGraceDays">
+                        <CorasauControls:IntegerEditor EditValue="{Binding GraceDays,Mode=TwoWay}" SetMask="false"/>
+                    </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
             </CorasauControls:CorasauLayoutGroup>
         </CorasauControls:CorasauLayoutControl>       

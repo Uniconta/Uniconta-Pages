@@ -137,6 +137,7 @@ namespace UnicontaClient.Pages.CustomPage
                     user._ConfirmDelete = editrow._ConfirmDelete;
                     user._AutoSave = editrow._AutoSave;
                     user._UseDefaultBrowser = editrow._UseDefaultBrowser;
+                    //user._IncludeFilterInLayout = editrow._IncludeFilterInLayout;
                     string msg;
                     if (Curlanguage != editrow._Language)
                         msg = string.Format(Uniconta.ClientTools.Localization.lookup("LanguageApplyMsg"), editrow.UserLanguage);

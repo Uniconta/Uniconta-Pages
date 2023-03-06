@@ -10,7 +10,10 @@
     <RibbonItem Action="DetailView" LocalizedNameKey="DetailView" Glyph="Detailed_View_32x32.png" LargeGlyph="Detailed_View_32x32.png"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="RefreshGrid" ShortcutKey="CTRL+R" LocalizedNameKey="Refresh" Glyph="refresh.png" LargeGlyph="refresh.png"/>
+    <RibbonItem LocalizedNameKey="Refresh" Action="RefreshGrid" ShortcutKey="Ctrl+R" LargeGlyph="refresh.png">
+      <!--<RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="UseFilter" Glyph="Filter_16x16.png"/>
+      <RibbonItem Action="ClearFilter" LocalizedNameKey="ClearFilter" ShortcutKey="Ctrl+K" Glyph="Delete_16x16.png"/>-->
+    </RibbonItem>
     <RibbonItem Action="Filter" ShortcutKey="CTRL+I" LocalizedNameKey="Filter" LargeGlyph="Filter_32x32.png"/>
   </RibbonItem>
   <RibbonItem>
@@ -54,6 +57,7 @@
   </RibbonItem>
   <RibbonItem LocalizedNameKey="Sales">
     <RibbonItem Action="Offers" LocalizedNameKey="Offers" ControlName="DebtorOffers" LargeGlyph="Offer_32x32.png"/>
+	<RibbonItem Action="PurchaseOrders" LocalizedNameKey="CreditorOrders" ControlName="PurchaseLines" Module="Purchase" LargeGlyph="Journal_Lines_32x32.png" />
     <RibbonItem LocalizedNameKey="Invoices" LargeGlyph="Invoice_32x32.png">
       <RibbonItem Action="Invoices" LocalizedNameKey="PostedInvoices" ControlName="Invoices" Glyph="AccountInvoice_16x16.png" />
       <RibbonItem Action="OnAccountInvoicing" LocalizedNameKey="OnAccountInvoicing" ControlName="ProjectOnAccountInvoiceLinePage" Module="_ProjShowPctAcontoInvoice" Glyph="AccountInvoice_16x16.png" />

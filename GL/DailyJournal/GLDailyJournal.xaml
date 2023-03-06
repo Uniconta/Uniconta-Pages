@@ -9,6 +9,7 @@ x:Class="UnicontaClient.Pages.CustomPage.GLDailyJournal"
     xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
     xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage" 
     xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
     d:DesignHeight="300" d:DesignWidth="400">
     <UserControl.Resources>
     
@@ -23,7 +24,20 @@ x:Class="UnicontaClient.Pages.CustomPage.GLDailyJournal"
             <localPage:GLDailyJournalGrid x:Name="dgGldailyJournal" AutoGenerateColumns="None">
                 <localPage:GLDailyJournalGrid.Columns>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Journal" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" Width="200"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" Width="200">
+                        <localPage:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Margin="5,0,0,0" TextDecorations="Underline" Cursor="Hand" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.Name,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" PreviewMouseDown="TextBlock_PreviewMouseDown"></TextBlock>
+                                    <TextBlock Grid.Column="1"></TextBlock>
+                                </Grid>
+                            </DataTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                    </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="NumberOfLines" Width="70"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DefaultAccountType" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Account" Visible="False"/>

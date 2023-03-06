@@ -23,6 +23,11 @@
       <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16.png" ShortcutKey=""/>
     </RibbonItem>
   </RibbonItem>
+	<RibbonItem>
+		<RibbonItem Action="SetPermissions" LocalizedNameKey="SetPermissions" Glyph="User_Rights_32x32.png" LargeGlyph="User_Rights_32x32.png"/>
+		<RibbonItem Action="TableRights" LocalizedNameKey="TableRights" Glyph="" LargeGlyph="CopyUserTable_32x32.png"/>
+		<RibbonItem Action="BlockFunctions" LocalizedNameKey="BlockFunctions" Glyph="" LargeGlyph="Add_Menu_32x32.png"/>
+	</RibbonItem>
   <RibbonItem>
     <!---When we create new TabPage -->
     <RibbonItem Action="Lines" LocalizedNameKey="Lines" Glyph="Journal_Lines_32x32.png" LargeGlyph="Journal_Lines_Highlighted_32x32.png" ShortcutKey="ALT+L"/>    

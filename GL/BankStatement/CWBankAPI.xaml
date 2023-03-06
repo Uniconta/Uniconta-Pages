@@ -8,7 +8,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CWBankAPI"
            xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
             xmlns:dxinteraction="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
                     xmlns:enumType ="clr-namespace:Uniconta.DataModel;assembly=Uniconta.WindowsAPI"
-           Width="450"  KeyDown="ChildWindow_KeyDown" SizeToContent="Height">
+           Width="500"  KeyDown="ChildWindow_KeyDown" SizeToContent="Height">
     <Grid x:Name="LayoutRoot" Margin="2" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
             <RowDefinition />
@@ -16,15 +16,35 @@ x:Class="UnicontaClient.Pages.CustomPage.CWBankAPI"
         </Grid.RowDefinitions>
         <Grid x:Name="gridLayout" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
             <ClientToolsControls:CorasauLayoutControl Orientation="Vertical" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
-                <ClientToolsControls:CorasauLayoutGroup x:Name="lgType"  View="GroupBox" GroupBoxDisplayMode="Light" IsCollapsible="False" HorizontalAlignment="Stretch" ClientToolsControls:CorasauLayoutControl.AllowHorizontalSizing="True">
+                <ClientToolsControls:CorasauLayoutGroup x:Name="lgType"  View="GroupBox" GroupBoxDisplayMode="Light" Orientation="Vertical" IsCollapsible="False" HorizontalAlignment="Stretch" ClientToolsControls:CorasauLayoutControl.AllowHorizontalSizing="True">
+                    <ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
+                        <DataTemplate>
+                            <Image Source="/UnicontaPages;component/Assets/img/group-web_16x16.png" Width="16" Height="16" Stretch="UniformToFill" HorizontalAlignment="Left" />
+                        </DataTemplate>
+                    </ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
+                    <ClientToolsControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=WebService}">
+                        <CorasauControls:ComboBoxEditor x:Name="cmbBankService" Height="25" SelectedIndex="{Binding BankService,Mode=TwoWay}" HorizontalAlignment="Stretch" SelectedIndexChanged="BankService_SelectedIndexChanged"/>
+                    </ClientToolsControls:CorasauLayoutItem>
+                    <ClientToolsControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Function}">
+                        <CorasauControls:ComboBoxEditor x:Name="cmbBankAPIFunction" Height="25" SelectedIndex="{Binding Type,Mode=TwoWay}" HorizontalAlignment="Stretch" SelectedIndexChanged="BankAPIFunction_SelectedIndexChanged"/>
+                    </ClientToolsControls:CorasauLayoutItem>
+                </ClientToolsControls:CorasauLayoutGroup>
+
+                <ClientToolsControls:CorasauLayoutGroup x:Name="lgParm"  View="GroupBox" GroupBoxDisplayMode="Light" Orientation="Vertical" IsCollapsible="False" HorizontalAlignment="Stretch" ClientToolsControls:CorasauLayoutControl.AllowHorizontalSizing="True">
                     <ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
                         <DataTemplate>
                             <Image Source="/UnicontaPages;component/Assets/img/group-questiont_16x16.png" Width="16" Height="16" Stretch="UniformToFill" HorizontalAlignment="Left" />
                         </DataTemplate>
                     </ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
-                    <ClientToolsControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Type}">
-                        <CorasauControls:ComboBoxEditor x:Name="cmbBankAPIFunction" Height="25" SelectedIndex="{Binding Type,Mode=TwoWay}" HorizontalAlignment="Stretch" SelectedIndexChanged="BankAPIFunction_SelectedIndexChanged"/>
-                    </ClientToolsControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="BankAccount" x:Name="liBankAccount">
+                        <CorasauControls:LookupEditor x:Name="leBankAccount" Text="{Binding BankAccount,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="FromDate">
+                        <CorasauControls:DateEditor EditValue="{Binding FromDate,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="ToDate">
+                        <CorasauControls:DateEditor EditValue="{Binding ToDate,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                    </CorasauControls:CorasauLayoutItem>
                 </ClientToolsControls:CorasauLayoutGroup>
                 <ClientToolsControls:CorasauLayoutGroup x:Name="lgCustomer"  View="GroupBox" GroupBoxDisplayMode="Light" IsCollapsible="False" HorizontalAlignment="Stretch" ClientToolsControls:CorasauLayoutControl.AllowHorizontalSizing="True">
                     <ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
@@ -32,8 +52,8 @@ x:Class="UnicontaClient.Pages.CustomPage.CWBankAPI"
                             <Image Source="/UnicontaPages;component/Assets/img/group-user_16x16.png" Width="16" Height="16" Stretch="UniformToFill" HorizontalAlignment="Left" />
                         </DataTemplate>
                     </ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
-                    <ClientToolsControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CustomerNo}">
-                        <ClientToolsControls:TextEditor x:Name="txtCustomerNo"  Text="{Binding CustomerNo,Mode=TwoWay}" Height="25" HorizontalAlignment="Stretch"/>
+                    <ClientToolsControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ServiceId}">
+                        <ClientToolsControls:TextEditor x:Name="txtServiceId"  Text="{Binding ServiceId,Mode=TwoWay}" Height="25" HorizontalAlignment="Stretch"/>
                     </ClientToolsControls:CorasauLayoutItem>
                 </ClientToolsControls:CorasauLayoutGroup>
                 <ClientToolsControls:CorasauLayoutGroup x:Name="lgConnect"  View="GroupBox" GroupBoxDisplayMode="Light" Orientation="Vertical" IsCollapsible="False" HorizontalAlignment="Stretch" ClientToolsControls:CorasauLayoutControl.AllowHorizontalSizing="True">
@@ -50,7 +70,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CWBankAPI"
                         </CorasauControls:ComboBoxEditor>
                     </ClientToolsControls:CorasauLayoutItem>
                     <ClientToolsControls:CorasauLayoutItem x:Name="liActivationCode" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ActivationCode}">
-                        <ClientToolsControls:TextEditor x:Name="txtActivationCode" Text="{Binding ActivationCode,Mode=TwoWay}" Height="25"  Grid.Row="3" Grid.Column="3" HorizontalAlignment="Stretch"/>
+                        <ClientToolsControls:TextEditor Text="{Binding ActivationCode,Mode=TwoWay}" Height="25"  Grid.Row="3" Grid.Column="3" HorizontalAlignment="Stretch"/>
                     </ClientToolsControls:CorasauLayoutItem>
                     <ClientToolsControls:CorasauLayoutItem x:Name="liCompany" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Company}">
                         <CorasauControls:ComboBoxEditor x:Name="cbCompany" DisplayMember="Name" ValueMember="CompanyId" SelectedIndexChanged="cbCompany_SelectedIndexChanged" HorizontalAlignment="Stretch"/>

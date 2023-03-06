@@ -15,6 +15,7 @@ using UnicontaClient.Utilities;
 using Uniconta.ClientTools.Util;
 using DevExpress.Xpf.Grid;
 using Uniconta.Common.Utility;
+using System.Windows.Input;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -72,6 +73,16 @@ namespace UnicontaClient.Pages.CustomPage
             dgProductionPostedGrid.BusyIndicator = busyIndicator;
             SetRibbonControl(localMenu, dgProductionPostedGrid);
             localMenu.OnItemClicked += LocalMenu_OnItemClicked; ;
+            dgProductionPostedGrid.RowDoubleClick += dgProductionPostedGrid_RowDoubleClick;
+        }
+
+        private void dgProductionPostedGrid_RowDoubleClick()
+        {
+            LocalMenu_OnItemClicked("StockTransaction");
+        }
+        private void Name_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            dgProductionPostedGrid_RowDoubleClick();
         }
 
         private void LocalMenu_OnItemClicked(string ActionType)

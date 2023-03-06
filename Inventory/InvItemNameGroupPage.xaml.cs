@@ -44,6 +44,15 @@ namespace UnicontaClient.Pages.CustomPage
             dgInventoryNameGroupGrid.api = this.api;
             dgInventoryNameGroupGrid.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
+            dgInventoryNameGroupGrid.RowDoubleClick += dgInventoryNameGroupGrid_RowDoubleClick; ;
+        }
+        private void dgInventoryNameGroupGrid_RowDoubleClick()
+        {
+            localMenu_OnItemClicked("Lines");
+        }
+        private void Name_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            dgInventoryNameGroupGrid_RowDoubleClick();
         }
 
         bool CopiedData;

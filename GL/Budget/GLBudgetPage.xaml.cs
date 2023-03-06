@@ -80,7 +80,10 @@ namespace UnicontaClient.Pages.CustomPage
                 return;
             AddDockItem(TabControls.GLBudgetLinePage, selectedItem);
         }
-
+        private void Name_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            dgGlBudget_RowDoubleClick();
+        }
         static DateTime AddMonth2Date(DateTime d, int m)
         {
             if (d == DateTime.MinValue)

@@ -8,6 +8,8 @@ using Uniconta.ClientTools;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.Common;
+using UnicontaClient.Controls.Dialogs;
+using Uniconta.API.System;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -20,6 +22,7 @@ namespace UnicontaClient.Pages.CustomPage
 
     public partial class UserProfilePage : GridBasePage
     {
+        CompanyAccessAPI companyAPI;
         public override string NameOfControl { get { return TabControls.UserProfilePage; } }
 
         public UserProfilePage(BaseAPI API) : base(API, string.Empty)
@@ -31,7 +34,8 @@ namespace UnicontaClient.Pages.CustomPage
             SetRibbonControl(localMenu, dgUserProfile);
             localMenu.OnItemClicked += LocalMenu_OnItemClicked;
         }
-
+        
+        int selectedRowIndex = 0;
         private void LocalMenu_OnItemClicked(string ActionType)
         {
             var selectedItem = dgUserProfile.SelectedItem as UserProfileClient;
@@ -58,9 +62,43 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         SaveAndOpenUsers(selectedItem);
                     break;
+                case "SetPermissions":
+                    if (selectedItem == null)
+                        return;
+                    dgUserProfile.SetLoadedRow(selectedItem);
+                    CWUserTasks userTask = new CWUserTasks(companyAPI, selectedItem);
+                    userTask.Closing += delegate
+                    {
+                        if (userTask.DialogResult == true)
+                        {
+                            dgUserProfile.SetModifiedRow(selectedItem);
+                            dgUserProfile.UpdateItemSource(2, selectedItem);
+                        }
+                    };
+                    userTask.Show();
+                    break;
+                case "TableRights":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.UserProfileTableAccessPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("TableRights"), selectedItem._Name));
+                    break;
+                case "BlockFunctions":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.UserProfileRestrictedMethodPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("BlockFunctions"), selectedItem._Name));
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
+            }
+        }
+
+        private bool dataChanged;
+        public override bool IsDataChaged
+        {
+            get
+            {
+                if (dataChanged)
+                    return true;
+                return base.IsDataChaged;
             }
         }
 

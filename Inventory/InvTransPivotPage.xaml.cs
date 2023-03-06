@@ -83,11 +83,15 @@ namespace UnicontaClient.Pages.CustomPage
                             filterDialog = new CWServerFilter(api, typeof(InvTransClient), null, null, UserFields);
                         else
                             filterDialog = new CWServerFilter(api, typeof(InvTransClient), null, null, UserFields);
+                        filterDialog.GridSource = pivotDgInvTrans.DataSource as IList<UnicontaBaseEntity>;
                         filterDialog.Closing += filterDialog_Closing;
                         filterDialog.Show();
                     }
                     else
+                    {
+                        filterDialog.GridSource = pivotDgInvTrans.DataSource as IList<UnicontaBaseEntity>;
                         filterDialog.Show(true);
+                    }
                     break;
                 case "ClearLocalFilter":
                     filterDialog = null;

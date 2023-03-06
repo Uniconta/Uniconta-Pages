@@ -105,7 +105,6 @@ namespace UnicontaClient.Pages.CustomPage
                 docViewer = new DocumentViewerWindow(api, header);
                 docViewer.InitViewer(sourceData);
                 docViewer.Owner = Application.Current.MainWindow;
-                docViewer.Closing += delegate { docViewer.Owner = null; };
                 docViewer.Closed += delegate { docViewer = null; };
             }
             if (DocumentViewerWindow.lastHeight != 0)

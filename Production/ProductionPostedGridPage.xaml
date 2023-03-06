@@ -19,8 +19,21 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionPostedGridPage"
         <UnicontaControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <local:ProductionPostedGridClient x:Name="dgProductionPostedGrid" AutoGenerateColumns="None">
                 <local:ProductionPostedGridClient.Columns>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Date" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Item" Width="100" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Date" Width="80" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Item" Width="100">
+                        <local:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Margin="5,0,0,0" TextDecorations="Underline" Cursor="Hand" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.Item,RelativeSource={RelativeSource TemplatedParent}}" PreviewMouseDown="Name_PreviewMouseDown"></TextBlock>
+                                    <TextBlock Grid.Column="1"></TextBlock>
+                                </Grid>
+                            </DataTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Qty" Width="60">
                         <local:CorasauDataGridTemplateColumnClient.CellTemplate>
                             <DataTemplate>
@@ -39,7 +52,10 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionPostedGridPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="AccountName" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Project" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="ProjectName" Visible="False" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="OrderTotal" Width="80" ReadOnly="True" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="NoLines" Width="50" ReadOnly="True" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Remark" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ProductionCreated" />
                 </local:ProductionPostedGridClient.Columns>
             </local:ProductionPostedGridClient>
         </UnicontaControls:BusyIndicator>

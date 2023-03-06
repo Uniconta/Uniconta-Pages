@@ -77,6 +77,11 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOpenTrans"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Message" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DocumentRef" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="FromCreditor" Visible="False" ShowCheckBoxInHeader="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="LastCollectionsLetterCode" Visible="False" Width="100"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="FeeAmount" Visible="False" Width="70"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PaymentCharge" Visible="False" Width="70"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="OrderNumber" Width="60" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ReferenceNumber" Visible="False" />
                 </localPage:DebtorOpenTransGrid.Columns>
                 <localPage:DebtorOpenTransGrid.TotalSummary>
                     <localPage:SumColumn FieldName="Amount" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>

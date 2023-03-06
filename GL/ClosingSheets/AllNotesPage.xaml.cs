@@ -108,15 +108,10 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         glAccountFilterDialog = new CWServerFilter(api, typeof(GLAccountClient), glAccountDefaultFilter, null, GLAccountUserFields);
                         glAccountFilterDialog.Closing += glAccountFilterDialog_Closing;
-#if !SILVERLIGHT
                         glAccountFilterDialog.Show();
                     }
                     else
                         glAccountFilterDialog.Show(true);
-#elif SILVERLIGHT
-                    }
-                    glAccountFilterDialog.Show();
-#endif
                     break;
                 case "ClearGLAccountFilter":
                     glAccountFilterDialog = null;
@@ -127,15 +122,14 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         userNotesFilterDialog = new CWServerFilter(api, typeof(UserNotesClient), null, null, UserNotesUserFields);
                         userNotesFilterDialog.Closing += userNotesFilterDialog_Closing;
-#if !SILVERLIGHT
+                        userNotesFilterDialog.GridSource = dgGLAccount.ItemsSource as IList<UnicontaBaseEntity>;
                         userNotesFilterDialog.Show();
                     }
                     else
+                    {
+                        userNotesFilterDialog.GridSource = dgGLAccount.ItemsSource as IList<UnicontaBaseEntity>;
                         userNotesFilterDialog.Show(true);
-#elif SILVERLIGHT
                     }
-                    userNotesFilterDialog.Show();
-#endif
                     break;
                 case "ClearUserNotesFilter":
                     userNotesFilterDialog = null;

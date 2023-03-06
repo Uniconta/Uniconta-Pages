@@ -19,6 +19,7 @@ using UnicontaClient.Models;
 using System.IO;
 using Uniconta.ClientTools;
 using Uniconta.ClientTools.Controls;
+using Uniconta.DataModel;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -62,19 +63,22 @@ namespace UnicontaClient.Pages.CustomPage
             frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
 
             var TableId = userDocsClientRow._TableId;
-            if (TableId != 71 && TableId != 72 && TableId != 73 && TableId != 77 && TableId != 78 && TableId != 79 && TableId != 205 && TableId != 203) // Sales Order, purchase order, Offer, Invoices, Production Order, Project Invoice Proposal
+            if (TableId != DebtorOrder.CLASSID && TableId != CreditorOrder.CLASSID && TableId != DebtorOffer.CLASSID &&
+                TableId != DebtorInvoice.CLASSID && TableId != Uniconta.DataModel.CreditorInvoice.CLASSID && 
+                TableId != ProjectOrder.CLASSID && TableId != ProjectInvoiceProposalClient.CLASSID && TableId != ProductionOrderClient.CLASSID &&
+                TableId != CompanySMTP.CLASSID)
                 groupInclude.Visibility = Visibility.Collapsed;
-            else if (TableId != 72) /*Purchase Order */
+            else if (TableId != CreditorOrderClient.CLASSID) /*Purchase Order */
                 layoutRequisition.Visibility = Visibility.Collapsed;
             
-            if (TableId == 203) /* Project Invoice Proposal*/
+            if (TableId == ProjectInvoiceProposalClient.CLASSID) /* Project Invoice Proposal*/
             {
                 layoutOffer.Visibility = Visibility.Collapsed;
                 layoutConfirmation.Visibility = Visibility.Collapsed;
                 layoutPacknote.Visibility = Visibility.Collapsed;
             }
 
-            if (TableId == 205) /*Production Order*/
+            if (TableId == ProductionOrderClient.CLASSID) /*Production Order*/
             {
                 layoutInvoice.Visibility = Visibility.Collapsed;
                 layoutOffer.Visibility = Visibility.Collapsed;
@@ -84,7 +88,10 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (LoadedRow == null)
             {
+                var RowId = userDocsClientRow._TableRowId;
                 SetTemplateDefault(userDocsClientRow);
+                userDocsClientRow._TableId = TableId;
+                userDocsClientRow._TableRowId = RowId;
                 api.AllowBackgroundCrud = false;
                 frmRibbon.DisableButtons("Delete");
             }
@@ -113,8 +120,8 @@ namespace UnicontaClient.Pages.CustomPage
 #endif
                     {
                         int indexOfExtention = browseControl.FileName.IndexOf('.');
-                        var nameOfFile = indexOfExtention > 0 ? browseControl.FileName.Substring(0, indexOfExtention) : browseControl.FileName;
                         userDocsClientRow.DocumentType = DocumentConvert.GetDocumentType(browseControl.FileExtension);
+                        var nameOfFile = indexOfExtention > 0 && userDocsClientRow.DocumentType != FileextensionsTypes.UNK ? browseControl.FileName.Substring(0, indexOfExtention) : browseControl.FileName;
                         userDocsClientRow.Text = string.IsNullOrWhiteSpace(txedUserDocNotes.Text) ? nameOfFile : txedUserDocNotes.Text;
                         userDocsClientRow._Url = null;
                     }

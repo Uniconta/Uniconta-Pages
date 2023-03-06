@@ -104,7 +104,7 @@ namespace Uniconta.ClientTools.Controls
                     var lst = _dimensionItemDataModel;
                     if (_api == null || lst == null || lst.Count == 0)
                     {
-                        DialogResult = false;
+                        SetDialogResult(false);
                         return;
                     }
 
@@ -143,7 +143,7 @@ namespace Uniconta.ClientTools.Controls
 
                     Result = await (new Uniconta.API.GeneralLedger.PostingAPI(_api)).MoveDimensions(dim1, dim2, dim3, dim4, dim5, toDim1, toDim2, toDim3, toDim4, toDim5);
                     busyIndicator.IsBusy = false;
-                    DialogResult = true;
+                    SetDialogResult(true);
                 }
             };
             startDialog.Show();
@@ -151,7 +151,7 @@ namespace Uniconta.ClientTools.Controls
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            DialogResult = false;
+            SetDialogResult(false);
         }
 
         private void ChildWindow_KeyDown(object sender, KeyEventArgs e)

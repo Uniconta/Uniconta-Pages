@@ -1,0 +1,71 @@
+<ClientTools:ChildWindow xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.CWGLTransLogClientFormView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools" 
+             xmlns:local="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+             xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+             Height="{Binding Source={x:Static SystemParameters.PrimaryScreenHeight},Converter={Util:ScreenRatioConverter},ConverterParameter='0.45'}"
+             Width="{Binding Source={x:Static SystemParameters.PrimaryScreenWidth},Converter={Util:ScreenRatioConverter},ConverterParameter='0.20'}" SizeToContent="WidthAndHeight" ResizeMode="CanResize">
+    <Grid x:Name="LayoutRoot" Margin="2" Background="{StaticResource LayoutGridColor}" KeyDown="LayoutRoot_KeyDown">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="5" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <local:CorasauLayoutControl x:Name="layoutItems" Orientation="Vertical" Grid.Row="0" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
+            <local:CorasauLayoutGroup x:Name="grpdDescription" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Description}" Orientation="Vertical"  
+                                      local:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                <local:CorasauLayoutItem FieldName="UserName" x:Name="liUserName">
+                    <local:TextEditor x:Name="txtUserName" Text="{Binding UserName,Mode=OneWay}"  IsReadOnly="True"/>
+                </local:CorasauLayoutItem>
+                <local:CorasauLayoutItem FieldName="ByUser" x:Name="liByUser">
+                    <local:TextEditor x:Name="txtByUser" Text="{Binding ByUser,Mode=OneWay}"  IsReadOnly="True"/>
+                </local:CorasauLayoutItem>
+                <local:CorasauLayoutItem x:Name="liTime" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Deleted}">
+                    <local:TextEditor x:Name="txtTime" Text="{Binding Time,Mode=OneWay}"  IsReadOnly="True" Mask="d"
+                MaskType="DateTimeAdvancingCaret"
+                MaskUseAsDisplayFormat="True"/>
+                </local:CorasauLayoutItem>
+                <local:CorasauLayoutItem FieldName="JournalPostedId" x:Name="JournalPostedId">
+                    <local:TextEditor x:Name="txtJournalPostedId" Text="{Binding JournalPostedId,Mode=OneWay}"  IsReadOnly="True" />
+                </local:CorasauLayoutItem>
+                <local:CorasauLayoutItem FieldName="TransDate" x:Name="liTransDate">
+                    <local:TextEditor x:Name="txtTransDate" Text="{Binding TransDate,Mode=OneWay}"  IsReadOnly="True" Mask="d"
+                MaskType="DateTimeAdvancingCaret"
+                MaskUseAsDisplayFormat="True" />
+                </local:CorasauLayoutItem>
+                <local:CorasauLayoutItem FieldName="Amount" x:Name="liAmounty">
+                    <local:TextEditor x:Name="txtAmount" Text="{Binding Amount,Mode=OneWay}" Mask="N2" MaskType="Numeric"  IsReadOnly="True"/>
+                </local:CorasauLayoutItem>
+                <local:CorasauLayoutItem FieldName="Voucher" x:Name="liVoucher">
+                    <local:TextEditor x:Name="txtVoucher" Text="{Binding Voucher,Mode=OneWay}"  IsReadOnly="True"/>
+                </local:CorasauLayoutItem>
+                <local:CorasauLayoutItem FieldName="Invoice" x:Name="liInvoice">
+                    <local:TextEditor x:Name="txtInvoice" Text="{Binding Invoice,Mode=OneWay}"  IsReadOnly="True"/>
+                </local:CorasauLayoutItem>
+                <local:CorasauLayoutItem FieldName="Action" x:Name="liAction">
+                    <local:TextEditor x:Name="txtAction" Text="{Binding Action,Mode=OneWay}"  IsReadOnly="True"/>
+                </local:CorasauLayoutItem>
+                <local:CorasauLayoutItem FieldName="JournalType" x:Name="liJournalType">
+                    <local:TextEditor x:Name="txtJournalType" Text="{Binding JournalType,Mode=OneWay}"  IsReadOnly="True"/>
+                </local:CorasauLayoutItem>
+                <local:CorasauLayoutItem FieldName="Journal" x:Name="liJournal">
+                    <local:TextEditor x:Name="txtJournal" Text="{Binding Journal,Mode=OneWay}"  IsReadOnly="True"/>
+                </local:CorasauLayoutItem>
+                <local:CorasauLayoutItem FieldName="JournalName" x:Name="liJournalName">
+                    <local:TextEditor x:Name="txtJournalName" Text="{Binding JournalName,Mode=OneWay}"  IsReadOnly="True"/>
+                </local:CorasauLayoutItem>
+                <local:CorasauLayoutItem FieldName="Comment" x:Name="liComment">
+                    <local:TextEditor x:Name="txtComment" Text="{Binding Comment,Mode=OneWay}"  IsReadOnly="True"/>
+                </local:CorasauLayoutItem>
+                <local:CorasauLayoutItem FieldName="TransText" x:Name="liTransText">
+                    <local:TextEditor x:Name="txtTransText" Text="{Binding TransText,Mode=OneWay}"  IsReadOnly="True"/>
+                </local:CorasauLayoutItem>
+            </local:CorasauLayoutGroup>
+        </local:CorasauLayoutControl>
+        <Button x:Name="btnClose" HorizontalAlignment="Right" Margin="5" VerticalAlignment="Bottom" Height="23" Width="60" 
+                Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Close}" 
+                Click="btnClose_Click" Grid.Row="2" />
+    </Grid>
+</ClientTools:ChildWindow>

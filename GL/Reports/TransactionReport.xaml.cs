@@ -150,12 +150,15 @@ namespace UnicontaClient.Pages.CustomPage
             return null;
         }
 
-        async void InitialLoad()
+        void InitialLoad()
         {
+            Task t;
             if (!LateLoading)
-                await SetHeaderAndLoad();
-            await SetNoOfDimensions(api.CompanyEntity.NumberOfDimensions);
-            var t = SetDailyJournal(cmbJournal, api);
+                t = SetHeaderAndLoad();
+            else
+                t = null;
+            SetNoOfDimensions(api.CompanyEntity.NumberOfDimensions);
+            SetDailyJournal(cmbJournal, api);
             StartLoadCache(t);
         }
         protected override void OnLayoutLoaded()
@@ -248,7 +251,7 @@ namespace UnicontaClient.Pages.CustomPage
             cldim5.Header = c._Dim5;
         }
 
-        private async Task SetNoOfDimensions(int noofDimensions)
+        private async void SetNoOfDimensions(int noofDimensions)
         {
             var Hdr = objPageHdr;
 
@@ -347,7 +350,7 @@ namespace UnicontaClient.Pages.CustomPage
                 cb.SelectedIndex = 0;
         }
 
-        static public async Task SetDailyJournal(ComboBoxEditor cmbJournal, CrudAPI api)
+        static public async void SetDailyJournal(ComboBoxEditor cmbJournal, CrudAPI api)
         {
             var journalSource = new List<string>();
             var cache = api.GetCache(typeof(Uniconta.DataModel.GLDailyJournal)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLDailyJournal));
@@ -428,14 +431,10 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var Hdr = objPageHdr;
             Hdr.CompanyName = api.CompanyEntity.Name;
-            string account = string.Empty;
             string actStatement = Uniconta.ClientTools.Localization.lookup("AccountStatement");
             Hdr.ReportName = actStatement;
             if (masterClient != null)
-            {
-                account = masterClient.AccountNumber;
-                Hdr.ReportName = string.Format("{0}:{1}", actStatement, account);
-            }
+                Hdr.ReportName = string.Format("{0}:{1}", actStatement, masterClient.AccountNumber);
             Hdr.CurDateTime = DateTime.Now.ToString("g");
             Hdr.HeaderParameterTemplateStyle = Application.Current.Resources["AccountStatementPageHeaderStyle"] as Style;
             Hdr.FromDate = txtDateFrm.Text == string.Empty ? string.Empty : txtDateFrm.DateTime.ToShortDateString();
@@ -444,27 +443,27 @@ namespace UnicontaClient.Pages.CustomPage
             var NumberOfDimensions = api.CompanyEntity.NumberOfDimensions;
             if (NumberOfDimensions >= 5)
             {
-                Hdr.LBLDim5 = string.Format("{0}:", lblDim5.Text);
+                Hdr.LBLDim5 = lblDim5.Text + ":";
                 Hdr.TxtDim5 = cbdim5.SelectedItem == null ? string.Empty : cbdim5.Text;
             }
             if (NumberOfDimensions >= 4)
             {
-                Hdr.LBLDim4 = string.Format("{0}:", lblDim4.Text);
+                Hdr.LBLDim4 = lblDim4.Text + ":";
                 Hdr.TxtDim4 = cbdim4.SelectedItem == null ? string.Empty : cbdim4.Text;
             }
             if (NumberOfDimensions >= 3)
             {
-                Hdr.LBLDim3 = string.Format("{0}:", lblDim3.Text);
+                Hdr.LBLDim3 = lblDim3.Text + ":";
                 Hdr.TxtDim3 = cbdim3.SelectedItem == null ? string.Empty : cbdim3.Text;
             }
             if (NumberOfDimensions >= 2)
             {
-                Hdr.LBLDim2 = string.Format("{0}:", lblDim2.Text);
+                Hdr.LBLDim2 = lblDim2.Text + ":";
                 Hdr.TxtDim2 = cbdim2.SelectedItem == null ? string.Empty : cbdim2.Text;
             }
             if (NumberOfDimensions >= 1)
             {
-                Hdr.LBLDim1 = string.Format("{0}:", lblDim1.Text);
+                Hdr.LBLDim1 = lblDim1.Text + ":";
                 Hdr.TxtDim1 = cbdim1.SelectedItem == null ? string.Empty : cbdim1.Text;
             }
             return Hdr;

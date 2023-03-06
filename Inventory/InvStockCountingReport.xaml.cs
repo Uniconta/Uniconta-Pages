@@ -117,7 +117,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         [NoSQL]
         [AppEnumAttribute(EnumName = "ItemType")]
-        [Display(Name = "ItemType", ResourceType = typeof(InventoryText)), Key]
+        [Display(Name = "ItemType", ResourceType = typeof(InventoryText))]
         public string ItemType { get { var rec = itemRec; return (rec != null) ? AppEnums.ItemType.ToString(rec._ItemType) : null; } }
 
         [NoSQL]
@@ -279,7 +279,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             var api = this.api;
 
@@ -337,7 +337,10 @@ namespace UnicontaClient.Pages.CustomPage
                     dockCtrl.PrintCurrentTabGrids("CSV");
                     break;
                 case "Import":
-                    ImportCsv();
+                    ImportCsv(false);
+                    break;
+                case "Update":
+                    ImportCsv(true);
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);
@@ -345,9 +348,8 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        void ImportCsv()
+        void ImportCsv(bool Update)
         {
-#if !SILVERLIGHT
             var openFileDailog = UtilDisplay.LoadOpenFileDialog;
             openFileDailog.Filter = "CSV Files |*.csv";
             openFileDailog.Multiselect = false;
@@ -357,9 +359,10 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 using (var sr = new StreamReader(File.OpenRead(openFileDailog.FileName), Encoding.Default))
                 {
-                    dgInvStockStatus.ItemsSource = null;
+                    if (!Update)
+                        dgInvStockStatus.ItemsSource = null;
                     var delim = UtilFunctions.GetDefaultDeLimiter();
-                    dgInvStockStatus.CopyFromExcel(sr, delim , true, true, false);
+                    dgInvStockStatus.CopyFromExcel(sr, delim , true, true, false, true);
                 }
             }
             catch (Exception ex)
@@ -367,8 +370,8 @@ namespace UnicontaClient.Pages.CustomPage
                 UnicontaMessageBox.Show(ex);
                 return;
             }
-#endif
         }
+
         public override void PageClosing()
         {
             var selected = dgInvStockStatus.SelectedItem as Uniconta.DataModel.InvItemStorage;

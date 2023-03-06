@@ -69,17 +69,13 @@ namespace UnicontaClient.Pages.CustomPage
 
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "UndoDelete", "SaveGrid" });
-
+           
             if (Comp.RoundTo100)
                 CurBalance.HasDecimals = Overdue.HasDecimals = false;
 
             dgDebtorAccountGrid.ShowTotalSummary();
 
-#if SILVERLIGHT
-            Application.Current.RootVisual.KeyDown += RootVisual_KeyDown;
-#else
             this.PreviewKeyDown += RootVisual_KeyDown;
-#endif
             this.BeforeClose += DebtorAccount_BeforeClose;
         }
 
@@ -97,19 +93,9 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void DebtorAccount_BeforeClose()
         {
-#if SILVERLIGHT
-            Application.Current.RootVisual.KeyDown -= RootVisual_KeyDown;
-#else
             this.PreviewKeyDown -= RootVisual_KeyDown;
-#endif
         }
 
-        public override Task InitQuery()
-        {
-            if (!this.dgDebtorAccountGrid.ReuseCache(typeof(Uniconta.DataModel.Debtor)))
-                return BindGrid();
-            return null;
-        }
         protected override void OnLayoutCtrlLoaded()
         {
             detailControl.api = api;
@@ -144,8 +130,13 @@ namespace UnicontaClient.Pages.CustomPage
             dgDebtorAccountGrid.Readonly = true;
 
             var rb = (RibbonBase)localMenu.DataContext;
-            if (rb != null && BasePage.session.User._Role == (byte)UserRoles.Standard)
-                UtilDisplay.RemoveMenuCommand(rb, "AccountantClientInfo");
+            if (rb != null)
+            {
+                if (BasePage.session.User._Role == (byte)UserRoles.Standard)
+                    UtilDisplay.RemoveMenuCommand(rb, "AccountantClientInfo");
+                if (BasePage.session.User._Role != (byte)UserRoles.Accountant)
+                    UtilDisplay.RemoveMenuCommand(rb, "ClientInformation");
+            }
         }
 
         void dgDebtorAccountGrid_RowDoubleClick()
@@ -195,12 +186,10 @@ namespace UnicontaClient.Pages.CustomPage
                     else
                         UtilDisplay.ShowFieldMissing("ItemNameGroup");
                     break;
-#if !SILVERLIGHT
                 case "CreateMandates":
                     if (selectedItems != null)
                         CreateMandates(selectedItems);
                     break;
-#endif
                 case "Prices":
                     if (selectedItem != null && selectedItem._PriceList != null)
                         AddDockItem(TabControls.CustomerPriceListLinePage, selectedItem);
@@ -222,7 +211,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                     {
                         string header = string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("UserNotesInfo"), selectedItem._Account);
-                        AddDockItem(TabControls.UserNotesPage, dgDebtorAccountGrid.syncEntity,header);
+                        AddDockItem(TabControls.UserNotesPage, dgDebtorAccountGrid.syncEntity, header);
                     }
                     break;
                 case "AddDoc":
@@ -297,12 +286,10 @@ namespace UnicontaClient.Pages.CustomPage
                 case "CopyRecord":
                     CopyRecord(selectedItem);
                     break;
-#if WPF
                 case "DebtorTransPivot":
                     if (selectedItem != null)
                         AddDockItem(TabControls.DebtorInvoiceLinesPivotReport, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Pivot"), selectedItem._Name));
                     break;
-#endif
                 case "Project":
                     if (selectedItem != null)
                         AddDockItem(TabControls.Project, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Project"), selectedItem._Name));
@@ -320,17 +307,32 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "AccountantClientInfo":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.AccountantClientInfo, selectedItem, string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("AccountantClientInfo"), selectedItem._Account));
+                        AddDockItem(TabControls.AccountantClientInfo, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("AccountantClientInfo"), selectedItem._Account));
                     break;
                 case "Budget":
                     if (selectedItem != null)
                         AddDockItem(TabControls.DebtorBudgetLinePage, dgDebtorAccountGrid.syncEntity);
                     break;
+                case "CollectionLetterLog":
+                    if (selectedItem != null)
+                    {
+                        string header = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("CollectionLetterLog"), selectedItem.Account);
+                        AddDockItem(TabControls.DebtorTransCollectPage, dgDebtorAccountGrid.syncEntity, header);
+                    }
+                    break;
+                case "ClientInformation":
+                    if (selectedItem != null)
+                    {
+                        var controlParams = "Dashboard=UC_DK_Std_Univisor_MasterData;Field=Account;sourcetype=UseCurrentRecord";
+                        AddDockItem(TabControls.DashBoardViewerPage, selectedItem, string.Concat(Uniconta.ClientTools.Localization.lookup("Dashboard"), ": ", "UC_DK_Std_Univisor_MasterData"), null, true, null, controlParams, null);
+                        break;
+                    }
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
-        }   
+        }
 
         void CopyRecord(DebtorClient selectedItem)
         {
@@ -340,6 +342,8 @@ namespace UnicontaClient.Pages.CustomPage
             CorasauDataGrid.CopyAndClearRowId(selectedItem, debtor);
             debtor._Created = DateTime.MinValue;
             debtor._D2CAccount = null;
+            debtor._lastPayment = DateTime.MinValue;
+            debtor._LastInvoice = DateTime.MinValue;
             AddDockItem(TabControls.DebtorAccountPage2, new object[2] { debtor, IdObject.get(false) }, Uniconta.ClientTools.Localization.lookup("DebtorAccount"), "Add_16x16.png");
         }
 
@@ -480,12 +484,7 @@ namespace UnicontaClient.Pages.CustomPage
                 dgDebtorAccountGrid.UpdateItemSource(argument);
         }
 
-        private Task BindGrid()
-        {
-            return dgDebtorAccountGrid.Filter(null);
-        }
-
-        protected async override void LoadCacheInBackGround()
+        protected override async Task LoadCacheInBackGroundAsync()
         {
             var Comp = api.CompanyEntity;
             var lst = new List<Type>(12) { typeof(Uniconta.DataModel.Employee), typeof(Uniconta.DataModel.GLVat), typeof(Uniconta.DataModel.DebtorGroup), typeof(Uniconta.DataModel.PaymentTerm), typeof(Uniconta.DataModel.DebtorLayoutGroup) };

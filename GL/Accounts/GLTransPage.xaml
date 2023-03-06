@@ -39,6 +39,7 @@ x:Class="UnicontaClient.Pages.CustomPage.GLTransPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="AmountCur" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="AmountBase" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="JournalPostedId" Width="50" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Origin" Width="100" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DCType" Width="50" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DCAccount"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DCName"/>
@@ -53,14 +54,10 @@ x:Class="UnicontaClient.Pages.CustomPage.GLTransPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ReferenceNumber" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Correction" Width="50" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Canceled" Width="50" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Accrual" Width="50" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Accrued" Width="50" Visible="False" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Allocation" Width="50" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Allocated" Width="50" Visible="False" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="YearTransfer" Width="50" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PostCalculated" Width="50" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="VatEntered" Width="50" Visible="False" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PrimoTrans" Width="50" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim1" Width="70" FieldName="Dimension1" ShowInColumnChooser="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim2" Width="70" FieldName="Dimension2" ShowInColumnChooser="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim3" Width="70" FieldName="Dimension3" ShowInColumnChooser="False"/>

@@ -126,8 +126,15 @@ namespace UnicontaClient.Pages.CustomPage
                 case "Invoices":
                     if (selectedItem != null)
                     {
-                        string header = string.Format("{0}/{1}", Uniconta.ClientTools.Localization.lookup("DebtorInvoice"), selectedItem.Account);
+                        string header = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("DebtorInvoice"), selectedItem.Account);
                         AddDockItem(TabControls.Invoices, dgDebtorTransOpen.syncEntity, header);
+                    }
+                    break;
+                case "CollectionLetterLog":
+                    if (selectedItem != null)
+                    {
+                        string header = string.Format("{0}/{1}", Uniconta.ClientTools.Localization.lookup("CollectionLetterLog"), selectedItem.InvoiceAN);
+                        AddDockItem(TabControls.DebtorTransCollectPage, dgDebtorTransOpen.syncEntity, header);
                     }
                     break;
                 default:
@@ -149,17 +156,21 @@ namespace UnicontaClient.Pages.CustomPage
         private void SendEmail(DebtorTransOpenClient debtorTransOpen)
         {
             var postType = debtorTransOpen.Trans._PostType;
-            DebtorEmailType emailType = DebtorEmailType.InterestNote;
-            bool isInterest = false;
             if (postType != (byte)DCPostType.Collection && postType != (byte)DCPostType.CollectionLetter && postType != (byte)DCPostType.InterestFee && postType != (byte)DCPostType.PaymentCharge)
                 return;
 
+            bool isInterest = false;
+            DebtorEmailType emailType;
             if (postType == (byte)DCPostType.InterestFee)
+            {
                 isInterest = true;
-            if (postType == (byte)DCPostType.Collection)
+                emailType = DebtorEmailType.InterestNote;
+            }
+            else if (postType == (byte)DCPostType.Collection)
                 emailType = DebtorEmailType.Collection;
             else
             {
+                emailType = DebtorEmailType.CollectionLetter1;
                 CWCollectionLetter collectionLetterWin = new CWCollectionLetter();
                 collectionLetterWin.Closed += delegate
                 {
@@ -171,17 +182,15 @@ namespace UnicontaClient.Pages.CustomPage
             }
 
             var cwSendInvoice = new CWSendInvoice();
-#if !SILVERLIGHT
             cwSendInvoice.DialogTableId = 2000000031;
-#endif
             cwSendInvoice.Closed += delegate
             {
-                var selectedRow = new DebtorTransOpenClient[] { debtorTransOpen };
-                var feelist = new [] { debtorTransOpen.Amount };
-
                 if (cwSendInvoice.DialogResult == true)
-                    DebtorPayments.ExecuteDebtorCollection(api, busyIndicator, selectedRow, feelist, null, false, emailType, cwSendInvoice.Emails,
+                {
+                    debtorTransOpen._Code = emailType;
+                    DebtorPayments.ExecuteDebtorCollection(api, busyIndicator, new DebtorTransOpenClient[] { debtorTransOpen }, false, cwSendInvoice.Emails,
                         cwSendInvoice.sendOnlyToThisEmail, isInterest);
+                }
             };
             cwSendInvoice.Show();
         }
@@ -203,15 +212,11 @@ namespace UnicontaClient.Pages.CustomPage
                 ribbonControl.EnableButtons( "SaveGrid" );
                 copyRowIsEnabled = true;
                 editAllChecked = false;
-#if !SILVERLIGHT
                 OnHold.ShowCheckBoxInHeader = Paid.ShowCheckBoxInHeader = true;
-#endif
             }
             else
             {
-#if !SILVERLIGHT
                 OnHold.ShowCheckBoxInHeader = Paid.ShowCheckBoxInHeader = false;
-#endif
                 if (IsDataChaged)
                 {
                     string message = Uniconta.ClientTools.Localization.lookup("SaveChangesPrompt");

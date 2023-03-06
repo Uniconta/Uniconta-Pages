@@ -30,13 +30,6 @@ namespace UnicontaClient.Pages.CustomPage
     }
     public class GLDailyJournalLineGridLocal : GLDailyJournalLineGrid
     {
-        public GLDailyJournalLineGridLocal()
-        {
-            CustomTableView tableView = new CustomTableView();
-            tableView.ShowGroupPanel = false;
-            SetTableViewStyle(tableView);
-            this.View = tableView;
-        }
         public override bool SingleBufferUpdate { get { return false; } }
     }
     public partial class MatchPhysicalVoucherToGLDailyJournalLines : GridBasePage
@@ -44,6 +37,7 @@ namespace UnicontaClient.Pages.CustomPage
         GLDailyJournalClient masterRecord;
         ItemBase ibase;
         static bool AssignText;
+        Orientation orient;
         public MatchPhysicalVoucherToGLDailyJournalLines(UnicontaBaseEntity master)
             : base(null)
         {
@@ -55,6 +49,7 @@ namespace UnicontaClient.Pages.CustomPage
             dgvoucherGrid.Readonly = true;
             masterRecord = master as GLDailyJournalClient;
             dgGldailyJournalLinesGrid._AutoSave = masterRecord._AutoSave;
+            dgGldailyJournalLinesGrid.tableView.ShowGroupPanel = false;
             if (!api.CompanyEntity._UseVatOperation)
 #if !SILVERLIGHT
                 VatOperation.Visible = VatOffsetOperation.Visible = false;
@@ -79,6 +74,8 @@ namespace UnicontaClient.Pages.CustomPage
             DebtorCache = Comp.GetCache(typeof(Uniconta.DataModel.Debtor));
             CreditorCache = Comp.GetCache(typeof(Uniconta.DataModel.Creditor));
             localMenu.OnChecked += LocalMenu_OnChecked;
+            orient = api.session.Preference.BankStatementHorisontal ? Orientation.Horizontal : Orientation.Vertical;
+            lGroup.Orientation = orient;
         }
 
         private void DgvoucherGrid_SelectedItemChanged(object sender, DevExpress.Xpf.Grid.SelectedItemChangedEventArgs e)
@@ -261,7 +258,7 @@ namespace UnicontaClient.Pages.CustomPage
             le.EnteredText = null;
         }
 
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             var api = this.api;
             if (DebtorCache == null)
@@ -366,12 +363,23 @@ namespace UnicontaClient.Pages.CustomPage
                 case "AutoMatch":
                     AutoMatch();
                     break;
+                case "SaveLines":
+                    SaveLines();
+                    break;
+                case "ChangeOrientation":
+                    orient = 1 - orient;
+                    lGroup.Orientation = orient;
+                    api.session.Preference.BankStatementHorisontal = (orient == Orientation.Horizontal);
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
         }
-
+        private void SaveLines()
+        {
+            dgGldailyJournalLinesGrid.SaveData();
+        }
         private void Attach(VouchersClientLocal selectedVoucher, GLDailyJournalLineClient selectedJournalLine, bool isAuto)
         {
             var selectedRowId = selectedVoucher.RowId;
@@ -400,20 +408,33 @@ namespace UnicontaClient.Pages.CustomPage
             var journalLines = dgGldailyJournalLinesGrid.ItemsSource as IEnumerable<JournalLineGridClient>;
             var visibleRowVouchers = dgvoucherGrid.GetVisibleRows() as IEnumerable<VouchersClientLocal>;
             int rowCountUpdate = 0;
-            foreach (var voucher in visibleRowVouchers)
+            for (int i = 0; (i < 6); i++)
             {
-                if (!voucher.IsAttached && voucher._Amount != 0)
+                int n = i % 3;
+                foreach (var voucher in visibleRowVouchers)
                 {
-                    var amount = Math.Abs(voucher._Amount);
-                    var date = voucher._PostingDate != DateTime.MinValue ? voucher._PostingDate : 
-                             (voucher._DocumentDate != DateTime.MinValue ? voucher._DocumentDate : voucher.Created.Date);
-                    foreach (var p in journalLines)
-                        if (p._Date == date && Math.Abs(p.Amount) == amount)
+                    if (!voucher.IsAttached && voucher._Amount != 0)
+                    {
+                        DateTime date;
+                        if (i < 3)
+                            date = voucher._PostingDate != DateTime.MinValue ? voucher._PostingDate :
+                                (voucher._DocumentDate != DateTime.MinValue ? voucher._DocumentDate : voucher.Created.Date);
+                        else
+                            date = voucher._PayDate;
+                        if (date != DateTime.MinValue)
                         {
-                            Attach(voucher, p, true);
-                            rowCountUpdate++;
-                            break;
+                            var amount = Math.Abs(voucher._Amount);
+                            var dtmin = date.AddDays(-n);
+                            var dtmax = date.AddDays(n);
+                            foreach (var p in journalLines)
+                                if (Math.Abs(p.Amount) == amount && p._Date >= dtmin && p.Date <= dtmax)
+                                {
+                                    Attach(voucher, p, true);
+                                    rowCountUpdate++;
+                                    break;
+                                }
                         }
+                    }
                 }
             }
 

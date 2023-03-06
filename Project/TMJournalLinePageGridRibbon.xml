@@ -48,12 +48,13 @@
 	</RibbonItem>
     <RibbonItem>
 	  <RibbonItem Action="Reports" LocalizedNameKey="Reports" LargeGlyph="Item_Number_32x32.png">
-		<RibbonItem Action="KmRegnskab" LocalizedNameKey="Km Regnskab" Glyph="Item_Number_16x16.png" />
-		<RibbonItem Action="FerieogFlex" LocalizedNameKey="Ferie og Flex"  Glyph="Item_Number_16x16.png"/>
-		<RibbonItem Action="Produktion" LocalizedNameKey="Produktion" Glyph="Item_Number_16x16.png" />
+		<RibbonItem Action="KmRegnskab" LocalizedNameKey="Milage" Glyph="Item_Number_16x16.png" />
+		<RibbonItem Action="FerieogFlex" LocalizedNameKey="VacationAndFlexTime"  Glyph="Item_Number_16x16.png"/>
+		<RibbonItem Action="Produktion" LocalizedNameKey="Production" Glyph="Item_Number_16x16.png" />
 		<RibbonItem Action="CrmFollowUp" LocalizedNameKey="FollowUp" ControlName="CrmFollowUpPage" Module="CRM" Glyph="Item_Number_16x16.png"/>
 		<RibbonItem Action="Task" LocalizedNameKey="Tasks" ControlName="ProjectTaskGridPage" Module="ProjectTask" Glyph="Item_Number_16x16.png"/>
-	  </RibbonItem>
+    <RibbonItem Action="BudgetPanningSchedule" LocalizedNameKey="ProjectBudgetSchedule" ControlName="ProjectBudgetPlanningSchedulePage" Module="_ProjectPlanning" Glyph="Calendar_16x16.png"/>
+    </RibbonItem>
 	</RibbonItem>
 	<RibbonItem>
 		<RibbonItem Action="EfficiencyPercentage" LocalizedNameKey="EfficiencyPercentage" StatusValue=""/>

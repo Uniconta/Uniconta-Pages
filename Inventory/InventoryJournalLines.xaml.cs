@@ -210,13 +210,13 @@ namespace UnicontaClient.Pages.CustomPage
                     SetAccountSource(selectedItem);
             }
         }
-        async void setSerieBatch(InvItem master, InvJournalLineGridClient rec)
+        async void setSerieBatchSource(InvItem master, InvJournalLineGridClient rec)
         {
             if (master != null && master._UseSerialBatch)
             {
                 var serie = new InvSerieBatchOpen() { _Item = rec._Item };
                 var lst = await api.Query<InvSerieBatchClient>(serie);
-                rec.serieBatchSource = lst?.Select(x=>x.Number).ToList() ;
+                rec.serieBatchSource = lst;
             }
             else
             {
@@ -398,6 +398,13 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         if (rec._Item == null || rec._Item == string.Empty)
                             GetItemFromSerailNumber(rec);
+                        var selectedSerieBatch = (rec.serieBatchSource as InvSerieBatchClient[])?.Where(x => x.Number == rec.SerieBatch).FirstOrDefault();
+                        if (selectedSerieBatch != null && api.CompanyEntity.Warehouse)
+                        {
+                            rec.Warehouse = selectedSerieBatch.Warehouse;
+                            if (api.CompanyEntity.Location)
+                                rec.Location = selectedSerieBatch.Location;
+                        }
                     }
                     break;
             }
@@ -451,7 +458,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             var api = this.api;
 
@@ -595,9 +602,8 @@ namespace UnicontaClient.Pages.CustomPage
             var savetask = saveGrid();
             api.AllowBackgroundCrud = true;
 
-            var lines = dgInvJournalLine.ItemsSource as IList;
-            int NumberOfLines = lines.Count;
-            if (NumberOfLines == 0)
+            var source = (ICollection<InvJournalLineGridClient>)dgInvJournalLine.ItemsSource;
+            if (source == null || source.Count == 0)
                 return;
 
             CWInvPosting invpostingDialog = new CWInvPosting(api);
@@ -614,7 +620,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (savetask != null)
                         await savetask;
                     var postingApi = new Uniconta.API.Inventory.PostingAPI(api);
-                    var postingResult = await postingApi.PostJournal(journal, invpostingDialog.Date, invpostingDialog.Text, invpostingDialog.TransType, invpostingDialog.Comment, invpostingDialog.FixedVoucher, invpostingDialog.Simulation, new GLTransClientTotal(), NumberOfLines);
+                    var postingResult = await postingApi.PostJournal(journal, invpostingDialog.Date, invpostingDialog.Text, invpostingDialog.TransType, invpostingDialog.Comment, invpostingDialog.FixedVoucher, invpostingDialog.Simulation, new GLTransClientTotal(), source.Count);
                     busyIndicator.IsBusy = false;
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("LoadingMsg");
 
@@ -645,7 +651,15 @@ namespace UnicontaClient.Pages.CustomPage
                         UnicontaMessageBox.Show(msg, Uniconta.ClientTools.Localization.lookup("Message"));
 
                         if (journal._DeleteLines)
-                            dgInvJournalLine.ItemsSource = new List<InvJournalLineGridClient>();
+                        {
+                            var lst = new List<InvJournalLineGridClient>();
+                            foreach (var journalLine in source)
+                                if (journalLine._OnHold)
+                                    lst.Add(journalLine);
+
+                            dgInvJournalLine.ItemsSource = null;
+                            dgInvJournalLine.ItemsSource = lst;
+                        }
                     }
                 }
             };
@@ -680,7 +694,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (selectedItem?._Item != null)
             {
                 var selected = items.Get<InvItem>(selectedItem._Item);
-                setSerieBatch(selected, selectedItem);
+                setSerieBatchSource(selected, selectedItem);
             }
         }
 

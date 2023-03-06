@@ -22,9 +22,8 @@ using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
 using Uniconta.Common;
 using Uniconta.DataModel;
-#if !SILVERLIGHT
+using UnicontaClient.Utilities;
 using UnicontaClient.Controls;
-#endif
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -70,9 +69,6 @@ namespace UnicontaClient.Pages.CustomPage
             dgPartnerInvoice.api = api;
             dgPartnerInvoice.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
-#if SILVERLIGHT
-            ribbonControl.DisableButtons(new string[] { "ShowInvoice" });
-#endif
             dgPartnerInvoice.ShowTotalSummary();
         }
 
@@ -116,14 +112,11 @@ namespace UnicontaClient.Pages.CustomPage
                         return;
                     AddDockItem(TabControls.SubscriptionInvoicePage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("InvoiceNumber"), selectedItem._Invoice));
                     break;
-
-#if !SILVERLIGHT
                 case "ShowInvoice":
                     if (selectedItem == null)
                         return;
                     ShowInvoice(selectedItem);
                     break;
-#endif
                 case "SendAsEmail":
                     if (dgPartnerInvoice.ItemsSource == null)
                     {
@@ -184,7 +177,6 @@ namespace UnicontaClient.Pages.CustomPage
             UtilDisplay.ShowErrorCode(result);
         }
 
-#if !SILVERLIGHT
         async private void ShowInvoice(PartnerInvoiceClient selectedItem)
         {
             var partnerDetails = await GetInvData(selectedItem);
@@ -209,11 +201,10 @@ namespace UnicontaClient.Pages.CustomPage
             var partner = rSellerClient.Where(p => p.Pid == reseller).SingleOrDefault();
 
             partnerInvDetails.Reseller = partner;
-            partnerInvDetails.CompanyLogo = await UtilDisplay.GetLogo(api);
+            partnerInvDetails.CompanyLogo = await UtilCommon.GetLogo(api);
             partnerInvDetails.Language = session.User._Language;
 
             return partnerInvDetails;
         }
-#endif
     }
 }

@@ -337,7 +337,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "CheckOnholdAll":
                     selectedItems = dgCreditorTranOpenGrid.GetVisibleRows();
                     if (selectedItems != null)
-                        CheckUncheckOnhold(selectedItems as IEnumerable<CreditorTransPayment>, true); 
+                        CheckUncheckOnhold(selectedItems as IEnumerable<CreditorTransPayment>, true);
                     break;
 
                 case "CheckOnholdMarked":
@@ -386,7 +386,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                                 NumberSerieAPI numberserieApi = new NumberSerieAPI(posApi);
                                 int nextVoucherNumber = 0;
-                              
+
                                 var DJclient = (Uniconta.DataModel.GLDailyJournal)JournalCache.Get(cwLine.Journal);
 
                                 if (!DJclient._GenerateVoucher && !DJclient._ManualAllocation && cwLine.AddVoucherNumber)
@@ -395,7 +395,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 var credTransPaymLst = dgCreditorTranOpenGrid.GetVisibleRows() as IList<CreditorTransPayment>;
                                 var dictPaymTransfer = new Dictionary<long, CreditorTransPayment>(credTransPaymLst.Count);
 
-                                foreach (var rec in credTransPaymLst.OrderBy(x => x.PaymentAmount)) 
+                                foreach (var rec in credTransPaymLst.OrderBy(x => x.PaymentAmount))
                                 {
                                     if (rec._OnHold || (rec.PaymentAmount <= 0d && rec.PaymentRefId == 0))
                                         continue;
@@ -419,12 +419,12 @@ namespace UnicontaClient.Pages.CustomPage
                                         mergePaymentRefId = new CreditorTransPayment();
                                         StreamingManager.Copy(rec, mergePaymentRefId);
                                         mergePaymentRefId.PaymentRefId = paymRefId;
-                                        mergePaymentRefId.MergedAmount = rec.PaymentAmount; 
+                                        mergePaymentRefId.MergedAmount = rec.PaymentAmount;
                                         mergePaymentRefId.invoiceNumbers = new StringBuilder(rec.InvoiceAN);
                                         mergePaymentRefId.rowNumbers = new StringBuilder();
                                         mergePaymentRefId.rowNumbers.AppendNum(rec.PrimaryKeyId);
                                         mergePaymentRefId.settleTypeRowId = true;
-                                        
+
                                         mergePaymentRefId._UsedCashDiscount = includeCashDisc ? rec._UsedCashDiscount : 0;
                                         dictPaymTransfer.Add(paymRefId, mergePaymentRefId);
                                     }
@@ -467,7 +467,7 @@ namespace UnicontaClient.Pages.CustomPage
                                     {
                                         lineclient._Settlements = null;
                                     }
-                                  
+
                                     lineclient._UsedCachDiscount = cTOpenClient._UsedCashDiscount;
                                     lineclient._DocumentRef = cTOpenClient.DocumentRef;
                                     var curOpen = cTOpenClient._AmountOpenCur;
@@ -515,7 +515,7 @@ namespace UnicontaClient.Pages.CustomPage
                                     UtilDisplay.ShowErrorCode(ErrorCodes.NoLinesToUpdate);
                                 }
                             }
-                         };
+                        };
                     cwLine.Show();
                     break;
                 #endregion
@@ -534,11 +534,15 @@ namespace UnicontaClient.Pages.CustomPage
                     if (creditorFilterDialog == null)
                     {
                         creditorFilterDialog = new CWServerFilter(api, typeof(CreditorClient), null, null, CreditorUserFields);
+                        creditorFilterDialog.GridSource = dgCreditorTranOpenGrid.ItemsSource as IList<UnicontaBaseEntity>;
                         creditorFilterDialog.Closing += creditorFilterDialog_Closing;
                         creditorFilterDialog.Show();
                     }
                     else
+                    {
+                        creditorFilterDialog.GridSource = dgCreditorTranOpenGrid.ItemsSource as IList<UnicontaBaseEntity>;
                         creditorFilterDialog.Show(true);
+                    }
                     setMergeUnMergePaym(false);
                     break;
                 case "ClearCreditorFilter":
@@ -564,7 +568,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
 
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             var api = this.api;
             if (CreditorCache == null)

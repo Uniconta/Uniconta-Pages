@@ -47,7 +47,21 @@ x:Class="UnicontaClient.Pages.CustomPage.CustomerPriceListsPage"
                             </ControlTemplate>
                         </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                     </localPage:CorasauDataGridTemplateColumnClient>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PriceList"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" Width="150" >
+                        <localPage:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Margin="5,0,0,0" TextDecorations="Underline" Cursor="Hand" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.Name,RelativeSource={RelativeSource TemplatedParent}}" PreviewMouseDown="Name_PreviewMouseDown"></TextBlock>
+                                    <TextBlock Grid.Column="1"></TextBlock>
+                                </Grid>
+                            </DataTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                    </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ValidFrom" ShowTime="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ValidTo" ShowTime="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="UseDeliveryDate" HideHeaderCheck="True" />

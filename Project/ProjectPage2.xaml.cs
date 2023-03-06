@@ -20,6 +20,7 @@ using System.Windows.Shapes;
 using Uniconta.ClientTools.Util;
 using Uniconta.ClientTools.Controls;
 using Uniconta.DataModel;
+using DevExpress.Xpf.Editors;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -35,6 +36,8 @@ namespace UnicontaClient.Pages.CustomPage
         public override UnicontaBaseEntity ModifiedRow { get { return editrow; } set { editrow = (ProjectClient)value; } }
         bool isCopiedRow = false;
         Uniconta.DataModel.Debtor Debtor;
+        ContactClient Contact;
+        ProjectClient Project;
         public ProjectPage2(UnicontaBaseEntity sourcedata, bool IsEdit)
             : base(sourcedata, IsEdit)
         {
@@ -56,7 +59,8 @@ namespace UnicontaClient.Pages.CustomPage
             : base(sourcedata, true)
         {
             InitializeComponent();
-            Debtor = master as Uniconta.DataModel.Debtor;
+            if (master != null)
+                Debtor = master as DebtorClient;
             InitPage(api);
         }
 
@@ -64,11 +68,10 @@ namespace UnicontaClient.Pages.CustomPage
          : base(crudApi, "")
         {
             InitializeComponent();
-            Debtor = master as Uniconta.DataModel.Debtor;
+            if (master != null)
+                Debtor = master as DebtorClient;
             InitPage(crudApi);
-#if !SILVERLIGHT
             FocusManager.SetFocusedElement(txtNumber, txtNumber);
-#endif
         }
 
         void InitPage(CrudAPI crudapi)
@@ -77,7 +80,8 @@ namespace UnicontaClient.Pages.CustomPage
             dAddress.Header = Localization.lookup("DeliveryAddr");
             layoutControl = layoutItems;
             cbCountry.ItemsSource = Enum.GetValues(typeof(Uniconta.Common.CountryCode));
-            lePersonInCharge.api = lePurchaser.api = lePrStandard.api = leAccount.api = lePayment.api = leVat.api = cmbDim1.api = cmbDim2.api = cmbDim3.api = cmbDim4.api = cmbDim5.api = leGroup.api = leMasterProject.api = lePrType.api = leInstallation.api = crudapi;
+            lePersonInCharge.api = lePurchaser.api = lePrStandard.api = leAccount.api = lePayment.api = leVat.api = cmbDim1.api = cmbDim2.api = cmbDim3.api = cmbDim4.api = cmbDim5.api =
+                leGroup.api = leMasterProject.api = lePrType.api = leInstallation.api = lePriceList.api = crudapi;
             Utility.SetDimensions(crudapi, lbldim1, lbldim2, lbldim3, lbldim4, lbldim5, cmbDim1, cmbDim2, cmbDim3, cmbDim4, cmbDim5, usedim);
             if (LoadedRow == null)
             {
@@ -90,15 +94,72 @@ namespace UnicontaClient.Pages.CustomPage
                         editrow.SetMaster(Debtor);
                         leAccount.IsEnabled = false;
                     }
+                    if (Contact != null)
+                    {
+                        editrow.SetMaster(Contact);
+                        leAccount.IsEnabled = txtName.IsEnabled = cmbContactName.IsEnabled = false;
+                    }
                     else
                         editrow.SetMaster(crudapi.CompanyEntity);
                 }
             }
+
+            if (editrow != null)
+                BindContact(editrow.Debtor);
+
             layoutItems.DataContext = editrow;
             frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
             editrow.PropertyChanged += Editrow_PropertyChanged;
+            liContactName.ButtonClicked += LiContactName_ButtonClicked;
+            var Comp = api.CompanyEntity;
+            if (!Comp.Contacts)
+                cmbContactName.Visibility = System.Windows.Visibility.Collapsed;
         }
 
+        private void LiContactName_ButtonClicked(object sender)
+        {
+            if (editrow.Debtor == null)
+                return;
+            var contactClient = api.CompanyEntity.CreateUserType<ContactClient>();
+            var debt = editrow.Debtor;
+            api.SetMaster(contactClient, debt);
+            AddDockItem(TabControls.ContactPage2, new object[] { contactClient, false, debt }, string.Format("{0} : {1},{2}",
+                Uniconta.ClientTools.Localization.lookup("Contacts"), editrow.Number, debt.Name), "Add_16x16.png");
+        }
+
+        async void BindContact(Debtor debtor)
+        {
+            if (debtor == null) return;
+
+            var cache = api.GetCache(typeof(Uniconta.DataModel.Contact)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Contact));
+            SetContactSource(cache, debtor);
+            cmbContactName.DisplayMember = "KeyName";
+
+            if (editrow == null) return;
+
+            var contactRefId = editrow._ContactRef;
+            if (contactRefId != 0)
+            {
+                var contact = cache.Get(contactRefId);
+                if (contact == null)
+                {
+                    cache = api.LoadCache(typeof(Uniconta.DataModel.Contact), true).GetAwaiter().GetResult();
+                    contact = cache.Get(contactRefId);
+                    SetContactSource(cache, debtor);
+                }
+                cmbContactName.SelectedItem = contact;
+                if (contact == null)
+                {
+                    editrow._ContactRef = 0;
+                    editrow.ContactName = null;
+                }
+            }
+        }
+
+        void SetContactSource(SQLCache cache, Debtor debtor)
+        {
+            cmbContactName.ItemsSource = cache != null ? new ContactCacheFilter(cache, 1, debtor._Account) : null;
+        }
         protected override void AfterTemplateSet(UnicontaBaseEntity row)
         {
             if (this.Debtor != null)
@@ -160,10 +221,61 @@ namespace UnicontaClient.Pages.CustomPage
                 leInstallation.cacheFilter = new AccountCacheFilter(installationCache, 1, debtor._Account);
                 leInstallation.InvalidCache();
             }
+
+            if (editrow != null)
+            {
+                string debAcc = Convert.ToString(e.OldValue);
+                string id = Convert.ToString(e.NewValue);
+                if (id != editrow._DCAccount ||
+                    editrow.RowId == 0 ||
+                    (!string.IsNullOrEmpty(debAcc) && debAcc != id) ||
+                    ((LoadedRow as DCOrder)?._DCAccount != id))
+                {
+                    if (leAccount.IsEnabled)
+                    {
+                        editrow.Installation = null;
+                        SetFieldFromDebtor(editrow, (Uniconta.DataModel.Debtor)api.GetCache(typeof(Uniconta.DataModel.Debtor))?.Get(id));
+                    }
+                }
+            }
+        }
+
+        async void SetFieldFromDebtor(ProjectClient editrow, Debtor debtor)
+        {
+            TableField.SetUserFieldsFromRecord(debtor, editrow);
+            BindContact(debtor);
+            layoutItems.DataContext = null;
+            layoutItems.DataContext = editrow;
+            await api.Read(debtor);
+        }
+        private void cmbContactName_EditValueChanged(object sender, EditValueChangedEventArgs e)
+        {
+            var selectedItem = cmbContactName.SelectedItem as Contact;
+            if (selectedItem != null)
+            {
+                editrow._ContactRef = selectedItem.RowId;
+                editrow.ContactName = selectedItem._Name;
+            }
+            else
+            {
+                editrow._ContactRef = 0;
+                editrow.ContactName = null;
+            }
+        }
+
+        public override void Utility_Refresh(string screenName, object argument = null)
+        {
+            if (screenName == TabControls.ContactPage2 && argument != null)
+            {
+                BindContact(editrow.Debtor);
+
+                if (argument is object[] arg && arg.Length == 2)
+                    cmbContactName.SelectedItem = arg[arg.Length - 1];
+            }
         }
 
         SQLCache installationCache;
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             var api = this.api;
 

@@ -24,6 +24,8 @@ using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.Common;
 using Uniconta.DataModel;
+using DevExpress.Xpf.Grid;
+using NPOI.SS.Formula.PTG;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -152,17 +154,15 @@ namespace UnicontaClient.Pages.CustomPage
                     if (itemFilterDialog == null)
                     {
                         itemFilterDialog = new CWServerFilter(api, typeof(InvSumClient), null, null);
+                        itemFilterDialog.GridSource = dgCalculatedCommissionGrid.ItemsSource as IList<UnicontaBaseEntity>;
                         itemFilterDialog.Closing += itemFilterDialog_Closing;
-#if !SILVERLIGHT
                         itemFilterDialog.Show();
                     }
                     else
+                    {
+                        itemFilterDialog.GridSource = dgCalculatedCommissionGrid.ItemsSource as IList<UnicontaBaseEntity>;
                         itemFilterDialog.Show(true);
-#elif SILVERLIGHT
                     }
-
-                    itemFilterDialog.Show();
-#endif
                     break;
                 case "ClearItemFilter":
                     itemFilterDialog = null;

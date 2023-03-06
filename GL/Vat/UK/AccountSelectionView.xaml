@@ -1,0 +1,271 @@
+<Pages:BasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools" 
+        xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.AccountSelectionView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
+        xmlns:cnv="clr-namespace:UnicontaClient.Pages.CustomPage.GL.Vat.UK.Converter"
+      >
+    <Pages:BasePage.Resources>
+        <Style TargetType="Label">
+            <Setter Property="Margin"
+                    Value="5,0,5,0" />
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="Margin"
+                    Value="5,0,5,0" />
+            <Setter Property="Validation.ErrorTemplate">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <StackPanel>
+                            <AdornedElementPlaceholder>
+                                <ItemsControl ItemsSource="{Binding}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding ErrorContent}"
+                                                       Foreground="Red"
+                                                       HorizontalAlignment="Right" />
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </AdornedElementPlaceholder>
+                        </StackPanel>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="Validation.HasError"
+                         Value="True">
+                    <Setter Property="ToolTip"
+                            Value="{Binding RelativeSource={x:Static RelativeSource.Self}, 
+                                    Path=(Validation.Errors)[0].ErrorContent}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <cnv:InverseBooleansToBooleanConverter x:Key="InverseBooleansToBooleanConverter" />
+        
+        <cnv:BusyToCursorConverter x:Key="BusyToCursorConverter" />
+        
+    </Pages:BasePage.Resources>
+    <Pages:BasePage.Cursor>
+        <Binding Path="IsBusy"
+                 Converter="{StaticResource BusyToCursorConverter}" />
+    </Pages:BasePage.Cursor>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <DockPanel LastChildFill="True">
+            <Grid DockPanel.Dock="Top"
+                  Height="170">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="13*" />
+                    <RowDefinition Height="14*" />
+                    <RowDefinition Height="0*" />
+                    <RowDefinition Height="105" />
+                </Grid.RowDefinitions>
+                <Label Content="HMRC VAT Return"
+                       FontSize="18"
+                       Grid.Row="0"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Stretch"
+                       Margin="5,0,0,14"
+                       Grid.RowSpan="2"/>
+                <TextBlock Text="Get HMRC VAT obligations will show you your open and fulfilled VAT periods with HMRC. Selecting one will fill the date fields for Get VAT Report."
+                           Grid.Row="1"
+                           Margin="10,0,0,5"
+                           TextWrapping="Wrap" />
+                <StackPanel Grid.Row="3">
+                <Label Content="From:"/>
+                <DatePicker Margin="10,0"
+                            SelectedDate="{Binding HMRCFromDate,
+                            UpdateSourceTrigger=PropertyChanged}" />
+                <Label Content="To:"/>
+                <DatePicker Margin="10,0"
+                            SelectedDate="{Binding HMRCToDate,
+                            UpdateSourceTrigger=PropertyChanged}" />
+                </StackPanel>
+            </Grid>
+
+            <Grid DockPanel.Dock="Bottom"
+                  Height="50">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Button x:Name="btnSubmit"
+                        Grid.Column="0"
+                        Content="Submit"
+                        Command="{Binding SubmitCommand}"
+                        CommandParameter="{Binding ElementName=mainWindow}"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Margin="25,10,5,10"
+                        Width="75"
+                        Height="30">
+                    <Button.IsEnabled>
+                        <MultiBinding Converter="{StaticResource InverseBooleansToBooleanConverter}">
+                            <Binding Path="(Validation.HasError)" ElementName="txtVatSales"/>
+                            <Binding Path="(Validation.HasError)" ElementName="txtVatAcquisitions"/>
+                            <Binding Path="(Validation.HasError)" ElementName="txtVatPurchase"/>
+                            <Binding Path="(Validation.HasError)" ElementName="txtSalesExVat"/>
+                            <Binding Path="(Validation.HasError)" ElementName="txtPurchasesExVat"/>
+                            <Binding Path="(Validation.HasError)" ElementName="txtGoodsSuppliedExVat"/>
+                            <Binding Path="(Validation.HasError)" ElementName="txtAcquisitionsExVat"/>
+                        </MultiBinding>
+                    </Button.IsEnabled>
+                </Button>
+                <Button x:Name="btnCancel"
+                        Content="Cancel"
+                        Grid.Column="1"
+                        Command="{Binding CancelCommand}"
+                        CommandParameter="{Binding ElementName=mainWindow}"
+                        VerticalAlignment="Top"
+                        HorizontalAlignment="Right"
+                        Margin="5,10,25,10"
+                        Width="76"
+                        Height="30" />
+            </Grid>
+            <StackPanel DockPanel.Dock="Top">
+                <ListBox Name="lboxObligations"
+                         MinHeight="50"
+                         Margin="10,0,10,0"
+                         ItemsSource="{Binding Obligations}"
+                         DisplayMemberPath="DisplayProperty"
+                         ScrollViewer.VerticalScrollBarVisibility="Auto">
+                </ListBox>
+                <DockPanel Margin="10,0,0,0">
+                    <Button Command="{Binding GetObligationsCommand}"
+                            Content="Get HMRC VAT Obligations"
+                            HorizontalAlignment="Right"
+                            Margin="0,10,10,0"
+                            Height="30"
+                            Width="170" />
+                    <Button Command="{Binding SetObligationsCommand}"
+                            CommandParameter="{Binding ElementName=lboxObligations,Path=SelectedItem}"
+                            Content="Select Obligation"
+                            HorizontalAlignment="Right"
+                            Margin="0,10,10,0"
+                            Height="30" />
+                </DockPanel>
+            </StackPanel>
+
+            <StackPanel Grid.Column="1"
+                        Grid.Row="0"
+                        Grid.RowSpan="6">
+
+                <TextBlock Text="Get VAT Report will retrieve sales and purchases values for the period between the selected dates."
+                           Grid.Row="1"
+                           Margin="10,5,0,0"
+                           TextWrapping="Wrap" />
+                <Label Content="From:" />
+                <DatePicker Margin="10,0"
+                            SelectedDate="{Binding FromDate,
+                            UpdateSourceTrigger=PropertyChanged}" />
+                <Label Content="To:" />
+                <DatePicker Margin="10,0"
+                            SelectedDate="{Binding ToDate,
+                            UpdateSourceTrigger=PropertyChanged}" />
+
+                <Button x:Name="btnGetVat"
+                        Grid.Column="0"
+                        Content="Get VAT Report"
+                        Command="{Binding GetVatCommand}"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
+                        Margin="0,15,15,0"
+                        Width="110"
+                        Height="30" />
+
+                <Label Content="1. Sales Vat Due:" />
+                <TextBox Margin="10,0"
+                         x:Name="txtVatSales"
+                         Text="{Binding Model.VatDueSales, 
+                    UpdateSourceTrigger=PropertyChanged, 
+                    ConverterCulture='en-gb',
+                    StringFormat={}{0:C},
+                    ValidatesOnNotifyDataErrors=True, 
+                    ValidatesOnExceptions=True,
+                    NotifyOnValidationError=True}" />
+                <Label Content="2. Acquisitions Vat Due:" />
+                <TextBox Margin="10,0" x:Name="txtVatAcquisitions"
+                         Text="{Binding Model.VatDueAcquisitions, 
+                    UpdateSourceTrigger=PropertyChanged, 
+                    ConverterCulture='en-gb',
+                    StringFormat={}{0:C},
+                    ValidatesOnNotifyDataErrors=True, 
+                    ValidatesOnExceptions=True,
+                    NotifyOnValidationError=True}" />
+                <Label Content="3. Total VAT Due (calculated box):" />
+                <TextBox Margin="10,0"
+                         IsReadOnly="True"
+                         Text="{Binding Model.TotalVatDue,
+                            Mode=OneWay,
+                            UpdateSourceTrigger=Default,
+                            ConverterCulture='en-gb',
+                            StringFormat={}{0:C}}" />
+                <Label Content="4. Vat Reclaimed:" />
+                <TextBox Margin="10,0"
+                         x:Name="txtVatPurchases"
+                         Text="{Binding Model.VatReclaimedCurrPeriod, 
+                    UpdateSourceTrigger=PropertyChanged, 
+                    ConverterCulture='en-gb',
+                    StringFormat={}{0:C},
+                    ValidatesOnNotifyDataErrors=True, 
+                    ValidatesOnExceptions=True,
+                    NotifyOnValidationError=True}" />
+                <Label Content="5. Net Vat (calculated box):" />
+                <TextBox Margin="10,0"
+                         IsReadOnly="True"
+                         Text="{Binding Model.NetVatDue,
+                            Mode=OneWay, 
+                            UpdateSourceTrigger=PropertyChanged, 
+                            ConverterCulture='en-gb',
+                            StringFormat={}{0:C}}" />
+                <Label Content="6. Business Sales Excluding VAT:" />
+                <TextBox Margin="10,0"
+                         x:Name="txtSalesExVat"
+                         Text="{Binding Model.TotalValueSalesExVAT, 
+                    UpdateSourceTrigger=PropertyChanged, 
+                    ConverterCulture='en-gb',
+                    StringFormat={}{0:C0},
+                    ValidatesOnNotifyDataErrors=True, 
+                    ValidatesOnExceptions=True,
+                    NotifyOnValidationError=True}" />
+                <Label Content="7. Business Purchases Excluding VAT:" />
+                <TextBox Margin="10,0"
+                         x:Name="txtPurchasesExVat"
+                         Text="{Binding Model.TotalValuePurchasesExVAT, 
+                    UpdateSourceTrigger=PropertyChanged, 
+                    ConverterCulture='en-gb',
+                    StringFormat={}{0:C0},
+                    ValidatesOnNotifyDataErrors=True, 
+                    ValidatesOnExceptions=True,
+                    NotifyOnValidationError=True}" />
+                <Label Content="8. Goods Supplied to EC Member States:" />
+                <TextBox Margin="10,0"
+                         x:Name="txtGoodsSuppliedExVat"
+                         Text="{Binding Model.TotalValueGoodsSuppliedExVAT, 
+                    UpdateSourceTrigger=PropertyChanged, 
+                    ConverterCulture='en-gb',
+                    StringFormat={}{0:C0},
+                    ValidatesOnNotifyDataErrors=True, 
+                    ValidatesOnExceptions=True,
+                    NotifyOnValidationError=True}" />
+                <Label Content="9. Goods Purchased from EC Member States:" />
+                <TextBox Margin="10,0"
+                         x:Name="txtAcquisitionsExVat"
+                         Text="{Binding Model.TotalAcquisitionsExVAT, 
+                    UpdateSourceTrigger=PropertyChanged, 
+                    ConverterCulture='en-gb',
+                    StringFormat={}{0:C0},
+                    ValidatesOnNotifyDataErrors=True, 
+                    ValidatesOnExceptions=True,
+                    NotifyOnValidationError=True}" />
+                <TextBlock Text="The Submit button will send the above information to the HMRC. Click submit when you are certain those details are correct and accurate."
+                           Grid.Row="1"
+                           Margin="10,5,10,10"
+                           TextWrapping="Wrap" />
+            </StackPanel>
+        </DockPanel>
+    </ScrollViewer>
+</Pages:BasePage>

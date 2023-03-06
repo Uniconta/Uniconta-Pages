@@ -73,6 +73,12 @@ x:Class="UnicontaClient.Pages.CustomPage.EditCompany"
                         <CorasauControls:CorasauLayoutItem FieldName="OwnerUid">
                             <CorasauControls:TextEditor Text="{Binding OwnerUid,Mode=OneWay}" IsReadOnly="True"/>
                         </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liOwnerName">
+                            <CorasauControls:TextEditor x:Name="txtOwner" IsReadOnly="True"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liReseller">
+                            <CorasauControls:TextEditor x:Name="txtReseller" IsReadOnly="True"/>
+                        </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="Created">
                             <CorasauControls:DateEditor Text="{Binding Created,Mode=OneWay}" IsReadOnly="True" IsEnabled="False"/>
                         </CorasauControls:CorasauLayoutItem>

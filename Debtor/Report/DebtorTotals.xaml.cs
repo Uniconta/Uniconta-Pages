@@ -77,7 +77,7 @@ namespace UnicontaClient.Pages.CustomPage
                 countEdit.EditValue = count;
             dgDebtorTotalsGrid.ShowTotalSummary();
             chkSkipOnHold.IsEnabled = false;
-            cmbCurrency.ItemsSource = Utility.GetCurrencyEnum();
+            cmbCurrency.ItemsSource = AppEnums.Currencies.GetLabels();
             cmbCurrency.SelectedIndex = 0;
             var Comp = api.CompanyEntity;
             if (Comp.GetCache(typeof(Uniconta.DataModel.Debtor)) == null)
@@ -111,16 +111,15 @@ namespace UnicontaClient.Pages.CustomPage
                             debtorFilterDialog = new CWServerFilter(api, typeof(DebtorClient), null, null, DebtorUserFields);
                         else
                             debtorFilterDialog = new CWServerFilter(api, typeof(DebtorClient), null, null, DebtorUserFields);
+                        debtorFilterDialog.GridSource = dgDebtorTotalsGrid.ItemsSource as IList<UnicontaBaseEntity>;
                         debtorFilterDialog.Closing += debtorFilterDialog_Closing;
-#if !SILVERLIGHT
                         debtorFilterDialog.Show();
                     }
                     else
+                    {
+                        debtorFilterDialog.GridSource = dgDebtorTotalsGrid.ItemsSource as IList<UnicontaBaseEntity>;
                         debtorFilterDialog.Show(true);
-#elif SILVERLIGHT
                     }
-                    debtorFilterDialog.Show();
-#endif
                     break;
 
                 case "ClearDebtorFilter":

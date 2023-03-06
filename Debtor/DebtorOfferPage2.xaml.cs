@@ -163,7 +163,19 @@ namespace UnicontaClient.Pages.CustomPage
                 else
                     LoadType(typeof(Uniconta.DataModel.Debtor));
             }
+            liContactName.ButtonClicked += LiContactName_ButtonClicked;
             StartLoadCache();
+        }
+
+        private void LiContactName_ButtonClicked(object sender)
+        {
+            if (editrow.Debtor == null)
+                return;
+            var contactClient = api.CompanyEntity.CreateUserType<ContactClient>();
+            var debt = editrow.Debtor;
+            api.SetMaster(contactClient, debt);
+            AddDockItem(TabControls.ContactPage2, new object[] { contactClient, false, debt }, string.Format("{0} : {1}",
+                Uniconta.ClientTools.Localization.lookup("Contacts"),debt.Name), "Add_16x16.png");
         }
 
         void RemoveMenuItem()
@@ -270,6 +282,14 @@ namespace UnicontaClient.Pages.CustomPage
                     if (string.IsNullOrEmpty(leAccount.EditValue as string))
                         leAccount.SelectedItem = dc;
                 }
+            }
+
+            if (screenName == TabControls.ContactPage2 && argument != null)
+            {
+                BindContact(editrow.Debtor);
+
+                if (argument is object[] arg && arg.Length == 2)
+                    cmbContactName.SelectedItem = arg[arg.Length - 1];
             }
         }
 
@@ -526,7 +546,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
 #endif
         SQLCache installationCache;
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             var api = this.api;
             var Comp = api.CompanyEntity;

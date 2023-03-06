@@ -1,0 +1,65 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools" 
+             xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.CopyOfferLines"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:UnicontaClient.Controls"
+             xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage"
+             xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+             xmlns:docking="http://schemas.devexpress.com/winfx/2008/xaml/docking"
+             KeyDown="ChildWindow_KeyDown">
+    <Grid x:Name="LayoutRoot" Margin="2" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Assets/FilterLayoutRibbon.xml" x:Name="localMenu"/>
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}" Grid.Row="1">
+            <docking:DockLayoutManager x:Name="DockingControl" Visibility="Visible" AllowCustomization="False">
+                <docking:LayoutGroup x:Name="lGroup" AllowDrag="False" AllowDock="False" AllowFloat="False" Orientation="Vertical" AllowContextMenu="False" >
+                    <docking:LayoutPanel x:Name="layOutDebtorInvoiceLine" Visibility="Visible" FloatOnDoubleClick="False" AllowDrag="False" AllowDock="False" AllowClose="False" AllowContextMenu="False" AllowMaximize="False" AllowDockToDocumentGroup="False" ShowCloseButton="False"  ShowPinButton="False">
+                        <localPage:DebtorOffersGrid x:Name="dgOffersGrid" AutoGenerateColumns="None" Readonly="True">
+                            <localPage:DebtorOffersGrid.Columns>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Account"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Name"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Group"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="OfferNumber" Width="70"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryDate" Width="90" />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="OrderTotal" Width="90"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Margin" Width="90"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Project" Visible="False"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Visible="False"/>
+                                <localPage:CorasauDataGridForeignKeyColumnClient x:Name="Task" Visible="False" />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="WorkSpace" Visible="False"/>
+                            </localPage:DebtorOffersGrid.Columns>
+                        </localPage:DebtorOffersGrid>
+                    </docking:LayoutPanel>
+                    <docking:LayoutPanel x:Name="layOutOfferline" FloatOnDoubleClick="False" AllowDrag="False" AllowDock="False" AllowClose="False" AllowContextMenu="False" AllowMaximize="False" AllowDockToDocumentGroup="False" ShowCloseButton="False"  ShowPinButton="False">
+                        <localPage:DebtorOfferLineGrid x:Name="dgOfferLinesGrid"  AutoGenerateColumns="None">
+                            <localPage:DebtorOfferLineGrid.Columns>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Item" />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="colNote" FieldName="Note" Width="150" Visible="False"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant" FieldName="Variant" />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Text" Width="200" />
+                                <localPage:CorasauDataGridTemplateColumnClient FieldName="Unit" IsSmart="True" AllowEditing="False" Width="50"/>
+                                <localPage:CorasauDataGridTemplateColumnClient FieldName="DiscountPct" IsSmart="True" AllowEditing="False" Width="80" />
+                                <localPage:CorasauDataGridTemplateColumnClient FieldName="Discount" IsSmart="True" AllowEditing="False" Width="80" />
+                                <localPage:CorasauDataGridTemplateColumnClient FieldName="Total" IsSmart="True" AllowEditing="False" Width="120"/>
+                                <localPage:CorasauDataGridTemplateColumnClient FieldName="Employee" IsSmart="True" AllowEditing="False" Width="120"/>
+                                <localPage:CorasauDataGridTemplateColumnClient FieldName="Warehouse" IsSmart="True" AllowEditing="False" Width="120"/>
+                                <localPage:CorasauDataGridTemplateColumnClient FieldName="Location" IsSmart="True" AllowEditing="False" Width="50"/>
+                                <localPage:CorasauDataGridTemplateColumnClient FieldName="Warehouse" IsSmart="True" AllowEditing="False" Width="120"/>
+                            </localPage:DebtorOfferLineGrid.Columns>
+                        </localPage:DebtorOfferLineGrid>
+                    </docking:LayoutPanel>
+                </docking:LayoutGroup>
+            </docking:DockLayoutManager>
+        </CorasauControls:BusyIndicator>
+        <CheckBox Grid.Row="2" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DeleteProposalLines}" Height="23" HorizontalAlignment="Left" IsChecked="{Binding IsDeleteLines}" />
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0 10 0 10">
+            <Button x:Name="CreateButton" IsDefault="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Copylines}" Click="OKButton_Click"  Height="23" HorizontalAlignment="Right" />
+            <Button x:Name="CancelButton" IsCancel="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Cancel}" Click="CancelButton_Click"  Height="23"  Margin="3,0,0,0" />
+        </StackPanel>
+    </Grid>
+</Pages:GridBasePage>

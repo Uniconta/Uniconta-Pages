@@ -57,7 +57,7 @@ x:Class="UnicontaClient.Pages.CustomPage.GLOffsetAccountTemplate"
                         </local:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
                         <local:CorasauDataGridForeignKeyColumnClient.CellTemplate>
                             <DataTemplate>
-                                <local:CorasauGridLookupEditorClient HasCustomLookUp="true"  GotFocus="Account_GotFocus" x:Name="PART_Editor" ItemsSource="{Binding DataContext.RowData.Row.AccountSource,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" />
+                                <local:CorasauGridLookupEditorClient HasCustomLookUp="true"  GotFocus="Account_GotFocus" x:Name="PART_Editor" ItemsSource="{Binding DataContext.RowData.Row.AccountSource,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" LostFocus="Account_LostFocus"/>
                             </DataTemplate>
                         </local:CorasauDataGridForeignKeyColumnClient.CellTemplate>
                     </local:CorasauDataGridForeignKeyColumnClient>

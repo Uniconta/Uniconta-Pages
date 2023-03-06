@@ -50,7 +50,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         SQLCache prCat;
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             if (prCat == null)
                 prCat = await api.LoadCache(typeof(Uniconta.DataModel.PrCategory)).ConfigureAwait(false);
@@ -95,8 +95,8 @@ namespace UnicontaClient.Pages.CustomPage
                 case "Filter":
                     break;
                 case "ClearFilter":
-                    ribbonControl.filterValues = null;
-                    ribbonControl.PropSort = null;
+                    ribbonControl.SavedFilters = null;
+                    ribbonControl.SavedSorter = null;
                     break;
                 case "RefreshGrid":
                     LoadData();

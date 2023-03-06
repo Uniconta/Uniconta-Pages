@@ -57,14 +57,26 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorInvoicePage2"
                 <CorasauControls:CorasauLayoutItem x:Name="liDeliveryCountry" FieldName="DeliveryCountry">
                     <CorasauControls:ComboBoxEditor x:Name="cmbDelCountry" SelectedItem="{Binding DeliveryCountry,Mode=TwoWay}"/>
                 </CorasauControls:CorasauLayoutItem>
+                <CorasauControls:CorasauLayoutItem FieldName="DeliveryContactPerson" x:Name="liDeliveryContactPerson">
+                    <CorasauControls:TextEditor  Text="{Binding DeliveryContactPerson,Mode=TwoWay}"/>
+                </CorasauControls:CorasauLayoutItem>
+                <CorasauControls:CorasauLayoutItem FieldName="DeliveryPhone" x:Name="liDeliveryPhone">
+                    <CorasauControls:TextEditor  Text="{Binding DeliveryPhone,Mode=TwoWay}"/>
+                </CorasauControls:CorasauLayoutItem>
+                <CorasauControls:CorasauLayoutItem FieldName="DeliveryContactEmail" x:Name="liDeliveryContactEmail">
+                    <CorasauControls:TextEditor  Text="{Binding DeliveryContactEmail,Mode=TwoWay}"/>
+                </CorasauControls:CorasauLayoutItem>
                 <CorasauControls:CorasauLayoutItem FieldName="YourRef" x:Name="liYourRef">
                     <CorasauControls:TextEditor x:Name="txtYourRef" EditValue="{Binding YourRef,Mode=TwoWay}"/>
                 </CorasauControls:CorasauLayoutItem>
                 <CorasauControls:CorasauLayoutItem FieldName="OurRef" x:Name="liOurRef">
                     <CorasauControls:TextEditor x:Name="txtOurRef" EditValue="{Binding OurRef,Mode=TwoWay}"/>
                 </CorasauControls:CorasauLayoutItem>
+                <CorasauControls:CorasauLayoutItem FieldName="DocumentRef" x:Name="liDocumentRef" Style="{StaticResource LayoutItemsLookUpEditViewstyle}" LookupButtonClicked="liDocumentRef_LookupButtonClicked" ButtonContent="&#x1f441;" ButtonClicked="liDocumentRef_ButtonClicked">
+                    <CorasauControls:IntegerEditor HorizontalContentAlignment="Left" Text="{Binding DocumentRef,Mode=TwoWay}" />
+                </CorasauControls:CorasauLayoutItem>
                 <CorasauControls:CorasauLayoutItem FieldName="Remark" x:Name="liRemark">
-                    <CorasauControls:TextEditor x:Name="txtRemark" EditValue="{Binding Remark ,Mode=TwoWay}"/>
+                    <CorasauControls:TextEditor x:Name="txtRemark" AcceptsReturn="True" EditValue="{Binding Remark ,Mode=TwoWay}" VerticalContentAlignment="Top" TextWrapping="Wrap" MinHeight="60"/>
                 </CorasauControls:CorasauLayoutItem>
                 <CorasauControls:CorasauLayoutItem FieldName="Employee" x:Name="liEmployee">
                     <CorasauControls:LookupEditor x:Name="leEmployee" EditValue="{Binding Employee ,Mode=TwoWay}"/>
@@ -105,6 +117,23 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorInvoicePage2"
                 <CorasauControls:CorasauLayoutItem FieldName="Installation " x:Name="liInstallation">
                     <CorasauControls:LookupEditor x:Name="leInstallation" Text="{Binding Installation ,Mode=TwoWay}"/>
                 </CorasauControls:CorasauLayoutItem>
+                <CorasauControls:CorasauLayoutGroup View="Group"  x:Name="usedim"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Dimensions}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="376">
+                    <CorasauControls:CorasauLayoutItem x:Name="lbldim1">
+                        <CorasauControls:LookupEditor x:Name="cmbDim1" Text="{Binding Dimension1,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="lbldim2">
+                        <CorasauControls:LookupEditor x:Name="cmbDim2" Text="{Binding Dimension2,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="lbldim3">
+                        <CorasauControls:LookupEditor x:Name="cmbDim3" Text="{Binding Dimension3,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="lbldim4">
+                        <CorasauControls:LookupEditor x:Name="cmbDim4" Text="{Binding Dimension4,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="lbldim5">
+                        <CorasauControls:LookupEditor x:Name="cmbDim5" Text="{Binding Dimension5,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
             </CorasauControls:CorasauLayoutGroup>
         </CorasauControls:CorasauLayoutControl>
     </Grid>

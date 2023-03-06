@@ -166,11 +166,7 @@ namespace UnicontaClient.Pages.CustomPage
             else
                 className = master.GetType().Name;
 
-            var userFields = await api.Query<TableFieldsClient>(master);
-            var classCode = ClassGenerator.Create(className, userFields, isBaseClass);
-
-            var cwGenerateClass = new CWGenerateClass(classCode);
-            cwGenerateClass.Show();
+            UserTablePage.GenerateClass(master, isBaseClass, api, className);
         }
     }
 }

@@ -63,22 +63,16 @@ namespace UnicontaClient.Pages.CustomPage
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgProductionOrders.RowDoubleClick += DgProductionOrders_RowDoubleClick;
             ribbonControl.DisableButtons(new string[] { "DeleteRow", "UndoDelete", "SaveGrid" });
-#if SILVERLIGHT
-            HideMenuItems();
-#endif
         }
 
-        private void HideMenuItems()
-        {
-            RibbonBase rb = (RibbonBase)localMenu.DataContext;
-            if (rb != null)
-                UtilDisplay.RemoveMenuCommand(rb, "ProductionReport");
-        }
         private void DgProductionOrders_RowDoubleClick()
         {
             localMenu_OnItemClicked("ProductionLines");
         }
-
+        private void Name_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            DgProductionOrders_RowDoubleClick();
+        }
         protected override void OnLayoutLoaded()
         {
             base.OnLayoutLoaded();
@@ -106,11 +100,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (!Comp.ProjectTask)
                 Task.ShowInColumnChooser = Task.Visible = false;
 
-#if !SILVERLIGHT
             Utility.SetupVariants(api, colVariant, VariantName, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
-#else
-            Utility.SetupVariants(api, null, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
-#endif
         }
 
         private void localMenu_OnItemClicked(string ActionType)
@@ -165,12 +155,10 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem?._ProdItem != null)
                         MarkedOrderLine(selectedItem);
                     break;
-#if !SILVERLIGHT
                 case "ProductionReport":
                     if (selectedItem != null)
                         CreateProductionReport(selectedItem);
                     break;
-#endif
                 case "EditAll":
                     if (dgProductionOrders.Visibility == Visibility.Visible)
                         EditAll();
@@ -196,9 +184,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                     {
                         CWOrderFromOrder cwOrderFromOrder = new CWOrderFromOrder(api);
-#if !SILVERLIGHT
                         cwOrderFromOrder.DialogTableId = 2000000084;
-#endif
                         cwOrderFromOrder.Closed += async delegate
                         {
                             if (cwOrderFromOrder.DialogResult == true)
@@ -320,11 +306,10 @@ namespace UnicontaClient.Pages.CustomPage
                 UtilDisplay.ShowErrorCode(res);
         }
 
-#if !SILVERLIGHT
         async private void CreateProductionReport(ProductionOrderClient productionOrder)
         {
-            var companyClient = Utility.GetCompanyClientUserInstance(api.CompanyEntity);
-            var getLogo = await UtilDisplay.GetLogo(api);
+            var companyClient = UtilCommon.GetCompanyClientUserInstance(api.CompanyEntity);
+            var getLogo = await UtilCommon.GetLogo(api);
 
             var productionOrderLineInstance = api.CompanyEntity.CreateUserType<ProductionOrderLineClient>();
             var productionOrderLines = await api.Query(productionOrderLineInstance, new UnicontaBaseEntity[] { productionOrder }, null);
@@ -343,13 +328,10 @@ namespace UnicontaClient.Pages.CustomPage
             else
                 UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("NoLinesFound"), Uniconta.ClientTools.Localization.lookup("Warning"), MessageBoxButton.OK);
         }
-#endif
         private void PostProduction(ProductionOrder dbOrder)
         {
             CWInvPosting invpostingDialog = new CWInvPosting(api, "ReportAsFinished", true);
-#if !SILVERLIGHT
             invpostingDialog.DialogTableId = 2000000041;
-#endif
             invpostingDialog.Closed += async delegate
             {
                 if (invpostingDialog.DialogResult == true)
@@ -402,9 +384,7 @@ namespace UnicontaClient.Pages.CustomPage
         void CreateOrderLines(ProductionOrderClient productionOrder)
         {
             CWProductionOrderLine dialog = new CWProductionOrderLine(productionOrder, api, false, null);
-#if !SILVERLIGHT
             dialog.DialogTableId = 2000000078;
-#endif
             dialog.Closing += async delegate
             {
                 if (dialog.DialogResult == true)

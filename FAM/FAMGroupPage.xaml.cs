@@ -74,13 +74,6 @@ namespace UnicontaClient.Pages.CustomPage
             dgFAMGroupGrid.ShowTotalSummary();
         }
 
-        public override Task InitQuery()
-        {
-            if (!this.dgFAMGroupGrid.ReuseCache(typeof(Uniconta.DataModel.FAMGroup)))
-                return BindGrid();
-            return null;
-        }
-
         private void localMenu_OnItemClicked(string ActionType)
         {
             var selectedItem = dgFAMGroupGrid.SelectedItem as FAMGroupClient;

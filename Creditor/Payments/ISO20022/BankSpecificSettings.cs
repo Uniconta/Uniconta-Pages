@@ -233,6 +233,14 @@ namespace UnicontaISO20022CreditTransfer
             return false;
         }
 
+        /// <summary>
+        /// Exclude section InitgPty
+        /// SEB Sweden
+        /// </summary>
+        public virtual bool ExcludeSectionInitgPty()
+        {
+            return false;
+        }
 
         /// <summary>
         /// CdtrAgt - Creditor Bank CountryId
@@ -241,6 +249,25 @@ namespace UnicontaISO20022CreditTransfer
         {
             return countryId;
         }
+
+        /// <summary>
+        /// CdtrAgt - Creditor Bank MemberIdentification
+        /// Used by SEB
+        /// </summary>
+        public virtual string CdtrAgtClrSysId(ISO20022PaymentTypes ISOPaymType)
+        {
+            return null;
+        }
+
+        /// <summary>
+        /// CdtrAgt - Creditor Bank ClearingSystemId
+        /// Used by SEB
+        /// </summary>
+        public virtual string CdtrAgtMmbId(PaymentTypes paymentMethod)
+        {
+            return null;
+        }
+
 
         /// <summary>
         /// Unique and unambiguous way of identifying an organisation or an individual person.

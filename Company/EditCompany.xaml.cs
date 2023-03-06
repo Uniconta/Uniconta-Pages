@@ -41,7 +41,7 @@ namespace UnicontaClient.Pages.CustomPage
             : base(sourceData, true)
         {
             InitializeComponent();
-            cmbCurrency.ItemsSource = Utility.GetCurrencyEnum();
+            cmbCurrency.ItemsSource = AppEnums.Currencies.GetLabels();
             cmbCompanyType.ItemsSource = Enum.GetValues(typeof(Uniconta.DataModel.CompanyTypeType));
             layoutControl = layoutItems;
 #if SILVERLIGHT
@@ -86,9 +86,21 @@ namespace UnicontaClient.Pages.CustomPage
                 liOIOUBLSendOnServer.Visibility = Visibility.Collapsed;
             }
 
-#if !SILVERLIGHT
             cmbSendAppRemdr.ItemsSource = AppEnums.Weekdays.Values.ToList();
-#endif
+            SetOwnerName();
+        }
+
+        async void SetOwnerName()
+        {
+            liOwnerName.Label = string.Format("{0} {1}", Uniconta.ClientTools.Localization.lookup("Owner"), Uniconta.ClientTools.Localization.lookup("Name"));
+            liReseller.Label = Uniconta.ClientTools.Localization.lookup("Reseller");
+            var owners = await api.Query<UserClient>(editrow);
+            var owner = owners?.FirstOrDefault(x => x.Uid == editrow._OwnerUid);
+            if (owner != null)
+            {
+                txtOwner.Text = owner._Name;
+                txtReseller.Text = owner.ResellerName;
+            }
         }
 
         private bool onlyRunOnce;

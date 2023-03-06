@@ -45,7 +45,10 @@ x:Class="UnicontaClient.Pages.CustomPage.ContactPage2"
                         <CorasauControls:CorasauLayoutItem FieldName="ReferenceId" x:Name="liReferenceId">
                             <CorasauControls:TextEditor Text="{Binding ReferenceId,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                         </CorasauControls:CorasauLayoutItem>
-                    </CorasauControls:CorasauLayoutGroup>
+                    <CorasauControls:CorasauLayoutItem FieldName="ContactType" x:Name="liContactType">
+                        <CorasauControls:ComboBoxEditor x:Name="cbContactType" SelectedItem="{Binding ContactType,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
 
                     <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="crmGroup" Visibility="Collapsed"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CRM}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="350">
                         <CorasauControls:CorasauLayoutItem FieldName="Interests" x:Name="liInterests">

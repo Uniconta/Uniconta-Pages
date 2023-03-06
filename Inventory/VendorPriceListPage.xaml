@@ -19,7 +19,7 @@ x:Class="UnicontaClient.Pages.CustomPage.VendorPriceListPage"
         </Grid.RowDefinitions>
         <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Inventory/CustomerPriceListsPageGridRibbon.xml" x:Name="localMenu"/>
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
-           
+
             <localPage:CreditorPriceListGrid  x:Name="dgCreditorPriceListGrid" AutoGenerateColumns="None" HorizontalAlignment="Stretch">
                 <localPage:CreditorPriceListGrid.Columns>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="HasNotes" Width="30" ReadOnly="True">
@@ -46,7 +46,21 @@ x:Class="UnicontaClient.Pages.CustomPage.VendorPriceListPage"
                             </ControlTemplate>
                         </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                     </localPage:CorasauDataGridTemplateColumnClient>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PriceList"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" Width="150">
+                        <localPage:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Margin="5,0,0,0" TextDecorations="Underline" Cursor="Hand" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.Name,RelativeSource={RelativeSource TemplatedParent}}" PreviewMouseDown="Name_PreviewMouseDown"></TextBlock>
+                                    <TextBlock Grid.Column="1"></TextBlock>
+                                </Grid>
+                            </DataTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                    </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ValidFrom" ShowTime="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ValidTo" ShowTime="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="UseDeliveryDate" HideHeaderCheck="True" />
@@ -59,7 +73,6 @@ x:Class="UnicontaClient.Pages.CustomPage.VendorPriceListPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DiscountGroupFirst" Width="70"  HideHeaderCheck="True"/>
                 </localPage:CreditorPriceListGrid.Columns>
             </localPage:CreditorPriceListGrid>
-
         </CorasauControls:BusyIndicator>
     </Grid>
 </Pages:GridBasePage>

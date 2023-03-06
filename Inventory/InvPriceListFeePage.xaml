@@ -1,0 +1,41 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"      
+   xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.InvPriceListFeePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"  
+    xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+    xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage" 
+    xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+    d:DesignHeight="300" d:DesignWidth="400">
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Inventory/CustomerPriceListLinePageGridRibbon.xml" x:Name="localMenu"/>
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <localPage:InvPriceListFeeClientGrid  x:Name="dgInvPriceListFee" AutoGenerateColumns="None" HorizontalAlignment="Stretch">
+                <localPage:InvPriceListFeeClientGrid.Columns>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Item" Width="100"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" Width="200"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Text" Width="200"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PriceList" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PriceListDebtor" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PriceListCreditor" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Account" Width="100"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="AccountName" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Amount" Width="80" />
+                    <localPage:ComboBoxColumnClient x:Name="IsPct" Width="80"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ValidFrom" Width="80" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ValidTo" Width="80" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="AmountFrom" Width="50" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="AmountTo" Width="80" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Disable" Width="80" />
+                </localPage:InvPriceListFeeClientGrid.Columns>
+            </localPage:InvPriceListFeeClientGrid>
+        </CorasauControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

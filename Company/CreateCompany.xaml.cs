@@ -23,12 +23,8 @@ using System.Collections;
 using System.Diagnostics;
 using Uniconta.ClientTools.Util;
 using Uniconta.ClientTools.Controls;
-#if !SILVERLIGHT
 using UnicontaClient;
 using ImportingTool.Model;
-#else
-using UnicontaClient.Controls.Login;
-#endif
 using System.Threading;
 using Uniconta.API.GeneralLedger;
 using UnicontaClient.Controls;
@@ -65,9 +61,7 @@ namespace UnicontaClient.Pages.CustomPage
             : base(API, string.Empty)
         {
             Init();
-#if !SILVERLIGHT
             FocusManager.SetFocusedElement(txtCompanyRegNo, txtCompanyRegNo);
-#endif
         }
 
         private void Init()
@@ -89,7 +83,6 @@ namespace UnicontaClient.Pages.CustomPage
                 SetOwnCompany();
                 CompanySetupPage.SetCountry(cmbCountry, cmbStandardCompany, editrow, true);
                 browseTopLogo.FileSelected += BrowseTopLogo_FileSelected;
-#if !SILVERLIGHT
                 lblImportInvoice.Label = string.Format(Uniconta.ClientTools.Localization.lookup("ImportOBJ"), Uniconta.ClientTools.Localization.lookup("Invoice"));
                 BindSetupType();
                 grpImportSetup.Header = string.Format(Uniconta.ClientTools.Localization.lookup("ImportOBJ"), Uniconta.ClientTools.Localization.lookup("Company"));
@@ -117,12 +110,10 @@ namespace UnicontaClient.Pages.CustomPage
                 Uniconta.ClientTools.Localization.lookup("ContactEmail")
             };
                 cmbInvoiceOrContactMail.ItemsSource = navEmailType;
-#endif
             }
             else
                 UtilDisplay.ShowErrorCode(ErrorCodes.NoRights);
         }
-#if !SILVERLIGHT
         void BindSetupType()
         {
             var ind = string.Format(Uniconta.ClientTools.Localization.lookup("ImportOBJ"), Uniconta.ClientTools.Localization.lookup("Company"));
@@ -414,7 +405,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void FileBrowse_ButtonClicked(object sender)
         {
             var openFolderDialog = UtilDisplay.LoadFolderBrowserDialog;
-            if (openFolderDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            if (openFolderDialog.ShowDialog() == true)
                 txtImportFromDirectory.Text = openFolderDialog.SelectedPath;
         }
         private void ExcelFileBrowse_ButtonClicked(object sender)
@@ -425,7 +416,6 @@ namespace UnicontaClient.Pages.CustomPage
             if (openFileDialog.ShowDialog() == true)
                 txtImportFromFile.Text = openFileDialog.FileName;
         }
-#endif
         private void BrowseTopLogo_FileSelected()
         {
             if (browseTopLogo.FileBytes != null && browseTopLogo.FileBytes.Length > 100 * 1024)
@@ -464,20 +454,10 @@ namespace UnicontaClient.Pages.CustomPage
                     MoveFocus();
                     if (string.IsNullOrWhiteSpace(editrow._Name))
                     {
-#if !SILVERLIGHT
                         int importFrom = cmbImportFrom.SelectedIndex;
                         int setupType = lstSetupType.SelectedIndex;
-#else
-                        int importFrom = -1;
-                        int setupType = 1;
-#endif
-#if !SILVERLIGHT
                         if (setupType == 1 || importFrom == (int)ImportFrom.dk_Iceland || (importFrom >= (int)ImportFrom.economic_Danmark && importFrom <= (int)ImportFrom.economic_Germany))
 
-#else
-                        if (setupType == 1)
-
-#endif
                         {
                             UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("CannotBeBlank"), Uniconta.ClientTools.Localization.lookup("CompanyName")),
                                 Uniconta.ClientTools.Localization.lookup("Warning"));
@@ -489,25 +469,22 @@ namespace UnicontaClient.Pages.CustomPage
                         UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("CountryNotSet"), Uniconta.ClientTools.Localization.lookup("Warning"), MessageBoxButton.OK);
                         return;
                     }
-
-#if !SILVERLIGHT
                     if (lblerrorAccount.Visibility == Visibility.Visible && (txtNavErrorAccount.Text == Uniconta.ClientTools.Localization.lookup("Required") || string.IsNullOrWhiteSpace(txtNavErrorAccount.Text)))
                     {
-                        UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("CannotBeBlank"), Uniconta.ClientTools.Localization.lookup("CreateOrFindErrorAccount")), 
+                        UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("CannotBeBlank"), Uniconta.ClientTools.Localization.lookup("CreateOrFindErrorAccount")),
                             Uniconta.ClientTools.Localization.lookup("Warning"));
                         return;
                     }
 
                     if (lblAccountForPrimo.Visibility == Visibility.Visible && (txtAccountForPrimo.Text == Uniconta.ClientTools.Localization.lookup("Required") || string.IsNullOrWhiteSpace(txtAccountForPrimo.Text)))
                     {
-                        UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("CannotBeBlank"), Uniconta.ClientTools.Localization.lookup("AccountTypeYearResultTransfer")), 
+                        UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("CannotBeBlank"), Uniconta.ClientTools.Localization.lookup("AccountTypeYearResultTransfer")),
                             Uniconta.ClientTools.Localization.lookup("Warning"));
                         return;
                     }
 
                     if (lstSetupType.SelectedIndex == 1)
                     {
-#endif
                         if (cmbOwnCompany.SelectedIndex > 0)
                             fromCompany = (Company)cmbOwnCompany.SelectedItem;
                         else if (cmbStandardCompany.SelectedIndex > 0)
@@ -527,11 +504,9 @@ namespace UnicontaClient.Pages.CustomPage
                         }
                         else
                             SaveCompany(fromCompany);
-#if !SILVERLIGHT
                     }
                     else
                         SaveCompany(fromCompany);
-#endif
                     break;
                 default:
                     frmRibbon_BaseActions(ActionType);
@@ -547,7 +522,6 @@ namespace UnicontaClient.Pages.CustomPage
             bool set0InAccount, set0InCustAcc, set0InVendAcc;
             bool includeVatInPrices, concatC5ItemNames;
             int importDim;
-#if !SILVERLIGHT
             setupType = lstSetupType.SelectedIndex;
             importFrom = cmbImportFrom.SelectedIndex;
             if (importFrom == (int)ImportFrom.BC_NAVOnline)
@@ -574,7 +548,6 @@ namespace UnicontaClient.Pages.CustomPage
                 case ImportFrom.Ax30_eCTRL: editrow._ConvertedFrom = (int)ConvertFromType.eCtrl; break;
                 case ImportFrom.dk_Iceland: editrow._ConvertedFrom = (int)ConvertFromType.dk_Iceland; break;
             }
-#endif
             if (setupType == 1)
             {
                 if (dateFrm.DateTime.Date < new DateTime(2000, 1, 1))
@@ -606,7 +579,7 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         editrow.CopyFunctions(fromCompany);
                         busyIndicator.BusyContent = string.Format(Uniconta.ClientTools.Localization.lookup("CopyingCompany"), fromCompany._Name, editrow._Name);
-                    }                    
+                    }
                     busyIndicator.IsBusy = true;
                     if (chkDimensions.IsChecked == true && fromCompany != null)
                     {
@@ -624,87 +597,67 @@ namespace UnicontaClient.Pages.CustomPage
                 }
                 else
                     busyIndicator.IsBusy = true;
-                ErrorCodes err;
                 if (string.IsNullOrWhiteSpace(editrow._Name))
                     editrow._Name = "import";
-                if (usermaster != null)
-                    err = await session.CreateCompany(editrow, usermaster);
-                else
-                    err = await session.CreateCompany(editrow);
-                if (err == ErrorCodes.Succes)
+                if (setupType == 1)
                 {
-                    Company[] companies = await BasePage.session.GetCompanies();
-                    UnicontaClient.Controls.CWDefaultCompany.loadedCompanies = companies;
-
-                    if (Utility.GetDefaultCompany() == null)
-                        globalEvents.OnRefresh(NameOfControl);
-                    if (setupType == 1)/* Import- Financial year not required*/
+                    ErrorCodes err;
+                    if (usermaster != null)
+                        err = await session.CreateCompany(editrow, usermaster);
+                    else
+                        err = await session.CreateCompany(editrow);
+                    if (err == ErrorCodes.Succes)
                     {
-                        await SaveFinancialYear(editrow, dateFrm.DateTime.Date, dateTo.DateTime.Date);
-                        if (fromCompany != null)
-                            await CopyBaseData();
+                        AfterCompanyCreated(editrow, setupType);
                     }
-                    await SaveCompanyLogos();
-                    if (setupType != 1)
-                    {
-#if !SILVERLIGHT
-                        var pastYears = string.IsNullOrWhiteSpace(invoiceDateCounter.Text) ? 0 : - (int)NumberConvert.ToInt(invoiceDateCounter.Text);
-                        DateTime invoiceFrmDate = DateTime.Today.AddYears(pastYears); 
-                        var listOfNavDim = new List<string>();
-                        var dim = string.IsNullOrWhiteSpace(txtNavDim1.Text) ? string.Empty : txtNavDim1.Text;
-                        listOfNavDim.Add(dim);
-                        dim = string.IsNullOrWhiteSpace(txtNavDim2.Text) ? string.Empty : txtNavDim2.Text;
-                        listOfNavDim.Add(dim);
-                        dim = string.IsNullOrWhiteSpace(txtNavDim3.Text) ? string.Empty : txtNavDim3.Text;
-                        listOfNavDim.Add(dim);
-                        dim = string.IsNullOrWhiteSpace(txtNavDim4.Text) ? string.Empty : txtNavDim4.Text;
-                        listOfNavDim.Add(dim);
-                        dim = string.IsNullOrWhiteSpace(txtNavDim5.Text) ? string.Empty : txtNavDim5.Text;
-                        listOfNavDim.Add(dim);
-
-                        var arrayOfNavDim = listOfNavDim.ToArray();
-
-                        object[] compParams = new object[18];
-                        compParams[0] = path;
-                        compParams[1] = editrow;
-                        compParams[2] = (ImportFrom)importFrom;
-                        compParams[3] = set0InAccount;
-                        compParams[4] = importDim;
-                        compParams[5] = arrayOfNavDim;
-                        compParams[6] = cmbInvoiceOrContactMail.SelectedIndex == 0;
-                        compParams[7] = txtNavErrorAccount.Text;
-                        compParams[8] = includeVatInPrices;
-                        compParams[9] = chkLedgerTransactions.IsChecked.Value;
-                        compParams[10] = chkDebtorTransactions.IsChecked.Value;
-                        compParams[11] = chkCreditorTransactions.IsChecked.Value;
-                        compParams[12] = txtAccountForPrimo.Text;
-                        compParams[13] = chkImportInvoice.IsChecked.Value;
-                        compParams[14] = set0InCustAcc;
-                        compParams[15] = set0InVendAcc;
-                        compParams[16] = concatC5ItemNames;
-                        compParams[17] = invoiceFrmDate;
-
-                        string header = string.Format(Uniconta.ClientTools.Localization.lookup("ImportOBJ"), Uniconta.ClientTools.Localization.lookup("Company"));
-                        AddDockItem(TabControls.ImportFromOtherCompanySetup, compParams, header);
-#endif
-                    }
-
-                    if (usermaster != null && usermaster.Uid != session.Uid)
+                    else
                     {
                         busyIndicator.IsBusy = false;
-                        return;
-                    }
-
-                    if (setupType == 1)
-                    {
-                        globalEvents.OnRefresh(TabControls.CreateCompany, editrow.RowId);
-                        CloseDockItem();
+                        UtilDisplay.ShowErrorCode(err);
                     }
                 }
                 else
                 {
-                    busyIndicator.IsBusy = false;
-                    UtilDisplay.ShowErrorCode(err);
+                    var pastYears = string.IsNullOrWhiteSpace(invoiceDateCounter.Text) ? 0 : -(int)NumberConvert.ToInt(invoiceDateCounter.Text);
+                    DateTime invoiceFrmDate = DateTime.Today.AddYears(pastYears);
+                    var listOfNavDim = new List<string>();
+                    var dim = string.IsNullOrWhiteSpace(txtNavDim1.Text) ? string.Empty : txtNavDim1.Text;
+                    listOfNavDim.Add(dim);
+                    dim = string.IsNullOrWhiteSpace(txtNavDim2.Text) ? string.Empty : txtNavDim2.Text;
+                    listOfNavDim.Add(dim);
+                    dim = string.IsNullOrWhiteSpace(txtNavDim3.Text) ? string.Empty : txtNavDim3.Text;
+                    listOfNavDim.Add(dim);
+                    dim = string.IsNullOrWhiteSpace(txtNavDim4.Text) ? string.Empty : txtNavDim4.Text;
+                    listOfNavDim.Add(dim);
+                    dim = string.IsNullOrWhiteSpace(txtNavDim5.Text) ? string.Empty : txtNavDim5.Text;
+                    listOfNavDim.Add(dim);
+
+                    var arrayOfNavDim = listOfNavDim.ToArray();
+                    var comp = new Company();
+                    CorasauDataGrid.CopyAndClearRowId(editrow, comp);
+                    comp._Name = editrow.Name;
+                    object[] compParams = new object[19];
+                    compParams[0] = path;
+                    compParams[1] = comp;
+                    compParams[2] = (ImportFrom)importFrom;
+                    compParams[3] = set0InAccount;
+                    compParams[4] = importDim;
+                    compParams[5] = arrayOfNavDim;
+                    compParams[6] = cmbInvoiceOrContactMail.SelectedIndex == 0;
+                    compParams[7] = txtNavErrorAccount.Text;
+                    compParams[8] = includeVatInPrices;
+                    compParams[9] = chkLedgerTransactions.IsChecked.Value;
+                    compParams[10] = chkDebtorTransactions.IsChecked.Value;
+                    compParams[11] = chkCreditorTransactions.IsChecked.Value;
+                    compParams[12] = txtAccountForPrimo.Text;
+                    compParams[13] = chkImportInvoice.IsChecked.Value;
+                    compParams[14] = set0InCustAcc;
+                    compParams[15] = set0InVendAcc;
+                    compParams[16] = concatC5ItemNames;
+                    compParams[17] = invoiceFrmDate;
+                    compParams[18] = usermaster;
+                    string header = string.Format(Uniconta.ClientTools.Localization.lookup("ImportOBJ"), Uniconta.ClientTools.Localization.lookup("Company"));
+                    AddDockItem(TabControls.ImportFromOtherCompanySetup, compParams, header);
                 }
             }
             catch (Exception ex)
@@ -715,7 +668,29 @@ namespace UnicontaClient.Pages.CustomPage
             if (setupType == 1)
                 busyIndicator.IsBusy = false;
         }
+        async void AfterCompanyCreated(Company editrow, int setupType)
+        {
+            Company[] companies = await BasePage.session.GetCompanies();
+            UnicontaClient.Controls.CWDefaultCompany.loadedCompanies = companies;
 
+            if (Utility.GetDefaultCompany() == null)
+                globalEvents.OnRefresh(NameOfControl);
+            if (setupType == 1)/* Import- Financial year not required*/
+            {
+                await SaveFinancialYear(editrow, dateFrm.DateTime.Date, dateTo.DateTime.Date);
+                if (fromCompany != null)
+                    await CopyBaseData();
+            }
+            await SaveCompanyLogos();
+            if (usermaster != null && usermaster.Uid != session.Uid)
+            {
+                busyIndicator.IsBusy = false;
+                return;
+            }
+
+            globalEvents.OnRefresh(TabControls.CreateCompany, editrow.RowId);
+            CloseDockItem();
+        }
         async private Task SaveCompanyLogos()
         {
             var companyDocumentsList = new List<CompanyDocumentClient>();
@@ -889,7 +864,6 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-#if !SILVERLIGHT
         private void CorasauLayoutItem_OnButtonClicked(object sender)
         {
             var location = editrow.Address1 + "+" + editrow.Address2 + "+" + editrow.Address3 + "+" + editrow.Country;
@@ -1011,6 +985,14 @@ namespace UnicontaClient.Pages.CustomPage
 
             }
         }
-#endif
+
+        public override async void Utility_Refresh(string screenName, object argument = null)
+        {
+            if (screenName == TabControls.ImportFromOtherCompanySetup)
+            {
+                Company comp = argument as Company;
+                AfterCompanyCreated(comp, 0);
+            }
+        }
     }
 }

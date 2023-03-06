@@ -67,7 +67,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void InitPage(UnicontaBaseEntity masterRecord)
         {
             var tableId = masterRecord.ClassId();
-            if ((tableId >= 301 && tableId <= 309) || tableId == Uniconta.DataModel.User.CLASS_ID)
+            if ((tableId >= 301 && tableId <= 309) || tableId == Uniconta.DataModel.User.CLASSID)
                 Group.Visible = false;
             dgNotesGrid.UpdateMaster(masterRecord);
             InitPage();

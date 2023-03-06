@@ -5,6 +5,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CrmProspectPage2"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:Controls="clr-namespace:UnicontaClient.Controls"
         xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools" 
         xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
         xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors">
@@ -25,7 +26,10 @@ x:Class="UnicontaClient.Pages.CustomPage.CrmProspectPage2"
                     <CorasauControls:CorasauLayoutItem FieldName="Name" x:Name="liName">
                         <CorasauControls:TextEditor Text="{Binding Name,Mode=TwoWay}" x:Name="txtName"/>
                     </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="CompanyRegNo" x:Name="liCompanyRegNo">
+                    <CorasauControls:CorasauLayoutItem FieldName="CompanyRegNo" x:Name="liCompanyRegNo" Style="{StaticResource LayoutItemsstyle}"  ButtonClicked="liCompanyRegNo_ButtonClicked" Padding="0">
+                        <CorasauControls:CorasauLayoutItem.ButtonContent>
+                            <Controls:CrownControl/>
+                        </CorasauControls:CorasauLayoutItem.ButtonContent>
                         <CorasauControls:TextEditor Text="{Binding CompanyRegNo,Mode=TwoWay}" x:Name="txtCompanyRegNo"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="Address1" x:Name="liAddress1">

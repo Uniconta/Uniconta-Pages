@@ -339,7 +339,11 @@ namespace UnicontaClient.Pages.CustomPage
                     RecalculateWeekInternalMileage();
                 }
                 if (e.PropertyName == "Project")
+                {
                     rec.Task = null;
+                    if (IsProjectBlocked(rec._Project))
+                        UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("ProjectIsBlocked"), Uniconta.ClientTools.Localization.lookup("Warning"));
+                }
             }
             else if (e.PropertyName == "PayrollCategory")
             {
@@ -528,10 +532,15 @@ namespace UnicontaClient.Pages.CustomPage
                 }
                 RecalculateEfficiencyPercentage();
                 if (e.PropertyName == "Project")
+                {
                     rec.Task = null;
 
-                var proj = (Uniconta.DataModel.Project)projCache.Get(rec._Project);
-                SetProjectTask(proj, rec);
+                    if (IsProjectBlocked(rec._Project))
+                        UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("ProjectIsBlocked"), Uniconta.ClientTools.Localization.lookup("Warning"));
+
+                    var proj = (Uniconta.DataModel.Project)projCache.Get(rec._Project);
+                    SetProjectTask(proj, rec);
+                }
             }
             else if (e.PropertyName == "PayrollCategory")
             {
@@ -808,6 +817,9 @@ namespace UnicontaClient.Pages.CustomPage
 
             foreach (var rec in copyPrevJournalLine)
             {
+                if (IsProjectBlocked(rec._Project))
+                    continue;
+                
                 rec._Date = JournalLineDate;
                 rec._Day1 = rec._Day2 = rec._Day3 = rec._Day4 = rec._Day5 = rec._Day6 = rec._Day7 = 0;
                 rec._AddressFrom = rec._AddressTo = rec._VechicleRegNo = null;
@@ -816,6 +828,14 @@ namespace UnicontaClient.Pages.CustomPage
                 rec.RowId = 0;
                 dgTMJournalLineGrid.AddRow(rec, -1, false);
             }
+        }
+
+        bool IsProjectBlocked(string project)
+        {
+            var proj = (Uniconta.DataModel.Project)projCache.Get(project);
+            if (proj != null && (proj._Blocked || (proj._Phase != ProjectPhase.Created && proj._Phase != ProjectPhase.Accepted && proj._Phase != ProjectPhase.InProgress)))
+                return true;
+            return false;
         }
 
         void SetValuesForGridProperties()
@@ -960,7 +980,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 if (internalTransLst != null || journalLineNotApprovedLst != null)
                 {
-                    var vacationStartDate = JournalLineDate < new DateTime(2021, 1, 1) ? new DateTime(2020, 5, 1) : new DateTime(JournalLineDate.Year, 1, 1);
+                    var vacationStartDate = JournalLineDate < new DateTime(2023, 1, 1) ? new DateTime(JournalLineDate.Year, 1, 1) : new DateTime(2023, 1, 1);
 
                     if (internalTransLst != null)
                     {
@@ -997,7 +1017,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 if (internalTransLst != null || journalLineNotApprovedLst != null)
                 {
-                    var vacationStartDate = JournalLineDate < new DateTime(2021, 1, 1) ? new DateTime(2020, 5, 1) : new DateTime(JournalLineDate.Year, 1, 1);
+                    var vacationStartDate = JournalLineDate < new DateTime(2023, 1, 1) ? new DateTime(JournalLineDate.Year, 1, 1) : new DateTime(2023, 1, 1);
 
                     if (internalTransLst != null)
                     {
@@ -1917,26 +1937,26 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         string header = string.Format("{0} : {1} ({2}: {3} {4}: {5})", Uniconta.ClientTools.Localization.lookup("RemainingBudget"), selectedItem?._Project, Uniconta.ClientTools.Localization.lookup("WorkSpace"),
                                                                              selectedItem?._WorkSpace, Uniconta.ClientTools.Localization.lookup("Task"), selectedItem?._Task);
-                        AddDockItem(TabControls.RemainingBudgetLine, dgTMJournalLineGrid.syncEntity, true, header, null, new Point() { X=25,Y=350});
+                        AddDockItem(TabControls.RemainingBudgetLine, dgTMJournalLineGrid.syncEntity, true, header, null, new Point() { X = 25, Y = 350 });
                     }
                     break;
                 case "CrmFollowUp":
-                    if (this.employee!= null)
+                    if (this.employee != null)
                     {
                         var empParam = new List<BasePage.ValuePair> { new BasePage.ValuePair("Employee", employee.KeyStr) };
                         AddDockItem(TabControls.CrmFollowUpPage, null, Uniconta.ClientTools.Localization.lookup("FollowUp"), null, true, null, empParam);
                     }
                     break;
                 case "Task":
-                    if (this.employee!= null)
+                    if (this.employee != null)
                     {
                         var empParams = new List<BasePage.ValuePair> { new BasePage.ValuePair("Employee", employee.KeyStr) };
-                        AddDockItem(TabControls.ProjectTaskGridPage, null,Uniconta.ClientTools.Localization.lookup("Tasks"), null, true, null, empParams);
+                        AddDockItem(TabControls.ProjectTaskGridPage, null, Uniconta.ClientTools.Localization.lookup("Tasks"), null, true, null, empParams);
                     }
                     break;
                 case "KmRegnskab":
                     var Parameters = new List<BasePage.ValuePair> { new BasePage.ValuePair("Dashboard", "UCDK-std-Km-Regnskab") };
-                    AddDockItem(TabControls.DashBoardViewerPage,null, string.Concat(Uniconta.ClientTools.Localization.lookup("Dashboard"), ": ", "Km Regnskab"), null, true, null, Parameters);
+                    AddDockItem(TabControls.DashBoardViewerPage, null, string.Concat(Uniconta.ClientTools.Localization.lookup("Dashboard"), ": ", "Km Regnskab"), null, true, null, Parameters);
                     break;
                 case "FerieogFlex":
                     var param = new List<BasePage.ValuePair> { new BasePage.ValuePair("Dashboard", "UCDK-Std-Ferie-og-Flex") };
@@ -1945,6 +1965,11 @@ namespace UnicontaClient.Pages.CustomPage
                 case "Produktion":
                     var prodParam = new List<BasePage.ValuePair> { new BasePage.ValuePair("Dashboard", "UCDK-Std-Medarbejder-TimeProduktion") };
                     AddDockItem(TabControls.DashBoardViewerPage, null, string.Concat(Uniconta.ClientTools.Localization.lookup("Dashboard"), ": ", "Produktion"), null, true, null, prodParam);
+                    break;
+                case "BudgetPanningSchedule":
+                    var ctrl = dockCtrl.AddDockItem(TabControls.ProjectBudgetPlanningSchedulePage, null, this.employee, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("BudgetPlanningSchedule"), this.employee._Name)) as ProjectBudgetPlanningSchedulePage;
+                    ctrl.startupStartDate = txtDateTo.DateTime;
+                    ctrl.startupView = "WeekView";
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);
@@ -2262,8 +2287,7 @@ namespace UnicontaClient.Pages.CustomPage
             var proj = (Uniconta.DataModel.Project)projCache.Get(rec._Project);
             if (proj != null)
             {
-                var order = new DebtorOrder() { _DCAccount = proj._DCAccount };
-                var priceLookup = new Uniconta.API.DebtorCreditor.FindPrices(order, api);
+                var priceLookup = new Uniconta.API.DebtorCreditor.FindPrices(proj, api);
                 return priceLookup;
             }
             return null;
@@ -2804,7 +2828,7 @@ namespace UnicontaClient.Pages.CustomPage
                 CopyLines();
         }
 
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             projCache = projCache ?? await api.LoadCache<Uniconta.DataModel.Project>().ConfigureAwait(false);
             payrollCache = payrollCache ?? await api.LoadCache<Uniconta.DataModel.EmpPayrollCategory>().ConfigureAwait(false);
@@ -2814,7 +2838,7 @@ namespace UnicontaClient.Pages.CustomPage
             ItemCache = ItemCache ?? await api.LoadCache(typeof(Uniconta.DataModel.InvItem)).ConfigureAwait(false);
             workspaceCache = workspaceCache ?? await api.LoadCache<Uniconta.DataModel.PrWorkSpace>().ConfigureAwait(false);
 
-            LoadType(new Type[] { typeof(Uniconta.DataModel.Debtor) });
+            LoadType(new Type[] { typeof(Uniconta.DataModel.Debtor), typeof(Uniconta.DataModel.ProjectTask) });
 
             defaultWrkSpace = workspaceCache.FirstOrDefault(s => s._Default)?._Number;
             dgTMJournalLineGrid.WorkSpaceDefault = defaultWrkSpace;

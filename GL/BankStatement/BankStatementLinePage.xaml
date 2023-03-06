@@ -6,7 +6,6 @@ x:Class="UnicontaClient.Pages.CustomPage.BankStatementLinePage"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    xmlns:toolkit="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Toolkit"
     xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
     xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage" 
     xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
@@ -60,7 +59,8 @@ x:Class="UnicontaClient.Pages.CustomPage.BankStatementLinePage"
                                     </localPage:CorasauDataGridTemplateColumnClient.HeaderTemplate>
                                     <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                         <DataTemplate>
-                                            <CorasauControls:CheckEditor Name="PART_Editor" Margin="5,0" EditValue="{Binding DataContext.RowData.Row.Mark,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent},UpdateSourceTrigger=PropertyChanged}" IsEnabled="True"/>
+                                            <CheckBox Name="PART_Editor" Margin="5,0" IsChecked="{Binding DataContext.RowData.Row.Mark,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent},UpdateSourceTrigger=PropertyChanged}"
+                                                                         IsEnabled="True"/>
                                         </DataTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridTemplateColumnClient>
@@ -121,7 +121,7 @@ x:Class="UnicontaClient.Pages.CustomPage.BankStatementLinePage"
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="VoidLine" Width="60" HideHeaderCheck="True"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Reconciled" Width="60" Visible="False"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="MultiLine" Width="60" Visible="False"/>
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="VoucherReference" Width="85"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="DocumentRef" Width="85"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="HasVoucher"  Width="80" ReadOnly="True" >
                                     <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                                         <ControlTemplate>
@@ -169,7 +169,8 @@ x:Class="UnicontaClient.Pages.CustomPage.BankStatementLinePage"
                                     </localPage:CorasauDataGridTemplateColumnClient.HeaderTemplate>
                                     <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                         <DataTemplate>
-                                            <CorasauControls:CheckEditor Name="PART_Editor" Margin="5,0" EditValue="{Binding DataContext.RowData.Row.Mark,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent},UpdateSourceTrigger=PropertyChanged}" IsEnabled="True"/>
+                                            <CheckBox Name="PART_Editor" Margin="5,0" IsChecked="{Binding DataContext.RowData.Row.Mark,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent},UpdateSourceTrigger=PropertyChanged}" 
+                                                      IsEnabled="True"/>
                                         </DataTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridTemplateColumnClient>
@@ -183,9 +184,9 @@ x:Class="UnicontaClient.Pages.CustomPage.BankStatementLinePage"
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Datecol" FieldName="Date" Width="90"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Accountcol" FieldName="Account" Width="90" Visible="False" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="NumberSerie"  Width="50" Visible="False"/>
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="DocumentRef" Width="70" AllowThousandMask="False"/>
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Vouchercol" FieldName="Voucher" Width="70" AllowThousandMask="False"/>
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="VoucherLinecol" FieldName="VoucherLine" Width="50" AllowThousandMask="False" Visible="False" />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="DocumentRefcol" FieldName="DocumentRef" Width="70" />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Vouchercol" FieldName="Voucher" Width="70" />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="VoucherLinecol" FieldName="VoucherLine" Width="50"  Visible="False" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Textcol" FieldName="Text" Width="200"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="TransTypecol" FieldName="TransType" Visible="False"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Debitcol" FieldName="Debit" Visible="False" Width="100"/>
@@ -193,8 +194,9 @@ x:Class="UnicontaClient.Pages.CustomPage.BankStatementLinePage"
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Amountcol"  FieldName="Amount" Width="100"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="AmountCur" Width="100"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Totalcol" FieldName="Total" Width="100"/>
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Invoicecol" FieldName="Invoice"  Width="80" AllowThousandMask="false"/>
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="JournalPostedIdcol" FieldName="JournalPostedId"  Width="50" AllowThousandMask="False"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Invoicecol" FieldName="Invoice"  Width="80" />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="JournalPostedIdcol" FieldName="JournalPostedId"  Width="50" />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Origin" Width="100" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Vatcol" Width="50" FieldName="Vat" Visible="False" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="VatOperationcol" FieldName="VatOperation" Width="30" Visible="False" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="AmountVat" Visible="False" />
@@ -217,11 +219,8 @@ x:Class="UnicontaClient.Pages.CustomPage.BankStatementLinePage"
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Name"   Visible="False"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Correction"  Width="50" Visible="False"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Canceled"  Width="50" Visible="False"/>
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Accrual"  Width="50" Visible="False" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Accrued"  Width="50" Visible="False" />
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Allocation"  Width="50" Visible="False" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Allocated" Width="50" Visible="False" />
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="YearTransfer"  Width="50" Visible="False" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="VatEntered" Width="50" Visible="False" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim1" Width="70" FieldName="Dimension1" ShowInColumnChooser="False"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim2" Width="70" FieldName="Dimension2" ShowInColumnChooser="False"/>

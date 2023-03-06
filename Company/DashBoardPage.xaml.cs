@@ -17,6 +17,7 @@ using Uniconta.API.Service;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.Common;
+using DevExpress.Data.Filtering;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -39,6 +40,7 @@ namespace UnicontaClient.Pages.CustomPage
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgDashboardpage.RowDoubleClick += DgDashboardpage_RowDoubleClick;
             colUserId.Header = Uniconta.ClientTools.Localization.lookup("UserId");
+            CriteriaOperator.RegisterCustomFunction(new DashBoardView.ExchangeRateFunction(new Uniconta.API.System.CrudAPI(api)));
         }
 
         private void DgDashboardpage_RowDoubleClick()
@@ -51,12 +53,12 @@ namespace UnicontaClient.Pages.CustomPage
             var selectedItem = dgDashboardpage.SelectedItem as DashboardClient;
             switch (ActionType)
             {
-                  case "OpenDashboard":
+                case "OpenDashboard":
                     if (selectedItem == null)
                         return;
-                    AddDockItem(TabControls.DashBoardViewerPage, selectedItem, string.Format("{0}:{1}",Uniconta.ClientTools.Localization.lookup("Dashboard") ,selectedItem._Name ));
+                    AddDockItem(TabControls.DashBoardViewerPage, selectedItem, string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("Dashboard"), selectedItem._Name));
                     break;
-                  default:
+                default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }

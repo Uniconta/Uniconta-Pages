@@ -26,7 +26,6 @@ namespace UnicontaClient.Pages.CustomPage
         public override void OnClosePage(object[] RefreshParams)
         {
             globalEvents.OnRefresh(NameOfControl, RefreshParams);
-
         }
         public override string NameOfControl { get { return TabControls.DebtorTranPage2; } }
 
@@ -36,15 +35,15 @@ namespace UnicontaClient.Pages.CustomPage
             : base(sourcedata, true)
         {
             InitializeComponent();
-            InitPage(api);
+            InitPage();
         }
         public DebtorTranPage2(CrudAPI crudApi, string dummy)
             : base(crudApi, dummy)
         {
             InitializeComponent();
-            InitPage(crudApi);
+            InitPage();
         }
-        void InitPage(CrudAPI crudapi)
+        void InitPage()
         {
             Paymentlookupeditior.api= Vatlookupeditior.api = PaymtFormatlookupeditor.api = api;
             Paymentlookupeditior.api = api;
@@ -52,6 +51,8 @@ namespace UnicontaClient.Pages.CustomPage
             frmRibbon.DisableButtons("Delete");
             layoutItems.DataContext = editrow;
             frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
+            if (!api.CompanyEntity._CollectionLetter)
+                grpReminders.Visibility = System.Windows.Visibility.Hidden;
         }
 
         private void frmRibbon_OnItemClicked(string ActionType)

@@ -37,7 +37,6 @@ namespace UnicontaClient.Pages.CustomPage
         [ForeignKeyAttribute(ForeignKeyTable = typeof(InvItem))]
         [Display(Name = "InvoicingItemNumber", ResourceType = typeof(PrCategoryText))]
         public string InvoiceItem { get { return _Item; } set { if (_Item == value) return; _Item = value; _itemRec = null; NotifyPropertyChanged("Item"); NotifyPropertyChanged("ItemName"); NotifyPropertyChanged("Text"); } }
-
         public bool IsEnabled { get { return !Invoiced; } }
 
         public double _SalesAmountAgr, _CostAmountAgr;
@@ -131,7 +130,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         SQLCache ItemCache, CategoryCache;
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             ItemCache = api.GetCache(typeof(Uniconta.DataModel.InvItem)) ??
                         await api.LoadCache(typeof(Uniconta.DataModel.InvItem)).ConfigureAwait(false);

@@ -26,9 +26,22 @@ x:Class="UnicontaClient.Pages.CustomPage.PostedJournals"
                         </localPage:CorasauDataGridTemplateColumnClient.EditSettings>
                     </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PostedBy" Width="100" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="JournalPostedId" Width="60"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="JournalPostedId" Width="60">
+                        <localPage:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Margin="5,0,0,0" TextDecorations="Underline" Cursor="Hand" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.JournalPostedId,RelativeSource={RelativeSource TemplatedParent}}" PreviewMouseDown="Name_PreviewMouseDown"></TextBlock>
+                                    <TextBlock Grid.Column="1"></TextBlock>
+                                </Grid>
+                            </DataTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                    </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Reference" Width="150" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ReferenceName" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ReferenceName"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="NumberSerie" Width="60" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Voucher" Width="60"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="VoucherPrefix" Width="100" Visible="False"/>

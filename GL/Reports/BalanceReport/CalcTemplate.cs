@@ -14,6 +14,7 @@ using System.Windows.Shapes;
 using Uniconta.Common;
 using Uniconta.DataModel;
 using Uniconta.Common.Utility;
+using DevExpress.Xpf.Grid;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -123,6 +124,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             AccountName.Visible = AccountNo.Visible = false;
             Text.Visible = true;
+            ((TableView)dgBalanceReport.View).RowStyle = Application.Current.Resources["TemplateRowStyle"] as Style;
             dgBalanceReport.ItemsSource = TemplateReportlist;
             templateReportData = new object[] { items, hdrData, PassedCriteria.ObjBalance, null };
             return newBalance;

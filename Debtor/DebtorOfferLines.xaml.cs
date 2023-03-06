@@ -105,6 +105,7 @@ namespace UnicontaClient.Pages.CustomPage
                     line._Date = it._Date;
                     line._Week = it._Week;
                     line._Note = it._Note;
+                    TableField.SetUserFieldsFromRecord(it, line);
                     lst.Add(line);
                 }
             }
@@ -183,11 +184,17 @@ namespace UnicontaClient.Pages.CustomPage
 
         void SetupMaster(UnicontaBaseEntity args)
         {
-            PriceLookup = null;
             var OrderId = Order?.RowId;
             dgDebtorOfferLineGrid.UpdateMaster(args);
-            if (Order.RowId != OrderId)
-                PriceLookup = new Uniconta.API.DebtorCreditor.FindPrices(Order, api);
+            if (Order?.RowId != OrderId)
+            {
+                if (Order == null)
+                    PriceLookup = null;
+                else if (PriceLookup == null)
+                    PriceLookup = new Uniconta.API.DebtorCreditor.FindPrices(Order, api);
+                else
+                    PriceLookup.OrderChanged(Order);
+            }
         }
         void SetHeader()
         {
@@ -282,8 +289,8 @@ namespace UnicontaClient.Pages.CustomPage
                         else if (api.CompanyEntity._OrderLineOne)
                             rec.Qty = 1d;
                         rec.SetItemValues(selectedItem);
-                        this.PriceLookup = _priceLookup;
                         _priceLookup?.SetPriceFromItem(rec, selectedItem);
+                        this.PriceLookup = _priceLookup;
 
                         if (selectedItem._StandardVariant != rec.standardVariant)
                         {
@@ -538,12 +545,18 @@ namespace UnicontaClient.Pages.CustomPage
 
                 double qty = 0d;
                 int i = 0;
+                var Comp = Company.Get(order.CompanyId);
+                var items = Comp?.GetCache(typeof(Uniconta.DataModel.InvItem));
+                bool reloadCache = false;
                 foreach (var lin in source)
                 {
                     i++;
                     var orderLine = (DCOrderLineClient)lin;
                     if (!orderLine._Subtotal)
                     {
+                        if (orderLine._Item != null && items != null && items.Get(orderLine._Item) == null)
+                            reloadCache = true;
+
                         qty += orderLine._Qty;
                         var cost = orderLine.costvalue();
                         Costsum += cost;
@@ -582,6 +595,8 @@ namespace UnicontaClient.Pages.CustomPage
                     order.NoLines = i;
                     order.TotalQty = Math.Round(qty, 10);
                 }
+                if (reloadCache)
+                    new QueryAPI(BasePage.session, Comp).LoadCache(typeof(Uniconta.DataModel.InvItem), true);
             }
             Amountsum = Math.Round(Amountsum, 2);
             double AmountsumCur = exRate == 0d ? Amountsum : Math.Round(Amountsum / exRate, 2);
@@ -716,18 +731,12 @@ namespace UnicontaClient.Pages.CustomPage
                 case "CreateFromInvoice":
                     try
                     {
-                        CWCreateOrderFromQuickInvoice createOrderCW = new CWCreateOrderFromQuickInvoice(api, Order.Account, false, Order);
-                        createOrderCW.Closing += delegate
-                       {
-                           if (createOrderCW.DialogResult == true)
-                           {
-                               var orderApi = new OrderAPI(api);
-                               var checkIfCreditNote = createOrderCW.chkIfCreditNote.IsChecked.HasValue ? createOrderCW.chkIfCreditNote.IsChecked.Value : false;
-                               var debtorInvoice = createOrderCW.dgCreateOrderGrid.SelectedItem as DebtorInvoiceClient;
-                               dgDebtorOfferLineGrid.PasteRows(createOrderCW.DCOrderLines);
-                           }
-                       };
-                        createOrderCW.Show();
+                        var par = new object[4];
+                        par[0] = api;
+                        par[1] = Order.Account;
+                        par[2] = false;
+                        par[3] = Order;
+                        AddDockItem(TabControls.CreateOrderFromQuickInvoice, par, true, String.Format(Uniconta.ClientTools.Localization.lookup("CopyOBJ"), Uniconta.ClientTools.Localization.lookup("Invoice")));
                     }
                     catch (Exception ex)
                     {
@@ -756,7 +765,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "RefreshGrid":
                     RefreshGrid();
-                    break;
+                    return; // RecalculateAmount called in refresh method
                 case "ViewItemAttachments":
                     if (selectedItem?.InvItem != null && selectedItem?.Item!= null)
                         AddDockItem(TabControls.UserDocsPage, selectedItem.InvItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Documents"), selectedItem?.InvItem?._Name));
@@ -826,8 +835,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (t != null && offerLine.RowId == 0)
                 await t;
 
-            object[] arr = new object[3] { api, offerLine, dgDebtorOfferLineGrid.masterRecord };
-            AddDockItem(TabControls.ProductionOrdersPage2, arr, Uniconta.ClientTools.Localization.lookup("Production"), "Add_16x16.png");
+            AddDockItem(TabControls.ProductionOrdersPage2, new object[] { api, offerLine, dgDebtorOfferLineGrid.masterRecord }, Uniconta.ClientTools.Localization.lookup("Production"), "Add_16x16.png");
         }
 
         public override void Utility_Refresh(string screenName, object argument)
@@ -859,6 +867,12 @@ namespace UnicontaClient.Pages.CustomPage
                     dgDebtorOfferLineGrid.PasteRows(invItems);
                 }
             }
+            else if (screenName == TabControls.CreateOrderFromQuickInvoice && argument != null)
+            {
+                var args = argument as object[];
+                var orderlines = args[2] as IEnumerable<UnicontaBaseEntity>;
+                dgDebtorOfferLineGrid.PasteRows(orderlines);
+            }
         }
 
         async void RefreshGrid()
@@ -866,7 +880,10 @@ namespace UnicontaClient.Pages.CustomPage
             var savetask = saveGrid(); // we need to wait until it is saved, otherwise Storage is not updated
             if (savetask != null)
                 await savetask;
-            gridRibbon_BaseActions("RefreshGrid");
+            await dgDebtorOfferLineGrid.RefreshTask();
+            RecalculateAmount();
+            if (this.items.CacheAge.TotalMinutes > 10d)
+                this.items = await api.LoadCache(typeof(Uniconta.DataModel.InvItem), true);
         }
 
         async void ViewStorage()
@@ -999,7 +1016,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             var api = this.api;
             var Comp = api.CompanyEntity;

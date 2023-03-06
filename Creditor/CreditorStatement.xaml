@@ -106,6 +106,8 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorStatement"
                                     <localPage:CorasauDataGridTemplateColumnClient x:Name="HasVoucher" Width="50"/>
                                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryAccount" Visible="False"/>
                                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DocumentRef" Visible="False"/>
+                                    <localPage:CorasauDataGridTemplateColumnClient x:Name="OrderNumber" Width="60" Visible="False"/>
+                                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ReferenceNumber" Visible="False" />
                                 </localPage:CreditorStatementGridClient.Columns>
                                 <localPage:CreditorStatementGridClient.TotalSummary>
                                     <localPage:SumColumn FieldName="Amount" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>

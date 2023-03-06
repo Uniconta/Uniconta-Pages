@@ -40,6 +40,7 @@ x:Class="UnicontaClient.Pages.CustomPage.PostedTransactions"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Currency" Width="35"/>
 					<localPage:CorasauDataGridTemplateColumnClient x:Name="AmountCur"/>
 					<localPage:CorasauDataGridTemplateColumnClient x:Name="HasVoucher" Width="50"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Origin" Width="100" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Invoice" Width="70" AllowThousandMask="false" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DocumentDate" Width="85" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DocumentRef" Width="50" Visible="False" />
@@ -57,13 +58,9 @@ x:Class="UnicontaClient.Pages.CustomPage.PostedTransactions"
 					<localPage:CorasauDataGridTemplateColumnClient x:Name="DebitCur" Visible="False"/>
 					<localPage:CorasauDataGridTemplateColumnClient x:Name="CreditCur" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Canceled" Width="50" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Accrual" Width="50" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Accrued" Width="50" Visible="False" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Allocation" Width="50" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Allocated" Width="50" Visible="False" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="YearTransfer" Width="50" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PostCalculated" Width="50" Visible="False" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PrimoTrans" Width="50" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Reconciled" Width="50" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="VatEntered" Width="50" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim1" Width="70" FieldName="Dimension1" ShowInColumnChooser="False"/>

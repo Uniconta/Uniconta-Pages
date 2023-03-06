@@ -10,7 +10,10 @@
     <RibbonItem Action="DetailView" LocalizedNameKey="DetailView" Glyph="Detailed_View_32x32.png" LargeGlyph="Detailed_View_32x32.png"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh.png" LargeGlyph="refresh.png"/>
+    <RibbonItem LocalizedNameKey="Refresh" Action="RefreshGrid" ShortcutKey="Ctrl+R" LargeGlyph="refresh.png">
+      <!--<RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="UseFilter" Glyph="Filter_16x16.png"/>
+      <RibbonItem Action="ClearFilter" LocalizedNameKey="ClearFilter" ShortcutKey="Ctrl+K" Glyph="Delete_16x16.png"/>-->
+    </RibbonItem>
     <RibbonItem Action="Filter" ShortcutKey="Ctrl+I" LocalizedNameKey="Filter" LargeGlyph="Filter_32x32.png"/>
   </RibbonItem>
   <RibbonItem>   
@@ -41,15 +44,15 @@
     <RibbonItem Action="CreditorTran" LocalizedNameKey="Transactions" ControlName="CreditorTransactions" Glyph="Cover_16x16.png" LargeGlyph="Account-statement_32x32.png" ShortcutKey="CTRL+T"/>
     <RibbonItem Action="OpenTran" LocalizedNameKey="OpenTrans" ShortcutKey="F8" ControlName="CreditorOpenTransactions" LargeGlyph="Open_Transaction_32x32.png" />
     <RibbonItem Action="CreditorStatement" LocalizedNameKey="Statement" ControlName="CreditorStatement" LargeGlyph="Show_Invoice_32x32.png" />
-    <RibbonItem Action="InvTran" LocalizedNameKey="InvTransactions" ControlName="CreditorInvoiceLine" LargeGlyph="Inventory_Trans_32x32.png" />
-    <RibbonItem Action="CreditorTransPivot" LocalizedNameKey="PivotTable" ControlName="CreditorInvoiceLinesPivotReport" LargeGlyph="Category_Charge_32x32.png" />
+    <RibbonItem Action="InvTran" LocalizedNameKey="InvTransactions" ControlName="CreditorInvoiceLine" Module="Inventory" LargeGlyph="Inventory_Trans_32x32.png" />
+    <RibbonItem Action="CreditorTransPivot" LocalizedNameKey="PivotTable" ControlName="CreditorInvoiceLinesPivotReport" Module="Inventory" LargeGlyph="Category_Charge_32x32.png" />
   </RibbonItem> 
   <RibbonItem>
     <RibbonItem Action="Orders" LocalizedNameKey="CreditorOrders" ControlName="CreditorOrders" Module="Purchase" LargeGlyph="Orders_32x32.png" />
-    <RibbonItem Action="Invoices" LocalizedNameKey="Invoices" ControlName="CreditorInvoice" LargeGlyph="Invoice_32x32.png" />
+    <RibbonItem Action="Invoices" LocalizedNameKey="Invoices" ControlName="CreditorInvoice" Module="FullPackage" LargeGlyph="Invoice_32x32.png" />
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="QueriesandReports" LocalizedNameKey="QueriesandReports" LargeGlyph="Statistics_32x32.png">
+    <RibbonItem Action="QueriesandReports" LocalizedNameKey="QueriesandReports" Module="Inventory" LargeGlyph="Statistics_32x32.png">
       <RibbonItem Action="AccountStat" LocalizedNameKey="CreditorAccountStat" ControlName="InventoryTotals" LargeGlyph=""/>
     </RibbonItem>
   </RibbonItem>

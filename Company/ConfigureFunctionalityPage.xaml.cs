@@ -78,6 +78,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (ActionType == "Save")
             {
+                editrow._LogTableChanges = editrow.TraceFieldChanges;
                 await this.saveForm();
                 var MainPageObj = App.MainPageObj;
                 MainPageObj.dockCtrl.CloseAllDocuments(false);

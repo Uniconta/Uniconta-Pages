@@ -49,12 +49,12 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            DialogResult = false;
+            SetDialogResult(false);
         }
 
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
-            DialogResult = true;
+            SetDialogResult(true);
         }
     }
 }

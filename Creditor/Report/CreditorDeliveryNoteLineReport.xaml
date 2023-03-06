@@ -45,6 +45,8 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorDeliveryNoteLineReport"
                     <local:CorasauDataGridTemplateColumnClient x:Name="Week" Width="70"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="DateOnOrder" Width="70" />
                     <local:ComboBoxColumnClient x:Name="Unit" Width="70"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DCAccount" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Name" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="OrderNumber" Width="70"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="DeliveryNoteNumber" Width="100" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="InvoiceRowId" Width="70" Visible="False"/>

@@ -60,7 +60,7 @@ x:Class="UnicontaClient.Pages.CustomPage.SimulatedPrJournalLinePage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Approved" Width="50"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="OnHold" Width="50"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Invoiceable" Width="50" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="VoucherReference" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DocumentRef" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ReferenceNumber" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CreditorAccount" Width="100"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PayrollCategory" Width="70"/>

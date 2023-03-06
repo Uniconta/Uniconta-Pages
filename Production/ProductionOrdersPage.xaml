@@ -52,7 +52,20 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionOrdersPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="Account" Width="70"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="AccountName" Width="100"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Group" Width="70"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="ProductionNumber" Width="70"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ProductionNumber" Width="70">
+                        <local:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Margin="5,0,0,0" TextDecorations="Underline" Cursor="Hand" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.ProductionNumber,RelativeSource={RelativeSource TemplatedParent}}" PreviewMouseDown="Name_PreviewMouseDown"></TextBlock>
+                                    <TextBlock Grid.Column="1"></TextBlock>
+                                </Grid>
+                            </DataTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
                     <local:CorasauDataGridTemplateColumnClient x:Name="ProdItem" Width="70"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="colVariant" FieldName="Variant" Width="80" >
                         <local:CorasauDataGridTemplateColumnClient.CellTemplate>
@@ -127,6 +140,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionOrdersPage"
                     <local:CorasauDataGridForeignKeyColumnClient x:Name="Task" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="WorkSpace"  Visible="False" Width="100"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Created" Width="100" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="LastReportedFinished" Width="100" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Remaining" Width="80" Visible="False" >
                         <local:CorasauDataGridTemplateColumnClient.CellTemplate>
                             <DataTemplate>

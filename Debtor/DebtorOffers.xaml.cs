@@ -114,6 +114,9 @@ namespace UnicontaClient.Pages.CustomPage
                 DeliveryZipCode.Visible = false;
                 DeliveryCity.Visible = false;
                 DeliveryCountry.Visible = false;
+                DeliveryContactPerson.Visible = false;
+                DeliveryPhone.Visible = false;
+                DeliveryContactEmail.Visible = false;
             }
             dgDebtorOffers.Readonly = true;
             if (!Comp.Project)
@@ -169,7 +172,10 @@ namespace UnicontaClient.Pages.CustomPage
         {
             localMenu_OnItemClicked("OfferLine");
         }
-
+        private void Name_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            dgDebtorOffers_RowDoubleClick();
+        }
         private void localMenu_OnItemClicked(string ActionType)
         {
             var selectedItem = dgDebtorOffers.SelectedItem as DebtorOfferClient;
@@ -418,10 +424,20 @@ namespace UnicontaClient.Pages.CustomPage
                 if (cwOfferToOrder.DialogResult == true)
                 {
                     var odrApi = new OrderAPI(api);
-                    ErrorCodes res = await odrApi.ConvertOfferToOrder(offerclient, cwOfferToOrder.KeepOffer);
+                    DebtorOrder debtorOrder = api.CompanyEntity.CreateUserType<DebtorOrderClient>();
+                    ErrorCodes res = await odrApi.ConvertOfferToOrder(offerclient, debtorOrder, cwOfferToOrder.KeepOffer);
                     if (res == ErrorCodes.Succes)
-                        InitQuery();
-                    UtilDisplay.ShowErrorCode(res);
+                    {
+                        if (!cwOfferToOrder.KeepOffer)
+                            dgDebtorOffers.RemoveFocusedRowFromGrid();
+                        var text = string.Format(" {0}. {1}:{2},{3}:{4}\r\n{5}", Uniconta.ClientTools.Localization.lookup("SalesOrderCreated"), Uniconta.ClientTools.Localization.lookup("OrderNumber"), debtorOrder._OrderNumber,
+                         Uniconta.ClientTools.Localization.lookup("Account"), debtorOrder._DCAccount, string.Concat(string.Format(Uniconta.ClientTools.Localization.lookup("GoTo"), Uniconta.ClientTools.Localization.lookup("Orderline")), " ?"));
+                        var select = UnicontaMessageBox.Show(text, Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.YesNo);
+                        if (select == MessageBoxResult.Yes)
+                            AddDockItem(TabControls.DebtorOrderLines, debtorOrder, string.Format("{0}:{1},{2}", Uniconta.ClientTools.Localization.lookup("OrdersLine"), debtorOrder._OrderNumber, debtorOrder._DCAccount));
+                    }
+                    else
+                        UtilDisplay.ShowErrorCode(res);
                 }
             };
             cwOfferToOrder.Show();

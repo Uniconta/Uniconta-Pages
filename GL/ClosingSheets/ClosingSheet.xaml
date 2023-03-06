@@ -26,7 +26,20 @@ x:Class="UnicontaClient.Pages.CustomPage.ClosingSheet"
                                                                    CellDisplayTemplate="{StaticResource NotesDisplayTemplate}" Visible="True" ShowInColumnChooser="true"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="HasDocs" ReadOnly="True"  Width="30" HeaderTemplate="{StaticResource DocsHeaderTemplate}" 
                                                                    CellDisplayTemplate="{StaticResource DocsDisplayTemplate}" Visible="True" ShowInColumnChooser="True" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" Width="200"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" Width="200">
+                        <localPage:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Margin="5,0,0,0" TextDecorations="Underline" Cursor="Hand" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.Name,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" PreviewMouseDown="Name_PreviewMouseDown"></TextBlock>
+                                    <TextBlock Grid.Column="1"></TextBlock>
+                                </Grid>
+                            </DataTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                    </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="FromDate" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ToDate"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="FromDate2" Visible="False"/>

@@ -96,7 +96,11 @@ namespace UnicontaClient.Pages.CustomPage
                     var invApi = new InvoiceAPI(crudApi);
                     var invoiceLIneInstance = Activator.CreateInstance(debtorInvoiceLineUserType) as DebtorInvoiceLines;
                     dcInv = debtorInvoice;
+#if !UNIREPORT
                     InvTransInvoiceLines = (DebtorInvoiceLines[])await invApi.GetInvoiceLines(dcInv, invoiceLIneInstance);
+#else
+                    InvTransInvoiceLines = (DebtorInvoiceLines[])await invApi.GetInvoiceLines(dcInv, invoiceLIneInstance).ConfigureAwait(false);
+#endif
                     PreviousAddressClient = isMultipleInvoicePrint ? LayoutPrintReport.GetPreviousAddressClientForInvoice(previousAddressLookup, debtorInvoice) :
                         await LayoutPrintReport.GetPreviousAddressClientForInvoice(dcInv, crudApi);
                 }
@@ -184,7 +188,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (dcInv._Installation != null && Comp.GetCache(typeof(Uniconta.DataModel.WorkInstallation)) == null)
                     await Comp.LoadCache(typeof(Uniconta.DataModel.WorkInstallation), crudApi);
 
-                UnicontaClient.Pages.DebtorOrders.SetDeliveryAdress(debtorInvoiceClientUser, debtorClientUser, crudApi);
+                UtilCommon.SetDeliveryAdress(debtorInvoiceClientUser, debtorClientUser, crudApi);
                 debtorInvoiceClientUser.SetInvoiceAddress(debtorClientUser);
 
                 /*In case debtor order is null, fill from DCInvoice*/
@@ -200,11 +204,11 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                 }
 
-                Company = Utility.GetCompanyClientUserInstance(Comp);
+                Company = UtilCommon.GetCompanyClientUserInstance(Comp);
 
                 var InvCache = Comp.GetCache(typeof(InvItem)) ?? await crudApi.LoadCache(typeof(InvItem));
 
-                CompanyLogo = await Uniconta.ClientTools.Util.UtilDisplay.GetLogo(crudApi);
+                CompanyLogo = await UtilCommon.GetLogo(crudApi);
 
                 Language lang = ReportGenUtil.GetLanguage(debtorClientUser, Comp);
                 InvTransInvoiceLines = LayoutPrintReport.SetInvTransLines(DebtorInvoice, InvTransInvoiceLines, InvCache, crudApi, debtorInvoiceLineUserType, lang, false);
@@ -218,7 +222,7 @@ namespace UnicontaClient.Pages.CustomPage
                     : IsCreditNote ? "Creditnote" : "Invoice";
 
                 MessageClient = isMultipleInvoicePrint ? LayoutPrintReport.GetDebtorMessageClient(debtorMessageLookup, lang, GetDebtorEmailType()) :
-                    await Utility.GetDebtorMessageClient(crudApi, lang, GetDebtorEmailType());
+                    await UtilCommon.GetDebtorMessageClient(crudApi, lang, GetDebtorEmailType());
 
                 var _LayoutGroup = DebtorInvoice._LayoutGroup ?? Debtor._LayoutGroup;
                 if (_LayoutGroup != null)

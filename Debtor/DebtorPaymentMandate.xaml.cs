@@ -125,7 +125,7 @@ namespace UnicontaClient.Pages.CustomPage
             return true;
         }
           
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             var api = this.api;
             DebtorCache = api.GetCache(typeof(Uniconta.DataModel.Debtor)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Debtor)).ConfigureAwait(false);
@@ -181,9 +181,6 @@ namespace UnicontaClient.Pages.CustomPage
                 case "EnableStatusInfoSection":
                     hideStatusInfoSection = !hideStatusInfoSection;
                     SetShowHideStatusInfoSection(hideStatusInfoSection);
-                    break;
-                case "RefreshGrid":
-                    InitQuery();
                     break;
                 case "Filter":
                     InitQuery(); 

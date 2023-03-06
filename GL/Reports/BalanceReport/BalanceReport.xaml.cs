@@ -1122,11 +1122,7 @@ namespace UnicontaClient.Pages.CustomPage
             hdrData.BalanceName = header;
             DevExpress.XtraReports.UI.XtraReport frontPageReport = null;
             if (PassedCriteria.ObjBalance._PrintFrontPage)
-            {
-                var frontpageText = PassedCriteria.ObjBalance._FrontPage;
-                var frontPageData = PassedCriteria.ObjBalance.FrontPageData;
-                frontPageReport = await GetFrontPageXtraReport(cmplClient, frontpageText, PassedCriteria?.ObjBalance?._ReportFrontPage, frontPageData);
-            }
+                frontPageReport = await GetFrontPageXtraReport(cmplClient, PassedCriteria.ObjBalance);
 
             if (!string.IsNullOrEmpty(PassedCriteria.Template))
             {
@@ -1144,15 +1140,16 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        async private Task<DevExpress.XtraReports.UI.XtraReport> GetFrontPageXtraReport(CompanyClient company, string frontPageText, string frontPageTemplate, object frontPageData)
+        async private Task<DevExpress.XtraReports.UI.XtraReport> GetFrontPageXtraReport(CompanyClient company, Balance objBalance)
         {
-            var cmpClientUser = Utilities.Utility.GetCompanyClientUserInstance(company);
+            var cmpClientUser = UnicontaClient.Utilities.UtilCommon.GetCompanyClientUserInstance(company);
+            var frontPageTemplate = objBalance?._ReportFrontPage;
             busyIndicator.IsBusy = true;
             busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("LoadingMsg");
 
             DevExpress.XtraReports.UI.XtraReport balanceFrontPageReport = null;
             var userReportApi = new UserReportAPI(api);
-            
+
             if (!string.IsNullOrEmpty(frontPageTemplate))
             {
                 var dataBytes = await userReportApi.LoadForRun(frontPageTemplate, 50);
@@ -1161,7 +1158,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                 if (balanceFrontPageReport != null)
                 {
-                    var logoBytes = await UtilDisplay.GetLogo(api);
+                    var logoBytes = await UnicontaClient.Utilities.UtilCommon.GetLogo(api);
                     var accountantClient = session.User._Role == (byte)Uniconta.Common.User.UserRoles.Accountant ? await api.Query<AccountantClient>() : null;
                     var accountantInfoClient = await api.Query<AccountantClientInfoClient>(api.CompanyEntity);
                     balanceFrontPageReport.DataSource = new IStandardBalanceReportClient[1]
@@ -1171,9 +1168,10 @@ namespace UnicontaClient.Pages.CustomPage
                          * 2. ReportData
                          * 3. AccountantClient
                          * 4. AccountantInfoClient
+                         * 5. Text2
                          */
-                        new BalanceFrontPageReportClient(cmpClientUser, logoBytes, Uniconta.ClientTools.Localization.lookup("FrontPageReport"), frontPageText,frontPageData,
-                        accountantClient?.FirstOrDefault(),accountantInfoClient?.FirstOrDefault())
+                        new BalanceFrontPageReportClient(cmpClientUser, logoBytes, Uniconta.ClientTools.Localization.lookup("FrontPageReport"), objBalance._FrontPage,objBalance.FrontPageData,
+                        accountantClient?.FirstOrDefault(),accountantInfoClient?.FirstOrDefault(),objBalance._FrontPage2)
                     };
                 }
             }

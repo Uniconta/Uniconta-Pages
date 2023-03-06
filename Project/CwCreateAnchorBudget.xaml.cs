@@ -19,11 +19,9 @@ namespace UnicontaClient.Pages.CustomPage
         [Display(Name = "Group", ResourceType = typeof(InputFieldDataText))]
         public static string Group { get; set; }
 
-#if !SILVERLIGHT
         public int DialogTableId;
         protected override int DialogId { get { return DialogTableId; } }
         protected override bool ShowTableValueButton { get { return true; } }
-#endif
         public CwCreateAnchorBudget(CrudAPI crudApi, int dialogType = 0)
         {
             this.DataContext = this;

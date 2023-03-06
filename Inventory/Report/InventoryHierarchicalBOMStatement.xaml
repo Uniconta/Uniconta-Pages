@@ -5,6 +5,7 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryHierarchicalBOMStatement"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
              xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid" 
+             xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
              xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools">
     <UserControl.Resources>
         <Style x:Key="StyleRow" TargetType="dxg:GridRowContent">
@@ -20,62 +21,59 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryHierarchicalBOMStatement"
         </Grid.RowDefinitions>
         <CorasauControls:CorasauRibbonControl x:Name="localMenu" XMLSourcePath=";component/Pages/Inventory/Report/InventoryHierarchicalBOMRibbon.xml"/>
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1"  BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
-            <dxg:GridControl x:Name="dgInvBomclientGrid" AutoGenerateColumns="None">
-                <dxg:GridControl.Columns>
-                    <dxg:GridColumn FieldName="ItemPart" x:Name="ItemPart" Width="90" AllowEditing="False" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Item}"/>
-                    <dxg:GridColumn FieldName="Name" Width="80" AllowEditing="False" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Name}"/>
-                    <dxg:GridColumn FieldName="HasNotes" Width="50" ReadOnly="True">
-                        <dxg:GridColumn.HeaderTemplate>
+            <local:InventoryHierarchicalBOMGrid x:Name="dgInvBomclientGrid" AutoGenerateColumns="None">
+                <local:InventoryHierarchicalBOMGrid.Columns>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ItemPart" Width="90" AllowEditing="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Name" Width="80" AllowEditing="False"/>
+                    <local:CorasauDataGridTemplateColumnClient FieldName="HasNotes" Width="50" ReadOnly="True">
+                        <local:CorasauDataGridTemplateColumnClient.HeaderTemplate>
                             <DataTemplate>
                                 <Image Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Note_16x16.png}" Width="16" Height="16" VerticalAlignment="Center"/>
                             </DataTemplate>
-                        </dxg:GridColumn.HeaderTemplate>
-                        <dxg:GridColumn.DisplayTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.HeaderTemplate>
+                        <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                             <ControlTemplate>
                                 <Image Margin="5" Tag="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Note_16x16.png}" MouseLeftButtonDown="HasNoteImage_MouseLeftButtonDown" Visibility="{Binding DataContext.RowData.Row.HasNotes,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource VisibilityBoolConverter}}" Stretch="Fill" Width="16" Height="16" RenderOptions.BitmapScalingMode="NearestNeighbor" RenderOptions.EdgeMode="Aliased" />
                             </ControlTemplate>
-                        </dxg:GridColumn.DisplayTemplate>
-                    </dxg:GridColumn>
-                    <dxg:GridColumn FieldName="HasDocs" ReadOnly="True"  Width="50" >
-                        <dxg:GridColumn.HeaderTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="HasDocs" ReadOnly="True"  Width="50" >
+                        <local:CorasauDataGridTemplateColumnClient.HeaderTemplate>
                             <DataTemplate>
                                 <Image Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Document_Attachment_16x16.png}" Width="16" Height="16" VerticalAlignment="Center"/>
                             </DataTemplate>
-                        </dxg:GridColumn.HeaderTemplate>
-                        <dxg:GridColumn.DisplayTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.HeaderTemplate>
+                        <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                             <ControlTemplate>
                                 <Image Margin="5" Tag="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Document_Attachment_16x16.png}" MouseLeftButtonDown="HasDocImage_MouseLeftButtonDown" Visibility="{Binding DataContext.RowData.Row.HasDocs,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource VisibilityBoolConverter}}" Stretch="Fill" Width="16" Height="16" RenderOptions.BitmapScalingMode="NearestNeighbor" RenderOptions.EdgeMode="Aliased" />
                             </ControlTemplate>
-                        </dxg:GridColumn.DisplayTemplate>
-                    </dxg:GridColumn>
-                    <dxg:GridColumn FieldName="ItemType" Width="80" Visible="false" AllowEditing="False" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ItemType}"/>
-                    <dxg:GridColumn x:Name="colVariant1" FieldName="Variant1" AllowEditing="False"/>
-                    <dxg:GridColumn x:Name="colVariant2" FieldName="Variant2" AllowEditing="False"/>
-                    <dxg:GridColumn x:Name="colVariant3" FieldName="Variant3" AllowEditing="False"/>
-                    <dxg:GridColumn x:Name="colVariant4" FieldName="Variant4" AllowEditing="False"/>
-                    <dxg:GridColumn x:Name="colVariant5" FieldName="Variant5" AllowEditing="False"/>
-                    <dxg:GridColumn x:Name="Variant1Name" Width="100" Visible="False"/>
-                    <dxg:GridColumn x:Name="Variant2Name" Width="100" Visible="False"/>
-                    <dxg:GridColumn x:Name="Variant3Name" Width="100" Visible="False"/>
-                    <dxg:GridColumn x:Name="Variant4Name" Width="100" Visible="False"/>
-                    <dxg:GridColumn x:Name="Variant5Name" Width="100" Visible="False"/>
-                    <dxg:GridColumn FieldName="UnfoldBOM" x:Name="colUnfoldBom" Width="120" Visible="False" AllowEditing="False" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=UnfoldBOM}"/>
-                    <dxg:GridColumn FieldName="Qty" Width="90" AllowEditing="False" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Qty}"/>
-                    <dxg:GridColumn FieldName="UnitSize" Width="80" AllowEditing="False" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=UnitSize}"/>
-                    <dxg:GridColumn FieldName="CostPriceFactor" Width="80" AllowEditing="False" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CostPriceFactor}"/>
-                    <dxg:GridColumn FieldName="QtyType" AllowEditing="False" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=QtyType}"/>
-                    <dxg:GridColumn FieldName="MoveType" AllowEditing="False" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Usage}"/>
-                    <dxg:GridColumn FieldName="CostValue" AllowEditing="False" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CostValue}"/>
-                    <dxg:GridColumn FieldName="SalesValue" AllowEditing="False" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=SalesValue}"/>
-                    <dxg:GridColumn FieldName="ShowOnInvoice" AllowEditing="False" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ShowOnInvoice}"/>
-                    <dxg:GridColumn FieldName="ShowOnPacknote" AllowEditing="False" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ShowOnPacknote}"/>
-                    <dxg:GridColumn FieldName="ShowOnPicklist" AllowEditing="False" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ShowOnPicklist}"/>
-                    <dxg:GridColumn FieldName="InclValueOnInvoice" AllowEditing="False" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=InclValueOnInvoice}"/>
-                </dxg:GridControl.Columns>
-                <dxg:GridControl.View>
-                    <dxg:TreeListView x:Name="treeListView" AutoWidth="True" AllowEditing="False" KeyFieldName="ID" ShowIndicator="False" ParentFieldName="ParentID" TreeDerivationMode="Selfreference" ShowTotalSummary="False" />
-                </dxg:GridControl.View>
-            </dxg:GridControl>
+                        </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ItemType" Width="80" Visible="false" AllowEditing="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="colVariant1" FieldName="Variant1" AllowEditing="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="colVariant2" FieldName="Variant2" AllowEditing="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="colVariant3" FieldName="Variant3" AllowEditing="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="colVariant4" FieldName="Variant4" AllowEditing="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="colVariant5" FieldName="Variant5" AllowEditing="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Variant1Name" Width="100" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Variant2Name" Width="100" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Variant3Name" Width="100" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Variant4Name" Width="100" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Variant5Name" Width="100" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="UnfoldBOM" Width="120" Visible="False" AllowEditing="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Qty" Width="90" AllowEditing="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="UnitSize" Width="80" AllowEditing="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="CostPriceFactor" Width="80"/>
+                    <local:ComboBoxColumnClient x:Name="QtyType" AllowEditing="False"/>
+                    <local:ComboBoxColumnClient x:Name="MoveType" AllowEditing="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="CostValue" AllowEditing="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="SalesValue" AllowEditing="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ShowOnInvoice" AllowEditing="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ShowOnPacknote" AllowEditing="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ShowOnPicklist" AllowEditing="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="InclValueOnInvoice" AllowEditing="False"/>
+                </local:InventoryHierarchicalBOMGrid.Columns>
+            </local:InventoryHierarchicalBOMGrid>
         </CorasauControls:BusyIndicator>
     </Grid>
 </Pages:GridBasePage>

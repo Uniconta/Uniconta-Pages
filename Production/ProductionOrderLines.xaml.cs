@@ -109,6 +109,7 @@ namespace UnicontaClient.Pages.CustomPage
                     line._Date = it._Date;
                     line._Week = it._Week;
                     line._Note = it._Note;
+                    TableField.SetUserFieldsFromRecord(it, line);
                     lst.Add(line);
                 }
                 return lst;
@@ -176,7 +177,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (dgProductionOrderLineGrid.CurrentColumn == Warehouse)
             {
-                if (Validate(Convert.ToString(e.NewValue), Convert.ToString(e.OldValue)))
+                if (Validate(Convert.ToString(e.OldValue), Convert.ToString(e.NewValue)))
                     e.Handled=true;
             }
         }
@@ -185,7 +186,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (dgProductionOrderLineGrid.CurrentColumn == Location)
             {
-                if (Validate(Convert.ToString(e.NewValue), Convert.ToString(e.OldValue)))
+                if (Validate(Convert.ToString(e.OldValue), Convert.ToString(e.NewValue)))
                     e.Handled=true;
             }
         }
@@ -197,8 +198,6 @@ namespace UnicontaClient.Pages.CustomPage
                 return false;
             if (selectedItem._SerieBatchMarked)
             {
-                if (string.IsNullOrWhiteSpace(newValue) || string.IsNullOrWhiteSpace(oldValue))
-                    return false;
                 if (newValue != oldValue)
                 {
                     UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("ChangeWareHousLoc"), Uniconta.ClientTools.Localization.lookup("Warning"));
@@ -370,6 +369,15 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "EAN":
                     UnicontaClient.Pages.DebtorOfferLines.FindOnEAN(rec, this.items, api);
+                    break;
+                case "SerieBatch":
+                    var selectedSerieBatch = rec.SerieBatches?.Where(x => x.Number == rec.SerieBatch).FirstOrDefault();
+                    if (selectedSerieBatch != null && api.CompanyEntity.Warehouse)
+                    {
+                        rec.Warehouse = selectedSerieBatch.Warehouse;
+                        if (api.CompanyEntity.Location)
+                            rec.Location = selectedSerieBatch.Location;
+                    }
                     break;
             }
         }
@@ -730,7 +738,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             if (this.items == null)
                 this.items = await api.LoadCache(typeof(Uniconta.DataModel.InvItem)).ConfigureAwait(false);

@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <root>
   <RibbonItem TabId="0" LocalizedNameKey="Home">
-       <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh.png" LargeGlyph="refresh.png"/>
-       <RibbonItem Action="ReOpen" LocalizedNameKey="ReOpen" Glyph="Re_Open_32x32.png" LargeGlyph="Re_Open_32x32.png"/>
+    <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh.png" LargeGlyph="refresh.png"/>
+    <RibbonItem Action="ReOpen" LocalizedNameKey="ReOpen" Glyph="Re_Open_32x32.png" LargeGlyph="Re_Open_32x32.png"/>
+	  <RibbonItem Action="CollectionLetterLog" LocalizedNameKey="CollectionLetterLog" Module="_CollectionLetter"  LargeGlyph="Note_32x32.png"/>
   </RibbonItem>
   <RibbonItem>
     <!---If we want to create a new group in same PageTab-->

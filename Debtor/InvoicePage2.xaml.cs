@@ -20,6 +20,7 @@ using System.Windows;
 using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.Util;
 using DevExpress.Xpf.Editors;
+using DevExpress.CodeParser;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -49,8 +50,13 @@ namespace UnicontaClient.Pages.CustomPage
             layoutControl = layoutItems;
             layoutItems.DataContext = editrow;
             cmbDelCountry.ItemsSource = Enum.GetValues(typeof(Uniconta.Common.CountryCode));
-            leDeliveryTerm.api = lePayment.api = leShipment.api = leInstallation.api = leOrderGroup.api= leLayoutGroup.api= leEmployee.api= api;
+            leDeliveryTerm.api = lePayment.api = leShipment.api = leInstallation.api = leOrderGroup.api = leLayoutGroup.api = leEmployee.api = cmbDim1.api = cmbDim2.api =
+            cmbDim3.api = cmbDim4.api = cmbDim5.api = api;
             frmRibbon.OnItemClicked += FrmRibbon_OnItemClicked;
+            if (api.CompanyEntity.NumberOfDimensions == 0)
+                usedim.Visibility = Visibility.Collapsed;
+            else
+                Utility.SetDimensions(api, lbldim1, lbldim2, lbldim3, lbldim4, lbldim5, cmbDim1, cmbDim2, cmbDim3, cmbDim4, cmbDim5, usedim);
             BindContact(editrow.Debtor);
         }
 

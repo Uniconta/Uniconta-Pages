@@ -105,11 +105,15 @@ namespace UnicontaClient.Pages.CustomPage
                             filterDialog = new CWServerFilter(api, typeof(DebtorInvoiceLines), null, null, UserFields);
                         else
                             filterDialog = new CWServerFilter(api, typeof(DebtorInvoiceLines), DefaultFilters(), null, UserFields);
+                        filterDialog.GridSource = pivotDgDebtorInvLines.DataSource as IList<UnicontaBaseEntity>;
                         filterDialog.Closing += filterDialog_Closing;
                         filterDialog.Show();
                     }
                     else
+                    {
+                        filterDialog.GridSource = pivotDgDebtorInvLines.DataSource as IList<UnicontaBaseEntity>;
                         filterDialog.Show(true);
+                    }
                     break;
                 case "ClearLocalFilter":
                     filterDialog = null;

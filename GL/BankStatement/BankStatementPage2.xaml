@@ -48,8 +48,14 @@ x:Class="UnicontaClient.Pages.CustomPage.BankStatementPage2"
                     <CorasauControls:CorasauLayoutItem FieldName="BankCompanyId" x:Name="liBankCompanyId">
                         <CorasauControls:TextEditor Text="{Binding BankCompanyId,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="ServiceId" x:Name="liServiceId">
+                        <CorasauControls:TextEditor Text="{Binding ServiceId,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="Journal" x:Name="liJournal">
                         <CorasauControls:LookupEditor x:Name="lkJournal" Text="{Binding Journal,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="KeepOriginalText" x:Name="liKeepOriginalText">
+                        <CorasauControls:CheckEditor x:Name="chkKeepOriginalText" IsChecked="{Binding KeepOriginalText,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
                 <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpBank" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Bank}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">

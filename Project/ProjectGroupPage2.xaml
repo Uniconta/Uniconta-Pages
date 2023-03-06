@@ -76,6 +76,12 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectGroupPage2"
                         <CorasauControls:CorasauLayoutItem x:Name="liInvoiceAdjustmentOffset" FieldName="InvoiceAdjustmentOffset">
                             <CorasauControls:LookupEditor x:Name="leInvoiceAdjustmentOffset" Text="{Binding InvoiceAdjustmentOffset,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liReversedWIP" FieldName="ReversedWIP">
+                            <CorasauControls:LookupEditor x:Name="leReversedWIP" Text="{Binding ReversedWIP,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liReversedWIPOffset" FieldName="ReversedWIPOffset">
+                            <CorasauControls:LookupEditor x:Name="leReversedWIPOffset" Text="{Binding ReversedWIPOffset,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
                 </CorasauControls:CorasauLayoutGroup>
             </CorasauControls:CorasauLayoutControl>

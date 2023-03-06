@@ -157,7 +157,7 @@ namespace UnicontaClient.Pages.CustomPage
             public override bool IsValid(object rec) { return ((InvItem)rec)._ItemType == (byte)ItemType.ProductionBOM; }
         }
 
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             var api = this.api;
             var Cache = api.GetCache(typeof(InvItem)) ?? await api.LoadCache(typeof(InvItem)).ConfigureAwait(false);
@@ -187,6 +187,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         public async void SaveAndCreateLine(bool goToLines)
         {
+            MoveFocus();
             if (rowId == 0 || (editrow._ProdQty != prodQty))
             {
                 if (goToLines)

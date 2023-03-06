@@ -264,7 +264,7 @@ namespace UnicontaClient.Pages.CustomPage
             //navGroupOrders.IsExpanded = true;
         }
 
-        public override void Utility_Refresh(string screenName, object argument)
+        public override async void Utility_Refresh(string screenName, object argument)
         {
             if (screenName == TabControls.InvItemStoragePage && argument != null)
             {
@@ -331,6 +331,16 @@ namespace UnicontaClient.Pages.CustomPage
                     if (string.IsNullOrEmpty(LeAccount.EditValue as string))
                         LeAccount.SelectedItem = args[3];
                 }
+            }
+            if (screenName == TabControls.CreateOrderFromQuickInvoice && argument != null)
+            {
+                var args = argument as object[];
+                var selectedItem = args[0] as DebtorInvoiceClient;
+                bool checkIfCreditNote = (bool)args[1];
+                var orderApi = new OrderAPI(api);
+                await CreateOrderFromInvoice(Order, selectedItem, checkIfCreditNote);
+                dgDebtorOrderLineGrid.ItemsSource = Order.Lines;
+                LeAccount.Focus();
             }
         }
         public override bool IsDataChaged
@@ -561,21 +571,10 @@ namespace UnicontaClient.Pages.CustomPage
                 case "CreateFromInvoice":
                     try
                     {
-                        CWCreateOrderFromQuickInvoice createOrderCW = new CWCreateOrderFromQuickInvoice(api, Order.Account);
-                        createOrderCW.Closing += async delegate
-                        {
-                            if (createOrderCW.DialogResult == true)
-                            {
-                                var orderApi = new OrderAPI(api);
-                                var checkIfCreditNote = createOrderCW.chkIfCreditNote.IsChecked.HasValue ? createOrderCW.chkIfCreditNote.IsChecked.Value : false;
-                                var selectedItem = createOrderCW.dgCreateOrderGrid.SelectedItem as DebtorInvoiceClient;
-
-                                await CreateOrderFromInvoice(Order, selectedItem, checkIfCreditNote);
-                                dgDebtorOrderLineGrid.ItemsSource = Order.Lines;
-                                LeAccount.Focus();
-                            }
-                        };
-                        createOrderCW.Show();
+                        var par = new object[2];
+                        par[0] = api;
+                        par[1] = Order.Account;
+                        AddDockItem(TabControls.CreateOrderFromQuickInvoice, par, true, String.Format(Uniconta.ClientTools.Localization.lookup("CopyOBJ"), Uniconta.ClientTools.Localization.lookup("Invoice")));
                     }
                     catch (Exception ex)
                     {
@@ -1043,7 +1042,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         SQLCache installationCache;
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             var api = this.api;
             var Comp = api.CompanyEntity;

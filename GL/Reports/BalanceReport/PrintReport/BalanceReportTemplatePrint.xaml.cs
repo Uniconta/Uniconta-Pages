@@ -186,7 +186,7 @@ namespace UnicontaClient.Pages.CustomPage
         public Visibility Hide { get { return line._Hide ? Visibility.Collapsed : Visibility.Visible; } }
         public FontWeight IsBold { get { return line._Bold ? FontWeights.Bold : FontWeights.Normal; } }
         public FontStyle IsItalic { get { return line._Italic ? FontStyles.Italic : FontStyles.Normal; } }
-        public Visibility IsUnderline { get { return line._Underline ? Visibility.Visible : Visibility.Collapsed; } }
+        public TextDecorationCollection IsUnderline { get { return line._Underline ? TextDecorations.Underline : null; } }
         public Visibility IsNewline { get { return line._NewLine && !line._NewPage ? Visibility.Visible : Visibility.Collapsed; } }
         public Visibility IsNewPage { get { return line._NewPage ? Visibility.Visible : Visibility.Collapsed; } }
         public byte[] Line { get { return line._Underline == true ? Utilities.Utility.GetImageData("BlackLine.png") : null; } }

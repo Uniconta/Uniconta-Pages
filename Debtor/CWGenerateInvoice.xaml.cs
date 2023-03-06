@@ -63,6 +63,8 @@ namespace UnicontaClient.Pages.CustomPage
         public bool SendByOutlook { get; set; }
         [Display(Name = "AdditionalOrders", ResourceType = typeof(InputFieldDataText))]
         public List<object> AdditionalOrders { get; set; }
+        [Display(Name = "PhysicalVouchers", ResourceType = typeof(InputFieldDataText))]
+        public int PhysicalVoucherRef { get; set; }
 
 #if !SILVERLIGHT
         protected override int DialogId { get { return DialogTableId; } }
@@ -140,7 +142,7 @@ namespace UnicontaClient.Pages.CustomPage
                 liInvoiceNumber.Label = Uniconta.ClientTools.Localization.lookup("PackNoteNumber");
             else
                 liInvoiceNumber.Label = Uniconta.ClientTools.Localization.lookup("InvoiceNumber");
-            txtInvNumber.MaxLength = 20; 
+            txtInvNumber.MaxLength = 20;
             chkShowInvoice.IsChecked = showInvoice;
 #if SILVERLIGHT
             Utilities.Utility.SetThemeBehaviorOnChildWindow(this);
@@ -213,6 +215,18 @@ namespace UnicontaClient.Pages.CustomPage
 #endif
         }
 
+        IEnumerable<VouchersClient> _voucherList;
+        public void SetVoucherClients(IEnumerable<VouchersClient> vouchersList)
+        {
+            if (lgOrders.Visibility == Visibility.Collapsed)
+            {
+                lgOrders.Visibility = Visibility.Visible;
+                liAdditionalOrders.Visibility = Visibility.Collapsed;
+            }
+            liDocumentRef.Visibility = Visibility.Visible;
+            _voucherList = vouchersList;
+        }
+
         public void SetOIOUBLLabelText(bool sendXmlSalesInvoice)
         {
             IsSendXmlSalesInvoice = sendXmlSalesInvoice;
@@ -277,6 +291,23 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (isHidden)
                 liSendByOutlook.Visibility = Visibility.Collapsed;
+        }
+
+        private void liDocumentRef_LookupButtonClicked(object sender)
+        {
+            var lookupDocumentRefEditor = sender as LookupEditor;
+            lookupDocumentRefEditor.PopupContentTemplate = (Application.Current).Resources["LookUpUrlDocumentClientPopupContent"] as ControlTemplate;
+            lookupDocumentRefEditor.ValueMember = "RowId";
+            lookupDocumentRefEditor.SelectedIndexChanged += LookupDocumentRefEditor_SelectedIndexChanged;
+            lookupDocumentRefEditor.ItemsSource = _voucherList;
+        }
+
+        private void LookupDocumentRefEditor_SelectedIndexChanged(object sender, RoutedEventArgs e)
+        {
+            var lookUpEditor = sender as LookupEditor;
+            var voucherClient = lookUpEditor.SelectedItem as VouchersClient;
+            PhysicalVoucherRef = voucherClient.RowId;
+            NotifyPropertyChanged(nameof(PhysicalVoucherRef));
         }
 #endif
     }

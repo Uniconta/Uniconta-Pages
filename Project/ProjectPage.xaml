@@ -96,10 +96,13 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="EndDate" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="PersonInCharge"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="PrStandard" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PriceList" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="PrType" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Installation" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="FixedPrice" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ContactName" ReadOnly="True" />
                     <local:ComboBoxColumnClient x:Name="Phase"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Created"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="cldim1" Width="70" FieldName="Dimension1" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="cldim2" Width="70" FieldName="Dimension2" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="cldim3" Width="70" FieldName="Dimension3" />

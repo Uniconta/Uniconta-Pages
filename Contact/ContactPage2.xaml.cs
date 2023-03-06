@@ -97,7 +97,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         SQLCache DebtorCache, CreditorCache, CrmProspectCache;
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             var api = this.api;
             DebtorCache = api.GetCache(typeof(Uniconta.DataModel.Debtor)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Debtor)).ConfigureAwait(false);

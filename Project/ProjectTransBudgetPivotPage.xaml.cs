@@ -342,7 +342,10 @@ namespace UnicontaClient.Pages.CustomPage
         {
             public int Compare(TMEmpCalendarSetupClient x, TMEmpCalendarSetupClient y)
             {
-                return string.Compare(x.Employee, y.Employee);
+                var c = string.Compare(x.Employee, y.Employee);
+                if (c != 0)
+                    return c;
+                return x.RowId - y.RowId;
             }
         }
 
@@ -406,6 +409,10 @@ namespace UnicontaClient.Pages.CustomPage
                    Uniconta.ClientTools.Localization.lookup("Field"), field);
         }
 
+        List<ProjectTransPivotClientLocal> extras;
+        List<PropValuePair> filter;
+        ProjectTransPivotClientLocal[] trans;
+        ProjectTransBudgetPivotSort sort;
         async Task LoadGrid()
         {
             fromDate = txtFromDate.DateTime;
@@ -458,98 +465,30 @@ namespace UnicontaClient.Pages.CustomPage
 
             busyIndicator.IsBusy = true;
 
-            List<PropValuePair> filter = new List<PropValuePair>();
+            filter = new List<PropValuePair>();
             if (fromDate != DateTime.MinValue)
-            {
-                var propValuePairFolder = PropValuePair.GenereteParameter("FromDate", typeof(string), Convert.ToString(fromDate.Ticks));
-                filter.Add(propValuePairFolder);
-            }
+                filter.Add(PropValuePair.GenereteParameter("FromDate", typeof(string), Convert.ToString(fromDate.Ticks)));
             if (toDate != DateTime.MinValue)
-            {
-                var propValuePairFolder = PropValuePair.GenereteParameter("ToDate", typeof(string), Convert.ToString(toDate.Ticks));
-                filter.Add(propValuePairFolder);
-            }
+                filter.Add(PropValuePair.GenereteParameter("ToDate", typeof(string), Convert.ToString(toDate.Ticks)));
             if (budgetGroup != null)
-            {
-                var propValuePairFolder = PropValuePair.GenereteParameter("BudgetGroup", typeof(string), budgetGroup);
-                filter.Add(propValuePairFolder);
-            }
+                filter.Add(PropValuePair.GenereteParameter("BudgetGroup", typeof(string), budgetGroup));
 
             var api = this.api;
             var CompanyId = api.CompanyId;
 
-            var trans = await api.Query(new ProjectTransPivotClientLocal(), new [] { master }, filter);
+            trans = await api.Query(new ProjectTransPivotClientLocal(), new [] { master }, filter);
             if (trans == null)
                 return;
 
             var len = trans.Length;
-            var sort = new ProjectTransBudgetPivotSort();
+            sort = new ProjectTransBudgetPivotSort();
             Array.Sort(trans, sort);
 
-            List<ProjectTransPivotClientLocal> extras = null;
-           
             if (showBudget)
             {
-                var budget = await api.Query(new ProjectBudgetPivotClient(), new List<UnicontaBaseEntity>() { master }, filter);
-                var key = new ProjectTransPivotClientLocal();
-                foreach (var bc in budget)
-                {
-                    key._Project = bc._Project;
-                    key._Date = bc._Date;
-                    key._PrCategory = bc._PrCategory;
-                    key._PayrollCategory = bc._PayrollCategory;
-                    key._Employee = bc.Employee;
-                    key._Task= bc._Task;
-                    key._Workspace= bc._Workspace;
-                    var idx = Array.BinarySearch(trans, key, sort);
-                    if (idx >= 0 && idx < len)
-                    {
-                        var t = trans[idx];
-                        if (bc._AnchorBudget)
-                        {
-                            t._AnchorBudgetSales += bc._Sales;
-                            t._AnchorBudgetCost += bc._Cost;
-                            t._AnchorBudgetQty += bc._Qty;
-                        }
-                        else
-                        {
-                            t._BudgetSales += bc._Sales;
-                            t._BudgetCost += bc._Cost;
-                            t._BudgetQty += bc._Qty;
-                        }
-                    }
-                    else
-                    {
-                        var prTrans = new ProjectTransPivotClientLocal()
-                        {
-                            _CompanyId = CompanyId,
-                            _PrCategory = bc._PrCategory,
-                            _Project = bc._Project,
-                            _Date = bc._Date,
-                            _Employee = bc._Employee,
-                            _PayrollCategory = bc._PayrollCategory,
-                            _Workspace=bc._Workspace,
-                            _Task=bc._Task
-                        };
-
-                        if (bc._AnchorBudget)
-                        {
-                            prTrans._AnchorBudgetSales = bc._Sales;
-                            prTrans._AnchorBudgetCost = bc._Cost;
-                            prTrans._AnchorBudgetQty = bc._Qty;
-                        }
-                        else
-                        {
-                            prTrans._BudgetSales = bc._Sales;
-                            prTrans._BudgetCost = bc._Cost;
-                            prTrans._BudgetQty = bc._Qty;
-                        }
-
-                        if (extras == null)
-                            extras = new List<ProjectTransPivotClientLocal>();
-                        extras.Add(prTrans);
-                    }
-                }
+                await GetBudget();
+                filter.Add(PropValuePair.GenereteParameter("Anchor", typeof(bool), "1"));
+                await GetBudget();
             }
 
             if (grpPrevYear)
@@ -855,6 +794,82 @@ namespace UnicontaClient.Pages.CustomPage
             busyIndicator.IsBusy = false;
         }
 
+        private async Task GetBudget()
+        {
+            var len = trans.Length;
+            var budget = await api.Query(new ProjectBudgetPivotClient(), new List<UnicontaBaseEntity>() { master }, filter);
+            var key = new ProjectTransPivotClientLocal();
+            foreach (var bc in budget)
+            {
+                key._Project = bc._Project;
+                key._Date = bc._Date;
+                key._PrCategory = bc._PrCategory;
+                key._PayrollCategory = bc._PayrollCategory;
+                key._Employee = bc.Employee;
+                key._Task = bc._Task;
+                key._Workspace = bc._Workspace;
+                var idx = Array.BinarySearch(trans, key, sort);
+                if (idx >= 0 && idx < len)
+                {
+                    var t = trans[idx];
+                    if (bc._AnchorBudget)
+                    {
+                        t._AnchorBudgetSales += bc._Sales;
+                        t._AnchorBudgetCost += bc._Cost;
+                        t._AnchorBudgetQty += bc._Qty;
+                    }
+                    else
+                    {
+                        t._BudgetSales += bc._Sales;
+                        t._BudgetCost += bc._Cost;
+                        t._BudgetQty += bc._Qty;
+                    }
+                }
+                else
+                {
+                    var prTrans = new ProjectTransPivotClientLocal()
+                    {
+                        _CompanyId = api.CompanyId,
+                        _PrCategory = bc._PrCategory,
+                        _Project = bc._Project,
+                        _Date = bc._Date,
+                        _Employee = bc._Employee,
+                        _PayrollCategory = bc._PayrollCategory,
+                        _Workspace = bc._Workspace,
+                        _Task = bc._Task
+                    };
+
+                    if (bc._AnchorBudget)
+                    {
+                        prTrans._AnchorBudgetSales = bc._Sales;
+                        prTrans._AnchorBudgetCost = bc._Cost;
+                        prTrans._AnchorBudgetQty = bc._Qty;
+                    }
+                    else
+                    {
+                        prTrans._BudgetSales = bc._Sales;
+                        prTrans._BudgetCost = bc._Cost;
+                        prTrans._BudgetQty = bc._Qty;
+                    }
+
+                    if (extras == null)
+                        extras = new List<ProjectTransPivotClientLocal>();
+                    extras.Add(prTrans);
+                }
+            }
+
+            if (extras != null)
+            {
+                Array.Resize(ref trans, len + extras.Count);
+                foreach (var sum in extras)
+                    trans[len++] = sum;
+                Array.Sort(trans, sort);
+                extras = null;
+            }
+        }
+
+
+
         bool isPivotIsVisible;
 
         private DateTime FirstDayOfMonth(DateTime date)
@@ -952,7 +967,7 @@ namespace UnicontaClient.Pages.CustomPage
             return LoadGrid();
         }
 
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             if (prCategoryCache == null)
                 prCategoryCache = await api.LoadCache<Uniconta.DataModel.PrCategory>().ConfigureAwait(false);
@@ -961,6 +976,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (ProjBgtGroupCache==null)
                 ProjBgtGroupCache = await api.LoadCache(typeof(Uniconta.DataModel.ProjectBudgetGroup)).ConfigureAwait(false);
 
+            LoadType(new Type[] { typeof(Uniconta.DataModel.ProjectTask) });
         }
 
         private void pivotDgProjectPlanning_CustomSummary(object sender, PivotCustomSummaryEventArgs e)

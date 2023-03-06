@@ -69,15 +69,28 @@ namespace UnicontaClient.Pages.CustomPage
             dgGldailyJournal.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgGldailyJournal.RowDoubleClick += dgGldailyJournal_RowDoubleClick;
-
+           // dgGldailyJournal.PreviewMouseDown += DgGldailyJournal_PreviewMouseDown;
             RemoveMenuItem();
         }
+
+        //private void DgGldailyJournal_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        //{
+        //    if (dgGldailyJournal.CurrentColumn == dgGldailyJournal.Columns["Name"])
+        //    {
+        //        var selectedItem = dgGldailyJournal.SelectedItem as GLDailyJournalClient;
+        //        if (selectedItem != null)
+        //            AddDockItem(TabControls.GL_DailyJournalLine, selectedItem);
+        //    }
+        //}
 
         void RemoveMenuItem()
         {
             var Comp = api.CompanyEntity;
+            var rb = (RibbonBase)localMenu.DataContext;
             if (Comp._CountryId != CountryCode.Denmark && Comp._CountryId != CountryCode.Iceland && Comp._CountryId != CountryCode.Netherlands && Comp._CountryId != CountryCode.Austria)
-                UtilDisplay.RemoveMenuCommand((RibbonBase)localMenu.DataContext, "BilagscanReadVouchers");
+                UtilDisplay.RemoveMenuCommand(rb, "BilagscanReadVouchers");
+            if (Comp._CountryId != CountryCode.Iceland)
+                UtilDisplay.RemoveMenuCommand(rb, "Iceland_PSPSettlements");
         }
 
         void dgGldailyJournal_RowDoubleClick()
@@ -187,6 +200,10 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         MoveJournalLines(selectedItem);
                     break;
+                case "Iceland_PSPSettlements":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.Iceland_ImportPSPSettlements, selectedItem, string.Concat("Sækja uppgjör færsluhirðis", " : ", selectedItem._Journal), null, true);
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -221,8 +238,8 @@ namespace UnicontaClient.Pages.CustomPage
 
         void OpenImportDataPage(GLDailyJournalClient selectedItem)
         {
-            string header = selectedItem._Journal;
-            UnicontaBaseEntity[] baseEntityArray = new UnicontaBaseEntity[2] { new GLDailyJournalLineClient(), selectedItem };
+            var header = selectedItem._Journal;            
+            var baseEntityArray = new UnicontaBaseEntity[2] { api.CompanyEntity.CreateUserType<GLDailyJournalLineClient>(), selectedItem };
             AddDockItem(TabControls.ImportPage, new object[] { baseEntityArray, header }, string.Format("{0}: {1}", Localization.lookup("Import"), header));
         }
 
@@ -542,6 +559,15 @@ namespace UnicontaClient.Pages.CustomPage
                     AddDockItem(TabControls.GL_DailyJournalLine, journal, null, null, true);
                 }
             }
+        }
+
+        private void TextBlock_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            busyIndicator.IsBusy = true;
+            var selectedItem = dgGldailyJournal.SelectedItem as GLDailyJournalClient;
+            if (selectedItem != null)
+                AddDockItem(TabControls.GL_DailyJournalLine, selectedItem);
+            busyIndicator.IsBusy = false;
         }
     }
 

@@ -209,9 +209,12 @@ x:Class="UnicontaClient.Pages.CustomPage.GLDailyJournalLine"
                     <localPage:ComboBoxColumnClient x:Name="DCPostType" Visible="False" />
                     <localPage:ComboBoxColumnClient x:Name="PaymentMethod" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PaymentId" Width="150" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="OrderNumber" Width="80" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="colProject" FieldName="Project" Width="100" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="colPrCategory" FieldName="PrCategory" Width="80" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="colWorkSpace" FieldName="WorkSpace" Width="80" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colEmployee" FieldName="Employee" Width="85" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="colEmployeeName" FieldName="EmployeeName" Visible="False"/>
                     <localPage:CorasauDataGridForeignKeyColumnClient x:Name="Task" Width="80">
                         <localPage:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
                             <ControlTemplate>

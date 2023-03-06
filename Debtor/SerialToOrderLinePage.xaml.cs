@@ -150,7 +150,7 @@ namespace UnicontaClient.Pages.CustomPage
                 SetHeader(header);
         }
 
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             if (warehouse == null)
                 warehouse = await api.CompanyEntity.LoadCache(typeof(Uniconta.DataModel.InvWarehouse), api).ConfigureAwait(false);
@@ -497,19 +497,7 @@ namespace UnicontaClient.Pages.CustomPage
     {
         bool _mark;
         public bool Mark { get { return _mark; } set { _mark = value; NotifyPropertyChanged("Mark"); } }
-        public string DisplayText
-        {
-            get
-            {
-                string num = _Number;
-                if (string.IsNullOrEmpty(num))
-                    num = "0";
-                string cp = Convert.ToString(QtyOpen);
-                if (string.IsNullOrEmpty(cp))
-                    cp = "0";
-                return string.Concat(num, "(", cp, ")");
-            }
-        }
+      
        
         internal object locationSource;
         public object LocationSource { get { return locationSource; } }

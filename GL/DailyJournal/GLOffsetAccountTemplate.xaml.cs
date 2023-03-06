@@ -33,7 +33,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         SQLCache LedgerCache, DebtorCache, CreditorCache;
 
-        public GLOffsetAccountTemplate(BaseAPI API):base(API, string.Empty)
+        public GLOffsetAccountTemplate(BaseAPI API) : base(API, string.Empty)
         {
             InitPage(null);
         }
@@ -183,12 +183,12 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override void OnLayoutLoaded()
         {
-            if(!api.CompanyEntity.Project)
+            if (!api.CompanyEntity.Project)
             {
                 this.Project.Visible = this.Project.ShowInColumnChooser = false;
                 this.PrCategory.Visible = this.PrCategory.ShowInColumnChooser = false;
                 this.WorkSpace.Visible = this.WorkSpace.ShowInColumnChooser = false;
-                this.Qty.Visible = this.Qty.ShowInColumnChooser = false; 
+                this.Qty.Visible = this.Qty.ShowInColumnChooser = false;
             }
             base.OnLayoutLoaded();
             setDim();
@@ -240,7 +240,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             if (LedgerCache == null)
                 LedgerCache = await api.LoadCache(typeof(Uniconta.DataModel.GLAccount)).ConfigureAwait(false);
@@ -445,6 +445,35 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                 }
             }
+        }
+        private void Account_LostFocus(object sender, RoutedEventArgs e)
+        {
+            SetAccountByLookupText(sender);
+        }
+        void SetAccountByLookupText(object sender)
+        {
+            var selectedItem = dgGlOffSetAccountTplt.SelectedItem as GLOffsetAccountLineGridClient;
+            if (selectedItem == null)
+                return;
+            var actType = selectedItem._AccountType;
+            if (actType != GLJournalAccountType.Finans)
+                return;
+            var le = sender as CorasauGridLookupEditor;
+            if (string.IsNullOrEmpty(le.EnteredText))
+                return;
+            var accounts = LedgerCache?.GetNotNullArray as GLAccount[];
+            if (accounts != null)
+            {
+                var act = accounts.Where(ac => string.Compare(ac._Lookup, le.EnteredText, StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
+                if (act != null)
+                {
+                    dgGlOffSetAccountTplt.SetLoadedRow(selectedItem);
+                    selectedItem.Account = act.KeyStr;
+                    le.EditValue = act.KeyStr;
+                    dgGlOffSetAccountTplt.SetModifiedRow(selectedItem);
+                }
+            }
+            le.EnteredText = null;
         }
     }
 

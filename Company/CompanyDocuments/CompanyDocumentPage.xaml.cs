@@ -80,10 +80,6 @@ namespace UnicontaClient.Pages.CustomPage
                     AddDockItem(TabControls.CompanyDocumentPage2, paramEdit, Uniconta.ClientTools.Localization.lookup("CompanyImages"), "Edit_16x16.png");
                     break;
 
-                case "RefreshGrid":
-                    dgCompanyDocsGrid.Filter(null, null, true);
-                    break;
-
                 case "ViewDownloadRow":
                     if (selectedItem != null)
                         ShowContent(selectedItem);

@@ -22,6 +22,7 @@ using Uniconta.ClientTools.Util;
 using System.ComponentModel.DataAnnotations;
 using Uniconta.DataModel;
 using Uniconta.Common.Utility;
+using dk.gov.oiosi.logging;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -309,7 +310,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         SQLCache TextTypes, VatCache;
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             VatCache = api.GetCache(typeof(Uniconta.DataModel.GLVat)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLVat)).ConfigureAwait(false);
             TextTypes = api.GetCache(typeof(Uniconta.DataModel.GLTransType)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLTransType)).ConfigureAwait(false);
@@ -408,6 +409,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void localMenu_OnItemClicked(string ActionType)
         {
             var trans = dgAccountsTransGrid.SelectedItem as GLTransClient;
+            var selectedClosingSheetLine = dgClosingSheetLine.SelectedItem as GLClosingSheetLineLocal;
 
             switch (ActionType)
             {
@@ -440,7 +442,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "VoucherTransactions":
                     if (trans == null)
                         return;
-                    string vheader = Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("VoucherTransactions"),trans._Voucher);
+                    string vheader = Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("VoucherTransactions"), trans._Voucher);
                     AddDockItem(TabControls.AccountsTransaction, dgAccountsTransGrid.syncEntity, vheader);
                     break;
                 case "ReverseVoucher":
@@ -461,10 +463,72 @@ namespace UnicontaClient.Pages.CustomPage
                     dgClosingSheetLine.AddRow(closingLine);
                     RecalculateSum();
                     break;
+                case "ViewDownloadRow":
+                    var selectedItem = dgAccountsTransGrid.SelectedItem as GLTransClient;
+                    if (selectedItem != null)
+                        DebtorTransactions.ShowVoucher(dgAccountsTransGrid.syncEntity, api, busyIndicator);
+                    break;
+                case "RefVoucher":
+                    var source = (IEnumerable<GLClosingSheetLineLocal>)dgClosingSheetLine.ItemsSource;
+                    if (source != null)
+                    {
+                        var _refferedVouchers = new List<int>();
+                        foreach (var line in source)
+                            if (line._DocumentRef != 0)
+                                _refferedVouchers.Add(line._DocumentRef);
+                        var parameters = new List<BasePage.ValuePair>() { new BasePage.ValuePair() { Name = "ShowAll", Value = "1" } };
+                        AttachVoucherRow = selectedClosingSheetLine;
+                        dockCtrl.AddDockItem(null, TabControls.AttachVoucherGridPage, ParentControl, new object[] { _refferedVouchers }, true, null, null, 0, null, new Point(), parameters);
+                    }
+                    break;
+                case "ViewVoucher":
+                    if (selectedClosingSheetLine == null)
+                        return;
+                    dgClosingSheetLine.syncEntity.Row = selectedClosingSheetLine;
+                    dgClosingSheetLine.syncEntity.AllowEmpty = true;
+                    busyIndicator.IsBusy = true;
+                    ViewVoucher(TabControls.VouchersPage3, dgClosingSheetLine.syncEntity);
+                    busyIndicator.IsBusy = false;
+                    break;
+                case "DragDrop":
+                case "ImportVoucher":
+                    if (selectedClosingSheetLine != null)
+                        AddVoucher(selectedClosingSheetLine, ActionType);
+                    break;
+
+                case "RemoveVoucher":
+                    RemoveVoucher(selectedClosingSheetLine);
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
+        }
+        private void AddVoucher(GLClosingSheetLineLocal line, string actionType)
+        {
+            if (actionType == "DragDrop")
+            {
+                var dragDropWindow = new UnicontaDragDropWindow(false);
+                Utility.PauseLastAutoSaveTime();
+                dragDropWindow.Closed += delegate
+                {
+                    if (dragDropWindow.DialogResult == true)
+                    {
+                        var fileInfo = dragDropWindow.FileInfoList?.FirstOrDefault();
+                        if (fileInfo != null)
+                        {
+                            var voucher = new VouchersClient();
+                            voucher._Data = fileInfo.FileBytes;
+                            voucher._Text = fileInfo.FileName;
+                            voucher._Fileextension = DocumentConvert.GetDocumentType(fileInfo.FileExtension);
+                            Utility.ImportVoucher(line, api, voucher, true);
+                        }
+                    }
+                };
+                dragDropWindow.Show();
+            }
+            else
+                Utility.ImportVoucher(line, api, null, false);
         }
 
         void SumLines(GLAccountClosingSheetClient acc)
@@ -527,11 +591,10 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected async override Task<ErrorCodes> saveGrid()
         {
-            if (! dgClosingSheetLine.HasUnsavedData)
+            if (!dgClosingSheetLine.HasUnsavedData)
                 return ErrorCodes.Succes;
 
             anyChange = true;
-            dgClosingSheetLine.SelectedItem = null;
             var err = await dgClosingSheetLine.SaveData();
 
             if (err == 0 && masterAccount != null)
@@ -603,6 +666,28 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 Vat.Visible = true;
                 OffsetVat.Visible = true;
+            }
+            if (!c._UseQtyInLedger)
+                Qty.Visible = false;
+        }
+
+        GLClosingSheetLineLocal AttachVoucherRow;
+        public override void Utility_Refresh(string screenName, object argument = null)
+        {
+            if (screenName == TabControls.AttachVoucherGridPage && argument != null)
+            {
+                var voucherObj = argument as object[];
+                var vouchersClient = voucherObj[0] as VouchersClient;
+                var selectedLine = AttachVoucherRow ?? dgClosingSheetLine.SelectedItem as GLClosingSheetLineLocal;
+                if (selectedLine != null && vouchersClient != null)
+                {
+                    dgClosingSheetLine.SetLoadedRow(selectedLine);
+                    selectedLine.DocumentRef = vouchersClient.RowId;
+                    if (selectedLine._Text == null && selectedLine._TransType == null)
+                        selectedLine.Text = vouchersClient._Text;
+                    dgClosingSheetLine.SetModifiedRow(selectedLine);
+                }
+                AttachVoucherRow = null;
             }
         }
     }

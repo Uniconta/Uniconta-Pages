@@ -247,16 +247,15 @@ namespace UnicontaClient.Pages.CustomPage
                             filterDialog = new CWServerFilter(api, typeof(InvBOMClient), null, defaultSort);
                         else
                             filterDialog = new CWServerFilter(api, typeof(InvBOMClient), defaultFilters, defaultSort);
+                        filterDialog.GridSource = dgInvBomclientGrid.ItemsSource as IList<UnicontaBaseEntity>;
                         filterDialog.Closing += FilterDialog_Closing;
-#if !SILVERLIGHT
                         filterDialog.Show();
                     }
                     else
+                    {
+                        filterDialog.GridSource = dgInvBomclientGrid.ItemsSource as IList<UnicontaBaseEntity>;
                         filterDialog.Show(true);
-#elif SILVERLIGHT
                     }
-                    filterDialog.Show();
-#endif
                     break;
                 case "ClearFilter":
                     filterDialog = null;

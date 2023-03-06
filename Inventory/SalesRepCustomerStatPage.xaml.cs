@@ -21,6 +21,7 @@ using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.Common;
 using Uniconta.DataModel;
+using Uniconta.ClientTools.Util;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -82,7 +83,9 @@ namespace UnicontaClient.Pages.CustomPage
             gridControl.api = api;
             gridControl.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
-            localMenu.DisableButtons("Aggregate" );
+            localMenu.DisableButtons("Aggregate");
+            RibbonBase rb = (RibbonBase)localMenu.DataContext;
+            UtilDisplay.RemoveMenuCommand(rb, new string[] { "PerWarehouse","PerLocation" });
         }
 
         public override Task InitQuery()
@@ -108,17 +111,15 @@ namespace UnicontaClient.Pages.CustomPage
                     if (itemFilterDialog == null)
                     {
                         itemFilterDialog = new CWServerFilter(api, typeof(EmployeeDebSales), null, null);
+                        itemFilterDialog.GridSource = dgSalesRepCustomerStat.ItemsSource as IList<UnicontaBaseEntity>;
                         itemFilterDialog.Closing += itemFilterDialog_Closing;
-#if !SILVERLIGHT
                         itemFilterDialog.Show();
                     }
                     else
+                    {
+                        itemFilterDialog.GridSource = dgSalesRepCustomerStat.ItemsSource as IList<UnicontaBaseEntity>;
                         itemFilterDialog.Show(true);
-#elif SILVERLIGHT
                     }
-
-                    itemFilterDialog.Show();
-#endif
                     break;
                 case "ClearItemFilter":
                     itemFilterDialog = null;

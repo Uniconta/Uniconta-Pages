@@ -68,7 +68,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         SQLCache CostGroups;
-        protected async override void LoadCacheInBackGround()
+        protected override async Task LoadCacheInBackGroundAsync()
         {
             CostGroups = api.GetCache(typeof(Uniconta.DataModel.CreditorOrderCost)) ?? await api.LoadCache(typeof(Uniconta.DataModel.CreditorOrderCost)).ConfigureAwait(false);
         }

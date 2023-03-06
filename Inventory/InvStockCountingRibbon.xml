@@ -30,8 +30,9 @@
   <RibbonItem>
     <RibbonItem Action="PostJournal" LocalizedNameKey="GenerateJournalLines"  LargeGlyph="Generate_32x32.png" />
   </RibbonItem>
- <RibbonItem>
-    <RibbonItem Action="Export" LocalizedNameKey="Export" LargeGlyph="Export_32x32.png"/>
-    <RibbonItem Action="Import" LocalizedNameKey="Import" LargeGlyph="Import_32x32.png"/>
+ <RibbonItem LocalizedNameKey="ImportFromFile">
+   <RibbonItem Action="Export" LocalizedNameKey="Export" LargeGlyph="Export_32x32.png"/>
+   <RibbonItem Action="Import" LocalizedNameKey="Import" LargeGlyph="Import_32x32.png"/>
+   <RibbonItem Action="Update" LocalizedNameKey="UpdateOBJ" Parameter="Counted" LargeGlyph="Import_32x32.png"/>
   </RibbonItem>
 </root>

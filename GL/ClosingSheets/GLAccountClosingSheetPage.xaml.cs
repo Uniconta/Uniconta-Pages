@@ -63,11 +63,36 @@ namespace UnicontaClient.Pages.CustomPage
             dgGLTable.BusyIndicator = busyIndicator;
             dgGLTable.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;
             ((TableView)dgGLTable.View).RowStyle = Application.Current.Resources["RowStyle"] as Style;
+            GetMenuItem();
         }
 
-        public async override Task InitQuery()
+        static int selectedCode;
+        string[] code;
+        void GetMenuItem()
         {
-             await BindGrid();
+            RibbonBase rb = (RibbonBase)localMenu.DataContext;
+            var comboItem = UtilDisplay.GetMenuCommandByName(rb, "Code");
+            if (comboItem != null)
+            {
+                code = new string[11];
+                code[0] = Uniconta.ClientTools.Localization.lookup("All");
+                for (int i = 0; (i < 10); i++)
+                    code[i + 1] = NumberConvert.ToString(i);
+                comboItem.ComboBoxItemSource = code;
+                comboItem.SelectedItem = code[selectedCode]; 
+                localMenu.OnSelectedIndexChanged += LocalMenu_OnSelectedIndexChanged;
+            }
+        }
+
+        private void LocalMenu_OnSelectedIndexChanged(string ActionType, string SelectedItem)
+        {
+            selectedCode = Array.IndexOf(code, SelectedItem);
+            BindGrid();
+        }
+
+        public override Task InitQuery()
+        {
+            return BindGrid();
         }
 
         void DataControl_CurrentItemChanged(object sender, DevExpress.Xpf.Grid.CurrentItemChangedEventArgs e)
@@ -138,21 +163,21 @@ namespace UnicontaClient.Pages.CustomPage
         {
             localMenu_OnItemClicked("ClosingSheetLines");
         }
-
+        private void Name_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            dgGLTable_RowDoubleClick();
+        }
         void localMenu_OnItemClicked(string ActionType)
         {
             GLAccountClosingSheetClient selectedItem = dgGLTable.SelectedItem as GLAccountClosingSheetClient;
             switch (ActionType)
             {
                 case "ClosingSheetLines":
-                    if (selectedItem == null || !selectedItem._PostingAccount)
-                        return;
-                    object[] masters = new object[] { masterRecord, dgGLTable.syncEntity, this.AccountListCache };
-                    AddDockItem(TabControls.ClosingSheetLines, masters, string.Format("{0}: {1}, {2}", Uniconta.ClientTools.Localization.lookup("ClosingSheetLines"), selectedItem._Account, masterRecord._Name));
+                    if (selectedItem != null && selectedItem._PostingAccount)
+                        AddDockItem(TabControls.ClosingSheetLines, new object[] { masterRecord, dgGLTable.syncEntity, this.AccountListCache }, string.Format("{0}: {1}, {2}", Uniconta.ClientTools.Localization.lookup("ClosingSheetLines"), selectedItem._Account, masterRecord._Name));
                     break;
                 case "ClosingSheetLinesAll":
-                    object[] masters2 = new object[] { masterRecord };
-                    AddDockItem(TabControls.ClosingSheetLinesAll, masters2, string.Format("{0}: {1}", masterRecord._Name, Uniconta.ClientTools.Localization.lookup("AllLines")));
+                    AddDockItem(TabControls.ClosingSheetLinesAll, new object[] { masterRecord }, string.Format("{0}: {1}", masterRecord._Name, Uniconta.ClientTools.Localization.lookup("AllLines")));
                     break;
                 case "ClosingSheetHasLines":
                     ClosingSheetHasLines();
@@ -183,17 +208,14 @@ namespace UnicontaClient.Pages.CustomPage
                         AddDockItem(TabControls.UserDocsPage, dgGLTable.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Documents"), selectedItem._Name));
                     break;
                 case "AllNotes":
-                    object[] masters3 = new object[] { api, this.AccountListCache };
-                    AddDockItem(TabControls.AllNotesPage, masters3, Uniconta.ClientTools.Localization.lookup("Notes"));
+                    AddDockItem(TabControls.AllNotesPage, new object[] { api, this.AccountListCache }, Uniconta.ClientTools.Localization.lookup("Notes"));
                     break;
                 case "AddItem":
                     AddDockItem(TabControls.GLAccountPage2, api, Uniconta.ClientTools.Localization.lookup("Accounts"), "Add_16x16.png");
                     break;
                 case "EditItem":
-                    if (selectedItem == null)
-                        return;
-                    var param = new object[2] { selectedItem, true };
-                    AddDockItem(TabControls.GLAccountPage2, param, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Accounts"), selectedItem.Account));
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.GLAccountPage2, new object[2] { selectedItem, true }, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Accounts"), selectedItem.Account));
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);
@@ -291,7 +313,7 @@ namespace UnicontaClient.Pages.CustomPage
         async void RefreshLines()
         {
             busyIndicator.IsBusy = true;
-            var postingResult = await postingApi.PostClosingSheet(masterRecord, null, true, masterRecord._ToDate, null, 1, null);
+            var postingResult = await postingApi.PostClosingSheet(masterRecord, selectedCode > 0 ? (byte?)(selectedCode-1) : (byte?)null, true, masterRecord._ToDate, null, 1, null);
 
             GLTrans[] PostedLines;
             var ClosingLines = postingResult?.ClosingLines;
@@ -309,7 +331,21 @@ namespace UnicontaClient.Pages.CustomPage
             var selectedItem = dgGLTable.SelectedItem;
 
             dgGLTable.ItemsSource = null;
-            dgGLTable.ItemsSource = this.AccountListCache.GetKeyStrRecords;
+            if (masterRecord._Skip0Accounts)
+            {
+                var arr = (GLAccountClosingSheetClient[])this.AccountListCache.GetKeyStrRecords;
+                var lst = new List<GLAccountClosingSheetClient>(arr.Length);
+                for (int i = 0; (i < arr.Length); i++)
+                {
+                    var rec = arr[i];
+                    if (rec._AccountType < (byte)GLAccountTypes.PL || rec._TmpChange != 0 || rec._Change != 0 || rec._NewBalance != 0 || rec._OrgBalance != 0 || rec._LastPeriod != 0)
+                        lst.Add(rec);
+                }
+                dgGLTable.ItemsSource = lst.ToArray();
+
+            }
+            else
+                dgGLTable.ItemsSource = this.AccountListCache.GetKeyStrRecords;
 
             if (selectedItem != null)
                 dgGLTable.SelectedItem = selectedItem;
@@ -345,9 +381,13 @@ namespace UnicontaClient.Pages.CustomPage
             }
 
             int factor = (PostedLines != null) ? 0 : 1;
+            int code = selectedCode - 1;
 
             foreach (var _lin in ClosingLines)
             {
+                if (code >= 0 && code != _lin._Code)
+                    continue;
+
                 var lin = _lin as GLClosingSheetLineClient;
                 if (lin == null)
                 {
@@ -417,7 +457,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        async Task BindGrid(bool ForceLoadAcc = false)
+        async Task BindGrid()
         {
             busyIndicator.IsBusy = true;
 
@@ -432,7 +472,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             BalanceHeader[] balance = rApi.Format(numbers, LedgerCache);
 
-            var LocalAccounts = new List<GLAccountClosingSheetClient>();
+            var LocalAccounts = new List<GLAccountClosingSheetClient>(balance.Length);
             var FromAccount = masterRecord._FromAccount;
             var ToAccount = masterRecord._ToAccount;
 

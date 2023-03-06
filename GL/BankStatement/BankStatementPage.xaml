@@ -21,7 +21,20 @@ x:Class="UnicontaClient.Pages.CustomPage.BankStatementPage"
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <local:BankStatementGrid  x:Name="dgBankStatement" AutoGenerateColumns="None" HorizontalAlignment="Stretch">
                 <local:BankStatementGrid.Columns>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Name" Width="200"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Name" Width="200">
+                        <local:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Margin="5,0,0,0" TextDecorations="Underline" Cursor="Hand" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.Name,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" PreviewMouseDown="Name_PreviewMouseDown"></TextBlock>
+                                    <TextBlock Grid.Column="1"></TextBlock>
+                                </Grid>
+                            </DataTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Currency" Width="50" ReadOnly="True" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="BankAccountPart1" Width="50"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="BankAccountPart2" Width="100"/>
@@ -33,6 +46,7 @@ x:Class="UnicontaClient.Pages.CustomPage.BankStatementPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="Journal" Width="100"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="DaysSlip" Width="60" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="LastTransaction" Width="90" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="LastBankRequest" ShowTime="True" Width="120" />
                     <local:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension1" x:Name="coldim1"/>
                     <local:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension2" x:Name="coldim2"/>
                     <local:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension3" x:Name="coldim3"/>

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using Uniconta.API.Service;
 using Uniconta.ClientTools;
+using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
@@ -22,7 +23,6 @@ namespace UnicontaClient.Pages.CustomPage
     {
         public override Type TableType { get { return typeof(ProjectJournalLineLocal); } }
         public override IComparer GridSorting { get { return new ProjectJournalLineSort(); } }
-        public override bool Readonly { get { return true; } }
         public override bool IsAutoSave { get { return false; } }
         public bool IsTime { get; set; }
     }
@@ -43,16 +43,17 @@ namespace UnicontaClient.Pages.CustomPage
             InitializeComponent();
             dgJournalLineStartStopPageGrid.IsTime = true;
             dgJournalLineStartStopPageGrid.api = api;
-            company=api.CompanyEntity;
+            company = api.CompanyEntity;
             dgJournalLineStartStopPageGrid.BusyIndicator = busyIndicator;
             SetRibbonControl(localMenu, dgJournalLineStartStopPageGrid);
             localMenu.OnItemClicked += localMenu_OnItemClicked;
+            ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "UndoDelete", "SaveGrid" });
         }
 
         public override bool CheckIfBindWithUserfield(out bool isReadOnly, out bool useBinding)
         {
-            isReadOnly=false;
-            useBinding=false;
+            isReadOnly = false;
+            useBinding = false;
             return false;
         }
 
@@ -125,18 +126,136 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "EditRow":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.TmJournalLineStartStopPage2, new object[] { selectedItem, true , true }, string.Format("{0}: {1}/{2}", Uniconta.ClientTools.Localization.lookup("StartTimeRegistration"), Employee?._Number, projectJournal?.KeyStr));
+                        AddDockItem(TabControls.TmJournalLineStartStopPage2, new object[] { selectedItem, true, true }, string.Format("{0}: {1}/{2}", Uniconta.ClientTools.Localization.lookup("StartTimeRegistration"), Employee?._Number, projectJournal?.KeyStr));
                     break;
                 case "Stop":
-                    if (selectedItem!= null)
+                    if (selectedItem != null)
                         Stop(selectedItem);
                     break;
                 case "RefreshGrid":
                     InitQuery();
                     return;
+                case "EditAll":
+                    if (dgJournalLineStartStopPageGrid.Visibility == Visibility.Visible)
+                        EditAll();
+                    break;
+                case "AddLine":
+                    var newLIne = new ProjectJournalLineLocal();
+                    newLIne.SetMaster(projectJournal);
+                    newLIne.TimeFrom = DateTime.Now;
+                    dgJournalLineStartStopPageGrid.AddRow(newLIne);
+                    break;
+                case "CopyRow":
+                    if (selectedItem != null)
+                    {
+                        if (copyRowIsEnabled)
+                            dgJournalLineStartStopPageGrid.CopyRow();
+                        else
+                            CopyRecord(selectedItem);
+                    }
+                    break;
+                case "DeleteRow":
+                    dgJournalLineStartStopPageGrid.DeleteRow();
+                    break;
+                case "SaveGrid":
+                    Save();
+                    break;
+                case "UndoDelete":
+                    dgJournalLineStartStopPageGrid.UndoDeleteRow();
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
+            }
+        }
+
+        void CopyRecord(ProjectJournalLineLocal selectedItem)
+        {
+            if (selectedItem == null)
+                return;
+
+            var projectJournalLine = Activator.CreateInstance(selectedItem.GetType()) as ProjectJournalLineLocal;
+            CorasauDataGrid.CopyAndClearRowId(selectedItem, projectJournalLine);
+            AddDockItem(TabControls.DebtorAccountPage2, new object[2] { projectJournalLine, IdObject.get(false) }, Uniconta.ClientTools.Localization.lookup("DebtorAccount"), "Add_16x16.png");
+        }
+
+        private async void Save()
+        {
+            SetBusy();
+            var result = await saveGrid();
+            if (result == ErrorCodes.Succes)
+                InitQuery();
+            ClearBusy();
+        }
+
+        bool copyRowIsEnabled = false;
+        bool editAllChecked;
+        private void EditAll()
+        {
+            RibbonBase rb = (RibbonBase)localMenu.DataContext;
+            var ibase = UtilDisplay.GetMenuCommandByName(rb, "EditAll");
+            if (ibase == null)
+                return;
+
+            if (dgJournalLineStartStopPageGrid.Readonly)
+            {
+                api.AllowBackgroundCrud = false;
+                dgJournalLineStartStopPageGrid.MakeEditable();
+                dgJournalLineStartStopPageGrid.UpdateMaster(Employee);
+                UserFieldControl.MakeEditable(dgJournalLineStartStopPageGrid);
+                ibase.Caption = Uniconta.ClientTools.Localization.lookup("LeaveEditAll");
+                ribbonControl.EnableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "UndoDelete", "SaveGrid" });
+                copyRowIsEnabled = true;
+                editAllChecked = false;
+            }
+            else
+            {
+                if (IsDataChaged)
+                {
+                    var confirmationDialog = new CWConfirmationBox(Uniconta.ClientTools.Localization.lookup("SaveChangesPrompt"));
+                    confirmationDialog.Closing += async delegate
+                    {
+                        if (confirmationDialog.DialogResult == null)
+                            return;
+
+                        switch (confirmationDialog.ConfirmationResult)
+                        {
+                            case CWConfirmationBox.ConfirmationResultEnum.Yes:
+                                var err = await dgJournalLineStartStopPageGrid.SaveData();
+                                if (err != 0)
+                                {
+                                    api.AllowBackgroundCrud = true;
+                                    return;
+                                }
+                                break;
+                            case CWConfirmationBox.ConfirmationResultEnum.No:
+                                break;
+                        }
+                        editAllChecked = true;
+                        dgJournalLineStartStopPageGrid.Readonly = true;
+                        dgJournalLineStartStopPageGrid.tableView.CloseEditor();
+                        ibase.Caption = Uniconta.ClientTools.Localization.lookup("EditAll");
+                        ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "UndoDelete", "SaveGrid" });
+                        copyRowIsEnabled = false;
+                    };
+                    confirmationDialog.Show();
+                }
+                else
+                {
+                    dgJournalLineStartStopPageGrid.Readonly = true;
+                    dgJournalLineStartStopPageGrid.tableView.CloseEditor();
+                    ibase.Caption = Uniconta.ClientTools.Localization.lookup("EditAll");
+                    ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "UndoDelete", "SaveGrid" });
+                    copyRowIsEnabled = false;
+                }
+            }
+        }
+
+        public override bool IsDataChaged
+        {
+            get
+            {
+                return editAllChecked ? false : dgJournalLineStartStopPageGrid.HasUnsavedData;
             }
         }
 
@@ -146,27 +265,7 @@ namespace UnicontaClient.Pages.CustomPage
             selectedItem.Qty = (selectedItem.TimeTo - selectedItem.TimeFrom).TotalMinutes;
             if (company.TimeManagement)
             {
-                TMJournalLineClient tmJournalLine = new TMJournalLineClient
-                {
-                    Text = selectedItem.Text,
-                    Project = selectedItem.Project,
-                    PayrollCategory = selectedItem.PayrollCategory,
-                    Task = selectedItem.Task,
-                    WorkSpace = selectedItem.WorkSpace
-                };
-
-                tmJournalLine.SetMaster(Employee);
-
-                if(dgJournalLineStartStopPageGrid.IsTime)
-                    tmJournalLine._RegistrationType = RegistrationType.Hours;
-
-                if (tmJournalLine.PayrollCategoryRef != null)
-                    tmJournalLine.PayrollCategoryRef.PrCategory = selectedItem.PrCategory;
-
-                tmJournalLine.Date = DateTime.Today;
-                GetHours(selectedItem, tmJournalLine);
-
-                var result = await api.Insert(tmJournalLine);
+                var result = await InsertTMJournalLine(selectedItem);
 
                 if (result == ErrorCodes.Succes)
                 {
@@ -182,7 +281,7 @@ namespace UnicontaClient.Pages.CustomPage
             else
             {
                 var res = await api.Update(selectedItem);
-                if (res== ErrorCodes.Succes)
+                if (res == ErrorCodes.Succes)
                     InitQuery();
                 else
                     UtilDisplay.ShowErrorCode(res);
@@ -190,6 +289,59 @@ namespace UnicontaClient.Pages.CustomPage
 
         }
 
+        private async Task<ErrorCodes> InsertTMJournalLine(ProjectJournalLineLocal selectedItem)
+        {
+            TMJournalLineClient tmJournalLine = new TMJournalLineClient
+            {
+                Text = selectedItem.Text,
+                Project = selectedItem.Project,
+                PayrollCategory = selectedItem.PayrollCategory,
+                Task = selectedItem.Task,
+                WorkSpace = selectedItem.WorkSpace
+            };
+
+            tmJournalLine.SetMaster(Employee);
+
+            if (dgJournalLineStartStopPageGrid.IsTime)
+                tmJournalLine._RegistrationType = RegistrationType.Hours;
+
+            if (tmJournalLine.PayrollCategoryRef != null)
+                tmJournalLine.PayrollCategoryRef.PrCategory = selectedItem.PrCategory;
+
+            tmJournalLine.Date = DateTime.Today;
+            GetHours(selectedItem, tmJournalLine);
+
+            var result = await api.Insert(tmJournalLine);
+
+            return result;
+        }
+
+        async protected override Task<ErrorCodes> saveGrid()
+        {
+            var visibleItems = dgJournalLineStartStopPageGrid.VisibleItems.Cast<ProjectJournalLineLocal>();
+
+            ErrorCodes result = await base.saveGrid();
+            if (visibleItems == null || result != ErrorCodes.Succes)
+                return result;
+
+            foreach (var selectedItem in visibleItems)
+            {
+                var timeSpan = selectedItem.TimeTo.TimeOfDay;
+                if (timeSpan.TotalSeconds == 0)
+                    continue;
+
+                TimeToRounding(selectedItem);
+                selectedItem.Qty = (selectedItem.TimeTo - selectedItem.TimeFrom).TotalMinutes;
+                result = await InsertTMJournalLine(selectedItem);
+
+                if (result != ErrorCodes.Succes)
+                    break;
+
+                result = await api.Delete(selectedItem);
+            }
+
+            return result;
+        }
         void GetHours(ProjectJournalLineLocal PrJrLine, TMJournalLineClient tmJrLine)
         {
             TimeSpan ts = PrJrLine.TimeTo - PrJrLine.TimeFrom;
@@ -197,56 +349,64 @@ namespace UnicontaClient.Pages.CustomPage
             switch (weekDay)
             {
                 case 0:
-                    tmJrLine._Day7 =  ts.TotalHours;
+                    tmJrLine._Day7 = ts.TotalHours;
                     break;
                 case 1:
-                    tmJrLine._Day1 =  ts.TotalHours;
+                    tmJrLine._Day1 = ts.TotalHours;
                     break;
                 case 2:
-                    tmJrLine._Day2 =  ts.TotalHours;
+                    tmJrLine._Day2 = ts.TotalHours;
                     break;
                 case 3:
-                    tmJrLine._Day3 =  ts.TotalHours;
+                    tmJrLine._Day3 = ts.TotalHours;
                     break;
                 case 4:
-                    tmJrLine._Day4 =  ts.TotalHours;
+                    tmJrLine._Day4 = ts.TotalHours;
                     break;
                 case 5:
-                    tmJrLine._Day5 =  ts.TotalHours;
+                    tmJrLine._Day5 = ts.TotalHours;
                     break;
                 case 6:
-                    tmJrLine._Day6 =  ts.TotalHours;
+                    tmJrLine._Day6 = ts.TotalHours;
                     break;
 
             }
         }
 
-         void TimeToRounding(ProjectJournalLineLocal lineClient)
+        void TimeToRounding(ProjectJournalLineLocal lineClient)
         {
             var roundingEnum = AppEnums.TMRounding.IndexOf(companySettings.RoundingStop);
+            var time = lineClient.TimeTo.TimeOfDay.TotalSeconds;
+            DateTime dt;
+
+            if (time != 0)
+                dt = lineClient.TimeTo;
+            else
+                dt = DateTime.Now;
+
             switch (roundingEnum)
             {
                 case 0:
                 case 1:
                 case 2:
                 case 3:
-                    lineClient.TimeTo = Utility.RoundUp(roundingEnum, DateTime.Now);
+                    lineClient.TimeTo = Utility.RoundUp(roundingEnum, dt);
                     break;
                 case 4:
                 case 5:
                 case 6:
                 case 7:
-                    lineClient.TimeTo = Utility.RoundDown(roundingEnum, DateTime.Now);
+                    lineClient.TimeTo = Utility.RoundDown(roundingEnum, dt);
                     break;
             }
         }
 
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             PayrollCache = company.GetCache(typeof(Uniconta.DataModel.EmpPayrollCategory)) ?? await company.LoadCache(typeof(Uniconta.DataModel.EmpPayrollCategory), api).ConfigureAwait(false);
             var settings = await api.Query<CompanySettingsClient>();
             companySettings = settings.FirstOrDefault();
         }
-        
+
     }
 }

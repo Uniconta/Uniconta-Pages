@@ -27,11 +27,6 @@ namespace UnicontaClient.Pages.CustomPage
     public partial class RemainingBudgetLine : GridBasePage
     {
         SQLCache ProjectCache, EmployeeCache, ItemCache, PayrollCache, BudgetGroupCache;
-        bool showAnchorBudget;
-        ItemBase iShowAnchorBudget;
-
-        private const string AND_OPERATOR = "And";
-        private const string FILTERVALUE_ANCHORBUDGET = @"[AnchorBudget] = False";
 
         public RemainingBudgetLine(UnicontaBaseEntity master) : base(master)
         {
@@ -52,7 +47,6 @@ namespace UnicontaClient.Pages.CustomPage
             SetRibbonControl(localMenu, dgProjectBgtPlangLine);
             dgProjectBgtPlangLine.UpdateMaster(master);
             dgProjectBgtPlangLine.BusyIndicator = busyIndicator;
-            localMenu.OnChecked += LocalMenu_OnChecked;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgProjectBgtPlangLine.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;
             dgProjectBgtPlangLine.ShowTotalSummary();
@@ -65,9 +59,6 @@ namespace UnicontaClient.Pages.CustomPage
             ItemCache = Comp.GetCache(typeof(Uniconta.DataModel.InvItem));
             PayrollCache = Comp.GetCache(typeof(Uniconta.DataModel.EmpPayrollCategory));
             BudgetGroupCache = Comp.GetCache(typeof(Uniconta.DataModel.ProjectBudgetGroup));
-
-            GetMenuItem();
-            iShowAnchorBudget.IsChecked = showAnchorBudget;
         }
 
         protected override void SyncEntityMasterRowChanged(UnicontaBaseEntity args)
@@ -87,12 +78,6 @@ namespace UnicontaClient.Pages.CustomPage
                                                                                 syncMaster?._WorkSpace, Uniconta.ClientTools.Localization.lookup("Task"), syncMaster?._Task);
 
             SetHeader(header);
-        }
-
-        void GetMenuItem()
-        {
-            RibbonBase rb = (RibbonBase)localMenu.DataContext;
-            iShowAnchorBudget = UtilDisplay.GetMenuCommandByName(rb, "ShowAnchorBudget");
         }
 
         private void DataControl_CurrentItemChanged(object sender, DevExpress.Xpf.Grid.CurrentItemChangedEventArgs e)
@@ -120,10 +105,6 @@ namespace UnicontaClient.Pages.CustomPage
             }
             else
                 Task.ShowInColumnChooser = true;
-
-            AnchorBudget.Visible = showAnchorBudget;
-
-            SetIncludeFilter();
         }
 
         private void SelectedItem_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -372,45 +353,6 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        private void LocalMenu_OnChecked(string actionType, bool IsChecked)
-        {
-            switch (actionType)
-            {
-                case "ShowAnchorBudget":
-                    showAnchorBudget = IsChecked;
-                    iShowAnchorBudget.IsChecked = showAnchorBudget;
-                    AnchorBudget.Visible = showAnchorBudget;
-                    SetIncludeFilter();
-                    break;
-                default:
-                    gridRibbon_BaseActions(actionType);
-                    break;
-            }
-        }
-
-        private void SetIncludeFilter()
-        {
-            string filterString = dgProjectBgtPlangLine.FilterString ?? string.Empty;
-
-            if (showAnchorBudget)
-            {
-                filterString = filterString.Replace(FILTERVALUE_ANCHORBUDGET, string.Empty).Trim();
-                if (filterString != string.Empty && filterString.IndexOf(AND_OPERATOR, 0, 3) != -1)
-                    filterString = filterString.Substring(3).Trim();
-                else if (filterString != string.Empty && filterString.IndexOf(AND_OPERATOR, filterString.Length - 3) != -1)
-                    filterString = filterString.Substring(0, filterString.IndexOf(AND_OPERATOR, filterString.Length - 3)).Trim();
-            }
-            else
-            {
-                if (filterString == string.Empty)
-                    filterString = FILTERVALUE_ANCHORBUDGET;
-                else
-                    filterString += filterString.IndexOf(FILTERVALUE_ANCHORBUDGET) == -1 ? string.Format(" {0} {1}", AND_OPERATOR, FILTERVALUE_ANCHORBUDGET) : string.Empty;
-            }
-
-            dgProjectBgtPlangLine.FilterString = filterString;
-        }
-
         private void Task_GotFocus(object sender, RoutedEventArgs e)
         {
             var selectedItem = dgProjectBgtPlangLine.SelectedItem as ProjectBudgetLineLocal;
@@ -436,7 +378,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             var api = this.api;
             if (ProjectCache == null)

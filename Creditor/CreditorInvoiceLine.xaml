@@ -70,7 +70,9 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorInvoiceLine"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="SalesPriceCur" Visible="false"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="LineNumber" Mask="" Visible="false"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ReferenceNumber" Width="70" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PostingAccount" Width="80" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceNumber" Visible="false"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PurchaseCharges" Width="70" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Margin" Width="100" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="MarginRatio" Width="60" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Weight" Visible="false"/>

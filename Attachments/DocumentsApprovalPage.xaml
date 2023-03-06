@@ -25,7 +25,20 @@ x:Class="UnicontaClient.Pages.CustomPage.DocumentsApprovalPage"
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <localPage:DocumentsApprovalPageGrid x:Name="dgVoucherApproveGrid" AutoGenerateColumns="None">
                 <localPage:DocumentsApprovalPageGrid.Columns>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PrimaryKeyId" Width="70"  />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PrimaryKeyId" Width="70">
+                        <localPage:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Margin="5,0,0,0" TextDecorations="Underline" Cursor="Hand" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.PrimaryKeyId,RelativeSource={RelativeSource TemplatedParent}}" PreviewMouseDown="PrimaryKeyId_PreviewMouseDown"></TextBlock>
+                                    <TextBlock Grid.Column="1"></TextBlock>
+                                </Grid>
+                            </DataTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                    </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Created" ShowTime="True" Width="110"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ViewInFolder" AllowEditing="False" Width="100" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="UserName" Visible="False" Width="100" />

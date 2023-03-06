@@ -54,9 +54,6 @@ namespace UnicontaClient.Pages.CustomPage
                 case "SaveGrid":
                     dgCrmFollowUpGroup.SaveData();
                     break;
-                case "RefreshGrid":
-                    dgCrmFollowUpGroup.Filter(null);
-                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;

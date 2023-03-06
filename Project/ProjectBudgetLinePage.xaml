@@ -49,7 +49,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectBudgetLinePage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CategoryName" Width="100" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PayrollCategory" Width="70" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PayrollCategoryName" Width="100" Visible="False"/>                    
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Item" Width="100" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Item" Width="100" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant" FieldName="Variant">
                         <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                             <DataTemplate>
@@ -83,10 +83,11 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectBudgetLinePage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="SalesPrice" Width="80"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Cost" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Sales" Width="90"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="AnchorBudget" AllowEditing="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="AnchorBudget" AllowEditing="False" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Margin" Width="90" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="MarginRatio" Width="50" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Completed" Width="50" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Warehouse" Width="70" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CreditorAccount" Width="70" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CreditorName" Width="100" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ReferenceNumber" Width="100" Visible="False"/>

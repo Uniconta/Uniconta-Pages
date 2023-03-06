@@ -318,13 +318,6 @@ namespace UnicontaClient.Pages.CustomPage
                 editor.isValidate = true;
             }
         }
-
-        public override bool CheckIfBindWithUserfield(out bool isReadOnly, out bool useBinding)
-        {
-            isReadOnly = false;
-            useBinding = true;
-            return true;
-        }
     }
 
     public class ItemDataTemplateSelector : DataTemplateSelector

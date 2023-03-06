@@ -64,17 +64,19 @@ namespace UnicontaClient.Pages.CustomPage
         {
             Init(master);
         }
-
+        CompanyUserAccessClient user = null;
         void Init(UnicontaBaseEntity master)
         {
             InitializeComponent();
+            user = master as CompanyUserAccessClient;
             dgUserProfileUser.UpdateMaster(master);
             localMenu.dataGrid = dgUserProfileUser;
             SetRibbonControl(localMenu, dgUserProfileUser);
             dgUserProfileUser.api = api;
             dgUserProfileUser.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
-            LoadCompanyUsers(api);
+            if (user == null)
+                LoadCompanyUsers(api);
         }
 
         async void LoadCompanyUsers(CrudAPI crudApi)
@@ -101,17 +103,24 @@ namespace UnicontaClient.Pages.CustomPage
             switch (ActionType)
             {
                 case "AddRow":
-                    CWCompanyUserAccess cw = new CWCompanyUserAccess(UpdateCompanyUserList());
-                    cw.Closing += delegate
-                      {
-                          if (cw.DialogResult == true)
-                          {
-                              var userProfile = new UserProfileUserClient();
-                              userProfile.SetMaster(cw.user);
-                              dgUserProfileUser.AddRow(userProfile);
-                          }
-                      };
-                    cw.Show();
+                    if (user == null)
+                    {
+                        CWCompanyUserAccess cw = new CWCompanyUserAccess(UpdateCompanyUserList());
+                        cw.Closing += delegate
+                        {
+                            if (cw.DialogResult == true)
+                            {
+                                var userProfile = new UserProfileUserClient();
+                                userProfile.SetMaster(cw.user);
+                                dgUserProfileUser.AddRow(userProfile);
+                            }
+                        };
+                        cw.Show();
+                    }
+                    else
+                    {
+                        dgUserProfileUser.AddRow();
+                    }
                     break;
                 case "SaveGrid":
                     dgUserProfileUser.SaveData();

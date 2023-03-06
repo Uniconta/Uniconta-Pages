@@ -155,6 +155,8 @@ namespace UnicontaClient.Pages.CustomPage
         protected override void OnLayoutLoaded()
         {
             base.OnLayoutLoaded();
+            if (!api.CompanyEntity.ProjectTask)
+                this.Task.Visible = this.Task.ShowInColumnChooser = false;
             UnicontaClient.Utilities.Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
             SetDimensionLocalMenu();
         }
@@ -213,10 +215,8 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         rec.NotifyClosingBalance();
                     }
-
                     dgWorkInProgressRpt.Columns.GetColumnByName("EmployeeHoursJournal").Visible = includeJournals;
                     dgWorkInProgressRpt.Columns.GetColumnByName("EmployeeFeeJournal").Visible = includeJournals;
-
                     break;
             }
 
@@ -339,7 +339,6 @@ namespace UnicontaClient.Pages.CustomPage
                 }
             }
             tmLinesWIPLoaded = true;
-
             busyIndicator.IsBusy = false;
         }
 
@@ -347,7 +346,6 @@ namespace UnicontaClient.Pages.CustomPage
         private void SetIncludeFilter()
         {
             string filterString = dgWorkInProgressRpt.FilterString ?? string.Empty;
-
             if (includeZeroBalance)
             {
                 filterString = filterString.Replace(FILTERVALUE_ZEROBALANCE, string.Empty).Trim();
@@ -363,7 +361,6 @@ namespace UnicontaClient.Pages.CustomPage
                 else
                     filterString += filterString.IndexOf(FILTERVALUE_ZEROBALANCE) == -1 ? string.Format(" {0} {1}", AND_OPERATOR, FILTERVALUE_ZEROBALANCE) : string.Empty;
             }
-
             dgWorkInProgressRpt.FilterString = filterString;
         }
 
@@ -804,7 +801,7 @@ namespace UnicontaClient.Pages.CustomPage
                 EmployeeFeeCostValue = y.Sum(xs => xs.EmployeeFeeCostValue),
                 Expenses = y.Sum(xs => xs.Expenses),
                 ExpensesCostValue = y.Sum(xs => xs.ExpensesCostValue),
-                OnAccount = y.Sum(xs => xs.OnAccount),
+                OnAccount = Math.Round(y.Sum(xs => xs.OnAccount), 2), 
                 Invoiced = y.Sum(xs => xs.Invoiced),
                 InvoicedCostValue = y.Sum(xs => xs.InvoicedCostValue),
                 Adjustment = y.Sum(xs => xs.Adjustment),
@@ -1061,6 +1058,11 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
+        private void ProjectName_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            dgWorkInProgressRpt_RowDoubleClick();
+        }
+
         private async void CreateOrder(ProjectTransLocalClient selectedItem)
         {
             var project = (ProjectClient)projCache.Get(selectedItem.Project);
@@ -1201,7 +1203,7 @@ namespace UnicontaClient.Pages.CustomPage
                 AddDockItem(TabControls.UserNotesPage, local.ProjectRef, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Notes"), local.ProjectRef._Name));
         }
 
-        protected async override void LoadCacheInBackGround()
+        protected override async Task LoadCacheInBackGroundAsync()
         {
             projCache = projCache ?? await api.LoadCache<Uniconta.DataModel.Project>().ConfigureAwait(false);
             projGroupCache = projGroupCache ?? await api.LoadCache<Uniconta.DataModel.ProjectGroup>().ConfigureAwait(false);
@@ -1210,7 +1212,8 @@ namespace UnicontaClient.Pages.CustomPage
             projectInvoiceProposalCache = projectInvoiceProposalCache ?? await api.LoadCache<Uniconta.DataModel.ProjectInvoiceProposal>().ConfigureAwait(false);
             workSpaceCache = workSpaceCache ?? await api.LoadCache(typeof(Uniconta.DataModel.PrWorkSpace)).ConfigureAwait(false);
 
-            LoadType(new Type[] { typeof(Uniconta.DataModel.Debtor) });
+
+            LoadType(new Type[] { typeof(Uniconta.DataModel.Debtor), typeof(Uniconta.DataModel.ProjectTask) });
 
             if (this.priceLookup == null)
                 priceLookup = new Uniconta.API.Project.FindPricesEmpl(api);
@@ -1415,6 +1418,8 @@ namespace UnicontaClient.Pages.CustomPage
         {
             get
             {
+                if (_Task == null)
+                    return null;
                 var proj = ClientHelper.GetRef(_CompanyId, typeof(Uniconta.DataModel.Project), _Project);
                 if (proj != null)
                 {

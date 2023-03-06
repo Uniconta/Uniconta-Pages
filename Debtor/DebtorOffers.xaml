@@ -49,7 +49,20 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOffers"
                         </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                     </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Account"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Name"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Name">
+                        <localPage:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Margin="5,0,0,0" TextDecorations="Underline" Cursor="Hand" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.Name,RelativeSource={RelativeSource TemplatedParent}}" PreviewMouseDown="Name_PreviewMouseDown"></TextBlock>
+                                    <TextBlock Grid.Column="1"></TextBlock>
+                                </Grid>
+                            </DataTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                    </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Group"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="OfferNumber" Width="70"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryDate" Width="90" />
@@ -122,6 +135,10 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOffers"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Volume" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Cartons" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PostingText" Visible="False" />
+
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryContactPerson" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryPhone" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryContactEmail" Visible="False" />
                 </localPage:DebtorOffersGrid.Columns>
             </localPage:DebtorOffersGrid>
         </CorasauControls:BusyIndicator>

@@ -138,6 +138,7 @@ namespace UnicontaClient.Pages.CustomPage
             var dc = master as Uniconta.DataModel.DCAccount;
             if (dc != null)
             {
+                dgInvPriceListLineClientGrid.FixedDCType = dc.__DCType();
                 ShowDC = false;
                 if (dc.__DCType() == 1)
                     PriceListCreditor.Visible = false;
@@ -150,8 +151,12 @@ namespace UnicontaClient.Pages.CustomPage
                     FixedContributionRate.Visible = false;
                 }
             }
-            if (master is Uniconta.DataModel.InvPriceList)
+            var pList = master as Uniconta.DataModel.InvPriceList;
+            if (pList != null)
+            {
+                dgInvPriceListLineClientGrid.FixedDCType = pList.__DCType();
                 ShowDC = false;
+            }
             if (master is Uniconta.DataModel.InvItem)
                 ShowItem = false;
 

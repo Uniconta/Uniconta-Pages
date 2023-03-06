@@ -94,6 +94,7 @@ x:Class="UnicontaClient.Pages.CustomPage.InvStockCountingReport"
                         </local:CorasauDataGridTemplateColumnClient.CellTemplate>
                     </local:CorasauDataGridTemplateColumnClient>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Available" Width="80" Visible="False" AllowEditing="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="AvailableForReservation" Width="80" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="MinStockLevel" Width="80" AllowEditing="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="MaxStockLevel" Width="80" AllowEditing="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="PurchaseAccount" Visible="False" AllowEditing="False"/>

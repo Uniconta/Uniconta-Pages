@@ -29,6 +29,7 @@ using UnicontaClient.Controls.Dialogs;
 using UnicontaClient.Pages;
 using Uniconta.Common.Utility;
 using Uniconta.API.Service;
+using DevExpress.Mvvm.Native;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -68,8 +69,10 @@ namespace UnicontaClient.Pages.CustomPage
                 foreach (var _it in copyFromRows)
                 {
                     var it = (DCOrderLine)_it;
-                    lst.Add(CreateNewProposalLine(it._Item, it._Qty, it._Text, it._Price, it._AmountEntered, it._DiscountPct, it._Discount, it._Variant1, it._Variant2, it._Variant3, it._Variant4, it._Variant5, it._Unit,
-                        it._Date, it._Week, it._Note));
+                    var line = CreateNewProposalLine(it._Item, it._Qty, it._Text, it._Price, it._AmountEntered, it._DiscountPct, it._Discount, it._Variant1, it._Variant2, it._Variant3, it._Variant4, it._Variant5, it._Unit,
+                        it._Date, it._Week, it._Note);
+                    TableField.SetUserFieldsFromRecord(it, line);
+                    lst.Add(line);
                 }
             }
             else if (row is InvItemClient)
@@ -316,8 +319,39 @@ namespace UnicontaClient.Pages.CustomPage
                             await t;
                     }
                 }
+                else if (screenName == TabControls.CreateOrderFromQuickInvoice)
+                {
+                    var args = argument as object[];
+                    bool checkIfCreditNote = (bool)args[1];
+                    var orderlines = args[2] as IEnumerable<UnicontaBaseEntity>;
+                    bool IsDeleteLines = (bool)args[3];
+                    double sign = checkIfCreditNote ? -1d : 1d;
+                    if (checkIfCreditNote)
+                        orderlines.ForEach(u => (u as DCOrderLine)._Qty = (u as DCOrderLine)._Qty * sign);
+                    if (IsDeleteLines)
+                        dgProjInvProposedLineGrid.DeleteAllRows();
+                    dgProjInvProposedLineGrid.PasteRows(orderlines);
+                }
+                else if (screenName == TabControls.CopyOfferLines)
+                {
+                    var args = argument as object[];
+                    var IsDeleteLines = (bool)args[0];
+                    var offerLines = args[1] as DebtorOfferLineClient[];
+                    if (IsDeleteLines)
+                        dgProjInvProposedLineGrid.DeleteAllRows(); // It will remove the rows from the grid and on save it will remove it from sql
+                    //Add lines to grid
+                    dgProjInvProposedLineGrid.PasteRows(offerLines);
+                }
+                else if (screenName == TabControls.CopyBudgetLines)
+                {
+                    var args = argument as object[];
+                    var IsDeleteLines = (bool)args[0];
+                    var ProposalLines = args[1] as List<ProjectInvoiceProposalLineClient>;
+                    if (IsDeleteLines)
+                        dgProjInvProposedLineGrid.DeleteAllRows();
+                    dgProjInvProposedLineGrid.PasteRows(ProposalLines);
+                }
             }
-
             if (screenName == TabControls.RegenerateOrderFromProjectPage)
                 InitQuery();
         }
@@ -654,17 +688,12 @@ namespace UnicontaClient.Pages.CustomPage
                 case "CreateFromInvoice":
                     try
                     {
-                        CWCreateOrderFromQuickInvoice createOrderCW = new CWCreateOrderFromQuickInvoice(api, ord.Account, true, ord);
-                        createOrderCW.Closing += delegate
-                        {
-                            if (createOrderCW.DialogResult == true)
-                            {
-                                var checkIfCreditNote = createOrderCW.chkIfCreditNote.IsChecked.HasValue ? createOrderCW.chkIfCreditNote.IsChecked.Value : false;
-                                var debtorInvoice = createOrderCW.dgCreateOrderGrid.SelectedItem as DebtorInvoiceClient;
-                                dgProjInvProposedLineGrid.PasteRows(createOrderCW.DCOrderLines);
-                            }
-                        };
-                        createOrderCW.Show();
+                        var par = new object[4];
+                        par[0] = api;
+                        par[1] = ord.Account;
+                        par[2] = true;
+                        par[3] = ord;
+                        AddDockItem(TabControls.CreateOrderFromQuickInvoice, par, true, String.Format(Uniconta.ClientTools.Localization.lookup("CopyOBJ"), Uniconta.ClientTools.Localization.lookup("Invoice")), null, new Point(250, 200));
                     }
                     catch (Exception ex)
                     {
@@ -673,9 +702,12 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "RefreshGrid":
                     RefreshGrid();
-                    break;
+                    return;
                 case "CopyOffer":
                     CopyLinesFromOffer();
+                    break;
+                case "CopyBudget":
+                    CopyLinesFromBudget();
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);
@@ -688,33 +720,26 @@ namespace UnicontaClient.Pages.CustomPage
         {
             try
             {
-                var cwOffers = new CWCopyOfferLines(api);
-                cwOffers.Closed += delegate
-                {
-                    if (cwOffers.DialogResult == true)
-                    {
-                        if (cwOffers.IsDeleteLines)
-                            dgProjInvProposedLineGrid.DeleteAllRows(); // It will remove the rows from the grid and on save it will remove it from sql
-
-                        //Add lines to grid
-                        dgProjInvProposedLineGrid.PasteRows(cwOffers.OfferLines);
-                    }
-
-                };
-                cwOffers.Show();
+                var par = new object[1] { api };
+                AddDockItem(TabControls.CopyOfferLines, par, true, String.Format(Uniconta.ClientTools.Localization.lookup("CopyOBJ"), Uniconta.ClientTools.Localization.lookup("OfferLine")), null, new Point(250, 200));
             }
             catch (Exception ex)
             {
                 UnicontaMessageBox.Show(ex);
             }
         }
-
+        void CopyLinesFromBudget()
+        {
+                var par = new object[2] { api, Order };
+                AddDockItem(TabControls.CopyBudgetLines, par, true, String.Format(Uniconta.ClientTools.Localization.lookup("CopyOBJ"), Uniconta.ClientTools.Localization.lookup("ProjectEstimate")), null, new Point(250, 200));
+        }
         async void RefreshGrid()
         {
             var savetask = saveGridLocal(); // we need to wait until it is saved, otherwise Storage is not updated
             if (savetask != null)
                 await savetask;
-            gridRibbon_BaseActions("RefreshGrid");
+            await dgProjInvProposedLineGrid.RefreshTask();
+            RecalculateAmount();
         }
 
         public override bool IsDataChaged
@@ -934,7 +959,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
 
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             var api = this.api;
             var Comp = api.CompanyEntity;

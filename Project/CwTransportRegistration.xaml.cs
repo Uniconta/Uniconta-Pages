@@ -101,7 +101,7 @@ namespace UnicontaClient.Pages.CustomPage
             var journalline = this.journalline;
             Project = journalline._Project;
             WorkSpace = journalline._WorkSpace;
-            
+            Purpose = journalline._Text;
             VechicleRegNo = employee._VechicleRegNo;
 
             if (catMileage == null)

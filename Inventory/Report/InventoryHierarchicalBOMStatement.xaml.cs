@@ -21,10 +21,35 @@ using Uniconta.ClientTools.Util;
 using Uniconta.Common;
 using Uniconta.DataModel;
 using DevExpress.Xpf.Core;
+using System.Collections;
+using DevExpress.Xpf.Grid;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
+    public class InventoryHierarchicalBOMGrid : CorasauDataGridClient
+    {
+        public override Type TableType { get { return typeof(InvBOMClient); } }
+        public override IComparer GridSorting { get { return new InvBOMSort(); } }
+        public override bool AllowSort { get { return false; } }
+        public override bool ShowTreeListView => true;
+
+        public override TreeListView SetTreeListViewFromPage
+        {
+            get
+            {
+                var tv = base.SetTreeListViewFromPage;
+                tv.AutoWidth = true;
+                tv.KeyFieldName = "ID";
+                tv.ShowIndicator = false;
+                tv.ParentFieldName = "ParentID";
+                tv.TreeDerivationMode = TreeDerivationMode.Selfreference;
+                tv.ShowTotalSummary = false;
+                return tv;
+            }
+        }
+    }
+
     /// <summary>
     /// Interaction logic for InventoryInvBOMClient.xaml
     /// </summary>
@@ -53,8 +78,8 @@ namespace UnicontaClient.Pages.CustomPage
             invClient = baseEntity as InvItem;
             if (invClient == null)
             {
-                var syncMaster2 = baseEntity as IVariant;
-                if (syncMaster2 != null)
+                IVariant syncMaster2 = baseEntity as IVariant;
+                if (syncMaster2 is IVariant)
                     invClient = api.GetCache(typeof(Uniconta.DataModel.InvItem))?.Get(syncMaster2.Item) as InvItemClient;
                 else
                 {
@@ -63,20 +88,13 @@ namespace UnicontaClient.Pages.CustomPage
                         Quantity = invBom._Qty;
                 }
             }
-            baseRibbon = localMenu;
+            localMenu.dataGrid = dgInvBomclientGrid;
+            SetRibbonControl(localMenu, dgInvBomclientGrid);
             localMenu.OnItemClicked += LocalMenu_OnItemClicked;
             LoadBOM = new LoadInvBOMDeep(api);
             SetDefaultFilterValues();
             Utility.SetupVariants(api, null, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
             GetMenuItem();
-            SetTreeListViewStyle();
-            dgInvBomclientGrid.View.ShownColumnChooser += View_ShownColumnChooser;
-#if SILVERLIGHT
-            Application.Current.RootVisual.KeyDown += RootVisual_KeyDown;
-#else
-            this.PreviewKeyDown += RootVisual_KeyDown;
-#endif
-            this.BeforeClose += InventoryHierarchicalBOMStatement_BeforeClose;
             HideMenuItems();
         }
 
@@ -107,39 +125,7 @@ namespace UnicontaClient.Pages.CustomPage
             base.SetParameter(Parameters);
         }
 
-        private void InventoryHierarchicalBOMStatement_BeforeClose()
-        {
-#if SILVERLIGHT
-            Application.Current.RootVisual.KeyDown -= RootVisual_KeyDown;
-#else
-            this.PreviewKeyDown -= RootVisual_KeyDown;
-#endif
-        }
-
-        private void RootVisual_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
-        {
-            if (e.Key == Key.F6 && dgInvBomclientGrid.CurrentColumn == ItemPart)
-            {
-                var itempart = dgInvBomclientGrid.CurrentCellValue;
-                var lookupTable = new LookUpTable();
-                lookupTable.api = this.api;
-                lookupTable.KeyStr = Convert.ToString(itempart);
-                lookupTable.TableType = typeof(InvItem);
-                this.LookUpTable(lookupTable, Uniconta.ClientTools.Localization.lookup("Lookup"), TabControls.InventoryItems);
-            }
-        }
-
-        private void View_ShownColumnChooser(object sender, RoutedEventArgs e)
-        {
-            dgInvBomclientGrid.View.ColumnChooserState = new DefaultColumnChooserState() { Location = Mouse.GetPosition(this) };
-        }
-
-        public override void PerformAction(ShortcutAction action)
-        {
-            if (action == ShortcutAction.ShowColumnChooser)
-                dgInvBomclientGrid.View.ShowColumnChooser();
-            base.PerformAction(action);
-        }
+   
 
         private void SetDefaultFilterValues()
         {
@@ -153,30 +139,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 case "RefreshGrid":
                     InitQuery();
-                    break;
-                case "ApplyFilter":
-                    if (filterDialog == null)
-                    {
-                        if (defaultFilterCleared)
-                            filterDialog = new CWServerFilter(api, typeof(InvBOMClient), null, defaultSort);
-                        else
-                            filterDialog = new CWServerFilter(api, typeof(InvBOMClient), defaultFilters, defaultSort);
-                        filterDialog.Closing += FilterDialog_Closing;
-#if !SILVERLIGHT
-                        filterDialog.Show();
-                    }
-                    else
-                        filterDialog.Show(true);
-#elif SILVERLIGHT
-                    }
-                    filterDialog.Show();
-#endif
-                    break;
-                case "ClearFilter":
-                    filterDialog = null;
-                    filters = null;
-                    defaultFilterCleared = true;
-                    break;
+                    break;               
                 case "ExpandAndCollapse":
                     if (dgInvBomclientGrid.ItemsSource != null)
                         SetExpandCollapse();
@@ -199,13 +162,16 @@ namespace UnicontaClient.Pages.CustomPage
                         AddDockItem(TabControls.UserDocsPage, dgInvBomclientGrid.SelectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Document"), selectedItem._ItemPart));
                     }
                     break;
+                default:
+                    gridRibbon_BaseActions(ActionType);
+                    break;
             }
         }
 
         private void SetExpandRows()
         {
             var rowHandles = dgInvBomclientGrid.GetSelectedRowHandles();
-            treeListView.ExpandNode(rowHandles[0]);
+            dgInvBomclientGrid.treeListView.ExpandNode(rowHandles[0]);
         }
 
         void GetMenuItem()
@@ -219,31 +185,18 @@ namespace UnicontaClient.Pages.CustomPage
             if (ibase == null)
                 return;
 
-            if (ibase.Caption == Uniconta.ClientTools.Localization.lookup("ExpandAll") && !treeListView.AutoExpandAllNodes)
+            if (ibase.Caption == Uniconta.ClientTools.Localization.lookup("ExpandAll") && !dgInvBomclientGrid.treeListView.AutoExpandAllNodes)
             {
-                treeListView.ExpandAllNodes();
+                dgInvBomclientGrid.treeListView.ExpandAllNodes();
                 ibase.Caption = Uniconta.ClientTools.Localization.lookup("CollapseAll");
                 ibase.LargeGlyph = Utility.GetGlyph("Collapse_32x32.png");
             }
             else
             {
-                treeListView.CollapseAllNodes();
+                dgInvBomclientGrid.treeListView.CollapseAllNodes();
                 ibase.Caption = Uniconta.ClientTools.Localization.lookup("ExpandAll");
                 ibase.LargeGlyph = Utility.GetGlyph("Expand_32x32.png");
             }
-        }
-
-        private void FilterDialog_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            if (filterDialog.DialogResult == true)
-            {
-                filters = filterDialog.PropValuePair;
-                sort = filterDialog.PropSort;
-            }
-#if !SILVERLIGHT
-            e.Cancel = true;
-            filterDialog.Hide();
-#endif
         }
 
         public override async Task InitQuery()
@@ -261,41 +214,18 @@ namespace UnicontaClient.Pages.CustomPage
             dgInvBomclientGrid.Visibility = Visibility.Visible;
             busyIndicator.IsBusy = false;
         }
-
-        private void SetTreeListViewStyle()
-        {
-            if (!session.User._ShowGridLines)
-            {
-                treeListView.ShowHorizontalLines = false;
-                treeListView.ShowVerticalLines = false;
-            }
-
-#if !SILVERLIGHT
-            Style rowStyle = new Style(typeof(DevExpress.Xpf.Grid.RowControl));
-            rowStyle.Setters.Add(new Setter(HeightProperty, 25.0));
-#else
-            Style rowStyle = new Style(typeof(DevExpress.Xpf.Grid.GridRowContent));
-            rowStyle.Setters.Add(new Setter(DevExpress.Xpf.Grid.GridRowContent.HeightProperty,25.0));
-#endif
-            treeListView.RowStyle = rowStyle;
-#if !SILVERLIGHT
-            if (!System.Windows.Forms.SystemInformation.TerminalServerSession)
-#endif
-                if (!session.User._ShowGridLines)
-                    treeListView.AlternateRowBackground = Application.Current.Resources["AlternateGridRowColor"] as SolidColorBrush;
-        }
+       
+        
 
         private void HasDocImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var invBomItem = (sender as Image).Tag as InvBOMClient;
-            if (invBomItem != null)
+            if ((sender as Image).Tag is InvBOMClient invBomItem)
                 AddDockItem(TabControls.UserDocsPage, invBomItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Note"), invBomItem._ItemPart));
         }
 
         private void HasNoteImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var invBomItem = (sender as Image).Tag as InvBOMClient;
-            if (invBomItem != null)
+            if ((sender as Image).Tag is InvBOMClient invBomItem)
                 AddDockItem(TabControls.UserNotesPage, invBomItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Document"), invBomItem._ItemPart));
         }
     }

@@ -57,7 +57,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CWGenerateInvoice"
                             <ClientToolsControls:CheckEditor x:Name="chkPostOnlyDel" IsChecked="{Binding PostOnlyDelivered,Mode=TwoWay}"/>
                         </ClientToolsControls:CorasauLayoutItem>
                     </ClientToolsControls:CorasauLayoutGroup>
-                    <ClientToolsControls:CorasauLayoutGroup x:Name="lgOrders"  View="GroupBox" GroupBoxDisplayMode="Light" Visibility="Collapsed" IsCollapsible="False" HorizontalAlignment="Stretch" ClientToolsControls:CorasauLayoutControl.AllowHorizontalSizing="True">
+                    <ClientToolsControls:CorasauLayoutGroup x:Name="lgOrders"  View="GroupBox" Orientation="Vertical" GroupBoxDisplayMode="Light" Visibility="Collapsed" IsCollapsible="False" HorizontalAlignment="Stretch" ClientToolsControls:CorasauLayoutControl.AllowHorizontalSizing="True">
                         <ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
                             <DataTemplate>
                                 <Image Source="/UnicontaPages;component/Assets/img/group-order_16x16.png" Width="16" Height="16" Stretch="UniformToFill" HorizontalAlignment="Left" />
@@ -69,6 +69,9 @@ x:Class="UnicontaClient.Pages.CustomPage.CWGenerateInvoice"
                                     <editor:CheckedComboBoxStyleSettings  />
                                 </ClientToolsControls:DimComboBoxEditor.StyleSettings>
                             </ClientToolsControls:DimComboBoxEditor>
+                        </ClientToolsControls:CorasauLayoutItem>
+                        <ClientToolsControls:CorasauLayoutItem FieldName="PhysicalVoucherRef" x:Name="liDocumentRef" Style="{StaticResource LayoutItemsLookUpEditstyle}" LookupButtonClicked="liDocumentRef_LookupButtonClicked" Visibility="Collapsed">
+                            <ClientToolsControls:IntegerEditor HorizontalContentAlignment="Left" Text="{Binding PhysicalVoucherRef,Mode=TwoWay}" SetMask="False" />
                         </ClientToolsControls:CorasauLayoutItem>
                     </ClientToolsControls:CorasauLayoutGroup>
                 </ClientToolsControls:CorasauLayoutGroup>

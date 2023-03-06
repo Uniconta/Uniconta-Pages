@@ -1,3 +1,4 @@
+using dk.gov.oiosi.security.oces;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -100,12 +101,15 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         ViewVoucher(TabControls.VouchersPage3, dgVoucherApproveGrid.syncEntity);
                     break;
-                case "RefreshGrid":
-                    InitQuery();
-                    break;
                 case "ModifyApprover":
                     if (selectedItem != null)
                         ModifyApprover(selectedItem);
+                    break;
+                case "RefreshGrid":
+                    InitQuery();
+                    break;
+                case "Archived":
+                    ShowArchivedRecords();
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);
@@ -113,6 +117,18 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
+        async void ShowArchivedRecords()
+        {
+            var user = api.session.User;
+            var employee = (await api.Query<EmployeeClient>(user))?.FirstOrDefault();
+
+            if (employee != null)
+            {
+                var header = string.Concat(Uniconta.ClientTools.Localization.lookup("PhysicalVouchers"), " : ", employee.Name);
+                AddDockItem(TabControls.AttachedVouchers, new object[] { employee }, header);
+            }
+        }
+        
         void ModifyApprover(VouchersClient voucher)
         {
             var cwEmployee = new CWEmployee(api);
@@ -173,6 +189,11 @@ namespace UnicontaClient.Pages.CustomPage
                 }
             };
             commentsDialog.Show();
+        }
+
+        private void PrimaryKeyId_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            localMenu_OnItemClicked("ViewVoucher");
         }
     }
 }

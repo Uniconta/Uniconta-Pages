@@ -60,13 +60,13 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryStatement"
         </Grid>
         <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{StaticResource WindowHeaderGradient}" />
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="3" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
-            <localPage:AccountsStatementGrid x:Name="dgInvTran" AutoGenerateColumns="None" SelectionMode="None" MasterRowExpanded="MasterRowExpanded" SubstituteFilter="SubstituteFilter">
-                <localPage:AccountsStatementGrid.Columns>
+            <localPage:InventoryStatementGrid x:Name="dgInvTran" AutoGenerateColumns="None" SelectionMode="None" MasterRowExpanded="MasterRowExpanded" SubstituteFilter="SubstituteFilter">
+                <localPage:InventoryStatementGrid.Columns>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ItemNumber" CellTemplate="{StaticResource RegularCellTemplate}"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Name"  />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ItemType"/>                 
-                </localPage:AccountsStatementGrid.Columns>
-                <localPage:AccountsStatementGrid.DetailDescriptor>
+                </localPage:InventoryStatementGrid.Columns>
+                <localPage:InventoryStatementGrid.DetailDescriptor>
                     <localPage:DataControlDetailDescriptorCls ItemsSourceBinding="{Binding ChildRecord}">
                         <localPage:InventoryStatementGrid x:Name="childDgInvTrans" SelectionMode="None">
                             <localPage:InventoryStatementGrid.Columns>
@@ -109,6 +109,7 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryStatement"
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceNumber" Visible="False" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Item" Visible="False" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Text" Visible="False" />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Note" Visible="False" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="LineNumber" Mask="" Visible="false"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="InvJournalPostedId" Visible="false"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="JournalPostedId" Visible="false"/>
@@ -126,8 +127,8 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryStatement"
                             </localPage:InventoryStatementGrid.Columns>
                         </localPage:InventoryStatementGrid>
                     </localPage:DataControlDetailDescriptorCls>
-                </localPage:AccountsStatementGrid.DetailDescriptor>
-            </localPage:AccountsStatementGrid>
+                </localPage:InventoryStatementGrid.DetailDescriptor>
+            </localPage:InventoryStatementGrid>
         </CorasauControls:BusyIndicator>
     </Grid>
 </Pages:GridBasePage>

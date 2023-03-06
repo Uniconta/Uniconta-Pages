@@ -31,7 +31,21 @@ x:Class="UnicontaClient.Pages.CustomPage.UserDocsPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="UserName" Width="100"  AllowEditing="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DocumentType" Width="55" AllowEditing="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Url" AllowEditing="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Text" Width="500" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Text" Width="500">
+                        <localPage:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Margin="5,0,0,0" TextDecorations="Underline" Cursor="Hand" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.Text,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" PreviewMouseDown="Text_PreviewMouseDown"></TextBlock>
+                                    <TextBlock Grid.Column="1"></TextBlock>
+                                </Grid>
+                            </DataTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                    </localPage:CorasauDataGridTemplateColumnClient>
+                                                                   
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Group" Width="80"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="GroupName" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="RowId" Width="50"/>

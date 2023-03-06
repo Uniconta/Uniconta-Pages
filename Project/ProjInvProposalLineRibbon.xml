@@ -54,6 +54,7 @@
   <RibbonItem>
     <RibbonItem Action="CreateFromInvoice" LocalizedNameKey="CopyOBJ" Parameter="Invoice"  LargeGlyph="Orders_32x32.png" />
     <RibbonItem Action="CopyOffer" LocalizedNameKey="CopyOBJ" Parameter="Offer" LargeGlyph="Copy_32x32.png" />
+    <RibbonItem Action="CopyBudget" LocalizedNameKey="CopyOBJ" Parameter="Budget" LargeGlyph="Budget_32x32.png" />
   </RibbonItem>
   <RibbonItem>
     <RibbonItem LocalizedNameKey="Amount" StatusValue=""/>

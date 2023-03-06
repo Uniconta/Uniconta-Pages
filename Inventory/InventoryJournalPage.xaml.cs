@@ -12,7 +12,7 @@ using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
 using Uniconta.Common;
-
+using System.Windows.Input;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -53,7 +53,10 @@ namespace UnicontaClient.Pages.CustomPage
             if (selectedItem != null)
                 AddDockItem(TabControls.InventoryJournalLines, selectedItem, string.Format("{0} {1} : {2}", Uniconta.ClientTools.Localization.lookup("Inventory"), Uniconta.ClientTools.Localization.lookup("Journal"), selectedItem.Journal));
         }
-
+        private void Name_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            DgInventoryJournal_RowDoubleClick();
+        }
         protected override void LoadCacheInBackGround()
         {
             LoadType(typeof(Uniconta.DataModel.InvItem));

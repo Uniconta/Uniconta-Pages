@@ -35,9 +35,7 @@ using DevExpress.Data.Filtering;
 using DevExpress.Xpf.Editors;
 using DevExpress.Mvvm.UI.Interactivity;
 using Uniconta.Common.Utility;
-#if !SILVERLIGHT
 using UnicontaClient.Pages;
-#endif
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -63,10 +61,8 @@ namespace UnicontaClient.Pages.CustomPage
         }
         public override void PrintGrid(string reportName, object printparam, string format = null, BasePage page = null, bool showDialogInPrint = true)
         {
-#if !SILVERLIGHT
             ((CustomTableView)View).HasPageBreak = PageBreak;
-#endif
-            base.PrintGrid(reportName, printparam, format, page, false);
+            base.PrintGrid(reportName, printparam, format, page);
         }
     }
 
@@ -135,19 +131,18 @@ namespace UnicontaClient.Pages.CustomPage
         ReportAPI transApi;
         Uniconta.DataModel.GLAccount _master;
         static bool pageBreak;
-        static public DateTime DefaultFromDate, DefaultToDate;
-        static int setShowDimOnPrimoIndex = 0;
+        static int setShowDimOnPrimoIndex;
         static bool IsCollapsed = true;
         public static void SetDateTime(DateEditor frmDateeditor, DateEditor todateeditor)
         {
             if (frmDateeditor.Text == string.Empty)
-                DefaultFromDate = DateTime.MinValue;
+                DebtorStatement.DefaultFromDate = DateTime.MinValue;
             else
-                DefaultFromDate = frmDateeditor.DateTime.Date;
+                DebtorStatement.DefaultFromDate = frmDateeditor.DateTime.Date;
             if (todateeditor.Text == string.Empty)
-                DefaultToDate = DateTime.MinValue;
+                DebtorStatement.DefaultToDate = DateTime.MinValue;
             else
-                DefaultToDate = todateeditor.DateTime.Date;
+                DebtorStatement.DefaultToDate = todateeditor.DateTime.Date;
         }
 
         public AccountStatement(BaseAPI API) : base(API, string.Empty)
@@ -213,24 +208,17 @@ namespace UnicontaClient.Pages.CustomPage
             cmbFromAccount.api = cmbToAccount.api = api;
             SetRibbonControl(localMenu, dgGLTrans);
             localMenu.OnItemClicked += LocalMenu_OnItemClicked;
-
-            if (AccountStatement.DefaultFromDate == DateTime.MinValue)
-            {
-                var now = BasePage.GetSystemDefaultDate();
-                AccountStatement.DefaultToDate = now;
-                AccountStatement.DefaultFromDate = now.AddDays(1 - now.Day).AddMonths(-2);
-            }
+            DebtorStatement.SetDefaultDateTime();
             var Pref = api.session.Preference;
             cbxAscending.IsChecked = Pref.Debtor_isAscending;
             cbxSkipBlank.IsChecked = Pref.Debtor_skipBlank;
-#if !SILVERLIGHT
             cbxPageBreak.IsChecked = pageBreak;
             dgGLTrans.PageBreak = pageBreak;
-#endif
+
             cmbShowDimOnPrimo.ItemsSource = new string[] { Uniconta.ClientTools.Localization.lookup("OnePrimo"), Uniconta.ClientTools.Localization.lookup("PrimoPerDim"), Uniconta.ClientTools.Localization.lookup("NoPrimo") };
             cmbShowDimOnPrimo.SelectedIndex = setShowDimOnPrimoIndex;
-            txtDateTo.DateTime = AccountStatement.DefaultToDate;
-            txtDateFrm.DateTime = AccountStatement.DefaultFromDate;
+            txtDateTo.DateTime = DebtorStatement.DefaultToDate;
+            txtDateFrm.DateTime = DebtorStatement.DefaultFromDate;
             GetMenuItem();
 
             var Comp = api.CompanyEntity;
@@ -244,9 +232,6 @@ namespace UnicontaClient.Pages.CustomPage
             dgGLTrans.MasterRowExpanded += DgGLTrans_MasterRowExpanded;
             dgGLTrans.MasterRowCollapsed += DgGLTrans_MasterRowCollapsed;
             dgGLTrans.ShowTotalSummary();
-#if SILVERLIGHT
-            childDgGLTrans.CurrentItemChanged += ChildDgDebtorTrans_CurrentItemChanged;
-#endif
             transApi = new Uniconta.API.GeneralLedger.ReportAPI(api);
             transApi.SetClosingSheet(sheet);
 
@@ -270,13 +255,8 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void DgGLTrans_SelectedItemChanged(object sender, SelectedItemChangedEventArgs e)
         {
-#if SILVERLIGHT
-            if(dgGLTrans.SelectedItem == null || dgGLTrans.Visibility == Visibility.Collapsed)
-#else
             if (dgGLTrans.SelectedItem == null || !dgGLTrans.IsVisible)
-#endif
                 return;
-
             SetExpandAndCollapseCurrent(false, false);
         }
 
@@ -284,7 +264,10 @@ namespace UnicontaClient.Pages.CustomPage
         {
             LocalMenu_OnItemClicked("VoucherTransactions");
         }
-
+        private void Name_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            DgGLTrans_RowDoubleClick();
+        }
         void MasterRowExpanded(object sender, RowEventArgs e)
         {
             var detailView = GetDetailView(e.RowHandle);
@@ -308,8 +291,6 @@ namespace UnicontaClient.Pages.CustomPage
             return true;
         }
 
-#if !SILVERLIGHT
-
         void SubstituteFilter(object sender, DevExpress.Data.SubstituteFilterEventArgs e)
         {
             if (string.IsNullOrEmpty(ribbonControl?.SearchControl?.SearchText))
@@ -332,17 +313,17 @@ namespace UnicontaClient.Pages.CustomPage
                 detailOperator.Operands.Add(new FunctionOperator(FunctionOperatorType.Contains, op, new OperandValue(searchString)));
             return new AggregateOperand("ChildRecords", Aggregate.Exists, detailOperator);
         }
-#endif
+
         public override Task InitQuery()
         {
             return null;
         }
 
-        async void InitialLoad()
+        void InitialLoad()
         {
-            await TransactionReport.SetDailyJournal(cmbJournal, api);
-            var t = SetNoOfDimensions();
-            StartLoadCache(t);
+            TransactionReport.SetDailyJournal(cmbJournal, api);
+            SetNoOfDimensions();
+            StartLoadCache();
         }
 
         public override void AssignMultipleGrid(List<CorasauDataGrid> gridCtrls)
@@ -352,12 +333,10 @@ namespace UnicontaClient.Pages.CustomPage
             isChildGridExist = true;
         }
 
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
-            var api = this.api;
-            var Comp = api.CompanyEntity;
             if (accountCache == null)
-                accountCache = await Comp.LoadCache(typeof(Uniconta.DataModel.GLAccount), api).ConfigureAwait(false);
+                accountCache = await api.LoadCache(typeof(Uniconta.DataModel.GLAccount)).ConfigureAwait(false);
             LoadType(new Type[] { typeof(Uniconta.DataModel.Debtor), typeof(Uniconta.DataModel.Creditor), typeof(Uniconta.DataModel.GLDailyJournal), typeof(Uniconta.DataModel.GLVat), typeof(Uniconta.DataModel.GLTransType), typeof(Uniconta.DataModel.NumberSerie) });
         }
 
@@ -400,20 +379,16 @@ namespace UnicontaClient.Pages.CustomPage
                     else if (childDgGLTrans.SelectedItem != null)
                         SetExpandAndCollapseCurrent(true, true);
                     break;
+                case "PostedBy":
+                    if (selectedItem != null)
+                        AccountsTransaction.JournalPosted(selectedItem, api);
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
         }
 
-#if SILVERLIGHT
-        private void ChildDgDebtorTrans_CurrentItemChanged(object sender, CurrentItemChangedEventArgs e)
-        {
-            var detailsSelectedItem = e.NewItem as GLTransClientTotal;
-            childDgGLTrans.SelectedItem = detailsSelectedItem;
-            childDgGLTrans.syncEntity.Row = detailsSelectedItem;
-        }
-#endif
         private void SetExpandAndCollapseCurrent(bool changeState, bool isChild)
         {
             if (ibaseCurrent == null)
@@ -455,23 +430,23 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void SetCollapseCurrent()
         {
-            if (ibaseCurrent == null)
-                return;
-
-            ibaseCurrent.Caption = Uniconta.ClientTools.Localization.lookup("CollapseCurrent");
-            ibaseCurrent.LargeGlyph = Utility.GetGlyph("Collapse_32x32.png");
+            if (ibaseCurrent != null)
+            {
+                ibaseCurrent.Caption = Uniconta.ClientTools.Localization.lookup("CollapseCurrent");
+                ibaseCurrent.LargeGlyph = Utility.GetGlyph("Collapse_32x32.png");
+            }
         }
 
         private void SetExpandCurrent()
         {
-            if (ibaseCurrent == null)
-                return;
-
-            ibaseCurrent.Caption = Uniconta.ClientTools.Localization.lookup("ExpandCurrent");
-            ibaseCurrent.LargeGlyph = Utilities.Utility.GetGlyph("Expand_32x32.png");
+            if (ibaseCurrent != null)
+            {
+                ibaseCurrent.Caption = Uniconta.ClientTools.Localization.lookup("ExpandCurrent");
+                ibaseCurrent.LargeGlyph = Utilities.Utility.GetGlyph("Expand_32x32.png");
+            }
         }
 
-        bool manualExpanded = false;
+        bool manualExpanded;
         private void SetExpandAndCollapse(bool expandState)
         {
             if (ibase == null)
@@ -541,13 +516,11 @@ namespace UnicontaClient.Pages.CustomPage
             if (NumberOfDimensions >= 5)
                 dim5 = TransactionReport.GetRowIDs(cbdim5);
             AccountStatement.SetDateTime(txtDateFrm, txtDateTo);
-            DateTime fromDate = AccountStatement.DefaultFromDate, toDate = AccountStatement.DefaultToDate;
+            DateTime fromDate = DebtorStatement.DefaultFromDate, toDate = DebtorStatement.DefaultToDate;
 
             var showDimOnPrimo = cmbShowDimOnPrimo.SelectedIndex;
 
-#if !SILVERLIGHT
             pageBreak = cbxPageBreak.IsChecked.Value;
-#endif
             setShowDimOnPrimoIndex = showDimOnPrimo;
 
             string fromAccount = null, toAccount = null;
@@ -580,6 +553,8 @@ namespace UnicontaClient.Pages.CustomPage
             }
             dgGLTrans.Visibility = Visibility.Visible;
             busyIndicator.IsBusy = false;
+            if (fromAccount == toAccount)
+                IsCollapsed = false;
             SetExpandAndCollapse(IsCollapsed);
         }
 
@@ -651,22 +626,16 @@ namespace UnicontaClient.Pages.CustomPage
                 if (!isAscending)
                     Array.Reverse(masterDbStatement.ChildRecords);
             }
-
             dataRowCount = statementList.Count;
-            if (dataRowCount > 0)
-            {
-                dgGLTrans.ItemsSource = null;
-                dgGLTrans.ItemsSource = statementList;
-            }
+            dgGLTrans.ItemsSource = null;
+            dgGLTrans.ItemsSource = statementList;
         }
 
-
-#if !SILVERLIGHT
         private void cbxPageBreak_Click(object sender, RoutedEventArgs e)
         {
             dgGLTrans.PageBreak = (cbxPageBreak.IsChecked == true);
         }
-#endif
+
         public override object GetPrintParameter()
         {
             if (!manualExpanded)
@@ -703,15 +672,12 @@ namespace UnicontaClient.Pages.CustomPage
             cmbToAccount.SelectedItem = cmbFromAccount.SelectedItem;
         }
 
-        private async Task SetNoOfDimensions()
+        private async void SetNoOfDimensions()
         {
             var api = this.api;
             int noofDimensions = api.CompanyEntity.NumberOfDimensions;
             if (noofDimensions < 5)
             {
-#if SILVERLIGHT
-                cbdim5.Visibility = cldim5.Visibility = Visibility.Collapsed;
-#endif
                 lblDim5.Visibility = Visibility.Collapsed;
                 cldim5.Visible = false;
                 cbdim5.Visibility = Visibility.Collapsed;
@@ -725,9 +691,6 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (noofDimensions < 4)
             {
-#if SILVERLIGHT
-                cbdim4.Visibility = cldim4.Visibility = Visibility.Collapsed;
-#endif
                 lblDim4.Visibility = Visibility.Collapsed;
                 cldim4.Visible = false;
                 cbdim4.Visibility = Visibility.Collapsed;
@@ -741,9 +704,6 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (noofDimensions < 3)
             {
-#if SILVERLIGHT
-                cbdim3.Visibility = cldim3.Visibility = Visibility.Collapsed;
-#endif
                 lblDim3.Visibility = Visibility.Collapsed;
                 cldim3.Visible = false;
                 cbdim3.Visibility = Visibility.Collapsed;
@@ -757,9 +717,6 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (noofDimensions < 2)
             {
-#if SILVERLIGHT
-                cbdim2.Visibility = cldim2.Visibility = Visibility.Collapsed;
-#endif
                 lblDim2.Visibility = Visibility.Collapsed;
                 cldim2.Visible = false;
                 cbdim2.Visibility = Visibility.Collapsed;
@@ -773,9 +730,6 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (noofDimensions < 1)
             {
-#if SILVERLIGHT
-                cbdim1.Visibility = cldim1.Visibility = Visibility.Collapsed;
-#endif
                 lblDim1.Visibility = Visibility.Collapsed;
                 cldim1.Visible = false;
                 cbdim1.Visibility = Visibility.Collapsed;
@@ -795,5 +749,4 @@ namespace UnicontaClient.Pages.CustomPage
                 DebtorTransactions.ShowVoucher(childDgGLTrans.syncEntity, api, busyIndicator);
         }
     }
-
 }

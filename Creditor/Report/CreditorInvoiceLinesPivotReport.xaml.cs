@@ -70,7 +70,7 @@ namespace UnicontaClient.Pages.CustomPage
         void SetDefaultFilter()
         {
             filterDate = BasePage.GetFilterDate(api.CompanyEntity, false);
-            var filterSorthelper = new FilterSortHelper(typeof(DebtorInvoiceLines), DefaultFilters(), null);
+            var filterSorthelper = new FilterSortHelper(typeof(CreditorInvoiceLines), DefaultFilters(), null);
             List<string> errors;
             filterValues = filterSorthelper.GetPropValuePair(out errors);
         }
@@ -111,11 +111,15 @@ namespace UnicontaClient.Pages.CustomPage
                             filterDialog = new CWServerFilter(api, typeof(CreditorInvoiceLines), null, null, UserFields);
                         else
                             filterDialog = new CWServerFilter(api, typeof(CreditorInvoiceLines), DefaultFilters(), null, UserFields);
+                        filterDialog.GridSource = pivotDgCreditorInvLines.DataSource as IList<UnicontaBaseEntity>;
                         filterDialog.Closing += filterDialog_Closing;
                         filterDialog.Show();
                     }
                     else
+                    {
+                        filterDialog.GridSource = pivotDgCreditorInvLines.DataSource as IList<UnicontaBaseEntity>;
                         filterDialog.Show(true);
+                    }
                     break;
                 case "ClearLocalFilter":
                     filterDialog = null;

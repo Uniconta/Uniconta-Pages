@@ -71,7 +71,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectJournalLinePage"
                         </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                         <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                             <DataTemplate>
-                                <CorasauControls:ComboBoxEditor IsEditable="True" GotFocus="SerieBatch_GotFocus" x:Name="PART_Editor" ItemsSource="{Binding DataContext.RowData.Row.SerieBatchSource,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" />
+                                <CorasauControls:ComboBoxEditor IsEditable="True" GotFocus="SerieBatch_GotFocus" x:Name="PART_Editor" ValueMember="Number" DisplayMember="DisplayText" ItemsSource="{Binding DataContext.RowData.Row.SerieBatchSource,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" />
                             </DataTemplate>
                         </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                     </localPage:CorasauDataGridTemplateColumnClient>
@@ -98,7 +98,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectJournalLinePage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Approved" Width="50"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="OnHold" Width="50"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Invoiceable" Width="50" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="VoucherReference" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DocumentRef" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ReferenceNumber" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CreditorAccount" Width="100"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PayrollCategory" Width="70"/>

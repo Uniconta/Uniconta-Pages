@@ -12,6 +12,9 @@
     <RibbonItem Action="VatReportIceland" LocalizedNameKey="VSK skýrsla" LargeGlyph="Generate_32x32.png" ShortcutKey="Ctrl+G"/>
   </RibbonItem>
   <RibbonItem>
+    <RibbonItem Action="UKVatReturn" LocalizedNameKey="UKVatReturn" LargeGlyph="VAT_32x32.png" />
+  </RibbonItem>
+  <RibbonItem>
     <RibbonItem Action="Transactions" ShortcutKey="Alt+T" LocalizedNameKey="Transactions" LargeGlyph="Voucher_Transactions_32x32.png" />
   </RibbonItem>
   <RibbonItem>

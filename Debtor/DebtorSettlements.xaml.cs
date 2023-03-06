@@ -118,6 +118,13 @@ namespace UnicontaClient.Pages.CustomPage
                 case "RefreshGrid":
                     InitQuery();
                     break;
+                case "CollectionLetterLog":
+                    if (trans != null)
+                    {
+                        string header = string.Format("{0}/{1}", Uniconta.ClientTools.Localization.lookup("CollectionLetterLog"), trans.InvoiceAN);
+                        AddDockItem(TabControls.DebtorTransCollectPage, dgSettlements.syncEntity, header);
+                    }
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;

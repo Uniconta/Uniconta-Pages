@@ -1,4 +1,3 @@
-using UnicontaClient.Utilities;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,6 +8,7 @@ using Uniconta.Common;
 using Uniconta.DataModel;
 using Uniconta.Reports.Utilities;
 using Uniconta.Common.Utility;
+using UnicontaClient.Utilities;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -84,7 +84,11 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     var invApi = new InvoiceAPI(crudApi);
                     var invoiceLIneInstance = Activator.CreateInstance(creditorInvoiceLineUserType) as CreditorInvoiceLines;
+#if !UNIREPORT
                     InvTransInvoiceLines = (CreditorInvoiceLines[])await invApi.GetInvoiceLines(CreditorInvoice, invoiceLIneInstance);
+#else
+                    InvTransInvoiceLines = (CreditorInvoiceLines[])await invApi.GetInvoiceLines(CreditorInvoice, invoiceLIneInstance).ConfigureAwait(false);
+#endif
                 }
                 else
                 {
@@ -153,7 +157,7 @@ namespace UnicontaClient.Pages.CustomPage
                         catch { }
                     }
                 }
-                UnicontaClient.Pages.DebtorOrders.SetDeliveryAdress(creditorInvoiceClientUser, Creditor, crudApi);
+                UtilCommon.SetDeliveryAdress(creditorInvoiceClientUser, Creditor, crudApi);
 
                 /*In case debtor order is null, fill from DCInvoice*/
                 if (CreditorOrder == null)
@@ -168,11 +172,11 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                 }
 
-                Company = Utility.GetCompanyClientUserInstance(Comp);
+                Company = UtilCommon.GetCompanyClientUserInstance(Comp);
 
                 var InvCache = Comp.GetCache(typeof(InvItem)) ?? await crudApi.LoadCache(typeof(InvItem));
 
-                CompanyLogo = await Uniconta.ClientTools.Util.UtilDisplay.GetLogo(crudApi);
+                CompanyLogo = await UtilCommon.GetLogo(crudApi);
 
                 Language lang = ReportGenUtil.GetLanguage(Creditor, Comp);
                 InvTransInvoiceLines = LayoutPrintReport.SetInvTransLines(CreditorInvoice, InvTransInvoiceLines, InvCache, crudApi, creditorInvoiceLineUserType, lang, false);
@@ -199,7 +203,7 @@ namespace UnicontaClient.Pages.CustomPage
         /// <returns>Text</returns>
         async private Task<string> GetMessageClientText(Language lang)
         {
-            var messageClient = await Utility.GetDebtorMessageClient(crudApi, lang, GetEmailTypeForCreditor());
+            var messageClient = await UtilCommon.GetDebtorMessageClient(crudApi, lang, GetEmailTypeForCreditor());
             return messageClient?._Text;
         }
 

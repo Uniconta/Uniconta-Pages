@@ -23,7 +23,6 @@ using System.Windows.Threading;
 using Uniconta.ClientTools.Util;
 using Uniconta.ClientTools.Controls;
 using UnicontaClient.Controls.Dialogs;
-using UnicontaClient.Controls.Dialogs;
 using Uniconta.API.Service;
 using System.IO;
 using Uniconta.Common.Utility;
@@ -110,15 +109,8 @@ namespace UnicontaClient.Pages.CustomPage
 
         void RemoveMenuItem()
         {
-            RibbonBase rb = (RibbonBase)localMenu.DataContext;
-            var Comp = api.CompanyEntity;
-
-#if !SILVERLIGHT
-            if (Comp._CountryId != CountryCode.Denmark)
-                UtilDisplay.RemoveMenuCommand(rb, "ReadOIOUBL");
-#else
-            UtilDisplay.RemoveMenuCommand(rb, "ReadOIOUBL");
-#endif
+            if (api.CompanyEntity._CountryId != CountryCode.Denmark)
+                UtilDisplay.RemoveMenuCommand((RibbonBase)localMenu.DataContext, "ReadOIOUBL");
         }
 
         protected override void OnLayoutLoaded()
@@ -138,6 +130,9 @@ namespace UnicontaClient.Pages.CustomPage
                 DeliveryZipCode.Visible = false;
                 DeliveryCity.Visible = false;
                 DeliveryCountry.Visible = false;
+                DeliveryContactPerson.Visible = false;
+                DeliveryPhone.Visible = false;
+                DeliveryContactEmail.Visible = false;
             }
             dgCreditorOrdersGrid.Readonly = true;
             if (!Comp.ApprovePurchaseOrders)
@@ -162,7 +157,10 @@ namespace UnicontaClient.Pages.CustomPage
         {
             localMenu_OnItemClicked("OrderLine");
         }
-
+        private void Name_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            dgCreditorOrdersGrid_RowDoubleClick();
+        }
         private void localMenu_OnItemClicked(string ActionType)
         {
             string header;
@@ -229,9 +227,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                     {
                         CWOrderFromOrder cwOrderFromOrder = new CWOrderFromOrder(api);
-#if !SILVERLIGHT
                         cwOrderFromOrder.DialogTableId = 2000000027;
-#endif
                         cwOrderFromOrder.Closed += async delegate
                         {
                             if (cwOrderFromOrder.DialogResult == true)
@@ -269,6 +265,7 @@ namespace UnicontaClient.Pages.CustomPage
                         _refferedVouchers.Add(selectedItem._DocumentRef);
 
                     VoucherOpen = true;
+                    AttachVoucherRow = selectedItem;
                     AddDockItem(TabControls.AttachVoucherGridPage, new object[] { _refferedVouchers }, true);
                     break;
                 case "ViewVoucher":
@@ -278,7 +275,10 @@ namespace UnicontaClient.Pages.CustomPage
                 case "DragDrop":
                 case "ImportVoucher":
                     if (selectedItem != null)
+                    {
+                        dgCreditorOrdersGrid.SetLoadedRow(selectedItem);
                         AddVoucher(selectedItem, ActionType);
+                    }
                     break;
                 case "RemoveVoucher":
                     if (selectedItem != null)
@@ -331,7 +331,6 @@ namespace UnicontaClient.Pages.CustomPage
                     TestCreditorReload(true, dgCreditorOrdersGrid.ItemsSource as IEnumerable<CreditorOrder>);
                     break;
                 case "ReadOIOUBL":
-#if !SILVERLIGHT
                     var orderOIOCW = new CWOrderOIOUBLImport();
                     orderOIOCW.Closing += delegate
                     {
@@ -341,10 +340,7 @@ namespace UnicontaClient.Pages.CustomPage
                         ReadOIOUBL(orderOIOCW.OneOrMultiple);
                     };
                     orderOIOCW.Show();
-
-
                     gridRibbon_BaseActions("RefreshGrid");
-#endif
                     break;
                 case "ApproveOrder":
                     if (selectedItem != null && api.CompanyEntity.ApprovePurchaseOrders)
@@ -364,10 +360,10 @@ namespace UnicontaClient.Pages.CustomPage
             voucher._Project = selectedItem._Project;
             voucher._Approver1 = selectedItem._Approver;
             voucher._CreditorAccount = selectedItem._InvoiceAccount ?? selectedItem._DCAccount;
-#if !SILVERLIGHT
             if (actionType == "DragDrop")
             {
                 var dragDropWindow = new UnicontaDragDropWindow(false);
+                Utility.PauseLastAutoSaveTime();
                 dragDropWindow.Closed += delegate
                 {
                     if (dragDropWindow.DialogResult == true)
@@ -385,20 +381,17 @@ namespace UnicontaClient.Pages.CustomPage
                 dragDropWindow.Show();
             }
             else
-#endif
                 Utility.ImportVoucher(selectedItem, api, voucher, false);
         }
 
-        private void GenerateInvoice(CreditorOrderClient creditorOrderClient)
+        async private void GenerateInvoice(CreditorOrderClient creditorOrderClient)
         {
             var accountName = Util.ConcatParenthesis(creditorOrderClient._DCAccount, creditorOrderClient.Name);
             var creditor = ClientHelper.GetRef(creditorOrderClient.CompanyId, typeof(Uniconta.DataModel.Creditor), creditorOrderClient._DCAccount) as Uniconta.DataModel.Creditor;
             bool showSendByEmail = creditor != null ? (!string.IsNullOrEmpty(creditor._InvoiceEmail) || creditor._EmailDocuments) : false;
 
             CWGenerateInvoice GenrateInvoiceDialog = new CWGenerateInvoice(true, string.Empty, true, true, showNoEmailMsg: !showSendByEmail, AccountName: accountName);
-#if !SILVERLIGHT
             GenrateInvoiceDialog.DialogTableId = 2000000002;
-#endif
             GenrateInvoiceDialog.SetSendAsEmailCheck(false);
             GenrateInvoiceDialog.SetInvoiceNumber(creditorOrderClient._InvoiceNumber);
             if (creditorOrderClient._InvoiceDate != DateTime.MinValue)
@@ -406,6 +399,9 @@ namespace UnicontaClient.Pages.CustomPage
             var additionalOrdersList = Utility.GetAdditionalOrders(api, creditorOrderClient);
             if (additionalOrdersList != null)
                 GenrateInvoiceDialog.SetAdditionalOrders(additionalOrdersList);
+            var voucherList = await Utility.GetVoucherReferenceList(api, creditorOrderClient);
+            if (voucherList != null)
+                GenrateInvoiceDialog.SetVoucherClients(voucherList);
 
             GenrateInvoiceDialog.Closed += async delegate
             {
@@ -418,6 +414,7 @@ namespace UnicontaClient.Pages.CustomPage
                         GenrateInvoiceDialog.ShowInvoice, false, GenrateInvoiceDialog.InvoiceQuickPrint, GenrateInvoiceDialog.NumberOfPages, GenrateInvoiceDialog.SendByEmail, GenrateInvoiceDialog.SendByOutlook,
                         GenrateInvoiceDialog.sendOnlyToThisEmail, GenrateInvoiceDialog.Emails, false, null, false);
                     invoicePostingResult.SetAdditionalOrders(GenrateInvoiceDialog.AdditionalOrders?.Cast<DCOrder>().ToList());
+                    invoicePostingResult.SetDocumentRef(GenrateInvoiceDialog.PhysicalVoucherRef);
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
                     busyIndicator.IsBusy = true;
                     var result = await invoicePostingResult.Execute();
@@ -525,7 +522,6 @@ namespace UnicontaClient.Pages.CustomPage
 
         public async void ReadOIOUBL(bool oneOrMultiple)
         {
-#if !SILVERLIGHT
             try
             {
                 if (creditorCache == null)
@@ -539,7 +535,7 @@ namespace UnicontaClient.Pages.CustomPage
                     string listOfFailedFiles = null;
 
                     var openFolderDialog = UtilDisplay.LoadFolderBrowserDialog;
-                    if (openFolderDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+                    if (openFolderDialog.ShowDialog() != true)
                         return;
 
                     string[] files = Directory.GetFiles(openFolderDialog.SelectedPath);
@@ -651,7 +647,6 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 UnicontaMessageBox.Show(ex);
             }
-#endif
         }
 
         public override bool IsDataChaged
@@ -744,7 +739,7 @@ namespace UnicontaClient.Pages.CustomPage
             bool showUpdateInv = comp.Storage || (doctype == CompanyLayoutType.PurchasePacknote && comp.CreditorPacknote);
             CWGenerateInvoice GenrateOfferDialog = new CWGenerateInvoice(false, doctype.ToString(), showInputforInvNumber: doctype == CompanyLayoutType.PurchasePacknote ? true : false,
                 isShowInvoiceVisible: true, askForEmail: true, showNoEmailMsg: !showSendByMail, debtorName: creditorName, isShowUpdateInv: showUpdateInv);
-#if !SILVERLIGHT
+
             switch (doctype)
             {
                 case CompanyLayoutType.PurchaseOrder:
@@ -757,7 +752,7 @@ namespace UnicontaClient.Pages.CustomPage
                     GenrateOfferDialog.DialogTableId = 2000000057;
                     break;
             }
-#endif
+
             GenrateOfferDialog.SetInvPrintPreview(showInvPrintPreview);
             var additionalOrdersList = Utility.GetAdditionalOrders(api, dbOrder);
             if (additionalOrdersList != null)
@@ -796,6 +791,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         bool VoucherOpen;
+        CreditorOrderClient AttachVoucherRow;
         public override async void Utility_Refresh(string screenName, object argument = null)
         {
             if (screenName == TabControls.CreditorOrdersPage2)
@@ -830,12 +826,13 @@ namespace UnicontaClient.Pages.CustomPage
                     var attachedVoucher = voucherObj[0] as VouchersClient;
                     if (attachedVoucher != null)
                     {
-                        var selectedItem = dgCreditorOrdersGrid.SelectedItem as CreditorOrderClient;
+                        var selectedItem = AttachVoucherRow ?? dgCreditorOrdersGrid.SelectedItem as CreditorOrderClient;
                         if (selectedItem != null)
                         {
                             selectedItem.DocumentRef = attachedVoucher.RowId;
                             UpdateVoucher(attachedVoucher, selectedItem);
                         }
+                        AttachVoucherRow = null;
                     }
                 }
             }

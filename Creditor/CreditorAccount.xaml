@@ -75,7 +75,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorAccount"
                     </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Account"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Name"/>
-					<localPage:CorasauDataGridTemplateColumnClient x:Name="CurBalance" Width="90"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CurBalance" Width="90"/>
 					<localPage:CorasauDataGridTemplateColumnClient x:Name="Overdue" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CurBalanceCur" Visible="False" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="OverdueCur" Visible="False" Width="90"/>
@@ -148,6 +148,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorAccount"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="D2CAccount" Visible="False" />
                     <localPage:ComboBoxColumnClient x:Name="BalanceMethod" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="EORI" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="TransType" Visible="False"/>
                 </localPage:CreditorAccountGrid.Columns>
                 <localPage:CreditorAccountGrid.TotalSummary>
                     <localPage:SumColumn FieldName="CurBalance" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>

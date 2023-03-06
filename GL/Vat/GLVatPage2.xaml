@@ -41,6 +41,9 @@ x:Class="UnicontaClient.Pages.CustomPage.GLVatPage2"
                     <CorasauControls:CorasauLayoutItem FieldName="TypeBuy" x:Name="liTypeBuy">
                         <CorasauControls:LookupEditor x:Name="leTypeBuy" Text="{Binding TypeBuy,Mode=TwoWay}" IsEnabled="False" />
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="UsedSalesVat" x:Name="liUsedSalesVat">
+                        <CorasauControls:CheckEditor IsChecked="{Binding UsedSalesVat,Mode=TwoWay}" />
+                    </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
                 <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpOptions" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Options}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                     <CorasauControls:CorasauLayoutItem FieldName="Method" x:Name="liMethod">
@@ -48,6 +51,9 @@ x:Class="UnicontaClient.Pages.CustomPage.GLVatPage2"
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="Rate" x:Name="liRate">
                         <CorasauControls:DoubleEditor FieldName="Rate" ApplyMask="false"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Exempt" x:Name="liExempt">
+                        <CorasauControls:DoubleEditor FieldName="Exempt" />
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="Rate1Vat" x:Name="liRate1Vat">
                         <CorasauControls:LookupEditor x:Name="leRate1Vat" Text="{Binding Rate1Vat,Mode=TwoWay}" />

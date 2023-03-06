@@ -32,6 +32,7 @@
 	</RibbonItem>
   <RibbonItem>
      <RibbonItem Action="Invoices" LocalizedNameKey="Invoice" LargeGlyph="Account-statement_32x32.png" />
-    <RibbonItem Action="InvoiceLine" LocalizedNameKey="InvoiceLines" LargeGlyph="Order_Lines_Highlighted_32x32.png" ShortcutKey="ALT+L"/>
+     <RibbonItem Action="InvoiceLine" LocalizedNameKey="InvoiceLines" LargeGlyph="Order_Lines_Highlighted_32x32.png" ShortcutKey="ALT+L"/>
+	  <RibbonItem Action="CollectionLetterLog" LocalizedNameKey="CollectionLetterLog" Module="_CollectionLetter" LargeGlyph="Note_32x32.png"/>
   </RibbonItem>
 </root>

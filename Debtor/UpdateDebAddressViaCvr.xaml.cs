@@ -149,7 +149,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (s1.Length == 0)
                     s1 = null;
             }
-            return s1 == s2;
+            return string.Compare(s1, s2, StringComparison.CurrentCultureIgnoreCase) == 0;
         }
 
         async void LoadDebtorList()

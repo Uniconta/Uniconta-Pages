@@ -87,14 +87,18 @@ namespace UnicontaClient.Pages.CustomPage
                 var projectPosted = master as ProjectJournalPostedClient;
                 if (projectPosted != null)
                     argsProj = projectPosted;
-#if !SILVERLIGHT
                 else
                 {
-                    var WIPreport = master as UnicontaClient.Pages.ProjectTransLocalClient;
+                    var WIPreport = master as ProjectTransLocalClient;
                     if (WIPreport != null)
                         argsProj = WIPreport.ProjectRef;
+                    else
+                    {
+                        var budgetLine = master as ProjectBudgetLine;
+                        if (budgetLine != null)
+                            argsProj = budgetLine;
+                    }
                 }
-#endif
             }
             InitializePage(argsProj);
             SetHeader();
@@ -113,14 +117,18 @@ namespace UnicontaClient.Pages.CustomPage
                 var projectPosted = args as ProjectJournalPostedClient;
                 if (projectPosted != null)
                     argsProj = projectPosted;
-#if !SILVERLIGHT
                 else
                 {
                     var WIPreport = args as UnicontaClient.Pages.ProjectTransLocalClient;
                     if (WIPreport != null)
                         argsProj = WIPreport.ProjectRef;
+                    else
+                    {
+                        var budgetLine = args as ProjectBudgetLine;
+                        if (budgetLine != null)
+                            argsProj = budgetLine;
+                    }
                 }
-#endif
             }
 
             dgProjectTransaction.UpdateMaster(argsProj);
@@ -140,7 +148,13 @@ namespace UnicontaClient.Pages.CustomPage
                 if (syncMaster2 != null)
                     header = string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("PrTransaction"), syncMaster2.RowId);
                 else
-                    return;
+                {
+                    var syncMaster3 = dgProjectTransaction.masterRecord as Uniconta.DataModel.ProjectBudgetLine;
+                    if (syncMaster3 != null)
+                        header = string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("PrTransaction"), syncMaster3.RowId);
+                    else
+                        return;
+                }
             }
             SetHeader(header);
         }
@@ -199,8 +213,9 @@ namespace UnicontaClient.Pages.CustomPage
                 this.ProjectCol.Visible = !(master is Uniconta.DataModel.Project);
             }
 
+            if (!api.CompanyEntity.ProjectTask)
+                this.Task.Visible = this.Task.ShowInColumnChooser = false;
             this.IsTimeJournal.Visible = InclTimeJournals;
-
             Utility.SetupVariants(api, null, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
             dgProjectTransaction.Readonly = true;
             Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
@@ -278,7 +293,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (dgProjectTransaction.HasUnsavedData)
                         Utility.ShowConfirmationOnRefreshGrid(dgProjectTransaction);
                     else
-                        InitQuery();
+                        gridRibbon_BaseActions(ActionType);
                     break;
                 case "Filter":
                     if (dgProjectTransaction.HasUnsavedData)
@@ -437,6 +452,7 @@ namespace UnicontaClient.Pages.CustomPage
                             line._Employee = s._Employee;
                             line._PayrollCategory = s._PayrollCategory;
                             line._PrCategory = payrollCat?._PrCategory;
+                            line._WorkSpace = s._WorkSpace;
                             line._Task = s._Task;
                             line._Invoiceable = s._Invoiceable;
                             line._Date = s._Date;
@@ -621,12 +637,14 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        protected async override void LoadCacheInBackGround()
+        protected override async Task LoadCacheInBackGroundAsync()
         {
-            Employees = Employees ?? await api.LoadCache<Uniconta.DataModel.Employee>().ConfigureAwait(false);
-            Projects = Projects ?? await api.LoadCache<Uniconta.DataModel.Project>().ConfigureAwait(false);
-            Payrolls = Payrolls ?? await api.LoadCache(typeof(Uniconta.DataModel.EmpPayrollCategory)).ConfigureAwait(false);
-
+            if (Employees == null)
+                Employees = await api.LoadCache<Uniconta.DataModel.Employee>().ConfigureAwait(false);
+            if (Projects == null)
+                Projects = await api.LoadCache<Uniconta.DataModel.Project>().ConfigureAwait(false);
+            if (Payrolls == null)
+                Payrolls = await api.LoadCache(typeof(Uniconta.DataModel.EmpPayrollCategory)).ConfigureAwait(false);
             if (this.priceLookup == null)
                 priceLookup = new Uniconta.API.Project.FindPricesEmpl(api);
         }

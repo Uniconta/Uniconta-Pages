@@ -196,13 +196,12 @@ namespace UnicontaClient.Pages.CustomPage
             InitPage(masterRecord);
         }
         CrudAPI crudApi;
-        bool isCompUserDoc = false;
+        bool isCompUserDoc;
         public UserDocsPage(UnicontaBaseEntity sourcedata, string companyUserDoc)
            : base(null)
         {
             InitializeComponent();
-            CrudAPI Crudapi = new CrudAPI(session, sourcedata as CompanyClient);
-            crudApi = Crudapi;
+            crudApi = new CrudAPI(session, sourcedata as CompanyClient ?? Uniconta.DataModel.Company.Get(sourcedata.CompanyId));
             isCompUserDoc = true;
             InitPage(sourcedata);
         }
@@ -236,7 +235,7 @@ namespace UnicontaClient.Pages.CustomPage
             dgDocsGrid.tableView.DropRecord += dgDocsGrid_DropRecord;
             dgDocsGrid.tableView.DragRecordOver += dgDocsGrid_DragRecordOver;
 #endif
-            if (masterRecord is DebtorClient || masterRecord is CreditorClient || masterRecord is InvItemClient)
+            if (!(masterRecord is Uniconta.DataModel.DCOrder || masterRecord is Uniconta.DataModel.DCInvoice || masterRecord is Uniconta.DataModel.CompanySMTP))
             {
                 Invoice.Visible = Invoice.ShowInColumnChooser = false;
                 Offer.Visible = Offer.ShowInColumnChooser = false;
@@ -418,7 +417,7 @@ namespace UnicontaClient.Pages.CustomPage
                         return;
                     var url = string.Concat("https://web.uniconta.com/document/ViewAttachment?", selectedItem._DocumentGuid);
                     if (BasePage.session.Connection.Target == APITarget.Demo)
-                        url = string.Concat("http://46.36.211.200:8080/document/ViewAttachment?", selectedItem._DocumentGuid);
+                        url = string.Concat("https://test.uniconta.com:8080/document/ViewAttachment?", selectedItem._DocumentGuid);
                     System.Diagnostics.Process.Start(url);
                     break;
                 case "AttachInOutlook":
@@ -692,6 +691,11 @@ namespace UnicontaClient.Pages.CustomPage
                 }
             };
             cwUpdateFile.Show();
+        }
+
+        private void Text_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            localMenu_OnItemClicked("ViewDownloadRow");
         }
     }
 }

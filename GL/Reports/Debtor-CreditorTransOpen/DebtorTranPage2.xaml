@@ -66,6 +66,15 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorTranPage2"
                     <CorasauControls:CorasauLayoutItem FieldName="LastCollectionLetter" x:Name="liLastCollectionLetter">
                         <CorasauControls:DateEditor EditValue="{Binding LastCollectionLetter,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="LastCollectionsLetterCode" x:Name="liLastCollectionsLetterCode">
+                        <CorasauControls:ComboBoxEditor SelectedItem="{Binding LastCollectionsLetterCode,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="FeeAmount" x:Name="liFeeAmount">
+                        <CorasauControls:DoubleEditor FieldName="FeeAmount"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="PaymentCharge" x:Name="liPaymentCharge">
+                        <CorasauControls:DoubleEditor FieldName="PaymentCharge"/>
+                    </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
             </CorasauControls:CorasauLayoutGroup>
         </CorasauControls:CorasauLayoutControl>

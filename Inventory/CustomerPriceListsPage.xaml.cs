@@ -92,13 +92,17 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         SaveAndOpenPriceList(selectedItem);
                     break;
+                case "InvoiceFee":
+                    if (selectedItem != null)
+                        SaveAndOpenPriceList(selectedItem, false);
+                    break;
                 case "AddNote":
                     if (selectedItem != null)
                         AddDockItem(TabControls.UserNotesPage, dgInvPriceListGrid.syncEntity);
                     break;
                 case "AddDoc":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.UserDocsPage, dgInvPriceListGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Documents"), selectedItem._Name));
+                        AddDockItem(TabControls.UserDocsPage, dgInvPriceListGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Documents"), selectedItem.KeyStr));
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);
@@ -106,7 +110,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        async void SaveAndOpenPriceList(InvPriceList selectedItem)
+        async void SaveAndOpenPriceList(InvPriceList selectedItem, bool isLines= true)
         {
             if (dgInvPriceListGrid.HasUnsavedData)
             {
@@ -115,7 +119,7 @@ namespace UnicontaClient.Pages.CustomPage
                     await tsk;
             }
             if (selectedItem.RowId != 0)
-                AddDockItem(TabControls.CustomerPriceListLinePage, dgInvPriceListGrid.syncEntity);
+                AddDockItem(isLines ? TabControls.CustomerPriceListLinePage : TabControls.InvPriceListFeePage, dgInvPriceListGrid.syncEntity);
         }
 
         protected override void LoadCacheInBackGround()
@@ -135,6 +139,11 @@ namespace UnicontaClient.Pages.CustomPage
             var row = (sender as Image).Tag as DebtorPriceListClient;
             if (row != null)
                 AddDockItem(TabControls.UserNotesPage, dgInvPriceListGrid.syncEntity);
+        }
+
+        private void Name_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            DgInvPriceListGrid_RowDoubleClick();
         }
     }
 }

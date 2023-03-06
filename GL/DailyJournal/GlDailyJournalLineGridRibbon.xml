@@ -63,12 +63,12 @@
     <RibbonItem Action="Functions" LocalizedNameKey="Functions" LargeGlyph="Generate_32x32.png" ShortcutKey="CTRL+G">
       <!---If we want Inner menu-->
       <RibbonItem Action="CreatePaymentsFile" LocalizedNameKey="CreatePaymentsFile" Glyph="Import_16x16.png" LargeGlyph=""/>
-      <RibbonItem Action="InvertSign" LocalizedNameKey="InvertSign" Glyph="Invert_Sign_16x16.png" LargeGlyph=""/>
-      <RibbonItem Action="RenumberVoucher" LocalizedNameKey="RenumberingOfVoucher" Glyph="Transactions_16x16.png" LargeGlyph=""/>
-      <RibbonItem Action="SetText" LocalizedNameKey="SetOBJ" Parameter="Text" Glyph="Multiple_16x16.png" LargeGlyph=""/>
-      <RibbonItem Action="SetDate" LocalizedNameKey="SetOBJ" Parameter="Date" Glyph="Period_16x16.png" LargeGlyph=""/>
-      <RibbonItem Action="SetAmountZero" LocalizedNameKey="SetOBJ" Parameter="AmountToZero" Glyph="Budget_16x16.png" LargeGlyph=""/>
-      <RibbonItem Action="RemoveAllVouchers" LocalizedNameKey="RemoveOBJ" Parameter="Attachments" Glyph="Delete_16x16.png"  LargeGlyph=""/>
+      <RibbonItem Action="InvertSign" LocalizedNameKey="InvertSign" Glyph="Invert_Sign_16x16.png" LargeGlyph="" ShortcutKey=""/>
+      <RibbonItem Action="RenumberVoucher" LocalizedNameKey="RenumberingOfVoucher" Glyph="Transactions_16x16.png" LargeGlyph="" ShortcutKey=""/>
+      <RibbonItem Action="SetText" LocalizedNameKey="SetOBJ" Parameter="Text" Glyph="Multiple_16x16.png" LargeGlyph="" ShortcutKey=""/>
+      <RibbonItem Action="SetDate" LocalizedNameKey="SetOBJ" Parameter="Date" Glyph="Period_16x16.png" LargeGlyph="" ShortcutKey=""/>
+      <RibbonItem Action="SetAmountZero" LocalizedNameKey="SetOBJ" Parameter="AmountToZero" Glyph="Budget_16x16.png" LargeGlyph="" ShortcutKey=""/>
+      <RibbonItem Action="RemoveAllVouchers" LocalizedNameKey="RemoveOBJ" Parameter="Attachments" Glyph="Delete_16x16.png" LargeGlyph="" ShortcutKey=""/>
     </RibbonItem>
     <RibbonItem Action="OffSetAccount" LocalizedNameKey="OffSetAccount" ShortcutKey="Ctrl+M" LargeGlyph="Offset_Account_32x32.png"/>
   </RibbonItem>

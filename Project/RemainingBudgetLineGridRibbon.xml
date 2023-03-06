@@ -21,7 +21,4 @@
 			<RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16.png" ShortcutKey=""/>
 		</RibbonItem>
 	</RibbonItem>
-  <RibbonItem>
-    <RibbonItem Action="ShowAnchorBudget" LocalizedNameKey="ShowAnchorBudget" IsCheckBox="True" />
-  </RibbonItem>
 </root>

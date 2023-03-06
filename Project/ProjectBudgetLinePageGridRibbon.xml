@@ -3,9 +3,11 @@
   <RibbonItem TabId="0" LocalizedNameKey="Home">
     <!---When we create a new group and a new TabPage -->
     <RibbonItem Action="AddRow" LocalizedNameKey="AddOBJ" Parameter="Lines" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png"/>
+    <RibbonItem Action="AddItems" LocalizedNameKey="AddOBJ" Parameter="InventoryItems" LargeGlyph="Add_Menu_32x32.png"/>
     <RibbonItem Action="CopyRow" LocalizedNameKey="CopyLine" LargeGlyph="Copy_32x32.png"/>
     <RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="Delete" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png"/>
     <RibbonItem Action="SaveGrid" ShortcutKey="CTRL+S" LocalizedNameKey="Save" Glyph="save-16x16.png" LargeGlyph="save-32x32.png"/>
+    <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh.png" LargeGlyph="refresh.png"/>
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="ViewPhoto" ShortcutKey="" LocalizedNameKey="ViewOBJ" Parameter="Photo" LargeGlyph="View_Highlighted_32x32.png"/>
@@ -25,6 +27,6 @@
     </RibbonItem>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="ShowAnchorBudget" LocalizedNameKey="ShowAnchorBudget" IsCheckBox="True" />
+	  <RibbonItem Action="UnfoldBOM" LocalizedNameKey="UnfoldBOM" LargeGlyph="CopyUserTable_32x32.png"/>
   </RibbonItem>
 </root>

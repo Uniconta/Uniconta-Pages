@@ -32,6 +32,7 @@
   </RibbonItem>
   <RibbonItem>
     <!---When we create new TabPage -->
-    <RibbonItem Action="Lines" LocalizedNameKey="Prices" Glyph="Journal_Lines_32x32.png" LargeGlyph="Journal_Lines_Highlighted_32x32.png" ShortcutKey="ALT+L"/>    
+    <RibbonItem Action="Lines" LocalizedNameKey="Prices" Glyph="Journal_Lines_32x32.png" LargeGlyph="Journal_Lines_Highlighted_32x32.png" ShortcutKey="ALT+L"/>
+	<RibbonItem Action="InvoiceFee" LocalizedNameKey="InvoiceFee" LargeGlyph="Budget_32x32.png" />
   </RibbonItem>
 </root>

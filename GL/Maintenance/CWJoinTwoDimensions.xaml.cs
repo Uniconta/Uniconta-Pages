@@ -69,7 +69,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            DialogResult = false;
+            SetDialogResult(false);
         }
 
         private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
@@ -96,7 +96,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 var mainTableApi = new MaintableAPI(crudApi);
                 JoinResult = mainTableApi.JoinTwoDimensions(copyFromDim, copyToDim);
-                DialogResult = true;
+                SetDialogResult(true);
             }
             else
                 Uniconta.ClientTools.Controls.UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("MandatoryField"), (Uniconta.ClientTools.Localization.lookup("CopyFrom"))), Uniconta.ClientTools.Localization.lookup("Error"));

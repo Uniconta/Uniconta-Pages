@@ -15,8 +15,21 @@ x:Class="UnicontaClient.Pages.CustomPage.UserCompaniesGridPage"
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <local:UserCompaniesGridClient x:Name="dgUserCompaniesGridClient" AutoGenerateColumns="None">
                 <local:UserCompaniesGridClient.Columns>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="CompanyName" Width="250" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Id" Width="100" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="CompanyName" Width="250">
+                        <local:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Margin="5,0,0,0" TextDecorations="Underline" Cursor="Hand" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.CompanyName,RelativeSource={RelativeSource TemplatedParent}}" PreviewMouseDown="Name_PreviewMouseDown"></TextBlock>
+                                    <TextBlock Grid.Column="1"></TextBlock>
+                                </Grid>
+                            </DataTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                        </local:CorasauDataGridTemplateColumnClient>
+                        <local:CorasauDataGridTemplateColumnClient x:Name="Id" Width="100" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="PrimaryKeyId" Width="70" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="OwnerUid" Width="60" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="ClientId" />
@@ -57,7 +70,34 @@ x:Class="UnicontaClient.Pages.CustomPage.UserCompaniesGridPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="UseUnrealizedVat" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="LastBankTrans" Visible="False" Width="90"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="LastPosting" Visible="False"  Width="90"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="NInbox" Visible="False" Width="60"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="NInbox" Visible="False" Width="60">
+                        <local:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Margin="5,0,0,0" TextDecorations="Underline" Cursor="Hand" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.NInbox,RelativeSource={RelativeSource TemplatedParent}}" PreviewMouseDown="NInbox_PreviewMouseDown"></TextBlock>
+                                    <TextBlock Grid.Column="1"></TextBlock>
+                                </Grid>
+                            </DataTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
+                <local:CorasauDataGridTemplateColumnClient x:Name="NJournal" Visible="False" Width="60">
+                    <local:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Margin="5,0,0,0" TextDecorations="Underline" Cursor="Hand" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.NJournal,RelativeSource={RelativeSource TemplatedParent}}" PreviewMouseDown="NJournal_PreviewMouseDown"></TextBlock>
+                                <TextBlock Grid.Column="1"></TextBlock>
+                            </Grid>
+                        </DataTemplate>
+                    </local:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                </local:CorasauDataGridTemplateColumnClient>
                 </local:UserCompaniesGridClient.Columns>
             </local:UserCompaniesGridClient>
         </CorasauControls:BusyIndicator>

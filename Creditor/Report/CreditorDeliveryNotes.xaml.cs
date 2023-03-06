@@ -110,7 +110,10 @@ namespace UnicontaClient.Pages.CustomPage
                 DeliveryZipCode.Visible = false;
                 DeliveryCity.Visible = false;
                 DeliveryCountry.Visible = false;
-            }
+                DeliveryContactPerson.Visible = false;
+                DeliveryPhone.Visible = false;
+                DeliveryContactEmail.Visible = false;
+      }
         }
 
         private void SetDimension()
@@ -154,10 +157,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "AddDoc":
                     if (selectedItem != null)
                         AddDockItem(TabControls.UserDocsPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Documents"), selectedItem.InvoiceNum));
-                    break;
-                case "RefreshGrid":
-                    InitQuery();
-                    break;
+                    break;               
 #if !SILVERLIGHT
                 case "SendAsOutlook":
                     if (selectedItem != null)
@@ -212,7 +212,7 @@ namespace UnicontaClient.Pages.CustomPage
                 var count = packNotelist.Count;
                 string dockName = null, reportName = null;
                 bool exportAsPdf = false;
-                System.Windows.Forms.FolderBrowserDialog folderDialogSaveInvoice = null;
+                DevExpress.Xpf.Dialogs.DXFolderBrowserDialog folderDialogSaveInvoice = null;
                 hasLookups = false;
                 if (count > 1)
                 {
@@ -256,7 +256,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 {
                                     folderDialogSaveInvoice = UtilDisplay.LoadFolderBrowserDialog;
                                     var dialogResult = folderDialogSaveInvoice.ShowDialog();
-                                    if (dialogResult == System.Windows.Forms.DialogResult.OK || dialogResult == System.Windows.Forms.DialogResult.Yes)
+                                    if (dialogResult == true)
                                         directoryPath = folderDialogSaveInvoice.SelectedPath;
                                 }
                                 else

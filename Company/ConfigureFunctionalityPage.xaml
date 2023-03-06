@@ -23,7 +23,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ConfigureFunctionalityPage"
                         <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Ledger}">
                             <CorasauControls:CheckEditor IsChecked="{Binding Ledger,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem  Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BankStatement}">
+                        <CorasauControls:CorasauLayoutItem  Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BankReconciliation}">
                             <CorasauControls:CheckEditor IsChecked="{Binding BankStatement,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem  Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=PhysicalVoucher}">
@@ -40,6 +40,9 @@ x:Class="UnicontaClient.Pages.CustomPage.ConfigureFunctionalityPage"
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem  Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Inventory}">
                             <CorasauControls:CheckEditor IsChecked="{Binding Inventory,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem  Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=InterestAndCollection}">
+                            <CorasauControls:CheckEditor IsChecked="{Binding CollectionLetter,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
                     <CorasauControls:CorasauLayoutGroup x:Name="grpOnlyPosting" View="GroupBox" Orientation="Vertical" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OnlyPosting}" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
@@ -171,6 +174,9 @@ x:Class="UnicontaClient.Pages.CustomPage.ConfigureFunctionalityPage"
                 <CorasauControls:CorasauLayoutGroup View="GroupBox" Orientation="Vertical" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Addins}"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                     <CorasauControls:CorasauLayoutItem x:Name="cbDirectDebit" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=AutoBanking}">
                         <CorasauControls:CheckEditor IsChecked="{Binding _DirectDebit,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="cbAiia" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Aiia}">
+                        <CorasauControls:CheckEditor IsChecked="{Binding Aiia,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem x:Name="cbTraceFieldChanges" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FieldChangeLog}">
                         <CorasauControls:CheckEditor IsChecked="{Binding TraceFieldChanges, Mode=TwoWay}"/>

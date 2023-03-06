@@ -13,6 +13,7 @@ using Uniconta.DataModel;
 using Localization = Uniconta.ClientTools.Localization;
 using UnicontaClient.Creditor.Payments;
 using System.Text.RegularExpressions;
+using Uniconta.Common.Utility;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
@@ -48,10 +49,9 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
             }
             else
             {
-
                 danishFields.NameOfReceiver = ShortenWordToCriteria(tran.Creditor.Name, 35);
-                danishFields.AddressOfReceiver = ShortenWordToCriteria(string.Format("{0}, {1} {2}", tran.Creditor.Address1, tran.Creditor.ZipCode, tran.Creditor.City), 35);
-                danishFields.AddressOfReceiver2 = ShortenWordToCriteria(tran.Creditor.Address2, 35);
+                danishFields.AddressOfReceiver = ShortenWordToCriteria(StringBuilderReuse.Create().Append(tran.Creditor.Address1).Append(" ").Append(tran.Creditor.Address2).Trim().ToStringAndRelease(), 35);
+                danishFields.AddressOfReceiver2 = ShortenWordToCriteria(StringBuilderReuse.Create().Append(tran.Creditor.ZipCode).Append(" ").Append(tran.Creditor.City).Trim().ToStringAndRelease(), 35);
             }
 
             danishFields.Blanks = string.Empty;

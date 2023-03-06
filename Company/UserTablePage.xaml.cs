@@ -20,6 +20,7 @@ using Uniconta.DataModel;
 using UnicontaClient.Controls.Dialogs;
 using Uniconta.ClientTools.Util;
 using Uniconta.API.Service;
+using Uniconta.API.System;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -142,11 +143,11 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "BaseClass":
                     if (selectedItem != null)
-                        GenerateClass(selectedItem, true);
+                        GenerateClass(selectedItem, true, api);
                     break;
                 case "ClientClass":
                     if (selectedItem != null)
-                        GenerateClass(selectedItem, false);
+                        GenerateClass(selectedItem, false, api);
                     break;
                 case "SharedToCompany":
                     if (selectedItem != null && selectedItem._SharedFromCompanyId == 0)
@@ -158,12 +159,25 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        async private void GenerateClass(TableHeader selectedItem, bool isBaseClass)
+        async public static void GenerateClass(UnicontaBaseEntity selectedItem, bool isBaseClass, CrudAPI api, string className = null)
         {
-            var properties = await api.Query<TableField>(selectedItem);
-            var str = ClassGenerator.Create(selectedItem, properties, api, isBaseClass);
-            var cwGenerateClass = new CWGenerateClass(str);
-            cwGenerateClass.Show();
+            var cwGenerateClassType = new CWGenerateClassType();
+            cwGenerateClassType.Closing += async delegate
+            {
+                if (cwGenerateClassType.DialogResult == true)
+                {
+                    ClassGenerator.generateByName = cwGenerateClassType.GenerateByName;
+                    var properties = await api.Query<TableField>(selectedItem);
+                    string classCode;
+                    if (className != null)
+                        classCode = ClassGenerator.Create(className, properties, isBaseClass);
+                    else
+                        classCode = ClassGenerator.Create(selectedItem as TableHeader, properties, api, isBaseClass);
+                    var cwGenerateClass = new CWGenerateClass(classCode);
+                    cwGenerateClass.Show();
+                }
+            };
+            cwGenerateClassType.Show();
         }
     }
 }

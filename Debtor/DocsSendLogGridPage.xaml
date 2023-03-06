@@ -18,15 +18,15 @@ x:Class="UnicontaClient.Pages.CustomPage.DocsSendLogGridPage"
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <UnicontaControls:CorasauRibbonControl XMLSourcePath=";component/Assets/GridRibbonReadOnlyLayout.xml" x:Name="localMenu"/>
+        <UnicontaControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Debtor/DocsSendLogGridPageRibbon.xml" x:Name="localMenu"/>
         <UnicontaControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <local:DocsSendLogDataGridClient x:Name="dgDocsSendLogDataGrid" AutoGenerateColumns="None">
                 <local:DocsSendLogDataGridClient.Columns>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Date" ShowSec="True" Width="150"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Status" Width="80"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="LogType" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="LogType" Width="100"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="DocType" Width="90"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="DocNumber" Width="90"/>                    
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DocNumber" Width="90"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="UserId" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Message" Width="400">
                         <local:CorasauDataGridTemplateColumnClient.EditSettings>
@@ -34,12 +34,12 @@ x:Class="UnicontaClient.Pages.CustomPage.DocsSendLogGridPage"
                         </local:CorasauDataGridTemplateColumnClient.EditSettings>
                     </local:CorasauDataGridTemplateColumnClient>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Server" Width="300"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="MergePaymId" Width="300" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="To" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Cc" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Bcc" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Fileextension"  Width="50"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Account"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Name" Width="200"/>
-                    </local:DocsSendLogDataGridClient.Columns>
+                </local:DocsSendLogDataGridClient.Columns>
             </local:DocsSendLogDataGridClient>
         </UnicontaControls:BusyIndicator>
     </Grid>

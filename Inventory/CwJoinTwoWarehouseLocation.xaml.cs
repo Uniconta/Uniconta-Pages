@@ -68,7 +68,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            DialogResult = false;
+            SetDialogResult(false);
         }
 
         private void ChildWindow_KeyDown(object sender, KeyEventArgs e)

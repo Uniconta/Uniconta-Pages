@@ -210,7 +210,7 @@ namespace UnicontaClient.Pages.CustomPage
                     }
             }
 
-            DebtorOrders.SetDeliveryAdress(invClient, debtor, api);
+            UtilCommon.SetDeliveryAdress(invClient, debtor, api);
 
             Debtor deliveryAccount;
             if (invClient._DeliveryAccount != null)

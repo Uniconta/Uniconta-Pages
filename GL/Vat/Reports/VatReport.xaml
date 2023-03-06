@@ -59,9 +59,10 @@ x:Class="UnicontaClient.Pages.CustomPage.VatReport"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="WithoutVAT"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="VatCode" Width="60"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="VatOperation" Width="30"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Rate" Width="50"/>   
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CalculatedVAT"/>                                 
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PostedVAT"/>                            
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Rate" Width="50"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CalculatedVAT" Width="100"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PostedVAT" Width="100"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Difference" Width="100"/>                            
                 </localPage:VatReportGrid.Columns>
             </localPage:VatReportGrid>
         </CorasauControls:BusyIndicator>

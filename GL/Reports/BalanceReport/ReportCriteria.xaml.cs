@@ -104,9 +104,7 @@ namespace UnicontaClient.Pages.CustomPage
             StartLoadCache(t);
             this.DataContext = this;
             InitializeComponent();
-#if !SILVERLIGHT
             FocusManager.SetFocusedElement(txtbalanceName, txtbalanceName);
-#endif
             cbFromAccount.api = cbToAccount.api = cbTemplate.api = api;
             ribbonControl = frmRibbon;
             setDim();
@@ -123,11 +121,6 @@ namespace UnicontaClient.Pages.CustomPage
             string[] strPrintOrientation = new string[] { Uniconta.ClientTools.Localization.lookup("Landscape"), Uniconta.ClientTools.Localization.lookup("Portrait") };
             cbPrintOrientation.ItemsSource = strPrintOrientation;
             txtColWidth.Text = Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("ColumnWidth"), Uniconta.ClientTools.Localization.lookup("Printout"));
-#if SILVERLIGHT
-            RibbonBase rb = (RibbonBase)frmRibbon.DataContext;
-            if (rb != null)
-                UtilDisplay.RemoveMenuCommand(rb, "SetFrontPage");
-#endif
             var sumAccounts = new string[] { Uniconta.ClientTools.Localization.lookup("Show"), Uniconta.ClientTools.Localization.lookup("Hide"), Uniconta.ClientTools.Localization.lookup("OnlyShow") };
             cmbSumAccount.ItemsSource = sumAccounts;
             cmbSumAccount.IsEditable = false;
@@ -167,6 +160,13 @@ namespace UnicontaClient.Pages.CustomPage
             Selectedcol.ColNo = colnum;
             Selectedcol.ColNameNumber = string.Concat(Uniconta.ClientTools.Localization.lookup("Name"), " (", NumberConvert.ToString(colnum), ")");
         }
+        class balSort : IComparer<Balance>
+        {
+            int IComparer<Balance>.Compare(Balance x, Balance y)
+            {
+                return string.Compare(x._Name, y._Name, StringComparison.CurrentCultureIgnoreCase);
+            }
+        }
         async void LoadBalance(Task<Balance[]> balTsk)
         {
             busyIndicator.IsBusy = true;
@@ -174,6 +174,7 @@ namespace UnicontaClient.Pages.CustomPage
             var lstEntity = await balTsk;
             if (lstEntity != null && lstEntity.Length > 0)
             {
+                Array.Sort(lstEntity, new balSort());
                 itemsBalance = new ObservableCollection<Balance>(lstEntity);
                 cbBalance.ItemsSource = itemsBalance;
                 if (LastGeneratedBalance != null)
@@ -511,12 +512,13 @@ namespace UnicontaClient.Pages.CustomPage
         private void SetFrontPage()
         {
             balanceFrontPageReportData = GetBalanceFrontPageReportData();
-            var frontPageDialog = new CWFrontPage(api, Uniconta.ClientTools.Localization.lookup("FrontPage"), objBalance?._FrontPage, objBalance?._ReportFrontPage, balanceFrontPageReportData);
+            var frontPageDialog = new CWFrontPage(api, Uniconta.ClientTools.Localization.lookup("FrontPage"), objBalance?._FrontPage, objBalance?._FrontPage2, objBalance?._ReportFrontPage, balanceFrontPageReportData);
             frontPageDialog.Closing += delegate
             {
                 if (frontPageDialog.DialogResult == true)
                 {
                     objBalance._FrontPage = frontPageDialog.FrontPageText;
+                    objBalance._FrontPage2 = frontPageDialog.FrontPageText2;
                     objBalance._ReportFrontPage = frontPageDialog.FrontPageReport;
                 }
             };
@@ -618,15 +620,9 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (objCriteria.selectedCriteria.Count > 1)
             {
-                var deleteRow = balanceCollist[balanceCollist.Count - 1];
-                api.DeleteNoResponse(deleteRow);
                 balanceCollist.RemoveAt(balanceCollist.Count - 1);
                 objCriteria.selectedCriteria.Remove(objCriteria.selectedCriteria[objCriteria.selectedCriteria.Count - 1]);
-#if !SILVERLIGHT
                 ControlContainer.Children.RemoveAt(ControlContainer.Children.Count - 1);
-#else
-                ControlContainer.Children.Remove(ControlContainer.Children.Last());
-#endif
             }
         }
         private void setDim()
@@ -901,9 +897,7 @@ namespace UnicontaClient.Pages.CustomPage
                 txtColoumnSizeName.Text = Convert.ToString(objBalance.ColumnSizeName);
                 txtColoumnSizeDim.Text = Convert.ToString(objBalance.ColumnSizeDim);
                 txtColoumnSizeAmount.Text = Convert.ToString(objBalance.ColumnSizeAmount);
-#if !SILVERLIGHT
                 chkPrintFrtPage.IsChecked = objBalance._PrintFrontPage;
-#endif
                 txtLineSpace.Text = Convert.ToString(objBalance.LineSpace);
                 txtFontSize.Text = Convert.ToString(objBalance.FontSize);
                 txtLeftMargin.Text = Convert.ToString(objBalance.LeftMargin);

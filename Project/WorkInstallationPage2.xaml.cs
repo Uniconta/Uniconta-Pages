@@ -159,7 +159,7 @@ namespace UnicontaClient.Pages.CustomPage
                         if (address != null)
                         {
                             var streetAddress = address.CompleteStreet;
-                            if (ci.life.name == editrow._Name && streetAddress == editrow._Address1 &&
+                            if (string.Compare(ci.life.name, editrow._Name, StringComparison.CurrentCultureIgnoreCase) == 0 && streetAddress == editrow._Address1 &&
                                 address.zipcode == editrow._ZipCode)
                                 return; // we wil not override since address has not changed
 
@@ -170,6 +170,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 if (result != UnicontaMessageBox.Yes)
                                     return;
                             }
+                            editrow.Name = ci.life.name;
                             editrow.Address1 = streetAddress;
                             editrow.Address2 = address.street2;
                             editrow.ZipCode = address.zipcode;

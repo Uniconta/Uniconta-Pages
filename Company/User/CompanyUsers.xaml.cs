@@ -144,10 +144,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "EditRow":
                     if (selectedItem != null)
-                    {
-                        var parms = new object[2] { selectedItem,true };
-                        AddDockItem(TabControls.EditCompanyUser, parms, string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("Edit"), selectedItem.UserName));
-                    }
+                        AddDockItem(TabControls.EditCompanyUser, new object[2] { selectedItem, true }, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Edit"), selectedItem.UserName));
                     break;
                 case "DeleteRow":
                     if (selectedItem != null)
@@ -222,19 +219,31 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "RefreshGrid":
                     selectedRowIndex = 0;
-                    InitQuery();
+                    gridRibbon_BaseActions(ActionType);
                     break;
                 case "UserOperations":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.UserOperationsLog, selectedItem, string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("UserOperations"), selectedItem._Name));
+                        AddDockItem(TabControls.UserOperationsLog, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("UserOperations"), selectedItem._Name));
                     break;
                 case "UserLoginHistory":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.AllUsersLoginHistoryPage, selectedItem, string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("UserLoginHistory"), selectedItem._Name));
+                        AddDockItem(TabControls.AllUsersLoginHistoryPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("UserLoginHistory"), selectedItem._Name));
                     break;
                 case "SetDefaultCompany":
                     if (selectedItem != null)
                         SetDefaultCompany(selectedItem);
+                    break;
+                case "TableRights":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.UserTableAccessPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("TableRights"), selectedItem._Name));
+                    break;
+                case "BlockFunctions":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.UserRestrictedMethodPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("BlockFunctions"), selectedItem._Name));
+                    break;
+                case "UserProfiles":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.UserProfileUserPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("UserProfiles"), selectedItem._Name));
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);

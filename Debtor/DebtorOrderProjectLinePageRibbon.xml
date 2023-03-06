@@ -8,7 +8,7 @@
     <RibbonItem Action="SaveGrid" ShortcutKey="CTRL+S" LocalizedNameKey="SaveExit" Glyph="save-16x16.png" LargeGlyph="save-32x32.png"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="Adjustment" LocalizedNameKey="AdjustmentPerEmployee" LargeGlyph="Transactions_32x32.png"/>
+    <RibbonItem Action="Adjustment" LocalizedNameKey="AdjustmentPerOBJ" Parameter="Employee" LargeGlyph="Transactions_32x32.png"/>
   </RibbonItem>
    <RibbonItem>   
     <!---next group-->

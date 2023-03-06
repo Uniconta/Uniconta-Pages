@@ -33,6 +33,7 @@
   <RibbonItem>
     <RibbonItem Action="MarkInvTrans" LocalizedNameKey="MarkedTransactions"  LargeGlyph="Check_Journal_32x32.png" />
     <RibbonItem Action="MarkOrderLineAgnstInvTrans" LocalizedNameKey="MarkOBJ" Parameter="InvTransactions"  LargeGlyph="Order_Confirmation_32x32.png" />
+    <RibbonItem Action="ChangeCostValue" LocalizedNameKey="ChangeObj" Parameter="CostValue" Glyph="Default_Values_32x32.png" LargeGlyph="Default_Values_32x32.png"/>
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="TransInBOM" LocalizedNameKey="TransInBOM" Module="InvBOM" Glyph="Voucher_Transactions_32x32.png" LargeGlyph="Order_Lines_Highlighted_32x32.png" ShortcutKey="ALT+L" />

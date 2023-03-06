@@ -47,6 +47,8 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorDeliveryNoteLineReport"
                     <local:ComboBoxColumnClient x:Name="Unit" Width="70"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="OrderNumber" Width="70"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="DeliveryNoteNumber" Width="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DCAccount" Width="70"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Name" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="InvoiceRowId" Width="70" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Text" Width="150"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Warehouse" Width="100"/>

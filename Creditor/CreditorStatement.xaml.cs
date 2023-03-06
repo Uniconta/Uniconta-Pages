@@ -26,6 +26,7 @@ using Uniconta.API.Service;
 using System.Windows.Data;
 using DevExpress.Data.Filtering;
 using Uniconta.Common.Utility;
+using Newtonsoft.Json;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -103,6 +104,23 @@ namespace UnicontaClient.Pages.CustomPage
         [Display(Name = "OverDueCur", ResourceType = typeof(DCTransText))]
         [NoSQL]
         public double OverDueCur { get { return _OverDueCur; } }
+
+        [Display(Name = "OrderNumber", ResourceType = typeof(DCOrderText))]
+        [NoSQL]
+        public int OrderNumber { get { return _OrderNumber; } set { _OrderNumber = value; NotifyPropertyChanged("OrderNumber"); } }
+
+        [JsonIgnore]
+        [ReportingAttribute]
+        public CreditorOrderClient Order
+        {
+            get
+            {
+                if (_OrderNumber != 0)
+                    return ClientHelper.GetRefClient<CreditorOrderClient>(CompanyId, typeof(CreditorOrder), NumberConvert.ToString(_OrderNumber));
+                else
+                    return null;
+            }
+        }
     }
 
     public partial class CreditorStatement : GridBasePage
@@ -116,7 +134,6 @@ namespace UnicontaClient.Pages.CustomPage
         SQLCache accountCache;
         ItemBase ibase, ibaseCurrent;
 
-        static public DateTime DefaultFromDate, DefaultToDate;
         static bool IsCollapsed = true;
         static int transaction;
         CWServerFilter creditorFilterDialog = null;
@@ -127,13 +144,13 @@ namespace UnicontaClient.Pages.CustomPage
         public static void SetDateTime(DateEditor frmDateeditor, DateEditor todateeditor)
         {
             if (frmDateeditor.Text == string.Empty)
-                DefaultFromDate = DateTime.MinValue;
+                DebtorStatement.DefaultFromDate = DateTime.MinValue;
             else
-                DefaultFromDate = frmDateeditor.DateTime.Date;
+                DebtorStatement.DefaultFromDate = frmDateeditor.DateTime.Date;
             if (todateeditor.Text == string.Empty)
-                DefaultToDate = DateTime.MinValue;
+                DebtorStatement.DefaultToDate = DateTime.MinValue;
             else
-                DefaultToDate = todateeditor.DateTime.Date;
+                DebtorStatement.DefaultToDate = todateeditor.DateTime.Date;
         }
 
         public override string NameOfControl { get { return TabControls.CreditorStatement; } }
@@ -190,20 +207,13 @@ namespace UnicontaClient.Pages.CustomPage
             cmbFromAccount.api = cmbToAccount.api = api;
             SetRibbonControl(localMenu, dgCreditorTrans);
             localMenu.OnItemClicked += LocalMenu_OnItemClicked;
-
-            if (CreditorStatement.DefaultFromDate == DateTime.MinValue)
-            {
-                var now = BasePage.GetSystemDefaultDate();
-                CreditorStatement.DefaultToDate = now;
-                CreditorStatement.DefaultFromDate = now.AddDays(1 - now.Day).AddMonths(-2);
-            }
-
+            DebtorStatement.SetDefaultDateTime();
             var Pref = api.session.Preference;
             cbxAscending.IsChecked = Pref.Debtor_isAscending;
             cbxSkipBlank.IsChecked = Pref.Debtor_skipBlank;
 
-            txtDateTo.DateTime = CreditorStatement.DefaultToDate;
-            txtDateFrm.DateTime = CreditorStatement.DefaultFromDate;
+            txtDateTo.DateTime = DebtorStatement.DefaultToDate;
+            txtDateFrm.DateTime = DebtorStatement.DefaultFromDate;
             cmbTrasaction.ItemsSource = AppEnums.TransToShow.Values;
             cmbTrasaction.SelectedIndex = transaction;
             GetMenuItem();
@@ -303,7 +313,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             if (accountCache == null)
                 accountCache = await api.LoadCache(typeof(Uniconta.DataModel.Creditor)).ConfigureAwait(false);
@@ -349,11 +359,15 @@ namespace UnicontaClient.Pages.CustomPage
                             creditorFilterDialog = new CWServerFilter(api, typeof(CreditorClient), null, null, CreditorUserFields);
                         else
                             creditorFilterDialog = new CWServerFilter(api, typeof(CreditorClient), null, null, CreditorUserFields);
+                        creditorFilterDialog.GridSource = dgCreditorTrans.ItemsSource as IList<UnicontaBaseEntity>;
                         creditorFilterDialog.Closing += creditorFilterDialog_Closing;
                         creditorFilterDialog.Show();
                     }
                     else
+                    {
+                        creditorFilterDialog.GridSource = dgCreditorTrans.ItemsSource as IList<UnicontaBaseEntity>;
                         creditorFilterDialog.Show(true);
+                    }
                     break;
                 case "ClearCreditorFilter":
                     creditorFilterDialog = null;
@@ -507,7 +521,7 @@ namespace UnicontaClient.Pages.CustomPage
             SetExpandAndCollapse(true);
 
             CreditorStatement.SetDateTime(txtDateFrm, txtDateTo);
-            DateTime fromDate = CreditorStatement.DefaultFromDate, toDate = CreditorStatement.DefaultToDate;
+            DateTime fromDate = DebtorStatement.DefaultFromDate, toDate = DebtorStatement.DefaultToDate;
             transaction = cmbTrasaction.SelectedIndex;
 
             var fromAccount = Convert.ToString(cmbFromAccount.EditValue);
@@ -532,10 +546,9 @@ namespace UnicontaClient.Pages.CustomPage
             dgCreditorTrans.Visibility = Visibility.Visible;
             busyIndicator.IsBusy = false;
 
-            if (_master != null)
-                SetExpandAndCollapse(false);
-            else
-                SetExpandAndCollapse(IsCollapsed);
+            if (fromAccount == toAccount || _master != null)
+                IsCollapsed = false;
+            SetExpandAndCollapse(IsCollapsed);
         }
 
         void FillStatement(CreditorTransClientTotal[] listTrans, bool OnlyOpen, DateTime toDate)
@@ -608,11 +621,9 @@ namespace UnicontaClient.Pages.CustomPage
             }
 
             dataRowCount = statementList.Count;
+            dgCreditorTrans.ItemsSource = null;
             if (dataRowCount > 0)
-            {
-                dgCreditorTrans.ItemsSource = null;
                 dgCreditorTrans.ItemsSource = statementList;
-            }
         }
 
         private void cbxPageBreak_Click(object sender, RoutedEventArgs e)

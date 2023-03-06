@@ -11,7 +11,7 @@
   <RibbonItem>    
     <RibbonItem Action="CheckPeriodSum" LocalizedNameKey="CheckPeriodSum" LargeGlyph="Calculator_32x32.png"/>
     <RibbonItem Action="RecalcPeriodSum" LocalizedNameKey="RecalcPeriodSum" LargeGlyph="Calculator_32x32.png"/>
-    <RibbonItem Action="ResetFiscalYear" LocalizedNameKey="EraseFiscalYear" LargeGlyph="Delete_32x32.png"/>
+    <RibbonItem Action="EraseFiscalYear" LocalizedNameKey="EraseFiscalYear" LargeGlyph="Delete_32x32.png"/>
     <RibbonItem Action="GeneratePrimo" LocalizedNameKey="TransferOpeningTrans" LargeGlyph="Account-statement_32x32.png"/>
     <RibbonItem Action="RemovePrimo" LocalizedNameKey="RemoveOBJ" Parameter="PrimoTransactions" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png"/>
   </RibbonItem>

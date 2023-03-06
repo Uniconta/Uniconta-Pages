@@ -26,6 +26,7 @@
 	<RibbonItem>
 		<RibbonItem Action="ProjInvProposalLine" LocalizedNameKey="InvoiceProposalLine" ControlName="ProjInvoiceProposalLine" LargeGlyph="Order_Lines_Highlighted_32x32.png" ShortcutKey="ALT+L"/>
 		<RibbonItem Action="CreateInvoice" LocalizedNameKey="CreateOBJ" Parameter="Invoice" LargeGlyph="UserField_32x32.png" ShortcutKey="Ctrl+M"/>
+		<RibbonItem Action="CreatePacknote" LocalizedNameKey="CreateOBJ" Parameter="Packnote" LargeGlyph="Pack_Note_32x32.png" ShortcutKey="Ctrl+K"/>
 	</RibbonItem>
 	<RibbonItem>
 		<RibbonItem Action="Invoices" LocalizedNameKey="PostedInvoices" ControlName="Invoices" LargeGlyph="Invoice_32x32.png"/>

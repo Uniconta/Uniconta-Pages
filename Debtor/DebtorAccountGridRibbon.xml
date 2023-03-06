@@ -10,7 +10,10 @@
     <RibbonItem Action="DetailView" LocalizedNameKey="DetailView" Glyph="Detailed_View_32x32.png" LargeGlyph="Detailed_View_32x32.png"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh.png" LargeGlyph="refresh.png"/>
+    <RibbonItem LocalizedNameKey="Refresh" Action="RefreshGrid" ShortcutKey="Ctrl+R" LargeGlyph="refresh.png">
+      <!--<RibbonItem  LocalizedNameKey="UseFilter" Action="RefreshGrid" ShortcutKey="Ctrl+R" Glyph="Filter_16x16.png"/>
+      <RibbonItem Action="ClearFilter" LocalizedNameKey="ClearFilter" ShortcutKey="Ctrl+K" Glyph="Delete_16x16.png"/>-->
+    </RibbonItem>
     <RibbonItem Action="Filter" ShortcutKey="Ctrl+I" LocalizedNameKey="Filter" LargeGlyph="Filter_32x32.png"/>
   </RibbonItem>
   <RibbonItem>
@@ -45,24 +48,26 @@
     <RibbonItem Action="DebtorTran" LocalizedNameKey="Transactions" Glyph="Cover_16x16.png" LargeGlyph="Account-statement_32x32.png" ShortcutKey="CTRL+T"/>
     <RibbonItem Action="OpenTran" LocalizedNameKey="OpenTrans" ShortcutKey="F8" LargeGlyph="Open_Transaction_32x32.png"/>
     <RibbonItem Action="DebtorStatement" LocalizedNameKey="Statement" ControlName="DebtorStatement" LargeGlyph="Show_Invoice_32x32.png"/>
-    <RibbonItem Action="InvTran" LocalizedNameKey="InvTransactions" ControlName="DebtorInvoiceLines" LargeGlyph="Inventory_Trans_32x32.png"/>  
-    <RibbonItem Action="DebtorTransPivot" LocalizedNameKey="PivotTable" ControlName="DebtorInvoiceLinesPivotReport" LargeGlyph="Category_Charge_32x32.png" />
-    <RibbonItem Action="DocSendLog" LocalizedNameKey="Log" ControlName="DocsSendLogGridPage" LargeGlyph="Server_Count_32x32.png" />
+    <RibbonItem Action="CollectionLetterLog" LocalizedNameKey="CollectionLetterLog" Module="_CollectionLetter" LargeGlyph="Note_32x32.png"/>
+    <RibbonItem Action="InvTran" LocalizedNameKey="InvTransactions" ControlName="DebtorInvoiceLines" Module="FullPackage" LargeGlyph="Inventory_Trans_32x32.png"/>  
+    <RibbonItem Action="DebtorTransPivot" LocalizedNameKey="PivotTable" ControlName="DebtorInvoiceLinesPivotReport" Module="FullPackage" LargeGlyph="Category_Charge_32x32.png" />
+    <RibbonItem Action="DocSendLog" LocalizedNameKey="Log" ControlName="DocsSendLogGridPage" Module="FullPackage" LargeGlyph="Server_Count_32x32.png" />
   </RibbonItem>
   <RibbonItem LocalizedNameKey="Sales">
     <RibbonItem Action="Orders" LocalizedNameKey="Orders" ControlName="DebtorOrdersMultiple" Module="Order" LargeGlyph="Orders_32x32.png"/>
     <RibbonItem Action="Offers" LocalizedNameKey="Offers" ControlName="DebtorOffers" Module="Order" LargeGlyph="Offer_32x32.png"/>
     <RibbonItem Action="Project" LocalizedNameKey="Project" ControlName="Project" Module="Project" LargeGlyph="Folder_32x32.png"/>
-    <RibbonItem Action="Invoice" LocalizedNameKey="Invoices" LargeGlyph="Invoice_32x32.png">
+    <RibbonItem Action="Invoice" LocalizedNameKey="Invoices" Module="FullPackage" LargeGlyph="Invoice_32x32.png">
        <RibbonItem Action="Invoices" LocalizedNameKey="Invoices" ControlName="Invoices" Glyph="AccountInvoice_16x16.png" />
        <RibbonItem Action="QuickInvoice" LocalizedNameKey="CreateOBJ" Parameter="Invoice" ControlName="CreateInvoicePage" Glyph="Invoice_16x16.png" />
     </RibbonItem>
 	 <RibbonItem Action="TaskGroups" LocalizedNameKey="TaskGroups" ControlName="DebtorProjTaskGroupPage" Module="ProjectTask" LargeGlyph="Group_by_32x32.png"/>
   </RibbonItem>
   <RibbonItem>    
-    <RibbonItem Action="QueriesandReports" LocalizedNameKey="QueriesandReports" LargeGlyph="Statistics_32x32.png">      
+    <RibbonItem Action="QueriesandReports" LocalizedNameKey="QueriesandReports" Module="Inventory" LargeGlyph="Statistics_32x32.png">      
       <RibbonItem Action="AccountStat" LocalizedNameKey="AccountStat" ControlName="InventoryTotals" LargeGlyph=""/>
       <RibbonItem Action="AccountStatDate" LocalizedNameKey="AccountStatDate" LargeGlyph=""/>
+      <RibbonItem Action="ClientInformation" LocalizedNameKey="AccountantClientInfo" LargeGlyph=""/>
     </RibbonItem>
   </RibbonItem>
   <RibbonItem TabId="1" LocalizedNameKey="EditAll">

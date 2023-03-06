@@ -44,6 +44,8 @@ namespace UnicontaClient.Pages.CustomPage
         protected override void OnLayoutLoaded()
         {
             base.OnLayoutLoaded();
+            if (!api.CompanyEntity.ProjectTask)
+                this.Task.Visible = this.Task.ShowInColumnChooser = false;
             Utility.SetupVariants(api, null, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
             Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
         }

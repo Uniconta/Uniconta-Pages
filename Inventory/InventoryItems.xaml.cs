@@ -85,13 +85,6 @@ namespace UnicontaClient.Pages.CustomPage
 #endif
         }
 
-        public override Task InitQuery()
-        {
-            if (!this.dgInventoryItemsGrid.ReuseCache(typeof(Uniconta.DataModel.InvItem)))
-                return Filter(null);
-            return null;
-        }
-
         private void DgInventoryItemsGrid_SelectedItemChanged(object sender, DevExpress.Xpf.Grid.SelectedItemChangedEventArgs e)
         {
             var oldselectedItem = e.OldItem as InvItemClient;
@@ -153,7 +146,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             detailControl.api = api;
         }
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             var lst = new List<Type>(10) { typeof(Uniconta.DataModel.InvGroup) };
             var Comp = api.CompanyEntity;

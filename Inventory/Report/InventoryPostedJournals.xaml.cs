@@ -61,8 +61,17 @@ namespace UnicontaClient.Pages.CustomPage
             dgInvPostedJournal.api = api;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgInvPostedJournal.BusyIndicator = busyIndicator;
+            dgInvPostedJournal.RowDoubleClick += dgInvPostedJournal_RowDoubleClick;
         }
-        
+
+        private void dgInvPostedJournal_RowDoubleClick()
+        {
+            localMenu_OnItemClicked("InvPostedTransaction");
+        }
+        private void Journal_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            localMenu_OnItemClicked("InvPostedTransaction");
+        }
         private void localMenu_OnItemClicked(string ActionType)
         {
             InvJournalPostedClient selectedItem = dgInvPostedJournal.SelectedItem as InvJournalPostedClient;

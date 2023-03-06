@@ -131,9 +131,14 @@ namespace UnicontaClient.Pages.CustomPage
         }
         protected override void LoadCacheInBackGround()
         {
+            var projects = api.GetCache(typeof(Uniconta.DataModel.Project));
+            TestDebtorReload(false, projects?.GetNotNullArray as IEnumerable<Uniconta.DataModel.Project>);
+
             var Comp = api.CompanyEntity;
             var lst = new List<Type>(15) { typeof(Uniconta.DataModel.PrType), typeof(Uniconta.DataModel.PaymentTerm), typeof(Uniconta.DataModel.ProjectGroup), typeof(Uniconta.DataModel.PrStandard),
                 typeof(Uniconta.DataModel.PrCategory), typeof(Uniconta.DataModel.PrWorkSpace) };
+            if (Comp.Contacts)
+                lst.Add(typeof(Uniconta.DataModel.Contact));
             if (Comp.NumberOfDimensions >= 1)
                 lst.Add(typeof(Uniconta.DataModel.GLDimType1));
             if (Comp.NumberOfDimensions >= 2)
@@ -149,6 +154,36 @@ namespace UnicontaClient.Pages.CustomPage
             if (Comp.DeliveryAddress)
                 lst.Add(typeof(Uniconta.DataModel.WorkInstallation));
             LoadType(lst);
+        }
+
+        async void TestDebtorReload(bool refresh, IEnumerable<Uniconta.DataModel.Project> lst)
+        {
+            if (lst != null && lst.Count() > 0)
+            {
+                var cache = api.GetCache(typeof(Uniconta.DataModel.Debtor));
+                if (cache != null)
+                {
+                    bool reload = false;
+                    var Contacts = api.GetCache(typeof(Uniconta.DataModel.Contact));
+                    foreach (var rec in lst)
+                    {
+                        if (rec._DCAccount != null && cache.Get(rec._DCAccount) == null)
+                        {
+                            reload = true;
+                            break;
+                        }
+                        if (rec._ContactRef != 0 && Contacts != null && Contacts.Get(rec._ContactRef) == null)
+                        {
+                            Contacts = null;
+                            api.LoadCache(typeof(Uniconta.DataModel.Contact), true);
+                        }
+                    }
+                    if (reload)
+                        await api.LoadCache(typeof(Uniconta.DataModel.Debtor), true);
+                }
+            }
+            if (refresh)
+                gridRibbon_BaseActions("RefreshGrid");
         }
 
         private void localMenu_OnItemClicked(string ActionType)
@@ -341,6 +376,13 @@ namespace UnicontaClient.Pages.CustomPage
                 case "BudgetPanningSchedule":
                     if (selectedItem != null)
                         AddDockItem(TabControls.ProjectBudgetPlanningSchedulePage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("BudgetPlanningSchedule"), selectedItem._Name));
+                    break;
+                case "PurchaseOrders":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.PurchaseLines, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("PurchaseLines"), selectedItem._Number));
+                    break;
+                case "RefreshGrid":
+                    TestDebtorReload(true, dgProjectGrid.ItemsSource as IEnumerable<Uniconta.DataModel.Project>);
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);

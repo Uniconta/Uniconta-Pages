@@ -58,7 +58,10 @@ namespace UnicontaClient.Pages.CustomPage
         {
             localMenu_OnItemClicked("Lines");
         }
-
+        private void Name_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            DgCreditorPriceListGrid_RowDoubleClick();
+        }
         bool CopiedData;
         private void localMenu_OnItemClicked(string ActionType)
         {
@@ -92,7 +95,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "AddDoc":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.UserDocsPage, dgCreditorPriceListGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Documents"), selectedItem._Name));
+                        AddDockItem(TabControls.UserDocsPage, dgCreditorPriceListGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Documents"), selectedItem.KeyStr));
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);

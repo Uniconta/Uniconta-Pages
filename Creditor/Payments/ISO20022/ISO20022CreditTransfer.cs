@@ -106,6 +106,7 @@ namespace ISO20022CreditTransfer
 
             doc.CompanyID = company.CompanyId;
             doc.NumberSeqPaymentFileId = uniqueFileId;
+            doc.ExcludeSectionInitgPty = bankSpecific.ExcludeSectionInitgPty();
 
             string companyAccountId = string.Empty;
             string companyBIC = string.Empty;
@@ -121,7 +122,7 @@ namespace ISO20022CreditTransfer
                 doc.CompanyPaymentMethod = "BBAN";
             }
 
-            doc.InitgPty = new InitgPty(doc.CompanyName, doc.IdentificationId, doc.IdentificationCode);
+            doc.InitgPty = new InitgPty(doc.CompanyName, doc.IdentificationId, doc.IdentificationCode, doc.ExcludeSectionInitgPty);
 
             //Update ISO PaymentType >>
             foreach (var rec in queryPaymentTrans)
@@ -280,9 +281,11 @@ namespace ISO20022CreditTransfer
                 }
 
                 var cdtrAgtCountryId = bankSpecific.CdtrAgtCountryId(credBankCountryId);
+                var cdtrAgtClrSysId = bankSpecific.CdtrAgtClrSysId(doc.ISOPaymentType);
+                var cdtrAgtMmbId = bankSpecific.CdtrAgtMmbId(rec._PaymentMethod);
 
                 doc.CdtTrfTxInfList.Add(new CdtTrfTxInf(doc.PaymentInfoId, instructionId, doc.EndToEndId, amount, currency,
-                    new CdtrAgt(creditorBIC, credBankName, cdtrAgtCountryId, doc.ExcludeSectionCdtrAgt),
+                    new CdtrAgt(creditorBIC, credBankName, cdtrAgtCountryId, cdtrAgtClrSysId, cdtrAgtMmbId, doc.ExcludeSectionCdtrAgt),
                     new Cdtr(credName, creditorAddress),
                     new CdtrAcct(creditorAcc, isPaymentTypeIBAN, OCRPaymentType, credPaymFormat._ExportFormat, rec),
                     new RgltryRptg(credPaymFormat._ExportFormat, doc.ISOPaymentType, rec.RgltryRptgCode, rec.RgltryRptgText),

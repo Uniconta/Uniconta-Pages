@@ -41,7 +41,7 @@ namespace UnicontaClient.Pages.CustomPage
         readonly FinancialYearAPI FiApi;
         CompanyFinancePeriodClient[] AccountPeriodslist;
 
-        public override string NameOfControl { get { return TabControls.AccountingYear.ToString(); } }
+        public override string NameOfControl { get { return TabControls.AccountingYear; } }
         protected override bool IsLayoutSaveRequired() { return false; }
 
         public AccountingYear(BaseAPI API) : base(API, string.Empty)
@@ -58,56 +58,69 @@ namespace UnicontaClient.Pages.CustomPage
         public override void Utility_Refresh(string screenName, object argument = null)
         {
             if (screenName == TabControls.FinanceYearPage2)
+            {
                 dgFinanceYearGrid.UpdateItemSource(argument);
-        }       
+                object[] argumentParams = argument as object[];
+                if (argumentParams != null && argumentParams.Length >= 2 && (int)argumentParams[0] == 1) // insert
+                {
+                    var Row = argumentParams[1] as CompanyFinanceYearClient;
+                    if (Row != null && Math.Abs((Row._FromDate - BasePage.GetSystemDefaultDate()).TotalDays) < 200)
+                    {
+                        if (UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("CreateOpeningBalance"),
+                            Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                        {
+                            GeneratePrimo(Row);
+                        }
+                    }
+                }
+            }
+        }
+        
         private void localMenu_OnItemClicked(string ActionType)
         {
             var selectedItem = dgFinanceYearGrid.SelectedItem as CompanyFinanceYearClient;
             switch (ActionType)
             {
                 case "AddRow":
-                    var objectItemsForUpdate = new object[3];
-                    objectItemsForUpdate[0] = api;
-                    objectItemsForUpdate[1] = dgFinanceYearGrid;
-                    objectItemsForUpdate[2] = "";
-                    AddDockItem(TabControls.FinanceYearPage2, objectItemsForUpdate, Uniconta.ClientTools.Localization.lookup("AccountingYear"), "Add_16x16.png");
+                    AddDockItem(TabControls.FinanceYearPage2, new object[] { api, dgFinanceYearGrid, "" }, Uniconta.ClientTools.Localization.lookup("AccountingYear"), "Add_16x16.png");
                     break;
                 case "EditRow":
-                    if (selectedItem == null)
-                        return;
-                    var objectItemsForUpdate2 = new object[2];
-                    objectItemsForUpdate2[0] = selectedItem;
-                    objectItemsForUpdate2[1] = dgFinanceYearGrid;
-                    AddDockItem(TabControls.FinanceYearPage2, objectItemsForUpdate2, Uniconta.ClientTools.Localization.lookup("AccountingYear"), "Edit_16x16.png");
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.FinanceYearPage2, new object[] { selectedItem, dgFinanceYearGrid }, Uniconta.ClientTools.Localization.lookup("AccountingYear"), "Edit_16x16.png");
                     break;                          
                 case "RecalcPeriodSum":
-                    RecalcPeriodSum();
+                    if (selectedItem != null)
+                        RecalcPeriodSum(selectedItem);
                     break;
                 case "CheckPeriodSum":
-                    CheckPeriodSum();
+                    if (selectedItem != null)
+                        CheckPeriodSum(selectedItem);
                     break;
-                case "ResetFiscalYear":
-                    ResetFiscalYear();
+                case "EraseFiscalYear":
+                    if (selectedItem != null)
+                        EraseFiscalYear(selectedItem);
                     break;
                 case "GeneratePrimo":
-                    GeneratePrimo();
+                    if (selectedItem != null)
+                        GeneratePrimo(selectedItem);
                     break;
                 case "PrimoTransactions":
-                    if (selectedItem == null)
-                        return;
-                    AddDockItem(TabControls.AccountsTransaction, selectedItem, Uniconta.ClientTools.Localization.lookup("PrimoTransactions"));
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.AccountsTransaction, selectedItem, Uniconta.ClientTools.Localization.lookup("PrimoTransactions"));
                     break;
                 case "AccountingPeriod":
-                    genrateAccountingPeriod();
-                    if (AccountPeriodslist != null)
+                    if (selectedItem != null)
                     {
-                        CWAccountingPeriod ap = new CWAccountingPeriod(selectedItem, AccountPeriodslist, api);
-                        ap.Show();
+                        genrateAccountingPeriod(selectedItem);
+                        if (AccountPeriodslist != null)
+                        {
+                            new CWAccountingPeriod(selectedItem, AccountPeriodslist, api).Show();
+                        }
                     }
                     break;
                 case "RemovePrimo":
-                    if (selectedItem == null) return;
-                    RemovePrimo(selectedItem);
+                    if (selectedItem != null)
+                        RemovePrimo(selectedItem);
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);
@@ -129,17 +142,9 @@ namespace UnicontaClient.Pages.CustomPage
             };
             removePrimoWindowDialog.Show();
         }
-        CompanyFinanceYearClient getSelectedItem()
-        {
-            return dgFinanceYearGrid.SelectedItem as CompanyFinanceYearClient;
-        }
 
-        private void ResetFiscalYear()
+        private void EraseFiscalYear(CompanyFinanceYearClient p)
         {
-            var p = getSelectedItem();
-            if (p == null)
-                return;
-
             var interval = string.Format(Uniconta.ClientTools.Localization.lookup("FromTo"), p._FromDate.ToShortDateString(), p._ToDate.ToShortDateString());
             var Header = string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("DeleteTrans"), interval);
 
@@ -149,25 +154,20 @@ namespace UnicontaClient.Pages.CustomPage
                 if (EraseYearWindowDialog.DialogResult == true)
                 {
                     ErrorCodes res = await FiApi.EraseAllTransactions(p);
-                    if (res != ErrorCodes.Succes)
-                    { UtilDisplay.ShowErrorCode(res); }
-                    else
+                    UtilDisplay.ShowErrorCode(res);
+                    if (res == ErrorCodes.Succes)
                     {
                         dgFinanceYearGrid.RemoveFocusedRowFromGrid();
                         if (dgFinanceYearGrid.GetVisibleRows()?.Count > 0)
                             (dgFinanceYearGrid.View as TableView).FocusedRowHandle = 0;
                     }
-                        
                 }
             };
             EraseYearWindowDialog.Show();
         }
 
-        private void GeneratePrimo()
+        private void GeneratePrimo(CompanyFinanceYearClient p)
         {
-            var p = getSelectedItem();
-            if (p == null)
-                return;
             CWCreatePrimo dialogPrimo = new CWCreatePrimo(this.api,p);
             dialogPrimo.Closed += delegate
             {
@@ -175,42 +175,10 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     var s = string.Format(Uniconta.ClientTools.Localization.lookup("PrimoOnDate"), p._FromDate.ToShortDateString());
                     var EraseYearWindowDialog = new EraseYearWindow(s, true);
-                    EraseYearWindowDialog.Closed += async delegate
+                    EraseYearWindowDialog.Closed += delegate
                     {
                         if (EraseYearWindowDialog.DialogResult == true)
-                        {
-                            ErrorCodes res = await FiApi.GeneratePrimoTransactions(p, dialogPrimo.BalanceName, dialogPrimo.PLText, dialogPrimo.Voucher, dialogPrimo.NumberserieText);
-                            UtilDisplay.ShowErrorCode(res);
-                            if (res == ErrorCodes.Succes && !p._Current)
-                            {
-                                var text = string.Format(Uniconta.ClientTools.Localization.lookup("MoveToOBJ"), string.Format("{0} - {1}", p._FromDate.ToShortDateString(), p._ToDate.ToShortDateString()));
-                                CWConfirmationBox dialog = new CWConfirmationBox(text, Uniconta.ClientTools.Localization.lookup("IsYearEnded"), true);
-                                dialog.Closing += delegate
-                                {
-                                    var res2 = dialog.ConfirmationResult;
-                                    if (res2 == CWConfirmationBox.ConfirmationResultEnum.Yes)
-                                    {
-                                        var source = (IList)dgFinanceYearGrid.ItemsSource;
-                                        if (source != null)
-                                        {
-                                            IEnumerable<CompanyFinanceYearClient> gridItems = source.Cast<CompanyFinanceYearClient>();
-                                            foreach (var y in gridItems)
-                                            {
-                                                if (y._Current)
-                                                {
-                                                    y.Current = false;
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                        var org = StreamingManager.Clone(p);
-                                        p.Current = true;
-                                        api.UpdateNoResponse(org, p);
-                                    };
-                                };
-                                dialog.Show();
-                            }
-                        }
+                            runPrimo(dialogPrimo, p);
                     };
                     EraseYearWindowDialog.Show();
                 }
@@ -218,35 +186,76 @@ namespace UnicontaClient.Pages.CustomPage
             dialogPrimo.Show();
         }
 
-        async void CheckPeriodSum()
+        async void runPrimo(CWCreatePrimo dialogPrimo, CompanyFinanceYearClient p)
         {
-            var p = getSelectedItem();
-            if (p != null)
+            ErrorCodes res = await FiApi.GeneratePrimoTransactions(p, dialogPrimo.BalanceName, dialogPrimo.PLText, dialogPrimo.Voucher, dialogPrimo.NumberserieText);
+            if (res == ErrorCodes.Succes && !p._Current)
             {
-                ErrorCodes res = await FiApi.CheckSumtables(p);
+                var text = string.Format(Uniconta.ClientTools.Localization.lookup("MoveToOBJ"), string.Format("{0} - {1}", p._FromDate.ToShortDateString(), p._ToDate.ToShortDateString()));
+                CWConfirmationBox dialog = new CWConfirmationBox(text, Uniconta.ClientTools.Localization.lookup("IsYearEnded"), true);
+                dialog.Closing += delegate
+                {
+                    if (dialog.ConfirmationResult == CWConfirmationBox.ConfirmationResultEnum.Yes)
+                    {
+                        var source = (IList)dgFinanceYearGrid.ItemsSource;
+                        if (source != null)
+                        {
+                            IEnumerable<CompanyFinanceYearClient> gridItems = source.Cast<CompanyFinanceYearClient>();
+                            foreach (var y in gridItems)
+                            {
+                                if (y._Current)
+                                {
+                                    y.Current = false;
+                                    break;
+                                }
+                            }
+                        }
+                        var org = StreamingManager.Clone(p);
+                        p.Current = true;
+                        api.UpdateNoResponse(org, p);
+                    };
+                };
+                dialog.Show();
+            }
+            else if (res == ErrorCodes.AccountIsMissing)
+            {
+                var cw = new CwSystemAccountType(api, "AccountTypeYearResultTransfer");
+                cw.Closing += async delegate
+                {
+                    var glAcc = cw.GlAccount;
+                    if (cw.DialogResult == true && glAcc != null && glAcc.AccountTypeEnum >= Uniconta.DataModel.GLAccountTypes.PL)
+                    {
+                        var loaded = StreamingManager.Clone(glAcc);
+                        glAcc._SystemAccount = (byte)Uniconta.DataModel.SystemAccountTypes.EndYearResultTransfer;
+                        var err = await api.Update(loaded, glAcc);
+                        if (err != 0)
+                            UtilDisplay.ShowErrorCode(err);
+                        else
+                            runPrimo(dialogPrimo, p);
+                    }
+                };
+                cw.Show();
+            }
+            else
                 UtilDisplay.ShowErrorCode(res);
-            }
         }
 
-        async void RecalcPeriodSum()
+        async void CheckPeriodSum(CompanyFinanceYearClient p)
         {
-            var p = getSelectedItem();
-            if (p != null)
-            {
-                ErrorCodes res = await FiApi.RecalcSumtables(p);
-                if (res == ErrorCodes.Succes)
-                    UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("CalculatingPeriods"), Uniconta.ClientTools.Localization.lookup("Message"));
-                else
-                    UtilDisplay.ShowErrorCode(res);
-            }
+            UtilDisplay.ShowErrorCode(await FiApi.CheckSumtables(p));
         }
 
-        void genrateAccountingPeriod()
+        async void RecalcPeriodSum(CompanyFinanceYearClient p)
         {
-            var selectedItem = dgFinanceYearGrid.SelectedItem as CompanyFinanceYearClient;
-            if (selectedItem == null)
-                return;
+            ErrorCodes res = await FiApi.RecalcSumtables(p);
+            if (res == ErrorCodes.Succes)
+                UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("CalculatingPeriods"), Uniconta.ClientTools.Localization.lookup("Message"));
+            else
+                UtilDisplay.ShowErrorCode(res);
+        }
 
+        void genrateAccountingPeriod(CompanyFinanceYearClient selectedItem)
+        {
             int l = selectedItem.NumberOfPeriods;
             AccountPeriodslist = new CompanyFinancePeriodClient[l];
             DateTime FromDate = selectedItem._FromDate;
@@ -266,20 +275,22 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void dgFinanceYearGrid_SelectedItemChanged(object sender, DevExpress.Xpf.Grid.SelectedItemChangedEventArgs e)
         {
-            if( (dgFinanceYearGrid.View as TableView).FocusedRowHandle  == dgFinanceYearGrid.VisibleRowCount - 1)
+            if( (dgFinanceYearGrid.View as TableView).FocusedRowHandle == dgFinanceYearGrid.VisibleRowCount - 1)
             {
-                ribbonControl.EnableButtons( "ResetFiscalYear" );  
+                ribbonControl.EnableButtons("EraseFiscalYear");
+                ribbonControl.DisableButtons(new[] { "GeneratePrimo", "RemovePrimo" });
             }
             else
             {
-                ribbonControl.DisableButtons("ResetFiscalYear" );
+                ribbonControl.DisableButtons("EraseFiscalYear");
+                ribbonControl.EnableButtons(new[] { "GeneratePrimo", "RemovePrimo" });
             }
         }
 
         void ShowHideMenu()
         {
             RibbonBase rb = (RibbonBase)localMenu.DataContext;
-            if (api.session.User._Role <= (byte)Uniconta.Common.User.UserRoles.Reseller)
+            if (api.session.User._Role < (byte)Uniconta.Common.User.UserRoles.SystemAdmin)
                 UtilDisplay.RemoveMenuCommand(rb, "RecalcPeriodSum");
         }
     }

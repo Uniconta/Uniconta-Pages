@@ -37,6 +37,7 @@ using Bilagscan;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using Uniconta.API.System;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -106,9 +107,12 @@ namespace UnicontaClient.Pages.CustomPage
             return await base.SaveData();
         }
 
-        public override IList ModifyDraggedRows(DevExpress.Xpf.Grid.DragDrop.GridDropEventArgs e)
+        public override IList ModifyDraggedRows(DevExpress.Xpf.Grid.DragDrop.DataControlDropEventArgs e)
         {
-            var tr = e.TargetRow as VouchersClient;
+            var tableArgs = e as DevExpress.Xpf.Grid.DragDrop.GridDropEventArgs;
+            if (tableArgs == null)
+                return base.ModifyDraggedRows(e);
+            var tr = tableArgs.TargetRow as VouchersClient;
             foreach (var row in e.DraggedRows)
             {
                 if (tr != null)
@@ -133,7 +137,7 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                 }
             }
-            return e.DraggedRows;
+            return tableArgs.DraggedRows;
         }
 
         public override IEnumerable<UnicontaBaseEntity> ConvertPastedRows(IEnumerable<UnicontaBaseEntity> copyFromRows)
@@ -428,7 +432,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         SQLCache LedgerCache, CreditorCache, PaymentCache, ProjectCache, TextTypes, FolderCache;
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             if (this.LedgerCache == null)
                 this.LedgerCache = api.GetCache(typeof(Uniconta.DataModel.GLAccount)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLAccount)).ConfigureAwait(false);
@@ -495,6 +499,8 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                     if (dc._Employee != null)
                         rec.Approver1 = dc._Employee;
+                    if (dc._TransType != null)
+                        rec.TransType = dc._TransType;
 
                     SetPayDate(PaymentCache, rec, dc);
                     rec.UpdateDefaultText();
@@ -560,14 +566,15 @@ namespace UnicontaClient.Pages.CustomPage
             var t = (Uniconta.DataModel.GLTransType)TextTypes?.Get(rec._TransType);
             if (t != null)
             {
-                rec.Text = t._TransType;
+                if (rec._Text == null)
+                    rec.NotifyPropertyChanged("Text");
                 if (t._AccountType == 0 && t._Account != null)
                     rec.CostAccount = t._Account;
                 if (t._OffsetAccount != null)
                 {
                     if (t._OffsetAccountType == 0)
                         rec.PayAccount = t._OffsetAccount;
-                    else if (t._OffsetAccountType == GLJournalAccountType.Creditor)
+                    else if (rec._CreditorAccount == null && t._OffsetAccountType == GLJournalAccountType.Creditor)
                         rec.CreditorAccount = t._OffsetAccount;
                 }
             }
@@ -643,15 +650,18 @@ namespace UnicontaClient.Pages.CustomPage
                 case "AddRow":
                     AddRow();
                     break;
-
                 case "DeleteRow":
                     if (selectedItem != null)
                     {
-                        VoucherCache.RemoveGlobalVoucherCache(selectedItem);
-                        dgVoucherGrid.DeleteRow();
+                        if (selectedItem._InJournal)
+                            UtilDisplay.ShowErrorCode(ErrorCodes.CouldNotDeleteRecordThatIsReferred);
+                        else
+                        {
+                            VoucherCache.RemoveGlobalVoucherCache(selectedItem);
+                            dgVoucherGrid.DeleteRow();
+                        }
                     }
                     break;
-
                 case "Save":
                     Save();
                     break;
@@ -660,9 +670,8 @@ namespace UnicontaClient.Pages.CustomPage
                     if (dgVoucherGrid.HasUnsavedData)
                         Utility.ShowConfirmationOnRefreshGrid(dgVoucherGrid);
                     else
-                        dgVoucherGrid.Filter(null);
+                        gridRibbon_BaseActions(ActionType);
                     break;
-
                 case "ViewDownloadRow":
                 case "ViewVoucher":
                     if (selectedItem != null)
@@ -711,7 +720,11 @@ namespace UnicontaClient.Pages.CustomPage
                                 lst = dgVoucherGrid.GetVisibleRows() as IEnumerable<VouchersClient>;
 
                             if (object.ReferenceEquals(lst, dgVoucherGrid.ItemsSource))
+                            {
                                 task = postingApi.GenerateJournalFromDocument(journalName, journalDate, journals.IsCreditAmount, OnlyApproved, journals.AddVoucherNumber);
+                                foreach (var doc in lst)
+                                    doc.InJournal = true;
+                            }
                             else
                             {
                                 // For Visible rows or just selected row.
@@ -751,7 +764,88 @@ namespace UnicontaClient.Pages.CustomPage
                     };
                     journals.Show();
                     break;
+                case "PostJournal":
+                    // save lines first.
+                    dgVoucherGrid.SelectedItem = null;
 
+                    api.AllowBackgroundCrud = false;
+                    var savetask = dgVoucherGrid.SaveData();
+                    api.AllowBackgroundCrud = true;
+
+                    CWJournal cwjournal = new CWJournal(api, true);
+                    cwjournal.ShowComments(true);
+                    cwjournal.DialogTableId = 2000000104;
+                    cwjournal.Closed += async delegate
+                    {
+                        if (cwjournal.DialogResult == true)
+                        {
+                            var journalName = cwjournal.Journal;
+                            var journalDate = cwjournal.Date;
+                            var OnlyApproved = cwjournal.OnlyApproved;
+                            var comment = cwjournal.comments;
+                            var simulate = cwjournal.IsSimulation;
+                            var errorCode = await savetask;  // make sure save is completed.
+                            if (errorCode != ErrorCodes.Succes)
+                            {
+                                UtilDisplay.ShowErrorCode(errorCode);
+                                return;
+                            }
+                            busyIndicator.IsBusy = true;
+
+                            var postingApi = new PostingAPI(api);
+                            IEnumerable<VouchersClient> lst;
+                            if (cwjournal.OnlyCurrentRecord)
+                            {
+                                if (selectedItem == null)
+                                    return;
+                                OnlyApproved = false;
+                                lst = new VouchersClient[] { selectedItem };
+                            }
+                            else
+                                lst = dgVoucherGrid.GetVisibleRows() as IEnumerable<VouchersClient>;
+                            PostingResult postingResult;
+                            if (object.ReferenceEquals(lst, dgVoucherGrid.ItemsSource))
+                            {
+                                postingResult = await postingApi.PostJournalFromDocument(journalName, journalDate, comment, simulate, cwjournal.IsCreditAmount, OnlyApproved, new GLTransClientTotal(), null);
+                            }
+                            else
+                            {
+                                // For Visible rows or just selected row.
+                                if (OnlyApproved)
+                                {
+                                    var VoucherList = new List<VouchersClient>();
+                                    foreach (var doc in lst)
+                                    {
+                                        if (doc._OnHold || !doc._Approved || (doc._Approver2 != null && !doc._Approved2))
+                                            continue;
+                                        VoucherList.Add(doc);
+                                    }
+                                    lst = VoucherList;
+                                }
+                                postingResult = await postingApi.PostJournalFromDocument(journalName, journalDate, comment, simulate, cwjournal.IsCreditAmount, OnlyApproved, new GLTransClientTotal(), lst);
+                            }
+
+                            busyIndicator.IsBusy = false;
+                            if (postingResult == null)
+                                return;
+                            if (postingResult.Err != ErrorCodes.Succes)
+                                UtilDisplay.ShowErrorCode(postingResult.Err);
+                            else if (postingResult.SimulatedTrans != null && postingResult.SimulatedTrans.Length > 0)
+                                AddDockItem(TabControls.SimulatedTransactions, new object[] { postingResult.AccountBalance, postingResult.SimulatedTrans }, Uniconta.ClientTools.Localization.lookup("SimulatedTransactions"), null, true);
+                            else
+                            {
+                                string msg;
+                                if (postingResult.JournalPostedlId != 0)
+                                    msg = string.Format("{0} {1}={2}", Uniconta.ClientTools.Localization.lookup("JournalHasBeenPosted"), Uniconta.ClientTools.Localization.lookup("JournalPostedId"), NumberConvert.ToString(postingResult.JournalPostedlId));
+                                else
+                                    msg = Uniconta.ClientTools.Localization.lookup("JournalHasBeenPosted");
+                                UnicontaMessageBox.Show(msg, Uniconta.ClientTools.Localization.lookup("Message"));
+                                gridRibbon_BaseActions("RefreshGrid");
+                            }
+                        }
+                    };
+                    cwjournal.Show();
+                    break;
                 case "GeneratePurchaseOrder":
                     if (selectedItem != null)
                         CreatePurchaseOrder(selectedItem);
@@ -935,7 +1029,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (voucherClient._Fileextension == FileextensionsTypes.JPEG || voucherClient.Fileextension == FileextensionsTypes.PNG)
             {
                 if (UnicontaMessageBox.Show(Localization.lookup("AreYouSureToContinue"),
-                    Localization.lookup("Confirmation"), MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
+                    Localization.lookup("Confirmation"), MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
                     return;
 
                 busyIndicator.IsBusy = true;
@@ -954,6 +1048,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                 voucherClient._Fileextension = FileextensionsTypes.PDF;
                 voucherClient._Data = pdfBytes;
+                voucherClient._NoCompress = true;
                 VoucherCache.SetGlobalVoucherCache(voucherClient);
                 var result = await api.Update(voucherClient);
                 busyIndicator.IsBusy = false;
@@ -1238,7 +1333,8 @@ namespace UnicontaClient.Pages.CustomPage
                             StreamingManager.Copy(selectedItem, voucher);
                             voucher._Fileextension = DocumentConvert.GetDocumentType(fileInfo.FileExtension);
                             voucher._Data = fileInfo.FileBytes;
-                            voucher._Text = string.IsNullOrEmpty(selectedItem.Text) ? fileInfo.FileName : selectedItem.Text;
+                            voucher._Text = selectedItem._Text ?? fileInfo.FileName;
+                            voucher._NoCompress = true;
                             voucherClients[iVoucher++] = voucher;
                         }
                     }
@@ -1323,22 +1419,19 @@ namespace UnicontaClient.Pages.CustomPage
             EnvelopeWizard.Show();
         }
 
-        async private Task<ErrorCodes> SaveFolderData(object wizarddata)
+        private Task<ErrorCodes> SaveFolderData(object wizarddata)
         {
-            ErrorCodes result = ErrorCodes.CouldNotSave;
-
-            if (wizarddata is object[])
+            var data = wizarddata as object[];
+            if (data != null)
             {
-                var data = wizarddata as object[];
                 var voucherClient = new VouchersClient();
                 var voucherList = data[0] as IEnumerable<VouchersClient>;
                 voucherClient._Text = data[1] as string;
                 voucherClient.Content = data[2] as string;
                 var documentApi = new DocumentAPI(api);
-
-                result = await documentApi.CreateEnvelope(voucherClient, voucherList);
+                return documentApi.CreateEnvelope(voucherClient, voucherList);
             }
-            return result;
+            return BaseAPI.RetErr(ErrorCodes.CouldNotSave);
         }
 
         public override void Utility_Refresh(string screenName, object argument = null)
@@ -1354,12 +1447,13 @@ namespace UnicontaClient.Pages.CustomPage
                 if (selectedPageIndex == 1)
                     dgVoucherGrid.FilterString = "Contains([Envelope],'true')";
             }
+            else if (screenName == TabControls.GL_DailyJournalLine)
+                gridRibbon_BaseActions("RefreshGrid");
         }
 
         protected override void OnLayoutLoaded()
         {
             base.OnLayoutLoaded();
-            var Comp = api.CompanyEntity;
             Utility.SetDimensionsGrid(api, clDim1, clDim2, clDim3, clDim4, clDim5);
         }
 
@@ -1404,7 +1498,7 @@ namespace UnicontaClient.Pages.CustomPage
                     BindFolders();
                 dgVoucherGrid.RefreshData();
 
-                var items = (accordionView.Items[0] as UnicontaClient.Controls.AccordionFilterGroup)?.FilterItems;
+                var items = (accordionView.Items[0] as UnicontaClient.Controls.AccordionFilterGroup).FilterItems;
                 foreach (var item in items)
                 {
                     if (item.FilterName == folderName)
@@ -1456,6 +1550,12 @@ namespace UnicontaClient.Pages.CustomPage
                     _BilagscanSend(lst);
             }
         }
+
+        private void PrimaryKeyId_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            localMenu_OnItemClicked("ViewDownloadRow");
+        }
+
         async void _BilagscanSend(List<VouchersClient> lst)
         {
             try

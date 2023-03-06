@@ -99,7 +99,6 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorAccount"
                     <localPage:ComboBoxColumnClient x:Name="InvoiceInXML" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PricesInclVat" Width="60"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CrmGroup" Width="100" />
-
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Interests" Binding="{Binding Path=Interests, Mode=TwoWay, Converter={StaticResource ListToStringConverter}}" Width="100" >
                         <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                             <DataTemplate>
@@ -123,7 +122,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorAccount"
                             </DataTemplate>
                         </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                     </localPage:CorasauDataGridTemplateColumnClient>
-
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="TransType" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PostingAccount" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Payment" Width="50"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PaymentFormat" Visible="False"/>

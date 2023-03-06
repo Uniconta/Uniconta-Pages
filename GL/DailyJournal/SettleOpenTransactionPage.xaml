@@ -49,7 +49,7 @@ x:Class="UnicontaClient.Pages.CustomPage.SettleOpenTransactionPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="Date" Width="90"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="DueDate" Width="90"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Text" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Invoice" AllowThousandMask="false" Width="60"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Invoice" Width="70"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Amount" Width="90"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="AmountOpen" Width="90"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="AmountCur" Width="90"/>
@@ -59,23 +59,25 @@ x:Class="UnicontaClient.Pages.CustomPage.SettleOpenTransactionPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="Comment" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="OnHold" Width="50"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Paid" Width="50"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="OrderNumber" Width="80"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="TransType" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="NumberSerie" Visible="False" Width="60"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="VoucherX" Visible="False" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Voucher" AllowThousandMask="false" Width="60"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="PaymentMethod" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="PaymentId" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Payment"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Voucher"  Width="60"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="YourRef" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PaymentMethod" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PaymentId" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Payment" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="CashDiscount"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="CashDiscountDate" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="LastInterest"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="LastCollectionLetter"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="CollectionsLetters"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Debit"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Credit" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="LastInterest" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="LastCollectionLetter" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="CollectionsLetters" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Debit" Visible="False" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Credit" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="DebitCur" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="CreditCur" Visible="False"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="JournalPostedId" AllowThousandMask="false" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="JournalPostedId" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Open" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Name" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Account" Visible="False"/>

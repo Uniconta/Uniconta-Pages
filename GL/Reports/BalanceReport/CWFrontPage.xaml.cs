@@ -21,6 +21,7 @@ namespace UnicontaClient.Pages.CustomPage
 {
     public partial class CWFrontPage : ChildWindow
     {
+        public string FrontPageText2 { get; set; }
         public string FrontPageText { get; set; }
         public string FrontPageReport { get; set; }
 
@@ -129,9 +130,10 @@ namespace UnicontaClient.Pages.CustomPage
 
         private CrudAPI Api;
         private BalanceFrontPageReportDataClient reportDataClient;
-        public CWFrontPage(CrudAPI api, string title, string text, string report, BalanceFrontPageReportDataClient balanceFrontPageReportData)
+        public CWFrontPage(CrudAPI api, string title, string text, string text2, string report, BalanceFrontPageReportDataClient balanceFrontPageReportData)
         {
             FrontPageText = text;
+            FrontPageText2 = text2;
             FrontPageReport = report;
             reportDataClient = balanceFrontPageReportData;
             this.DataContext = this;

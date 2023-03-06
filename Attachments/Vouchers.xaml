@@ -75,7 +75,20 @@ x:Class="UnicontaClient.Pages.CustomPage.Vouchers"
                                 </DataTemplate>
                             </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                         </localPage:CorasauDataGridTemplateColumnClient>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="PrimaryKeyId" Width="70" AllowEditing="False" />
+                        <localPage:CorasauDataGridTemplateColumnClient x:Name="PrimaryKeyId" Width="70" AllowEditing="False">
+                            <localPage:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Margin="5,0,0,0" TextDecorations="Underline" Cursor="Hand" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.PrimaryKeyId,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" PreviewMouseDown="PrimaryKeyId_PreviewMouseDown"></TextBlock>
+                                        <TextBlock Grid.Column="1"></TextBlock>
+                                    </Grid>
+                                </DataTemplate>
+                            </localPage:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Created" ShowTime="True" AllowEditing="False" Width="110">
                             <localPage:CorasauDataGridTemplateColumnClient.EditSettings>
                                 <editor:TextEditSettings DisplayFormat="g" MaskType="DateTime" />

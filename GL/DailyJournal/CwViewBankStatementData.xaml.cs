@@ -329,7 +329,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (customDataColumnSource == null || customDataColumnSource.Count == 0 || bankImportFormat == null)
             {
-                DialogResult = true;
+                SetDialogResult(true);
                 return;
             }
             var bankformatPositionProps = UtilFunctions.GetDisplayAttributeNonReadOnlyPropertiesFromType(bankImportFormat.GetType(), true);
@@ -381,12 +381,12 @@ namespace UnicontaClient.Pages.CustomPage
                 }
             }
 
-            DialogResult = true;
+            SetDialogResult(true);
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            DialogResult = false;
+            SetDialogResult(false);
         }
     }
 

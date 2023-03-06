@@ -37,26 +37,20 @@ namespace UnicontaClient.Pages.CustomPage
     {
         public override string NameOfControl { get { return TabControls.PrCategoryPage; } }
 
-        public PrCategoryPage(BaseAPI API) : base(API, string.Empty)
-        {
-            Init();
-        }
+        public PrCategoryPage(BaseAPI API) : this(API, string.Empty) { }
         public PrCategoryPage(BaseAPI api, string lookupKey)
             : base(api, lookupKey)
         {
-            Init();
-        }
-        void Init()
-        {
             InitializeComponent();
-            dgProjectCategoryGrid.api = api;
+            dgProjectCategoryGrid.api = this.api;
             SetRibbonControl(localMenu, dgProjectCategoryGrid);
             dgProjectCategoryGrid.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
         }
+
         private void localMenu_OnItemClicked(string ActionType)
         {
-            PrCategoryClient selectedItem = dgProjectCategoryGrid.SelectedItem as PrCategoryClient;
+            //PrCategoryClient selectedItem = dgProjectCategoryGrid.SelectedItem as PrCategoryClient;
             switch (ActionType)
             {
                 case "AddRow":
@@ -75,6 +69,11 @@ namespace UnicontaClient.Pages.CustomPage
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
+        }
+
+        protected override void LoadCacheInBackGround()
+        {
+            LoadType(typeof(Uniconta.DataModel.GLAccount));
         }
     }
 }

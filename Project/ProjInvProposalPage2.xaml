@@ -82,10 +82,23 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjInvProposalPage2"
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="DueDate" x:Name="liDueDate">
                             <CorasauControls:DateEditor x:Name="deDueDate" DateTime="{Binding DueDate,Mode=TwoWay}"/>
-
                         </CorasauControls:CorasauLayoutItem>
+
+                        <CorasauControls:CorasauLayoutItem x:Name="shipmentItem" FieldName="Shipment">
+                            <CorasauControls:LookupEditor x:Name="leShipment" EditValue="{Binding Shipment,Mode=TwoWay}">
+                            </CorasauControls:LookupEditor>
+                        </CorasauControls:CorasauLayoutItem>
+
+                        <CorasauControls:CorasauLayoutItem FieldName="DeliveryTerm" x:Name="liDeliveryTerm" Visibility="{Binding ElementName=shipmentItem, Path=Visibility}">
+                            <CorasauControls:LookupEditor x:Name="leDeliveryTerm" EditValue="{Binding DeliveryTerm,Mode=TwoWay}">
+                            </CorasauControls:LookupEditor>
+                        </CorasauControls:CorasauLayoutItem>
+
                         <CorasauControls:CorasauLayoutItem FieldName="Employee" x:Name="liEmployee">
                             <CorasauControls:LookupEditor x:Name="Employeelookupeditor" Text="{Binding Employee,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="Currency" x:Name="liCurrency">
+                            <CorasauControls:ComboBoxEditor x:Name="cmbCurrency" SelectedItem="{Binding Currency,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="Settlements" x:Name="liSettlements">
                             <CorasauControls:IntegerEditor EditValue="{Binding Settlements,Mode=TwoWay}" SetMask="False"/>

@@ -82,9 +82,9 @@ namespace UnicontaClient.Pages.CustomPage
             SetMenuItem();
         }
 
-        async void LoadJournals()
+        void LoadJournals()
         {
-            await TransactionReport.SetDailyJournal(cmbJournal, api);
+            TransactionReport.SetDailyJournal(cmbJournal, api);
         }
 
         private void DgVatReport_RowDoubleClick()
@@ -107,7 +107,10 @@ namespace UnicontaClient.Pages.CustomPage
             if (country != CountryCode.Estonia)
                 UtilDisplay.RemoveMenuCommand(rb, "VatReportEstonia");
             if (country != CountryCode.UnitedKingdom)
+            {
                 UtilDisplay.RemoveMenuCommand(rb, "VatReportUnitedKingdom");
+                UtilDisplay.RemoveMenuCommand(rb, "UKVatReturn");
+            }
             if (country != CountryCode.Norway)
                 UtilDisplay.RemoveMenuCommand(rb, "VatReportNorway");
             else
@@ -190,6 +193,16 @@ namespace UnicontaClient.Pages.CustomPage
                 case "VatReportIceland":
                     if (vatReportSum != null)
                         AddDockItem(TabControls.VatReportIceland, new object[] { vatReportSum, fromDate, toDate }, "VAT statement", null, closeIfOpened: true);
+                    break;
+                case "UKVatReturn":
+                    string vrn = api.CompanyEntity._Id;
+                    if (string.IsNullOrWhiteSpace(vrn))
+                    {
+                        var msg = " VAT number has not been found. Please check your company setup before continuing.";
+                        UnicontaMessageBox.Show(msg, Uniconta.ClientTools.Localization.lookup("Information"));
+                        return;
+                    }
+                    AddDockItem(TabControls.AccountSelectionView, new object[] { vrn }, Uniconta.ClientTools.Localization.lookup("UKVatReturn"), null, closeIfOpened: true);
                     break;
                 case "Search":
                     LoadVatReport();
@@ -318,7 +331,10 @@ namespace UnicontaClient.Pages.CustomPage
 
                 v.AccountNumber = acStr;
                 v.Account = Account;
-                v.AccountIsVat = Account._SystemAccount == (byte)SystemAccountTypes.SalesTaxPayable || Account._SystemAccount == (byte)SystemAccountTypes.SalesTaxReceiveable ? (byte)1 : (byte)0;
+                v.AccountIsVat = Account._SystemAccount == (byte)SystemAccountTypes.SalesTaxPayable || 
+                    Account._SystemAccount == (byte)SystemAccountTypes.SalesTaxReceiveable ||
+                    Account._SystemAccount == (byte)SystemAccountTypes.ManuallyReceivableVAT ||
+                    Account._SystemAccount == (byte)SystemAccountTypes.ManuallyPayableVAT ? (byte)1 : (byte)0;
 
                 if (Vat._Account == acStr || Vat._OffsetAccount == acStr)
                 {
@@ -387,17 +403,22 @@ namespace UnicontaClient.Pages.CustomPage
                 }
             }
 
-            foreach (var acc in (GLAccount[])accounts.GetNotNullArray)
+            var arr = (GLAccount[])accounts.GetNotNullArray;
+            for (i = 0; (i < arr.Length); i++)
             {
-                if (acc._Vat != null)
+                Account = arr[i];
+                if (Account._Vat != null)
                 {
-                    Vat = (GLVat)vats.Get(acc._Vat);
+                    Vat = (GLVat)vats.Get(Account._Vat);
                     if (Vat == null)
                         continue;
                     if (countrySelected != 0 && countrySelected != (Vat._VatCountry != 0 ? Vat._VatCountry : country))
                         continue;
-                    AccsFound.Add(acc.RowId);
+                    AccsFound.Add(Account.RowId);
                 }
+                else if (Account._SystemAccount == (byte)SystemAccountTypes.ManuallyReceivableVAT ||
+                        Account._SystemAccount == (byte)SystemAccountTypes.ManuallyPayableVAT)
+                    AccsFound.Add(Account.RowId);
             }
 
             List<int> AccLst = AccsFound.ToList();
@@ -458,18 +479,26 @@ namespace UnicontaClient.Pages.CustomPage
                     if (!AccsFound.Contains(AccTotal.RowId) && (AccTotal._Debit - AccTotal._Credit) != 0)
                     {
                         Account = (GLAccount)accounts.Get(AccTotal.RowId);
-                        if (Account?._Vat == null)
-                            continue;
-                        Vat = (GLVat)vats.Get(Account._Vat);
-                        if (Vat == null)
-                            continue;
+                        if (Account != null)
+                        {
+                            Vat = (GLVat)vats.Get(Account._Vat);
+                            if (Vat != null)
+                            {
+                                vDif = new VatReportLine() { VatType = (byte)Vat._VatType };
+                            }
+                            else if (Account._SystemAccount == (byte)SystemAccountTypes.ManuallyReceivableVAT ||
+                                     Account._SystemAccount == (byte)SystemAccountTypes.ManuallyPayableVAT)
+                            {
+                                vDif = new VatReportLine() { AccountIsVat = 1, VatType = Account._SystemAccount == (byte)SystemAccountTypes.ManuallyReceivableVAT ? (byte)1 : (byte)0 };
+                            }
+                            else
+                                continue;
 
-                        vDif = new VatReportLine();
-                        vDif.AmountWithout = (AccTotal._Debit - AccTotal._Credit) / 100d;
-                        vDif.Account = Account;
-                        vDif.AccountNumber = Account._Account;
-                        vDif.VatType = (byte)Vat._VatType;
-                        lst.Add(vDif);
+                            vDif.AmountWithout = (AccTotal._Debit - AccTotal._Credit) / 100d;
+                            vDif.Account = Account;
+                            vDif.AccountNumber = Account._Account;
+                            lst.Add(vDif);
+                        }
                     }
                 }
             }
@@ -689,7 +718,9 @@ namespace UnicontaClient.Pages.CustomPage
                 AccLst.Clear();
                 foreach (var acc in (GLAccount[])accounts.GetNotNullArray)
                 {
-                    if (acc._SystemAccount == (byte)SystemAccountTypes.OtherTax)
+                    if (acc._SystemAccount == (byte)SystemAccountTypes.OtherTax ||
+                        (acc._SystemAccount >= (byte)SystemAccountTypes.OilDuty &&
+                         acc._SystemAccount <= (byte)SystemAccountTypes.WaterDuty))
                         AccLst.Add(acc.RowId);
                 }
                 if (AccLst != null && AccLst.Count > 0)

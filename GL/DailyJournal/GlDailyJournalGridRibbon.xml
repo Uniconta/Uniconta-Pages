@@ -50,4 +50,7 @@
   <RibbonItem>
     <RibbonItem Action="AccountActivity" LocalizedNameKey="GLTransLog" ControlName="GLTransLogPage" LargeGlyph="Account-statement_32x32.png"/>
   </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="Iceland_PSPSettlements" LocalizedNameKey="Sækja uppgjör færsluhirðis" LargeGlyph="Settled_Transaction_32x32.png"/>
+  </RibbonItem>
 </root>

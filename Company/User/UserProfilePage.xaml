@@ -17,9 +17,10 @@ x:Class="UnicontaClient.Pages.CustomPage.UserProfilePage"
             <local:UserProfileDataGrid x:Name="dgUserProfile" AutoGenerateColumns="None" Grid.Row="1">
                 <local:UserProfileDataGrid.Columns>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Profile"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Name" Width="300"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Name" Width="250"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="ExcludeList" Width="150" HideHeaderCheck="True"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Disable" Width="150"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Disable" Width="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="UserTasks" IsSmart="True" Width="300" />
                 </local:UserProfileDataGrid.Columns>
             </local:UserProfileDataGrid>
         </Grid>

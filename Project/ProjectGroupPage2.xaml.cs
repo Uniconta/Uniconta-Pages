@@ -70,7 +70,8 @@ namespace UnicontaClient.Pages.CustomPage
             layoutControl = layoutItems;
             leWorkInProgress.api = leWorkInProgressOffset.api = leOutlay.api = leOutlayOffset.api = 
             leMaterials.api = leMaterialsOffset.api = leAutoNumber.api= leAdjustment.api=
-            leAdjustmentOffset.api = leInvoiceAdjustment.api = leInvoiceAdjustmentOffset.api = crudapi;
+            leAdjustmentOffset.api = leInvoiceAdjustment.api = leInvoiceAdjustmentOffset.api =
+            leReversedWIP.api = leReversedWIPOffset.api = crudapi;
             cbUseCostInWIP.ItemsSource = AppEnums.WIPValue.Values;
 
             if (editrow == null && LoadedRow == null)

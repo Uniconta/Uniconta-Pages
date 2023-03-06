@@ -33,13 +33,11 @@ using DevExpress.Data;
 using Uniconta.Common.Utility;
 
 
-#if !SILVERLIGHT
 using ubl_norway_uniconta;
 using FromXSDFile.OIOUBL.ExportImport;
 using Microsoft.Win32;
 using UBL.Iceland;
-using UnicontaClient.Pages;
-#endif
+using Uniconta.API.System;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -57,7 +55,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (cache != null)
                 {
                     foreach (var rec in (IEnumerable<DCInvoice>)Arr)
-                        DebtorOrders.SetDeliveryAdress(rec, (DCAccount)cache.Get(rec._DCAccount), api);
+                        UtilCommon.SetDeliveryAdress(rec, (DCAccount)cache.Get(rec._DCAccount), api);
                 }
             }
         }
@@ -151,36 +149,28 @@ namespace UnicontaClient.Pages.CustomPage
             RibbonBase rb = (RibbonBase)localMenu.DataContext;
             if (!Comp.Order && !Comp.Purchase)
                 UtilDisplay.RemoveMenuCommand(rb, "CreateOrder");
-#if SILVERLIGHT
-            UtilDisplay.RemoveMenuCommand(rb, "GenerateOioXml");
-#endif
             dgInvoicesGrid.CustomSummary += dgInvoicesGrid_CustomSummary;
         }
 
-#if !SILVERLIGHT
         public override bool IsDataChaged { get { return IsGeneratingDocument; } }
-#endif
 
-        double sumMargin, sumSales, sumMarginRatio;
+        double sumCost, sumSales;
         private void dgInvoicesGrid_CustomSummary(object sender, DevExpress.Data.CustomSummaryEventArgs e)
         {
             var fieldName = ((GridSummaryItem)e.Item).FieldName;
             switch (e.SummaryProcess)
             {
                 case CustomSummaryProcess.Start:
-                    sumMargin = sumSales = 0d;
+                    sumCost = sumSales = 0d;
                     break;
                 case CustomSummaryProcess.Calculate:
                     var row = e.Row as DebtorInvoiceClient;
-                    sumSales += row.SalesValue;
-                    sumMargin += row.Margin;
+                    sumSales += row._NetAmountCur;
+                    sumCost += row._CostValue;
                     break;
                 case CustomSummaryProcess.Finalize:
                     if (fieldName == "MarginRatio" && sumSales > 0)
-                    {
-                        sumMarginRatio = 100 * sumMargin / sumSales;
-                        e.TotalValue = sumMarginRatio;
-                    }
+                        e.TotalValue = 100d * (sumSales - sumCost) / sumSales;
                     break;
             }
         }
@@ -207,6 +197,9 @@ namespace UnicontaClient.Pages.CustomPage
                 DeliveryZipCode.Visible = false;
                 DeliveryCity.Visible = false;
                 DeliveryCountry.Visible = false;
+                DeliveryContactPerson.Visible = false;
+                DeliveryPhone.Visible = false;
+                DeliveryContactEmail.Visible = false;
             }
         }
 
@@ -276,6 +269,10 @@ namespace UnicontaClient.Pages.CustomPage
                     else
                         ShowDocument(selectedItems, false);
                     break;
+                case "OriginalInvoicePdf":
+                    if (selectedItem != null)
+                        OriginalInvoicePdf(selectedItem, api, busyIndicator);
+                    break;
                 case "Trans":
                     if (selectedItem != null)
                         AddDockItem(TabControls.AccountsTransaction, selectedItem, Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("VoucherTransactions"), selectedItem._Voucher));
@@ -294,9 +291,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                     {
                         CWOrderFromInvoice cwOrderInvoice = new CWOrderFromInvoice(api);
-#if !SILVERLIGHT
                         cwOrderInvoice.DialogTableId = 2000000032;
-#endif
                         cwOrderInvoice.Closed += async delegate
                         {
                             if (cwOrderInvoice.DialogResult == true)
@@ -323,8 +318,6 @@ namespace UnicontaClient.Pages.CustomPage
                         cwOrderInvoice.Show();
                     }
                     break;
-
-#if !SILVERLIGHT
                 case "GenerateOioXml":
                     if (selectedItem != null)
                         GenerateOIOXmlForAll(new[] { selectedItem });
@@ -346,10 +339,6 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         OpenOutLook(selectedItem);
                     break;
-#endif
-                case "RefreshGrid":
-                    InitQuery();
-                    break;
                 case "PostedBy":
                     if (selectedItem != null)
                         JournalPosted(selectedItem);
@@ -358,12 +347,10 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem?.Debtor != null)
                         AddDockItem(TabControls.DCPreviousAddressPage, selectedItem.Debtor, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("PreviousAddresses"), selectedItem.Debtor._Name));
                     break;
-#if !SILVERLIGHT
                 case "DocSendLog":
                     if (selectedItem != null)
                         AddDockItem(TabControls.DocsSendLogGridPage, dgInvoicesGrid.syncEntity);
                     break;
-#endif
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -380,13 +367,11 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-#if !SILVERLIGHT
         StandardPrintReportPage standardViewerPageForDocument;
         bool IsGeneratingDocument;
         DCPreviousAddressClient[] previousAddressLookup;
         DebtorMessagesClient[] messagesLookup;
         bool hasLookups;
-#endif
         async private void ShowDocument(IEnumerable<DebtorInvoiceClient> debtorInvoices, bool isInvoice)
         {
             busyIndicator.IsBusy = true;
@@ -395,12 +380,11 @@ namespace UnicontaClient.Pages.CustomPage
             try
             {
                 var docList = debtorInvoices.ToList();
-#if !SILVERLIGHT
                 var failedPrints = new List<long>();
                 var count = docList.Count;
                 string dockName = null, reportName = null;
                 bool exportAsPdf = false;
-                System.Windows.Forms.FolderBrowserDialog folderDialogSaveInvoice = null;
+                DevExpress.Xpf.Dialogs.DXFolderBrowserDialog folderDialogSaveInvoice = null;
                 hasLookups = false;
                 if (count > 1)
                 {
@@ -426,16 +410,8 @@ namespace UnicontaClient.Pages.CustomPage
                     ribbonControl.DisableButtons(new [] { "ShowInvoice", "ShowPackNote" });
                 }
 
-#elif SILVERLIGHT
-                int top = 200, left = 300;
-                int count = docList.Count;
-
-                if (count > 1)
-                {
-#endif
                 foreach (var debtInvoice in docList)
                 {
-#if !SILVERLIGHT
                     IsGeneratingDocument = true;
                     IPrintReport printReport = isInvoice ? await PrintInvoice(debtInvoice) : await PrintPackNote(debtInvoice);
                     if (printReport?.Report != null)
@@ -451,7 +427,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 {
                                     folderDialogSaveInvoice = UtilDisplay.LoadFolderBrowserDialog;
                                     var dialogResult = folderDialogSaveInvoice.ShowDialog();
-                                    if (dialogResult == System.Windows.Forms.DialogResult.OK || dialogResult == System.Windows.Forms.DialogResult.Yes)
+                                    if (dialogResult == true)
                                         directoryPath = folderDialogSaveInvoice.SelectedPath;
                                 }
                                 else
@@ -490,15 +466,6 @@ namespace UnicontaClient.Pages.CustomPage
                     var failedList = string.Join(",", failedPrints);
                     UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("FailedPrintmsg") + failedList, Uniconta.ClientTools.Localization.lookup("Error"), MessageBoxButton.OK);
                 }
-#elif SILVERLIGHT
-                        DefaultPrint(debtInvoice, true, new Point(top, left));
-                        left = left - left / count;
-                        top = top - top / count;
-                    }
-                }
-                else
-                    DefaultPrint(debtorInvoices.First());
-#endif
             }
             catch (Exception ex)
             {
@@ -508,7 +475,16 @@ namespace UnicontaClient.Pages.CustomPage
             finally { busyIndicator.IsBusy = false; }
         }
 
-#if !SILVERLIGHT
+        async public static void OriginalInvoicePdf(DebtorInvoiceClient debtorInvoice, CrudAPI api, BusyIndicator busyIndicator)
+        {
+            if (busyIndicator != null)
+                busyIndicator.IsBusy = true;
+            var invoicePdf = await new InvoiceAPI(api).GetInvoicePdf(debtorInvoice);
+            if (invoicePdf != null)
+                new CWDocumentViewer(invoicePdf, FileextensionsTypes.PDF).Show();
+            if (busyIndicator != null)
+                busyIndicator.IsBusy = false;
+        }
 
         async private void OpenOutLook(DebtorInvoiceClient invClient)
         {
@@ -637,7 +613,7 @@ namespace UnicontaClient.Pages.CustomPage
             int countErr = 0;
             bool hasUserFolder = false;
             SaveFileDialog saveDialog = null;
-            System.Windows.Forms.FolderBrowserDialog folderBrowserDialog = null;
+            DevExpress.Xpf.Dialogs.DXFolderBrowserDialog folderBrowserDialog = null;
             InvoiceAPI Invapi = new InvoiceAPI(api);
             var cnt = lstInvClient.Count();
             foreach (var invClient in lstInvClient)
@@ -664,7 +640,7 @@ namespace UnicontaClient.Pages.CustomPage
                         }
                 }
 
-                DebtorOrders.SetDeliveryAdress(invClient, debtor, api);
+                UtilCommon.SetDeliveryAdress(invClient, debtor, api);
 
                 Debtor deliveryAccount;
                 if (invClient._DeliveryAccount != null)
@@ -746,7 +722,7 @@ namespace UnicontaClient.Pages.CustomPage
                         {
                             folderBrowserDialog = UtilDisplay.LoadFolderBrowserDialog;
                             var dialogResult = folderBrowserDialog.ShowDialog();
-                            if (dialogResult != System.Windows.Forms.DialogResult.OK)
+                            if (dialogResult != true)
                                 break;
                         }
 
@@ -790,26 +766,6 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-#elif SILVERLIGHT
-        private void DefaultPrint(DebtorInvoiceClient debtorInvoice, bool isPackNote = false)
-        {
-            object[] ob = new object[2];
-            ob[0] = debtorInvoice;
-            ob[1] = isPackNote ? CompanyLayoutType.Packnote : CompanyLayoutType.Invoice;
-            string headerName = isPackNote ? "PackNote" : "Invoice";
-            AddDockItem(TabControls.ProformaInvoice, ob, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup(headerName), debtorInvoice.InvoiceNum));
-        }
-
-        private void DefaultPrint(DebtorInvoiceClient debtorInvoice, bool isFloat, Point position, bool isPackNote = false)
-        {
-            object[] ob = new object[2];
-            ob[0] = debtorInvoice;
-            ob[1] = isPackNote ? CompanyLayoutType.Packnote : CompanyLayoutType.Invoice;
-            string headerName = isPackNote ? "PackNote" : "Invoice";
-            AddDockItem(TabControls.ProformaInvoice, ob, isFloat, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup(headerName), debtorInvoice.InvoiceNum), floatingLoc: position);
-        }
-#endif
-
         private void ShowOrderLines(DCOrder order)
         {
             var confrimationText = string.Format(" {0}. {1}:{2},{3}:{4}\r\n{5}", Uniconta.ClientTools.Localization.lookup("SalesOrderCreated"), Uniconta.ClientTools.Localization.lookup("OrderNumber"), order._OrderNumber,
@@ -838,9 +794,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             int icount = invoiceEmails.Count();
             UnicontaClient.Pages.CWSendInvoice cwSendInvoice = new UnicontaClient.Pages.CWSendInvoice();
-#if !SILVERLIGHT
             cwSendInvoice.DialogTableId = 2000000028;
-#endif
             cwSendInvoice.Closed += async delegate
              {
                  if (cwSendInvoice.DialogResult == true)
@@ -879,7 +833,6 @@ namespace UnicontaClient.Pages.CustomPage
             cwSendInvoice.Show();
         }
 
-#if !SILVERLIGHT
         void SendUBL(IEnumerable<DebtorInvoiceClient> invoiceUBL)
         {
             int icount = invoiceUBL.Count();
@@ -928,7 +881,6 @@ namespace UnicontaClient.Pages.CustomPage
             };
             cwSendUBL.Show();
         }
-#endif
 
         void setDim()
         {
@@ -941,10 +893,8 @@ namespace UnicontaClient.Pages.CustomPage
                 dgInvoicesGrid.UpdateItemSource(argument);
             else if (screenName == TabControls.StandardPrintReportPage)
             {
-#if !SILVERLIGHT
                 IsGeneratingDocument = false;
                 standardViewerPageForDocument = null;
-#endif
             }
         }
     }

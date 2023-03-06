@@ -116,7 +116,7 @@ namespace UnicontaClient.Pages.CustomPage
             return null;
         }
 
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             if (glVatCache == null)
                 glVatCache = await api.LoadCache<Uniconta.DataModel.GLVat>().ConfigureAwait(false);

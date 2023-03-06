@@ -52,9 +52,6 @@ namespace UnicontaClient.Pages.CustomPage
                 case "SaveGrid":
                     dgPrTaskPage.SaveData();
                     break;
-                case "RefreshGrid":
-                    InitQuery();
-                    break;
                 case "Debtors":
                     if (selectedItem != null)
                         AddDockItem(TabControls.DebtorProjTaskGroup, dgPrTaskPage.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("TaskGroups"), selectedItem._Name));

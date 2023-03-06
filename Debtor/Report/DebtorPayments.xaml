@@ -64,13 +64,15 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorPayments"
                     <local:CorasauDataGridTemplateColumnClient x:Name="DueDate" Width="80"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="LastInterest" ReadOnly="True" Width="80"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="LastCollectionLetter" ReadOnly="True" Width="80"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="CollectionsLetters" ReadOnly="True" Width="50"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Code" Width="90"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="LastCollectionsLetterCode" Width="90"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="CollectionsLetters" ReadOnly="True" Visible="False" Width="50"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="FeeAmount" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PaymentCharge" Width="80" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Text" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Invoice" Width="60"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Amount" Width="90"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="AmountOpen" Width="90" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="FeeAmount" Width="80"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="PaymentCharge" Width="80" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="TransType" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="NumberSerie" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="VoucherX"  Visible="False" />
@@ -95,6 +97,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorPayments"
                     <local:CorasauDataGridTemplateColumnClient x:Name="Open" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="DocumentRef" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="FromCreditor" Visible="False" ShowCheckBoxInHeader="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ReferenceNumber" Visible="False" />
                 </local:DebtorPaymentsGrid.Columns>
                 <local:DebtorPaymentsGrid.TotalSummary>
                     <local:SumColumn FieldName="Debit" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>

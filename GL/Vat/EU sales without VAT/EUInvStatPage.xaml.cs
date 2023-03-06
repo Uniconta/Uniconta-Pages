@@ -74,6 +74,8 @@ namespace UnicontaClient.Pages.CustomPage
             FromDate.DateTime = fromDate;
             dgEUInvStatGrid.ShowTotalSummary();
             localMenu.OnItemClicked += localMenu_OnItemClicked;
+            RibbonBase rb = (RibbonBase)localMenu.DataContext;
+            UtilDisplay.RemoveMenuCommand(rb, new string[] { "PerWarehouse", "PerLocation" });
         }
 
         public override Task InitQuery()
@@ -101,16 +103,15 @@ namespace UnicontaClient.Pages.CustomPage
                             itemFilterDialog = new CWServerFilter(api, typeof(EUInvStat), null, null, ItemUserFields);
                         else
                             itemFilterDialog = new CWServerFilter(api, typeof(EUInvStat), null, null, ItemUserFields);
+                        itemFilterDialog.GridSource = dgEUInvStatGrid.ItemsSource as IList<UnicontaBaseEntity>;
                         itemFilterDialog.Closing += itemFilterDialog_Closing;
-#if !SILVERLIGHT
                         itemFilterDialog.Show();
                     }
                     else
+                    {
+                        itemFilterDialog.GridSource = dgEUInvStatGrid.ItemsSource as IList<UnicontaBaseEntity>;
                         itemFilterDialog.Show(true);
-#elif SILVERLIGHT
                     }
-                    itemFilterDialog.Show();
-#endif
                     break;
                 case "ClearItemFilter":
                     itemFilterDialog = null;

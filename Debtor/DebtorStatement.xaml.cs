@@ -35,7 +35,6 @@ using UnicontaClient.Pages;
 using System.Windows.Data;
 using DevExpress.Data.Filtering;
 using Uniconta.Common.Utility;
-using UnicontaClient.Pages;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -214,7 +213,16 @@ namespace UnicontaClient.Pages.CustomPage
                 FromAccount = ToAccount = key;
             }
         }
-
+        public static void SetDefaultDateTime()
+        {
+            if (DefaultFromDate == DateTime.MinValue)
+            {
+                var now = BasePage.GetSystemDefaultDate();
+                DefaultToDate = now;
+                var lastMonth = now.AddMonths(-1);
+                DefaultFromDate = new DateTime(lastMonth.Year, lastMonth.Month, 1);
+            }
+        }
         void Init()
         {
             this.DataContext = this;
@@ -225,12 +233,7 @@ namespace UnicontaClient.Pages.CustomPage
             localMenu.OnItemClicked += LocalMenu_OnItemClicked;
             dgDebtorTrans.OnPrintClick += DgDebtorTrans_OnPrintClick;
 
-            if (DebtorStatement.DefaultFromDate == DateTime.MinValue)
-            {
-                var now = BasePage.GetSystemDefaultDate();
-                DebtorStatement.DefaultToDate = now;
-                DebtorStatement.DefaultFromDate = now.AddDays(1 - now.Day).AddMonths(-2);
-            }
+            SetDefaultDateTime();
             var Pref = api.session.Preference;
             cbxAscending.IsChecked = Pref.Debtor_isAscending;
             cbxSkipBlank.IsChecked = Pref.Debtor_skipBlank;
@@ -328,7 +331,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             var companyClient = api.CompanyEntity.CreateUserType<CompanyClient>();
             StreamingManager.Copy(api.CompanyEntity, companyClient);
-            byte[] getLogoBytes = await UtilDisplay.GetLogo(api);
+            byte[] getLogoBytes = await UtilCommon.GetLogo(api);
             int rowHandle = -1;
             foreach (var db in statementList)
             {
@@ -363,7 +366,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (lastMessage == null || messageLanguage != lan)
                 {
                     messageLanguage = lan;
-                    var msg = await Utility.GetDebtorMessageClient(api, lan, DebtorEmailType.AccountStatement);
+                    var msg = await UtilCommon.GetDebtorMessageClient(api, lan, DebtorEmailType.AccountStatement);
                     if (msg != null)
                         lastMessage = msg._Text;
                     else
@@ -469,7 +472,7 @@ namespace UnicontaClient.Pages.CustomPage
 
 
         Task<SQLCache> accountCacheTask;
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             if (accountCache == null)
             {
@@ -520,11 +523,15 @@ namespace UnicontaClient.Pages.CustomPage
                             debtorFilterDialog = new CWServerFilter(api, typeof(DebtorClient), null, null, DebtorUserFields);
                         else
                             debtorFilterDialog = new CWServerFilter(api, typeof(DebtorClient), null, null, DebtorUserFields);
+                        debtorFilterDialog.GridSource = dgDebtorTrans.ItemsSource as IList<UnicontaBaseEntity>;
                         debtorFilterDialog.Closing += debtorFilterDialog_Closing;
                         debtorFilterDialog.Show();
                     }
                     else
+                    {
+                        debtorFilterDialog.GridSource = dgDebtorTrans.ItemsSource as IList<UnicontaBaseEntity>;
                         debtorFilterDialog.Show(true);
+                    }
                     break;
                 case "ClearDebtorFilter":
                     debtorFilterDialog = null;
@@ -726,73 +733,85 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        bool checkForMarked;
+        bool checkForMarked, running;
         async void DoSendAsEmail(IEnumerable<DebtorStatementList> lstDebtorTransLst, bool SendAll, string fromAccount, string toAccount, string emails, bool onlyThisEmail)
         {
-            var transApi = new ReportAPI(api);
-            DebtorStatement.SetDateTime(txtDateFrm, txtDateTo);
-            DateTime fromDate = DebtorStatement.DefaultFromDate, toDate = DebtorStatement.DefaultToDate;
+            if (running)
+                return;
+            try
+            {
+                running = true;
+                ribbonControl.DisableButtons(new string[] { "SendAsEmail" });
+                var transApi = new ReportAPI(api);
+                DebtorStatement.SetDateTime(txtDateFrm, txtDateTo);
+                DateTime fromDate = DebtorStatement.DefaultFromDate, toDate = DebtorStatement.DefaultToDate;
 
-            if (!SendAll) 
-            {
-                // lets check if we will send all anyway.
-                SendAll = checkForMarked;
-                foreach (var t in lstDebtorTransLst)
+                if (!SendAll)
                 {
-                    if (!t._Mark)
+                    // lets check if we will send all anyway.
+                    SendAll = checkForMarked;
+                    foreach (var t in lstDebtorTransLst)
                     {
-                        SendAll = false;
-                        break;
-                    }
-                }
-            }
-
-            if (SendAll)
-            {
-                var skipBlank = cbxSkipBlank.IsChecked.Value;
-                busyIndicator.IsBusy = true;
-                busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
-                var result = await transApi.DebtorAccountStatement(fromDate, toDate, fromAccount, toAccount, OnlyOpen, null, false, debtorFilterValues, emails, onlyThisEmail, OnlyDue, skipBlank);
-                busyIndicator.IsBusy = false;
-                if (result == ErrorCodes.Succes)
-                    UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("SendEmailMsgOBJ"), Uniconta.ClientTools.Localization.lookup("AccountStatement")),
-                                                  Uniconta.ClientTools.Localization.lookup("Message"), MessageBoxButton.OK);
-                else
-                    UtilDisplay.ShowErrorCode(result);
-            }
-            else
-            {
-                List<string> errorList = new List<string>();
-                busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
-                busyIndicator.IsBusy = true;
-                bool RunInBack = false;
-                foreach (var t in lstDebtorTransLst)
-                {
-                    if (!t._Mark)
-                        continue;
-                    var result = await transApi.DebtorAccountStatement(fromDate, toDate, t.Account, t.Account, OnlyOpen, null, RunInBack, debtorFilterValues, emails, onlyThisEmail);
-                    if (result != ErrorCodes.Succes)
-                    {
-                        string error = string.Format("{0}: {1}", t.Account, Uniconta.ClientTools.Localization.lookup(result.ToString()));
-                        errorList.Add(error);
-                        if (!RunInBack)
+                        if (!t._Mark)
+                        {
+                            SendAll = false;
                             break;
+                        }
                     }
-                    RunInBack = true;
-                    emails = null;
                 }
-                busyIndicator.IsBusy = false;
 
-                if (errorList.Count > 0)
+                if (SendAll)
                 {
-                    CWErrorBox errorDialog = new CWErrorBox(errorList.ToArray(), true);
-                    errorDialog.Show();
+                    var skipBlank = cbxSkipBlank.IsChecked.Value;
+                    busyIndicator.IsBusy = true;
+                    busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
+                    var result = await transApi.DebtorAccountStatement(fromDate, toDate, fromAccount, toAccount, OnlyOpen, null, false, debtorFilterValues, emails, onlyThisEmail, OnlyDue, skipBlank);
+                    busyIndicator.IsBusy = false;
+                    if (result == ErrorCodes.Succes)
+                        UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("SendEmailMsgOBJ"), Uniconta.ClientTools.Localization.lookup("AccountStatement")),
+                                                      Uniconta.ClientTools.Localization.lookup("Message"), MessageBoxButton.OK);
+                    else
+                        UtilDisplay.ShowErrorCode(result);
                 }
-                else if (RunInBack)
-                    UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("SendEmailMsgOBJ"), Uniconta.ClientTools.Localization.lookup("AccountStatement")),
-                                                  Uniconta.ClientTools.Localization.lookup("Message"), MessageBoxButton.OK);
                 else
-                    UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("zeroRecords"), Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OK);
+                {
+                    List<string> errorList = new List<string>();
+                    busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
+                    busyIndicator.IsBusy = true;
+                    bool RunInBack = false;
+                    foreach (var t in lstDebtorTransLst.ToList())
+                    {
+                        if (!t._Mark)
+                            continue;
+                        var result = await transApi.DebtorAccountStatement(fromDate, toDate, t.Account, t.Account, OnlyOpen, null, RunInBack, debtorFilterValues, emails, onlyThisEmail);
+                        if (result != ErrorCodes.Succes)
+                        {
+                            string error = string.Format("{0}: {1}", t.Account, Uniconta.ClientTools.Localization.lookup(result.ToString()));
+                            errorList.Add(error);
+                            if (!RunInBack)
+                                break;
+                        }
+                        RunInBack = true;
+                        emails = null;
+                    }
+                    busyIndicator.IsBusy = false;
+
+                    if (errorList.Count > 0)
+                    {
+                        CWErrorBox errorDialog = new CWErrorBox(errorList.ToArray(), true);
+                        errorDialog.Show();
+                    }
+                    else if (RunInBack)
+                        UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("SendEmailMsgOBJ"), Uniconta.ClientTools.Localization.lookup("AccountStatement")),
+                                                      Uniconta.ClientTools.Localization.lookup("Message"), MessageBoxButton.OK);
+                    else
+                        UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("zeroRecords"), Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OK);
+                }
+            }
+            finally 
+            { 
+                running = false;
+                ribbonControl.EnableButtons(new string[] { "SendAsEmail" });
             }
         }
 
@@ -871,11 +890,9 @@ namespace UnicontaClient.Pages.CustomPage
 
             dgDebtorTrans.Visibility = Visibility.Visible;
             busyIndicator.IsBusy = false;
-
-            if (_master != null)
-                SetExpandAndCollapse(false);
-            else
-                SetExpandAndCollapse(IsCollapsed);
+            if (fromAccount == toAccount || _master != null)
+                IsCollapsed = false;
+            SetExpandAndCollapse(IsCollapsed);
         }
 
         void FillStatement(DebtorTransClientTotal[] listTrans, bool OnlyOpen, DateTime toDate)
@@ -948,12 +965,11 @@ namespace UnicontaClient.Pages.CustomPage
             }
 
             dataRowCount = statementList.Count;
+            dgDebtorTrans.ItemsSource = null;
             if (dataRowCount > 0)
             {
                 if (statementList.Count == 1)
                     statementList[0].Mark = true;
-
-                dgDebtorTrans.ItemsSource = null;
                 dgDebtorTrans.ItemsSource = statementList;
             }
         }

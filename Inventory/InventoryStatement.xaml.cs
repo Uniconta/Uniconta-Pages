@@ -55,7 +55,7 @@ namespace UnicontaClient.Pages.CustomPage
 #if !SILVERLIGHT
             ((CustomTableView)View).HasPageBreak = PageBreak;
 #endif
-            base.PrintGrid(reportName, printparam, format, page, false);
+            base.PrintGrid(reportName, printparam, format, page);
         }
     }
 
@@ -246,6 +246,8 @@ namespace UnicontaClient.Pages.CustomPage
             }
             dgInvTran.Visibility = Visibility.Visible;
             busyIndicator.IsBusy = false;
+            if (fromItem == toItem)
+                setExpandAndCollapse(false);
         }
 
         void FillStatement(InvTransClientTotal[] listtran)
@@ -313,20 +315,18 @@ namespace UnicontaClient.Pages.CustomPage
             }
 
             dataRowCount = statementList.Count;
+            dgInvTran.ItemsSource = null;
             if (dataRowCount > 0)
             {
-                dgInvTran.ItemsSource = null;
                 dgInvTran.ItemsSource = statementList;
             }
         }
 
-        protected async override void LoadCacheInBackGround()
+        protected override async Task LoadCacheInBackGroundAsync()
         {
             var api = this.api;
             var Comp = api.CompanyEntity;
-            ItemCache = Comp.GetCache(typeof(Uniconta.DataModel.InvItem));
-            if (ItemCache == null)
-                ItemCache = await Comp.LoadCache(typeof(Uniconta.DataModel.InvItem), api).ConfigureAwait(false);
+            ItemCache = Comp.GetCache(typeof(Uniconta.DataModel.InvItem)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.InvItem), api).ConfigureAwait(false);
 
             LoadType(new Type[] { typeof(Uniconta.DataModel.Debtor), typeof(Uniconta.DataModel.Creditor) });
         }

@@ -113,11 +113,15 @@ namespace UnicontaClient.Pages.CustomPage
                             filterDialog = new CWServerFilter(api, typeof(GLTransSumClient), null, null, UserFields);
                         else
                             filterDialog = new CWServerFilter(api, typeof(GLTransSumClient), null, null, UserFields);
+                        filterDialog.GridSource = pivotDgGLTransSum.DataSource as IList<UnicontaBaseEntity>;
                         filterDialog.Closing += filterDialog_Closing;
                         filterDialog.Show();
                     }
                     else
+                    {
+                        filterDialog.GridSource = pivotDgGLTransSum.DataSource as IList<UnicontaBaseEntity>;
                         filterDialog.Show(true);
+                    }
                     break;
                 case "ClearLocalFilter":
                     filterDialog = null;

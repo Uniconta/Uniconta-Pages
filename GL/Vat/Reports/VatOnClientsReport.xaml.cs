@@ -96,16 +96,15 @@ namespace UnicontaClient.Pages.CustomPage
                             filterDialog = new CWServerFilter(api, typeof(GLTransDCSumClient), null, null);
                         else
                             filterDialog = new CWServerFilter(api, typeof(GLTransDCSumClient), null, null);
+                        filterDialog.GridSource = dgVatOnClients.ItemsSource as IList<UnicontaBaseEntity>;
                         filterDialog.Closing += itemFilterDialog_Closing;
-#if !SILVERLIGHT
                         filterDialog.Show();
                     }
                     else
+                    {
+                        filterDialog.GridSource = dgVatOnClients.ItemsSource as IList<UnicontaBaseEntity>;
                         filterDialog.Show(true);
-#elif SILVERLIGHT
                     }
-                    filterDialog.Show();
-#endif
                     break;
 
                 case "ClearItemFilter":

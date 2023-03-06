@@ -118,26 +118,23 @@ namespace UnicontaClient.Pages.CustomPage
             dgDebtorOrdersGrid.CustomSummary += dgDebtorOrdersGrid_CustomSummary;
         }
 
-        double sumMargin, sumSales, sumMarginRatio;
+        double sumCost, sumSales;
         private void dgDebtorOrdersGrid_CustomSummary(object sender, DevExpress.Data.CustomSummaryEventArgs e)
         {
             var fieldName = ((GridSummaryItem)e.Item).FieldName;
             switch (e.SummaryProcess)
             {
                 case CustomSummaryProcess.Start:
-                    sumMargin = sumSales = 0d;
+                    sumCost = sumSales = 0d;
                     break;
                 case CustomSummaryProcess.Calculate:
                     var row = e.Row as DebtorOrderClient;
-                    sumSales += row.SalesValue;
-                    sumMargin += row.Margin;
+                    sumSales += !row._PricesInclVat ? row.SalesValue : row.SalesExVat(row.SalesValue);
+                    sumCost += row.CostValue;
                     break;
                 case CustomSummaryProcess.Finalize:
                     if (fieldName == "MarginRatio" && sumSales > 0)
-                    {
-                        sumMarginRatio = 100 * sumMargin / sumSales;
-                        e.TotalValue = sumMarginRatio;
-                    }
+                        e.TotalValue = Math.Round((sumSales - sumCost) * 100d / sumSales, 2);
                     break;
             }
         }
@@ -158,6 +155,9 @@ namespace UnicontaClient.Pages.CustomPage
                 DeliveryZipCode.Visible = false;
                 DeliveryCity.Visible = false;
                 DeliveryCountry.Visible = false;
+                DeliveryContactPerson.Visible = false;
+                DeliveryPhone.Visible = false;
+                DeliveryContactEmail.Visible = false;
             }
             dgDebtorOrdersGrid.Readonly = true;
             if (!Comp.ApproveSalesOrders)
@@ -179,7 +179,10 @@ namespace UnicontaClient.Pages.CustomPage
         {
             localMenu_OnItemClicked("OrderLine");
         }
-
+        private void Name_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            dgDebtorOrdersGrid_RowDoubleClick();
+        }
         private void localMenu_OnItemClicked(string ActionType)
         {
             string header;
@@ -605,105 +608,6 @@ namespace UnicontaClient.Pages.CustomPage
             cwPickingList.Show();
         }
 
-        static public void SetGLNnumber(DCInvoice InvClient, DCAccount client, QueryAPI api)
-        {
-            var installation = (WorkInstallation)api.GetCache(typeof(WorkInstallation))?.Get(InvClient._Installation);
-            var dctype = InvClient.__DCType();
-            var dccache = api.GetCache((dctype == 2 || dctype == 9) ? typeof(Uniconta.DataModel.Creditor) : typeof(Uniconta.DataModel.Debtor));
-            var debtor = client ?? (DCAccount)dccache?.Get(InvClient._DCAccount);
-            var contact = (Contact)api.GetCache(typeof(Contact))?.Get(InvClient._ContactRef);
-
-            InvClient._EAN = installation?._GLN ?? contact?._EAN ?? debtor?._EAN;
-        }
-
-        static public void SetDeliveryAdress(DCInvoice InvClient, DCAccount client, QueryAPI api)
-        {
-            SetGLNnumber(InvClient, client, api);
-
-            if (InvClient._DeliveryAddress1 != null)
-                return;
-
-            if (InvClient._Installation != null)
-            {
-                var wInsCache = api.GetCache(typeof(WorkInstallation)) ?? api.LoadCache(typeof(WorkInstallation)).GetAwaiter().GetResult();
-                var installation = (WorkInstallation)wInsCache.Get(InvClient._Installation);
-                if (installation == null)
-                {
-                    wInsCache = api.LoadCache(typeof(WorkInstallation), true).GetAwaiter().GetResult();
-                    installation = (WorkInstallation)wInsCache.Get(InvClient._Installation);
-                }
-                if (installation != null)
-                {
-                    InvClient._DeliveryName = installation._Name;
-                    InvClient._DeliveryAddress1 = installation._Address1;
-                    InvClient._DeliveryAddress2 = installation._Address2;
-                    InvClient._DeliveryAddress3 = installation._Address3;
-                    InvClient._DeliveryZipCode = installation._ZipCode;
-                    InvClient._DeliveryCity = installation._City;
-                    if (api.CompanyEntity._Country != (byte)installation._Country)
-                        InvClient._DeliveryCountry = installation._Country;
-                }
-            }
-            else
-            {
-                DCAccount deb = null;
-                string ac;
-                bool UseDebAddress;
-                if (InvClient._DeliveryAccount != null)
-                {
-                    ac = InvClient._DeliveryAccount;
-                    UseDebAddress = true;
-                }
-                else
-                {
-                    UseDebAddress = false;
-                    if (client != null)
-                    {
-                        deb = client;
-                        ac = null;
-                    }
-                    else
-                        ac = InvClient._DCAccount;
-                }
-                if (ac != null)
-                {
-                    var dctype = InvClient.__DCType();
-                    var t = (dctype == 2 || dctype == 9) ? typeof(Uniconta.DataModel.Creditor) : typeof(Uniconta.DataModel.Debtor);
-                    var dcCache = api.GetCache(t) ?? api.LoadCache(t).GetAwaiter().GetResult();
-                    deb = (DCAccount)dcCache.Get(ac);
-                    if (deb == null)
-                    {
-                        dcCache = api.LoadCache(t, true).GetAwaiter().GetResult();
-                        deb = (DCAccount)dcCache.Get(ac);
-                    }
-                }
-                if (deb != null)
-                {
-                    if (deb._DeliveryAddress1 != null)
-                    {
-                        InvClient._DeliveryName = deb._DeliveryName;
-                        InvClient._DeliveryAddress1 = deb._DeliveryAddress1;
-                        InvClient._DeliveryAddress2 = deb._DeliveryAddress2;
-                        InvClient._DeliveryAddress3 = deb._DeliveryAddress3;
-                        InvClient._DeliveryZipCode = deb._DeliveryZipCode;
-                        InvClient._DeliveryCity = deb._DeliveryCity;
-                        InvClient._DeliveryCountry = deb._DeliveryCountry;
-                    }
-                    else if (UseDebAddress)
-                    {
-                        InvClient._DeliveryName = deb._Name;
-                        InvClient._DeliveryAddress1 = deb._Address1;
-                        InvClient._DeliveryAddress2 = deb._Address2;
-                        InvClient._DeliveryAddress3 = deb._Address3;
-                        InvClient._DeliveryZipCode = deb._ZipCode;
-                        InvClient._DeliveryCity = deb._City;
-                        if (api.CompanyEntity._Country != (byte)deb._Country)
-                            InvClient._DeliveryCountry = deb._Country;
-                    }
-                }
-            }
-        }
-
         public override async void Utility_Refresh(string screenName, object argument = null)
         {
             if (screenName == TabControls.DebtorOrdersPage2)
@@ -910,7 +814,7 @@ namespace UnicontaClient.Pages.CustomPage
                     }
             }
 
-            DebtorOrders.SetDeliveryAdress(invClient, debtor, api);
+            UtilCommon.SetDeliveryAdress(invClient, debtor, api);
 
             Debtor deliveryAccount;
             if (invClient._DeliveryAccount != null)

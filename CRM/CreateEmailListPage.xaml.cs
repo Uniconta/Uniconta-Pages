@@ -213,11 +213,15 @@ namespace UnicontaClient.Pages.CustomPage
                             debtorFilterDialog = new CWServerFilter(api, typeof(DebtorClient), null, debtorDefaultSort, DebtorUserFields);
                         else
                             debtorFilterDialog = new CWServerFilter(api, typeof(DebtorClient), debtorDefaultFilters, debtorDefaultSort, DebtorUserFields);
+                        debtorFilterDialog.GridSource = dgCreateEmailList.ItemsSource as IList<UnicontaBaseEntity>;
                         debtorFilterDialog.Closing += debtorFilterDialog_Closing;
                         debtorFilterDialog.Show();
                     }
                     else
+                    {
+                        debtorFilterDialog.GridSource = dgCreateEmailList.ItemsSource as IList<UnicontaBaseEntity>;
                         debtorFilterDialog.Show(true);
+                    }
                     break;
 
                 case "ClearDebtorFilter":
@@ -311,11 +315,15 @@ namespace UnicontaClient.Pages.CustomPage
                             invTransFilterDialog = new CWServerFilter(api, typeof(InvTransClient), null, invTransDefaultSort, null);
                         else
                             invTransFilterDialog = new CWServerFilter(api, typeof(InvTransClient), invTransDefaultFilters, invTransDefaultSort, null);
+                        invTransFilterDialog.GridSource = dgCreateEmailList.ItemsSource as IList<UnicontaBaseEntity>;
                         invTransFilterDialog.Closing += invTransFilterDialog_Closing;
                         invTransFilterDialog.Show();
                     }
                     else
+                    {
+                        invTransFilterDialog.GridSource = dgCreateEmailList.ItemsSource as IList<UnicontaBaseEntity>;
                         invTransFilterDialog.Show(true);
+                    }
                     break;
                 case "ClearInvTransFilter":
                     invTransFilterDialog = null;

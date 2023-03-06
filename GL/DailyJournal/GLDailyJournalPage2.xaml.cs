@@ -164,7 +164,7 @@ namespace UnicontaClient.Pages.CustomPage
             SetOffsetAccountSource();
         }
 
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             var Cache = api.GetCache(typeof(Uniconta.DataModel.NumberSerie)) ?? await api.LoadCache(typeof(Uniconta.DataModel.NumberSerie)).ConfigureAwait(false);
             var numbers = new NumberSerieSQLCacheFilter(Cache, false);

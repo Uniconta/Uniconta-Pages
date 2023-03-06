@@ -99,12 +99,11 @@ x:Class="UnicontaClient.Pages.CustomPage.SimulatedTransactions"
                         </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                     </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Total" Width="90" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Origin" Width="100" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Amount" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Correction" Width="50" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="HasVoucher" Width="50" Visible="False" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Accrual" Width="50" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Accrued" Width="50" Visible="False" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Allocation" Width="50" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Allocated" Width="50" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="VatEntered" Width="50" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Vat" Width="60" />

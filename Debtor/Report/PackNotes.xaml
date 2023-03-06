@@ -20,14 +20,13 @@ x:Class="UnicontaClient.Pages.CustomPage.PackNotes"
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <local:PackNotesGrid  x:Name="dgPackNotesGrid" AutoGenerateColumns="None">
                 <local:PackNotesGrid.Columns>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="PackNoteNumber" Width="100" /> 
                     <local:CorasauDataGridTemplateColumnClient x:Name="Account" Width="100" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Name" Width="150" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Date" Width="90" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="SendTime" Width="90" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="OrderCreated" Width="90" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="OrderNumber" Width="60" AllowThousandMask="False"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="InvoiceNumber" Width="60" AllowThousandMask="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PackNoteNumber" Width="60" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="NetAmount" Width="100"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="TotalAmount" Width="100"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="CostValue" Visible="False"/>
@@ -70,6 +69,9 @@ x:Class="UnicontaClient.Pages.CustomPage.PackNotes"
                     <local:CorasauDataGridTemplateColumnClient x:Name="DeliveryCity" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="DeliveryCountry" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="DeliveryDate" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DeliveryContactPerson" Visible="False" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DeliveryPhone" Visible="False" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DeliveryContactEmail" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Installation" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="YourRef" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="OurRef" />

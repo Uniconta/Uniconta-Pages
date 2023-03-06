@@ -6,7 +6,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorAccountPage2"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
-    xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+    xmlns:Controls="clr-namespace:UnicontaClient.Controls" 
     xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors"
     xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools" 
     mc:Ignorable="d"
@@ -26,8 +26,11 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorAccountPage2"
                         <CorasauControls:CorasauLayoutItem FieldName="Account" x:Name="liAccount">
                             <CorasauControls:TextEditor Text="{Binding Account,Mode=TwoWay}" x:Name="txtAccount" LostFocus="txtAccount_LostFocus"/>
                         </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="CompanyRegNo" x:Name="liCompanyRegNo">
-                            <CorasauControls:TextEditor Text="{Binding CompanyRegNo,Mode=TwoWay}" x:Name="txtCompanyRegNo"/>
+                    <CorasauControls:CorasauLayoutItem FieldName="CompanyRegNo" x:Name="liCompanyRegNo" Style="{StaticResource LayoutItemsstyle}"  ButtonClicked="liCompanyRegNo_ButtonClicked" Padding="0">
+                        <CorasauControls:CorasauLayoutItem.ButtonContent>
+                            <Controls:CrownControl/>
+                        </CorasauControls:CorasauLayoutItem.ButtonContent>
+                        <CorasauControls:TextEditor Text="{Binding CompanyRegNo,Mode=TwoWay}" x:Name="txtCompanyRegNo"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="Name" x:Name="liName">
                             <CorasauControls:TextEditor Text="{Binding Name,Mode=TwoWay}"/>
@@ -92,7 +95,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorAccountPage2"
                         <CorasauControls:CorasauLayoutItem FieldName="PaymentFormat" x:Name="liPaymentFormat">
                             <CorasauControls:LookupEditor x:Name="lePaymtFormat" Text="{Binding PaymentFormat,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="Payment" x:Name="liPayment">
+                    <CorasauControls:CorasauLayoutItem FieldName="Payment" x:Name="liPayment">
                             <CorasauControls:LookupEditor x:Name="Paymentlookupeditior" Text="{Binding Payment,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem x:Name="shipmentItem" FieldName="Shipment">
@@ -180,10 +183,13 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorAccountPage2"
                         <CorasauControls:CorasauLayoutItem FieldName="PostingAccount" x:Name="liPostingAccount">
                             <CorasauControls:LookupEditor x:Name="lePostingAccount" Text="{Binding PostingAccount,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                         </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="InvoiceAccount" x:Name="liInvoiceAccount">
+                    <CorasauControls:CorasauLayoutItem FieldName="TransType" x:Name="liTransType">
+                        <CorasauControls:LookupEditor x:Name="leTransType" Text="{Binding TransType,Mode=TwoWay}" />
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="InvoiceAccount" x:Name="liInvoiceAccount">
                             <CorasauControls:LookupEditor x:Name="leInvoiceAccount" Text="{Binding InvoiceAccount,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="LayoutGroup" x:Name="liLayoutGroup">
+                    <CorasauControls:CorasauLayoutItem FieldName="LayoutGroup" x:Name="liLayoutGroup">
                             <CorasauControls:LookupEditor x:Name="LayoutGrouplookupeditior" Text="{Binding LayoutGroup,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="ItemNameGroup" x:Name="itemNameGrpLayoutItem">

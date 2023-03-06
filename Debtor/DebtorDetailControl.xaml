@@ -161,6 +161,9 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorDetailControl"
                     <CorasauControls:CorasauLayoutItem FieldName="PostingAccount" x:Name="liPostingAccount">
                         <CorasauControls:TextEditor x:Name="lePostingAccount" Text="{Binding PostingAccount}" IsReadOnly="True"/>
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="TransType" x:Name="liTransType">
+                        <CorasauControls:TextEditor x:Name="leTransType" Text="{Binding TransType}" IsReadOnly="True" />
+                    </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="InvoiceAccount" x:Name="liInvoiceAccount">
                         <CorasauControls:TextEditor x:Name="leInvoiceAccount" Text="{Binding InvoiceAccount}" IsReadOnly="True" />
                     </CorasauControls:CorasauLayoutItem>

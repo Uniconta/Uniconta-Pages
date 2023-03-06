@@ -56,7 +56,10 @@ namespace UnicontaClient.Pages.CustomPage
         {
             localMenu_OnItemClicked("Lines");
         }
-
+        private void Name_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            DgInvUnitGroupGrid_RowDoubleClick();
+        }
         bool CopiedData;
         private void localMenu_OnItemClicked(string ActionType)
         {

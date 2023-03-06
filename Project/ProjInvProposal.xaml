@@ -48,9 +48,22 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjInvProposal"
                         </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                     </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Project" Width="100" ReadOnly="True" AllowEditing="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ProjectName" Width="150" ReadOnly="True" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Account" Width="100" ReadOnly="True" AllowEditing="False" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" Width="150" ReadOnly="True" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ProjectName" Width="150" ReadOnly="True" >
+                        <localPage:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Margin="5,0,0,0" TextDecorations="Underline" Cursor="Hand" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.ProjectName,RelativeSource={RelativeSource TemplatedParent}}" PreviewMouseDown="ProjectName_PreviewMouseDown"></TextBlock>
+                                    <TextBlock Grid.Column="1"></TextBlock>
+                                </Grid>
+                            </DataTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                    </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Account" Width="100" ReadOnly="True" AllowEditing="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" Width="150" ReadOnly="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Group"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="OrderNumber" Width="70"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="OrderTotal" Width="90"/>
@@ -77,7 +90,10 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjInvProposal"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Task" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="WorkSpace" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Shipment" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryTerm" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeleteOrder" Width="50" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Currency" Width="50" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeleteLines" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Created"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Blocked" Visible="False"/>

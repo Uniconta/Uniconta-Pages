@@ -90,12 +90,12 @@ namespace UnicontaClient.Pages.CustomPage
         private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
-                DialogResult = false;
+                SetDialogResult(false);
             else if (e.Key == Key.Enter)
             {
                 if (CancelButton.IsFocused)
                 {
-                    DialogResult = false;
+                    SetDialogResult(false);
                     return;
                 }
                 OKButton_Click(sender, e);
@@ -104,12 +104,12 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
-            DialogResult = true;
+            SetDialogResult(true);
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            DialogResult = false;
+            SetDialogResult(false);
         }
 
 #if !SILVERLIGHT

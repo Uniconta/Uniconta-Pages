@@ -23,18 +23,24 @@ x:Class="UnicontaClient.Pages.CustomPage.BalanceReport"
                 <Setter Property="BorderThickness" Value="1"/>
             </Style.Setters>
         </Style>
-       </UserControl.Resources>
+    </UserControl.Resources>
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
-        <Grid.RowDefinitions>     
+        <Grid.RowDefinitions>
             <RowDefinition Height="*"></RowDefinition>
-        </Grid.RowDefinitions>   
+        </Grid.RowDefinitions>
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1">
             <localPage:BalanceReportManagerGrid x:Name="dgBalanceReport" AutoGenerateColumns="None">
                 <localPage:BalanceReportManagerGrid.Bands>
                     <localPage:BalanceReportManagerGridColumnGridControlBand Fixed="Left">
                         <localPage:BalanceReportManagerTextGridColumn  FieldName="AccountNo" IsSmart="True" x:Name="AccountNo" />
                         <localPage:BalanceReportManagerTextGridColumn  FieldName="AccountName" MinWidth="200" IsSmart="True" x:Name="AccountName" PrintCellStyle="{StaticResource UnderlineTextPrintStyle}"/>
-                        <localPage:BalanceReportManagerTextGridColumn  FieldName="Text" MinWidth="200" IsSmart="True" x:Name="Text"  />
+                        <localPage:BalanceReportManagerTextGridColumn  FieldName="Text" MinWidth="200" IsSmart="True" x:Name="Text">
+                            <localPage:BalanceReportManagerTextGridColumn.CellDisplayTemplate>
+                                <DataTemplate>
+                                <CorasauControls:TextEditor  x:Name="PART_Editor" HorizontalContentAlignment="Left" Text="{Binding Path=DataContext.RowData.Row.Text,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" TextDecorations="{Binding Path=DataContext.RowData.Row.IsUnderline,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}"/>
+                                </DataTemplate>
+                            </localPage:BalanceReportManagerTextGridColumn.CellDisplayTemplate>
+                        </localPage:BalanceReportManagerTextGridColumn>
                         <localPage:BalanceReportManagerTextGridColumn x:Name="coldim1" FieldName="Dim1" />
                         <localPage:BalanceReportManagerTextGridColumn x:Name="coldim2" FieldName="Dim2"  />
                         <localPage:BalanceReportManagerTextGridColumn x:Name="coldim3" FieldName="Dim3" />

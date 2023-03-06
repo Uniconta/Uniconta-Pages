@@ -182,12 +182,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 api.ForcePrimarySQL = true;
                 var CountryId = Comp._CountryId;
-                if (CountryId == CountryCode.Iceland)
-                {
-                    if (api.session.User._Role < (byte)Uniconta.Common.User.UserRoles.Reseller)
-                        RemoveDeleteVoucher();
-                }
-                else if ((CountryId == CountryCode.Germany)
+                if ((CountryId == CountryCode.Germany)
                      && api.session.User._Role < (byte)Uniconta.Common.User.UserRoles.Distributor)
                 {
                     RemoveDeleteVoucher();
@@ -305,9 +300,11 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                     {
                         var glAccount = selectedItem.Master;
-                        if (glAccount == null) return;
-                        string accHeader = Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("AccountsTransaction"), selectedItem._Account);
-                        AddDockItem(TabControls.AccountsTransaction, glAccount, accHeader);
+                        if (glAccount != null)
+                        {
+                            string accHeader = Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("AccountsTransaction"), selectedItem._Account);
+                            AddDockItem(TabControls.AccountsTransaction, glAccount, accHeader);
+                        }
                     }
                     break;
                 case "DragDrop":
@@ -320,9 +317,7 @@ namespace UnicontaClient.Pages.CustomPage
                         return;
                     CWCommentsDialogBox commentsDialog = new CWCommentsDialogBox(Uniconta.ClientTools.Localization.lookup("CancelVoucher"),
                         true, selectedItem.Date);
-#if !SILVERLIGHT
                     commentsDialog.DialogTableId = 2000000035;
-#endif
                     commentsDialog.Closing += async delegate
                     {
                         if (commentsDialog.DialogResult == true)
@@ -379,16 +374,8 @@ namespace UnicontaClient.Pages.CustomPage
                             if (statementLine._DocumentRef != 0)
                                 _refferedVouchers.Add(statementLine._DocumentRef);
                     }
-                    CWAttachVouchers attachVouchersDialog = new CWAttachVouchers(api, _refferedVouchers);
-                    attachVouchersDialog.Closing += delegate
-                    {
-                        if (attachVouchersDialog.DialogResult == true)
-                        {
-                            if (attachVouchersDialog.VoucherReference != 0 && selectedItem != null)
-                                SaveAttachment(selectedItem, attachVouchersDialog.Voucher);
-                        }
-                    };
-                    attachVouchersDialog.Show();
+                    AttachVoucherRow = selectedItem;
+                    AddDockItem(TabControls.AttachVoucherGridPage, new object[] { _refferedVouchers }, true);
                     break;
                 case "RemoveVoucher":
                     if (selectedItem == null || selectedItem._DocumentRef == 0)
@@ -466,14 +453,12 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "PostedBy":
                     if (selectedItem != null)
-                        JournalPosted(selectedItem);
+                        JournalPosted(selectedItem, api);
                     break;
                 case "ChangeDate":
                     if (selectedItem == null) return;
                     var dateSelector = new CWDateSelector(selectedItem.Date, true);
-#if !SILVERLIGHT
                     dateSelector.DialogTableId = 2000000058;
-#endif
                     dateSelector.Closed += delegate
                      {
                          if (dateSelector.DialogResult == true)
@@ -498,28 +483,74 @@ namespace UnicontaClient.Pages.CustomPage
                         CopyToJOurnal();
                     break;
                 case "ExportVouchers":
-                    var glTrans = ((IEnumerable<GLTransClient>)dgAccountsTransGrid.GetVisibleRows())?.Where(x=>x._DocumentRef != 0);
+                    var glTrans = ((IEnumerable<GLTransClient>)dgAccountsTransGrid.GetVisibleRows())?.Where(x => x._DocumentRef != 0);
                     AddDockItem(TabControls.VoucherExportPage, new object[] { glTrans }, Uniconta.ClientTools.Localization.lookup("ExportVouchers"));
                     break;
-
+                case "ChangeAmount":
+                    if (selectedItem != null)
+                        ChangeAmount(selectedItem);
+                    break;
+                case "CurrentYear":
+                    FilterWithAccountingYear(false);
+                    break;
+                case "PreviousYear":
+                    FilterWithAccountingYear(true);
+                    break;
+                case "RefreshGrid":
+                    BindGrid();
+                    break;     
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
+        }
+        async void FilterWithAccountingYear(bool prevYear)
+        {
+            this.ribbonControl.ClearFilterDialog();
+            var actYear = await Utility.GetCurrentAccountingYear(api, prevYear);
+            if (actYear != null)
+            {
+                this.ribbonControl.SavedFilters = new List<FilterProperties>() { new FilterProperties() { PropertyName = "Date", ParameterType = typeof(DateTime), UserInput = actYear.FromDate.ToShortDateString() + ".." + actYear.ToDate.ToShortDateString() } };
+                dgAccountsTransGrid.Filter(this.ribbonControl.filterValues);
+            }
+        }
+        void ChangeAmount(GLTransClient selectedItem)
+        {
+            var cwObj = new CwChangeAmount(selectedItem);
+            cwObj.Closed += async delegate
+            {
+                if (cwObj.DialogResult == true)
+                {
+                    if (SameSign(selectedItem._Amount, cwObj.Amount) || UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("SignIsInverted") + "\n" + Uniconta.ClientTools.Localization.lookup("AreYouSureToContinue"), Uniconta.ClientTools.Localization.lookup("Confirmation"), MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                    {
+                        busyIndicator.IsBusy = true;
+                        var errorCodes = await postingApiInv.ChangeAmountOnTrans(selectedItem, cwObj.Amount, cwObj.Comment);
+                        busyIndicator.IsBusy = false;
+                        UtilDisplay.ShowErrorCode(errorCodes);
+                        if (errorCodes == ErrorCodes.Succes)
+                            BindGrid();
+                    }
+                }
+            };
+            cwObj.Show();
+        }
+
+        static bool SameSign(double num1, double num2)
+        {
+            return (num1 * num2) >= 0;
         }
 
         void CopyToJOurnal()
         {
             var gltranslst = dgAccountsTransGrid.GetVisibleRows() as IEnumerable<GLTransClient>;
             var cwObj = new CWCopyVoucherToJrnl(api);
-#if !SILVERLIGHT
             cwObj.DialogTableId = 2000000082;
-#endif
             cwObj.Closed += async delegate
             {
                 if (cwObj.DialogResult == true)
                 {
                     var Accounts = api.GetCache(typeof(GLAccount));
+                    var Vats = api.GetCache(typeof(GLVat));
 
                     GLDailyJournalLineClient gljournaLine = null;
                     double factor = CWCopyVoucherToJrnl.InvertSign ? -1d : 1d;
@@ -527,6 +558,10 @@ namespace UnicontaClient.Pages.CustomPage
                     var glDailyJrnlLineLst = new List<GLDailyJournalLineClient>(gltranslst.Count());
                     foreach (var trans in gltranslst)
                     {
+                        var vat = (GLVat)Vats.Get(trans._Vat);
+                        if (vat != null && vat._Account != null && vat._OffsetAccount != null && (trans._Account == vat._Account || trans._Account == vat._OffsetAccount))
+                            continue;
+
                         if (gljournaLine != null && gljournaLine._AccountType == 0 && vatAmount != 0 && vatAmount == trans._Amount && gljournaLine._Vat == trans._Vat)
                         {
                             // We join vat with previous line
@@ -535,7 +570,11 @@ namespace UnicontaClient.Pages.CustomPage
                             gljournaLine = null;
                             continue;
                         }
-                        vatAmount = trans._AmountVat;
+
+                        if (vat != null && vat._Account != null && vat._OffsetAccount == null)
+                            vatAmount = trans._AmountVat;
+                        else
+                            vatAmount = 0;
 
                         gljournaLine = new GLDailyJournalLineClient();
 
@@ -639,7 +678,7 @@ namespace UnicontaClient.Pages.CustomPage
             cwObj.Show();
         }
 
-        async private void JournalPosted(GLTransClient selectedItem)
+        async public static void JournalPosted(GLTransClient selectedItem, CrudAPI api)
         {
             var result = await api.Query(new GLDailyJournalPostedClient(), new UnicontaBaseEntity[] { selectedItem }, null);
             if (result != null && result.Length == 1)
@@ -652,10 +691,10 @@ namespace UnicontaClient.Pages.CustomPage
         private void AddVoucher(GLTransClient selectedItem, string actionType)
         {
             CWAddVouchers addVouchersDialog = null;
-#if !SILVERLIGHT
             if (actionType == "DragDrop")
             {
                 var dragDropWindow = new UnicontaDragDropWindow(false);
+                Utility.PauseLastAutoSaveTime();
                 dragDropWindow.Closed += delegate
                 {
                     if (dragDropWindow.DialogResult == true)
@@ -674,7 +713,6 @@ namespace UnicontaClient.Pages.CustomPage
                 dragDropWindow.Show();
             }
             else
-#endif
                 addVouchersDialog = new CWAddVouchers(api, false, null);
 
             if (addVouchersDialog == null) return;
@@ -806,6 +844,18 @@ namespace UnicontaClient.Pages.CustomPage
             if (errorCodes == ErrorCodes.Succes)
                 BindGrid();
         }
+        GLTransClient AttachVoucherRow;
+        public override void Utility_Refresh(string screenName, object argument = null)
+        {
+            if (screenName == TabControls.AttachVoucherGridPage && argument != null)
+            {
+                var selectedItem = AttachVoucherRow ?? dgAccountsTransGrid.SelectedItem as GLTransClient;
+                object[] argumentParams = (object[])argument;
+                var doc = (VouchersClient)argumentParams[0];
+                SaveAttachment(selectedItem, doc);
+            }
+            AttachVoucherRow = null;
+        }
 
         void SaveAttachment(GLTransClient selectedItem, VouchersClient doc)
         {
@@ -855,6 +905,8 @@ namespace UnicontaClient.Pages.CustomPage
         {
             return AccountsTransaction.HandleLookupOnLocalPage(dgAccountsTransGrid, lookup);
         }
+
+        
 
         static public LookUpTable HandleLookupOnLocalPage(CorasauDataGrid grid, LookUpTable lookup)
         {

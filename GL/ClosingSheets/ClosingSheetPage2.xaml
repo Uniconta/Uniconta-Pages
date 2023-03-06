@@ -39,6 +39,9 @@ x:Class="UnicontaClient.Pages.CustomPage.ClosingSheetPage2"
                     <CorasauControls:CorasauLayoutItem FieldName="UseVATCodes" x:Name="liUseVATCodes">
                         <CorasauControls:CheckEditor  IsChecked="{Binding UseVATCodes,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="SkipEmptyAccounts" x:Name="liSkipEmptyAccounts">
+                        <CorasauControls:CheckEditor  IsChecked="{Binding SkipEmptyAccounts,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
 
                 <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpPeriod" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Period}" Orientation="Vertical" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">

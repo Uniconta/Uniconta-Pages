@@ -24,4 +24,8 @@
   <RibbonItem>
     <RibbonItem Action="Aggregate" LocalizedNameKey="Aggregate" LargeGlyph="Variants_Combination_32x32.png" />
   </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="PerWarehouse" LocalizedNameKey="PerOBJ" Parameter="Warehouse" IsCheckBox="True" />
+    <RibbonItem Action="PerLocation" LocalizedNameKey="PerOBJ" Parameter="Location" IsCheckBox="True" />
+  </RibbonItem>
 </root>

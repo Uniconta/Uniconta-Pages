@@ -50,12 +50,12 @@ namespace UnicontaClient.Pages.CustomPage
         }
         void dgReportLayout_RowDoubleClick()
         {
-            var selectedItem = dgSplittemplateGrid.SelectedItem as GLSplitTemplateClient;
-            if (selectedItem == null)
-                return;
-            AddDockItem(TabControls.GLSplitTemplatePage2, selectedItem, Localization.lookup("SplitTemplate"), "Edit_16x16.png");
+            localMenu_OnItemClicked("SplitLine");
         }
-
+        private void Name_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            dgReportLayout_RowDoubleClick();
+        }
         private void localMenu_OnItemClicked(string ActionType)
         {
             var selectedItem = dgSplittemplateGrid.SelectedItem as GLSplitTemplateClient;

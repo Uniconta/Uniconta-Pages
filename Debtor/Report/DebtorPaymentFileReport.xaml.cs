@@ -24,6 +24,7 @@ using Uniconta.ClientTools.Util;
 using Uniconta.Common;
 using Uniconta.DataModel;
 using Uniconta.ClientTools;
+using ICSharpCode.SharpZipLib.Zip;
 #if !SILVERLIGHT
 using System.IO.Compression;
 #endif
@@ -133,11 +134,11 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             var api = this.api;
             var Comp = api.CompanyEntity;
-          
+
             paymentFormatCache = Comp.GetCache(typeof(Uniconta.DataModel.DebtorPaymentFormat)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.DebtorPaymentFormat), api).ConfigureAwait(false);
         }
 
@@ -147,7 +148,7 @@ namespace UnicontaClient.Pages.CustomPage
             try
             {
                 int countFiles = 0;
-                System.Windows.Forms.FolderBrowserDialog folderBrowserDialog = null;
+                DevExpress.Xpf.Dialogs.DXFolderBrowserDialog folderBrowserDialog = null;
 
                 var lstUpdate = new List<DebtorPaymentFileClient>();
 
@@ -161,7 +162,7 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         folderBrowserDialog = UtilDisplay.LoadFolderBrowserDialog;
                         var dialogResult = folderBrowserDialog.ShowDialog();
-                        if (dialogResult != System.Windows.Forms.DialogResult.OK)
+                        if (dialogResult != true)
                             break;
                     }
                     if (rec._Data == null)
@@ -185,7 +186,7 @@ namespace UnicontaClient.Pages.CustomPage
                             {
                                 using (var stream = entry.Open())
                                 {
-                                    var filename = string.Concat(filepath,"\\", entry.FullName);
+                                    var filename = string.Concat(filepath, "\\", entry.FullName);
                                     using (var fileStream = new FileStream(filename, FileMode.Create, FileAccess.Write))
                                     {
                                         stream.CopyTo(fileStream);
@@ -225,13 +226,118 @@ namespace UnicontaClient.Pages.CustomPage
 
         async void ViewFile(DebtorPaymentFileClient selectedItem)
         {
-            if (selectedItem._Data == null)
-                await api.Read(selectedItem);
+            try
+            {
+                if (selectedItem._Data == null)
+                {
+                    busyIndicator.IsBusy = true;
+                    await api.Read(selectedItem);
+                    busyIndicator.IsBusy = false;
+                }
 
-            CWShowDebPaymentFileText cw = new CWShowDebPaymentFileText(selectedItem._Data);
-            cw.Show();
+                if (selectedItem._Data != null)
+                {
+                    if (TryUnZip(selectedItem._Data, out byte[] xmlData))
+                        ContentPreview(xmlData);
+                    else
+                        ContentPreview(selectedItem._Data);
+                }
+            }
+            catch
+            {
+                busyIndicator.IsBusy = false;
+            }
         }
 
+        private void ContentPreview(byte[] xmlData)
+        {
+            ChildWindow cw;
+            var encoding = Encoding.GetEncoding("iso-8859-1");
+            var dataLen = xmlData.Length;
+            var encodedText = encoding.GetString(xmlData, 0, dataLen);
+
+            if (UtilDisplay.TryGetValidXML(encodedText, out string xml))
+                cw = dataLen <= 1024000 ? new CWPreviewXMLViewer(xml) : new CWPreviewXMLViewer(xml, null, false);
+            else
+                cw = new CWPreviewTextViewer(encodedText);
+
+            cw?.Show();
+        }
+
+        private bool TryUnZip(byte[] data, out byte[] xmlData)
+        {
+            xmlData = null;
+            Unistream stream = null;
+            try
+            {
+                stream = new Unistream(data);
+
+                if (IsZip(stream))
+                {
+                    var zipFile = new ZipFile(stream);
+
+                    foreach (ZipEntry zipEntry in zipFile)
+                    {
+                        if (!zipEntry.IsFile)
+                            continue;
+
+                        var buffer = UnistreamReuse.Create((int)zipEntry.Size);
+                        var xmlstream = zipFile.GetInputStream(zipEntry);
+                        buffer.CopyFrom(xmlstream);
+                        xmlData = buffer.ToArrayAndRelease();
+                    }
+                    stream.Close();
+                    return true;
+                }
+            }
+            catch { stream?.Close(); }
+            finally { stream?.Dispose(); }
+
+            return false;
+        }
+
+        private bool IsZip(Unistream streamZip)
+        {
+            try
+            {
+                if (streamZip.Position > 0)
+                {
+                    streamZip.Seek(0, SeekOrigin.Begin);
+                }
+
+                bool isZip = CheckSignature(streamZip, 4, "50-4B-03-04");
+                bool isGzip = CheckSignature(streamZip, 3, "1F-8B-08");
+
+                return isZip || isGzip;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public bool CheckSignature(Unistream stream, int signatureSize, string expectedSignature)
+        {
+            try
+            {
+                if (stream.Length < signatureSize)
+                    return false;
+
+                byte[] signature = new byte[signatureSize];
+                int bytesRequired = signatureSize;
+                int index = 0;
+                while (bytesRequired > 0)
+                {
+                    int bytesRead = stream.Read(signature, index, bytesRequired);
+                    bytesRequired -= bytesRead;
+                    index += bytesRead;
+                }
+                string actualSignature = BitConverter.ToString(signature);
+
+                return actualSignature == expectedSignature;
+            }
+            catch (Exception ex) { throw ex; }
+        }
 
         async void ImportFile()
         {

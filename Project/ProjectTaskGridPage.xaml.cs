@@ -104,6 +104,7 @@ namespace UnicontaClient.Pages.CustomPage
                 UtilDisplay.RemoveMenuCommand(rb, new string[] { "CreateTaskFromTask" });
             }
             dgProjectTaskGrid.ShowTotalSummary();
+            ribbonControl.DisableButtons(new string[] { "AddLine", "DeleteRow", "UndoDelete", "SaveGrid" });
         }
 
         Filter defaultFilter;
@@ -278,7 +279,7 @@ namespace UnicontaClient.Pages.CustomPage
             ClearBusy();
         }
 
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             var api = this.api;
             if (api.CompanyEntity.ProjectTask)

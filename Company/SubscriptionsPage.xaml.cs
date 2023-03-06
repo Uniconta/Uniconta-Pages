@@ -60,7 +60,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (LoadedRow == null)
             {
                 frmRibbon.DisableButtons(new string[] { "Delete" });
-                editrow =CreateNew() as SubscriptionClient;
+                editrow = CreateNew() as SubscriptionClient;
                 editrow._OwnerUid = Uid;
                 editrow._Country = session.User._Nationality;
                 editrow.Name = api.CompanyEntity.Name;
@@ -75,11 +75,7 @@ namespace UnicontaClient.Pages.CustomPage
                 txtOwnerUid.IsReadOnly = true;
             layoutItems.DataContext = editrow;
             frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
-            cmbCurrency.ItemsSource = Utility.GetCurrencyEnum();
-#if SILVERLIGHT
-            var countries = Utility.GetEnumItemsWithPascalToSpace(typeof(CountryCode));
-            cmbCountry.ItemsSource = countries;
-#endif
+            cmbCurrency.ItemsSource = AppEnums.Currencies.GetLabels();
             OwnerUidItem.ButtonClicked += OwnerUidItem_ButtonClicked;
 
             editrow.PropertyChanged += Editrow_PropertyChanged;
@@ -167,12 +163,7 @@ namespace UnicontaClient.Pages.CustomPage
                 CompanyInfo ci = null;
                 try
                 {
-#if !SILVERLIGHT
                     ci = await CVR.CheckCountry(cvr, editrow._Country);
-#else
-                    var lookupApi = new Uniconta.API.System.UtilityAPI(api);
-                    ci = await lookupApi.LookupCVR(cvr, editrow._Country);
-#endif
                 }
                 catch (Exception ex)
                 {
@@ -191,7 +182,7 @@ namespace UnicontaClient.Pages.CustomPage
                         if (address != null)
                         {
                             var streetAddress = address.CompleteStreet;
-                            if (ci.life.name == editrow._Name && streetAddress == editrow._Address1 && address.zipcode == editrow._ZipCode)
+                            if (string.Compare(ci.life.name, editrow._Name, StringComparison.CurrentCultureIgnoreCase) == 0 && streetAddress == editrow._Address1 && address.zipcode == editrow._ZipCode)
                                 return; // we wil not override since address has not changed
 
                             onlyRunOnce = true;
@@ -201,6 +192,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 if (result != UnicontaMessageBox.Yes)
                                     return;
                             }
+                            editrow.Name = ci.life.name;
                             editrow.Address1 = streetAddress;
                             editrow.Address2 = address.street2;
                             editrow.ZipCode = address.zipcode;
@@ -224,7 +216,6 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-#if !SILVERLIGHT
         private void Email_ButtonClicked(object sender)
         {
             var txtEmail = ((CorasauLayoutItem)sender).Content as TextEditor;
@@ -241,7 +232,9 @@ namespace UnicontaClient.Pages.CustomPage
             var location = editrow.Address1 + "+" + editrow.Address2 + "+" + editrow.ZipCode + "+" + editrow.City + "+" + editrow.Country;
             Utility.OpenGoogleMap(location);
         }
-#endif
-
+        private void liCompanyRegNo_ButtonClicked(object sender)
+        {
+            Utility.OpenCVR(editrow._Country, editrow._LegalIdent);
+        }
     }
 }

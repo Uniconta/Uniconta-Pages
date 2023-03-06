@@ -54,7 +54,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (cache != null)
                 {
                     foreach (var rec in (IEnumerable<DCInvoice>)Arr)
-                        DebtorOrders.SetDeliveryAdress(rec, (DCAccount)cache.Get(rec._DCAccount), api);
+                        UtilCommon.SetDeliveryAdress(rec, (DCAccount)cache.Get(rec._DCAccount), api);
                 }
             }
         }
@@ -267,9 +267,6 @@ namespace UnicontaClient.Pages.CustomPage
                         };
                         cwOrderInvoice.Show();
                     }
-                    break;
-                case "RefreshGrid":
-                    InitQuery();
                     break;
                 case "PostedBy":
                     if (selectedItem != null)

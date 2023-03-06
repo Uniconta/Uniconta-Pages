@@ -22,7 +22,7 @@ x:Class="UnicontaClient.Pages.CustomPage.TableValuePage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="TableNo" Width="100" ReadOnly="True" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Property" Width="200" IsSmart="True">
                         <local:CorasauDataGridTemplateColumnClient.EditSettings>
-                            <editor:ComboBoxEditSettings x:Name="cmbTableProperties" DisplayMember="Value" ValueMember="Key"  IsTextEditable="False"  />
+                            <CorasauControls:ComboBoxEditSettingsCustom x:Name="cmbTableProperties" DisplayMember="Value" ValueMember="Key"  IsTextEditable="False"  />
                         </local:CorasauDataGridTemplateColumnClient.EditSettings>
                     </local:CorasauDataGridTemplateColumnClient>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Value" Width="150" IsSmart="True">

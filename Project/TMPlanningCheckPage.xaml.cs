@@ -275,7 +275,7 @@ namespace UnicontaClient.Pages.CustomPage
             cmbBudgetGroup.ItemsSource = budgetGroup;
         }
 
-        protected async override void LoadCacheInBackGround()
+        protected override async Task LoadCacheInBackGroundAsync()
         {
             projects = projects ?? await api.LoadCache<Uniconta.DataModel.Project>().ConfigureAwait(false);
             debtors = debtors ?? await api.LoadCache<Uniconta.DataModel.Debtor>().ConfigureAwait(false);

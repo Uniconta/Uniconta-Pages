@@ -91,7 +91,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         SQLCache LedgerCache, DebtorCache, CreditorCache;
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             var api = this.api;
             var Comp = api.CompanyEntity;
@@ -281,7 +281,7 @@ namespace UnicontaClient.Pages.CustomPage
                         foreach (var statementLine in gridItems)
                             if (statementLine._DocumentRef != 0)
                                 _refferedVouchers.Add(statementLine._DocumentRef);
-
+                        AttachVoucherRow = selectedItem;
                         AddDockItem(TabControls.AttachVoucherGridPage, new object[1] { _refferedVouchers }, true);
                     }
                     break;
@@ -303,7 +303,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem == null)
                         return;
                     if (selectedItem._DocumentRef != 0)
-                        selectedItem.VoucherReference = 0;
+                        selectedItem.DocumentRef = 0;
                     else
                         UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("NoVoucherExist"), Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OK);
                     break;
@@ -329,7 +329,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
             }
         }
-
+        BankStatementLineGridClient AttachVoucherRow;
         public override void Utility_Refresh(string screenName, object argument = null)
         {
             if (screenName == TabControls.AttachVoucherGridPage && argument != null)
@@ -338,14 +338,15 @@ namespace UnicontaClient.Pages.CustomPage
                 var voucher = voucherObj[0] as VouchersClient;
                 if (voucher != null)
                 {
-                    var selectedItem = dgBankStatementLine.SelectedItem as BankStatementLineGridClient;
+                    var selectedItem = AttachVoucherRow ?? dgBankStatementLine.SelectedItem as BankStatementLineGridClient;
                     if (selectedItem != null && voucher.RowId != 0)
                     {
                         dgBankStatementLine.SetLoadedRow(selectedItem);
-                        selectedItem.VoucherReference = voucher.RowId;
+                        selectedItem.DocumentRef = voucher.RowId;
                         selectedItem.Invoice = voucher._Invoice;
                         dgBankStatementLine.SetModifiedRow(selectedItem);
                     }
+                    AttachVoucherRow = null;
                 }
             }
 

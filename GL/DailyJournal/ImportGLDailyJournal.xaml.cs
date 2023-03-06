@@ -356,7 +356,7 @@ namespace UnicontaClient.Pages.CustomPage
             get { return TabControls.ImportGLDailyJournal.ToString(); }
         }
 
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             var api = this.api;
             var Comp = api.CompanyEntity;
@@ -433,7 +433,7 @@ namespace UnicontaClient.Pages.CustomPage
                     liBankAccountPos.Visibility = Visibility.Collapsed;
                     liAddVoucherNumber.Visibility = Visibility.Collapsed;
                     if (currentBankFormat.Format == BankImportFormatType.LANDSBANKINN || currentBankFormat.Format == BankImportFormatType.ISLANDSBANKI || currentBankFormat.Format == BankImportFormatType.ARION)
-                        txtBankAccount.Text = bsClient._Account;
+                        txtBankAccount.Text = string.IsNullOrEmpty(bsClient._BankAccountPart2) ? bsClient._Account : bsClient._BankAccountPart2;
                     else
                         grpUserLogin.Visibility = Visibility.Collapsed;
                 }

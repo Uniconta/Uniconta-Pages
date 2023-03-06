@@ -60,9 +60,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             InitializeComponent();
             InitPage(crudApi);
-#if !SILVERLIGHT
             FocusManager.SetFocusedElement(txtName, txtName);
-#endif
         }
 
         void InitPage(CrudAPI crudapi)
@@ -153,7 +151,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        private bool onlyRunOnce = false;
+        private bool onlyRunOnce;
 
         private async void TxtCVR_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
         {
@@ -170,12 +168,7 @@ namespace UnicontaClient.Pages.CustomPage
                 CompanyInfo ci = null;
                 try
                 {
-#if !SILVERLIGHT
                     ci = await CVR.CheckCountry(cvr, editrow._Country);
-#else
-                    var lookupApi = new Uniconta.API.System.UtilityAPI(api);
-                    ci = await lookupApi.LookupCVR(cvr, editrow._Country);
-#endif
                 }
                 catch (Exception ex)
                 {
@@ -193,7 +186,7 @@ namespace UnicontaClient.Pages.CustomPage
                         if (address != null)
                         {
                             var streetAddress = address.CompleteStreet;
-                            if (ci.life.name == editrow._Name && streetAddress == editrow._Address1 &&
+                            if (string.Compare(ci.life.name, editrow._Name, StringComparison.CurrentCultureIgnoreCase) == 0 && streetAddress == editrow._Address1 &&
                                 address.zipcode == editrow._ZipCode)
                                 return; // we wil not override since address has not changed
 
@@ -204,6 +197,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 if (result != UnicontaMessageBox.Yes)
                                     return;
                             }
+                            editrow.Name = ci.life.name;
                             editrow.Address1 = streetAddress;
                             editrow.Address2 = address.street2;
                             editrow.ZipCode = address.zipcode;
@@ -228,7 +222,6 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-#if !SILVERLIGHT
         private void Email_ButtonClicked(object sender)
         {
             var txtEmail = ((CorasauLayoutItem)sender).Content as TextEditor;
@@ -250,6 +243,9 @@ namespace UnicontaClient.Pages.CustomPage
         {
             Utility.OpenWebSite(editrow._Www);
         }
-#endif
+        private void liCompanyRegNo_ButtonClicked(object sender)
+        {
+            Utility.OpenCVR(editrow._Country, editrow._LegalIdent);
+        }
     }
 }

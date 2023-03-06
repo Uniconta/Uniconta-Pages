@@ -26,6 +26,9 @@
 	  <RibbonItem Action="Trans" LocalizedNameKey="Transactions" Glyph="Cover_16x16.png" LargeGlyph="Posted_Transaction_32x32.png" ShortcutKey="Ctrl+T" />
     <RibbonItem Action="PostedBy" LocalizedNameKey="PostedBy" Glyph="Debtor_Group_Posting_32x32.png" LargeGlyph="Debtor_Group_Posting_32x32.png"/>
     <RibbonItem Action="AddDoc" LocalizedNameKey="Attachments" LargeGlyph="Attachments_32x32.png" />
+    <RibbonItem Action="ViewVoucher" ShortcutKey="F7" LocalizedNameKey="PhysicalVoucher" LargeGlyph="View_Voucher_32x32.png" />
+  </RibbonItem>
+  <RibbonItem>
     <RibbonItem Action="InvoiceLine" LocalizedNameKey="InvoiceLines" LargeGlyph="Order_Lines_Highlighted_32x32.png" ShortcutKey="ALT+L"/>
 	  <RibbonItem Action="ShowInvoice" LocalizedNameKey="ShowInvoice" LargeGlyph="Show_Invoice_32x32.png" />
     <RibbonItem Action="ShowPackNote" LocalizedNameKey="CreditorPackNote" LargeGlyph="Pack_Note_32x32.png" />

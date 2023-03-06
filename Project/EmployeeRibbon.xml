@@ -28,7 +28,7 @@
   </RibbonItem>
   <RibbonItem>
 	 <RibbonItem Action="BudgetPanningSchedule" LocalizedNameKey="ProjectBudgetSchedule" ControlName="ProjectBudgetPlanningSchedulePage" Module="_ProjectPlanning" LargeGlyph="Schedule_Task_32x32.png"/>
-    <RibbonItem Action="TimeSheet" LocalizedNameKey="TimeRegistration" ControlName="TMJournalLinePage"  LargeGlyph="Timesheet_32x32.png"/>
+    <RibbonItem Action="TimeSheet" LocalizedNameKey="TimeRegistration" ControlName="TMJournalLinePage" Module="TimeManagement" LargeGlyph="Timesheet_32x32.png"/>
     <RibbonItem Action="ProjectTask" LocalizedNameKey="Tasks" Module="ProjectTask" LargeGlyph="GanttChart_32x32.png">
       <RibbonItem Action="GridView" LocalizedNameKey="DataGrid" ControlName="ProjectTaskGridPage" Glyph="Multiple_16x16.png" />
       <RibbonItem Action="ChartView" LocalizedNameKey="EnableChart" Glyph="Report_16x16.png" />
@@ -53,7 +53,8 @@
     </RibbonItem>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="ApproveDocument" LocalizedNameKey="ApproveDocument" ControlName="DocumentsApprovalPage" Glyph="View_Voucher_32x32.png" LargeGlyph="View_Voucher_32x32.png"/>
+    <RibbonItem Action="ApproveDocument" LocalizedNameKey="ApproveDocument" ControlName="DocumentsApprovalPage" LargeGlyph="View_Voucher_32x32.png"/>
+    <RibbonItem Action="Archived" LocalizedNameKey="Archive" LargeGlyph="Expense_32x32.png" />
   </RibbonItem>
    <RibbonItem>
     <RibbonItem Action="ProjectEmployee" LocalizedNameKey="Projects"  LargeGlyph="Folder_32x32.png" Module="MyProjects"/>

@@ -21,7 +21,7 @@ x:Class="UnicontaClient.Pages.CustomPage.GL_SetupDimension"
                     <!--<toolkitControls:NumericUpDown Value="{Binding NumberOfDimensions,Mode=TwoWay}" Minimum="0" Maximum="5"  ValueChanged="NumericUpDown_ValueChanged"/>-->
                 </CorasauControls:CorasauLayoutItem>
             </CorasauControls:CorasauLayoutGroup>
-            <CorasauControls:CorasauLayoutGroup x:Name="grpDims" View="GroupBox" Orientation="Vertical" MinWidth="250" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+            <CorasauControls:CorasauLayoutGroup x:Name="grpDims" View="GroupBox" Orientation="Vertical" MinWidth="250" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=PropertyName}" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                 <CorasauControls:CorasauLayoutItem x:Name="lbldim1" CustomLabel="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Dimension,StringFormat=\{0\}1}" >
                     <CorasauControls:TextEditor x:Name="txtDim1" Text="{Binding Dim1,Mode=TwoWay}"/>
                 </CorasauControls:CorasauLayoutItem>

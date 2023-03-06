@@ -179,6 +179,13 @@ namespace UnicontaClient.Pages.CustomPage
                         AddDockItem(TabControls.Invoices, dgDebtorTran.syncEntity, header);
                     }
                     break;
+                case "CollectionLetterLog":
+                    if (selectedItem != null)
+                    {
+                        string header = string.Format("{0}/{1}", Uniconta.ClientTools.Localization.lookup("CollectionLetterLog"), selectedItem.InvoiceAN);
+                        AddDockItem(TabControls.DebtorTransCollectPage, dgDebtorTran.syncEntity, header);
+                    }
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -213,18 +220,6 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-#if SILVERLIGHT
-
-        private static void DefaultPrint(UnicontaBaseEntity dcInvoice)
-        {
-            var dc = dcInvoice as DCInvoice;
-
-            object[] ob = new object[2];
-            ob[0] = dcInvoice;
-            ob[1] = CompanyLayoutType.Invoice;
-            DockInvoiceVoucher(TabControls.ProformaInvoice, ob, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Invoice"), dc?.InvoiceNum));
-        }
-#endif
         public async static void ShowVoucher(SynchronizeEntity selectedRow, CrudAPI crudapi, BusyIndicator voucherBusyIndicator)
         {
             var Row = selectedRow.Row;
@@ -314,14 +309,7 @@ namespace UnicontaClient.Pages.CustomPage
                             var invoice = debtorInvoice?.FirstOrDefault();
                             if (invoice == null)
                                 return;
-#if !SILVERLIGHT
-                            var debtInvNumber = invoice._InvoiceNumber;
-                            var standardPrintReport = await StandardPrint(invoice, crudapi);
-                            var reportName = await Utilities.Utility.GetLocalizedReportName(crudapi, invoice, CompanyLayoutType.Invoice);
-                            StandardPrint(standardPrintReport, debtInvNumber, reportName);
-#else
-                            DefaultPrint(invoice);
-#endif
+                            Invoices.OriginalInvoicePdf(invoice, crudapi, voucherBusyIndicator);
                         }
                         else if (dcType == 2)
                         {
@@ -329,14 +317,10 @@ namespace UnicontaClient.Pages.CustomPage
                             var invoice = creditorInvoice?.FirstOrDefault();
                             if (invoice == null)
                                 return;
-#if !SILVERLIGHT
                             var credInvNumber = invoice._InvoiceNumber;
                             var iprintReport = await StandardPrint(invoice, crudapi);
                             var reportName = await Utilities.Utility.GetLocalizedReportName(crudapi, invoice, CompanyLayoutType.PurchaseInvoice);
                             StandardPrint(iprintReport, credInvNumber, reportName);
-#else
-                            DefaultPrint(invoice);
-#endif
                         }
                     }
                 }
@@ -350,8 +334,7 @@ namespace UnicontaClient.Pages.CustomPage
                 voucherBusyIndicator.IsBusy = false;
             }
         }
-
-#if !SILVERLIGHT
+        
         public static void StandardPrint(IPrintReport standardPrintReport, long invoiceNumber)
         {
             StandardPrint(standardPrintReport, invoiceNumber, null);
@@ -410,6 +393,5 @@ namespace UnicontaClient.Pages.CustomPage
             }
             return null;
         }
-#endif
     }
 }

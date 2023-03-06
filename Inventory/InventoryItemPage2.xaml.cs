@@ -165,7 +165,7 @@ namespace UnicontaClient.Pages.CustomPage
             parentGroup = invDtlLastGroup;
             return true;
         }
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             var api = this.api;
             if (api.CompanyEntity.Warehouse)
@@ -182,16 +182,17 @@ namespace UnicontaClient.Pages.CustomPage
                 var prCatCache = api.GetCache(typeof(Uniconta.DataModel.PrCategory)) ?? await api.LoadCache(typeof(Uniconta.DataModel.PrCategory)).ConfigureAwait(false);
                 cmbPrCategory.cacheFilter = new PrCategoryCostFilter(prCatCache);
             }
-            if (editrow != null && editrow.RowId != 0)
-            {
-                //await api.Read(editrow).ConfigureAwait(false);
+            //if (api.CompanyEntity.Storage && editrow != null && editrow.RowId != 0 && editrow._ItemType != (byte)ItemType.Service)
+            //{
+            //    await api.Read(editrow).ConfigureAwait(false);
 
-                //Dispatcher.BeginInvoke(new Action(() => {
-                //    object[] editParams = new object[2];
-                //    editParams[0] = 2;
-                //    editParams[1] = LoadedRow ?? ModifiedRow;
-                //    globalEvents.OnRefresh(TabControls.InventoryItemPage2, editParams); }));
-            }
+            //    Dispatcher.BeginInvoke(new Action(() => {
+            //        object[] editParams = new object[2];
+            //        editParams[0] = 2;
+            //        editParams[1] = LoadedRow ?? ModifiedRow;
+            //        globalEvents.OnRefresh(TabControls.InventoryItemPage2, editParams);
+            //    }));
+            //}
         }
 
         private void cmbWarehouse_SelectedIndexChanged(object sender, RoutedEventArgs e)
@@ -240,7 +241,7 @@ namespace UnicontaClient.Pages.CustomPage
                 userDocsClient.SetMaster(editrow);
                 userDocsClient._RowId = editrow._Photo;
                 await api.Read(userDocsClient);
-                ViewDocument(TabControls.UserDocsPage3, userDocsClient, string.Format(Uniconta.ClientTools.Localization.lookup("ViewOBJ"), 
+                ViewDocument(TabControls.UserDocsPage3, userDocsClient, string.Format(Uniconta.ClientTools.Localization.lookup("ViewOBJ"),
                     Uniconta.ClientTools.Localization.lookup("Photo")), ViewerType.Photo);
             }
         }
@@ -281,7 +282,7 @@ namespace UnicontaClient.Pages.CustomPage
                     Utility.OpenWebSite(userDocsClient.Url);
                 else
 #endif
-                    ViewDocument(TabControls.UserDocsPage3, userDocsClient, string.Format(Uniconta.ClientTools.Localization.lookup("ViewOBJ"), 
+                    ViewDocument(TabControls.UserDocsPage3, userDocsClient, string.Format(Uniconta.ClientTools.Localization.lookup("ViewOBJ"),
                         Uniconta.ClientTools.Localization.lookup("Url")), ViewerType.Url);
             }
         }

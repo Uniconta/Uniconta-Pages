@@ -101,7 +101,10 @@ namespace UnicontaClient.Pages.CustomPage
         private void saveImage_Click(object sender, RoutedEventArgs e)
         {
             busyIndicator.IsBusy = true;
-            UtilDisplay.SaveData(userDocClient.UserDocument, userDocClient.DocumentType);
+            if (userDocClient.DocumentType == FileextensionsTypes.UNK)
+                UtilDisplay.SaveData(userDocClient.UserDocument, userDocClient.DocumentType, userDocClient.Text);
+            else
+                UtilDisplay.SaveData(userDocClient.UserDocument, userDocClient.DocumentType);
             busyIndicator.IsBusy = false;
         }
 

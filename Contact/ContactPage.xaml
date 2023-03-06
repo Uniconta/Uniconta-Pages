@@ -91,6 +91,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ContactPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Confirmation"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Offer"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="GetEmailIfContact"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ContactType"/>
                 </localPage:ContactGrid.Columns>
             </localPage:ContactGrid>
         </CorasauControls:BusyIndicator>

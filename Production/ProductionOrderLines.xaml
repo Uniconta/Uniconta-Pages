@@ -28,7 +28,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionOrderLines"
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <docking:DockLayoutManager x:Name="DockingControl" AllowCustomization="False">
                 <docking:LayoutGroup x:Name="lGroup" AllowDrag="False" AllowDock="False" AllowFloat="False" Orientation="Vertical" AllowContextMenu="False" >
-                    <docking:LayoutPanel x:Name="layOutDebtorOrderLine" FloatOnDoubleClick="False" AllowDrag="False" AllowDock="False" AllowClose="False" AllowContextMenu="False" AllowMaximize="False" AllowDockToDocumentGroup="False" ShowCloseButton="False"  ShowPinButton="False">
+                    <docking:LayoutPanel x:Name="layOutDebtorOrderLine" FloatOnDoubleClick="False" AllowDrag="False" AllowDock="False" AllowClose="False" AllowContextMenu="False" AllowMaximize="False" AllowDockToDocumentGroup="False" ShowCloseButton="False"  ShowPinButton="False" ItemHeight="7*">
                         <local:ProductionOrderLineGrid  x:Name="dgProductionOrderLineGrid" AutoGenerateColumns="None" HorizontalAlignment="Stretch">
                             <local:ProductionOrderLineGrid.Columns>
                                 <local:CorasauDataGridTemplateColumnClient x:Name="Note" Width="50" >
@@ -149,7 +149,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionOrderLines"
                             </local:ProductionOrderLineGrid.Columns>
                         </local:ProductionOrderLineGrid>
                     </docking:LayoutPanel>
-                    <docking:LayoutPanel x:Name="layOutInvItemStorage" FloatOnDoubleClick="False" AllowDrag="False" AllowDock="False" AllowClose="False" AllowContextMenu="False" AllowMaximize="False" AllowDockToDocumentGroup="False" ShowCloseButton="False"  ShowPinButton="False">
+                    <docking:LayoutPanel x:Name="layOutInvItemStorage" FloatOnDoubleClick="False" AllowDrag="False" AllowDock="False" AllowClose="False" AllowContextMenu="False" AllowMaximize="False" AllowDockToDocumentGroup="False" ShowCloseButton="False"  ShowPinButton="False" ItemHeight="3*">
                         <docking:LayoutPanel.CaptionTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
@@ -176,6 +176,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionOrderLines"
                                 <local:CorasauDataGridTemplateColumnClient x:Name="InvItemWarehouse" FieldName="Warehouse" Width="100" ReadOnly="True"/>
                                 <local:CorasauDataGridTemplateColumnClient x:Name="InvItemLocation" FieldName="Location" Width="100" ReadOnly="True"/>
                                 <local:CorasauDataGridTemplateColumnClient x:Name="Available" Width="80" />
+                                <local:CorasauDataGridTemplateColumnClient x:Name="AvailableForReservation" Width="80" />
                                 <local:CorasauDataGridTemplateColumnClient x:Name="inItemQty" FieldName="Qty" Width="80" ReadOnly="True"/>
                                 <local:CorasauDataGridTemplateColumnClient x:Name="QtyReserved" Width="80" ReadOnly="True"/>
                                 <local:CorasauDataGridTemplateColumnClient x:Name="QtyOrdered" Width="80" ReadOnly="True"/>

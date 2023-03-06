@@ -53,7 +53,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         [Display(Name = "ToOrder", ResourceType = typeof(DCOrderText))]
         [NoSQL]
-        public double Quantity { get { return _Quantity; } set { _Quantity = value; } }
+        public double Quantity { get { return _Quantity; } set { _Quantity = value; NotifyPropertyChanged("Quantity"); } }
 
         [Display(Name = "QtyReserved", ResourceType = typeof(InvItemStorageClientText))]
         [NoSQL]
@@ -656,7 +656,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         SQLCache items;
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             var api = this.api;
             if (this.items == null)

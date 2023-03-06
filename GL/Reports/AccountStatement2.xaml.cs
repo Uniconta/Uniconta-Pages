@@ -291,11 +291,11 @@ namespace UnicontaClient.Pages.CustomPage
 #endif
         }
 
-        async void InitialLoad()
+        void InitialLoad()
         {
-            await TransactionReport.SetDailyJournal(cmbJournal, api);
-            var t = SetNoOfDimensions();
-            StartLoadCache(t);
+            TransactionReport.SetDailyJournal(cmbJournal, api);
+            SetNoOfDimensions();
+            StartLoadCache();
         }
 
         public override void AssignMultipleGrid(List<CorasauDataGrid> gridCtrls)
@@ -304,7 +304,7 @@ namespace UnicontaClient.Pages.CustomPage
             gridCtrls.Add(childDgGLTrans);
         }
 
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             var api = this.api;
             var Comp = api.CompanyEntity;

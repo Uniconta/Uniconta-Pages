@@ -71,14 +71,14 @@ namespace UnicontaClient.Pages.CustomPage
         {
             DebtorOrderLineClient oldselectedItem = e.OldItem as DebtorOrderLineClient;
             if (oldselectedItem != null)
-                oldselectedItem.PropertyChanged -= CreditorOrderLineGrid_PropertyChanged;
+                oldselectedItem.PropertyChanged -= DebtorOrderLineGrid_PropertyChanged;
 
             DebtorOrderLineClient selectedItem = e.NewItem as DebtorOrderLineClient;
             if (selectedItem != null)
-                selectedItem.PropertyChanged += CreditorOrderLineGrid_PropertyChanged;
+                selectedItem.PropertyChanged += DebtorOrderLineGrid_PropertyChanged;
         }
 
-        private void CreditorOrderLineGrid_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void DebtorOrderLineGrid_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             var rec = (DebtorOrderLineClient)sender;
             switch (e.PropertyName)
@@ -104,6 +104,15 @@ namespace UnicontaClient.Pages.CustomPage
                 case "Location":
                     if (string.IsNullOrEmpty(rec._Warehouse))
                         rec._Location = null;
+                    break;
+                case "SerieBatch":
+                    var selectedSerieBatch = rec.SerieBatches?.Where(x => x.Number == rec.SerieBatch).FirstOrDefault();
+                    if (selectedSerieBatch != null && api.CompanyEntity.Warehouse)
+                    {
+                        rec.Warehouse = selectedSerieBatch.Warehouse;
+                        if (api.CompanyEntity.Location)
+                            rec.Location = selectedSerieBatch.Location;
+                    }
                     break;
             }
         }
@@ -302,7 +311,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             var api = this.api;
             var Comp = api.CompanyEntity;

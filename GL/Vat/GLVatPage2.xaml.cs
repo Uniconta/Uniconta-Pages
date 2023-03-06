@@ -36,6 +36,13 @@ namespace UnicontaClient.Pages.CustomPage
 
         public override Type TableType { get { return typeof(GLVatClient); } }
         public override UnicontaBaseEntity ModifiedRow { get { return editrow; } set { editrow = (GLVatClient)value; } }
+        bool isCopiedRow = false;
+        public GLVatPage2(UnicontaBaseEntity sourcedata, bool IsEdit) : base(sourcedata, IsEdit)
+        {
+            InitializeComponent();
+            isCopiedRow = !IsEdit;
+            InitPage(api);
+        }
         public GLVatPage2(UnicontaBaseEntity sourcedata)
             : base(sourcedata, true)
         {
@@ -59,9 +66,9 @@ namespace UnicontaClient.Pages.CustomPage
             layoutControl = layoutItems;
             if (LoadedRow == null)
             {
-                frmRibbon.DisableButtons( "Delete" );
-                editrow =CreateNew() as GLVatClient;
-                // editrow._Method = GLVatCalculationMethod.Automatic;
+                frmRibbon.DisableButtons("Delete");
+                if (!isCopiedRow)
+                    editrow = CreateNew() as GLVatClient;
             }
             layoutItems.DataContext = editrow;
             frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
@@ -102,7 +109,7 @@ namespace UnicontaClient.Pages.CustomPage
             ItemRateAfterDate.IsEnabled = ItemRate2AfterDate.IsEnabled = de.EditValue == null ? false : true;  
         }
 
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             var api = this.api;
             var Comp = api.CompanyEntity;
@@ -122,7 +129,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void txtVat_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
         {
             var s = sender as TextEditor;
-            if (s != null && s.IsLoaded && vatCache != null)
+            if (s != null && s.IsLoaded && vatCache != null && ShouldValidate)
             {
                 if (vatCache.GetKeyList().Contains(s.Text))
                 {

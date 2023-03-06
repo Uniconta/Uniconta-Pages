@@ -63,7 +63,10 @@ namespace UnicontaClient.Pages.CustomPage
         {
             LocalMenu_OnItemClicked("Lines");
         }
-
+        private void Name_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            DgInvDutyGroupGrid_RowDoubleClick();
+        }
         protected override void LoadCacheInBackGround()
         {
             LoadType(new Type[] { typeof(Uniconta.DataModel.GLAccount), typeof(Uniconta.DataModel.InvItem) });
@@ -103,6 +106,10 @@ namespace UnicontaClient.Pages.CustomPage
                 case "AddDoc":
                     if (selectedItem != null)
                         AddDockItem(TabControls.UserDocsPage, dgInvDutyGroupGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Documents"), selectedItem._Name));
+                    break;
+                case "ExemptDuty":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.InvDutyExemptPage, dgInvDutyGroupGrid.SelectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ExemptDuty"), selectedItem._Name));
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);

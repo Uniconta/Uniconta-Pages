@@ -69,7 +69,20 @@ x:Class="UnicontaClient.Pages.CustomPage.WorkInProgressReportPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="Debtor" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="DebtorName" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Project" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="ProjectName" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ProjectName">
+                        <local:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Margin="5,0,0,0" TextDecorations="Underline" Cursor="Hand" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.ProjectName,RelativeSource={RelativeSource TemplatedParent}}" PreviewMouseDown="ProjectName_PreviewMouseDown"></TextBlock>
+                                    <TextBlock Grid.Column="1"></TextBlock>
+                                </Grid>
+                            </DataTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Workspace" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Task" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Phase" Visible="False"/>
@@ -100,7 +113,7 @@ x:Class="UnicontaClient.Pages.CustomPage.WorkInProgressReportPage"
                         <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                             <ControlTemplate>
                                 <CorasauControls:TextEditor IsPrintingMode="True" HorizontalContentAlignment="Right" Text="{Binding Path=DataContext.RowData.Row.EmployeeFee,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" Mask="N2" MaskUseAsDisplayFormat="True" MaskType="Numeric" Width="100"/>
-                                </ControlTemplate>
+                            </ControlTemplate>
                         </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                     </local:CorasauDataGridTemplateColumnClient>
                     <local:CorasauDataGridTemplateColumnClient x:Name="EmployeeFeeCostValue" Visible="False">
@@ -229,7 +242,7 @@ x:Class="UnicontaClient.Pages.CustomPage.WorkInProgressReportPage"
                             </ControlTemplate>
                         </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                     </local:CorasauDataGridTemplateColumnClient>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="OpenInvoiceProposal" AllowEditing="False" Visible="True" />                    
+                    <local:CorasauDataGridTemplateColumnClient x:Name="OpenInvoiceProposal" AllowEditing="False" Visible="True" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="ErrorInfo" Visible="False" AllowEditing="False"/>
                 </local:WorkInProgressReportGrid.Columns>
                 <local:WorkInProgressReportGrid.GroupSummary >
@@ -242,18 +255,18 @@ x:Class="UnicontaClient.Pages.CustomPage.WorkInProgressReportPage"
                     <local:SumColumn FieldName="Expenses" SummaryType="Sum" ShowInGroupColumnFooter="Expenses"/>
                     <local:SumColumn FieldName="ExpensesCostValue" SummaryType="Sum" ShowInGroupColumnFooter="ExpensesCostValue"/>
                     <local:SumColumn FieldName="Revenue" SummaryType="Sum" ShowInGroupColumnFooter="Revenue"/>
-                    <local:SumColumn FieldName="RevenueCostValue" SummaryType="Sum" ShowInGroupColumnFooter="RevenueCostValue"/>                    
+                    <local:SumColumn FieldName="RevenueCostValue" SummaryType="Sum" ShowInGroupColumnFooter="RevenueCostValue"/>
                     <local:SumColumn FieldName="OnAccount" SummaryType="Sum" ShowInGroupColumnFooter="OnAccount"/>
                     <local:SumColumn FieldName="Invoiced" SummaryType="Sum" ShowInGroupColumnFooter="Invoiced"/>
                     <local:SumColumn FieldName="InvoicedCostValue" SummaryType="Sum" ShowInGroupColumnFooter="InvoicedCostValue"/>
                     <local:SumColumn FieldName="TotalInvoiced" SummaryType="Sum" ShowInGroupColumnFooter="TotalInvoiced"/>
                     <local:SumColumn FieldName="TotalInvoicedCostValue" SummaryType="Sum" ShowInGroupColumnFooter="TotalInvoicedCostValue"/>
                     <local:SumColumn FieldName="Adjustment" SummaryType="Sum" ShowInGroupColumnFooter="Adjustment"/>
-                    <local:SumColumn FieldName="AdjustmentCostValue" SummaryType="Sum" ShowInGroupColumnFooter="AdjustmentCostValue"/>                    
+                    <local:SumColumn FieldName="AdjustmentCostValue" SummaryType="Sum" ShowInGroupColumnFooter="AdjustmentCostValue"/>
                     <local:SumColumn FieldName="OpeningBalance" SummaryType="Sum" ShowInGroupColumnFooter="OpeningBalance"/>
-                    <local:SumColumn FieldName="OpeningBalanceCostValue" SummaryType="Sum" ShowInGroupColumnFooter="OpeningBalanceCostValue"/>                    
+                    <local:SumColumn FieldName="OpeningBalanceCostValue" SummaryType="Sum" ShowInGroupColumnFooter="OpeningBalanceCostValue"/>
                     <local:SumColumn FieldName="ClosingBalance" SummaryType="Sum" ShowInGroupColumnFooter="ClosingBalance"/>
-                    <local:SumColumn FieldName="ClosingBalanceCostValue" SummaryType="Sum" ShowInGroupColumnFooter="ClosingBalanceCostValue"/>                    
+                    <local:SumColumn FieldName="ClosingBalanceCostValue" SummaryType="Sum" ShowInGroupColumnFooter="ClosingBalanceCostValue"/>
                 </local:WorkInProgressReportGrid.GroupSummary>
                 <local:WorkInProgressReportGrid.TotalSummary >
                     <local:SumColumn FieldName="EmployeeFee" SummaryType="Sum"/>
@@ -261,20 +274,20 @@ x:Class="UnicontaClient.Pages.CustomPage.WorkInProgressReportPage"
                     <local:SumColumn FieldName="EmployeeHoursPosted" SummaryType="Sum"/>
                     <local:SumColumn FieldName="EmployeeHoursJournal" SummaryType="Sum"/>
                     <local:SumColumn FieldName="EmployeeFeeJournal" SummaryType="Sum"/>
-                    <local:SumColumn FieldName="EmployeeFeeJournalCostValue" SummaryType="Sum"/>                    
+                    <local:SumColumn FieldName="EmployeeFeeJournalCostValue" SummaryType="Sum"/>
                     <local:SumColumn FieldName="Expenses" SummaryType="Sum"/>
                     <local:SumColumn FieldName="ExpensesCostValue" SummaryType="Sum"/>
                     <local:SumColumn FieldName="Revenue" SummaryType="Sum"/>
                     <local:SumColumn FieldName="RevenueCostValue" SummaryType="Sum"/>
                     <local:SumColumn FieldName="OnAccount" SummaryType="Sum"/>
                     <local:SumColumn FieldName="Invoiced" SummaryType="Sum"/>
-                    <local:SumColumn FieldName="InvoicedCostValue" SummaryType="Sum"/>                    
+                    <local:SumColumn FieldName="InvoicedCostValue" SummaryType="Sum"/>
                     <local:SumColumn FieldName="TotalInvoiced" SummaryType="Sum"/>
                     <local:SumColumn FieldName="TotalInvoicedCostValue" SummaryType="Sum"/>
                     <local:SumColumn FieldName="Adjustment" SummaryType="Sum"/>
                     <local:SumColumn FieldName="AdjustmentCostValue" SummaryType="Sum"/>
                     <local:SumColumn FieldName="OpeningBalance" SummaryType="Sum"/>
-                    <local:SumColumn FieldName="OpeningBalanceCostValue" SummaryType="Sum"/>                    
+                    <local:SumColumn FieldName="OpeningBalanceCostValue" SummaryType="Sum"/>
                     <local:SumColumn FieldName="ClosingBalance" SummaryType="Sum"/>
                     <local:SumColumn FieldName="ClosingBalanceCostValue" SummaryType="Sum"/>
                 </local:WorkInProgressReportGrid.TotalSummary>

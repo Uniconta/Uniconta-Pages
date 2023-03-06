@@ -38,6 +38,8 @@ x:Class="UnicontaClient.Pages.CustomPage.PrCategoryPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CostRecognition" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="RevenueRecognition" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Forward" Width="60"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Account" Width="100"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="OffsetAccount" Width="100"/>
                 </localPage:PrCategoryGrid.Columns>
             </localPage:PrCategoryGrid>
         </CorasauControls:BusyIndicator>

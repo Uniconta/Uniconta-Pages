@@ -30,41 +30,42 @@ namespace UnicontaClient.Pages.CustomPage
         [ForeignKeyAttribute(ForeignKeyTable = typeof(Uniconta.DataModel.GLDailyJournal))]
         [InputFieldData]
         [Display(Name = "Journal", ResourceType = typeof(InputFieldDataText))]
-        public string Journal { get; set; }
+        public string Journal { get { return _Journal; } set { _Journal = value; } }
+        static string _Journal;
+
         [InputFieldData]
         [Display(Name = "Date", ResourceType = typeof(InputFieldDataText))]
         public DateTime Date { get; set; }
+
         [ForeignKeyAttribute(ForeignKeyTable = typeof(Uniconta.DataModel.GLAccount))]
         [InputFieldData]
         [Display(Name = "Offsetaccount", ResourceType = typeof(InputFieldDataText))]
-        public string BankAccount { get; set; }
+        public string BankAccount { get { return _BankAccount; } set { _BankAccount = value; } }
+        static string _BankAccount;
+
         [ForeignKeyAttribute(ForeignKeyTable = typeof(Uniconta.DataModel.GLTransType))]
         [InputFieldData]
         [Display(Name = "Text", ResourceType = typeof(InputFieldDataText))]
-        public string TransType { get; set; }
+        public string TransType { get { return _TransType; } set { _TransType = value; } }
+        static string _TransType;
 
         public bool AggregateAmount { get; set; }
         [Display(Name = "Per", ResourceType = typeof(InputFieldDataText))]
         [InputFieldData]
-        public bool PerAccount { get; set; }
+        public bool PerAccount { get { return _PerAccount; } set { _PerAccount = value; } }
+        static bool _PerAccount;
 
-#if !SILVERLIGHT
         protected override int DialogId { get { return DialogTableId; } }
         public int DialogTableId { get; set; }
         protected override bool ShowTableValueButton { get { return true; } }
-#endif
 
-        public CWImportToLine(CrudAPI api,DateTime dateTime)
+        public CWImportToLine(CrudAPI api, DateTime dateTime)
         {
             InitializeComponent();
-#if !SILVERLIGHT
             this.Title = Uniconta.ClientTools.Localization.lookup("GenerateJournalLines");
-#else
-            Utility.SetThemeBehaviorOnChildWindow(this);
-#endif
             lblPer.Text = Uniconta.ClientTools.Localization.lookup("Per");
             cmbtypeValue.ItemsSource = new string[] { Uniconta.ClientTools.Localization.lookup("Transaction"), Uniconta.ClientTools.Localization.lookup("Account") };
-            Date = dateTime;
+            Date = dateTime != DateTime.MinValue ? dateTime : Uniconta.ClientTools.Page.BasePage.GetSystemDefaultDate();
             this.DataContext = this;
             lookupJournal.api = lookupAccount.api = lookupTransType.api = api;
             this.Loaded += CW_Loaded;

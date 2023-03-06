@@ -48,6 +48,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorTransactions"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryAccount" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DocumentRef" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="FromDebtor" Visible="False" ShowCheckBoxInHeader="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ReferenceNumber" Visible="False" />
                 </localPage:GridCreditorTrans.Columns>
                 <localPage:GridCreditorTrans.TotalSummary>
                     <localPage:SumColumn FieldName="Debit" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>

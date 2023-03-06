@@ -27,7 +27,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             this.DataContext = this;
             InitializeComponent();
-            Title = string.Format(Uniconta.ClientTools.Localization.lookup("ViewOBJ"), UtilDisplay.ClientTypeTableAttributeName(typeof(ProjectJournalPostedClient)));
+            Title = string.Format(Uniconta.ClientTools.Localization.lookup("ViewOBJ"), UnicontaClient.Utilities.UtilCommon.ClientTypeTableAttributeName(typeof(ProjectJournalPostedClient)));
             layoutItems.DataContext = projJnlPostedClient;
             this.Loaded += CWGLPostedClientFormView_Loaded;
         }

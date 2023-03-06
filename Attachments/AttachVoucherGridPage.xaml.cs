@@ -44,7 +44,6 @@ namespace UnicontaClient.Pages.CustomPage
             InitControl();
             dgAttachVouchers.CustomUnboundColumnData += DgAttachVouchers_CustomUnboundColumnData;
             dgAttachVouchers.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;
-            BeforeClose += AttachVouchers_BeforeClose;
             localMenu.OnItemClicked += LocalMenu_OnItemClicked;
         }
 
@@ -67,16 +66,16 @@ namespace UnicontaClient.Pages.CustomPage
         private void AttachVouchers_BeforeClose()
         {
             attachParams = null;
-            position = GetPosition();
+            position = GetPosition(dockCtrl);
+            voucherViewer.Dispose();
             BeforeClose -= AttachVouchers_BeforeClose;
         }
 
-        private Point GetPosition()
+        public static Point GetPosition(DockControl dockControl)
         {
-            var floatGrp = GetFloatGroup();
+            var floatGrp = GetFloatGroup(dockControl);
             if (floatGrp == null)
                 return new Point();
-
             return floatGrp.FloatLocation;
         }
         public override void PageClosing()
@@ -106,13 +105,27 @@ namespace UnicontaClient.Pages.CustomPage
             colAttached.Visible = colAttached.ShowInColumnChooser = false;
             addFilter = true;
         }
+        bool showAllDocs;
+        public override void SetParameter(IEnumerable<ValuePair> Parameters)
+        {
+            foreach (var rec in Parameters)
+            {
+                if (rec.Name == null || rec.Name == "ShowAll")
+                {
+                    if (int.Parse(rec.Value) == 1)
+                        dgAttachVouchers.masterRecords = null;
+                }
+            }
+            base.SetParameter(Parameters);
 
+        }
         private void InitControl()
         {
             dgAttachVouchers.api = api;
             dgAttachVouchers.BusyIndicator = busyIndicator;
             SetRibbonControl(localMenu, dgAttachVouchers);
             dgAttachVouchers.UpdateMaster(new Uniconta.DataModel.DocumentNoRef());
+            BeforeClose += AttachVouchers_BeforeClose;
         }
 
         private void AttachVoucher()
@@ -176,29 +189,38 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override void OnLayoutLoaded()
         {
-            var winSetting = BasePage.session.Preference.GetWindowSetting(TabControls.AttachVoucherGridPage);
+            SetFloatingHeightAndWidth(dockCtrl, position, TabControls.AttachVoucherGridPage);
+            base.OnLayoutLoaded();
+        }
+        public static void SetFloatingHeightAndWidth(DockControl dockCtrl, Point position, string nameOfControl)
+        {
+            var winSetting = BasePage.session.Preference.GetWindowSetting(nameOfControl);
             if (winSetting == null)
             {
                 var currPanel = dockCtrl?.Activpanel;
                 if (currPanel != null && currPanel.IsFloating)
                 {
-                    SetFloatGroup();
+                    SetFloatGroup(dockCtrl, position);
                     currPanel.Parent.FloatSize = new Size(pageWidth, pageHeight);
-                    currPanel.SizeChanged += CurrPanel_SizeChanged;
+                    currPanel.SizeChanged += delegate (object sender, SizeChangedEventArgs e)
+                    {
+                        var size = e.NewSize;
+                        pageHeight = size.Height;
+                        pageWidth = size.Width;
+                    };
+
                     currPanel.UpdateLayout();
                 }
             }
-            base.OnLayoutLoaded();
         }
-
-        private void SetFloatGroup()
+        static void SetFloatGroup(DockControl dockCtrl, Point position)
         {
-            var floatgrp = GetFloatGroup();
+            var floatgrp = GetFloatGroup(dockCtrl);
             if (floatgrp != null)
                 floatgrp.FloatLocation = position;
         }
 
-        private FloatGroup GetFloatGroup()
+        static FloatGroup GetFloatGroup(DockControl dockCtrl)
         {
             var curPanel = dockCtrl?.Activpanel;
 
@@ -206,13 +228,6 @@ namespace UnicontaClient.Pages.CustomPage
                 return curPanel.Parent as FloatGroup;
 
             return null;
-        }
-
-        private void CurrPanel_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            var size = e.NewSize;
-            pageHeight = size.Height;
-            pageWidth = size.Width;
         }
     }
 }

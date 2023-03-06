@@ -30,14 +30,14 @@ x:Class="UnicontaClient.Pages.CustomPage.TextInHtmlPage"
                     <dxr:RibbonPageGroup Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Properties}">
                         <dxb:BarEditItem x:Name="cmbExternType" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Type}" EditWidth="100" EditValueChanged="cmbExternType_EditValueChanged"  >
                             <dxb:BarEditItem.EditSettings>
-                                <dxe:ComboBoxEditSettings ItemsSource="{Binding ExternTypes}"  >
-                                </dxe:ComboBoxEditSettings>
+                                <CorasauControls:ComboBoxEditSettingsCustom ItemsSource="{Binding ExternTypes}"  >
+                                </CorasauControls:ComboBoxEditSettingsCustom>
                             </dxb:BarEditItem.EditSettings>
                         </dxb:BarEditItem>
                         <dxb:BarEditItem x:Name="cmbProperties" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Properties}" EditWidth="100"  EditValueChanged="cmbProperties_EditValueChanged"  >
                             <dxb:BarEditItem.EditSettings>
-                                <dxe:ComboBoxEditSettings  ItemsSource="{Binding Properties}">
-                                </dxe:ComboBoxEditSettings>
+                                <CorasauControls:ComboBoxEditSettingsCustom  ItemsSource="{Binding Properties}">
+                                </CorasauControls:ComboBoxEditSettingsCustom>
                             </dxb:BarEditItem.EditSettings>
                         </dxb:BarEditItem>
                         <dxb:BarButtonItem x:Name="btn" >

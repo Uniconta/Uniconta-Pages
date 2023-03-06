@@ -17,9 +17,9 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="{Binding FromDimension,StringFormat=\{0\} : }" Grid.Column="0"/>
-                <CorasauControls:DimComboBoxEditor ItemsSource="{Binding DimensionValues}" EditValue="{Binding ActualDimensionValue}" DisplayMember="KeyStr" ValueMember="RowId" Grid.Column="2" />
+                <CorasauControls:DimComboBoxEditor NullText="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BlankDimension}" ItemsSource="{Binding DimensionValues}" EditValue="{Binding ActualDimensionValue}" DisplayMember="KeyStr" ValueMember="RowId" Grid.Column="2" />
                 <TextBlock Text="{Binding ToDimension,StringFormat=\{0\} : }" Grid.Column="4"/>
-                <CorasauControls:DimComboBoxEditor ItemsSource="{Binding DimensionValues}" EditValue="{Binding SelectedDimensionValue}" DisplayMember="KeyStr" ValueMember="RowId" Grid.Column="6" />
+                <CorasauControls:DimComboBoxEditor NullText="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BlankDimension}" ItemsSource="{Binding DimensionValues}" EditValue="{Binding SelectedDimensionValue}" DisplayMember="KeyStr" ValueMember="RowId" Grid.Column="6" />
             </Grid>
         </DataTemplate>
     </ClientTools:ChildWindow.Resources>

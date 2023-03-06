@@ -53,6 +53,9 @@ x:Class="UnicontaClient.Pages.CustomPage.MultiInvoicePage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="DeliveryZipCode" Visible="False" ReadOnly="True"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="DeliveryCity" Visible="False" ReadOnly="True" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="DeliveryCountry" Visible="False" ReadOnly="True" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DeliveryContactPerson" Visible="False" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DeliveryPhone" Visible="False" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DeliveryContactEmail" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Installation" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Project" Visible="False" ReadOnly="True" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Visible="False" ReadOnly="True" />

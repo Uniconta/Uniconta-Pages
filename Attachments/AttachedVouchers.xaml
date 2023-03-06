@@ -22,7 +22,21 @@ x:Class="UnicontaClient.Pages.CustomPage.AttachedVouchers"
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <localPage:AttachedVouchersGrid x:Name="dgAttachedVoucherGrid" AutoGenerateColumns="None">
                 <localPage:AttachedVouchersGrid.Columns>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PrimaryKeyId" Width="70" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PrimaryKeyId" Width="70">
+                        <localPage:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Margin="5,0,0,0" TextDecorations="Underline" Cursor="Hand" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.PrimaryKeyId,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" PreviewMouseDown="PrimaryKeyId_PreviewMouseDown"></TextBlock>
+                                    <TextBlock Grid.Column="1"></TextBlock>
+                                </Grid>
+                            </DataTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                    </localPage:CorasauDataGridTemplateColumnClient>
+
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Created" ShowTime="True" Width="120" SortOrder="Descending" Visible="False">
                         <localPage:CorasauDataGridTemplateColumnClient.EditSettings>
                             <editor:TextEditSettings DisplayFormat="g" MaskType="DateTime" />

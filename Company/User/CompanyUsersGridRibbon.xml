@@ -10,11 +10,14 @@
 	</RibbonItem>
 	<RibbonItem>
 		<RibbonItem Action="SetPermissions" LocalizedNameKey="SetPermissions" Glyph="User_Rights_32x32.png" LargeGlyph="User_Rights_32x32.png"/>
-		<RibbonItem Action="EditRow" ShortcutKey="Ctrl+E" LocalizedNameKey="MenuLayout" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>
-		<RibbonItem Action="ChangeOwnership" LocalizedNameKey="ChangeOwnership" Glyph="Change_Ownership_32x32.png" LargeGlyph="Change_Ownership_32x32.png"/>
-	</RibbonItem>
-	<RibbonItem>
-		<RibbonItem Action="SetDefaultCompany" LocalizedNameKey="SetOBJ" Parameter="DefaultCompany" LargeGlyph="Default_Values_32x32.png"/>
+		<RibbonItem Action="TableRights" LocalizedNameKey="TableRights" Glyph="" LargeGlyph="CopyUserTable_32x32.png"/>
+		<RibbonItem Action="BlockFunctions" LocalizedNameKey="BlockFunctions" Glyph="" LargeGlyph="Add_Menu_32x32.png"/>
+    <RibbonItem Action="EditRow" ShortcutKey="Ctrl+E" LocalizedNameKey="MenuLayout" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>
+    <RibbonItem Action="UserProfiles" LocalizedNameKey="UserProfiles" LargeGlyph="Employee_32x32.png" Module="Profiles"/>
+    <RibbonItem Action="ChangeOwnership" LocalizedNameKey="ChangeOwnership" Glyph="Change_Ownership_32x32.png" LargeGlyph="Change_Ownership_32x32.png"/>
+  </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="SetDefaultCompany" LocalizedNameKey="SetOBJ" Parameter="DefaultCompany" LargeGlyph="Default_Values_32x32.png"/>
 		<RibbonItem Action="OwnerOf" LocalizedNameKey="OwnerOf" LargeGlyph="Owner_32x32.png"/>
 		<RibbonItem Action="UserOf" LocalizedNameKey="UserOf" LargeGlyph="UsresOf_32x32.png"/>
 	</RibbonItem>

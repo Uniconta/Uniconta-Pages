@@ -29,7 +29,8 @@
   </RibbonItem>
   <RibbonItem>
 		<RibbonItem Action="VoucherTransactions" ShortcutKey="Alt+T" LocalizedNameKey="VoucherTransactions" Glyph="Voucher_Transactions_32x32.png" LargeGlyph="Voucher_Transactions_32x32.png" />
-	</RibbonItem>
+    <RibbonItem Action="CollectionLetterLog" LocalizedNameKey="CollectionLetterLog" Module="_CollectionLetter" LargeGlyph="Note_32x32.png"/>
+  </RibbonItem>
   <RibbonItem>
 		<RibbonItem Action="SendAsEmail" LocalizedNameKey="Sendinvoicebyemail" LargeGlyph="SendInvoiceMail_32x32.png" />
 	</RibbonItem>

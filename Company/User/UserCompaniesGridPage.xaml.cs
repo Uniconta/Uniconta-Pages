@@ -81,7 +81,7 @@ namespace UnicontaClient.Pages.CustomPage
         static double pageHeight = 600.0d, pageWidth = 900.0d;
         protected override void OnLayoutLoaded()
         {
-            if(BasePage.session.User._Role >= (byte)Uniconta.Common.User.UserRoles.Accountant)
+            if (BasePage.session.User._Role >= (byte)Uniconta.Common.User.UserRoles.Accountant)
             {
                 var currPanel = dockCtrl?.Activpanel;
                 if (currPanel != null && currPanel.IsFloating)
@@ -93,8 +93,8 @@ namespace UnicontaClient.Pages.CustomPage
                 }
 
                 this.NInbox.Visible = this.NInbox.ShowInColumnChooser = true;
-                this.LastBankTrans.Visible= this.LastBankTrans.ShowInColumnChooser = true;
-                this.LastPosting.Visible= this.LastPosting.ShowInColumnChooser = true;
+                this.LastBankTrans.Visible = this.LastBankTrans.ShowInColumnChooser = true;
+                this.LastPosting.Visible = this.LastPosting.ShowInColumnChooser = true;
             }
             base.OnLayoutLoaded();
         }
@@ -190,6 +190,21 @@ namespace UnicontaClient.Pages.CustomPage
             busyIndicator.IsBusy = false;
         }
 
+        private void Name_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            LocalMenu_OnItemClicked("JumpTo");
+        }
+
+        private void NInbox_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            LocalMenu_OnItemClicked("Inbox");
+        }
+
+        private void NJournal_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            LocalMenu_OnItemClicked("GL_DailyJournal");
+        }
+
         private void LocalMenu_OnItemClicked(string ActionType)
         {
             var selectedItem = dgUserCompaniesGridClient.SelectedItem as CompanyClient;
@@ -225,6 +240,43 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "RefreshGrid":
                     GetCompanies(true);
+                    break;
+                case "Inbox":
+                    if (selectedItem != null)
+                    {
+                        if (!selectedItem._Delete)
+                        {
+                            var inboxNode = new UnicontaClient.TreeNode()
+                            {
+                                Text = UtilFunctions.ToLowerConditional("PhysicalVouchersInbox", null),
+                                ControlName = TabControls.Vouchers,
+                                Module = UtilFunctions.Intern("PhycicalVoucher"),
+                                ControlType = (int)ControlTypes.Form,
+                            };
+                            globalEvents?.NotifyCompanyChange(this, new Uniconta.ClientTools.Util.CompanyEventArgs(selectedItem) { OpenPage = inboxNode });
+                            CloseDockItem();
+                        }
+                        else
+                            UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("CompanyDeleted"), Uniconta.ClientTools.Localization.lookup("Warning"), MessageBoxButton.OK);
+                    }
+                    break;
+                case "GL_DailyJournal":
+                    if (selectedItem != null)
+                    {
+                        if (!selectedItem._Delete)
+                        {
+                            var PostingNode = new UnicontaClient.TreeNode()
+                            {
+                                Text = UtilFunctions.ToLowerConditional("Posting", null),
+                                ControlName = TabControls.GL_DailyJournal,
+                                ControlType = (int)ControlTypes.Form,
+                            };
+                            globalEvents?.NotifyCompanyChange(this, new Uniconta.ClientTools.Util.CompanyEventArgs(selectedItem) { OpenPage = PostingNode });
+                            CloseDockItem();
+                        }
+                        else
+                            UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("CompanyDeleted"), Uniconta.ClientTools.Localization.lookup("Warning"), MessageBoxButton.OK);
+                    }
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);

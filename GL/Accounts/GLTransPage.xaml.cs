@@ -91,7 +91,7 @@ namespace UnicontaClient.Pages.CustomPage
             return dgAccountsTransGrid.Filter(inputs);
         }
 
-        protected async override void LoadCacheInBackGround()
+        protected override async Task LoadCacheInBackGroundAsync()
         {
             if (Accounts == null)
                 Accounts = await api.LoadCache(typeof(Uniconta.DataModel.GLAccount)).ConfigureAwait(false);

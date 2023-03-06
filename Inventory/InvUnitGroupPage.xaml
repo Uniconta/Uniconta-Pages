@@ -23,7 +23,20 @@ x:Class="UnicontaClient.Pages.CustomPage.InvUnitGroupPage"
             <local:InvUnitGroupPageGrid  x:Name="dgInvUnitGroupGrid" AutoGenerateColumns="None" HorizontalAlignment="Stretch">
                 <local:InvUnitGroupPageGrid.Columns>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Group" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Name" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Name">
+                        <local:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Margin="5,0,0,0" TextDecorations="Underline" Cursor="Hand" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.Name,RelativeSource={RelativeSource TemplatedParent}}" PreviewMouseDown="Name_PreviewMouseDown"></TextBlock>
+                                    <TextBlock Grid.Column="1"></TextBlock>
+                                </Grid>
+                            </DataTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
                 </local:InvUnitGroupPageGrid.Columns>
             </local:InvUnitGroupPageGrid>
         </CorasauControls:BusyIndicator>

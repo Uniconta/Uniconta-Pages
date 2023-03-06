@@ -10,6 +10,8 @@ namespace UnicontaISO20022CreditTransfer
         private readonly string companyName;
         private readonly string identificationId;
         private readonly string identificationCode;
+        private readonly bool excludeSection;
+
 
         private const string PSTLADR = "PstlAdr";
         private const string HINITGPTY = "InitgPty";
@@ -55,15 +57,19 @@ namespace UnicontaISO20022CreditTransfer
             }
         }
 
-        public InitgPty(string companyName, string identificationId, string identificationCode)
+        public InitgPty(string companyName, string identificationId, string identificationCode, bool excludeSection)
         {
             this.companyName = companyName;
             this.identificationId = identificationId;
             this.identificationCode = identificationCode;
+            this.excludeSection = excludeSection;
         }
 
         internal virtual void Append(BaseDocument baseDoc, XmlDocument doc, XmlElement parent)
         {
+            if (excludeSection)
+                return;
+
             XmlElement initgPty = baseDoc.AppendElement(doc, parent, HINITGPTY);
             baseDoc.AppendElement(doc, initgPty, NAME, companyName);
 

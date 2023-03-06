@@ -19,6 +19,9 @@ using Uniconta.ClientTools.Page;
 using Uniconta.Common;
 using System.Collections;
 using Uniconta.API.Service;
+using System.Globalization;
+using Uniconta.ClientTools;
+using Uniconta.DataModel;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -53,7 +56,48 @@ namespace UnicontaClient.Pages.CustomPage
             dgGLTranLogGridClient.BusyIndicator = busyIndicator;
             dgGLTranLogGridClient.UpdateMaster(master);
             SetRibbonControl(localMenu, dgGLTranLogGridClient);
-            localMenu.OnItemClicked += gridRibbon_BaseActions;
+            localMenu.OnItemClicked += localMenu_OnItemClicked;
+            dgGLTranLogGridClient.RowDoubleClick += DgGLTranLogGridClient_RowDoubleClick;
+        }
+
+        private void DgGLTranLogGridClient_RowDoubleClick()
+        {
+            localMenu_OnItemClicked("DeletedTransactions");
+        }
+        private void Name_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            DgGLTranLogGridClient_RowDoubleClick();
+        }
+        private void localMenu_OnItemClicked(string ActionType)
+        {
+            var selectedItem = dgGLTranLogGridClient.SelectedItem as GLTransLogClient;
+            switch (ActionType)
+            {
+                case "DeletedTransactions":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.GLTransDeletedReport, dgGLTranLogGridClient.syncEntity, string.Format("{0}: {1}/{2}", Uniconta.ClientTools.Localization.lookup("DeletedTransactions"), selectedItem._JournalPostedId, selectedItem._Voucher));
+                    break;
+                default:
+                    gridRibbon_BaseActions(ActionType);
+                    break;
+            }
+        }
+    }
+    public class UnderlineConverter : IValueConverter
+    {
+        object IValueConverter.Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            string action = Convert.ToString(value);
+            var val = (TransLogActions)AppEnums.TransLogActions.IndexOf(action);
+            if (val == TransLogActions.DeleteJournal || val == TransLogActions.DeleteVoucher)
+                return TextDecorations.Underline;
+            else
+                return null;
+        }
+
+        object IValueConverter.ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return null;
         }
     }
 }

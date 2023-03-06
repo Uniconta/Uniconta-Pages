@@ -138,6 +138,9 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryItemPage2"
                     <CorasauControls:CorasauLayoutItem FieldName="StockPosition" x:Name="liStockPosition">
                         <CorasauControls:TextEditor Text="{Binding StockPosition,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="UNSPSC" x:Name="liUNSPSC">
+                        <CorasauControls:TextEditor Text="{Binding UNSPSC,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="Warehouse" x:Name="itemWarehouse">
                         <CorasauControls:LookupEditor x:Name="cmbWarehouse" SelectedIndexChanged="cmbWarehouse_SelectedIndexChanged" Text="{Binding Warehouse,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>

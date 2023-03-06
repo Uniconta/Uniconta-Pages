@@ -63,6 +63,7 @@ namespace UnicontaClient.Pages.CustomPage
         public override bool Readonly { get { return false; } }
         public override bool CanInsert { get { return false; } }
         public override bool CanDelete { get { return false; } }
+        public override bool AllowSave { get { return false; } }
         public override Type TableType { get { return typeof(GLTransClientTotalBank); } }
     }
 
@@ -266,7 +267,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         SQLCache LedgerCache, DebtorCache, CreditorCache, ChargeGrp;
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             var api = this.api;
             LedgerCache = api.GetCache(typeof(Uniconta.DataModel.GLAccount)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLAccount)).ConfigureAwait(false);
@@ -597,6 +598,8 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void localMenu_OnItemClicked(string ActionType)
         {
+            GLTransClientTotalBank selectedTrans;
+
             var selectedItem = getBSLSelecteditem();
             dgAccountsTransGrid.tableView.CloseEditor();
             dgBankStatementLine.tableView.CloseEditor();
@@ -626,6 +629,7 @@ namespace UnicontaClient.Pages.CustomPage
                             if (statementLine._DocumentRef != 0)
                                 _refferedVouchers.Add(statementLine._DocumentRef);
 
+                        AttachVoucherRow = selectedItem;
                         AddDockItem(TabControls.AttachVoucherGridPage, new object[1] { _refferedVouchers }, true);
                     }
 
@@ -634,10 +638,10 @@ namespace UnicontaClient.Pages.CustomPage
                     bool useGLTrans = true;
                     if (selectedItem != null)
                     {
-                        var actTransSelected = dgAccountsTransGrid.SelectedItem as GLTrans;
-                        if (actTransSelected == null || actTransSelected._DocumentRef == 0)
+                        selectedTrans = dgAccountsTransGrid.SelectedItem as GLTransClientTotalBank;
+                        if (selectedTrans == null || selectedTrans._DocumentRef == 0)
                             useGLTrans = false;
-                        else if (selectedItem._DocumentRef != 0 && selectedItem._DocumentRef != actTransSelected._DocumentRef)
+                        else if (selectedItem._DocumentRef != 0 && selectedItem._DocumentRef != selectedTrans._DocumentRef)
                         {
                             var page = this as GridBasePage;
                             useGLTrans = (page.CurrentKeyDownGrid == dgAccountsTransGrid);
@@ -645,10 +649,10 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                     if (useGLTrans)
                     {
-                        var actTransSelected = dgAccountsTransGrid.SelectedItem as GLTrans;
-                        if (actTransSelected != null)
+                        selectedTrans = dgAccountsTransGrid.SelectedItem as GLTransClientTotalBank;
+                        if (selectedTrans != null)
                         {
-                            dgAccountsTransGrid.syncEntity.Row = actTransSelected;
+                            dgAccountsTransGrid.syncEntity.Row = selectedTrans;
                             busyIndicator.IsBusy = true;
                             ViewVoucher(TabControls.VouchersPage3, dgAccountsTransGrid.syncEntity);
                             busyIndicator.IsBusy = false;
@@ -666,6 +670,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "ImportVoucher":
                     if (selectedItem != null)
                     {
+                        dgBankStatementLine.SetLoadedRow(selectedItem);
                         AddVoucher(selectedItem, ActionType);
                     }
                     break;
@@ -674,16 +679,17 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem == null)
                         return;
                     if (selectedItem._DocumentRef != 0)
-                        selectedItem.VoucherReference = 0;
+                        selectedItem.DocumentRef = 0;
                     else
                         UnicontaMessageBox.Show(Localization.lookup("NoVoucherExist"), Localization.lookup("Information"), MessageBoxButton.OK);
                     break;
                 case "VoucherTransactions":
-                    var selected = dgAccountsTransGrid.SelectedItem as GLTransClientTotalBank;
-                    if (selected == null)
-                        return;
-                    string vheader = Util.ConcatParenthesis(Localization.lookup("VoucherTransactions"), selected._Voucher);
-                    AddDockItem(TabControls.AccountsTransaction, dgAccountsTransGrid.syncEntity, vheader);
+                    selectedTrans = dgAccountsTransGrid.SelectedItem as GLTransClientTotalBank;
+                    if (selectedTrans != null)
+                    {
+                        string vheader = Util.ConcatParenthesis(Localization.lookup("VoucherTransactions"), selectedTrans._Voucher);
+                        AddDockItem(TabControls.AccountsTransaction, dgAccountsTransGrid.syncEntity, vheader);
+                    }
                     break;
                 case "AddMatch":
                     AddMatch();
@@ -696,7 +702,7 @@ namespace UnicontaClient.Pages.CustomPage
                     TransferBankStatementToJournal();
                     break;
                 case "VoidTransaction":
-                    var selectedTrans = dgAccountsTransGrid.SelectedItem as GLTransClientTotalBank;
+                    selectedTrans = dgAccountsTransGrid.SelectedItem as GLTransClientTotalBank;
                     if (selectedTrans != null)
                         ChangeVoidState(selectedTrans);
                     break;
@@ -735,9 +741,9 @@ namespace UnicontaClient.Pages.CustomPage
                         SettleOpenTransactionPage(selectedItem);
                     break;
                 case "EditJournalLine":
-                    var selectedGlTrans = dgAccountsTransGrid.SelectedItem as GLTransClientTotal;
-                    if (selectedGlTrans != null)
-                        EditGLDailyJournalLine(selectedGlTrans);
+                    selectedTrans = dgAccountsTransGrid.SelectedItem as GLTransClientTotalBank;
+                    if (selectedTrans != null)
+                        EditGLDailyJournalLine(selectedTrans);
                     break;
                 case "RefreshGrid":
                     SetStatusText();
@@ -772,25 +778,28 @@ namespace UnicontaClient.Pages.CustomPage
                 return;
             }
 
-            string labl1, labl2;
             var glTran = markedactList[0];
             if (glTran._JournalPostedId == 0)
             {
                 UnicontaMessageBox.Show(Localization.lookup("CannotUseMethod") + Environment.NewLine + Localization.lookup("JournalLinesIncluded"), Localization.lookup("Information"), MessageBoxButton.OK);
                 return;
             }
-            if (glTran._Currency == 0)
-            {
-                labl1 = "CreatePennyDif";
-                labl2 = "PennyDif";
-            }
-            else
-            {
-                labl1 = "CreateExchangeRegulation";
-                labl2 = "ExchangeRegulated";
-            }
+
             var bnk = markedbstList[0];
             var dif = bnk._AmountCent - glTran._AmountCent;
+
+            var labl1 = "CreatePennyDif";
+            var labl2 = "PennyDif";
+            if (glTran._Currency != 0)
+            {
+                if (glTran._Currency == master._Currency)
+                    dif = bnk._AmountCent - glTran._AmountCurCent;
+                else
+                {
+                    labl1 = "CreateExchangeRegulation";
+                    labl2 = "ExchangeRegulated";
+                }
+            }
 
             if (dif != 0 && UnicontaMessageBox.Show(string.Concat(Localization.lookup(labl1), "? ", Localization.lookup("Amount"), " = ", (dif / 100d).ToString("N2")),
                      Localization.lookup(labl2), MessageBoxButton.YesNo) == MessageBoxResult.Yes)
@@ -804,7 +813,18 @@ namespace UnicontaClient.Pages.CustomPage
                     UtilDisplay.ShowErrorCode(err);
                 else
                 {
-                    rec._DCAccount = (from r in (IEnumerable<GLAccount>)LedgerCache.GetNotNullArray where r._SystemAccount == (glTran._Currency != 0 ? (byte)SystemAccountTypes.ExchangeDif : (byte)SystemAccountTypes.PennyDif) select r).FirstOrDefault()?._Account;
+                    byte SystemAccount = (byte)SystemAccountTypes.PennyDif;
+                    if (glTran._Currency != 0)
+                    {
+                        if (glTran._Currency == master._Currency)
+                        {
+                            rec._Currency = glTran._Currency;
+                            rec._AmountCurCent = dif;
+                        }
+                        else
+                            SystemAccount = (byte)SystemAccountTypes.ExchangeDif;
+                    }
+                    rec._DCAccount = (from r in (IEnumerable<GLAccount>)LedgerCache.GetNotNullArray where r._SystemAccount == SystemAccount select r).FirstOrDefault()?._Account;
                     rec._Mark = true;
                     lstAct.Insert(lstAct.IndexOf(glTran) + 1, rec);
                     dgAccountsTransGrid.RefreshData();
@@ -853,10 +873,10 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void AddVoucher(BankStatementLineGridClient bankStatementLine, string actionType)
         {
-#if !SILVERLIGHT
             if (actionType == "DragDrop")
             {
                 var dragDropWindow = new UnicontaDragDropWindow(false);
+                Utility.PauseLastAutoSaveTime();
                 dragDropWindow.Closed += delegate
                 {
                     if (dragDropWindow.DialogResult == true)
@@ -873,7 +893,6 @@ namespace UnicontaClient.Pages.CustomPage
                 dragDropWindow.Show();
             }
             else
-#endif
                 Utility.ImportVoucher(bankStatementLine, api, null, false);
         }
 
@@ -922,7 +941,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             return lines;
         }
-
+        BankStatementLineGridClient AttachVoucherRow;
         public override void Utility_Refresh(string screenName, object argument = null)
         {
             if (screenName == TabControls.AttachVoucherGridPage && argument != null)
@@ -931,15 +950,16 @@ namespace UnicontaClient.Pages.CustomPage
                 var voucher = voucherObj[0] as VouchersClient;
                 if (voucher != null)
                 {
-                    var selectedItem = dgBankStatementLine.SelectedItem as BankStatementLineGridClient;
+                    var selectedItem = AttachVoucherRow ?? dgBankStatementLine.SelectedItem as BankStatementLineGridClient;
                     if (selectedItem != null && voucher.RowId != 0)
                     {
                         dgBankStatementLine.SetLoadedRow(selectedItem);
-                        selectedItem.VoucherReference = voucher.RowId;
+                        selectedItem.DocumentRef = voucher.RowId;
                         selectedItem.Invoice = voucher._Invoice;
                         dgBankStatementLine.SetModifiedRow(selectedItem);
                     }
                 }
+                AttachVoucherRow = null;
             }
 
             if (screenName == TabControls.SettleOpenTransactionPage)

@@ -24,13 +24,14 @@ namespace UnicontaClient.Pages.CustomPage
     {
         public override Type TableType { get { return typeof(CompanyIPRestrictionClient); } }
         public override bool Readonly { get { return false; } }
+        public override bool IsAutoSave => false;
     }
 
     public partial class CompanyIPRestrictionPage : GridBasePage
     {
         public override string NameOfControl { get { return TabControls.CompanyIPRestrictionPage; } }
 
-        public CompanyIPRestrictionPage(UnicontaBaseEntity master): base(master)
+        public CompanyIPRestrictionPage(UnicontaBaseEntity master) : base(master)
         {
             InitializeComponent();
             localMenu.dataGrid = dgCompanyIPRestriction;
@@ -54,9 +55,6 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "SaveGrid":
                     dgCompanyIPRestriction.SaveData();
-                    break;
-                case "RefreshGrid":
-                    InitQuery();
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);

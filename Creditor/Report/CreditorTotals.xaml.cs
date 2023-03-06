@@ -77,7 +77,7 @@ namespace UnicontaClient.Pages.CustomPage
             dgCreditorTotalsGrid.ShowTotalSummary();
             chkSkipOnHold.IsEnabled = false;
             LoadType(typeof(Uniconta.DataModel.Creditor));
-            cmbCurrency.ItemsSource = Utility.GetCurrencyEnum();
+            cmbCurrency.ItemsSource = AppEnums.Currencies.GetLabels();
             cmbCurrency.SelectedIndex = 0;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             GetShowHideChart();
@@ -105,16 +105,15 @@ namespace UnicontaClient.Pages.CustomPage
                             creditorFilterDialog = new CWServerFilter(api, typeof(CreditorClient), null, null, CreditorUserFields);
                         else
                             creditorFilterDialog = new CWServerFilter(api, typeof(CreditorClient), null, null, CreditorUserFields);
+                        creditorFilterDialog.GridSource = dgCreditorTotalsGrid.ItemsSource as IList<UnicontaBaseEntity>;
                         creditorFilterDialog.Closing += creditorFilterDialog_Closing;
-#if !SILVERLIGHT
                         creditorFilterDialog.Show();
                     }
                     else
+                    {
+                        creditorFilterDialog.GridSource = dgCreditorTotalsGrid.ItemsSource as IList<UnicontaBaseEntity>;
                         creditorFilterDialog.Show(true);
-#elif SILVERLIGHT
                     }
-                    creditorFilterDialog.Show();
-#endif
                     break;
 
                 case "ClearCreditorFilter":

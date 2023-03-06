@@ -62,7 +62,7 @@ namespace UnicontaClient.Pages.CustomPage
             SetRibbonControl(localMenu, dgDocsSendLogDataGrid);
             dgDocsSendLogDataGrid.BusyIndicator = busyIndicator;
             dgDocsSendLogDataGrid.api = api;
-            localMenu.OnItemClicked += gridRibbon_BaseActions;
+            localMenu.OnItemClicked += LocalMenu_OnItemClicked;
         }
 
         protected override void SyncEntityMasterRowChanged(UnicontaBaseEntity args)
@@ -91,5 +91,38 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         public override string NameOfControl { get { return TabControls.DocsSendLogGridPage; } }
+
+        private void LocalMenu_OnItemClicked(string ActionType)
+        {
+            var selectedItem = dgDocsSendLogDataGrid.SelectedItem as DCDocSendLogClient;
+            switch (ActionType)
+            {
+                case "ViewFile":
+                    if (selectedItem != null)
+                        ViewFile(selectedItem);
+                    break;
+                default:
+                    gridRibbon_BaseActions(ActionType);
+                    break;
+            }
+        }
+
+        async void ViewFile(DCDocSendLogClient selectedItem)
+        {
+            if (selectedItem._File == null)
+                await api.Read(selectedItem);
+
+            if (selectedItem._File != null)
+            {
+                ChildWindow cw = null;
+                if (selectedItem._Fileextenson == FileextensionsTypes.XML)
+                    cw = new CWPreviewXMLViewer(selectedItem._File);
+                else if (selectedItem._Fileextenson == FileextensionsTypes.TXT)
+                    cw = new CWPreviewTextViewer(selectedItem._File);
+
+                cw?.Show();
+            }
+        }
+
     }
 }

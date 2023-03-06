@@ -19,7 +19,20 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryJournalPage"
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <local:InventoryJournalGrid   x:Name="dgInventoryJournal" AutoGenerateColumns="None">
                 <local:InventoryJournalGrid.Columns>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Journal" Width="200"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Journal" Width="200">
+                        <local:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Margin="5,0,0,0" TextDecorations="Underline" Cursor="Hand" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.Journal,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" PreviewMouseDown="Name_PreviewMouseDown"></TextBlock>
+                                    <TextBlock Grid.Column="1"></TextBlock>
+                                </Grid>
+                            </DataTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
                     <local:CorasauDataGridTemplateColumnClient x:Name="NumberSerie" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="TransType" Width="200"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Blocked" Width="70"/>

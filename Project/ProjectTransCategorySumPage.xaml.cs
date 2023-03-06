@@ -476,16 +476,15 @@ namespace UnicontaClient.Pages.CustomPage
                             proTransFilterDialog = new CWServerFilter(api, typeof(ProjectTransClient), null, null, null);
                         else
                             proTransFilterDialog = new CWServerFilter(api, typeof(ProjectTransClient), null, null, null);
+                        proTransFilterDialog.GridSource = dgProjectTransCategorySum.ItemsSource as IList<UnicontaBaseEntity>;
                         proTransFilterDialog.Closing += ProTransFilterDialog_Closing;
-#if !SILVERLIGHT
                         proTransFilterDialog.Show();
                     }
                     else
+                    {
+                        proTransFilterDialog.GridSource = dgProjectTransCategorySum.ItemsSource as IList<UnicontaBaseEntity>;
                         proTransFilterDialog.Show(true);
-#elif SILVERLIGHT
                     }
-                    proTransFilterDialog.Show();
-#endif
                     break;
                 case "ClearProjectTransFilter":
                     proTransFilterDialog = null;

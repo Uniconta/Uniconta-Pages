@@ -179,7 +179,7 @@ x:Class="UnicontaClient.Pages.CustomPage.TMJournalLinePage"
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Text" Width="200" >
                                     <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                         <DataTemplate>
-                                            <CorasauControls:TextEditor  x:Name="PART_Editor" IsReadOnly="{Binding DataContext.RowData.Row.IsEditable,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToBoolConverter}}" HorizontalContentAlignment="Left"  EditValue="{Binding Path=DataContext.RowData.Row.Text,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"/>
+                                            <CorasauControls:TextEditor  x:Name="PART_Editor" TextWrapping="Wrap" IsReadOnly="{Binding DataContext.RowData.Row.IsEditable,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToBoolConverter}}" HorizontalContentAlignment="Left"  EditValue="{Binding Path=DataContext.RowData.Row.Text,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"/>
                                         </DataTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridTemplateColumnClient>

@@ -5,7 +5,7 @@ x:Class="UnicontaClient.Pages.CustomPage.SubscriptionsPage"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d" xmlns:CientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+    mc:Ignorable="d" xmlns:Controls="clr-namespace:UnicontaClient.Controls"
     xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools" 
     xmlns:dxinteraction="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
     xmlns:Util="clr-namespace:UnicontaClient.Utilities"
@@ -26,7 +26,11 @@ x:Class="UnicontaClient.Pages.CustomPage.SubscriptionsPage"
                 <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="grpFirst">
 
                     <CorasauControls:CorasauLayoutGroup View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Description}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                        <CorasauControls:CorasauLayoutItem FieldName="LegalIdent">
+                        <CorasauControls:CorasauLayoutItem FieldName="LegalIdent" Style="{StaticResource LayoutItemsstyle}"  ButtonClicked="liCompanyRegNo_ButtonClicked" Padding="0">
+                            <CorasauControls:CorasauLayoutItem.ButtonContent>
+                                <Controls:CrownControl/>
+                            </CorasauControls:CorasauLayoutItem.ButtonContent>
+
                             <CorasauControls:TextEditor Text="{Binding LegalIdent,Mode=TwoWay}" x:Name="txtCompanyRegNo" EditValueChanged="TxtCompanyRegNo_OnEditValueChanged"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="Name">
@@ -145,6 +149,9 @@ x:Class="UnicontaClient.Pages.CustomPage.SubscriptionsPage"
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="FixedPrice">
                             <CorasauControls:CheckEditor x:Name="chkFixedPrice" IsChecked="{Binding FixedPrice,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="NoCPU">
+                            <CorasauControls:CheckEditor x:Name="chkNoCPU" IsChecked="{Binding NoCPU,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
 

@@ -175,6 +175,7 @@ namespace UnicontaClient.Pages.CustomPage
                 this.documentViewer.Children.Add((UtilDisplay.LoadDefaultControl(string.Format("{0}. {1} : {2}", Uniconta.ClientTools.Localization.lookup("InvalidDocSave"),
                     Uniconta.ClientTools.Localization.lookup("ViewerFailed"), ex.Message))));
                 busyIndicator.IsBusy = false;
+                BasePage.session.ReportException(ex, "VoucherPage3", voucherClient.CompanyId);
             }
             SetMetaInfo(voucherClient);
         }
@@ -274,6 +275,7 @@ namespace UnicontaClient.Pages.CustomPage
                 brdMetaInfo.Visibility = System.Windows.Visibility.Visible;
                 this.documentViewer.Children.Add((UtilDisplay.LoadDefaultControl(string.Format("{0}. \n{1} : {2}", Uniconta.ClientTools.Localization.lookup("InvalidDocSave"),
                     Uniconta.ClientTools.Localization.lookup("ViewerFailed"), ex.Message))));
+                BasePage.session.ReportException(ex, "VoucherPage3", voucherClient.CompanyId);
             }
             SetMetaInfo(voucherClient);
         }
@@ -307,22 +309,6 @@ namespace UnicontaClient.Pages.CustomPage
                 fs.Flush();
                 fs.Close();
             }
-#if SILVERLIGHT
-            //for OOB 
-            try
-            {
-                if (Application.Current.IsRunningOutOfBrowser)
-                {
-                    var shell = AutomationFactory.CreateObject("Shell.Application");
-                    shell.ShellExecute(fileName, null, null, null, 1);
-                }
-            }
-            catch (Exception ex)
-            {
-                BasePage.session.ReportException(ex, "VoucherPage3_OOB", 0);
-            }
-#endif
-#if !SILVERLIGHT
             try
             {
                 Process process = new Process();
@@ -330,17 +316,15 @@ namespace UnicontaClient.Pages.CustomPage
                 process.StartInfo.UseShellExecute = true;
                 process.Start();
             }
-            catch (Exception excp)
+            catch (Exception ex)
             {
-                BasePage.session.ReportException(excp, "VoucherPage3", 0);
+                BasePage.session.ReportException(ex, "VoucherPage3", 0);
             }
-#endif
         }
 
         private void showAllFields_Click(object sender, RoutedEventArgs e)
         {
-            var childWindow = new CWShowAllFields(voucherClient);
-            childWindow.Show();
+            new CWShowAllFields(voucherClient).Show();
         }
     }
 }

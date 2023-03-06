@@ -23,6 +23,7 @@ using Uniconta.ClientTools.Util;
 using System.Threading.Tasks;
 using Uniconta.ClientTools.Controls;
 using Uniconta.DataModel;
+using Uniconta.API.GeneralLedger;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -94,13 +95,10 @@ namespace UnicontaClient.Pages.CustomPage
             BusyIndicator = busyIndicator; 
             layoutItems.DataContext = voucherClientRow;
             frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
-
-#if !SILVERLIGHT
             browseControl.CompressVisibility = Visibility.Visible;
             browseControl.PDFSplitVisibility = Visibility.Visible;
             txtPurchaseNumber.CrudApi = api;
             txtUrl.LostFocus += txtUrl_LostFocus;
-#endif
             voucherClientRow.PropertyChanged += VoucherClientRow_PropertyChanged;
         }
 
@@ -117,7 +115,7 @@ namespace UnicontaClient.Pages.CustomPage
             cmbViewInFolder.ItemsSource = appEnumFolderLst;
         }
 
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             var api = this.api;
             FolderCache = api.GetCache(typeof(Uniconta.DataModel.DocumentFolder)) ?? await api.LoadCache(typeof(Uniconta.DataModel.DocumentFolder)).ConfigureAwait(false);
@@ -239,7 +237,13 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         Utility.UpdateBuffers(api, buffers, multiVouchers);
                         ClosePage(4); // full refresh and clearBusy inside
-                        CloseDockItem();
+                        if (generateLine)
+                        {
+                            savedVouchers = new List<VouchersClient>();
+                            savedVouchers.AddRange(multiVouchers);
+                        }
+                        else
+                            CloseDockItem();
                     }
                     return;
                 }
@@ -271,6 +275,8 @@ namespace UnicontaClient.Pages.CustomPage
                     buf = null;
             }
 
+            if (generateLine)
+                closePageOnSave = false;
             await saveForm();
             ClearBusy();
 
@@ -285,6 +291,7 @@ namespace UnicontaClient.Pages.CustomPage
                 VoucherCache.SetGlobalVoucherCache(voucherClientRow);
         }
 
+        bool generateLine = false;
         private void frmRibbon_OnItemClicked(string ActionType)
         {
             if (ActionType == "Save")
@@ -298,8 +305,53 @@ namespace UnicontaClient.Pages.CustomPage
                 else
                     SaveIn2Steps();
             }
+            else if (ActionType == "GenerateJournalLines")
+            {
+                busyIndicator.IsBusy = true;
+                if (!ValidateSave())
+                {
+                    busyIndicator.IsBusy = false;
+                    UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("NoFilesSelected"), Uniconta.ClientTools.Localization.lookup("Error"));
+                }
+                else
+                    SaveDocAndGenerateJournalLine();
+            }
             else
                 frmRibbon_BaseActions(ActionType);
+        }
+
+        List<VouchersClient> savedVouchers;
+        private void SaveDocAndGenerateJournalLine()
+        {
+            generateLine = true;
+            SaveIn2Steps();
+            CWJournal journals = new CWJournal(api, true);
+            journals.DialogTableId = 2000000015;
+            journals.Closed += async delegate
+            {
+                if (journals.DialogResult == true)
+                {
+                    var journalName = journals.Journal;
+                    var journalDate = journals.Date;
+                    var OnlyApproved = journals.OnlyApproved;
+
+                    if (voucherClientRow != null)
+                    {
+                        IEnumerable<VouchersClient> lst;
+                        OnlyApproved = false;
+                        voucherClientRow.InJournal = true;
+                        if (browseControl.IsMultiSelect && savedVouchers != null)
+                            lst = savedVouchers.ToList();
+                        else
+                            lst = new VouchersClient[] { voucherClientRow };
+                        var res = await new PostingAPI(api).GenerateJournalFromDocument(journalName, journalDate, journals.IsCreditAmount, journals.AddVoucherNumber, lst);
+                        if (res != 0)
+                            UtilDisplay.ShowErrorCode(res);
+                    }
+                }
+                CloseDockItem();
+            };
+            journals.Show();
         }
 
         private bool ValidateSave()
@@ -357,11 +409,9 @@ namespace UnicontaClient.Pages.CustomPage
                         vc.SetMaster(api.CompanyEntity);
                         multiVouchers[iCtr++] = vc;
                         vc._Fileextension = DocumentConvert.GetDocumentType(fileInfo.FileExtension);
-#if !SILVERLIGHT
                         if (chkIncludeOnlyReference.IsChecked == true)
                             vc._Url = fileInfo.FilePath;
                         else
-#endif
                             vc._Data = fileInfo.FileBytes;
                         var text = txedVoucherComments.Text;
                         if (string.IsNullOrEmpty(text))
@@ -392,11 +442,9 @@ namespace UnicontaClient.Pages.CustomPage
                 byte[] fileBytes = browseControl.FileBytes;
                 if (fileBytes != null)
                 {
-#if !SILVERLIGHT
                     if (chkIncludeOnlyReference.IsChecked == true)
                         voucherClientRow.Url = browseControl.FilePath;
                     else
-#endif
                         voucherClientRow._Data = fileBytes;
                     voucherClientRow.Fileextension = DocumentConvert.GetDocumentType(fileExtension);
                 }
@@ -533,7 +581,7 @@ namespace UnicontaClient.Pages.CustomPage
         /// <param name="filePaths"></param>
         public void LoadPageOnFileDrop(string[] filePaths)
         {
-            browseControl.Visibility = Visibility.Collapsed;
+            grpDocument.Visibility = Visibility.Collapsed;
             try
             {
                 List<string> failedFiles = null;
@@ -561,7 +609,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             try
             {
-                browseControl.Visibility = Visibility.Collapsed;
+                grpDocument.Visibility = Visibility.Collapsed;
                 string error;
                 var selectedFileInfo = UtilDisplay.CreateSelectedFileInfo(dataObject, out error);
                 if (string.IsNullOrEmpty(error) && selectedFileInfo != null)

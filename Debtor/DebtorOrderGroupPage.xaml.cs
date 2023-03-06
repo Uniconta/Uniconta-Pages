@@ -54,10 +54,7 @@ namespace UnicontaClient.Pages.CustomPage
                     dgDebtorOrderGroup.DeleteRow();
                     break;
                 case "SaveGrid":
-                    dgDebtorOrderGroup.SaveData();                  
-                    break;
-                case "RefreshGrid":
-                    InitQuery();
+                    dgDebtorOrderGroup.SaveData();
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);

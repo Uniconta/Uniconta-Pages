@@ -44,5 +44,6 @@
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="SendAsOutlook" LocalizedNameKey="SendInvoiceInOutLook" LargeGlyph="Posted_Journal_32x32.png" />
+	  <RibbonItem Action="CollectionLetterLog" LocalizedNameKey="CollectionLetterLog" Module="_CollectionLetter" LargeGlyph="Note_32x32.png"/>
   </RibbonItem>
 </root>

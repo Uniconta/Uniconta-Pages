@@ -81,7 +81,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (obj != null)
             {
                 tableId = obj.ClassId();
-                if (tableId == Uniconta.DataModel.TableData.CLASS_ID)
+                if (tableId == Uniconta.DataModel.TableData.CLASSID)
                     tableId = ((Uniconta.DataModel.TableData)obj).GetClassIdSpecial();
             }
             GetFields(tableType);

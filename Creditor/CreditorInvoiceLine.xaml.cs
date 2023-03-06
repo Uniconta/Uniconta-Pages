@@ -26,6 +26,8 @@ using DevExpress.Data;
 using Uniconta.API.Service;
 using Uniconta.Client.Pages;
 using Uniconta.Common.Utility;
+using System.Windows;
+using Localization = Uniconta.ClientTools.Localization;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -78,11 +80,11 @@ namespace UnicontaClient.Pages.CustomPage
             string header;
             if (dgCrdInvLines.masterRecord is CreditorInvoiceClient dCInvoice)
             {
-                header = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("InvoiceNumber"), dCInvoice._InvoiceNumber);
+                header = string.Format("{0}: {1}", Localization.lookup("InvoiceNumber"), dCInvoice._InvoiceNumber);
             }
             else if (dgCrdInvLines.masterRecord is DCAccount dcAccount)
             {
-                header = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("InvTransactions"), dcAccount._Account);
+                header = string.Format("{0}: {1}", Localization.lookup("InvTransactions"), dcAccount._Account);
             }
             else
                 return;
@@ -108,26 +110,23 @@ namespace UnicontaClient.Pages.CustomPage
             dgCrdInvLines.ShowTotalSummary();
         }
 
-        double sumMargin, sumSales, sumMarginRatio;
+        double sumCost, sumSales;
         private void DgCrdInvLines_CustomSummary(object sender, DevExpress.Data.CustomSummaryEventArgs e)
         {
             var fieldName = ((GridSummaryItem)e.Item).FieldName;
             switch (e.SummaryProcess)
             {
                 case CustomSummaryProcess.Start:
-                    sumMargin = sumSales = 0d;
+                    sumCost = sumSales = 0d;
                     break;
                 case CustomSummaryProcess.Calculate:
                     var row = e.Row as CreditorInvoiceLines;
-                    sumSales += row.SalesPrice;
-                    sumMargin += row.Margin;
+                    sumSales += row._NetAmount();
+                    sumCost += row.CostValue;
                     break;
                 case CustomSummaryProcess.Finalize:
                     if (fieldName == "MarginRatio" && sumSales > 0)
-                    {
-                        sumMarginRatio = 100 * sumMargin / sumSales;
-                        e.TotalValue = sumMarginRatio;
-                    }
+                        e.TotalValue = Math.Round((sumSales - sumCost) * 100d / sumSales, 2);
                     break;
             }
         }
@@ -152,8 +151,8 @@ namespace UnicontaClient.Pages.CustomPage
             else
                 Warehouse.ShowInColumnChooser = true;
             if (!company.Project)
-                Project.Visible = Project.ShowInColumnChooser = WorkSpace.ShowInColumnChooser= WorkSpace.Visible=
-                    PrCategory.Visible= PrCategory.ShowInColumnChooser= false;
+                Project.Visible = Project.ShowInColumnChooser = WorkSpace.ShowInColumnChooser = WorkSpace.Visible =
+                    PrCategory.Visible = PrCategory.ShowInColumnChooser = false;
             else
                 Project.ShowInColumnChooser = true;
             if (!company.ProjectTask)
@@ -167,7 +166,7 @@ namespace UnicontaClient.Pages.CustomPage
             Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
         }
 
-       
+
         void localMenu_OnItemClicked(string ActionType)
         {
             var selectedItem = dgCrdInvLines.SelectedItem as InvTransClient;
@@ -223,8 +222,8 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "Invoice":
                     if (selectedItem == null) return;
-                        var credHeader = Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("CreditorInvoice"), selectedItem._Item);
-                        AddDockItem(TabControls.CreditorInvoice, selectedItem, credHeader);
+                    var credHeader = Util.ConcatParenthesis(Localization.lookup("CreditorInvoice"), selectedItem._Item);
+                    AddDockItem(TabControls.CreditorInvoice, selectedItem, credHeader);
                     break;
                 case "ViewDownloadRow":
                     if (selectedItem != null)
@@ -235,15 +234,18 @@ namespace UnicontaClient.Pages.CustomPage
                         return;
                     string arg;
                     if (selectedItem._JournalPostedId != 0)
-                        arg = string.Format("{0}={1}", Uniconta.ClientTools.Localization.lookup("JournalPostedId"), selectedItem._JournalPostedId);
+                        arg = string.Format("{0}={1}", Localization.lookup("JournalPostedId"), selectedItem._JournalPostedId);
                     else if (selectedItem._InvoiceNumber != 0)
-                        arg = string.Format("{0}={1}", Uniconta.ClientTools.Localization.lookup("Invoice"), selectedItem._InvoiceNumber);
+                        arg = string.Format("{0}={1}", Localization.lookup("Invoice"), selectedItem._InvoiceNumber);
                     else if (selectedItem._InvJournalPostedId != 0)
-                        arg = string.Format("{0} ({1})={2}", Uniconta.ClientTools.Localization.lookup("JournalPostedId"), Uniconta.ClientTools.Localization.lookup("Inventory"), selectedItem._InvJournalPostedId);
+                        arg = string.Format("{0} ({1})={2}", Localization.lookup("JournalPostedId"), Localization.lookup("Inventory"), selectedItem._InvJournalPostedId);
                     else
-                        arg = string.Format("{0}={1}", Uniconta.ClientTools.Localization.lookup("Account"), selectedItem.AccountName);
-                    string vheader = Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("VoucherTransactions"), arg);
+                        arg = string.Format("{0}={1}", Localization.lookup("Account"), selectedItem.AccountName);
+                    string vheader = Util.ConcatParenthesis(Localization.lookup("VoucherTransactions"), arg);
                     AddDockItem(TabControls.AccountsTransaction, dgCrdInvLines.syncEntity, vheader);
+                    break;
+                case "ChangeCostValue":
+                    DebtorInvoiceLinesPage.ChangeCostValue(selectedItem, dgCrdInvLines);
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);

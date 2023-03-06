@@ -219,6 +219,15 @@ namespace UnicontaClient.Pages.CustomPage
                     if (string.IsNullOrEmpty(rec._Warehouse))
                         rec._Location = null;
                     break;
+                case "SerieBatch":
+                    var selectedSerieBatch = rec.SerieBatches?.Where(x => x.Number == rec.SerieBatch).FirstOrDefault();
+                    if (selectedSerieBatch != null && api.CompanyEntity.Warehouse)
+                    {
+                        rec.Warehouse = selectedSerieBatch.Warehouse;
+                        if (api.CompanyEntity.Location)
+                            rec.Location = selectedSerieBatch.Location;
+                    }
+                    break;
             }
         }
 
@@ -289,7 +298,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             var api = this.api;
             var Comp = api.CompanyEntity;

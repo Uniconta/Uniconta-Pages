@@ -188,7 +188,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             if (api.CompanyEntity.ItemVariants)
                 LoadType(new Type[] { typeof(Uniconta.DataModel.InvVariant1), typeof(Uniconta.DataModel.InvVariant2), typeof(Uniconta.DataModel.InvVariant3), typeof(Uniconta.DataModel.InvVariant4), typeof(Uniconta.DataModel.InvVariant5) });

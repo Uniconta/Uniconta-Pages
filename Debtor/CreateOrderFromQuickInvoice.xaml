@@ -1,26 +1,25 @@
-<cw:ChildWindow xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
-x:Class="UnicontaClient.Pages.CustomPage.CWCreateOrderFromQuickInvoice"
+<Pages:GridBasePage  xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools" 
+           xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.CreateOrderFromQuickInvoice"
            xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
-           xmlns:cw="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
-           xmlns:controls="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls"  
-           xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
            xmlns:UnicontaControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
            xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
            xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
            xmlns:docking="http://schemas.devexpress.com/winfx/2008/xaml/docking"
-           xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage" Width="700" Height="650" KeyDown="ChildWindow_KeyDown">
-    <cw:ChildWindow.Resources>
+           xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage" KeyDown="ChildWindow_KeyDown">
+    <UserControl.Resources>
         <Style x:Key="StyleRow" TargetType="dxg:RowControl">
             <Setter Property="Height" Value="Auto"/>
         </Style>
         <Util:RowIndexConverter x:Key="RowIndexConverter" />
         <Util:MaskConverter x:Key="MaskConverter" />
-    </cw:ChildWindow.Resources>
+    </UserControl.Resources>
     <Grid x:Name="LayoutRoot" Margin="2" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <UnicontaControls:CorasauRibbonControl XMLSourcePath=";component/Assets/FilterLayoutRibbon.xml" x:Name="localMenu"/>
@@ -34,6 +33,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CWCreateOrderFromQuickInvoice"
                                 <UnicontaControls:CorasauDataGridTemplateColumn FieldName="Name" IsSmart="True" AllowEditing="False" Width="120"/>
                                 <UnicontaControls:CorasauDataGridTemplateColumn FieldName="Date" IsSmart="True" AllowEditing="False" Width="80" />
                                 <UnicontaControls:CorasauDataGridTemplateColumn FieldName="InvoiceNumber" IsSmart="True" AllowEditing="False" Width="50"/>
+                                <UnicontaControls:CorasauDataGridTemplateColumn FieldName="LineAmount" IsSmart="True" AllowEditing="False" Width="120"/>
                                 <UnicontaControls:CorasauDataGridTemplateColumn FieldName="TotalAmount" IsSmart="True" AllowEditing="False" Width="120"/>
                             </localPage:InvoicesGrid.Columns>
                         </localPage:InvoicesGrid>
@@ -59,10 +59,11 @@ x:Class="UnicontaClient.Pages.CustomPage.CWCreateOrderFromQuickInvoice"
                 </docking:LayoutGroup>
             </docking:DockLayoutManager>
         </UnicontaControls:BusyIndicator>
-        <CheckBox x:FieldModifier="public" x:Name="chkIfCreditNote" Grid.Row="2" Unchecked="chkIfCreditNote_Checked" Checked="chkIfCreditNote_Checked" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CreditNote}" Height="23" HorizontalAlignment="Left" />
+        <CheckBox x:FieldModifier="public" x:Name="chkIfCreditNote" Grid.Row="2" Unchecked="chkIfCreditNote_Checked" Checked="chkIfCreditNote_Checked" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CreditNote}" HorizontalAlignment="Left" />
+        <CheckBox x:Name="chkDelete" Grid.Row="2" Visibility="Collapsed" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DeleteProposalLines}" Margin="0 20 0 0" HorizontalAlignment="Left" IsChecked="{Binding IsDeleteLines}" />
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0 10 0 10">
             <Button x:Name="CreateButton" IsDefault="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CopyLine}" Click="CreateButton_Click"  Height="23" HorizontalAlignment="Right" />
             <Button x:Name="CancelButton" IsCancel="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Cancel}" Click="CancelButton_Click"  Height="23"  Margin="3,0,0,0" />
         </StackPanel>
     </Grid>
-</cw:ChildWindow>
+</Pages:GridBasePage>

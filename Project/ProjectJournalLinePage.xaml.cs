@@ -25,6 +25,7 @@ using UnicontaClient.Pages.GL.ChartOfAccount.Reports;
 using Uniconta.API.GeneralLedger;
 using Uniconta.API.Project;
 using Uniconta.API.Service;
+using Uniconta.Common.Utility;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -33,7 +34,7 @@ namespace UnicontaClient.Pages.CustomPage
     {
         internal bool InsidePropChange;
         public double costPct, salesPct, costAmount, salesAmount;
-       
+
         public void SetCost(double cost)
         {
             if (cost != 0d)
@@ -125,7 +126,12 @@ namespace UnicontaClient.Pages.CustomPage
                 newRow._WorkSpace = last._WorkSpace;
                 newRow._Invoiceable = last._Invoiceable;
                 newRow.PrCategorySource = last.PrCategorySource;
-            }
+                newRow._Dim1 = last._Dim1;
+                newRow._Dim2 = last._Dim2;
+                newRow._Dim3 = last._Dim3;
+                newRow._Dim4 = last._Dim4;
+                newRow._Dim5 = last._Dim5;
+             }
         }
     }
 
@@ -179,7 +185,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         public override void SetParameter(IEnumerable<ValuePair> Parameters)
         {
-            foreach(var rec in Parameters)
+            foreach (var rec in Parameters)
             {
                 if (string.Compare(rec.Name, "Journal", StringComparison.CurrentCultureIgnoreCase) == 0)
                 {
@@ -279,11 +285,11 @@ namespace UnicontaClient.Pages.CustomPage
                     var pro = (Uniconta.DataModel.Project)ProjectCache.Get(rec._Project);
                     if (pro != null)
                     {
-                        if (pro._Dim1 != null) rec.Dimension1 = pro._Dim1;
-                        if (pro._Dim2 != null) rec.Dimension2 = pro._Dim2;
-                        if (pro._Dim3 != null) rec.Dimension3 = pro._Dim3;
-                        if (pro._Dim4 != null) rec.Dimension4 = pro._Dim4;
-                        if (pro._Dim5 != null) rec.Dimension5 = pro._Dim5;
+                        rec.Dimension1 = pro._Dim1;
+                        rec.Dimension2 = pro._Dim2;
+                        rec.Dimension3 = pro._Dim3;
+                        rec.Dimension4 = pro._Dim4;
+                        rec.Dimension5 = pro._Dim5;
                         rec.Invoiceable = pro._InvoiceAble;
                         getCostAndSales(rec);
                         TimePriceLookup?.GetEmployeePrice(rec);
@@ -335,7 +341,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (rec._TimeTo >= rec._TimeFrom)
                         rec.Qty = (rec._TimeTo - rec._TimeFrom) / 60d;
                     else
-                        rec.Qty = ((rec._TimeTo + 24*60) - rec._TimeFrom) / 60d;
+                        rec.Qty = ((rec._TimeTo + 24 * 60) - rec._TimeFrom) / 60d;
                     break;
 
                 case "Qty":
@@ -360,6 +366,13 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         if (rec._Item == null || rec._Item == string.Empty)
                             GetItemFromSerailNumber(rec);
+                        var selectedSerieBatch = (rec.serieBatchSource as InvSerieBatchClient[])?.Where(x => x.Number == rec.SerieBatch).FirstOrDefault();
+                        if (selectedSerieBatch != null && api.CompanyEntity.Warehouse)
+                        {
+                            rec.Warehouse = selectedSerieBatch.Warehouse;
+                            if (api.CompanyEntity.Location)
+                                rec.Location = selectedSerieBatch.Location;
+                        }
                     }
                     break;
                 case "Task":
@@ -605,7 +618,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var priceLookup = SetPriceLookup(rec);
             if (priceLookup != null && priceLookup.UseCustomerPrices)
-                priceLookup.GetCustomerPrice(rec, false); 
+                priceLookup.GetCustomerPrice(rec, false);
         }
 
         Uniconta.API.DebtorCreditor.FindPrices SetPriceLookup(ProjectJournalLineLocal rec)
@@ -616,15 +629,14 @@ namespace UnicontaClient.Pages.CustomPage
                 if (dictPriceLookup.ContainsKey(proj._DCAccount))
                     return dictPriceLookup[proj._DCAccount];
 
-                var order = new DebtorOrder() { _DCAccount = proj._DCAccount };
-                var priceLookup = new Uniconta.API.DebtorCreditor.FindPrices(order, api);
+                var priceLookup = new Uniconta.API.DebtorCreditor.FindPrices(proj, api);
                 dictPriceLookup.Add(proj._DCAccount, priceLookup);
                 return priceLookup;
             }
             return null;
         }
 
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             var api = this.api;
             if (ProjectCache == null)
@@ -638,14 +650,14 @@ namespace UnicontaClient.Pages.CustomPage
             if (EmployeeCache == null)
                 EmployeeCache = await api.LoadCache(typeof(Uniconta.DataModel.Employee)).ConfigureAwait(false);
             if (PrStandardCache == null)
-                PrStandardCache =  await api.LoadCache(typeof(Uniconta.DataModel.PrStandard)).ConfigureAwait(false);
+                PrStandardCache = await api.LoadCache(typeof(Uniconta.DataModel.PrStandard)).ConfigureAwait(false);
             if (api.CompanyEntity.Payroll)
                 PayrollCache = api.GetCache(typeof(Uniconta.DataModel.EmpPayrollCategory)) ?? await api.LoadCache(typeof(Uniconta.DataModel.EmpPayrollCategory)).ConfigureAwait(false);
             if (api.CompanyEntity.Warehouse)
                 WarehouseCache = api.GetCache(typeof(Uniconta.DataModel.InvWarehouse)) ?? await api.LoadCache(typeof(Uniconta.DataModel.InvWarehouse)).ConfigureAwait(false);
             WorkspaceCache = WorkspaceCache ?? await api.LoadCache<Uniconta.DataModel.PrWorkSpace>().ConfigureAwait(false);
 
-            TimePriceLookup = new Uniconta.API.Project.FindPricesEmpl(api);
+            TimePriceLookup = new Uniconta.API.Project.FindPricesEmpl(api, true);
 
             dgProjectJournalLinePageGrid.WorkSpaceDefault = WorkspaceCache.FirstOrDefault(s => s._Default)?._Number; ;
         }
@@ -686,6 +698,13 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         UnfoldBOM(selectedItem);
                     break;
+                case "AddItems":
+                    if (ItemsCache == null)
+                        return;
+                    object[] paramArray = new object[3] { new InvItemSalesCacheFilter(ItemsCache), dgProjectJournalLinePageGrid.TableTypeUser, masterJournal };
+                    AddDockItem(TabControls.AddMultiInventoryItemsForProject, paramArray, true,
+                        string.Format(Uniconta.ClientTools.Localization.lookup("AddOBJ"), Uniconta.ClientTools.Localization.lookup("InventoryItems")), null, floatingLoc: Utility.GetDefaultLocation());
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -696,14 +715,14 @@ namespace UnicontaClient.Pages.CustomPage
         {
             ProjectJournalLineLocal selectedItem = dgProjectJournalLinePageGrid.SelectedItem as ProjectJournalLineLocal;
             if (selectedItem?._Item != null)
-                setSerieBatch(ItemsCache.Get<InvItem>(selectedItem._Item), selectedItem);
+                setSerieBatchSource(ItemsCache.Get<InvItem>(selectedItem._Item), selectedItem);
         }
-        async void setSerieBatch(InvItem master, ProjectJournalLineLocal rec)
+        async void setSerieBatchSource(InvItem master, ProjectJournalLineLocal rec)
         {
             if (master != null && master._UseSerialBatch)
             {
                 var lst = await api.Query<InvSerieBatchClient>(new InvSerieBatchOpen() { _Item = rec._Item });
-                rec.serieBatchSource = lst?.Select(x => x.Number).ToList();
+                rec.serieBatchSource = lst;
             }
             else
             {
@@ -792,7 +811,7 @@ namespace UnicontaClient.Pages.CustomPage
             return saveGrid();
         }
 
-        void UpdatePrices() 
+        void UpdatePrices()
         {
             var source = dgProjectJournalLinePageGrid.GetVisibleRows() as IEnumerable<ProjectJournalLineLocal>;
             foreach (var rec in source)
@@ -905,7 +924,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (savetask != null)
                         await savetask;
 
-                   // var source = dgProjectJournalLinePageGrid.ItemsSource as IEnumerable<ProjectJournalLineLocal>;
+                    // var source = dgProjectJournalLinePageGrid.ItemsSource as IEnumerable<ProjectJournalLineLocal>;
                     var cnt = source.Count();
 
                     Task<PostingResult> task;
@@ -958,7 +977,7 @@ namespace UnicontaClient.Pages.CustomPage
                 return;
 
             var selectedItem = dgProjectJournalLinePageGrid.SelectedItem as ProjectJournalLineLocal;
-            if (selectedItem?._Warehouse != null )
+            if (selectedItem?._Warehouse != null)
             {
                 var selected = (InvWarehouse)WarehouseCache.Get(selectedItem._Warehouse);
                 setLocation(selected, selectedItem);
@@ -984,6 +1003,28 @@ namespace UnicontaClient.Pages.CustomPage
                 mClient.NumberOfLines = cnt;
             else
                 masterJournal._NumberOfLines = cnt;
+        }
+
+        public override void Utility_Refresh(string screenName, object argument = null)
+        {
+            var param = argument as object[];
+            if (param != null)
+            {
+                if (screenName == TabControls.AddMultiInventoryItemsForProject)
+                {
+                    var journalId = (int)NumberConvert.ToInt(Convert.ToString(param[1]));
+                    if (masterJournal.RowId == journalId)
+                    {
+                        if (dgProjectJournalLinePageGrid.isDefaultFirstRow)
+                        {
+                            dgProjectJournalLinePageGrid.DeleteRow();
+                            dgProjectJournalLinePageGrid.isDefaultFirstRow = false;
+                        }
+                        var invItems = param[0] as List<UnicontaBaseEntity>;
+                        dgProjectJournalLinePageGrid.PasteRows(invItems);
+                    }
+                }
+            }
         }
     }
 }

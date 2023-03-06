@@ -67,6 +67,7 @@ namespace UnicontaClient.Pages.CustomPage
             InitializeComponent();
             SetRibbonControl(localMenu, dgCreditorTranOpenGrid);
             dgCreditorTranOpenGrid.api = api;
+            api.ForcePrimarySQL = true;
             dgCreditorTranOpenGrid.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgCreditorTranOpenGrid.UpdateMaster(pageMaster = master);

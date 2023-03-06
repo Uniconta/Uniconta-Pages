@@ -128,14 +128,11 @@ x:Class="UnicontaClient.Pages.CustomPage.AccountStatement2"
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Credit" Width="100"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Amount" Visible="False" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Total" Width="100"/>
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="PrimoTrans" Width="50" Visible="False" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="JournalPostedId" Visible="False" Width="60" />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Origin" Width="100" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Correction" Width="50" Visible="False" />
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Accrual" Width="50" Visible="False" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Accrued" Width="50" Visible="False" />
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Allocation" Width="50" Visible="False" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Allocated" Width="50" Visible="False" />
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="YearTransfer" Width="50" Visible="False" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="PostCalculated" Width="50" Visible="False" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="VatEntered" Width="50" Visible="False" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Vat" Width="50" />

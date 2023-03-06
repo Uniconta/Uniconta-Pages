@@ -169,6 +169,10 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         AddDockItem(TabControls.DebtorBudgetLinePage, dgEmployeeGrid.syncEntity);
                     break;
+                case "Archived":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.AttachedVouchers, dgEmployeeGrid.SelectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Vouchers"), selectedItem._Name));
+                    break; 
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;

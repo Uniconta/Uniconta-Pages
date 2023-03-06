@@ -57,6 +57,7 @@ namespace UnicontaClient.Pages.CustomPage
         bool OffSet, RoundTo100;
         private object[] refreshParams;
         private List<long> markedlist;
+        int GraceDays;
         public SettleOpenTransactionPage(UnicontaBaseEntity baseEntity, byte openTransType, UnicontaBaseEntity selectedjournalLine, bool offSet, IEnumerable<string> markedList) : base(null)
         {
             InitializeComponent();
@@ -88,6 +89,9 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 PaymentId.Visible = PaymentId.ShowInColumnChooser = false;
                 PaymentMethod.Visible = PaymentMethod.ShowInColumnChooser = false;
+
+                if (api.CompanyEntity.Settings != null)
+                    this.GraceDays = api.CompanyEntity.Settings._GraceDays;
             }
             localMenu.OnItemClicked += LocalMenu_OnItemClicked;
             var Comp = api.CompanyEntity;
@@ -399,7 +403,7 @@ namespace UnicontaClient.Pages.CustomPage
                     refreshParams[1] = settlement;
                     refreshParams[2] = RemainingAmt;
                     refreshParams[3] = RemainingAmtCur;
-                    refreshParams[4] = settleCur != 0 ? Enum.GetName(typeof(Currencies), IdObject.get(settleCur)) : null;
+                    refreshParams[4] = settleCur != 0 ? CurrencyUtil.GetStringFromId(settleCur) : null;
                     refreshParams[5] = OffSet;
                 }
                 else if (SelectedBankStatemenLine != null)
@@ -545,7 +549,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (row._CashDiscount != 0)
             {
                 DateTime dt = (SelectedJournalLine != null) ? SelectedJournalLine._Date : (SelectedBankStatemenLine != null ? SelectedBankStatemenLine._Date : DateTime.MinValue);
-                if (dt <= row._CashDiscountDate)
+                if (dt <= row._CashDiscountDate.AddDays(this.GraceDays))
                 {
                     if (amountOpenCur == 0)
                     {

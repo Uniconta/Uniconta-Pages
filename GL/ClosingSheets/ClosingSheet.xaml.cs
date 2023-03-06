@@ -48,6 +48,15 @@ namespace UnicontaClient.Pages.CustomPage
             dgClosingSheet.BusyIndicator = busyIndicator;        
             
             localMenu.OnItemClicked += localMenu_OnItemClicked;
+            dgClosingSheet.RowDoubleClick += dgClosingSheet_RowDoubleClick;
+        }
+        void dgClosingSheet_RowDoubleClick()
+        {
+            localMenu_OnItemClicked("Accounts");
+        }
+        private void Name_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            dgClosingSheet_RowDoubleClick();
         }
 
         protected override void LoadCacheInBackGround() { LoadType(typeof(Uniconta.DataModel.GLAccount)); }

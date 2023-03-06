@@ -62,6 +62,10 @@ namespace UnicontaClient.Pages.CustomPage
             if (selectedItem != null)
                 AddDockItem(TabControls.GLReportLine, selectedItem, string.Format("{0}: {1}", Localization.lookup("ReportLines"), selectedItem._Name));
         }
+        private void Name_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            dgGLReportTemplate_RowDoubleClick();
+        }
         public override void Utility_Refresh(string screenName, object argument = null)
         {
             if (screenName == TabControls.GLReportTemplatePage2)

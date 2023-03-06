@@ -92,7 +92,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             localMenu_OnItemClicked("GLTran");
         }
-
+        
         void localMenu_OnItemClicked(string ActionType)
         {
             GLAccountClient selectedItem = dgGLTable.SelectedItem as GLAccountClient;

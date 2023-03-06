@@ -105,7 +105,7 @@ namespace UnicontaClient.Pages.CustomPage
             return null;
         }
 
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             if (glVatCache == null)
                 glVatCache = await api.LoadCache<Uniconta.DataModel.GLVat>().ConfigureAwait(false);
@@ -149,8 +149,8 @@ namespace UnicontaClient.Pages.CustomPage
             SetDateTime(txtDateFrm, txtDateTo);
 
             busyIndicator.IsBusy = true;
-            List<PropValuePair> propValPair = new List<PropValuePair>();
 
+            PropValuePair propDate = null;
             if (fromDate != DateTime.MinValue || toDate != DateTime.MinValue)
             {
                 string filter;
@@ -160,23 +160,32 @@ namespace UnicontaClient.Pages.CustomPage
                     filter = "..";
                 if (toDate != DateTime.MinValue)
                     filter += String.Format("{0:d}", toDate);
-                var prop = PropValuePair.GenereteWhereElements("Date", typeof(DateTime), filter);
-                propValPair.Add(prop);
+                propDate = PropValuePair.GenereteWhereElements("Date", typeof(DateTime), filter);
             }
 
             if (glVatCache == null)
                 glVatCache = await api.LoadCache<Uniconta.DataModel.GLVat>();
 
             var vatEUList = glVatCache.Where(s => s._TypeSales == CreateVatOSSFile.VATTYPE_MOSS).Select(x => x._Vat).Distinct();
-            if (vatEUList != null && vatEUList.Count() > 0)
-            {
-                var strLst = string.Join(";", vatEUList);
-                propValPair.Add(PropValuePair.GenereteWhereElements(nameof(DebtorInvoiceLines.Vat), typeof(string), strLst));
-            }
-            var listOfDebInvLines = await api.Query<DebtorInvoiceLines>(propValPair);
-            List<VatOSSTable> vatOSSlst = new List<VatOSSTable>();
 
-            if (listOfDebInvLines != null && listOfDebInvLines.Length != 0)
+            List<IEnumerable<string>> listOfLists = new List<IEnumerable<string>>();
+            for (int i = 0; i < vatEUList.Count(); i += 40)
+                listOfLists.Add(vatEUList.Skip(i).Take(40));
+
+            var listOfDebInvLines = new List<DebtorInvoiceLines>(500);
+            foreach (var lst in listOfLists)
+            {
+                List<PropValuePair> propValPair = new List<PropValuePair>();
+                if (propDate != null) propValPair.Add(propDate);
+
+                if (lst != null && lst.Count() > 0)
+                    propValPair.Add(PropValuePair.GenereteWhereElements(nameof(DebtorInvoiceLines.Vat), typeof(string), string.Join(";", lst)));
+
+                listOfDebInvLines.AddRange(await api.Query<DebtorInvoiceLines>(propValPair));
+            }
+
+            List<VatOSSTable> vatOSSlst = new List<VatOSSTable>();
+            if (listOfDebInvLines != null && listOfDebInvLines.Count > 0)
             {
                 vatOSSlst = UpdateValues(listOfDebInvLines);
                 busyIndicator.IsBusy = false;
@@ -222,9 +231,9 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        public List<VatOSSTable> UpdateValues(DebtorInvoiceLines[] listOfDebInvLines)
+        public List<VatOSSTable> UpdateValues(List<DebtorInvoiceLines> listOfDebInvLines)
         {
-            var listOfResults = new List<VatOSSTable>(listOfDebInvLines.Length);
+            var listOfResults = new List<VatOSSTable>(listOfDebInvLines.Count);
             string lastVat = null;
             string lastVatName = null;
             GLVat lastGLVat = null;

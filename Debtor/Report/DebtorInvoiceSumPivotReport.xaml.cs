@@ -133,11 +133,15 @@ namespace UnicontaClient.Pages.CustomPage
                             filterDialog = new CWServerFilter(api, typeof(DebtorInvoiceSumClient), null, null, UserFields);
                         else
                             filterDialog = new CWServerFilter(api, typeof(DebtorInvoiceSumClient), DefaultFilters(), null, UserFields);
+                        filterDialog.GridSource = pivotDgDebtorInvoiceSum.DataSource as IList<UnicontaBaseEntity>;
                         filterDialog.Closing += filterDialog_Closing;
                         filterDialog.Show();
                     }
                     else
+                    {
+                        filterDialog.GridSource = pivotDgDebtorInvoiceSum.DataSource as IList<UnicontaBaseEntity>;
                         filterDialog.Show(true);
+                    }
                     break;
                 case "ClearLocalFilter":
                     filterDialog = null;

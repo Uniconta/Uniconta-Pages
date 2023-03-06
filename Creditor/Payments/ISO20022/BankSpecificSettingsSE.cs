@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Uniconta.ClientTools.DataModel;
+using Uniconta.ClientTools.Page;
 using Uniconta.Common;
 using Uniconta.DataModel;
 using UnicontaClient.Pages;
@@ -90,6 +91,21 @@ namespace UnicontaISO20022CreditTransfer
         }
 
         /// <summary>
+        /// Date and time at which the message was created
+        /// </summary>
+        public override string CreDtTim()
+        {
+            switch (companyBankEnum)
+            {
+                case CompanyBankENUM.SEB:
+                    return DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss");
+
+                default:
+                    return DateTimeOffset.Now.ToString("o");
+            }
+        }
+
+        /// <summary>
         /// Test marked payment
         /// </summary>
         public override bool TestMarked()
@@ -130,8 +146,6 @@ namespace UnicontaISO20022CreditTransfer
 
             switch (companyBankEnum)
             {
-             
-                case CompanyBankENUM.SEB:
                 case CompanyBankENUM.DanskeBank_SE:
                     identificationId = companyCVR.Replace(" ", String.Empty);
                     return identificationId;
@@ -160,6 +174,37 @@ namespace UnicontaISO20022CreditTransfer
             }
         }
 
+        public override string CdtrAgtClrSysId(ISO20022PaymentTypes ISOPaymType)
+        {
+            if (ISOPaymType == ISO20022PaymentTypes.DOMESTIC)
+            {
+                switch (companyBankEnum)
+                {
+                    case CompanyBankENUM.SEB:
+                        return "SESBA";
+                    default:
+                        return null;
+                }
+            }
+
+            return null;
+        }
+
+        public override string CdtrAgtMmbId(PaymentTypes paymentMethod)
+        {
+            switch (companyBankEnum)
+            {
+                case CompanyBankENUM.SEB:
+                    if (paymentMethod == PaymentTypes.PaymentMethod3)
+                        return "9900";
+                    else if (paymentMethod == PaymentTypes.PaymentMethod5)
+                        return "9960";
+                    return null;
+                default:
+                    return null;
+            }
+        }
+
         /// <summary>
         /// Specifies the local instrument, as published in an external local instrument code list.
         /// Allowed Codes: 
@@ -170,9 +215,9 @@ namespace UnicontaISO20022CreditTransfer
         {
             switch (companyBankEnum)
             {
-                case CompanyBankENUM.SEB:
                 case CompanyBankENUM.DanskeBank_SE:
                     return "ONCL";
+                case CompanyBankENUM.SEB:
                 case CompanyBankENUM.Nordea_SE:
                     return string.Empty;
                 default:
@@ -187,6 +232,7 @@ namespace UnicontaISO20022CreditTransfer
             switch (companyBankEnum)
             {
                 //Service code given by Nordea is mandatory
+                case CompanyBankENUM.SEB:
                 case CompanyBankENUM.Nordea_SE:
                     return debtorId;
 
@@ -253,6 +299,61 @@ namespace UnicontaISO20022CreditTransfer
             return new Tuple<string, string>(ocrLine, creditorPaymId);
         }
 
+        public override string OCRPaymentType(string creditorOCRPaymentId)
+        {
+            if (companyBankEnum == CompanyBankENUM.SEB)
+                return null;
+
+            if (!string.IsNullOrEmpty(creditorOCRPaymentId))
+                return BaseDocument.OCR;
+
+            return null;
+        }
+
+        public override string RemittanceInfo(string externalAdvText, ISO20022PaymentTypes ISOPaymType, PaymentTypes paymentMethod)
+        {
+            if (companyBankEnum == CompanyBankENUM.SEB)
+                return string.Empty;
+            
+            string remittanceInfo = StandardPaymentFunctions.RegularExpressionReplace(externalAdvText, allowedCharactersRegEx, replaceCharactersRegEx);
+
+            if (remittanceInfo != string.Empty && ISOPaymType == ISO20022PaymentTypes.DOMESTIC)
+            {
+                switch (paymentMethod)
+                {
+                    case PaymentTypes.VendorBankAccount:
+                        if (remittanceInfo.Length > 20)
+                            remittanceInfo = remittanceInfo.Substring(0, 20);
+                        break;
+
+                    case PaymentTypes.IBAN:
+                        remittanceInfo = string.Empty;
+                        break;
+
+                    case PaymentTypes.PaymentMethod3: //FIK71
+                        remittanceInfo = string.Empty;
+                        break;
+
+                    case PaymentTypes.PaymentMethod5: //FIK75
+                        remittanceInfo = string.Empty;
+                        break;
+
+                    case PaymentTypes.PaymentMethod4: //FIK73
+                        remittanceInfo = string.Empty;
+                        break;
+
+                    case PaymentTypes.PaymentMethod6: //FIK04
+                        remittanceInfo = string.Empty;
+                        break;
+                }
+            }
+            else
+            {
+                remittanceInfo = string.Empty;
+            }
+
+            return remittanceInfo;
+        }
 
         /// <summary>
         /// Unstructured Remittance Information
@@ -303,7 +404,18 @@ namespace UnicontaISO20022CreditTransfer
                         maxStrLen = 105;
                     }
                     break;
-                    
+                case CompanyBankENUM.SEB:
+                    if (ISOPaymType == ISO20022PaymentTypes.DOMESTIC)
+                    {
+                        maxLines = 3;
+                        maxStrLen = 140;
+                    }
+                    else
+                    {
+                        maxLines = 1;
+                        maxStrLen = 140;
+                    }
+                    break;
                 case CompanyBankENUM.DanskeBank_SE:
                     maxLines = 4;
                     maxStrLen = 35;

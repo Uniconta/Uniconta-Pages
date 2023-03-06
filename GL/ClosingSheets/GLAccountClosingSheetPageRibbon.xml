@@ -40,4 +40,7 @@
     </RibbonItem>
     <RibbonItem Action="AllNotes" LocalizedNameKey="UserNotesInfo" LargeGlyph="Transactions_32x32.png"/>
   </RibbonItem>
+	<RibbonItem>
+		<RibbonItem Action="Code" LocalizedNameKey="Code" ButtonType="ComboBox" />
+	</RibbonItem>
 </root>

@@ -32,7 +32,8 @@ namespace UnicontaClient.Pages.CustomPage
     {
         public override Type TableType { get { return UserTableType; } }
         public override bool Readonly { get { return !IsEditable; } }
-        public bool IsEditable;
+        public override bool SingleBufferUpdate { get { return !doubleUpdate; } }
+        public bool IsEditable, doubleUpdate;
         public Type UserTableType;
     }
     public partial class UserTableData : GridBasePage
@@ -165,6 +166,7 @@ namespace UnicontaClient.Pages.CustomPage
             master = masterRecord;
             dgTabledataGrid.UserTableType = thMaster.UserType;
             dgTabledataGrid.IsEditable = thMaster._EditLines && !thMaster._ReadOnly;
+            dgTabledataGrid.doubleUpdate = thMaster._EditLines && thMaster._TableType == TableBaseType.Transaction;
 
             // first call setUserFields after grid is setup correctly
             setUserFields(thMaster);

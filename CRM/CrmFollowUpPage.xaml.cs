@@ -154,7 +154,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         SQLCache DebtorCache, CreditorCache, CrmProspectCache, ContactCache, ProjectCache;
-        protected override async void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             var api = this.api;
             if (DebtorCache == null)

@@ -97,7 +97,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (result == ErrorCodes.Succes)
                     {
                         UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("Succes"), Uniconta.ClientTools.Localization.lookup("Message"));
-                        DialogResult = true;
+                        SetDialogResult(true);
                     }
                 }
                 else
@@ -110,13 +110,13 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 stream?.Dispose();
                 UnicontaMessageBox.Show(ex);
-                DialogResult = false;
+                SetDialogResult(false);
             }
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            DialogResult = false;
+            SetDialogResult(false);
         }
 
         private void ChildWindow_KeyDown(object sender, KeyEventArgs e)

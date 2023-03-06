@@ -68,7 +68,7 @@ namespace UnicontaClient.Pages.CustomPage
         public override void Utility_Refresh(string screenName, object argument = null)
         {
             if (screenName == TabControls.GLVatPage2)
-                dgVat.UpdateItemSource(argument);    
+                dgVat.UpdateItemSource(argument);
         }
 
         void localMenu_OnItemClicked(string ActionType)
@@ -79,6 +79,10 @@ namespace UnicontaClient.Pages.CustomPage
                 case "AddRow":
                     AddDockItem(TabControls.GLVatPage2, api, Uniconta.ClientTools.Localization.lookup("Vat"), "Add_16x16.png");
                     break;
+                case "CopyRow":
+                    if (selectedItem != null)
+                        CopyRecord(selectedItem);
+                    break;
                 case "EditRow":
                     if (selectedItem == null)
                         return;
@@ -88,6 +92,13 @@ namespace UnicontaClient.Pages.CustomPage
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
+        }
+
+        void CopyRecord(GLVatClient selectedItem)
+        {
+            var vat = Activator.CreateInstance(selectedItem.GetType()) as GLVatClient;
+            CorasauDataGrid.CopyAndClearRowId(selectedItem, vat);
+            AddDockItem(TabControls.GLVatPage2, new object[2] { vat, false }, Uniconta.ClientTools.Localization.lookup("Vat"), "Add_16x16.png");
         }
     }
 }
