@@ -262,9 +262,9 @@ namespace UnicontaClient.Pages.CustomPage
         async void Stop(ProjectJournalLineLocal selectedItem)
         {
             TimeToRounding(selectedItem);
-            selectedItem.Qty = (selectedItem.TimeTo - selectedItem.TimeFrom).TotalMinutes;
             if (company.TimeManagement)
             {
+                selectedItem.Qty = (selectedItem.TimeTo - selectedItem.TimeFrom).TotalMinutes;
                 var result = await InsertTMJournalLine(selectedItem);
 
                 if (result == ErrorCodes.Succes)
@@ -280,6 +280,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
             else
             {
+                selectedItem.Qty = (selectedItem.TimeTo - selectedItem.TimeFrom).TotalHours;
                 var res = await api.Update(selectedItem);
                 if (res == ErrorCodes.Succes)
                     InitQuery();
@@ -331,13 +332,25 @@ namespace UnicontaClient.Pages.CustomPage
                     continue;
 
                 TimeToRounding(selectedItem);
-                selectedItem.Qty = (selectedItem.TimeTo - selectedItem.TimeFrom).TotalMinutes;
-                result = await InsertTMJournalLine(selectedItem);
+
+                if (company.TimeManagement)
+                {
+                    selectedItem.Qty = (selectedItem.TimeTo - selectedItem.TimeFrom).TotalMinutes;
+                    result = await InsertTMJournalLine(selectedItem);
+
+                    if (result != ErrorCodes.Succes)
+                        break;
+
+                    result = await api.Delete(selectedItem);
+                }
+                else
+                {
+                    selectedItem.Qty = (selectedItem.TimeTo - selectedItem.TimeFrom).TotalHours;
+                    result = await api.Update(selectedItem);
+                }
 
                 if (result != ErrorCodes.Succes)
                     break;
-
-                result = await api.Delete(selectedItem);
             }
 
             return result;

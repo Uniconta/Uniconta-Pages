@@ -37,7 +37,7 @@
 	<RibbonItem Action="DeleteStatement" LocalizedNameKey="DeleteOBJ" Parameter="Imported" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png" />
   </RibbonItem>
   <RibbonItem >
-	<RibbonItem Action="ConnectToBank" LocalizedNameKey="ConnectToBank" Module="_DirectDebitAiia" LargeGlyph="Bank_Connect_32x32.png"/>
-	<RibbonItem Action="BankLog" LocalizedNameKey="Log" Module="_DirectDebitAiia" LargeGlyph="Server_Count_32x32.png"/>
+	<RibbonItem Action="ConnectToBank" LocalizedNameKey="ConnectToBank" Module="_DirectDebit" LargeGlyph="Bank_Connect_32x32.png"/>
+	<RibbonItem Action="BankLog" LocalizedNameKey="Log" Module="_DirectDebit" LargeGlyph="Server_Count_32x32.png"/>
   </RibbonItem>
 </root>

@@ -221,6 +221,14 @@ namespace UnicontaClient.Pages.CustomPage
             return sb.ToStringAndRelease();
         }
 
+        internal class invoiceSort : IComparer<DCInvoice>
+        {
+            public int Compare(DCInvoice x, DCInvoice y)
+            {
+                return x._JournalPostedId - y._JournalPostedId;
+            }
+        }
+
         async void ExportToDatev()
         {
             if (!DataIsValidForExport(Accounts, Debtors, Creditors))
@@ -270,9 +278,28 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 try
                 {
-                    SaveGLTransactions(datev, string.Format("{0}/{1}", defaultPath, glTransFileName));
-                    SaveDebtorCreditor(datev, string.Format("{0}/{1}", defaultPath, DCFileName));
-                    SaveGLAccountLabels(datev, string.Format("{0}/{1}", defaultPath, accountLabelFileName));
+                    var filter = new[]
+                    {
+                        PropValuePair.GenereteWhereElements("Date", typeof(DateTime), String.Format("{0:d}..{1:d}", glTransExported._FromDate, glTransExported._ToDate)),
+                        PropValuePair.GenereteWhereElements("DeliveryDate", typeof(DateTime), "!null")
+                    };
+
+                    var invSort = new invoiceSort();
+
+                    var debInvoice = await api.Query<Uniconta.DataModel.DebtorInvoice>(filter);
+                    if (debInvoice.Length > 0)
+                        Array.Sort(debInvoice, invSort);
+                    else
+                        debInvoice = null;
+                    var creInvoice = await api.Query<Uniconta.DataModel.CreditorInvoice>(filter);
+                    if (creInvoice.Length > 0)
+                        Array.Sort(creInvoice, invSort);
+                    else
+                        creInvoice = null;
+
+                    SaveGLTransactions(datev, defaultPath + "/" + glTransFileName, debInvoice, creInvoice, invSort);
+                    SaveDebtorCreditor(datev, defaultPath + "/" + DCFileName);
+                    SaveGLAccountLabels(datev, defaultPath + "/" + accountLabelFileName);
                     UnicontaMessageBox.Show("DATEV Export erfolgreich", Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OK);
                 }
                 catch (Exception ex)
@@ -282,7 +309,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        private void SaveGLTransactions(DatevHeader datev, string fileName)
+        private void SaveGLTransactions(DatevHeader datev, string fileName, DCInvoice[] debInvoice, DCInvoice[] creInvoice, invoiceSort invSort)
         {
             using (Stream stream = File.Create(fileName))
             {
@@ -292,7 +319,10 @@ namespace UnicontaClient.Pages.CustomPage
                     Debtors = Debtors,
                     Creditors = Creditors,
                     VATs = VATs,
-                    Pays = Pays
+                    Pays = Pays,
+                    invSort = invSort,
+                    debInvoice = debInvoice,
+                    creInvoice = creInvoice
                 };
 
                 df.GenerateTransactionFile(dgAccountsTransGrid.ItemsSource as IEnumerable<GLTransClient>, new StreamWriter(stream, Encoding.UTF8));
@@ -416,6 +446,9 @@ namespace UnicontaClient.Pages.CustomPage
             public SQLCache Accounts, Debtors, Creditors, VATs, Pays;
             HashSet<string> bankAccounts;
             string[] line;
+            internal invoiceSort invSort;
+            DebtorInvoice invSearch;
+            internal DCInvoice[] debInvoice, creInvoice;
 
             public DateveWrapper(Company company, GLTransExportedClient glTransExported, DatevHeader datev, int AccountLength)
             {
@@ -437,6 +470,8 @@ namespace UnicontaClient.Pages.CustomPage
                 fromDate = glTransExported._FromDate;
                 toDate = glTransExported._ToDate;
                 line = new string[300];
+
+                invSearch = new DebtorInvoice();
             }
 
             void PopulateEmptyFieldIndexLists()
@@ -715,6 +750,21 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     entry.ContraAccount = dcaccount;
                     entry.EUMemberStateAndVATI = tc.LegalIdent;
+
+                    DCInvoice[] arr;
+                    if (tc._DCType == GLTransRefType.Debtor)
+                        arr = this.debInvoice;
+                    else if (tc._DCType == GLTransRefType.Creditor)
+                        arr = this.creInvoice;
+                    else
+                        arr = null;
+                    if (arr != null)
+                    {
+                        this.invSearch._JournalPostedId = tc._JournalPostedId;
+                        var pos = Array.BinarySearch(arr, invSearch, invSort);
+                        if (pos >= 0 && pos < arr.Length)
+                            entry.DelvDate = arr[pos]._DeliveryDate;
+                    }
                 }
                 else
                     entry.ContraAccount = defaultContraAccount;
@@ -845,6 +895,7 @@ namespace UnicontaClient.Pages.CustomPage
             public string logId;
             public Guid LinkGuid; //DT Per
             public int cID;
+            public DateTime DelvDate; //DT Per 90
 
             public override void ToDatevArray(string[] line)
             {
@@ -866,6 +917,8 @@ namespace UnicontaClient.Pages.CustomPage
                 line[37] = AddSingleQuotes(KOST2);
                 line[38] = KOSTQuantity == 0 ? "" : NumberConvert.ToString(KOSTQuantity);
                 line[39] = AddSingleQuotes(EUMemberStateAndVATI);
+                line[114] = DelvDate == DateTime.MinValue ? "\"\"" : AddSingleQuotes(DelvDate.ToString("ddMMyyyy"));
+
             }
         }
 

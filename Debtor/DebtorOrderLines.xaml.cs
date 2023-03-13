@@ -489,7 +489,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (dgDebtorOrderLineGrid.CurrentColumn == Item)
             {
                 var selectedItem = dgDebtorOrderLineGrid.SelectedItem as DebtorOrderLineClient;
-                if (!(selectedItem._QtyDelivered == 0 || (selectedItem._QtyDelivered == selectedItem._QtyInvoiced)))
+                if (selectedItem != null && !(selectedItem._QtyDelivered == 0 || (selectedItem._QtyDelivered == selectedItem._QtyInvoiced)))
                 {
                     UtilDisplay.ShowErrorCode(ErrorCodes.ContainsLinesDelivered);
                     (dgDebtorOrderLineGrid.tableView).CancelRowEdit();

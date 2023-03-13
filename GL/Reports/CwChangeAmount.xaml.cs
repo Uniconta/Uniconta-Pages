@@ -33,9 +33,12 @@ namespace UnicontaClient.Pages.CustomPage
         [Display(Name = "Comment", ResourceType = typeof(InputFieldDataText))]
         public string Comment { get; set; }
 
-        public CwChangeAmount(GLTransClient glTrans)
+        public string AmountFormat { get; private set; }
+
+        public CwChangeAmount(GLTransClient glTrans, bool hasDecimal)
         {
             Amount = glTrans._Amount;
+            AmountFormat = hasDecimal ? "n2" : "n0";
             InitializeComponent();
             this.DataContext = this;
             this.Title = String.Format(Uniconta.ClientTools.Localization.lookup("ChangeOBJ"),
@@ -65,7 +68,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
-            if(string.IsNullOrWhiteSpace(txtAmount.Text))
+            if (string.IsNullOrWhiteSpace(txtAmount.Text))
             {
                 UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("MandatoryField"), (Uniconta.ClientTools.Localization.lookup("Amount"))), Uniconta.ClientTools.Localization.lookup("Warning"));
                 return;

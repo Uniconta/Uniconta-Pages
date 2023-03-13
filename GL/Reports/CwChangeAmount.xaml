@@ -25,7 +25,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CwChangeAmount"
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
             <TextBlock  Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Amount}" Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" />
-            <UnicontaCtrls:TextEditor x:Name="txtAmount" Text="{Binding Amount, Mode=TwoWay}" MaskType="Numeric" Mask="N2"  Grid.Column="2" Grid.Row="0" Height="25" VerticalAlignment="Center"   />
+            <UnicontaCtrls:TextEditor x:Name="txtAmount" Text="{Binding Amount, Mode=TwoWay}" MaskType="Numeric" Mask="{Binding AmountFormat}"  Grid.Column="2" Grid.Row="0" Height="25" VerticalAlignment="Center"   />
             <TextBlock x:Name="txtBlockComments" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Comment}" Grid.Column="0" Grid.Row="4" VerticalAlignment="Center" />
             <UnicontaCtrls:TextEditor  x:Name="txtComments" Text="{Binding Comment,Mode=TwoWay}"  Grid.Column="2" Grid.Row="4" Height="25"   VerticalAlignment="Center"/>
         </Grid>

@@ -494,6 +494,11 @@ namespace UnicontaISO20022CreditTransfer
 
         }
 
+        public virtual string ExtServicePrtry(ISO20022PaymentTypes paymentType, string creditorSWIFT)
+        {
+            return null;
+        }
+
         /// <summary>
         /// Name of the agent (typical a bank name).
         /// </summary>

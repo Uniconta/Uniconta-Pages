@@ -64,9 +64,9 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorPayments"
                     <local:CorasauDataGridTemplateColumnClient x:Name="DueDate" Width="80"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="LastInterest" ReadOnly="True" Width="80"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="LastCollectionLetter" ReadOnly="True" Width="80"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Code" Width="90"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="LastCollectionsLetterCode" Width="90"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="CollectionsLetters" ReadOnly="True" Visible="False" Width="50"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="LastCollectionsLetterCode" Width="90"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Code" Width="90"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="FeeAmount" Width="80"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="PaymentCharge" Width="80" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Text" />

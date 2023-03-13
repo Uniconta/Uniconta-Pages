@@ -18,6 +18,7 @@ using Uniconta.ClientTools.DataModel;
 using System.ComponentModel.DataAnnotations;
 using UnicontaClient.Controls;
 using Uniconta.ClientTools.Controls;
+using Uniconta.API.System;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -84,7 +85,6 @@ namespace UnicontaClient.Pages.CustomPage
             this.DataContext = this;
             InitializeComponent();
             ShowInvoice = true;
-#if !SILVERLIGHT
             this.Title = Uniconta.ClientTools.Localization.lookup("GenerateInvoice");
             if (isOrderOrQuickInv)
             {
@@ -92,7 +92,6 @@ namespace UnicontaClient.Pages.CustomPage
                 chkOIOUBL.IsEnabled = true;
                 chkOIOUBL.IsChecked = InvoiceInXML;
             }
-#endif
             dpDate.DateTime = dpDate.DateTime == DateTime.MinValue ? BasePage.GetSystemDefaultDate() : dpDate.DateTime;
 
             if (AccountName == null)
@@ -144,24 +143,17 @@ namespace UnicontaClient.Pages.CustomPage
                 liInvoiceNumber.Label = Uniconta.ClientTools.Localization.lookup("InvoiceNumber");
             txtInvNumber.MaxLength = 20;
             chkShowInvoice.IsChecked = showInvoice;
-#if SILVERLIGHT
-            Utilities.Utility.SetThemeBehaviorOnChildWindow(this);
-#endif
             if (!isShowInvoiceVisible)
                 liShowInvoice.Visibility = Visibility.Collapsed;
-#if !SILVERLIGHT
             lgPrint.Visibility = isQuickPrintVisible ? Visibility.Visible : Visibility.Collapsed;
             liNumberOfPages.Visibility = isQuickPrintVisible && isPageCountVisible ? Visibility.Visible : Visibility.Collapsed;
-#endif
             this.Loaded += CW_Loaded;
         }
 
         void CW_Loaded(object sender, RoutedEventArgs e)
         {
-#if !SILVERLIGHT
             if (IsSendXmlSalesInvoice)
                 liGenerateOIOUBLClicked.Label = Uniconta.ClientTools.Localization.lookup("SendInvoicebyUBL");
-#endif
             Dispatcher.BeginInvoke(new Action(() => { OKButton.Focus(); }));
         }
         private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
@@ -209,14 +201,13 @@ namespace UnicontaClient.Pages.CustomPage
 
         public void SetAdditionalOrders(IEnumerable<DCOrder> orderList)
         {
-#if !SILVERLIGHT
             lgOrders.Visibility = Visibility.Visible;
             cbOrders.ItemsSource = orderList;
-#endif
         }
 
-        IEnumerable<VouchersClient> _voucherList;
-        public void SetVoucherClients(IEnumerable<VouchersClient> vouchersList)
+        CreditorOrderClient _dcOrder;
+        CrudAPI _api;
+        public void SetVouchersFromCreditorOrder(CrudAPI api, CreditorOrderClient dcOrder)
         {
             if (lgOrders.Visibility == Visibility.Collapsed)
             {
@@ -224,7 +215,8 @@ namespace UnicontaClient.Pages.CustomPage
                 liAdditionalOrders.Visibility = Visibility.Collapsed;
             }
             liDocumentRef.Visibility = Visibility.Visible;
-            _voucherList = vouchersList;
+            _dcOrder = dcOrder;
+            _api = api;
         }
 
         public void SetOIOUBLLabelText(bool sendXmlSalesInvoice)
@@ -251,10 +243,8 @@ namespace UnicontaClient.Pages.CustomPage
             GenrateDate = dpDate.DateTime;
             ShowInvoice = chkShowInvoice.IsChecked.Value;
             UpdateInventory = chkUpdateInv.IsChecked.Value;
-#if !SILVERLIGHT
             InvoiceQuickPrint = chkPrintInvoice.IsChecked.Value;
             GenerateOIOUBLClicked = chkOIOUBL.IsChecked.Value;
-#endif
             Emails = (string.IsNullOrEmpty(txtEmail.Text) || string.IsNullOrWhiteSpace(txtEmail.Text)) ? null : txtEmail.Text;
             sendOnlyToThisEmail = chkSendOnlyEmail.IsChecked.Value;
             PostOnlyDelivered = chkPostOnlyDel.IsChecked.Value;
@@ -266,7 +256,6 @@ namespace UnicontaClient.Pages.CustomPage
             SetDialogResult(false);
         }
 
-#if !SILVERLIGHT
         private void chkShowInvoice_Checked(object sender, RoutedEventArgs e)
         {
             chkPrintInvoice.IsChecked = false;
@@ -293,13 +282,14 @@ namespace UnicontaClient.Pages.CustomPage
                 liSendByOutlook.Visibility = Visibility.Collapsed;
         }
 
-        private void liDocumentRef_LookupButtonClicked(object sender)
+        async private void liDocumentRef_LookupButtonClicked(object sender)
         {
             var lookupDocumentRefEditor = sender as LookupEditor;
             lookupDocumentRefEditor.PopupContentTemplate = (Application.Current).Resources["LookUpUrlDocumentClientPopupContent"] as ControlTemplate;
             lookupDocumentRefEditor.ValueMember = "RowId";
             lookupDocumentRefEditor.SelectedIndexChanged += LookupDocumentRefEditor_SelectedIndexChanged;
-            lookupDocumentRefEditor.ItemsSource = _voucherList;
+            var voucherList = await Utilities.Utility.GetVoucherReferenceList(_api, _dcOrder);
+            lookupDocumentRefEditor.ItemsSource = voucherList;
         }
 
         private void LookupDocumentRefEditor_SelectedIndexChanged(object sender, RoutedEventArgs e)
@@ -309,7 +299,6 @@ namespace UnicontaClient.Pages.CustomPage
             PhysicalVoucherRef = voucherClient.RowId;
             NotifyPropertyChanged(nameof(PhysicalVoucherRef));
         }
-#endif
     }
 }
 

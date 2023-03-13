@@ -78,7 +78,7 @@ namespace UnicontaClient.Pages.CustomPage
         public DashBoardViewerPage(UnicontaBaseEntity entity) : base(entity)
         {
             _selectedDashBoard = entity as DashboardClient;
-            if (_selectedDashBoard== null)
+            if (_selectedDashBoard == null)
                 master = entity;
             InitPage();
         }
@@ -99,7 +99,7 @@ namespace UnicontaClient.Pages.CustomPage
         void SetHeader(UnicontaBaseEntity row)
         {
             var keystr = (row as IdKeyName)?.KeyStr;
-            string header =string.Empty;
+            string header = string.Empty;
             if (string.IsNullOrEmpty(keystr))
                 header = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Dashboard"), dashboardName);
             else
@@ -145,7 +145,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (rec.Name == null || string.Compare(rec.Name, "Dashboard", StringComparison.CurrentCultureIgnoreCase) == 0)
                 {
                     dashboardName = rec.Value;
-                    SetHeader( string.Concat(Uniconta.ClientTools.Localization.lookup("Dashboard"), ": ", dashboardName) );
+                    SetHeader(string.Concat(Uniconta.ClientTools.Localization.lookup("Dashboard"), ": ", dashboardName));
                 }
                 if (string.Compare(rec.Name, "Field", StringComparison.CurrentCultureIgnoreCase) == 0)
                 {
@@ -184,7 +184,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                 if ((name != null || !string.IsNullOrEmpty(name)) && (col.Name.StartsWith("&") || col.Name.StartsWith("@") || savedName.StartsWith("@") || savedName.StartsWith("&")))
                 {
-                     name = savedName;
+                    name = savedName;
                     ((DataItem)col).Name = Uniconta.ClientTools.Localization.lookup(name.Substring(1));
                 }
             }
@@ -199,7 +199,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                 if ((name != null || !string.IsNullOrEmpty(name)) && (col.Name.StartsWith("&") || col.Name.StartsWith("@") || savedName.StartsWith("@") || savedName.StartsWith("&")))
                 {
-                     name = savedName;
+                    name = savedName;
                     ((DataItem)col).Name = Uniconta.ClientTools.Localization.lookup(name.Substring(1));
                 }
             }
@@ -214,7 +214,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                 if ((name != null || !string.IsNullOrEmpty(name)) && (col.Name.StartsWith("&") || col.Name.StartsWith("@") || savedName.StartsWith("@") || savedName.StartsWith("&")))
                 {
-                     name = savedName;
+                    name = savedName;
                     ((DataItem)col).Name = Uniconta.ClientTools.Localization.lookup(name.Substring(1));
                 }
             }
@@ -406,7 +406,7 @@ namespace UnicontaClient.Pages.CustomPage
                 foreach (var ds in e.Dashboard.DataSources)
                     dataSourceLoadingParams.Add(ds.ComponentName);
         }
-        
+
         private List<PropValuePair> GetPropValuePairForDataSource(Type TableType, List<FilterProperties> filterProps)
         {
             List<PropValuePair> propPairLst = new List<PropValuePair>();
@@ -636,33 +636,11 @@ namespace UnicontaClient.Pages.CustomPage
                 var bufferedReport = StreamingManager.readMemory(customReader);
                 var st = Compression.Uncompress(bufferedReport);
 
-                if (version < 3 && customReader.readBoolean())
+                if (customReader.readBoolean())
                 {
                     int filterCount = (int)customReader.readNum();
-                    for (int i = 0; i < filterCount; i++)
+                    if (version < 3)
                     {
-                        var key = customReader.readString();
-                        List<FilterProperties> arrFilter;
-                        SortingProperties[] sortProps;
-                        FilterSortHelper.ConvertPropValuePair((PropValuePair[])customReader.ToArray(typeof(PropValuePair)), out arrFilter, out sortProps);
-                        lstOfNewFilters.Add(key, arrFilter);
-                    }
-                }
-                else if (version == 3 )
-                {
-                    if (customReader.readBoolean())
-                    {
-                        int filterCount = (int)customReader.readNum();
-                        for (int i = 0; i < filterCount; i++)
-                        {
-                            var key = customReader.readString();
-                            var arrFilter = (FilterProperties[])customReader.ToArray(typeof(FilterProperties));
-                            lstOfNewFilters.Add(key, arrFilter.ToList());
-                        }
-                    }
-                    if (customReader.readBoolean())
-                    {
-                        int filterCount = (int)customReader.readNum();
                         for (int i = 0; i < filterCount; i++)
                         {
                             var key = customReader.readString();
@@ -670,6 +648,15 @@ namespace UnicontaClient.Pages.CustomPage
                             SortingProperties[] sortProps;
                             FilterSortHelper.ConvertPropValuePair((PropValuePair[])customReader.ToArray(typeof(PropValuePair)), out arrFilter, out sortProps);
                             lstOfNewFilters.Add(key, arrFilter);
+                        }
+                    }
+                    else if (version == 3)
+                    {
+                        for (int i = 0; i < filterCount; i++)
+                        {
+                            var key = customReader.readString();
+                            var arrFilter = (FilterProperties[])customReader.ToArray(typeof(FilterProperties));
+                            lstOfNewFilters.Add(key, arrFilter.ToList());
                         }
                     }
                 }
@@ -701,7 +688,7 @@ namespace UnicontaClient.Pages.CustomPage
                         timer.Start();
                     }
                 }
-                ShowBusyIndicator(); 
+                ShowBusyIndicator();
                 st.Seek(0, System.IO.SeekOrigin.Begin);
                 dashboardViewerUniconta.LoadDashboard(st);
                 st.Release();
@@ -898,7 +885,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         List<UnicontaBaseEntity> GetMasterRecords(Type TableTYpe)
         {
-            if (master == null || masterField== null)
+            if (master == null || masterField == null)
                 return null;
             List<UnicontaBaseEntity> masters = null;
             var instance = Activator.CreateInstance(TableTYpe) as UnicontaBaseEntity;

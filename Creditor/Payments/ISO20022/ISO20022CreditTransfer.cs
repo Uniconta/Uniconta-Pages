@@ -255,7 +255,8 @@ namespace ISO20022CreditTransfer
                 amount = rec.PaymentAmount;
 
                 doc.ISOPaymentType = bankSpecific.ISOPaymentType(currency, bankAccount._IBAN, isPaymentTypeIBAN ? creditorAcc : string.Empty, creditorBIC, credBankCountryId, doc.CompanyCountryId);
-                doc.ExtServiceCode = bankSpecific.ExtServiceCode(doc.ISOPaymentType); 
+                doc.ExtServiceCode = bankSpecific.ExtServiceCode(doc.ISOPaymentType);
+                doc.ExtServicePrtry = bankSpecific.ExtServicePrtry(doc.ISOPaymentType, creditorBIC);
                 doc.ExternalLocalInstrument = bankSpecific.ExternalLocalInstrument(currency, doc.RequestedExecutionDate);
                 doc.InstructionPriority = bankSpecific.InstructionPriority();
                 doc.ExtCategoryPurpose = bankSpecific.ExtCategoryPurpose(doc.ISOPaymentType);
@@ -274,7 +275,7 @@ namespace ISO20022CreditTransfer
                 {
                     paymentInfoIdLst.Add(doc.PaymentInfoId);
                     doc.PmtInfList.Add(new PmtInf(doc,
-                        new PmtTpInf(doc.ExtServiceCode, doc.ExternalLocalInstrument, doc.ExtCategoryPurpose, doc.InstructionPriority, doc.ExtProprietaryCode),
+                        new PmtTpInf(doc.ExtServiceCode, doc.ExtServicePrtry, doc.ExternalLocalInstrument, doc.ExtCategoryPurpose, doc.InstructionPriority, doc.ExtProprietaryCode),
                         new Dbtr(doc.CompanyName, debtorAddress, doc.DebtorIdentificationCode),
                         new DbtrAcct(doc.CompanyCcy, companyAccountId, companyBIC, doc.CompanyCcyActive),
                         new DbtrAgt(doc.CompanyBIC, doc.CompanyBankName), doc.ChargeBearer));

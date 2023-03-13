@@ -175,9 +175,6 @@ x:Class="UnicontaClient.Pages.CustomPage.ConfigureFunctionalityPage"
                     <CorasauControls:CorasauLayoutItem x:Name="cbDirectDebit" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=AutoBanking}">
                         <CorasauControls:CheckEditor IsChecked="{Binding _DirectDebit,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="cbAiia" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Aiia}">
-                        <CorasauControls:CheckEditor IsChecked="{Binding Aiia,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem x:Name="cbTraceFieldChanges" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FieldChangeLog}">
                         <CorasauControls:CheckEditor IsChecked="{Binding TraceFieldChanges, Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>

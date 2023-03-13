@@ -47,6 +47,7 @@ x:Class="UnicontaClient.Pages.CustomPage.BankStatementPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="DaysSlip" Width="60" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="LastTransaction" Width="90" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="LastBankRequest" ShowTime="True" Width="120" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="LastBankSynchronized" ShowTime="True" Width="120" />
                     <local:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension1" x:Name="coldim1"/>
                     <local:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension2" x:Name="coldim2"/>
                     <local:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension3" x:Name="coldim3"/>

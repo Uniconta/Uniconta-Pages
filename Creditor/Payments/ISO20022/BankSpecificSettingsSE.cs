@@ -134,6 +134,18 @@ namespace UnicontaISO20022CreditTransfer
             }
         }
 
+
+        public override string ExtServicePrtry(ISO20022PaymentTypes paymentType, string creditorSWIFT)
+        {
+            if (companyBankEnum == CompanyBankENUM.SEB)
+            {
+                if (paymentType == ISO20022PaymentTypes.DOMESTIC && creditorSWIFT != string.Empty)
+                    return "MPNS";
+            }
+            
+            return null;
+        }
+
         /// <summary>
         /// Identification assigned by an institution.
         /// Max. 35 characters.

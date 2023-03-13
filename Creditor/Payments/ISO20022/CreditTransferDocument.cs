@@ -75,6 +75,7 @@ namespace UnicontaISO20022CreditTransfer
         protected string batchBooking;
         protected DateTime requestedExecutionDate;
         protected string extServiceCode;
+        protected string extServicePrtry;
         protected string externalLocalInstrument;
         protected string companyName;
         protected string companyBBAN;
@@ -499,6 +500,19 @@ namespace UnicontaISO20022CreditTransfer
             set
             {
                 extServiceCode = value;
+            }
+        }
+
+        public string ExtServicePrtry 
+        {
+            get 
+            {
+                return extServicePrtry;
+            }
+
+            set 
+            {
+                extServicePrtry = value;
             }
         }
 

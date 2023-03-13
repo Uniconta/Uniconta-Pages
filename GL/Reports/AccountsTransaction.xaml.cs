@@ -498,7 +498,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "RefreshGrid":
                     BindGrid();
-                    break;     
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -516,7 +516,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
         void ChangeAmount(GLTransClient selectedItem)
         {
-            var cwObj = new CwChangeAmount(selectedItem);
+            var cwObj = new CwChangeAmount(selectedItem, api.CompanyEntity.HasDecimals);
             cwObj.Closed += async delegate
             {
                 if (cwObj.DialogResult == true)
@@ -906,7 +906,7 @@ namespace UnicontaClient.Pages.CustomPage
             return AccountsTransaction.HandleLookupOnLocalPage(dgAccountsTransGrid, lookup);
         }
 
-        
+
 
         static public LookUpTable HandleLookupOnLocalPage(CorasauDataGrid grid, LookUpTable lookup)
         {

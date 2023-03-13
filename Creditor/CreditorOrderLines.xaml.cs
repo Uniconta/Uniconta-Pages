@@ -1004,9 +1004,7 @@ namespace UnicontaClient.Pages.CustomPage
             var additionalOrdersList = Utility.GetAdditionalOrders(api, dbOrder);
             if (additionalOrdersList != null)
                 GenrateInvoiceDialog.SetAdditionalOrders(additionalOrdersList);
-            var voucherList = await Utility.GetVoucherReferenceList(api, dbOrder);
-            if (voucherList != null)
-                GenrateInvoiceDialog.SetVoucherClients(voucherList);
+            GenrateInvoiceDialog.SetVouchersFromCreditorOrder(api, dbOrder);
             GenrateInvoiceDialog.Closed += async delegate
             {
                 if (GenrateInvoiceDialog.DialogResult == true)

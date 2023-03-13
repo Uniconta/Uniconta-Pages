@@ -50,20 +50,15 @@ namespace UnicontaISO20022CreditTransfer
             XmlElement cdtrAgt = baseDoc.AppendElement(doc, parent, HCDTRAGT);
             XmlElement finInstnId = baseDoc.AppendElement(doc, cdtrAgt, HFININSTNID);
 
-            if(!string.IsNullOrEmpty(bic))
-                baseDoc.AppendElement(doc, finInstnId, BIC, bic);
-
             if (!string.IsNullOrEmpty(bic))
                 baseDoc.AppendElement(doc, finInstnId, BIC, bic);
 
-            if (clrSysId != null)
+            if (clrSysId != null && mmbId != null)
             {
                 XmlElement clrSysMmbId = baseDoc.AppendElement(doc, finInstnId, CLRSYSMMBID);
                 XmlElement clrSys = baseDoc.AppendElement(doc, clrSysMmbId, CLRSYSID);
                 baseDoc.AppendElement(doc, clrSys, CD, clrSysId);
-
-                if (mmbId != null)
-                    baseDoc.AppendElement(doc, clrSysMmbId, MMBID, mmbId);
+                baseDoc.AppendElement(doc, clrSysMmbId, MMBID, mmbId);
             }
 
            

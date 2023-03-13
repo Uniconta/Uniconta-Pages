@@ -78,9 +78,20 @@ namespace UnicontaClient.Pages.CustomPage
                         dgFolderGrid.DeleteRow();
                     break;
                 default:
-                    gridRibbon_BaseActions(ActionType);
+                    SaveAndOpenLines(ActionType, selectedItem);
                     break;
             }
+        }
+
+        async void SaveAndOpenLines(string ActionType, CompanyFolderClient selectedItem)
+        {
+            if (selectedItem != null && dgFolderGrid.HasUnsavedData)
+            {
+                var tsk = saveGrid(selectedItem);
+                if (tsk != null && selectedItem.RowId == 0)
+                    await tsk;
+            }
+            gridRibbon_BaseActions(ActionType);
         }
     }
 }

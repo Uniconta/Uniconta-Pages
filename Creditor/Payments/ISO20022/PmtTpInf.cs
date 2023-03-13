@@ -6,6 +6,7 @@ namespace UnicontaISO20022CreditTransfer
     public class PmtTpInf
     {
         private readonly string extServiceCode;
+        private readonly string extServicePrtry;
         private readonly string externalLocalInstrument;
         private readonly string extCategoryPurpose;
         private readonly string extProprietaryCode;
@@ -58,10 +59,11 @@ namespace UnicontaISO20022CreditTransfer
         /// <param name="paymentInfoId">Unique identification, as assigned by the initiating party, to unambiguously identify the payment.</param> 
         /// <param name="paymentMethod">Specifies the means of payment that will be used to move the amount of money. CHK Cheque TRF CreditTransfer.</param>
         /// <param name="requestedExecutionDate">Date at which the initiating party requests the clearing agent to process the payment..</param>
-        public PmtTpInf(string extServiceCode, string externalLocalInstrument, string extCategoryPurpose, string instructionPriority, string extProprietaryCode)
+        public PmtTpInf(string extServiceCode, string extServicePrtry, string externalLocalInstrument, string extCategoryPurpose, string instructionPriority, string extProprietaryCode)
         {
             this.instructionPriority = instructionPriority;
             this.extServiceCode = extServiceCode;
+            this.extServicePrtry = extServicePrtry;
             this.externalLocalInstrument = externalLocalInstrument;
             this.extCategoryPurpose = extCategoryPurpose;
             this.extProprietaryCode = extProprietaryCode;
@@ -75,10 +77,13 @@ namespace UnicontaISO20022CreditTransfer
             if (instructionPriority != null)
                 baseDoc.AppendElement(doc, pmtTpInf, INSTRPRTY, instructionPriority);
 
-            if (extServiceCode != null)
+            if (extServiceCode != null || extServicePrtry != null)
             {
                 XmlElement svcLvl = baseDoc.AppendElement(doc, pmtTpInf, HSVCLVL);
-                baseDoc.AppendElement(doc, svcLvl, CD, extServiceCode);
+                if (extServicePrtry != null)
+                    baseDoc.AppendElement(doc, svcLvl, PRTRY, extServicePrtry);
+                else if (extServiceCode != null)
+                    baseDoc.AppendElement(doc, svcLvl, CD, extServiceCode);
             }
 
             if (externalLocalInstrument != string.Empty || extProprietaryCode != string.Empty)
