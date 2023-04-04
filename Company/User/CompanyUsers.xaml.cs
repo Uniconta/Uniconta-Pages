@@ -219,7 +219,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "RefreshGrid":
                     selectedRowIndex = 0;
-                    gridRibbon_BaseActions(ActionType);
+                    InitQuery();
                     break;
                 case "UserOperations":
                     if (selectedItem != null)

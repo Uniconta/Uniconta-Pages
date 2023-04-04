@@ -187,10 +187,20 @@ namespace UnicontaClient.Pages.CustomPage
             if (!company.Production)
                 UtilDisplay.RemoveMenuCommand(rb, "CreateProduction");
             InitialLoad();
+            this.Loaded += DebtorOrderLines_Loaded;
             dgDebtorOrderLineGrid.ShowTotalSummary();
             dgDebtorOrderLineGrid.CustomSummary += dgDebtorOrderLineGrid_CustomSummary;
             this.PreviewKeyDown += RootVisual_KeyDown;
             this.BeforeClose += DebtorOrderLines_BeforeClose;
+        }
+        bool isloaded = false;
+        private void DebtorOrderLines_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (!isloaded)
+            {
+                Item.Validate += Item_Validate;
+                isloaded = true;
+            }
         }
 
         private void DebtorOrderLines_BeforeClose()
@@ -401,12 +411,12 @@ namespace UnicontaClient.Pages.CustomPage
                     if (api.CompanyEntity.Warehouse)
                         dgDebtorOrderLineGrid.SetLoadedRow(orderLine);
                 }
-            }
-            else if (screenName == TabControls.CreateOrderFromQuickInvoice && argument != null)
-            {
-                var args = argument as object[];
-                var orderlines = args[2] as IEnumerable<UnicontaBaseEntity>;
-                dgDebtorOrderLineGrid.PasteRows(orderlines);
+                else if (screenName == TabControls.CreateOrderFromQuickInvoice && argument != null)
+                {
+                    var args = argument as object[];
+                    var orderlines = args[2] as IEnumerable<UnicontaBaseEntity>;
+                    dgDebtorOrderLineGrid.PasteRows(orderlines);
+                }
             }
             if (screenName == TabControls.RegenerateOrderFromProjectPage)
                 InitQuery();
@@ -481,20 +491,6 @@ namespace UnicontaClient.Pages.CustomPage
                 }
                 else
                     orderLine._Item = null;
-            }
-        }
-
-        private void Item_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
-        {
-            if (dgDebtorOrderLineGrid.CurrentColumn == Item)
-            {
-                var selectedItem = dgDebtorOrderLineGrid.SelectedItem as DebtorOrderLineClient;
-                if (selectedItem != null && !(selectedItem._QtyDelivered == 0 || (selectedItem._QtyDelivered == selectedItem._QtyInvoiced)))
-                {
-                    UtilDisplay.ShowErrorCode(ErrorCodes.ContainsLinesDelivered);
-                    (dgDebtorOrderLineGrid.tableView).CancelRowEdit();
-                    e.Handled = true;
-                }
             }
         }
 
@@ -1291,7 +1287,7 @@ namespace UnicontaClient.Pages.CustomPage
         async void CloseOrderLineScreen(Task reloadTask, DevExpress.Xpf.Docking.DocumentPanel panel)
         {
             await reloadTask;
-            if (((IList)dgDebtorOrderLineGrid.ItemsSource).Count == 0)
+            if (dgDebtorOrderLineGrid.ItemsSource == null || ((IList)dgDebtorOrderLineGrid.ItemsSource).Count == 0)
             {
                 globalEvents.OnRefresh(this.NameOfControl, Order);
                 dockCtrl?.JustClosePanel(panel);
@@ -1402,6 +1398,20 @@ namespace UnicontaClient.Pages.CustomPage
             var selectedItem = dgInvItemStorageClientGrid.SelectedItem as InvItemStorageClient;
             if (selectedItem != null)
                 AddDockItem(TabControls.PurchaseLines, selectedItem, string.Format("{0}:{2} {1}", Uniconta.ClientTools.Localization.lookup("PurchaseLines"), selectedItem.ItemName, Uniconta.ClientTools.Localization.lookup("OnHand")));
+        }
+
+        private void Item_Validate(object sender, GridCellValidationEventArgs e)
+        {
+            var selectedItem = dgDebtorOrderLineGrid.SelectedItem as DebtorOrderLineClient;
+            if (selectedItem == null || e.Row != selectedItem)
+                return;
+            if (!(selectedItem._QtyDelivered == 0 || (selectedItem._QtyDelivered == selectedItem._QtyInvoiced)))
+            {
+                UtilDisplay.ShowErrorCode(ErrorCodes.ContainsLinesDelivered);
+                (dgDebtorOrderLineGrid.tableView).CancelRowEdit();
+                e.IsValid = false;
+                e.Handled = true;
+            }
         }
 
         private void btnSales_Click(object sender, RoutedEventArgs e)

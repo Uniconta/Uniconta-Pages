@@ -135,7 +135,7 @@ namespace UnicontaClient.Pages.CustomPage
                     var _refferedVouchers = new List<int>();
                     if (selectedItem._DocumentRef != 0)
                         _refferedVouchers.Add(selectedItem._DocumentRef);
-                    AttachVoucherRow = selectedItem;
+
                     AddDockItem(TabControls.AttachVoucherGridPage, new object[1] { _refferedVouchers }, true);
                     break;
                 case "ViewVoucher":
@@ -329,7 +329,7 @@ namespace UnicontaClient.Pages.CustomPage
             useBinding = true;
             return true;
         }
-        CreditorOrderClient AttachVoucherRow;
+
         public override void Utility_Refresh(string screenName, object argument = null)
         {
             if (screenName == TabControls.AttachVoucherGridPage && argument != null)
@@ -340,13 +340,12 @@ namespace UnicontaClient.Pages.CustomPage
                     var attachedVoucher = voucherObj[0] as VouchersClient;
                     if (attachedVoucher != null)
                     {
-                        var selectedItem = AttachVoucherRow ?? dgMultiInvGrid.SelectedItem as CreditorOrderClient;
+                        var selectedItem = dgMultiInvGrid.SelectedItem as CreditorOrderClient;
                         if (selectedItem != null)
                         {
                             selectedItem.DocumentRef = attachedVoucher.RowId;
                             UpdateVoucher(attachedVoucher, selectedItem);
                         }
-                        AttachVoucherRow = null;
                     }
                 }
             }

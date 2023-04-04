@@ -257,18 +257,17 @@ namespace UnicontaClient.Pages.CustomPage
 
                 if (item is PivotDashboardItem)
                 {
-
                     var pivot = dasdboard.Items[item.ComponentName] as PivotDashboardItem;
                     if (pivot != null)
                     {
                         var cols = pivot.Columns.OfType<DataItem>().ToList();
-                        if (cols?.Count() > 0)
+                        if (cols.Count > 0)
                             SetLabelValues(pivot, cols);
                         var rows = pivot.Rows.OfType<DataItem>().ToList();
-                        if (rows?.Count() > 0)
+                        if (rows.Count > 0)
                             SetLabelValues(pivot, rows);
                         var values = pivot.Values.OfType<DataItem>().ToList();
-                        if (values?.Count() > 0)
+                        if (values.Count > 0)
                             SetLabelValues(pivot, values);
                     }
                 }
@@ -278,11 +277,11 @@ namespace UnicontaClient.Pages.CustomPage
                     var chart = dasdboard.Items[item.ComponentName] as ChartDashboardItem;
                     if (chart != null)
                     {
-                        var dimensions = chart.GetDimensions()?.OfType<DataItem>().ToList();
-                        if (dimensions?.Count() > 0)
+                        var dimensions = chart.GetDimensions().OfType<DataItem>().ToList();
+                        if (dimensions.Count > 0)
                             SetChartLabelValues(chart, dimensions);
-                        var measures = chart.GetMeasures()?.OfType<DataItem>().ToList();
-                        if (measures?.Count() > 0)
+                        var measures = chart.GetMeasures().OfType<DataItem>().ToList();
+                        if (measures.Count > 0)
                             SetChartLabelValues(chart, measures);
                     }
                 }
@@ -292,11 +291,11 @@ namespace UnicontaClient.Pages.CustomPage
                     var pie = dasdboard.Items[item.ComponentName] as PieDashboardItem;
                     if (pie != null)
                     {
-                        var dimensions = pie.GetDimensions()?.OfType<DataItem>().ToList();
-                        if (dimensions?.Count() > 0)
+                        var dimensions = pie.GetDimensions().OfType<DataItem>().ToList();
+                        if (dimensions.Count > 0)
                             SetPieLabelValues(pie, dimensions);
-                        var measures = pie.GetMeasures()?.OfType<DataItem>().ToList();
-                        if (measures?.Count() > 0)
+                        var measures = pie.GetMeasures().OfType<DataItem>().ToList();
+                        if (measures.Count > 0)
                             SetPieLabelValues(pie, measures);
                     }
                 }
@@ -304,8 +303,8 @@ namespace UnicontaClient.Pages.CustomPage
                 var sctChart = dasdboard.Items[item.ComponentName] as ScatterChartDashboardItem;
                 if (sctChart != null)
                 {
-                    var measures = sctChart.GetMeasures()?.OfType<DataItem>().ToList();
-                    if (measures?.Count() > 0)
+                    var measures = sctChart.GetMeasures().OfType<DataItem>().ToList();
+                    if (measures.Count > 0)
                         SetScatterChartLabelValues(sctChart, measures);
                 }
             }
@@ -569,6 +568,13 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void Timer_Tick(object sender, EventArgs e)
         {
+            if (!LoadOnOpen)
+            {
+                LoadOnOpen = true;
+                var componentName = ((DashboardObjectDataSource)(dashboardViewerUniconta.Dashboard?.DataSources?.FirstOrDefault()))?.ComponentName;
+                if (!string.IsNullOrEmpty(componentName) && !dataSourceLoadingParams.Contains(componentName))
+                    dataSourceLoadingParams.Add(componentName);
+            }
             dashboardViewerUniconta.ReloadData();
         }
 
@@ -738,30 +744,28 @@ namespace UnicontaClient.Pages.CustomPage
         {
             try
             {
-                var dashboard = _dashboard?.DataSources?.FirstOrDefault(x => x.ComponentName == e.DataSourceComponentName);
-                var fixedComp = fixedCompanies?.FirstOrDefault(x => x.DatasourceName == e.DataSourceComponentName);
+                var DataSourceComponentName = e.DataSourceComponentName;
+                var dashboard = _dashboard?.DataSources?.FirstOrDefault(x => x.ComponentName == DataSourceComponentName);
+                var fixedComp = fixedCompanies?.FirstOrDefault(x => x.DatasourceName == DataSourceComponentName);
                 var compId = fixedComp != null ? fixedComp.CompanyId : this.company.CompanyId;
-                var typeofTable = GetTypeAssociatedWithDashBoardDataSource(e.DataSourceName, e.DataSourceComponentName, compId);
-                if (typeofTable == null && dataSourceAndTypeMap.ContainsKey(e.DataSourceComponentName))
-                    typeofTable = dataSourceAndTypeMap[e.DataSourceComponentName];
+                var typeofTable = GetTypeAssociatedWithDashBoardDataSource(e.DataSourceName, DataSourceComponentName, compId);
+                if (typeofTable == null && dataSourceAndTypeMap.ContainsKey(DataSourceComponentName))
+                    typeofTable = dataSourceAndTypeMap[DataSourceComponentName];
                 if (typeofTable != null)
                 {
                     if (dashboard != null)
                     {
                         bool IsDashBoardTableTYpe = false;
                         Type dashbaordTableType = null;
-                        if (lstOfNewFilters.ContainsKey(e.DataSourceComponentName))
-                            filterValues = UtilDisplay.GetPropValuePair(lstOfNewFilters[e.DataSourceComponentName]);
-                        else
-                            filterValues = null;
+
                         if (!LoadOnOpen)
                             e.Data = Activator.CreateInstance(typeofTable);
                         else
                         {
-                            if (dataSourceLoadingParams.Contains(e.DataSourceComponentName) && LoadOnOpen)
+                            if (dataSourceLoadingParams.Contains(DataSourceComponentName) && LoadOnOpen)
                             {
                                 UnicontaBaseEntity[] data;
-                                var dbUserflds = dashboardUserFields?.FirstOrDefault(x => x.Key == e.DataSourceComponentName).Value;  // Dashbaord user field list for particular datasource
+                                var dbUserflds = dashboardUserFields?.FirstOrDefault(x => x.Key == DataSourceComponentName).Value;  // Dashbaord user field list for particular datasource
                                 if (dbUserflds != null)
                                 {
                                     var t = GeneraterUserType(typeofTable, dbUserflds);
@@ -772,25 +776,42 @@ namespace UnicontaClient.Pages.CustomPage
                                     }
                                 }
                                 var masterRecords = GetMasterRecords(typeofTable);
+                                var type = !IsDashBoardTableTYpe ? typeofTable : dashbaordTableType;
+
+                                if (lstOfNewFilters.ContainsKey(DataSourceComponentName))
+                                {
+                                    var lst = lstOfNewFilters[DataSourceComponentName];
+                                    if (lst != null)
+                                    {
+                                        foreach (var f in lst)
+                                        {
+                                            if (f.ParameterType == null)
+                                                f.ParameterType = type?.GetProperty(f.PropertyName)?.PropertyType;
+                                        }
+                                    }
+                                    filterValues = UtilDisplay.GetPropValuePair(lstOfNewFilters[DataSourceComponentName]);
+                                }
+                                else
+                                    filterValues = null;
                                 CrudAPI compApi = null;
                                 if (fixedComp == null || this.company.CompanyId == fixedComp.CompanyId)
-                                    data = Query(!IsDashBoardTableTYpe ? typeofTable : dashbaordTableType, api, masterRecords, filterValues).GetAwaiter().GetResult();
+                                    data = Query(type, api, masterRecords, filterValues).GetAwaiter().GetResult();
                                 else
                                 {
                                     var comp = CWDefaultCompany.loadedCompanies.FirstOrDefault(x => x.CompanyId == fixedComp.CompanyId);
                                     compApi = new CrudAPI(BasePage.session, comp);
-                                    data = Query(!IsDashBoardTableTYpe ? typeofTable : dashbaordTableType, compApi, masterRecords, filterValues).GetAwaiter().GetResult();
+                                    data = Query(type, compApi, masterRecords, filterValues).GetAwaiter().GetResult();
                                 }
 
-                                if (lstOfSorters != null && lstOfSorters.ContainsKey(e.DataSourceComponentName))
-                                    Array.Sort(data.ToArray(), lstOfSorters[e.DataSourceComponentName]);
+                                if (lstOfSorters != null && lstOfSorters.ContainsKey(DataSourceComponentName))
+                                    Array.Sort(data, lstOfSorters[DataSourceComponentName]);
 
                                 if (typeofTable.Equals(typeof(CompanyDocumentClient)))
                                     ReadData(data, compApi ?? api).GetAwaiter().GetResult(); // if there is image in property it will load again;
 
-                                if (data != null)
-                                    e.Data = BuildDataTable(data, !IsDashBoardTableTYpe ? typeofTable : dashbaordTableType, compApi ?? api);
-                                else
+                                //if (data != null)
+                                //    e.Data = BuildDataTable(data, type, compApi ?? api);
+                                //else
                                     e.Data = data;
                             }
                             else
@@ -810,76 +831,81 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        public static DataTable BuildDataTable(IList<UnicontaBaseEntity> lst, Type entType, CrudAPI compApi, bool removeRefProps = false, bool showActualProps = false)
+        public static DataTable BuildDataTable(IList<UnicontaBaseEntity> lst, Type entType, CrudAPI compApi)
         {
-            DataTable dataTable = CreateTable(entType, compApi, removeRefProps, showActualProps);
-            PropertyDescriptorCollection properties = TypeDescriptor.GetProperties(entType);
+            DataTable dataTable = new DataTable(entType.Name);
+            var props = new List<PropertyInfo>();
+            foreach (var prop in entType.GetProperties())
+            {
+                var col = CreateColumn(prop, compApi);
+                if (col != null)
+                {
+                    dataTable.Columns.Add(col);
+                    props.Add(prop);
+                }
+            }
+
+            var arr = props.ToArray();
+            var values = new Object[arr.Length];
             foreach (UnicontaBaseEntity current in lst)
             {
                 DataRow dataRow = dataTable.NewRow();
 
-                foreach (PropertyDescriptor propertyDescriptor in properties)
-                {
-                    if (dataTable.Columns.Contains(propertyDescriptor.Name))
-                        dataRow[propertyDescriptor.Name] = propertyDescriptor.GetValue(current) ?? DBNull.Value;
-                }
+                for (int i = 0; i < arr.Length; i++)
+                    values[i] = arr[i].GetValue(current);
+
+                dataRow.ItemArray = values;
                 dataTable.Rows.Add(dataRow);
             }
+
             return dataTable;
         }
 
-        private static DataTable CreateTable(Type entType, CrudAPI compApi, bool removeRefProps = false, bool showActualProps = false)
+        static DataColumn CreateColumn(PropertyInfo prop, CrudAPI compApi)
         {
-            DataTable dataTable = new DataTable(entType.Name);
-            var propInfos = entType.GetProperties();
-            foreach (var prop in propInfos)
-            {
-                var col = CreateColumn(prop, showActualProps, removeRefProps, compApi);
-                if (col != null)
-                    dataTable.Columns.Add(col);
-            }
-            return dataTable;
-        }
-
-        static DataColumn CreateColumn(PropertyInfo prop, bool showActualProps, bool removeRefProps, CrudAPI compApi)
-        {
-            var column = new DataColumn();
-            column.ColumnName = prop.Name;
-            if (prop.GetCustomAttributes(typeof(ReportingAttribute), true).Length != 0 && !removeRefProps)
+            if (prop.GetCustomAttributes(typeof(ReportingAttribute), true).Length > 0)
             {
                 var propType = Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType;
                 var userType = compApi.CompanyEntity?.GetUserType(propType);
-                column.DataType = userType ?? propType;
+                return new DataColumn { ColumnName = prop.Name, DataType = userType ?? propType };
             }
-            else
-                column.DataType = Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType;
 
-            if (!showActualProps)
+            var attribut = prop.GetCustomAttributes(typeof(DisplayAttribute), false);
+            if (attribut.Length > 0)
             {
-                var attribut = prop.GetCustomAttributes(typeof(DisplayAttribute), false);
-                if (attribut != null && attribut.Count() > 0)
+                return new DataColumn
                 {
-                    var name = attribut?.Cast<DisplayAttribute>()?.Single()?.GetName();
-                    column.Caption = name;
-                }
+                    ColumnName = prop.Name,
+                    DataType = Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType,
+                    Caption = ((DisplayAttribute)attribut[0]).Name
+                };
             }
-            return column;
+            return null;
         }
-        public static Task<bool> ReadData(UnicontaBaseEntity[] data, CrudAPI api)
+        public static Task ReadData(UnicontaBaseEntity[] data, CrudAPI api)
         {
             return Task.Run(async () =>
             {
-                foreach (UnicontaBaseEntity row in data)
+                bool found = false;
+                if (data.Length > 0)
                 {
-                    foreach (PropertyInfo propertyInfo in row.GetType().GetProperties())
+                    foreach (PropertyInfo propertyInfo in data[0].GetType().GetProperties())
                     {
                         if (propertyInfo.PropertyType == typeof(byte[]))
                         {
-                            await api.Read(row);
+                            found = true;
+                            break;
                         }
                     }
+
                 }
-                return true;
+                if (found)
+                {
+                    foreach (UnicontaBaseEntity row in data)
+                    {
+                        await api.Read(row);
+                    }
+                }
             });
         }
 
@@ -940,11 +966,11 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     fullname = fullname.Replace("[]", "");
                     var tables = ListOfReportTableTypes.FirstOrDefault(x => x.Key == companyId).Value;
-                    retType = tables?.Where(p => p.FullName == fullname).FirstOrDefault();
+                    retType = tables.Where(p => p.FullName == fullname).FirstOrDefault();
                     if (retType == null)
-                        retType = tables?.Where(p => p.FullName == dataSource).FirstOrDefault();
+                        retType = tables.Where(p => p.FullName == dataSource).FirstOrDefault();
                     if (retType == null)
-                        retType = tables?.Where(p => p.FullName == tblType).FirstOrDefault();
+                        retType = tables.Where(p => p.FullName == tblType).FirstOrDefault();
                     if (retType != null)
                     {
                         if (!dataSourceAndTypeMap.ContainsKey(componentName))
@@ -1019,12 +1045,12 @@ namespace UnicontaClient.Pages.CustomPage
                     if (filtersProps == null || filtersProps.Count() == 0)
                         lstOfNewFilters.Remove(selectedDataSourceName);
                     else
-                        lstOfNewFilters[selectedDataSourceName] = filtersProps?.ToList();
+                        lstOfNewFilters[selectedDataSourceName] = filtersProps.ToList();
                 }
                 else
                 {
                     if (filtersProps != null && filtersProps.Count() > 0)
-                        lstOfNewFilters.Add(selectedDataSourceName, filtersProps?.ToList());
+                        lstOfNewFilters.Add(selectedDataSourceName, filtersProps.ToList());
                 }
 
                 if (lstOfSorters.ContainsKey(selectedDataSourceName))

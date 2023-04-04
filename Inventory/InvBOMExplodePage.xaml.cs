@@ -328,5 +328,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         public override string NameOfControl { get { return TabControls.InvBOMExplodePage; } }
+
+        public override bool FilterOnLoadLayout => false;
     }
 }

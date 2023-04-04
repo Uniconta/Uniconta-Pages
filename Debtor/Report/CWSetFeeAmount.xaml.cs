@@ -41,14 +41,14 @@ namespace UnicontaClient.Pages.CustomPage
 
         [InputFieldData]
         [Display(Name = "CollectionLetter", ResourceType = typeof(InputFieldDataText))]
-        [AppEnumAttribute(EnumName = "DebtorEmailType", ValidIndexes = new[] { 13, 3, 4, 5, 6 })]
+        [AppEnumAttribute(EnumName = "DebtorEmailType", ValidIndexes = new[] { 3, 4, 5, 6, 13 })]
         public string CollectionType { get { return _CollectionType; } set { _CollectionType = value; } }
         static string _CollectionType;
 
         [InputFieldData]
         [AppEnumAttribute(EnumName = "Currencies", Enumtype = typeof(Currencies))]
         [Display(Name = "Currency", ResourceType = typeof(InputFieldDataText))]
-        public string FeeCurrency { get { return _FeeCurrency; } set {  _FeeCurrency = value; } }
+        public string FeeCurrency { get { return _FeeCurrency; } set { _FeeCurrency = value; } }
         static string _FeeCurrency;
 
         [InputFieldData]
@@ -75,7 +75,13 @@ namespace UnicontaClient.Pages.CustomPage
         public bool FeeOnReminder { get { return _FeeOnReminder; } set { _FeeOnReminder = value; } }
         static bool _FeeOnReminder;
 
-        public int CollectionLetterTypes;
+        [InputFieldData]
+        [AppEnumAttribute(EnumName = "DebtorEmailType", ValidIndexes = new[] { 3, 4, 5, 6, 13 })]
+        [Display(Name = "FirstCollection", ResourceType = typeof(InputFieldDataText))]
+        public string FirstCollectionType { get { return _firstCollectionType; } set { _firstCollectionType = value; } }
+        static string _firstCollectionType;
+
+        public int CollectionLetterTypes, FirstCollectionIndex;
         bool _addInterest;
         protected override int DialogId => DialogTableId;
         public int DialogTableId { get; set; }
@@ -102,15 +108,15 @@ namespace UnicontaClient.Pages.CustomPage
                 colMarginFeeCurrency.Width = new GridLength(0);
                 rowFeeCharge.Height = new GridLength(0);
                 rowFeeOnReminder.Height = new GridLength(0);
+                rowFirstCollection.Height = new GridLength(0);
             }
             else
             {
                 Prompt = CWName = Uniconta.ClientTools.Localization.lookup("AddCollection");
                 lblFee.Text = Uniconta.ClientTools.Localization.lookup("Per");
                 cmbtypeValue.ItemsSource = new string[] { Uniconta.ClientTools.Localization.lookup("Transaction"), Uniconta.ClientTools.Localization.lookup("Account") };
-                cmbtypeValue.SelectedIndex = PerTransaction ? 0 : 1;
                 cmbCurrency.ItemsSource = AppEnums.Currencies.GetLabels();
-                cmbCollections.ItemsSource = Utility.GetDebtorCollectionLetters().OrderBy(p => p).ToList();
+                cmbFirstCollections.ItemsSource = cmbCollections.ItemsSource = Utility.GetDebtorCollectionLetters().ToList();
                 rowNoOfDays.Height = new GridLength(0);
             }
             if (_PrDate == DateTime.MinValue)
@@ -125,6 +131,10 @@ namespace UnicontaClient.Pages.CustomPage
         {
             Dispatcher.BeginInvoke(new Action(() =>
             {
+                if (string.IsNullOrEmpty(_firstCollectionType))
+                    cmbFirstCollections.SelectedIndex = 0;
+                cmbtypeValue.SelectedIndex = PerTransaction ? 0 : 1;
+
                 if (string.IsNullOrWhiteSpace(txtValue.Text))
                     txtValue.Focus();
                 else
@@ -160,10 +170,12 @@ namespace UnicontaClient.Pages.CustomPage
                         case 6: CollectionLetterTypes |= 0x10; break;
                     }
                 }
+
+                FirstCollectionIndex = cmbFirstCollections.SelectedIndex;
             }
-            SetDialogResult(true);
             _PrDate = dePrDate.DateTime;
             PerTransaction = cmbtypeValue.SelectedIndex == 0;
+            SetDialogResult(true);
         }
 
         private void ChildWindow_KeyDown(object sender, KeyEventArgs e)

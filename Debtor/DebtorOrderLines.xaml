@@ -41,18 +41,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrderLines"
                                     </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridTemplateColumnClient>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="colNote" FieldName="Note" Width="150" Visible="False"/>
-                                <localPage:CorasauDataGridForeignKeyColumnClient x:Name="Item" Width="100">
-                                    <localPage:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
-                                        <ControlTemplate>
-                                            <TextBlock Margin="2" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.Item,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"></TextBlock>
-                                        </ControlTemplate>
-                                    </localPage:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
-                                    <localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
-                                        <DataTemplate>
-                                            <localPage:CorasauGridLookupEditorClient  x:Name="PART_Editor" EditValueChanged="Item_EditValueChanged"  />
-                                        </DataTemplate>
-                                    </localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
-                                </localPage:CorasauDataGridForeignKeyColumnClient>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Item" Width="100"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant" FieldName="Variant">
                                     <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                         <DataTemplate>

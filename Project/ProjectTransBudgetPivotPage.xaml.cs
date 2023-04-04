@@ -774,6 +774,7 @@ namespace UnicontaClient.Pages.CustomPage
                 }
                 if (empNormLst.Count > 0)
                 {
+                    len = trans.Length;
                     Array.Resize(ref trans, len + empNormLst.Count);
                     foreach (var norm in empNormLst)
                         trans[len++] = norm;

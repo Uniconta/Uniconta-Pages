@@ -762,6 +762,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 PropValuePair.GenereteWhereElements(nameof(DebtorPaymentFileClient._Output), typeof(int), 0),
                 PropValuePair.GenereteWhereElements(nameof(DebtorPaymentFileClient.IsOk), typeof(int), 0),
+                PropValuePair.GenereteWhereElements(nameof(DebtorPaymentFileClient.HasError), typeof(int), 0),
             };
 
             var debtorPaymFile = await api.Query<DebtorPaymentFileClient>(pairFile);

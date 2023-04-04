@@ -180,7 +180,7 @@ namespace UnicontaClient.Pages.CustomPage
             EmployeeCache = api.GetCache(typeof(Uniconta.DataModel.Employee));
             PrStandardCache = api.GetCache(typeof(Uniconta.DataModel.PrStandard));
             WorkspaceCache = api.GetCache<Uniconta.DataModel.PrWorkSpace>();
-
+            localInvSerieBatchList = new List<InvSerieBatchClient>();
         }
 
         public override void SetParameter(IEnumerable<ValuePair> Parameters)
@@ -366,7 +366,7 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         if (rec._Item == null || rec._Item == string.Empty)
                             GetItemFromSerailNumber(rec);
-                        var selectedSerieBatch = (rec.serieBatchSource as InvSerieBatchClient[])?.Where(x => x.Number == rec.SerieBatch).FirstOrDefault();
+                        var selectedSerieBatch = localInvSerieBatchList.Where(x => x.Number == rec.SerieBatch).FirstOrDefault();
                         if (selectedSerieBatch != null && api.CompanyEntity.Warehouse)
                         {
                             rec.Warehouse = selectedSerieBatch.Warehouse;
@@ -717,12 +717,14 @@ namespace UnicontaClient.Pages.CustomPage
             if (selectedItem?._Item != null)
                 setSerieBatchSource(ItemsCache.Get<InvItem>(selectedItem._Item), selectedItem);
         }
+        List<InvSerieBatchClient> localInvSerieBatchList = null;
         async void setSerieBatchSource(InvItem master, ProjectJournalLineLocal rec)
         {
             if (master != null && master._UseSerialBatch)
             {
                 var lst = await api.Query<InvSerieBatchClient>(new InvSerieBatchOpen() { _Item = rec._Item });
-                rec.serieBatchSource = lst;
+                localInvSerieBatchList.AddRange(lst);
+                rec.serieBatchSource = lst?.Select(x => x.Number).ToList();
             }
             else
             {

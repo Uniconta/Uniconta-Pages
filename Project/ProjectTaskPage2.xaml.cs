@@ -29,10 +29,10 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         public override string NameOfControl { get { return TabControls.ProjectTaskPage2.ToString(); } }
-        ProjectTaskClientLocal editrow;
-        public override Type TableType { get { return typeof(ProjectTaskClientLocal); } }
+        ProjectTaskClient editrow;
+        public override Type TableType { get { return typeof(ProjectTaskClient); } }
 
-        public override UnicontaBaseEntity ModifiedRow { get { return editrow; } set { editrow = (ProjectTaskClientLocal)value; } }
+        public override UnicontaBaseEntity ModifiedRow { get { return editrow; } set { editrow = (ProjectTaskClient)value; } }
 
         SQLCache ProjectCache;
         public ProjectTaskPage2(UnicontaBaseEntity sourcedata, bool isEdit, UnicontaBaseEntity master = null)
@@ -54,7 +54,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 if (editrow == null)
                 {
-                    editrow = CreateNew() as ProjectTaskClientLocal;
+                    editrow = CreateNew() as ProjectTaskClient;
                     editrow.SetMaster(master != null ? master : api.CompanyEntity);
                 }
                 frmRibbon.DisableButtons("Delete");

@@ -25,7 +25,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectPage2"
                         <CorasauControls:TextEditor x:Name="txtName" Text="{Binding Name,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="Created" x:Name="liCreatedTime">
-                        <CorasauControls:TextEditor x:Name="txtCreatedTime"  Text="{Binding Created, Mode=OneWay}" MaskType="DateTime"/>
+                        <CorasauControls:DateEditor x:Name="dteCreated"  EditValue="{Binding Created,Mode=OneWay}" ShowPopupIfReadOnly="False" IsReadOnly="True" />
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem x:Name="liGroup" FieldName="Group">
                         <CorasauControls:LookupEditor x:Name="leGroup" Text="{Binding Group,Mode=TwoWay}">

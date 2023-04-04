@@ -668,6 +668,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (setupType == 1)
                 busyIndicator.IsBusy = false;
         }
+
         async void AfterCompanyCreated(Company editrow, int setupType)
         {
             Company[] companies = await BasePage.session.GetCompanies();
@@ -687,9 +688,11 @@ namespace UnicontaClient.Pages.CustomPage
                 busyIndicator.IsBusy = false;
                 return;
             }
-
-            globalEvents.OnRefresh(TabControls.CreateCompany, editrow.RowId);
-            CloseDockItem();
+            if (setupType == 1)
+            {
+                globalEvents.OnRefresh(TabControls.CreateCompany, editrow.RowId);
+                CloseDockItem();
+            }
         }
         async private Task SaveCompanyLogos()
         {

@@ -1758,13 +1758,11 @@ namespace UnicontaClient.Pages.CustomPage
                                     originalVoucher.PayDate = paymentDate;
                                 }
 
-                                bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "purchase_order_number", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
-                                if (bsItem != null)
+                                if (originalVoucher._PurchaseNumber == 0)
                                 {
-                                    var purchaseNumber = bsItem.value;
-                                    purchaseNumber = Regex.Replace(purchaseNumber, "[^0-9]", string.Empty);
-                                    int tmpNumber = int.TryParse(purchaseNumber, out tmpNumber) ? tmpNumber : 0;
-                                    originalVoucher.PurchaseNumber = tmpNumber;
+                                    bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "purchase_order_number", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
+                                    if (bsItem != null)
+                                        originalVoucher.PurchaseNumber = (int)NumberConvert.ToInt(Regex.Replace(bsItem.value, "[^0-9]", string.Empty));
                                 }
 
                                 bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "currency", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
@@ -1776,133 +1774,127 @@ namespace UnicontaClient.Pages.CustomPage
 
                                     originalVoucher._Currency = (byte)currencyISO;
                                     originalVoucher.NotifyPropertyChanged("Currency");
-
                                 }
 
-                                Uniconta.DataModel.Creditor creditor = null;
-                                var creditorCVRNum = Regex.Replace(creditorCVR, "[^0-9]", string.Empty);
-                                if (creditorCVRNum != string.Empty)
-                                    creditor = (CreditorCache.GetKeyStrRecords as Uniconta.DataModel.Creditor[]).Where(s => (Regex.Replace(s._LegalIdent ?? string.Empty, "[^0-9.]", "") == creditorCVRNum)).FirstOrDefault();
-
-                                bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_swift_bic", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
-                                var swiftNo = bsItem?.value;
-
-                                if (originalVoucher._PaymentId == null && creditor?._PaymentId == null)
+                                if (originalVoucher._CreditorAccount == null)
                                 {
-                                    bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_account_number", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
-                                    var bbanAcc = bsItem?.value;
+                                    Uniconta.DataModel.Creditor creditor = null;
+                                    var creditorCVRNum = Regex.Replace(creditorCVR, "[^0-9]", string.Empty);
+                                    if (creditorCVRNum != string.Empty)
+                                        creditor = (CreditorCache.GetKeyStrRecords as Uniconta.DataModel.Creditor[]).Where(s => (Regex.Replace(s._LegalIdent ?? string.Empty, "[^0-9.]", "") == creditorCVRNum)).FirstOrDefault();
 
-                                    bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_reg_number", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
-                                    var bbanRegNum = bsItem?.value;
+                                    bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_swift_bic", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
+                                    var swiftNo = bsItem?.value;
 
-                                    bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_iban", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
-                                    var ibanNo = bsItem?.value;
-
-                                    bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_code_id", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
-                                    var paymentCodeId = bsItem?.value;
-
-                                    bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_id", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
-                                    var paymentId = bsItem?.value;
-
-                                    bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "joint_payment_id", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
-                                    var jointPaymentId = bsItem?.value;
-
-                                    var paymentMethod = PaymentTypes.VendorBankAccount;
-                                    switch (paymentCodeId)
+                                    if (originalVoucher._PaymentId == null && creditor?._PaymentId == null)
                                     {
-                                        case "71": paymentMethod = PaymentTypes.PaymentMethod3; break;
-                                        case "73": paymentMethod = PaymentTypes.PaymentMethod4; break;
-                                        case "75": paymentMethod = PaymentTypes.PaymentMethod5; break;
-                                        case "04":
-                                        case "4": paymentMethod = PaymentTypes.PaymentMethod6; break;
-                                    }
+                                        bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_account_number", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
+                                        var bbanAcc = bsItem?.value;
 
-                                    if (paymentMethod != PaymentTypes.VendorBankAccount && (paymentId != null || jointPaymentId != null))
-                                    {
-                                        originalVoucher._PaymentMethod = paymentMethod;
-                                        originalVoucher.PaymentId = string.Format("{0} +{1}", paymentId, jointPaymentId);
-                                    }
-                                    else if (bbanRegNum != null && bbanAcc != null)
-                                    {
-                                        originalVoucher._PaymentMethod = PaymentTypes.VendorBankAccount;
-                                        originalVoucher.PaymentId = string.Format("{0}-{1}", bbanRegNum, bbanAcc);
-                                    }
-                                    else if (swiftNo != null && ibanNo != null)
-                                    {
-                                        originalVoucher._PaymentMethod = PaymentTypes.IBAN;
-                                        originalVoucher.PaymentId = ibanNo;
-                                    }
-                                    originalVoucher.NotifyPropertyChanged("PaymentMethod");
-                                }
+                                        bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_reg_number", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
+                                        var bbanRegNum = bsItem?.value;
 
-                                if (creditorCVRNum == string.Empty)
-                                {
-                                    originalVoucher._Text = Localization.lookup("NotValidVatNo");
-                                }
-                                else if (creditor == null)
-                                {
-                                    var newCreditor = new CreditorClient()
-                                    {
-                                        _Account = creditorCVR,
-                                        _LegalIdent = creditorCVR,
-                                        _PaymentMethod = originalVoucher._PaymentMethod,
-                                        _PaymentId = originalVoucher._PaymentId,
-                                        _SWIFT = swiftNo
-                                    };
+                                        bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_iban", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
+                                        var ibanNo = bsItem?.value;
 
-                                    CompanyInfo companyInformation = null;
-                                    try
-                                    {
-                                        companyInformation = await CVR.CheckCountry(creditorCVR, countryCode);
-                                    }
-                                    catch { }
+                                        bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_code_id", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
+                                        var paymentCodeId = bsItem?.value;
 
-                                    if (companyInformation != null)
-                                    {
-                                        if (companyInformation.life != null)
-                                            newCreditor._Name = companyInformation.life.name;
+                                        bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_id", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
+                                        var paymentId = bsItem?.value;
 
-                                        if (companyInformation.address != null)
+                                        bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "joint_payment_id", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
+                                        var jointPaymentId = bsItem?.value;
+
+                                        var paymentMethod = PaymentTypes.VendorBankAccount;
+                                        switch (paymentCodeId)
                                         {
-                                            newCreditor._Address1 = companyInformation.address.CompleteStreet;
-                                            newCreditor._Address2 = companyInformation.address.street2;
-                                            newCreditor._ZipCode = companyInformation.address.zipcode;
-                                            newCreditor._City = companyInformation.address.cityname;
-                                            newCreditor._Country = companyInformation.address.Country;
+                                            case "71": paymentMethod = PaymentTypes.PaymentMethod3; break;
+                                            case "73": paymentMethod = PaymentTypes.PaymentMethod4; break;
+                                            case "75": paymentMethod = PaymentTypes.PaymentMethod5; break;
+                                            case "04":
+                                            case "4": paymentMethod = PaymentTypes.PaymentMethod6; break;
                                         }
 
-                                        if (companyInformation.contact != null)
+                                        if (paymentMethod != PaymentTypes.VendorBankAccount && (paymentId != null || jointPaymentId != null))
                                         {
-                                            newCreditor._Phone = companyInformation.contact.phone;
-                                            newCreditor._ContactEmail = companyInformation.contact.email;
+                                            originalVoucher._PaymentMethod = paymentMethod;
+                                            originalVoucher.PaymentId = string.Format("{0} +{1}", paymentId, jointPaymentId);
                                         }
+                                        else if (bbanRegNum != null && bbanAcc != null)
+                                        {
+                                            originalVoucher._PaymentMethod = PaymentTypes.VendorBankAccount;
+                                            originalVoucher.PaymentId = string.Format("{0}-{1}", bbanRegNum, bbanAcc);
+                                        }
+                                        else if (swiftNo != null && ibanNo != null)
+                                        {
+                                            originalVoucher._PaymentMethod = PaymentTypes.IBAN;
+                                            originalVoucher.PaymentId = ibanNo;
+                                        }
+                                        originalVoucher.NotifyPropertyChanged("PaymentMethod");
+                                    }
+
+                                    if (creditorCVRNum == string.Empty)
+                                    {
+                                        originalVoucher._Text = Localization.lookup("NotValidVatNo");
+                                    }
+                                    else if (creditor == null)
+                                    {
+                                        var newCreditor = new CreditorClient()
+                                        {
+                                            _Account = creditorCVR,
+                                            _LegalIdent = creditorCVR,
+                                            _PaymentMethod = originalVoucher._PaymentMethod,
+                                            _PaymentId = originalVoucher._PaymentId,
+                                            _SWIFT = swiftNo
+                                        };
+
+                                        CompanyInfo companyInformation = null;
+                                        try
+                                        {
+                                            companyInformation = await CVR.CheckCountry(creditorCVR, countryCode);
+                                        }
+                                        catch { }
+
+                                        if (companyInformation != null)
+                                        {
+                                            if (companyInformation.life != null)
+                                                newCreditor._Name = companyInformation.life.name;
+
+                                            if (companyInformation.address != null)
+                                            {
+                                                newCreditor._Address1 = companyInformation.address.CompleteStreet;
+                                                newCreditor._Address2 = companyInformation.address.street2;
+                                                newCreditor._ZipCode = companyInformation.address.zipcode;
+                                                newCreditor._City = companyInformation.address.cityname;
+                                                newCreditor._Country = companyInformation.address.Country;
+                                            }
+
+                                            if (companyInformation.contact != null)
+                                            {
+                                                newCreditor._Phone = companyInformation.contact.phone;
+                                                newCreditor._ContactEmail = companyInformation.contact.email;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            newCreditor.Name = Localization.lookup("NotValidVatNo");
+                                        }
+
+                                        await api.Insert(newCreditor);
+                                        originalVoucher.CreditorAccount = creditorCVR;
                                     }
                                     else
                                     {
-                                        newCreditor.Name = Localization.lookup("NotValidVatNo");
-                                    }
+                                        if (!string.IsNullOrEmpty(creditor._PostingAccount))
+                                        {
+                                            originalVoucher.CostAccount = creditor._PostingAccount;
+                                            var acc = (Uniconta.DataModel.GLAccount)LedgerCache?.Get(creditor._PostingAccount);
+                                            if (acc != null && acc._Vat != null)
+                                                originalVoucher.Vat = acc._Vat;
+                                        }
 
-                                    await api.Insert(newCreditor);
-                                    originalVoucher.CreditorAccount = creditorCVR;
-                                }
-                                else
-                                {
-                                    if (!string.IsNullOrEmpty(creditor._PostingAccount))
-                                    {
-                                        originalVoucher.CostAccount = creditor._PostingAccount;
-                                        var acc = (Uniconta.DataModel.GLAccount)LedgerCache?.Get(creditor._PostingAccount);
-                                        if (acc != null && acc._Vat != null)
-                                            originalVoucher.Vat = acc._Vat;
-                                    }
-
-                                    originalVoucher.CreditorAccount = creditor._Account;
-
-                                    if (!string.IsNullOrEmpty(swiftNo) && creditor._PaymentMethod == PaymentTypes.IBAN && creditor._SWIFT == null)
-                                    {
-                                        creditor._SWIFT = swiftNo;
-                                        if (CreList == null)
-                                            CreList = new List<Uniconta.DataModel.Creditor>();
-                                        CreList.Add(creditor);
+                                        originalVoucher.CreditorAccount = creditor._Account;
                                     }
                                 }
 

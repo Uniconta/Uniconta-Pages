@@ -20,7 +20,6 @@ using System.Windows.Threading;
 using System.Threading;
 using UnicontaClient.Utilities;
 using System.Windows;
-using UnicontaClient.Pages.GL.ChartOfAccount.Reports;
 using Uniconta.API.GeneralLedger;
 using Uniconta.ClientTools;
 using DevExpress.Xpf.Grid;
@@ -632,6 +631,8 @@ namespace UnicontaClient.Pages.CustomPage
                     projBudgetLine._Location = bom._Location ?? item._Location ?? selectedItem._Location;
                     projBudgetLine._CostPrice = item._CostPrice;
                     projBudgetLine._Qty = Math.Round(bom.GetBOMQty(selectedItem._Qty), item._Decimals);
+                    projBudgetLine._WorkSpace = selectedItem._WorkSpace;
+                    projBudgetLine._Task = selectedItem._Task;
                     SetItem(projBudgetLine);
                     lst.Add(projBudgetLine);
                 }
@@ -821,6 +822,8 @@ namespace UnicontaClient.Pages.CustomPage
                             orderLine._DiscountPct = creditor._LineDiscountPct;
                             orderLine._Project = Proj._Number;
                             orderLine._PrCategory = line._PrCategory ?? item._PrCategory;
+                            orderLine._WorkSpace = line._WorkSpace;
+                            orderLine._Task = line._Task;
                             orderLine.SetMaster(order);
                             TableField.SetUserFieldsFromRecord(orderLine, item);
                             orderList.Add(orderLine);
@@ -1017,7 +1020,7 @@ namespace UnicontaClient.Pages.CustomPage
                             dgPrjBugtItmCov.DeleteRow();
                             dgPrjBugtItmCov.isDefaultFirstRow = false;
                         }
-                        var lst = param[0] as List<UnicontaBaseEntity>;
+                        var lst = param[0] as IEnumerable<UnicontaBaseEntity>;
                         if (dgPrjBugtItmCov.PasteRows(lst))
                         {
                             foreach (var r in lst)

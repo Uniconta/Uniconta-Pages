@@ -47,21 +47,33 @@ namespace UnicontaClient.Pages.CustomPage
             deCostPrice.EditValueChanged += DeCostPrice_EditValueChanged;
             deCostValue.EditValueChanged += DeCostValue_EditValueChanged;
         }
-
+        bool changedByCalc = false;
         private void DeCostValue_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
         {
-            double Qty = NumberConvert.ToDouble(deQty.Text);
-            double CostValue = NumberConvert.ToDouble(deCostValue.Text);
-            var CostPrice = CostValue / Qty;
-            deCostPrice.Text = CostPrice.ToString("N2");
+            if (!changedByCalc)
+            {
+                double Qty = NumberConvert.ToDouble(deQty.Text);
+                double CostValue = NumberConvert.ToDouble(deCostValue.Text);
+                var CostPrice = CostValue / Qty;
+                changedByCalc = true;
+                deCostPrice.Text = CostPrice.ToString("N2");
+            }
+            else
+                changedByCalc = false;
         }
 
         private void DeCostPrice_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
         {
-            double Qty = NumberConvert.ToDouble(deQty.Text);
-            double CostPrice = NumberConvert.ToDouble(deCostPrice.Text);
-            CostValue = Qty * CostPrice;
-            deCostValue.Text = CostValue.ToString("N2");
+            if (!changedByCalc)
+            {
+                double Qty = NumberConvert.ToDouble(deQty.Text);
+                double CostPrice = NumberConvert.ToDouble(deCostPrice.Text);
+                CostValue = Qty * CostPrice;
+                changedByCalc = true;
+                deCostValue.Text = CostValue.ToString("N2");
+            }
+            else
+                changedByCalc = false;
         }
 
         private void CW_Loaded(object sender, RoutedEventArgs e)

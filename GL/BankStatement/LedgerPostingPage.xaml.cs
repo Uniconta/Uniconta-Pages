@@ -281,7 +281,7 @@ namespace UnicontaClient.Pages.CustomPage
                         foreach (var statementLine in gridItems)
                             if (statementLine._DocumentRef != 0)
                                 _refferedVouchers.Add(statementLine._DocumentRef);
-                        AttachVoucherRow = selectedItem;
+
                         AddDockItem(TabControls.AttachVoucherGridPage, new object[1] { _refferedVouchers }, true);
                     }
                     break;
@@ -329,7 +329,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
             }
         }
-        BankStatementLineGridClient AttachVoucherRow;
+
         public override void Utility_Refresh(string screenName, object argument = null)
         {
             if (screenName == TabControls.AttachVoucherGridPage && argument != null)
@@ -338,7 +338,7 @@ namespace UnicontaClient.Pages.CustomPage
                 var voucher = voucherObj[0] as VouchersClient;
                 if (voucher != null)
                 {
-                    var selectedItem = AttachVoucherRow ?? dgBankStatementLine.SelectedItem as BankStatementLineGridClient;
+                    var selectedItem = dgBankStatementLine.SelectedItem as BankStatementLineGridClient;
                     if (selectedItem != null && voucher.RowId != 0)
                     {
                         dgBankStatementLine.SetLoadedRow(selectedItem);
@@ -346,7 +346,6 @@ namespace UnicontaClient.Pages.CustomPage
                         selectedItem.Invoice = voucher._Invoice;
                         dgBankStatementLine.SetModifiedRow(selectedItem);
                     }
-                    AttachVoucherRow = null;
                 }
             }
 

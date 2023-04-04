@@ -58,8 +58,8 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryItems"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CostPrice" AllowMath="True" Width="70">
                         <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                             <DataTemplate>
-                                <CorasauControls:TextEditor  x:Name="PART_Editor" HorizontalContentAlignment="Right" ValidateOnEnterKeyPressed="False" ValidateOnTextInput="False" 
-                                                             EditValue="{Binding Path=DataContext.RowData.Row.CostPrice,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}"/>
+                                <CorasauControls:TextEditor  x:Name="PART_Editor" HorizontalContentAlignment="Right" ValidateOnTextInput="False" ValidateOnEnterKeyPressed="False" MaskUseAsDisplayFormat="False" 
+                                                             DisplayFormatString="N2" EditValue="{Binding Path=DataContext.RowData.Row.CostPrice,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}"/>
                             </DataTemplate>
                         </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                     </localPage:CorasauDataGridTemplateColumnClient>
@@ -70,7 +70,9 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryItems"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Qty" Width="70">
                         <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                             <DataTemplate>
-                                <CorasauControls:TextEditor  x:Name="PART_Editor" HorizontalContentAlignment="Right" Mask="{Binding Path=DataContext.RowData.Row.Decimals,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource MaskConverter},ConverterParameter=Decimals}" MaskUseAsDisplayFormat="True" MaskType="Numeric" EditValue="{Binding Path=DataContext.RowData.Row.Qty,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}"/>
+                                <CorasauControls:TextEditor  x:Name="PART_Editor" HorizontalContentAlignment="Right" 
+                                                             Mask="{Binding Path=DataContext.RowData.Row.Decimals,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource MaskConverter},ConverterParameter=Decimals}" 
+                                                             MaskUseAsDisplayFormat="True" MaskType="Numeric" EditValue="{Binding Path=DataContext.RowData.Row.Qty,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}"/>
                             </DataTemplate>
                         </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                     </localPage:CorasauDataGridTemplateColumnClient>

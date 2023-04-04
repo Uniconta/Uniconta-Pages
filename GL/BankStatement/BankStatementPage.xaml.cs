@@ -287,7 +287,6 @@ namespace UnicontaClient.Pages.CustomPage
 
         async Task BankAPI(CWBankAPI cwBank)
         {
-            busyIndicator.IsBusy = true;
             BankStatementAPI bankApi = new BankStatementAPI(api);
 
             string dialogText = null;
@@ -374,15 +373,9 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case 5:
                     if (CWBankAPI.BankService == 0)
-                    {
-                        if (!api.CompanyEntity.Aiia)
-                            dialogText = Uniconta.ClientTools.Localization.lookup("AiiaNotActivated");
-                        else
-                            await ConnectAiia(true);
-                    }
+                        await ConnectAiia(true);
                     break;
             }
-            busyIndicator.IsBusy = false;
 
             if (logText != null)
             {

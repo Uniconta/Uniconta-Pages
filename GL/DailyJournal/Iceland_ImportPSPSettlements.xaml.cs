@@ -196,7 +196,7 @@ namespace UnicontaClient.Pages.CustomPage
             // Set code for device rent
             switch (SelectedProvider())
             {
-                case Providers.Saltpay:
+                case Providers.Saltpay: // Teya
                     CodeRent = "F_MONTHLY";
                     FromDate = DateTime.Now.AddDays(-1);
                     break;
@@ -217,7 +217,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private Providers SelectedProvider()
         {
-            if ((bool)(selectedJournal.ToLower().Contains("saltpay")) || (bool)(selectedJournal.ToLower().Contains("borgun")))
+            if ((bool)(selectedJournal.ToLower().Contains("saltpay")) || (bool)(selectedJournal.ToLower().Contains("borgun")) || (bool)(selectedJournal.ToLower().Contains("teya")))
                 return Providers.Saltpay;
             else if ((bool)(selectedJournal.ToLower().Contains("rapyd")) || (bool)(selectedJournal.ToLower().Contains("korta")))
                 return Providers.Rapyd;
@@ -412,7 +412,7 @@ namespace UnicontaClient.Pages.CustomPage
             switch (Provider)
             {
                 case Providers.Saltpay:
-                    return "SaltPay";
+                    return "Teya";
                 case Providers.Rapyd:
                     return "Rapyd";
                 case Providers.Valitor:

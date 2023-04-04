@@ -263,7 +263,6 @@ namespace UnicontaClient.Pages.CustomPage
         private void localMenu_OnItemClicked(string ActionType)
         {
             var selectedItem = dgCreditorTranOpenGrid.SelectedItem as CreditorTransPayment;
-            var selectedItems = dgCreditorTranOpenGrid.SelectedItems;
 
             switch (ActionType)
             {
@@ -319,14 +318,11 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
 
                 case "UncheckAllPaid":
-                    selectedItems = dgCreditorTranOpenGrid.GetVisibleRows();
-                    if (selectedItems != null)
-                        UncheckPaid(selectedItems as IEnumerable<CreditorTransPayment>);
+                    UncheckPaid(dgCreditorTranOpenGrid.GetVisibleRows() as IEnumerable<CreditorTransPayment>);
                     break;
 
                 case "UncheckMarkedPaid":
-                    if (selectedItems != null)
-                        UncheckPaid(selectedItems as IEnumerable<CreditorTransPayment>);
+                    UncheckPaid(dgCreditorTranOpenGrid.SelectedItems as IEnumerable<CreditorTransPayment>);
                     break;
 
                 case "UncheckCurrentPaid":
@@ -335,14 +331,11 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
 
                 case "CheckOnholdAll":
-                    selectedItems = dgCreditorTranOpenGrid.GetVisibleRows();
-                    if (selectedItems != null)
-                        CheckUncheckOnhold(selectedItems as IEnumerable<CreditorTransPayment>, true);
+                    CheckUncheckOnhold(dgCreditorTranOpenGrid.GetVisibleRows() as IEnumerable<CreditorTransPayment>, true);
                     break;
 
                 case "CheckOnholdMarked":
-                    if (selectedItems != null)
-                        CheckUncheckOnhold(selectedItems as IEnumerable<CreditorTransPayment>, true);
+                    CheckUncheckOnhold(dgCreditorTranOpenGrid.SelectedItems as IEnumerable<CreditorTransPayment>, true);
                     break;
 
                 case "CheckOnholdCurrent":
@@ -351,14 +344,11 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
 
                 case "UncheckOnholdAll":
-                    selectedItems = dgCreditorTranOpenGrid.GetVisibleRows();
-                    if (selectedItems != null)
-                        CheckUncheckOnhold(selectedItems as IEnumerable<CreditorTransPayment>, false);
+                    CheckUncheckOnhold(dgCreditorTranOpenGrid.GetVisibleRows() as IEnumerable<CreditorTransPayment>, false);
                     break;
 
                 case "UncheckOnholdMarked":
-                    if (selectedItems != null)
-                        CheckUncheckOnhold(selectedItems as IEnumerable<CreditorTransPayment>, false);
+                    CheckUncheckOnhold(dgCreditorTranOpenGrid.SelectedItems as IEnumerable<CreditorTransPayment>, false);
                     break;
 
                 case "UncheckOnholdCurrent":
@@ -842,32 +832,38 @@ namespace UnicontaClient.Pages.CustomPage
 
         void UncheckPaid(IEnumerable<CreditorTransPayment> paymentList)
         {
-            List<CreditorTransPayment> ListTransPaym = new List<CreditorTransPayment>();
-            foreach (var rec in paymentList)
+            if (paymentList != null)
             {
-                if (rec._Paid)
+                List<CreditorTransPayment> ListTransPaym = new List<CreditorTransPayment>();
+                foreach (var rec in paymentList)
                 {
-                    rec.Paid = false;
-                    ListTransPaym.Add(rec);
+                    if (rec._Paid)
+                    {
+                        rec.Paid = false;
+                        ListTransPaym.Add(rec);
+                    }
                 }
+                if (ListTransPaym.Count > 0)
+                    api.Update(ListTransPaym);
             }
-            if (ListTransPaym.Count > 0)
-                api.Update(ListTransPaym);
         }
 
         void CheckUncheckOnhold(IEnumerable<CreditorTransPayment> paymentList, bool check)
         {
-            List<CreditorTransPayment> ListTransPaym = new List<CreditorTransPayment>();
-            foreach (var rec in paymentList)
+            if (paymentList != null)
             {
-                if (rec._OnHold != check)
+                List<CreditorTransPayment> ListTransPaym = new List<CreditorTransPayment>();
+                foreach (var rec in paymentList)
                 {
-                    rec.OnHold = check;
-                    ListTransPaym.Add(rec);
+                    if (rec._OnHold != check)
+                    {
+                        rec.OnHold = check;
+                        ListTransPaym.Add(rec);
+                    }
                 }
+                if (ListTransPaym.Count > 0)
+                    api.Update(ListTransPaym);
             }
-            if (ListTransPaym.Count > 0)
-                api.Update(ListTransPaym);
         }
 
         void MergePaym()

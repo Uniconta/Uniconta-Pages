@@ -257,7 +257,7 @@ namespace UnicontaClient.Pages.CustomPage
             base.OnLayoutLoaded();
             var Comp = api.CompanyEntity;
             RibbonBase rb = (RibbonBase)localMenu.DataContext;
-            
+
             if (!Comp.ProjectTask)
             {
                 Task.Visible = false;
@@ -266,7 +266,7 @@ namespace UnicontaClient.Pages.CustomPage
             else
                 Task.ShowInColumnChooser = true;
 
-            if(Comp._Country != 57)
+            if (Comp._Country != 57)
             {
                 UtilDisplay.RemoveMenuCommand(rb, "KmRegnskab");
                 UtilDisplay.RemoveMenuCommand(rb, "FerieogFlex");
@@ -646,7 +646,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        void SetFields(DateTime selectedDate) 
+        void SetFields(DateTime selectedDate)
         {
             cmbRegistration.ItemsSource = Uniconta.ClientTools.AppEnums.RegistrationType.Values;
             cmbRegistration.SelectedIndex = 0;
@@ -819,7 +819,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 if (IsProjectBlocked(rec._Project))
                     continue;
-                
+
                 rec._Date = JournalLineDate;
                 rec._Day1 = rec._Day2 = rec._Day3 = rec._Day4 = rec._Day5 = rec._Day6 = rec._Day7 = 0;
                 rec._AddressFrom = rec._AddressTo = rec._VechicleRegNo = null;
@@ -2852,5 +2852,7 @@ namespace UnicontaClient.Pages.CustomPage
             await dgTMJournalLineTransRegGrid.SaveData();
             return await dgTMJournalLineGrid.SaveData();
         }
+
+        public override bool FilterOnLoadLayout => false;
     }
 }

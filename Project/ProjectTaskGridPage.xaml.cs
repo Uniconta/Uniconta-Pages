@@ -19,15 +19,9 @@ using System.Linq;
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
-    public class ProjectTaskClientLocal : ProjectTaskClient
-    {
-        internal object taskSource;
-        public object TaskSource { get { return taskSource; } }
-    }
-
     public class ProjectTaskGridClient : CorasauDataGridClient
     {
-        public override Type TableType { get { return typeof(ProjectTaskClientLocal); } }
+        public override Type TableType { get { return typeof(ProjectTaskClient); } }
     }
     
     public partial class ProjectTaskGridPage : GridBasePage
@@ -138,14 +132,14 @@ namespace UnicontaClient.Pages.CustomPage
         public override bool CheckIfBindWithUserfield(out bool isReadOnly, out bool useBinding)
         {
             isReadOnly = false;
-            useBinding = true;
+            useBinding = false;
             return true;
         }
 
         private void LocalMenu_OnItemClicked(string ActionType)
         {
             var selectedItem = dgProjectTaskGrid.SelectedItem as ProjectTaskClient;
-            var selectedTasks = dgProjectTaskGrid.SelectedItems?.Cast<ProjectTaskClientLocal>();
+            var selectedTasks = dgProjectTaskGrid.SelectedItems?.Cast<ProjectTaskClient>();
             switch (ActionType)
             {
                 case "EditAll":
@@ -288,7 +282,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void FollowsTask_GotFocus(object sender, RoutedEventArgs e)
         {
-            var selectedItem = dgProjectTaskGrid.SelectedItem as ProjectTaskClientLocal;
+            var selectedItem = dgProjectTaskGrid.SelectedItem as ProjectTaskClient;
             if (selectedItem?._Project != null)
             {
                 var selected = (ProjectClient)ProjectCache.Get(selectedItem._Project);
@@ -296,7 +290,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        async void setTask(ProjectClient project, ProjectTaskClientLocal rec)
+        async void setTask(ProjectClient project, ProjectTaskClient rec)
         {
             if (api.CompanyEntity.ProjectTask)
             {
@@ -334,7 +328,7 @@ namespace UnicontaClient.Pages.CustomPage
             cwCreateTask.Show();
         }
 
-        private void CreateBudgetTask(IEnumerable<ProjectTaskClientLocal> taskLst)
+        private void CreateBudgetTask(IEnumerable<ProjectTaskClient> taskLst)
         {
             var cwCreateBjtTask = new CwCreateBudgetTask(api, 1, taskLst.Count());
             cwCreateBjtTask.DialogTableId = 2000000180;
@@ -357,7 +351,7 @@ namespace UnicontaClient.Pages.CustomPage
             cwCreateBjtTask.Show();
         }
 
-        private void CloseTask(IEnumerable<ProjectTaskClientLocal> lst)
+        private void CloseTask(IEnumerable<ProjectTaskClient> lst)
         {
             var icount = lst.Count();
             var cwProjectTaskClose = new CWProjectTaskClose(icount);

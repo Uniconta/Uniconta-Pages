@@ -19,6 +19,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CWSetFeeAmount"
                 <RowDefinition Height="30" x:Name="rowNoOfDays" />
                 <RowDefinition Height="30" x:Name="rowFeeOnReminder" />
                 <RowDefinition Height="30" x:Name="rowFeeCharge" />
+                <RowDefinition Height="30" x:Name="rowFirstCollection" />
                 <RowDefinition Height="30" x:Name="rowFeeTransaction" />
                 <RowDefinition Height="30" x:Name="rowCollectionLetter" />
             </Grid.RowDefinitions>
@@ -46,11 +47,14 @@ x:Class="UnicontaClient.Pages.CustomPage.CWSetFeeAmount"
             <TextBlock x:Name="lblFeeOnReminder" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FeeOnReminder}" Grid.Column="0" Grid.Row="4"  VerticalAlignment="Center" HorizontalAlignment="Right"  />
             <ClientToolsControl:CheckEditor x:Name="chkFeeOnReminder" EditValue="{Binding FeeOnReminder}" Grid.Row="4" Grid.Column="2" Grid.ColumnSpan="3" />
 
-            <TextBlock x:Name="lblFee" Grid.Column="0" Grid.Row="5"  VerticalAlignment="Center" HorizontalAlignment="Right"  />
-            <ClientToolsControl:ComboBoxEditor x:Name="cmbtypeValue" SelectedItem="{Binding SelectedType}" Height="25"  Grid.Row="5" Grid.Column="2" Grid.ColumnSpan="3" />
+            <TextBlock x:Name="lblFirstCollection" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FirstCollection}" Grid.Column="0" Grid.Row="5"  VerticalAlignment="Center" HorizontalAlignment="Right"  />
+            <ClientToolsControl:ComboBoxEditor x:Name="cmbFirstCollections" SelectedItem="{Binding FirstCollectionType,Mode=TwoWay}" Height="25" Grid.Row="5" Grid.Column="2" Grid.ColumnSpan="3" IsEditable="False" />
+
+            <TextBlock x:Name="lblFee" Grid.Column="0" Grid.Row="6"  VerticalAlignment="Center" HorizontalAlignment="Right"  />
+            <ClientToolsControl:ComboBoxEditor x:Name="cmbtypeValue" SelectedItem="{Binding SelectedType}" Height="25"  Grid.Row="6" Grid.Column="2" Grid.ColumnSpan="3" />
             
-            <TextBlock x:Name="lblCollection" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CollectionLetter}" Grid.Column="0" Grid.Row="6" VerticalAlignment="Center" HorizontalAlignment="Right" />
-            <ClientToolsControl:ComboBoxEditor x:Name="cmbCollections" Text="{Binding CollectionType,Mode=TwoWay}" Height="25" Grid.Row="6" Grid.Column="2" Grid.ColumnSpan="3" >
+            <TextBlock x:Name="lblCollection" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CollectionLetter}" Grid.Column="0" Grid.Row="7" VerticalAlignment="Center" HorizontalAlignment="Right" />
+            <ClientToolsControl:ComboBoxEditor x:Name="cmbCollections" Text="{Binding CollectionType,Mode=TwoWay}" Height="25" Grid.Row="7" Grid.Column="2" Grid.ColumnSpan="3" >
                 <ClientToolsControl:ComboBoxEditor.StyleSettings>
                     <editor:CheckedComboBoxStyleSettings />
                 </ClientToolsControl:ComboBoxEditor.StyleSettings>

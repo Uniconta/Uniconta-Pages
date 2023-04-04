@@ -374,7 +374,6 @@ namespace UnicontaClient.Pages.CustomPage
                             if (statementLine._DocumentRef != 0)
                                 _refferedVouchers.Add(statementLine._DocumentRef);
                     }
-                    AttachVoucherRow = selectedItem;
                     AddDockItem(TabControls.AttachVoucherGridPage, new object[] { _refferedVouchers }, true);
                     break;
                 case "RemoveVoucher":
@@ -844,38 +843,47 @@ namespace UnicontaClient.Pages.CustomPage
             if (errorCodes == ErrorCodes.Succes)
                 BindGrid();
         }
-        GLTransClient AttachVoucherRow;
+
         public override void Utility_Refresh(string screenName, object argument = null)
         {
             if (screenName == TabControls.AttachVoucherGridPage && argument != null)
             {
-                var selectedItem = AttachVoucherRow ?? dgAccountsTransGrid.SelectedItem as GLTransClient;
                 object[] argumentParams = (object[])argument;
                 var doc = (VouchersClient)argumentParams[0];
-                SaveAttachment(selectedItem, doc);
+                if (argumentParams.Length > 1)
+                {
+                    var openedFrom = argumentParams[1];
+                    if (openedFrom == this.ParentControl)
+                    {
+                        var selectedItem = dgAccountsTransGrid.SelectedItem as GLTransClient;
+                        SaveAttachment(selectedItem, doc);
+                    }
+                }
             }
-            AttachVoucherRow = null;
         }
 
         void SaveAttachment(GLTransClient selectedItem, VouchersClient doc)
         {
-            CWForAllTrans cwconfirm = new CWForAllTrans();
-            cwconfirm.Closing += async delegate
+            if (selectedItem != null && doc != null)
             {
-                if (cwconfirm.DialogResult == true)
+                CWForAllTrans cwconfirm = new CWForAllTrans();
+                cwconfirm.Closing += async delegate
                 {
-                    if (selectedItem._DocumentRef != 0)
-                        VoucherCache.RemoveGlobalVoucherCache(selectedItem.CompanyId, selectedItem._DocumentRef);
-                    busyIndicator.IsBusy = true;
-                    var errorCodes = await postingApiInv.AddPhysicalVoucher(selectedItem, doc, cwconfirm.ForAllTransactions, cwconfirm.AppendDoc);
-                    busyIndicator.IsBusy = false;
-                    if (errorCodes == ErrorCodes.Succes)
-                        BindGrid();
-                    else
-                        UtilDisplay.ShowErrorCode(errorCodes);
-                }
-            };
-            cwconfirm.Show();
+                    if (cwconfirm.DialogResult == true)
+                    {
+                        if (selectedItem._DocumentRef != 0)
+                            VoucherCache.RemoveGlobalVoucherCache(selectedItem.CompanyId, selectedItem._DocumentRef);
+                        busyIndicator.IsBusy = true;
+                        var errorCodes = await postingApiInv.AddPhysicalVoucher(selectedItem, doc, cwconfirm.ForAllTransactions, cwconfirm.AppendDoc);
+                        busyIndicator.IsBusy = false;
+                        if (errorCodes == ErrorCodes.Succes)
+                            BindGrid();
+                        else
+                            UtilDisplay.ShowErrorCode(errorCodes);
+                    }
+                };
+                cwconfirm.Show();
+            }
         }
 
         void InvertSign(GLTransClient selectedItem)

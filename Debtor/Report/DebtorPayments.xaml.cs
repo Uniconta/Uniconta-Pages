@@ -653,12 +653,12 @@ namespace UnicontaClient.Pages.CustomPage
                         var chargeCurrency = CurrencyUtil.Parse(cwwin.ChargeCurrency);
 
                         if (cwwin.PerTransaction)
-                            SetFeeAmount(debtorPayments, cwwin.value, currencuEnum, cwwin.Charge, chargeCurrency, day, cwwin.CollectionLetterTypes, cwwin.FeeOnReminder);
+                            SetFeeAmount(debtorPayments, cwwin.value, currencuEnum, cwwin.Charge, chargeCurrency, day, cwwin.CollectionLetterTypes, cwwin.FeeOnReminder, cwwin.FirstCollectionIndex);
                         else
                         {
-                            SetFeeAmount(debtorPayments, 0, currencuEnum, 0, chargeCurrency, day, cwwin.CollectionLetterTypes, cwwin.FeeOnReminder);
+                            SetFeeAmount(debtorPayments, 0, currencuEnum, 0, chargeCurrency, day, cwwin.CollectionLetterTypes, cwwin.FeeOnReminder, cwwin.FirstCollectionIndex);
                             var selectedAccounts = debtorPayments.GroupBy(x => new { x.Account, x._Code } ).Select(x => x.FirstOrDefault(x2 => x2._AmountOpen > 0 && !x2._OnHold));
-                            SetFeeAmount(selectedAccounts, cwwin.value, currencuEnum, cwwin.Charge, chargeCurrency, day, cwwin.CollectionLetterTypes, cwwin.FeeOnReminder);
+                            SetFeeAmount(selectedAccounts, cwwin.value, currencuEnum, cwwin.Charge, chargeCurrency, day, cwwin.CollectionLetterTypes, cwwin.FeeOnReminder, cwwin.FirstCollectionIndex);
                         }
                     }
                 }
@@ -666,7 +666,7 @@ namespace UnicontaClient.Pages.CustomPage
             cwwin.Show();
         }
 
-        private void SetFeeAmount(IEnumerable<DebtorTransPayment> debtorPayments, double feeAmount, Currencies feeCurrency, double ChargeAmount, Currencies chargeCurrency, DateTime day, int CollectionLetterTypes, bool FeeOnReminder)
+        private void SetFeeAmount(IEnumerable<DebtorTransPayment> debtorPayments, double feeAmount, Currencies feeCurrency, double ChargeAmount, Currencies chargeCurrency, DateTime day, int CollectionLetterTypes, bool FeeOnReminder, int FirstCollectionIndex)
         {
             foreach (var rec in debtorPayments)
             {
@@ -682,7 +682,12 @@ namespace UnicontaClient.Pages.CustomPage
                             case DebtorEmailType.CollectionLetter2: if ((CollectionLetterTypes & 0x08) != 0) code = DebtorEmailType.CollectionLetter3; break;
                             case DebtorEmailType.CollectionLetter3: if ((CollectionLetterTypes & 0x10) != 0) code = DebtorEmailType.Collection; break;
                             case DebtorEmailType.Collection: if ((CollectionLetterTypes & 0x10) != 0) code = DebtorEmailType.Collection; break;
-                            default: if ((CollectionLetterTypes & 0x01) != 0) code = DebtorEmailType.PaymentReminder; break;
+                            default: if ((CollectionLetterTypes & (0x01 << FirstCollectionIndex)) != 0)
+                                    code = FirstCollectionIndex == 0 ? DebtorEmailType.PaymentReminder :
+                                        (FirstCollectionIndex == 1 ? DebtorEmailType.CollectionLetter1 :
+                                        (FirstCollectionIndex == 2 ? DebtorEmailType.CollectionLetter2 :
+                                        (FirstCollectionIndex == 3 ? DebtorEmailType.CollectionLetter3 : DebtorEmailType.Collection)));
+                                break;
                         }
 
                         if (code != 0)

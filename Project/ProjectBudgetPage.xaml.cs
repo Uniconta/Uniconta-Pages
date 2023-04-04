@@ -20,7 +20,6 @@ using Uniconta.ClientTools;
 using Uniconta.API.Service;
 using Uniconta.ClientTools.Controls;
 using System.Windows;
-using UnicontaClient.Pages.Project.TimeManagement;
 using Uniconta.DataModel;
 using Uniconta.API.Project;
 using Uniconta.ClientTools.Util;
@@ -85,7 +84,7 @@ namespace UnicontaClient.Pages.CustomPage
             var syncMaster = dgProjectBudgetGrid.masterRecord as Uniconta.DataModel.Project;
             if (syncMaster == null) return;
             string header = null;
-            header = string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("ProjectBudget"), syncMaster._Name);
+            header = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ProjectBudget"), syncMaster._Name);
             SetHeader(header);
         }
 
@@ -227,11 +226,11 @@ namespace UnicontaClient.Pages.CustomPage
                     }
 
                     var rows = await api.Query<ProjectBudgetLine>(projectBudget);
-                    if (rows == null || rows.Count() == 0)
-                     return;
+                    if (rows == null || rows.Length == 0)
+                        return;
 
                     InvItem item;
-                    var orderList = new List<DebtorOrderLineClient>(rows.Count());
+                    var orderList = new List<DebtorOrderLineClient>(rows.Length);
                     int lineNo = 0;
                     foreach (var line in rows)
                     {
@@ -254,6 +253,8 @@ namespace UnicontaClient.Pages.CustomPage
                             orderLine._DiscountPct = debtor._LineDiscountPct;
                             orderLine._Project = projectBudget.Project;
                             orderLine._PrCategory = line._PrCategory ?? item._PrCategory;
+                            orderLine._WorkSpace = line._WorkSpace;
+                            orderLine._Task = line._Task;
                             orderLine.SetMaster(order);
                             TableField.SetUserFieldsFromRecord(orderLine, item);
                             orderList.Add(orderLine);

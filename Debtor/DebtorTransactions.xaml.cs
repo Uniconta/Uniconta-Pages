@@ -309,7 +309,10 @@ namespace UnicontaClient.Pages.CustomPage
                             var invoice = debtorInvoice?.FirstOrDefault();
                             if (invoice == null)
                                 return;
-                            Invoices.OriginalInvoicePdf(invoice, crudapi, voucherBusyIndicator);
+                            var debtInvNumber = invoice._InvoiceNumber;
+                            var standardPrintReport = await StandardPrint(invoice, crudapi);
+                            var reportName = await Utilities.Utility.GetLocalizedReportName(crudapi, invoice, CompanyLayoutType.Invoice);
+                            StandardPrint(standardPrintReport, debtInvNumber, reportName);
                         }
                         else if (dcType == 2)
                         {

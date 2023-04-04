@@ -103,6 +103,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (!company.ItemVariants)
                 colVariant.Visible = false;
             localMenu.OnItemClicked += LocalMenu_OnItemClicked;
+            
         }
         private void LocalMenu_OnItemClicked(string ActionType)
         {
@@ -141,12 +142,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Escape)
-            {
-                dgCreateOrderGrid.SelectedItem = null;
-                this.dockCtrl.JustClosePanel(dockCtrl.Activpanel);
-            }
-            else if (e.Key == Key.Enter)
+            if (e.Key == Key.Enter)
             {
                 if (CreateButton.IsFocused)
                     CreateButton_Click(null, null);

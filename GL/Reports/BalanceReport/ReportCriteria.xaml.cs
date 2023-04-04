@@ -86,7 +86,7 @@ namespace UnicontaClient.Pages.CustomPage
         Company[] companies;
         static Balance LastGeneratedBalance;
         BalanceFrontPageReportDataClient balanceFrontPageReportData;
-
+        string DefaultBalance;
         public ReportCriteria(UnicontaBaseEntity sourceData) : base(sourceData)
         {
             master = sourceData;
@@ -130,7 +130,19 @@ namespace UnicontaClient.Pages.CustomPage
             this.BeforeClose += ReportCriteria_BeforeClose;
             LoadBalance(t);
         }
-
+        public override void SetParameter(IEnumerable<ValuePair> Parameters)
+        {
+            foreach (var rec in Parameters)
+            {
+                if (string.IsNullOrEmpty(rec.Name) || string.Compare(rec.Name, "Balance", StringComparison.CurrentCultureIgnoreCase) == 0)
+                {
+                    this.DefaultBalance = rec.Value;
+                    if (itemsBalance != null)
+                        cbBalance.SelectedItem = itemsBalance.Where(x => x._Name == DefaultBalance).FirstOrDefault();
+                }
+            }
+            base.SetParameter(Parameters);
+        }
         private void ReportCriteria_BeforeClose()
         {
             if (BasePage.session.User._AutoSave)
@@ -181,10 +193,11 @@ namespace UnicontaClient.Pages.CustomPage
                     cbBalance.SelectedItem = lstEntity.Where(x => x.RowId == LastGeneratedBalance.RowId).FirstOrDefault();
                 else
                     cbBalance.SelectedIndex = 0;
+                if (DefaultBalance != null)
+                    cbBalance.SelectedItem = lstEntity.Where(x => x._Name == DefaultBalance).FirstOrDefault();
             }
             else
                 cbBalance.ItemsSource = new ObservableCollection<Balance>();
-
             busyIndicator.IsBusy = false;
         }
 

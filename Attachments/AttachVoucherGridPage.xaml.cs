@@ -133,7 +133,7 @@ namespace UnicontaClient.Pages.CustomPage
             var selectedVouher = dgAttachVouchers.SelectedItem as VouchersClient;
             if (selectedVouher != null)
             {
-                attachParams = new object[] { selectedVouher };
+                attachParams = new object[] { selectedVouher, backTab };
                 CloseDockItem();
             }
         }

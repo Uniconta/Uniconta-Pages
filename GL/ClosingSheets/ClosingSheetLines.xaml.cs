@@ -78,19 +78,19 @@ namespace UnicontaClient.Pages.CustomPage
         public override IComparer GridSorting { get { return new GLClosingSheetLineSort(); } }
         internal string MasterAccount;
 
-		public override bool AddRowOnPageDown()
+        public override bool AddRowOnPageDown()
         {
             var selectedItem = (GLClosingSheetLineLocal)this.SelectedItem;
-			return (selectedItem != null && selectedItem._AmountCent != 0);
+            return (selectedItem != null && selectedItem._AmountCent != 0);
         }
 
-		protected override void DataLoaded(UnicontaBaseEntity[] Arr)
-		{
-			var MasterAccount = this.MasterAccount;
-			foreach (var lin in (GLClosingSheetLineLocal[])Arr)
-				lin.Swap = (lin._Account != MasterAccount) && (lin._ShowOnAccount != MasterAccount);
-		}
-	}
+        protected override void DataLoaded(UnicontaBaseEntity[] Arr)
+        {
+            var MasterAccount = this.MasterAccount;
+            foreach (var lin in (GLClosingSheetLineLocal[])Arr)
+                lin.Swap = (lin._Account != MasterAccount) && (lin._ShowOnAccount != MasterAccount);
+        }
+    }
 
     public partial class ClosingSheetLines : GridBasePage
     {
@@ -477,7 +477,6 @@ namespace UnicontaClient.Pages.CustomPage
                             if (line._DocumentRef != 0)
                                 _refferedVouchers.Add(line._DocumentRef);
                         var parameters = new List<BasePage.ValuePair>() { new BasePage.ValuePair() { Name = "ShowAll", Value = "1" } };
-                        AttachVoucherRow = selectedClosingSheetLine;
                         dockCtrl.AddDockItem(null, TabControls.AttachVoucherGridPage, ParentControl, new object[] { _refferedVouchers }, true, null, null, 0, null, new Point(), parameters);
                     }
                     break;
@@ -671,14 +670,13 @@ namespace UnicontaClient.Pages.CustomPage
                 Qty.Visible = false;
         }
 
-        GLClosingSheetLineLocal AttachVoucherRow;
         public override void Utility_Refresh(string screenName, object argument = null)
         {
             if (screenName == TabControls.AttachVoucherGridPage && argument != null)
             {
                 var voucherObj = argument as object[];
                 var vouchersClient = voucherObj[0] as VouchersClient;
-                var selectedLine = AttachVoucherRow ?? dgClosingSheetLine.SelectedItem as GLClosingSheetLineLocal;
+                var selectedLine = dgClosingSheetLine.SelectedItem as GLClosingSheetLineLocal;
                 if (selectedLine != null && vouchersClient != null)
                 {
                     dgClosingSheetLine.SetLoadedRow(selectedLine);
@@ -687,7 +685,6 @@ namespace UnicontaClient.Pages.CustomPage
                         selectedLine.Text = vouchersClient._Text;
                     dgClosingSheetLine.SetModifiedRow(selectedLine);
                 }
-                AttachVoucherRow = null;
             }
         }
     }

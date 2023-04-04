@@ -703,7 +703,7 @@ namespace UnicontaClient.Pages.CustomPage
                     row.Voucher = LastVoucher;
             }
         }
-        JournalLineGridClient AttachVoucherRow;
+      
         private void localMenu_OnItemClicked(string ActionType)
         {
             var selectedItem = dgGLDailyJournalLine.SelectedItem as JournalLineGridClient;
@@ -761,7 +761,7 @@ namespace UnicontaClient.Pages.CustomPage
                         foreach (var journalLine in source)
                             if (journalLine._DocumentRef != 0)
                                 _refferedVouchers.Add(journalLine._DocumentRef);
-                        AttachVoucherRow = selectedItem;
+                     
                         AddDockItem(TabControls.AttachVoucherGridPage, new object[] { _refferedVouchers }, true);
                     }
                     break;
@@ -1029,7 +1029,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void SetAttachedVoucherForJournalLine(VouchersClient vouchersClient)
         {
-            var selectedItem = AttachVoucherRow ?? dgGLDailyJournalLine.SelectedItem as JournalLineGridClient;
+            var selectedItem = dgGLDailyJournalLine.SelectedItem as JournalLineGridClient;
             if (selectedItem != null && vouchersClient != null)
             {
                 dgGLDailyJournalLine.SetLoadedRow(selectedItem);
@@ -1046,7 +1046,6 @@ namespace UnicontaClient.Pages.CustomPage
                 }
                 dgGLDailyJournalLine.SetModifiedRow(selectedItem);
             }
-            AttachVoucherRow = null;
         }
 
         static bool showDif(double settle, double journal, bool Offset)

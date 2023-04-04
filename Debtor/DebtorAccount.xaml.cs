@@ -544,7 +544,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void cmbInterests_GotFocus(object sender, RoutedEventArgs e)
         {
             var cmb = sender as ComboBoxEditor;
-            if (cmb != null)
+            if (cmb != null && interestCache != null)
                 cmb.ItemsSource = interestCache.GetKeyList();
         }
 

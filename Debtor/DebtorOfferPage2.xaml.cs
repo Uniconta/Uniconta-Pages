@@ -86,9 +86,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             InitializeComponent();
             InitPage(crudApi, null);
-#if !SILVERLIGHT
             FocusManager.SetFocusedElement(leAccount, leAccount);
-#endif
         }
 
         UnicontaBaseEntity master;
@@ -101,11 +99,7 @@ namespace UnicontaClient.Pages.CustomPage
             Employeelookupeditor.api = leAccount.api = lePayment.api = cmbDim1.api = cmbDim2.api = cmbDim3.api = cmbDim4.api = cmbDim5.api = leLayoutGroup.api = leInvoiceAccount.api = PriceListlookupeditior.api =
                leGroup.api = leShipment.api = leDeliveryTerm.api = Projectlookupeditor.api = PrCategorylookupeditor.api = leDeliveryAddress.api = leVat.api = prTasklookupeditor.api = lePrWorkSpace.api = crudapi;
 
-#if SILVERLIGHT
-            leRelatedOrder.api = crudapi;
-#else
             leRelatedOrder.CrudApi = crudapi;
-#endif
             cbDeliveryCountry.ItemsSource = Enum.GetValues(typeof(Uniconta.Common.CountryCode));
             AdjustLayout();
             if (editrow == null)
@@ -143,10 +137,7 @@ namespace UnicontaClient.Pages.CustomPage
             frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
 
             AcItem.ButtonClicked += AcItem_ButtonClicked;
-
-#if !SILVERLIGHT
             editrow.PropertyChanged += Editrow_PropertyChanged;
-#endif
             this.master = master;
             if (Prospect != null || Contact != null)
             {
@@ -511,8 +502,6 @@ namespace UnicontaClient.Pages.CustomPage
             setTask(selectedItem);
         }
 
-
-#if !SILVERLIGHT
         private void LiDeliveryZipCode_OnButtonClicked(object sender)
         {
             var location = editrow._DeliveryAddress1 + "+" + editrow._DeliveryAddress2 + "+" + editrow._DeliveryAddress3 + "+" + editrow._DeliveryZipCode + "+" + editrow._DeliveryCity + "+" + editrow._DeliveryCountry;
@@ -524,27 +513,26 @@ namespace UnicontaClient.Pages.CustomPage
             var selectedInstallation = leDeliveryAddress.SelectedItem as WorkInstallationClient;
             if (selectedInstallation != null)
             {
-                CopyAddressToRow(selectedInstallation._Name, selectedInstallation._Address1, selectedInstallation._Address2, selectedInstallation._Address3, selectedInstallation._ZipCode, selectedInstallation._City, selectedInstallation._Country);
+                var row = this.editrow;
+                row.DeliveryName = selectedInstallation._Name;
+                row.DeliveryAddress1 = selectedInstallation._Address1;
+                row.DeliveryAddress2 = selectedInstallation._Address2;
+                row.DeliveryAddress3 = selectedInstallation._Address3;
+                row.DeliveryCity = selectedInstallation._City;
+                if (row.DeliveryZipCode != selectedInstallation._ZipCode)
+                {
+                    lookupZipCode = false;
+                    row.DeliveryZipCode = selectedInstallation._ZipCode;
+                }
+                row.DeliveryCountry = selectedInstallation._Country;
+                row.DeliveryContactPerson = selectedInstallation._ContactPerson;
+                row.DeliveryContactEmail = selectedInstallation._ContactEmail;
+                row.DeliveryPhone = selectedInstallation._Phone;
                 if (selectedInstallation._DeliveryTerm != null)
-                    editrow.DeliveryTerm = selectedInstallation._DeliveryTerm;
+                    row.DeliveryTerm = selectedInstallation._DeliveryTerm;
             }
         }
 
-        private void CopyAddressToRow(string name, string address1, string address2, string address3, string zipCode, string city, CountryCode? country)
-        {
-            editrow.DeliveryName = name;
-            editrow.DeliveryAddress1 = address1;
-            editrow.DeliveryAddress2 = address2;
-            editrow.DeliveryAddress3 = address3;
-            editrow.DeliveryCity = city;
-            if (editrow.DeliveryZipCode != zipCode)
-            {
-                lookupZipCode = false;
-                editrow.DeliveryZipCode = zipCode;
-            }
-            editrow.DeliveryCountry = country;
-        }
-#endif
         SQLCache installationCache;
         protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {

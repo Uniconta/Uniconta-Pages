@@ -562,6 +562,9 @@ namespace UnicontaClient.Pages.CustomPage
             if (selectedInstallation != null)
             {
                 CopyAddressToRow(selectedInstallation._Name, selectedInstallation._Address1, selectedInstallation._Address2, selectedInstallation._Address3, selectedInstallation._ZipCode, selectedInstallation._City, selectedInstallation._Country);
+                editrow.DeliveryContactPerson = selectedInstallation._ContactPerson;
+                editrow.DeliveryContactEmail = selectedInstallation._ContactEmail;
+                editrow.DeliveryPhone = selectedInstallation._Phone;
                 if (selectedInstallation._DeliveryTerm != null)
                     editrow.DeliveryTerm = selectedInstallation._DeliveryTerm;
             }
@@ -569,17 +572,18 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void CopyAddressToRow(string name, string address1, string address2, string address3, string zipCode, string city, CountryCode? country)
         {
-            editrow.DeliveryName = name;
-            editrow.DeliveryAddress1 = address1;
-            editrow.DeliveryAddress2 = address2;
-            editrow.DeliveryAddress3 = address3;
-            editrow.DeliveryCity = city;
-            if (editrow.DeliveryZipCode != zipCode)
+            var row = this.editrow;
+            row.DeliveryName = name;
+            row.DeliveryAddress1 = address1;
+            row.DeliveryAddress2 = address2;
+            row.DeliveryAddress3 = address3;
+            row.DeliveryCity = city;
+            if (row.DeliveryZipCode != zipCode)
             {
                 lookupZipCode = false;
-                editrow.DeliveryZipCode = zipCode;
+                row.DeliveryZipCode = zipCode;
             }
-            editrow.DeliveryCountry = country;
+            row.DeliveryCountry = country;
         }
     }
 }

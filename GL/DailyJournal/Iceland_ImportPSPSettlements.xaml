@@ -8,7 +8,7 @@ x:Class="UnicontaClient.Pages.CustomPage.Iceland_ImportPSPSettlements"
             xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"   
             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:CorasauControls1="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms">
     <Pages:FormBasePage.Resources>
-    
+
     </Pages:FormBasePage.Resources>
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
@@ -21,48 +21,48 @@ x:Class="UnicontaClient.Pages.CustomPage.Iceland_ImportPSPSettlements"
                 <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="grpFirst">
                     <CorasauControls:CorasauLayoutGroup x:Name="grpDescription" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Description}" Orientation="Vertical" MinWidth="350" 
                                                 CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                        <CorasauControls:CorasauLayoutItem FieldName="Payment Provider"  x:Name="liProviderName">
+                        <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=PaymentProvider}" x:Name="liProviderName">
                             <CorasauControls:ComboBoxEditor x:Name="cmdProviders"  DisplayMember="FormatName" SelectedIndexChanged="cmdProviders_SelectedIndexChanged"/>
                         </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="MerchantID" x:Name="txtMerchantID">
+                        <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=MerchantID}" x:Name="txtMerchantID">
                             <TextBox x:Name="txtmerchantID" Text="{Binding MerchantID,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                         </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="SettlementNumber" x:Name="txtSettlementNumber">
+                        <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=SettlementNumber}" x:Name="txtSettlementNumber">
                             <TextBox x:Name="txtsettlementNumber" Text="{Binding SettlementNumber,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="CreditcardClaims" x:Name="liCreditcardClaims">
+                        <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CreditcardClaims}" x:Name="liCreditcardClaims">
                             <CorasauControls:LookupEditor   x:Name="CreditcardClaimsLookupEditor" Text="{Binding CreditcardClaims,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="CreditcardFees" x:Name="liCreditcardFees">
+                        <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CreditcardFees}" x:Name="liCreditcardFees">
                             <CorasauControls:LookupEditor   x:Name="CreditcardFeesLookupEditor2" Text="{Binding CreditcardFees,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="DeviceRent" x:Name="liDeviceRent">
+                        <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DeviceRent}" x:Name="liDeviceRent">
                             <CorasauControls:LookupEditor   x:Name="DeviceRentLookupEditor" Text="{Binding DeviceRent,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="BankAccount" x:Name="liBankAccount">
+                        <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BankAccount}" x:Name="liBankAccount">
                             <CorasauControls:LookupEditor   x:Name="BankAccountLookupEditor" Text="{Binding BankAccount,Mode=TwoWay}" />
-                        </CorasauControls:CorasauLayoutItem>                        
-                        <CorasauControls:CorasauLayoutItem FieldName="AllTrans" x:Name="chkAllTrans" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=AllTrans}">
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="chkAllTrans" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=AllTrans}">
                             <CorasauControls:CheckEditor x:Name="chkallTrans" Width="Auto" EditValue="{Binding AllTrans,Mode=OneWay}"/>
                         </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="LastImport"  x:Name="liLastImport" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LastImport}">
+                        <CorasauControls:CorasauLayoutItem x:Name="liLastImport" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LastImport}">
                             <CorasauControls:DateEditor x:Name="dtLastImport" EditValue="{Binding LastImport,Mode=TwoWay}" AllowDefaultButton="False" />
                         </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
 
                     <CorasauControls:CorasauLayoutGroup x:Name="grpInterval"  View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Interval}" Orientation="Vertical" MinWidth="350" 
                                                 CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                        <CorasauControls:CorasauLayoutItem FieldName="FromDate" x:Name="liFromDate" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FromDate}">
+                        <CorasauControls:CorasauLayoutItem x:Name="liFromDate" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FromDate}">
                             <CorasauControls:DateEditor x:Name="txtfromDate" EditValue="{Binding FromDate,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
 
                     <CorasauControls:CorasauLayoutGroup x:Name="grpUserLogin" Visibility="Visible" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Login}" Orientation="Vertical" MinWidth="350" 
                                                 CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                        <CorasauControls:CorasauLayoutItem FieldName="LoginId"  x:Name="liLoginId">
+                        <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoginId}" x:Name="liLoginId">
                             <CorasauControls:TextEditor x:Name="txtLoginId" Text="{Binding LoginId,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
                         </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="Password"  x:Name="liPassword">
+                        <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Password}" x:Name="liPassword">
                             <CorasauControls:PasswordBoxEditor x:Name="txtPassowrd" Text="{Binding Password,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                         </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
