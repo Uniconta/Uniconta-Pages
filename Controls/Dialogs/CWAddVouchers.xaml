@@ -1,0 +1,97 @@
+<ClientTools:ChildWindow x:Class="UnicontaClient.Controls.Dialogs.CWAddVouchers"
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+           xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+           xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+           Width="500" Height="280" KeyDown="ChildWindow_KeyDown" SizeToContent="Height">
+
+    <CorasauControls:BusyIndicator x:Name="busyIndicator" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=SendingWait}">
+        <Grid x:Name="LayoutRoot" Margin="2" Background="{StaticResource LayoutGridColor}">
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" x:Name="colContentLayout" />
+                <ColumnDefinition Width="5" />
+                <ColumnDefinition Width="Auto" x:Name="colViewLayout"/>
+            </Grid.ColumnDefinitions>
+            <Grid x:Name="contentlayout">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="5" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="5" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="5" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="5" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="5" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="5" />
+                    <RowDefinition x:Name="rowPurchaseNumber" Height="Auto" />
+                    <RowDefinition x:Name="rowPurchaseNumberSpace" Height="5" />
+                    <RowDefinition x:Name="rowAccountNumber"  Height="Auto" />
+                    <RowDefinition x:Name="rowAccountNumberSpace" Height="5" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="5" />
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <!-- Row 0-->
+                <TextBlock x:Name="txtSelectFile" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=UserDocFile}" Grid.Column="0" Grid.Row="0" />
+                <CorasauControls:FileBrowseControl x:Name="fileBrowseControl" Grid.Column="1" Grid.Row="0" Margin="5,0,0,0" />
+
+                <!-- Row 1-->
+                <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Content}" Grid.Column="0" Grid.Row="2" />
+                <CorasauControls:ComboBoxEditor x:Name="cmbContentTypes" SelectedItem="{Binding Content,Mode=TwoWay}" Grid.Column="1" Grid.Row="2" Margin="5,0,0,0"  />
+                <!-- Row 2-->
+                <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Amount}" Grid.Column="0" Grid.Row="4" />
+                <CorasauControls:DoubleEditor  x:Name="txtAmount" MaxLength="20" FieldName="Amount" Grid.Column="1" Grid.Row="4" Margin="5,0,0,0"  />
+
+                <!-- Row 3-->
+                <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Currency}" Grid.Column="0" Grid.Row="6" />
+                <CorasauControls:ComboBoxEditor x:Name="cmbCurrency" SelectedItem="{Binding Currency,Mode=TwoWay}" Grid.Column="1" Grid.Row="6" Margin="5,0,0,0"  />
+
+                <!-- Row 4-->
+                <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=InvoiceNumber}" Grid.Column="0" Grid.Row="8" />
+                <CorasauControls:TextEditor  x:Name="txtInvoiceNumber" MaxLength="20" Text="{Binding Invoice,Mode=TwoWay}" Grid.Column="1" Grid.Row="8" Margin="5,0,0,0"  />
+
+                <!-- Row 5-->
+                <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DocumentDate}" Grid.Column="0" Grid.Row="10" />
+                <CorasauControls:DateEditor  x:Name="txtDocumentDate" EditValue="{Binding DocumentDate,Mode=TwoWay}" Grid.Column="1" Grid.Row="10" Margin="5,0,0,0"  />
+
+                <!-- Row 6-->
+                <TextBlock x:Name="txtPurchaseNumber"  Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CreditorOrderSerie}" Grid.Column="0" Grid.Row="12" />
+                <CorasauControls:UnicontaEditableLookupControl x:Name="ueLookupCtrl" LookupEditValue="{Binding PurchaseNumber,Mode=TwoWay}" Grid.Column="1" Grid.Row="12" Margin="5 0 0 0" />
+
+                <!-- Row 7-->
+                <TextBlock x:Name="txtCreditorAccount"  Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Account}" Grid.Column="0" Grid.Row="14" />
+                <CorasauControls:LookupEditor  x:Name="txtAccount" MaxLength="20" Text="{Binding CreditorAccount,Mode=TwoWay}" Grid.Column="1" Grid.Row="14" Margin="5,0,0,0"  />
+
+                <!-- Row 8-->
+                <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Comment}" Grid.Column="0" Grid.Row="16" />
+                <CorasauControls:TextEditor x:Name="txedVoucherComments" Text="{Binding Text,Mode=TwoWay}" AcceptsReturn="True" TextWrapping="Wrap" HorizontalContentAlignment="Left" 
+                                                  VerticalContentAlignment="Top" Grid.Column="1" Grid.Row="16" Margin="5,0,0,0" MinHeight="60" />
+                <!-- Row 9-->
+                <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Note}" Grid.Column="0" Grid.Row="18" />
+                <CorasauControls:TextEditor x:Name="txedPostingInstruction" Text="{Binding PostingInstruction,Mode=TwoWay}" AcceptsReturn="True" TextWrapping="Wrap" HorizontalContentAlignment="Left" 
+                                                  VerticalContentAlignment="Top" Grid.Column="1" Grid.Row="18" Margin="5,0,0,0" MinHeight="60" />
+            </Grid>
+            <GridSplitter HorizontalAlignment="Center" Visibility="Collapsed" x:Name="splitter" VerticalAlignment="Stretch" Background="{StaticResource BodyTextColorBrush}" Grid.Column="1" ShowsPreview="True" />
+            <Grid x:Name="viewLayout" Grid.Column="2" Visibility="Collapsed">
+                <CorasauControls:UnicontaVoucherViewer x:Name="voucherViewer" />
+            </Grid>
+            <StackPanel x:Name="actionButton" HorizontalAlignment="Right" Grid.Row="1" Grid.ColumnSpan="3" Orientation="Horizontal" Margin="0 10 0 0">
+                <Button x:Name="SaveButton" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Save}" Click="SaveButton_Click" MinWidth="75" 
+                        Height="23" HorizontalAlignment="Right" Margin="0 0 3 0" />
+                <Button x:Name="CancelButton" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Cancel}" Click="CancelButton_Click" MinWidth="75"
+                        Height="23" HorizontalAlignment="Right" />
+            </StackPanel>
+        </Grid>
+    </CorasauControls:BusyIndicator>
+</ClientTools:ChildWindow>
