@@ -1954,6 +1954,10 @@ namespace UnicontaClient.Pages.CustomPage
                         AddDockItem(TabControls.ProjectTaskGridPage, null, Uniconta.ClientTools.Localization.lookup("Tasks"), null, true, null, empParams);
                     }
                     break;
+                case "Planning":
+                    if (this.employee != null)
+                        AddDockItem(TabControls.ProjectTransBudgetPivotPage, employee, string.Format("{0} : {1}",Uniconta.ClientTools.Localization.lookup("Planning"), employee._Name), null, true, null);
+                    break;
                 case "KmRegnskab":
                     var Parameters = new List<BasePage.ValuePair> { new BasePage.ValuePair("Dashboard", "UCDK-std-Km-Regnskab") };
                     AddDockItem(TabControls.DashBoardViewerPage, null, string.Concat(Uniconta.ClientTools.Localization.lookup("Dashboard"), ": ", "Km Regnskab"), null, true, null, Parameters);

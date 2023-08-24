@@ -40,7 +40,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CrmFollowUpPage2"
                     <CorasauControls:CorasauLayoutItem x:Name="liOfferNumber" FieldName="OfferNumber" Style="{StaticResource LayoutItemsstyle}">
                         <CorasauControls:LookupEditor x:Name="leOfferNumber" Text="{Binding OfferNumber,Mode=TwoWay}" />
                         <CorasauControls:CorasauLayoutItem.ButtonContent>
-                            <Image Source="{Binding Converter={StaticResource AssemblyConverter},ConverterParameter=;component/Assets/img/Right_Arrow_16x16.png}" Width="12"/>
+                            <Image Source="{Binding Converter={StaticResource AssemblyConverter},ConverterParameter=;component/Assets/img/Right_Arrow_16x16.svg}" Height="16"/>
                         </CorasauControls:CorasauLayoutItem.ButtonContent>
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>

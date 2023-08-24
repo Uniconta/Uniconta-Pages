@@ -21,6 +21,8 @@ using Uniconta.ClientTools.Controls;
 using UnicontaClient.Models;
 using Uniconta.API.Service;
 using DevExpress.Xpf.Docking;
+using System.Windows.Threading;
+using Uniconta.API.System;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -144,9 +146,27 @@ namespace UnicontaClient.Pages.CustomPage
             CloseDockItem();
         }
 
-        async private void DataControl_CurrentItemChanged(object sender, DevExpress.Xpf.Grid.CurrentItemChangedEventArgs e)
+        DispatcherTimer dt;
+        VouchersClient selectedVoucherClient;
+        private void DataControl_CurrentItemChanged(object sender, DevExpress.Xpf.Grid.CurrentItemChangedEventArgs ce)
         {
-            var selectedVoucherClient = e.NewItem as VouchersClient;
+            selectedVoucherClient = ce.NewItem as VouchersClient;
+            if (dt == null)
+            {
+                dt = new DispatcherTimer() { Interval = TimeSpan.FromMilliseconds(250) };
+                dt.Tick += delegate
+                {
+                    ShowVoucherOnTimer(dt, selectedVoucherClient, busyIndicator, voucherViewer, api);
+                };
+            }
+            else if (dt.IsEnabled)
+                dt.Stop();
+            dt.Start();
+        }
+
+        public static async void ShowVoucherOnTimer(DispatcherTimer dt, VouchersClient selectedVoucherClient, BusyIndicator busyIndicator, UnicontaVoucherViewer voucherViewer, CrudAPI api)
+        {
+            dt?.Stop();
             if (selectedVoucherClient != null)
             {
                 busyIndicator.IsBusy = true;

@@ -28,7 +28,7 @@ x:Class="UnicontaClient.Pages.CustomPage.BankLogGridPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="LogType" Width="80"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="RequestType" Width="170"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="MessageType" Width="80"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Message" Width="420">
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Message" Width="500">
                         <local:CorasauDataGridTemplateColumnClient.EditSettings>
                             <editor:TextEditSettings TextWrapping="Wrap" AcceptsReturn="True"/>
                         </local:CorasauDataGridTemplateColumnClient.EditSettings>
@@ -45,6 +45,7 @@ x:Class="UnicontaClient.Pages.CustomPage.BankLogGridPage"
                     </local:CorasauDataGridTemplateColumnClient>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Transactions" Width="70"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Posted" Width="70"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="QtyUpdated" Width="70"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Rejected" Width="70"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Balance" Width="90"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="UserId" Width="80" />

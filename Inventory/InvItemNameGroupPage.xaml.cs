@@ -48,7 +48,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
         private void dgInventoryNameGroupGrid_RowDoubleClick()
         {
-            localMenu_OnItemClicked("Lines");
+            ribbonControl.PerformRibbonAction("Lines");
         }
         private void Name_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {

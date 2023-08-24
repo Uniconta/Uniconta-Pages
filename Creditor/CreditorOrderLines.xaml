@@ -111,7 +111,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOrderLines"
                         </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                     </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="QtyInvoiced" Width="80" Visible="false"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Currency" Width="50" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Currency" Width="50" ReadOnly="True" Visible="False" />
                     <localPage:CorasauDataGridForeignKeyColumnClient x:Name="Warehouse" Width="100">
                         <localPage:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
                             <ControlTemplate>

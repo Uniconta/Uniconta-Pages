@@ -119,7 +119,7 @@ namespace UnicontaClient.Pages.CustomPage
             switch (ActionType)
             {
                 case "AddRow":
-                    AddDockItem(TabControls.AddUserFieldsPage2, new object[2] { api, dgUserField.masterRecord }, Uniconta.ClientTools.Localization.lookup("UserFields"), "Add_16x16.png");
+                    AddDockItem(TabControls.AddUserFieldsPage2, new object[2] { api, dgUserField.masterRecord }, Uniconta.ClientTools.Localization.lookup("UserFields"), "Add_16x16");
                     break;
                 case "EditRow":
                     if (selectedItem == null)

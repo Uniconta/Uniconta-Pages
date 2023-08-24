@@ -112,7 +112,7 @@ namespace UnicontaClient.Pages.CustomPage
                     dgFAMGrid.SaveData();
                     break;
                 case "AddRow":
-                    AddDockItem(TabControls.FAMPage2, api, Uniconta.ClientTools.Localization.lookup("Asset"), "Add_16x16.png");
+                    AddDockItem(TabControls.FAMPage2, api, Uniconta.ClientTools.Localization.lookup("Asset"), "Add_16x16");
                     break;
                 case "EditRow":
                     if (selectedItem != null)
@@ -158,11 +158,12 @@ namespace UnicontaClient.Pages.CustomPage
 
         static Uniconta.DataModel.GLDailyJournalLine CreateLine(Uniconta.DataModel.GLDailyJournalLine org)
         {
-            var to = new Uniconta.DataModel.GLDailyJournalLine();
-            to._Date = org._Date;
-            to._Text = org._Text;
-            to._Asset = org._Asset;
-            return to;
+            return new Uniconta.DataModel.GLDailyJournalLine
+            {
+                _Date = org._Date,
+                _Text = org._Text,
+                _Asset = org._Asset
+            };
         }
 
         void SaleOfAsset(FamClient Asset)
@@ -355,7 +356,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void dgFAMGrid_RowDoubleClick()
         {
-            localMenu_OnItemClicked("FAMTrans");
+            ribbonControl.PerformRibbonAction("FAMTrans");
         }
 
         private void HasDocImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

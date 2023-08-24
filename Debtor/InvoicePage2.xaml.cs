@@ -50,7 +50,7 @@ namespace UnicontaClient.Pages.CustomPage
             layoutControl = layoutItems;
             layoutItems.DataContext = editrow;
             cmbDelCountry.ItemsSource = Enum.GetValues(typeof(Uniconta.Common.CountryCode));
-            leDeliveryTerm.api = lePayment.api = leShipment.api = leInstallation.api = leOrderGroup.api = leLayoutGroup.api = leEmployee.api = cmbDim1.api = cmbDim2.api =
+            leDeliveryTerm.api = lePayment.api = leShipment.api = leInstallation.api = leOrderGroup.api = leLayoutGroup.api = leEmployee.api = cmbDim1.api = cmbDim2.api = leDeliveryAccount.api =
             cmbDim3.api = cmbDim4.api = cmbDim5.api = api;
             frmRibbon.OnItemClicked += FrmRibbon_OnItemClicked;
             if (api.CompanyEntity.NumberOfDimensions == 0)
@@ -112,6 +112,12 @@ namespace UnicontaClient.Pages.CustomPage
         void SetContactSource(SQLCache cache, Debtor debtor)
         {
             cmbContactName.ItemsSource = cache != null ? new ContactCacheFilter(cache, 1, debtor._Account) : null;
+        }
+
+        private void cmbContactName_KeyDown(object sender, KeyEventArgs e)
+        {
+            var selectedItem = cmbContactName.SelectedItem as Contact;
+            GoToContact(selectedItem, e.Key);
         }
     }
 }

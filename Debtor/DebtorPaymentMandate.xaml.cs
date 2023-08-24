@@ -145,7 +145,7 @@ namespace UnicontaClient.Pages.CustomPage
                     param[0] = newItem;
                     param[1] = false;
                     param[2] = dgDebtorPaymentMandate.masterRecord;
-                    AddDockItem(TabControls.DebtorPaymentMandatePage2, param, Uniconta.ClientTools.Localization.lookup("Mandates"), "Add_16x16.png");
+                    AddDockItem(TabControls.DebtorPaymentMandatePage2, param, Uniconta.ClientTools.Localization.lookup("Mandates"), "Add_16x16");
                     break;
                 case "EditRow":
                     if (selectedItem != null)

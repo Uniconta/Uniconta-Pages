@@ -62,7 +62,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void DgGLTranLogGridClient_RowDoubleClick()
         {
-            localMenu_OnItemClicked("DeletedTransactions");
+            ribbonControl.PerformRibbonAction("DeletedTransactions");
         }
         private void Name_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {

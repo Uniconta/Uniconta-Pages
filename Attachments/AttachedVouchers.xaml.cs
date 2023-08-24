@@ -107,7 +107,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         void dgAttachedVoucherGrid_RowDoubleClick()
         {
-            localMenu_OnItemClicked("ViewDownloadRow");
+            ribbonControl.PerformRibbonAction("ViewDownloadRow");
         }
 
         async void View(VouchersClient selectedItem)
@@ -210,66 +210,6 @@ namespace UnicontaClient.Pages.CustomPage
             cwUpdateFile.Show();
         }
 
-        async void SaveVouchers(IEnumerable<VouchersClient> vouchers)
-        {
-            byte[] compressedResult;
-
-            var saveDialog = Uniconta.ClientTools.Util.UtilDisplay.LoadSaveFileDialog;
-            saveDialog.Filter = "ZIP Files (*.zip)|*.zip";
-            bool? dialogResult = saveDialog.ShowDialog();
-            if (dialogResult == true)
-            {
-                try
-                {
-#if !SILVERLIGHT
-                    using (Stream stream = File.Create(saveDialog.FileName))
-#else
-                    using (Stream stream = (Stream)saveDialog.OpenFile())
-#endif
-                    {
-                        compressedResult = await CreateZip(vouchers);
-                        stream.Write(compressedResult, 0, compressedResult.Length);
-                        stream.Flush();
-                        stream.Close();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    UnicontaMessageBox.Show(ex);
-                }
-            }
-        }
-
-        private async Task<byte[]> CreateZip(IEnumerable<VouchersClient> vouchers)
-        {
-            var zippedMemoryStream = UnistreamReuse.Create();
-            using (ZipOutputStream zipOutputStream = new ZipOutputStream(zippedMemoryStream))
-            {
-                // Highest compression rating
-                zipOutputStream.SetLevel(9);
-                busyIndicator.IsBusy = true;
-
-                foreach (var voucher in vouchers)
-                {
-                    zippedMemoryStream.SecureSize();
-                    if (voucher._Data == null)
-                        await UtilDisplay.GetData(voucher, api);
-                    byte[] attachment = voucher.Buffer;
-                    zippedMemoryStream.SecureSize(attachment.Length);
-                    // Write the data to the ZIP file  
-                    string name = string.Format("{0}_{1}.{2}", voucher.Text, voucher.RowId, Enum.GetName(typeof(FileextensionsTypes), voucher.Fileextension));
-                    name = name.Replace("/", "-").Replace(@"\", "-");
-                    ZipEntry entry = new ZipEntry(name);
-                    zipOutputStream.PutNextEntry(entry);
-                    zipOutputStream.Write(attachment, 0, attachment.Length);
-                }
-                busyIndicator.IsBusy = false;
-
-                zipOutputStream.Finish();
-            }
-            return zippedMemoryStream.ToArrayAndRelease();
-        }
-
         public override string NameOfControl
         {
             get { return TabControls.AttachedVouchers; }
@@ -290,7 +230,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void PrimaryKeyId_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            localMenu_OnItemClicked("ViewDownloadRow");
+            ribbonControl.PerformRibbonAction("ViewDownloadRow");
         }
     }
 }

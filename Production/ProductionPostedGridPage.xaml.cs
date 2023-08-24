@@ -78,7 +78,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void dgProductionPostedGrid_RowDoubleClick()
         {
-            LocalMenu_OnItemClicked("StockTransaction");
+            ribbonControl.PerformRibbonAction("StockTransaction");
         }
         private void Name_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {

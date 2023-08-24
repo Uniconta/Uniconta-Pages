@@ -38,11 +38,9 @@ namespace UnicontaClient.Pages.CustomPage
         [Display(Name = "Comment", ResourceType = typeof(InputFieldDataText))]
         public string comments { get; set; }
 
-#if !SILVERLIGHT
         protected override int DialogId { get { return DialogTableId; } }
         public int DialogTableId { get; set; }
         protected override bool ShowTableValueButton { get { return true; } }
-#endif
         string companyName;
         public CWTimePosting(DateTime approveDate, string comment, string compName)
         {
@@ -57,13 +55,9 @@ namespace UnicontaClient.Pages.CustomPage
             this.DataContext = this;
             InitializeComponent();
 
-#if !SILVERLIGHT
             this.Title = Uniconta.ClientTools.Localization.lookup("PostJournal");
             if (string.IsNullOrWhiteSpace(txtComments.Text))
                 FocusManager.SetFocusedElement(txtComments, txtComments);
-#else
-            Utility.SetThemeBehaviorOnChildWindow(this);
-#endif
             dpApprovePrdPer.DateTime = PostedDate;  
             txtCompName.Text = companyName;
             this.Loaded += CW_Loaded;
@@ -101,7 +95,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
-            IsSimulation = chkSimulation.IsChecked.Value;
+            IsSimulation = chkSimulation.IsChecked.GetValueOrDefault();
             PostedDate = dpApprovePrdPer.DateTime;
             comments = txtComments.Text;
             SetDialogResult(true);

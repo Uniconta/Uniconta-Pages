@@ -638,6 +638,11 @@ namespace UnicontaClient.Pages.CustomPage
                 }
                 dgPrjBugtItmCov.PasteRows(lst);
                 this.DataChanged = true;
+
+                dgPrjBugtItmCov.SetLoadedRow(selectedItem);
+                selectedItem.Qty = 0;
+                selectedItem.CostPrice = 0;
+                selectedItem.SalesPrice = 0;
             }
             busyIndicator.IsBusy = false;
         }
@@ -823,7 +828,11 @@ namespace UnicontaClient.Pages.CustomPage
                             orderLine._Project = Proj._Number;
                             orderLine._PrCategory = line._PrCategory ?? item._PrCategory;
                             orderLine._WorkSpace = line._WorkSpace;
-                            orderLine._Task = line._Task;
+                            if (line._Task != null)
+                            {
+                                orderLine._Task = line._Task;
+                                orderLine._Project = line._Project;
+                            }
                             orderLine.SetMaster(order);
                             TableField.SetUserFieldsFromRecord(orderLine, item);
                             orderList.Add(orderLine);
@@ -900,6 +909,8 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     var journalLine = new ProjectJournalLineClient();
                     journalLine._Project = Proj._Number;
+                    journalLine._Task = line._Task;
+                    journalLine._WorkSpace = line._WorkSpace;
                     journalLine._Item = line._Item;
                     journalLine._Variant1 = line._Variant1;
                     journalLine._Variant2 = line._Variant2;

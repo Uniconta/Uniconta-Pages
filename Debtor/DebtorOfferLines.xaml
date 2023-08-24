@@ -103,7 +103,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOfferLines"
                             </editor:TextEditSettings>
                         </localPage:CorasauDataGridTemplateColumnClient.EditSettings>
                     </localPage:CorasauDataGridTemplateColumnClient>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Currency" Width="35" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Currency" Width="35" ReadOnly="True" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CostPrice" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Warehouse" Width="100"/>
                     <localPage:CorasauDataGridForeignKeyColumnClient x:Name="Location" Width="100">

@@ -92,14 +92,14 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 var budGrp = (ProjectBudgetGroup)budgetGrpCache.FirstOrDefault(s => s._Default);
                 leGroup.SelectedItem = budGrp;
-                Group = budGrp?.Number;
+                Group = Group ?? budGrp?.Number;
             }
 
             if (workspaceCache != null)
             {
                 var wrkspace = (PrWorkSpace)workspaceCache.FirstOrDefault(s => s._Default);
                 leWorkspace.SelectedItem = wrkspace;
-                PrWorkSpace = wrkspace?.Number;
+                PrWorkSpace = PrWorkSpace ?? wrkspace?.Number;
             }
         }
 

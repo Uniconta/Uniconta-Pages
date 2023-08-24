@@ -4,6 +4,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CWGenerateInvoice"
            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
            xmlns:cw="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
            xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+           xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
            xmlns:ClientToolsControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
            Height="{StaticResource Height39}" Width="{StaticResource Width39}" KeyDown="ChildWindow_KeyDown" SizeToContent="Height" IsTabStop="True">
     <cw:ChildWindow.Resources>
@@ -25,7 +26,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CWGenerateInvoice"
                     <ClientToolsControls:CorasauLayoutGroup x:Name="lgAccount"  View="GroupBox" GroupBoxDisplayMode="Light" IsCollapsible="False" HorizontalAlignment="Stretch" ClientToolsControls:CorasauLayoutControl.AllowHorizontalSizing="True">
                         <ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
                             <DataTemplate>
-                                <Image Source="/UnicontaPages;component/Assets/img/group-user_16x16.png" Width="16" Height="16" Stretch="UniformToFill" HorizontalAlignment="Left" />
+                                <Image Source="{dx:SvgImageSource Uri=/UnicontaPages;component/Assets/img/group-user_16x16.svg, UsePalette=True}" dx:WpfSvgPalette.Palette="{StaticResource SVGIconPallete}" Width="16" Height="16" Stretch="UniformToFill" HorizontalAlignment="Left" />
                             </DataTemplate>
                         </ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
                         <ClientToolsControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Account}" LabelTemplate="{StaticResource PrimaryLableTemplate}">
@@ -35,7 +36,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CWGenerateInvoice"
                     <ClientToolsControls:CorasauLayoutGroup x:Name="lgImportant" IsCollapsible="False" GroupBoxDisplayMode="Light"  View="GroupBox" Orientation="Vertical" ClientToolsControls:CorasauLayoutControl.AllowHorizontalSizing="True"  Header="QuestionMark" HorizontalAlignment="Stretch">
                         <ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
                             <DataTemplate>
-                                <Image Source="/UnicontaPages;component/Assets/img/group-questiont_16x16.png" Width="16" Height="16" Stretch="UniformToFill" HorizontalAlignment="Left" />
+                                <Image Source="{dx:SvgImageSource Uri=/UnicontaPages;component/Assets/img/group-questiont_16x16.svg, UsePalette=True}" dx:WpfSvgPalette.Palette="{StaticResource SVGIconPallete}" Width="16" Height="16" Stretch="UniformToFill" HorizontalAlignment="Left" />
                             </DataTemplate>
                         </ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
                         <ClientToolsControls:CorasauLayoutItem FieldName="GenrateDate" x:Name="liGenrateDate" LabelTemplate="{StaticResource PrimaryLableTemplate}">
@@ -60,7 +61,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CWGenerateInvoice"
                     <ClientToolsControls:CorasauLayoutGroup x:Name="lgOrders"  View="GroupBox" Orientation="Vertical" GroupBoxDisplayMode="Light" Visibility="Collapsed" IsCollapsible="False" HorizontalAlignment="Stretch" ClientToolsControls:CorasauLayoutControl.AllowHorizontalSizing="True">
                         <ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
                             <DataTemplate>
-                                <Image Source="/UnicontaPages;component/Assets/img/group-order_16x16.png" Width="16" Height="16" Stretch="UniformToFill" HorizontalAlignment="Left" />
+                                <Image Source="{dx:SvgImageSource Uri=/UnicontaPages;component/Assets/img/group-order_16x16.svg, UsePalette=True}" dx:WpfSvgPalette.Palette="{StaticResource SVGIconPallete}" Width="16" Height="16" Stretch="UniformToFill" HorizontalAlignment="Left" />
                             </DataTemplate>
                         </ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
                         <ClientToolsControls:CorasauLayoutItem FieldName="AdditionalOrders" x:Name="liAdditionalOrders" LabelTemplate="{StaticResource PrimaryLableTemplate}">
@@ -79,7 +80,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CWGenerateInvoice"
                     <ClientToolsControls:CorasauLayoutGroup x:Name="lgPrint" IsCollapsible="False" GroupBoxDisplayMode="Light" View="GroupBox" Orientation="Vertical" HorizontalAlignment="Stretch" ClientToolsControls:CorasauLayoutControl.AllowHorizontalSizing="True">
                         <ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
                             <DataTemplate>
-                                <Image Source="/UnicontaPages;component/Assets/img/group-print_16x16.png" Width="16" Height="16" Stretch="Fill" HorizontalAlignment="Left" />
+                                <Image Source="{dx:SvgImageSource Uri=/UnicontaPages;component/Assets/img/group-print_16x16.svg, UsePalette=True}" dx:WpfSvgPalette.Palette="{StaticResource SVGIconPallete}" Width="16" Height="16" Stretch="Fill" HorizontalAlignment="Left" />
                             </DataTemplate>
                         </ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
                         <ClientToolsControls:CorasauLayoutItem FieldName="InvoiceQuickPrint" x:Name="liInvoiceQuickPrint" LabelTemplate="{StaticResource SecondayLableTemplate}">
@@ -93,7 +94,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CWGenerateInvoice"
                     <ClientToolsControls:CorasauLayoutGroup x:Name="lgEmail" IsCollapsible="False" GroupBoxDisplayMode="Light" View="GroupBox" Orientation="Vertical" HorizontalAlignment="Stretch" ClientToolsControls:CorasauLayoutControl.AllowHorizontalSizing="True">
                         <ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
                             <DataTemplate>
-                                <Image Source="/UnicontaPages;component/Assets/img/group-envelope_16x16.png" Width="16" Height="16" Stretch="Fill" HorizontalAlignment="Left"/>
+                                <Image Source="{dx:SvgImageSource Uri=/UnicontaPages;component/Assets/img/group-envelope_16x16.svg, UsePalette=True}" dx:WpfSvgPalette.Palette="{StaticResource SVGIconPallete}" Width="16" Height="16" Stretch="Fill" HorizontalAlignment="Left"/>
                             </DataTemplate>
                         </ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
                         <ClientToolsControls:CorasauLayoutItem FieldName="SendByOutlook" x:Name="liSendByOutlook" LabelTemplate="{StaticResource SecondayLableTemplate}">
@@ -116,7 +117,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CWGenerateInvoice"
                     <ClientToolsControls:CorasauLayoutGroup x:Name="lgUBL" IsCollapsible="False" GroupBoxDisplayMode="Light" View="GroupBox" Visibility="Collapsed" HorizontalAlignment="Stretch" ClientToolsControls:CorasauLayoutControl.AllowHorizontalSizing="True">
                         <ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
                             <DataTemplate>
-                                <Image Source="/UnicontaPages;component/Assets/img/group-file_16x16.png" Width="16" Height="16" Stretch="Fill" HorizontalAlignment="Left"/>
+                                <Image Source="{dx:SvgImageSource Uri=/UnicontaPages;component/Assets/img/group-file_16x16.svg, UsePalette=True}" dx:WpfSvgPalette.Palette="{StaticResource SVGIconPallete}" Width="16" Height="16" Stretch="Fill" HorizontalAlignment="Left"/>
                             </DataTemplate>
                         </ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
                         <ClientToolsControls:CorasauLayoutItem FieldName="GenerateOIOUBLClicked" x:Name="liGenerateOIOUBLClicked" LabelTemplate="{StaticResource SecondayLableTemplate}">

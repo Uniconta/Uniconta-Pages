@@ -2,29 +2,29 @@
 <root>
 	<RibbonItem TabId="0" LocalizedNameKey="Home">
 		<!---When we create new TabPage -->
-		<RibbonItem Action="AddBalance" LocalizedNameKey="AddOBJ" Parameter="ReportBalance" LargeGlyph="Add_32x32.png" ShortcutKey="CTRL+N"/>
-		<RibbonItem Action="CopyRecord" LocalizedNameKey="CopyOBJ" Parameter="ReportBalance" LargeGlyph="Copy_32x32.png" ShortcutKey="Shift+F2"/>
-		<RibbonItem Action="CopyBalanceFromCompany" LocalizedNameKey="CopyBalFromOthCom" LargeGlyph="CopyUserTable_32x32.png"/>
-		<RibbonItem Action="DeleteBalance" LocalizedNameKey="DeleteOBJ" Parameter="ReportBalance" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png" ShortcutKey="Shift+DELETE"/>
-		<RibbonItem Action="SaveBalance" LocalizedNameKey="Save" LargeGlyph="save-32x32.png" ShortcutKey="CRTL+S"/>
+		<RibbonItem Action="AddBalance" LocalizedNameKey="AddOBJ" Parameter="ReportBalance" LargeGlyph="Add_32x32" ShortcutKey="CTRL+N"/>
+		<RibbonItem Action="CopyRecord" LocalizedNameKey="CopyOBJ" Parameter="ReportBalance" LargeGlyph="Copy_32x32" ShortcutKey="Shift+F2"/>
+		<RibbonItem Action="CopyBalanceFromCompany" LocalizedNameKey="CopyBalFromOthCom" LargeGlyph="CopyUserTable_32x32"/>
+		<RibbonItem Action="DeleteBalance" LocalizedNameKey="DeleteOBJ" Parameter="ReportBalance" Glyph="Delete_16x16" LargeGlyph="Delete_32x32" ShortcutKey="Shift+DELETE"/>
+		<RibbonItem Action="SaveBalance" LocalizedNameKey="Save" LargeGlyph="save-32x32" ShortcutKey="CRTL+S"/>
 	</RibbonItem>
 	<RibbonItem>
 		<!---When we create new TabPage -->
-		<RibbonItem Action="NewColumn" LocalizedNameKey="AppendOBJ" Parameter="Column" LargeGlyph="Add_32x32.png"/>
-		<RibbonItem Action="DeleteColumn" LocalizedNameKey="RemoveOBJ" Parameter="Column" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png"/>
-		<RibbonItem Action="MoveColumnUp" LocalizedNameKey="MoveColumnUp" LargeGlyph="Upload_32x32.png"/>
-		<RibbonItem Action="MoveColumnDown" LocalizedNameKey="MoveColumnDown" LargeGlyph="Import_32x32.png"/>
+		<RibbonItem Action="NewColumn" LocalizedNameKey="AppendOBJ" Parameter="Column" LargeGlyph="Add_32x32"/>
+		<RibbonItem Action="DeleteColumn" LocalizedNameKey="RemoveOBJ" Parameter="Column" Glyph="Delete_16x16" LargeGlyph="Delete_32x32"/>
+		<RibbonItem Action="MoveColumnUp" LocalizedNameKey="MoveColumnUp" LargeGlyph="Upload_32x32"/>
+		<RibbonItem Action="MoveColumnDown" LocalizedNameKey="MoveColumnDown" LargeGlyph="Import_32x32"/>
 	</RibbonItem>
 	<RibbonItem>
-		<RibbonItem  LocalizedNameKey="ChangeOBJ" Parameter="Period" LargeGlyph="Day_View_32x32.png">
-			<RibbonItem Action="AddMonth" LocalizedNameKey="Months" Glyph="Column_Head_16x16.png"/>
-			<RibbonItem Action="AddDate" LocalizedNameKey="Date" Glyph="Column_Head_16x16.png"/>
+		<RibbonItem  LocalizedNameKey="ChangeOBJ" Parameter="Period" LargeGlyph="Day_View_32x32">
+			<RibbonItem Action="AddMonth" LocalizedNameKey="Months" Glyph="Column_Head_16x16"/>
+			<RibbonItem Action="AddDate" LocalizedNameKey="Date" Glyph="Column_Head_16x16"/>
 		</RibbonItem>
 	</RibbonItem>
 	<RibbonItem>
-		<RibbonItem Action="SetFrontPage" LocalizedNameKey="FrontPage" LargeGlyph="Add_Menu_32x32.png"/>
+		<RibbonItem Action="SetFrontPage" LocalizedNameKey="FrontPage" LargeGlyph="Add_Menu_32x32"/>
 	</RibbonItem>
 	<RibbonItem>
-		<RibbonItem Action="BalanceReport" LocalizedNameKey="Generate" LargeGlyph="Generate_32x32.png" ShortcutKey="Ctrl+G"/>
+		<RibbonItem Action="BalanceReport" LocalizedNameKey="Generate" LargeGlyph="Generate_32x32" ShortcutKey="Ctrl+G"/>
 	</RibbonItem>
 </root>

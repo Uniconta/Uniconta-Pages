@@ -5,6 +5,7 @@ x:Class="UnicontaClient.Pages.CustomPage.Vouchers"
            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
            xmlns:localControls="clr-namespace:UnicontaClient.Controls"
            xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+           xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
            xmlns:Controls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools" 
            xmlns:converter="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
            xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage" 
@@ -14,8 +15,39 @@ x:Class="UnicontaClient.Pages.CustomPage.Vouchers"
     <UserControl.Resources>
         <converter:VisibilityBoolConverter x:Key="VisibilityBoolConverter" />
         <converter:RowIndexConverter x:Key="RowIndexConverter" />
-        <sys:Double x:Key="{dxat:AccordionItemThemeKeys ResourceKey=RootItemHeaderHeight, IsThemeIndependent=true}">22</sys:Double>
-        <Thickness x:Key="{dxat:AccordionItemThemeKeys ResourceKey=HeaderElementsMargin, ThemeName=Office2016ColorfulSE}">0,0,0,0</Thickness>
+        <sys:Double x:Key="{dxat:AccordionItemThemeKeys ResourceKey=RootItemHeaderHeight, IsThemeIndependent=true}">20</sys:Double>
+        <DataTemplate x:Key="MainMenuControlGlyphTemplate">
+            <Rectangle  Height="16" Width="16">
+                <Rectangle.Fill>
+                    <ImageBrush ImageSource="{dx:SvgImageSource Uri='/UnicontaPages;component/Assets/img/Grid_Transactions_16x16.svg', UsePalette=True}" 
+                                dx:WpfSvgPalette.Palette="{StaticResource SVGIconPallete}" />
+                </Rectangle.Fill>
+            </Rectangle>
+        </DataTemplate>
+        <DataTemplate x:Key="AddMenuControlGlyphTemplate">
+            <Rectangle  Height="16" Width="16">
+                <Rectangle.Fill>
+                    <ImageBrush ImageSource="{dx:SvgImageSource Uri='/UnicontaPages;component/Assets/img/Grid_Add_16x16.svg', UsePalette=True}" 
+                                dx:WpfSvgPalette.Palette="{StaticResource SVGIconPallete}" />
+                </Rectangle.Fill>
+            </Rectangle>
+        </DataTemplate>
+        <DataTemplate x:Key="EditMenuControlGlyphTemplate">
+            <Rectangle  Height="16" Width="16">
+                <Rectangle.Fill>
+                    <ImageBrush ImageSource="{dx:SvgImageSource Uri='/UnicontaPages;component/Assets/img/Grid_Edit_16x16.svg', UsePalette=True}" 
+                                dx:WpfSvgPalette.Palette="{StaticResource SVGIconPallete}" />
+                </Rectangle.Fill>
+            </Rectangle>
+        </DataTemplate>
+        <DataTemplate x:Key="DeleteMenuControlGlyphTemplate">
+            <Rectangle  Height="16" Width="16">
+                <Rectangle.Fill>
+                    <ImageBrush ImageSource="{dx:SvgImageSource Uri='/UnicontaPages;component/Assets/img/Grid_Delete_16x16.svg', UsePalette=True}" 
+                                dx:WpfSvgPalette.Palette="{StaticResource SVGIconPallete}" />
+                </Rectangle.Fill>
+            </Rectangle>
+        </DataTemplate>
     </UserControl.Resources>
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
@@ -44,12 +76,16 @@ x:Class="UnicontaClient.Pages.CustomPage.Vouchers"
                                             <Controls:MenuBar.DockInfo>
                                                 <Controls:MenuDockInfo ContainerType="Top"/>
                                             </Controls:MenuBar.DockInfo>
-                                            <Controls:MenuBarSplitButtonItem ActAsDropDown="True" CategoryName="Folders" GlyphAlignment="Top" Glyph="/UnicontaPages;component/Assets/img/Grid_Transactions_16x16.png" Hint="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Folder}">
+                                            <Controls:MenuBarSplitButtonItem ActAsDropDown="True" CategoryName="Folders" GlyphAlignment="Top"  Hint="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Folder}"
+                                                                             GlyphTemplate="{StaticResource MainMenuControlGlyphTemplate}" Margin="0 0 0 2">
                                                 <Controls:MenuBarSplitButtonItem.PopupControl>
                                                     <Controls:MenuBarPopupMenu>
-                                                        <Controls:MenuBarButtonItem ItemClick="OpenFolderWindow" Tag="Add" x:Name="Add" Glyph="/UnicontaPages;component/Assets/img/Grid_Add_16x16.png" CategoryName="Folders" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=Add}"/>
-                                                        <Controls:MenuBarButtonItem ItemClick="OpenFolderWindow" Tag="Edit" x:Name="Edit" Glyph="/UnicontaPages;component/Assets/img/Grid_Edit_16x16.png" CategoryName="Folders" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=Edit}"/>
-                                                        <Controls:MenuBarButtonItem ItemClick="OpenFolderWindow" Tag="Delete" x:Name="Delete" Glyph="/UnicontaPages;component/Assets/img/Grid_Delete_16x16.png" CategoryName="Folders" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=Delete}"/>
+                                                        <Controls:MenuBarButtonItem ItemClick="OpenFolderWindow" Tag="Add" x:Name="Add" CategoryName="Folders" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=Add}"
+                                                                                    GlyphTemplate="{StaticResource AddMenuControlGlyphTemplate}"/>
+                                                        <Controls:MenuBarButtonItem ItemClick="OpenFolderWindow" Tag="Edit" x:Name="Edit" CategoryName="Folders" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=Edit}"
+                                                                                    GlyphTemplate="{StaticResource EditMenuControlGlyphTemplate}"/>
+                                                        <Controls:MenuBarButtonItem ItemClick="OpenFolderWindow" Tag="Delete" x:Name="Delete" CategoryName="Folders" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=Delete}"
+                                                                                    GlyphTemplate="{StaticResource DeleteMenuControlGlyphTemplate}"/>
                                                     </Controls:MenuBarPopupMenu>
                                                 </Controls:MenuBarSplitButtonItem.PopupControl>
                                             </Controls:MenuBarSplitButtonItem>
@@ -117,13 +153,14 @@ x:Class="UnicontaClient.Pages.CustomPage.Vouchers"
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="HasOffSetAccounts" Width="30" ReadOnly="True" Visible="False" >
                             <localPage:CorasauDataGridTemplateColumnClient.HeaderTemplate>
                                 <DataTemplate>
-                                    <Image Source="/UnicontaPages;component/Assets/img/Offset_Account_16x16.png" Width="16" Height="16" VerticalAlignment="Center"/>
+                                    <Image Source="{dx:SvgImageSource Uri=/UnicontaPages;component/Assets/img/Offset_Account_16x16.svg, UsePalette=True}" dx:WpfSvgPalette.Palette="{StaticResource SVGIconPallete}" Width="16" Height="16" VerticalAlignment="Center"/>
                                 </DataTemplate>
                             </localPage:CorasauDataGridTemplateColumnClient.HeaderTemplate>
                             <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                                 <ControlTemplate>
-                                    <Image Margin="5" Tag="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" Source="/UnicontaPages;component/Assets/img/Offset_Account_16x16.png" MouseLeftButtonDown="Offeset_MouseLeftButtonDown"  
-                                       Visibility="{Binding DataContext.RowData.Row.HasOffSetAccounts,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource VisibilityBoolConverter}}" Stretch="Fill" Width="16" Height="16" RenderOptions.BitmapScalingMode="NearestNeighbor" RenderOptions.EdgeMode="Aliased" />
+                                    <Image Margin="5" Tag="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" Source="{dx:SvgImageSource Uri=/UnicontaPages;component/Assets/img/Offset_Account_16x16.svg, UsePalette=True}"
+                                           dx:WpfSvgPalette.Palette="{StaticResource SVGIconPallete}" MouseLeftButtonDown="Offeset_MouseLeftButtonDown"  Stretch="Fill" Width="16" Height="16" RenderOptions.BitmapScalingMode="NearestNeighbor" RenderOptions.EdgeMode="Aliased"
+                                       Visibility="{Binding DataContext.RowData.Row.HasOffSetAccounts,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource VisibilityBoolConverter}}"  />
                                 </ControlTemplate>
                             </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                         </localPage:CorasauDataGridTemplateColumnClient>

@@ -2,43 +2,43 @@
 <root>
   <RibbonItem TabId="0" LocalizedNameKey="Home">
     <!---When we create new TabPage -->
-    <RibbonItem Action="Save" ShortcutKey="Ctrl+S" LocalizedNameKey="Save" Glyph="save-16x16.png" LargeGlyph="save-32x32.png"/>    
+    <RibbonItem Action="Save" ShortcutKey="Ctrl+S" LocalizedNameKey="Save" Glyph="save-16x16" LargeGlyph="save-32x32"/>    
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="Pre" LocalizedNameKey="PrevMonth" Glyph="Previous_32x32.png" LargeGlyph="Previous_32x32.png"/>
-    <RibbonItem Action="Next" LocalizedNameKey="NextMonth" Glyph="Next_32x32.png" LargeGlyph="Next_32x32.png"/>
-    <RibbonItem Action="Interval" LocalizedNameKey="Interval" Glyph="Interval_32x32.png" LargeGlyph="Interval_32x32.png"/>
+    <RibbonItem Action="Pre" LocalizedNameKey="PrevMonth" Glyph="Previous_32x32" LargeGlyph="Previous_32x32"/>
+    <RibbonItem Action="Next" LocalizedNameKey="NextMonth" Glyph="Next_32x32" LargeGlyph="Next_32x32"/>
+    <RibbonItem Action="Interval" LocalizedNameKey="Interval" Glyph="Interval_32x32" LargeGlyph="Interval_32x32"/>
   </RibbonItem>
   <RibbonItem>
     <!---next group-->
-    <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32.png">
+    <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32">
       <!---If we want Inner menu-->
-      <RibbonItem Action="StartEdit" LocalizedNameKey="StartEdit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
-      <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16.png" ShortcutKey="" />
-      <RibbonItem Action="EndEdit" LocalizedNameKey="SaveOBJ" Parameter="Layout" Glyph="save-as-16x16.png" LargeGlyph="save-as-32x32.png" ShortcutKey=""/>
-      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png" ShortcutKey=""/>
-      <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16.png" LargeGlyph="Delete_32x32.png" ShortcutKey="Ctrl+U"/>
-      <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportLayout" EnableSeperator="True" Glyph="ExportLayout_16x16.png" LargeGlyph="ExportLayout_16x16.png" ShortcutKey=""/>
-     <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportLayout" Glyph="Import_16x16.png" LargeGlyph="Import_16x16.png" ShortcutKey=""/>
-    <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16.png" ShortcutKey=""/>
+      <RibbonItem Action="StartEdit" LocalizedNameKey="StartEdit" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
+      <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16" ShortcutKey="" />
+      <RibbonItem Action="EndEdit" LocalizedNameKey="SaveOBJ" Parameter="Layout" Glyph="save-as-16x16" LargeGlyph="save-as-32x32" ShortcutKey=""/>
+      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16" LargeGlyph="Delete_32x32" ShortcutKey=""/>
+      <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16" LargeGlyph="Delete_32x32" ShortcutKey="Ctrl+U"/>
+      <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportLayout" EnableSeperator="True" Glyph="ExportLayout_16x16" LargeGlyph="ExportLayout_16x16" ShortcutKey=""/>
+     <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportLayout" Glyph="Import_16x16" LargeGlyph="Import_16x16" ShortcutKey=""/>
+    <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16" ShortcutKey=""/>
     </RibbonItem> 
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem LocalizedNameKey="PhysicalVoucher" Glyph="Cover_16x16.png" LargeGlyph="View_Voucher_32x32.png" >
-      <RibbonItem Action="ViewVoucher" LocalizedNameKey="View" Glyph="View_16x16.png" LargeGlyph="View_32x32.png" />
-      <RibbonItem Action="RefVoucher" LocalizedNameKey="Attach" Glyph="Attachments_16x16.png" LargeGlyph="Attachments_32x32.png" />
-      <RibbonItem Action="ImportVoucher" LocalizedNameKey="ImportFile" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png" ShortcutKey="Ctrl+J"/>
-      <RibbonItem Action="RemoveVoucher" LocalizedNameKey="Remove" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png" ShortcutKey="Ctrl+I"/>
+    <RibbonItem LocalizedNameKey="PhysicalVoucher" Glyph="Cover_16x16" LargeGlyph="View_Voucher_32x32" >
+      <RibbonItem Action="ViewVoucher" LocalizedNameKey="View" Glyph="View_16x16" LargeGlyph="View_32x32" />
+      <RibbonItem Action="RefVoucher" LocalizedNameKey="Attach" Glyph="Attachments_16x16" LargeGlyph="Attachments_32x32" />
+      <RibbonItem Action="ImportVoucher" LocalizedNameKey="ImportFile" Glyph="Add_16x16" LargeGlyph="Add_32x32" ShortcutKey="Ctrl+J"/>
+      <RibbonItem Action="RemoveVoucher" LocalizedNameKey="Remove" Glyph="Delete_16x16" LargeGlyph="Delete_32x32" ShortcutKey="Ctrl+I"/>
     </RibbonItem>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="TransferBankStatement" LocalizedNameKey="GenerateJournalLines" LargeGlyph="Generate_32x32.png" />
+    <RibbonItem Action="TransferBankStatement" LocalizedNameKey="GenerateJournalLines" LargeGlyph="Generate_32x32" />
   </RibbonItem>
   <RibbonItem>
-     <RibbonItem Action="ShowHideGreenLines" LocalizedNameKey="HideOBJ" Parameter="Green" LargeGlyph="HideGreen_32x32.png" />
+     <RibbonItem Action="ShowHideGreenLines" LocalizedNameKey="HideOBJ" Parameter="Green" LargeGlyph="HideGreen_32x32" />
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem LocalizedNameKey="ShowAmount" Action="ShowAmount" LargeGlyph="Budget_32x32.png"/>
+    <RibbonItem LocalizedNameKey="ShowAmount" Action="ShowAmount" LargeGlyph="Budget_32x32"/>
     <RibbonItem LocalizedNameKey="FromDate" StatusValue="a"></RibbonItem>
     <RibbonItem LocalizedNameKey="ToDate" StatusValue="b" />
   </RibbonItem>

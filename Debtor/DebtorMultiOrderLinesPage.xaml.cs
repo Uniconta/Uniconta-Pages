@@ -299,8 +299,11 @@ namespace UnicontaClient.Pages.CustomPage
                     if (org != null)
                     {
                         var row = dgMultiDebtorOrderLine.CopyRow() as DebtorOrderLineClient;
-                        row._CostPriceLine = org._CostPriceLine;
-                        row._ExchangeRate = org._ExchangeRate;
+                        if (row != null)
+                        {
+                            row._CostPriceLine = org._CostPriceLine;
+                            row._ExchangeRate = org._ExchangeRate;
+                        }
                     }
                     break;
                 case "SaveGrid":
@@ -310,7 +313,7 @@ namespace UnicontaClient.Pages.CustomPage
                     dgMultiDebtorOrderLine.DeleteRow();
                     break;
                 case "AddOrder":
-                    AddDockItem(TabControls.DebtorOrdersPage2, api, Uniconta.ClientTools.Localization.lookup("Orders"), "Add_16x16.png");
+                    AddDockItem(TabControls.DebtorOrdersPage2, api, Uniconta.ClientTools.Localization.lookup("Orders"), "Add_16x16");
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);

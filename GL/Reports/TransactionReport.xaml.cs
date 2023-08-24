@@ -229,10 +229,6 @@ namespace UnicontaClient.Pages.CustomPage
             if (record != null && record.Length > 0)
             {
                 var voucherInfo = record[0];
-#if SILVERLIGHT
-                var viewer = new CWDocumentViewer(voucherInfo);
-                viewer.Show();
-#endif
             }
         }
 
@@ -257,9 +253,6 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (noofDimensions < 5)
             {
-#if SILVERLIGHT
-                cldim5.Visibility = Visibility.Collapsed;
-#endif
                 cbdim5.Visibility = lblDim5.Visibility = Visibility.Collapsed;
                 cldim5.Visible = false;
                 Hdr.LBLDim5 = string.Empty;
@@ -270,9 +263,6 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (noofDimensions < 4)
             {
-#if SILVERLIGHT
-                cldim4.Visibility = Visibility.Collapsed;
-#endif
                 cbdim4.Visibility = lblDim4.Visibility = Visibility.Collapsed;
                 cldim4.Visible = false;
                 Hdr.LBLDim4 = string.Empty;
@@ -283,9 +273,6 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (noofDimensions < 3)
             {
-#if SILVERLIGHT
-                cldim3.Visibility = Visibility.Collapsed;
-#endif
                 cbdim3.Visibility = lblDim3.Visibility = Visibility.Collapsed;
                 cldim3.Visible = false;
                 Hdr.LBLDim3 = string.Empty;
@@ -296,9 +283,6 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (noofDimensions < 2)
             {
-#if SILVERLIGHT
-                cldim2.Visibility = Visibility.Collapsed;
-#endif
                 cbdim2.Visibility = lblDim2.Visibility = Visibility.Collapsed;
                 cldim2.Visible = false;
                 Hdr.LBLDim2 = string.Empty;
@@ -309,9 +293,6 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (noofDimensions < 1)
             {
-#if SILVERLIGHT
-               cldim1.Visibility = Visibility.Collapsed;
-#endif
                 cbdim1.Visibility = lblDim1.Visibility = Visibility.Collapsed;
                 cldim1.Visible = false;
                 Hdr.LBLDim1 = string.Empty;
@@ -384,7 +365,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (NumberOfDimensions >= 5)
                 dim5 = GetRowIDs(cbdim5);
 
-            var isAscending = cbxAscending.IsChecked.Value;
+            var isAscending = cbxAscending.IsChecked.GetValueOrDefault();
             api.session.Preference.TransactionReport_isAscending = isAscending;
 
             var showDimOnPrimo = cmbShowDimOnPrimo.SelectedIndex;

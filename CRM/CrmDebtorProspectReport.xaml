@@ -3,8 +3,7 @@
 x:Class="UnicontaClient.Pages.CustomPage.CrmDebtorProspectReport"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
         xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
         xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
         xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
@@ -32,13 +31,13 @@ x:Class="UnicontaClient.Pages.CustomPage.CrmDebtorProspectReport"
                     <local:CorasauDataGridTemplateColumnClient x:Name="HasNotes" Width="30" ReadOnly="True">
                         <local:CorasauDataGridTemplateColumnClient.HeaderTemplate>
                             <DataTemplate>
-                                <Image Source="/UnicontaPages;component/Assets/img/Note_16x16.png" Width="16" Height="16" VerticalAlignment="Center"/>
+                                <Image Source="{dx:SvgImageSource Uri=/UnicontaPages;component/Assets/img/Note_16x16.svg, UsePalette=True}" dx:WpfSvgPalette.Palette="{StaticResource SVGIconPallete}" Width="16" Height="16" VerticalAlignment="Center"/>
                             </DataTemplate>
                         </local:CorasauDataGridTemplateColumnClient.HeaderTemplate>
                         <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                             <ControlTemplate>
-                                <Image Margin="5" Tag="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" 
-                                       Source="/UnicontaPages;component/Assets/img/Note_16x16.png" MouseLeftButtonDown="HasNoteImage_MouseLeftButtonDown" Visibility="{Binding DataContext.RowData.Row.HasNotes,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource VisibilityBoolConverter}}" 
+                                <Image Margin="5" Tag="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" dx:WpfSvgPalette.Palette="{StaticResource SVGIconPallete}"
+                                       Source="{dx:SvgImageSource Uri=/UnicontaPages;component/Assets/img/Note_16x16.svg, UsePalette=True}" MouseLeftButtonDown="HasNoteImage_MouseLeftButtonDown" Visibility="{Binding DataContext.RowData.Row.HasNotes,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource VisibilityBoolConverter}}" 
                                        Stretch="Fill" Width="16" Height="16" RenderOptions.BitmapScalingMode="NearestNeighbor" RenderOptions.EdgeMode="Aliased" />
                             </ControlTemplate>
                         </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
@@ -46,27 +45,27 @@ x:Class="UnicontaClient.Pages.CustomPage.CrmDebtorProspectReport"
                     <local:CorasauDataGridTemplateColumnClient x:Name="HasDocs" ReadOnly="True"  Width="30" >
                         <local:CorasauDataGridTemplateColumnClient.HeaderTemplate>
                             <DataTemplate>
-                                <Image Source="/UnicontaPages;component/Assets/img/Document_Attachment_16x16.png" Width="16" Height="16" VerticalAlignment="Center"/>
+                                <Image Source="{dx:SvgImageSource Uri=/UnicontaPages;component/Assets/img/Document_Attachment_16x16.svg, UsePalette=True}" dx:WpfSvgPalette.Palette="{StaticResource SVGIconPallete}" Width="16" Height="16" VerticalAlignment="Center" />
                             </DataTemplate>
                         </local:CorasauDataGridTemplateColumnClient.HeaderTemplate>
                         <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                             <ControlTemplate>
-                                <Image Margin="5" Tag="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" Source="/UnicontaPages;component/Assets/img/Document_Attachment_16x16.png" MouseLeftButtonDown="HasDocImage_MouseLeftButtonDown" Visibility="{Binding DataContext.RowData.Row.HasDocs,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource VisibilityBoolConverter}}" Stretch="Fill" Width="16" Height="16" RenderOptions.BitmapScalingMode="NearestNeighbor" RenderOptions.EdgeMode="Aliased" />
+                                <Image Margin="5" Tag="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" dx:WpfSvgPalette.Palette="{StaticResource SVGIconPallete}"
+                                       Source="{dx:SvgImageSource Uri=/UnicontaPages;component/Assets/img/Document_Attachment_16x16.svg,UsePalette=True}" MouseLeftButtonDown="HasDocImage_MouseLeftButtonDown" Visibility="{Binding DataContext.RowData.Row.HasDocs,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource VisibilityBoolConverter}}" 
+                                       Stretch="Fill" Width="16" Height="16" RenderOptions.BitmapScalingMode="NearestNeighbor" RenderOptions.EdgeMode="Aliased" />
                             </ControlTemplate>
                         </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                     </local:CorasauDataGridTemplateColumnClient>
                     <local:CorasauDataGridTemplateColumnClient x:Name="IsDebtor"  Width="30" >
                         <local:CorasauDataGridTemplateColumnClient.HeaderTemplate>
                             <DataTemplate>
-                                <Image Source="/UnicontaPages;component/Assets/img/Column_Head_16x16.png" Width="16" Height="16" VerticalAlignment="Center"/>
+                                <Image Source="{dx:SvgImageSource Uri=/UnicontaPages;component/Assets/img/Column_Head_16x16.svg, UsePalette=True}" dx:WpfSvgPalette.Palette="{StaticResource SVGIconPallete}" Width="16" Height="16" VerticalAlignment="Center"/>
                             </DataTemplate>
                         </local:CorasauDataGridTemplateColumnClient.HeaderTemplate>
                         <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                             <ControlTemplate>
-                                <Image Margin="5" Tag="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"
-                                       VerticalAlignment="Center" Source="{Binding DataContext.RowData.Row.IsDebtor,
-                                        RelativeSource ={RelativeSource TemplatedParent},Converter={StaticResource DebtorPropsectImageConverter}}" 
-                                       Stretch="Fill" Width="16" Height="16" RenderOptions.BitmapScalingMode="NearestNeighbor" RenderOptions.EdgeMode="Aliased" />
+                                <Image Margin="5" Tag="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" Source="{Binding DataContext.RowData.Row.IsDebtor,
+                                        RelativeSource ={RelativeSource TemplatedParent},Converter={StaticResource DebtorPropsectImageConverter}}" Stretch="Fill" Width="16" Height="16" RenderOptions.BitmapScalingMode="NearestNeighbor" RenderOptions.EdgeMode="Aliased" />
                             </ControlTemplate>
                         </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                     </local:CorasauDataGridTemplateColumnClient>

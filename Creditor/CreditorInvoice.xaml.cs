@@ -31,14 +31,28 @@ namespace UnicontaClient.Pages.CustomPage
         protected override void DataLoaded(UnicontaBaseEntity[] Arr)
         {
             var api = this.api;
-            var comp = api.CompanyEntity;
-            if (comp.DeliveryAddress && Arr != null)
+            var Comp = api.CompanyEntity;
+            if (Arr != null)
             {
-                foreach (var rec in Arr)
+                if (Comp.DeliveryAddress)
                 {
-                    var dcInvoice = rec as CreditorInvoiceClient;
-                    UtilCommon.SetDeliveryAdress(dcInvoice, dcInvoice.Creditor, api);
+                    foreach (var rec in Arr)
+                    {
+                        var dcInvoice = rec as CreditorInvoiceClient;
+                        UtilCommon.SetDeliveryAdress(dcInvoice, dcInvoice.Creditor, api);
+                    }
                 }
+                if (Comp.CreditorInvoices == null)
+                {
+                    Comp.CreditorInvoices = new IRowIdCache<CreditorInvoiceClient>();
+                    Comp.CreditorInvoices.SetCache((IEnumerable<CreditorInvoiceClient>)Arr);
+                }
+                else
+                {
+                    foreach (var rec in (IEnumerable<CreditorInvoiceClient>)Arr)
+                        Comp.CreditorInvoices.Add(rec);
+                }
+                Comp.CreditorInvoicesArr = null;
             }
         }
     }

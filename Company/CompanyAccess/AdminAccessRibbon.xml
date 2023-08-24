@@ -2,10 +2,10 @@
 <root>
   <RibbonItem TabId="0" LocalizedNameKey="Home">
     <!---When we create a new TabPage -->
-    <RibbonItem Action="Accept" LocalizedNameKey="Accept" LargeGlyph="Allow_32x32.png"/>
-    <RibbonItem Action="Deny" LocalizedNameKey="Deny" LargeGlyph="Deny_32x32.png"/>
+    <RibbonItem Action="Accept" LocalizedNameKey="Accept" LargeGlyph="Allow_32x32"/>
+    <RibbonItem Action="Deny" LocalizedNameKey="Deny" LargeGlyph="Deny_32x32"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh.png" LargeGlyph="refresh.png"/>
+    <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh" LargeGlyph="refresh"/>
   </RibbonItem>
 </root>

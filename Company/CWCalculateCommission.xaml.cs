@@ -45,7 +45,11 @@ namespace UnicontaClient.Pages.CustomPage
             this.Title = Uniconta.ClientTools.Localization.lookup("CalculateCommission");
             this.Loaded += CW_Loaded;
         }
-
+        public void SetTitleAndButton(string title, string btnOKText)
+        { 
+            this.Title = title;
+            OKButton.Content = btnOKText;
+        }
         private void OKButton_OnClick(object sender, RoutedEventArgs e)
         {
             SetDialogResult(true);

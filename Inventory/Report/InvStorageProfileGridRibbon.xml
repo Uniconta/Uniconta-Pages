@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <root>
   <RibbonItem TabId="0" LocalizedNameKey="Home">
-    <RibbonItem Action="Search" LocalizedNameKey="Search" LargeGlyph="Validate_32x32.png" ShortcutKey="Ctrl+H" />
+    <RibbonItem Action="Search" LocalizedNameKey="Search" LargeGlyph="Validate_32x32" ShortcutKey="Ctrl+H" />
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="ItemFilter" LocalizedNameKey="FilterOBJ" Parameter="Item" Glyph="Filter_16x16.png" LargeGlyph="Filter_32x32.png"/>
-    <RibbonItem Action="ClearItemFilter" LocalizedNameKey="ClearFilter" Glyph="Filter_Clear_32x32.png" LargeGlyph="Filter_Clear_32x32.png"/>
+    <RibbonItem Action="ItemFilter" LocalizedNameKey="FilterOBJ" Parameter="Item" Glyph="Filter_16x16" LargeGlyph="Filter_32x32"/>
+    <RibbonItem Action="ClearItemFilter" LocalizedNameKey="ClearFilter" Glyph="Filter_Clear_32x32" LargeGlyph="Filter_Clear_32x32"/>
 	<RibbonItem Action="PerWarehouse" LocalizedNameKey="PerOBJ" Parameter="Warehouse" ButtonType="CheckBox" />
   </RibbonItem>
   <RibbonItem>
     <!---If we want to create a new group in same PageTab-->
-    <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32.png">
+    <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32">
       <!---If we want Inner menu-->
-      <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
-      <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16.png" ShortcutKey="" />
-      <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
-      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png" ShortcutKey=""/>
-      <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16.png" LargeGlyph="Delete_32x32.png" ShortcutKey="Ctrl+U"/>
-      <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportLayout" EnableSeperator="True" Glyph="ExportLayout_16x16.png" LargeGlyph="ExportLayout_16x16.png" ShortcutKey=""/>
-      <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportLayout" Glyph="Import_16x16.png" LargeGlyph="Import_16x16.png" ShortcutKey=""/>
-      <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16.png" ShortcutKey=""/>
+      <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
+      <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16" ShortcutKey="" />
+      <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
+      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16" LargeGlyph="Delete_32x32" ShortcutKey=""/>
+      <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16" LargeGlyph="Delete_32x32" ShortcutKey="Ctrl+U"/>
+      <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportLayout" EnableSeperator="True" Glyph="ExportLayout_16x16" LargeGlyph="ExportLayout_16x16" ShortcutKey=""/>
+      <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportLayout" Glyph="Import_16x16" LargeGlyph="Import_16x16" ShortcutKey=""/>
+      <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16" ShortcutKey=""/>
     </RibbonItem>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="InvReservation" LocalizedNameKey="Reservations" ControlName="InventoryReservationReport" Module="Storage" LargeGlyph="Item_Number_32x32.png"/>
+    <RibbonItem Action="InvReservation" LocalizedNameKey="Reservations" ControlName="InventoryReservationReport" Module="Storage" LargeGlyph="Item_Number_32x32"/>
   </RibbonItem>
 </root>

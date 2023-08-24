@@ -73,10 +73,8 @@ namespace UnicontaClient.Pages.CustomPage
         void SetHeader()
         {
             var syncMaster = dgCreditorTrans.masterRecord as Uniconta.DataModel.Creditor;
-            if (syncMaster == null)
-                return;
-            string header = string.Format("{0}/{1}", Uniconta.ClientTools.Localization.lookup("CreditorTransactions"), syncMaster._Account);
-            SetHeader(header);
+            if (syncMaster != null)
+                SetHeader(string.Concat(Uniconta.ClientTools.Localization.lookup("CreditorTransactions"), "/", syncMaster._Account));
         }
         public CreditorTransactions(BaseAPI API)
             : base(API, string.Empty)

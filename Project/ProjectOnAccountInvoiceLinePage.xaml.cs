@@ -173,7 +173,6 @@ namespace UnicontaClient.Pages.CustomPage
             //SystemInfo.Visible = true;
 
             int countErr = 0;
-            SaveFileDialog saveDialog = null;
             Uniconta.API.DebtorCreditor.InvoiceAPI Invapi = new Uniconta.API.DebtorCreditor.InvoiceAPI(api);
 
             var listPropval = new List<PropValuePair>()
@@ -252,7 +251,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (result.Document != null && createXmlFile)
             {
                 string invoice = Uniconta.ClientTools.Localization.lookup("Invoice");
-                saveDialog = Uniconta.ClientTools.Util.UtilDisplay.LoadSaveFileDialog;
+                var saveDialog = Uniconta.ClientTools.Util.UtilDisplay.LoadSaveFileDialog;
                 saveDialog.FileName = string.Format("{0}_{1}", invoice, invClient.InvoiceNumber);
                 saveDialog.Filter = "XML-File | *.xml";
                 bool? dialogResult = saveDialog.ShowDialog();

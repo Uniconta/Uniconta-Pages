@@ -164,7 +164,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void Page_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.F8)
-                localMenu_OnItemClicked("AddItems");
+                ribbonControl.PerformRibbonAction("AddItems");
         }
 
         protected override void SyncEntityMasterRowChanged(UnicontaBaseEntity args)

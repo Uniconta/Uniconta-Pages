@@ -907,7 +907,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         void dgWorkInProgressRpt_RowDoubleClick()
         {
-            localMenu_OnItemClicked("Transactions");
+            ribbonControl.PerformRibbonAction("Transactions");
         }
 
         private void localMenu_OnItemClicked(string ActionType)

@@ -52,9 +52,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
         public override void PrintGrid(string reportName, object printparam, string format = null, BasePage page = null, bool showDialogInPrint = true)
         {
-#if !SILVERLIGHT
             ((CustomTableView)View).HasPageBreak = PageBreak;
-#endif
             base.PrintGrid(reportName, printparam, format, page);
         }
     }
@@ -136,20 +134,7 @@ namespace UnicontaClient.Pages.CustomPage
             txtDateFrm.DateTime = InventoryStatement.DefaultFromDate;
 
             GetMenuItem();
-
-#if SILVERLIGHT
-            childDgInvTrans.CurrentItemChanged += ChildDgInvTrans_CurrentItemChanged;
-#endif
         }
-
-#if SILVERLIGHT
-        private void ChildDgInvTrans_CurrentItemChanged(object sender, CurrentItemChangedEventArgs e)
-        {
-            var detailsSelectedItem = e.NewItem as InvTransClientTotal;
-            childDgInvTrans.SelectedItem = detailsSelectedItem;
-            childDgInvTrans.syncEntity.Row = detailsSelectedItem;
-        }
-#endif
 
         void MasterRowExpanded(object sender, RowEventArgs e)
         {
@@ -166,8 +151,6 @@ namespace UnicontaClient.Pages.CustomPage
             var detail = childDgInvTrans.GetDetail(rowHandle) as GridControl;
             return detail == null ? null : detail.View as TableView;
         }
-
-#if !SILVERLIGHT
 
         void SubstituteFilter(object sender, DevExpress.Data.SubstituteFilterEventArgs e)
         {
@@ -191,7 +174,7 @@ namespace UnicontaClient.Pages.CustomPage
                 detailOperator.Operands.Add(new FunctionOperator(FunctionOperatorType.Contains, op, new OperandValue(searchString)));
             return new AggregateOperand("ChildRecord", Aggregate.Exists, detailOperator);
         }
-#endif
+
         public override Task InitQuery()
         {
             return null;
@@ -212,9 +195,7 @@ namespace UnicontaClient.Pages.CustomPage
             UnicontaClient.Utilities.Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
             if (!company.Project)
                 PrCategory.Visible = PrCategory.ShowInColumnChooser = false;
-#if!SILVERLIGHT
             Utilities.Utility.SetupVariants(api, colVariant, VariantName, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
-#endif
         }
 
         public override void AssignMultipleGrid(List<Uniconta.ClientTools.Controls.CorasauDataGrid> gridCtrls)
@@ -226,8 +207,6 @@ namespace UnicontaClient.Pages.CustomPage
 
         private async void LoadInvTran()
         {
-            setExpandAndCollapse(true);
-
             InventoryStatement.setDateTime(txtDateFrm, txtDateTo);
             DateTime FromDate = InventoryStatement.DefaultFromDate, ToDate = InventoryStatement.DefaultToDate;
 
@@ -246,20 +225,26 @@ namespace UnicontaClient.Pages.CustomPage
             }
             dgInvTran.Visibility = Visibility.Visible;
             busyIndicator.IsBusy = false;
-            if (fromItem == toItem)
-                setExpandAndCollapse(false);
+            if (statementList?.Count == 1)
+                ExpandAndCollapseAll(false);
         }
-
+        public override object GetPrintParameter()
+        {
+            for (int rowHandle = 0; rowHandle < dataRowCount; rowHandle++)
+                dgInvTran.ExpandMasterRow(rowHandle);
+            return base.GetPrintParameter();
+        }
+        List<InvItemStatementList> statementList = null;
         void FillStatement(InvTransClientTotal[] listtran)
         {
-            var isAscending = cbxAscending.IsChecked.Value;
-            var skipBlank = cbxSkipBlank.IsChecked.Value;
+            var isAscending = cbxAscending.IsChecked.GetValueOrDefault();
+            var skipBlank = cbxSkipBlank.IsChecked.GetValueOrDefault();
 
             var Pref = api.session.Preference;
             Pref.Inventory_isAscending = isAscending;
             Pref.Inventory_skipBlank = skipBlank;
 
-            var statementList = new List<InvItemStatementList>(Math.Min(20, dataRowCount));
+            statementList = new List<InvItemStatementList>(Math.Min(20, dataRowCount));
 
             string curItem = " ";
             InvItemStatementList ob = null;
@@ -354,20 +339,10 @@ namespace UnicontaClient.Pages.CustomPage
             if (dgInvTran.ItemsSource == null) return;
             if (ibase == null) return;
             if (ibase.Caption == Uniconta.ClientTools.Localization.lookup("ExpandAll") && !expandState)
-            {
                 ExpandAndCollapseAll(false);
-                ibase.Caption = Uniconta.ClientTools.Localization.lookup("CollapseAll");
-                ibase.LargeGlyph = Utilities.Utility.GetGlyph("Collapse_32x32.png");
-            }
-            else
-            {
-                if (expandState)
-                {
-                    ExpandAndCollapseAll(true);
-                    ibase.Caption = Uniconta.ClientTools.Localization.lookup("ExpandAll");
-                    ibase.LargeGlyph = Utilities.Utility.GetGlyph("Expand_32x32.png");
-                }
-            }
+            else if (expandState)
+                ExpandAndCollapseAll(true);
+
         }
 
         void GetMenuItem()
@@ -383,13 +358,23 @@ namespace UnicontaClient.Pages.CustomPage
             cmbToAccount.SelectedItem = cmbFromAccount.SelectedItem;
         }
 
-        void ExpandAndCollapseAll(bool ISCollapseAll)
+        void ExpandAndCollapseAll(bool IsCollapseAll)
         {
             for (int rowHandle = 0; rowHandle < dataRowCount; rowHandle++)
-                if (!ISCollapseAll)
+                if (!IsCollapseAll)
                     dgInvTran.ExpandMasterRow(rowHandle);
                 else
                     dgInvTran.CollapseMasterRow(rowHandle);
+            if (IsCollapseAll)
+            {
+                ibase.Caption = Uniconta.ClientTools.Localization.lookup("ExpandAll");
+                ibase.LargeGlyph = Utilities.Utility.GetGlyph("Expand_32x32");
+            }
+            else
+            {
+                ibase.Caption = Uniconta.ClientTools.Localization.lookup("CollapseAll");
+                ibase.LargeGlyph = Utilities.Utility.GetGlyph("Collapse_32x32");
+            }
         }
     }
 }

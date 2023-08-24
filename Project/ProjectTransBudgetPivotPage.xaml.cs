@@ -92,6 +92,7 @@ namespace UnicontaClient.Pages.CustomPage
         static string budgetGroup;
         static bool grpWeek;
         static bool grpPrevYear;
+        static bool grpAnchorBudget;
         bool pivotIsLoaded = false;
         SQLTableCache<Uniconta.DataModel.PrCategory> prCategoryCache;
         SQLTableCache<Uniconta.DataModel.Employee> employeeCache;
@@ -145,6 +146,7 @@ namespace UnicontaClient.Pages.CustomPage
             txtToDate.DateTime = toDate == DateTime.MinValue ? GetSystemDefaultDate() : toDate;
             chkGroupWeek.IsChecked = grpWeek;
             chkGroupPrevYear.IsChecked = grpPrevYear;
+            chkGroupAnchorBudget.IsChecked = grpAnchorBudget;
             pivotDgProjectPlanning.CellClick += PivotDgProjectPlanning_CellClick;
             pivotDgProjectPlanning.CustomCellAppearance += PivotDgProjectPlanning_CustomCellAppearance;
             fieldQtyActualBudDiff.Caption = ProjectTransPivotClientText.QtyActualBudDiff;
@@ -418,8 +420,9 @@ namespace UnicontaClient.Pages.CustomPage
             fromDate = txtFromDate.DateTime;
             toDate = txtToDate.DateTime;
             budgetGroup = cmbBudgetGroup.Text;
-            grpWeek = chkGroupWeek.IsChecked.Value;
-            grpPrevYear = chkGroupPrevYear.IsChecked.Value;
+            grpWeek = chkGroupWeek.IsChecked.GetValueOrDefault();
+            grpPrevYear = chkGroupPrevYear.IsChecked.GetValueOrDefault();
+            grpAnchorBudget = chkGroupAnchorBudget.IsChecked.GetValueOrDefault();
 
             fieldQtyPrev.Visible = grpPrevYear;
             fieldCostPrev.Visible = grpPrevYear;
@@ -472,11 +475,13 @@ namespace UnicontaClient.Pages.CustomPage
                 filter.Add(PropValuePair.GenereteParameter("ToDate", typeof(string), Convert.ToString(toDate.Ticks)));
             if (budgetGroup != null)
                 filter.Add(PropValuePair.GenereteParameter("BudgetGroup", typeof(string), budgetGroup));
-
+            var emp = master as Uniconta.DataModel.Employee;
+            if (master != null)
+                filter.Add(PropValuePair.GenereteParameter("_Employee", typeof(string), emp.KeyStr));
             var api = this.api;
             var CompanyId = api.CompanyId;
 
-            trans = await api.Query(new ProjectTransPivotClientLocal(), new [] { master }, filter);
+            trans = await api.Query(new ProjectTransPivotClientLocal(), new[] { master }, filter);
             if (trans == null)
                 return;
 
@@ -487,8 +492,11 @@ namespace UnicontaClient.Pages.CustomPage
             if (showBudget)
             {
                 await GetBudget();
-                filter.Add(PropValuePair.GenereteParameter("Anchor", typeof(bool), "1"));
-                await GetBudget();
+                if (grpAnchorBudget)
+                {
+                    filter.Add(PropValuePair.GenereteParameter("Anchor", typeof(bool), "1"));
+                    await GetBudget();
+                }
             }
 
             if (grpPrevYear)
@@ -501,7 +509,7 @@ namespace UnicontaClient.Pages.CustomPage
                         p.Arg = Convert.ToString(toDate.AddYears(-1).Ticks);
                 }
 
-                var transTaskPrev = api.Query(new ProjectTransPivotClientLocal(), new [] { master }, filter);
+                var transTaskPrev = api.Query(new ProjectTransPivotClientLocal(), new[] { master }, filter);
                 var transPrev = await transTaskPrev;
 
                 foreach (var y in transPrev)
@@ -517,8 +525,8 @@ namespace UnicontaClient.Pages.CustomPage
                         _Date = y._Date,
                         _Employee = y._Employee,
                         _PayrollCategory = y._PayrollCategory,
-                        _Task= y._Task,
-                        _Workspace=y._Workspace
+                        _Task = y._Task,
+                        _Workspace = y._Workspace
                     };
 
                     if (extras == null)
@@ -552,7 +560,7 @@ namespace UnicontaClient.Pages.CustomPage
                     ProjectNumber = ((Uniconta.DataModel.Project)master)._Number;
                     end = len;
                 }
-   
+
                 start = end;
             }
 
@@ -631,7 +639,8 @@ namespace UnicontaClient.Pages.CustomPage
                     var curEmployee = empl._Number;
 
                     calenders.Clear();
-
+                    if (emp != null && emp._Number != curEmployee)
+                        continue;
                     searchCalSetup.Employee = curEmployee;
                     var posCalSetup = Array.BinarySearch(lstCalendarSetup, searchCalSetup, calSetupSort);
                     if (posCalSetup < 0)

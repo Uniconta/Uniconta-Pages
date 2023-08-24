@@ -3,11 +3,9 @@
 x:Class="UnicontaClient.Pages.CustomPage.ProductionOrderLines"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core" 
              xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
              xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
-             xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
              xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors"
              xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
              xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
@@ -156,12 +154,12 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionOrderLines"
                                     <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OnHand}"/>
                                     <Button x:Name="btnPurchase" Click="btnPurchase_Click" ToolTip="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=PurchaseLines}"  Margin="10,0,0,0">
                                         <StackPanel>
-                                            <Image Source="/UnicontaPages;component/Assets/img/Plus_8x8.png"/>
+                                            <Image Source="{dx:SvgImageSource Uri=/UnicontaPages;component/Assets/img/Plus_8x8.svg, UsePalette=True}" dx:WpfSvgPalette.Palette="{StaticResource SVGIconPallete}"/>
                                         </StackPanel>
                                     </Button>
                                     <Button x:Name="btnSales" Click="btnSales_Click" ToolTip="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OrdersLine}"  Margin="5,0,0,0">
                                         <StackPanel>
-                                            <Image Source="/UnicontaPages;component/Assets/img/Minus_8x8.png"/>
+                                            <Image Source="{dx:SvgImageSource Uri=/UnicontaPages;component/Assets/img/Minus_8x8.svg, UsePalette=True}" dx:WpfSvgPalette.Palette="{StaticResource SVGIconPallete}"/>
                                         </StackPanel>
                                     </Button>
                                 </StackPanel>

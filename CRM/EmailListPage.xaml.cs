@@ -75,6 +75,9 @@ namespace UnicontaClient.Pages.CustomPage
                 case "SendEmail":
                     SendEmail();
                     break;
+                case "Remove":
+                    dgEmailList.RemoveFocusedRowFromGrid();
+                    break;  
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;

@@ -168,7 +168,7 @@ namespace UnicontaClient.Pages.CustomPage
             var debt = editrow.Debtor;
             api.SetMaster(contactClient, debt);
             AddDockItem(TabControls.ContactPage2, new object[] { contactClient, false, debt }, string.Format("{0} : {1},{2}",
-                Uniconta.ClientTools.Localization.lookup("Contacts"), editrow.OrderNumber, debt.Name), "Add_16x16.png");
+                Uniconta.ClientTools.Localization.lookup("Contacts"), editrow.OrderNumber, debt.Name), "Add_16x16");
         }
 
         protected override void AfterTemplateSet(UnicontaBaseEntity row)
@@ -355,7 +355,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void AddDebtor_Click(object sender, RoutedEventArgs e)
         {
-            AddDockItem(TabControls.DebtorAccountPage2, new object[] { api, null }, Uniconta.ClientTools.Localization.lookup("DebtorAccount"), "Add_16x16.png");
+            AddDockItem(TabControls.DebtorAccountPage2, new object[] { api, null }, Uniconta.ClientTools.Localization.lookup("DebtorAccount"), "Add_16x16");
         }
 
         private void leAccount_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
@@ -610,6 +610,12 @@ namespace UnicontaClient.Pages.CustomPage
                 row.DeliveryZipCode = zipCode;
             }
             row.DeliveryCountry = country;
+        }
+
+        private void cmbContactName_KeyDown(object sender, KeyEventArgs e)
+        {
+            var selectedItem = cmbContactName.SelectedItem as Contact;
+            GoToContact(selectedItem, e.Key);
         }
     }
 }

@@ -376,7 +376,7 @@ namespace UnicontaClient.Pages.CustomPage
                     param[0] = newItem;
                     param[1] = false;
                     if (isCompUserDoc) param[2] = crudApi;
-                    AddDockItem(TabControls.UserDocsPage2, param, headerStr, "Add_16x16.png");
+                    AddDockItem(TabControls.UserDocsPage2, param, headerStr, "Add_16x16");
                     break;
                 case "EditRow":
                     if (selectedItem == null || selectedItem.Created == DateTime.MinValue)
@@ -385,7 +385,7 @@ namespace UnicontaClient.Pages.CustomPage
                     para[0] = selectedItem;
                     para[1] = true;
                     if (isCompUserDoc) para[2] = crudApi;
-                    AddDockItem(TabControls.UserDocsPage2, para, headerStr, "Edit_16x16.png");
+                    AddDockItem(TabControls.UserDocsPage2, para, headerStr, "Edit_16x16");
                     break;
 
                 case "RefreshGrid":
@@ -695,7 +695,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void Text_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            localMenu_OnItemClicked("ViewDownloadRow");
+            ribbonControl.PerformRibbonAction("ViewDownloadRow");
         }
     }
 }

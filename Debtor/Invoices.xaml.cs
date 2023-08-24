@@ -49,14 +49,29 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override void DataLoaded(UnicontaBaseEntity[] Arr)
         {
-            if (api.CompanyEntity.DeliveryAddress && Arr != null)
+            if (Arr != null)
             {
-                var cache = api.GetCache(typeof(Debtor));
-                if (cache != null)
+                var Comp = api.CompanyEntity;
+                if (Comp.DeliveryAddress)
                 {
-                    foreach (var rec in (IEnumerable<DCInvoice>)Arr)
-                        UtilCommon.SetDeliveryAdress(rec, (DCAccount)cache.Get(rec._DCAccount), api);
+                    var cache = api.GetCache(typeof(Debtor));
+                    if (cache != null)
+                    {
+                        foreach (var rec in (IEnumerable<DCInvoice>)Arr)
+                            UtilCommon.SetDeliveryAdress(rec, (DCAccount)cache.Get(rec._DCAccount), api);
+                    }
                 }
+                if (Comp.DebtorInvoices == null)
+                {
+                    Comp.DebtorInvoices = new IRowIdCache<DebtorInvoiceClient>();
+                    Comp.DebtorInvoices.SetCache((IEnumerable<DebtorInvoiceClient>)Arr);
+                }
+                else
+                {
+                    foreach (var rec in (IEnumerable<DebtorInvoiceClient>)Arr)
+                        Comp.DebtorInvoices.Add(rec);
+                }
+                Comp.DebtorInvoicesArr = null;
             }
         }
     }
@@ -407,7 +422,7 @@ namespace UnicontaClient.Pages.CustomPage
                         reportName = Uniconta.ClientTools.Localization.lookup("Packnote");
                     }
 
-                    ribbonControl.DisableButtons(new [] { "ShowInvoice", "ShowPackNote" });
+                    ribbonControl.DisableButtons(new[] { "ShowInvoice", "ShowPackNote" });
                 }
 
                 foreach (var debtInvoice in docList)
@@ -459,7 +474,7 @@ namespace UnicontaClient.Pages.CustomPage
                 }
 
                 IsGeneratingDocument = false;
-                ribbonControl?.EnableButtons(new [] { "ShowInvoice", "ShowPackNote" });
+                ribbonControl?.EnableButtons(new[] { "ShowInvoice", "ShowPackNote" });
 
                 if (failedPrints.Count > 0)
                 {
@@ -493,10 +508,19 @@ namespace UnicontaClient.Pages.CustomPage
                 busyIndicator.IsBusy = true;
                 busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("LaunchingWaitMsg");
                 var debtor = invClient.Debtor;
-                var invoiceReport = await PrintInvoice(invClient);
+                var invoicePdf = await new InvoiceAPI(api).GetInvoicePdf(invClient);
                 var documentType = invClient._LineTotal >= -0.0001d ? CompanyLayoutType.Invoice : CompanyLayoutType.Creditnote;
                 invClient._SendTime = DateTime.MinValue; // this will for outlook function to update server
-                InvoicePostingPrintGenerator.OpenReportInOutlook(api, invoiceReport, invClient, debtor, documentType);
+                var language = Uniconta.Reports.Utilities.ReportGenUtil.GetLanguage(debtor, api.CompanyEntity);
+                var localization = Uniconta.ClientTools.Localization.GetLocalization(language);
+                var docName = InvoicePostingPrintGenerator.FormatDocumentName(documentType, invClient, localization);
+                var tempPath = System.IO.Path.GetTempPath();
+                var filePath = string.Format("{0}{1}.pdf", tempPath, docName);
+                File.WriteAllBytes(filePath, invoicePdf);
+                //Include Attachements
+                filePath = await InvoicePostingPrintGenerator.AppendExtraAttachements(api, filePath, documentType, localization, null, invClient);
+
+                InvoicePostingPrintGenerator.ExecuteOpenOutlook(api, invClient, debtor, documentType, language, localization, docName, filePath);
             }
             catch (Exception ex)
             {
@@ -612,7 +636,7 @@ namespace UnicontaClient.Pages.CustomPage
             var listOfXmlPath = new List<string>();
             int countErr = 0;
             bool hasUserFolder = false;
-            SaveFileDialog saveDialog = null;
+            DevExpress.Xpf.Dialogs.DXSaveFileDialog saveDialog = null;
             DevExpress.Xpf.Dialogs.DXFolderBrowserDialog folderBrowserDialog = null;
             InvoiceAPI Invapi = new InvoiceAPI(api);
             var cnt = lstInvClient.Count();

@@ -3,11 +3,9 @@
 x:Class="UnicontaClient.Pages.CustomPage.DebtorOrderLines"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
     xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
     xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage" 
-    xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
     xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors"
     xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
     xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
@@ -128,7 +126,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrderLines"
                                     </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridTemplateColumnClient>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="QtyInvoiced" Width="80" />
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Currency" Width="35" Visible="False" />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Currency" ReadOnly="True" Width="35" Visible="False" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="CostPrice" Visible="False" />
                                 <localPage:CorasauDataGridForeignKeyColumnClient x:Name="Warehouse" Width="100">
                                     <localPage:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
@@ -213,12 +211,12 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrderLines"
                                     <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OnHand}"/>
                                     <Button x:Name="btnPurchase" Click="btnPurchase_Click" ToolTip="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=PurchaseLines}"  Margin="10,0,0,0">
                                         <StackPanel>
-                                            <Image Source="/UnicontaPages;component/Assets/img/Plus_8x8.png"/>
+                                            <Image Source="{dx:SvgImageSource Uri=/UnicontaPages;component/Assets/img/Plus_8x8.svg, UsePalette=True}" dx:WpfSvgPalette.Palette="{StaticResource SVGIconPallete}"/>
                                         </StackPanel>
                                     </Button>
                                     <Button x:Name="btnSales" Click="btnSales_Click" ToolTip="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OrdersLine}"  Margin="5,0,0,0">
                                         <StackPanel>
-                                            <Image Source="/UnicontaPages;component/Assets/img/Minus_8x8.png"/>
+                                            <Image Source="{dx:SvgImageSource Uri=/UnicontaPages;component/Assets/img/Minus_8x8.svg, UsePalette=True}" dx:WpfSvgPalette.Palette="{StaticResource SVGIconPallete}"/>
                                         </StackPanel>
                                     </Button>
                                 </StackPanel>

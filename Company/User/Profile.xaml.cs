@@ -100,6 +100,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             string buildText = AssemblyBuildDate(this.GetType());
             txtXapBuildDate.Text = buildText;
+            txtClientVersion.Text =System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString();
             txtAPIVersion.Text = APIVersion.CurrentVersion.ToString();
         }
         private async void savePassword()

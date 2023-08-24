@@ -182,17 +182,18 @@ namespace UnicontaClient.Pages.CustomPage
                 var prCatCache = api.GetCache(typeof(Uniconta.DataModel.PrCategory)) ?? await api.LoadCache(typeof(Uniconta.DataModel.PrCategory)).ConfigureAwait(false);
                 cmbPrCategory.cacheFilter = new PrCategoryCostFilter(prCatCache);
             }
-            //if (api.CompanyEntity.Storage && editrow != null && editrow.RowId != 0 && editrow._ItemType != (byte)ItemType.Service)
-            //{
-            //    await api.Read(editrow).ConfigureAwait(false);
-
-            //    Dispatcher.BeginInvoke(new Action(() => {
-            //        object[] editParams = new object[2];
-            //        editParams[0] = 2;
-            //        editParams[1] = LoadedRow ?? ModifiedRow;
-            //        globalEvents.OnRefresh(TabControls.InventoryItemPage2, editParams);
-            //    }));
-            //}
+            if (api.CompanyEntity.Storage && editrow != null && editrow.RowId != 0 && editrow._ItemType != (byte)ItemType.Service)
+            {
+                await api.Read(LoadedRow).ConfigureAwait(false);
+                Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    SetDataContext(LoadedRow);
+                    object[] editParams = new object[2];
+                    editParams[0] = 2;
+                    editParams[1] = LoadedRow ?? ModifiedRow;
+                    globalEvents.OnRefresh(TabControls.InventoryItemPage2, editParams);
+                }));
+            }
         }
 
         private void cmbWarehouse_SelectedIndexChanged(object sender, RoutedEventArgs e)

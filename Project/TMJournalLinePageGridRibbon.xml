@@ -2,58 +2,59 @@
 <root>
 	<RibbonItem TabId="0" LocalizedNameKey="Home">
 		<!---When we create a new TabPage -->
-		<RibbonItem Action="AddRow" LocalizedNameKey="AddNewRow" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png"/>
-		<RibbonItem Action="CopyRow" LocalizedNameKey="CopyRow" ShortcutKey="Shift+F2" LargeGlyph="Copy_32x32.png"/>
-		<RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="DeleteRow" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png"/>
-		<RibbonItem Action="SaveGrid" ShortcutKey="CTRL+S" LocalizedNameKey="Save" Glyph="save-16x16.png" LargeGlyph="save-32x32.png"/>
+		<RibbonItem Action="AddRow" LocalizedNameKey="AddNewRow" Glyph="Add_16x16" LargeGlyph="Add_32x32"/>
+		<RibbonItem Action="CopyRow" LocalizedNameKey="CopyRow" ShortcutKey="Shift+F2" LargeGlyph="Copy_32x32"/>
+		<RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="DeleteRow" Glyph="Delete_16x16" LargeGlyph="Delete_32x32"/>
+		<RibbonItem Action="SaveGrid" ShortcutKey="CTRL+S" LocalizedNameKey="Save" Glyph="save-16x16" LargeGlyph="save-32x32"/>
 	</RibbonItem>
 	<RibbonItem>
-		<RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh.png" LargeGlyph="refresh.png"/>
+		<RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh" LargeGlyph="refresh"/>
 	</RibbonItem>
 	<RibbonItem>
 		<!---next group in same Tab-->
-		<RibbonItem Action="Layout" LocalizedNameKey="Layout" Glyph="Cover_16x16.png" LargeGlyph="Layout_32x32.png">
+		<RibbonItem Action="Layout" LocalizedNameKey="Layout" Glyph="Cover_16x16" LargeGlyph="Layout_32x32">
 			<!---If we want Inner menu-->
-			<RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
-			<RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16.png" ShortcutKey="" />
-			<RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
-			<RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png" ShortcutKey=""/>
-			<RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16.png" LargeGlyph="Delete_32x32.png" ShortcutKey="Ctrl+U"/>
-			<RibbonItem Action="ExportLayout" LocalizedNameKey="ExportLayout" EnableSeperator="True" Glyph="ExportLayout_16x16.png" LargeGlyph="ExportLayout_16x16.png" ShortcutKey=""/>
-			<RibbonItem Action="ImportLayout" LocalizedNameKey="ImportLayout" Glyph="Import_16x16.png" LargeGlyph="Import_16x16.png" ShortcutKey=""/>
-			<RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16.png" ShortcutKey=""/>
+			<RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
+			<RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16" ShortcutKey="" />
+			<RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
+			<RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16" LargeGlyph="Delete_32x32" ShortcutKey=""/>
+			<RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16" LargeGlyph="Delete_32x32" ShortcutKey="Ctrl+U"/>
+			<RibbonItem Action="ExportLayout" LocalizedNameKey="ExportLayout" EnableSeperator="True" Glyph="ExportLayout_16x16" LargeGlyph="ExportLayout_16x16" ShortcutKey=""/>
+			<RibbonItem Action="ImportLayout" LocalizedNameKey="ImportLayout" Glyph="Import_16x16" LargeGlyph="Import_16x16" ShortcutKey=""/>
+			<RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16" ShortcutKey=""/>
 		</RibbonItem>
 	</RibbonItem>
 	<RibbonItem>
-		<RibbonItem Action="ShowMileage" LocalizedNameKey="ShowOBJ" Parameter="Mileage" LargeGlyph="Mileage_32x32.png"/>
-		<RibbonItem Action="AddMileage" LocalizedNameKey="AddOBJ" Parameter="Mileage" LargeGlyph="Add_Mileage_32x32.png"/>
+		<RibbonItem Action="ShowMileage" LocalizedNameKey="ShowOBJ" Parameter="Mileage" LargeGlyph="Mileage_32x32"/>
+		<RibbonItem Action="AddMileage" LocalizedNameKey="AddOBJ" Parameter="Mileage" LargeGlyph="Add_Mileage_32x32"/>
 	</RibbonItem>
 	<RibbonItem>
-		<RibbonItem Action="Today" LocalizedNameKey="Today" Glyph="Day_View_32x32.png" LargeGlyph="Day_View_32x32.png"/>
-		<RibbonItem Action="BackWard" LocalizedNameKey="Back" Glyph="Back_32x32.png" LargeGlyph="Back_32x32.png"/>
-		<RibbonItem Action="Forward" LocalizedNameKey="Forward" Glyph="Forward_32x32.png" LargeGlyph="Forward_32x32.png"/>
+		<RibbonItem Action="Today" LocalizedNameKey="Today" Glyph="Day_View_32x32" LargeGlyph="Day_View_32x32"/>
+		<RibbonItem Action="BackWard" LocalizedNameKey="Back" Glyph="Back_32x32" LargeGlyph="Back_32x32"/>
+		<RibbonItem Action="Forward" LocalizedNameKey="Forward" Glyph="Forward_32x32" LargeGlyph="Forward_32x32"/>
 	</RibbonItem>
 	<RibbonItem>
-		<RibbonItem Action="ValidateJournal" LocalizedNameKey="Validate"  LargeGlyph="Check_Journal_32x32.png"/>
+		<RibbonItem Action="ValidateJournal" LocalizedNameKey="Validate"  LargeGlyph="Check_Journal_32x32"/>
 	</RibbonItem>
 	<RibbonItem>
-		<RibbonItem Action="Close" LocalizedNameKey="ReportAsReady"   LargeGlyph="Order_Confirmation_32x32.png"/>
-		<RibbonItem Action="Open" LocalizedNameKey="ReOpen"   LargeGlyph="Re_Open_32x32.png"/>
+		<RibbonItem Action="Close" LocalizedNameKey="ReportAsReady"   LargeGlyph="Order_Confirmation_32x32"/>
+		<RibbonItem Action="Open" LocalizedNameKey="ReOpen"   LargeGlyph="Re_Open_32x32"/>
 	</RibbonItem>
 	<RibbonItem>
-		<RibbonItem Action="Approve" LocalizedNameKey="Approve"   LargeGlyph="Order_Confirmation_32x32.png"/>
+		<RibbonItem Action="Approve" LocalizedNameKey="Approve"   LargeGlyph="Order_Confirmation_32x32"/>
 	</RibbonItem>
 	<RibbonItem>
-		<RibbonItem Action="RemainingBudget" LocalizedNameKey="RemainingBudget" Module="ProjectBudget" LargeGlyph="Budget_32x32.png"/>
+		<RibbonItem Action="RemainingBudget" LocalizedNameKey="RemainingBudget" Module="ProjectBudget" LargeGlyph="Budget_32x32"/>
 	</RibbonItem>
     <RibbonItem>
-	  <RibbonItem Action="Reports" LocalizedNameKey="Reports" LargeGlyph="Item_Number_32x32.png">
-		<RibbonItem Action="KmRegnskab" LocalizedNameKey="Milage" Glyph="Item_Number_16x16.png" />
-		<RibbonItem Action="FerieogFlex" LocalizedNameKey="VacationAndFlexTime"  Glyph="Item_Number_16x16.png"/>
-		<RibbonItem Action="Produktion" LocalizedNameKey="Production" Glyph="Item_Number_16x16.png" />
-		<RibbonItem Action="CrmFollowUp" LocalizedNameKey="FollowUp" ControlName="CrmFollowUpPage" Module="CRM" Glyph="Item_Number_16x16.png"/>
-		<RibbonItem Action="Task" LocalizedNameKey="Tasks" ControlName="ProjectTaskGridPage" Module="ProjectTask" Glyph="Item_Number_16x16.png"/>
-    <RibbonItem Action="BudgetPanningSchedule" LocalizedNameKey="ProjectBudgetSchedule" ControlName="ProjectBudgetPlanningSchedulePage" Module="_ProjectPlanning" Glyph="Calendar_16x16.png"/>
+	  <RibbonItem Action="Reports" LocalizedNameKey="Reports" LargeGlyph="Item_Number_32x32">
+		<RibbonItem Action="KmRegnskab" LocalizedNameKey="Milage" Glyph="Item_Number_16x16" />
+		<RibbonItem Action="FerieogFlex" LocalizedNameKey="VacationAndFlexTime"  Glyph="Item_Number_16x16"/>
+		<RibbonItem Action="Produktion" LocalizedNameKey="Production" Glyph="Item_Number_16x16" />
+		<RibbonItem Action="CrmFollowUp" LocalizedNameKey="FollowUp" ControlName="CrmFollowUpPage" Module="CRM" Glyph="Item_Number_16x16"/>
+    <RibbonItem Action="Task" LocalizedNameKey="Tasks" ControlName="ProjectTaskGridPage" Module="ProjectTask" Glyph="Item_Number_16x16"/>
+    <RibbonItem Action="Planning" LocalizedNameKey="Planning" Glyph="Item_Number_16x16"/>
+    <RibbonItem Action="BudgetPanningSchedule" LocalizedNameKey="ProjectBudgetSchedule" ControlName="ProjectBudgetPlanningSchedulePage" Module="_ProjectPlanning" Glyph="Calendar_16x16"/>
     </RibbonItem>
 	</RibbonItem>
 	<RibbonItem>

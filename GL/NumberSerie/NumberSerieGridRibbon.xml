@@ -2,10 +2,10 @@
 <root>
   <RibbonItem TabId="0" LocalizedNameKey="Home">
     <!---When we create a new group and a new TabPage -->
-    <RibbonItem Action="AddRow" LocalizedNameKey="Add" ControlName="NumberSeriePage2" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png"/>
-    <RibbonItem Action="EditRow" ShortcutKey="Ctrl+E" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>
+    <RibbonItem Action="AddRow" LocalizedNameKey="Add" ControlName="NumberSeriePage2" Glyph="Add_16x16" LargeGlyph="Add_32x32"/>
+    <RibbonItem Action="EditRow" ShortcutKey="Ctrl+E" LocalizedNameKey="Edit" Glyph="Edit_16x16" LargeGlyph="Edit_32x32"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh.png" LargeGlyph="refresh.png"/>
+    <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh" LargeGlyph="refresh"/>
   </RibbonItem>
  </root>

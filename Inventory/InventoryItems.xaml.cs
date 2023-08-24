@@ -73,7 +73,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void RootVisual_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.F8 && Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
-                localMenu_OnItemClicked("InvTrans");
+                ribbonControl.PerformRibbonAction("InvTrans");
         }
 
         private void DebtorAccount_BeforeClose()
@@ -251,7 +251,7 @@ namespace UnicontaClient.Pages.CustomPage
                         EditAll();
                     break;
                 case "AddRow":
-                    AddDockItem(TabControls.InventoryItemPage2, api, Uniconta.ClientTools.Localization.lookup("InventoryItems"), "Add_16x16.png");
+                    AddDockItem(TabControls.InventoryItemPage2, api, Uniconta.ClientTools.Localization.lookup("InventoryItems"), "Add_16x16");
                     break;
                 case "EditRow":
                     if (selectedItem != null)
@@ -397,7 +397,7 @@ namespace UnicontaClient.Pages.CustomPage
             var item = Activator.CreateInstance(selectedItem.GetType()) as InvItemClient;
             CorasauDataGrid.CopyAndClearRowId(selectedItem, item);
             ClearValues(item);
-            AddDockItem(TabControls.InventoryItemPage2, new object[] { item, false }, Uniconta.ClientTools.Localization.lookup("InventoryItems"), "Add_16x16.png");
+            AddDockItem(TabControls.InventoryItemPage2, new object[] { item, false }, Uniconta.ClientTools.Localization.lookup("InventoryItems"), "Add_16x16");
         }
 
         bool copyRowIsEnabled;

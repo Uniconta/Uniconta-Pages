@@ -82,11 +82,11 @@ namespace UnicontaClient.Pages.CustomPage
             switch (ActionType)
             {
                 case "AddRow":
-                    AddDockItem(TabControls.FinanceYearPage2, new object[] { api, dgFinanceYearGrid, "" }, Uniconta.ClientTools.Localization.lookup("AccountingYear"), "Add_16x16.png");
+                    AddDockItem(TabControls.FinanceYearPage2, new object[] { api, dgFinanceYearGrid, "" }, Uniconta.ClientTools.Localization.lookup("AccountingYear"), "Add_16x16");
                     break;
                 case "EditRow":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.FinanceYearPage2, new object[] { selectedItem, dgFinanceYearGrid }, Uniconta.ClientTools.Localization.lookup("AccountingYear"), "Edit_16x16.png");
+                        AddDockItem(TabControls.FinanceYearPage2, new object[] { selectedItem, dgFinanceYearGrid }, Uniconta.ClientTools.Localization.lookup("AccountingYear"), "Edit_16x16");
                     break;                          
                 case "RecalcPeriodSum":
                     if (selectedItem != null)

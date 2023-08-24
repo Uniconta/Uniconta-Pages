@@ -97,8 +97,9 @@ namespace UnicontaClient.Pages.CustomPage
 
             cmbBankService.SelectedIndex = BankService;
             cmbBankAPIFunction.ItemsSource = new string[] { Uniconta.ClientTools.Localization.lookup("Register"), Uniconta.ClientTools.Localization.lookup("Connect"), Uniconta.ClientTools.Localization.lookup("Unregister"),
-                                                            string.Concat(Uniconta.ClientTools.Localization.lookup("Download"), " ", Uniconta.ClientTools.Localization.lookup("Transactions").ToLower()),
+                                                            Uniconta.ClientTools.Localization.lookup("Sync"), string.Concat(Uniconta.ClientTools.Localization.lookup("Download"), " ", Uniconta.ClientTools.Localization.lookup("Transactions").ToLower()),
                                                             Uniconta.ClientTools.Localization.lookup("WebServiceInfo"), Uniconta.ClientTools.Localization.lookup("Settings") };
+            //TODO:Udvid label vedr. SYNC
             cmbBankAPIFunction.SelectedIndex = Type;
             cmbBank.SelectedIndex = 0;
 
@@ -140,7 +141,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             switch (Type)
             {
-                case 0:
+                case 0: //Register
                     if (BankService == 1)
                         txtDescription.Text = String.Concat(string.Format(Uniconta.ClientTools.Localization.lookup("RegisterCompanyTo"), BANKCONNECT), Environment.NewLine,
                                                           "Bankdata: ", Uniconta.ClientTools.Localization.lookup("ServiceId"), " = 13 ", Uniconta.ClientTools.Localization.lookup("Digits").ToLower(), Environment.NewLine,
@@ -156,29 +157,23 @@ namespace UnicontaClient.Pages.CustomPage
                             .Append("- ").AppendLine(Uniconta.ClientTools.Localization.lookup("AiiaDialogRegister3")).ToStringAndRelease();
                     }
                     break;
-                case 1:
-                    if (BankService == 0)
-                        txtDescription.Text = Uniconta.ClientTools.Localization.lookup("FunctionNotSupported");
-                    else
-                        txtDescription.Text = Uniconta.ClientTools.Localization.lookup("AddCompanyToConnection");
+                case 1: //Connect
+                    txtDescription.Text = BankService == 0 ? Uniconta.ClientTools.Localization.lookup("FunctionNotSupported") : Uniconta.ClientTools.Localization.lookup("AddCompanyToConnection");
                     break;
-                case 2:
+                case 2: //Unregister
                     txtDescription.Text = string.Concat(Uniconta.ClientTools.Localization.lookup("Unregister"), " ", Uniconta.ClientTools.Localization.lookup("Connection").ToLower());
                     break;
-                case 3:
-                    if (BankService == 0)
-                        txtDescription.Text = Uniconta.ClientTools.Localization.lookup("RetrieveBankTransPeriod");
-                    else
-                        txtDescription.Text = Uniconta.ClientTools.Localization.lookup("FunctionNotSupported");
+                case 3: //Sync
+                    txtDescription.Text = BankService == 0 ? Uniconta.ClientTools.Localization.lookup("SynchronizeAiiaWithBank") : Uniconta.ClientTools.Localization.lookup("FunctionNotSupported");
                     break;
-                case 4:
+                case 4: //OnDemand
+                    txtDescription.Text = BankService == 0 ? Uniconta.ClientTools.Localization.lookup("RetrieveBankTransPeriod") : Uniconta.ClientTools.Localization.lookup("FunctionNotSupported");
+                    break;
+                case 5: //Service Info
                     txtDescription.Text = string.Format(Uniconta.ClientTools.Localization.lookup("InfoAgreement"), BankServiceLst[BankService]);
                     break;
-                case 5:
-                    if (BankService == 0)
-                        txtDescription.Text = string.Concat("Aiia Hub", Environment.NewLine, Uniconta.ClientTools.Localization.lookup("AiiaConsentOverview"));
-                    else
-                        txtDescription.Text = Uniconta.ClientTools.Localization.lookup("FunctionNotSupported");
+                case 6: //Settings
+                    txtDescription.Text = BankService == 0 ? string.Concat("Aiia Hub", Environment.NewLine, Uniconta.ClientTools.Localization.lookup("AiiaConsentOverview")) : Uniconta.ClientTools.Localization.lookup("FunctionNotSupported");
                     break;
             }
         }
@@ -211,7 +206,7 @@ namespace UnicontaClient.Pages.CustomPage
                         errText = fieldCannotBeEmpty("ActivationCode");
                 }
             }
-            else if (Type == 3)
+            else if (Type == 4)
             {
                 if (ToDate > DateTime.Now.Date)
                     errText = string.Format(Uniconta.ClientTools.Localization.lookup("ValueMayNoBeGreater"), Uniconta.ClientTools.Localization.lookup("ToDate"), Uniconta.ClientTools.Localization.lookup("TodaysDate").ToLower());
@@ -220,7 +215,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
             else
             {
-                if (Type != 5 && BankService != 0 && string.IsNullOrEmpty(ServiceId))
+                if (Type != 6 && Type != 3 && BankService != 0 && string.IsNullOrEmpty(ServiceId))
                     errText = fieldCannotBeEmpty("ServiceId");
             }
 
@@ -258,14 +253,14 @@ namespace UnicontaClient.Pages.CustomPage
             lgCustomer.Visibility = Visibility.Visible;
             lgConnect.Visibility = Visibility.Visible;
 
-            //Tilmeld=0, Tilknyt=1, Afmeld=2, Transactions=3, Info=4, Settings=5
+            //Tilmeld=0, Tilknyt=1, Afmeld=2, Sync=3, Transactions=4, Info=5, Settings=6
             if (Type == 0)
             {
                 liBank.Visibility = Visibility.Visible;
                 liActivationCode.Visibility = Visibility.Visible;
                 liCompany.Visibility = Visibility.Collapsed;
             }
-            else if (Type == 2 || Type == 4)
+            else if (Type == 2 || Type == 5)
             {
                 lgConnect.Visibility = Visibility.Collapsed;
             }
@@ -275,14 +270,14 @@ namespace UnicontaClient.Pages.CustomPage
                 liCompany.Visibility = Visibility.Visible;
                 liActivationCode.Visibility = Visibility.Collapsed;
             }
-            else if (Type == 3)
+            else if (Type == 4)
             {
                 lgCustomer.Visibility = Visibility.Collapsed;
                 liBank.Visibility = Visibility.Collapsed;
                 liCompany.Visibility = Visibility.Collapsed;
                 lgConnect.Visibility = Visibility.Collapsed;
             }
-            else if (Type == 5)
+            else if (Type == 6 || Type == 3)
             {
                 lgConnect.Visibility = Visibility.Collapsed;
                 lgCustomer.Visibility = Visibility.Collapsed;
@@ -307,7 +302,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 liBank.Visibility = Visibility.Collapsed;
                 liActivationCode.Visibility = Visibility.Collapsed;
-                lgParm.Visibility = Type == 3 ? Visibility.Visible : Visibility.Collapsed;
+                lgParm.Visibility = Type == 4 ? Visibility.Visible : Visibility.Collapsed;
                 lgCustomer.Visibility = Visibility.Collapsed;
                 lgConnect.Visibility = Type == 1 ? Visibility.Visible : Visibility.Collapsed;
                 liCompany.Visibility = Type == 1 ? Visibility.Visible : Visibility.Collapsed;

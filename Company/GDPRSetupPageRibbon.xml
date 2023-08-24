@@ -2,10 +2,10 @@
 <root>
 	<RibbonItem TabId="0" LocalizedNameKey="Home">
 		<!---When we create new TabPage -->
-		<RibbonItem Action="Save" ShortcutKey="Ctrl+S" LocalizedNameKey="Save" Glyph="save-16x16.png" LargeGlyph="save-32x32.png"/>
-		<RibbonItem Action="Cancel" LocalizedNameKey="Cancel" Glyph="close-16x16.png" LargeGlyph="close-32x32.png"/>
+		<RibbonItem Action="Save" ShortcutKey="Ctrl+S" LocalizedNameKey="Save" Glyph="save-16x16" LargeGlyph="save-32x32"/>
+		<RibbonItem Action="Cancel" LocalizedNameKey="Cancel" Glyph="close-16x16" LargeGlyph="close-32x32"/>
 	</RibbonItem>
 	<RibbonItem>
-		<RibbonItem Action="CleanUp" LocalizedNameKey="CleanUp" LargeGlyph="Order_Confirmation_32x32.png"/>
+		<RibbonItem Action="CleanUp" LocalizedNameKey="CleanUp" LargeGlyph="Order_Confirmation_32x32"/>
 	</RibbonItem>
 </root>

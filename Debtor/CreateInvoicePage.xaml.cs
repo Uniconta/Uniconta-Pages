@@ -149,7 +149,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void Page_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.F8)
-                localMenu_OnItemClicked("AddItems");
+                ribbonControl.PerformRibbonAction("AddItems");
 
             if (e.Key == Key.F9)
             {
@@ -505,8 +505,11 @@ namespace UnicontaClient.Pages.CustomPage
                     if (org != null)
                     {
                         row = dgDebtorOrderLineGrid.CopyRow() as DebtorOrderLineClient;
-                        row._ExchangeRate = this.exchangeRate;
-                        row._CostPriceLine = org._CostPriceLine;
+                        if (row != null)
+                        {
+                            row._ExchangeRate = this.exchangeRate;
+                            row._CostPriceLine = org._CostPriceLine;
+                        }
                     }
                     break;
                 case "DeleteRow":
@@ -740,7 +743,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (Order?._DCAccount != initialOrder._DCAccount)
                 cmbContactName.SelectedItem = null;
             Order = StreamingManager.Clone(initialOrder) as DebtorOrderClient;
-            if (master== null)
+            if (master == null)
                 ChildWindow.SetTablePropertiesValue(api, Order, Order.ClassId(), page: this);
             this.SetMaster(Order._DCAccount);
             Order.PropertyChanged += Editrow_PropertyChanged;
@@ -781,7 +784,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
 
             string debtorName = dbOrder.Debtor?.Name ?? dbOrder._DCAccount;
-            
+
             bool invoiceInXML = dc != null && dc.IsPeppolSupported && dc._einvoice;
 
             var accountName = Util.ConcatParenthesis(dbOrder._DCAccount, dbOrder.Name);
@@ -805,7 +808,7 @@ namespace UnicontaClient.Pages.CustomPage
                     var invoicePostingResult = SetupInvoicePostingPrintGenerator(dbOrder, lines, GenrateInvoiceDialog.GenrateDate, isSimulated, GenrateInvoiceDialog.ShowInvoice,
                         GenrateInvoiceDialog.PostOnlyDelivered, GenrateInvoiceDialog.InvoiceQuickPrint, GenrateInvoiceDialog.NumberOfPages, GenrateInvoiceDialog.SendByEmail,
                         GenrateInvoiceDialog.SendByOutlook, GenrateInvoiceDialog.sendOnlyToThisEmail, GenrateInvoiceDialog.Emails, GenrateInvoiceDialog.GenerateOIOUBLClicked,
-                        documents, false);
+                        documents, GenrateInvoiceDialog.SendByOutlook);
 
                     busyIndicator.IsBusy = true;
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
@@ -836,7 +839,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var invoicePostingResult = new InvoicePostingPrintGenerator(api, this);
             invoicePostingResult.SetUpInvoicePosting(dbOrder, lines, CompanyLayoutType.Invoice, generateDate, null, isSimulation, showInvoice, postOnlyDelivered, isQuickPrint, pagePrintCount,
-                invoiceSendByEmail, !isSimulation && invoiceSendByOutlook, sendOnlyToEmail, sendOnlyToEmailList, OIOUBLgenerate, documents, returnAsPdf);
+                invoiceSendByEmail, !isSimulation && invoiceSendByOutlook, sendOnlyToEmail, sendOnlyToEmailList, OIOUBLgenerate, attachedDocs, returnAsPdf);
 
 
             return invoicePostingResult;
@@ -862,7 +865,7 @@ namespace UnicontaClient.Pages.CustomPage
             this.DataContext = Order;
         }
         void SetMaster(string Account)
-        { 
+        {
             var Debtor = (Debtor)debtors?.Get(Account);
             if (Debtor != null)
             {
@@ -1140,7 +1143,7 @@ namespace UnicontaClient.Pages.CustomPage
             object[] param = new object[2];
             param[0] = api;
             param[1] = null;
-            AddDockItem(TabControls.DebtorAccountPage2, param, Uniconta.ClientTools.Localization.lookup("DebtorAccount"), "Add_16x16.png");
+            AddDockItem(TabControls.DebtorAccountPage2, param, Uniconta.ClientTools.Localization.lookup("DebtorAccount"), "Add_16x16");
         }
 
         FileBrowseControl fileBrowser;

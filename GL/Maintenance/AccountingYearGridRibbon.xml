@@ -2,20 +2,20 @@
 <root>
   <RibbonItem TabId="0" LocalizedNameKey="Home">
     <!---When we create a new group and a new TabPage -->
-    <RibbonItem Action="AddRow" LocalizedNameKey="AddOBJ" Parameter="AccountingYear" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png"/>
-    <RibbonItem Action="EditRow" ShortcutKey="Ctrl+E" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>
+    <RibbonItem Action="AddRow" LocalizedNameKey="AddOBJ" Parameter="AccountingYear" Glyph="Add_16x16" LargeGlyph="Add_32x32"/>
+    <RibbonItem Action="EditRow" ShortcutKey="Ctrl+E" LocalizedNameKey="Edit" Glyph="Edit_16x16" LargeGlyph="Edit_32x32"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="AccountingPeriod" LocalizedNameKey="BlockingStatus" LargeGlyph="Accounting_Period_32x32.png"/>
+    <RibbonItem Action="AccountingPeriod" LocalizedNameKey="BlockingStatus" LargeGlyph="Accounting_Period_32x32"/>
   </RibbonItem>
   <RibbonItem>    
-    <RibbonItem Action="CheckPeriodSum" LocalizedNameKey="CheckPeriodSum" LargeGlyph="Calculator_32x32.png"/>
-    <RibbonItem Action="RecalcPeriodSum" LocalizedNameKey="RecalcPeriodSum" LargeGlyph="Calculator_32x32.png"/>
-    <RibbonItem Action="EraseFiscalYear" LocalizedNameKey="EraseFiscalYear" LargeGlyph="Delete_32x32.png"/>
-    <RibbonItem Action="GeneratePrimo" LocalizedNameKey="TransferOpeningTrans" LargeGlyph="Account-statement_32x32.png"/>
-    <RibbonItem Action="RemovePrimo" LocalizedNameKey="RemoveOBJ" Parameter="PrimoTransactions" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png"/>
+    <RibbonItem Action="CheckPeriodSum" LocalizedNameKey="CheckPeriodSum" LargeGlyph="Calculator_32x32"/>
+    <RibbonItem Action="RecalcPeriodSum" LocalizedNameKey="RecalcPeriodSum" LargeGlyph="Calculator_32x32"/>
+    <RibbonItem Action="EraseFiscalYear" LocalizedNameKey="EraseFiscalYear" LargeGlyph="Delete_32x32"/>
+    <RibbonItem Action="GeneratePrimo" LocalizedNameKey="TransferOpeningTrans" LargeGlyph="Account-statement_32x32"/>
+    <RibbonItem Action="RemovePrimo" LocalizedNameKey="RemoveOBJ" Parameter="PrimoTransactions" Glyph="Delete_16x16" LargeGlyph="Delete_32x32"/>
   </RibbonItem>
    <RibbonItem>
-    <RibbonItem Action="PrimoTransactions" LocalizedNameKey="PrimoTransactions" LargeGlyph="Transactions_32x32.png"/>
+    <RibbonItem Action="PrimoTransactions" LocalizedNameKey="PrimoTransactions" LargeGlyph="Transactions_32x32"/>
   </RibbonItem>
 </root>

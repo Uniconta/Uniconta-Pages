@@ -41,7 +41,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjInvProposalPage2"
                             <CorasauControls:TextEditor x:Name="txtCreditMax"  Text="{Binding CreditMax,Mode=OneWay}" IsReadOnly="True"  Mask="N2" MaskType="Numeric"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="ContactName" x:Name="liContactName">
-                            <CorasauControls:ComboBoxEditor AllowNullInput="True" AssignNullValueOnClearingEditText="True" x:Name="cmbContactName"  EditValueChanged="cmbContactName_EditValueChanged"/>
+                            <CorasauControls:ComboBoxEditor AllowNullInput="True" AssignNullValueOnClearingEditText="True" x:Name="cmbContactName"  EditValueChanged="cmbContactName_EditValueChanged" KeyDown="cmbContactName_KeyDown"/>
                         </CorasauControls:CorasauLayoutItem>
 
                     </CorasauControls:CorasauLayoutGroup>

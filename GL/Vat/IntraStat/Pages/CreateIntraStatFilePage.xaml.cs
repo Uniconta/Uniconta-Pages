@@ -137,10 +137,10 @@ namespace UnicontaClient.Pages.CustomPage
                     WeightPerPCS.Visible = false;
                     IntraUnitPerPCS.Visible = false;
                     Date.Visible = false;
-                    DebtorRegNo.Visible = checkExport.IsChecked.Value;
-                    fDebtorRegNo.Visible = checkExport.IsChecked.Value;
-                    CountryOfOrigin.Visible = checkExport.IsChecked.Value;
-                    CountryOfOriginUNK.Visible = checkExport.IsChecked.Value;
+                    DebtorRegNo.Visible = checkExport.IsChecked.GetValueOrDefault();
+                    fDebtorRegNo.Visible = checkExport.IsChecked.GetValueOrDefault();
+                    CountryOfOrigin.Visible = checkExport.IsChecked.GetValueOrDefault();
+                    CountryOfOriginUNK.Visible = checkExport.IsChecked.GetValueOrDefault();
                     Compressed.Visible = true;
                     SystemInfo.Visible = true;
 
@@ -266,9 +266,7 @@ namespace UnicontaClient.Pages.CustomPage
                 Stream stream = null;
                 try
                 {
-#if !SILVERLIGHT
                     stream = File.Create(sfd.FileName);
-#endif
                     var cnt = ExportDataGrid(stream, (UnicontaBaseEntity[])lstIntraStat, mappedItems);
 
                     if (cnt > 0)
@@ -319,11 +317,9 @@ namespace UnicontaClient.Pages.CustomPage
                 }
             }
             int cnt = 0;
-#if !SILVERLIGHT
             var writer = new StreamWriter(stream, Encoding.Default);
             cnt = CSVHelper.ExportDataGridToExcel(stream, Headers, corasauBaseEntity, Props, spreadSheet, ".xlsx", "Intrastat");
             writer.Flush();
-#endif
             return cnt;
         }
 
@@ -497,17 +493,9 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 var countErr = intralst.Count(s => s.SystemInfo != IntraHelper.VALIDATE_OK);
                 if (countErr == 0)
-#if SILVERLIGHT
-                    UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("ValidateNoError"), Uniconta.ClientTools.Localization.lookup("Validate"), MessageBoxButton.OK);
-#else
                     UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("ValidateNoError"), Uniconta.ClientTools.Localization.lookup("Validate"), MessageBoxButton.OK, MessageBoxImage.Information);
-#endif
                 else
-#if SILVERLIGHT
-                    UnicontaMessageBox.Show(string.Format("{0} {1}", countErr, Localization.lookup("JournalFailedValidation")), Localization.lookup("Validate"), MessageBoxButton.OK);
-#else
                       UnicontaMessageBox.Show(string.Format("{0} {1}", countErr, Localization.lookup("JournalFailedValidation")), Localization.lookup("Validate"), MessageBoxButton.OK, MessageBoxImage.Warning);
-#endif
             }
 
             return intralst;
@@ -519,10 +507,10 @@ namespace UnicontaClient.Pages.CustomPage
             AccountName.Visible = true;
             Item.Visible = true;
             ItemName.Visible = true;
-            DebtorRegNo.Visible = checkExport.IsChecked.Value;
-            fDebtorRegNo.Visible = checkExport.IsChecked.Value;
-            CountryOfOrigin.Visible = checkExport.IsChecked.Value;
-            CountryOfOriginUNK.Visible = checkExport.IsChecked.Value;
+            DebtorRegNo.Visible = checkExport.IsChecked.GetValueOrDefault();
+            fDebtorRegNo.Visible = checkExport.IsChecked.GetValueOrDefault();
+            CountryOfOrigin.Visible = checkExport.IsChecked.GetValueOrDefault();
+            CountryOfOriginUNK.Visible = checkExport.IsChecked.GetValueOrDefault();
             InvoiceNumber.Visible = true;
             WeightPerPCS.Visible = true;
             IntraUnitPerPCS.Visible = true;
@@ -538,13 +526,13 @@ namespace UnicontaClient.Pages.CustomPage
             DefaultFromDate = txtDateFrm.DateTime;
             DefaultToDate = txtDateTo.DateTime;
 
-            DefaultImp = checkImport.IsChecked.Value;
-            DefaultExp = checkExport.IsChecked.Value;
+            DefaultImp = checkImport.IsChecked.GetValueOrDefault();
+            DefaultExp = checkExport.IsChecked.GetValueOrDefault();
 
             var ws = spreadSheet.Document.Worksheets[0];
             ws.Clear(ws.GetUsedRange());
 
-            GetInvoiceLinesToIntraStat(txtDateFrm.DateTime, txtDateTo.DateTime, checkImport.IsChecked.Value, checkExport.IsChecked.Value);
+            GetInvoiceLinesToIntraStat(txtDateFrm.DateTime, txtDateTo.DateTime, checkImport.IsChecked.GetValueOrDefault(), checkExport.IsChecked.GetValueOrDefault());
         }
 
         public override bool HandledOnClearFilter()

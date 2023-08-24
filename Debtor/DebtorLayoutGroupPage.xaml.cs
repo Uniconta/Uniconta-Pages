@@ -69,7 +69,7 @@ namespace UnicontaClient.Pages.CustomPage
                     object[] param = new object[2];
                     param[0] = newItem;
                     param[1] = false;
-                    AddDockItem(TabControls.DebtorLayoutGroupPage2, param, Uniconta.ClientTools.Localization.lookup("DebtorLayoutgroup"), "Add_16x16.png");
+                    AddDockItem(TabControls.DebtorLayoutGroupPage2, param, Uniconta.ClientTools.Localization.lookup("DebtorLayoutgroup"), "Add_16x16");
                     break;
                 case "EditRow":
                     if (selectedItem == null)

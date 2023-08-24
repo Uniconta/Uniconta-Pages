@@ -67,11 +67,9 @@ namespace UnicontaClient.Pages.CustomPage
         [Display(Name = "PhysicalVouchers", ResourceType = typeof(InputFieldDataText))]
         public int PhysicalVoucherRef { get; set; }
 
-#if !SILVERLIGHT
         protected override int DialogId { get { return DialogTableId; } }
         public int DialogTableId { get; set; }
         protected override bool ShowTableValueButton { get { return true; } }
-#endif
         private bool IsSendXmlSalesInvoice;
         public CWGenerateInvoice(bool showSimulation, string title, bool showInputforInvNumber, bool askForEmail, bool showInvoice, bool isShowInvoiceVisible, bool showNoEmailMsg, string debtorName,
             bool isShowUpdateInv, bool isOrderOrQuickInv, bool isQuickPrintVisible, bool isDebtorOrder, bool InvoiceInXML, bool isPageCountVisible)
@@ -238,16 +236,16 @@ namespace UnicontaClient.Pages.CustomPage
                 }
             }
 
-            SendByEmail = chkSendEmail.IsChecked.Value;
-            IsSimulation = chkSimulation.IsChecked.Value;
+            SendByEmail = chkSendEmail.IsChecked.GetValueOrDefault();
+            IsSimulation = chkSimulation.IsChecked.GetValueOrDefault();
             GenrateDate = dpDate.DateTime;
-            ShowInvoice = chkShowInvoice.IsChecked.Value;
-            UpdateInventory = chkUpdateInv.IsChecked.Value;
-            InvoiceQuickPrint = chkPrintInvoice.IsChecked.Value;
-            GenerateOIOUBLClicked = chkOIOUBL.IsChecked.Value;
+            ShowInvoice = chkShowInvoice.IsChecked.GetValueOrDefault();
+            UpdateInventory = chkUpdateInv.IsChecked.GetValueOrDefault();
+            InvoiceQuickPrint = chkPrintInvoice.IsChecked.GetValueOrDefault();
+            GenerateOIOUBLClicked = chkOIOUBL.IsChecked.GetValueOrDefault();
             Emails = (string.IsNullOrEmpty(txtEmail.Text) || string.IsNullOrWhiteSpace(txtEmail.Text)) ? null : txtEmail.Text;
-            sendOnlyToThisEmail = chkSendOnlyEmail.IsChecked.Value;
-            PostOnlyDelivered = chkPostOnlyDel.IsChecked.Value;
+            sendOnlyToThisEmail = chkSendOnlyEmail.IsChecked.GetValueOrDefault();
+            PostOnlyDelivered = chkPostOnlyDel.IsChecked.GetValueOrDefault();
             SetDialogResult(true);
         }
 

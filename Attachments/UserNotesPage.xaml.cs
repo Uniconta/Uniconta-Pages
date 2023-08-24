@@ -35,6 +35,7 @@ namespace UnicontaClient.Pages.CustomPage
             get { return typeof(UserNotesClient); }
         }
         public override IComparer GridSorting { get { return new SortNote(); } }
+        public override bool SingleBufferUpdate => false;
 
         public override bool Readonly { get { return false; } }
         public override bool AddRowOnPageDown()

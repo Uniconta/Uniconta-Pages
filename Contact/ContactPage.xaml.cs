@@ -290,7 +290,7 @@ namespace UnicontaClient.Pages.CustomPage
                     param[0] = newItem;
                     param[1] = false;
                     param[2] = dgContactGrid.masterRecord;
-                    AddDockItem(TabControls.ContactPage2, param, Uniconta.ClientTools.Localization.lookup("Contacts"), "Add_16x16.png");
+                    AddDockItem(TabControls.ContactPage2, param, Uniconta.ClientTools.Localization.lookup("Contacts"), "Add_16x16");
                     break;
                 case "EditRow":
                     if (selectedItem == null)

@@ -26,6 +26,8 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectTransBudgetPivotPage"
             <CorasauControls:LookupEditor x:Name="cmbBudgetGroup" Margin="10,0,0,0" Text="{Binding BudgetGroup,Mode=TwoWay}" VerticalAlignment="Top" />
             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ViewActualPrevYear}" VerticalAlignment="Center" Margin="10,0,0,0"/>
             <CorasauControls:CheckEditor x:Name="chkGroupPrevYear" Margin="10,0,0,0"  VerticalAlignment="Top"/>
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ViewAnchorBudget}" VerticalAlignment="Center" Margin="10,0,0,0"/>
+            <CorasauControls:CheckEditor x:Name="chkGroupAnchorBudget" Margin="10,0,0,0"  VerticalAlignment="Top"/>
             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Week}" VerticalAlignment="Center" Margin="10,0,0,0"/>
             <CorasauControls:CheckEditor x:Name="chkGroupWeek" Margin="10,0,0,0"  VerticalAlignment="Top"/>
             <TextBlock x:Name="tbGrdTtlRow" VerticalAlignment="Center" Margin="10,0,0,0"/>

@@ -93,7 +93,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void RootVisual_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.F8 && Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
-                localMenu_OnItemClicked("PrTrans");
+                ribbonControl.PerformRibbonAction("PrTrans");
         }
 
         double sumMargin, sumSales, sumMarginRatio;
@@ -198,11 +198,11 @@ namespace UnicontaClient.Pages.CustomPage
                 case "AddRow":
                     if (dgProjectGrid.masterRecords != null)
                     {
-                        AddDockItem(TabControls.ProjectPage2, new object[] { api, dgProjectGrid.masterRecord }, Uniconta.ClientTools.Localization.lookup("Project"), "Add_16x16.png");
+                        AddDockItem(TabControls.ProjectPage2, new object[] { api, dgProjectGrid.masterRecord }, Uniconta.ClientTools.Localization.lookup("Project"), "Add_16x16");
                     }
                     else
                     {
-                        AddDockItem(TabControls.ProjectPage2, api, Uniconta.ClientTools.Localization.lookup("Project"), "Add_16x16.png");
+                        AddDockItem(TabControls.ProjectPage2, api, Uniconta.ClientTools.Localization.lookup("Project"), "Add_16x16");
                     }
                     break;
                 case "EditRow":
@@ -672,7 +672,7 @@ namespace UnicontaClient.Pages.CustomPage
             var project = Activator.CreateInstance(selectedItem.GetType()) as ProjectClient;
             CorasauDataGrid.CopyAndClearRowId(selectedItem, project);
             var parms = new object[2] { project, false };
-            AddDockItem(TabControls.ProjectPage2, parms, Uniconta.ClientTools.Localization.lookup("Project"), "Add_16x16.png");
+            AddDockItem(TabControls.ProjectPage2, parms, Uniconta.ClientTools.Localization.lookup("Project"), "Add_16x16");
         }
 
         bool copyRowIsEnabled = false;

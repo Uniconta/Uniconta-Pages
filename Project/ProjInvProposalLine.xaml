@@ -96,7 +96,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjInvProposalLine"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="MarginRatio" Visible="False" Width="50" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DoInvoice" Width="50" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="QtyInvoiced" Width="80" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Currency" Width="35" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Currency" Width="35" ReadOnly="True" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CostPrice" Visible="False" />
                     <localPage:CorasauDataGridForeignKeyColumnClient x:Name="Task" Width="80" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="IsMarked" Visible="False" />

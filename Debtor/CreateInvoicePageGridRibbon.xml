@@ -2,54 +2,54 @@
 <root>
   <RibbonItem TabId="0" LocalizedNameKey="Home">
     <!---When we create a new group and a new TabPage -->
-    <RibbonItem Action="AddRow" LocalizedNameKey="AddOBJ" Parameter="Line"  LargeGlyph="Add_32x32.png"/>
-    <RibbonItem Action="AddItems" LocalizedNameKey="AddOBJ" Parameter="InventoryItems" LargeGlyph="Add_Menu_32x32.png"/>
-    <RibbonItem Action="AddVariants" LocalizedNameKey="AddOBJ" Parameter="Variants" Module="ItemVariants" LargeGlyph="GanttChart_32x32.png"/>
-    <RibbonItem Action="CopyRow" LocalizedNameKey="CopyLine" LargeGlyph="Copy_32x32.png"/>
-    <RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="Delete"  LargeGlyph="Delete_32x32.png"/>
+    <RibbonItem Action="AddRow" LocalizedNameKey="AddOBJ" Parameter="Line"  LargeGlyph="Add_32x32"/>
+    <RibbonItem Action="AddItems" LocalizedNameKey="AddOBJ" Parameter="InventoryItems" LargeGlyph="Add_Menu_32x32"/>
+    <RibbonItem Action="AddVariants" LocalizedNameKey="AddOBJ" Parameter="Variants" Module="ItemVariants" LargeGlyph="GanttChart_32x32"/>
+    <RibbonItem Action="CopyRow" LocalizedNameKey="CopyLine" LargeGlyph="Copy_32x32"/>
+    <RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="Delete"  LargeGlyph="Delete_32x32"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32.png">
-      <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" />
-      <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16.png" ShortcutKey="" />
-      <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" Glyph="save-16x16.png" />
-      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteOBJ" Parameter="Layout" Glyph="Delete_16x16.png" />
-      <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16.png" />
-      <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportLayout" EnableSeperator="True" Glyph="ExportLayout_16x16.png" />
-      <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportLayout" Glyph="Import_16x16.png" />
-      <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16.png" />
-      <RibbonItem Action="FieldSetting" LocalizedNameKey="FieldSetting" Glyph="Setup_16x16.png" />
+    <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32">
+      <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16" />
+      <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16" ShortcutKey="" />
+      <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" Glyph="save-16x16" />
+      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteOBJ" Parameter="Layout" Glyph="Delete_16x16" />
+      <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16" />
+      <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportLayout" EnableSeperator="True" Glyph="ExportLayout_16x16" />
+      <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportLayout" Glyph="Import_16x16" />
+      <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16" />
+      <RibbonItem Action="FieldSetting" LocalizedNameKey="FieldSetting" Glyph="Setup_16x16" />
     </RibbonItem>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem LocalizedNameKey="ShowInvoice" Action="ShowInvoice" LargeGlyph="Show_Invoice_32x32.png" ShortcutKey="F7" />
-    <RibbonItem LocalizedNameKey="GenerateInvoice" Action="GenerateInvoice" LargeGlyph="Generate_32x32.png" ShortcutKey="Ctrl+M" />
-    <RibbonItem Action="Storage" LocalizedNameKey="OnHand" Module="Storage" LargeGlyph="Storage_32x32.png"/>
-    <RibbonItem Action="StockLines" LocalizedNameKey="InvTransactions" LargeGlyph="Inventory_Trans_32x32.png"/>
+    <RibbonItem LocalizedNameKey="ShowInvoice" Action="ShowInvoice" LargeGlyph="Show_Invoice_32x32" ShortcutKey="F7" />
+    <RibbonItem LocalizedNameKey="GenerateInvoice" Action="GenerateInvoice" LargeGlyph="Generate_32x32" ShortcutKey="Ctrl+M" />
+    <RibbonItem Action="Storage" LocalizedNameKey="OnHand" Module="Storage" LargeGlyph="Storage_32x32"/>
+    <RibbonItem Action="StockLines" LocalizedNameKey="InvTransactions" LargeGlyph="Inventory_Trans_32x32"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem LocalizedNameKey="PhysicalVoucher"  LargeGlyph="View_Voucher_32x32.png" >
-      <RibbonItem Action="ShowVoucher"   LocalizedNameKey="View" Glyph="View_16x16.png"  ShortcutKey="Alt+V"/>
-      <RibbonItem Action="RefVoucher" LocalizedNameKey="Attach" Glyph="Attachments_16x16.png"  ShortcutKey="Ctrl+T"/>
-      <RibbonItem Action="ImportVoucher" LocalizedNameKey="ImportFile" Glyph="Add_16x16.png"  ShortcutKey="Ctrl+J"/>
-      <RibbonItem Action="RemoveVoucher" LocalizedNameKey="Remove" Glyph="Delete_16x16.png"  ShortcutKey="Ctrl+I"/>
+    <RibbonItem LocalizedNameKey="PhysicalVoucher"  LargeGlyph="View_Voucher_32x32" >
+      <RibbonItem Action="ShowVoucher"   LocalizedNameKey="View" Glyph="View_16x16"  ShortcutKey="Alt+V"/>
+      <RibbonItem Action="RefVoucher" LocalizedNameKey="Attach" Glyph="Attachments_16x16"  ShortcutKey="Ctrl+T"/>
+      <RibbonItem Action="ImportVoucher" LocalizedNameKey="ImportFile" Glyph="Add_16x16"  ShortcutKey="Ctrl+J"/>
+      <RibbonItem Action="RemoveVoucher" LocalizedNameKey="Remove" Glyph="Delete_16x16"  ShortcutKey="Ctrl+I"/>
     </RibbonItem>
-    <RibbonItem Action="AttachDoc" LocalizedNameKey="AttachOBJ" Parameter="Documents" LargeGlyph="Attachments_32x32.png"/>
+    <RibbonItem Action="AttachDoc" LocalizedNameKey="AttachOBJ" Parameter="Documents" LargeGlyph="Attachments_32x32"/>
   </RibbonItem>
 
   <RibbonItem>
-    <RibbonItem Action="LoadOrderTemplate" LocalizedNameKey="FormTemplates"  LargeGlyph="Layout_32x32.png" Module="Order"/>
-    <RibbonItem Action="LoadOrderLineTemplate" LocalizedNameKey="TemplateLines"  LargeGlyph="Order_Lines_Highlighted_32x32.png" >
-      <RibbonItem Action="LoadLinesTemplate" LocalizedNameKey="Load" Glyph="Edit_16x16.png"  ShortcutKey="ALT+L"/>
-      <RibbonItem Action="SaveTemplate" LocalizedNameKey="SaveAs" Glyph="save-16x16.png" />
-      <RibbonItem Action="DeleteTemplate" LocalizedNameKey="Delete" Glyph="Delete_16x16.png" />
+    <RibbonItem Action="LoadOrderTemplate" LocalizedNameKey="FormTemplates"  LargeGlyph="Layout_32x32" Module="Order"/>
+    <RibbonItem Action="LoadOrderLineTemplate" LocalizedNameKey="TemplateLines"  LargeGlyph="Order_Lines_Highlighted_32x32" >
+      <RibbonItem Action="LoadLinesTemplate" LocalizedNameKey="Load" Glyph="Edit_16x16"  ShortcutKey="ALT+L"/>
+      <RibbonItem Action="SaveTemplate" LocalizedNameKey="SaveAs" Glyph="save-16x16" />
+      <RibbonItem Action="DeleteTemplate" LocalizedNameKey="Delete" Glyph="Delete_16x16" />
     </RibbonItem>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="CreateFromInvoice" LocalizedNameKey="CopyOBJ" Parameter="Invoice"  LargeGlyph="Orders_32x32.png" />
+    <RibbonItem Action="CreateFromInvoice" LocalizedNameKey="CopyOBJ" Parameter="Invoice"  LargeGlyph="Orders_32x32" />
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="InsertSubTotal" LocalizedNameKey="InsertSubTotal" Parameter="Line"  LargeGlyph="Add_32x32.png"/>
+    <RibbonItem Action="InsertSubTotal" LocalizedNameKey="InsertSubTotal" Parameter="Line"  LargeGlyph="Add_32x32"/>
   </RibbonItem>
   <RibbonItem>
     <RibbonItem LocalizedNameKey="Amount" StatusValue=""></RibbonItem>

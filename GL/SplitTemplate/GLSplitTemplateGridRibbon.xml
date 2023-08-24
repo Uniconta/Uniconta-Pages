@@ -2,23 +2,23 @@
 <root>
   <RibbonItem TabId="0" LocalizedNameKey="Home">
     <!---When we create a new group and a new TabPage -->
-    <RibbonItem Action="AddRow" LocalizedNameKey="Add" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png"/>
-    <RibbonItem Action="EditRow" ShortcutKey="Ctrl+E" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>
+    <RibbonItem Action="AddRow" LocalizedNameKey="Add" Glyph="Add_16x16" LargeGlyph="Add_32x32"/>
+    <RibbonItem Action="EditRow" ShortcutKey="Ctrl+E" LocalizedNameKey="Edit" Glyph="Edit_16x16" LargeGlyph="Edit_32x32"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="SplitLine" LocalizedNameKey="SplitLines" LargeGlyph="Journal_Lines_Highlighted_32x32.png" ShortcutKey="ALT+L"/>
-    <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh.png" LargeGlyph="refresh.png"/>
+    <RibbonItem Action="SplitLine" LocalizedNameKey="SplitLines" LargeGlyph="Journal_Lines_Highlighted_32x32" ShortcutKey="ALT+L"/>
+    <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh" LargeGlyph="refresh"/>
   </RibbonItem>
   <RibbonItem>   
     <!---If we want to create a new group in same PageTab-->
-    <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32.png">
+    <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32">
       <!---If we want Inner menu-->
-      <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>
-      <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" Glyph="save-16x16.png" LargeGlyph="save-32x32.png"/>
-      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png"/>
-     <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportLayout" EnableSeperator="True" Glyph="ExportLayout_16x16.png" LargeGlyph="ExportLayout_16x16.png"/>
-     <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportLayout" Glyph="Import_16x16.png" LargeGlyph="Import_16x16.png"/>
-    <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16.png" />
+      <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16" LargeGlyph="Edit_32x32"/>
+      <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" Glyph="save-16x16" LargeGlyph="save-32x32"/>
+      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16" LargeGlyph="Delete_32x32"/>
+     <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportLayout" EnableSeperator="True" Glyph="ExportLayout_16x16" LargeGlyph="ExportLayout_16x16"/>
+     <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportLayout" Glyph="Import_16x16" LargeGlyph="Import_16x16"/>
+    <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16" />
 </RibbonItem>
   </RibbonItem>  
 </root>

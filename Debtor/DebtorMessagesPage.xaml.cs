@@ -47,7 +47,7 @@ namespace UnicontaClient.Pages.CustomPage
             switch (ActionType)
             {
                 case "AddRow":
-                    AddDockItem(TabControls.DebtorMessagesPage2, api, Uniconta.ClientTools.Localization.lookup("Message"), "Add_16x16.png");
+                    AddDockItem(TabControls.DebtorMessagesPage2, api, Uniconta.ClientTools.Localization.lookup("Message"), "Add_16x16");
                     break;
 
                 case "CopyRow":
@@ -56,7 +56,7 @@ namespace UnicontaClient.Pages.CustomPage
                     object[] copyParam = new object[2];
                     copyParam[0] = StreamingManager.Clone(selectedItem);
                     copyParam[1] = false;
-                    AddDockItem(TabControls.DebtorMessagesPage2, copyParam, string.Format("{0}: {1}", string.Format(Uniconta.ClientTools.Localization.lookup("CopyOBJ"), Uniconta.ClientTools.Localization.lookup("Message")), selectedItem._Name), "Copy_16x16.png");
+                    AddDockItem(TabControls.DebtorMessagesPage2, copyParam, string.Format("{0}: {1}", string.Format(Uniconta.ClientTools.Localization.lookup("CopyOBJ"), Uniconta.ClientTools.Localization.lookup("Message")), selectedItem._Name), "Copy_16x16");
                     break;
 
                 case "EditRow":
@@ -65,7 +65,7 @@ namespace UnicontaClient.Pages.CustomPage
                     object[] editParam = new object[2];
                     editParam[0] = selectedItem;
                     editParam[1] = true;
-                    AddDockItem(TabControls.DebtorMessagesPage2, editParam, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Message"), selectedItem._Name), "Edit_16x16.png");
+                    AddDockItem(TabControls.DebtorMessagesPage2, editParam, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Message"), selectedItem._Name), "Edit_16x16");
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);

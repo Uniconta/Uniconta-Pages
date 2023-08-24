@@ -57,7 +57,7 @@ namespace UnicontaClient.Pages.CustomPage
             switch (ActionType)
             {
                 case "AddRow":
-                    AddDockItem(TabControls.ProdCatalogPage2, api, Uniconta.ClientTools.Localization.lookup("ProdCatalog"), "Add_16x16.png");
+                    AddDockItem(TabControls.ProdCatalogPage2, api, Uniconta.ClientTools.Localization.lookup("ProdCatalog"), "Add_16x16");
                     break;
                 case "EditRow":
                     if (selectedItem == null) return;
@@ -65,7 +65,7 @@ namespace UnicontaClient.Pages.CustomPage
                     object[] EditParam = new object[2];
                     EditParam[0] = selectedItem;
                     EditParam[1] = true;
-                    AddDockItem(TabControls.ProdCatalogPage2, EditParam, header, "Edit_16x16.png");
+                    AddDockItem(TabControls.ProdCatalogPage2, EditParam, header, "Edit_16x16");
                     break;
                 case "CopyRow":
                     if (selectedItem == null) return;

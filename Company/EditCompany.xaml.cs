@@ -80,6 +80,8 @@ namespace UnicontaClient.Pages.CustomPage
                 country != CountryCode.Norway)
                 liPymtCodeOpt.Visibility = Visibility.Collapsed;
 
+            RemoveMenuItem();
+
             if (!Enum.IsDefined(typeof(PeppolSupportedCountries), (byte)country))
             {
                 liPymtCodeOpt.Visibility = Visibility.Collapsed;
@@ -271,10 +273,25 @@ namespace UnicontaClient.Pages.CustomPage
                 case "AllowedIPAdresses":
                     AddDockItem(TabControls.CompanyIPRestrictionPage, editrow, string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("AllowedIPAdresses"), editrow._Name));
                     break;
+                case "RegisterEdelivery":
+                    Utility.OpenWebSite("https://www.uniconta.com/da/moduler/modtag-e-faktura-med-nemhandel/tilmelding/");
+                    break;
                 default:
                     frmRibbon_BaseActions(ActionType);
                     globalEvents.OnRefresh(TabControls.CreateCompany, editrow.CompanyId);
                     break;
+            }
+        }
+
+        void RemoveMenuItem()
+        {
+            var country = api.CompanyEntity._CountryId;
+            if (country != CountryCode.Denmark &&
+                country != CountryCode.Greenland &&
+                country != CountryCode.FaroeIslands)
+            {
+                RibbonBase rb = (RibbonBase)frmRibbon.DataContext;
+                UtilDisplay.RemoveMenuCommand(rb, "RegisterEdelivery");
             }
         }
 

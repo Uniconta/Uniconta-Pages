@@ -52,7 +52,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
         void dgClosingSheet_RowDoubleClick()
         {
-            localMenu_OnItemClicked("Accounts");
+            ribbonControl.PerformRibbonAction("Accounts");
         }
         private void Name_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -72,7 +72,7 @@ namespace UnicontaClient.Pages.CustomPage
             switch (ActionType)
             {
                 case "AddRow":
-                    AddDockItem(TabControls.ClosingSheetPage2, api, Uniconta.ClientTools.Localization.lookup("ClosingSheet"), "Add_16x16.png");
+                    AddDockItem(TabControls.ClosingSheetPage2, api, Uniconta.ClientTools.Localization.lookup("ClosingSheet"), "Add_16x16");
                     break;
                 case "EditRow":
                     if (selectedItem == null)

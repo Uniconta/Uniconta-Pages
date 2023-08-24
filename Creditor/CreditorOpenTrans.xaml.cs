@@ -53,8 +53,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
         void SetHeader()
         {
-            string header = string.Format("{0}/{1}", Uniconta.ClientTools.Localization.lookup("OpenTrans"), BasePage.SetTableHeader(dgCreditorTranOpenGrid.masterRecord));
-            SetHeader(header);
+            SetHeader(string.Concat(Uniconta.ClientTools.Localization.lookup("OpenTrans"), "/", BasePage.SetTableHeader(dgCreditorTranOpenGrid.masterRecord)));
         }
         public CreditorOpenTrans(UnicontaBaseEntity master)
             : base(master)
@@ -139,7 +138,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "EditRow":
                     if (selectedItem == null)
                         return;
-                    AddDockItem(TabControls.CreditorTranOpenPage2, selectedItem, Uniconta.ClientTools.Localization.lookup("AmountToPay"), "Edit_16x16.png");
+                    AddDockItem(TabControls.CreditorTranOpenPage2, selectedItem, Uniconta.ClientTools.Localization.lookup("AmountToPay"), "Edit_16x16");
                     break;
                 case "SettleTran":
                     Settle();
@@ -159,7 +158,10 @@ namespace UnicontaClient.Pages.CustomPage
                     saveGrid();
                     break;
                 case "ReopenAll":
-                    ReOpenAllTrans();
+                    ReOpenAllTrans(true);
+                    break;
+                case "ReopenCheck":
+                    ReOpenAllTrans(false);
                     break;
                 case "AutoSettlement":
                     AutoSettlementTrans();
@@ -177,7 +179,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        private void ReOpenAllTrans()
+        private void ReOpenAllTrans(bool LeaveAllOpen)
         {
             CWConfirmationBox dialog = new CWConfirmationBox(Uniconta.ClientTools.Localization.lookup("AreYouSureToContinue"), Uniconta.ClientTools.Localization.lookup("Confirmation"), false);
             dialog.Closing += async delegate
@@ -189,7 +191,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (masterAccount != null)
                     {
                         busyIndicator.IsBusy = true;
-                        var errorCodes = await transApi.ReOpenAll(masterAccount, true);
+                        var errorCodes = await transApi.ReOpenAll(masterAccount, true, LeaveAllOpen);
                         busyIndicator.IsBusy = false;
                         UtilDisplay.ShowErrorCode(errorCodes);
                         if (errorCodes == ErrorCodes.Succes)
@@ -264,7 +266,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (transOpenMaster != null)
             {
                 payment = transOpenMaster.AmountOpen;
-                paymentCur = transOpenMaster.AmountOpenCur.HasValue ? transOpenMaster.AmountOpenCur.Value : 0d;
+                paymentCur = transOpenMaster.AmountOpenCur.GetValueOrDefault();
                 if ((settles != null && settles.Count != 0))
                 {
                     invoice = settles.Sum(s => s.AmountOpen);
@@ -286,11 +288,11 @@ namespace UnicontaClient.Pages.CustomPage
                         grp.StatusValue = invoice != 0d ? (payment + invoice).ToString("N2") : string.Empty;
 
                     if (grp.Caption == Uniconta.ClientTools.Localization.lookup("PaymentCurrency"))
-                        grp.StatusValue = paymentCur.HasValue ? paymentCur.Value.ToString("N2") : null;
+                        grp.StatusValue = paymentCur.HasValue ? paymentCur.GetValueOrDefault().ToString("N2") : null;
                     else if (grp.Caption == Uniconta.ClientTools.Localization.lookup("InvoiceCurrency"))
-                        grp.StatusValue = invoiceCur != 0d ? invoiceCur.Value.ToString("N2") : string.Empty;
+                        grp.StatusValue = invoiceCur != 0d ? invoiceCur.GetValueOrDefault().ToString("N2") : string.Empty;
                     else if (grp.Caption == Uniconta.ClientTools.Localization.lookup("TotalCur"))
-                        grp.StatusValue = invoiceCur != 0d ? (paymentCur + invoiceCur).Value.ToString("N2") : string.Empty;
+                        grp.StatusValue = invoiceCur != 0d ? (paymentCur.GetValueOrDefault() + invoiceCur.GetValueOrDefault()).ToString("N2") : string.Empty;
                 }
             }
         }

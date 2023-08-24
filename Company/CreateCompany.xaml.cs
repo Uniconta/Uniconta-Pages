@@ -528,11 +528,11 @@ namespace UnicontaClient.Pages.CustomPage
                 path = txtImportFromFile.Text;
             else
                 path = txtImportFromDirectory.Text;
-            set0InAccount = chkSet0InAct.IsChecked.Value;
-            set0InCustAcc = chkSet0InCustAcc.IsChecked.Value;
-            set0InVendAcc = chkSet0InVendAcc.IsChecked.Value;
-            concatC5ItemNames = chkConcatC5ItemNames.IsChecked.Value;
-            includeVatInPrices = chkInvoiceVatPriceCheck.IsChecked.Value;
+            set0InAccount = chkSet0InAct.IsChecked.GetValueOrDefault();
+            set0InCustAcc = chkSet0InCustAcc.IsChecked.GetValueOrDefault();
+            set0InVendAcc = chkSet0InVendAcc.IsChecked.GetValueOrDefault();
+            concatC5ItemNames = chkConcatC5ItemNames.IsChecked.GetValueOrDefault();
+            includeVatInPrices = chkInvoiceVatPriceCheck.IsChecked.GetValueOrDefault();
             importDim = cmbImportDimension.SelectedIndex;
             switch ((ImportFrom)importFrom)
             {
@@ -646,11 +646,11 @@ namespace UnicontaClient.Pages.CustomPage
                     compParams[6] = cmbInvoiceOrContactMail.SelectedIndex == 0;
                     compParams[7] = txtNavErrorAccount.Text;
                     compParams[8] = includeVatInPrices;
-                    compParams[9] = chkLedgerTransactions.IsChecked.Value;
-                    compParams[10] = chkDebtorTransactions.IsChecked.Value;
-                    compParams[11] = chkCreditorTransactions.IsChecked.Value;
+                    compParams[9] = chkLedgerTransactions.IsChecked.GetValueOrDefault();
+                    compParams[10] = chkDebtorTransactions.IsChecked.GetValueOrDefault();
+                    compParams[11] = chkCreditorTransactions.IsChecked.GetValueOrDefault();
                     compParams[12] = txtAccountForPrimo.Text;
-                    compParams[13] = chkImportInvoice.IsChecked.Value;
+                    compParams[13] = chkImportInvoice.IsChecked.GetValueOrDefault();
                     compParams[14] = set0InCustAcc;
                     compParams[15] = set0InVendAcc;
                     compParams[16] = concatC5ItemNames;
@@ -812,12 +812,7 @@ namespace UnicontaClient.Pages.CustomPage
                 CompanyInfo ci = null;
                 try
                 {
-#if !SILVERLIGHT
                     ci = await CVR.CheckCountry(cvr, editrow.Country);
-#else
-                    var lookupApi = new Uniconta.API.System.UtilityAPI(api);
-                    ci = await lookupApi.LookupCVR(cvr, editrow.Country);
-#endif
                 }
                 catch (Exception ex)
                 {
@@ -954,7 +949,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void ChkLedgerTransactions_OnChecked(object sender, RoutedEventArgs e)
         {
-            if (chkLedgerTransactions.IsChecked.Value)
+            if (chkLedgerTransactions.IsChecked.GetValueOrDefault())
             {
                 chkLedgerTransactions.IsChecked = true;
 
@@ -972,7 +967,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void ChkLedgerTransactions_OnUnchecked(object sender, RoutedEventArgs e)
         {
-            if (!chkLedgerTransactions.IsChecked.Value)
+            if (!chkLedgerTransactions.IsChecked.GetValueOrDefault())
             {
                 chkLedgerTransactions.IsChecked = false;
 

@@ -96,11 +96,9 @@ namespace UnicontaClient.Pages.CustomPage
                 frmRibbon.DisableButtons("Delete");
             }
 
-#if !SILVERLIGHT
             browseControl.CompressVisibility = Visibility.Visible;
             liDocumentType.Visibility = isFieldsAvailableForEdit ? Visibility.Visible : Visibility.Collapsed;
             txtUrl.LostFocus += txtUrl_LostFocus;
-#endif
         }
 
         private void frmRibbon_OnItemClicked(string ActionType)
@@ -113,11 +111,7 @@ namespace UnicontaClient.Pages.CustomPage
                 }
                 else
                 {
-#if !SILVERLIGHT
                     if (!string.IsNullOrEmpty(browseControl?.FileName) && !(bool)chkIncludeOnlyReference.IsChecked)
-#else
-                    if (!string.IsNullOrEmpty(browseControl?.FileName))
-#endif
                     {
                         int indexOfExtention = browseControl.FileName.IndexOf('.');
                         userDocsClientRow.DocumentType = DocumentConvert.GetDocumentType(browseControl.FileExtension);
@@ -133,7 +127,6 @@ namespace UnicontaClient.Pages.CustomPage
                         if (!isFileExtManualSet)
                         {
                             var url = userDocsClientRow._Url;
-#if !SILVERLIGHT
                             if (url.StartsWith("http", StringComparison.OrdinalIgnoreCase) || url.StartsWith("www", StringComparison.OrdinalIgnoreCase))
                             {
                                 int idxExtension = url.LastIndexOf('.');
@@ -141,7 +134,6 @@ namespace UnicontaClient.Pages.CustomPage
                                 fileExt = ext != FileextensionsTypes.UNK ? ext : FileextensionsTypes.WWW;
                             }
                             else
-#endif
                             if (!Utility.TryParseUrl(url, isFieldsAvailableForEdit, ref fileName, ref fileExt)) return;
                         }
                         /* only updating if different */
@@ -152,9 +144,7 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                     else
                         userDocsClientRow.Text = txedUserDocNotes.Text;
-#if !SILVERLIGHT
                     txtUrl.LostFocus -= txtUrl_LostFocus;
-#endif
                     saveForm();
                 }
             }
@@ -192,7 +182,6 @@ namespace UnicontaClient.Pages.CustomPage
         {
             globalEvents.OnRefresh(NameOfControl, RefreshParams);
         }
-#if !SILVERLIGHT
         string browseUrl;
         private void browseControl_FileSelected()
         {
@@ -210,7 +199,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void chkIncludeOnlyReference_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
         {
-            browseControl.CheckMaxSize = !chkIncludeOnlyReference.IsChecked.Value;
+            browseControl.CheckMaxSize = !chkIncludeOnlyReference.IsChecked.GetValueOrDefault();
             if (chkIncludeOnlyReference.IsChecked == true)
                 browseControl_FileSelected();
             else
@@ -242,6 +231,5 @@ namespace UnicontaClient.Pages.CustomPage
                 }
             }
         }
-#endif
     }
 }

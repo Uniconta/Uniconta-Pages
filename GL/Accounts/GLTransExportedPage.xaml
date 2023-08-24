@@ -27,6 +27,12 @@ x:Class="UnicontaClient.Pages.CustomPage.GLTransExportedPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="Exported" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="LastSupplement" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Comment" Width="150"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="AccessToken" Width="150" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="IdentityToken" Width="150" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="RefreshToken" Width="150" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="SendToDatevStatus" Width="150" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="TokenValidTo" Width="100" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DatevService" Width="150" Visible="False"/>
                 </local:GLTransExportedPageGrid.Columns>
             </local:GLTransExportedPageGrid>
         </CorasauControls:BusyIndicator>

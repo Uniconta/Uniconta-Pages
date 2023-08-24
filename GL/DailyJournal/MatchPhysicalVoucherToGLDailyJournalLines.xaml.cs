@@ -50,18 +50,11 @@ namespace UnicontaClient.Pages.CustomPage
             masterRecord = master as GLDailyJournalClient;
             dgGldailyJournalLinesGrid._AutoSave = masterRecord._AutoSave;
             dgGldailyJournalLinesGrid.tableView.ShowGroupPanel = false;
-            if (!api.CompanyEntity._UseVatOperation)
-#if !SILVERLIGHT
+            var Comp = api.CompanyEntity;
+            if (!Comp._UseVatOperation)
                 VatOperation.Visible = VatOffsetOperation.Visible = false;
-#else
-                VatOperation.Visibility = VatOffsetOperation.Visibility = Visibility.Collapsed;
-#endif
             if (!masterRecord._TwoVatCodes)
-#if !SILVERLIGHT
                 OffsetVat.Visible = VatOffsetOperation.Visible = false;
-#else
-                OffsetVat.Visibility = VatOffsetOperation.Visibility = Visibility.Collapsed;
-#endif
             SetRibbonControl(localMenu, dgGldailyJournalLinesGrid);
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgvoucherGrid.RowDoubleClick += dgvoucherGrid_RowDoubleClick;
@@ -69,13 +62,42 @@ namespace UnicontaClient.Pages.CustomPage
             dgGldailyJournalLinesGrid.SelectedItemChanged += DgGldailyJournalLinesGrid_SelectedItemChanged;
             dgGldailyJournalLinesGrid.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;
             GetMenuItem();
-            var Comp = api.CompanyEntity;
             LedgerCache = Comp.GetCache(typeof(Uniconta.DataModel.GLAccount));
             DebtorCache = Comp.GetCache(typeof(Uniconta.DataModel.Debtor));
             CreditorCache = Comp.GetCache(typeof(Uniconta.DataModel.Creditor));
             localMenu.OnChecked += LocalMenu_OnChecked;
             orient = api.session.Preference.BankStatementHorisontal ? Orientation.Horizontal : Orientation.Vertical;
             lGroup.Orientation = orient;
+            if (!Comp._HasWithholding)
+                Withholding.Visible = Withholding.ShowInColumnChooser = false;
+            else
+                Withholding.ShowInColumnChooser = true;
+            if (!Comp.Project)
+            {
+                colWorkSpace.Visible = colPrCategory.ShowInColumnChooser = false;
+                colPrCategory.Visible = colPrCategory.ShowInColumnChooser = false;
+                colProject.Visible = colProject.ShowInColumnChooser = false;
+                colProjectText.Visible = colProjectText.ShowInColumnChooser = false;
+                colEmployee.Visible = colEmployee.ShowInColumnChooser = false;
+                colEmployeeName.Visible = colEmployeeName.ShowInColumnChooser = false;
+            }
+            else
+            {
+                colWorkSpace.ShowInColumnChooser = true;
+                colPrCategory.ShowInColumnChooser = true;
+                colProject.ShowInColumnChooser = true;
+                colProjectText.ShowInColumnChooser = true;
+                colEmployee.ShowInColumnChooser = true;
+                colEmployeeName.ShowInColumnChooser = true;
+            }
+
+            if (!Comp.ProjectTask)
+            {
+                Task.Visible = false;
+                Task.ShowInColumnChooser = false;
+            }
+            else
+                Task.ShowInColumnChooser = true;
         }
 
         private void DgvoucherGrid_SelectedItemChanged(object sender, DevExpress.Xpf.Grid.SelectedItemChangedEventArgs e)
@@ -132,7 +154,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
             }
         }
-        SQLCache LedgerCache, DebtorCache, CreditorCache;
+        SQLCache LedgerCache, DebtorCache, CreditorCache, ProjectCache;
         SQLCache GetCache(byte AccountType)
         {
             switch (AccountType)
@@ -261,6 +283,7 @@ namespace UnicontaClient.Pages.CustomPage
         protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             var api = this.api;
+            var Comp = api.CompanyEntity;
             if (DebtorCache == null)
                 DebtorCache = await api.LoadCache(typeof(Uniconta.DataModel.Debtor)).ConfigureAwait(false);
             if (CreditorCache == null)
@@ -279,6 +302,9 @@ namespace UnicontaClient.Pages.CustomPage
                 if (rec == null)
                     header._OffsetAccount = null;
             }
+            if (Comp.ProjectTask)
+                ProjectCache = Comp.GetCache(typeof(Uniconta.DataModel.Project)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Project)).ConfigureAwait(false);
+
         }
 
         void GetMenuItem()
@@ -307,7 +333,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         void dgvoucherGrid_RowDoubleClick()
         {
-            localMenu_OnItemClicked("Attach");
+            ribbonControl.PerformRibbonAction("Attach");
         }
 
         async void SaveAndRefresh(bool isAttached, GLDailyJournalLineClient jour, VouchersClientLocal voucher)
@@ -470,13 +496,13 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 Unlinked(true);
                 ibase.Caption = Uniconta.ClientTools.Localization.lookup("All");
-                ibase.LargeGlyph = Utilities.Utility.GetGlyph("Account-statement_32x32.png");
+                ibase.LargeGlyph = Utilities.Utility.GetGlyph("Account-statement_32x32");
             }
             else if (ibase.Caption == Uniconta.ClientTools.Localization.lookup("All"))
             {
                 Unlinked(false);
                 ibase.Caption = Uniconta.ClientTools.Localization.lookup("Unlinked");
-                ibase.LargeGlyph = Utilities.Utility.GetGlyph("Check_Journal_32x32.png");
+                ibase.LargeGlyph = Utilities.Utility.GetGlyph("Check_Journal_32x32");
             }
         }
 
@@ -550,6 +576,37 @@ namespace UnicontaClient.Pages.CustomPage
         public override string NameOfControl
         {
             get { return TabControls.MatchPhysicalVoucherToGLDailyJournalLines; }
+        }
+
+        CorasauGridLookupEditorClient prevTask;
+        private void Task_GotFocus(object sender, RoutedEventArgs e)
+        {
+            var selectedItem = dgGldailyJournalLinesGrid.SelectedItem as JournalLineGridClient;
+            var selected = (ProjectClient)ProjectCache?.Get(selectedItem?._Project);
+            if (selected != null)
+            {
+                setTask(selected, selectedItem);
+                if (prevTask != null)
+                    prevTask.isValidate = false;
+                var editor = (CorasauGridLookupEditorClient)sender;
+                prevTask = editor;
+                editor.isValidate = true;
+            }
+        }
+
+        async void setTask(ProjectClient project, JournalLineGridClient rec)
+        {
+            if (api.CompanyEntity.ProjectTask)
+            {
+                if (project != null)
+                    rec.taskSource = project.Tasks ?? await project.LoadTasks(api);
+                else
+                {
+                    rec.taskSource = null;
+                    rec.Task = null;
+                }
+                rec.NotifyPropertyChanged("TaskSource");
+            }
         }
     }
 

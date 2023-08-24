@@ -133,23 +133,23 @@ namespace UnicontaClient.Pages.CustomPage
 
         [Display(Name = "Variant1Name", ResourceType = typeof(InvVariantClientsText))]
         [NoSQL]
-        public string Variant1Name { get { return ClientHelper.GetNameKey(CompanyId, typeof(InvVariant1), _Variant1); } }
+        public string Variant1Name { get { return ClientHelper.GetName(CompanyId, typeof(InvVariant1), _Variant1); } }
 
         [Display(Name = "Variant2Name", ResourceType = typeof(InvVariantClientsText))]
         [NoSQL]
-        public string Variant2Name { get { return ClientHelper.GetNameKey(CompanyId, typeof(InvVariant2), _Variant2); } }
+        public string Variant2Name { get { return ClientHelper.GetName(CompanyId, typeof(InvVariant2), _Variant2); } }
 
         [Display(Name = "Variant3Name", ResourceType = typeof(InvVariantClientsText))]
         [NoSQL]
-        public string Variant3Name { get { return ClientHelper.GetNameKey(CompanyId, typeof(InvVariant3), _Variant3); } }
+        public string Variant3Name { get { return ClientHelper.GetName(CompanyId, typeof(InvVariant3), _Variant3); } }
 
         [Display(Name = "Variant4Name", ResourceType = typeof(InvVariantClientsText))]
         [NoSQL]
-        public string Variant4Name { get { return ClientHelper.GetNameKey(CompanyId, typeof(InvVariant4), _Variant4); } }
+        public string Variant4Name { get { return ClientHelper.GetName(CompanyId, typeof(InvVariant4), _Variant4); } }
 
         [Display(Name = "Variant5Name", ResourceType = typeof(InvVariantClientsText))]
         [NoSQL]
-        public string Variant5Name { get { return ClientHelper.GetNameKey(CompanyId, typeof(InvVariant5), _Variant5); } }
+        public string Variant5Name { get { return ClientHelper.GetName(CompanyId, typeof(InvVariant5), _Variant5); } }
 
         public string _Project;
         [ForeignKeyAttribute(ForeignKeyTable = typeof(Uniconta.DataModel.Project))]

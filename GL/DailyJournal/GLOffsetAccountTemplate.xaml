@@ -67,7 +67,7 @@ x:Class="UnicontaClient.Pages.CustomPage.GLOffsetAccountTemplate"
                     <local:CorasauDataGridTemplateColumnClient x:Name="Amount" Width="100" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Debit" Width="90"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Credit" Width="90"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Currency" Width="35" />
+                    <local:ComboBoxColumnClient x:Name="Currency" Width="35" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Pct" Width="50"/>
                     <local:CorasauDataGridForeignKeyColumnClient x:Name="Vat" Width="60">
                         <local:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
@@ -82,6 +82,7 @@ x:Class="UnicontaClient.Pages.CustomPage.GLOffsetAccountTemplate"
                         </local:CorasauDataGridForeignKeyColumnClient.CellTemplate>
                     </local:CorasauDataGridForeignKeyColumnClient>
 
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Invoice" Width="100"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Project" Width="80"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Width="80"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="WorkSpace" Width="80"/>

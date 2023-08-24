@@ -3,14 +3,11 @@ xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
 x:Class="UnicontaClient.Pages.CustomPage.EditCompany"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d" xmlns:CientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
     xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools" 
     xmlns:dxinteraction="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
     xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors"
-    xmlns:enumType ="clr-namespace:Uniconta.Common;assembly=Uniconta.WindowsAPI"
-    d:DesignHeight="300" d:DesignWidth="400">
+    xmlns:enumType ="clr-namespace:Uniconta.Common;assembly=Uniconta.WindowsAPI">
     <CorasauControls:BusyIndicator x:Name="busyIndicator" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
         <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
             <Grid.RowDefinitions>
@@ -94,7 +91,7 @@ x:Class="UnicontaClient.Pages.CustomPage.EditCompany"
                         <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Accountant}" x:Name="accountantItem" Style="{StaticResource LayoutItemsstyle}">
                             <CorasauControls:TextEditor x:Name="txtaccountant" IsReadOnly="True"/>
                             <CorasauControls:CorasauLayoutItem.ButtonContent>
-                                <Image Source="/UnicontaPages;component/Assets/img/Right_Arrow_16x16.png" Width="12"/>
+                                <Image Source="{dx:SvgImageSource Uri=/UnicontaPages;component/Assets/img/Right_Arrow_16x16.svg, UsePalette=True}" Height="16" dx:WpfSvgPalette.Palette="{StaticResource SVGIconPallete}"/>
                             </CorasauControls:CorasauLayoutItem.ButtonContent>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="ResellerAccess">

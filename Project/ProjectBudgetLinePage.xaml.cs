@@ -153,8 +153,8 @@ namespace UnicontaClient.Pages.CustomPage
     {
         public override string NameOfControl { get { return TabControls.ProjectBudgetLinePage; } }
         SQLCache ProjectCache, EmployeeCache, ItemCache, PayrollCache;
-        int PriceGrp;
         UnicontaBaseEntity _master;
+        Uniconta.API.DebtorCreditor.FindPrices PriceLookup;
 
         public ProjectBudgetLinePage(UnicontaBaseEntity master)
             : base(master)
@@ -182,6 +182,19 @@ namespace UnicontaClient.Pages.CustomPage
             if (string.IsNullOrEmpty(key)) return;
             string header = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ProjectBudget"), key);
             SetHeader(header);
+            if (PriceLookup != null)
+            {
+                var master = dgProjectBudgetLinePageGrid.masterRecord;
+                var masterProject = (master as Uniconta.DataModel.Project);
+                if (masterProject == null)
+                {
+                    var budget = (master as ProjectBudget);
+                    if (budget != null)
+                        masterProject = (Uniconta.DataModel.Project)ProjectCache.Get(budget._Project);
+                }
+                if (masterProject != null)
+                    PriceLookup.OrderChanged(masterProject);
+            }
         }
 
         void InitPage(UnicontaBaseEntity master)
@@ -190,6 +203,7 @@ namespace UnicontaClient.Pages.CustomPage
             localMenu.dataGrid = dgProjectBudgetLinePageGrid;
             dgProjectBudgetLinePageGrid.api = api;
             _master = master;
+
             dgProjectBudgetLinePageGrid.UpdateMaster(master);
             SetRibbonControl(localMenu, dgProjectBudgetLinePageGrid);
             dgProjectBudgetLinePageGrid.BusyIndicator = busyIndicator;
@@ -248,11 +262,7 @@ namespace UnicontaClient.Pages.CustomPage
                     masterProject = (Uniconta.DataModel.Project)ProjectCache.Get(budget._Project);
             }
             if (masterProject != null)
-            {
-                var dc = (Uniconta.DataModel.Debtor)Debtors.Get(masterProject._DCAccount);
-                if (dc != null)
-                    PriceGrp = dc._PriceGroup;
-            }
+                PriceLookup = new Uniconta.API.DebtorCreditor.FindPrices(masterProject, api);
         }
 
         protected override void OnLayoutLoaded()
@@ -348,6 +358,9 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
 
                 case "Qty":
+                    if (this.PriceLookup != null && this.PriceLookup.UseCustomerPrices)
+                        this.PriceLookup.GetCustomerPrice(rec, false);
+
                     if (rec._Qty != (rec._ToTime - rec._FromTime) / 60d)
                     {
                         rec._FromTime = 0;
@@ -469,24 +482,10 @@ namespace UnicontaClient.Pages.CustomPage
                 rec.CostPrice = item._CostPrice;
             }
 
-            double price = 0d;
-            int pg = PriceGrp;
-            if (pg == 3)
-            {
-                price = item._SalesPrice3;
-                if (price == 0)
-                    pg = 2;
-            }
-            if (pg == 2)
-                price = item._SalesPrice2;
-            if (price == 0)
-                price = item._SalesPrice1;
-            if (price != 0d)
-            {
-                if (rec._Qty == 0)
-                    rec.Qty = 1d;
-                rec.SalesPrice = price;
-            }
+            var _priceLookup = this.PriceLookup;
+            this.PriceLookup = null; // avoid that we call priceupdated in property change on Qty
+            _priceLookup?.SetPriceFromItem(rec, item);
+            this.PriceLookup = _priceLookup;
 
             if (item._Dim1 != null) rec.Dimension1 = item._Dim1;
             if (item._Dim2 != null) rec.Dimension2 = item._Dim2;
@@ -533,7 +532,9 @@ namespace UnicontaClient.Pages.CustomPage
                     dgProjectBudgetLinePageGrid.AddRow();
                     break;
                 case "CopyRow":
-                    dgProjectBudgetLinePageGrid.CopyRow();
+                    var row = dgProjectBudgetLinePageGrid.CopyRow() as ProjectBudgetLineLocal;
+                    if (row != null)
+                        row.Id = 0;
                     break;
                 case "SaveGrid":
                     saveGrid();
@@ -553,10 +554,53 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         UnfoldBOM(selectedItem);
                     break;
+                case "AddPeriod":
+                    AddPeriod();
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
+        }
+
+        private void AddPeriod()
+        {
+            var prjBudgetLns = dgProjectBudgetLinePageGrid.GetVisibleRows() as IEnumerable<ProjectBudgetLineLocal>;
+
+            if (prjBudgetLns == null || prjBudgetLns.Count() == 0)
+                return;
+
+            var cwSelectPeriod = new CWAddPeriod();
+            cwSelectPeriod.DialogTableId = 2000000105;
+            cwSelectPeriod.Closed += delegate
+            {
+                if (cwSelectPeriod.DialogResult == true)
+                {
+                    var periodType = cwSelectPeriod.PeriodType;
+                    foreach (ProjectBudgetLineLocal line in prjBudgetLns)
+                    {
+                        var budgetDt = line.Date;
+                        dgProjectBudgetLinePageGrid.SetLoadedRow(line);
+                        switch (periodType)
+                        {
+                            case 0:
+                                line._Date = budgetDt.AddDays(cwSelectPeriod.PeriodValue);
+                                break;
+                            case 1:
+                                line._Date = budgetDt.AddMonths(cwSelectPeriod.PeriodValue);
+                                break;
+                            case 2:
+                                line._Date = budgetDt.AddYears(cwSelectPeriod.PeriodValue);
+                                break;
+                        }
+                        line.NotifyPropertyChanged("Date");
+                        dgProjectBudgetLinePageGrid.SetModifiedRow(line);
+                    }
+
+                    saveGrid();
+                }
+            };
+            cwSelectPeriod.Show();
         }
 
         async void UnfoldBOM(ProjectBudgetLineLocal selectedItem)
@@ -662,7 +706,7 @@ namespace UnicontaClient.Pages.CustomPage
                         {
                             foreach (var r in lst)
                             {
-                                var rec = (ProjectBudgetLineLocal)r; 
+                                var rec = (ProjectBudgetLineLocal)r;
                                 if (selectedItem != null)
                                 {
                                     rec.Date = selectedItem._Date;

@@ -67,7 +67,7 @@ namespace UnicontaClient.Pages.CustomPage
                         EditAll();
                     break;
                 case "AddRow":
-                    AddDockItem(TabControls.ProjectGroupPage2, api, Uniconta.ClientTools.Localization.lookup("ProjectGroup"), "Add_16x16.png");
+                    AddDockItem(TabControls.ProjectGroupPage2, api, Uniconta.ClientTools.Localization.lookup("ProjectGroup"), "Add_16x16");
                     break;
                 case "EditRow":
                     if (selectedItem == null)

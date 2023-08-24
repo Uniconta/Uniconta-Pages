@@ -158,13 +158,13 @@ x:Class="UnicontaClient.Pages.CustomPage.AccountStatement"
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="HasVoucher" Width="50" PrintCellStyle="{StaticResource VoucherColumnLinkPrintingStyle}">
                                     <localPage:CorasauDataGridTemplateColumnClient.HeaderTemplate>
                                         <DataTemplate>
-                                            <Image Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Document_Attachment_16x16.png}" Width="16" Height="16" VerticalAlignment="Center" />
+                                            <Image Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Attachments_16x16.svg}" Width="16" Height="16" VerticalAlignment="Center" />
                                         </DataTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.HeaderTemplate>
                                     <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                                         <ControlTemplate>
-                                            <Image Margin="5" Tag="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Document_Attachment_16x16.png}" 
-                                                   MouseLeftButtonDown="HasVoucherImage_MouseLeftButtonDown" Visibility="{Binding DataContext.RowData.Row.HasVoucher,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource VisibilityBoolConverter}}"
+                                            <Image Margin="5" Tag="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Attachments_16x16.svg}" 
+                                                   MouseLeftButtonDown="HasVoucherImage_MouseLeftButtonDown" Visibility="{Binding DataContext.RowData.Row.HasVoucher,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource VisibilityBoolConverter}}" Cursor="Hand"
                                                    Stretch="Fill" Width="16" Height="16" RenderOptions.BitmapScalingMode="NearestNeighbor" RenderOptions.EdgeMode="Aliased" />
                                         </ControlTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>

@@ -34,9 +34,7 @@ namespace Uniconta.Client.Pages
         {
             this.DataContext = this;
             InitializeComponent();
-#if !SILVERLIGHT
             this.Title = Uniconta.ClientTools.Localization.lookup("UpdateAll");
-#endif
             api = crudapi;
             SetItemSource();
             dpDate.DateTime = BasePage.GetSystemDefaultDate();
@@ -58,9 +56,6 @@ namespace Uniconta.Client.Pages
                 RowSendByEmail.Height = new GridLength(0);
             }
 
-#if SILVERLIGHT
-            Utility.SetThemeBehaviorOnChildWindow(this);
-#endif
             this.Loaded += CW_Loaded;
         }
 
@@ -106,8 +101,8 @@ namespace Uniconta.Client.Pages
                     return;
                 }
             }
-            SendByEmail = chkSendEmail.IsChecked.Value;
-            IsSimulation = chkSimulation.IsChecked.Value;
+            SendByEmail = chkSendEmail.IsChecked.GetValueOrDefault();
+            IsSimulation = chkSimulation.IsChecked.GetValueOrDefault();
             GenrateDate = dpDate.DateTime;
             InvoiceCategory = cmbCategory.Text;   
             SetDialogResult(true);

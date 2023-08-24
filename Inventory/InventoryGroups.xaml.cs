@@ -80,7 +80,7 @@ namespace UnicontaClient.Pages.CustomPage
                         EditAll();
                     break;
                 case "AddRow":
-                    AddDockItem(TabControls.InventoryGroupPage2, api, Uniconta.ClientTools.Localization.lookup("InventoryGroup"), "Add_16x16.png");
+                    AddDockItem(TabControls.InventoryGroupPage2, api, Uniconta.ClientTools.Localization.lookup("InventoryGroup"), "Add_16x16");
                     break;
                 case "AddLine":
                     dgInventoryGroupGrid.AddRow();

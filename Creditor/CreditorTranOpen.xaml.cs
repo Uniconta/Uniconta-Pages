@@ -103,7 +103,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "EditRow":
                     if (selectedItem == null)
                         return;
-                    AddDockItem(TabControls.CreditorTranOpenPage2, selectedItem, Uniconta.ClientTools.Localization.lookup("AmountToPay"), "Edit_16x16.png");
+                    AddDockItem(TabControls.CreditorTranOpenPage2, selectedItem, Uniconta.ClientTools.Localization.lookup("AmountToPay"), "Edit_16x16");
                     break;
                 case "ViewDownloadRow":
                     if (selectedItem == null)

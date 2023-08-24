@@ -161,7 +161,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         void dgGLTable_RowDoubleClick()
         {
-            localMenu_OnItemClicked("ClosingSheetLines");
+            ribbonControl.PerformRibbonAction("ClosingSheetLines");
         }
         private void Name_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -211,7 +211,7 @@ namespace UnicontaClient.Pages.CustomPage
                     AddDockItem(TabControls.AllNotesPage, new object[] { api, this.AccountListCache }, Uniconta.ClientTools.Localization.lookup("Notes"));
                     break;
                 case "AddItem":
-                    AddDockItem(TabControls.GLAccountPage2, api, Uniconta.ClientTools.Localization.lookup("Accounts"), "Add_16x16.png");
+                    AddDockItem(TabControls.GLAccountPage2, api, Uniconta.ClientTools.Localization.lookup("Accounts"), "Add_16x16");
                     break;
                 case "EditItem":
                     if (selectedItem != null)

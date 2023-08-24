@@ -2,20 +2,20 @@
 <root>
   <RibbonItem TabId="0" LocalizedNameKey="Home">
     <!---When we create new TabPage -->
-    <RibbonItem Action="Save" ShortcutKey="Ctrl+S" LocalizedNameKey="Save" Glyph="save-16x16.png" LargeGlyph="save-32x32.png"/>
-    <RibbonItem Action="Cancel" LocalizedNameKey="Cancel" Glyph="close-16x16.png" LargeGlyph="close-32x32.png"/>
+    <RibbonItem Action="Save" ShortcutKey="Ctrl+S" LocalizedNameKey="Save" Glyph="save-16x16" LargeGlyph="save-32x32"/>
+    <RibbonItem Action="Cancel" LocalizedNameKey="Cancel" Glyph="close-16x16" LargeGlyph="close-32x32"/>
   </RibbonItem>
   <RibbonItem>
     <!---next group-->
-    <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32.png">
+    <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32">
       <!---If we want Inner menu-->
-      <RibbonItem Action="StartEdit" LocalizedNameKey="StartEdit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" Shortcut="Ctrl+E"/>
-      <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16.png" Shortcut=""/>
-      <RibbonItem Action="EndEdit" LocalizedNameKey="SaveOBJ" Parameter="Layout" Glyph="save-as-16x16.png" LargeGlyph="save-as-32x32.png" Shortcut=""/>
-      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png" Shortcut=""/>
-      <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportLayout" EnableSeperator="True" Glyph="ExportLayout_16x16.png" LargeGlyph="ExportLayout_16x16.png" Shortcut=""/>
-      <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportLayout" Glyph="Import_16x16.png" LargeGlyph="Import_16x16.png" Shortcut=""/>
-      <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16.png" Shortcut=""/>
+      <RibbonItem Action="StartEdit" LocalizedNameKey="StartEdit" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" Shortcut="Ctrl+E"/>
+      <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16" Shortcut=""/>
+      <RibbonItem Action="EndEdit" LocalizedNameKey="SaveOBJ" Parameter="Layout" Glyph="save-as-16x16" LargeGlyph="save-as-32x32" Shortcut=""/>
+      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16" LargeGlyph="Delete_32x32" Shortcut=""/>
+      <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportLayout" EnableSeperator="True" Glyph="ExportLayout_16x16" LargeGlyph="ExportLayout_16x16" Shortcut=""/>
+      <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportLayout" Glyph="Import_16x16" LargeGlyph="Import_16x16" Shortcut=""/>
+      <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16" Shortcut=""/>
   </RibbonItem>
   </RibbonItem>
 </root>

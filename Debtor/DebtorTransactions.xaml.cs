@@ -87,10 +87,8 @@ namespace UnicontaClient.Pages.CustomPage
         void SetHeader()
         {
             var masterClient = dgDebtorTran.masterRecord as Debtor;
-            if (masterClient == null)
-                return;
-            string header = string.Format("{0}/{1}", Uniconta.ClientTools.Localization.lookup("DebtorTransactions"), masterClient._Account);
-            SetHeader(header);
+            if (masterClient != null)
+                SetHeader(string.Concat(Uniconta.ClientTools.Localization.lookup("DebtorTransactions"), "/", masterClient._Account));
         }
 
         UnicontaBaseEntity master;

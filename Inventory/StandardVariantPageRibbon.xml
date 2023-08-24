@@ -2,11 +2,11 @@
 <root>
   <RibbonItem TabId="0" LocalizedNameKey="Home">
     <!---When we create a new TabPage -->
-    <RibbonItem Action="AddRow" LocalizedNameKey="AddNewRow" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png"/>
-    <RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="DeleteRow" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png"/>
-    <RibbonItem Action="SaveGrid" ShortcutKey="CTRL+S" LocalizedNameKey="Save" Glyph="save-16x16.png" LargeGlyph="save-32x32.png"/>
+    <RibbonItem Action="AddRow" LocalizedNameKey="AddNewRow" Glyph="Add_16x16" LargeGlyph="Add_32x32"/>
+    <RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="DeleteRow" Glyph="Delete_16x16" LargeGlyph="Delete_32x32"/>
+    <RibbonItem Action="SaveGrid" ShortcutKey="CTRL+S" LocalizedNameKey="Save" Glyph="save-16x16" LargeGlyph="save-32x32"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="Lines" LocalizedNameKey="Variants"  LargeGlyph="Variants_32x32.png"/>
+    <RibbonItem Action="Lines" LocalizedNameKey="Variants"  LargeGlyph="Variants_32x32"/>
   </RibbonItem>
 </root>

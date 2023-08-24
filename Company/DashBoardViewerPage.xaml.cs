@@ -41,6 +41,7 @@ using System.Web.Caching;
 using DevExpress.XtraPrinting.Native;
 using Uniconta.ClientTools.Util;
 using DevExpress.XtraSpreadsheet.Model;
+using DevExpress.Data.Filtering;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -110,6 +111,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             dState = new DashboardState();
             company = api.CompanyEntity;
+            CriteriaOperator.RegisterCustomFunction(new DashBoardView.ExchangeRateFunction(new CrudAPI(api)));
             InitializeComponent();
             this.BusyIndicator = busyIndicator;
             dashboardViewerUniconta.ObjectDataSourceLoadingBehavior = DevExpress.DataAccess.DocumentLoadingBehavior.LoadAsIs;
@@ -160,7 +162,7 @@ namespace UnicontaClient.Pages.CustomPage
             e.InitialState = dState;
         }
 
-        void SetLabelValues(PivotDashboardItem pivot, List<DataItem> targetLst)
+        void SetLabelValues(PivotDashboardItem pivot, List<DataItem> targetLst, string dataSourceName)
         {
             foreach (var col in targetLst)
             {
@@ -172,10 +174,11 @@ namespace UnicontaClient.Pages.CustomPage
                     name = savedName;
                     ((DataItem)col).Name = Uniconta.ClientTools.Localization.lookup(name.Substring(1));
                 }
+                IsNestedField(col, dataSourceName);
             }
         }
 
-        void SetChartLabelValues(ChartDashboardItem chart, List<DataItem> targetLst)
+        void SetChartLabelValues(ChartDashboardItem chart, List<DataItem> targetLst, string dataSourceName)
         {
             foreach (var col in targetLst)
             {
@@ -187,10 +190,19 @@ namespace UnicontaClient.Pages.CustomPage
                     name = savedName;
                     ((DataItem)col).Name = Uniconta.ClientTools.Localization.lookup(name.Substring(1));
                 }
+                IsNestedField(col, dataSourceName);
             }
         }
 
-        void SetPieLabelValues(PieDashboardItem pie, List<DataItem> targetLst)
+        private void IsNestedField(DataItem col, string dataSourceName)
+        {
+            if (string.IsNullOrEmpty(dataSourceName))
+                return;
+            if (col?.DataMember?.Contains(".") == true && !HasNestedField?.ContainsKey(dataSourceName) == true)
+                HasNestedField.Add(dataSourceName, true);
+        }
+
+        void SetPieLabelValues(PieDashboardItem pie, List<DataItem> targetLst, string dataSourceName)
         {
             foreach (var col in targetLst)
             {
@@ -202,10 +214,11 @@ namespace UnicontaClient.Pages.CustomPage
                     name = savedName;
                     ((DataItem)col).Name = Uniconta.ClientTools.Localization.lookup(name.Substring(1));
                 }
+                IsNestedField(col, dataSourceName);
             }
         }
 
-        void SetScatterChartLabelValues(ScatterChartDashboardItem sctChart, List<DataItem> targetLst)
+        void SetScatterChartLabelValues(ScatterChartDashboardItem sctChart, List<DataItem> targetLst, string dataSourceName)
         {
             foreach (var col in targetLst)
             {
@@ -217,15 +230,18 @@ namespace UnicontaClient.Pages.CustomPage
                     name = savedName;
                     ((DataItem)col).Name = Uniconta.ClientTools.Localization.lookup(name.Substring(1));
                 }
+                IsNestedField(col, dataSourceName);
             }
         }
-
+        Dictionary<string, bool> HasNestedField;
         private void DashboardViewerUniconta_DashboardLoaded(object sender, DevExpress.DashboardWpf.DashboardLoadedEventArgs e)
         {
             Dashboard dasdboard = e.Dashboard;
+            HasNestedField = new Dictionary<string, bool>();
             foreach (var item in dasdboard?.Items)
             {
                 var name = dasdboard?.CustomProperties.GetValue(item.ComponentName);
+                var dataSourceComponentName = GetDataSourceComponentName(item);
                 if (name != null)
                 {
                     if (name[0] == '&' || name[0] == '@')
@@ -240,17 +256,28 @@ namespace UnicontaClient.Pages.CustomPage
                         var targetLst = grid.Columns.OfType<GridDimensionColumn>().ToList();
                         foreach (var col in targetLst)
                         {
-                            var colName = ((GridDimensionColumn)col).Dimension.Name;
+                            var dimName = col.Dimension.Name;
+                            var colName = col.Name;
                             var savedName = col.CustomProperties.GetValue(col.Dimension.UniqueId) ?? string.Empty;
 
-                            if ((colName != null || !string.IsNullOrEmpty(colName)) && (col.Dimension.Name.StartsWith("&") || col.Dimension.Name.StartsWith("@") || savedName.StartsWith("@") || savedName.StartsWith("&")))
+                            if (!string.IsNullOrEmpty(dimName) && (dimName.StartsWith("&") || dimName.StartsWith("@") || savedName.StartsWith("@") || savedName.StartsWith("&")))
+                            {
+                                if (col.CustomProperties.GetValue(col.Dimension.UniqueId) == null)
+                                    col.CustomProperties.SetValue(col.Dimension.UniqueId, name);
+                                else
+                                    dimName = savedName;
+                                col.Dimension.Name = Uniconta.ClientTools.Localization.lookup(dimName.Substring(1));
+                            }
+
+                            if (!string.IsNullOrEmpty(colName) && (colName.StartsWith("&") || colName.StartsWith("@") || savedName.StartsWith("@") || savedName.StartsWith("&")))
                             {
                                 if (col.CustomProperties.GetValue(col.Dimension.UniqueId) == null)
                                     col.CustomProperties.SetValue(col.Dimension.UniqueId, name);
                                 else
                                     colName = savedName;
-                                ((GridDimensionColumn)col).Dimension.Name = Uniconta.ClientTools.Localization.lookup(colName.Substring(1));
+                                col.Name = Uniconta.ClientTools.Localization.lookup(colName.Substring(1));
                             }
+                            IsNestedField(col.Dimension, dataSourceComponentName);
                         }
                     }
                 }
@@ -262,13 +289,13 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         var cols = pivot.Columns.OfType<DataItem>().ToList();
                         if (cols.Count > 0)
-                            SetLabelValues(pivot, cols);
+                            SetLabelValues(pivot, cols, dataSourceComponentName);
                         var rows = pivot.Rows.OfType<DataItem>().ToList();
                         if (rows.Count > 0)
-                            SetLabelValues(pivot, rows);
+                            SetLabelValues(pivot, rows, dataSourceComponentName);
                         var values = pivot.Values.OfType<DataItem>().ToList();
                         if (values.Count > 0)
-                            SetLabelValues(pivot, values);
+                            SetLabelValues(pivot, values, dataSourceComponentName);
                     }
                 }
 
@@ -279,10 +306,10 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         var dimensions = chart.GetDimensions().OfType<DataItem>().ToList();
                         if (dimensions.Count > 0)
-                            SetChartLabelValues(chart, dimensions);
+                            SetChartLabelValues(chart, dimensions, dataSourceComponentName);
                         var measures = chart.GetMeasures().OfType<DataItem>().ToList();
                         if (measures.Count > 0)
-                            SetChartLabelValues(chart, measures);
+                            SetChartLabelValues(chart, measures, dataSourceComponentName);
                     }
                 }
 
@@ -293,10 +320,10 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         var dimensions = pie.GetDimensions().OfType<DataItem>().ToList();
                         if (dimensions.Count > 0)
-                            SetPieLabelValues(pie, dimensions);
+                            SetPieLabelValues(pie, dimensions, dataSourceComponentName);
                         var measures = pie.GetMeasures().OfType<DataItem>().ToList();
                         if (measures.Count > 0)
-                            SetPieLabelValues(pie, measures);
+                            SetPieLabelValues(pie, measures, dataSourceComponentName);
                     }
                 }
 
@@ -305,7 +332,7 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     var measures = sctChart.GetMeasures().OfType<DataItem>().ToList();
                     if (measures.Count > 0)
-                        SetScatterChartLabelValues(sctChart, measures);
+                        SetScatterChartLabelValues(sctChart, measures, dataSourceComponentName);
                 }
             }
 
@@ -404,6 +431,17 @@ namespace UnicontaClient.Pages.CustomPage
             if (LoadOnOpen)
                 foreach (var ds in e.Dashboard.DataSources)
                     dataSourceLoadingParams.Add(ds.ComponentName);
+        }
+
+        private string GetDataSourceComponentName(DashboardItem item)
+        {
+            try
+            {
+                var dataSource = item.GetType().GetProperty("DataSource")?.GetValue(item, null);
+                var dataSourceComponentName = dataSource?.GetType().GetProperty("ComponentName")?.GetValue(dataSource, null) as string;
+                return dataSourceComponentName;
+            }
+            catch { return null; }
         }
 
         private List<PropValuePair> GetPropValuePairForDataSource(Type TableType, List<FilterProperties> filterProps)
@@ -586,6 +624,7 @@ namespace UnicontaClient.Pages.CustomPage
                 isDashBoardLaoded = true;
                 Initialise();
             }
+
             if (isDashBoardLaoded && timer != null)
                 timer.Start();
         }
@@ -809,9 +848,9 @@ namespace UnicontaClient.Pages.CustomPage
                                 if (typeofTable.Equals(typeof(CompanyDocumentClient)))
                                     ReadData(data, compApi ?? api).GetAwaiter().GetResult(); // if there is image in property it will load again;
 
-                                //if (data != null)
-                                //    e.Data = BuildDataTable(data, type, compApi ?? api);
-                                //else
+                                if (HasNestedField.TryGetValue(DataSourceComponentName, out bool nestField))
+                                    e.Data = UtilFunctions.BuildDataTable(data, type, (compApi ?? api).CompanyEntity);
+                                else
                                     e.Data = data;
                             }
                             else
@@ -831,57 +870,6 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        public static DataTable BuildDataTable(IList<UnicontaBaseEntity> lst, Type entType, CrudAPI compApi)
-        {
-            DataTable dataTable = new DataTable(entType.Name);
-            var props = new List<PropertyInfo>();
-            foreach (var prop in entType.GetProperties())
-            {
-                var col = CreateColumn(prop, compApi);
-                if (col != null)
-                {
-                    dataTable.Columns.Add(col);
-                    props.Add(prop);
-                }
-            }
-
-            var arr = props.ToArray();
-            var values = new Object[arr.Length];
-            foreach (UnicontaBaseEntity current in lst)
-            {
-                DataRow dataRow = dataTable.NewRow();
-
-                for (int i = 0; i < arr.Length; i++)
-                    values[i] = arr[i].GetValue(current);
-
-                dataRow.ItemArray = values;
-                dataTable.Rows.Add(dataRow);
-            }
-
-            return dataTable;
-        }
-
-        static DataColumn CreateColumn(PropertyInfo prop, CrudAPI compApi)
-        {
-            if (prop.GetCustomAttributes(typeof(ReportingAttribute), true).Length > 0)
-            {
-                var propType = Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType;
-                var userType = compApi.CompanyEntity?.GetUserType(propType);
-                return new DataColumn { ColumnName = prop.Name, DataType = userType ?? propType };
-            }
-
-            var attribut = prop.GetCustomAttributes(typeof(DisplayAttribute), false);
-            if (attribut.Length > 0)
-            {
-                return new DataColumn
-                {
-                    ColumnName = prop.Name,
-                    DataType = Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType,
-                    Caption = ((DisplayAttribute)attribut[0]).Name
-                };
-            }
-            return null;
-        }
         public static Task ReadData(UnicontaBaseEntity[] data, CrudAPI api)
         {
             return Task.Run(async () =>

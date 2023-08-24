@@ -211,7 +211,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void RootVisual_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.F8)
-                localMenu_OnItemClicked("AddItems");
+                ribbonControl.PerformRibbonAction("AddItems");
         }
 
 
@@ -415,7 +415,11 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     var args = argument as object[];
                     var orderlines = args[2] as IEnumerable<UnicontaBaseEntity>;
-                    dgDebtorOrderLineGrid.PasteRows(orderlines);
+                    var masterRecord = dgDebtorOrderLineGrid.masterRecord;
+                    var currentRecrod = args[4] as UnicontaBaseEntity;
+
+                    if (currentRecrod!=null && object.ReferenceEquals(masterRecord, currentRecrod))
+                        dgDebtorOrderLineGrid.PasteRows(orderlines);
                 }
             }
             if (screenName == TabControls.RegenerateOrderFromProjectPage)
@@ -782,11 +786,14 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                     {
                         row = dgDebtorOrderLineGrid.CopyRow() as DebtorOrderLineClient;
-                        row._ExchangeRate = this.exchangeRate;
-                        row._CostPriceLine = selectedItem._CostPriceLine;
-                        row._QtyDelivered = 0;
-                        row._QtyInvoiced = 0;
-                        row._SerieBatchMarked = false;
+                        if (row != null)
+                        {
+                            row._ExchangeRate = this.exchangeRate;
+                            row._CostPriceLine = selectedItem._CostPriceLine;
+                            row._QtyDelivered = 0;
+                            row._QtyInvoiced = 0;
+                            row._SerieBatchMarked = false;
+                        }
                     }
                     break;
                 case "SaveGrid":
@@ -972,7 +979,7 @@ namespace UnicontaClient.Pages.CustomPage
                     else
                         qty = item.GetReorderQty(orderLine, dialogOrderSize.WhatToOrder == 2);
                     object[] arr = new object[] { api, orderLine, dgDebtorOrderLineGrid.masterRecord, qty };
-                    AddDockItem(TabControls.ProductionOrdersPage2, arr, Uniconta.ClientTools.Localization.lookup("Production"), "Add_16x16.png");
+                    AddDockItem(TabControls.ProductionOrdersPage2, arr, Uniconta.ClientTools.Localization.lookup("Production"), "Add_16x16");
                 }
             };
             dialogOrderSize.Show();
@@ -1278,7 +1285,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var invoicePostingResult = new InvoicePostingPrintGenerator(api, this);
             invoicePostingResult.SetUpInvoicePosting(dbOrder, null, CompanyLayoutType.Invoice, generateDate, null, isSimulation, showInvoice, postOnlyDelivered, isQuickPrint, pagePrintCount,
-                invoiceSendByEmail, invoiceSendByOutlook, sendOnlyToEmail, sendOnlyToEmailList, OIOUBLgenerate, null, false);
+                invoiceSendByEmail, invoiceSendByOutlook, sendOnlyToEmail, sendOnlyToEmailList, OIOUBLgenerate, null, invoiceSendByOutlook);
 
 
             return invoicePostingResult;

@@ -1,0 +1,36 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools" 
+   xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.VatSettlements"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+    xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage" 
+    xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+    xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+    mc:Ignorable="d"
+    d:DesignHeight="300" d:DesignWidth="400">
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition></RowDefinition>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/GL/Vat/Reports/VatSettlementRibbon.xml" x:Name="localMenu"/>
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <localPage:VatSettlementsGrid  x:Name="dgVatVatSettlements" AutoGenerateColumns="None">
+                <localPage:VatSettlementsGrid.Columns>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="FromDate" Width="90"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ToDate" Width="90"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="MaxJournalPostedId" Width="100" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CreatedBy" Width="50" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CreatedByUser" Width="100"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Comment" Width="150" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="JournalPostedId" Width="80"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="UploadedAt" Width="90" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Created" Width="90" />
+               </localPage:VatSettlementsGrid.Columns>
+            </localPage:VatSettlementsGrid>
+        </CorasauControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

@@ -140,7 +140,7 @@ namespace UnicontaClient.Pages.CustomPage
             var cred = editrow.Creditor;
             api.SetMaster(contactClient, cred);
             AddDockItem(TabControls.ContactPage2, new object[] { contactClient, false, cred }, string.Format("{0} : {1},{2}",
-                Uniconta.ClientTools.Localization.lookup("Contacts"), editrow.OrderNumber, cred.Name), "Add_16x16.png");
+                Uniconta.ClientTools.Localization.lookup("Contacts"), editrow.OrderNumber, cred.Name), "Add_16x16");
         }
 
         int contactRefId;
@@ -379,7 +379,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
         private void AddCreditor_Click(object sender, RoutedEventArgs e)
         {
-            AddDockItem(TabControls.CreditorAccountPage2, new object[2] { api, null }, Uniconta.ClientTools.Localization.lookup("Creditorsaccount"), "Add_16x16.png");
+            AddDockItem(TabControls.CreditorAccountPage2, new object[2] { api, null }, Uniconta.ClientTools.Localization.lookup("Creditorsaccount"), "Add_16x16");
         }
 
         private void leAccount_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
@@ -465,6 +465,12 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var location = editrow._DeliveryAddress1 + "+" + editrow._DeliveryAddress2 + "+" + editrow._DeliveryAddress3 + "+" + editrow._DeliveryZipCode + "+" + editrow._DeliveryCity + "+" + editrow.DeliveryCountry;
             Utility.OpenGoogleMap(location);
+        }
+
+        private void cmbContactName_KeyDown(object sender, KeyEventArgs e)
+        {
+            var selectedItem = cmbContactName.SelectedItem as Contact;
+            GoToContact(selectedItem, e.Key);
         }
     }
 }

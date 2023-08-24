@@ -74,7 +74,7 @@ namespace UnicontaClient.Pages.CustomPage
 #if !SILVERLIGHT
                         ViewDocument(dgDocsGrid.syncEntity, header);
 #else
-                        AddDockItem(TabControls.UserDocsPage3, dgDocsGrid.syncEntity, true, header, "View_16x16.png");
+                        AddDockItem(TabControls.UserDocsPage3, dgDocsGrid.syncEntity, true, header, "View_16x16");
 #endif
                     }
                     break;

@@ -77,7 +77,7 @@ namespace UnicontaClient.Pages.CustomPage
             switch (ActionType)
             {
                 case "AddRow":
-                    AddDockItem(TabControls.GLVatPage2, api, Uniconta.ClientTools.Localization.lookup("Vat"), "Add_16x16.png");
+                    AddDockItem(TabControls.GLVatPage2, api, Uniconta.ClientTools.Localization.lookup("Vat"), "Add_16x16");
                     break;
                 case "CopyRow":
                     if (selectedItem != null)
@@ -98,7 +98,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var vat = Activator.CreateInstance(selectedItem.GetType()) as GLVatClient;
             CorasauDataGrid.CopyAndClearRowId(selectedItem, vat);
-            AddDockItem(TabControls.GLVatPage2, new object[2] { vat, false }, Uniconta.ClientTools.Localization.lookup("Vat"), "Add_16x16.png");
+            AddDockItem(TabControls.GLVatPage2, new object[2] { vat, false }, Uniconta.ClientTools.Localization.lookup("Vat"), "Add_16x16");
         }
     }
 }

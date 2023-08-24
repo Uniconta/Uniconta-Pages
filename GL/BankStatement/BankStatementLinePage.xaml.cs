@@ -219,11 +219,11 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (e.Key == Key.F8)
             {
-                localMenu_OnItemClicked("OpenTran");
+                ribbonControl.PerformRibbonAction("OpenTran");
             }
             else if (e.Key == Key.F9)
             {
-                localMenu_OnItemClicked("VoidTransaction");
+                ribbonControl.PerformRibbonAction("VoidTransaction");
             }
         }
 
@@ -1038,12 +1038,12 @@ namespace UnicontaClient.Pages.CustomPage
             if (hideGreen)
             {
                 ibase.Caption = string.Format(Localization.lookup("ShowOBJ"), Localization.lookup("Green"));
-                ibase.LargeGlyph = Utilities.Utility.GetGlyph("ShowGreen_32x32.png");
+                ibase.LargeGlyph = Utilities.Utility.GetGlyph("ShowGreen_32x32");
             }
             else
             {
                 ibase.Caption = string.Format(Localization.lookup("HideOBJ"), Localization.lookup("Green"));
-                ibase.LargeGlyph = Utilities.Utility.GetGlyph("HideGreen_32x32.png");
+                ibase.LargeGlyph = Utilities.Utility.GetGlyph("HideGreen_32x32");
             }
         }
         async void ChangeVoidState(GLTransClientTotalBank trans)

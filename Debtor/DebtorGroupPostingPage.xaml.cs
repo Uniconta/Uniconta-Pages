@@ -71,7 +71,7 @@ namespace UnicontaClient.Pages.CustomPage
                     object[] addParam = new object[2];
                     addParam[0] = api;
                     addParam[1] = dgGroupPosting.masterRecord;
-                    AddDockItem(TabControls.DebtorGroupPostingPage2, addParam, Uniconta.ClientTools.Localization.lookup("CustomerPosting"), "Add_16x16.png");
+                    AddDockItem(TabControls.DebtorGroupPostingPage2, addParam, Uniconta.ClientTools.Localization.lookup("CustomerPosting"), "Add_16x16");
                     break;
                 case "EditRow":
                     if (selectedItem == null) return;
@@ -80,7 +80,7 @@ namespace UnicontaClient.Pages.CustomPage
                     EditParam[0] = selectedItem;
                     EditParam[1] = dgGroupPosting.masterRecord;
                     EditParam[2] = true;
-                    AddDockItem(TabControls.DebtorGroupPostingPage2, EditParam, grpPostingHeader, "Edit_16x16.png");
+                    AddDockItem(TabControls.DebtorGroupPostingPage2, EditParam, grpPostingHeader, "Edit_16x16");
                     break;
                 case "CopyRow":
                     dgGroupPosting.CopyRow();

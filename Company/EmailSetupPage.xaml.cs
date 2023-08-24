@@ -19,6 +19,9 @@ using System.Collections;
 using Uniconta.Common;
 using UnicontaClient.Utilities;
 using Uniconta.API.Service;
+using System.Collections.ObjectModel;
+using Uniconta.ClientTools;
+using Uniconta.ClientTools.Util;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -52,17 +55,25 @@ namespace UnicontaClient.Pages.CustomPage
 
             switch (ActionType)
             {
-                case "AddRow":
-                    AddDockItem(TabControls.EmailSetupPage2, api, Uniconta.ClientTools.Localization.lookup("EmailSetup"), "Add_16x16.png");
+                case "AddMicrosoftGraph":
+                    object[] addMicrosoftGraphParam = new object[2];
+                    addMicrosoftGraphParam[0] = api;
+                    addMicrosoftGraphParam[1] = true;
+                    AddDockItem(TabControls.EmailSetupPage2, addMicrosoftGraphParam, Uniconta.ClientTools.Localization.lookup("EmailSetup"), "Add_16x16");
                     break;
-
+                case "AddSMTP":
+                    object[] addSMTPParam = new object[2];
+                    addSMTPParam[0] = api;
+                    addSMTPParam[1] = false;
+                    AddDockItem(TabControls.EmailSetupPage2, addSMTPParam, Uniconta.ClientTools.Localization.lookup("EmailSetup"), "Add_16x16");
+                    break;
                 case "CopyRow":
                     if (selectedItem == null)
                         return;
                     object[] copyParam = new object[2];
                     copyParam[0] = StreamingManager.Clone(selectedItem);
                     copyParam[1] = false;
-                    AddDockItem(TabControls.EmailSetupPage2, copyParam, string.Format("{0}: {1}", string.Format(Uniconta.ClientTools.Localization.lookup("CopyOBJ"), Uniconta.ClientTools.Localization.lookup("EmailSetup")), selectedItem._Name), "Copy_16x16.png");
+                    AddDockItem(TabControls.EmailSetupPage2, copyParam, string.Format("{0}: {1}", string.Format(Uniconta.ClientTools.Localization.lookup("CopyOBJ"), Uniconta.ClientTools.Localization.lookup("EmailSetup")), selectedItem._Name), "Copy_16x16");
                     break;
 
                 case "EditRow":
@@ -71,7 +82,7 @@ namespace UnicontaClient.Pages.CustomPage
                     object[] editParam = new object[2];
                     editParam[0] = selectedItem;
                     editParam[1] = true;
-                    AddDockItem(TabControls.EmailSetupPage2, editParam, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("EmailSetup"), selectedItem._Name), "Edit_16x16.png");
+                    AddDockItem(TabControls.EmailSetupPage2, editParam, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("EmailSetup"), selectedItem._Name), "Edit_16x16");
                     break;
                 case "ApprovalSetup":
                     var smtps = dgEmailSetupGrid.ItemsSource as IList<CompanySMTPClient>;
@@ -85,6 +96,23 @@ namespace UnicontaClient.Pages.CustomPage
                 case "AddDoc":
                     if (selectedItem != null)
                         AddDockItem(TabControls.UserDocsPage, dgEmailSetupGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Documents"), selectedItem._Name));
+                    break;
+                case "CopySetupFromCompany":
+                    var childWindow = new CwCompanyEmailSetup();
+                    childWindow.Closing += async delegate
+                    {
+                        if (childWindow.DialogResult == true)
+                        {
+                            var newItem = new CompanySMTPClient();
+                            StreamingManager.Copy(childWindow.EmailSetup, newItem);
+                            var err = await api.Insert(newItem);
+                            if (err != ErrorCodes.Succes)
+                                UtilDisplay.ShowErrorCode(err);
+                            else
+                                dgEmailSetupGrid.UpdateItemSource(1, newItem);
+                        }
+                    };
+                    childWindow.Show();
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);

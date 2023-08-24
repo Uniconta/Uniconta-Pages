@@ -26,6 +26,7 @@ namespace UnicontaClient.Pages.CustomPage
     {
         public override bool Readonly { get { return false; } }
         public override bool SingleBufferUpdate { get { return false; } }
+        public override bool IsAutoSave => false;
     }
     /// <summary>
     /// Interaction logic for FAMPrimoTransClientGridPage.xaml
@@ -45,10 +46,12 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override Filter[] DefaultFilters()
         {
-            Filter primoFilter = new Filter() { name = "Primo" };
-            primoFilter.parameterType = typeof(int);
-            primoFilter.value = "1";
-            return new Filter[] { primoFilter };
+            return new[] { new Filter
+            {
+                name = "PrimoTrans",
+                parameterType = typeof(int),
+                value = "1"
+            }};
         }
         private void InitPage(UnicontaBaseEntity master = null)
         {
@@ -75,6 +78,8 @@ namespace UnicontaClient.Pages.CustomPage
                         dgFAMPrimoTranClient.CopyRow();
                     break;
                 case "SaveGrid":
+                    if (selectedItem != null && selectedItem._Date == DateTime.MinValue)
+                        selectedItem._Date = DateTime.Today;
                     saveGrid();
                     break;
                 case "DeleteRow":

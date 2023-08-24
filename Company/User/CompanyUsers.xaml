@@ -21,6 +21,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CompanyUsers"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="UserName" Width="120" ReadOnly="True" FixedWidth="True" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="UserLoginId" Width="120" FixedWidth="True" ReadOnly="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Role" Width="100" FixedWidth="True" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ServerUser" Width="70" FixedWidth="True" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="UserTasks" IsSmart="True" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="FixedProfile" Width="100" FixedWidth="True" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="HasTwoFactor" Width="70" FixedWidth="True" />

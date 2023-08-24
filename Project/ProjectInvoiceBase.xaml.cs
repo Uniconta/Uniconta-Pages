@@ -36,7 +36,7 @@ namespace UnicontaClient.Pages.CustomPage
     {
         [ForeignKeyAttribute(ForeignKeyTable = typeof(InvItem))]
         [Display(Name = "InvoicingItemNumber", ResourceType = typeof(PrCategoryText))]
-        public string InvoiceItem { get { return _Item; } set { if (_Item == value) return; _Item = value; _itemRec = null; NotifyPropertyChanged("Item"); NotifyPropertyChanged("ItemName"); NotifyPropertyChanged("Text"); } }
+        public string InvoiceItem { get { return _Item; } set { if (_Item == value) return; _Item = value; NotifyPropertyChanged("Item"); NotifyPropertyChanged("ItemName"); NotifyPropertyChanged("Text"); } }
         public bool IsEnabled { get { return !Invoiced; } }
 
         public double _SalesAmountAgr, _CostAmountAgr;
@@ -150,7 +150,7 @@ namespace UnicontaClient.Pages.CustomPage
                     dgProjectTransClientInvoiceGrid.Readonly = false;
                     break;
                 case "Aggregate":
-                    aggregate(cbxItem.IsChecked.Value, cbxEmployee.IsChecked.Value, cbxCategory.IsChecked.Value);
+                    aggregate(cbxItem.IsChecked.GetValueOrDefault(), cbxEmployee.IsChecked.GetValueOrDefault(), cbxCategory.IsChecked.GetValueOrDefault());
                     dgProjectTransClientInvoiceGrid.Readonly = true;
                     break;
                 case "GenerateInvoice":

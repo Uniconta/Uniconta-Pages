@@ -124,7 +124,7 @@ namespace UnicontaClient.Pages.CustomPage
             var debt = editrow.Debtor;
             api.SetMaster(contactClient, debt);
             AddDockItem(TabControls.ContactPage2, new object[] { contactClient, false, debt }, string.Format("{0} : {1},{2}",
-                Uniconta.ClientTools.Localization.lookup("Contacts"), editrow.Number, debt.Name), "Add_16x16.png");
+                Uniconta.ClientTools.Localization.lookup("Contacts"), editrow.Number, debt.Name), "Add_16x16");
         }
 
         async void BindContact(Debtor debtor)
@@ -286,6 +286,12 @@ namespace UnicontaClient.Pages.CustomPage
                     leInstallation.cacheFilter = new AccountCacheFilter(installationCache, 1, editrow._DCAccount);
             }
             LoadType(typeof(Uniconta.DataModel.Debtor));
+        }
+
+        private void cmbContactName_KeyDown(object sender, KeyEventArgs e)
+        {
+            var selectedItem = cmbContactName.SelectedItem as Contact;
+            GoToContact(selectedItem, e.Key);
         }
     }
 }

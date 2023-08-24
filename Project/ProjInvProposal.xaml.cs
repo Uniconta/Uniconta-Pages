@@ -199,7 +199,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
         void dgProjInvProposalGrid_RowDoubleClick()
         {
-            localMenu_OnItemClicked("ProjInvProposalLine");
+            ribbonControl.PerformRibbonAction("ProjInvProposalLine");
         }
         private void localMenu_OnItemClicked(string ActionType)
         {
@@ -213,10 +213,10 @@ namespace UnicontaClient.Pages.CustomPage
                 case "AddRow":
                     if (dgProjInvProposalGrid.masterRecords != null)
                     {
-                        AddDockItem(TabControls.ProjInvProposalPage2, new object[] { api, dgProjInvProposalGrid.masterRecord }, Uniconta.ClientTools.Localization.lookup("InvoiceProposal"), "Add_16x16.png");
+                        AddDockItem(TabControls.ProjInvProposalPage2, new object[] { api, dgProjInvProposalGrid.masterRecord }, Uniconta.ClientTools.Localization.lookup("InvoiceProposal"), "Add_16x16");
                     }
                     else
-                        AddDockItem(TabControls.ProjInvProposalPage2, api, Uniconta.ClientTools.Localization.lookup("InvoiceProposal"), "Add_16x16.png");
+                        AddDockItem(TabControls.ProjInvProposalPage2, api, Uniconta.ClientTools.Localization.lookup("InvoiceProposal"), "Add_16x16");
                     break;
                 case "EditRow":
                     if (selectedItem == null)

@@ -367,7 +367,7 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
         /// </summary>
         void ValidateProject(TMJournalLineClient rec)
         {
-            if (err)
+            if (err || proj == null)
                 return;
 
             if (proj._Blocked)

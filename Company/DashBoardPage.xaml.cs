@@ -40,12 +40,11 @@ namespace UnicontaClient.Pages.CustomPage
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgDashboardpage.RowDoubleClick += DgDashboardpage_RowDoubleClick;
             colUserId.Header = Uniconta.ClientTools.Localization.lookup("UserId");
-            CriteriaOperator.RegisterCustomFunction(new DashBoardView.ExchangeRateFunction(new Uniconta.API.System.CrudAPI(api)));
         }
 
         private void DgDashboardpage_RowDoubleClick()
         {
-            localMenu_OnItemClicked("OpenDashboard");
+            ribbonControl.PerformRibbonAction("OpenDashboard");
         }
 
         void localMenu_OnItemClicked(string ActionType)

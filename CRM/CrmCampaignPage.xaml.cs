@@ -76,7 +76,7 @@ namespace UnicontaClient.Pages.CustomPage
                     object[] param = new object[2];
                     param[0] = api;
                     param[1] = null;
-                    AddDockItem(TabControls.CrmCampaignPage2, param, Uniconta.ClientTools.Localization.lookup("Campaign"), "Add_16x16.png");
+                    AddDockItem(TabControls.CrmCampaignPage2, param, Uniconta.ClientTools.Localization.lookup("Campaign"), "Add_16x16");
                     break;
                 case "EditRow":
                     if (selectedItem != null)
@@ -120,7 +120,7 @@ namespace UnicontaClient.Pages.CustomPage
                     object[] fuParam = new object[2];
                     fuParam[0] = api;
                     fuParam[1] = selectedItem;
-                    AddDockItem(TabControls.CrmCampaignFollowUp, fuParam, true, String.Format(Uniconta.ClientTools.Localization.lookup("AddOBJ"), Uniconta.ClientTools.Localization.lookup("FollowUp")), "Add_16x16.png");
+                    AddDockItem(TabControls.CrmCampaignFollowUp, fuParam, true, String.Format(Uniconta.ClientTools.Localization.lookup("AddOBJ"), Uniconta.ClientTools.Localization.lookup("FollowUp")), "Add_16x16");
                     break;
                 case "SendEmail":
                     if (selectedItem == null) return;

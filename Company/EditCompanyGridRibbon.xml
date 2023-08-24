@@ -2,28 +2,31 @@
 <root>
   <RibbonItem TabId="0" LocalizedNameKey="Home">
     <!---When we create new TabPage -->
-    <RibbonItem Action="Save" ShortcutKey="Ctrl+S" LocalizedNameKey="SaveOBJ" Parameter="Company" Glyph="save-16x16.png" LargeGlyph="save-32x32.png"/>
-    <RibbonItem Action="Cancel" LocalizedNameKey="Cancel" Glyph="close-16x16.png" LargeGlyph="close-32x32.png"/>
+    <RibbonItem Action="Save" ShortcutKey="Ctrl+S" LocalizedNameKey="SaveOBJ" Parameter="Company" Glyph="save-16x16" LargeGlyph="save-32x32"/>
+    <RibbonItem Action="Cancel" LocalizedNameKey="Cancel" Glyph="close-16x16" LargeGlyph="close-32x32"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="OpenDocs" LocalizedNameKey="CompanyImages" LargeGlyph="Copy_32x32.png"/>
-      <RibbonItem LocalizedNameKey="Attachments" LargeGlyph="Attachments_32x32.png">
-      <RibbonItem Action="AddNote" ShortcutKey="Alt+N" LocalizedNameKey="Note" Glyph="Add_Notes_16x16.png" />
-      <RibbonItem Action="AddDoc" LocalizedNameKey="Document" Glyph="Accounts_Statement_Report_16x16.png" />
+    <RibbonItem Action="OpenDocs" LocalizedNameKey="CompanyImages" LargeGlyph="Copy_32x32"/>
+      <RibbonItem LocalizedNameKey="Attachments" LargeGlyph="Attachments_32x32">
+      <RibbonItem Action="AddNote" ShortcutKey="Alt+N" LocalizedNameKey="Note" Glyph="Add_Notes_16x16" />
+      <RibbonItem Action="AddDoc" LocalizedNameKey="Document" Glyph="Accounts_Statement_Report_16x16" />
     </RibbonItem>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="Activate" LocalizedNameKey="Activate" LargeGlyph="Allow_32x32.png"/>
-    <RibbonItem Action="Deactivate" LocalizedNameKey="Deactivate" LargeGlyph="Deny_32x32.png"/>
+    <RibbonItem Action="Activate" LocalizedNameKey="Activate" LargeGlyph="Allow_32x32"/>
+    <RibbonItem Action="Deactivate" LocalizedNameKey="Deactivate" LargeGlyph="Deny_32x32"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="DeleteAllTransactions" LocalizedNameKey="DeleteAllTransactions" LargeGlyph="Delete_32x32.png"/>
-    <RibbonItem Action="Delete" ShortcutKey="Shift+DELETE" LocalizedNameKey="DeleteOBJ" Parameter="Company" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png"/>
+    <RibbonItem Action="DeleteAllTransactions" LocalizedNameKey="DeleteAllTransactions" LargeGlyph="Delete_32x32"/>
+    <RibbonItem Action="Delete" ShortcutKey="Shift+DELETE" LocalizedNameKey="DeleteOBJ" Parameter="Company" Glyph="Delete_16x16" LargeGlyph="Delete_32x32"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="CreateBackup" LocalizedNameKey="Backup" LargeGlyph="Update_32x32.png"/>
+    <RibbonItem Action="CreateBackup" LocalizedNameKey="Backup" LargeGlyph="Update_32x32"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="AllowedIPAdresses" LocalizedNameKey="AllowedIPAdresses" LargeGlyph="Account-statement_32x32.png"/>
+    <RibbonItem Action="AllowedIPAdresses" LocalizedNameKey="AllowedIPAdresses" LargeGlyph="Account-statement_32x32"/>
   </RibbonItem>
+	<RibbonItem>
+		<RibbonItem Action="RegisterEdelivery" LocalizedNameKey="RegisterEdelivery" LargeGlyph="Bank_Connect_32x32"/>
+	</RibbonItem>
 </root>

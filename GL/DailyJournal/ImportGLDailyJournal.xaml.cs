@@ -146,14 +146,14 @@ namespace UnicontaClient.Pages.CustomPage
                 if (ctrlBrowseFile.SelectedFileInfos == null && voucherClient == null)
                     return;
             selectedbankFormat.BankAccountPos = cbBankAccountPos.Text;
-            selectedbankFormat._Reverse = chkReverse.IsChecked.Value;
+            selectedbankFormat._Reverse = chkReverse.IsChecked.GetValueOrDefault();
             if (!selectedbankFormat._BankReconciliation)
             {
                 if (selectedbankFormat.Format == BankImportFormatType.LANDSBANKINN || selectedbankFormat.Format == BankImportFormatType.ISLANDSBANKI || selectedbankFormat.Format == BankImportFormatType.ARION)
                     selectedbankFormat._BankAccountNo = txtBankAccount.Text;
                 else
                     selectedbankFormat._BankAccount = BankAccountLookupEditor.Text;
-                selectedbankFormat._PutLinesOnHold = chkPutLinesOnHold.IsChecked.Value;
+                selectedbankFormat._PutLinesOnHold = chkPutLinesOnHold.IsChecked.GetValueOrDefault();
             }
             else
             {
@@ -223,27 +223,26 @@ namespace UnicontaClient.Pages.CustomPage
 
         async private Task<ErrorCodes> ImportFromZipFile(BankImportFormatClient selectedbankFormat, SelectedFileInfo fileInfo, PostingAPI postingapi, bool append, DateTime fromDate, DateTime toDate)
         {
-            var zipContent = new MemoryStream(fileInfo.FileBytes);
-            var zipFile = new ZipFile(zipContent);
+            var zipFile = new ZipFile(new Unistream(fileInfo.FileBytes));
             ErrorCodes importZipResult = ErrorCodes.NoSucces;
 
+            var st = UnistreamReuse.Create();
             foreach (ZipEntry zipEntry in zipFile)
             {
                 if (!zipEntry.IsFile)
                     continue;
 
-                var bufferSize = (int)zipEntry.Size;
-                var buffer = UnistreamReuse.Create(bufferSize);
                 var stream = zipFile.GetInputStream(zipEntry);
-                buffer.CopyFrom(stream);
+                st.Reset();
+                st.CopyFrom(stream);
 
                 var zipFileInfo = new FileInfo(zipEntry.Name);
-                importZipResult = await postingapi.ImportJournalLines(selectedbankFormat, buffer, append, fromDate, toDate);
-                buffer.Release();
+                importZipResult = await postingapi.ImportJournalLines(selectedbankFormat, st, append, fromDate, toDate);
 
                 if (importZipResult != ErrorCodes.Succes)
                     break;
             }
+            st.Release();
 
             return importZipResult;
         }
@@ -295,13 +294,13 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "AddBankFormat":
 
-                    AddDockItem(TabControls.ImportGLDailyJournalPage2, null, Uniconta.ClientTools.Localization.lookup("BankFormatName"), "Add_16x16.png");
+                    AddDockItem(TabControls.ImportGLDailyJournalPage2, null, Uniconta.ClientTools.Localization.lookup("BankFormatName"), "Add_16x16");
                     break;
                 case "EditBankFormat":
                     if (selectedbankFormat != null)
                     {
                         object[] Params = new object[2] { selectedbankFormat, true };
-                        AddDockItem(TabControls.ImportGLDailyJournalPage2, Params, Uniconta.ClientTools.Localization.lookup("BankFormatName"), "Edit_16x16.png");
+                        AddDockItem(TabControls.ImportGLDailyJournalPage2, Params, Uniconta.ClientTools.Localization.lookup("BankFormatName"), "Edit_16x16");
                     }
                     break;
                 case "LookupAccounts":
@@ -323,7 +322,6 @@ namespace UnicontaClient.Pages.CustomPage
 
         void ViewBankStatemnt(BankImportFormatClient selectedBankFormat)
         {
-#if !SILVERLIGHT
             var objCw = new CwViewBankStatementData(ctrlBrowseFile.FilePath, selectedBankFormat);
             objCw.Closed += delegate
                 {
@@ -334,7 +332,6 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                 };
             objCw.Show();
-#endif
         }
 
         void CopyBankFormat(BankImportFormatClient selectedItem)
@@ -343,7 +340,7 @@ namespace UnicontaClient.Pages.CustomPage
             StreamingManager.Copy(selectedItem, bankFormat);
             bankFormat.SetMaster(api.CompanyEntity);
             var parms = new object[2] { bankFormat, false };
-            AddDockItem(TabControls.ImportGLDailyJournalPage2, parms, Uniconta.ClientTools.Localization.lookup("BankFormatName"), "Add_16x16.png");
+            AddDockItem(TabControls.ImportGLDailyJournalPage2, parms, Uniconta.ClientTools.Localization.lookup("BankFormatName"), "Add_16x16");
         }
 
         public override void OnClosePage(object[] refreshParams)

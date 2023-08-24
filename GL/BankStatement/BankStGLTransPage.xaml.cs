@@ -147,12 +147,12 @@ namespace UnicontaClient.Pages.CustomPage
             if (hideGreen)
             {
                 ibase.Caption = string.Format(Uniconta.ClientTools.Localization.lookup("ShowOBJ"), Uniconta.ClientTools.Localization.lookup("Green"));
-                ibase.LargeGlyph = Utilities.Utility.GetGlyph("ShowGreen_32x32.png");
+                ibase.LargeGlyph = Utilities.Utility.GetGlyph("ShowGreen_32x32");
             }
             else
             {
                 ibase.Caption = string.Format(Uniconta.ClientTools.Localization.lookup("HideOBJ"), Uniconta.ClientTools.Localization.lookup("Green"));
-                ibase.LargeGlyph = Utilities.Utility.GetGlyph("HideGreen_32x32.png");
+                ibase.LargeGlyph = Utilities.Utility.GetGlyph("HideGreen_32x32");
             }
         }
         private void localMenu_OnItemClicked(string ActionType)

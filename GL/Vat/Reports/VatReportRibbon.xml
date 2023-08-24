@@ -1,34 +1,35 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <root>
   <RibbonItem TabId="0" LocalizedNameKey="Home">
-    <RibbonItem Action="Search" LocalizedNameKey="Search" LargeGlyph="Validate_32x32.png" ShortcutKey="Ctrl+H" />
+    <RibbonItem Action="Search" LocalizedNameKey="Search" LargeGlyph="Validate_32x32" ShortcutKey="Ctrl+H" />
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="VatReportSpain" LocalizedNameKey="Modelo 303" LargeGlyph="Generate_32x32.png" ShortcutKey="Ctrl+G"/>
-    <RibbonItem Action="VatReportNorway" LocalizedNameKey="Mva skattemeldingen" LargeGlyph="Add_Menu_32x32.png"/>
-    <RibbonItem Action="VatReportDenmark" LocalizedNameKey="Momsopgørelse" LargeGlyph="Generate_32x32.png" ShortcutKey="Ctrl+G"/>
-    <RibbonItem Action="VatReportHolland" LocalizedNameKey="BTW Aangifte" LargeGlyph="Generate_32x32.png" ShortcutKey="Ctrl+G"/>
-    <RibbonItem Action="VatReportEstonia" LocalizedNameKey="KM avaldus" LargeGlyph="Generate_32x32.png" ShortcutKey="Ctrl+G"/>
-    <RibbonItem Action="VatReportIceland" LocalizedNameKey="VSK skýrsla" LargeGlyph="Generate_32x32.png" ShortcutKey="Ctrl+G"/>
+    <RibbonItem Action="VatReportSpain" LocalizedNameKey="Modelo 303" LargeGlyph="Show_Invoice_32x32" ShortcutKey="Ctrl+G"/>
+    <RibbonItem Action="VatReportNorway" LocalizedNameKey="Mva skattemeldingen" LargeGlyph="Add_Menu_32x32"/>
+    <RibbonItem Action="VatReportDenmark" LocalizedNameKey="Momsopgørelse" LargeGlyph="Show_Invoice_32x32" ShortcutKey="Ctrl+G"/>
+    <RibbonItem Action="VatReportHolland" LocalizedNameKey="BTW Aangifte" LargeGlyph="Show_Invoice_32x32" ShortcutKey="Ctrl+G"/>
+    <RibbonItem Action="VatReportEstonia" LocalizedNameKey="KM avaldus" LargeGlyph="Show_Invoice_32x32" ShortcutKey="Ctrl+G"/>
+    <RibbonItem Action="VatReportIceland" LocalizedNameKey="VSK skýrsla" LargeGlyph="Show_Invoice_32x32" ShortcutKey="Ctrl+G"/>
+    <RibbonItem Action="UKVatReturn" LocalizedNameKey="UKVatReturn" LargeGlyph="VAT_32x32" />
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="UKVatReturn" LocalizedNameKey="UKVatReturn" LargeGlyph="VAT_32x32.png" />
+    <RibbonItem Action="Save" ShortcutKey="CTRL+S" LocalizedNameKey="SaveOBJ" Parameter="VATSettlement" Glyph="save-16x16" LargeGlyph="save-32x32"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="Transactions" ShortcutKey="Alt+T" LocalizedNameKey="Transactions" LargeGlyph="Voucher_Transactions_32x32.png" />
+    <RibbonItem Action="Transactions" ShortcutKey="Alt+T" LocalizedNameKey="Transactions" LargeGlyph="Posted_Transaction_32x32" />
   </RibbonItem>
   <RibbonItem>
     <!---If we want to create a new group in same PageTab-->
-    <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32.png">
+    <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32">
       <!---If we want Inner menu-->
-      <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
-      <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16.png" ShortcutKey="" />
-      <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
-      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16.png" ShortcutKey=""/>
-      <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16.png" ShortcutKey="Ctrl+U"/>
-      <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportLayout" EnableSeperator="True" Glyph="ExportLayout_16x16.png" LargeGlyph="ExportLayout_16x16.png" ShortcutKey=""/>
-      <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportLayout" Glyph="Import_16x16.png" LargeGlyph="Import_16x16.png" ShortcutKey=""/>
-      <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16.png" ShortcutKey=""/>
+      <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
+      <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16" ShortcutKey="" />
+      <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
+      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16" ShortcutKey=""/>
+      <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16" ShortcutKey="Ctrl+U"/>
+      <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportLayout" EnableSeperator="True" Glyph="ExportLayout_16x16" LargeGlyph="ExportLayout_16x16" ShortcutKey=""/>
+      <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportLayout" Glyph="Import_16x16" LargeGlyph="Import_16x16" ShortcutKey=""/>
+      <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16" ShortcutKey=""/>
     </RibbonItem>
   </RibbonItem>
 </root>

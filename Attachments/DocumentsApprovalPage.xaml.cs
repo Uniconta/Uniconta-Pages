@@ -193,7 +193,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void PrimaryKeyId_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            localMenu_OnItemClicked("ViewVoucher");
+            ribbonControl.PerformRibbonAction("ViewVoucher");
         }
     }
 }

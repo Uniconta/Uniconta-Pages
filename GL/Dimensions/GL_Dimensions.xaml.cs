@@ -123,7 +123,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "SetupDimension":
                     var compClient = new CompanyClient();
                     StreamingManager.Copy(api.CompanyEntity, compClient);
-                    AddDockItem(TabControls.GL_SetupDimension, compClient, Uniconta.ClientTools.Localization.lookup("SetupDimension"), "Add_16x16.png");
+                    AddDockItem(TabControls.GL_SetupDimension, compClient, Uniconta.ClientTools.Localization.lookup("SetupDimension"), "Add_16x16");
                     break;
                 case "JoinDimensions":
                     var cwJoinTwoDimension = new CWJoinTwoDimensions(api, cmbDimensions.SelectedItem as string);

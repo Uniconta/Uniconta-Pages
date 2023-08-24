@@ -166,7 +166,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (glVatCache == null)
                 glVatCache = await api.LoadCache<Uniconta.DataModel.GLVat>();
 
-            var vatEUList = glVatCache.Where(s => s._TypeSales == CreateVatOSSFile.VATTYPE_MOSS).Select(x => x._Vat).Distinct();
+            var vatEUList = glVatCache.Where(s => s._VatOperationCode == 200 || s._VatOperationCode == 201).Select(x => x._Vat).Distinct();
 
             List<IEnumerable<string>> listOfLists = new List<IEnumerable<string>>();
             for (int i = 0; i < vatEUList.Count(); i += 40)
@@ -263,20 +263,22 @@ namespace UnicontaClient.Pages.CustomPage
                 if (lastGLVat == null)
                     continue;
 
-                var vatOSS = new VatOSSTable();
-                vatOSS._CompanyId = api.CompanyId;
-                vatOSS._Account = invLine._DCAccount;
-                vatOSS._Date = invLine._Date;
-                vatOSS._InvoiceNumber = invLine._InvoiceNumber;
-                vatOSS._Item = invLine._Item;
-                vatOSS._Vat = lastVat;
-                vatOSS._MOSSType = lastGLVat._MOSSType;
-                vatOSS._MOSSTypeName = lastVatName;
-                vatOSS._VatCountry = lastGLVat._VatCountry;
-                vatOSS._BusinessCountry = lastGLVat._BusinessCountry;
-                vatOSS._ShipmentCountry = lastGLVat._ShipmentCountry;
-                vatOSS._Id = lastGLVat._Id;
-                vatOSS._Amount = -invLine.NetAmount;
+                var vatOSS = new VatOSSTable
+                {
+                    _CompanyId = api.CompanyId,
+                    _Account = invLine._DCAccount,
+                    _Date = invLine._Date,
+                    _InvoiceNumber = invLine._InvoiceNumber,
+                    _Item = invLine._Item,
+                    _Vat = lastVat,
+                    _MOSSType = lastGLVat._MOSSType,
+                    _MOSSTypeName = lastVatName,
+                    _VatCountry = lastGLVat._VatCountry,
+                    _BusinessCountry = lastGLVat._BusinessCountry,
+                    _ShipmentCountry = lastGLVat._ShipmentCountry,
+                    _Id = lastGLVat._Id,
+                    _Amount = -invLine.NetAmount
+                };
                 vatOSS._VatAmount = lastGLVat.VatAmount(vatOSS._Amount, vatOSS._Date, false, GLVatCalculationMethod.Netto);
                 listOfResults.Add(vatOSS);
             }
@@ -290,7 +292,7 @@ namespace UnicontaClient.Pages.CustomPage
             string lastId = null;
             foreach (var glvat in glVatLst)
             {
-                if (glvat._TypeSales != CreateVatOSSFile.VATTYPE_MOSS || (glvat._BusinessCountry == CountryCode.Unknown && glvat._ShipmentCountry == CountryCode.Unknown))
+                if ((glvat._VatOperationCode != 200 && glvat._VatOperationCode != 201) || (glvat._BusinessCountry == CountryCode.Unknown && glvat._ShipmentCountry == CountryCode.Unknown))
                     continue;
 
                 if (lastId == glvat._Id)

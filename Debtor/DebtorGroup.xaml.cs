@@ -77,7 +77,7 @@ namespace UnicontaClient.Pages.CustomPage
                         EditAll();
                     break;
                 case "AddRow":
-                    AddDockItem(TabControls.DebtorGroupPage2, api, Uniconta.ClientTools.Localization.lookup("DebtorGroup"), "Add_16x16.png");
+                    AddDockItem(TabControls.DebtorGroupPage2, api, Uniconta.ClientTools.Localization.lookup("DebtorGroup"), "Add_16x16");
                     break;
                 case "EditRow": 
                     if (selectedItem == null)
@@ -127,7 +127,7 @@ namespace UnicontaClient.Pages.CustomPage
             var debtorGrp = Activator.CreateInstance(selectedItem.GetType()) as DebtorGroupClient;
             CorasauDataGrid.CopyAndClearRowId(selectedItem, debtorGrp);
             var parms = new object[2] { debtorGrp, false };
-            AddDockItem(TabControls.DebtorGroupPage2, parms, Uniconta.ClientTools.Localization.lookup("Debtorgroup"), "Add_16x16.png");
+            AddDockItem(TabControls.DebtorGroupPage2, parms, Uniconta.ClientTools.Localization.lookup("Debtorgroup"), "Add_16x16");
         }
 
         bool copyRowIsEnabled = false;

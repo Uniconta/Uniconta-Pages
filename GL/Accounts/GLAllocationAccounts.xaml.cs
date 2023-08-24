@@ -87,7 +87,7 @@ namespace UnicontaClient.Pages.CustomPage
                     object[] param = new object[2];
                     param[0] = newItem;
                     param[1] = false;
-                    AddDockItem(TabControls.AllocationAccountPage2, param, Uniconta.ClientTools.Localization.lookup("SetupAllocations"), "Add_16x16.png");
+                    AddDockItem(TabControls.AllocationAccountPage2, param, Uniconta.ClientTools.Localization.lookup("SetupAllocations"), "Add_16x16");
                     break;
                 case "EditRow":
                     if (selectedItem == null)

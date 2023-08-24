@@ -52,7 +52,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         void DgFolderGrid_RowDoubleClick()
         {
-            localMenu_OnItemClicked("AddDoc");
+            ribbonControl.PerformRibbonAction("AddDoc");
         }
         private void Name_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {

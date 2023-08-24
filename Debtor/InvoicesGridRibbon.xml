@@ -1,53 +1,53 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <root>
   <RibbonItem TabId="0" LocalizedNameKey="Home">
-    <RibbonItem Action="EditRow" ShortcutKey="Ctrl+E" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>
+    <RibbonItem Action="EditRow" ShortcutKey="Ctrl+E" LocalizedNameKey="Edit" Glyph="Edit_16x16" LargeGlyph="Edit_32x32"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh.png" LargeGlyph="refresh.png"/>
-    <RibbonItem Action="Filter" ShortcutKey="Ctrl+I" LocalizedNameKey="Filter" LargeGlyph="Filter_32x32.png"/>
-    <RibbonItem Action="ClearFilter" ShortcutKey="Ctrl+K" LocalizedNameKey="ClearFilter" LargeGlyph="Filter_Clear_32x32.png"/>
+    <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh" LargeGlyph="refresh"/>
+    <RibbonItem Action="Filter" ShortcutKey="Ctrl+I" LocalizedNameKey="Filter" LargeGlyph="Filter_32x32"/>
+    <RibbonItem Action="ClearFilter" ShortcutKey="Ctrl+K" LocalizedNameKey="ClearFilter" LargeGlyph="Filter_Clear_32x32"/>
   </RibbonItem>
   <!---If we want to create a new group in same PageTab-->
   <RibbonItem>
-    <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32.png">
+    <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32">
       <!---If we want Inner menu-->
-      <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
-      <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16.png" ShortcutKey="" />
-      <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
-      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16.png" ShortcutKey=""/>
-      <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16.png" ShortcutKey="Ctrl+U"/>
-      <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportLayout" EnableSeperator="True" Glyph="ExportLayout_16x16.png" LargeGlyph="ExportLayout_16x16.png" ShortcutKey=""/>
-      <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportLayout" Glyph="Import_16x16.png" LargeGlyph="Import_16x16.png" ShortcutKey=""/>
-      <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16.png" ShortcutKey=""/>
+      <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
+      <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16" ShortcutKey="" />
+      <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
+      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16" ShortcutKey=""/>
+      <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16" ShortcutKey="Ctrl+U"/>
+      <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportLayout" EnableSeperator="True" Glyph="ExportLayout_16x16" LargeGlyph="ExportLayout_16x16" ShortcutKey=""/>
+      <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportLayout" Glyph="Import_16x16" LargeGlyph="Import_16x16" ShortcutKey=""/>
+      <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16" ShortcutKey=""/>
     </RibbonItem>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="Trans" LocalizedNameKey="Transactions" Glyph="Cover_16x16.png" LargeGlyph="Posted_Transaction_32x32.png" ShortcutKey="Ctrl+T" />
-    <RibbonItem Action="PostedBy" LocalizedNameKey="PostedBy" Glyph="Debtor_Group_Posting_32x32.png" LargeGlyph="Debtor_Group_Posting_32x32.png"/>
-    <RibbonItem Action="AddDoc" LocalizedNameKey="Attachments" LargeGlyph="Attachments_32x32.png" />
-    <RibbonItem Action="InvoiceLine" LocalizedNameKey="InvoiceLines" LargeGlyph="Order_Lines_Highlighted_32x32.png" ShortcutKey="ALT+L"/>
-    <RibbonItem Action="OriginalInvoicePdf" LocalizedNameKey="ShowOBJ" Parameter="OriginalInvoicePdf" LargeGlyph="Show_Invoice_32x32.png" />
-    <RibbonItem Action="ShowInvoice" LocalizedNameKey="ShowInvoice" LargeGlyph="Show_Invoice_32x32.png" />
-    <RibbonItem Action="ShowPackNote" LocalizedNameKey="ShowOBJ" Parameter="Packnote" LargeGlyph="Pack_Note_32x32.png" />
+    <RibbonItem Action="Trans" LocalizedNameKey="Transactions" Glyph="Cover_16x16" LargeGlyph="Posted_Transaction_32x32" ShortcutKey="Ctrl+T" />
+    <RibbonItem Action="PostedBy" LocalizedNameKey="PostedBy" Glyph="Debtor_Group_Posting_32x32" LargeGlyph="Debtor_Group_Posting_32x32"/>
+    <RibbonItem Action="AddDoc" LocalizedNameKey="Attachments" LargeGlyph="Attachments_32x32" />
+    <RibbonItem Action="InvoiceLine" LocalizedNameKey="InvoiceLines" LargeGlyph="Order_Lines_Highlighted_32x32" ShortcutKey="ALT+L"/>
+    <RibbonItem Action="OriginalInvoicePdf" LocalizedNameKey="ShowOBJ" Parameter="OriginalInvoicePdf" LargeGlyph="Show_Invoice_32x32" />
+    <RibbonItem Action="ShowInvoice" LocalizedNameKey="ShowInvoice" LargeGlyph="Show_Invoice_32x32" />
+    <RibbonItem Action="ShowPackNote" LocalizedNameKey="ShowOBJ" Parameter="Packnote" LargeGlyph="Pack_Note_32x32" />
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="SendInvoice" LocalizedNameKey="Sendinvoicebyemail" LargeGlyph="SendInvoiceMail_32x32.png" />
-    <RibbonItem Action="SendAsOutlook" LocalizedNameKey="SendInvoiceInOutLook" LargeGlyph="Posted_Journal_32x32.png" />
+    <RibbonItem Action="SendInvoice" LocalizedNameKey="Sendinvoicebyemail" LargeGlyph="SendInvoiceMail_32x32" />
+    <RibbonItem Action="SendAsOutlook" LocalizedNameKey="SendInvoiceInOutLook" LargeGlyph="Posted_Journal_32x32" />
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="SendUBL" LocalizedNameKey="SendInvoicebyUBL" Module="_OIOUBLSendOnServer" LargeGlyph="SendInvoiceMail_32x32.png" />
-    <RibbonItem LocalizedNameKey="GenerateOBJ" Parameter="einvoice" LargeGlyph="Account-statement_32x32.png">
-      <RibbonItem Action="GenerateOioXml" LocalizedNameKey="CurrentRecord" Glyph="Attachments_16x16.png"/>
-      <RibbonItem Action="GenerateMarkedOioXml" LocalizedNameKey="SelectedRows" Glyph="Item_Number_16x16.png"/>
-      <RibbonItem Action="GenerateAllOioXml" LocalizedNameKey="All" Glyph="Reseller_16x16.png"/>
+    <RibbonItem Action="SendUBL" LocalizedNameKey="SendInvoicebyUBL" Module="_OIOUBLSendOnServer" LargeGlyph="SendInvoiceMail_32x32" />
+    <RibbonItem LocalizedNameKey="GenerateOBJ" Parameter="einvoice" LargeGlyph="Account-statement_32x32">
+      <RibbonItem Action="GenerateOioXml" LocalizedNameKey="CurrentRecord" Glyph="Attachments_16x16"/>
+      <RibbonItem Action="GenerateMarkedOioXml" LocalizedNameKey="SelectedRows" Glyph="Item_Number_16x16"/>
+      <RibbonItem Action="GenerateAllOioXml" LocalizedNameKey="All" Glyph="Reseller_16x16"/>
     </RibbonItem>
-    <RibbonItem Action="DocSendLog" LocalizedNameKey="Log" ControlName="DocsSendLogGridPage" LargeGlyph="Server_Count_32x32.png" />
+    <RibbonItem Action="DocSendLog" LocalizedNameKey="Log" ControlName="DocsSendLogGridPage" LargeGlyph="Server_Count_32x32" />
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="CreateOrder" LocalizedNameKey="CreateOBJ" Parameter="Order" LargeGlyph="Orders_32x32.png"/>
+    <RibbonItem Action="CreateOrder" LocalizedNameKey="CreateOBJ" Parameter="Order" LargeGlyph="Orders_32x32"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="PreviousAddresses" LocalizedNameKey="PreviousAddresses" LargeGlyph="CopyUserTable_32x32.png"/>
+    <RibbonItem Action="PreviousAddresses" LocalizedNameKey="PreviousAddresses" LargeGlyph="CopyUserTable_32x32"/>
   </RibbonItem>
 </root>

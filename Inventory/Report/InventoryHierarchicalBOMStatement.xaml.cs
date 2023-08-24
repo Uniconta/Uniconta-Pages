@@ -189,13 +189,13 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 dgInvBomclientGrid.treeListView.ExpandAllNodes();
                 ibase.Caption = Uniconta.ClientTools.Localization.lookup("CollapseAll");
-                ibase.LargeGlyph = Utility.GetGlyph("Collapse_32x32.png");
+                ibase.LargeGlyph = Utility.GetGlyph("Collapse_32x32");
             }
             else
             {
                 dgInvBomclientGrid.treeListView.CollapseAllNodes();
                 ibase.Caption = Uniconta.ClientTools.Localization.lookup("ExpandAll");
-                ibase.LargeGlyph = Utility.GetGlyph("Expand_32x32.png");
+                ibase.LargeGlyph = Utility.GetGlyph("Expand_32x32");
             }
         }
 

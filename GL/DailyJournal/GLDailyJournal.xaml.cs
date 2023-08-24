@@ -134,7 +134,7 @@ namespace UnicontaClient.Pages.CustomPage
             switch (ActionType)
             {
                 case "AddRow":
-                    AddDockItem(TabControls.GLDailyJournalPage2, api, Localization.lookup("Posting"), "Add_16x16.png");
+                    AddDockItem(TabControls.GLDailyJournalPage2, api, Localization.lookup("Posting"), "Add_16x16");
                     break;
                 case "EditRow":
                     if (selectedItem != null)
@@ -486,22 +486,20 @@ namespace UnicontaClient.Pages.CustomPage
                             }
                             else
                             {
+                                string vat;
                                 if (creditor._PostingAccount != null)
                                 {
-                                    var account = (GLAccountClient)offsetCache.Get(creditor._PostingAccount);
-                                    if (account?._Vat != null)
-                                    {
-                                        if (journal._TwoVatCodes)
-                                            journalLine._OffsetVat = account._Vat;
-                                        else
-                                            journalLine._Vat = account._Vat;
-                                    }
-
                                     journalLine._OffsetAccount = creditor._PostingAccount;
+                                    vat = ((GLAccount)offsetCache.Get(creditor._PostingAccount))?._Vat;
                                 }
                                 else
+                                    vat = creditor._Vat;
+                                if (vat != null)
                                 {
-                                    journalLine._Vat = creditor._Vat;
+                                    if (journal._TwoVatCodes)
+                                        journalLine._OffsetVat = vat;
+                                    else
+                                        journalLine._Vat = vat;
                                 }
 
                                 if (journalLine._DueDate == DateTime.MinValue && creditor._Payment != string.Empty)

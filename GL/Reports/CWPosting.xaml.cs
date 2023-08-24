@@ -38,11 +38,9 @@ namespace UnicontaClient.Pages.CustomPage.GL.ChartOfAccount.Reports
         [Display(Name = "Comment", ResourceType = typeof(InputFieldDataText))]
         public string comments { get; set; }
 
-#if !SILVERLIGHT
         protected override int DialogId { get { return DialogTableId; } }
         public int DialogTableId { get; set; }
         protected override bool ShowTableValueButton { get { return true; } }
-#endif
         public string companyName, dateMsg;
         public CWPosting(Uniconta.DataModel.GLDailyJournal journal, string compName, string _dateMsg)
         {
@@ -56,13 +54,9 @@ namespace UnicontaClient.Pages.CustomPage.GL.ChartOfAccount.Reports
             this.DataContext = this;
             InitializeComponent();
 
-#if !SILVERLIGHT
             this.Title = Uniconta.ClientTools.Localization.lookup("PostJournal");
             if (string.IsNullOrWhiteSpace(txtComments.Text))
                 FocusManager.SetFocusedElement(txtComments, txtComments);
-#else
-            Utility.SetThemeBehaviorOnChildWindow(this);
-#endif
             dpPostingDate.DateTime = BasePage.GetSystemDefaultDate().Date;  // just need the date and it should NOT be convert to univesal time
             if (objJournal is Uniconta.DataModel.GLDailyJournal)
             {
@@ -113,7 +107,7 @@ namespace UnicontaClient.Pages.CustomPage.GL.ChartOfAccount.Reports
         }
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
-            IsSimulation = chkSimulation.IsChecked.Value;
+            IsSimulation = chkSimulation.IsChecked.GetValueOrDefault();
             PostedDate = dpPostingDate.DateTime;
             comments = txtComments.Text;
             SetDialogResult(true);

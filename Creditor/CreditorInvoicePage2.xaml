@@ -36,6 +36,9 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorInvoicePage2"
                 <CorasauControls:CorasauLayoutItem FieldName="SendTime" x:Name="liSendTime">
                     <CorasauControls:DateEditor x:Name="leSendTime" EditValue="{Binding SendTime,Mode=TwoWay}"/>
                 </CorasauControls:CorasauLayoutItem>
+                <CorasauControls:CorasauLayoutItem FieldName="DeliveryAccount" x:Name="liDeliveryAccount">
+                    <CorasauControls:LookupEditor x:Name="leDeliveryAccount" EditValue="{Binding DeliveryAccount,Mode=TwoWay}"/>
+                </CorasauControls:CorasauLayoutItem>
                 <CorasauControls:CorasauLayoutItem FieldName="DeliveryName" x:Name="liDeliveryName">
                     <CorasauControls:TextEditor x:Name="txtDeliveryName" EditValue="{Binding DeliveryName,Mode=TwoWay}"/>
                 </CorasauControls:CorasauLayoutItem>

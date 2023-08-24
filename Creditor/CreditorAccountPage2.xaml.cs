@@ -314,7 +314,7 @@ namespace UnicontaClient.Pages.CustomPage
                             editrow.Phone = contact.phone;
                             editrow.ContactEmail = contact.email;
                         }
-                        if (!string.IsNullOrEmpty(ci.vat))
+                        if (!string.IsNullOrEmpty(ci.vat) && editrow.Country == CountryCode.Denmark)
                             editrow.VatNumber = ci.vat;
                     }
                 }

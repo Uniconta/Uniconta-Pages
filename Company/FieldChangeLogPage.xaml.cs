@@ -96,6 +96,21 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 return CheckProperty(oldRecord, newRecord, IsNewValue, prop);
             }
+            else
+            {
+                var Comp = Uniconta.DataModel.Company.Get(oldRecord.CompanyId);
+                if (Comp != null)
+                {
+                    var idx = Comp.GetUserFieldIndex(this._PropName);
+                    if (idx >= 0)
+                    {
+                        var flds = Comp.GetUserField(oldRecord.ClassId());
+                        if (flds != null)
+                            return flds[idx]._Name;
+                    }
+                }
+            }
+
             StringBuilderReuse values = null;
             string singleVal = null;
             foreach (var RecProperty in oldRecord.GetType().GetProperties())
@@ -139,10 +154,13 @@ namespace UnicontaClient.Pages.CustomPage
             if (!RecProperty.Name.StartsWith("Dim"))
             {
                 var attribute = RecProperty.GetCustomAttributes(typeof(DisplayAttribute), true);
-                if (attribute.Count() == 0)
+                if (attribute.Length != 0)
+                {
+                    var displayAttribute = (DisplayAttribute)attribute[0];
+                    name = Uniconta.ClientTools.Localization.lookup(displayAttribute.Name);
+                }
+                else
                     return null;
-                var displayAttribute = (DisplayAttribute)attribute[0];
-                name = Uniconta.ClientTools.Localization.lookup(displayAttribute.Name);
             }
             else
             {

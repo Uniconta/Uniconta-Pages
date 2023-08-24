@@ -2,55 +2,55 @@
 <root>
   <RibbonItem TabId="0" LocalizedNameKey="Home">
     <!---When we create a new group and a new TabPage -->
-    <RibbonItem Action="AddRow" LocalizedNameKey="AddOBJ" Parameter="Journal" ControlName="GLDailyJournalPage2" ShortcutKey="CTRL+N" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png"/>
-    <RibbonItem Action="EditRow" ShortcutKey="CTRL+E" LocalizedNameKey="SetupOBJ" Parameter="Journal" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>
+    <RibbonItem Action="AddRow" LocalizedNameKey="AddOBJ" Parameter="Journal" ControlName="GLDailyJournalPage2" ShortcutKey="CTRL+N" Glyph="Add_16x16" LargeGlyph="Add_32x32"/>
+    <RibbonItem Action="EditRow" ShortcutKey="CTRL+E" LocalizedNameKey="SetupOBJ" Parameter="Journal" Glyph="Edit_16x16" LargeGlyph="Edit_32x32"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh.png" LargeGlyph="refresh.png"/>
+    <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh" LargeGlyph="refresh"/>
   </RibbonItem>
   <RibbonItem>
     <!---If we want to create a new group in same PageTab-->
-    <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32.png">
+    <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32">
       <!---If we want Inner menu-->
-      <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
-      <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16.png" ShortcutKey="" />
-      <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
-      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16.png" ShortcutKey=""/>
-      <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16.png" ShortcutKey="CTRL+U"/>
-      <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportLayout" EnableSeperator="True" Glyph="ExportLayout_16x16.png" LargeGlyph="ExportLayout_16x16.png" ShortcutKey=""/>
-      <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportLayout" Glyph="Import_16x16.png" LargeGlyph="Import_16x16.png" ShortcutKey=""/>
-      <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16.png" ShortcutKey=""/>
+      <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
+      <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16" ShortcutKey="" />
+      <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
+      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16" ShortcutKey=""/>
+      <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16" ShortcutKey="CTRL+U"/>
+      <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportLayout" EnableSeperator="True" Glyph="ExportLayout_16x16" LargeGlyph="ExportLayout_16x16" ShortcutKey=""/>
+      <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportLayout" Glyph="Import_16x16" LargeGlyph="Import_16x16" ShortcutKey=""/>
+      <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16" ShortcutKey=""/>
     </RibbonItem>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="GLDailyJournalLine" LocalizedNameKey="Journallines" ControlName="GL_DailyJournalLine" Glyph="Cover_16x16.png" LargeGlyph="Journal_Lines_Highlighted_32x32.png" ShortcutKey="ALT+L"/>
-    <RibbonItem Action="GLDailyJournalPosted" LocalizedNameKey="PostedJournals" ControlName="PostedJournals" Glyph="Cover_16x16.png" LargeGlyph="Posted_Journal_32x32.png" />
+    <RibbonItem Action="GLDailyJournalLine" LocalizedNameKey="Journallines" ControlName="GL_DailyJournalLine" Glyph="Cover_16x16" LargeGlyph="Journal_Lines_Highlighted_32x32" ShortcutKey="ALT+L"/>
+    <RibbonItem Action="GLDailyJournalPosted" LocalizedNameKey="PostedJournals" ControlName="PostedJournals" Glyph="Cover_16x16" LargeGlyph="Posted_Journal_32x32" />
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="MatchVoucherToJournalLines" LocalizedNameKey="MatchVoucherToJournalLines" ControlName="MatchPhysicalVoucherToGLDailyJournalLines" LargeGlyph="Match_32x32.png" />
+    <RibbonItem Action="MatchVoucherToJournalLines" LocalizedNameKey="MatchVoucherToJournalLines" ControlName="MatchPhysicalVoucherToGLDailyJournalLines" LargeGlyph="Match_32x32" />
   </RibbonItem>
   <RibbonItem LocalizedNameKey="Load">
-    <RibbonItem Action="ImportBankStatement" LocalizedNameKey="ImportOBJ" Parameter="BankStatement" ControlName="ImportGLDailyJournal" LargeGlyph="Import_32x32.png"/>
-    <RibbonItem Action="ImportData" LocalizedNameKey="ImportFromFile" Parameter="" LargeGlyph="Import_32x32.png"/>
+    <RibbonItem Action="ImportBankStatement" LocalizedNameKey="ImportOBJ" Parameter="BankStatement" ControlName="ImportGLDailyJournal" LargeGlyph="Import_32x32"/>
+    <RibbonItem Action="ImportData" LocalizedNameKey="ImportFromFile" Parameter="" LargeGlyph="Import_32x32"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="BilagscanReadVouchers" LocalizedNameKey="BilagscanRead" Module="Bilagscan" LargeGlyph="Import_32x32.png" />
+    <RibbonItem Action="BilagscanReadVouchers" LocalizedNameKey="BilagscanRead" Module="Bilagscan" LargeGlyph="Import_32x32" />
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="DeleteAllJournalLines" LocalizedNameKey="DeleteAllJournalLines" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png" />
-	<RibbonItem Action="MoveJournalLines" LocalizedNameKey="MoveOBJ" Parameter="Journallines" LargeGlyph="Default_Values_32x32.png" />
+    <RibbonItem Action="DeleteAllJournalLines" LocalizedNameKey="DeleteAllJournalLines" Glyph="Delete_16x16" LargeGlyph="Delete_32x32" />
+	<RibbonItem Action="MoveJournalLines" LocalizedNameKey="MoveOBJ" Parameter="Journallines" LargeGlyph="Move_32x32" />
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem LocalizedNameKey="TransTypes" LargeGlyph="Enumerated_Label_32x32.png">
-      <RibbonItem Action="AppendTransType" LocalizedNameKey="AppendOBJ" Parameter="" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png"/>
-      <RibbonItem Action="TransType" LocalizedNameKey="EditOBJ" Parameter="" ControlName="GLTransTypePage" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>
+    <RibbonItem LocalizedNameKey="TransTypes" LargeGlyph="Enumerated_Label_32x32">
+      <RibbonItem Action="AppendTransType" LocalizedNameKey="AppendOBJ" Parameter="" Glyph="Add_16x16" LargeGlyph="Add_32x32"/>
+      <RibbonItem Action="TransType" LocalizedNameKey="EditOBJ" Parameter="" ControlName="GLTransTypePage" Glyph="Edit_16x16" LargeGlyph="Edit_32x32"/>
     </RibbonItem>
-    <RibbonItem Action="GLOffSetAccountTemplate" LocalizedNameKey="OffsetAccountTemplates" ControlName="GLOffsetAccountTemplate" LargeGlyph="Offset_Account_32x32.png" />
+    <RibbonItem Action="GLOffSetAccountTemplate" LocalizedNameKey="OffsetAccountTemplates" ControlName="GLOffsetAccountTemplate" LargeGlyph="Offset_Account_32x32" />
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="AccountActivity" LocalizedNameKey="GLTransLog" ControlName="GLTransLogPage" LargeGlyph="Account-statement_32x32.png"/>
+    <RibbonItem Action="AccountActivity" LocalizedNameKey="GLTransLog" ControlName="GLTransLogPage" LargeGlyph="Account-statement_32x32"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="Iceland_PSPSettlements" LocalizedNameKey="Sækja uppgjör færsluhirðis" LargeGlyph="Settled_Transaction_32x32.png"/>
+    <RibbonItem Action="Iceland_PSPSettlements" LocalizedNameKey="Sækja uppgjör færsluhirðis" LargeGlyph="Settled_Transaction_32x32"/>
   </RibbonItem>
 </root>

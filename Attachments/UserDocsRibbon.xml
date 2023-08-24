@@ -2,36 +2,36 @@
 <root>
   <RibbonItem TabId="0" LocalizedNameKey="Home">
     <!---When we create a new TabPage -->
-    <RibbonItem Action="AddRow" LocalizedNameKey="Add" ControlName="UserDocsPage2" LargeGlyph="Add_32x32.png"/>
-    <RibbonItem Action="EditRow" ShortcutKey="Ctrl+E" LocalizedNameKey="Edit" LargeGlyph="Edit_32x32.png"/>
-	  <RibbonItem Action="UpdateRow" LocalizedNameKey="UpdateOBJ" Parameter="Content" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey="Ctrl+E"/>
-	  <RibbonItem Action="Save" LocalizedNameKey="Save" LargeGlyph="save-32x32.png" />
+    <RibbonItem Action="AddRow" LocalizedNameKey="Add" ControlName="UserDocsPage2" LargeGlyph="Add_32x32"/>
+    <RibbonItem Action="EditRow" ShortcutKey="Ctrl+E" LocalizedNameKey="Edit" LargeGlyph="Edit_32x32"/>
+	  <RibbonItem Action="UpdateRow" LocalizedNameKey="UpdateOBJ" Parameter="Content" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey="Ctrl+E"/>
+	  <RibbonItem Action="Save" LocalizedNameKey="Save" LargeGlyph="save-32x32" />
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh.png" LargeGlyph="refresh.png"/>
+    <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh" LargeGlyph="refresh"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32.png">
-      <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
-      <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16.png" ShortcutKey="" />
-      <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
-      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16.png" ShortcutKey=""/>
-      <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16.png" ShortcutKey="Ctrl+U"/>
-      <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportLayout" EnableSeperator="True" Glyph="ExportLayout_16x16.png" LargeGlyph="ExportLayout_16x16.png" ShortcutKey=""/>
-      <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportLayout" Glyph="Import_16x16.png" LargeGlyph="Import_16x16.png" ShortcutKey=""/>
-      <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16.png" ShortcutKey=""/>
-      <RibbonItem Action="FieldSetting" LocalizedNameKey="FieldSetting" Glyph="Setup_16x16.png" ShortcutKey=""/>
+    <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32">
+      <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
+      <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16" ShortcutKey="" />
+      <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
+      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16" ShortcutKey=""/>
+      <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16" ShortcutKey="Ctrl+U"/>
+      <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportLayout" EnableSeperator="True" Glyph="ExportLayout_16x16" LargeGlyph="ExportLayout_16x16" ShortcutKey=""/>
+      <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportLayout" Glyph="Import_16x16" LargeGlyph="Import_16x16" ShortcutKey=""/>
+      <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16" ShortcutKey=""/>
+      <RibbonItem Action="FieldSetting" LocalizedNameKey="FieldSetting" Glyph="Setup_16x16" ShortcutKey=""/>
     </RibbonItem>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="ViewDownloadRow" ShortcutKey="Alt+V" LocalizedNameKey="View" LargeGlyph="View_Highlighted_32x32.png" />
-    <RibbonItem Action="ViewInWeb" LocalizedNameKey="ViewInOBJ" Parameter="Web" LargeGlyph="Translation_32x32.png" />
+    <RibbonItem Action="ViewDownloadRow" ShortcutKey="Alt+V" LocalizedNameKey="View" LargeGlyph="View_Highlighted_32x32" />
+    <RibbonItem Action="ViewInWeb" LocalizedNameKey="ViewInOBJ" Parameter="Web" LargeGlyph="Translation_32x32" />
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="JoinPDF" LocalizedNameKey="JoinTwoOBJ" Parameter="pdfs" LargeGlyph="Match_Add_32x32.png" />
-    <!--RibbonItem Action="ConvertToPDF" LocalizedNameKey="ConvertToPDF" LargeGlyph="Image_To_PDF_32x32.png" /-->
+    <RibbonItem Action="JoinPDF" LocalizedNameKey="JoinTwoOBJ" Parameter="pdfs" LargeGlyph="Match_Add_32x32" />
+    <!--RibbonItem Action="ConvertToPDF" LocalizedNameKey="ConvertToPDF" LargeGlyph="Image_To_PDF_32x32" /-->
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="AttachInOutlook" LocalizedNameKey="AttachInOutlook" LargeGlyph="Posted_Journal_32x32.png" />
+    <RibbonItem Action="AttachInOutlook" LocalizedNameKey="AttachInOutlook" LargeGlyph="Posted_Journal_32x32" />
   </RibbonItem>
 </root>

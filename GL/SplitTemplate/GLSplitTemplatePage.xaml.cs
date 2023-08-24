@@ -50,7 +50,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
         void dgReportLayout_RowDoubleClick()
         {
-            localMenu_OnItemClicked("SplitLine");
+            ribbonControl.PerformRibbonAction("SplitLine");
         }
         private void Name_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -62,12 +62,12 @@ namespace UnicontaClient.Pages.CustomPage
             switch (ActionType)
             {
                 case "AddRow":
-                    AddDockItem(TabControls.GLSplitTemplatePage2, api, Uniconta.ClientTools.Localization.lookup("SplitTemplate"), "Add_16x16.png");
+                    AddDockItem(TabControls.GLSplitTemplatePage2, api, Uniconta.ClientTools.Localization.lookup("SplitTemplate"), "Add_16x16");
                     break;
                 case "EditRow":
                     if (selectedItem == null)
                         return;
-                    AddDockItem(TabControls.GLSplitTemplatePage2, selectedItem, Uniconta.ClientTools.Localization.lookup("SplitTemplate"), "Edit_16x16.png");
+                    AddDockItem(TabControls.GLSplitTemplatePage2, selectedItem, Uniconta.ClientTools.Localization.lookup("SplitTemplate"), "Edit_16x16");
                     break;
                 case "SplitLine":
                     if (selectedItem == null)

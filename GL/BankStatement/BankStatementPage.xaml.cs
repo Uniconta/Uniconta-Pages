@@ -95,7 +95,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         void dgBankStatement_RowDoubleClick()
         {
-            localMenu_OnItemClicked("MatchLines");
+            ribbonControl.PerformRibbonAction("MatchLines");
         }
         void setDim()
         {
@@ -107,7 +107,7 @@ namespace UnicontaClient.Pages.CustomPage
             switch (ActionType)
             {
                 case "AddRow":
-                    AddDockItem(TabControls.BankStatementPage2, api, Uniconta.ClientTools.Localization.lookup("BankStatement"), "Add_16x16.png");
+                    AddDockItem(TabControls.BankStatementPage2, api, Uniconta.ClientTools.Localization.lookup("BankStatement"), "Add_16x16");
                     break;
                 case "EditRow":
                     if (selectedItem != null)
@@ -296,7 +296,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             switch (CWBankAPI.Type)
             {
-                case 0:
+                case 0: //Register
                     if (CWBankAPI.BankService == 0)
                         serviceId = string.Concat("CheckServiceId", serviceId);
 
@@ -319,7 +319,7 @@ namespace UnicontaClient.Pages.CustomPage
                         default: dialogText = Uniconta.ClientTools.Localization.lookup(err.ToString()); break;
                     }
                     break;
-                case 1:
+                case 1: //Connect
                     if (CWBankAPI.BankService == 0)
                         break;
                     err = await bankApi.AddBankConnect(serviceId, (byte)CWBankAPI.BankService, cwBank.Company.CompanyId, 1);
@@ -336,7 +336,7 @@ namespace UnicontaClient.Pages.CustomPage
                         default: dialogText = Uniconta.ClientTools.Localization.lookup(err.ToString()); break;
                     }
                     break;
-                case 2:
+                case 2: //Unregister
                     err = await bankApi.AddBankConnect(serviceId, (byte)CWBankAPI.BankService, cwBank.Company.CompanyId, 2);
                     switch (err)
                     {
@@ -349,7 +349,20 @@ namespace UnicontaClient.Pages.CustomPage
                         default: dialogText = Uniconta.ClientTools.Localization.lookup(err.ToString()); break;
                     }
                     break;
-                case 3:
+                case 3: //Sync
+                    if (CWBankAPI.BankService == 0)
+                    {
+                        var authUrl = await bankApi.AiiaSynchronize();
+                        if (authUrl != null)
+                        {
+                            var cwBrowserView = new CWBrowserDialog(authUrl);
+                            cwBrowserView.Show();
+                        }
+                        else
+                            dialogText = Uniconta.ClientTools.Localization.lookup("RequestSent");
+                    }
+                    break;
+                case 4: //OnDemand
                     if (CWBankAPI.BankService == 0)
                     {
                         err = await bankApi.AiiaTransOnDemand(cwBank.BankAccount, CWBankAPI.FromDate, CWBankAPI.ToDate);
@@ -363,7 +376,7 @@ namespace UnicontaClient.Pages.CustomPage
                     else
                         dialogText = Uniconta.ClientTools.Localization.lookup("FunctionNotSupported");
                     break;
-                case 4:
+                case 5: //Service Info
                     logText = await bankApi.ShowBankConnect(serviceId, (byte)CWBankAPI.BankService);
                     if (logText == null)
                     {
@@ -371,7 +384,7 @@ namespace UnicontaClient.Pages.CustomPage
                         logText = null;
                     }
                     break;
-                case 5:
+                case 6: //Settings
                     if (CWBankAPI.BankService == 0)
                         await ConnectAiia(true);
                     break;

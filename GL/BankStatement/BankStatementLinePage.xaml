@@ -97,12 +97,12 @@ x:Class="UnicontaClient.Pages.CustomPage.BankStatementLinePage"
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="HasOffsetAccounts"  Width="30" ReadOnly="True" >
                                     <localPage:CorasauDataGridTemplateColumnClient.HeaderTemplate>
                                         <DataTemplate>
-                                            <Image Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Offset_Account_16x16.png}" Width="16" Height="16" VerticalAlignment="Center"/>
+                                            <Image Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Offset_Account_16x16.svg}" Width="16" Height="16" VerticalAlignment="Center"/>
                                         </DataTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.HeaderTemplate>
                                     <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                                         <ControlTemplate>
-                                            <Image Margin="5" Tag="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Offset_Account_16x16.png}" MouseLeftButtonDown="HasOffSetAccount_MouseLeftButtonDown" Visibility="{Binding DataContext.RowData.Row.HasOffSetAccounts,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource VisibilityBoolConverter}}" Stretch="Fill" Width="16" Height="16" RenderOptions.BitmapScalingMode="NearestNeighbor" RenderOptions.EdgeMode="Aliased" />
+                                            <Image Margin="5" Tag="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Offset_Account_16x16.svg}" MouseLeftButtonDown="HasOffSetAccount_MouseLeftButtonDown" Visibility="{Binding DataContext.RowData.Row.HasOffSetAccounts,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource VisibilityBoolConverter}}" Stretch="Fill" Width="16" Height="16" RenderOptions.BitmapScalingMode="NearestNeighbor" RenderOptions.EdgeMode="Aliased" />
                                         </ControlTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                                 </localPage:CorasauDataGridTemplateColumnClient>
@@ -125,7 +125,7 @@ x:Class="UnicontaClient.Pages.CustomPage.BankStatementLinePage"
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="HasVoucher"  Width="80" ReadOnly="True" >
                                     <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                                         <ControlTemplate>
-                                            <Image Margin="5" Tag="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Document_Attachment_16x16.png}"  Visibility="{Binding DataContext.RowData.Row.HasVoucher,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource VisibilityBoolConverter}}" Stretch="Fill" Width="16" Height="16" RenderOptions.BitmapScalingMode="NearestNeighbor" RenderOptions.EdgeMode="Aliased" />
+                                            <Image Margin="5" Tag="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Document_Attachment_16x16.svg}"  Visibility="{Binding DataContext.RowData.Row.HasVoucher,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource VisibilityBoolConverter}}" Stretch="Fill" Width="16" Height="16" RenderOptions.BitmapScalingMode="NearestNeighbor" RenderOptions.EdgeMode="Aliased" />
                                         </ControlTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                                 </localPage:CorasauDataGridTemplateColumnClient>
@@ -205,7 +205,7 @@ x:Class="UnicontaClient.Pages.CustomPage.BankStatementLinePage"
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="HasVouchercol" FieldName="HasVoucher"  Width="30" ReadOnly="True" >
                                     <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                                         <ControlTemplate>
-                                            <Image Margin="5" Tag="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Document_Attachment_16x16.png}"  Visibility="{Binding DataContext.RowData.Row.HasVoucher,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource VisibilityBoolConverter}}" Stretch="Fill" Width="16" Height="16" RenderOptions.BitmapScalingMode="NearestNeighbor" RenderOptions.EdgeMode="Aliased" />
+                                            <Image Margin="5" Tag="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Document_Attachment_16x16.svg}"  Visibility="{Binding DataContext.RowData.Row.HasVoucher,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource VisibilityBoolConverter}}" Stretch="Fill" Width="16" Height="16" RenderOptions.BitmapScalingMode="NearestNeighbor" RenderOptions.EdgeMode="Aliased" />
                                         </ControlTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                                 </localPage:CorasauDataGridTemplateColumnClient>

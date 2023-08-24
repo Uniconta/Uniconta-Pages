@@ -67,7 +67,7 @@ namespace UnicontaClient.Pages.CustomPage
 
 #if !SILVERLIGHT
             browseControl.CompressVisibility = Visibility.Visible;
-            string imgfilter = "Image Files|*.jpg;*.jpeg;*.png;*.gif;*.tif;...";
+            string imgfilter = "Image Files|*.jpg;*.jpeg;*.svg;*.gif;*.tif;...";
 #else
             string imgfilter = "Image files (*.bmp,*.jpg) |*.bmp; *.jpg";
 #endif

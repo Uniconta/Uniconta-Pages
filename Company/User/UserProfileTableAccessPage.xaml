@@ -17,7 +17,7 @@ x:Class="UnicontaClient.Pages.CustomPage.UserProfileTableAccessPage"
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BusyMessage}">
             <local:UserProfileTableAccessDataGrid x:Name="dgUserPrflTblAccess" AutoGenerateColumns="None" >
                 <local:UserProfileTableAccessDataGrid.Columns>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="TableId" Width="200">
+                    <local:CorasauDataGridTemplateColumnClient x:Name="TableId" Width="500">
                         <local:CorasauDataGridTemplateColumnClient.EditSettings>
                             <editor:ComboBoxEditSettings x:Name="cmbTables" DisplayMember="Value" ValueMember="Key" AutoComplete="True"></editor:ComboBoxEditSettings>
                         </local:CorasauDataGridTemplateColumnClient.EditSettings>

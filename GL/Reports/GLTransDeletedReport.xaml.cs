@@ -350,13 +350,16 @@ namespace UnicontaClient.Pages.CustomPage
 
         static public LookUpTable HandleLookupOnLocalPage(CorasauDataGrid grid, LookUpTable lookup)
         {
-            var trans = grid.SelectedItem as Uniconta.DataModel.GLTrans;
+            var trans = grid.SelectedItem as Uniconta.DataModel.GLTransDeleted;
             if (trans == null)
                 return lookup;
             if (grid.CurrentColumn?.Name == "DCAccount")
             {
                 switch ((int)trans._DCType)
                 {
+                    case 0:
+                        lookup.TableType = typeof(Uniconta.DataModel.GLAccount);
+                        break;
                     case 1:
                         lookup.TableType = typeof(Uniconta.DataModel.Debtor);
                         break;
@@ -377,6 +380,5 @@ namespace UnicontaClient.Pages.CustomPage
             ViewVoucher(TabControls.VouchersPage3, dgDeletedTransGrid.syncEntity);
             busyIndicator.IsBusy = false;
         }
-
     }
 }

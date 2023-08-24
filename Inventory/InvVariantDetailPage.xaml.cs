@@ -21,15 +21,15 @@ using Uniconta.ClientTools;
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
+    public class InvVariantDetailGrid : CorasauDataGridClient
+    {
+        public override Type TableType { get { return typeof(InvVariantDetailClient); } }
+    }
 
-    /// <summary>
-    /// Interaction logic for InvVaraintDetailPage.xaml
-    /// </summary>
     public partial class InvVariantDetailPage : GridBasePage
     {
         public override string NameOfControl { get { return TabControls.InvVariantDetailPage; } }
         InvItemClient invMaster;
-        SQLCache items;
         public InvVariantDetailPage(SynchronizeEntity syncEntity) : base(syncEntity, true)
         {
             invMaster = (InvItemClient)syncEntity.Row;
@@ -62,7 +62,6 @@ namespace UnicontaClient.Pages.CustomPage
             string header = string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("ItemVariants"), key);
             SetHeader(header);
         }
-
 
         public InvVariantDetailPage(UnicontaBaseEntity master)
             : base(master)
@@ -243,26 +242,9 @@ namespace UnicontaClient.Pages.CustomPage
             editor.isValidate = true;
         }
 
-        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
+        protected override void LoadCacheInBackGround()
         {
-            var api = this.api;
-            var Comp = api.CompanyEntity;
-            if (this.items == null)
-                this.items = await Comp.LoadCache(typeof(Uniconta.DataModel.InvItem), api).ConfigureAwait(false);
+            LoadType(typeof(Uniconta.DataModel.InvItem));
         }
-    }
-    public class InvVariantDetailGrid : CorasauDataGridClient
-    {
-        public override Type TableType { get { return typeof(InvVariantDetailClient); } }
-        public override string LineNumberProperty { get { return "_LineNumber"; } }
-        public override bool AllowSort
-        {
-            get
-            {
-                return false;
-            }
-        }
-        public override bool Readonly { get { return false; } }
-
     }
 }

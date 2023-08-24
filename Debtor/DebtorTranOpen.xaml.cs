@@ -100,7 +100,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "EditRow":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.DebtorTranPage2, selectedItem, Uniconta.ClientTools.Localization.lookup("TransactionOutstanding"), "Edit_16x16.png");
+                        AddDockItem(TabControls.DebtorTranPage2, selectedItem, Uniconta.ClientTools.Localization.lookup("TransactionOutstanding"), "Edit_16x16");
                     break;
                 case "ViewDownloadRow":
                     if (selectedItem != null)

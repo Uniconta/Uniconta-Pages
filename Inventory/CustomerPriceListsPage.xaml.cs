@@ -62,7 +62,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void DgInvPriceListGrid_RowDoubleClick()
         {
-            localMenu_OnItemClicked("Lines");
+            ribbonControl.PerformRibbonAction("Lines");
         }
 
         bool CopiedData;

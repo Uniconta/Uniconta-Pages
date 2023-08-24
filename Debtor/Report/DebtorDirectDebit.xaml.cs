@@ -154,11 +154,11 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (e.Key == Key.R && Keyboard.Modifiers.HasFlag(ModifierKeys.Alt))
             {
-                localMenu_OnItemClicked("StatusResend");
+                ribbonControl.PerformRibbonAction("StatusResend");
             }
             else if (e.Key == Key.S && Keyboard.Modifiers.HasFlag(ModifierKeys.Alt))
             {
-                localMenu_OnItemClicked("StatusStopPayment");
+                ribbonControl.PerformRibbonAction("StatusStopPayment");
             }
         }
 
@@ -789,7 +789,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (doMergePaym)
             {
                 ibaseMergePaym.Caption = Uniconta.ClientTools.Localization.lookup("UnmergePayments");
-                ibaseMergePaym.LargeGlyph = Utility.GetGlyph("Match_Remove_32x32.png");
+                ibaseMergePaym.LargeGlyph = Utility.GetGlyph("Match_Remove_32x32");
 
                 dgDebtorTranOpenGrid.GroupBy("MergeDataId");
                 dgDebtorTranOpenGrid.Columns.GetColumnByName("PaymentDate").AllowFocus = false;
@@ -801,7 +801,7 @@ namespace UnicontaClient.Pages.CustomPage
             else
             {
                 ibaseMergePaym.Caption = Uniconta.ClientTools.Localization.lookup("MergePayments");
-                ibaseMergePaym.LargeGlyph = Utility.GetGlyph("Match_Add_32x32.png");
+                ibaseMergePaym.LargeGlyph = Utility.GetGlyph("Match_Add_32x32");
 
                 dgDebtorTranOpenGrid.UngroupBy("MergeDataId");
                 dgDebtorTranOpenGrid.Columns.GetColumnByName("PaymentDate").AllowFocus = true;

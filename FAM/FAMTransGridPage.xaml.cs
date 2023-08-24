@@ -235,6 +235,9 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 switch ((int)trans._DCType)
                 {
+                    case 0:
+                        lookup.TableType = typeof(Uniconta.DataModel.GLAccount);
+                        break;
                     case 1:
                         lookup.TableType = typeof(Uniconta.DataModel.Debtor);
                         break;

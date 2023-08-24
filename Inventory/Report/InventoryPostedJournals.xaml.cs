@@ -66,11 +66,11 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void dgInvPostedJournal_RowDoubleClick()
         {
-            localMenu_OnItemClicked("InvPostedTransaction");
+            ribbonControl.PerformRibbonAction("InvPostedTransaction");
         }
         private void Journal_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            localMenu_OnItemClicked("InvPostedTransaction");
+            ribbonControl.PerformRibbonAction("InvPostedTransaction");
         }
         private void localMenu_OnItemClicked(string ActionType)
         {

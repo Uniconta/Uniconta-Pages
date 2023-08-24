@@ -121,7 +121,7 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         var newItem = new ProjectJournalLineLocal();
                         newItem.SetMaster(projectJournal);
-                        AddDockItem(TabControls.TmJournalLineStartStopPage2, new object[] { newItem, false, true }, Uniconta.ClientTools.Localization.lookup("StartTimeRegistration"), "Add_16x16.png");
+                        AddDockItem(TabControls.TmJournalLineStartStopPage2, new object[] { newItem, false, true }, Uniconta.ClientTools.Localization.lookup("StartTimeRegistration"), "Add_16x16");
                     }
                     break;
                 case "EditRow":
@@ -176,7 +176,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             var projectJournalLine = Activator.CreateInstance(selectedItem.GetType()) as ProjectJournalLineLocal;
             CorasauDataGrid.CopyAndClearRowId(selectedItem, projectJournalLine);
-            AddDockItem(TabControls.DebtorAccountPage2, new object[2] { projectJournalLine, IdObject.get(false) }, Uniconta.ClientTools.Localization.lookup("DebtorAccount"), "Add_16x16.png");
+            AddDockItem(TabControls.DebtorAccountPage2, new object[2] { projectJournalLine, IdObject.get(false) }, Uniconta.ClientTools.Localization.lookup("DebtorAccount"), "Add_16x16");
         }
 
         private async void Save()

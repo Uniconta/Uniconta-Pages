@@ -2,12 +2,12 @@
 <root>
   <RibbonItem TabId="0" LocalizedNameKey="Home">
     <!---When we create new TabPage -->
-    <RibbonItem Action="Save" ShortcutKey="Ctrl+S" LocalizedNameKey="SaveOBJ" Parameter="Subscription" Glyph="save-16x16.png" LargeGlyph="save-32x32.png"/>
-    <RibbonItem Action="Delete" ShortcutKey="Shift+DELETE" LocalizedNameKey="DeleteOBJ" Parameter="Subscription" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png"/>
-    <RibbonItem Action="Cancel" LocalizedNameKey="Cancel" Glyph="close-16x16.png" LargeGlyph="close-32x32.png"/>
+    <RibbonItem Action="Save" ShortcutKey="Ctrl+S" LocalizedNameKey="SaveOBJ" Parameter="Subscription" Glyph="save-16x16" LargeGlyph="save-32x32"/>
+    <RibbonItem Action="Delete" ShortcutKey="Shift+DELETE" LocalizedNameKey="DeleteOBJ" Parameter="Subscription" Glyph="Delete_16x16" LargeGlyph="Delete_32x32"/>
+    <RibbonItem Action="Cancel" LocalizedNameKey="Cancel" Glyph="close-16x16" LargeGlyph="close-32x32"/>
   </RibbonItem> 
    <RibbonItem>
-     <RibbonItem Action="Company" LocalizedNameKey="Companies" LargeGlyph="Companies_32x32.png"/>
-     <RibbonItem Action="Invoice" LocalizedNameKey="Invoices"  LargeGlyph="Invoice_32x32.png"/>
+     <RibbonItem Action="Company" LocalizedNameKey="Companies" LargeGlyph="Companies_32x32"/>
+     <RibbonItem Action="Invoice" LocalizedNameKey="Invoices"  LargeGlyph="Invoice_32x32"/>
   </RibbonItem>  
 </root>

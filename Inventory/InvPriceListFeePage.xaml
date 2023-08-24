@@ -29,6 +29,7 @@ x:Class="UnicontaClient.Pages.CustomPage.InvPriceListFeePage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="AccountName" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Amount" Width="80" />
                     <localPage:ComboBoxColumnClient x:Name="IsPct" Width="80"/>
+                    <localPage:ComboBoxColumnClient x:Name="OnceOnly" Width="80"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ValidFrom" Width="80" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ValidTo" Width="80" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="AmountFrom" Width="50" />

@@ -2,45 +2,45 @@
 <root>
   <RibbonItem TabId="0" LocalizedNameKey="Home">
     <!---When we create a new TabPage -->
-    <RibbonItem Action="AddRow" LocalizedNameKey="AddOBJ" Parameter="InventoryGroup" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png">
-      <RibbonItem Action="AddRow" LocalizedNameKey="AddOBJ" Parameter="InventoryGroup" ControlName="InventoryGroupPage2" Glyph="Add_16x16.png" ShortcutKey="CTRL+N"/>
-      <RibbonItem Action="CopyRecord" LocalizedNameKey="CopyOBJ" Parameter="InventoryGroup" Glyph="Copy_16x16.png" ShortcutKey="Shift+F2"/>
+    <RibbonItem Action="AddRow" LocalizedNameKey="AddOBJ" Parameter="InventoryGroup" Glyph="Add_16x16" LargeGlyph="Add_32x32">
+      <RibbonItem Action="AddRow" LocalizedNameKey="AddOBJ" Parameter="InventoryGroup" ControlName="InventoryGroupPage2" Glyph="Add_16x16" ShortcutKey="CTRL+N"/>
+      <RibbonItem Action="CopyRecord" LocalizedNameKey="CopyOBJ" Parameter="InventoryGroup" Glyph="Copy_16x16" ShortcutKey="Shift+F2"/>
     </RibbonItem>
-    <RibbonItem Action="EditRow" ShortcutKey="Ctrl+E" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>
+    <RibbonItem Action="EditRow" ShortcutKey="Ctrl+E" LocalizedNameKey="Edit" Glyph="Edit_16x16" LargeGlyph="Edit_32x32"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh.png" LargeGlyph="refresh.png"/>
+    <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh" LargeGlyph="refresh"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32.png">
+    <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32">
       <!---If we want Inner menu-->
-      <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
-      <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16.png" ShortcutKey="" />
-      <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
-      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16.png" ShortcutKey=""/>
-      <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16.png" ShortcutKey="Ctrl+U"/>
-      <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportLayout" EnableSeperator="True" Glyph="ExportLayout_16x16.png" LargeGlyph="ExportLayout_16x16.png" ShortcutKey=""/>
-      <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportLayout" Glyph="Import_16x16.png" LargeGlyph="Import_16x16.png" ShortcutKey=""/>
-      <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16.png" ShortcutKey=""/>
+      <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
+      <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16" ShortcutKey="" />
+      <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
+      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16" ShortcutKey=""/>
+      <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16" ShortcutKey="Ctrl+U"/>
+      <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportLayout" EnableSeperator="True" Glyph="ExportLayout_16x16" LargeGlyph="ExportLayout_16x16" ShortcutKey=""/>
+      <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportLayout" Glyph="Import_16x16" LargeGlyph="Import_16x16" ShortcutKey=""/>
+      <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16" ShortcutKey=""/>
     </RibbonItem>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="DebtorGroupPosting" LocalizedNameKey="CustomerPosting" ControlName="DebtorGroupPostingPage" LargeGlyph="Debtor_Group_Posting_32x32.png" />
-    <RibbonItem Action="CreditorGroupPosting" LocalizedNameKey="CreditorPosting" ControlName="CreditorGroupPostingPage" LargeGlyph="Creditor_Group_Posting_32x32.png" />
+    <RibbonItem Action="DebtorGroupPosting" LocalizedNameKey="CustomerPosting" ControlName="DebtorGroupPostingPage" LargeGlyph="Debtor_Group_Posting_32x32" />
+    <RibbonItem Action="CreditorGroupPosting" LocalizedNameKey="CreditorPosting" ControlName="CreditorGroupPostingPage" LargeGlyph="Creditor_Group_Posting_32x32" />
   </RibbonItem>
 
   <RibbonItem TabId="1" LocalizedNameKey="EditAll">
-    <RibbonItem Action="EditAll"  LocalizedNameKey="EditAll" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>
-    <RibbonItem Action="AddLine"  LocalizedNameKey="AddOBJ" Parameter="InventoryGroup" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png"/>
-    <RibbonItem Action="CopyRow" LocalizedNameKey="CopyOBJ" Parameter="InventoryGroup" LargeGlyph="Copy_32x32.png"/>
+    <RibbonItem Action="EditAll"  LocalizedNameKey="EditAll" Glyph="Edit_16x16" LargeGlyph="Edit_32x32"/>
+    <RibbonItem Action="AddLine"  LocalizedNameKey="AddOBJ" Parameter="InventoryGroup" Glyph="Add_16x16" LargeGlyph="Add_32x32"/>
+    <RibbonItem Action="CopyRow" LocalizedNameKey="CopyOBJ" Parameter="InventoryGroup" LargeGlyph="Copy_32x32"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="DeleteOBJ" Parameter="InventoryGroup" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png"/>
+    <RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="DeleteOBJ" Parameter="InventoryGroup" Glyph="Delete_16x16" LargeGlyph="Delete_32x32"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="UndoDelete" ShortcutKey="CTRL+Z" LocalizedNameKey="UndoDelete" LargeGlyph="Undo_Delete_32x32.png"/>
+    <RibbonItem Action="UndoDelete" ShortcutKey="CTRL+Z" LocalizedNameKey="UndoDelete" LargeGlyph="Undo_Delete_32x32"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="SaveGrid" ShortcutKey="CTRL+S" LocalizedNameKey="Save" Glyph="save-16x16.png" LargeGlyph="save-32x32.png"/>
+    <RibbonItem Action="SaveGrid" ShortcutKey="CTRL+S" LocalizedNameKey="Save" Glyph="save-16x16" LargeGlyph="save-32x32"/>
   </RibbonItem>
 </root>

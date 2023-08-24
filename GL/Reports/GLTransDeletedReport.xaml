@@ -27,7 +27,7 @@ x:Class="UnicontaClient.Pages.CustomPage.GLTransDeletedReport"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Time" Width="100" >
                         <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                             <DataTemplate>
-                                <CorasauControls:TextEditor  x:Name="PART_Editor" HorizontalContentAlignment="Left"  MaskUseAsDisplayFormat="True" Mask="HH:mm" MaskType="DateTime"  Text="{Binding Path=DataContext.RowData.Row.Time,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}"/>
+                                <CorasauControls:TextEditor  x:Name="PART_Editor" HorizontalContentAlignment="Left"  MaskUseAsDisplayFormat="True" Mask="g" MaskType="DateTime"  Text="{Binding Path=DataContext.RowData.Row.Time,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}"/>
                             </DataTemplate>
                         </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                     </localPage:CorasauDataGridTemplateColumnClient>
@@ -55,31 +55,33 @@ x:Class="UnicontaClient.Pages.CustomPage.GLTransDeletedReport"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="HasVoucher" Width="30"  PrintCellStyle="{StaticResource VoucherColumnLinkPrintingStyle}">
                         <localPage:CorasauDataGridTemplateColumnClient.HeaderTemplate>
                             <DataTemplate>
-                                <Image Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Document_Attachment_16x16.png}" Width="16" Height="16" VerticalAlignment="Center"/>
+                                <Image Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Document_Attachment_16x16.svg}" Width="16" Height="16" VerticalAlignment="Center"/>
                             </DataTemplate>
                         </localPage:CorasauDataGridTemplateColumnClient.HeaderTemplate>
                         <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                             <ControlTemplate>
-                                <Image Margin="5" Tag="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Document_Attachment_16x16.png}" MouseLeftButtonDown="HasVoucherImage_MouseLeftButtonDown" Visibility="{Binding DataContext.RowData.Row.HasVoucher,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource VisibilityBoolConverter}}" Stretch="Fill" Width="16" Height="16" />
+                                <Image Margin="5" Tag="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Document_Attachment_16x16.svg}" MouseLeftButtonDown="HasVoucherImage_MouseLeftButtonDown" Visibility="{Binding DataContext.RowData.Row.HasVoucher,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource VisibilityBoolConverter}}" Stretch="Fill" Width="16" Height="16" />
                             </ControlTemplate>
                         </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                     </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="HasNote" Width="30">
                         <localPage:CorasauDataGridTemplateColumnClient.HeaderTemplate>
                             <DataTemplate>
-                                <Image Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Note_16x16.png}" Width="16" Height="16" VerticalAlignment="Center"/>
+                                <Image Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Note_16x16.svg}" Width="16" Height="16" VerticalAlignment="Center"/>
                             </DataTemplate>
                         </localPage:CorasauDataGridTemplateColumnClient.HeaderTemplate>
                         <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                             <ControlTemplate>
-                                <Image Margin="5" Tag="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Note_16x16.png}"  Visibility="{Binding DataContext.RowData.Row.HasNote,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource VisibilityBoolConverter}}" Stretch="Fill" Width="16" Height="16" />
+                                <Image Margin="5" Tag="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Note_16x16.svg}"  Visibility="{Binding DataContext.RowData.Row.HasNote,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource VisibilityBoolConverter}}" Stretch="Fill" Width="16" Height="16" />
                             </ControlTemplate>
                         </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                     </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DCType" Width="50" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DCAccount" Width="90"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DCName" Width="150"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="LegalIdent" Width="50" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DocumentRef" Width="50" Visible="False" />
-                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Qty" Visible="False" Width="70"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Qty" Visible="False" Width="70"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ReferenceNumber" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Project" Width="90" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ProjectName" Visible="False" />

@@ -98,36 +98,10 @@ namespace UnicontaClient.Pages.CustomPage
             var OtherTaxName = new string[10];
             data.OtherTaxName = OtherTaxName;
 
-            foreach (var rec in vatSumOperationLst)
-            {
-                if (rec == null)
-                    continue;
-
-                var idx = rec._Line;
-                if (idx < 14)
-                    vatArray[idx] += rec._AmountBase;
-                else if (idx >= 14 && idx <= 19)
-                {
-                    OtherTaxName[idx - 13] = rec._Text;
-                    vatArray[idx] = rec._Amount;
-                    vatArray[31] += rec._Amount;
-                }
-                else
-                    vatArray[idx] += rec._Amount;
-                /*
-                 1-10 totals at the buttom
-                 14-18 other tax
-
-                 51 TotalAmountUdgående
-                 52 TotalAmountIndgående
-                 */
-            }
-
-            vatArray[32] = vatArray[33] + vatArray[34] + vatArray[35];
-            vatArray[30] = vatArray[32] - vatArray[31];
+            VatSumOperationReport.SumArray(vatArray, vatSumOperationLst, OtherTaxName);
 
             data.CompanyInfo = api.CompanyEntity._Name;
-            data.CompanyRegNr = string.Format("Cvr.nr: {0}", api.CompanyEntity._Id);
+            data.CompanyRegNr = string.Concat("Cvr.nr: ", api.CompanyEntity._Id);
 
             VatDenmarkReportHeader sourcedata = new VatDenmarkReportHeader();
             //sourcedata.exportUri = CorasauDataGrid.GetExportServiceConnection(api);

@@ -37,7 +37,8 @@ namespace UnicontaClient.Pages.CustomPage
     public partial class EUSalesWithoutVATPage : GridBasePage
     {
         SQLTableCache<GLVat> glVatCache;
-     
+        SQLTableCache<GLVatType> glVatTypeCache;
+
         public override string NameOfControl
         {
             get { return TabControls.EUSalesWithoutVATPage; }
@@ -90,6 +91,7 @@ namespace UnicontaClient.Pages.CustomPage
             SetDateTime(txtDateFrm, txtDateTo);
 
             glVatCache = api.GetCache<Uniconta.DataModel.GLVat>();
+            glVatTypeCache = api.GetCache<Uniconta.DataModel.GLVatType>();
             StartLoadCache();
         }
 
@@ -120,7 +122,11 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (glVatCache == null)
                 glVatCache = await api.LoadCache<Uniconta.DataModel.GLVat>().ConfigureAwait(false);
-           
+
+            if (glVatTypeCache == null)
+                glVatTypeCache = await api.LoadCache<Uniconta.DataModel.GLVatType>().ConfigureAwait(false);
+
+
             LoadType(new Type[] { typeof(Uniconta.DataModel.Debtor), typeof(Uniconta.DataModel.InvGroup) });
         }
 
@@ -184,12 +190,29 @@ namespace UnicontaClient.Pages.CustomPage
             if (glVatCache == null)
                 glVatCache = await api.LoadCache<Uniconta.DataModel.GLVat>();
 
-            var vatEUList = glVatCache.Where(s => s._TypeSales == "s3" || s._TypeSales == "s4" || s._TypeSales == "s7").Select(x => x._Vat).Distinct();
-            if (vatEUList != null && vatEUList.Count() > 0)
+            if (glVatTypeCache == null)
+                glVatTypeCache = await api.LoadCache<Uniconta.DataModel.GLVatType>();
+
+            var lstEUSales = glVatTypeCache.Where(s => s._EUSaleWithoutVAT).Select(x => x._Code).Distinct();
+            if (lstEUSales != null && lstEUSales.Count() > 0)
             {
-                var strLst = string.Join(";", vatEUList);
-                propValPair.Add(PropValuePair.GenereteWhereElements(nameof(DebtorInvoiceLines.Vat), typeof(string), strLst));
+                var vatEUList = glVatCache.Where(s => lstEUSales.Contains(s._TypeSales)).Select(x => x._Vat).Distinct();
+
+                if (vatEUList != null && vatEUList.Count() > 0)
+                {
+                    var strLst = string.Join(";", vatEUList);
+                    propValPair.Add(PropValuePair.GenereteWhereElements(nameof(DebtorInvoiceLines.Vat), typeof(string), strLst));
+                }
+                else
+                {
+                    busyIndicator.IsBusy = false;
+                    UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("VatForEUSalesNotDefined"), Uniconta.ClientTools.Localization.lookup("Warning"));
+                    dgEUSalesWithoutVATGrid.ItemsSource = null;
+                    dgEUSalesWithoutVATGrid.Visibility = Visibility.Visible;
+                    return;
+                }
             }
+
             var listOfDebInvLines = await api.Query<DebtorInvoiceLines>(propValPair);
             List<EUSaleWithoutVAT> listdeb;
 

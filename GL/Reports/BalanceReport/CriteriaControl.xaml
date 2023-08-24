@@ -100,7 +100,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CriteriaControl"
                         <CorasauControls:CheckEditor x:Name="chkHide"  Grid.Column="1" Grid.Row="6" IsChecked="{Binding Hide,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
                     </Grid>
                 </StackPanel>
-                <Image Source="{Binding Converter={StaticResource AssemblyConverter},ConverterParameter=;component/Assets/img/black.png}" Width="Auto" Grid.Column="2" Margin="0,5,0,0" Grid.RowSpan="5"/>
+                <Image Source="{Binding Converter={StaticResource AssemblyConverter},ConverterParameter=;component/Assets/img/black.svg}" Width="Auto" Grid.Column="2" Margin="0,5,0,0" Grid.RowSpan="5"/>
                 <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="3" Margin="0,5,0,0">
                     <Grid>
                         <Grid.RowDefinitions>

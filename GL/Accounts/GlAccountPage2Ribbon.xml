@@ -2,31 +2,31 @@
 <root>
   <RibbonItem TabId="0" LocalizedNameKey="Home">
     <!---When we create new TabPage -->
-    <RibbonItem Action="Save" ShortcutKey="Ctrl+S" LocalizedNameKey="Save" LargeGlyph="save-32x32.png"/>
-    <RibbonItem Action="Cancel" LocalizedNameKey="Cancel" LargeGlyph="close-32x32.png"/>
-    <RibbonItem Action="Delete" ShortcutKey="Shift+DELETE" LocalizedNameKey="Delete" LargeGlyph="Delete_32x32.png"/>
+    <RibbonItem Action="Save" ShortcutKey="Ctrl+S" LocalizedNameKey="Save" LargeGlyph="save-32x32"/>
+    <RibbonItem Action="Cancel" LocalizedNameKey="Cancel" LargeGlyph="close-32x32"/>
+    <RibbonItem Action="Delete" ShortcutKey="Shift+DELETE" LocalizedNameKey="Delete" LargeGlyph="Delete_32x32"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="Script" LocalizedNameKey="CalculationExpression" LargeGlyph="Generate_32x32.png" ShortcutKey="Ctrl+G"/>
+    <RibbonItem Action="Script" LocalizedNameKey="CalculationExpression" LargeGlyph="Calculator_32x32" ShortcutKey="Ctrl+G"/>
   </RibbonItem>
   <RibbonItem>
    <!---next group-->
-  <RibbonItem Action="Templates" LocalizedNameKey="Templates" LargeGlyph="Layout_32x32.png">
+  <RibbonItem Action="Templates" LocalizedNameKey="Templates" LargeGlyph="Layout_32x32">
     <!---If we want Inner menu-->
-    <RibbonItem Action="LoadTemplate" LocalizedNameKey="Load" Glyph="Edit_16x16.png"/>
-    <RibbonItem Action="SaveAs" LocalizedNameKey="SaveAs" Glyph="save-16x16.png"/>
-    <RibbonItem Action="DeleteTemplate" LocalizedNameKey="Delete" Glyph="Delete_16x16.png"/>
+    <RibbonItem Action="LoadTemplate" LocalizedNameKey="Load" Glyph="Edit_16x16"/>
+    <RibbonItem Action="SaveAs" LocalizedNameKey="SaveAs" Glyph="save-16x16"/>
+    <RibbonItem Action="DeleteTemplate" LocalizedNameKey="Delete" Glyph="Delete_16x16"/>
   </RibbonItem>
   </RibbonItem>
     <RibbonItem><!---next group-->
-    <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32.png">
+    <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32">
       <!---If we want Inner menu-->
-      <RibbonItem Action="StartEdit" LocalizedNameKey="StartEdit" Glyph="Edit_16x16.png"/>
-      <RibbonItem Action="EndEdit" LocalizedNameKey="SaveOBJ" Parameter="Layout" Glyph="save-16x16.png"/>
-      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16.png"/>
-      <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportLayout" EnableSeperator="True" Glyph="ExportLayout_16x16.png"/>
-     <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportLayout" Glyph="Import_16x16.png"/>
-      <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16.png" />
+      <RibbonItem Action="StartEdit" LocalizedNameKey="StartEdit" Glyph="Edit_16x16"/>
+      <RibbonItem Action="EndEdit" LocalizedNameKey="SaveOBJ" Parameter="Layout" Glyph="save-16x16"/>
+      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16"/>
+      <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportLayout" EnableSeperator="True" Glyph="ExportLayout_16x16"/>
+     <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportLayout" Glyph="Import_16x16"/>
+      <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16" />
     </RibbonItem>
   </RibbonItem>
 </root>

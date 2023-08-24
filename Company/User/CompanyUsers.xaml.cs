@@ -133,7 +133,7 @@ namespace UnicontaClient.Pages.CustomPage
                                     parm[0] = api;
                                     parm[1] = true;
                                     parm[2] = dockCtrl.Activpanel;
-                                    AddDockItem(TabControls.UsersPage2, parm, Uniconta.ClientTools.Localization.lookup("User"), "Add_16x16.png");
+                                    AddDockItem(TabControls.UsersPage2, parm, Uniconta.ClientTools.Localization.lookup("User"), "Add_16x16");
                                 }
                             }
                         };

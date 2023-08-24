@@ -1,31 +1,31 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <root>
 	<RibbonItem TabId="0" LocalizedNameKey="Home">
-		<RibbonItem Action="Filter" ShortcutKey="CTRL+I" LocalizedNameKey="Filter" Glyph="Filter_16x16.png" LargeGlyph="Filter_32x32.png"/>
-		<RibbonItem Action="ClearFilter" ShortcutKey="CTRL+K" LocalizedNameKey="ClearFilter" Glyph="Filter_Clear_32x32.png" LargeGlyph="Filter_Clear_32x32.png"/>
+		<RibbonItem Action="Filter" ShortcutKey="CTRL+I" LocalizedNameKey="Filter" Glyph="Filter_16x16" LargeGlyph="Filter_32x32"/>
+		<RibbonItem Action="ClearFilter" ShortcutKey="CTRL+K" LocalizedNameKey="ClearFilter" Glyph="Filter_Clear_32x32" LargeGlyph="Filter_Clear_32x32"/>
 	</RibbonItem>
 	<RibbonItem>
-		<RibbonItem Action="ViewDownloadRow" ShortcutKey="F7" LocalizedNameKey="PhysicalVoucher" Glyph="View_Voucher_32x32.png" LargeGlyph="View_Voucher_32x32.png" />
-		<RibbonItem Action="AccountsTransaction" LocalizedNameKey="AccountsTransaction" Glyph="Account-statement_32x32.png" LargeGlyph="Account-statement_32x32.png" />
-		<RibbonItem Action="PostedTransaction" LocalizedNameKey="PostedTransactions" Glyph="Posted_Transaction_32x32.png" LargeGlyph="Posted_Transaction_32x32.png" ShortcutKey="Ctrl+T"/>
-		<RibbonItem Action="PostedBy" LocalizedNameKey="PostedBy" Glyph="Debtor_Group_Posting_32x32.png" LargeGlyph="Debtor_Group_Posting_32x32.png"/>
-		<RibbonItem Action="DeletedBy" LocalizedNameKey="DeletedBy" Glyph="Job_32x32.png" LargeGlyph="Job_32x32.png"/>
+		<RibbonItem Action="ViewDownloadRow" ShortcutKey="F7" LocalizedNameKey="PhysicalVoucher" Glyph="View_Voucher_32x32" LargeGlyph="View_Voucher_32x32" />
+		<RibbonItem Action="AccountsTransaction" LocalizedNameKey="AccountsTransaction" Glyph="Account-statement_32x32" LargeGlyph="Account-statement_32x32" />
+		<RibbonItem Action="PostedTransaction" LocalizedNameKey="PostedTransactions" Glyph="Posted_Transaction_32x32" LargeGlyph="Posted_Transaction_32x32" ShortcutKey="Ctrl+T"/>
+		<RibbonItem Action="PostedBy" LocalizedNameKey="PostedBy" Glyph="Debtor_Group_Posting_32x32" LargeGlyph="Debtor_Group_Posting_32x32"/>
+		<RibbonItem Action="DeletedBy" LocalizedNameKey="DeletedBy" Glyph="Job_32x32" LargeGlyph="Job_32x32"/>
 	</RibbonItem>
 	<RibbonItem>
 		<!---If we want to create a new group in same PageTab-->
-		<RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32.png">
+		<RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32">
 			<!---If we want Inner menu-->
-			<RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
-			<RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16.png" ShortcutKey="" />
-			<RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
-			<RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16.png" ShortcutKey=""/>
-			<RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16.png" ShortcutKey="Ctrl+U"/>
-			<RibbonItem Action="ExportLayout" LocalizedNameKey="ExportLayout" EnableSeperator="True" Glyph="ExportLayout_16x16.png" LargeGlyph="ExportLayout_16x16.png" ShortcutKey=""/>
-			<RibbonItem Action="ImportLayout" LocalizedNameKey="ImportLayout" Glyph="Import_16x16.png" LargeGlyph="Import_16x16.png" ShortcutKey=""/>
-			<RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16.png" ShortcutKey=""/>
+			<RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
+			<RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16" ShortcutKey="" />
+			<RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
+			<RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16" ShortcutKey=""/>
+			<RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16" ShortcutKey="Ctrl+U"/>
+			<RibbonItem Action="ExportLayout" LocalizedNameKey="ExportLayout" EnableSeperator="True" Glyph="ExportLayout_16x16" LargeGlyph="ExportLayout_16x16" ShortcutKey=""/>
+			<RibbonItem Action="ImportLayout" LocalizedNameKey="ImportLayout" Glyph="Import_16x16" LargeGlyph="Import_16x16" ShortcutKey=""/>
+			<RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16" ShortcutKey=""/>
 		</RibbonItem>
 	</RibbonItem>
 	<RibbonItem>
-		<RibbonItem Action="CopyVoucherToJournal" LocalizedNameKey="CopyVoucherToJournal" LargeGlyph="Install_32x32.png"/>
+		<RibbonItem Action="CopyVoucherToJournal" LocalizedNameKey="CopyVoucherToJournal" LargeGlyph="Install_32x32"/>
 	</RibbonItem>
 </root>

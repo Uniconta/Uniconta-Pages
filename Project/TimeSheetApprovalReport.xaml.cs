@@ -971,7 +971,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         void dgTimeSheetApprovalRpt_RowDoubleClick()
         {
-            localMenu_OnItemClicked("TimeSheet");
+            ribbonControl.PerformRibbonAction("TimeSheet");
         }
 
         private void localMenu_OnItemClicked(string ActionType)

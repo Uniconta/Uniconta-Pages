@@ -147,7 +147,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "SetupVariants":
                     var compnClient = new CompanyClient();
                     StreamingManager.Copy(api.CompanyEntity, compnClient);
-                    AddDockItem(TabControls.InvVaraintSetupPage, compnClient, string.Format(Uniconta.ClientTools.Localization.lookup("SetupOBJ"), Uniconta.ClientTools.Localization.lookup("Variants")) , "Add_16x16.png");
+                    AddDockItem(TabControls.InvVaraintSetupPage, compnClient, string.Format(Uniconta.ClientTools.Localization.lookup("SetupOBJ"), Uniconta.ClientTools.Localization.lookup("Variants")) , "Add_16x16");
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);

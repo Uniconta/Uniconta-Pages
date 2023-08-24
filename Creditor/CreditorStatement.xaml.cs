@@ -234,14 +234,17 @@ namespace UnicontaClient.Pages.CustomPage
             dgCreditorTrans.MasterRowExpanded += DgCreditorTrans_MasterRowExpanded;
             dgCreditorTrans.MasterRowCollapsed += DgCreditorTrans_MasterRowCollapsed;
         }
+        bool maintainState;
 
         private void DgCreditorTrans_MasterRowCollapsed(object sender, RowEventArgs e)
         {
+            maintainState = true;
             SetExpandCurrent();
         }
 
         private void DgCreditorTrans_MasterRowExpanded(object sender, RowEventArgs e)
         {
+            maintainState = true; 
             SetCollapseCurrent();
         }
 
@@ -254,7 +257,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void DgCreditorTrans_RowDoubleClick()
         {
-            LocalMenu_OnItemClicked("VoucherTransactions");
+            ribbonControl.PerformRibbonAction("VoucherTransactions");
         }
 
         void MasterRowExpanded(object sender, RowEventArgs e)
@@ -435,7 +438,7 @@ namespace UnicontaClient.Pages.CustomPage
                 return;
 
             ibaseCurrent.Caption = Uniconta.ClientTools.Localization.lookup("CollapseCurrent");
-            ibaseCurrent.LargeGlyph = Utilities.Utility.GetGlyph("Collapse_32x32.png");
+            ibaseCurrent.LargeGlyph = Utilities.Utility.GetGlyph("Collapse_32x32");
         }
 
         private void SetExpandCurrent()
@@ -444,7 +447,7 @@ namespace UnicontaClient.Pages.CustomPage
                 return;
 
             ibaseCurrent.Caption = Uniconta.ClientTools.Localization.lookup("ExpandCurrent");
-            ibaseCurrent.LargeGlyph = Utilities.Utility.GetGlyph("Expand_32x32.png");
+            ibaseCurrent.LargeGlyph = Utilities.Utility.GetGlyph("Expand_32x32");
         }
 
         void ExpandAndCollapseCurrent(bool IsCollapseAll, int currentRowHandle)
@@ -470,28 +473,15 @@ namespace UnicontaClient.Pages.CustomPage
             LoadDCTrans();
         }
 
-        bool manualExpanded = false;
         private void SetExpandAndCollapse(bool expandState)
         {
             if (ibase == null)
                 return;
             if (dgCreditorTrans.ItemsSource == null) return;
             if (ibase.Caption == Uniconta.ClientTools.Localization.lookup("ExpandAll") && !expandState)
-            {
-                manualExpanded = true;
                 ExpandAndCollapseAll(false);
-                ibase.Caption = Uniconta.ClientTools.Localization.lookup("CollapseAll");
-                ibase.LargeGlyph = Utilities.Utility.GetGlyph("Collapse_32x32.png");
-            }
-            else
-            {
-                if (expandState)
-                {
-                    ExpandAndCollapseAll(true);
-                    ibase.Caption = Uniconta.ClientTools.Localization.lookup("ExpandAll");
-                    ibase.LargeGlyph = Utilities.Utility.GetGlyph("Expand_32x32.png");
-                }
-            }
+            else if (expandState)
+                ExpandAndCollapseAll(true);
         }
 
         void ExpandAndCollapseAll(bool IsCollapseAll)
@@ -501,6 +491,16 @@ namespace UnicontaClient.Pages.CustomPage
                     dgCreditorTrans.ExpandMasterRow(iRow);
                 else
                     dgCreditorTrans.CollapseMasterRow(iRow);
+            if (IsCollapseAll)
+            {
+                ibase.Caption = Uniconta.ClientTools.Localization.lookup("ExpandAll");
+                ibase.LargeGlyph = Utilities.Utility.GetGlyph("Expand_32x32");
+            }
+            else
+            {
+                ibase.Caption = Uniconta.ClientTools.Localization.lookup("CollapseAll");
+                ibase.LargeGlyph = Utilities.Utility.GetGlyph("Collapse_32x32");
+            }
         }
 
         private void cmbTrasaction_SelectedIndexChanged(object sender, RoutedEventArgs e)
@@ -518,8 +518,6 @@ namespace UnicontaClient.Pages.CustomPage
 
         async void LoadDCTrans()
         {
-            SetExpandAndCollapse(true);
-
             CreditorStatement.SetDateTime(txtDateFrm, txtDateTo);
             DateTime fromDate = DebtorStatement.DefaultFromDate, toDate = DebtorStatement.DefaultToDate;
             transaction = cmbTrasaction.SelectedIndex;
@@ -546,22 +544,23 @@ namespace UnicontaClient.Pages.CustomPage
             dgCreditorTrans.Visibility = Visibility.Visible;
             busyIndicator.IsBusy = false;
 
-            if (fromAccount == toAccount || _master != null)
+            if (statementList?.Count == 1)
                 IsCollapsed = false;
-            SetExpandAndCollapse(IsCollapsed);
+            ExpandAndCollapseAll(IsCollapsed);
+            maintainState = false;
         }
-
+        List<CreditorStatementList> statementList = null;
         void FillStatement(CreditorTransClientTotal[] listTrans, bool OnlyOpen, DateTime toDate)
         {
-            var isAscending = cbxAscending.IsChecked.Value;
-            var skipBlank = cbxSkipBlank.IsChecked.Value;
+            var isAscending = cbxAscending.IsChecked.GetValueOrDefault();
+            var skipBlank = cbxSkipBlank.IsChecked.GetValueOrDefault();
 
             var Pref = api.session.Preference;
             Pref.Debtor_isAscending = isAscending;
             Pref.Debtor_skipBlank = skipBlank;
             Pref.Debtor_OnlyOpen = OnlyOpen;
 
-            var statementList = new List<CreditorStatementList>(Math.Min(20, dataRowCount));
+            statementList = new List<CreditorStatementList>(Math.Min(20, dataRowCount));
 
             string currentItem = string.Empty;
             CreditorStatementList masterCredStatement = null;
@@ -643,7 +642,7 @@ namespace UnicontaClient.Pages.CustomPage
         int dataRowCount;
         public override object GetPrintParameter()
         {
-            if (!manualExpanded)
+            if (!maintainState)
             {
                 for (int rowHandle = 0; rowHandle < dataRowCount; rowHandle++)
                     dgCreditorTrans.ExpandMasterRow(rowHandle);

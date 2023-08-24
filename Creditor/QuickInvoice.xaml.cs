@@ -134,7 +134,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void Page_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.F8)
-                localMenu_OnItemClicked("AddItems");
+                ribbonControl.PerformRibbonAction("AddItems");
 
             if (e.Key == Key.F9)
             {
@@ -985,7 +985,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void btnAccount_Click(object sender, RoutedEventArgs e)
         {
-            AddDockItem(TabControls.CreditorAccountPage2, new object[2] { api, null }, Uniconta.ClientTools.Localization.lookup("Creditorsaccount"), "Add_16x16.png");
+            AddDockItem(TabControls.CreditorAccountPage2, new object[2] { api, null }, Uniconta.ClientTools.Localization.lookup("Creditorsaccount"), "Add_16x16");
         }
 
         List<TableAddOnData> documents;

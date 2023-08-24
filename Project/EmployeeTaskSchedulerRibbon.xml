@@ -2,22 +2,22 @@
 <root>
   <RibbonItem TabId="0" LocalizedNameKey="Home">
     <!---When we create a new group and a new TabPage -->
-    <RibbonItem Action="AddTask" LocalizedNameKey="AddOBJ" Parameter="Task" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png"/>
-    <RibbonItem Action="EditTask" LocalizedNameKey="EditOBJ" Parameter="Task" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>
-    <RibbonItem Action="DeleteTask"  LocalizedNameKey="DeleteOBJ" Parameter="Task" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png"/>
-    <RibbonItem Action="Cancel" LocalizedNameKey="Cancel" Glyph="close-16x16.png" LargeGlyph="close-32x32.png"/>
+    <RibbonItem Action="AddTask" LocalizedNameKey="AddOBJ" Parameter="Task" Glyph="Add_16x16" LargeGlyph="Add_32x32"/>
+    <RibbonItem Action="EditTask" LocalizedNameKey="EditOBJ" Parameter="Task" Glyph="Edit_16x16" LargeGlyph="Edit_32x32"/>
+    <RibbonItem Action="DeleteTask"  LocalizedNameKey="DeleteOBJ" Parameter="Task" Glyph="Delete_16x16" LargeGlyph="Delete_32x32"/>
+    <RibbonItem Action="Cancel" LocalizedNameKey="Cancel" Glyph="close-16x16" LargeGlyph="close-32x32"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="Backward" LocalizedNameKey="Backward"   LargeGlyph="Back_32x32.png"/>
-    <RibbonItem Action="Forward" LocalizedNameKey="Forward" LargeGlyph="Forward_32x32.png"/>
-    <RibbonItem Action="GoToday" LocalizedNameKey="GoToday" LargeGlyph="GoToToday_32x32.png"/>
-    <RibbonItem Action="ZoomIn" LocalizedNameKey="ZoomIn" LargeGlyph="Zoomin_32x32.png"/>
-    <RibbonItem Action="ZoomOut" LocalizedNameKey="ZoomOut" LargeGlyph="Zoomout_32x32.png"/>
+    <RibbonItem Action="Backward" LocalizedNameKey="Backward"   LargeGlyph="Back_32x32"/>
+    <RibbonItem Action="Forward" LocalizedNameKey="Forward" LargeGlyph="Forward_32x32"/>
+    <RibbonItem Action="GoToday" LocalizedNameKey="GoToday" LargeGlyph="GoToToday_32x32"/>
+    <RibbonItem Action="ZoomIn" LocalizedNameKey="ZoomIn" LargeGlyph="Zoomin_32x32"/>
+    <RibbonItem Action="ZoomOut" LocalizedNameKey="ZoomOut" LargeGlyph="Zoomout_32x32"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="DayView" LocalizedNameKey="DayView" LargeGlyph="Day_View_32x32.png"/>
-    <RibbonItem Action="WorkWeekView" LocalizedNameKey="WorkWeekView" LargeGlyph="Work_View_32x32.png"/>
-    <RibbonItem Action="WeekView" LocalizedNameKey="WeekView" LargeGlyph="Week_View_32x32.png"/>
-    <RibbonItem Action="MonthView" LocalizedNameKey="MonthView" LargeGlyph="Month_View_32x32.png"/>
+    <RibbonItem Action="DayView" LocalizedNameKey="DayView" LargeGlyph="Day_View_32x32"/>
+    <RibbonItem Action="WorkWeekView" LocalizedNameKey="WorkWeekView" LargeGlyph="Work_View_32x32"/>
+    <RibbonItem Action="WeekView" LocalizedNameKey="WeekView" LargeGlyph="Week_View_32x32"/>
+    <RibbonItem Action="MonthView" LocalizedNameKey="MonthView" LargeGlyph="Month_View_32x32"/>
   </RibbonItem>
 </root>

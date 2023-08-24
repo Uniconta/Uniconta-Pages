@@ -4,6 +4,7 @@ x:Class="UnicontaClient.Pages.CustomPage.MultiInvoicePage"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
+        xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
         xmlns:UnicontaControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
         xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools">
     <UserControl.Resources>
@@ -87,7 +88,21 @@ x:Class="UnicontaClient.Pages.CustomPage.MultiInvoicePage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="PriceList" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Shipment" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="DeliveryTerm" Visible="False" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="RelatedOrder" Visible="False" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="RelatedOrder" IsEditSettingSet="True" Visible="False" >
+                        <local:CorasauDataGridTemplateColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <UnicontaControls:UnicontaPopupBaseEdit x:Name="PART_Editor" FocusPopupOnOpen="True" ValidateOnTextInput="False" ValidateOnEnterKeyPressed="False"  
+                                                                       DataContext="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}">
+                                    <UnicontaControls:UnicontaPopupBaseEdit.PopupContentTemplate>
+                                        <ControlTemplate>
+                                            <UnicontaControls:UnicontaEditableLookupControl x:Name="editableLookup" UseBindingValue="True" Width="Auto"  LookupBindingValue="{Binding RelatedOrder,RelativeSource={RelativeSource TemplatedParent}}"
+                                                                                        LookupEditValue="{Binding Path=(dxe:BaseEdit.OwnerEdit).EditValue, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" Margin="2" />
+                                        </ControlTemplate>
+                                    </UnicontaControls:UnicontaPopupBaseEdit.PopupContentTemplate>
+                                </UnicontaControls:UnicontaPopupBaseEdit>
+                            </DataTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.CellTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
                     <local:CorasauDataGridTemplateColumnClient x:Name="CustomsNo" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="ProjectTotal" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="ProjectCost" Visible="False" />

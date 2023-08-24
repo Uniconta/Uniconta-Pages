@@ -71,7 +71,7 @@ namespace UnicontaClient.Pages.CustomPage
                         EditAll();
                     break;
                 case "AddRow":
-                    AddDockItem(TabControls.EmployeePage2, api, Uniconta.ClientTools.Localization.lookup("Employee"), "Add_16x16.png");
+                    AddDockItem(TabControls.EmployeePage2, api, Uniconta.ClientTools.Localization.lookup("Employee"), "Add_16x16");
                     break;
                 case "CopyRecord":
                     if (selectedItem != null)

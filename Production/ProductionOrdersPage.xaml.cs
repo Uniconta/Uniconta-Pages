@@ -67,7 +67,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void DgProductionOrders_RowDoubleClick()
         {
-            localMenu_OnItemClicked("ProductionLines");
+            ribbonControl.PerformRibbonAction("ProductionLines");
         }
         private void Name_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -111,9 +111,9 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 case "AddRow":
                     if (dgProductionOrders.masterRecords != null)
-                        AddDockItem(TabControls.ProductionOrdersPage2, new object[2] { api, dgProductionOrders.masterRecord }, Uniconta.ClientTools.Localization.lookup("Production"), "Add_16x16.png", true);
+                        AddDockItem(TabControls.ProductionOrdersPage2, new object[2] { api, dgProductionOrders.masterRecord }, Uniconta.ClientTools.Localization.lookup("Production"), "Add_16x16", true);
                     else
-                        AddDockItem(TabControls.ProductionOrdersPage2, api, Uniconta.ClientTools.Localization.lookup("Production"), "Add_16x16.png", true);
+                        AddDockItem(TabControls.ProductionOrdersPage2, api, Uniconta.ClientTools.Localization.lookup("Production"), "Add_16x16", true);
                     break;
                 case "EditRow":
                     if (selectedItem == null)

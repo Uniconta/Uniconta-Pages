@@ -173,7 +173,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             InfALines = new List<EEInfLines>();
             InfBLines = new List<EEInfLines>();
-            if (cbInfA.IsChecked.HasValue && cbInfA.IsChecked.Value)
+            if (cbInfA.IsChecked.HasValue && cbInfA.IsChecked.GetValueOrDefault())
             {
                 var infAGenerator = new InfAGeneration(api, fromDate, toDate);
                 busyIndicator.IsBusy = true;
@@ -191,7 +191,7 @@ namespace UnicontaClient.Pages.CustomPage
                 reportGrid.Columns[3].Header = Uniconta.ClientTools.Localization.lookup("InvoiceDate");
                 reportGrid.Columns[8].Header = Uniconta.ClientTools.Localization.lookup("Error");
             }
-            if (cbInfB.IsChecked.HasValue && cbInfB.IsChecked.Value)
+            if (cbInfB.IsChecked.HasValue && cbInfB.IsChecked.GetValueOrDefault())
             {
                 var infBGenerator = new InfBGeneration(api, fromDate, toDate);
                 reportGridB.BusyIndicator = busyIndicator;
@@ -294,12 +294,8 @@ namespace UnicontaClient.Pages.CustomPage
                     sfd.FileName = "KMD_Aruanne_" + fromDate.Year.ToString() + "_" + fromDate.Month.ToString() + ".xml";
                     if (sfd.ShowDialog() == true)
                         new XmlExporter(api).CreateXmlFile(
-#if !SILVERLIGHT
                             File.Create(sfd.FileName),
-#else
-                            sfd.OpenFile(), 
-#endif
-                            fromDate, toDate, VatSumOperationLst, InfALines, InfBLines, noOfCar50, noOfCar100, !cbInfA.IsChecked.Value, !cbInfB.IsChecked.Value);
+                            fromDate, toDate, VatSumOperationLst, InfALines, InfBLines, noOfCar50, noOfCar100, !cbInfA.IsChecked.GetValueOrDefault(), !cbInfB.IsChecked.GetValueOrDefault());
 
                     break;
                 case "Delete":

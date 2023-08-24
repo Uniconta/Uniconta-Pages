@@ -36,7 +36,7 @@ namespace UnicontaClient.Pages.CustomPage
         [Display(Name = "Table", ResourceType = typeof(TableChangeEventClientText))]
         public string Table { get { return GetTableName(_TableId); } set { _table = value; _TableId = GetClassId(_table); } }
 
-        static string GetTableName(int id)
+        string GetTableName(int id)
         {
             if (id != 0)
             {
@@ -46,13 +46,21 @@ namespace UnicontaClient.Pages.CustomPage
                     if (id == table.ClassId())
                         return type.Name;
                 }
+
+                foreach (var usrType in Global.GetUserTables(Company.Get(CompanyId)))
+                {
+                    var usrTable = Activator.CreateInstance(usrType) as UnicontaBaseEntity;
+                    if (usrTable is TableData tblData && id == tblData.GetClassIdSpecial())
+                        return usrType.Name;
+                }
+
                 if (id == InvItemStorage.CLASSID)
                     return "InvItemStorage";
             }
             return string.Empty;
         }
 
-        static int GetClassId(string key)
+        int GetClassId(string key)
         {
             if (!string.IsNullOrEmpty(key))
             {
@@ -62,8 +70,18 @@ namespace UnicontaClient.Pages.CustomPage
                     var tableType = Activator.CreateInstance(table) as UnicontaBaseEntity;
                     return tableType.ClassId();
                 }
+
+                var usrTable = Global.GetUserTables(Company.Get(CompanyId)).FirstOrDefault(x => x.Name == key);
+                if (usrTable != null)
+                {
+                    var usrTableType = Activator.CreateInstance(usrTable) as UnicontaBaseEntity;
+                    if (usrTableType is TableData tblData)
+                        return tblData.GetClassIdSpecial();
+                }
+
                 if (key == "InvItemStorage")
                     return InvItemStorage.CLASSID;
+
             }
             return 0;
         }
@@ -88,6 +106,10 @@ namespace UnicontaClient.Pages.CustomPage
             var referenceTables = new List<string>(100);
             foreach (Type tabletype in Global.GetStandardRefTables())
                 referenceTables.Add(tabletype.Name);
+
+            //UserDefined Tables
+            foreach (var userRefTable in Global.GetUserTables(api.CompanyEntity))
+                referenceTables.Add(userRefTable.Name);
 
             referenceTables.Add("InvItemStorage");
             referenceTables.Sort();

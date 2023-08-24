@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <root>
   <RibbonItem TabId="0" LocalizedNameKey="Home">
-    <RibbonItem Action="Search" LocalizedNameKey="Search" LargeGlyph="Validate_32x32.png" ShortcutKey="Ctrl+H" />
+    <RibbonItem Action="Search" LocalizedNameKey="Search" LargeGlyph="Validate_32x32" ShortcutKey="Ctrl+H" />
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="Remove" ShortcutKey="Shift+DELETE" LocalizedNameKey="Remove" LargeGlyph="Delete_32x32.png"/>
+    <RibbonItem Action="Remove" ShortcutKey="Shift+DELETE" LocalizedNameKey="Remove" LargeGlyph="Delete_32x32"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="SaveGrid" LocalizedNameKey="UpdateOBJ" Parameter="Address"  LargeGlyph="save-32x32.png" ShortcutKey="CTRL+N"/>
+    <RibbonItem Action="SaveGrid" LocalizedNameKey="UpdateOBJ" Parameter="Address"  LargeGlyph="save-32x32" ShortcutKey="CTRL+N"/>
   </RibbonItem>
   <RibbonItem>
       <RibbonItem LocalizedNameKey="New" StatusValue="" />

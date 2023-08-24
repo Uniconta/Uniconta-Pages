@@ -39,15 +39,10 @@ namespace UnicontaClient.Pages.CustomPage
         public override Type TableType { get { return typeof(GLTransClient); } }
         public override string SetColumnTooltip(object row, ColumnBase col)
         {
-            var tran = row as GLTransClient;
-            if (tran != null && col != null)
-            {
-                switch (col.FieldName)
-                {
-                    case "DCAccount": return tran.DCName;
-                }
-            }
-            return base.SetColumnTooltip(row, col);
+            if (col.FieldName == "DCAccount")
+                return ((row as GLTransClient)._DCKey as IToolTip)?.ToolTip();
+            else 
+                return base.SetColumnTooltip(row, col);
         }
     }
 
@@ -925,6 +920,9 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 switch ((int)trans._DCType)
                 {
+                    case 0:
+                        lookup.TableType = typeof(Uniconta.DataModel.GLAccount);
+                        break;
                     case 1:
                         lookup.TableType = typeof(Uniconta.DataModel.Debtor);
                         break;

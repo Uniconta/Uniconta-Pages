@@ -48,7 +48,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectPage2"
                         <CorasauControls:LookupEditor  x:Name="leInstallation" Text="{Binding Installation,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="ContactName" x:Name="liContactName" Style="{StaticResource LayoutItemsstyle}" ButtonContent="+">
-                        <CorasauControls:ComboBoxEditor AllowNullInput="True" AssignNullValueOnClearingEditText="True" x:Name="cmbContactName"  EditValueChanged="cmbContactName_EditValueChanged"/>
+                        <CorasauControls:ComboBoxEditor AllowNullInput="True" AssignNullValueOnClearingEditText="True" x:Name="cmbContactName"  EditValueChanged="cmbContactName_EditValueChanged" KeyDown="cmbContactName_KeyDown"/>
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
                 <CorasauControls:CorasauLayoutGroup x:Name="grpOrders" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Orders}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">

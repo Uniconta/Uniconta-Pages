@@ -90,7 +90,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         void dgGLTable_RowDoubleClick()
         {
-            localMenu_OnItemClicked("GLTran");
+            ribbonControl.PerformRibbonAction("GLTran");
         }
         
         void localMenu_OnItemClicked(string ActionType)
@@ -103,7 +103,7 @@ namespace UnicontaClient.Pages.CustomPage
                         EditAll();
                     break;
                 case "AddItem":
-                    AddDockItem(TabControls.GLAccountPage2, api, Uniconta.ClientTools.Localization.lookup("Accounts"), "Add_16x16.png");
+                    AddDockItem(TabControls.GLAccountPage2, api, Uniconta.ClientTools.Localization.lookup("Accounts"), "Add_16x16");
                     break;
                 case "EditItem":
                     if (selectedItem == null)
@@ -113,7 +113,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "AddRow":
                     if (dgGLTable.Readonly)
-                        AddDockItem(TabControls.GLAccountPage2, api, Uniconta.ClientTools.Localization.lookup("Accounts"), "Add_16x16.png");
+                        AddDockItem(TabControls.GLAccountPage2, api, Uniconta.ClientTools.Localization.lookup("Accounts"), "Add_16x16");
                     else
                         dgGLTable.AddRow();
                     break;
@@ -183,7 +183,7 @@ namespace UnicontaClient.Pages.CustomPage
             var glAccount = Activator.CreateInstance(selectedItem.GetType()) as GLAccountClient;
             CorasauDataGrid.CopyAndClearRowId(selectedItem, glAccount);
             var parms = new object[2] { glAccount, false };
-            AddDockItem(TabControls.GLAccountPage2, parms, Uniconta.ClientTools.Localization.lookup("Accounts"), "Add_16x16.png");
+            AddDockItem(TabControls.GLAccountPage2, parms, Uniconta.ClientTools.Localization.lookup("Accounts"), "Add_16x16");
         }
 
         bool copyRowIsEnabled = false;

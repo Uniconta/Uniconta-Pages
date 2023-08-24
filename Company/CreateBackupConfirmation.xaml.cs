@@ -38,9 +38,9 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
-            copyTrans = cbxCopyTrans.IsChecked.Value;
-            copyPhysicalVouchers = cbxPhysicalVoucher.IsChecked.Value;
-            copyAttachments = cbxCopyAttachments.IsChecked.Value;
+            copyTrans = cbxCopyTrans.IsChecked.GetValueOrDefault();
+            copyPhysicalVouchers = cbxPhysicalVoucher.IsChecked.GetValueOrDefault();
+            copyAttachments = cbxCopyAttachments.IsChecked.GetValueOrDefault();
             name = txtName.Text;
             this.DialogResult = (string.Compare(txtStart.Text, ConfirmWord, StringComparison.CurrentCultureIgnoreCase) == 0);
          

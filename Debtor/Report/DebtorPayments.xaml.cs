@@ -95,7 +95,7 @@ namespace UnicontaClient.Pages.CustomPage
         protected override void DataLoaded(UnicontaBaseEntity[] Arr)
         {
             var arr = (DebtorTransPayment[])Arr;
-            for(int i = 0; i < arr.Length; i++) 
+            for (int i = 0; i < arr.Length; i++)
             {
                 var rec = arr[i];
                 rec._FeeAmount = 0;
@@ -410,7 +410,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 var visibleRows = dgDebtorTranOpenGrid.GetVisibleRows() as IEnumerable<DebtorTransPayment>;
                                 if (cwLine.AggregateAmount)
                                 {
-                                    var rowsGroupBy = visibleRows.Where(p => p._Code != 0).GroupBy(a => new { a.Account, a._Code } );
+                                    var rowsGroupBy = visibleRows.Where(p => p._Code != 0).GroupBy(a => new { a.Account, a._Code });
                                     foreach (var group in rowsGroupBy)
                                     {
                                         string invoice;
@@ -497,7 +497,7 @@ namespace UnicontaClient.Pages.CustomPage
                         cwSendInvoice.DialogTableId = 2000000031;
                         cwSendInvoice.Closed += delegate
                         {
-                            SendReport(new [] { (DebtorTransPayment)dgDebtorTranOpenGrid.SelectedItem }, cwSendInvoice.Emails, cwSendInvoice.sendOnlyToThisEmail);
+                            SendReport(new[] { (DebtorTransPayment)dgDebtorTranOpenGrid.SelectedItem }, cwSendInvoice.Emails, cwSendInvoice.sendOnlyToThisEmail);
                         };
                         cwSendInvoice.Show();
                     }
@@ -621,30 +621,17 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         if (cwwin.value != 0)
                         {
+                            bool prDay = (cwwin.NoOfDays != "30");
+                            bool _PerAccount = !cwwin.PerTransaction;
                             var desm = api.CompanyEntity.HasDecimals ? 2 : 0;
-                            foreach (var rec in debtorPayments)
+                            if (!cwwin.PerTransaction)
                             {
-                                rec.PaymentCharge = 0d;
-                                if (!rec._OnHold && (rec._LastInterest == DateTime.MinValue || rec._LastInterest <= day))
-                                {
-                                    var factor = cwwin.value;
-                                    if (cwwin.NoOfDays != "30")
-                                    {
-                                        var dt = rec._LastInterest != DateTime.MinValue ? rec._LastInterest : (rec._DueDate != DateTime.MinValue ? rec._DueDate : rec.Date);
-                                        factor = Math.Max(Math.Min((cwwin.PrDate - dt).TotalDays, 360d) / 30d, 0d);
-                                    }
-                                    var val = Math.Round((rec._AmountOpenCur != 0 ? rec._AmountOpenCur : rec._AmountOpen) * factor / 100d, desm);
-                                    if (val > 0)
-                                    {
-                                        rec.FeeAmount = val;
-                                        rec._Code = DebtorEmailType.InterestNote;
-                                        rec.NotifyPropertyChanged("Code");
-                                        continue;
-                                    }
-                                }
-                                rec.FeeAmount = 0;
-                                rec.Code = null;
+                                SetInterestFeeAmount(debtorPayments, 0, cwwin.PrDate, day, prDay, desm);
+                                var selectedAccounts = debtorPayments.GroupBy(x => new { x.Account, x._Code }).Select(x => x.FirstOrDefault(x2 => x2._AmountOpen > 0 && !x2._OnHold));
+                                SetInterestFeeAmount(selectedAccounts, cwwin.value, cwwin.PrDate, day, prDay, desm);
                             }
+                            else
+                                SetInterestFeeAmount(debtorPayments, cwwin.value, cwwin.PrDate, day, prDay, desm);
                         }
                     }
                     else
@@ -657,13 +644,38 @@ namespace UnicontaClient.Pages.CustomPage
                         else
                         {
                             SetFeeAmount(debtorPayments, 0, currencuEnum, 0, chargeCurrency, day, cwwin.CollectionLetterTypes, cwwin.FeeOnReminder, cwwin.FirstCollectionIndex);
-                            var selectedAccounts = debtorPayments.GroupBy(x => new { x.Account, x._Code } ).Select(x => x.FirstOrDefault(x2 => x2._AmountOpen > 0 && !x2._OnHold));
+                            var selectedAccounts = debtorPayments.GroupBy(x => new { x.Account, x._Code }).Select(x => x.FirstOrDefault(x2 => x2._AmountOpen > 0 && !x2._OnHold));
                             SetFeeAmount(selectedAccounts, cwwin.value, currencuEnum, cwwin.Charge, chargeCurrency, day, cwwin.CollectionLetterTypes, cwwin.FeeOnReminder, cwwin.FirstCollectionIndex);
                         }
                     }
                 }
             };
             cwwin.Show();
+        }
+
+        private void SetInterestFeeAmount(IEnumerable<DebtorTransPayment> debtorPayments, double interestValue, DateTime prDate, DateTime day, bool prDay, int desm)
+        {
+            foreach (var rec in debtorPayments)
+            {
+                rec.PaymentCharge = 0d;
+                if (!rec._OnHold && (rec._LastInterest == DateTime.MinValue || rec._LastInterest <= day))
+                {
+                    var factor = interestValue;
+                    if (prDay)
+                    {
+                        var dt = rec._LastInterest != DateTime.MinValue ? rec._LastInterest : (rec._DueDate != DateTime.MinValue ? rec._DueDate : rec.Date);
+                        factor = Math.Max(Math.Min((prDate - dt).TotalDays, 360d) / 30d, 0d);
+                    }
+                    rec.FeeAmount = Math.Round((rec._AmountOpenCur != 0 ? rec._AmountOpenCur : rec._AmountOpen) * factor / 100d, desm);
+                    rec._Code = DebtorEmailType.InterestNote;
+                    rec.NotifyPropertyChanged("Code");
+                }
+                else
+                {
+                    rec.FeeAmount = 0;
+                    rec.Code = null;
+                }
+            }
         }
 
         private void SetFeeAmount(IEnumerable<DebtorTransPayment> debtorPayments, double feeAmount, Currencies feeCurrency, double ChargeAmount, Currencies chargeCurrency, DateTime day, int CollectionLetterTypes, bool FeeOnReminder, int FirstCollectionIndex)
@@ -682,7 +694,8 @@ namespace UnicontaClient.Pages.CustomPage
                             case DebtorEmailType.CollectionLetter2: if ((CollectionLetterTypes & 0x08) != 0) code = DebtorEmailType.CollectionLetter3; break;
                             case DebtorEmailType.CollectionLetter3: if ((CollectionLetterTypes & 0x10) != 0) code = DebtorEmailType.Collection; break;
                             case DebtorEmailType.Collection: if ((CollectionLetterTypes & 0x10) != 0) code = DebtorEmailType.Collection; break;
-                            default: if ((CollectionLetterTypes & (0x01 << FirstCollectionIndex)) != 0)
+                            default:
+                                if ((CollectionLetterTypes & (0x01 << FirstCollectionIndex)) != 0)
                                     code = FirstCollectionIndex == 0 ? DebtorEmailType.PaymentReminder :
                                         (FirstCollectionIndex == 1 ? DebtorEmailType.CollectionLetter1 :
                                         (FirstCollectionIndex == 2 ? DebtorEmailType.CollectionLetter2 :

@@ -157,20 +157,10 @@ namespace UnicontaClient.Pages.CustomPage
                 case "Estimation":
                     if (selectedItem != null)
                         SaveAndOpenTree(selectedItem);
-                    break; 
+                    break;
                 case "BudgetCategorySum":
                     if (selectedItem != null)
                         AddDockItem(TabControls.ProjectBudgetCategorySumPage, selectedItem, header);
-                    break;
-                case "CreateBudget":
-                    CreateBudget();
-                    break;
-                case "CreateBudgetTask":
-                    CreateBudgetTask();
-                    break;
-                case "UpdatePrices":
-                    if (dgProjectBudgetGrid.ItemsSource != null)
-                        UpdatePrices();
                     break;
                 case "CreateAnchorBudget":
                     if (dgProjectBudgetGrid.ItemsSource != null)
@@ -180,7 +170,10 @@ namespace UnicontaClient.Pages.CustomPage
                     AddDockItem(TabControls.TMPlanningCheckPage, null);
                     break;
                 case "RefreshGrid":
-                    gridRibbon_BaseActions(ActionType);
+                    if (dgProjectBudgetGrid.HasUnsavedData)
+                        Utility.ShowConfirmationOnRefreshGrid(dgProjectBudgetGrid);
+                    else
+                        gridRibbon_BaseActions(ActionType);
                     break;
                 case "ItemCoverage":
                     if (selectedItem != null)
@@ -192,13 +185,45 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "SetCurrent":
                     SetCurrentBudgetGroup();
-                    break;  
+                    break;
+                case "CopyEstimation":
+                    if (selectedItem != null)
+                        CopyEstimation(selectedItem);
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
         }
 
+        void CopyEstimation(ProjectBudgetClient projectBudget)
+        {
+            var cwProject = new CWProjects(api, string.Format(Uniconta.ClientTools.Localization.lookup("CopyOBJ"), Uniconta.ClientTools.Localization.lookup("Estimation")));
+            cwProject.Closed += async delegate
+            {
+                if (cwProject.DialogResult == true)
+                {
+                    var project = cwProject.Project;
+                    var newProjectBudgetClient = new ProjectBudgetClient();
+                    CorasauDataGrid.CopyAndClearRowId(projectBudget, newProjectBudgetClient);
+                    newProjectBudgetClient.Project = project;
+                    var result = await api.Insert(newProjectBudgetClient);
+                    if (result == ErrorCodes.Succes)
+                    {
+                        var currentProjectBudgetLns = await api.Query<ProjectBudgetLineClient>(projectBudget);
+
+                        if (currentProjectBudgetLns == null || currentProjectBudgetLns.Length == 0)
+                            return;
+
+                        foreach (var line in currentProjectBudgetLns)
+                            line.SetMaster(newProjectBudgetClient);
+
+                        api.InsertNoResponse(currentProjectBudgetLns);
+                    }
+                }
+            };
+            cwProject.Show();
+        }
         async void GenerateInvoice(ProjectBudgetClient projectBudget)
         {
             var Comp = api.CompanyEntity;
@@ -314,100 +339,19 @@ namespace UnicontaClient.Pages.CustomPage
             return invoicePostingResult;
         }
 
-
-        #region Create Budget
-        private void CreateBudget()
-        {
-            var cwCreateBjt = new CwCreateUpdateBudget(api);
-            cwCreateBjt.DialogTableId = 2000000100;
-            cwCreateBjt.Closed += async delegate
-            {
-                if (cwCreateBjt.DialogResult == true) 
-                {
-                    BudgetAPI budgetApi = new BudgetAPI(api);
-                    var result = await budgetApi.CreateBudget(CwCreateUpdateBudget.FromDate, CwCreateUpdateBudget.ToDate, CwCreateUpdateBudget.Employee, CwCreateUpdateBudget.Payroll,
-                                                              CwCreateUpdateBudget.PrCategory, CwCreateUpdateBudget.Group, CwCreateUpdateBudget.BudgetMethod, CwCreateUpdateBudget.BudgetName,
-                                                               CwCreateUpdateBudget.PrWorkSpace, cwCreateBjt.DeleteBudget, cwCreateBjt.InclProjectTask, null);
-
-                    if (result != ErrorCodes.Succes)
-                        UtilDisplay.ShowErrorCode(result);
-                    else
-                        UnicontaMessageBox.Show(string.Concat(Uniconta.ClientTools.Localization.lookup("Budget"), " ", Uniconta.ClientTools.Localization.lookup("Created").ToLower()), 
-                            Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OK);
-                }
-            };
-            cwCreateBjt.Show();
-            
-        }
-
-        private void CreateBudgetTask()
-        {
-            var cwCreateBjtTask = new CwCreateBudgetTask(api);
-            cwCreateBjtTask.DialogTableId = 2000000106;
-            cwCreateBjtTask.Closed += async delegate
-            {
-                if (cwCreateBjtTask.DialogResult == true)
-                {
-                    BudgetAPI budgetApi = new BudgetAPI(api);
-                    var result = await budgetApi.CreateBudgetTask(CwCreateBudgetTask.Employee, CwCreateBudgetTask.Payroll, CwCreateBudgetTask.Group,
-                                                                  CwCreateBudgetTask.PrWorkSpace, cwCreateBjtTask.DeleteBudget, (byte)CwCreateBudgetTask.BudgetTaskPrincip,
-                                                                  CwCreateBudgetTask.TaskHours, null);
-
-                    if (result != ErrorCodes.Succes)
-                        UtilDisplay.ShowErrorCode(result);
-                    else
-                        UnicontaMessageBox.Show(string.Concat(Uniconta.ClientTools.Localization.lookup("Budget"), " ", Uniconta.ClientTools.Localization.lookup("Created").ToLower()),
-                            Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OK);
-                }
-            };
-            cwCreateBjtTask.Show();
-        }
-        #endregion
-
-        #region UpdatePrices
-        private void UpdatePrices()
-        {
-            var cwUpdateBjt = new CwCreateUpdateBudget(api, 1);
-            cwUpdateBjt.DialogTableId = 2000000101;
-            cwUpdateBjt.Closed += async delegate
-            {
-                if (cwUpdateBjt.DialogResult == true)
-                {
-                    BudgetAPI budgetApi = new BudgetAPI(api);
-                    var result = await budgetApi.UpdatePrices(CwCreateUpdateBudget.FromDate, CwCreateUpdateBudget.ToDate, CwCreateUpdateBudget.Employee, CwCreateUpdateBudget.Payroll,
-                                                              CwCreateUpdateBudget.PrCategory, CwCreateUpdateBudget.Group, CwCreateUpdateBudget.PrWorkSpace, cwUpdateBjt.InclProjectTask, null);
-
-                    if (result != ErrorCodes.Succes)
-                        UtilDisplay.ShowErrorCode(result);
-                    else
-                        UnicontaMessageBox.Show(string.Concat(Uniconta.ClientTools.Localization.lookup("Prices"), " ", Uniconta.ClientTools.Localization.lookup("Updated").ToLower()),
-                      Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OK);
-                }
-            };
-            cwUpdateBjt.Show();
-        }
-        #endregion
-
         #region Create Anchor Budget
-        private void CreateAnchorBudget()
+        async private void CreateAnchorBudget()
         {
-            var cwCreateAnchorBjt = new CwCreateAnchorBudget(api);
-            cwCreateAnchorBjt.DialogTableId = 2000000102;
-            cwCreateAnchorBjt.Closed += async delegate
-            {
-                if (cwCreateAnchorBjt.DialogResult == true)
-                {
-                    BudgetAPI budgetApi = new BudgetAPI(api);
-                    var result = await budgetApi.CreateAnchorBudget(CwCreateAnchorBudget.Group);
+            var budgetLst = dgProjectBudgetGrid.GetVisibleRows() as IList<ProjectBudgetClient>;
+            BudgetAPI budgetApi = new BudgetAPI(api);
+            var result = await budgetApi.CreateAnchorBudget(budgetLst);
 
-                    if (result != ErrorCodes.Succes)
-                        UtilDisplay.ShowErrorCode(result);
-                    else
-                        UnicontaMessageBox.Show(string.Concat(Uniconta.ClientTools.Localization.lookup("AnchorBudget"), " ", Uniconta.ClientTools.Localization.lookup("Updated").ToLower()),
-                      Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OK);
-                }
-            };
-            cwCreateAnchorBjt.Show();
+            if (result != ErrorCodes.Succes)
+                UtilDisplay.ShowErrorCode(result);
+            else
+                UnicontaMessageBox.Show(string.Concat(Uniconta.ClientTools.Localization.lookup("AnchorBudget"), " ", Uniconta.ClientTools.Localization.lookup("Updated").ToLower()),
+              Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OK);
+
         }
         #endregion
         private void SetCurrentBudgetGroup()

@@ -146,6 +146,11 @@ namespace UnicontaClient.Pages.CustomPage
             UnicontaClient.Utilities.Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
         }
 
+        protected override void LoadCacheInBackGround()
+        {
+            LoadType(new Type[] { typeof(CrmInterest), typeof(CrmProduct), typeof(Contact) });
+        }
+
         private void localMenu_OnItemClicked(string ActionType)
         {
             var selectedItem = dgCrmDebtorProspect.SelectedItem as ICrmProspect;
@@ -156,9 +161,9 @@ namespace UnicontaClient.Pages.CustomPage
                 case "AddProspect":
                     object[] param = new object[2] { api, null };
                     if (ActionType == "AddDebtor")
-                        AddDockItem(TabControls.DebtorAccountPage2, param, Uniconta.ClientTools.Localization.lookup("DebtorAccount"), "Add_16x16.png");
+                        AddDockItem(TabControls.DebtorAccountPage2, param, Uniconta.ClientTools.Localization.lookup("DebtorAccount"), "Add_16x16");
                     else if (ActionType == "AddProspect")
-                        AddDockItem(TabControls.CrmProspectPage2, param, Uniconta.ClientTools.Localization.lookup("Prospects"), "Add_16x16.png");
+                        AddDockItem(TabControls.CrmProspectPage2, param, Uniconta.ClientTools.Localization.lookup("Prospects"), "Add_16x16");
                     break;
 
                 case "EditRow":
@@ -273,16 +278,12 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void HasNoteImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var selectedRowImageTag = (sender as Image).Tag;
-
-            OnClickImage(selectedRowImageTag, TabControls.UserNotesPage);
+            OnClickImage((sender as Image).Tag, TabControls.UserNotesPage);
         }
 
         private void HasDocImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var selectedRowImageTag = (sender as Image).Tag;
-
-            OnClickImage(selectedRowImageTag, TabControls.UserDocsPage);
+            OnClickImage((sender as Image).Tag, TabControls.UserDocsPage);
         }
 
         private void OnClickImage(object crmView, string page)

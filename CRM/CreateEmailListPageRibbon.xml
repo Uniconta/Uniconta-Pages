@@ -1,53 +1,53 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <root>
   <RibbonItem TabId="0" LocalizedNameKey="Home">
-    <RibbonItem Action="Search" LocalizedNameKey="Search" LargeGlyph="Validate_32x32.png" ShortcutKey="Ctrl+H" />
+    <RibbonItem Action="Search" LocalizedNameKey="Search" LargeGlyph="Validate_32x32" ShortcutKey="Ctrl+H" />
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="SaveAndExit" LocalizedNameKey="SaveExit" Glyph="CreateExit_32x32.png" LargeGlyph="CreateExit_32x32.png" />
+    <RibbonItem Action="SaveAndExit" LocalizedNameKey="SaveExit" Glyph="CreateExit_32x32" LargeGlyph="CreateExit_32x32" />
   </RibbonItem>
   <RibbonItem >
-    <RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="Remove" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png"/>
+    <RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="Remove" Glyph="Delete_16x16" LargeGlyph="Delete_32x32"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="DebtorFilter" LocalizedNameKey="FilterOBJ" Parameter="Debtors" Glyph="Filter_16x16.png" LargeGlyph="Filter_32x32.png" ShortcutKey="CTRL+I"/>
-    <RibbonItem Action="ClearDebtorFilter" LocalizedNameKey="ClearFilter" Glyph="Filter_Clear_32x32.png" LargeGlyph="Filter_Clear_32x32.png" ShortcutKey="CTRL+K"/>
+    <RibbonItem Action="DebtorFilter" LocalizedNameKey="FilterOBJ" Parameter="Debtors" Glyph="Filter_16x16" LargeGlyph="Filter_32x32" ShortcutKey="CTRL+I"/>
+    <RibbonItem Action="ClearDebtorFilter" LocalizedNameKey="ClearFilter" Glyph="Filter_Clear_32x32" LargeGlyph="Filter_Clear_32x32" ShortcutKey="CTRL+K"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="ProspectFilter" LocalizedNameKey="FilterOBJ" Parameter="Prospects" Glyph="Filter_16x16.png" LargeGlyph="Filter_32x32.png"/>
-    <RibbonItem Action="ClearProspectFilter" LocalizedNameKey="ClearFilter" Glyph="Filter_Clear_32x32.png" LargeGlyph="Filter_Clear_32x32.png"/>
+    <RibbonItem Action="ProspectFilter" LocalizedNameKey="FilterOBJ" Parameter="Prospects" Glyph="Filter_16x16" LargeGlyph="Filter_32x32"/>
+    <RibbonItem Action="ClearProspectFilter" LocalizedNameKey="ClearFilter" Glyph="Filter_Clear_32x32" LargeGlyph="Filter_Clear_32x32"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="CreditorFilter" LocalizedNameKey="FilterOBJ" Parameter="Creditor" Glyph="Filter_16x16.png" LargeGlyph="Filter_32x32.png"/>
-    <RibbonItem Action="ClearCreditorFilter" LocalizedNameKey="ClearFilter" Glyph="Filter_Clear_32x32.png" LargeGlyph="Filter_Clear_32x32.png"/>
+    <RibbonItem Action="CreditorFilter" LocalizedNameKey="FilterOBJ" Parameter="Creditor" Glyph="Filter_16x16" LargeGlyph="Filter_32x32"/>
+    <RibbonItem Action="ClearCreditorFilter" LocalizedNameKey="ClearFilter" Glyph="Filter_Clear_32x32" LargeGlyph="Filter_Clear_32x32"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="ContactFilter" LocalizedNameKey="FilterOBJ" Parameter="Contacts" Glyph="Filter_16x16.png" LargeGlyph="Filter_32x32.png"/>
-    <RibbonItem Action="ClearContactFilter" LocalizedNameKey="ClearFilter" Glyph="Filter_Clear_32x32.png" LargeGlyph="Filter_Clear_32x32.png"/>
+    <RibbonItem Action="ContactFilter" LocalizedNameKey="FilterOBJ" Parameter="Contacts" Glyph="Filter_16x16" LargeGlyph="Filter_32x32"/>
+    <RibbonItem Action="ClearContactFilter" LocalizedNameKey="ClearFilter" Glyph="Filter_Clear_32x32" LargeGlyph="Filter_Clear_32x32"/>
   </RibbonItem>
 	<RibbonItem>
-		<RibbonItem Action="InvItemFilter" LocalizedNameKey="FilterOBJ" Parameter="Item" Glyph="Filter_16x16.png" LargeGlyph="Filter_32x32.png"/>
-		<RibbonItem Action="ClearInvItemFilter" LocalizedNameKey="ClearFilter" Glyph="Filter_Clear_32x32.png" LargeGlyph="Filter_Clear_32x32.png"/>
+		<RibbonItem Action="InvItemFilter" LocalizedNameKey="FilterOBJ" Parameter="Item" Glyph="Filter_16x16" LargeGlyph="Filter_32x32"/>
+		<RibbonItem Action="ClearInvItemFilter" LocalizedNameKey="ClearFilter" Glyph="Filter_Clear_32x32" LargeGlyph="Filter_Clear_32x32"/>
 	</RibbonItem>
 	<RibbonItem>
-		<RibbonItem Action="InvTransFilter" LocalizedNameKey="FilterOBJ" Parameter="MovementType" Glyph="Filter_16x16.png" LargeGlyph="Filter_32x32.png"/>
-		<RibbonItem Action="ClearInvTransFilter" LocalizedNameKey="ClearFilter" Glyph="Filter_Clear_32x32.png" LargeGlyph="Filter_Clear_32x32.png"/>
+		<RibbonItem Action="InvTransFilter" LocalizedNameKey="FilterOBJ" Parameter="MovementType" Glyph="Filter_16x16" LargeGlyph="Filter_32x32"/>
+		<RibbonItem Action="ClearInvTransFilter" LocalizedNameKey="ClearFilter" Glyph="Filter_Clear_32x32" LargeGlyph="Filter_Clear_32x32"/>
 	</RibbonItem>
   <RibbonItem>
     <!---If we want to create a new group in same PageTab-->
-    <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32.png">
+    <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32">
       <!---If we want Inner menu-->
-      <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
-      <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16.png" ShortcutKey="" />
-      <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png" ShortcutKey=""/>
-      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16.png" ShortcutKey=""/>
-      <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16.png" ShortcutKey="Ctrl+U"/>
-      <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportLayout" EnableSeperator="True" Glyph="ExportLayout_16x16.png" LargeGlyph="ExportLayout_16x16.png" ShortcutKey=""/>
-      <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportLayout" Glyph="Import_16x16.png" LargeGlyph="Import_16x16.png" ShortcutKey=""/>
-      <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16.png" ShortcutKey=""/>
+      <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
+      <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16" ShortcutKey="" />
+      <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
+      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16" ShortcutKey=""/>
+      <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16" ShortcutKey="Ctrl+U"/>
+      <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportLayout" EnableSeperator="True" Glyph="ExportLayout_16x16" LargeGlyph="ExportLayout_16x16" ShortcutKey=""/>
+      <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportLayout" Glyph="Import_16x16" LargeGlyph="Import_16x16" ShortcutKey=""/>
+      <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16" ShortcutKey=""/>
     </RibbonItem>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="SendEmail" LocalizedNameKey="EmailDocuments" LargeGlyph="Email_32x32.png"/>
+    <RibbonItem Action="SendEmail" LocalizedNameKey="EmailDocuments" LargeGlyph="Email_32x32"/>
   </RibbonItem>
 </root>

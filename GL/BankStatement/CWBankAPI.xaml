@@ -6,8 +6,9 @@ x:Class="UnicontaClient.Pages.CustomPage.CWBankAPI"
            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"          
            xmlns:ClientToolsControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
            xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
-            xmlns:dxinteraction="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
-                    xmlns:enumType ="clr-namespace:Uniconta.DataModel;assembly=Uniconta.WindowsAPI"
+           xmlns:dxinteraction="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+           xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+           xmlns:enumType ="clr-namespace:Uniconta.DataModel;assembly=Uniconta.WindowsAPI"
            Width="500"  KeyDown="ChildWindow_KeyDown" SizeToContent="Height">
     <Grid x:Name="LayoutRoot" Margin="2" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
@@ -19,7 +20,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CWBankAPI"
                 <ClientToolsControls:CorasauLayoutGroup x:Name="lgType"  View="GroupBox" GroupBoxDisplayMode="Light" Orientation="Vertical" IsCollapsible="False" HorizontalAlignment="Stretch" ClientToolsControls:CorasauLayoutControl.AllowHorizontalSizing="True">
                     <ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
                         <DataTemplate>
-                            <Image Source="/UnicontaPages;component/Assets/img/group-web_16x16.png" Width="16" Height="16" Stretch="UniformToFill" HorizontalAlignment="Left" />
+                            <Image Source="{dx:SvgImageSource Uri=/UnicontaPages;component/Assets/img/group-web_16x16.svg, UsePalette=True}" dx:WpfSvgPalette.Palette="{StaticResource SVGIconPallete}" Width="16" Height="16" Stretch="UniformToFill" HorizontalAlignment="Left" />
                         </DataTemplate>
                     </ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
                     <ClientToolsControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=WebService}">
@@ -33,7 +34,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CWBankAPI"
                 <ClientToolsControls:CorasauLayoutGroup x:Name="lgParm"  View="GroupBox" GroupBoxDisplayMode="Light" Orientation="Vertical" IsCollapsible="False" HorizontalAlignment="Stretch" ClientToolsControls:CorasauLayoutControl.AllowHorizontalSizing="True">
                     <ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
                         <DataTemplate>
-                            <Image Source="/UnicontaPages;component/Assets/img/group-questiont_16x16.png" Width="16" Height="16" Stretch="UniformToFill" HorizontalAlignment="Left" />
+                            <Image Source="{dx:SvgImageSource  Uri=/UnicontaPages;component/Assets/img/group-questiont_16x16.svg, UsePalette=True}" dx:WpfSvgPalette.Palette="{StaticResource SVGIconPallete}" Width="16" Height="16" Stretch="UniformToFill" HorizontalAlignment="Left" />
                         </DataTemplate>
                     </ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
                     <CorasauControls:CorasauLayoutItem FieldName="BankAccount" x:Name="liBankAccount">
@@ -49,7 +50,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CWBankAPI"
                 <ClientToolsControls:CorasauLayoutGroup x:Name="lgCustomer"  View="GroupBox" GroupBoxDisplayMode="Light" IsCollapsible="False" HorizontalAlignment="Stretch" ClientToolsControls:CorasauLayoutControl.AllowHorizontalSizing="True">
                     <ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
                         <DataTemplate>
-                            <Image Source="/UnicontaPages;component/Assets/img/group-user_16x16.png" Width="16" Height="16" Stretch="UniformToFill" HorizontalAlignment="Left" />
+                            <Image Source="{dx:SvgImageSource Uri=/UnicontaPages;component/Assets/img/group-user_16x16.svg, UsePalette=True}" dx:WpfSvgPalette.Palette="{StaticResource SVGIconPallete}" Width="16" Height="16" Stretch="UniformToFill" HorizontalAlignment="Left" />
                         </DataTemplate>
                     </ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
                     <ClientToolsControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ServiceId}">
@@ -59,7 +60,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CWBankAPI"
                 <ClientToolsControls:CorasauLayoutGroup x:Name="lgConnect"  View="GroupBox" GroupBoxDisplayMode="Light" Orientation="Vertical" IsCollapsible="False" HorizontalAlignment="Stretch" ClientToolsControls:CorasauLayoutControl.AllowHorizontalSizing="True">
                     <ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
                         <DataTemplate>
-                            <Image Source="/UnicontaPages;component/Assets/img/group-connect_16x16.png" Width="16" Height="16" Stretch="UniformToFill" HorizontalAlignment="Left" />
+                            <Image Source="{dx:SvgImageSource Uri=/UnicontaPages;component/Assets/img/group-connect_16x16.svg, UsePalette=True}" dx:WpfSvgPalette.Palette="{StaticResource SVGIconPallete}" Width="16" Height="16" Stretch="UniformToFill" HorizontalAlignment="Left" />
                         </DataTemplate>
                     </ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
                     <ClientToolsControls:CorasauLayoutItem x:Name="liBank" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FinancialInstitution}">
@@ -79,7 +80,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CWBankAPI"
                 <ClientToolsControls:CorasauLayoutGroup x:Name="lgDescription"  View="GroupBox" GroupBoxDisplayMode="Light" IsCollapsible="False" HorizontalAlignment="Stretch" ClientToolsControls:CorasauLayoutControl.AllowHorizontalSizing="True">
                     <ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
                         <DataTemplate>
-                            <Image Source="/UnicontaPages;component/Assets/img/group-file_16x16.png" Width="16" Height="16" Stretch="UniformToFill" HorizontalAlignment="Left" />
+                            <Image Source="{dx:SvgImageSource Uri=/UnicontaPages;component/Assets/img/group-file_16x16.svg, UsePalette=True}" dx:WpfSvgPalette.Palette="{StaticResource SVGIconPallete}" Width="16" Height="16" Stretch="UniformToFill" HorizontalAlignment="Left" />
                         </DataTemplate>
                     </ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
                     <ClientToolsControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Description}" LabelVerticalAlignment="Top">

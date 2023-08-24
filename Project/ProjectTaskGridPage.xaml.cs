@@ -23,7 +23,7 @@ namespace UnicontaClient.Pages.CustomPage
     {
         public override Type TableType { get { return typeof(ProjectTaskClient); } }
     }
-    
+
     public partial class ProjectTaskGridPage : GridBasePage
     {
         public override string NameOfControl { get { return TabControls.ProjectTaskGridPage; } }
@@ -93,8 +93,8 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 var emp = (_master as Uniconta.DataModel.Employee);
                 if (emp != null)
-                    Employee.Visible = false;   
-                    
+                    Employee.Visible = false;
+
                 UtilDisplay.RemoveMenuCommand(rb, new string[] { "CreateTaskFromTask" });
             }
             dgProjectTaskGrid.ShowTotalSummary();
@@ -104,7 +104,7 @@ namespace UnicontaClient.Pages.CustomPage
         Filter defaultFilter;
         protected override Filter[] DefaultFilters()
         {
-            if (defaultFilter!= null)
+            if (defaultFilter != null)
                 return new Filter[] { defaultFilter };
             else
                 return null;
@@ -120,7 +120,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
             if (employee != null)
             {
-                defaultFilter= new Filter();
+                defaultFilter = new Filter();
                 defaultFilter.name = "Employee";
                 defaultFilter.value = employee;
                 SetHeader();
@@ -152,7 +152,7 @@ namespace UnicontaClient.Pages.CustomPage
                     param[0] = newItem;
                     param[1] = false;
                     param[2] = dgProjectTaskGrid.masterRecord;
-                    AddDockItem(TabControls.ProjectTaskPage2, param, Uniconta.ClientTools.Localization.lookup("Task"), "Add_16x16.png");
+                    AddDockItem(TabControls.ProjectTaskPage2, param, Uniconta.ClientTools.Localization.lookup("Task"), "Add_16x16");
                     break;
                 case "EditRow":
                     if (selectedItem == null)
@@ -194,10 +194,99 @@ namespace UnicontaClient.Pages.CustomPage
                 case "UndoDelete":
                     dgProjectTaskGrid.UndoDeleteRow();
                     break;
+                case "AddPeriod":
+                    AddPeriod();
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
+        }
+
+        private void AddPeriod()
+        {
+            var prjBudgetLns = dgProjectTaskGrid.GetVisibleRows() as IEnumerable<ProjectTaskClient>;
+
+            if (prjBudgetLns == null || prjBudgetLns.Count() == 0)
+                return;
+
+            var cwSelectPeriod = new CWAddPeriod(true);
+            cwSelectPeriod.DialogTableId = 2000000105;
+            cwSelectPeriod.Closed += delegate
+            {
+                if (cwSelectPeriod.DialogResult == true)
+                {
+                    var periodType = cwSelectPeriod.PeriodType;
+                    var isFromDate = cwSelectPeriod.IsFromDate;
+                    var isToDate = cwSelectPeriod.IsToDate;
+                    var isBothDate = cwSelectPeriod.IsBothDate;
+
+                    foreach (ProjectTaskClient line in prjBudgetLns)
+                    {
+                        var startDate = line._StartDate == DateTime.MinValue ? DateTime.Now : line._StartDate;
+                        var endDate = line._EndDate == DateTime.MinValue ? DateTime.Now : line._EndDate;
+
+                        dgProjectTaskGrid.SetLoadedRow(line);
+
+                        if (cwSelectPeriod.IsFromDate)
+                        {
+                            switch (periodType)
+                            {
+                                case 0:
+                                    line._StartDate = startDate.AddDays(cwSelectPeriod.PeriodValue);
+                                    break;
+                                case 1:
+                                    line._StartDate = startDate.AddMonths(cwSelectPeriod.PeriodValue);
+                                    break;
+                                case 2:
+                                    line._StartDate = startDate.AddYears(cwSelectPeriod.PeriodValue);
+                                    break;
+                            }
+                            line.NotifyPropertyChanged("StartDate");
+                        }
+                        else if (cwSelectPeriod.IsToDate)
+                        {
+                            switch (periodType)
+                            {
+                                case 0:
+                                    line._EndDate = endDate.AddDays(cwSelectPeriod.PeriodValue);
+                                    break;
+                                case 1:
+                                    line._EndDate = endDate.AddMonths(cwSelectPeriod.PeriodValue);
+                                    break;
+                                case 2:
+                                    line._EndDate = endDate.AddYears(cwSelectPeriod.PeriodValue);
+                                    break;
+                            }
+                            line.NotifyPropertyChanged("EndDate");
+                        }
+                        else
+                        {
+                            switch (periodType)
+                            {
+                                case 0:
+                                    line._StartDate = startDate.AddDays(cwSelectPeriod.PeriodValue);
+                                    line._EndDate = endDate.AddDays(cwSelectPeriod.PeriodValue);
+                                    break;
+                                case 1:
+                                    line._StartDate = startDate.AddMonths(cwSelectPeriod.PeriodValue);
+                                    line._EndDate = endDate.AddMonths(cwSelectPeriod.PeriodValue);
+                                    break;
+                                case 2:
+                                    line._StartDate = startDate.AddYears(cwSelectPeriod.PeriodValue);
+                                    line._EndDate = endDate.AddYears(cwSelectPeriod.PeriodValue);
+                                    break;
+                            }
+                            line.NotifyPropertyChanged("StartDate");
+                            line.NotifyPropertyChanged("EndDate");
+                        }
+                        dgProjectTaskGrid.SetModifiedRow(line);
+                    }
+
+                    saveGrid();
+                }
+            };
+            cwSelectPeriod.Show();
         }
 
         bool editAllChecked;

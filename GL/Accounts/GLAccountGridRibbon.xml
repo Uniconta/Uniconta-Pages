@@ -2,57 +2,57 @@
 <root>
   <RibbonItem TabId="0" LocalizedNameKey="Home">
     <!---When we create a new group and a new TabPage -->
-    <RibbonItem Action="AddRow" LocalizedNameKey="AddOBJ" Parameter="LedgerAccount" LargeGlyph="Add_32x32.png">
-      <RibbonItem Action="AddRow" LocalizedNameKey="Add" ControlName="GLAccountPage2" ShortcutKey="CTRL+N" Glyph="Add_16x16.png" LargeGlyph=""/>
-      <RibbonItem Action="CopyRecord" LocalizedNameKey="Copy" Glyph="Copy_16x16.png" ShortcutKey="Shift+F2"/>
+    <RibbonItem Action="AddRow" LocalizedNameKey="AddOBJ" Parameter="LedgerAccount" LargeGlyph="Add_32x32">
+      <RibbonItem Action="AddRow" LocalizedNameKey="Add" ControlName="GLAccountPage2" ShortcutKey="CTRL+N" Glyph="Add_16x16" LargeGlyph=""/>
+      <RibbonItem Action="CopyRecord" LocalizedNameKey="Copy" Glyph="Copy_16x16" ShortcutKey="Shift+F2"/>
     </RibbonItem>
-    <RibbonItem Action="EditItem" LocalizedNameKey="Edit" LargeGlyph="Edit_32x32.png" ShortcutKey="CTRL+E"/>
+    <RibbonItem Action="EditItem" LocalizedNameKey="Edit" LargeGlyph="Edit_32x32" ShortcutKey="CTRL+E"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="RefreshGrid" ShortcutKey="CTRL+R" LocalizedNameKey="Refresh" LargeGlyph="refresh.png"/>
-    <RibbonItem Action="Filter" ShortcutKey="CTRL+I" LocalizedNameKey="Filter" LargeGlyph="Filter_32x32.png"/>
+    <RibbonItem Action="RefreshGrid" ShortcutKey="CTRL+R" LocalizedNameKey="Refresh" LargeGlyph="refresh"/>
+    <RibbonItem Action="Filter" ShortcutKey="CTRL+I" LocalizedNameKey="Filter" LargeGlyph="Filter_32x32"/>
   </RibbonItem>
   <RibbonItem>
     <!---If we want to create a new group in same PageTab-->
-     <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32.png">
+     <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32">
       <!---If we want Inner menu-->
-      <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16.png" ShortcutKey=""/>
-      <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16.png" ShortcutKey="" />
-      <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" Glyph="Edit_16x16.png" ShortcutKey=""/>
-      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16.png" ShortcutKey=""/>
-      <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16.png" ShortcutKey="CTRL+U"/>
-      <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportLayout" EnableSeperator="True" Glyph="ExportLayout_16x16.png" ShortcutKey=""/>
-      <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportLayout" Glyph="Import_16x16.png" ShortcutKey=""/>
-      <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16.png" ShortcutKey=""/>
+      <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16" ShortcutKey=""/>
+      <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="OtherFields_16x16" ShortcutKey="" />
+      <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" Glyph="SaveLayout_16x16" ShortcutKey=""/>
+      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16" ShortcutKey=""/>
+      <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16" ShortcutKey="CTRL+U"/>
+      <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportLayout" EnableSeperator="True" Glyph="Export_16x16" ShortcutKey=""/>
+      <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportLayout" Glyph="Import_16x16" ShortcutKey=""/>
+      <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16" ShortcutKey=""/>
     </RibbonItem>
   </RibbonItem>
   <RibbonItem>
-     <RibbonItem Action="AllocationAccounts" LocalizedNameKey="AllocAndAccruals" LargeGlyph="Setup-allocation-32x32.png">
+     <RibbonItem Action="AllocationAccounts" LocalizedNameKey="AllocAndAccruals" LargeGlyph="Setup-allocation-32x32">
      </RibbonItem>
-    <RibbonItem Action="Budget" LocalizedNameKey="Budget" ControlName="GLBudgetLinePage" LargeGlyph="Budget_32x32.png"/>
-    <RibbonItem Module="Attachments" LocalizedNameKey="Attachments" LargeGlyph="Attachments_32x32.png">
-      <RibbonItem Action="AddNote" ShortcutKey="Alt+N" ControlName="UserNotesPage" LocalizedNameKey="Note" Glyph="Note_16x16.png" />
-      <RibbonItem Action="AddDoc" LocalizedNameKey="Document" ControlName="UserDocsPage" Glyph="Document_Attachment_16x16.png" />
+    <RibbonItem Action="Budget" LocalizedNameKey="Budget" ControlName="GLBudgetLinePage" LargeGlyph="Budget_32x32"/>
+    <RibbonItem Module="Attachments" LocalizedNameKey="Attachments" LargeGlyph="Attachments_32x32">
+      <RibbonItem Action="AddNote" ShortcutKey="Alt+N" ControlName="UserNotesPage" LocalizedNameKey="Note" Glyph="Note_16x16" />
+      <RibbonItem Action="AddDoc" LocalizedNameKey="Document" ControlName="UserDocsPage" Glyph="Document_Attachment_16x16" />
     </RibbonItem>
   </RibbonItem>
   <RibbonItem LocalizedNameKey="Reports">
-    <RibbonItem Action="GLTran" LocalizedNameKey="AccountStatement" ControlName="TransactionReport" LargeGlyph="Account-statement_32x32.png" />
-    <RibbonItem Action="Trans" LocalizedNameKey="Transactions" ControlName="AccountsTransaction" LargeGlyph="Posted_Transaction_32x32.png" ShortcutKey="CTRL+T" />
-    <RibbonItem Action="GLTransSum" LocalizedNameKey="AccountTotals" ControlName="GLTransSumClientPage"  LargeGlyph="Validate_Add_32x32.png" />
+    <RibbonItem Action="GLTran" LocalizedNameKey="AccountStatement" ControlName="TransactionReport" LargeGlyph="Account-statement_32x32" />
+    <RibbonItem Action="Trans" LocalizedNameKey="Transactions" ControlName="AccountsTransaction" LargeGlyph="Posted_Transaction_32x32" ShortcutKey="CTRL+T" />
+    <RibbonItem Action="GLTransSum" LocalizedNameKey="AccountTotals" ControlName="GLTransSumClientPage"  LargeGlyph="Validate_Add_32x32" />
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="VatOnClient" LocalizedNameKey="VATprDC" ControlName="VatOnClientsReport" LargeGlyph="VAT_32x32.png"/>
+    <RibbonItem Action="VatOnClient" LocalizedNameKey="VATprDC" ControlName="VatOnClientsReport" LargeGlyph="VAT_32x32"/>
   </RibbonItem>
   <RibbonItem TabId="1" TabHeader="EditAll" LocalizedNameKey="Add">
-    <RibbonItem Action="EditAll"  LocalizedNameKey="EditAll" Glyph="Edit_16x16.png" LargeGlyph="Edit_32x32.png"/>
-    <RibbonItem Action="AddRow"  LocalizedNameKey="AddOBJ" Parameter="LedgerAccount" Glyph="Add_16x16.png" LargeGlyph="Add_32x32.png"/>
-    <RibbonItem Action="CopyRow" LocalizedNameKey="CopyOBJ" Parameter="LedgerAccount" LargeGlyph="Copy_32x32.png"/>
+    <RibbonItem Action="EditAll"  LocalizedNameKey="EditAll" Glyph="Edit_16x16" LargeGlyph="Edit_32x32"/>
+    <RibbonItem Action="AddRow"  LocalizedNameKey="AddOBJ" Parameter="LedgerAccount" Glyph="Add_16x16" LargeGlyph="Add_32x32"/>
+    <RibbonItem Action="CopyRow" LocalizedNameKey="CopyOBJ" Parameter="LedgerAccount" LargeGlyph="Copy_32x32"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="DeleteOBJ" Parameter="LedgerAccount" Glyph="Delete_16x16.png" LargeGlyph="Delete_32x32.png"/>
-    <RibbonItem Action="UndoDelete" ShortcutKey="CTRL+Z" LocalizedNameKey="UndoDelete" LargeGlyph="Undo_Delete_32x32.png"/>
+    <RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="DeleteOBJ" Parameter="LedgerAccount" Glyph="Delete_16x16" LargeGlyph="Delete_32x32"/>
+    <RibbonItem Action="UndoDelete" ShortcutKey="CTRL+Z" LocalizedNameKey="UndoDelete" LargeGlyph="Undo_Delete_32x32"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="SaveGrid" ShortcutKey="CTRL+S" LocalizedNameKey="Save" Glyph="save-16x16.png" LargeGlyph="save-32x32.png"/>
+    <RibbonItem Action="SaveGrid" ShortcutKey="CTRL+S" LocalizedNameKey="Save" Glyph="save-16x16" LargeGlyph="save-32x32"/>
   </RibbonItem>
 </root>

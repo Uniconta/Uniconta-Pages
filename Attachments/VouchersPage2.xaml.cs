@@ -54,9 +54,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             viewInbin = viewInBin;
             InitPage(crudApi);
-#if !SILVERLIGHT
             FocusManager.SetFocusedElement(cmbContentTypes, cmbContentTypes);
-#endif
         }
         private void InitPage(CrudAPI crudApi)
         {
@@ -207,7 +205,6 @@ namespace UnicontaClient.Pages.CustomPage
                         var voucher = multiVouchers[i];
                         if (voucher._Data != null)
                         {
-#if !SILVERLIGHT
                             if (voucher._Fileextension == FileextensionsTypes.JPEG ||
                                 voucher._Fileextension == FileextensionsTypes.BMP ||
                                 voucher._Fileextension == FileextensionsTypes.TIFF ||
@@ -220,7 +217,6 @@ namespace UnicontaClient.Pages.CustomPage
                                     voucher._Fileextension = FileextensionsTypes.JPEG;
                                 }
                             }
-#endif
                             buffers[i] = voucher._Data;
                             voucher._Data = null;
                         }
@@ -357,7 +353,6 @@ namespace UnicontaClient.Pages.CustomPage
         private bool ValidateSave()
         {
             bool isSucess = false;
-#if !SILVERLIGHT
             if (browseControl?.FileName == null && !string.IsNullOrEmpty(voucherClientRow._Url))
             {
                 isSucess = true;
@@ -384,14 +379,9 @@ namespace UnicontaClient.Pages.CustomPage
 
                 return isSucess;
             }
-#endif
             if (browseControl.IsMultiSelect)
             {
-#if SILVERLIGHT
-                var lst = browseControl.SelectedFileInfos;
-#else
                 var lst = browseControl.Split ? browseControl.LoadFileInfosBySplittingPDF() : browseControl.SelectedFileInfos;
-#endif
                 if (lst == null && string.IsNullOrEmpty(voucherClientRow.Url))
                     return false;
                 var fileCount = lst.Count();
@@ -480,10 +470,8 @@ namespace UnicontaClient.Pages.CustomPage
             vc.PrCategory = leProjectcat.Text;
             vc._PostingInstruction = txedPostingInstruction.Text;
             vc.PaymentMethod = Convert.ToString(cmbPaymentMethod.SelectedItemValue);
-#if !SILVERLIGHT
             vc.ViewInFolder = Convert.ToString(cmbViewInFolder.SelectedItem);
             vc._PurchaseNumber = GetPurchaseNumber();
-#endif
             if (lbldim1.Visibility == Visibility.Visible)
                 vc.Dimension1 = cmbDim1.Text;
             if (lbldim2.Visibility == Visibility.Visible)
@@ -507,8 +495,6 @@ namespace UnicontaClient.Pages.CustomPage
         {
             globalEvents.OnRefresh(NameOfControl, RefreshParams);
         }
-
-#if !SILVERLIGHT
 
         private int GetPurchaseNumber()
         {
@@ -535,7 +521,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void chkIncludeOnlyReference_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
         {
-            browseControl.CheckMaxSize = !chkIncludeOnlyReference.IsChecked.Value;
+            browseControl.CheckMaxSize = !chkIncludeOnlyReference.IsChecked.GetValueOrDefault();
             if (browseControl.SelectedFileInfos?.Length == 1)
             {
                 if (chkIncludeOnlyReference.IsChecked == true)
@@ -625,6 +611,5 @@ namespace UnicontaClient.Pages.CustomPage
                 UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("FileError"), ex.Message), Uniconta.ClientTools.Localization.lookup("Exception"));
             }
         }
-#endif
     }
 }

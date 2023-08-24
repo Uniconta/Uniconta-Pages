@@ -377,7 +377,7 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         _Created = DateTime.Now,
                         _CredDirectDebitId = debPaymentFormat._CredDirectDebitId,
-                        _Filename = sfd.SafeFileName,
+                        _Filename = System.IO.Path.GetFileName(sfd.FileName),
                         _Data = Encoding.GetEncoding("iso-8859-1").GetBytes(filecontentText),
                         _FileId = string.Format("{0}_{1}_{2}", debPaymentFormat._Format, DateTime.Now.ToString("yyMMdd"), nextPaymentFileIdTest.ToString().PadLeft(5, '0')),
                         _Format = debPaymentFormat._Format,

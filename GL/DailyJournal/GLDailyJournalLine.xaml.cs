@@ -177,8 +177,6 @@ namespace UnicontaClient.Pages.CustomPage
             newRow.SetMaster(header);
 
             GridBase.RecalculateSum();
-
-
         }
 
         public override IEnumerable<UnicontaBaseEntity> ConvertPastedRows(IEnumerable<UnicontaBaseEntity> copyFromRows)
@@ -490,13 +488,13 @@ namespace UnicontaClient.Pages.CustomPage
                 var isShiftPressed = Keyboard.Modifiers.HasFlag(ModifierKeys.Shift);
                 var isCtrlPressed = Keyboard.Modifiers.HasFlag(ModifierKeys.Control);
                 if (isShiftPressed)
-                    localMenu_OnItemClicked("Account");
+                    ribbonControl.PerformRibbonAction("Account");
                 else if (isCtrlPressed)
-                    localMenu_OnItemClicked("OffsetAccount");
+                    ribbonControl.PerformRibbonAction("OffsetAccount");
                 else
                 {
                     dgGLDailyJournalLine.tableView.CloseEditor();
-                    localMenu_OnItemClicked("OpenTran");
+                    ribbonControl.PerformRibbonAction("OpenTran");
                 }
             }
             else if (e.Key == Key.F5)
@@ -642,10 +640,10 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 selectedItem.PropertyChanged += JournalLineGridClient_PropertyChanged;
 
-                //if (selectedItem.accntSource == null)
-                //    SetAccountSource(selectedItem);
-                //if (selectedItem.offsetAccntSource == null)
-                //    SetOffsetAccountSource(selectedItem);
+                if (selectedItem.accntSource == null && dgGLDailyJournalLine.CurrentColumn == Account)
+                    SetAccountSource(selectedItem);
+                if (selectedItem.offsetAccntSource == null && dgGLDailyJournalLine.CurrentColumn == OffsetAccount)
+                    SetOffsetAccountSource(selectedItem);
             }
         }
 
@@ -744,8 +742,7 @@ namespace UnicontaClient.Pages.CustomPage
                     AddDockItem(TabControls.GLTransTypePage, null, Uniconta.ClientTools.Localization.lookup("TransTypes"));
                     break;
                 case "AppendTransType":
-                    CWAppendEnumeratedLabel dialog = new CWAppendEnumeratedLabel(api);
-                    dialog.Show();
+                    new CWAppendEnumeratedLabel(api).Show();
                     break;
                 case "AllFields":
                     AddDockItem(TabControls.GLDailyJournalLinePage2, dgGLDailyJournalLine.syncEntity, true);
@@ -868,6 +865,18 @@ namespace UnicontaClient.Pages.CustomPage
                 case "UndoDelete":
                     dgGLDailyJournalLine.UndoDeleteRow();
                     break;
+                case "ExchangeRate":
+                    var exchangeDialog = new CWExchangeRate();
+                    exchangeDialog.Closing += delegate
+                    {
+                        if (exchangeDialog.DialogResult == true)
+                        {
+                            this.TmpCur = exchangeDialog._Currency;
+                            this.TmpRate = exchangeDialog.ExchangeRate;
+                        }
+                    };
+                    exchangeDialog.Show();
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -949,7 +958,7 @@ namespace UnicontaClient.Pages.CustomPage
                         dgGLDailyJournalLine.SetLoadedRow(line);
                         if (date != DateTime.MinValue)
                             line.Date = date;
-                        if (days != 0)
+                        if (days != 0 && line._Date != DateTime.MinValue)
                             line.Date = line._Date.AddDays(days);
                         dgGLDailyJournalLine.SetModifiedRow(line);
                     }
@@ -1501,7 +1510,7 @@ namespace UnicontaClient.Pages.CustomPage
                     var Acc = (GLAccount)LedgerCache.Get(TraceAccount[i]);
                     if (Acc != null)
                     {
-                        if (Acc._Currency != 0 && Acc._IsBank)
+                        if (Acc._Currency != 0 && (Acc._IsBank || Acc._IsDCAccount))
                         {
                             TraceSum[i] = Acc._CurBalanceCur / 100d;
                             AddCur[i] = (byte)Acc._Currency;
@@ -1864,6 +1873,9 @@ namespace UnicontaClient.Pages.CustomPage
                         var dc = copyDCAccount(rec, rec._OffsetAccountTypeEnum, rec._OffsetAccount);
                         if (dc != null)
                         {
+                            if (dc._TransType != null && rec._TransType == null && rec._Text == null)
+                                rec.TransType = dc._TransType;
+
                             if (dc._PostingAccount != null && rec._Account == null)
                             {
                                 if (rec._AccountType != (byte)GLJournalAccountType.Finans)
@@ -2408,8 +2420,8 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        double LastRate;
-        Currencies LastFromCur;
+        double LastRate, TmpRate;
+        Currencies LastFromCur, TmpCur;
         DateTime LastFromDate;
 
         async void calcLocalCur(JournalLineGridClient rec, double val, string field)
@@ -2432,7 +2444,10 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         LastFromCur = FromCur;
                         LastFromDate = rec._Date;
-                        LastRate = await api.session.ExchangeRate(FromCur, ToCur, rec._Date, api.CompanyEntity);
+                        if (TmpRate != 0 && FromCur == TmpCur)
+                            LastRate = TmpRate;
+                        else
+                            LastRate = await api.session.ExchangeRate(FromCur, ToCur, rec._Date, api.CompanyEntity);
 
                         // lets read value in case it has change while we awaited
                         val = Convert.ToDouble(typeof(JournalLineGridClient).GetProperty(field + "Cur")?.GetValue(rec, null));

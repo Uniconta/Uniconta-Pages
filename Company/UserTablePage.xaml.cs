@@ -102,7 +102,7 @@ namespace UnicontaClient.Pages.CustomPage
             switch (ActionType)
             {
                 case "AddRow":
-                    AddDockItem(TabControls.UserTablePage2, new object[] { api, null }, Uniconta.ClientTools.Localization.lookup("UserTables"), "Add_16x16.png");
+                    AddDockItem(TabControls.UserTablePage2, new object[] { api, null }, Uniconta.ClientTools.Localization.lookup("UserTables"), "Add_16x16");
                     break;
                 case "EditRow":
                     if (selectedItem != null && selectedItem._SharedFromCompanyId == 0)

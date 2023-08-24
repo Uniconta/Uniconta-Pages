@@ -352,9 +352,9 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                     {
                         if (selectedItem is DebtorTransOpenClientExtended)
-                            AddDockItem(TabControls.DebtorTranPage2, selectedItem, Uniconta.ClientTools.Localization.lookup("TransactionOutstanding"), "Edit_16x16.png");
+                            AddDockItem(TabControls.DebtorTranPage2, selectedItem, Uniconta.ClientTools.Localization.lookup("TransactionOutstanding"), "Edit_16x16");
                         else if (selectedItem is CreditorTransOpenClientExtended)
-                            AddDockItem(TabControls.CreditorTranOpenPage2, selectedItem, Uniconta.ClientTools.Localization.lookup("AmountToPay"), "Edit_16x16.png");
+                            AddDockItem(TabControls.CreditorTranOpenPage2, selectedItem, Uniconta.ClientTools.Localization.lookup("AmountToPay"), "Edit_16x16");
                     }
                     break;
                 default:

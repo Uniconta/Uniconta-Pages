@@ -40,7 +40,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOrdersPage2"
                         <CorasauControls:TextEditor x:Name="txtCreditMax"  Text="{Binding CreditMax,Mode=OneWay}" IsReadOnly="True"  Mask="N2" MaskType="Numeric"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="ContactName" x:Name="liContactName" Style="{StaticResource LayoutItemsstyle}" ButtonContent="+">
-                        <CorasauControls:ComboBoxEditor AllowNullInput="True" AssignNullValueOnClearingEditText="True" x:Name="cmbContactName"  EditValueChanged="cmbContactName_EditValueChanged"/>
+                        <CorasauControls:ComboBoxEditor AllowNullInput="True" AssignNullValueOnClearingEditText="True" x:Name="cmbContactName"  EditValueChanged="cmbContactName_EditValueChanged" KeyDown="cmbContactName_KeyDown"/>
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
                 <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpReference" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Reference}"  Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="475">

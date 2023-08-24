@@ -25,6 +25,7 @@ using System.Collections;
 using Uniconta.ClientTools.Controls;
 using Uniconta.DataModel;
 using Uniconta.Common.User;
+using Uniconta.Common.Utility;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -83,11 +84,11 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (e.Key == Key.F8 && Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
             {
-                localMenu_OnItemClicked("DebtorTran");
+                ribbonControl.PerformRibbonAction("DebtorTran");
             }
             else if (e.Key == Key.F8)
             {
-                localMenu_OnItemClicked("OpenTran");
+                ribbonControl.PerformRibbonAction("OpenTran");
             }
         }
 
@@ -141,7 +142,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         void dgDebtorAccountGrid_RowDoubleClick()
         {
-            localMenu_OnItemClicked("DebtorTran");
+            ribbonControl.PerformRibbonAction("DebtorTran");
         }
 
         private void localMenu_OnItemClicked(string ActionType)
@@ -159,22 +160,20 @@ namespace UnicontaClient.Pages.CustomPage
                     object[] param = new object[2];
                     param[0] = api;
                     param[1] = null;
-                    AddDockItem(TabControls.DebtorAccountPage2, param, Uniconta.ClientTools.Localization.lookup("DebtorAccount"), "Add_16x16.png");
+                    AddDockItem(TabControls.DebtorAccountPage2, param, Uniconta.ClientTools.Localization.lookup("DebtorAccount"), "Add_16x16");
                     break;
                 case "EditRow":
                     if (selectedItem != null)
-                    {
-                        object[] Params = new object[2] { selectedItem, true };
-                        AddDockItem(TabControls.DebtorAccountPage2, Params, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("DebtorAccount"), selectedItem._Account));
-                    }
+                        AddDockItem(TabControls.DebtorAccountPage2, new object[2] { selectedItem, true }, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("DebtorAccount"), selectedItem._Account));
                     break;
                 case "DebtorTran":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.DebtorTransactions, dgDebtorAccountGrid.syncEntity);
+                        AddDockItem(TabControls.DebtorTransactions, dgDebtorAccountGrid.syncEntity, 
+                            string.Concat(Uniconta.ClientTools.Localization.lookup("DebtorTransactions"), "/", selectedItem._Account));
                     break;
                 case "OpenTran":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.DebtorOpenTransactions, dgDebtorAccountGrid.syncEntity);
+                        AddDockItem(TabControls.DebtorOpenTransactions, dgDebtorAccountGrid.syncEntity, Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("OpenTransaction"), selectedItem._Name));
                     break;
                 case "Contacts":
                     if (selectedItem != null)
@@ -344,7 +343,7 @@ namespace UnicontaClient.Pages.CustomPage
             debtor._D2CAccount = null;
             debtor._lastPayment = DateTime.MinValue;
             debtor._LastInvoice = DateTime.MinValue;
-            AddDockItem(TabControls.DebtorAccountPage2, new object[2] { debtor, IdObject.get(false) }, Uniconta.ClientTools.Localization.lookup("DebtorAccount"), "Add_16x16.png");
+            AddDockItem(TabControls.DebtorAccountPage2, new object[2] { debtor, IdObject.get(false) }, Uniconta.ClientTools.Localization.lookup("DebtorAccount"), "Add_16x16");
         }
 
         async void CreateMandates(IList debtors)

@@ -125,13 +125,13 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 Marked(false);
                 ibase.Caption = Uniconta.ClientTools.Localization.lookup("Marked");
-                ibase.LargeGlyph = Utility.GetGlyph("Check_Journal_32x32.png");
+                ibase.LargeGlyph = Utility.GetGlyph("Check_Journal_32x32");
             }
             else if (ibase.Caption == Uniconta.ClientTools.Localization.lookup("Marked"))
             {
                 Marked(true);
                 ibase.Caption = Uniconta.ClientTools.Localization.lookup("All");
-                ibase.LargeGlyph = Utility.GetGlyph("Item_Number_32x32.png");
+                ibase.LargeGlyph = Utility.GetGlyph("Item_Number_32x32");
             }
         }
 

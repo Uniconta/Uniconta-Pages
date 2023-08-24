@@ -82,7 +82,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorMultiOrderLinesPage"
                             </DataTemplate>
                         </local:CorasauDataGridTemplateColumnClient.CellTemplate>
                     </local:CorasauDataGridTemplateColumnClient>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Currency" Width="35" Visible="False" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Currency" Width="35" ReadOnly="True" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="CostPrice" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Warehouse" Width="100"/>
                     <local:CorasauDataGridForeignKeyColumnClient x:Name="Location" Width="100">

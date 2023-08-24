@@ -170,7 +170,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         void dgDebtorOffers_RowDoubleClick()
         {
-            localMenu_OnItemClicked("OfferLine");
+            ribbonControl.PerformRibbonAction("OfferLine");
         }
         private void Name_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -188,11 +188,11 @@ namespace UnicontaClient.Pages.CustomPage
                     if (dgDebtorOffers.masterRecords != null)
                     {
                         object[] arr = new object[2] { api, dgDebtorOffers.masterRecord };
-                        AddDockItem(TabControls.DebtorOfferPage2, arr, Uniconta.ClientTools.Localization.lookup("Offers"), "Add_16x16.png", true);
+                        AddDockItem(TabControls.DebtorOfferPage2, arr, Uniconta.ClientTools.Localization.lookup("Offers"), "Add_16x16", true);
                     }
                     else
                     {
-                        AddDockItem(TabControls.DebtorOfferPage2, api, Uniconta.ClientTools.Localization.lookup("Offers"), "Add_16x16.png", true);
+                        AddDockItem(TabControls.DebtorOfferPage2, api, Uniconta.ClientTools.Localization.lookup("Offers"), "Add_16x16", true);
                     }
                     break;
                 case "EditRow":

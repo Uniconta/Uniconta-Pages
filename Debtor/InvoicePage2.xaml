@@ -34,7 +34,10 @@ x:Class="UnicontaClient.Pages.CustomPage.InvoicePage2"
                     <CorasauControls:DateEditor x:Name="leSendTime" EditValue="{Binding SendTime,Mode=TwoWay}"/>
                 </CorasauControls:CorasauLayoutItem>
                 <CorasauControls:CorasauLayoutItem FieldName="ContactName" x:Name="liContactName">
-                    <CorasauControls:ComboBoxEditor AllowNullInput="True" AssignNullValueOnClearingEditText="True" x:Name="cmbContactName"  EditValueChanged="cmbContactName_EditValueChanged"/>
+                    <CorasauControls:ComboBoxEditor AllowNullInput="True" AssignNullValueOnClearingEditText="True" x:Name="cmbContactName"  EditValueChanged="cmbContactName_EditValueChanged" KeyDown="cmbContactName_KeyDown"/>
+                </CorasauControls:CorasauLayoutItem>
+                <CorasauControls:CorasauLayoutItem FieldName="DeliveryAccount" x:Name="liDeliveryAccount">
+                    <CorasauControls:LookupEditor x:Name="leDeliveryAccount" EditValue="{Binding DeliveryAccount,Mode=TwoWay}"/>
                 </CorasauControls:CorasauLayoutItem>
                 <CorasauControls:CorasauLayoutItem FieldName="DeliveryName" x:Name="liDeliveryName">
                     <CorasauControls:TextEditor x:Name="txtDeliveryName" EditValue="{Binding DeliveryName,Mode=TwoWay}"/>

@@ -163,7 +163,8 @@ namespace UnicontaClient.Pages.CustomPage
                 }
             }
 
-            projBudgetLst= await api.Query<ProjectBudget>();
+            var filter = new List<PropValuePair>() { PropValuePair.GenereteWhereElements(nameof(ProjectBudgetClient.AnchorBudget), typeof(bool), "0") };
+            projBudgetLst = await api.Query<ProjectBudget>(filter);
         }
         private void ProjBudgetPlanScheduler_InitNewAppointment(object sender, AppointmentItemEventArgs e)
         {
@@ -561,7 +562,8 @@ namespace UnicontaClient.Pages.CustomPage
                 masters.Add(Employee);
             }
 
-            var projBudgetLinesLst = await api.Query<ProjectBudgetLineClient>(masters, null);
+            var filter = new List<PropValuePair>() { PropValuePair.GenereteWhereElements(nameof(ProjectBudgetLineClient.AnchorBudget), typeof(bool), "0") };
+            var projBudgetLinesLst = await api.Query<ProjectBudgetLineClient>(masters, filter);
 
             if (Employee == null)
                 budgetLinesLst = new ObservableCollection<ProjectBudgetLineClient>(projBudgetLinesLst?.Where(x => employeeLst.Any(y => y.Employee == x.Employee)));

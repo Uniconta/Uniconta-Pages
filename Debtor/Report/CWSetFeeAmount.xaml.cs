@@ -102,7 +102,6 @@ namespace UnicontaClient.Pages.CustomPage
                     _NoOfDays = "30";
                 if (cmbNoOfDays.SelectedIndex < 0)
                     cmbNoOfDays.SelectedIndex = 0;
-                rowFeeTransaction.Height = new GridLength(0);
                 rowCollectionLetter.Height = new GridLength(0);
                 colFeeCurrency.Width = new GridLength(0);
                 colMarginFeeCurrency.Width = new GridLength(0);
@@ -114,7 +113,6 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 Prompt = CWName = Uniconta.ClientTools.Localization.lookup("AddCollection");
                 lblFee.Text = Uniconta.ClientTools.Localization.lookup("Per");
-                cmbtypeValue.ItemsSource = new string[] { Uniconta.ClientTools.Localization.lookup("Transaction"), Uniconta.ClientTools.Localization.lookup("Account") };
                 cmbCurrency.ItemsSource = AppEnums.Currencies.GetLabels();
                 cmbFirstCollections.ItemsSource = cmbCollections.ItemsSource = Utility.GetDebtorCollectionLetters().ToList();
                 rowNoOfDays.Height = new GridLength(0);
@@ -122,6 +120,8 @@ namespace UnicontaClient.Pages.CustomPage
             if (_PrDate == DateTime.MinValue)
                 _PrDate = Uniconta.ClientTools.Page.BasePage.GetSystemDefaultDate();
 
+            lblFee.Text = Uniconta.ClientTools.Localization.lookup("Per");
+            cmbtypeValue.ItemsSource = new string[] { Uniconta.ClientTools.Localization.lookup("Transaction"), Uniconta.ClientTools.Localization.lookup("Account") };
             dePrDate.DateTime = _PrDate;
 
             this.Loaded += CW_Loaded;

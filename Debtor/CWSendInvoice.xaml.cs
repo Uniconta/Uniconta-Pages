@@ -29,21 +29,15 @@ namespace UnicontaClient.Pages.CustomPage
         public bool sendOnlyToThisEmail { get; set; }
 
         public static bool sendInBackgroundOnly = true;
-#if !SILVERLIGHT
         protected override int DialogId { get { return DialogTableId; } }
         public int DialogTableId { get; set; }
         protected override bool ShowTableValueButton { get { return true; } }
-#endif
         public CWSendInvoice()
         {
             this.DataContext = this;
             InitializeComponent();
             chkSendOnlyInBackGround.IsChecked = sendInBackgroundOnly;
-#if !SILVERLIGHT
             this.Title = Uniconta.ClientTools.Localization.lookup("Sendinvoicebyemail");
-#else
-            UnicontaClient.Utilities.Utility.SetThemeBehaviorOnChildWindow(this);
-#endif
             this.Loaded += CW_Loaded;
         }
 
@@ -78,8 +72,8 @@ namespace UnicontaClient.Pages.CustomPage
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
             Emails = (string.IsNullOrEmpty(txtEmail.Text) || string.IsNullOrWhiteSpace(txtEmail.Text)) ? null : txtEmail.Text;
-            sendOnlyToThisEmail = chkSendOnlyEmail.IsChecked.Value;
-            sendInBackgroundOnly = chkSendOnlyInBackGround.IsChecked.Value;
+            sendOnlyToThisEmail = chkSendOnlyEmail.IsChecked.GetValueOrDefault();
+            sendInBackgroundOnly = chkSendOnlyInBackGround.IsChecked.GetValueOrDefault();
             SetDialogResult(true);
         }
 

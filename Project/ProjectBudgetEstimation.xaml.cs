@@ -53,7 +53,6 @@ namespace UnicontaClient.Pages.CustomPage
             get
             {
                 var tv = base.SetTreeListViewFromPage;
-                tv.AutoWidth = true;
                 tv.KeyFieldName = "Id";
                 tv.ShowIndicator = false;
                 tv.ParentFieldName = "MasterId";
@@ -205,9 +204,9 @@ namespace UnicontaClient.Pages.CustomPage
     {
         public override string NameOfControl { get { return TabControls.ProjectBudgetEstimation; } }
         SQLCache ProjectCache, EmployeeCache, ItemCache, PayrollCache;
-        int PriceGrp;
 
         UnicontaBaseEntity master;
+        Uniconta.API.DebtorCreditor.FindPrices PriceLookup;
         public ProjectBudgetEstimationPage(UnicontaBaseEntity master)
             : base(master)
         {
@@ -231,6 +230,7 @@ namespace UnicontaClient.Pages.CustomPage
         public override async Task InitQuery()
         {
             busyIndicator.IsBusy = true;
+            dgProjectBudgetLinePageGrid.ItemsSource = null;
             var lines = await api.Query<ProjectBudgetLineLocal>(new UnicontaBaseEntity[] { master }, null);
             if (lines?.Length > 0)
             {
@@ -247,12 +247,26 @@ namespace UnicontaClient.Pages.CustomPage
             dgProjectBudgetLinePageGrid.Visibility = Visibility.Visible;
             busyIndicator.IsBusy = false;
         }
+
         private void SetHeader()
         {
             string key = Utility.GetHeaderString(dgProjectBudgetLinePageGrid.masterRecord);
             if (string.IsNullOrEmpty(key)) return;
             string header = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Estimation"), key);
             SetHeader(header);
+            if (PriceLookup != null)
+            {
+                var master = dgProjectBudgetLinePageGrid.masterRecord;
+                var masterProject = (master as Uniconta.DataModel.Project);
+                if (masterProject == null)
+                {
+                    var budget = (master as ProjectBudget);
+                    if (budget != null)
+                        masterProject = (Uniconta.DataModel.Project)ProjectCache.Get(budget._Project);
+                }
+                if (masterProject != null)
+                    PriceLookup.OrderChanged(masterProject);
+            }
         }
 
         void InitPage(UnicontaBaseEntity master)
@@ -270,7 +284,6 @@ namespace UnicontaClient.Pages.CustomPage
             dgProjectBudgetLinePageGrid.Loaded += DgProjectBudgetLinePageGrid_Loaded;
         }
 
-        double sumCost, sumSales;
         protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             var api = this.api;
@@ -292,11 +305,7 @@ namespace UnicontaClient.Pages.CustomPage
                     masterProject = (Uniconta.DataModel.Project)ProjectCache.Get(budget._Project);
             }
             if (masterProject != null)
-            {
-                var dc = (Uniconta.DataModel.Debtor)Debtors.Get(masterProject._DCAccount);
-                if (dc != null)
-                    PriceGrp = dc._PriceGroup;
-            }
+                PriceLookup = new Uniconta.API.DebtorCreditor.FindPrices(masterProject, api);
         }
 
         protected override void OnLayoutLoaded()
@@ -386,6 +395,8 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
 
                 case "Qty":
+                    if (this.PriceLookup != null && this.PriceLookup.UseCustomerPrices)
+                        this.PriceLookup.GetCustomerPrice(rec, false);
                     if (rec._Qty != (rec._ToTime - rec._FromTime) / 60d)
                     {
                         rec._FromTime = 0;
@@ -538,24 +549,10 @@ namespace UnicontaClient.Pages.CustomPage
                 rec.CostPrice = item._CostPrice;
             }
 
-            double price = 0d;
-            int pg = PriceGrp;
-            if (pg == 3)
-            {
-                price = item._SalesPrice3;
-                if (price == 0)
-                    pg = 2;
-            }
-            if (pg == 2)
-                price = item._SalesPrice2;
-            if (price == 0)
-                price = item._SalesPrice1;
-            if (price != 0d)
-            {
-                if (rec._Qty == 0)
-                    rec.Qty = 1d;
-                rec.SalesPrice = price;
-            }
+            var _priceLookup = this.PriceLookup;
+            this.PriceLookup = null; // avoid that we call priceupdated in property change on Qty
+            _priceLookup?.SetPriceFromItem(rec, item);
+            this.PriceLookup = _priceLookup;
 
             if (item._Dim1 != null) rec.Dimension1 = item._Dim1;
             if (item._Dim2 != null) rec.Dimension2 = item._Dim2;

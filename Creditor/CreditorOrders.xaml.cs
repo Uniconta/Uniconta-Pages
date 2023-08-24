@@ -155,7 +155,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         void dgCreditorOrdersGrid_RowDoubleClick()
         {
-            localMenu_OnItemClicked("OrderLine");
+            ribbonControl.PerformRibbonAction("OrderLine");
         }
         private void Name_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -170,9 +170,9 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 case "AddRow":
                     if (dgCreditorOrdersGrid.masterRecords != null)
-                        AddDockItem(TabControls.CreditorOrdersPage2, new object[] { api, dgCreditorOrdersGrid.masterRecord }, Uniconta.ClientTools.Localization.lookup("Orders"), "Add_16x16.png");
+                        AddDockItem(TabControls.CreditorOrdersPage2, new object[] { api, dgCreditorOrdersGrid.masterRecord }, Uniconta.ClientTools.Localization.lookup("Orders"), "Add_16x16");
                     else
-                        AddDockItem(TabControls.CreditorOrdersPage2, api, Uniconta.ClientTools.Localization.lookup("Orders"), "Add_16x16.png");
+                        AddDockItem(TabControls.CreditorOrdersPage2, api, Uniconta.ClientTools.Localization.lookup("Orders"), "Add_16x16");
                     break;
                 case "EditRow":
                     if (selectedItem == null)
@@ -291,15 +291,12 @@ namespace UnicontaClient.Pages.CustomPage
                     dgCreditorOrdersGrid.AddRow();
                     break;
                 case "CopyRow":
+                    selectedItem = dgCreditorOrdersGrid.CopyRow() as CreditorOrderClient;
                     if (selectedItem != null)
                     {
-                        selectedItem = dgCreditorOrdersGrid.CopyRow() as CreditorOrderClient;
-                        if (selectedItem != null)
-                        {
-                            selectedItem.InvoiceAmount = 0;
-                            selectedItem.InvoiceNumber = null;
-                            selectedItem.OrderNumber = 0;
-                        }
+                        selectedItem.InvoiceAmount = 0;
+                        selectedItem.InvoiceNumber = null;
+                        selectedItem.OrderNumber = 0;
                     }
                     break;
                 case "DeleteRow":

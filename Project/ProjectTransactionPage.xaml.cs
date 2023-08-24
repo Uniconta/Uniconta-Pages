@@ -545,17 +545,20 @@ namespace UnicontaClient.Pages.CustomPage
 
         async private void JournalPosted(ProjectTransClient selectedItem)
         {
-            var pairPostedJour = new PropValuePair[]
+            if (selectedItem._JournalPostedId != 0)
             {
-                PropValuePair.GenereteWhereElements(nameof(ProjectJournalPostedClient.GLJournalPostedId), typeof(int), NumberConvert.ToString(selectedItem._JournalPostedId))
-            };
-            var result = await api.Query<ProjectJournalPostedClient>(pairPostedJour);
-            if (result != null && result.Length == 1)
+                var result = await api.Query(new GLDailyJournalPostedClient(), new [] { selectedItem }, null);
+                if (result != null && result.Length == 1)
+                    new CWGLPostedClientFormView(result[0]).Show();
+            }
+            else
             {
-                CWProjPostedClientFormView cwPostedClient = new CWProjPostedClientFormView(result[0]);
-                cwPostedClient.Show();
+                var result = await api.Query(new ProjectJournalPostedClient(), new [] { selectedItem }, null);
+                if (result != null && result.Length == 1)
+                    new CWProjPostedClientFormView(result[0]).Show();
             }
         }
+
         private async void SaveGrid()
         {
             var err = await dgProjectTransaction.SaveData();

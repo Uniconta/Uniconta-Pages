@@ -107,7 +107,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void DgEmployeeCommissionGrid_RowDoubleClick()
         {
-            localMenu_OnItemClicked("EditRow");
+            ribbonControl.PerformRibbonAction("EditRow");
         }
 
         private void localMenu_OnItemClicked(string ActionType)

@@ -20,6 +20,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using System.Collections;
 using Uniconta.ClientTools.Controls;
+using Uniconta.Common.Utility;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -78,11 +79,11 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (e.Key == Key.F8 && Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
             {
-                localMenu_OnItemClicked("CreditorTran");
+                ribbonControl.PerformRibbonAction("CreditorTran");
             }
             else if (e.Key == Key.F8)
             {
-                localMenu_OnItemClicked("OpenTran");
+                ribbonControl.PerformRibbonAction("OpenTran");
             }
         }
 
@@ -115,7 +116,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         void dgCreditorAccountGrid_RowDoubleClick()
         {
-            localMenu_OnItemClicked("CreditorTran");
+            ribbonControl.PerformRibbonAction("CreditorTran");
         }
         public CreditorAccount(BaseAPI api, string lookupKey)
             : base(api, lookupKey)
@@ -154,22 +155,20 @@ namespace UnicontaClient.Pages.CustomPage
                     object[] param = new object[2];
                     param[0] = api;
                     param[1] = null;
-                    AddDockItem(TabControls.CreditorAccountPage2, param, Uniconta.ClientTools.Localization.lookup("Creditorsaccount"), "Add_16x16.png");
+                    AddDockItem(TabControls.CreditorAccountPage2, param, Uniconta.ClientTools.Localization.lookup("Creditorsaccount"), "Add_16x16");
                     break;
                 case "EditRow":
                     if (selectedItem != null)
-                    {
-                        var objParam = new object[2] { selectedItem, true };
-                        AddDockItem(TabControls.CreditorAccountPage2, objParam, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Creditorsaccount"), selectedItem.Account));
-                    }
+                        AddDockItem(TabControls.CreditorAccountPage2, new object[2] { selectedItem, true }, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Creditorsaccount"), selectedItem.Account));
                     break;
                 case "CreditorTran":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.CreditorTransactions, dgCreditorAccountGrid.syncEntity);
+                        AddDockItem(TabControls.CreditorTransactions, dgCreditorAccountGrid.syncEntity, 
+                            string.Concat(Uniconta.ClientTools.Localization.lookup("CreditorTransactions"), "/", selectedItem._Account));
                     break;
                 case "OpenTran":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.CreditorOpenTransactions, dgCreditorAccountGrid.syncEntity);
+                        AddDockItem(TabControls.CreditorOpenTransactions, dgCreditorAccountGrid.syncEntity, Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("OpenTransaction"), selectedItem._Name));
                     break;
                 case "Contacts":
                     if (selectedItem != null)
@@ -265,7 +264,7 @@ namespace UnicontaClient.Pages.CustomPage
             creditor._D2CAccount = null;
             creditor._lastPayment = DateTime.MinValue;
             creditor._LastInvoice = DateTime.MinValue;
-            AddDockItem(TabControls.CreditorAccountPage2, new object[2] { creditor, IdObject.get(false) }, Uniconta.ClientTools.Localization.lookup("Creditorsaccount"), "Add_16x16.png");
+            AddDockItem(TabControls.CreditorAccountPage2, new object[2] { creditor, IdObject.get(false) }, Uniconta.ClientTools.Localization.lookup("Creditorsaccount"), "Add_16x16");
         }
 
         bool copyRowIsEnabled = false;

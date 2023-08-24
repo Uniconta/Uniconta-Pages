@@ -23,8 +23,21 @@ x:Class="UnicontaClient.Pages.CustomPage.TMEmpCalendarPage"
             <local:TMEmpCalendarPageGrid  x:Name="dgTMEmpCalendarGrid" AutoGenerateColumns="None" HorizontalAlignment="Stretch">
                 <local:TMEmpCalendarPageGrid.Columns>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Calendar" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Name" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="IsDefault" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Name" Width="500">
+                        <local:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Margin="5,0,0,0" TextDecorations="Underline" Cursor="Hand" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.Name,RelativeSource={RelativeSource TemplatedParent}}" PreviewMouseDown="Name_PreviewMouseDown"></TextBlock>
+                                    <TextBlock Grid.Column="1"></TextBlock>
+                                </Grid>
+                            </DataTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                        </local:CorasauDataGridTemplateColumnClient>
+                        <local:CorasauDataGridTemplateColumnClient x:Name="IsDefault" />
                 </local:TMEmpCalendarPageGrid.Columns>
             </local:TMEmpCalendarPageGrid>
         </CorasauControls:BusyIndicator>

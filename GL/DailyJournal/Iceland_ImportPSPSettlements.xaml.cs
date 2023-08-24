@@ -17,6 +17,9 @@ using static UnicontaClient.Pages.Iceland_PaymentProviderConnectionInfo;
 using Uniconta.Common.Utility;
 using System.Text;
 using Uniconta.ClientTools;
+using Rapyd.CreditCard.Settlement;
+using static Rapyd.CreditCard.Settlement.Rapyd_CreditCardClient;
+using log4net.Layout;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -202,11 +205,8 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
 
                 case Providers.Valitor:
-                    CodeRent = "";
-                    break;
-
                 case Providers.Rapyd:
-                    CodeRent = "";
+                    CodeRent = "Pos";
                     break;
 
                 default:
@@ -262,11 +262,11 @@ namespace UnicontaClient.Pages.CustomPage
             using (var journalsettlement = new Iceland_JournalSettlements(Api, journal, MerchantID, CreditcardClaims, CreditcardFees, DeviceRent, BankAccount))
             using (var prov = new Iceland_PaymentProviderSettlements(new Iceland_PaymentProviderConnectionInfo(SelectedProvider(), MerchantID, FromDate, LoginId, Password)))
             {
-                var settlements = prov.getSettlements();
+                prov.getSettlements();
 
-                if (prov.Ok && settlements != null)
+                if (prov.Ok && prov.Settlements() != null)
                 {
-                    foreach (var settlement in (CreditCardSettlement[])settlements)
+                    foreach (var settlement in (dynamic)prov.Settlements())
                     {
                         if (!(await SettlementAlreadyBookedAsync(settlement.SettlementRunNumber)) &&
                             (string.IsNullOrEmpty(SettlementNumber) || SettlementNumber == settlement.SettlementRunNumber))
@@ -292,13 +292,14 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        private async Task<bool> handleTransactions(double settlementAmount, bool aggregateTransactions, Iceland_JournalSettlements journalsettlement, Iceland_PaymentProviderSettlements prov, CreditCardSettlement settlement)
+        private async Task<bool> handleTransactions(double settlementAmount, bool aggregateTransactions, Iceland_JournalSettlements journalsettlement,
+            Iceland_PaymentProviderSettlements prov, dynamic settlement)
         {
-            var transactions = prov.getTransactions(settlement.SettlementRunNumber);
-            if (prov.Ok && transactions != null)
+            prov.getTransactions(settlement.SettlementRunNumber);
+            if (prov.Ok && prov.transactions() != null)
             {
                 settlementAmount = 0.0;
-                foreach (var transaction in (CreditCardTransaction[])transactions)
+                foreach (var transaction in (dynamic)prov.transactions())
                 {
                     if (transaction.SettlementRunNumber == settlement.SettlementRunNumber)
                     {
@@ -323,12 +324,12 @@ namespace UnicontaClient.Pages.CustomPage
             return prov.Ok;
         }
 
-        private async Task<bool> handleDeductions(Iceland_JournalSettlements journalsettlement, Iceland_PaymentProviderSettlements prov, CreditCardSettlement settlement)
+        private async Task<bool> handleDeductions(Iceland_JournalSettlements journalsettlement, Iceland_PaymentProviderSettlements prov, dynamic settlement)//CreditCardSettlement settlement)
         {
-            var deductions = prov.getDeduction(settlement.SettlementRunNumber);
-            if (prov.Ok && deductions != null)
+            prov.getDeduction(settlement.SettlementRunNumber);
+            if (prov.Ok && prov.deductions() != null)
             {
-                foreach (var deduction in (CreditCardSettlementDeduction[])deductions)
+                foreach (var deduction in (dynamic)prov.deductions())
                 {
                     if (deduction.SettlementRunNumber == settlement.SettlementRunNumber)
                     {
@@ -433,6 +434,9 @@ namespace UnicontaClient.Pages.CustomPage
 
         public Iceland_PaymentProviderConnectionInfo connectInfo = null;
         private object p = null;
+        private object res = null;
+        private object trans_res = null;
+        private object dedu_res = null;
 
         public Iceland_PaymentProviderSettlements(Iceland_PaymentProviderConnectionInfo _iceland_PaymentProviderConnectionInfo)
         {
@@ -442,6 +446,11 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 case Providers.Saltpay:
                     p = new SaltPay_CreditCardClient(connectInfo.Username, connectInfo.Password);
+                    break;
+
+                case Providers.Rapyd:
+                case Providers.Valitor:
+                    p = new Rapyd_CreditCardClient(connectInfo.Username, connectInfo.Password);
                     break;
             }
         }
@@ -454,55 +463,77 @@ namespace UnicontaClient.Pages.CustomPage
             ((IDisposable)p)?.Dispose();
         }
 
-        internal object getSettlements()
+        internal object Settlements()
         {
-            try
+            switch (connectInfo.Provider)
             {
-                switch (connectInfo.Provider)
-                {
-                    case Providers.Saltpay:
-                        var res = (p as SaltPay_CreditCardClient).CreditCardClient.GetSettlementsByMerchant(new GetSettlementsByMerchantRequest(connectInfo.MerchantId, connectInfo.DateFrom, DateTime.Now, true, true));
-                        return res.GetSettlementsByMerchantResult;
-                }
-            }
-            catch (Exception ex)
-            {
-                _okstatus = false;
-                _message = ex.InnerException.Message;
-                _messageheader = "Error";
+                case Providers.Saltpay:
+                    return (res as GetSettlementsByMerchantResponse).GetSettlementsByMerchantResult;
+                case Providers.Rapyd:
+                case Providers.Valitor:
+                    return (p as Rapyd_CreditCardClient).settlements?.Settlements;
             }
             return null;
         }
 
-        internal object getTransactions(string settlementRunNumber)
+        internal object transactions()
         {
-            try
+            switch (connectInfo.Provider)
             {
-                switch (connectInfo.Provider)
-                {
-                    case Providers.Saltpay:
-                        var res = (p as SaltPay_CreditCardClient).CreditCardClient.GetTransactionsByRunNumber(new GetTransactionsByRunNumberRequest(connectInfo.MerchantId, settlementRunNumber));
-                        return res.GetTransactionsByRunNumberResult;
-                }
-            }
-            catch (Exception ex)
-            {
-                _okstatus = false;
-                _message = ex.InnerException.Message;
-                _messageheader = "Error";
+                case Providers.Saltpay:
+                    return (trans_res as GetTransactionsByRunNumberResponse).GetTransactionsByRunNumberResult;
+                case Providers.Rapyd:
+                case Providers.Valitor:
+                    return (p as Rapyd_CreditCardClient).transactions?.Transactions;
             }
             return null;
         }
 
-        internal object getDeduction(string settlementRunNumber)
+        internal void getSettlements()
         {
             try
             {
                 switch (connectInfo.Provider)
                 {
                     case Providers.Saltpay:
-                        var res = (p as SaltPay_CreditCardClient).CreditCardClient.GetSettlementDeductionItems(new GetSettlementDeductionItemsRequest(connectInfo.MerchantId, settlementRunNumber));
-                        return res.GetSettlementDeductionItemsResult;
+                        res = (p as SaltPay_CreditCardClient).CreditCardClient.GetSettlementsByMerchant(new GetSettlementsByMerchantRequest(connectInfo.MerchantId, connectInfo.DateFrom, DateTime.Now, true, true));
+                        break;
+
+                    case Providers.Rapyd:
+                    case Providers.Valitor:
+                        connectInfo.MerchantId = connectInfo.MerchantId.Replace("\0", "");
+                        (p as Rapyd_CreditCardClient).GetSettlements(connectInfo.MerchantId, connectInfo.DateFrom, DateTime.Now);
+                        if ((p as Rapyd_CreditCardClient).statuscode != null)
+                        {
+                            _okstatus = false;
+                            _message = (p as Rapyd_CreditCardClient).statuscode.Message;
+                            _messageheader = "Error";
+                        }
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                _okstatus = false;
+                _message = ex.ToString();
+                _messageheader = "Error";
+            }
+        }
+
+        internal void getTransactions(string settlementRunNumber)
+        {
+            try
+            {
+                switch (connectInfo.Provider)
+                {
+                    case Providers.Saltpay:
+                        trans_res = (p as SaltPay_CreditCardClient).CreditCardClient.GetTransactionsByRunNumber(new GetTransactionsByRunNumberRequest(connectInfo.MerchantId, settlementRunNumber));
+                        break;
+
+                    case Providers.Rapyd:
+                    case Providers.Valitor:
+                        (p as Rapyd_CreditCardClient).GetTransactionsByRunNumber(settlementRunNumber);
+                        break;
                 }
             }
             catch (Exception ex)
@@ -510,6 +541,43 @@ namespace UnicontaClient.Pages.CustomPage
                 _okstatus = false;
                 _message = ex.InnerException.Message;
                 _messageheader = "Error";
+            }
+        }
+
+        internal void getDeduction(string settlementRunNumber)
+        {
+            _okstatus = true;
+            try
+            {
+                switch (connectInfo.Provider)
+                {
+                    case Providers.Saltpay:
+                        dedu_res = (p as SaltPay_CreditCardClient).CreditCardClient.GetSettlementDeductionItems(new GetSettlementDeductionItemsRequest(connectInfo.MerchantId, settlementRunNumber));
+                        break;
+
+                    case Providers.Rapyd:
+                    case Providers.Valitor:
+                        (p as Rapyd_CreditCardClient).GetDeductionItems(settlementRunNumber);
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                _okstatus = false;
+                _message = ex.InnerException.Message;
+                _messageheader = "Error";
+            }
+        }
+
+        internal object deductions()
+        {
+            switch (connectInfo.Provider)
+            {
+                case Providers.Saltpay:
+                    return (dedu_res as GetSettlementDeductionItemsResponse).GetSettlementDeductionItemsResult;
+                case Providers.Rapyd:
+                case Providers.Valitor:
+                    return (p as Rapyd_CreditCardClient).deductions?.DeductedItems;
             }
             return null;
         }

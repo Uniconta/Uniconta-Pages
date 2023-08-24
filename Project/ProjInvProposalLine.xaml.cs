@@ -177,7 +177,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void Page_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.F8)
-                localMenu_OnItemClicked("AddItems");
+                ribbonControl.PerformRibbonAction("AddItems");
         }
 
         double sumMargin, sumSales, sumMarginRatio;
@@ -622,9 +622,9 @@ namespace UnicontaClient.Pages.CustomPage
                     row._ExchangeRate = this.exchangeRate;
                     break;
                 case "CopyRow":
-                    if (selectedItem != null)
+                    row = dgProjInvProposedLineGrid.CopyRow() as ProjectInvoiceProposalLineClient;
+                    if (row != null)
                     {
-                        row = dgProjInvProposedLineGrid.CopyRow() as ProjectInvoiceProposalLineClient;
                         row._ExchangeRate = this.exchangeRate;
                         row._CostPriceLine = selectedItem._CostPriceLine;
                         row._QtyDelivered = 0;

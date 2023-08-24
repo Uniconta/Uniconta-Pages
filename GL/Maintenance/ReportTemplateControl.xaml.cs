@@ -78,13 +78,13 @@ namespace UnicontaClient.Pages.CustomPage
             switch (ActionType)
             {
                 case "AddRow":
-                    AddDockItem(TabControls.GLReportTemplatePage2, api, Uniconta.ClientTools.Localization.lookup("CompanyAccountTemplate"), "Add_16x16.png");
+                    AddDockItem(TabControls.GLReportTemplatePage2, api, Uniconta.ClientTools.Localization.lookup("CompanyAccountTemplate"), "Add_16x16");
                     break;
                 case "EditRow":
                     if (selectedItem != null)
                     {
                         string header = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("CompanyAccountTemplate"), selectedItem._Name);
-                        AddDockItem(TabControls.GLReportTemplatePage2, selectedItem, header, "Edit_16x16.png");
+                        AddDockItem(TabControls.GLReportTemplatePage2, selectedItem, header, "Edit_16x16");
                     }
                     break;
                 case "ReportLines":

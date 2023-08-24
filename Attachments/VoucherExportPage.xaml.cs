@@ -28,7 +28,6 @@ using Uniconta.ClientTools.Util;
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
-
     public partial class VoucherExportPage : FormBasePage
     {
         public override string NameOfControl { get { return TabControls.VoucherExportPage; } }
@@ -42,59 +41,74 @@ namespace UnicontaClient.Pages.CustomPage
         IEnumerable<VouchersClient> vouchers;
         public VoucherExportPage(IEnumerable<VouchersClient> _vouchers) : base(_vouchers.FirstOrDefault())
         {
-            InitializeComponent();
+            InitPage();
             vouchers = _vouchers;
-            localMenu.OnItemClicked += localMenu_OnItemClicked;
         }
 
         IEnumerable<GLTransClient> glTransLst;
         public VoucherExportPage(IEnumerable<GLTransClient> _glTransLst) : base(_glTransLst.FirstOrDefault())
         {
-            InitializeComponent();
+            InitPage();
             glTransLst = _glTransLst;
-            localMenu.OnItemClicked += localMenu_OnItemClicked;
         }
 
+        void InitPage()
+        {
+            InitializeComponent();
+            localMenu.OnItemClicked += localMenu_OnItemClicked;
+            var format1 = string.Concat(Uniconta.ClientTools.Localization.lookup("UniqueId"), "_", Uniconta.ClientTools.Localization.lookup("Text"));
+            var format2 = string.Concat(Uniconta.ClientTools.Localization.lookup("PostingDate"), "_", Uniconta.ClientTools.Localization.lookup("Voucher"), "_", Uniconta.ClientTools.Localization.lookup("Text"));
+            cmbFormat.ItemsSource = new List<string>() { format1, format2 };
+            cmbFormat.SelectedIndex = 0;
+        }
+        bool zip;
+        int exportOption;
         void localMenu_OnItemClicked(string ActionType)
         {
             if (ActionType == "LocalBackup")
             {
                 logs = new ExportLog();
                 this.DataContext = logs;
+                zip = chkZip.IsChecked == true;
+                exportOption = cmbFormat.SelectedIndex;
                 SaveVouchers();
             }
         }
 
         async void SaveVouchers()
         {
-            string defaultName = string.Concat(Uniconta.ClientTools.Localization.lookup("ExportVouchers"), " ", api.CompanyEntity.Name);
+            bool? dialogResult = null;
+            string path = null;
+            Stream stream = null;
+            if (zip)
+            {
+                string defaultName = string.Concat(Uniconta.ClientTools.Localization.lookup("ExportVouchers"), " ", api.CompanyEntity.Name);
 
-            var saveDialog = Uniconta.ClientTools.Util.UtilDisplay.LoadSaveFileDialog;
-#if SILVERLIGHT
-            saveDialog.DefaultFileName = defaultName;
-#else
-            saveDialog.FileName = defaultName;
-#endif
-            saveDialog.Filter = "ZIP Files (*.zip)|*.zip";
-            bool? dialogResult = saveDialog.ShowDialog();
+                var saveDialog = Uniconta.ClientTools.Util.UtilDisplay.LoadSaveFileDialog;
+                saveDialog.FileName = defaultName;
+                saveDialog.Filter = "ZIP Files (*.zip)|*.zip";
+                dialogResult = saveDialog.ShowDialog();
+                if (dialogResult == true)
+                    stream = File.Create(saveDialog.FileName);
+            }
+            else
+            {
+                var openFolderDialog = UtilDisplay.LoadFolderBrowserDialog;
+                dialogResult = openFolderDialog.ShowDialog();
+                if (dialogResult == true)
+                    path = openFolderDialog.SelectedPath;
+            }
             if (dialogResult == true)
             {
                 try
                 {
                     leLog.Visibility = Visibility.Visible;
-#if SILVERLIGHT
-                    using (Stream stream = (Stream)saveDialog.OpenFile())
-#else
-                    using (Stream stream = File.Create(saveDialog.FileName))
-#endif
-                    {
-                        if (vouchers != null)
-                            await CreateZip(vouchers, stream);
-                        else if (glTransLst != null)
-                            await CreateZip(glTransLst, stream);
-                        WriteLogLine(Uniconta.ClientTools.Localization.lookup("ExportComplete"));
-                        stream.Close();
-                    }
+                    if (vouchers != null)
+                        await CreateZip(vouchers, stream, path);
+                    else if (glTransLst != null)
+                        await CreateZip(glTransLst, stream, path);
+                    WriteLogLine(Uniconta.ClientTools.Localization.lookup("ExportComplete"));
+                    stream?.Close();
                 }
                 catch (Exception ex)
                 {
@@ -104,61 +118,52 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        private async Task CreateZip(IEnumerable<VouchersClient> vouchers, Stream outputStream)
-        {
-            using (ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream))
-            {
-                // Highest compression rating
-                zipOutputStream.SetLevel(9);
-                zipOutputStream.UseZip64 = UseZip64.Dynamic;
-                foreach (var voucher in vouchers)
-                {
-                    if (!voucher._Envelope)
-                    {
-                        if (voucher._Data == null)
-                            await UtilDisplay.GetData(voucher, api);
-                        ExportFile(voucher, zipOutputStream);
-                    }
-                }
-                zipOutputStream.Finish();
-            }
-        }
-
-        private async Task CreateZip(IEnumerable<GLTransClient> glTransLst, Stream outputStream)
+        private async Task CreateZip(IEnumerable<UnicontaBaseEntity> lst, Stream outputStream, string folderpath)
         {
             var voucherExpLst = new HashSet<int>();
-            var docApi = new Uniconta.API.GeneralLedger.DocumentAPI(api);
-            using (ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream))
+            ZipOutputStream zipOutputStream = null;
+            if (outputStream != null)
             {
+                zipOutputStream = new ZipOutputStream(outputStream);
                 // Highest compression rating
                 zipOutputStream.SetLevel(9);
                 zipOutputStream.UseZip64 = UseZip64.Dynamic;
-                foreach (var glTrans in glTransLst)
+            }
+            foreach (var tr in lst)
+            {
+                GLTransClient glTrans = null;
+                VouchersClient voucher = tr as VouchersClient;
+                if (voucher == null)
+                    glTrans = tr as GLTransClient;
+                if (glTrans == null || !voucherExpLst.Contains(glTrans._DocumentRef))
                 {
-                    if (!voucherExpLst.Contains(glTrans._DocumentRef))
+                    if (voucher == null)
                     {
                         voucherExpLst.Add(glTrans._DocumentRef);
-                        var voucher = new VouchersClient() { RowId = glTrans._DocumentRef };
-                        if (await UtilDisplay.GetData(voucher, api) == ErrorCodes.Succes)
+                        voucher = new VouchersClient() { RowId = glTrans._DocumentRef };
+                    }
+                    ErrorCodes err = ErrorCodes.Succes;
+                    if (voucher._Data == null)
+                        await UtilDisplay.GetData(voucher, api);
+                    if (err == ErrorCodes.Succes)
+                    {
+                        if (!voucher._Envelope)
+                            ExportFile(voucher, zipOutputStream, folderpath);
+                        else
                         {
-                            if (!voucher._Envelope)
-                                ExportFile(voucher, zipOutputStream);
-                            else
+                            var content = voucher.GetEnvelopeContent();
+                            if (content != null)
                             {
-                                var content = voucher.GetEnvelopeContent();
-                                if (content != null)
+                                foreach (var vou in content)
                                 {
-                                    foreach (var vou in content)
+                                    if (!voucherExpLst.Contains(vou.RowId))
                                     {
-                                        if (!voucherExpLst.Contains(vou.RowId))
+                                        voucherExpLst.Add(vou.RowId);
+                                        voucher = new VouchersClient() { RowId = vou.RowId };
+                                        if (await UtilDisplay.GetData(voucher, api) == ErrorCodes.Succes)
                                         {
-                                            voucherExpLst.Add(vou.RowId);
-                                            voucher = new VouchersClient() { RowId = vou.RowId };
-                                            if (await UtilDisplay.GetData(voucher, api) == ErrorCodes.Succes)
-                                            {
-                                                if (!voucher._Envelope)
-                                                    ExportFile(voucher, zipOutputStream);
-                                            }
+                                            if (!voucher._Envelope)
+                                                ExportFile(voucher, zipOutputStream, folderpath);
                                         }
                                     }
                                 }
@@ -166,11 +171,11 @@ namespace UnicontaClient.Pages.CustomPage
                         }
                     }
                 }
-                zipOutputStream.Finish();
             }
+            zipOutputStream?.Finish();
         }
 
-        void ExportFile(VouchersClient voucher, ZipOutputStream zipOutputStream)
+        void ExportFile(VouchersClient voucher, ZipOutputStream zipOutputStream, string folderpath)
         {
             byte[] attachment = voucher.Buffer;
             voucher._Data = null;
@@ -208,15 +213,45 @@ namespace UnicontaClient.Pages.CustomPage
             }
             // Write the data to the ZIP file  
             var sb = StringBuilderReuse.Create();
-            sb.Append(voucher.RowId).Append('_');
-            sb.Append(voucher._Text).Replace('/', '-').Replace('\\', '-');
-            sb.Append('.').Append(Enum.GetName(typeof(FileextensionsTypes), IdObject.get((byte)voucher._Fileextension)));
+            if (exportOption == 1)
+            {
+                var dt = voucher._PostingDate;
+                if (dt == DateTime.MinValue)
+                    dt = voucher._Created;
+                sb.Append(dt).Append('_').Append(voucher._Voucher);
+            }
+            else
+                sb.Append(voucher.RowId);
+
+            if (voucher._Text != null)
+                sb.Append('_').Append(voucher._Text.Replace('_', ' ')).Replace('/', '-').Replace('\\', '-').Replace('.', ' ')
+                    .Replace('"', '\'').Replace('<', ' ').Replace('>', ' ')
+                    .Replace('?', ' ').Replace('*', ' ').Replace(':', ' ');
+
+            if (voucher._Fileextension == FileextensionsTypes.PDF)
+                sb.Append('.').Append("PDF");
+            else if (voucher._Fileextension == FileextensionsTypes.JPEG)
+                sb.Append('.').Append("JPEG");
+            else
+                sb.Append('.').Append(voucher._Fileextension.ToString());
             var name = sb.ToStringAndRelease();
-            var zipEntry= new ZipEntry(name);
-            zipEntry.IsUnicodeText = true;
-            zipOutputStream.PutNextEntry(zipEntry);
-            zipOutputStream.Write(attachment, 0, attachment.Length);
-            WriteLogLine(string.Format(Uniconta.ClientTools.Localization.lookup("ExportingFile"), name));
+            try
+            {
+                if (zipOutputStream != null)
+                {
+                    zipOutputStream.PutNextEntry(new ZipEntry(name) { IsUnicodeText = true });
+                    zipOutputStream.Write(attachment, 0, attachment.Length);
+                }
+                else
+                {
+                    File.WriteAllBytes(System.IO.Path.Combine(folderpath, name), attachment);
+                }
+                WriteLogLine(string.Format(Uniconta.ClientTools.Localization.lookup("ExportingFile"), name));
+            }
+            catch
+            {
+                WriteLogLine(string.Format(Uniconta.ClientTools.Localization.lookup("Error"), name));
+            }
         }
 
         private void WriteLogLine(string text)

@@ -17,6 +17,15 @@ x:Class="UnicontaClient.Pages.CustomPage.VoucherExportPage"
             <CorasauControls:CorasauRibbonControl x:Name="localMenu" XMLSourcePath=";component/Pages/Tools/LocalBackupRibbon.xml"/>
             <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Horizontal" Grid.Row="2" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
                 <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="grpFirst">
+                    <CorasauControls:CorasauLayoutGroup x:Name="grpOption" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ExportOptions}"
+                                                Orientation="Vertical" MinWidth="300" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                        <CorasauControls:CorasauLayoutItem x:Name="leFormat" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FileFormat}" LabelVerticalAlignment="Top">
+                            <CorasauControls:ComboBoxEditor x:Name="cmbFormat" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="leZip" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Zip}" LabelVerticalAlignment="Top">
+                                <CorasauControls:CheckEditor x:Name="chkZip" IsChecked="True"/>
+                        </CorasauControls:CorasauLayoutItem>
+                    </CorasauControls:CorasauLayoutGroup>
                     <CorasauControls:CorasauLayoutGroup x:Name="grpDescription" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Description}"
                                                 Orientation="Vertical" MinWidth="300" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                         <CorasauControls:CorasauLayoutItem x:Name="leLog" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ExportLog}" LabelVerticalAlignment="Top" Visibility="Collapsed">

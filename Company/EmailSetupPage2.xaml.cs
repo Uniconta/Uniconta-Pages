@@ -27,6 +27,9 @@ using System.Text.RegularExpressions;
 using System.Collections;
 using System.Text;
 using UnicontaClient.Pages;
+using Microsoft.Identity.Client;
+using System.Threading.Tasks;
+using UnicontaClient.Controls.Dialogs;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -47,10 +50,10 @@ namespace UnicontaClient.Pages.CustomPage
         public EmailSetupPage2(UnicontaBaseEntity sourceData, bool isEdit) : base(sourceData, isEdit)
         {
             InitializeComponent();
-            InitPage();
+            InitPage(editrow._UseMicrosoftGraph);
         }
 
-        private void InitPage()
+        private void InitPage(bool useMicrosoftGraph)
         {
             layoutControl = layoutItems;
             if (LoadedRow == null && editrow == null)
@@ -63,22 +66,33 @@ namespace UnicontaClient.Pages.CustomPage
             if (!string.IsNullOrEmpty(editrow._Host))
                 grpSmtp.IsCollapsed = true;
             frmRibbon.OnItemClicked += FrmRibbon_OnItemClicked;
-
-#if !SILVERLIGHT
             cmbExternType.ItemsSource = new List<string> { "Debtor", "DebtorInvoice", "Creditor", "CreditorInvoice", "Employee", "Contact", "CRMCampainMember", "CRMProspect" };
             cmbExternType.SelectedIndex = 0;
             layoutProp.Label = string.Format(Uniconta.ClientTools.Localization.lookup("AddOBJ"), Uniconta.ClientTools.Localization.lookup("Properties"));
-#endif
-#if !SILVERLIGHT
             liTextinHtml.Label = Uniconta.ClientTools.Localization.lookup("TextInHtml");
-#endif
             txtSmptPwd.Text = editrow._SmtpPsw;
+            if (useMicrosoftGraph)
+            {
+                rdbGraph.IsChecked = true;
+                grpEmailSetup.IsCollapsed = false;
+                ShowGraphControls();
+            }
+            else
+                rdbSMTP.IsChecked = true;
+            rdbGraph.Checked += rdbGraph_Checked;
         }
 
+      
+
+        public EmailSetupPage2(CrudAPI crudApi, bool useGraph) : base(crudApi, string.Empty)
+        {
+            InitializeComponent();
+            InitPage(useGraph);
+        }
         public EmailSetupPage2(CrudAPI crudApi, string dummy) : base(crudApi, dummy)
         {
             InitializeComponent();
-            InitPage();
+            InitPage(false);
         }
 
         public override void Utility_Refresh(string screenName, object argument = null)
@@ -102,50 +116,58 @@ namespace UnicontaClient.Pages.CustomPage
             switch (ActionType)
             {
                 case "TestMail":
-                    CWCommentsDialogBox dialog = new CWCommentsDialogBox(Uniconta.ClientTools.Localization.lookup("VerifyPOP3"), Uniconta.ClientTools.Localization.lookup("Email"));
-#if !SILVERLIGHT
-                    dialog.DialogTableId = 2000000043;
-#endif
-                    dialog.Closing += async delegate
+                    if (rdbGraph.IsChecked == true && editrow._TenantId == Guid.Empty)
+                        ConfirmAndConnect();
+                    else
                     {
-                        if (dialog.DialogResult == true)
+                        string title = Uniconta.ClientTools.Localization.lookup("VerifyPOP3");
+                        if (editrow._UseMicrosoftGraph)
+                            title = Uniconta.ClientTools.Localization.lookup("VerifyGraph");
+                        CWCommentsDialogBox dialog = new CWCommentsDialogBox(title, Uniconta.ClientTools.Localization.lookup("Email"));
+                        dialog.DialogTableId = 2000000043;
+                        dialog.Closing += async delegate
                         {
-                            if (!string.IsNullOrEmpty(dialog.Comments) && Utilities.Utility.EmailValidation(dialog.Comments))
+                            if (dialog.DialogResult == true)
                             {
-                                var invapi = new EmailAPI(api);
-                                busyIndicator.IsBusy = true;
-                                var err = await invapi.TestSMTP(editrow, dialog.Comments);
-                                if (err == ErrorCodes.Succes)
+                                if (!string.IsNullOrEmpty(dialog.Comments) && Utilities.Utility.EmailValidation(dialog.Comments))
                                 {
-                                    UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("SendEmailMsgOBJ"), Uniconta.ClientTools.Localization.lookup("Email")),
-                                        Uniconta.ClientTools.Localization.lookup("Message"));
-                                    isSMTPValidated = true;
-                                    itemHost.IsEnabled = false;
-                                    itemPort.IsEnabled = false;
-                                    itemSmtpUser.IsEnabled = false;
-                                    itemSmtpPassword.IsEnabled = false;
-                                    itemUseSSL.IsEnabled = false;
+                                    var invapi = new EmailAPI(api);
+                                    busyIndicator.IsBusy = true;
+                                    var err = await invapi.TestSMTP(editrow, dialog.Comments);
+                                    if (err == ErrorCodes.Succes)
+                                    {
+                                        UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("SendEmailMsgOBJ"), Uniconta.ClientTools.Localization.lookup("Email")),
+                                            Uniconta.ClientTools.Localization.lookup("Message"));
+                                        isSMTPValidated = true;
+                                        itemHost.IsEnabled = false;
+                                        itemPort.IsEnabled = false;
+                                        itemSmtpUser.IsEnabled = false;
+                                        itemSmtpPassword.IsEnabled = false;
+                                        itemUseSSL.IsEnabled = false;
+                                    }
+                                    else
+                                    {
+                                        if (editrow._UseMicrosoftGraph)
+                                            UtilDisplay.ShowErrorCode(err);
+                                        else
+                                            DebtorEmailSetupPage2.ShowErrorMsg(err, editrow._Host);
+                                    }
+                                    busyIndicator.IsBusy = false;
                                 }
                                 else
-                                    DebtorEmailSetupPage2.ShowErrorMsg(err, editrow._Host);
-                                busyIndicator.IsBusy = false;
+                                    UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("InvalidValue"), Uniconta.ClientTools.Localization.lookup("Email"), dialog.Comments), Uniconta.ClientTools.Localization.lookup("Error"));
                             }
-                            else
-                                UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("InvalidValue"), Uniconta.ClientTools.Localization.lookup("Email"), dialog.Comments), Uniconta.ClientTools.Localization.lookup("Error"));
-                        }
-                    };
-                    dialog.Show();
+                        };
+                        dialog.Show();
+                    }
                     break;
                 case "SetUpEMail":
+                    if (rdbGraph.IsChecked == true)
+                        return;
                     var objWizardWindow = new WizardWindow(new UnicontaClient.Pages.EmailSetupWizard(), string.Format(Uniconta.ClientTools.Localization.lookup("CreateOBJ"),
                     Uniconta.ClientTools.Localization.lookup("EmailSetup")));
-#if !SILVERLIGHT
                     objWizardWindow.Width = System.Convert.ToDouble(System.Windows.SystemParameters.PrimaryScreenWidth) * 0.14;
                     objWizardWindow.Height = System.Convert.ToDouble(System.Windows.SystemParameters.PrimaryScreenHeight) * 0.20;
-#else
-                    objWizardWindow.Width = System.Convert.ToDouble(System.Windows.Browser.HtmlPage.Window.Eval("screen.width")) * 0.18;
-                    objWizardWindow.Height = System.Convert.ToDouble(System.Windows.Browser.HtmlPage.Window.Eval("screen.height")) * 0.16;
-#endif
                     objWizardWindow.MinHeight = 120.0d;
                     objWizardWindow.MinWidth = 350.0d;
 
@@ -172,7 +194,7 @@ namespace UnicontaClient.Pages.CustomPage
                     objWizardWindow.Show();
                     break;
                 case "Save":
-                    if (ValidateSMTP())
+                    if (Validate())
                     {
                         //if (editrow.Html)
                         //{
@@ -187,11 +209,35 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
             }
         }
+
+        bool Validate()
+        {
+            if (rdbSMTP.IsChecked == true)
+                return ValidateSMTP();
+            else
+                return ValidateGraph();
+        }
+
+        bool ValidateGraph()
+        {
+            if (!editrow._UseMicrosoftGraph || editrow._TenantId == Guid.Empty)
+            {
+               
+                UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("IncompleteGraphAuthorization"), Uniconta.ClientTools.Localization.lookup("Warning"));
+                return false;
+            }
+            else if (string.IsNullOrEmpty(editrow.EmailSendFrom))
+            { 
+                UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("MandatoryField"), liEmailSendFrom.Label), Uniconta.ClientTools.Localization.lookup("Warning"));
+
+            }
+            editrow.Host = " ";//manadatory
+            return true;
+        }
         bool? isSMTPValidated;
         bool ValidateSMTP()
         {
             object element;
-#if !SILVERLIGHT
             element = FocusManager.GetFocusedElement(UtilDisplay.GetCurentWindow());
             if (element is Control)
             {
@@ -199,15 +245,6 @@ namespace UnicontaClient.Pages.CustomPage
                 TraversalRequest tReq = new TraversalRequest(FocusNavigationDirection.Down);
                 ctrl.MoveFocus(tReq);
             }
-#else
-            element = FocusManager.GetFocusedElement();
-            if (element is SLTextBox)
-            {
-                var dp = (element as TextBox).Tag as DateEditor;
-                if (dp != null)
-                    dp.UpdateEditValueSource();
-            }
-#endif
             if (isSMTPValidated == true)
                 return true;
             if (editrow.Host == string.Empty)
@@ -227,11 +264,7 @@ namespace UnicontaClient.Pages.CustomPage
                 isSMTPValidated = false;
             if (isSMTPValidated == false)
             {
-#if !SILVERLIGHT
                 if (UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("SMTPVerifyMsg"), Uniconta.ClientTools.Localization.lookup("Warning"), MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-#else
-                if( UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("SMTPVerifyMsg"), Uniconta.ClientTools.Localization.lookup("Warning"), MessageBoxButton.OKCancel) == MessageBoxResult.OK)
-#endif
                 {
                     FrmRibbon_OnItemClicked("TestMail");
                     return false;
@@ -252,15 +285,13 @@ namespace UnicontaClient.Pages.CustomPage
             Regex tagRegex = new Regex(@"<\s*([^ >]+)[^>]*>.*?<\s*/\s*\1\s*>");
             return tagRegex.IsMatch(HtmlString);
         }
-            
+
         private void btnTextInHtml_Click(object sender, RoutedEventArgs e)
         {
             var param = new object[1];
             param[0] = editrow.Body;
             AddDockItem(TabControls.TextInHtmlPage, param, true, Uniconta.ClientTools.Localization.lookup("TextInHtml"), null, new Point(250, 200));
         }
-
-#if !SILVERLIGHT
 
         private void InsertProperty_ButtonClicked(object sender, RoutedEventArgs e)
         {
@@ -327,7 +358,128 @@ namespace UnicontaClient.Pages.CustomPage
             proc.StartInfo.FileName = mail;
             proc.Start();
         }
-#endif
+        IPublicClientApplication app;
+        private void rdbGraph_Checked(object sender, RoutedEventArgs e)
+        {
+            ConfirmAndConnect();
+        }
+        private async void ConfirmAndConnect()
+        {
+            ShowGraphControls();
+            if (editrow._TenantId == Guid.Empty)
+            {
+                CWConfirmationBox dialog = new CWConfirmationBox(Uniconta.ClientTools.Localization.lookup("AreYouAzureAdmin"), Uniconta.ClientTools.Localization.lookup("Confirmation"), false);
+                dialog.Closing += delegate
+                {
+                    if (dialog.ConfirmationResult == CWConfirmationBox.ConfirmationResultEnum.Yes)
+                        Connect(true);
+                    else if (dialog.ConfirmationResult == CWConfirmationBox.ConfirmationResultEnum.No)
+                        Connect(false);
+
+                };
+                dialog.Show();
+            }
+        }
+        private async void Connect(bool isAdmin)
+        {
+            string clientId = "dbcf520d-28cc-4b88-af90-97ca7a761481";
+            if (app == null)
+            {
+                app = PublicClientApplicationBuilder.Create(clientId)
+            .WithRedirectUri("http://localhost:65419")
+            .Build();
+            }
+            var account = await AcquireTokenInteractive(isAdmin).ConfigureAwait(false);
+            if (account != null)
+            {
+                editrow._TenantId = new Guid(account.TenantId);
+                editrow._UseMicrosoftGraph = true;
+                editrow.EmailSendFrom = account.Account.Username;
+                var link = string.Format("https://login.microsoftonline.com/{0}/adminconsent?client_id={1}", account.TenantId, clientId);
+                if (!isAdmin)
+                {
+                    //not showing outlook for now. Not yet finalized
+                   // var emailBody = string.Concat(Uniconta.ClientTools.Localization.lookup("GraphMailBody"), string.Format("</br><a href='{0}'>{1}</a>", link, link));
+                   // var subject = Uniconta.ClientTools.Localization.lookup("GraphMailSubject");
+                   // Utility.DisplayOutLook(string.Empty, string.Empty, string.Empty, emailBody, subject, string.Empty, string.Empty, true);
+                }
+                Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        UnicontaHyperLinkMessageBox.Show(Uniconta.ClientTools.Localization.lookup("AdminGraphLinkMsg"), link, Uniconta.ClientTools.Localization.lookup("Information"));
+                    }));
+                //}
+                //else
+                //{
+
+                //    Dispatcher.BeginInvoke(new Action(() =>
+                //    {
+                //        var cwBrowserView = new CWBrowserDialog(link);
+                //        cwBrowserView.Show();
+                //    }));
+                //}
+                Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    frmRibbon.SetText("TestMail", Uniconta.ClientTools.Localization.lookup("VerifyGraph"));
+                }));
+            }
+            else
+            {
+                Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("IncompleteGraphAuthorization"), Uniconta.ClientTools.Localization.lookup("Warning"));
+                }));
+            }
+        }
+        private async Task<AuthenticationResult> AcquireTokenInteractive(bool isAdmin)
+        {
+            //Microsoft.Identity.Client.Prompt prompt = isAdmin ? Microsoft.Identity.Client.Prompt.Consent : Microsoft.Identity.Client.Prompt.NoPrompt;
+            List<string> Scopes = new List<string> { "User.read", "Mail.Send"};
+            try
+            {
+                var accounts = (await app.GetAccountsAsync()).ToList();
+                var builder = app.AcquireTokenInteractive(Scopes)
+                    .WithAccount(accounts.FirstOrDefault())
+                    .WithUseEmbeddedWebView(true)
+                    .WithPrompt(Microsoft.Identity.Client.Prompt.Consent);
+                var result = await builder.ExecuteAsync().ConfigureAwait(false);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+        private void rdbSMTP_Checked(object sender, RoutedEventArgs e)
+        {
+            ShowSMTPControls();
+        }
+        void ShowGraphControls()
+        {
+            grpSmtp.Visibility = Visibility.Collapsed;
+            frmRibbon.DisableButtons("SetUpEMail");
+            if (editrow._TenantId == Guid.Empty)
+            {
+                var item = frmRibbon.SetText("TestMail", Uniconta.ClientTools.Localization.lookup("Connect"));
+                item.LargeGlyph = Utilities.Utility.GetGlyph("SendInvoiceMail_32x32");
+            }
+            else
+            {
+                var item = frmRibbon.SetText("TestMail", Uniconta.ClientTools.Localization.lookup("VerifyGraph"));
+                item.LargeGlyph = Utilities.Utility.GetGlyph("Tick_32x32");
+            }
+            liMergeAttachment.Visibility = Visibility.Visible;
+            liNameInemail.Visibility = Visibility.Collapsed;
+            liReplyTo.Visibility = Visibility.Collapsed;
+        }
+        void ShowSMTPControls()
+        {
+            grpSmtp.Visibility = Visibility.Visible;
+            frmRibbon.EnableButtons("SetUpEMail");
+            frmRibbon.SetText("TestMail", Uniconta.ClientTools.Localization.lookup("VerifyPOP3"));
+            liMergeAttachment.Visibility = Visibility.Collapsed;
+            liNameInemail.Visibility = Visibility.Visible;
+            liReplyTo.Visibility = Visibility.Visible;
+        }
     }
 }
 

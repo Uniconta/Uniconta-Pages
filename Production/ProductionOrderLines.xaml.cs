@@ -548,7 +548,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (t != null && orderLine.RowId == 0)
                 await t;
 
-            AddDockItem(TabControls.ProductionOrdersPage2, new object[2] { api, orderLine }, Uniconta.ClientTools.Localization.lookup("Production"), "Add_16x16.png");
+            AddDockItem(TabControls.ProductionOrdersPage2, new object[2] { api, orderLine }, Uniconta.ClientTools.Localization.lookup("Production"), "Add_16x16");
         }
 
         async void UnfoldBOM(ProductionOrderLineClient selectedItem)

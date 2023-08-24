@@ -213,8 +213,8 @@ namespace UnicontaClient.Pages.CustomPage
                 childRibbon.Name = nodeText;
                 childRibbon.ActionName = dtlTables.Count > 1 ? "" : string.Concat("UserTableData;", tblName);
                 childRibbon.Child = childList;
-                childRibbon.Glyph = "UserFieldData_32x32.png";
-                childRibbon.LargeGlyph = "UserFieldData_32x32.png";
+                childRibbon.Glyph = "UserFieldData_32x32";
+                childRibbon.LargeGlyph = "UserFieldData_32x32";
                 var userRbnList = new List<TreeRibbon>();
                 userRbnList.Add(childRibbon);
                 var treeRibbon = new TreeRibbon();
@@ -227,8 +227,8 @@ namespace UnicontaClient.Pages.CustomPage
                         var ribbonNode = new TreeRibbon();
                         ribbonNode.Name = !string.IsNullOrEmpty(ur._Prompt) ? UserFieldControl.LocalizePrompt(ur._Prompt) : ur._Name;
                         ribbonNode.ActionName = string.Concat("UserTableData;", ur._Name);
-                        ribbonNode.LargeGlyph = "CopyUserTable_16x16.png";
-                        ribbonNode.Glyph = "CopyUserTable_16x16.png";
+                        ribbonNode.LargeGlyph = "CopyUserTable_16x16";
+                        ribbonNode.Glyph = "CopyUserTable_16x16";
                         ribbonNode.Child = new List<TreeRibbon>();
                         childList.Add(ribbonNode);
                     }
@@ -335,11 +335,11 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 case "AddItem":
                     if (this.thMaster?.UserType != null)
-                        AddDockItem(TabControls.UserTableDataPage2, new object[] { api, this.thMaster, this.master }, (this.thMaster as TableHeader)?._Name, "Add_16x16.png");
+                        AddDockItem(TabControls.UserTableDataPage2, new object[] { api, this.thMaster, this.master }, (this.thMaster as TableHeader)?._Name, "Add_16x16");
                     break;
                 case "EditItem":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.UserTableDataPage2, new object[] { selectedItem, this.thMaster }, (this.thMaster as TableHeader)?._Name, "Edit_16x16.png");
+                        AddDockItem(TabControls.UserTableDataPage2, new object[] { selectedItem, this.thMaster }, (this.thMaster as TableHeader)?._Name, "Edit_16x16");
                     break;
                 case "AddNote":
                     if (selectedItem != null)
@@ -379,14 +379,14 @@ namespace UnicontaClient.Pages.CustomPage
             if (screenName == TabControls.UserTableDataPage2)
             {
                 dgTabledataGrid.UpdateItemSource(argument);
-                localMenu_OnItemClicked("RefreshGrid");
+                ribbonControl.PerformRibbonAction("RefreshGrid");
                 if (dgTabledataGrid.Visibility == Visibility.Collapsed)
                     detailControl.Refresh(argument, dgTabledataGrid.SelectedItem);
             }
             else if (screenName == TabControls.UserNotesPage || screenName == TabControls.UserDocsPage && argument != null)
             {
                 dgTabledataGrid.UpdateItemSource(argument);
-                localMenu_OnItemClicked("RefreshGrid"); localMenu_OnItemClicked("RefreshGrid");
+                ribbonControl.PerformRibbonAction("RefreshGrid");
             }
         }
     }

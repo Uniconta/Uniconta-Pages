@@ -64,7 +64,7 @@ namespace UnicontaClient.Pages.CustomPage
                     object[] param = new object[2];
                     param[0] = newItem;
                     param[1] = false;
-                    AddDockItem(UnicontaTabs.CreditorLayoutGroupPage2, param, Uniconta.ClientTools.Localization.lookup("CreditorLayoutGroups"), "Add_16x16.png");
+                    AddDockItem(UnicontaTabs.CreditorLayoutGroupPage2, param, Uniconta.ClientTools.Localization.lookup("CreditorLayoutGroups"), "Add_16x16");
                     break;
 
                 case "EditRow":

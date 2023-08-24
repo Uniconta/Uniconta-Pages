@@ -46,7 +46,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void DgTMEmpCalendarGrid_RowDoubleClick()
         {
-            localMenu_OnItemClicked("Lines");
+            ribbonControl.PerformRibbonAction("Lines");
         }
 
         bool CopiedData;
@@ -91,6 +91,11 @@ namespace UnicontaClient.Pages.CustomPage
             }
             if (selectedItem.RowId != 0)
                 AddDockItem(TabControls.TMEmpCalendarLinePage, selectedItem);
+        }
+
+        private void Name_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            DgTMEmpCalendarGrid_RowDoubleClick();
         }
     }
 }

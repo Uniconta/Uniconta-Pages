@@ -109,6 +109,9 @@ x:Class="UnicontaClient.Pages.CustomPage.Profile"
                     <CorasauControls:CorasauLayoutItem x:Name="liXapBuildDate" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter= XapBuildDate,StringFormat=\{0\}:}">
                         <TextBlock x:Name="txtXapBuildDate" TextWrapping="Wrap"></TextBlock>
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="liClientVersion" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Version,StringFormat=\{0\}:}">
+                        <TextBlock x:Name="txtClientVersion" TextWrapping="Wrap"></TextBlock>
+                    </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem x:Name="liClientAPIVersion" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter= ClientAPIVersion,StringFormat=\{0\}:}">
                         <TextBlock x:Name="txtAPIVersion" TextWrapping="Wrap"></TextBlock>
                     </CorasauControls:CorasauLayoutItem>

@@ -80,7 +80,7 @@ namespace UnicontaClient.Pages.CustomPage
             switch (ActionType)
             {
                 case "AddRow":
-                    AddDockItem(TabControls.FAMGroupPage2, api, Uniconta.ClientTools.Localization.lookup("AssetGroup"), "Add_16x16.png");
+                    AddDockItem(TabControls.FAMGroupPage2, api, Uniconta.ClientTools.Localization.lookup("AssetGroup"), "Add_16x16");
                     break;
                 case "EditRow":
                     if (selectedItem == null)
@@ -194,7 +194,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void dgFAMGroupGrid_RowDoubleClick()
         {
-            localMenu_OnItemClicked("FAMTrans");
+            ribbonControl.PerformRibbonAction("FAMTrans");
         }
     }
 }

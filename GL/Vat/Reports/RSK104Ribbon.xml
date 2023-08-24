@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <root>
   <RibbonItem TabId="0" LocalizedNameKey="Home">
-	  <RibbonItem Action="RefreshGrid" ShortcutKey="CTRL+R" LocalizedNameKey="Refresh" LargeGlyph="refresh.png"/>
-	  <RibbonItem Action="Filter" ShortcutKey="CTRL+I" LocalizedNameKey="Filter" LargeGlyph="Filter_32x32.png"/>
-	  <RibbonItem Action="ClearFilter" ShortcutKey="Ctrl+K" LocalizedNameKey="ClearFilter" LargeGlyph="Filter_Clear_32x32.png"/>	  
+	  <RibbonItem Action="RefreshGrid" ShortcutKey="CTRL+R" LocalizedNameKey="Refresh" LargeGlyph="refresh"/>
+	  <RibbonItem Action="Filter" ShortcutKey="CTRL+I" LocalizedNameKey="Filter" LargeGlyph="Filter_32x32"/>
+	  <RibbonItem Action="ClearFilter" ShortcutKey="Ctrl+K" LocalizedNameKey="ClearFilter" LargeGlyph="Filter_Clear_32x32"/>	  
   </RibbonItem>
   <RibbonItem TabHeader="RSK 1.04" LocalizedNameKey="RSK104">
-	  <RibbonItem Action="TXT" ShortcutKey="CTRL+T" LocalizedNameKey="Textfile" LargeGlyph="Enumerated_Label_32x32.png" />
+	  <RibbonItem Action="TXT" ShortcutKey="CTRL+T" LocalizedNameKey="Textfile" LargeGlyph="Enumerated_Label_32x32" />
   </RibbonItem>
 </root>

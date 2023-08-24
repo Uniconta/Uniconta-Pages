@@ -56,11 +56,12 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (dgCreateOrderGrid.SelectedItem != null && createbuttonclicked)
             {
-                var args = new object[4];
+                var args = new object[5];
                 args[0] = dgCreateOrderGrid.SelectedItem;
-                args[1] = chkIfCreditNote.IsChecked.HasValue ? chkIfCreditNote.IsChecked.Value : false;
+                args[1] = chkIfCreditNote.IsChecked.HasValue ? chkIfCreditNote.IsChecked.GetValueOrDefault() : false;
                 args[2] = DCOrderLines;
                 args[3] = IsDeleteLines;
+                args[4] = dcOrder;
                 globalEvents.OnRefresh(NameOfControl, args);
             }
             position = AttachVoucherGridPage.GetPosition(dockCtrl);

@@ -64,9 +64,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             InitializeComponent();
             InitPage(crudApi);
-#if !SILVERLIGHT
             FocusManager.SetFocusedElement(txtAccount, txtAccount);
-#endif
         }
         bool lookupZipCode = true;
         void InitPage(CrudAPI crudapi)
@@ -379,7 +377,7 @@ namespace UnicontaClient.Pages.CustomPage
                             editrow.ContactEmail = contact.email;
                             editrow.Www = contact.www;
                         }
-                        if (!string.IsNullOrEmpty(ci.vat))
+                        if (!string.IsNullOrEmpty(ci.vat) && editrow.Country == CountryCode.Denmark)
                             editrow.VatNumber = ci.vat;
                     }
                 }
