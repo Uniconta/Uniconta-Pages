@@ -199,8 +199,13 @@ namespace UnicontaClient.Pages.CustomPage
 
         public void SetAdditionalOrders(IEnumerable<DCOrder> orderList)
         {
+            SetAdditionalOrders(orderList, null);
+        }
+        public void SetAdditionalOrders(IEnumerable<DCOrder> orderList, IEnumerable<object> selectedItems)
+        {
             lgOrders.Visibility = Visibility.Visible;
             cbOrders.ItemsSource = orderList;
+            cbOrders.EditValue = selectedItems;
         }
 
         CreditorOrderClient _dcOrder;

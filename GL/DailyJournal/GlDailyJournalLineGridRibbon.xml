@@ -50,6 +50,7 @@
       <RibbonItem Action="ImportVoucher" LocalizedNameKey="ImportFile" Glyph="Add_16x16" LargeGlyph="Add_32x32" ShortcutKey="Ctrl+J"/>
       <RibbonItem Action="RemoveVoucher" LocalizedNameKey="Remove" Glyph="Delete_16x16" LargeGlyph="Delete_32x32" ShortcutKey="Ctrl+I"/>
       <RibbonItem Action="DragDrop" LocalizedNameKey="DragAndDrop" Glyph="DragDrop_File_16x16" ShortcutKey="CTRL+G"/>
+      <RibbonItem Action="MatchLines" LocalizedNameKey="MatchLines" Glyph="Match_Add_16x16"/>
     </RibbonItem>
     <RibbonItem Action="Transactions" LocalizedNameKey="Transactions" LargeGlyph="Transactions_32x32">
       <!---If we want Inner menu-->

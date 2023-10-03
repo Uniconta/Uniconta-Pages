@@ -62,7 +62,11 @@ namespace UnicontaClient.Pages.CustomPage
             this.DataContext = this;
             SetRibbonControl(localMenu, dgGLTable2);
             dgGLTable2.api = (CrudAPI)api;
-            filterYear = BasePage.GetSystemDefaultDate().Year;
+            //filterYear = BasePage.GetSystemDefaultDate().Year;
+            var accountingYears = dgGLTable2.api.QuerySync<CompanyFinanceYearClient>();
+            var accountYear = accountingYears.Where(y => y.Current == true).FirstOrDefault();
+            filterYear = accountYear.FromDate.Year;
+
             txtYearValue.EditValue = DateTime.Parse($"{filterYear}-01-01", CultureInfo.InvariantCulture);
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             txtYearValue.IsReadOnly = true;

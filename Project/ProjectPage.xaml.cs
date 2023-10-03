@@ -153,6 +153,7 @@ namespace UnicontaClient.Pages.CustomPage
             lst.Add(typeof(Uniconta.DataModel.Debtor));
             if (Comp.DeliveryAddress)
                 lst.Add(typeof(Uniconta.DataModel.WorkInstallation));
+            lst.Add(typeof(Uniconta.DataModel.PrCategory));
             LoadType(lst);
         }
 
@@ -406,7 +407,7 @@ namespace UnicontaClient.Pages.CustomPage
                     BudgetAPI budgetApi = new BudgetAPI(api);
                     var result = await budgetApi.CreateBudget(CwCreateUpdateBudget.FromDate, CwCreateUpdateBudget.ToDate, CwCreateUpdateBudget.Employee, CwCreateUpdateBudget.Payroll,
                                                               CwCreateUpdateBudget.PrCategory, CwCreateUpdateBudget.Group, (byte)CwCreateUpdateBudget.BudgetMethod, CwCreateUpdateBudget.BudgetName,
-                                                              CwCreateUpdateBudget.PrWorkSpace, cwCreateBjt.DeleteBudget, cwCreateBjt.InclProjectTask, projLst);
+                                                              CwCreateUpdateBudget.PrWorkSpace, CwCreateUpdateBudget.PrWorkSpaceNew, cwCreateBjt.DeleteBudget, cwCreateBjt.InclProjectTask, projLst);
 
                     if (result != ErrorCodes.Succes)
                         UtilDisplay.ShowErrorCode(result);
@@ -531,6 +532,21 @@ namespace UnicontaClient.Pages.CustomPage
                                  debtorOrderInstance.SetMaster(selectedItem);
                                  debtorOrderInstance._PrCategory = CWCreateOrderFromProject.InvoiceCategory;
                                  debtorOrderInstance._NoItemUpdate = true;
+                                 if (debtorOrderInstance._PrCategory == null)
+                                 {
+                                     var CategoryCache = api.CompanyEntity.GetCache(typeof(PrCategory));
+                                     foreach (var cat in (IEnumerable<PrCategory>)CategoryCache.GetRecords)
+                                     {
+                                         if (cat._CatType == Uniconta.DataModel.CategoryType.Revenue)
+                                         {
+                                             debtorOrderInstance._PrCategory = cat._Number;
+                                             if (cat._Default)
+                                                 break;
+                                         }
+                                     }
+                                 }
+
+
                                  var err = await api.Insert(debtorOrderInstance);
                                  if (err == ErrorCodes.Succes)
                                      ShowOrderLines(debtorOrderInstance);

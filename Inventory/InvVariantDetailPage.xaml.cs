@@ -1,18 +1,12 @@
 using UnicontaClient.Models;
-using UnicontaClient.Pages;
 using UnicontaClient.Utilities;
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.Common;
-using Uniconta.DataModel;
 using System.ComponentModel;
-using Uniconta.Common.Utility;
 using Uniconta.ClientTools.Util;
 using Uniconta.API.Service;
 using Uniconta.ClientTools.Controls;
@@ -24,6 +18,15 @@ namespace UnicontaClient.Pages.CustomPage
     public class InvVariantDetailGrid : CorasauDataGridClient
     {
         public override Type TableType { get { return typeof(InvVariantDetailClient); } }
+        public override string LineNumberProperty { get { return "_LineNumber"; } }
+        public override bool AllowSort
+        {
+            get
+            {
+                return false;
+            }
+        }
+        public override bool Readonly { get { return false; } }
     }
 
     public partial class InvVariantDetailPage : GridBasePage
@@ -153,7 +156,6 @@ namespace UnicontaClient.Pages.CustomPage
                 case "Photo":
                     if (selectedItem == null)
                         return;
-#if !SILVERLIGHT
                     var cw = new CwSelectPhotoId(api, selectedItem);
                     cw.Closing += delegate
                       {
@@ -166,7 +168,6 @@ namespace UnicontaClient.Pages.CustomPage
                           }
                       };
                     cw.Show();
-#endif
                     break;
                 case "InvBOMPartOfContains":
                     if (selectedItem != null)

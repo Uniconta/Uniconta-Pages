@@ -71,7 +71,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (e.Key == Key.Enter)
             {
                 e.Handled = true;
-                ribbonControl.PerformRibbonAction("JumpTo");
+                localMenu.PerformRibbonAction("JumpTo");
             }
             else
                 base.OnPreviewKeyDown(e);
@@ -143,7 +143,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void DgUserCompaniesGridClient_RowDoubleClick()
         {
-            ribbonControl.PerformRibbonAction("JumpTo");
+            localMenu.PerformRibbonAction("JumpTo");
         }
 
         public override Task InitQuery()
@@ -192,17 +192,17 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void Name_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            ribbonControl.PerformRibbonAction("JumpTo");
+            localMenu.PerformRibbonAction("JumpTo");
         }
 
         private void NInbox_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            ribbonControl.PerformRibbonAction("Inbox");
+            localMenu.PerformRibbonAction("Inbox");
         }
 
         private void NJournal_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            ribbonControl.PerformRibbonAction("GL_DailyJournal");
+            localMenu.PerformRibbonAction("GL_DailyJournal");
         }
 
         private void LocalMenu_OnItemClicked(string ActionType)

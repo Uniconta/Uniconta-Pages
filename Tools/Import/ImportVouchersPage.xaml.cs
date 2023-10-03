@@ -125,6 +125,11 @@ namespace UnicontaClient.Pages.CustomPage
                         else
                             Text = lst[2];
 
+                        bool HasLetters;
+                        var n = NumberConvert.GetOnlyNumbers(Voucher, out HasLetters);
+                        if (HasLetters)
+                            Voucher = NumberConvert.ToString(n);
+
                         if (Voucher.Length == 0 || Voucher == "0")
                         {
                             _logs.AppendLogLine("Voucher not correctly formattet: '" + Voucher + "' " + file.Name);

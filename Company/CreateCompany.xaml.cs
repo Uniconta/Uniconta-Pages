@@ -32,6 +32,7 @@ using System.Windows;
 using DevExpress.Xpf.Editors;
 using Uniconta.API.Service;
 using Uniconta.Common.Utility;
+using UnicontaClient.Controls.Dialogs;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -39,6 +40,7 @@ namespace UnicontaClient.Pages.CustomPage
     public partial class CreateCompany : FormBasePage
     {
         CompanyClient editrow;
+        bool dineroAuthorized;
 
         public override void OnClosePage(object[] RefreshParams)
         {
@@ -375,6 +377,21 @@ namespace UnicontaClient.Pages.CustomPage
                 lblImportInvoice.Visibility = Visibility.Visible;
                 chkImportInvoice.IsChecked = true;
             }
+
+            if (cmbImportFrom.SelectedIndex == (int)ImportFrom.Dinero)
+            {
+                liAuthrizeDinero.Visibility = Visibility.Visible;
+                txtDinero.Text = Uniconta.ClientTools.Localization.lookup("NotApproved");
+                liDirectory.Visibility = Visibility.Collapsed;
+                txtImportFromDirectory.Text = string.Empty;
+            }
+            else
+            {
+                liAuthrizeDinero.Visibility = Visibility.Collapsed;
+                liDirectory.Visibility = Visibility.Visible;
+                txtImportFromDirectory.Text = string.Empty;
+            }
+
             SetCountry();
         }
 
@@ -547,6 +564,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case ImportFrom.NAV: editrow._ConvertedFrom = (int)ConvertFromType.Nav; break;
                 case ImportFrom.Ax30_eCTRL: editrow._ConvertedFrom = (int)ConvertFromType.eCtrl; break;
                 case ImportFrom.dk_Iceland: editrow._ConvertedFrom = (int)ConvertFromType.dk_Iceland; break;
+                case ImportFrom.Dinero: editrow._ConvertedFrom = (int)ConvertFromType.Dinero; break;
             }
             if (setupType == 1)
             {
@@ -564,7 +582,15 @@ namespace UnicontaClient.Pages.CustomPage
                         Uniconta.ClientTools.Localization.lookup("Warning"));
                     return;
                 }
-                if (string.IsNullOrEmpty(path))
+                if (importFrom == (int)ImportFrom.Dinero)
+                {
+                    if (!dineroAuthorized)
+                    {
+                        UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("DineroNotAuthorize"), Uniconta.ClientTools.Localization.lookup("Warning"));
+                        return;
+                    }
+                }
+                else if (string.IsNullOrEmpty(path))
                 {
                     UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("CannotBeBlank"), Uniconta.ClientTools.Localization.lookup("SelectDirectory")),
                         Uniconta.ClientTools.Localization.lookup("Warning"));
@@ -992,5 +1018,33 @@ namespace UnicontaClient.Pages.CustomPage
                 AfterCompanyCreated(comp, 0);
             }
         }
+
+        private void liAuthrizeDinero_ButtonClicked(object sender)
+        {
+            var cwDineroAuthorize = new CWDineroAuthorize() { Owner = UtilDisplay.GetCurentWindow() };
+            cwDineroAuthorize.Closed += delegate
+            {
+                if (cwDineroAuthorize.DialogResult == true && cwDineroAuthorize.DineroCompany != null && cwDineroAuthorize.ClientHelper != null)
+                {
+                    dineroAuthorized = true;
+                    var comp = cwDineroAuthorize.DineroCompany;
+                    Dinero.CurrentCompany = comp;
+                    Dinero.HttpClientHelper = cwDineroAuthorize.ClientHelper;
+                    editrow.CompanyName = comp.Name;
+                    editrow.Phone = comp.Phone;
+                    editrow.Address1 = comp.Street;
+                    editrow.Address2 = comp.ZipCode + " " + comp.City; 
+                    editrow.Email = comp.Email;
+                    editrow.Www = comp.Website;
+                    editrow._Id = comp.VatNumber;
+                    editrow._CurrencyId = Currencies.DKK;
+                    editrow._CountryId = CountryCode.Denmark;
+                    txtDinero.Text = Uniconta.ClientTools.Localization.lookup("Approved");
+                }
+            };
+            cwDineroAuthorize.ShowDialog();
+        }
+
+
     }
 }

@@ -701,12 +701,12 @@ namespace UnicontaClient.Pages.CustomPage
                 cbBalance.SelectedIndex = itemsBalance.Count - 1;
                 objBalance.ColumnList = cols;
 
-                if (objBalance._Name == null)
-                    objBalance._Name = Uniconta.ClientTools.Localization.lookup("Balance") + NumberConvert.ToString(itemsBalance.Count);
-
-                objBalance.SetMaster(api.CompanyEntity);
-                api.InsertNoResponse(objBalance);
-                UpdateBalancelist(cbBalance.SelectedIndex);
+                if (!string.IsNullOrEmpty(objBalance._Name))
+                {
+                    objBalance.SetMaster(api.CompanyEntity);
+                    api.InsertNoResponse(objBalance);
+                    UpdateBalancelist(cbBalance.SelectedIndex);
+                }
             }
             else
             {

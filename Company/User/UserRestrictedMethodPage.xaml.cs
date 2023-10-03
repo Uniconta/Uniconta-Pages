@@ -45,7 +45,9 @@ namespace UnicontaClient.Pages.CustomPage
         async void GetMethodNames()
         {
             var serLogApi = new ServerlogAPI(api);
-            methodNames = await serLogApi.ServerMethodNames();
+            methodNames = (await serLogApi.ServerMethodNames())?.Where(n => n!=null)?.ToArray(); //Server Method names return some null values
+                                                                                                 //which results in scrolling issue in combox.
+                                                                                                 //So we filter out the null values.
         }
 
         private void DataControl_CurrentItemChanged(object sender, DevExpress.Xpf.Grid.CurrentItemChangedEventArgs e)

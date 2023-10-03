@@ -20,6 +20,7 @@ using Uniconta.ClientTools;
 using Rapyd.CreditCard.Settlement;
 using static Rapyd.CreditCard.Settlement.Rapyd_CreditCardClient;
 using log4net.Layout;
+using Straumur.CreditCard.Settlement;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -49,12 +50,13 @@ namespace UnicontaClient.Pages.CustomPage
         public string SettlementNumber { get; set; }
         public DateTime FromDate { get { return txtfromDate.DateTime; } set { txtfromDate.EditValue = value; } }
         public bool AllTrans { get { return (bool)chkallTrans.IsChecked; } set { chkallTrans.IsChecked = value; } }
+        public bool AlreadyBooked { get { return (bool)chkalreadybooked.IsChecked; } set { chkalreadybooked.IsChecked = value; } }
         public string CodeRent { get; set; }
 
         public CrudAPI Api = null;
         public Company Comp = null;
         public Iceland_PSPHelpers helpers;
-        BankImportFormatClient formattouse;
+        static BankImportFormatClient formattouse;
         readonly UnicontaBaseEntity importMaster;
         SQLCache AccountsCache, CreditorsCache;
 
@@ -78,6 +80,7 @@ namespace UnicontaClient.Pages.CustomPage
             SettlementNumber = "";
             AllTrans = false;
             CodeRent = "";
+            AlreadyBooked = false;
 
             PrepareUI();
         }
@@ -91,7 +94,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var listPropval = new List<PropValuePair>() { PropValuePair.GenereteWhereElements("ReferenceNumber", settlementNumber, CompareOperator.Equal) };
             var FindDebInvLocal = await Api.Query<GLTransClient>(listPropval);
-            if (FindDebInvLocal.Length != 0)
+            if (FindDebInvLocal.Length != 0 && !AlreadyBooked)
                 return true;
             else
                 return false;
@@ -102,16 +105,14 @@ namespace UnicontaClient.Pages.CustomPage
             var listPropval = new List<PropValuePair>() { PropValuePair.GenereteWhereElements(nameof(BankImportFormatClient.CountryId), typeof(int), NumberConvert.ToString((int)CountryCode.Iceland)) };
             var res = await Api.Query<BankImportFormatClient>(listPropval);
             cmdProviders.ItemsSource = res;
-
-            foreach (var bankformat in res)
+            if (res != null)
             {
-                if (bankformat.ImportInto == "Dagbók" && bankformat.FormatName.Contains("Færsluhirðir") && bankformat.FormatName.Contains(selectedJournal))
-                {
-                    formattouse = bankformat;
-                    return true;
-                }
+                formattouse = null;
+                foreach (var bankformat in res)
+                    if (bankformat.ImportInto == "Dagbók" && bankformat.FormatName.Contains("Færsluhirðir") && bankformat.FormatName.Contains(selectedJournal))
+                        formattouse = bankformat;
             }
-            return false;
+            return formattouse != null;
         }
 
         private async Task<bool> saveUIData()
@@ -121,27 +122,28 @@ namespace UnicontaClient.Pages.CustomPage
             formattouse.Password = Password;
 
             var merc = helpers.ToByteArray(MerchantID);
-            formattouse.SkipLines = merc[0];
-            formattouse.DatePosition = merc[1];
-            formattouse.TextPosition = merc[2];
-            formattouse.AmountPosition = merc[3];
-            formattouse.VoucherPos = merc[4];
-            formattouse.InvoicePos = merc[5];
-            formattouse.ReferencePosition = merc[6];
+            try { formattouse.SkipLines = merc[0]; }
+            catch (Exception ex) { formattouse.SkipLines = 0; }
+            try { formattouse.DatePosition = merc[1]; }
+            catch (Exception ex) { formattouse.DatePosition = 0; }
+            try { formattouse.TextPosition = merc[2]; }
+            catch (Exception ex) { formattouse.TextPosition = 0; }
+            try { formattouse.AmountPosition = merc[3]; }
+            catch (Exception ex) { formattouse.AmountPosition = 0; }
+            try { formattouse.VoucherPos = merc[4]; }
+            catch (Exception ex) { formattouse.VoucherPos = 0; }
+            try { formattouse.InvoicePos = merc[5]; }
+            catch (Exception ex) { formattouse.InvoicePos = 0; }
+            try { formattouse.ReferencePosition = merc[6]; }
+            catch (Exception ex) { formattouse.ReferencePosition = 0; }
             formattouse.BankAccount = BankAccount;
 
 
             formattouse.SetMaster(Api.CompanyEntity);
             var res = await Api.Update(formattouse);
             if (res != ErrorCodes.Succes)
-            {
                 UtilDisplay.ShowErrorCode(res);
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return res == ErrorCodes.Succes;
         }
 
         private async Task LoadUI()
@@ -180,7 +182,9 @@ namespace UnicontaClient.Pages.CustomPage
                 merc[4] = formattouse.VoucherPos;
                 merc[5] = formattouse.InvoicePos;
                 merc[6] = formattouse.ReferencePosition;
-                MerchantID = Encoding.Default.GetString(merc);
+                var m = Encoding.Default.GetString(merc);
+                m = m.Replace("\0", "");
+                MerchantID = m;
             }
             cmdProviders.SelectedItem = formattouse;
         }
@@ -196,14 +200,16 @@ namespace UnicontaClient.Pages.CustomPage
             DeviceRentLookupEditor.cache = CreditorsCache;
             BankAccountLookupEditor.cache = AccountsCache;
 
+            FromDate = DateTime.Now.AddDays(-1);
+
             // Set code for device rent
             switch (SelectedProvider())
             {
                 case Providers.Saltpay: // Teya
                     CodeRent = "F_MONTHLY";
-                    FromDate = DateTime.Now.AddDays(-1);
                     break;
 
+                case Providers.Straumur:
                 case Providers.Valitor:
                 case Providers.Rapyd:
                     CodeRent = "Pos";
@@ -223,6 +229,8 @@ namespace UnicontaClient.Pages.CustomPage
                 return Providers.Rapyd;
             else if ((bool)(selectedJournal.ToLower().Contains("valitor")) || (bool)(selectedJournal.ToLower().Contains("visa")) || (bool)(selectedJournal.ToLower().Contains("vísa")))
                 return Providers.Valitor;
+            else if ((bool)(selectedJournal.ToLower().Contains("straumur")))
+                return Providers.Straumur;
             else
                 return Providers.Unknown;
         }
@@ -257,6 +265,7 @@ namespace UnicontaClient.Pages.CustomPage
         async void doImport(BankImportFormatClient selectedbankFormat, string journal = null)
         {
             SetBusy();
+            busyIndicator.IsBusy = true;
             double settlementAmount = 0.0;
 
             using (var journalsettlement = new Iceland_JournalSettlements(Api, journal, MerchantID, CreditcardClaims, CreditcardFees, DeviceRent, BankAccount))
@@ -284,11 +293,18 @@ namespace UnicontaClient.Pages.CustomPage
 
                 }
 
+                busyIndicator.IsBusy = false;
                 ClearBusy();
                 if (!prov.Ok)
-                    UnicontaMessageBox.Show(prov.Message, prov.MessageHeader);
-                else if (!await saveUIData())
-                    ShowGlDailyJournalLines(journal);
+                {
+                    if (prov.Message != null)
+                        UnicontaMessageBox.Show(prov.Message, prov.MessageHeader);
+                }
+                else
+                {
+                    if (await saveUIData())
+                        ShowGlDailyJournalLines(journal);
+                }
             }
         }
 
@@ -316,15 +332,16 @@ namespace UnicontaClient.Pages.CustomPage
                 }
                 if (aggregateTransactions)
                 {
-                    await journalsettlement.queueTransactionAsync("settlem. no." + settlement.SettlementRunNumber, settlement.CurrencyCode,
-                        (decimal)settlementAmount, settlement.SettlementRunNumber, settlement.SettlementDate);
+                    if (settlementAmount != 0.0)
+                        await journalsettlement.queueTransactionAsync("settlem. no." + settlement.SettlementRunNumber, settlement.CurrencyCode,
+                            (decimal)settlementAmount, settlement.SettlementRunNumber, settlement.SettlementDate);
                 }
                 await journalsettlement.saveToJournal();
             }
             return prov.Ok;
         }
 
-        private async Task<bool> handleDeductions(Iceland_JournalSettlements journalsettlement, Iceland_PaymentProviderSettlements prov, dynamic settlement)//CreditCardSettlement settlement)
+        private async Task<bool> handleDeductions(Iceland_JournalSettlements journalsettlement, Iceland_PaymentProviderSettlements prov, dynamic settlement)
         {
             prov.getDeduction(settlement.SettlementRunNumber);
             if (prov.Ok && prov.deductions() != null)
@@ -405,7 +422,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         public enum Providers
         {
-            Saltpay, Rapyd, Valitor, Unknown
+            Saltpay, Rapyd, Valitor, Straumur, Unknown
         }
 
         public string NameOfProvider()
@@ -418,6 +435,8 @@ namespace UnicontaClient.Pages.CustomPage
                     return "Rapyd";
                 case Providers.Valitor:
                     return "Valitor";
+                case Providers.Straumur:
+                    return "Straumur";
                 case Providers.Unknown:
                     return "Unknown";
             }
@@ -452,6 +471,10 @@ namespace UnicontaClient.Pages.CustomPage
                 case Providers.Valitor:
                     p = new Rapyd_CreditCardClient(connectInfo.Username, connectInfo.Password);
                     break;
+
+                case Providers.Straumur:
+                    p = new Straumur_CreditCardClient(connectInfo.Username, connectInfo.Password);
+                    break;
             }
         }
 
@@ -472,6 +495,8 @@ namespace UnicontaClient.Pages.CustomPage
                 case Providers.Rapyd:
                 case Providers.Valitor:
                     return (p as Rapyd_CreditCardClient).settlements?.Settlements;
+                case Providers.Straumur:
+                    return (p as Straumur_CreditCardClient).settlements?.Settlements;
             }
             return null;
         }
@@ -485,6 +510,8 @@ namespace UnicontaClient.Pages.CustomPage
                 case Providers.Rapyd:
                 case Providers.Valitor:
                     return (p as Rapyd_CreditCardClient).transactions?.Transactions;
+                case Providers.Straumur:
+                    return (p as Straumur_CreditCardClient).transactions?.Transactions;
             }
             return null;
         }
@@ -501,7 +528,6 @@ namespace UnicontaClient.Pages.CustomPage
 
                     case Providers.Rapyd:
                     case Providers.Valitor:
-                        connectInfo.MerchantId = connectInfo.MerchantId.Replace("\0", "");
                         (p as Rapyd_CreditCardClient).GetSettlements(connectInfo.MerchantId, connectInfo.DateFrom, DateTime.Now);
                         if ((p as Rapyd_CreditCardClient).statuscode != null)
                         {
@@ -509,6 +535,20 @@ namespace UnicontaClient.Pages.CustomPage
                             _message = (p as Rapyd_CreditCardClient).statuscode.Message;
                             _messageheader = "Error";
                         }
+                        else if ((p as Rapyd_CreditCardClient).settlements == null)
+                            _okstatus = false;
+                        break;
+
+                    case Providers.Straumur:
+                        (p as Straumur_CreditCardClient).GetSettlements(connectInfo.MerchantId, connectInfo.DateFrom, DateTime.Now);
+                        if ((p as Straumur_CreditCardClient).statuscode != null)
+                        {
+                            _okstatus = false;
+                            _message = (p as Straumur_CreditCardClient).statuscode.Message;
+                            _messageheader = "Error";
+                        }
+                        else if ((p as Straumur_CreditCardClient).settlements == null)
+                            _okstatus = false;
                         break;
                 }
             }
@@ -533,6 +573,10 @@ namespace UnicontaClient.Pages.CustomPage
                     case Providers.Rapyd:
                     case Providers.Valitor:
                         (p as Rapyd_CreditCardClient).GetTransactionsByRunNumber(settlementRunNumber);
+                        break;
+
+                    case Providers.Straumur:
+                        (p as Straumur_CreditCardClient).GetTransactionsByRunNumber(settlementRunNumber);
                         break;
                 }
             }
@@ -559,6 +603,10 @@ namespace UnicontaClient.Pages.CustomPage
                     case Providers.Valitor:
                         (p as Rapyd_CreditCardClient).GetDeductionItems(settlementRunNumber);
                         break;
+
+                    case Providers.Straumur:
+                        (p as Straumur_CreditCardClient).GetDeductionItems(settlementRunNumber);
+                        break;
                 }
             }
             catch (Exception ex)
@@ -578,10 +626,12 @@ namespace UnicontaClient.Pages.CustomPage
                 case Providers.Rapyd:
                 case Providers.Valitor:
                     return (p as Rapyd_CreditCardClient).deductions?.DeductedItems;
+                case Providers.Straumur:
+                    return (p as Straumur_CreditCardClient).deductions?.DeductedItems;
             }
             return null;
         }
-    }
+    } // class Iceland_PaymentProviderSettlements
 
     public class Iceland_JournalSettlements : IDisposable
     {

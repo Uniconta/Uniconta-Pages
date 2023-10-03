@@ -57,7 +57,6 @@ namespace UnicontaClient.Pages.CustomPage
         static bool showWorkspace;
         static bool includeJournals;
 
-
         ItemBase iIncludeZeroBalance, iIncludeJournals, iShowTask, iShowWorkspace;
         bool hasWorkspace;
 
@@ -107,7 +106,7 @@ namespace UnicontaClient.Pages.CustomPage
             cmbProject.api = api;
             SetProjectSource();
 
-            hasWorkspace = workSpaceCache != null;
+            hasWorkspace = (workSpaceCache == null || workSpaceCache.Count != 0);
             Task.Visible = showTask;
             Workspace.Visible = hasWorkspace && (showWorkspace || showTask);
             iShowWorkspace.isEditLayout = hasWorkspace && !showTask;
@@ -123,7 +122,6 @@ namespace UnicontaClient.Pages.CustomPage
                 WorkInProgressReportPage.DefaultToDate = now;
                 WorkInProgressReportPage.DefaultFromDate = fromDate;
             }
-
 
             txtDateTo.DateTime = WorkInProgressReportPage.DefaultToDate;
             txtDateFrm.DateTime = WorkInProgressReportPage.DefaultFromDate;
@@ -1073,12 +1071,10 @@ namespace UnicontaClient.Pages.CustomPage
                 projTask = projTaskLst?.Where(s => s.Task == selectedItem.Task).FirstOrDefault();
 
             }
-#if SILVERLIGHT
-            var cwCreateOrder = new CWCreateOrderFromProject(api);
-#else
-            var cwCreateOrder = new UnicontaClient.Pages.CWCreateOrderFromProject(api, true, project, projTask);
+
+            var prWorkspace = (PrWorkSpaceClient)workSpaceCache.Get(selectedItem.Workspace);
+            var cwCreateOrder = new UnicontaClient.Pages.CWCreateOrderFromProject(api, true, project, projTask, prWorkspace);
             cwCreateOrder.DialogTableId = 2000000053;
-#endif
             cwCreateOrder.Closed += async delegate
             {
                 if (cwCreateOrder.DialogResult == true)
@@ -1101,6 +1097,20 @@ namespace UnicontaClient.Pages.CustomPage
                             {
                                 debtorOrderInstance.SetMaster(selectedItem.ProjectRef);
                                 debtorOrderInstance._PrCategory = CWCreateOrderFromProject.InvoiceCategory;
+                                if (debtorOrderInstance._PrCategory == null)
+                                {
+                                    var CategoryCache = api.CompanyEntity.GetCache(typeof(PrCategory));
+                                    foreach (var cat in (IEnumerable<PrCategory>)CategoryCache.GetRecords)
+                                    {
+                                        if (cat._CatType == Uniconta.DataModel.CategoryType.Revenue)
+                                        {
+                                            debtorOrderInstance._PrCategory = cat._Number;
+                                            if (cat._Default)
+                                                break;
+                                        }
+                                    }
+                                }
+
                                 debtorOrderInstance._NoItemUpdate = true;
                                 var er = await api.Insert(debtorOrderInstance);
                                 if (er == ErrorCodes.Succes)
@@ -1121,7 +1131,8 @@ namespace UnicontaClient.Pages.CustomPage
         void CreateZeroInvoice(ProjectTransLocalClient selectedItem)
         {
             var project = (ProjectClient)projCache.Get(selectedItem.Project);
-            var cwCreateZeroInvoice = new UnicontaClient.Pages.CwCreateZeroInvoice(api, project);
+            var prWorkspace = (PrWorkSpaceClient)workSpaceCache.Get(selectedItem.Workspace);
+            var cwCreateZeroInvoice = new UnicontaClient.Pages.CwCreateZeroInvoice(api, project, prWorkspace);
             cwCreateZeroInvoice.DialogTableId = 2000000067;
 
             cwCreateZeroInvoice.Closed += delegate
@@ -1213,7 +1224,7 @@ namespace UnicontaClient.Pages.CustomPage
             workSpaceCache = workSpaceCache ?? await api.LoadCache(typeof(Uniconta.DataModel.PrWorkSpace)).ConfigureAwait(false);
 
 
-            LoadType(new Type[] { typeof(Uniconta.DataModel.Debtor), typeof(Uniconta.DataModel.ProjectTask) });
+            LoadType(new Type[] { typeof(Uniconta.DataModel.Debtor), typeof(Uniconta.DataModel.ProjectTask), typeof(Uniconta.DataModel.PrCategory) });
 
             if (this.priceLookup == null)
                 priceLookup = new Uniconta.API.Project.FindPricesEmpl(api);

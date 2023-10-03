@@ -22,17 +22,13 @@ namespace UnicontaClient.Pages.CustomPage
     public partial class CWForAllTrans : ChildWindow
     {
         public bool ForAllTransactions { get; set; }
-        public bool AppendDoc{ get; set; }
+        public bool AppendDoc { get; set; }
         public CWForAllTrans()
         {
             this.DataContext = this;
             ForAllTransactions = true;
             InitializeComponent();
-#if !SILVERLIGHT
-            this.Title = Uniconta.ClientTools.Localization.lookup("ForAllTransactionsOnVoucher");
-#else
-            Utilities.Utility.SetThemeBehaviorOnChildWindow(this);
-#endif
+            this.Title = Uniconta.ClientTools.Localization.lookup("Attach");
             this.Loaded += CW_Loaded;
         }
         void CW_Loaded(object sender, RoutedEventArgs e)
@@ -41,9 +37,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
-#if !SILVERLIGHT
             AppendDoc = (bool)rdbAppend.IsChecked ? true : false;
-#endif
             SetDialogResult(true);
         }
         private void ChildWindow_KeyDown(object sender, KeyEventArgs e)

@@ -14,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Uniconta.API.DebtorCreditor;
 using Uniconta.API.Service;
 using Uniconta.ClientTools;
 using Uniconta.ClientTools.Controls;
@@ -109,6 +110,17 @@ namespace UnicontaClient.Pages.CustomPage
 
         async void ViewFile(DCDocSendLogClient selectedItem)
         {
+            if (selectedItem._LogType == Uniconta.DataModel.DCDocType.eDelivery)
+            {
+                var xmlLst = await new InvoiceAPI(api).GetEdeliveryDoc(selectedItem);
+                if (xmlLst != null)
+                {
+                    var cw = new CWPreviewXMLViewer(xmlLst[0]);
+                    cw?.Show();
+                    return;
+                }
+            }
+            
             if (selectedItem._File == null)
                 await api.Read(selectedItem);
 
@@ -123,6 +135,5 @@ namespace UnicontaClient.Pages.CustomPage
                 cw?.Show();
             }
         }
-
     }
 }

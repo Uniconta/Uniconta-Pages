@@ -1,21 +1,10 @@
-using Uniconta.API.System;
 using UnicontaClient.Models;
-using UnicontaClient.Utilities;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.Common;
 using Uniconta.DataModel;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
+using Uniconta.ClientTools.Controls;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -36,7 +25,7 @@ namespace UnicontaClient.Pages.CustomPage
             InitializeComponent();
             cmbDebtorVoucherSerie.api = api;
             layoutControl = layoutItems;
-           
+
             layoutItems.DataContext = editrow;
             frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
         }
@@ -52,13 +41,36 @@ namespace UnicontaClient.Pages.CustomPage
         {
             switch (ActionType)
             {
-                case "Save": this.saveForm();
-                    var company = api.CompanyEntity;
+                case "Save":
+                    Save();
                     break;
                 default:
                     frmRibbon_BaseActions(ActionType);
                     break;
             }
+        }
+
+        private void Save()
+        {
+            MoveFocus();
+            var loadedRow = (CompanySettingsClient)LoadedRow;
+            var invoicenumber = loadedRow.SalesInvoice;
+            var vouchernumber = loadedRow.DebtorVoucherSerie;
+            bool save = true;
+            if (editrow.SalesInvoice != invoicenumber || (editrow.UseVoucherAsInvoice && editrow._DebtorVoucherSerie != vouchernumber))
+            {
+                var msg = Uniconta.ClientTools.Localization.lookup("InvoiceNumberChange") + "\n" + Uniconta.ClientTools.Localization.lookup("ProceedConfirmation");
+                if (UnicontaMessageBox.Show(msg, Uniconta.ClientTools.Localization.lookup("Warning"), System.Windows.MessageBoxButton.YesNo) == System.Windows.MessageBoxResult.No)
+                    save = false;
+            }
+            if (save)
+            {
+                saveForm();
+                if (api.CompanyEntity.Settings != null)
+                    api.CompanyEntity.Settings._GraceDays = editrow._GraceDays;
+            }
+            else
+                frmRibbon_BaseActions("Cancel");
         }
 
         private void CheckEditor_Checked(object sender, System.Windows.RoutedEventArgs e)

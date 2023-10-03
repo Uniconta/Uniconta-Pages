@@ -2,36 +2,22 @@ using Uniconta.ClientTools.Page;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
-using UnicontaClient.Pages.GL.ChartOfAccount.Reports;
 using Uniconta.ClientTools.DataModel;
 using UnicontaClient.Models;
 using Uniconta.Common;
 using Uniconta.API.GeneralLedger;
-using Uniconta.API.System;
 using Uniconta.DataModel;
-using Uniconta.ClientTools;
 using Uniconta.ClientTools.Controls;
-using System.ComponentModel;
 using Uniconta.ClientTools.Util;
-using DevExpress.Xpf.Grid;
-using System.Threading.Tasks;
 using Uniconta.API.Service;
 using Uniconta.Common.Utility;
 using System.Collections;
-using NPOI.SS.Formula.Functions;
-using UnicontaClient.Utilities;
 using Uniconta.Client.Pages;
 using UnicontaClient.Pages.Reports;
 using Localization = Uniconta.ClientTools.Localization;
-using DevExpress.Text.Interop;
+using UnicontaClient.Controls.Dialogs;
+using NPOI.SS.UserModel;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -62,6 +48,13 @@ namespace UnicontaClient.Pages.CustomPage
             localMenu.dataGrid = dgVatVatSettlements;
             gridControl.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
+            var countryId = api.CompanyEntity._CountryId;
+            if (countryId != CountryCode.Denmark && countryId != CountryCode.Greenland && countryId != CountryCode.FaroeIslands)
+            {
+                RibbonBase rb = (RibbonBase)localMenu.DataContext;
+                UtilDisplay.RemoveMenuCommand(rb, "Upload");
+            }
+
         }
 
         protected override void LoadCacheInBackGround()
@@ -90,7 +83,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "VatSettlementReport":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.VATSettlementReport, new object[] { selectedItem, new double[18], new double[18], new string[6] }, Uniconta.ClientTools.Localization.lookup("VATSettlementReport"), null, closeIfOpened: true);
+                        AddDockItem(TabControls.VATSettlementReport, new object[] { selectedItem, new double[18], new double[18], new string[6] }, Uniconta.ClientTools.Localization.lookup("VatDeclaration"), null, closeIfOpened: true);
                     break;
                 case "Show":
                     if (selectedItem != null)
@@ -115,10 +108,29 @@ namespace UnicontaClient.Pages.CustomPage
                 case "Upload":
                     if (selectedItem != null && dgVatVatSettlements.SelectedItem == dgVatVatSettlements.VisibleItems[0])
                     {
-                        if (UnicontaMessageBox.Show(Localization.lookup("ReportTo") + " " + Localization.lookup("To") + " " + Localization.lookup("CustomsService") + "\n" +
-                            Localization.lookup("AreYouSureToContinue"), Localization.lookup("Confirmation"),
-                                MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-                            Upload(selectedItem);
+                        if (selectedItem.UploadedAt > DateTime.MinValue)
+                        {
+                            UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("UploadedAt") + ": {0}", selectedItem.UploadedAt.ToShortDateString()), Uniconta.ClientTools.Localization.lookup("Information"));
+                            return;
+                        }
+                        var cwConfirmationBox = new CWConfirmationBox(Uniconta.ClientTools.Localization.lookup("UploadVATPermissionMsg"), Uniconta.ClientTools.Localization.lookup("Confirmation"), false, null,
+                        true, Uniconta.ClientTools.Localization.lookup("GrantPermission"), Uniconta.ClientTools.Localization.lookup("Continue"));
+                        cwConfirmationBox.Closed += delegate
+                        {
+                            if (cwConfirmationBox.DialogResult == true)
+                            {
+                                if (cwConfirmationBox.ConfirmationResult == CWConfirmationBox.ConfirmationResultEnum.Yes)
+                                {
+                                    System.Diagnostics.Process.Start("https://eur02.safelinks.protection.outlook.com/?url=https%3A%2F%2Furldefense.proofpoint.com%2Fv2%2Furl%3Fu%3Dhttps-3A__pdcs.skat.dk_dcs-2Datn-2Dgateway_" +
+                                        "nemlogin-3FtargetUrl-3DaHR0cHM6Ly93d3cuc2thdC5kay9mcm9udC9hcHBtYW5hZ2VyL3NrYXQvbnRzZT9fbmZwYj10cnVlJl9uZnBiPXRydWUmX3BhZ2VMYWJlbD1QMjgwMDY1NTM5MTM1OTczNDk4MTkwOSZfbmZscz1mYWxzZQ-3D-3D%26d%3DDwMFAw%26c%3Dvgc7_" +
+                                        "vOYmgImobMVdyKsCY1rdGZhhtCa2JetijQZAG0%26r%3Dy-Ffb9u1CNakT-m5-tkvg8uGekr8sZ4_HWF7ClzBAtg%26m%3D-_GeOzxAxYuJnuimeioPUULdHuMjnGgsT_BvugxBrqE%26s%3DLHNyqY-YQe8nsTNDtajbSGgim9u3q9TtoUWmznVLg_M%26e%3D&data=05%7C01%7Cac%40uniconta.com%" +
+                                        "7Cbdab8dea154a4bc3742208dbaea79758%7Cc77f48dcdd824f6da939e3b2bd7f2e95%7C0%7C0%7C638295807398038001%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=Jtbi9Wd1jp%2F0dALSTYtzof1bR8fbEzxHVhWe6TNlyYs%3D&reserved=0");
+                                }
+                                else if (cwConfirmationBox.ConfirmationResult == CWConfirmationBox.ConfirmationResultEnum.No)
+                                    UploadSettlements(selectedItem);
+                            }
+                        };
+                        cwConfirmationBox.Show();
                     }
                     break;
                 case "View":
@@ -140,12 +152,13 @@ namespace UnicontaClient.Pages.CustomPage
                         Month = 12;
                     var dialog = new CWCalculateCommission(api, fromdate, fromdate.AddMonths(Month).AddDays(-1));
                     dialog.SetTitleAndButton(Uniconta.ClientTools.Localization.lookup("Create"), Uniconta.ClientTools.Localization.lookup("OK"));
-                    dialog.Closing += delegate
+                    dialog.Closed += delegate
                     {
                         if (dialog.DialogResult == true)
                         {
                             var vatReported = new GLVatReportedClient
                             {
+                                CompanyId = api.CompanyId,
                                 _FromDate = dialog.FromDateTime,
                                 _ToDate = dialog.ToDateTime
                             };
@@ -158,6 +171,14 @@ namespace UnicontaClient.Pages.CustomPage
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
+        }
+
+        void UploadSettlements(GLVatReportedClient selectedItem)
+        {
+            if (UnicontaMessageBox.Show(Localization.lookup("ReportTo") + " " + Localization.lookup("To") + " " + Localization.lookup("CustomsService") + "\n" +
+                            Localization.lookup("AreYouSureToContinue"), Localization.lookup("Confirmation"),
+                                MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                Upload(selectedItem);
         }
 
         async void DeleteRow(GLVatReported rec)
@@ -176,13 +197,67 @@ namespace UnicontaClient.Pages.CustomPage
                 var lin = lst[i];
                 if (lin.AccountIsVat != 0 && lin.AmountWithVat != 0 && lin.AccountNumber != null)
                 {
-                    var l = NumberConvert.ToLong(lin.AmountWithVat * 100d);
+                    var l = NumberConvert.ToLong(lin.AmountWithVat * 100d, true);
                     total += l;
                     Trans.Add(new GLTransClientTotal
                     {
                         CompanyId = CompanyId,
                         _Date = Date,
                         _Account = lin.AccountNumber,
+                        _AmountCent = -l,
+                        _Text = Text ?? Util.ConcatParenthesis(Localization.lookup("VatSettlement"), lin.Vat?._Vat),
+                        _Origin = LedgerPostingType.VatSettlement
+                    });
+                }
+                else if (lin.AmountWithout != 0 && lin.Account != null &&
+                        (lin.Account._SystemAccount == (byte)SystemAccountTypes.ManuallyReceivableVAT ||
+                         lin.Account._SystemAccount == (byte)SystemAccountTypes.ManuallyPayableVAT))
+                {
+                    var l = NumberConvert.ToLong(lin.AmountWithout * 100d, true);
+                    total += l;
+                    Trans.Add(new GLTransClientTotal
+                    {
+                        CompanyId = CompanyId,
+                        _Date = Date,
+                        _Account = lin.AccountNumber,
+                        _AmountCent = -l,
+                        _Text = Text,
+                        _Origin = LedgerPostingType.VatSettlement
+                    });
+
+                }
+            }
+            if (total != 0 && Offset != null)
+            {
+                Trans.Add(new GLTransClientTotal
+                {
+                    CompanyId = CompanyId,
+                    _Date = Date,
+                    _Account = Offset,
+                    _AmountCent = total,
+                    _Text = Text,
+                    _Origin = LedgerPostingType.VatSettlement
+                });
+                return 0;
+            }
+            return total;
+        }
+
+        static long Generate(VatSumOperationReport[] lst, List<GLTransClientTotal> Trans, DateTime Date, int CompanyId, string Offset, string Text)
+        {
+            long total = 0;
+            for (var i = 13; i < 19; i++)
+            {
+                var lin = lst[i];
+                if (lin._Amount != 0)
+                {
+                    var l = NumberConvert.ToLong(lin._Amount * 100d, true);
+                    total += l;
+                    Trans.Add(new GLTransClientTotal
+                    {
+                        CompanyId = CompanyId,
+                        _Date = Date,
+                        _Account = lin.Acc._Account,
                         _AmountCent = -l,
                         _Text = Text,
                         _Origin = LedgerPostingType.VatSettlement
@@ -226,6 +301,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             var Trans = new List<GLTransClientTotal>(50);
             var total = Generate(lstPeriod, Trans, rec._ToDate, rec.CompanyId, Offset, null);
+            total += Generate(sumPeriod, Trans, rec._ToDate, rec.CompanyId, Offset, null);
 
             // last period
             lstPeriod = (VatReportLine[])cs.ToArray(typeof(VatReportLine));

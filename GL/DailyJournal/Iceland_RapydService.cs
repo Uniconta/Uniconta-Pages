@@ -13,85 +13,30 @@ using System.Threading.Tasks;
 using Uniconta.ClientTools.Controls;
 using Uniconta.DataModel;
 using UnicontaClient.Pages;
+using UnicontaClient.Pages.GL.DailyJournal;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace Rapyd.CreditCard.Settlement
 {
-    public class Rapyd_CreditCardClient : IDisposable
+    public class Rapyd_CreditCardClient : Iceland_RESTCli
     {
-        private HttpClient CreditCardClient { get; set; }
-        private const string EndpointUri = "https://api-saga.valitor.com/HttpServices";
-        private string username { get; set; }
-        private string password { get; set; }
-        private string base64EncodedAuthenticationString = "";
         private string merchantID;
         private DateTime datefrom;
         private DateTime dateto;
 
         public Rapyd_CreditCardClient(string _username, string _password)
+            : base("https://api-saga.valitor.com/HttpServices", _username, _password)
         {
-            CreditCardClient = new HttpClient();
-            CreditCardClient.DefaultRequestHeaders.Clear();
-            CreditCardClient.DefaultRequestHeaders.ConnectionClose = true;
-            username = _username;
-            password = _password;
-            var authenticationString = $"{username}:{password}";
-            base64EncodedAuthenticationString = Convert.ToBase64String(Encoding.ASCII.GetBytes(authenticationString));
         }
 
         private RapydAgreements agreements;
         public RapydSettlements settlements;
         public RapydTransactions transactions;
         public RapydDeductions deductions;
-        public RapydStatusCode statuscode;
 
         private async void GetAgreements()
         {
-            agreements = JsonConvert.DeserializeObject<RapydAgreements>(await RapydSagaAPI($"/api/agreements"));
-        }
-
-        public void Dispose()
-        {
-            CreditCardClient = null;
-        }
-
-        private async Task<string> RapydSagaAPI(string apicommand)
-        {
-            statuscode = null;
-            var res = "";
-            var requestMessage = new HttpRequestMessage(HttpMethod.Get, new Uri(EndpointUri+apicommand));
-            requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Basic", base64EncodedAuthenticationString);
-            try
-            {
-                res = await CreditCardClient.SendAsync(requestMessage).Result.Content.ReadAsStringAsync();
-                return res;
-            }
-            catch (Exception ex)
-            {
-                UnicontaMessageBox.Show(ex.ToString(), "");
-                return "";
-            }
-        }
-
-        private T rapyd<T>(string resultstring)
-        {
-            if ((!string.IsNullOrEmpty(resultstring)) && resultstring[0] == '{')
-            {
-                var jsondeserialized = JsonConvert.DeserializeObject<T>(resultstring);                
-                if (jsondeserialized != null && !resultstring.Contains("StatusCode"))
-                    return (T)Convert.ChangeType(jsondeserialized, typeof(T));
-                if (jsondeserialized != null && resultstring.Contains("StatusCode"))
-                {
-                    statuscode = JsonConvert.DeserializeObject<RapydStatusCode>(resultstring);
-                    return default(T);
-                }
-            }
-            else if (!string.IsNullOrEmpty(resultstring))
-            {
-                statuscode = new RapydStatusCode() { StatusCode = 999, Message = resultstring };
-                return default(T);
-            }
-            return default(T);
+            agreements = JsonConvert.DeserializeObject<RapydAgreements>(await api($"/api/agreements"));
         }
 
         internal async void GetSettlements(string _merchantID, DateTime _datefrom, DateTime _dateto)
@@ -99,20 +44,20 @@ namespace Rapyd.CreditCard.Settlement
             merchantID = _merchantID;
             datefrom = _datefrom;
             dateto = _dateto;
-            settlements = rapyd<RapydSettlements>(await RapydSagaAPI($"/api/settlements?agreementNumber={_merchantID}&" +
+            settlements = data<RapydSettlements>(await api($"/api/settlements?agreementNumber={_merchantID}&" +
                             $"paidDateFrom={_datefrom.ToString("yyyy-MM-ddTHH:mm:ss")}" +
                             $"&paidDateTo={_dateto.ToString("yyyy-MM-ddTHH:mm:ss")}"));
-        }        
+        }
 
         internal async void GetTransactionsByRunNumber(string settlementRunNumber)
         {
-            transactions = rapyd<RapydTransactions>(await RapydSagaAPI($"/api/transactions?settlementNumber={settlementRunNumber}"));
+            transactions = data<RapydTransactions>(await api($"/api/transactions?settlementNumber={settlementRunNumber}"));
         }
 
         internal async void GetDeductionItems(string settlementid)
         {
             var sid = "";
-            var settl = rapyd<RapydSettlements>(await RapydSagaAPI($"/api/settlements?agreementNumber={merchantID}&" +
+            var settl = data<RapydSettlements>(await api($"/api/settlements?agreementNumber={merchantID}&" +
                                         $"paidDateFrom={datefrom.ToString("yyyy-MM-ddTHH:mm:ss")}" +
                                         $"&paidDateTo={dateto.ToString("yyyy-MM-ddTHH:mm:ss")}" +
                                         $"&settlementNumber={settlementid}"));
@@ -123,9 +68,9 @@ namespace Rapyd.CreditCard.Settlement
                     break;
                 }
 
-            var hvadd = rapyd<RapydSingleSettlement>(await RapydSagaAPI($"/api/settlements/id/{sid}"));
-            if (hvadd!=null)
-                deductions = getDeductions(hvadd);
+            var h = data<RapydSingleSettlement>(await api($"/api/settlements/id/{sid}"));
+            if (h != null)
+                deductions = getDeductions(h);
         }
 
         private RapydDeductions getDeductions(RapydSingleSettlement rapydSettlement)
@@ -138,7 +83,7 @@ namespace Rapyd.CreditCard.Settlement
                 if (rapydSettlement.Settlement?.FeeAmount != 0.0)
                     items.Add(new RapydDeduction()
                     {
-                        Amount = (-1)*(decimal)rapydSettlement.Settlement.FeeAmount,
+                        Amount = (-1) * (decimal)rapydSettlement.Settlement.FeeAmount,
                         Text = "FeeAmount",
                         Code = "Fee",
                         CurrencyCode = rapydSettlement.Settlement.Currency,
@@ -147,7 +92,7 @@ namespace Rapyd.CreditCard.Settlement
                 if (rapydSettlement.Settlement?.PosFee != 0.0)
                     items.Add(new RapydDeduction()
                     {
-                        Amount = (-1)*(decimal)rapydSettlement.Settlement.PosFee,
+                        Amount = (-1) * (decimal)rapydSettlement.Settlement.PosFee,
                         Text = "PosFee",
                         Code = "Pos",
                         CurrencyCode = rapydSettlement.Settlement.Currency,
@@ -157,12 +102,6 @@ namespace Rapyd.CreditCard.Settlement
 
             t.DeductedItems = items;
             return t;
-        }
-
-        public class RapydStatusCode
-        {
-            public string Message { get; set; }
-            public int StatusCode { get; set; }
         }
 
         public class RapydDeduction

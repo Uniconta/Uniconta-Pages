@@ -20,13 +20,8 @@ using Uniconta.ClientTools.DataModel;
 using Uniconta.Common;
 using UnicontaClient.Controls;
 
-#if !SILVERLIGHT
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
-#elif SILVERLIGHT
-using UnicontaClient.Pages;
-namespace UnicontaClient.Pages.CustomPage
-#endif
 {
     /// <summary>
     /// Interaction logic for CWCreateOrderFromProject.xaml
@@ -60,24 +55,26 @@ namespace UnicontaClient.Pages.CustomPage
         public string ProjectWorkspace { get; set; }
 
         CrudAPI api;
-#if !SILVERLIGHT
         public int DialogTableId;
         protected override int DialogId { get { return DialogTableId; } }
         protected override bool ShowTableValueButton { get { return true; } }
-#endif
+
         public CWCreateOrderFromProject(CrudAPI crudApi, bool createOrder) : this(crudApi)
         {
             if (createOrder)
                 dpDate.DateTime = DateTime.MinValue;
         }
 
-        public CWCreateOrderFromProject(CrudAPI crudApi, bool createOrder, ProjectClient project, ProjectTaskClient projTask = null) : this(crudApi, createOrder)
+        public CWCreateOrderFromProject(CrudAPI crudApi, bool createOrder, ProjectClient project, ProjectTaskClient projTask = null, PrWorkSpaceClient prWorkspace = null) : this(crudApi, createOrder)
         {
             if (crudApi.CompanyEntity.ProjectTask && project != null)
             {
+                ProjectTask = projTask?._Task;
                 setTask(project, projTask);
                 lblProjTask.Visibility = leProjTask.Visibility = Visibility.Visible;
             }
+            ProjectWorkspace = prWorkspace?._Number;
+            leProjWorkspace.SelectedItem = prWorkspace;
         }
 
         public CWCreateOrderFromProject(CrudAPI crudApi)
@@ -91,9 +88,6 @@ namespace UnicontaClient.Pages.CustomPage
             leProjWorkspace.api = cmbCategory.api = crudApi;
             Loaded += CWCreateOrderFromProject_Loaded;
             SetItemSource(crudApi);
-#if SILVERLIGHT
-            Utility.SetThemeBehaviorOnChildWindow(this);
-#endif
         }
 
         private void CWCreateOrderFromProject_Loaded(object sender, RoutedEventArgs e)
@@ -120,8 +114,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 SetDialogResult(false);
             }
-            else
-                if (e.Key == Key.Enter)
+            else if (e.Key == Key.Enter)
             {
                 if (CancelButton.IsFocused)
                 {
@@ -134,7 +127,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
-            InvoiceCategory = cmbCategory.SelectedText;
+            InvoiceCategory = Uniconta.Common.Utility.Util.NotEmptyValue(cmbCategory.SelectedText);
             GenrateDate = dpDate.DateTime;
             FromDate = fromDate.DateTime;
             ToDate = toDate.DateTime;

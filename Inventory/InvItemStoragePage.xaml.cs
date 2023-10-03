@@ -35,7 +35,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         internal bool readOnly;
 
-        protected override void DataLoaded(UnicontaBaseEntity[] Arr) 
+        protected override void DataLoaded(UnicontaBaseEntity[] Arr)
         {
             InvItemStorageClient.UpdateOnHand((IEnumerable<InvItemStorage>)Arr, api);
         }
@@ -76,6 +76,16 @@ namespace UnicontaClient.Pages.CustomPage
             bool showFields = (this.syncEntity == null);
             Item.Visible = showFields;
             ItemName.Visible = showFields;
+
+            if (!api.CompanyEntity.Location || !api.CompanyEntity.Warehouse)
+                Location.Visible = Location.ShowInColumnChooser = false;
+            else
+                Location.ShowInColumnChooser = true;
+            if (!api.CompanyEntity.Warehouse)
+                Warehouse.Visible = Warehouse.ShowInColumnChooser = false;
+            else
+                Warehouse.ShowInColumnChooser = true;
+
         }
 
         Uniconta.DataModel.InvItem lastItem;
@@ -140,12 +150,13 @@ namespace UnicontaClient.Pages.CustomPage
             if (sourcedata != null)
             {
                 dgInvItemStorageClientGrid.UpdateMaster(sourcedata);
-                dgInvItemStorageClientGrid.readOnly = ! (sourcedata is InvItem);
+                dgInvItemStorageClientGrid.readOnly = !(sourcedata is InvItem);
             }
             else
                 dgInvItemStorageClientGrid.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;
             this.items = api.GetCache(typeof(InvItem));
-            this.warehouse = api.GetCache(typeof(InvWarehouse));
+            if (api.CompanyEntity.Location)
+                this.warehouse = api.GetCache(typeof(InvWarehouse));
 
             RibbonBase rb = (RibbonBase)localMenu.DataContext;
             if (sourcedata == null)

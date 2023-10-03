@@ -185,7 +185,7 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     fromDate = fromDate.AddMonths(-1);
                     toDate = toDate.AddMonths(-1);
-                } while (toDate >  _fromDate);
+                } while (toDate > _fromDate);
             }
 
             var lin = dgVatReport.SelectedItem as VatReportLine;
@@ -286,23 +286,35 @@ namespace UnicontaClient.Pages.CustomPage
                     LoadVatReport();
                     break;
                 case "Save":
-                    if (master == null || master._MaxJournalPostedId == 0)
-                    {
-                        if (UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("SaveOBJ"), Uniconta.ClientTools.Localization.lookup("VATsettlements")),
-                            Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.YesNo, MessageBoxImage.Question)
-                            == MessageBoxResult.Yes)
-                        {
-                            if (master == null)
-                                master = new GLVatReportedClient();
-                            master._FromDate = txtDateFrm.DateTime;
-                            master._ToDate = txtDateTo.DateTime;
-                            save();
-                        }
-                    }
+                    SaveVatReport();
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
+            }
+        }
+
+        private void SaveVatReport()
+        {
+            if (master == null || master._MaxJournalPostedId == 0)
+            {
+                var cwTypeConfirmationBox = new CWTypeConfirmationBox(string.Format(Uniconta.ClientTools.Localization.lookup("SaveOBJ") + "?", Uniconta.ClientTools.Localization.lookup("VATsettlements")));
+                cwTypeConfirmationBox.Closed += CwTypeConfirmationBox_Closed;
+                cwTypeConfirmationBox.Show();
+            }
+        }
+
+        private void CwTypeConfirmationBox_Closed(object sender, EventArgs e)
+        {
+            var cwTypeConfirmationBox = sender as CWTypeConfirmationBox;
+            if (cwTypeConfirmationBox != null && cwTypeConfirmationBox.DialogResult == true)
+            {
+                if (master == null)
+                    master = new GLVatReportedClient();
+                master._FromDate = txtDateFrm.DateTime;
+                master._ToDate = txtDateTo.DateTime;
+                master._Comment = cwTypeConfirmationBox.ConfirmationComment;
+                save();
             }
         }
 
@@ -313,7 +325,7 @@ namespace UnicontaClient.Pages.CustomPage
             var OtherTaxName = new string[10];
 
             VatSumOperationReport.SumArray(vatArray1, this.sumPeriod, OtherTaxName);
-            VatSumOperationReport.SumArray(vatArray2, this.sumPrevPeriod, OtherTaxName);
+            VatSumOperationReport.SumArray(vatArray2, this.sumPrevPeriod, null);
             GLVatReported rec = master;
             if (rec != null)
             {
@@ -387,7 +399,7 @@ namespace UnicontaClient.Pages.CustomPage
                 return;
             }
 
-            if (! PrevPeriod)
+            if (!PrevPeriod)
             {
                 this.sumPeriod = calc.sumPeriod;
                 this.lstPeriod = calc.lst;
@@ -909,7 +921,7 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                 }
 
-                if (country == CountryCode.Denmark)
+                if (country == CountryCode.Denmark && !this.PrevPeriod)
                 {
                     if (AccLst != null)
                         AccLst.Clear();
@@ -934,7 +946,7 @@ namespace UnicontaClient.Pages.CustomPage
                         }
                         if (acc._SystemAccount >= (byte)SystemAccountTypes.OilDuty && acc._SystemAccount <= (byte)SystemAccountTypes.WaterDuty)
                             AccLst.Add(acc.RowId);
-                     }
+                    }
 
                     if (AccLst != null && AccLst.Count > 0)
                     {

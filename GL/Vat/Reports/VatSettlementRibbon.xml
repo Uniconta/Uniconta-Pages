@@ -6,7 +6,7 @@
     <RibbonItem Action="DeleteRow" ShortcutKey="" LocalizedNameKey="Delete" LargeGlyph="Delete_32x32"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="VatReport" LocalizedNameKey="VatReport" LargeGlyph="VAT_32x32" ShortcutKey="Ctrl+G"/>
+    <RibbonItem Action="VatReport" LocalizedNameKey="VATspecification" LargeGlyph="VAT_32x32" ShortcutKey="Ctrl+G"/>
     <RibbonItem Action="Upload" LocalizedNameKey="ReportTo" LargeGlyph="Move_32x32" ShortcutKey=""/>
     <RibbonItem Action="View" ShortcutKey="Alt+P" LocalizedNameKey="PhysicalVoucher" LargeGlyph="View_Voucher_32x32" />
   </RibbonItem>

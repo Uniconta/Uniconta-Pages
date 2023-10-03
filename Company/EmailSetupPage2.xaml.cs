@@ -386,7 +386,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (app == null)
             {
                 app = PublicClientApplicationBuilder.Create(clientId)
-            .WithRedirectUri("http://localhost:65419")
+            .WithRedirectUri("https://www.uniconta.com/microsoft-graph-connected")
             .Build();
             }
             var account = await AcquireTokenInteractive(isAdmin).ConfigureAwait(false);

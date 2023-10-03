@@ -5,12 +5,12 @@
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="VatReportSpain" LocalizedNameKey="Modelo 303" LargeGlyph="Show_Invoice_32x32" ShortcutKey="Ctrl+G"/>
-    <RibbonItem Action="VatReportNorway" LocalizedNameKey="Mva skattemeldingen" LargeGlyph="Add_Menu_32x32"/>
-    <RibbonItem Action="VatReportDenmark" LocalizedNameKey="Momsopgørelse" LargeGlyph="Show_Invoice_32x32" ShortcutKey="Ctrl+G"/>
-    <RibbonItem Action="VatReportHolland" LocalizedNameKey="BTW Aangifte" LargeGlyph="Show_Invoice_32x32" ShortcutKey="Ctrl+G"/>
-    <RibbonItem Action="VatReportEstonia" LocalizedNameKey="KM avaldus" LargeGlyph="Show_Invoice_32x32" ShortcutKey="Ctrl+G"/>
-    <RibbonItem Action="VatReportIceland" LocalizedNameKey="VSK skýrsla" LargeGlyph="Show_Invoice_32x32" ShortcutKey="Ctrl+G"/>
-    <RibbonItem Action="UKVatReturn" LocalizedNameKey="UKVatReturn" LargeGlyph="VAT_32x32" />
+    <RibbonItem Action="VatReportNorway" LocalizedNameKey="VatDeclaration" LargeGlyph="Add_Menu_32x32"/>
+    <RibbonItem Action="VatReportDenmark" LocalizedNameKey="VatDeclaration" LargeGlyph="Show_Invoice_32x32" ShortcutKey="Ctrl+G"/>
+    <RibbonItem Action="VatReportHolland" LocalizedNameKey="VatDeclaration" LargeGlyph="Show_Invoice_32x32" ShortcutKey="Ctrl+G"/>
+    <RibbonItem Action="VatReportEstonia" LocalizedNameKey="VatDeclaration" LargeGlyph="Show_Invoice_32x32" ShortcutKey="Ctrl+G"/>
+    <RibbonItem Action="VatReportIceland" LocalizedNameKey="VatDeclaration" LargeGlyph="Show_Invoice_32x32" ShortcutKey="Ctrl+G"/>
+    <RibbonItem Action="UKVatReturn" LocalizedNameKey="VatDeclaration" LargeGlyph="VAT_32x32" />
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="Save" ShortcutKey="CTRL+S" LocalizedNameKey="SaveOBJ" Parameter="VATSettlement" Glyph="save-16x16" LargeGlyph="save-32x32"/>

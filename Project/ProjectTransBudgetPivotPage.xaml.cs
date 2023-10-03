@@ -549,7 +549,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 int end;
                 string ProjectNumber;
-                if (master == null)
+                if (master == null || master is Uniconta.DataModel.Employee)
                 {
                     ProjectNumber = trans[start]._Project;
                     for (end = start; (end < len && trans[end]._Project == ProjectNumber); end++)

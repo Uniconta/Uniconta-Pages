@@ -27,6 +27,6 @@
     <RibbonItem Action="AllowedIPAdresses" LocalizedNameKey="AllowedIPAdresses" LargeGlyph="Account-statement_32x32"/>
   </RibbonItem>
 	<RibbonItem>
-		<RibbonItem Action="RegisterEdelivery" LocalizedNameKey="RegisterEdelivery" LargeGlyph="Bank_Connect_32x32"/>
+		<RibbonItem Action="RegisterEdelivery" LocalizedNameKey="RegisterEdelivery" LargeGlyph="Nemhandel_Connect_32x32"/>
 	</RibbonItem>
 </root>

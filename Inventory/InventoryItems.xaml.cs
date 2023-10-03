@@ -337,7 +337,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "InvReservation":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.InventoryReservationReport, dgInventoryItemsGrid.syncEntity, Uniconta.ClientTools.Localization.lookup("Reservations"));
+                        AddDockItem(TabControls.InventoryReservationReport, dgInventoryItemsGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Reservations"), selectedItem._Item));
                     break;
                 case "CopyRecord":
                     CopyRecord(selectedItem);

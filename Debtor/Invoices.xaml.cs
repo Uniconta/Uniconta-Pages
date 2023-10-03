@@ -636,7 +636,7 @@ namespace UnicontaClient.Pages.CustomPage
             var listOfXmlPath = new List<string>();
             int countErr = 0;
             bool hasUserFolder = false;
-            DevExpress.Xpf.Dialogs.DXSaveFileDialog saveDialog = null;
+            Microsoft.Win32.SaveFileDialog saveDialog = null;
             DevExpress.Xpf.Dialogs.DXFolderBrowserDialog folderBrowserDialog = null;
             InvoiceAPI Invapi = new InvoiceAPI(api);
             var cnt = lstInvClient.Count();
@@ -894,8 +894,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                     busyIndicator.IsBusy = false;
                     if (errors.Count == 0)
-                        UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("SendEmailMsgOBJ"), icount == 1 ? Uniconta.ClientTools.Localization.lookup("Invoice") :
-                            Uniconta.ClientTools.Localization.lookup("Invoices")), Uniconta.ClientTools.Localization.lookup("Message"));
+                        UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("OIOSent"), Uniconta.ClientTools.Localization.lookup("Message"));
                     else
                     {
                         CWErrorBox errorDialog = new CWErrorBox(errors.ToArray(), true);

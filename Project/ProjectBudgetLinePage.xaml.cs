@@ -6,23 +6,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
-
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
 using Uniconta.ClientTools.Controls;
 using Uniconta.DataModel;
 using System.Windows.Threading;
 using System.Threading;
 using UnicontaClient.Utilities;
 using System.Windows;
-using UnicontaClient.Pages.GL.ChartOfAccount.Reports;
-using Uniconta.API.GeneralLedger;
 using Uniconta.ClientTools;
 using DevExpress.Xpf.Grid;
 using DevExpress.Data;
@@ -128,8 +118,7 @@ namespace UnicontaClient.Pages.CustomPage
                 ProjectBudgetLineLocal Cur = null;
                 int n = -1;
                 DateTime LastDateTime = DateTime.MinValue;
-                var castItem = lst.Cast<ProjectBudgetLineLocal>();
-                foreach (var journalLine in castItem)
+                foreach (var journalLine in (IEnumerable<ProjectBudgetLineLocal>) lst)
                 {
                     if (journalLine._Date != DateTime.MinValue && Cur == null)
                         LastDateTime = journalLine._Date;
@@ -138,8 +127,6 @@ namespace UnicontaClient.Pages.CustomPage
                         Cur = journalLine;
                     last = journalLine;
                 }
-                if (Cur == null)
-                    Cur = last;
 
                 newRow._Date = LastDateTime != DateTime.MinValue ? LastDateTime : BasePage.GetSystemDefaultDate().Date;
                 newRow._Project = last._Project;
@@ -250,7 +237,6 @@ namespace UnicontaClient.Pages.CustomPage
             if (Comp.Payroll)
                 PayrollCache = Comp.GetCache(typeof(Uniconta.DataModel.EmpPayrollCategory)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.EmpPayrollCategory), api).ConfigureAwait(false);
             ItemCache = Comp.GetCache(typeof(Uniconta.DataModel.InvItem)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.InvItem), api).ConfigureAwait(false);
-            var Debtors = Comp.GetCache(typeof(Uniconta.DataModel.Debtor)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.Debtor), api).ConfigureAwait(false);
             LoadType(typeof(Uniconta.DataModel.PrCategory));
 
             var master = dgProjectBudgetLinePageGrid.masterRecord;
@@ -701,7 +687,7 @@ namespace UnicontaClient.Pages.CustomPage
                             dgProjectBudgetLinePageGrid.DeleteRow();
                             dgProjectBudgetLinePageGrid.isDefaultFirstRow = false;
                         }
-                        var lst = param[0] as List<UnicontaBaseEntity>;
+                        var lst = param[0] as IEnumerable<UnicontaBaseEntity>;
                         if (dgProjectBudgetLinePageGrid.PasteRows(lst))
                         {
                             foreach (var r in lst)

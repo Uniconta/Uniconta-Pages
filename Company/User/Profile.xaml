@@ -35,6 +35,9 @@ x:Class="UnicontaClient.Pages.CustomPage.Profile"
                     <CorasauControls:CorasauLayoutItem FieldName="LoginId" x:Name="liLoginId">
                         <CorasauControls:TextEditor Text="{Binding LoginId,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Userid" x:Name="liUserid">
+                        <CorasauControls:TextEditor Text="{Binding Userid,Mode=OneWay}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="Email" x:Name="liEmail" Style="{StaticResource LayoutItemsstyle}" ButtonClicked="Email_ButtonClicked" ButtonContent="&#x2709;" Padding="0">
                         <CorasauControls:TextEditor x:Name="txtEmail" Text="{Binding Email,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>

@@ -2,17 +2,8 @@ using DevExpress.Data;
 using DevExpress.Xpf.Grid;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using Uniconta.ClientTools;
 using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.DataModel;
@@ -27,7 +18,9 @@ namespace UnicontaClient.Pages.CustomPage
     public partial class RemainingBudgetLine : GridBasePage
     {
         SQLCache ProjectCache, EmployeeCache, ItemCache, PayrollCache, BudgetGroupCache;
-
+        ItemBase iCurrentEmployee, iAllTransaction;
+        PropValuePair qtyFilter, employeeFilter, allTransactionDateFilter;
+        UnicontaBaseEntity _master;
         public RemainingBudgetLine(UnicontaBaseEntity master) : base(master)
         {
             InitializeComponent();
@@ -42,16 +35,19 @@ namespace UnicontaClient.Pages.CustomPage
 
         void InitPage(UnicontaBaseEntity master)
         {
+            _master = master;
             localMenu.dataGrid = dgProjectBgtPlangLine;
             dgProjectBgtPlangLine.api = api;
             SetRibbonControl(localMenu, dgProjectBgtPlangLine);
             dgProjectBgtPlangLine.UpdateMaster(master);
             dgProjectBgtPlangLine.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
+            localMenu.OnChecked += LocalMenu_OnChecked;
             dgProjectBgtPlangLine.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;
             dgProjectBgtPlangLine.ShowTotalSummary();
             dgProjectBgtPlangLine.CustomSummary += dgProjectBudgetLinePageGrid_CustomSummary;
             dgProjectBgtPlangLine.tableView.ShowGroupFooters = true;
+            CreateFilters();
 
             var Comp = api.CompanyEntity;
             ProjectCache = Comp.GetCache(typeof(Uniconta.DataModel.Project));
@@ -59,6 +55,22 @@ namespace UnicontaClient.Pages.CustomPage
             ItemCache = Comp.GetCache(typeof(Uniconta.DataModel.InvItem));
             PayrollCache = Comp.GetCache(typeof(Uniconta.DataModel.EmpPayrollCategory));
             BudgetGroupCache = Comp.GetCache(typeof(Uniconta.DataModel.ProjectBudgetGroup));
+        }
+
+
+        void CreateFilters()
+        {
+            RibbonBase rb = (RibbonBase)localMenu.DataContext;
+            iCurrentEmployee = UtilDisplay.GetMenuCommandByName(rb, "CurrentEmployee");
+            iCurrentEmployee.IsChecked = true;
+            iAllTransaction = UtilDisplay.GetMenuCommandByName(rb, "AllTransactions");
+            iAllTransaction.IsChecked = false;
+            qtyFilter = PropValuePair.GenereteWhereElements("Qty", 0, CompareOperator.NotEqual);
+            employeeFilter = PropValuePair.GenereteWhereElements("Employee", ((Project.TimeManagement.TMJournalLineHelper.TMJournalLineClientLocal)_master).Employee, CompareOperator.Equal);
+            var date = DateTime.Now.AddMonths(-1);
+            var startDate = new DateTime(date.Year, date.Month, 1);
+            var enddate = startDate.AddMonths(3).AddDays(-1);
+            allTransactionDateFilter = PropValuePair.GenereteWhereElements("Date", typeof(DateTime), string.Format("{0}..{1}", startDate.ToShortDateString(), enddate.ToShortDateString()));
         }
 
         protected override void SyncEntityMasterRowChanged(UnicontaBaseEntity args)
@@ -105,6 +117,28 @@ namespace UnicontaClient.Pages.CustomPage
             }
             else
                 Task.ShowInColumnChooser = true;
+        }
+
+        async public override Task InitQuery()
+        {
+            List<PropValuePair> filters = new List<PropValuePair>() { qtyFilter };
+
+            if (iCurrentEmployee.IsChecked)
+                filters.Add(employeeFilter);
+            else
+                filters.Remove(employeeFilter);
+
+            if (!iAllTransaction.IsChecked)
+                filters.Add(allTransactionDateFilter);
+            else
+                filters.Remove(allTransactionDateFilter);
+
+            await Filter(filters);
+        }
+
+        private Task Filter(IEnumerable<PropValuePair> propValuePair)
+        {
+            return dgProjectBgtPlangLine.Filter(propValuePair);
         }
 
         private void SelectedItem_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -333,7 +367,15 @@ namespace UnicontaClient.Pages.CustomPage
             switch (ActionType)
             {
                 case "AddRow":
-                    dgProjectBgtPlangLine.AddRow();
+                    var addedRow = dgProjectBgtPlangLine.AddRow() as ProjectBudgetLineLocal;
+                    if (_master is Project.TimeManagement.TMJournalLineHelper.TMJournalLineClientLocal tMJournalLineClient)
+                    {
+                        addedRow.Date = tMJournalLineClient.Date;
+                        addedRow.Project = tMJournalLineClient.Project;
+                        addedRow.Task = tMJournalLineClient.Task;
+                        addedRow.Employee = tMJournalLineClient.Employee;
+                        addedRow.WorkSpace = tMJournalLineClient.WorkSpace;
+                    }
                     break;
                 case "CopyRow":
                     dgProjectBgtPlangLine.CopyRow();
@@ -347,11 +389,29 @@ namespace UnicontaClient.Pages.CustomPage
                         dgProjectBgtPlangLine.DeleteRow();
                     }
                     break;
+                case "RefreshGrid":
+                    InitQuery();
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
         }
+
+        private void LocalMenu_OnChecked(string ActionType, bool IsChecked)
+        {
+            switch (ActionType)
+            {
+                case "CurrentEmployee":
+                case "AllTransactions":
+                    InitQuery();
+                    break;
+                default:
+                    gridRibbon_BaseActions(ActionType);
+                    break;
+            }
+        }
+
 
         private void Task_GotFocus(object sender, RoutedEventArgs e)
         {

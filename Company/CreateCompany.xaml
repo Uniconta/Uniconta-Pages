@@ -168,6 +168,9 @@ x:Class="UnicontaClient.Pages.CustomPage.CreateCompany"
                             <CorasauControls:CorasauLayoutItem x:Name="liExcelFile" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadFile}" LabelVerticalAlignment="Top" Style="{StaticResource LayoutItemsstyle}" ButtonClicked="ExcelFileBrowse_ButtonClicked" ButtonContent="&#128194;" Padding="0" Visibility="Collapsed">
                                 <CorasauControls:TextEditor x:Name="txtImportFromFile" />
                             </CorasauControls:CorasauLayoutItem>
+                            <CorasauControls:CorasauLayoutItem x:Name="liAuthrizeDinero" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Connect}" LabelVerticalAlignment="Top" Style="{StaticResource LayoutItemsstyle}" ButtonClicked="liAuthrizeDinero_ButtonClicked" ButtonContent="&#9919;" Padding="0" Visibility="Collapsed">
+                                <CorasauControls:TextEditor x:Name="txtDinero" IsReadOnly="True" ShowBorder="False" />
+                            </CorasauControls:CorasauLayoutItem>
                         </CorasauControls:CorasauLayoutGroup>
 
                         <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpCopySetup" ItemLabelsAlignment="Default" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CopySetup}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">

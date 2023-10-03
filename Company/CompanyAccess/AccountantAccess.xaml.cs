@@ -71,8 +71,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private async void BindAccountant(CrudAPI api, AccountantClient currentAccountant)
         {
-            var acctant = await api.Query<AccountantClient>();
-            cbAccountant.ItemsSource = acctant;
+            cbAccountant.ItemsSource = await new Corasau.API.Admin.UserAPI(api).GetPartners(new AccountantClient(), api.CompanyEntity._CountryId);
             grdAcctantDetail.DataContext = currentAccountant;
             if (currentAccountant != null)
                 cbAccountant.SelectedItem = currentAccountant;
@@ -126,8 +125,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void cbAccountant_SelectedIndexChanged(object sender, RoutedEventArgs e)
         {
-            var accountant = cbAccountant.SelectedItem as AccountantClient;
-            grdAcctantDetail.DataContext = accountant;
+            grdAcctantDetail.DataContext = cbAccountant.SelectedItem as AccountantClient;
         }
     }
 }

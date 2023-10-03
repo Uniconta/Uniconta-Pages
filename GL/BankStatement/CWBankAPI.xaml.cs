@@ -99,9 +99,17 @@ namespace UnicontaClient.Pages.CustomPage
             cmbBankAPIFunction.ItemsSource = new string[] { Uniconta.ClientTools.Localization.lookup("Register"), Uniconta.ClientTools.Localization.lookup("Connect"), Uniconta.ClientTools.Localization.lookup("Unregister"),
                                                             Uniconta.ClientTools.Localization.lookup("Sync"), string.Concat(Uniconta.ClientTools.Localization.lookup("Download"), " ", Uniconta.ClientTools.Localization.lookup("Transactions").ToLower()),
                                                             Uniconta.ClientTools.Localization.lookup("WebServiceInfo"), Uniconta.ClientTools.Localization.lookup("Settings") };
-            //TODO:Udvid label vedr. SYNC
-            cmbBankAPIFunction.SelectedIndex = Type;
-            cmbBank.SelectedIndex = 0;
+
+            if (bankStatement._Status == 2)
+            {
+                BankService = 0;
+                Type = 3;
+            }
+            else
+            {
+                cmbBankAPIFunction.SelectedIndex = Type;
+                cmbBank.SelectedIndex = 0;
+            }
 
             FromDate = FromDate != DateTime.MinValue ? FromDate : BasePage.GetSystemDefaultDate();
             ToDate = ToDate != DateTime.MinValue ? ToDate : BasePage.GetSystemDefaultDate();
@@ -164,7 +172,10 @@ namespace UnicontaClient.Pages.CustomPage
                     txtDescription.Text = string.Concat(Uniconta.ClientTools.Localization.lookup("Unregister"), " ", Uniconta.ClientTools.Localization.lookup("Connection").ToLower());
                     break;
                 case 3: //Sync
-                    txtDescription.Text = BankService == 0 ? Uniconta.ClientTools.Localization.lookup("SynchronizeAiiaWithBank") : Uniconta.ClientTools.Localization.lookup("FunctionNotSupported");
+                    txtDescription.Text = BankService == 0 ?
+                        StringBuilderReuse.Create().Append(Uniconta.ClientTools.Localization.lookup("SynchronizeAiiaWithBank")).AppendLine().AppendLine()
+                            .Append(Uniconta.ClientTools.Localization.lookup("AiiaDialogSync1")).AppendLine(":")
+                            .Append("- ").AppendLine(Uniconta.ClientTools.Localization.lookup("AiiaDialogSync2")).ToStringAndRelease() : Uniconta.ClientTools.Localization.lookup("FunctionNotSupported");
                     break;
                 case 4: //OnDemand
                     txtDescription.Text = BankService == 0 ? Uniconta.ClientTools.Localization.lookup("RetrieveBankTransPeriod") : Uniconta.ClientTools.Localization.lookup("FunctionNotSupported");

@@ -701,7 +701,7 @@ namespace UnicontaClient.Pages.CustomPage
                     row.Voucher = LastVoucher;
             }
         }
-      
+
         private void localMenu_OnItemClicked(string ActionType)
         {
             var selectedItem = dgGLDailyJournalLine.SelectedItem as JournalLineGridClient;
@@ -758,7 +758,7 @@ namespace UnicontaClient.Pages.CustomPage
                         foreach (var journalLine in source)
                             if (journalLine._DocumentRef != 0)
                                 _refferedVouchers.Add(journalLine._DocumentRef);
-                     
+
                         AddDockItem(TabControls.AttachVoucherGridPage, new object[] { _refferedVouchers }, true);
                     }
                     break;
@@ -876,6 +876,16 @@ namespace UnicontaClient.Pages.CustomPage
                         }
                     };
                     exchangeDialog.Show();
+                    break;
+                case "MatchLines":
+                    saveGrid();
+                    var visibleRows = dgGLDailyJournalLine.GetVisibleRows() as IEnumerable<JournalLineGridClient>;
+                    string header = string.Format("{0}:{1},{2}", Uniconta.ClientTools.Localization.lookup("MatchLines"), masterRecord.KeyStr, masterRecord.KeyName);
+                    if (visibleRows.Count() > 0)
+                    {
+                        var page = dockCtrl.AddDockItem(TabControls.MatchPhysicalVoucherToGLDailyJournalLines, ParentControl, masterRecord, header) as MatchPhysicalVoucherToGLDailyJournalLines;
+                        page.JournalLines = visibleRows;
+                    }
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);

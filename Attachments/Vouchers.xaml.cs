@@ -424,17 +424,35 @@ namespace UnicontaClient.Pages.CustomPage
             if (e.NewItem != null)
             {
                 var filterItem = e.NewItem as AccordionFilterItem;
+                var currentFilterString = dgVoucherGrid.FilterString;
 
                 if (!string.IsNullOrEmpty(filterItem.FilterString))
                 {
-                    var currentFilterString = dgVoucherGrid.FilterString;
                     if (string.IsNullOrEmpty(currentFilterString))
                         dgVoucherGrid.FilterString = filterItem.FilterString;
                     else if (currentFilterString.Contains("[ViewInFolder]"))
-                        dgVoucherGrid.FilterString = currentFilterString.Replace(GetViewInFolderCurrentFilterValue(currentFilterString), 
+                        dgVoucherGrid.FilterString = currentFilterString.Replace(GetViewInFolderCurrentFilterValue(currentFilterString),
                             GetViewInFolderCurrentFilterValue(filterItem.FilterString));
                     else
                         dgVoucherGrid.FilterString = string.Format("{0} And {1}", filterItem.FilterString, currentFilterString);
+                }
+                else
+                {
+                    if (!string.IsNullOrEmpty(currentFilterString))
+                    {
+                        string filterStr = string.Empty;
+                        if (currentFilterString.Contains(" And "))
+                        {
+                            var andFilters = currentFilterString.Split(new string[] { "And" }, StringSplitOptions.None);
+                            filterStr = string.Join(" And ", andFilters.Where(x => !x.Contains("[ViewInFolder]")));
+                        }
+                        else if (currentFilterString.Contains(" Or "))
+                        {
+                            var orFilters = currentFilterString.Split(new string[] { "Or" }, StringSplitOptions.None);
+                            filterStr = string.Join(" Or ", orFilters.Where(x => !x.Contains("[ViewInFolder]")));
+                        }
+                        dgVoucherGrid.FilterString = filterStr;
+                    }
                 }
             }
         }
@@ -741,7 +759,8 @@ namespace UnicontaClient.Pages.CustomPage
                             {
                                 task = postingApi.GenerateJournalFromDocument(journalName, journalDate, journals.IsCreditAmount, OnlyApproved, journals.AddVoucherNumber);
                                 foreach (var doc in lst)
-                                    doc.InJournal = true;
+                                    if (!doc._OnHold)
+                                        doc.InJournal = true;
                             }
                             else
                             {
@@ -951,12 +970,51 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null && !selectedItem.Envelope)
                         CopyRecord(selectedItem);
                     break;
+                case "Attach":
+                    if (selectedItem != null)
+                    {
+                        var transDialog = new CWSearchGLTrans(api);
+                        transDialog.Closed += delegate
+                        {
+                            if (transDialog.DialogResult == true)
+                            {
+                                if (transDialog.SelectedRow != null)
+                                    SaveAttachment(transDialog.SelectedRow, selectedItem);
+                            }
+                        };
+                        transDialog.Show();
+                    }
+                    break;
+
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
         }
-
+        void SaveAttachment(GLTransClient selectedItem, VouchersClient doc)
+        {
+            if (selectedItem != null && doc != null)
+            {
+                CWForAllTrans cwconfirm = new CWForAllTrans();
+                cwconfirm.Closing += async delegate
+                {
+                    if (cwconfirm.DialogResult == true)
+                    {
+                        if (selectedItem._DocumentRef != 0)
+                            VoucherCache.RemoveGlobalVoucherCache(selectedItem.CompanyId, selectedItem._DocumentRef);
+                        busyIndicator.IsBusy = true;
+                        var postingApiInv = new PostingAPI(api);
+                        var errorCodes = await postingApiInv.AddPhysicalVoucher(selectedItem, doc, cwconfirm.ForAllTransactions, cwconfirm.AppendDoc);
+                        busyIndicator.IsBusy = false;
+                        if (errorCodes == ErrorCodes.Succes)
+                            dgVoucherGrid.RemoveFocusedRowFromGrid();
+                        else
+                            UtilDisplay.ShowErrorCode(errorCodes);
+                    }
+                };
+                cwconfirm.Show();
+            }
+        }
         async void CopyRecord(VouchersClient selectedItem)
         {
             if (selectedItem._Data == null)

@@ -23,7 +23,6 @@
 		</RibbonItem>
 	</RibbonItem>
 	<RibbonItem>
-		<RibbonItem LocalizedNameKey="ShowInvoice" Action="ShowInvoice" LargeGlyph="Show_Invoice_32x32" ShortcutKey="F7" />
 		<RibbonItem Action="BudgetLines" LocalizedNameKey="Lines" Glyph="Add_16x16" LargeGlyph="Order_Lines_Highlighted_32x32" ShortcutKey="ALT+L"/>
 		<RibbonItem Action="Estimation" LocalizedNameKey="Estimation" LargeGlyph="Calculator_32x32"/>
 		<RibbonItem Action="ItemCoverage" LocalizedNameKey="ItemCoverage" LargeGlyph="Budget_32x32" />

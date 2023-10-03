@@ -814,7 +814,7 @@ namespace UnicontaClient.Pages.CustomPage
                                         IsDashBoardTableTYpe = true;
                                     }
                                 }
-                                var masterRecords = GetMasterRecords(typeofTable);
+                                var masterRecords = GetMasterRecordsAndFilters(typeofTable, out PropValuePair propValuePair);
                                 var type = !IsDashBoardTableTYpe ? typeofTable : dashbaordTableType;
 
                                 if (lstOfNewFilters.ContainsKey(DataSourceComponentName))
@@ -832,6 +832,16 @@ namespace UnicontaClient.Pages.CustomPage
                                 }
                                 else
                                     filterValues = null;
+
+                                if (propValuePair != null)
+                                {
+                                    var propLst = new List<PropValuePair>(1) { propValuePair };
+                                    if (filterValues != null)
+                                        filterValues.Union(propLst);
+                                    else
+                                        filterValues = propLst;
+                                }
+
                                 CrudAPI compApi = null;
                                 if (fixedComp == null || this.company.CompanyId == fixedComp.CompanyId)
                                     data = Query(type, api, masterRecords, filterValues).GetAwaiter().GetResult();
@@ -897,15 +907,25 @@ namespace UnicontaClient.Pages.CustomPage
             });
         }
 
-        List<UnicontaBaseEntity> GetMasterRecords(Type TableTYpe)
+        List<UnicontaBaseEntity> GetMasterRecordsAndFilters(Type TableTYpe, out PropValuePair propValuePair)
         {
+            propValuePair = null;
+
             if (master == null || masterField == null)
                 return null;
+
             List<UnicontaBaseEntity> masters = null;
-            var instance = Activator.CreateInstance(TableTYpe) as UnicontaBaseEntity;
             PropertyInfo p = TableTYpe.GetProperty(masterField);
+
             if (p != null)
+            {
+                var filterValue = master.GetType().GetProperty(masterField).GetValue(master, null);
+
+                if (filterValue != null)
+                    propValuePair = PropValuePair.GenereteWhereElements(masterField, p.PropertyType, filterValue.ToString());
+
                 masters = new List<UnicontaBaseEntity>() { master };
+            }
             return masters;
         }
 

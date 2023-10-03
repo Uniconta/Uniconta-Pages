@@ -55,6 +55,12 @@ namespace UnicontaClient.Pages.CustomPage
         public static string PrWorkSpace { get; set; }
 
         [InputFieldData]
+        [ForeignKeyAttribute(ForeignKeyTable = typeof(Uniconta.DataModel.PrWorkSpace))]
+        [Display(Name = "WorkSpace", ResourceType = typeof(InputFieldDataText))]
+        public static string PrWorkSpaceNew { get; set; }
+
+
+        [InputFieldData]
         [Display(Name = "DeleteBudget", ResourceType = typeof(InputFieldDataText))]
         public bool DeleteBudget { get; set; }
 
@@ -92,10 +98,12 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 case 0:
                     Width = 425;
-                    Height = 540;
+                    Height = 550;
                     this.Title = Uniconta.ClientTools.Localization.lookup("CreateBudgetRealized");
                     txtName.Visibility = Visibility.Visible;
                     lblTxtName.Visibility = txtName.Visibility;
+                    leWorkspaceNew.Visibility = Visibility.Visible;
+                    lblWorkspaceNew.Visibility = Visibility.Visible;
                     break;
                 case 1:
                     Width = 400;
@@ -111,10 +119,12 @@ namespace UnicontaClient.Pages.CustomPage
                     deleteBudget.Visibility = Visibility.Collapsed;
                     cmbBudgetMethod.Visibility = Visibility.Collapsed;
                     lblBudgetMethod.Visibility = Visibility.Collapsed;
+                    leWorkspaceNew.Visibility = Visibility.Collapsed;
+                    lblWorkspaceNew.Visibility = Visibility.Collapsed;
                     break;
             }
 
-            leGroup.api = leEmp.api = lePayroll.api = lePrCategory.api = leWorkspace.api = crudApi;
+            leGroup.api = leEmp.api = lePayroll.api = lePrCategory.api = leWorkspace.api = leWorkspaceNew.api = crudApi;
             cmbBudgetMethod.ItemsSource = new string[] { Uniconta.ClientTools.Localization.lookup("MonthView"), Uniconta.ClientTools.Localization.lookup("WeekView"), Uniconta.ClientTools.Localization.lookup("DayView") };
             cmbBudgetMethod.SelectedIndex = BudgetMethod;
 

@@ -69,13 +69,14 @@ namespace UnicontaClient.Pages.CustomPage
         protected override int DialogId { get { return DialogTableId; } }
         protected override bool ShowTableValueButton { get { return true; } }
 
-        public CwCreateZeroInvoice(CrudAPI crudApi, ProjectClient project) : this(crudApi)
+        public CwCreateZeroInvoice(CrudAPI crudApi, ProjectClient project, PrWorkSpaceClient prWorkspace = null) : this(crudApi)
         {
             if (crudApi.CompanyEntity.ProjectTask && project != null)
             {
                 setTask(project);
                 lblProjTask.Visibility = leProjTask.Visibility = Visibility.Visible;
             }
+            leProjWorkspace.SelectedItem = prWorkspace;
         }
         public CwCreateZeroInvoice(CrudAPI crudApi)
         {

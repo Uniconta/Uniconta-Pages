@@ -141,6 +141,19 @@ namespace UnicontaClient.Pages.CustomPage
             dgInvReservationReportGrid.SelectedItem = null;
         }
 
+        protected override void OnLayoutLoaded()
+        {
+            base.OnLayoutLoaded();
+
+            if (!api.CompanyEntity.Location || !api.CompanyEntity.Warehouse)
+                Location.Visible = Location.ShowInColumnChooser = false;
+            else
+                Location.ShowInColumnChooser = true;
+            if (!api.CompanyEntity.Warehouse)
+                Warehouse.Visible = Warehouse.ShowInColumnChooser = false;
+            else
+                Warehouse.ShowInColumnChooser = true;
+        }
         private Task Filter(IEnumerable<PropValuePair> propValuePair)
         {
             return dgInvReservationReportGrid.Filter(propValuePair);

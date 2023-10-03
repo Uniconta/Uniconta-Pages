@@ -8,6 +8,9 @@
 		<RibbonItem Action="SaveGrid" ShortcutKey="CTRL+S" LocalizedNameKey="Save" Glyph="save-16x16" LargeGlyph="save-32x32"/>
 	</RibbonItem>
 	<RibbonItem>
+		<RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh" LargeGlyph="refresh"/>
+	</RibbonItem>
+	<RibbonItem>
 		<!---If we want to create a new group in same PageTab-->
 		<RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32">
 			<!---If we want Inner menu-->
@@ -20,5 +23,9 @@
 			<RibbonItem Action="ImportLayout" LocalizedNameKey="ImportLayout" Glyph="Import_16x16" LargeGlyph="Import_16x16" ShortcutKey=""/>
 			<RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16" ShortcutKey=""/>
 		</RibbonItem>
+	</RibbonItem>
+	<RibbonItem>
+		<RibbonItem Action="CurrentEmployee" LocalizedNameKey="CurrentEmployee" IsCheckBox="True" />
+		<RibbonItem Action="AllTransactions" LocalizedNameKey="AllTransactions" IsCheckBox="True" />
 	</RibbonItem>
 </root>

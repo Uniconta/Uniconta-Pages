@@ -45,6 +45,9 @@ x:Class="UnicontaClient.Pages.CustomPage.Iceland_ImportPSPSettlements"
                         <CorasauControls:CorasauLayoutItem x:Name="chkAllTrans" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=AllTrans}">
                             <CorasauControls:CheckEditor x:Name="chkallTrans" Width="Auto" EditValue="{Binding AllTrans,Mode=OneWay}"/>
                         </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="chkAlreadyBooked" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=AlreadyBooked}">
+                            <CorasauControls:CheckEditor x:Name="chkalreadybooked" Width="Auto" EditValue="{Binding AlreadyBooked,Mode=OneWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem x:Name="liLastImport" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LastImport}">
                             <CorasauControls:DateEditor x:Name="dtLastImport" EditValue="{Binding LastImport,Mode=TwoWay}" AllowDefaultButton="False" />
                         </CorasauControls:CorasauLayoutItem>

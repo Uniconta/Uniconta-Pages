@@ -7,28 +7,19 @@ using Uniconta.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
 using Uniconta.DataModel;
 using System.Collections;
 using Uniconta.API.DebtorCreditor;
-using System.Windows.Threading;
 using Uniconta.ClientTools.Util;
 using Uniconta.ClientTools.Controls;
 using UnicontaClient.Controls.Dialogs;
 using Uniconta.API.Service;
 using System.IO;
 using Uniconta.Common.Utility;
-#if !SILVERLIGHT
-using UnicontaClient.Pages;
-#endif
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
@@ -380,7 +371,11 @@ namespace UnicontaClient.Pages.CustomPage
                 Utility.ImportVoucher(selectedItem, api, voucher, false);
         }
 
-        async private void GenerateInvoice(CreditorOrderClient creditorOrderClient)
+        CreditorOrderClient prevOrder;
+        DateTime prevDateTime;
+        string prevInvoiceNumber;
+        List<DCOrder> prevAddtionalOrdsSel;
+        private void GenerateInvoice(CreditorOrderClient creditorOrderClient)
         {
             var accountName = Util.ConcatParenthesis(creditorOrderClient._DCAccount, creditorOrderClient.Name);
             var creditor = ClientHelper.GetRef(creditorOrderClient.CompanyId, typeof(Uniconta.DataModel.Creditor), creditorOrderClient._DCAccount) as Uniconta.DataModel.Creditor;
@@ -389,12 +384,25 @@ namespace UnicontaClient.Pages.CustomPage
             CWGenerateInvoice GenrateInvoiceDialog = new CWGenerateInvoice(true, string.Empty, true, true, showNoEmailMsg: !showSendByEmail, AccountName: accountName);
             GenrateInvoiceDialog.DialogTableId = 2000000002;
             GenrateInvoiceDialog.SetSendAsEmailCheck(false);
-            GenrateInvoiceDialog.SetInvoiceNumber(creditorOrderClient._InvoiceNumber);
-            if (creditorOrderClient._InvoiceDate != DateTime.MinValue)
-                GenrateInvoiceDialog.SetInvoiceDate(creditorOrderClient._InvoiceDate);
+           
             var additionalOrdersList = Utility.GetAdditionalOrders(api, creditorOrderClient);
-            if (additionalOrdersList != null)
-                GenrateInvoiceDialog.SetAdditionalOrders(additionalOrdersList);
+
+            //Save values when the Simulation was setup in the previous action
+            if (prevOrder != null && prevOrder.OrderNumber == creditorOrderClient.OrderNumber)
+            {
+                GenrateInvoiceDialog.SetInvoiceDate(prevDateTime);
+                GenrateInvoiceDialog.SetInvoiceNumber(prevInvoiceNumber);
+                if (additionalOrdersList != null)
+                    GenrateInvoiceDialog.SetAdditionalOrders(additionalOrdersList, prevAddtionalOrdsSel);
+            }
+            else
+            {
+                if (creditorOrderClient._InvoiceDate != DateTime.MinValue)
+                    GenrateInvoiceDialog.SetInvoiceDate(creditorOrderClient._InvoiceDate);
+                GenrateInvoiceDialog.SetInvoiceNumber(creditorOrderClient._InvoiceNumber);
+                if (additionalOrdersList != null)
+                    GenrateInvoiceDialog.SetAdditionalOrders(additionalOrdersList);
+            }
 
             GenrateInvoiceDialog.SetVouchersFromCreditorOrder(api, creditorOrderClient);
 
@@ -414,6 +422,14 @@ namespace UnicontaClient.Pages.CustomPage
                     busyIndicator.IsBusy = true;
                     var result = await invoicePostingResult.Execute();
                     busyIndicator.IsBusy = false;
+
+                    if (isSimulated)
+                    {
+                        prevOrder = creditorOrderClient;
+                        prevDateTime = GenrateInvoiceDialog.GenrateDate;
+                        prevInvoiceNumber = GenrateInvoiceDialog.InvoiceNumber;
+                        prevAddtionalOrdsSel = GenrateInvoiceDialog.AdditionalOrders?.Cast<DCOrder>().ToList();
+                    }
 
                     if (result)
                     {

@@ -19,6 +19,7 @@ using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
 using Uniconta.Common;
 using Uniconta.DataModel;
+using Uniconta.ClientTools;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -38,6 +39,8 @@ namespace UnicontaClient.Pages.CustomPage
         ItemBase ibase;
         static bool AssignText;
         Orientation orient;
+        bool TwoVatCodes, UseDCVat;
+        public IEnumerable<JournalLineGridClient> JournalLines { get; set; }
         public MatchPhysicalVoucherToGLDailyJournalLines(UnicontaBaseEntity master)
             : base(null)
         {
@@ -54,7 +57,9 @@ namespace UnicontaClient.Pages.CustomPage
             if (!Comp._UseVatOperation)
                 VatOperation.Visible = VatOffsetOperation.Visible = false;
             if (!masterRecord._TwoVatCodes)
-                OffsetVat.Visible = VatOffsetOperation.Visible = false;
+                OffsetVat.Visible = VatOffsetOperation.Visible = VatAmountOffset.Visible = false;
+            else
+                TwoVatCodes = true;
             SetRibbonControl(localMenu, dgGldailyJournalLinesGrid);
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgvoucherGrid.RowDoubleClick += dgvoucherGrid_RowDoubleClick;
@@ -65,6 +70,7 @@ namespace UnicontaClient.Pages.CustomPage
             LedgerCache = Comp.GetCache(typeof(Uniconta.DataModel.GLAccount));
             DebtorCache = Comp.GetCache(typeof(Uniconta.DataModel.Debtor));
             CreditorCache = Comp.GetCache(typeof(Uniconta.DataModel.Creditor));
+            PaymentCache = Comp.GetCache(typeof(Uniconta.DataModel.PaymentTerm));
             localMenu.OnChecked += LocalMenu_OnChecked;
             orient = api.session.Preference.BankStatementHorisontal ? Orientation.Horizontal : Orientation.Vertical;
             lGroup.Orientation = orient;
@@ -141,6 +147,76 @@ namespace UnicontaClient.Pages.CustomPage
                 selectedItem.PropertyChanged += JournalLineGridClient_PropertyChanged;
         }
 
+        DCAccount getDCAccount(GLJournalAccountType type, string Acc)
+        {
+            if (Acc != null && type != GLJournalAccountType.Finans)
+            {
+                var cache = (type == GLJournalAccountType.Debtor) ? DebtorCache : CreditorCache;
+                return (DCAccount)cache?.Get(Acc);
+            }
+            return null;
+        }
+        DCAccount copyDCAccount(JournalLineGridClient rec, GLJournalAccountType type, string Acc, bool OnlyDueDate = false)
+        {
+            var dc = getDCAccount(type, Acc);
+            if (dc == null)
+                return null;
+            if ((rec._DocumentDate != DateTime.MinValue || rec._Date != DateTime.MinValue) && rec._DCPostType != Uniconta.DataModel.DCPostType.Creditnote && (rec._DCPostType < Uniconta.DataModel.DCPostType.Payment || rec._DCPostType > Uniconta.DataModel.DCPostType.PartialPayment))
+            {
+                var pay = (Uniconta.DataModel.PaymentTerm)PaymentCache?.Get(dc._Payment);
+                if (pay != null)
+                    rec.DueDate = pay.GetDueDate(rec._DocumentDate != DateTime.MinValue ? rec._DocumentDate : rec._Date);
+            }
+            if (OnlyDueDate)
+                return dc;
+
+            if (type == GLJournalAccountType.Creditor)
+            {
+                if (dc._PrCategory != null)
+                    rec.PrCategory = dc._PrCategory;
+                if (rec._PaymentMethod != dc._PaymentMethod)
+                {
+                    rec._PaymentMethod = dc._PaymentMethod;
+                    rec.NotifyPropertyChanged("PaymentMethod");
+                }
+            }
+            rec.Withholding = dc._Withholding;
+            if (dc._Dim1 != null)
+                rec.Dimension1 = dc._Dim1;
+            if (dc._Dim2 != null)
+                rec.Dimension2 = dc._Dim2;
+            if (dc._Dim3 != null)
+                rec.Dimension3 = dc._Dim3;
+            if (dc._Dim4 != null)
+                rec.Dimension4 = dc._Dim4;
+            if (dc._Dim5 != null)
+                rec.Dimension5 = dc._Dim5;
+            if (rec.AmountCur == 0)
+                rec.Currency = AppEnums.Currencies.ToString((int)dc._Currency);
+            return dc;
+        }
+
+        void assignOffsetVat(JournalLineGridClient rec, string vat, string vatOperation)
+        {
+            if (rec._DCPostType >= Uniconta.DataModel.DCPostType.Payment && rec._DCPostType <= Uniconta.DataModel.DCPostType.PartialPayment)
+                return;
+
+            if (vat != null)
+            {
+                if (TwoVatCodes)
+                    rec.OffsetVat = vat;
+                else
+                    rec.Vat = vat;
+            }
+            if (vatOperation != null)
+            {
+                if (TwoVatCodes)
+                    rec.VatOffsetOperation = vatOperation;
+                else
+                    rec.VatOperation = vatOperation;
+            }
+        }
+
         void JournalLineGridClient_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             var rec = sender as JournalLineGridClient;
@@ -152,9 +228,200 @@ namespace UnicontaClient.Pages.CustomPage
                 case "OffsetAccountType":
                     SetOffsetAccountSource(rec);
                     break;
+                case "Account":
+                    if (rec._AccountType != (byte)GLJournalAccountType.Finans)
+                    {
+                        var dc = copyDCAccount(rec, rec._AccountTypeEnum, rec._Account);
+                        if (dc != null)
+                        {
+                            rec.Vat = null;
+                            if (dc._PostingAccount != null)
+                            {
+                                // lets check the currenut offset account if it is a bank account
+                                var Acc = (GLAccount)LedgerCache?.Get(rec._OffsetAccount);
+                                if (Acc == null || Acc._MandatoryTax != VatOptions.NoVat)  // we will not override a bank account
+                                {
+                                    if (rec._OffsetAccountType != (byte)GLJournalAccountType.Finans)
+                                    {
+                                        rec._OffsetAccountType = (byte)GLJournalAccountType.Finans;
+                                        rec.NotifyPropertyChanged("OffsetAccountType");
+                                    }
+                                    var amount = rec.Amount;
+                                    if (rec._AccountType == (byte)GLJournalAccountType.Debtor)
+                                        amount *= -1d;
+                                    if (dc._TransType != null)
+                                        rec.TransType = dc._TransType;
+
+                                    rec.TmpOffsetAccount = null;
+                                    if (amount < 0) // expense
+                                        rec.OffsetAccount = dc._PostingAccount;
+                                    else if (amount == 0)
+                                        rec.TmpOffsetAccount = dc._PostingAccount;
+                                }
+                            }
+
+                            if (UseDCVat && rec._OffsetAccountType == (byte)GLJournalAccountType.Finans)
+                            {
+                                var Acc = (GLAccount)LedgerCache?.Get(rec._OffsetAccount);
+                                if (Acc != null && Acc._MandatoryTax != VatOptions.NoVat && Acc._MandatoryTax != VatOptions.Fixed)
+                                    assignOffsetVat(rec, dc._Vat, dc._VatOperation);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var Acc = (GLAccount)LedgerCache?.Get(rec._Account);
+                        if (Acc != null)
+                        {
+                            if (Acc._PrCategory != null)
+                                rec.PrCategory = Acc._PrCategory;
+                            if (Acc._Currency != 0)
+                            {
+                                rec._Currency = (byte)Acc._Currency;
+                                rec.NotifyPropertyChanged("Currency");
+                            }
+                            rec.SetGLDim(Acc);
+                            if (Acc._MandatoryTax == VatOptions.NoVat)
+                            {
+                                if (TwoVatCodes)
+                                {
+                                    rec.Vat = null;
+                                    rec.VatOperation = null;
+                                }
+                            }
+                            else if (Acc._IsDCAccount)
+                                assignOffsetVat(rec, Acc._Vat, Acc._VatOperation);
+                            else
+                            {
+                                var vat = Acc._Vat;
+                                var VatOperation = Acc._VatOperation;
+                                if (UseDCVat && Acc._MandatoryTax != VatOptions.Fixed)
+                                {
+                                    var dc = getDCAccount(rec._OffsetAccountTypeEnum, rec._OffsetAccount);
+                                    if (dc != null && dc._Vat != null)
+                                    {
+                                        vat = dc._Vat;
+                                        VatOperation = dc._VatOperation;
+                                    }
+                                }
+                                rec.Vat = vat;
+                                rec.VatOperation = VatOperation;
+                            }
+                            if (Acc._DefaultOffsetAccount != null)
+                            {
+                                rec._OffsetAccountType = (byte)Acc._DefaultOffsetAccountType; // set before account
+                                rec.OffsetAccount = Acc._DefaultOffsetAccount;
+                                if (rec._OffsetAccountType == 0)
+                                {
+                                    var Acc2 = (GLAccount)LedgerCache.Get(rec._OffsetAccount);
+                                    if (Acc2 != null)
+                                    {
+                                        if (TwoVatCodes || (Acc._MandatoryTax != VatOptions.NoVat && Acc._MandatoryTax != VatOptions.Fixed))
+                                            assignOffsetVat(rec, Acc2._Vat, Acc2._VatOperation);
+                                    }
+                                }
+                            }
+                            if (Acc._DebetCredit > 0)
+                                dgGldailyJournalLinesGrid.GoToCol(Acc._DebetCredit == DebitCreditPreference.Debet ? "Debit" : "Credit", true);
+                        }
+                    }
+                    rec.UpdateDefaultText();
+                    break;
+                case "OffsetAccount":
+                    if (rec._OffsetAccountType != (byte)GLJournalAccountType.Finans)
+                    {
+                        var dc = copyDCAccount(rec, rec._OffsetAccountTypeEnum, rec._OffsetAccount);
+                        if (dc != null)
+                        {
+                            if (dc._TransType != null && rec._TransType == null && rec._Text == null)
+                                rec.TransType = dc._TransType;
+
+                            if (dc._PostingAccount != null && rec._Account == null)
+                            {
+                                if (rec._AccountType != (byte)GLJournalAccountType.Finans)
+                                {
+                                    rec._AccountType = (byte)GLJournalAccountType.Finans;
+                                    rec.NotifyPropertyChanged("AccountType");
+                                }
+                                rec.Account = dc._PostingAccount;
+                                rec.TmpOffsetAccount = null;
+                            }
+
+                            rec.OffsetVat = null;
+                            if (UseDCVat && rec._AccountType == (byte)GLJournalAccountType.Finans)
+                            {
+                                var Acc2 = (GLAccount)LedgerCache?.Get(rec._Account);
+                                if (Acc2 != null && Acc2._MandatoryTax != VatOptions.NoVat && Acc2._MandatoryTax != VatOptions.Fixed)
+                                {
+                                    if (dc._Vat != null)
+                                        rec.Vat = dc._Vat;
+                                    if (dc._VatOperation != null)
+                                        rec.VatOperation = dc._VatOperation;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var Acc = (GLAccount)LedgerCache?.Get(rec._OffsetAccount);
+                        if (Acc != null)
+                        {
+                            if (Acc._MandatoryTax == VatOptions.NoVat)
+                            {
+                                if (TwoVatCodes)
+                                {
+                                    rec.OffsetVat = null;
+                                    rec.VatOffsetOperation = null;
+                                }
+                            }
+                            else if (Acc._IsDCAccount)
+                            {
+                                var Acc2 = (GLAccount)LedgerCache.Get(rec._Account);
+                                if (Acc2 == null || (Acc2._Vat == null && Acc2._MandatoryTax != VatOptions.NoVat))
+                                {
+                                    if (Acc._Vat != null)
+                                        rec.Vat = Acc._Vat;
+                                    if (Acc._VatOperation != null)
+                                        rec.VatOperation = Acc._VatOperation;
+                                }
+                            }
+                            else
+                            {
+                                var vat = Acc._Vat;
+                                var VatOperation = Acc._VatOperation;
+                                if (UseDCVat && Acc._MandatoryTax != VatOptions.Fixed)
+                                {
+                                    var dc = getDCAccount(rec._AccountTypeEnum, rec._Account);
+                                    if (dc != null)
+                                    {
+                                        if (dc._Vat != null)
+                                            vat = dc._Vat;
+                                        if (dc._VatOperation != null)
+                                            VatOperation = dc._VatOperation;
+                                    }
+                                }
+                                if (TwoVatCodes)
+                                    assignOffsetVat(rec, vat, VatOperation);
+                                else
+                                {
+                                    var Acc2 = (GLAccount)LedgerCache.Get(rec._Account);
+                                    if (Acc2 == null || (Acc2._Vat == null && Acc2._MandatoryTax != VatOptions.NoVat))
+                                    {
+                                        if (Acc._Vat != null)
+                                            rec.Vat = Acc._Vat;
+                                        if (Acc._VatOperation != null)
+                                            rec.VatOperation = Acc._VatOperation;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    rec.UpdateDefaultText();
+                    break;
             }
         }
-        SQLCache LedgerCache, DebtorCache, CreditorCache, ProjectCache;
+
+        SQLCache LedgerCache, DebtorCache, CreditorCache, ProjectCache, PaymentCache;
         SQLCache GetCache(byte AccountType)
         {
             switch (AccountType)
@@ -283,7 +550,8 @@ namespace UnicontaClient.Pages.CustomPage
         protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             var api = this.api;
-            var Comp = api.CompanyEntity;
+            if (PaymentCache == null)
+                PaymentCache = await api.LoadCache(typeof(Uniconta.DataModel.PaymentTerm)).ConfigureAwait(false);
             if (DebtorCache == null)
                 DebtorCache = await api.LoadCache(typeof(Uniconta.DataModel.Debtor)).ConfigureAwait(false);
             if (CreditorCache == null)
@@ -302,9 +570,8 @@ namespace UnicontaClient.Pages.CustomPage
                 if (rec == null)
                     header._OffsetAccount = null;
             }
-            if (Comp.ProjectTask)
-                ProjectCache = Comp.GetCache(typeof(Uniconta.DataModel.Project)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Project)).ConfigureAwait(false);
-
+            if (api.CompanyEntity.ProjectTask)
+                ProjectCache = api.GetCache(typeof(Uniconta.DataModel.Project)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Project)).ConfigureAwait(false);
         }
 
         void GetMenuItem()
@@ -406,10 +673,10 @@ namespace UnicontaClient.Pages.CustomPage
         {
             dgGldailyJournalLinesGrid.SaveData();
         }
-        private void Attach(VouchersClientLocal selectedVoucher, GLDailyJournalLineClient selectedJournalLine, bool isAuto)
+        private void Attach(VouchersClientLocal selectedVoucher, GLDailyJournalLineClient selectedJournalLine, bool isAuto, IEnumerable<VouchersClientLocal> visibleRows = null)
         {
             var selectedRowId = selectedVoucher.RowId;
-            if (selectedRowId != 0)
+            if (selectedRowId != 0 && selectedJournalLine._DocumentRef == 0)
             {
                 dgGldailyJournalLinesGrid.SetLoadedRow(selectedJournalLine);
                 selectedJournalLine.DocumentRef = selectedRowId;
@@ -418,8 +685,9 @@ namespace UnicontaClient.Pages.CustomPage
                     selectedJournalLine.Text = selectedJournalLine._Text ?? selectedVoucher._Text;
                 var amount = selectedJournalLine.Amount;
                 selectedJournalLine.Amount = amount != 0d ? amount : selectedVoucher._Amount;
-                dgGldailyJournalLinesGrid.SetModifiedRow(selectedJournalLine);
-                var visibleRows = dgvoucherGrid.GetVisibleRows() as IEnumerable<VouchersClientLocal>;
+                //dgGldailyJournalLinesGrid.SetModifiedRow(selectedJournalLine);
+                if (visibleRows == null)
+                    visibleRows = dgvoucherGrid.GetVisibleRows() as IEnumerable<VouchersClientLocal>;
                 var voucher = visibleRows.Where(v => v.PrimaryKeyId == selectedRowId).FirstOrDefault();
                 if (voucher != null)
                     voucher.IsAttached = true;
@@ -434,15 +702,14 @@ namespace UnicontaClient.Pages.CustomPage
             var journalLines = dgGldailyJournalLinesGrid.ItemsSource as IEnumerable<JournalLineGridClient>;
             var visibleRowVouchers = dgvoucherGrid.GetVisibleRows() as IEnumerable<VouchersClientLocal>;
             int rowCountUpdate = 0;
-            for (int i = 0; (i < 6); i++)
+            for (int i = 0; (i < 2); i++)
             {
-                int n = i % 3;
                 foreach (var voucher in visibleRowVouchers)
                 {
                     if (!voucher.IsAttached && voucher._Amount != 0)
                     {
                         DateTime date;
-                        if (i < 3)
+                        if (i == 0)
                             date = voucher._PostingDate != DateTime.MinValue ? voucher._PostingDate :
                                 (voucher._DocumentDate != DateTime.MinValue ? voucher._DocumentDate : voucher.Created.Date);
                         else
@@ -450,12 +717,10 @@ namespace UnicontaClient.Pages.CustomPage
                         if (date != DateTime.MinValue)
                         {
                             var amount = Math.Abs(voucher._Amount);
-                            var dtmin = date.AddDays(-n);
-                            var dtmax = date.AddDays(n);
                             foreach (var p in journalLines)
-                                if (Math.Abs(p.Amount) == amount && p._Date >= dtmin && p.Date <= dtmax)
+                                if (Math.Abs(p.Amount) == amount && p._Date == date)
                                 {
-                                    Attach(voucher, p, true);
+                                    Attach(voucher, p, true, visibleRowVouchers);
                                     rowCountUpdate++;
                                     break;
                                 }
@@ -541,23 +806,23 @@ namespace UnicontaClient.Pages.CustomPage
         {
             busyIndicator.IsBusy = true;
             await dgvoucherGrid.Filter(null);
-            await dgGldailyJournalLinesGrid.Filter(null);
+            if (JournalLines == null)
+                await dgGldailyJournalLinesGrid.Filter(null);
+            else
+                dgGldailyJournalLinesGrid.SetSource(JournalLines.ToArray());
             SetVoucherIsAttached();
             busyIndicator.IsBusy = false;
         }
 
         private void SetVoucherIsAttached()
         {
-            var rows = dgGldailyJournalLinesGrid.ItemsSource as List<JournalLineGridClient>;
-            var docRefs = rows.Select(r => r.DocumentRef).Distinct();
-            var vouchers = dgvoucherGrid.ItemsSource as List<VouchersClientLocal>;
-            foreach (var voucher in vouchers)
-            {
-                if (docRefs.Contains(voucher.PrimaryKeyId))
-                    voucher.IsAttached = true;
-                else
-                    voucher.IsAttached = false;
-            }
+            var docRefs = new HashSet<int>();
+            foreach (var rec in dgGldailyJournalLinesGrid.ItemsSource as IEnumerable<JournalLineGridClient>)
+                if (rec._DocumentRef != 0)
+                    docRefs.Add(rec._DocumentRef);
+            if (docRefs.Count > 0)
+                foreach (var voucher in dgvoucherGrid.ItemsSource as IEnumerable<VouchersClientLocal>)
+                    voucher.IsAttached = docRefs.Contains(voucher.RowId);
         }
 
         private void SetDimensions()

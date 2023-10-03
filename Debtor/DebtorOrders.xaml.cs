@@ -8,20 +8,14 @@ using Uniconta.Common.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
 using Uniconta.DataModel;
 using Uniconta.ClientTools.Controls;
 using System.Collections;
 using Uniconta.API.DebtorCreditor;
-using System.Windows.Threading;
 using System.IO;
 using Uniconta.ClientTools.Util;
 using UnicontaClient.Controls.Dialogs;
@@ -29,13 +23,9 @@ using Uniconta.API.System;
 using Uniconta.API.Service;
 using DevExpress.Xpf.Grid;
 using DevExpress.Data;
-#if !SILVERLIGHT
-using UnicontaClient.Pages;
 using FromXSDFile.OIOUBL.ExportImport;
 using ubl_norway_uniconta;
 using UBL.Iceland;
-using Microsoft.Win32;
-#endif
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
@@ -177,7 +167,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         void dgDebtorOrdersGrid_RowDoubleClick()
         {
-          ribbonControl.PerformRibbonAction("OrderLine");
+            ribbonControl.PerformRibbonAction("OrderLine");
         }
         private void Name_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -257,9 +247,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                     {
                         CWOrderFromOrder cwOrderFromOrder = new CWOrderFromOrder(api);
-#if !SILVERLIGHT
                         cwOrderFromOrder.DialogTableId = 2000000020;
-#endif
                         cwOrderFromOrder.Closed += async delegate
                         {
                             if (cwOrderFromOrder.DialogResult == true)
@@ -387,15 +375,14 @@ namespace UnicontaClient.Pages.CustomPage
                     var Contacts = api.GetCache(typeof(Uniconta.DataModel.Contact));
                     foreach (var rec in lst)
                     {
-                        if (rec._DCAccount != null && cache.Get(rec._DCAccount) == null)
-                        {
+                        if (!reload && rec._DCAccount != null && cache.Get(rec._DCAccount) == null)
                             reload = true;
-                            break;
-                        }
                         if (rec._ContactRef != 0 && Contacts != null && Contacts.Get(rec._ContactRef) == null)
                         {
                             Contacts = null;
                             api.LoadCache(typeof(Uniconta.DataModel.Contact), true);
+                            if (reload)
+                                break;
                         }
                     }
                     if (reload)
@@ -522,12 +509,12 @@ namespace UnicontaClient.Pages.CustomPage
             var accountName = Util.ConcatParenthesis(dbOrder._DCAccount, dbOrder.Name);
             CWGenerateInvoice GenrateOfferDialog = new CWGenerateInvoice(false, doctype.ToString(), isShowInvoiceVisible: true, askForEmail: true, showNoEmailMsg: !showSendByMail, debtorName: debtorName,
                 isShowUpdateInv: showUpdateInv, isDebtorOrder: true, AccountName: accountName);
-#if !SILVERLIGHT
+
             if (doctype == CompanyLayoutType.OrderConfirmation)
                 GenrateOfferDialog.DialogTableId = 2000000009;
             else if (doctype == CompanyLayoutType.Packnote)
                 GenrateOfferDialog.DialogTableId = 2000000018;
-#endif
+
             GenrateOfferDialog.SetInvPrintPreview(showPrintPreview);
             var additionalOrdersList = Utility.GetAdditionalOrders(api, dbOrder);
             if (additionalOrdersList != null)
@@ -571,23 +558,15 @@ namespace UnicontaClient.Pages.CustomPage
                 showSendByMail = !string.IsNullOrEmpty(debtor.InvoiceEmail) || debtor.EmailDocuments;
             }
 
-#if !SILVERLIGHT
             var cwPickingList = new CWGeneratePickingList(accountName, true, true, debtorName, showSendByMail);
             cwPickingList.DialogTableId = 2000000049;
-#else
-            var cwPickingList = new CWGeneratePickingList();
-#endif
             cwPickingList.Closed += async delegate
              {
                  if (cwPickingList.DialogResult == true)
                  {
                      var selectedDate = cwPickingList.SelectedDate;
 
-#if !SILVERLIGHT
                      var printDoc = cwPickingList.PrintDocument;
-#else
-                     var printDoc = false;
-#endif
                      var invoicePostingResult = new InvoicePostingPrintGenerator(api, this);
                      invoicePostingResult.SetUpInvoicePosting(dbOrder, null, CompanyLayoutType.PickingList, selectedDate, null, false, cwPickingList.ShowDocument, false, printDoc, cwPickingList.NumberOfPages,
                         cwPickingList.SendByEmail, cwPickingList.SendByOutlook, cwPickingList.sendOnlyToThisEmail, cwPickingList.EmailList, false, null, false);
@@ -686,6 +665,10 @@ namespace UnicontaClient.Pages.CustomPage
             UnicontaClient.Utilities.Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
         }
 
+        DebtorOrderClient prevDbOrder;
+        DateTime prevDateTime;
+        List<DCOrder> prevAdditionalOrd;
+
         private void GenerateInvoice(DebtorOrderClient dbOrder)
         {
             InvoiceAPI Invapi = new InvoiceAPI(api);
@@ -725,14 +708,23 @@ namespace UnicontaClient.Pages.CustomPage
             var accountName = Util.ConcatParenthesis(dbOrder._DCAccount, dbOrder.Name);
             CWGenerateInvoice GenrateInvoiceDialog = new CWGenerateInvoice(true, string.Empty, false, true, true, showNoEmailMsg: !showSendByMail, debtorName: debtorName, isOrderOrQuickInv: true, isDebtorOrder: true,
                 InvoiceInXML: invoiceInXML, AccountName: accountName);
-#if !SILVERLIGHT
             GenrateInvoiceDialog.DialogTableId = 2000000010;
-#endif
-            if (dbOrder._InvoiceDate != DateTime.MinValue)
-                GenrateInvoiceDialog.SetInvoiceDate(dbOrder._InvoiceDate);
+            
             var additionalOrdersList = Utility.GetAdditionalOrders(api, dbOrder);
-            if (additionalOrdersList != null)
-                GenrateInvoiceDialog.SetAdditionalOrders(additionalOrdersList);
+
+            if (prevDbOrder != null && prevDbOrder.OrderNumber == dbOrder.OrderNumber)
+            {
+                GenrateInvoiceDialog.SetInvoiceDate(prevDateTime);
+                if (additionalOrdersList != null)
+                    GenrateInvoiceDialog.SetAdditionalOrders(additionalOrdersList, prevAdditionalOrd);
+            }
+            else
+            {
+                if (dbOrder._InvoiceDate != DateTime.MinValue)
+                    GenrateInvoiceDialog.SetInvoiceDate(dbOrder._InvoiceDate);
+                if (additionalOrdersList != null)
+                    GenrateInvoiceDialog.SetAdditionalOrders(additionalOrdersList);
+            }
             GenrateInvoiceDialog.SetOIOUBLLabelText(api.CompanyEntity._OIOUBLSendOnServer);
 
             GenrateInvoiceDialog.Closed += async delegate
@@ -751,6 +743,13 @@ namespace UnicontaClient.Pages.CustomPage
                     busyIndicator.IsBusy = true;
                     var result = await invoicePostingResult.Execute();
                     busyIndicator.IsBusy = false;
+
+                    if(isSimulated)
+                    {
+                        prevDbOrder = dbOrder;
+                        prevDateTime = GenrateInvoiceDialog.GenrateDate;
+                        prevAdditionalOrd = GenrateInvoiceDialog.AdditionalOrders?.Cast<DCOrder>().ToList();
+                    }
 
                     if (result)
                     {
@@ -778,7 +777,6 @@ namespace UnicontaClient.Pages.CustomPage
                 AddDockItem(TabControls.UserNotesPage, dgDebtorOrdersGrid.syncEntity);
         }
 
-#if !SILVERLIGHT
         static public async void GenerateOIOXml(CrudAPI api, InvoicePostingResult res)
         {
             var Comp = api.CompanyEntity;
@@ -898,6 +896,5 @@ namespace UnicontaClient.Pages.CustomPage
             if (countErr != 0 && !string.IsNullOrWhiteSpace(errorInfo))
                 UnicontaMessageBox.Show(errorInfo, Uniconta.ClientTools.Localization.lookup("Error"));
         }
-#endif
     }
 }
