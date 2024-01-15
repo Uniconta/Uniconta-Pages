@@ -1,0 +1,21 @@
+﻿<ClientTools:ChildWindow x:Class="UnicontaClient.Pages.CWPreviewTextViewer"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:UnicontaClient.Pages"
+        xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools" 
+        xmlns:UnicontaCtrls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+        Width="850" Height="700"  ResizeMode="CanResize">
+    <Grid x:Name="LayoutRoot" Margin="2">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid  Margin="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <UnicontaCtrls:TextEditor x:Name="txtContents" IsReadOnly="True" TextWrapping="Wrap" HorizontalContentAlignment="Left" VerticalContentAlignment="Top" FontFamily="Courier New" />
+        </Grid>
+        <Button x:Name="btnClose" IsCancel="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=Close}" Click="btnClose_Click"  Width="75" Height="23" 
+                HorizontalAlignment="Right" Margin="0,12,0,0" Grid.Row="1" />
+    </Grid>
+</ClientTools:ChildWindow>

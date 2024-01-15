@@ -1,0 +1,37 @@
+﻿<ClientTools:ChildWindow x:Class="UnicontaClient.Controls.Dialogs.CWDineroAuthorize"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+        xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+        Height="{StaticResource Height29}" Width="{StaticResource Width23}" KeyDown="ChildWindow_KeyDown" Title="Dinero">
+    <CorasauControls:BusyIndicator x:Name="busyIndicator" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+        <Grid x:Name="LayoutRoot" Margin="2" Background="{StaticResource LayoutGridColor}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="2" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="2" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <CorasauControls:UnicontaWebViewer x:Name="webViewer" Grid.Row="0" HorizontalAlignment="Stretch" ShowNavigationError="False"/>
+            <CorasauControls:ListBoxEditor x:Name="lbCompanies" Grid.Row="2" HorizontalAlignment="Stretch" SelectedIndexChanged="lbCompanies_SelectedIndexChanged" Visibility="Collapsed" MinHeight="150" 
+                                           ScrollViewer.VerticalScrollBarVisibility="Visible" AllowItemHighlighting="True">
+                <CorasauControls:ListBoxEditor.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="{Binding Id}" />
+                            <TextBlock Text=" - " Grid.Column="1"/>
+                            <TextBlock Text="{Binding Name}" Grid.Column="2" />
+                        </Grid>
+                    </DataTemplate>
+                </CorasauControls:ListBoxEditor.ItemTemplate>
+            </CorasauControls:ListBoxEditor>
+            <Button x:Name="CancelBtn" IsDefault="True" Grid.Row="4" HorizontalAlignment="Center"  Content="{Binding Converter={StaticResource LocalizationConverter},ConverterParameter=Cancel}" Click="Cancel_Click" MinWidth="75" Height="23"/>
+        </Grid>
+    </CorasauControls:BusyIndicator>
+</ClientTools:ChildWindow>

@@ -1,0 +1,65 @@
+﻿<cw:ChildWindow x:Class="UnicontaClient.Controls.Dialogs.CWDebtorPaymentSetupIceland"
+                      xmlns:cw="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+           xmlns:controls="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls"
+           xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+           xmlns:ClientToolsControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+           xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+           Width="420" Height="340" KeyDown="ChildWindow_KeyDown">
+  
+    <Grid x:Name="LayoutRoot" Margin="2" >
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid VerticalAlignment="Center">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="{Binding Converter={StaticResource  GlobalLocalizationValueConverter},ConverterParameter=Bank,Mode=OneWay}" Margin="5,0,0,0" Grid.Column="0" Grid.Row="0" VerticalAlignment="Center"/>
+            <CorasauControls:ComboBoxEditor x:Name="cmbBank" SelectedItem="{Binding Bank,Mode=TwoWay}" Grid.Column="2"  Grid.Row="0" SelectedIndexChanged="cmbBank_SelectedIndexChanged" />
+            <TextBlock Text="{Binding Converter={StaticResource  GlobalLocalizationValueConverter},ConverterParameter=RecievedDefaultInterestAccount,Mode=OneWay}" Margin="5,0,0,0" Grid.Column="0" Grid.Row="1" VerticalAlignment="Center"/>
+            <CorasauControls:LookupEditor x:Name="LeRecievedDefaultInterestAccount" Text="{Binding RecievedDefaultInterestAccount,Mode=TwoWay}" Grid.Column="2" Grid.Row="1" />
+            <TextBlock Text="{Binding Converter={StaticResource  GlobalLocalizationValueConverter},ConverterParameter=CapitalAccount,Mode=OneWay}" Margin="5,0,0,0" Grid.Column="0" Grid.Row="2" VerticalAlignment="Center"/>
+            <CorasauControls:LookupEditor x:Name="LeCapitalAccount" Text="{Binding CapitalAccount,Mode=TwoWay}" Grid.Column="2" Grid.Row="2" />
+            <TextBlock Text="{Binding Converter={StaticResource  GlobalLocalizationValueConverter},ConverterParameter=ClaimFeeAccount,Mode=OneWay}" Margin="5,0,0,0" Grid.Column="0" Grid.Row="3" VerticalAlignment="Center"/>
+            <CorasauControls:LookupEditor x:Name="LeClaimFeeAccount" Text="{Binding ClaimFeeAccount,Mode=TwoWay}" Grid.Column="2" Grid.Row="3" />
+            <TextBlock Text="{Binding Converter={StaticResource  GlobalLocalizationValueConverter},ConverterParameter=ClearingBank,Mode=OneWay}" Margin="5,0,0,0" Grid.Column="0" Grid.Row="4" VerticalAlignment="Center"/>
+            <CorasauControls:TextEditor HandleKeyDown="False" Text="{Binding ClearingBank,Mode=TwoWay}" Grid.Column="2"  Grid.Row="4" Height="25"
+              x:Name="txtClearingBank"/>
+            <TextBlock Text="{Binding Converter={StaticResource  GlobalLocalizationValueConverter},ConverterParameter=IdentificationMark,Mode=OneWay}" Margin="5,0,0,0" Grid.Column="0" Grid.Row="5" VerticalAlignment="Center"/>
+            <CorasauControls:TextEditor HandleKeyDown="False" Text="{Binding IdentificationMark,Mode=TwoWay}" Grid.Column="2"  Grid.Row="5" Height="25"
+              x:Name="txtIdentificationMark"/>
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FinalDueDateDays,Mode=OneWay}" Margin="5,0,0,0" Grid.Column="0" Grid.Row="6" VerticalAlignment="Center"/>
+            <CorasauControls:IntegerEditor EditValue="{Binding FinalDueDateDays,Mode=TwoWay}" Grid.Column="2"  Grid.Row="6" Height="25"
+              x:Name="liFinalDueDateDays"/>
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CancelClaimInterval,Mode=OneWay}" Margin="5,0,0,0" Grid.Column="0" Grid.Row="7" VerticalAlignment="Center"/>
+            <CorasauControls:IntegerEditor EditValue="{Binding CancelClaimInterval,Mode=TwoWay}" Grid.Column="2"  Grid.Row="7" Height="25"
+              x:Name="liCancelClaimInterval"/>
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=MinAmount,Mode=OneWay}" Margin="5,0,0,0" Grid.Column="0" Grid.Row="8" VerticalAlignment="Center"/>
+            <CorasauControls:IntegerEditor EditValue="{Binding MinAmount,Mode=TwoWay}" Grid.Column="2"  Grid.Row="8" Height="25"
+              x:Name="liMinAmount"/>
+        </Grid>
+        <StackPanel x:Name="actionButton" HorizontalAlignment="Right" Grid.Row="1" Orientation="Horizontal" Margin="0 10 0 0">
+            <Button x:Name="OKButton" IsDefault="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OK,Mode=OneWay}" Click="OKButton_Click" MinWidth="75" Height="23" 
+                    HorizontalAlignment="Right" Margin="0 0 3 0" />
+            <Button x:Name="CancelButton" IsCancel="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Cancel,Mode=OneWay}" Click="CancelButton_Click" MinWidth="75" 
+                    Height="23" HorizontalAlignment="Right"/>
+        </StackPanel>
+    </Grid>
+</cw:ChildWindow>

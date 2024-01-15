@@ -1,0 +1,46 @@
+﻿<ClientTools:ChildWindow x:Class="UnicontaClient.Pages.CWPreviewXMLViewer"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools" 
+             xmlns:UnicontaCtrls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+             Width="850" Height="700"  ResizeMode="CanResize">
+    <Grid x:Name="LayoutRoot" Margin="2">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="5" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="5" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid x:Name="contentViewerGrid" Margin="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+
+        </Grid>
+        <Grid x:Name="prevNextPanel" VerticalAlignment="Center" HorizontalAlignment="Stretch" Grid.Row="2" Visibility="Collapsed">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Button x:Name="btnPrev" Height="23" Margin="10,0,0,0" Grid.Column="0" Width="90"  HorizontalAlignment="Right" VerticalAlignment="Center" 
+                        Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Previous}" Click="btnPrev_Click" />
+            <Button x:Name="btnNext" Height="23" Margin="5,0,5,0" Width="90" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" 
+                        Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Next}" Click="btnNext_Click" />
+            <StackPanel Orientation="Horizontal" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center">
+                <TextBlock x:Name="currentBlk"  Margin="0 0 2 0"  />
+                <TextBlock Text="/"  />
+                <TextBlock x:Name="totalBlk" Margin="2 0 3 0" />
+            </StackPanel>
+        </Grid>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Row="4">
+            <Button x:Name="ViewProgram" Height="23" Margin="10,0,0,0" Width="120"  HorizontalAlignment="Right" VerticalAlignment="Bottom"  
+                        Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ViewInProgram}" Click="ViewProgram_Click" />
+            <Button x:Name="fileSave" Height="23" Margin="5,0,5,0" Width="90"  HorizontalAlignment="Right" VerticalAlignment="Bottom"  
+                        Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=SaveAs}" Click="fileSave_Click" />
+            <Button x:Name="btnClose" IsCancel="True" Margin="5,0,5,0" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=Close}" Click="btnClose_Click"  
+                    Width="90" Height="23" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
+        </StackPanel>
+       
+    </Grid>
+</ClientTools:ChildWindow>

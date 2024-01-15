@@ -1,0 +1,62 @@
+﻿<cw:ChildWindow x:Class="UnicontaClient.Controls.Dialogs.CWDebtorPaymentSetupNets"
+                      xmlns:cw="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+           xmlns:controls="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls"
+           xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+           xmlns:ClientToolsControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+           xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+           Width="650" Height="700" KeyDown="ChildWindow_KeyDown">
+  
+    <Grid x:Name="LayoutRoot" Margin="2" >
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid VerticalAlignment="Top">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>                
+                <RowDefinition Height="260"/>
+                <RowDefinition Height="140"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="170"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="{Binding Converter={StaticResource  GlobalLocalizationValueConverter},ConverterParameter=Type,Mode=OneWay}" Margin="5,0,0,0" Grid.Column="0" Grid.Row="0" VerticalAlignment="Center"/>
+            <CorasauControls:ComboBoxEditor x:Name="cmbType" Height="23" Width="100" SelectedItem="{Binding Type,Mode=TwoWay}" Grid.Column="2" HorizontalAlignment="Left" Grid.Row="0" />
+           
+            <TextBlock Text="{Binding Converter={StaticResource  GlobalLocalizationValueConverter},ConverterParameter=DebtorGroup,Mode=OneWay}" Margin="5,0,0,0" Grid.Column="0" Grid.Row="1" VerticalAlignment="Center"/>
+            <CorasauControls:TextEditor HandleKeyDown="False" x:Name="txtDebtorGroup" Text="{Binding DebtorGroup,Mode=TwoWay}" Grid.Column="2" HorizontalAlignment="Left" Grid.Row="1" Height="23" Width="100"/>
+
+            <TextBlock Text="{Binding Converter={StaticResource  GlobalLocalizationValueConverter},ConverterParameter=CollectionPrinciple,Mode=OneWay}" Margin="5,0,0,0" Grid.Column="0" Grid.Row="2" VerticalAlignment="Center"/>
+            <CorasauControls:ComboBoxEditor x:Name="cmbCollectionPrinciple" Height="23" Width="100" SelectedItem="{Binding CollectionPrinciple,Mode=TwoWay}" Grid.Column="2" HorizontalAlignment="Left" Grid.Row="2" />
+
+            <TextBlock x:Name="lblCreatePaymentId" Text="{Binding Converter={StaticResource  GlobalLocalizationValueConverter},ConverterParameter=CreatePaymentId,Mode=OneWay}" Margin="5,0,0,0" Grid.Column="0" Grid.Row="3"  VerticalAlignment="Center"/>
+            <CorasauControls:CheckEditor x:Name="ceCreatePaymentId" IsChecked="{Binding CreatePaymentId,Mode=TwoWay}" Grid.Column="2" Grid.Row="3"  />
+
+            <TextBlock x:Name="lblBlockDisbursement" Text="{Binding Converter={StaticResource  GlobalLocalizationValueConverter},ConverterParameter=BlockDisbursement,Mode=OneWay}" Margin="5,0,0,0" Grid.Column="0" Grid.Row="4"  VerticalAlignment="Center"/>
+            <CorasauControls:CheckEditor x:Name="ceBlockDisbursement" IsChecked="{Binding BlockDisbursement,Mode=TwoWay}" Grid.Column="2" Grid.Row="4"  />
+
+            <TextBlock x:Name="lblExpandDeadline" Text="{Binding Converter={StaticResource  GlobalLocalizationValueConverter},ConverterParameter=ExtendedDeliveryDeadline,Mode=OneWay}" Margin="5,0,0,0" Grid.Column="0" Grid.Row="5"  VerticalAlignment="Center"/>
+            <CorasauControls:CheckEditor x:Name="ceExpandDeadline" IsChecked="{Binding ExpandDeadline,Mode=TwoWay}" Grid.Column="2" Grid.Row="5"  />
+
+            <TextBlock Text="{Binding Converter={StaticResource  GlobalLocalizationValueConverter},ConverterParameter=InvoiceTextTemplate,Mode=OneWay}" Margin="5,0,0,0" Grid.Column="0" Grid.Row="6" />
+            <CorasauControls:TextEditor HandleKeyDown="False" Text="{Binding InvoiceTextTemplate,Mode=TwoWay}" AcceptsReturn="True" VerticalContentAlignment="Top" TextWrapping="Wrap" HorizontalContentAlignment="Left" Grid.Column="2"  Grid.Row="6" Height="250"  x:Name="txtInvoiceTextTemplate"/>
+            <TextBlock Text="{Binding Converter={StaticResource  GlobalLocalizationValueConverter},ConverterParameter=InvoiceTextTemplateNoLines,Mode=OneWay}" Margin="5,0,0,0" Grid.Column="0" Grid.Row="7" />
+            <CorasauControls:TextEditor HandleKeyDown="False" Text="{Binding InvoiceTextTemplateNoLines,Mode=TwoWay}" AcceptsReturn="True" VerticalContentAlignment="Top" TextWrapping="Wrap" HorizontalContentAlignment="Left" Grid.Column="2"  Grid.Row="7" Height="140"  x:Name="txtInvoiceTextTemplateNoLines"/>
+        </Grid>
+        <StackPanel x:Name="actionButton" HorizontalAlignment="Right" Grid.Row="1" Orientation="Horizontal" Margin="0 10 0 0">
+            <Button x:Name="OKButton" IsDefault="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OK,Mode=OneWay}" Click="OKButton_Click" MinWidth="75" Height="23" 
+                    HorizontalAlignment="Right" Margin="0 0 3 0" />
+            <Button x:Name="CancelButton" IsCancel="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Cancel,Mode=OneWay}" Click="CancelButton_Click" MinWidth="75" 
+                    Height="23" HorizontalAlignment="Right"/>
+        </StackPanel>
+    </Grid>
+</cw:ChildWindow>
