@@ -92,6 +92,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CrmDebtorProspectReport"
                     <local:CorasauDataGridTemplateColumnClient x:Name="ZipCode" Width="70"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="City" Width="100"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Country" Width="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="IndustryCode" Width="100"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="CompanyRegNo" Width="100"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Currency" Width="100"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Phone" Width="150"  />

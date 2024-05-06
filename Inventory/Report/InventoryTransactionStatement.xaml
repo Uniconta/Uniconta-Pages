@@ -3,14 +3,12 @@
 x:Class="UnicontaClient.Pages.CustomPage.InventoryTransactionStatement"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
         xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
     <UserControl.Resources>
         <DataTemplate x:Key="RegularCellTemplate">
             <Grid>
-                <TextBlock FontWeight="Bold" Foreground="Red" VerticalAlignment="Center"  Text="{Binding RowData.Row.ItemNumber}" />
+                <TextBlock FontWeight="Bold" Foreground="{StaticResource StatementAccountHeaderColorForeground}" VerticalAlignment="Center"  Text="{Binding RowData.Row.ItemNumber}" />
             </Grid>
         </DataTemplate>
     </UserControl.Resources>

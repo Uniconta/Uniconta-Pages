@@ -50,7 +50,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         int OpenTransactionType;
         private string settlement;
-        private double RemainingAmt, RemainingAmtCur;
+        private double RemainingAmt, RemainingAmtCur, sumCashDiscount;
         byte settleCur;
         GLDailyJournalLineClient SelectedJournalLine;
         BankStatementLineClient SelectedBankStatemenLine;
@@ -398,19 +398,20 @@ namespace UnicontaClient.Pages.CustomPage
 
                 if (SelectedJournalLine != null)
                 {
-                    refreshParams = new object[6];
-                    refreshParams[0] = SelectedJournalLine;
-                    refreshParams[1] = settlement;
-                    refreshParams[2] = RemainingAmt;
-                    refreshParams[3] = RemainingAmtCur;
-                    refreshParams[4] = settleCur != 0 ? CurrencyUtil.GetStringFromId(settleCur) : null;
-                    refreshParams[5] = OffSet;
+                    refreshParams = new object[]
+                    {
+                        SelectedJournalLine,
+                        settlement,
+                        RemainingAmt,
+                        RemainingAmtCur,
+                        settleCur != 0 ? CurrencyUtil.GetStringFromId(settleCur) : null,
+                        OffSet,
+                        (selectedInvoices.Count > 1 && sumCashDiscount != 0 && UsedCachDiscount()) ? IdObject.get(Math.Abs(sumCashDiscount)) : null
+                    };
                 }
                 else if (SelectedBankStatemenLine != null)
                 {
-                    refreshParams = new object[2];
-                    refreshParams[0] = SelectedBankStatemenLine;
-                    refreshParams[1] = settlement;
+                    refreshParams = new object[] { SelectedBankStatemenLine, settlement };
                 }
                 CloseDockItem();
             }
@@ -423,6 +424,7 @@ namespace UnicontaClient.Pages.CustomPage
                 settleCur = 0;
                 RemainingAmt = 0;
                 RemainingAmtCur = 0;
+                sumCashDiscount = 0;
                 return true;
             }
             return false;
@@ -496,13 +498,10 @@ namespace UnicontaClient.Pages.CustomPage
 
         void AllCheckMarked(bool value)
         {
-            var sourceDebTran = dgOpenTransactionGrid.ItemsSource as IEnumerable<DebtorTransOpenClientExtended>;
-            IEnumerable<CreditorTransOpenClientExtended> sourceCredTran = null;
-            if (sourceDebTran == null)
-                sourceCredTran = dgOpenTransactionGrid.ItemsSource as IEnumerable<CreditorTransOpenClientExtended>;
-            if (sourceDebTran != null)
+            var lst = dgOpenTransactionGrid.ItemsSource as IEnumerable<DebtorTransOpenClientExtended>;
+            if (lst != null)
             {
-                foreach (var row in sourceDebTran)
+                foreach (var row in lst)
                 {
                     if (row.IsChecked == value)
                         continue;
@@ -511,22 +510,63 @@ namespace UnicontaClient.Pages.CustomPage
                     CheckBoxClicked(row);
                 }
             }
-            else if (sourceCredTran != null)
+            else
             {
-                foreach (var row in sourceCredTran)
+                var lst2 = dgOpenTransactionGrid.ItemsSource as IEnumerable<CreditorTransOpenClientExtended>;
+                if (lst2 != null)
                 {
-                    if (row.IsChecked == value)
-                        continue;
+                    foreach (var row in lst2)
+                    {
+                        if (row.IsChecked == value)
+                            continue;
 
-                    row.IsChecked = value;
-                    CheckBoxClicked(row);
+                        row.IsChecked = value;
+                        CheckBoxClicked(row);
+                    }
                 }
             }
         }
+
+        bool UsedCachDiscount()
+        {
+            int payments = 0, invoices = 0;
+            var lst = dgOpenTransactionGrid.ItemsSource as IEnumerable<DebtorTransOpenClientExtended>;
+            if (lst != null)
+            {
+                foreach (var row in lst)
+                {
+                    if (row.IsChecked == true)
+                    {
+                        if (row.Amount > 0)
+                            invoices++;
+                        else
+                            payments++;
+                    }
+                }
+            }
+            else
+            {
+                var lst2 = dgOpenTransactionGrid.ItemsSource as IEnumerable<CreditorTransOpenClientExtended>;
+                if (lst2 != null)
+                {
+                    foreach (var row in lst2)
+                    {
+                        if (row.IsChecked == true)
+                        {
+                            if (row.Amount < 0)
+                                invoices++;
+                            else
+                                payments++;
+                        }
+                    }
+                }
+            }
+            return invoices == 1 && payments > 0; // We will transfer UsedCachDiscount to journal, if we have one invoice and one or more payments/creditnote
+        }
+
         private void CheckBox_Click(object sender, RoutedEventArgs e)
         {
-            var chk = sender as CheckBox;
-            CheckBoxClicked(chk.Tag);
+            CheckBoxClicked((sender as CheckBox).Tag);
         }
 
         private void CheckBoxClicked(object selectedItem)
@@ -551,6 +591,7 @@ namespace UnicontaClient.Pages.CustomPage
                 DateTime dt = (SelectedJournalLine != null) ? SelectedJournalLine._Date : (SelectedBankStatemenLine != null ? SelectedBankStatemenLine._Date : DateTime.MinValue);
                 if (dt <= row._CashDiscountDate.AddDays(this.GraceDays))
                 {
+                    sumCashDiscount += row._CashDiscount;
                     if (amountOpenCur == 0)
                     {
                         if (amountOpen > 0)

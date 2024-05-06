@@ -34,13 +34,14 @@ namespace UnicontaClient.Pages.CustomPage
         public CompanyPreferencePage(BaseAPI API)
              : this(API.CompanyEntity)
         {
-          
+
         }
         public CompanyPreferencePage(UnicontaBaseEntity sourceData) : base(sourceData, true)
         {
             InitializeComponent();
             cmbOrdLineStorageReg.ItemsSource = AppEnums.StorageRegister.Values;
             cmbPurLineStorageReg.ItemsSource = AppEnums.StorageRegisterPurchage.Values;
+            cmbOIOUBLIncludes.ItemsSource = AppEnums.OIOUBLIncludeOptions.Values;
             cmbAccOnInvTrans.ItemsSource = new string[] { Uniconta.ClientTools.Localization.lookup("DeliveryAccount"), Uniconta.ClientTools.Localization.lookup("InvoiceAccount") };
             layoutControl = layoutItems;
             layoutItems.DataContext = editrow;

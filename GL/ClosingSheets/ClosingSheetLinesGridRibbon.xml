@@ -5,7 +5,7 @@
     <RibbonItem Action="AddRow" LocalizedNameKey="AddOBJ" Parameter="Line" Glyph="Add_16x16" LargeGlyph="Add_32x32"/>
     <RibbonItem Action="CopyRow" LocalizedNameKey="CopyLine" LargeGlyph="Copy_32x32"/>    
     <RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="Delete" Glyph="Delete_16x16" LargeGlyph="Delete_32x32"/>    
-    <RibbonItem Action="SaveGrid" ShortcutKey="CTRL+S" LocalizedNameKey="Save" Glyph="save-16x16" LargeGlyph="save-32x32"/>        
+    <RibbonItem Action="SaveGrid" ShortcutKey="CTRL+S" LocalizedNameKey="SaveExit" Glyph="save-16x16" LargeGlyph="save-32x32"/>        
   </RibbonItem>
   <RibbonItem>
     <!---If we want to create a new group in same PageTab-->
@@ -27,11 +27,11 @@
   </RibbonItem>
   <RibbonItem>
     <RibbonItem LocalizedNameKey="PhysicalVoucher" Glyph="Cover_16x16" LargeGlyph="View_Voucher_32x32">
-      <RibbonItem Action="ViewVoucher" LocalizedNameKey="View" Glyph="View_16x16" LargeGlyph="View_32x32"/>
-      <RibbonItem Action="RefVoucher" LocalizedNameKey="Attach" Glyph="Attachments_16x16" LargeGlyph="Attachments_32x32"/>
-      <RibbonItem Action="ImportVoucher" LocalizedNameKey="ImportFile" Glyph="Add_16x16" LargeGlyph="Add_32x32"/>
-      <RibbonItem Action="RemoveVoucher" LocalizedNameKey="Remove" Glyph="Delete_16x16" LargeGlyph="Delete_32x32"/>
-      <RibbonItem Action="DragDrop" LocalizedNameKey="DragAndDrop" Glyph="DragDrop_File_16x16"/>
+      <RibbonItem Action="ViewVoucher" LocalizedNameKey="View" ShortcutKey="F7" Glyph="View_16x16" LargeGlyph="View_32x32"/>
+      <RibbonItem Action="RefVoucher" LocalizedNameKey="Attach" ShortcutKey="Ctrl+T" Glyph="Attachments_16x16" LargeGlyph="Attachments_32x32"/>
+      <RibbonItem Action="ImportVoucher" LocalizedNameKey="ImportFile" Glyph="Add_16x16" LargeGlyph="Add_32x32" ShortcutKey="Ctrl+J"/>
+      <RibbonItem Action="RemoveVoucher" LocalizedNameKey="Remove" Glyph="Delete_16x16" LargeGlyph="Delete_32x32" ShortcutKey="Ctrl+I"/>
+      <RibbonItem Action="DragDrop" LocalizedNameKey="DragAndDrop" Glyph="DragDrop_File_16x16" ShortcutKey="Ctrl+G"/>
     </RibbonItem>
     <RibbonItem Action="ViewDownloadRow" ShortcutKey="F7" LocalizedNameKey="PhysicalVoucherTrans" Glyph="View_Voucher_32x32" LargeGlyph="View_Voucher_32x32" />
     <RibbonItem Action="VoucherTransactions" ShortcutKey="Alt+T" LocalizedNameKey="VoucherTransactions" Glyph="Voucher_Transactions_32x32" LargeGlyph="Voucher_Transactions_32x32" />

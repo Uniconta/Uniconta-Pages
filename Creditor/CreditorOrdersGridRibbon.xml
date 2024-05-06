@@ -57,9 +57,6 @@
     <RibbonItem Action="CreateOrder" LocalizedNameKey="CopyOBJ" Parameter="PurchaseSalesOrder" Glyph="refresh" LargeGlyph="Orders_32x32"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="ReadOIOUBL" LocalizedNameKey="ImportOBJ" Parameter="OIOUBL" LargeGlyph="Import_32x32"/>
-  </RibbonItem>
-  <RibbonItem>
     <RibbonItem Action="PurchaseCharges" LocalizedNameKey="PurchaseCharges" ControlName="CreditorOrderCostLinePage" Module="PurchaseCharges" LargeGlyph="Purchase_Lines_32x32"/>
   </RibbonItem>
   <RibbonItem>

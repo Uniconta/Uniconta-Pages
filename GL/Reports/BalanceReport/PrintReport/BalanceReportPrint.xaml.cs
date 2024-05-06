@@ -132,7 +132,7 @@ namespace UnicontaClient.Pages.CustomPage
         SimpleLink CreateLink(HeaderData hdrdata, List<BalanceReportdata> listbalance, bool _landscape)
         {
             SimpleLink link = new SimpleLink();
-            link.PaperKind = System.Drawing.Printing.PaperKind.A4;
+            link.PaperKind = DevExpress.Drawing.Printing.DXPaperKind.A4;
             link.PrintingSystem.ExportOptions.Html.EmbedImagesInHTML = true;
             ExportOptions options = link.PrintingSystem.ExportOptions;
             ExportOptionKind[] OptionsKinds = new ExportOptionKind[]{
@@ -416,15 +416,14 @@ namespace UnicontaClient.Pages.CustomPage
     }
     public class LineDetailsData
     {
-
-        public LineDetailsData()
+        public LineDetailsData(List<BalanceClient> balanceClient)
         {
-            this.balClient = new List<BalanceClient>();
-            this.BalanceReportlist = new List<BalanceReportdata>();
+            this.balClient = balanceClient;
+            this.BalanceReportlist = new List<BalanceReportdata>(balanceClient.Count);
         }
-        public List<BalanceClient> balClient { get; set; }
+        public List<BalanceClient> balClient { get; private set; }
         public byte[] Line { get { return Utilities.Utility.GetImageData("black.png"); } }
-        public List<BalanceReportdata> BalanceReportlist { get; set; }
+        public List<BalanceReportdata> BalanceReportlist { get; private set; }
     }
     public class PrintBaseModule : BaseModulel
     {
@@ -435,7 +434,7 @@ namespace UnicontaClient.Pages.CustomPage
         protected override TemplatedLink CreateLink()
         {
             SimpleLink link = new SimpleLink();
-            link.PaperKind = System.Drawing.Printing.PaperKind.A4;
+            link.PaperKind = DevExpress.Drawing.Printing.DXPaperKind.A4;
             if (!string.IsNullOrEmpty(BasePage.session.User._Printer))
                 link.PrintingSystem.PageSettings.PrinterName = BasePage.session.User._Printer;
 

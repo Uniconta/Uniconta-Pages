@@ -1,5 +1,4 @@
 using UnicontaClient.Models;
-using UnicontaClient.Utilities;
 using Uniconta.ClientTools;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
@@ -7,15 +6,8 @@ using Uniconta.ClientTools.Util;
 using Uniconta.Common;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
 using System.Windows.Controls;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
 using Uniconta.DataModel;
 using System.Collections;
 using Uniconta.ClientTools.Controls;
@@ -32,7 +24,7 @@ namespace UnicontaClient.Pages.CustomPage
     }
     public partial class ContactPage : GridBasePage
     {
-        SQLCache CrmProspectCache, DebtorCache, CreditorCache;
+        SQLCache CrmProspectCache, DebtorCache, CreditorCache, interestCache, productsCache;
         bool hasPageMaster;
 
         public override string NameOfControl
@@ -122,11 +114,10 @@ namespace UnicontaClient.Pages.CustomPage
             dgContactGrid.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;
             ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "UndoDelete", "SaveGrid" });
 
-#if SILVERLIGHT
-            Application.Current.RootVisual.KeyDown += RootVisual_KeyDown;
-#else
+            Interests.Visible = Interests.ShowInColumnChooser = api.CompanyEntity.CRM;
+            Products.Visible = Products.ShowInColumnChooser = api.CompanyEntity.CRM;
+
             this.PreviewKeyDown += RootVisual_KeyDown;
-#endif
             this.BeforeClose += ContactPage_BeforeClose;
         }
 
@@ -184,11 +175,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void ContactPage_BeforeClose()
         {
-#if SILVERLIGHT
-            Application.Current.RootVisual.KeyDown -= RootVisual_KeyDown;
-#else
             this.PreviewKeyDown -= RootVisual_KeyDown;
-#endif
         }
 
         private void RootVisual_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
@@ -363,6 +350,12 @@ namespace UnicontaClient.Pages.CustomPage
                 CreditorCache = api.GetCache(typeof(Uniconta.DataModel.Creditor)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Creditor)).ConfigureAwait(false);
             if (CrmProspectCache == null && api.CompanyEntity.CRM)
                 CrmProspectCache = api.GetCache(typeof(CrmProspect)) ?? await api.LoadCache(typeof(CrmProspect)).ConfigureAwait(false);
+
+            if (api.CompanyEntity.CRM)
+            {
+                interestCache = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.CrmInterest)) ?? await api.CompanyEntity.LoadCache(typeof(Uniconta.DataModel.CrmInterest), api).ConfigureAwait(false);
+                productsCache = api.GetCache(typeof(Uniconta.DataModel.CrmProduct)) ?? await api.CompanyEntity.LoadCache(typeof(Uniconta.DataModel.CrmProduct), api).ConfigureAwait(false);
+            }
         }
         private async void Save()
         {
@@ -413,6 +406,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 }
                                 break;
                             case CWConfirmationBox.ConfirmationResultEnum.No:
+                                dgContactGrid.CancelChanges();
                                 break;
                         }
                         editAllChecked = true;
@@ -497,7 +491,6 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-#if !SILVERLIGHT
         private void HasEmailImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             var contact = (sender as TextBlock).Tag as ContactClient;
@@ -509,6 +502,19 @@ namespace UnicontaClient.Pages.CustomPage
                 proc.Start();
             }
         }
-#endif
+
+        private void cmbInterests_GotFocus(object sender, RoutedEventArgs e)
+        {
+            var cmb = sender as ComboBoxEditor;
+            if (cmb != null && interestCache != null)
+                cmb.ItemsSource = interestCache.GetKeyList();
+        }
+
+        private void cmbProducts_GotFocus(object sender, RoutedEventArgs e)
+        {
+            var cmb = sender as ComboBoxEditor;
+            if (cmb != null)
+                cmb.ItemsSource = productsCache.GetKeyList();
+        }
     }
 }

@@ -1,0 +1,42 @@
+<Pages:GridBasePage xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.EmployeeRegistrationLinePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage"
+    xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
+    xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+    xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
+    xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors">
+    <UserControl.Resources>
+        <Style x:Key="StyleRow" TargetType="dxg:RowControl">
+            <Setter Property="Height" Value="Auto"/>
+        </Style>
+        <Util:MaskConverter x:Key="MaskConverter" />
+        <Util:RowIndexConverter x:Key="RowIndexConverter" />
+    </UserControl.Resources>
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Company/Employee/EmployeeRegistrationLinePageGridRibbon.xml" x:Name="localMenu"/>
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <localPage:EmployeeRegistrationLinePageGrid x:Name="dgEmployeeRegistrationLinePageGrid" AutoGenerateColumns="None" HorizontalAlignment="Stretch">
+                <localPage:EmployeeRegistrationLinePageGrid.Columns>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="FromTime" ShowTime="True" Width="150" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ToTime" ShowTime="True" Width="150"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PrimaryKeyId" Width="70" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Employee" Width="70"/>
+                    <localPage:ComboBoxColumnClient x:Name="Activity"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Qty" Width="80"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Text" Width="500"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Project" Width="80"/>
+                </localPage:EmployeeRegistrationLinePageGrid.Columns>
+            </localPage:EmployeeRegistrationLinePageGrid>
+        </CorasauControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>
+

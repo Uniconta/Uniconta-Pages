@@ -69,7 +69,7 @@ namespace UnicontaClient.Pages.CustomPage
             layoutControl = layoutItems;
             cbCountry.ItemsSource = Enum.GetValues(typeof(Uniconta.Common.CountryCode));
             DebGroupLookUpEditor.api = ItemNameGrouplookupeditior.api = PriceListlookupeditior.api = Employeelookupeditor.api = dim1lookupeditior.api = dim2lookupeditior.api =
-            dim3lookupeditior.api = dim4lookupeditior.api = dim5lookupeditior.api = grouplookupeditor.api = LayoutGrouplookupeditior.api = crudapi;
+            dim3lookupeditior.api = dim4lookupeditior.api = dim5lookupeditior.api = grouplookupeditor.api = LayoutGrouplookupeditior.api = leIndustryCode.api = crudapi;
 
             var Comp = crudapi.CompanyEntity;
 
@@ -182,6 +182,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                     if (!string.IsNullOrWhiteSpace(ci?.life?.name))
                     {
+                        editrow.IndustryCode = ci.industrycode?.code;
                         var address = ci.address;
                         if (address != null)
                         {

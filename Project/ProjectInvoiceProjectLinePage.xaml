@@ -43,6 +43,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectInvoiceProjectLinePage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="DiscountPct" Width="50" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="SalesAmount" Width="100"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="CostAmount" Width="100" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="WorkSpace" Width="70"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Employee" Width="70"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="ProjectForward" Width="70"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="ProjectForwardName" Width="120" Visible="False"/>

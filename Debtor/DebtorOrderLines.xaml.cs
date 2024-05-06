@@ -30,7 +30,6 @@ using UnicontaClient.Controls.Dialogs;
 using UnicontaClient.Pages;
 using Uniconta.Common.Utility;
 using Microsoft.Win32;
-using ubl_norway_uniconta;
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {

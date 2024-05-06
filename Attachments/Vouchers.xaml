@@ -132,6 +132,7 @@ x:Class="UnicontaClient.Pages.CustomPage.Vouchers"
                         </localPage:CorasauDataGridTemplateColumnClient>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="FromEmail" />
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="UserName" AllowEditing="False" Width="100" Visible="false" />
+                        <localPage:CorasauDataGridTemplateColumnClient x:Name="UserId" Width="70" Visible="False"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Fileextension"  Width="50" AllowEditing="False">
                             <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 <DataTemplate>
@@ -170,6 +171,7 @@ x:Class="UnicontaClient.Pages.CustomPage.Vouchers"
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Vat" Width="60" Visible="False"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Project" Visible="False" Width="90"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Visible="False" Width="90"/>
+                        <localPage:CorasauDataGridTemplateColumnClient x:Name="WorkSpace" Visible="False" Width="90" />
                         <localPage:ComboBoxColumnClient x:Name="PaymentMethod" Width="80" Visible="False" />
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="PaymentId" AllowEditing="True" MinWidth="100" Visible="False"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Approver1" Visible="False" Width="80"/>

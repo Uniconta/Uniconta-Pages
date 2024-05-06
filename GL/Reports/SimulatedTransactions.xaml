@@ -94,7 +94,7 @@ x:Class="UnicontaClient.Pages.CustomPage.SimulatedTransactions"
                             <ControlTemplate>
                                 <TextBlock Margin="2" HorizontalAlignment="Right"
                                            Text="{Binding DataContext.RowData.Row.VoucherTotal,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}"
-                                           Foreground="Red"/>
+                                           Foreground="{StaticResource StatementAccountHeaderColorForeground}"/>
                             </ControlTemplate>
                         </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                     </localPage:CorasauDataGridTemplateColumnClient>

@@ -83,6 +83,7 @@ x:Class="UnicontaClient.Pages.CustomPage.BankStGLTransPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Canceled"  Width="50" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Accrued"  Width="50" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Allocated" Width="50" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Modified" Width="50" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="VatEntered" Width="50" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim1" Width="70" FieldName="Dimension1" ShowInColumnChooser="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim2" Width="70" FieldName="Dimension2" ShowInColumnChooser="False"/>

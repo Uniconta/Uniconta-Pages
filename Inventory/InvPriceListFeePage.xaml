@@ -35,6 +35,7 @@ x:Class="UnicontaClient.Pages.CustomPage.InvPriceListFeePage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="AmountFrom" Width="50" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="AmountTo" Width="80" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Disable" Width="80" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="InclCreditnotes" Width="80" />
                 </localPage:InvPriceListFeeClientGrid.Columns>
             </localPage:InvPriceListFeeClientGrid>
         </CorasauControls:BusyIndicator>

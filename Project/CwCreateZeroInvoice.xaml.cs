@@ -76,6 +76,7 @@ namespace UnicontaClient.Pages.CustomPage
                 setTask(project);
                 lblProjTask.Visibility = leProjTask.Visibility = Visibility.Visible;
             }
+            ProjectWorkspace = prWorkspace?._Number;
             leProjWorkspace.SelectedItem = prWorkspace;
         }
         public CwCreateZeroInvoice(CrudAPI crudApi)

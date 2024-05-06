@@ -138,6 +138,7 @@ x:Class="UnicontaClient.Pages.CustomPage.BankStatementLinePage"
                                 <localPage:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension3" x:Name="coldim3"/>
                                 <localPage:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension4" x:Name="coldim4"/>
                                 <localPage:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension5" x:Name="coldim5"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="AiiaId" Width="100" Visible="False"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Note" Width="50" AllowEditing="True" >
                                     <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                         <DataTemplate>
@@ -221,6 +222,7 @@ x:Class="UnicontaClient.Pages.CustomPage.BankStatementLinePage"
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Canceled"  Width="50" Visible="False"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Accrued"  Width="50" Visible="False" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Allocated" Width="50" Visible="False" />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Modified" Width="50" Visible="False" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="VatEntered" Width="50" Visible="False" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim1" Width="70" FieldName="Dimension1" ShowInColumnChooser="False"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim2" Width="70" FieldName="Dimension2" ShowInColumnChooser="False"/>

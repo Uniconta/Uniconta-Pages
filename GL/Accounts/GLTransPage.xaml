@@ -11,6 +11,8 @@ x:Class="UnicontaClient.Pages.CustomPage.GLTransPage"
     d:DesignHeight="300" d:DesignWidth="400">
     <UserControl.Resources>
         <Util:RowIndexConverter x:Key="RowIndexConverter" />
+        <Util:ImageNameToImagesourceConverter x:Key="ImageNameToImagesourceConverter"/>
+        <Util:VisibilityBoolConverter x:Key="VisibilityBoolConverter" />
     </UserControl.Resources>
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
@@ -24,9 +26,10 @@ x:Class="UnicontaClient.Pages.CustomPage.GLTransPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Date" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Account" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="NumberSerie" Width="50"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Voucher" Width="60" AllowThousandMask="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="VoucherLine" Width="50" AllowThousandMask="false" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="NumberSerie" Width="50" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Voucher" Width="60" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="JournalPostedId" Width="60" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="VoucherLine" Width="50"  Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="VoucherX" Width="90" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Text" Width="200"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="TransType" Visible="False"/>
@@ -35,16 +38,29 @@ x:Class="UnicontaClient.Pages.CustomPage.GLTransPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Vat" Width="50" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="VatOperation" Width="30" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="AmountVat"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="HasVoucher" Width="50" PrintCellStyle="{StaticResource VoucherColumnLinkPrintingStyle}">
+                        <localPage:CorasauDataGridTemplateColumnClient.HeaderTemplate>
+                            <DataTemplate>
+                                <Image Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Attachments_16x16.svg}" Width="16" Height="16" VerticalAlignment="Center" />
+                            </DataTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.HeaderTemplate>
+                        <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <Image Margin="5" Tag="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Attachments_16x16.svg}" 
+                   MouseLeftButtonDown="HasVoucherImage_MouseLeftButtonDown" Visibility="{Binding DataContext.RowData.Row.HasVoucher,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource VisibilityBoolConverter}}" Cursor="Hand"
+                   Stretch="Fill" Width="16" Height="16" RenderOptions.BitmapScalingMode="NearestNeighbor" RenderOptions.EdgeMode="Aliased" />
+                            </ControlTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Currency" Width="35" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="AmountCur" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="AmountBase" Visible="False" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="JournalPostedId" Width="50" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Origin" Width="100" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DCType" Width="50" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DCAccount"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DCName"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="LegalIdent" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Invoice" Width="70" AllowThousandMask="false" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Invoice" Width="70"  Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DocumentDate" Width="85" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DocumentRef" Width="50" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Amount" Visible="False"/>
@@ -56,6 +72,7 @@ x:Class="UnicontaClient.Pages.CustomPage.GLTransPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Canceled" Width="50" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Accrued" Width="50" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Allocated" Width="50" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Modified" Width="50" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PostCalculated" Width="50" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="VatEntered" Width="50" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim1" Width="70" FieldName="Dimension1" ShowInColumnChooser="False"/>

@@ -101,6 +101,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOffers"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryCity" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryCountry" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Installation" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CompanyAddress" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Country" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="UpdatedAt" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="RelatedOrder" Visible="False" IsEditSettingSet="True">
@@ -132,10 +133,11 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOffers"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim4" Width="70" FieldName="Dimension4" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim5" Width="70" FieldName="Dimension5" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Weight" Visible="False" AllowThousandMask="True" Mask="N3"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="NetWeight" Visible="False" AllowThousandMask="True" Mask="N3"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Volume" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Cartons" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PostingText" Visible="False" />
-
+    
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryContactPerson" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryPhone" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryContactEmail" Visible="False" />

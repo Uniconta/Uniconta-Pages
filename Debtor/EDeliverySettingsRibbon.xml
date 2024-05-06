@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<root>
+	<RibbonItem TabId="0" LocalizedNameKey="Home">
+		<RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh" LargeGlyph="refresh"/>
+		<RibbonItem Action="Generate" LocalizedNameKey="Generate" LargeGlyph="Generate_32x32" ShortcutKey="Ctrl+G"/>
+		<RibbonItem Action="SendUBL" LocalizedNameKey="SendInvoicebyUBL" LargeGlyph="SendInvoiceMail_32x32" />
+		<RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" Glyph="SaveLayout_16x16"/>
+	</RibbonItem>
+	<RibbonItem>
+		<RibbonItem Action="ExpandAll" LocalizedNameKey="ExpandAll"  LargeGlyph="Expand_32x32" />
+		<RibbonItem Action="CollapseAll" LocalizedNameKey="CollapseAll" LargeGlyph="Collapse_32x32" />
+	</RibbonItem>
+</root>

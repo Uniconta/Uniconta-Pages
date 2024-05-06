@@ -77,7 +77,6 @@ x:Class="UnicontaClient.Pages.CustomPage.CrmProspectPage2"
                     <CorasauControls:CorasauLayoutItem FieldName="Blocked" x:Name="liBlocked" >
                         <CorasauControls:CheckEditor x:Name="Blocked" IsChecked="{Binding Blocked,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
-
                     <CorasauControls:CorasauLayoutItem FieldName="Interests" x:Name="liInterests">
                         <CorasauControls:ComboBoxEditor x:Name="cmbInterests" Text="{Binding Interests, Mode=TwoWay}">
                             <CorasauControls:ComboBoxEditor.StyleSettings>
@@ -85,7 +84,6 @@ x:Class="UnicontaClient.Pages.CustomPage.CrmProspectPage2"
                             </CorasauControls:ComboBoxEditor.StyleSettings>
                         </CorasauControls:ComboBoxEditor>
                     </CorasauControls:CorasauLayoutItem>
-
                     <CorasauControls:CorasauLayoutItem FieldName="Products" x:Name="liProducts">
                         <CorasauControls:ComboBoxEditor x:Name="cmbProducts" Text="{Binding Products, Mode=TwoWay}">
                             <CorasauControls:ComboBoxEditor.StyleSettings>
@@ -93,7 +91,9 @@ x:Class="UnicontaClient.Pages.CustomPage.CrmProspectPage2"
                             </CorasauControls:ComboBoxEditor.StyleSettings>
                         </CorasauControls:ComboBoxEditor>
                     </CorasauControls:CorasauLayoutItem>
-
+                    <CorasauControls:CorasauLayoutItem FieldName="IndustryCode" x:Name="liIndustryCode">
+                        <CorasauControls:LookupEditor x:Name="leIndustryCode" Text="{Binding IndustryCode ,Mode=TwoWay}" />
+                    </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
 
             </CorasauControls:CorasauLayoutGroup>

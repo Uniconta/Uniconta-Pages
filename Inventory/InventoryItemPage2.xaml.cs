@@ -64,7 +64,7 @@ namespace UnicontaClient.Pages.CustomPage
             cbCountry.ItemsSource = Enum.GetValues(typeof(Uniconta.Common.CountryCode));
             leAlternativeItem.api = leGroup.api = cmbDim1.api = cmbDim2.api = cmbDim3.api = cmbDim4.api = cmbDim5.api = cmbPrCategory.api =
                 leBrandGrp.api = leCategoryGrp.api = cmbPayrollCategory.api = cmbPurchaseAccount.api = cmbWarehouse.api = cmbLocation.api =
-                leDiscountGroup.api = leUnitGroup.api = leDutyGroup.api = crudapi;
+                leDiscountGroup.api = leUnitGroup.api = leDutyGroup.api = leStatisticsGroup.api = crudapi;
 
             if (LoadedRow == null)
             {
@@ -158,6 +158,22 @@ namespace UnicontaClient.Pages.CustomPage
                 var wareHouse = this.warehouse.Get(editrow._Warehouse) as InvWarehouseClient;
                 setLocation(wareHouse);
             }
+            if (Comp._InvGroups)
+            {
+                if (!string.IsNullOrEmpty(Comp._CategoryGroup))
+                {
+                    liCategoryGroup.IsLabelSet = true;
+                    liCategoryGroup.Label = Comp._CategoryGroup;
+                }
+                if (!string.IsNullOrEmpty(Comp._BrandGroup))
+                {
+                    liBrandGroup.IsLabelSet = true;
+                    liBrandGroup.Label = Comp._BrandGroup;
+                }
+            }
+            else
+                grpBrand.Visibility = Visibility.Collapsed;
+
             isLayoutCtrlLoaded = true;
         }
         public override bool BeforeSetUserField(ref CorasauLayoutGroup parentGroup)

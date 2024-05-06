@@ -225,6 +225,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 }
                                 break;
                             case CWConfirmationBox.ConfirmationResultEnum.No:
+                                dgGLTable.CancelChanges();
                                 break;
                         }
                         editAllChecked = true;

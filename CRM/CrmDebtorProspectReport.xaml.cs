@@ -363,6 +363,10 @@ namespace UnicontaClient.Pages.CustomPage
         [Display(Name = "Country", ResourceType = typeof(DCAccountText))]
         CountryCode Country { get; set; }
 
+        [ForeignKeyAttribute(ForeignKeyTable = typeof(IndustryCode))]
+        [Display(Name = "IndustryCode", ResourceType = typeof(DCAccountText))]
+        string IndustryCode { get; set; }
+
         [StringLength(20)]
         [Display(Name = "CompanyRegNo", ResourceType = typeof(DCAccountText))]
         string CompanyRegNo { get; set; }

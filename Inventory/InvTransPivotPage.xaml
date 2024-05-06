@@ -39,25 +39,26 @@ x:Class="UnicontaClient.Pages.CustomPage.InvTransPivotPage"
                 RowTotalsLocation="Far" RowTreeWidth="305"  ShowBorder="False" Loaded="PivotDgInvTrans_Loaded" 
                 VerticalAlignment="Stretch" ChartProvideDataByColumns="False" ChartSelectionOnly="True" ChartProvideColumnGrandTotals="False"
                  ChartProvideRowGrandTotals="False"    ChartDataProvideMode="UseCustomSettings" >
-                    <UnicontaControls:UnicontaPivotDataGrid.Fields>
-                        <UnicontaControls:UnicontaPivotGridField  x:Name="fieldItem"  FieldName="Item"  AllowFilter="True"   Width="100" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Item}"/>
-                        <UnicontaControls:UnicontaPivotGridField  x:Name="fieldItemName"  FieldName="ItemName"  AllowFilter="True"   Width="100" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ItemName}"/>
-                        <UnicontaControls:UnicontaPivotGridField  x:Name="fieldDCAccount"  FieldName="DCAccount"  AllowFilter="True"  Width="100" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Account}"/>
+                        <UnicontaControls:UnicontaPivotDataGrid.Fields>
+                            <UnicontaControls:UnicontaPivotGridField  x:Name="fieldItem"  FieldName="Item"  AllowFilter="True"   Width="100" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Item}"/>
+                            <UnicontaControls:UnicontaPivotGridField  x:Name="fieldItemName"  FieldName="ItemName"  AllowFilter="True"   Width="100" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ItemName}"/>
+                            <UnicontaControls:UnicontaPivotGridField  x:Name="fieldDCAccount"  FieldName="DCAccount"  AllowFilter="True"  Width="100" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Account}"/>
                             <UnicontaControls:UnicontaPivotGridField  x:Name="fieldAccountName"  FieldName="AccountName"  AllowFilter="True"  Width="100" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=AccountName}"/>
-                        <UnicontaControls:UnicontaPivotGridField  x:Name="fieldGroup"   FieldName="Group"  AllowFilter="True"  Width="100" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Group}" />
-                        <UnicontaControls:UnicontaPivotGridField  x:Name="fieldDebtorGroup"  FieldName="DebtorGroup"  AllowFilter="True"  Width="100" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DebtorGroup}" />
-                        <UnicontaControls:UnicontaPivotGridField  x:Name="fieldCreditorGroup"  FieldName="CreditorGroup"  AllowFilter="True"  Width="100" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CreditorGroup}"/>
-                        <UnicontaControls:UnicontaPivotGridField  x:Name="fieldMovType"  FieldName="MovementType"  AllowFilter="True"  Width="100" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=MovementType}"/>
-                        <UnicontaControls:UnicontaPivotGridField  x:Name="fieldWarehouse"  FieldName="Warehouse"  AllowFilter="True"  Width="100" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Warehouse}"/>
-                        <UnicontaControls:UnicontaPivotGridField  x:Name="fieldLocation"  FieldName="Location"  AllowFilter="True"  Width="100" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Location}"/>
-                        <UnicontaControls:UnicontaPivotGridField  x:Name="fieldEmployee"  FieldName="Employee"  AllowFilter="True"  Width="100" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Employee}"/>
-                        <UnicontaControls:UnicontaPivotGridField  x:Name="fieldVat"  FieldName="Vat"  AllowFilter="True" AreaIndex="10" Width="100" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Vat}"/>
+                            <UnicontaControls:UnicontaPivotGridField  x:Name="fieldGroup"   FieldName="Group"  AllowFilter="True"  Width="100" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Group}" />
+                            <UnicontaControls:UnicontaPivotGridField  x:Name="fieldDebtorGroup"  FieldName="DebtorGroup"  AllowFilter="True"  Width="100" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DebtorGroup}" />
+                            <UnicontaControls:UnicontaPivotGridField  x:Name="fieldCreditorGroup"  FieldName="CreditorGroup"  AllowFilter="True"  Width="100" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CreditorGroup}"/>
+                            <UnicontaControls:UnicontaPivotGridField  x:Name="fieldMovType"  FieldName="MovementType"  AllowFilter="True"  Width="100" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=MovementType}"/>
+                            <UnicontaControls:UnicontaPivotGridField  x:Name="fieldWarehouse"  FieldName="Warehouse"  AllowFilter="True"  Width="100" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Warehouse}"/>
+                            <UnicontaControls:UnicontaPivotGridField  x:Name="fieldLocation"  FieldName="Location"  AllowFilter="True"  Width="100" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Location}"/>
+                            <UnicontaControls:UnicontaPivotGridField  x:Name="fieldEmployee"  FieldName="Employee"  AllowFilter="True"  Width="100" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Employee}"/>
+                            <UnicontaControls:UnicontaPivotGridField  x:Name="fieldVat"  FieldName="Vat"  AllowFilter="True" AreaIndex="10" Width="100" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Vat}"/>
                             <UnicontaControls:UnicontaPivotGridField  x:Name="fieldBrandGroup"  FieldName="BrandGroup"  AllowFilter="True" Width="100"  Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BrandGroup}"/>
-                         <UnicontaControls:UnicontaPivotGridField  x:Name="fieldCategoryGroup"  FieldName="CategoryGroup"  AllowFilter="True"  Width="100" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CategoryGroup}"/>
-                        
-                        <UnicontaControls:UnicontaPivotGridField x:Name="fieldDate" FieldName="Date" GroupInterval="DateMonth"   Width="60" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Month}" />
-                        <UnicontaControls:UnicontaPivotGridField x:Name="fieldYear" FieldName="Date"  GroupInterval="DateYear"   Width="60" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Year}" />
-                        <UnicontaControls:UnicontaPivotGridField x:Name="fieldQuarter" ValueFormat="Quarter {0}" FieldName="Date"  GroupInterval="DateQuarter" Width="60" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Quarter}" />
+                            <UnicontaControls:UnicontaPivotGridField  x:Name="fieldCategoryGroup"  FieldName="CategoryGroup"  AllowFilter="True"  Width="100" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CategoryGroup}"/>
+                            <UnicontaControls:UnicontaPivotGridField  x:Name="fieldStatisticsGroup"  FieldName="StatisticsGroup"  AllowFilter="True"  Width="100" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=StatisticsGroup}"/>
+
+                            <UnicontaControls:UnicontaPivotGridField x:Name="fieldDate" FieldName="Date" GroupInterval="DateMonth"   Width="60" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Month}" />
+                            <UnicontaControls:UnicontaPivotGridField x:Name="fieldYear" FieldName="Date"  GroupInterval="DateYear"   Width="60" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Year}" />
+                            <UnicontaControls:UnicontaPivotGridField x:Name="fieldQuarter" ValueFormat="Quarter {0}" FieldName="Date"  GroupInterval="DateQuarter" Width="60" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Quarter}" />
 
                             <UnicontaControls:UnicontaPivotGridField x:Name="fieldQty" FieldName="Qty" SummaryType="Sum" ShowSummaryTypeName="True"  Area="DataArea" Width="120" AllowFilter="False" CellFormat="{}{0:N2}"
                                 AreaIndex="0" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Qty}" />
@@ -65,8 +66,8 @@ x:Class="UnicontaClient.Pages.CustomPage.InvTransPivotPage"
                                 AreaIndex="1" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Total}"  />
                             <UnicontaControls:UnicontaPivotGridField x:Name="fieldMargin" FieldName="Margin" SummaryType="Sum" ShowSummaryTypeName="True" Area="DataArea" Width="120" AllowFilter="False"  CellFormat="{}{0:N2}"
                                 AreaIndex="2" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Margin}" />
-                    </UnicontaControls:UnicontaPivotDataGrid.Fields>
-                </UnicontaControls:UnicontaPivotDataGrid>
+                        </UnicontaControls:UnicontaPivotDataGrid.Fields>
+                    </UnicontaControls:UnicontaPivotDataGrid>
                 <GridSplitter Grid.Row="1" x:Name="gridSplitter" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Visibility="{Binding ElementName=chartControl,Path=Visibility}" />
                 <UnicontaControls:UnicontaChart x:Name="chartControl" VerticalAlignment="Stretch" Grid.Row="2" Visibility="Collapsed" DataSource="{Binding ElementName=pivotDgInvTrans, Path=ChartDataSource}" >
                         <dxc:ChartControl.CrosshairOptions>

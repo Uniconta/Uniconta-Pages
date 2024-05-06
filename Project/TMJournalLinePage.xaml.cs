@@ -477,17 +477,17 @@ namespace UnicontaClient.Pages.CustomPage
                 if (item is SumColumn)
                 {
                     SumColumn customItem = (SumColumn)item;
-                    if (customItem.SerializableTag == "TotalDay1" ||
-                        customItem.SerializableTag == "TotalDay2" ||
-                        customItem.SerializableTag == "TotalDay3" ||
-                        customItem.SerializableTag == "TotalDay4" ||
-                        customItem.SerializableTag == "TotalDay5" ||
-                        customItem.SerializableTag == "TotalDay6" ||
-                        customItem.SerializableTag == "TotalDay7" ||
-                        customItem.SerializableTag == "TotalSum")
+                    var tag = customItem.SerializableTag;
+                    if (tag == "TotalDay1" ||
+                        tag == "TotalDay2" ||
+                        tag == "TotalDay3" ||
+                        tag == "TotalDay4" ||
+                        tag == "TotalDay5" ||
+                        tag == "TotalDay6" ||
+                        tag == "TotalDay7" ||
+                        tag == "TotalSum")
                     {
-                        Style style = this.FindResource("SummaryTotalStyle") as Style;
-                        customItem.TotalSummaryElementStyle = style;
+                        customItem.TotalSummaryElementStyle = this.FindResource("SummaryTotalStyle") as Style;
                     }
                 }
             }
@@ -516,22 +516,23 @@ namespace UnicontaClient.Pages.CustomPage
         private void SelectedItem_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             var rec = (TMJournalLineClientLocal)sender;
-            if (e.PropertyName == "Project" ||
-                e.PropertyName == "Day1" ||
-                e.PropertyName == "Day2" ||
-                e.PropertyName == "Day3" ||
-                e.PropertyName == "Day4" ||
-                e.PropertyName == "Day5" ||
-                e.PropertyName == "Day6" ||
-                e.PropertyName == "Day7")
+            var PropertyName = e.PropertyName;
+            if (PropertyName == "Project" ||
+                PropertyName == "Day1" ||
+                PropertyName == "Day2" ||
+                PropertyName == "Day3" ||
+                PropertyName == "Day4" ||
+                PropertyName == "Day5" ||
+                PropertyName == "Day6" ||
+                PropertyName == "Day7")
             {
-                if (rec._InternalType != Uniconta.DataModel.InternalType.None)
+                if (rec._InternalType != 0)
                 {
                     clearHoursList = true;
                     RecalculateWeekInternalHour();
                 }
                 RecalculateEfficiencyPercentage();
-                if (e.PropertyName == "Project")
+                if (PropertyName == "Project")
                 {
                     rec.Task = null;
 
@@ -542,17 +543,17 @@ namespace UnicontaClient.Pages.CustomPage
                     SetProjectTask(proj, rec);
                 }
             }
-            else if (e.PropertyName == "PayrollCategory")
+            else if (PropertyName == "PayrollCategory")
             {
                 SetInvoiceable(rec);
                 rec.NotifyPropertyChanged("IsMatched");
-                if (rec._InternalType != Uniconta.DataModel.InternalType.None)
+                if (rec._InternalType != 0)
                 {
                     clearHoursList = true;
                     RecalculateWeekInternalHour();
                 }
             }
-            else if (e.PropertyName == "Task")
+            else if (PropertyName == "Task")
             {
                 if (!rec.InsidePropChange)
                 {
@@ -565,13 +566,13 @@ namespace UnicontaClient.Pages.CustomPage
                         if (task != null)
                         {
                             rec.WorkSpace = task._WorkSpace;
-                            rec.PayrollCategory = task._PayrollCategory != null ? task._PayrollCategory : rec.PayrollCategory;
+                            rec.PayrollCategory = task._PayrollCategory ?? rec.PayrollCategory;
                         }
                     }
                     rec.InsidePropChange = false;
                 }
             }
-            else if (e.PropertyName == "WorkSpace")
+            else if (PropertyName == "WorkSpace")
             {
                 if (!rec.InsidePropChange)
                 {
@@ -773,7 +774,6 @@ namespace UnicontaClient.Pages.CustomPage
                 else
                     ribbonControl.EnableButtons("AddMileage");
 
-
                 ShowHideMileage();
             }
         }
@@ -858,7 +858,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         void SetInvoiceable(TMJournalLineClientLocal rec)
         {
-            var payroll = (Uniconta.DataModel.EmpPayrollCategory)payrollCache.Get(rec.PayrollCategory);
+            var payroll = (Uniconta.DataModel.EmpPayrollCategory)payrollCache?.Get(rec.PayrollCategory);
             if (payroll != null)
             {
                 var Cat = (PrCategory)CategoryCache.Get(payroll._PrCategory);
@@ -886,7 +886,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                 foreach (var val in payrollCache)
                 {
-                    if (val._InternalType == Uniconta.DataModel.InternalType.None || val._InternalType == Uniconta.DataModel.InternalType.OtherAbsence || val._InternalType == Uniconta.DataModel.InternalType.Sickness)
+                    if (val._InternalType == 0 || val._InternalType == Uniconta.DataModel.InternalType.OtherAbsence || val._InternalType == Uniconta.DataModel.InternalType.Sickness)
                         continue;
 
                     switch (val._InternalType)
@@ -1215,7 +1215,7 @@ namespace UnicontaClient.Pages.CustomPage
             var gridHours = (IEnumerable<TMJournalLineClient>)dgTMJournalLineGrid.ItemsSource;
             if (gridHours != null)
             {
-                var grpLstInvoiceable = gridHours.Where(s => s._InternalType == Uniconta.DataModel.InternalType.None).GroupBy(x => x._Invoiceable).Select(x => new { GroupKey = x.Key, Sum = x.Sum(y => y.Total) });
+                var grpLstInvoiceable = gridHours.Where(s => s._InternalType == 0).GroupBy(x => x._Invoiceable).Select(x => new { GroupKey = x.Key, Sum = x.Sum(y => y.Total) });
                 foreach (var i in grpLstInvoiceable)
                 {
                     if (i.GroupKey)
@@ -1228,6 +1228,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
 
             SetStatusTextEfficiencyPercentage(efficiencyPercentage);
+            SetStatusTextInvoiceableHours(invoiceableHours);
         }
 
         void RecalculateWeekInternalMileage()
@@ -1318,6 +1319,20 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
+        void SetStatusTextInvoiceableHours(double invoiceable = 0)
+        {
+            const string format = "N2";
+            RibbonBase rb = (RibbonBase)localMenu.DataContext;
+            var groups = UtilDisplay.GetMenuCommandsByStatus(rb, true);
+            var lblInvoiceable = Uniconta.ClientTools.Localization.lookup("InvoiceableHours");
+
+            foreach (var grp in groups)
+            {
+                if (grp.Caption == lblInvoiceable)
+                    grp.StatusValue = invoiceable.ToString(format);
+            }
+        }
+
         List<TMEmpCalendarSetupClient> calenderLst;
         List<TMEmpCalendarLineClient> calendarLineLst = new List<TMEmpCalendarLineClient>();
         List<TMEmpCalendarLineClient> standardCalendarLineLst = new List<TMEmpCalendarLineClient>();
@@ -1346,7 +1361,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (calenderLst != null && calenderLst.Any(s => s._Employee == employee._Number))
             {
                 var weekStartDate = employee._Hired > JournalLineDate ? employee._Hired : JournalLineDate;
-                var weekEnddate = JournalLineDate.AddDays(6);
+                var weekEnddate = employee._Terminated > JournalLineDate && employee._Terminated <= JournalLineDate.AddDays(6) ? employee._Terminated : JournalLineDate.AddDays(6);
 
                 var calenders = calenderLst.
                     Where(x => x._Employee == employee._Number &&
@@ -1357,7 +1372,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                 if (calenders.Count == 1)
                 {
-                    var tmEmpCalender = calenders.FirstOrDefault();
+                    var tmEmpCalender = calenders[0];
                     calendarStartDate = tmEmpCalender.ValidFrom;
 
                     if (calendarLineLst.Any(s => s.Calendar == tmEmpCalender.Calendar) == false)
@@ -1832,12 +1847,6 @@ namespace UnicontaClient.Pages.CustomPage
                         journalLine.NotifyPropertyChanged("RegistrationType");
                         dgTMJournalLineGrid.AddRow(journalLine);
                     }
-                    else
-                    {
-                        journalLine._RegistrationType = Uniconta.DataModel.RegistrationType.Mileage;
-                        journalLine.NotifyPropertyChanged("RegistrationType");
-                        dgTMJournalLineTransRegGrid.AddRow(journalLine);
-                    }
                     break;
                 case "CopyRow":
                     if (selectedItem != null && KeyAllowed("CopyLine") && !mileageGridFocus)
@@ -1845,12 +1854,6 @@ namespace UnicontaClient.Pages.CustomPage
                         dgTMJournalLineGrid.CopyRow();
                         RecalculateWeekInternalHour();
                         RecalculateEfficiencyPercentage();
-                    }
-                    else
-                    {
-                        var selectedMileage = dgTMJournalLineTransRegGrid.SelectedItem as TMJournalLineClientLocal;
-                        if (selectedMileage != null && KeyAllowed("CopyLine") && mileageGridFocus)
-                            dgTMJournalLineTransRegGrid.CopyRow();
                     }
                     break;
                 case "SaveGrid":
@@ -1988,31 +1991,30 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 if (cw.DialogResult == true)
                 {
-                    var journalLine = new TMJournalLineClientLocal();
+                    var journalLine = new TMJournalLineClientLocal
+                    {
+                        _Project = cw.RegistrationProject,
+                        _Date = JournalLineDate,
+                        _RegistrationType = Uniconta.DataModel.RegistrationType.Mileage,
+                        _WorkSpace = cw.WorkSpace,
+                        _Task = cw.PrTask,
+                        _Text = cw.Purpose,
+                        _PayrollCategory = cw.PayType,
+                        _Day1 = cw.Day1,
+                        _Day2 = cw.Day2,
+                        _Day3 = cw.Day3,
+                        _Day4 = cw.Day4,
+                        _Day5 = cw.Day5,
+                        _Day6 = cw.Day6,
+                        _Day7 = cw.Day7,
+                        _Mileage = cw.MileageLst
+                    };
                     journalLine.SetMaster(api.CompanyEntity);
-                    journalLine._Project = cw.RegistrationProject;
-                    journalLine._Date = JournalLineDate;
-                    journalLine._RegistrationType = Uniconta.DataModel.RegistrationType.Mileage;
-                    journalLine._AddressFrom = cw.FromAddress;
-                    journalLine._AddressTo = cw.ToAddress;
-                    journalLine._WorkSpace = cw.WorkSpace;
-                    journalLine._Task = cw.PrTask;
-                    journalLine._Text = cw.Purpose;
-                    journalLine._PayrollCategory = cw.PayType;
-                    journalLine._VechicleRegNo = cw.VechicleRegNo;
-                    journalLine._Day1 = cw.Day1;
-                    journalLine._Day2 = cw.Day2;
-                    journalLine._Day3 = cw.Day3;
-                    journalLine._Day4 = cw.Day4;
-                    journalLine._Day5 = cw.Day5;
-                    journalLine._Day6 = cw.Day6;
-                    journalLine._Day7 = cw.Day7;
                     SetInvoiceable(journalLine);
                     dgTMJournalLineTransRegGrid.AddRow(journalLine);
                     if (cw.Returning)
                     {
-                        journalLine._AddressFrom = cw.ToAddress;
-                        journalLine._AddressTo = cw.FromAddress;
+                        journalLine._Mileage = cw.MileageReturnLst;
                         dgTMJournalLineTransRegGrid.AddRow(journalLine);
                     }
                     dgTMJournalLineTransRegGrid.SaveData();
@@ -2150,7 +2152,7 @@ namespace UnicontaClient.Pages.CustomPage
                             if (qty != 0)
                             {
                                 var lineclient = new ProjectJournalLineClient();
-
+                                lineclient.CopyFrom(rec);
 
                                 if (rec._RegistrationType == RegistrationType.Hours)
                                 {
@@ -2163,19 +2165,15 @@ namespace UnicontaClient.Pages.CustomPage
                                 }
                                 else
                                 {
-                                    lineclient._Text = TMJournalLineClient.GetMileageFormattedText(rec._Text, rec._AddressFrom, rec._AddressTo, rec._VechicleRegNo);
+                                    lineclient._Mileage = rec._Mileage?[x-1];
+                                    lineclient._Text = rec._Text;
                                     lineclient._Unit = Uniconta.DataModel.ItemUnit.km;
                                     lineclient._Qty = qty;
                                 }
 
-                                lineclient._Approved = true;
-                                lineclient._TransType = rec._TransType;
-                                lineclient._Project = rec._Project;
-                                lineclient._PayrollCategory = rec._PayrollCategory;
+                                lineclient._Date = rec._Date.AddDays(x - 1);
                                 lineclient._Item = payrollCat._Item;
-                                lineclient._Task = rec._Task;
                                 lineclient._PrCategory = payrollCat._PrCategory;
-                                lineclient._Employee = rec._Employee;
 
                                 if (comp._DimFromProject)
                                 {
@@ -2193,10 +2191,6 @@ namespace UnicontaClient.Pages.CustomPage
                                     lineclient._Dim4 = employee._Dim4;
                                     lineclient._Dim5 = employee._Dim5;
                                 }
-
-                                lineclient._WorkSpace = rec._WorkSpace;
-                                lineclient._Invoiceable = rec._Invoiceable;
-                                lineclient._Date = rec._Date.AddDays(x - 1);
 
 
                                 if (payrollCat._Item != null)
@@ -2297,10 +2291,9 @@ namespace UnicontaClient.Pages.CustomPage
             return null;
         }
 
-
         private void ActionCloseOpen(TMJournalActionType actionType)
         {
-            var cwDate = new CwSetPeriodPerDate(actionType, JournalLineDate, api);
+            var cwDate = new CwSetPeriodPerDate(actionType, JournalLineDate, employee, api);
             cwDate.DialogTableId = 2000000055;
 
             cwDate.Closing += async delegate
@@ -2498,9 +2491,10 @@ namespace UnicontaClient.Pages.CustomPage
 
                 startDateWeek = employee._TMApproveDate >= JournalLineDate ? employee._TMApproveDate.AddDays(1) : JournalLineDate;
                 startDateClose = startDateWeek;
-                var closeDate = JournalLineDate.AddDays(6);
+                var closeDate = employee._Terminated > JournalLineDate && employee._Terminated <= JournalLineDate.AddDays(6) ? employee._Terminated : JournalLineDate.AddDays(6);
+
                 endDateClose = closeDate >= startDateWeek.AddDays(6) ? startDateWeek.AddDays(6) : closeDate;
-                daysCnt = (JournalLineDate.AddDays(6) - startDateWeek).TotalDays + 1;
+                daysCnt = (closeDate - startDateWeek).TotalDays + 1;
             }
 
             var preValidateRes = await tmHelper.PreValidate(actionType, valNormHoursTotal, valRegHours);
@@ -2548,8 +2542,13 @@ namespace UnicontaClient.Pages.CustomPage
                     var rec = tmLinesLst.Where(s => s.RowId == error.RowId).FirstOrDefault();
                     if (rec != null)
                     {
-                        rec.ErrorInfo += rec.ErrorInfo != string.Empty ? "\n" + error.Message : error.Message;
-                        ret = false;
+                        if (rec.HasError)
+                        {
+                            rec.ErrorInfo += rec.ErrorInfo != string.Empty ? "\n" + error.Message : error.Message;
+                            ret = false;
+                        }
+                        else
+                            rec.ErrorInfo = error.Message;
                     }
                 }
 
@@ -2705,8 +2704,9 @@ namespace UnicontaClient.Pages.CustomPage
                 }
                 #endregion
 
-                var cntErrLinesTime = tmLinesLst.Where(s => (s._RegistrationType == RegistrationType.Hours && s.ErrorInfo != TMJournalLineHelper.VALIDATE_OK)).Count();
-                var cntErrLinesMileage = tmLinesLst.Where(s => (s._RegistrationType == RegistrationType.Mileage && s.ErrorInfo != TMJournalLineHelper.VALIDATE_OK)).Count();
+                var cntErrLinesTime = tmLinesLst.Where(s => s._RegistrationType == RegistrationType.Hours && s.HasError).Count();
+                var cntErrLinesMileage = tmLinesLst.Where(s => s._RegistrationType == RegistrationType.Mileage && s.HasError).Count();
+
                 if (cntErrLinesTime != 0 || cntErrLinesMileage != 0)
                 {
                     string errText = null;

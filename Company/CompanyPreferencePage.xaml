@@ -93,6 +93,15 @@ x:Class="UnicontaClient.Pages.CustomPage.CompanyPreferencePage"
                         <CorasauControls:CorasauLayoutItem FieldName="UpdateDeliveryDate">
                             <CorasauControls:CheckEditor IsChecked="{Binding UpdateDeliveryDate,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="InvGroups">
+                            <CorasauControls:CheckEditor IsChecked="{Binding InvGroups,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="BrandGroup">
+                            <CorasauControls:TextEditor Text="{Binding BrandGroup,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="CategoryGroup">
+                            <CorasauControls:TextEditor Text="{Binding CategoryGroup,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
                     <CorasauControls:CorasauLayoutGroup View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Project}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" MinWidth="420">
                         <CorasauControls:CorasauLayoutItem FieldName="DimFromProject">
@@ -110,8 +119,19 @@ x:Class="UnicontaClient.Pages.CustomPage.CompanyPreferencePage"
                         <CorasauControls:CorasauLayoutItem FieldName="ProjQuickInvoice">
                             <CorasauControls:CheckEditor IsChecked="{Binding ProjQuickInvoice,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="ProjPrintInvoice">
+                            <CorasauControls:CheckEditor IsChecked="{Binding ProjPrintInvoice,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="MandatoryOnAccountItem">
+                            <CorasauControls:CheckEditor IsChecked="{Binding MandatoryOnAccountItem,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
+                    <CorasauControls:CorasauLayoutGroup View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=NemHandel}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" MinWidth="420">
+                        <CorasauControls:CorasauLayoutItem FieldName="OIOUBLIncludes">
+                            <CorasauControls:ComboBoxEditor x:Name="cmbOIOUBLIncludes" SelectedItem="{Binding OIOUBLIncludes,Mode=TwoWay}"  />
+                        </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
+                </CorasauControls:CorasauLayoutGroup>
             </CorasauControls:CorasauLayoutControl>
         </Grid>
     </CorasauControls:BusyIndicator>

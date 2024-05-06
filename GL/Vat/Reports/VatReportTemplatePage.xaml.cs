@@ -66,7 +66,7 @@ namespace UnicontaClient.Pages.CustomPage
             ((DevExpress.Xpf.Printing.LinkBase)(link)).Margins.Right = 20;
             link.PageHeaderData = ReportHeaderDataContext;
 #if !SILVERLIGHT
-            link.PaperKind = System.Drawing.Printing.PaperKind.A4;
+            link.PaperKind = DevExpress.Drawing.Printing.DXPaperKind.A4;
 #endif
             link.PageHeaderTemplate = PageHeaderTemplate;
             link.DetailTemplate = DetailTemplate;

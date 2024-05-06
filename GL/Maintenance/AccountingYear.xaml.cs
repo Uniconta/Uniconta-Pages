@@ -189,7 +189,7 @@ namespace UnicontaClient.Pages.CustomPage
         async void runPrimo(CWCreatePrimo dialogPrimo, CompanyFinanceYearClient p)
         {
             ErrorCodes res = await FiApi.GeneratePrimoTransactions(p, dialogPrimo.BalanceName, dialogPrimo.PLText, dialogPrimo.Voucher, dialogPrimo.NumberserieText);
-            if (res == ErrorCodes.Succes && !p._Current)
+            if (res == ErrorCodes.Succes && !p._Current && p._FromDate <= DateTime.Now && p._ToDate >= DateTime.Now)
             {
                 var text = string.Format(Uniconta.ClientTools.Localization.lookup("MoveToOBJ"), string.Format("{0} - {1}", p._FromDate.ToShortDateString(), p._ToDate.ToShortDateString()));
                 CWConfirmationBox dialog = new CWConfirmationBox(text, Uniconta.ClientTools.Localization.lookup("IsYearEnded"), true);
@@ -200,8 +200,7 @@ namespace UnicontaClient.Pages.CustomPage
                         var source = (IList)dgFinanceYearGrid.ItemsSource;
                         if (source != null)
                         {
-                            IEnumerable<CompanyFinanceYearClient> gridItems = source.Cast<CompanyFinanceYearClient>();
-                            foreach (var y in gridItems)
+                            foreach (var y in source.Cast<CompanyFinanceYearClient>())
                             {
                                 if (y._Current)
                                 {

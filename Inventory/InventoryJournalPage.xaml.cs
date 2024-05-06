@@ -83,7 +83,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "EditRow":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.InventoryJournalPage2, selectedItem, string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("Journal"), selectedItem.Journal));
+                        AddDockItem(TabControls.InventoryJournalPage2, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Journal"), selectedItem.Journal));
                     break;
                 case "InventoryJournalLine":
                     if (selectedItem != null)
@@ -103,19 +103,19 @@ namespace UnicontaClient.Pages.CustomPage
                             var res = await postApi.DeleteJournalLines(selectedItem);
                             if (res != ErrorCodes.Succes)
                                 UtilDisplay.ShowErrorCode(res);
+                            else
+                                selectedItem.NumberOfLines = 0;
                         }
                     };
                     EraseYearWindowDialog.Show();
                     break;
                 case "ImportData":
-                    if (selectedItem == null)
-                        return;
-                    OpenImportDataPage(selectedItem);
+                    if (selectedItem != null)
+                        OpenImportDataPage(selectedItem);
                     break;
                 case "InvJournalPosted":
-                    if (selectedItem == null)
-                        return;
-                    AddDockItem(TabControls.InventoryPostedJournals, selectedItem);
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.InventoryPostedJournals, selectedItem);
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);
@@ -125,13 +125,9 @@ namespace UnicontaClient.Pages.CustomPage
 
         void OpenImportDataPage(InvJournalClient selectedItem)
         {
-            var invJournalLine = new InvJournalLineClient();
             string header = selectedItem.Journal;
-            UnicontaBaseEntity[] baseEntityArray = new UnicontaBaseEntity[2] { invJournalLine, selectedItem };
-            object[] param = new object[2];
-            param[0] = baseEntityArray;
-            param[1] = header;
-            AddDockItem(TabControls.ImportPage, param, string.Format("{0} : {1}", Localization.lookup("Import"), header));
+            UnicontaBaseEntity[] baseEntityArray = new UnicontaBaseEntity[] { new InvJournalLineClient(), selectedItem };
+            AddDockItem(TabControls.ImportPage, new object[] { baseEntityArray, header }, string.Format("{0}: {1}", Localization.lookup("Import"), header));
         }
 
         void setDim()

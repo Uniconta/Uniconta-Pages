@@ -9,6 +9,8 @@ using Uniconta.Common.Utility;
 using Uniconta.Common;
 using Uniconta.DataModel;
 using Uniconta.API.GeneralLedger;
+using Uniconta.ClientTools;
+
 
 #if WPF
 using UnicontaClient.Pages;
@@ -34,7 +36,7 @@ namespace ImportVoucher.Utility
             Transfilter = new PropValuePair[2];
         }
 
-        public async Task Import(string Voucher, DateTime Date, FileextensionsTypes ext, string Text, Unistream Data)
+        public async Task Import(string Voucher, DateTime Date, FileextensionsTypes ext, string Text, byte[] Data)
         {
             try
             {
@@ -61,24 +63,27 @@ namespace ImportVoucher.Utility
 
                     var vc = new Document
                     {
-                        _Data = Data.ToArray(),
+                        _Data = Data,
                         _Text = Text,
                         _Fileextension = ext,
                         _Content = ContentTypes.Invoice,
                         _Voucher = (int)NumberConvert.ToInt(Voucher),
                         _PostingDate = Date
                     };
+                    if (tran._DCType == GLTransRefType.Creditor)
+                        vc._CreditorAccount = tran._DCAccount;
+
                     err = await Capi.Insert(vc);
                     if (err != ErrorCodes.Succes)
                     {
-                        _logs.AppendLogLine("Insert error: " + err.ToString());
+                        _logs.AppendLogLine(Localization.lookup(err.ToString()));
                         return;
                     }
                     err = await postAPI.AddPhysicalVoucher(tran, vc, true, true);
                     if (err == ErrorCodes.Succes)
-                        _logs.WriteMsg = "Saved: " + NumberConvert.ToString(++cnt);
+                        _logs.WriteMsg = Localization.lookup("DataSaved") + " " + NumberConvert.ToString(++cnt);
                     else
-                        _logs.AppendLogLine("Attach error: " + err.ToString());
+                        _logs.AppendLogLine(Localization.lookup("UpdateError") + " " + Localization.lookup(err.ToString()));
                 }
             }
             catch (Exception ex)

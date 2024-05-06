@@ -25,10 +25,8 @@ using Uniconta.ClientTools.Util;
 using UnicontaClient.Controls.Dialogs;
 using UnicontaClient.Pages;
 using Uniconta.API.Service;
-
-#if !SILVERLIGHT
 using UnicontaClient.Pages;
-#endif
+
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
@@ -138,6 +136,11 @@ namespace UnicontaClient.Pages.CustomPage
                 lst.Add(typeof(Uniconta.DataModel.Contact));
             if (Comp.InvPrice)
                 lst.Add(typeof(Uniconta.DataModel.DebtorPriceList));
+            if (Comp.Shipments)
+            {
+                lst.Add(typeof(Uniconta.DataModel.ShipmentType));
+                lst.Add(typeof(Uniconta.DataModel.DeliveryTerm));
+            }
             if (Comp.ItemVariants)
             {
                 lst.Add(typeof(Uniconta.DataModel.InvVariant1));
@@ -244,9 +247,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                     {
                         CWOrderFromOrder cwOrderFromOrder = new CWOrderFromOrder(api);
-#if !SILVERLIGHT
                         cwOrderFromOrder.DialogTableId = 2000000026;
-#endif
                         cwOrderFromOrder.Closed += async delegate
                         {
                             if (cwOrderFromOrder.DialogResult == true)
@@ -347,6 +348,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 await dgDebtorOffers.SaveData();
                                 break;
                             case CWConfirmationBox.ConfirmationResultEnum.No:
+                                dgDebtorOffers.CancelChanges();
                                 break;
                         }
                         editAllChecked = true;
@@ -390,9 +392,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
 
             CWGenerateInvoice GenrateOfferDialog = new CWGenerateInvoice(false, CompanyLayoutType.Offer.ToString(), askForEmail: true, showNoEmailMsg: !showSendByMail, debtorName: debtorName, isDebtorOrder: true);
-#if !SILVERLIGHT
             GenrateOfferDialog.DialogTableId = 2000000006;
-#endif
             GenrateOfferDialog.Closed += async delegate
             {
                 if (GenrateOfferDialog.DialogResult == true)
@@ -416,9 +416,7 @@ namespace UnicontaClient.Pages.CustomPage
         void ConvertOfferToOrder(DebtorOfferClient offerclient)
         {
             CwOffertoOrder cwOfferToOrder = new CwOffertoOrder();
-#if !SILVERLIGHT
             cwOfferToOrder.DialogTableId = 2000000044;
-#endif
             cwOfferToOrder.Closed += async delegate
             {
                 if (cwOfferToOrder.DialogResult == true)

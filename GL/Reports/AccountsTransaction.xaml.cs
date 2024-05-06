@@ -175,7 +175,6 @@ namespace UnicontaClient.Pages.CustomPage
                 RemoveMenuItem();
             else
             {
-                api.ForcePrimarySQL = true;
                 var CountryId = Comp._CountryId;
                 if ((CountryId == CountryCode.Germany)
                      && api.session.User._Role < (byte)Uniconta.Common.User.UserRoles.Distributor)
@@ -244,6 +243,8 @@ namespace UnicontaClient.Pages.CustomPage
         protected override void OnLayoutLoaded()
         {
             base.OnLayoutLoaded();
+            AmountConverted.Visible = (GLTransClient.Rates != null);
+            setCaption();
             setDim();
         }
 
@@ -311,7 +312,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem == null)
                         return;
                     CWCommentsDialogBox commentsDialog = new CWCommentsDialogBox(Uniconta.ClientTools.Localization.lookup("CancelVoucher"),
-                        true, selectedItem.Date);
+                        true, DateTime.MinValue);
                     commentsDialog.DialogTableId = 2000000035;
                     commentsDialog.Closing += async delegate
                     {
@@ -493,11 +494,40 @@ namespace UnicontaClient.Pages.CustomPage
                 case "RefreshGrid":
                     BindGrid();
                     break;
+                case "ShowConvertedAmount":
+                    var currencyDialog = new CWExchangeRate(false, Uniconta.ClientTools.Localization.lookup("Currency"));
+                    currencyDialog.Closing += delegate
+                    {
+                        if (currencyDialog.DialogResult == true)
+                        {
+                            SetConvertAmount(currencyDialog._Currency);
+                        }
+                    };
+                    currencyDialog.Show();
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
         }
+
+        async void SetConvertAmount(Currencies to)
+        {
+            GLTransClient.Rates = await new CurrencyAPI(api).ExchangeRates(0, to);
+            dgAccountsTransGrid.RefreshData();
+            AmountConverted.Visible = (GLTransClient.Rates != null);
+            setCaption();
+        }
+        void setCaption()
+        {
+            if (GLTransClient.Rates != null)
+            {
+                RibbonBase rb = (RibbonBase)localMenu.DataContext;
+                var rbItem = UtilDisplay.GetMenuCommandByName(rb, "ShowConvertedAmount");
+                rbItem.Caption = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("Converted"), AppEnums.Currencies.ToString((int)GLTransClient.Rates.CCY2));
+            }
+        }
+
         async void FilterWithAccountingYear(bool prevYear)
         {
             this.ribbonControl.ClearFilterDialog();

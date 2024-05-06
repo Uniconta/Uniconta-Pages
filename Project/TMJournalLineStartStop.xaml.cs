@@ -229,6 +229,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 }
                                 break;
                             case CWConfirmationBox.ConfirmationResultEnum.No:
+                                LoadGrid();
                                 break;
                         }
                         editAllChecked = true;

@@ -132,6 +132,9 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryItemPage2"
                     <CorasauControls:CorasauLayoutItem FieldName="PurchaseAccount" x:Name="liPurchaseAccount">
                         <CorasauControls:LookupEditor x:Name="cmbPurchaseAccount" Text="{Binding PurchaseAccount,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="SupplierItemId" x:Name="liSupplierItemId">
+                        <CorasauControls:TextEditor Text="{Binding SupplierItemId,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                    </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="EAN" x:Name="liEAN">
                         <CorasauControls:TextEditor Text="{Binding EAN,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                     </CorasauControls:CorasauLayoutItem>
@@ -230,6 +233,9 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryItemPage2"
                     <CorasauControls:CorasauLayoutItem FieldName="Weight" x:Name="liWeigt">
                         <CorasauControls:DoubleEditor FieldName="Weight" ApplyMask="false" />
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="NetWeight" x:Name="liNetWeight">
+                        <CorasauControls:DoubleEditor FieldName="NetWeight" ApplyMask="false" />
+                    </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="Volume" x:Name="liVolume">
                         <CorasauControls:DoubleEditor FieldName="Volume" ApplyMask="false" />
                     </CorasauControls:CorasauLayoutItem>
@@ -238,12 +244,15 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryItemPage2"
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
 
-                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpBrand" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Brand}"  Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpBrand" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=AlternativeItemGroups}"  Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                     <CorasauControls:CorasauLayoutItem FieldName="BrandGroup" x:Name="liBrandGroup">
                         <CorasauControls:LookupEditor x:Name="leBrandGrp" Text="{Binding BrandGroup,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="CategoryGroup" x:Name="liCategoryGroup">
                         <CorasauControls:LookupEditor x:Name="leCategoryGrp" Text="{Binding CategoryGroup,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="StatisticsGroup" x:Name="liStatisticsGroup">
+                        <CorasauControls:LookupEditor x:Name="leStatisticsGroup" Text="{Binding StatisticsGroup,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
 

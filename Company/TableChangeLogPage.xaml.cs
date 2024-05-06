@@ -1,25 +1,13 @@
 using UnicontaClient.Models;
-using UnicontaClient.Pages;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using Uniconta.API.System;
 using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.Common;
+using Uniconta.API.Service;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -48,6 +36,11 @@ namespace UnicontaClient.Pages.CustomPage
         public TableChangeLogPage(UnicontaBaseEntity rec, CrudAPI api) : base(api, string.Empty)
         {
             InitializeComponent();
+            InitPage(rec);
+        }
+
+        private void InitPage(UnicontaBaseEntity rec)
+        {
             localMenu.dataGrid = dgTableChangeLog;
             SetRibbonControl(localMenu, dgTableChangeLog);
             dgTableChangeLog.api = this.api;
@@ -58,6 +51,33 @@ namespace UnicontaClient.Pages.CustomPage
             localMenu.OnItemClicked += localMenu_OnItemClicked;
         }
 
+        public TableChangeLogPage(BaseAPI api) : base(api, string.Empty)
+        {
+            InitializeComponent();
+        }
+
+        public override void SetParameter(IEnumerable<ValuePair> Parameters)
+        {
+            if (Parameters == null)
+                return;
+
+            var tabLogParams = new TabChangeLogParameters();
+            tabLogParams.company = api.CompanyEntity;
+            tabLogParams.Parameters = Parameters;
+
+            if(tabLogParams.TryGetChangeLogParameters())
+            {
+                var tableType = tabLogParams.TableType;
+                if (tableType != null)
+                {
+                    var header = string.Concat(Uniconta.ClientTools.Localization.lookup("TableChangeLog"), ": ", tableType.Name);
+                    SetHeader(header);
+                    InitPage(Activator.CreateInstance(tabLogParams.TableType) as UnicontaBaseEntity);
+                }
+            }
+            base.SetParameter(Parameters);
+        }
+
         void localMenu_OnItemClicked(string ActionType)
         {
             var selectedItem = dgTableChangeLog.SelectedItem as TableChangeLogClient;
@@ -66,7 +86,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "ShowFieldChanges":
                     if (selectedItem != null)
                     {
-                        var param  = new object[3] { pageMaster, selectedItem, api };
+                        var param = new object[3] { pageMaster, selectedItem, api };
                         AddDockItem(TabControls.FieldChangeLogPage, param, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("FieldChangeLog"), selectedItem.KeyName));
                     }
                     break;
@@ -74,6 +94,54 @@ namespace UnicontaClient.Pages.CustomPage
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
+        }
+    }
+
+    internal class TabChangeLogParameters
+    {
+        public IEnumerable<BasePage.ValuePair> Parameters;
+        internal Type TableType;
+        internal Uniconta.DataModel.Company company;
+        public bool TryGetChangeLogParameters()
+        {
+            bool isvalid = false;
+
+            try
+            {
+                foreach (var param in Parameters)
+                {
+                    var paramName = param.Name;
+                    var paramValue = param.Value;
+
+                    if (string.IsNullOrEmpty(paramName) || string.Compare(param.Name, "table", StringComparison.OrdinalIgnoreCase) == 0)
+                    {
+                        string importtableType = paramValue;
+                        if (!string.IsNullOrEmpty(importtableType) && company != null)
+                        {
+
+                            if (company != null)
+                            {
+                                List<Type> tablestype;
+                                tablestype = Global.GetTables(company); // Standard tables
+                                tablestype.AddRange(Global.GetUserTables(company)); // User-defined tables
+                                for (int i = 0; i < tablestype.Count; i++)
+                                {
+                                    var tType = tablestype[i];
+                                    if (string.Compare(tType.Name, importtableType, StringComparison.OrdinalIgnoreCase) == 0)
+                                    {
+                                        TableType = tType;
+                                        isvalid = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch { isvalid = false; }
+
+            return isvalid;
         }
     }
 }

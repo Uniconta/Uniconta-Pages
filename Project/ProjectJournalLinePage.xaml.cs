@@ -131,7 +131,7 @@ namespace UnicontaClient.Pages.CustomPage
                 newRow._Dim3 = last._Dim3;
                 newRow._Dim4 = last._Dim4;
                 newRow._Dim5 = last._Dim5;
-             }
+            }
         }
     }
 
@@ -705,6 +705,28 @@ namespace UnicontaClient.Pages.CustomPage
                     AddDockItem(TabControls.AddMultiInventoryItemsForProject, paramArray, true,
                         string.Format(Uniconta.ClientTools.Localization.lookup("AddOBJ"), Uniconta.ClientTools.Localization.lookup("InventoryItems")), null, floatingLoc: Utility.GetDefaultLocation());
                     break;
+                case "Mileage":
+                    if (selectedItem != null)
+                    {
+                        EmployeeRegistrationLineClient mileage = null;
+                        if (selectedItem._Mileage == null)
+                        {
+                            mileage = new EmployeeRegistrationLineClient();
+                            mileage._Activity = InternalType.Mileage;
+                            mileage.SetMaster(api.CompanyEntity);
+                            mileage._Employee = selectedItem._Employee;
+                            mileage._Project = selectedItem._Project;
+                            var mileagePage = dockCtrl.AddDockItem(TabControls.RegisterMileage, this.ParentControl, new object[2] { mileage, false }, string.Format(Uniconta.ClientTools.Localization.lookup("AddOBJ"), Uniconta.ClientTools.Localization.lookup("Mileage"))) as RegisterMileage;
+                            mileagePage.DoNotSave = true;
+                        }
+                        else
+                        {
+                            mileage = selectedItem._Mileage;
+                            var mileagePage = dockCtrl.AddDockItem(TabControls.RegisterMileage, this.ParentControl, new object[2] { mileage, true }, string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("Mileage"), selectedItem.RowId)) as RegisterMileage;
+                            mileagePage.DoNotSave = true;
+                        }
+                    }
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -810,7 +832,9 @@ namespace UnicontaClient.Pages.CustomPage
             dgProjectJournalLinePageGrid.SelectedItem = null;
             dgProjectJournalLinePageGrid.SelectedItem = prOrderLine;
             refreshOnHand = prOrderLine != null && prOrderLine.RowId == 0;
-            return saveGrid();
+            var err = saveGrid();
+            dgProjectJournalLinePageGrid.SelectedItem = prOrderLine;
+            return err;
         }
 
         void UpdatePrices()
@@ -966,6 +990,8 @@ namespace UnicontaClient.Pages.CustomPage
                                     lst.Add(journalLine);
 
                             dgProjectJournalLinePageGrid.ItemsSource = lst;
+                            masterJournal._NumberOfLines = lst.Count;
+                            (masterJournal as ProjectJournalClient)?.NotifyPropertyChanged("NumberOfLines");
                         }
                     }
                 }
@@ -1025,6 +1051,19 @@ namespace UnicontaClient.Pages.CustomPage
                         var invItems = param[0] as List<UnicontaBaseEntity>;
                         dgProjectJournalLinePageGrid.PasteRows(invItems);
                     }
+                }
+                else if (screenName == TabControls.RegisterMileage)
+                {
+                    var opr = (Int32)param[0];
+                    var mileage = param[1] as EmployeeRegistrationLineClient;
+                    if (mileage == null) return;
+                    var selected = dgProjectJournalLinePageGrid.SelectedItem as ProjectJournalLineLocal;
+                    if (selected == null) return;
+                    dgProjectJournalLinePageGrid.SetLoadedRow(selected);
+                    selected._Mileage = mileage;
+                    if (opr == 3)
+                        selected._Mileage = null;
+                    dgProjectJournalLinePageGrid.SetModifiedRow(selected);
                 }
             }
         }

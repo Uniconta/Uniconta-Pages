@@ -25,10 +25,10 @@ x:Class="UnicontaClient.Pages.CustomPage.CWCopyUserFields"
                 <ColumnDefinition Width="5"/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-            <TextBlock Foreground="{StaticResource BodyTextColorBrush}" Margin="10,5,0,0" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Company,StringFormat=\{0\}:}" TextWrapping="Wrap"/>
+            <TextBlock Margin="10,5,0,0" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Company,StringFormat=\{0\}:}" TextWrapping="Wrap"/>
             <CorasauControls:ComboBoxEditor HorizontalAlignment="Left" Margin="10,5,0,0"  VerticalAlignment="Top" Grid.Column="2" x:Name="cbCompany" Width="160" DisplayMember="Name" ValueMember="CompanyId" SelectedIndexChanged="cbCompany_SelectedIndexChanged" />
             
-            <TextBlock  x:Name="lblTable" Foreground="{StaticResource BodyTextColorBrush}" Margin="10,5,0,0" Grid.Row="1" Grid.Column="0" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Table,StringFormat=\{0\}:}" TextWrapping="Wrap"/>
+            <TextBlock  x:Name="lblTable" Margin="10,5,0,0" Grid.Row="1" Grid.Column="0" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Table,StringFormat=\{0\}:}" TextWrapping="Wrap"/>
             <CorasauControls:ComboBoxEditor HorizontalAlignment="Left" Margin="10,5,0,0"  VerticalAlignment="Top" Grid.Row="1"  Grid.Column="2" x:Name="cbtable" Width="160" DisplayMember="Name"  SelectedIndexChanged="cbtable_SelectedIndexChanged" />
             
             <dxg:GridControl  x:Name="dgUserFields" Grid.Row="2"  AutoGenerateColumns="None" HorizontalAlignment="Stretch" Margin="10,5,0,0" Grid.ColumnSpan="3" Height="180">

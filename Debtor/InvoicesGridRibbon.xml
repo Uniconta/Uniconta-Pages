@@ -36,7 +36,8 @@
     <RibbonItem Action="SendAsOutlook" LocalizedNameKey="SendInvoiceInOutLook" LargeGlyph="Posted_Journal_32x32" />
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="SendUBL" LocalizedNameKey="SendInvoicebyUBL" Module="_OIOUBLSendOnServer" LargeGlyph="SendInvoiceMail_32x32" />
+	  <!--<RibbonItem Action="eDeliverySettings" LocalizedNameKey="eDeliverySettings" LargeGlyph="Settings_32x32"/>-->
+	  <RibbonItem Action="SendUBL" LocalizedNameKey="SendInvoicebyUBL" Module="_OIOUBLSendOnServer" LargeGlyph="SendInvoiceMail_32x32" />
     <RibbonItem LocalizedNameKey="GenerateOBJ" Parameter="einvoice" LargeGlyph="Account-statement_32x32">
       <RibbonItem Action="GenerateOioXml" LocalizedNameKey="CurrentRecord" Glyph="Attachments_16x16"/>
       <RibbonItem Action="GenerateMarkedOioXml" LocalizedNameKey="SelectedRows" Glyph="Item_Number_16x16"/>

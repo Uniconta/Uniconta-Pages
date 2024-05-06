@@ -529,12 +529,23 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem?.InvItem != null && selectedItem?.Item != null)
                         AddDockItem(TabControls.UserNotesPage, selectedItem.InvItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Notes"), selectedItem?.InvItem?._Name));
                     break;
+                case "RefreshGrid":
+                    RefreshGrid();
+                    return;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
         }
-
+        async void RefreshGrid()
+        {
+            var savetask = saveGridLocal();
+            if (savetask != null)
+                await savetask;
+            await dgProductionOrderLineGrid.RefreshTask();
+            if (this.items.CacheAge.TotalMinutes > 10d)
+                this.items = await api.LoadCache(typeof(Uniconta.DataModel.InvItem), true);
+        }
         async void AddAttachment(string actionType, ProductionOrderLineClient productionOrderLineClient)
         {
             var invBomResult = await api.Query<InvBOMClient>(productionOrderLineClient, new[] { PropValuePair.GenereteParameter("ItemPart", typeof(string), "1") });

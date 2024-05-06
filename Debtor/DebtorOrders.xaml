@@ -115,6 +115,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrders"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryCity" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryCountry" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Installation" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CompanyAddress" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ConfirmPrinted" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PicklistPrinted" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PackNotePrinted" Visible="False"/>
@@ -151,6 +152,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrders"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ExchangeRate" Visible="False" AllowThousandMask="True" Mask="N4" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="LastPackNote" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Weight" Visible="False" AllowThousandMask="True" Mask="N3"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="NetWeight" Visible="False" AllowThousandMask="True" Mask="N3"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Volume" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Cartons" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Vat" Visible="False" />

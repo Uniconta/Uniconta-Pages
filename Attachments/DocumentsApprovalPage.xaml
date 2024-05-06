@@ -59,6 +59,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DocumentsApprovalPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Vat" AllowEditing="False" Width="60" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Project" AllowEditing="True"  Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PrCategory" AllowEditing="True"  Width="90"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="WorkSpace" AllowEditing="True"  Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PaymentMethod" AllowEditing="False" Width="80" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PaymentId" AllowEditing="False" MinWidth="100" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Approver1" AllowEditing="False" Visible="False" Width="80"/>
@@ -70,6 +71,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DocumentsApprovalPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Approved2" AllowEditing="False" Width="70"  Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="SentToBilagscan" AllowEditing="False" Width="70"  Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="UserLogidId" Width="100"  Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="UserId" Width="70" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Envelope"  Visible="False" Width="55" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PayDate" AllowEditing="False" Width="85" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="VatOperation" AllowEditing="False" Visible="False"/>

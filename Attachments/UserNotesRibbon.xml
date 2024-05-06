@@ -6,8 +6,12 @@
     <RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="Delete" Glyph="Delete_16x16" LargeGlyph="Delete_32x32"/>
     <RibbonItem Action="SaveGrid" ShortcutKey="CTRL+S" LocalizedNameKey="Save" Glyph="save-16x16" LargeGlyph="save-32x32"/>
   </RibbonItem>
-  <RibbonItem>
-    <!---If we want to create a new group in same PageTab-->
+   <RibbonItem>
+     <RibbonItem Action="ImportMail" LocalizedNameKey="ImportOBJ" Parameter="Email" LargeGlyph="Email_Add_32x32"/>
+     <RibbonItem Action="SendMail" LocalizedNameKey="EmailDocuments" LargeGlyph="SendInvoiceMail_32x32"/>
+   </RibbonItem>
+   <RibbonItem>
+     <!---If we want to create a new group in same PageTab-->
     <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32">
       <!---If we want Inner menu-->
       <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>

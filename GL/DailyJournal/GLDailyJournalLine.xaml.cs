@@ -45,6 +45,7 @@ namespace UnicontaClient.Pages.CustomPage
         public override bool AllowSort { get { return false; } }
         public override bool Readonly { get { return blocked; } }
         public override bool IsAutoSave { get { return _AutoSave; } }
+        public override bool SingleBufferUpdate { get { return true; } }
         internal bool _AutoSave;
         bool blocked;
         public bool Blocked { get { return blocked; } set { blocked = value; this.View.AllowEditing = !value; } }
@@ -448,8 +449,8 @@ namespace UnicontaClient.Pages.CustomPage
             if (screenName == TabControls.SettleOpenTransactionPage)
             {
                 var obj = argument as object[];
-                if (obj != null && obj.Length == 6)
-                    SetSettlementsForJournalLine(obj[0] as JournalLineGridClient, obj[1] as string, (double)obj[2], (double)obj[3], (string)obj[4], (bool)obj[5]);
+                if (obj != null && obj.Length >= 6)
+                    SetSettlementsForJournalLine(obj[0] as JournalLineGridClient, obj[1] as string, (double)obj[2], (double)obj[3], (string)obj[4], (bool)obj[5], obj.Length >= 7 ? Convert.ToDouble(obj[6]) : 0d);
             }
 
             if (screenName == TabControls.GLOffsetAccountTemplate && argument != null)
@@ -887,12 +888,21 @@ namespace UnicontaClient.Pages.CustomPage
                         page.JournalLines = visibleRows;
                     }
                     break;
+                case "RefreshGrid":
+                    RefreshGrid();
+                    return;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
         }
-
+        async void RefreshGrid()
+        {
+            var savetask = saveGrid();
+            if (savetask != null)
+                await savetask;
+            dgGLDailyJournalLine.Refresh();
+        }
         private void AddVoucher(JournalLineGridClient journalLine, string actionType)
         {
             if (actionType == "DragDrop")
@@ -1035,33 +1045,36 @@ namespace UnicontaClient.Pages.CustomPage
             }
             isDataChaged = true;
         }
-        bool isDataChaged;
-        public override bool IsDataChaged
-        {
-            get
-            {
-                if (isDataChaged)
-                    return true;
-                return base.IsDataChaged;
-            }
-        }
 
-        private void SetAttachedVoucherForJournalLine(VouchersClient vouchersClient)
+        bool isDataChaged;
+        public override bool IsDataChaged { get { return isDataChaged || base.IsDataChaged; } }
+
+        private void SetAttachedVoucherForJournalLine(VouchersClient voucher)
         {
             var selectedItem = dgGLDailyJournalLine.SelectedItem as JournalLineGridClient;
-            if (selectedItem != null && vouchersClient != null)
+            if (selectedItem != null && voucher != null)
             {
                 dgGLDailyJournalLine.SetLoadedRow(selectedItem);
-                selectedItem.DocumentRef = vouchersClient.RowId;
-                if (vouchersClient._Invoice != null)
-                    selectedItem.Invoice = vouchersClient._Invoice;
-                selectedItem.DocumentDate = vouchersClient._DocumentDate;
+                selectedItem.DocumentRef = voucher.RowId;
+                if (voucher._Invoice != null)
+                    selectedItem.Invoice = voucher._Invoice;
+                if (voucher._Dim1 != null)
+                    selectedItem.Dimension1 = voucher._Dim1;
+                if (voucher._Dim2 != null)
+                    selectedItem.Dimension2 = voucher._Dim2;
+                if (voucher._Dim3 != null)
+                    selectedItem.Dimension3 = voucher._Dim3;
+                if (voucher._Dim4 != null)
+                    selectedItem.Dimension4 = voucher._Dim4;
+                if (voucher._Dim5 != null)
+                    selectedItem.Dimension5 = voucher._Dim5;
+                selectedItem.DocumentDate = voucher._DocumentDate;
                 if (selectedItem._Text == null && selectedItem._TransType == null && selectedItem._AccountType == 0 && selectedItem._OffsetAccountType == 0)
-                    selectedItem.Text = vouchersClient._Text;
+                    selectedItem.Text = voucher._Text;
                 if (selectedItem.Amount == 0d || selectedItem.AmountSetBySystem)
                 {
                     selectedItem.AmountSetBySystem = true;
-                    selectedItem.Amount = vouchersClient._Amount;
+                    selectedItem.Amount = voucher._Amount;
                 }
                 dgGLDailyJournalLine.SetModifiedRow(selectedItem);
             }
@@ -1079,7 +1092,7 @@ namespace UnicontaClient.Pages.CustomPage
                 Uniconta.ClientTools.Localization.lookup("Settlement"), UnicontaMessageBox.YesNo) == UnicontaMessageBox.Yes;
         }
 
-        private void SetSettlementsForJournalLine(JournalLineGridClient selectedItem, string settlementStr, double MarkedRemainingAmt, double MarkedRemainingAmtCur, string Currency, bool Offset)
+        private void SetSettlementsForJournalLine(JournalLineGridClient selectedItem, string settlementStr, double MarkedRemainingAmt, double MarkedRemainingAmtCur, string Currency, bool Offset, double CachDiscount)
         {
             if (selectedItem == null)
                 return;
@@ -1095,12 +1108,14 @@ namespace UnicontaClient.Pages.CustomPage
                         selectedItem.AmountSetBySystem = true;
                     selectedItem.KeepAmount = !selectedItem.AmountSetBySystem;
                     selectedItem.AmountCur = Offset ? MarkedRemainingAmtCur : -MarkedRemainingAmtCur;
+                    selectedItem.UsedCachDiscount = CachDiscount;
                 }
             }
             else if (selectedItem.AmountSetBySystem || selectedItem.Amount == 0d || (masterRecord != null && masterRecord._AskOverwriteAmount && showDif(MarkedRemainingAmt, selectedItem.Amount, Offset)))
             {
                 selectedItem.AmountSetBySystem = true;
                 selectedItem.Amount = Offset ? MarkedRemainingAmt : -MarkedRemainingAmt;
+                selectedItem.UsedCachDiscount = CachDiscount;
             }
             //Parsing the Settlement string
             if (!string.IsNullOrEmpty(settlementStr))
@@ -1334,6 +1349,8 @@ namespace UnicontaClient.Pages.CustomPage
 
                             dgGLDailyJournalLine.ItemsSource = lst;
                             RecalculateSum();
+                            masterRecord._NumberOfLines = lst.Count;
+                            (masterRecord as GLDailyJournalClient)?.NotifyPropertyChanged("NumberOfLines");
                         }
                         else
                         {
@@ -2464,7 +2481,8 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                     if (LastRate == 0d)
                         return;
-                    val = Math.Round(val * LastRate, RoundTo100 ? 0 : 2);
+                    var sign = val >= 0 ? 1d : -1d;
+                    val = Math.Round(Math.Abs(val) * LastRate, RoundTo100 ? 0 : 2) * sign; // we do this to make same rounding when amount is negative and positive
                 }
                 typeof(JournalLineGridClient).GetProperty(field)?.SetValue(rec, val, null);
             }

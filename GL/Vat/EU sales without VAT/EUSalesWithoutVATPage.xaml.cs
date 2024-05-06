@@ -236,6 +236,7 @@ namespace UnicontaClient.Pages.CustomPage
             var companyCountryId = api.CompanyEntity._CountryId;
 
             bool triangularTrade = false;
+            ItemOrServiceType itemOrService = ItemOrServiceType.None;
             string lastVat = null;
             DebtorClient debtor = null;
             string debtorCVR = null;
@@ -258,26 +259,42 @@ namespace UnicontaClient.Pages.CustomPage
 
                     DebtorOk = true;
                     debtorCVR = debtor._LegalIdent;
-                    if (debtorCVR != null)
+                    if (!string.IsNullOrWhiteSpace(debtorCVR))
                     {
-                        long value;
-                        if (!long.TryParse(debtorCVR, out value))
+                        debtorCVR = Regex.Replace(debtorCVR, "[^0-9]", "");
+                        switch (debtor._Country)
                         {
-                            debtorCVR = Regex.Replace(debtorCVR, @"[-/ ]", "");
+                            case CountryCode.Sweden:
+                                if (debtorCVR.Length == 10)
+                                    debtorCVR = string.Concat(debtorCVR, CreateEUSaleWithoutVATFile.SWEDEN_POSTFIX_01);
+                                break;
                         }
-
-                        if (char.IsLetter(debtorCVR[0]) && char.IsLetter(debtorCVR[1]))
-                            debtorCVR = debtorCVR.Substring(2);
                     }
                 }
 
                 if (! DebtorOk)
                     continue;
 
-                if (lastVat != invLine._Vat)
+                if (companyCountryId == CountryCode.Denmark)
                 {
-                    lastVat = invLine._Vat;
-                    triangularTrade = glVatCache.Get(lastVat)?._TypeSales == "s7";
+                    if (lastVat != invLine._Vat)
+                    {
+                        lastVat = invLine._Vat;
+                        var type = glVatCache.Get(lastVat)?._TypeSales;
+                        if (type != null)
+                        {
+                            if (type == "s3")
+                                itemOrService = ItemOrServiceType.Item;
+                            else if (type == "s4")
+                                itemOrService = ItemOrServiceType.Service;
+                            else if (type == "s7")
+                                triangularTrade = true;
+                        }
+                    }
+                }
+                else if (invLine._Item != null && invLine.InvItem != null)
+                {
+                    itemOrService = invLine.InvItem._ItemType == 1 ? ItemOrServiceType.Service : ItemOrServiceType.Item;
                 }
 
                 var invoice = new EUSaleWithoutVAT();
@@ -289,13 +306,12 @@ namespace UnicontaClient.Pages.CustomPage
                 invoice._Date = invLine._Date;
                 invoice._InvoiceNumber = invLine._InvoiceNumber;
                 invoice._Item = invLine._Item;
-                invoice._Vat = lastVat;
+                invoice._ItemName = invLine._Item == null ? invLine._Text : invLine.InvItem.Name;
+                invoice._Vat = invLine._Vat;
                 invoice._Amount = -netAmount;
                 invoice._IsTriangularTrade = triangularTrade;
                 invoice._DebtorRegNoFile = debtorCVR;
-
-                if (invLine._Item != null && invLine.InvItem != null)
-                    invoice._ItemOrService = invLine.InvItem._ItemType == 1 ? ItemOrServiceType.Service : ItemOrServiceType.Item;
+                invoice._ItemOrService = itemOrService;
 
                 sumOfAmount += invoice._Amount;
                 listOfResults.Add(invoice);
@@ -316,8 +332,11 @@ namespace UnicontaClient.Pages.CustomPage
 
             dgEUSalesWithoutVATGrid.Columns.GetColumnByName("SystemInfo").Visible = true;
 
+            busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("BusyMessage");
+            busyIndicator.IsBusy = true;
             var listOfEU = (IEnumerable<EUSaleWithoutVAT>)dgEUSalesWithoutVATGrid.GetVisibleRows();
             euSalesHelper.Validate(listOfEU, compressed, onlyValidate);
+            busyIndicator.IsBusy = false;
 
             if (onlyValidate)
             {

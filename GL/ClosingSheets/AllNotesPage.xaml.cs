@@ -35,9 +35,11 @@ namespace UnicontaClient.Pages.CustomPage
         public AllnotesGrid(IDataControlOriginationElement dataControlOriginationElement) : base(dataControlOriginationElement) { }
         public AllnotesGrid()
         {
-            CustomTableView tv = new CustomTableView();
-            tv.AllowEditing = false;
-            tv.ShowGroupPanel = false;
+            CustomTableView tv = new CustomTableView
+            {
+                AllowEditing = false,
+                ShowGroupPanel = false
+            };
             SetTableViewStyle(tv);
             this.View = tv;
         }
@@ -47,12 +49,11 @@ namespace UnicontaClient.Pages.CustomPage
 
     public class DataControlDetailDescriptorClass : DataControlDetailDescriptor
     {
-
     }
 
     public class AccountUserNoteList : GLAccountClient
     {        
-        public UserNotesClient[] ChildRecord { get; set; }
+        public List<UserNotesClient> ChildRecord { get; set; }
     }
     public partial class AllNotesPage : GridBasePage
     {
@@ -76,7 +77,7 @@ namespace UnicontaClient.Pages.CustomPage
             var arr = AccountListCache.GetKeyStrRecords;
             if (arr.Length > 0)
             {
-                var AccountRange = string.Format("{0}..{1}", arr[0].KeyStr, arr[arr.Length - 1].KeyStr);
+                var AccountRange = string.Concat(arr[0].KeyStr, "..", arr[arr.Length - 1].KeyStr);
                 glAccountDefaultFilter = new Uniconta.ClientTools.Controls.Filter[] { new Uniconta.ClientTools.Controls.Filter() { name = "Account", value = AccountRange } };
                 glAccountFilterValues = new List<PropValuePair>() { PropValuePair.GenereteWhereElements("Account", typeof(string), AccountRange) };
             }
@@ -207,28 +208,83 @@ namespace UnicontaClient.Pages.CustomPage
             userNotesFilterDialog.Hide();
 #endif
         }
-        
+
+        class SortNote : IComparer<Note>
+        {
+            public int Compare(Note x, Note y)
+            {
+                int c = x._TableRowId - y._TableRowId;
+                if (c != 0)
+                    return c;
+                var local = (y._Text != null && y._Text[0] == '!');
+                if (x._Text != null && x._Text[0] == '!')
+                {
+                    if (! local)
+                        return -1;
+                }
+                else if (local)
+                    return 1;
+                return DateTime.Compare(y._Created, x._Created); // we have swapped them
+            }
+        }
+
         public async override Task InitQuery()
         {
-            AccountUserNoteList[] notesList = null;
             busyIndicator.IsBusy = true;
-            var masterDtlList = await api.Query(new AccountUserNoteList(), null, glAccountFilterValues, new UserNotesClient(), userNotesFilterValues);           
-            if (masterDtlList != null && masterDtlList.Length > 0)
+
+            UserNotesClient n;
+            var lst = new List<UserNotesClient>(20);
+            var Arr = (GLAccountClosingSheetClient[])AccountListCache.GetRecords;
+            foreach (var Acc in Arr)
             {
-                notesList = new AccountUserNoteList[masterDtlList.Length];
-                int i = 0;
-                foreach (var item in masterDtlList)
+                if (!string.IsNullOrWhiteSpace(Acc._SheetNote))
                 {
-                    var obj = item.Master as AccountUserNoteList;
-                    obj.ChildRecord = (UserNotesClient[])item.Details;
-                    notesList[i++] = obj;
+                    n = new UserNotesClient();
+                    if (Acc._Note != null)
+                        n.Copy(Acc._Note);
+                    n._Text = "! " + Acc._SheetNote;
+                    n._TableId = GLAccount.CLASSID;
+                    n._TableRowId = Acc.RowId;
+                    lst.Add(n);
                 }
             }
+            lst.AddRange(await api.Query<UserNotesClient>(new GLAccount(), userNotesFilterValues));
+            lst.Sort(new SortNote());
 
-            if (notesList != null)
+            StreamingManager.Copy(null, null);
+
+            if (lst.Count > 0)
             {
-                dgGLAccount.ItemsSource = null;
-                dgGLAccount.ItemsSource = notesList;
+                var notesList = new List<AccountUserNoteList>(lst.Count);
+
+                for(var i = 0; i < lst.Count; i++)
+                {
+                    n = lst[i];
+                    var Acc = (GLAccount)AccountListCache.Get(n._TableRowId);
+                    if (Acc != null)
+                    {
+                        var acc = new AccountUserNoteList() { ChildRecord = new List<UserNotesClient>() { n } };
+                        acc.Copy(Acc);
+                        notesList.Add(acc);
+                        while (i + 1 < lst.Count)
+                        {
+                            n = lst[i + 1];
+                            if (n._TableRowId == Acc.RowId)
+                            {
+                                acc.ChildRecord.Add(n);
+                                i++;
+                            }
+                            else
+                                break;
+                        }
+                    }
+                }
+                if (notesList.Count > 0)
+                {
+                    notesList.Sort(Uniconta.Common.SQLCache.KeyStrSorter);
+                    dgGLAccount.ItemsSource = null;
+                    dgGLAccount.ItemsSource = notesList;
+                }
             }
             dgGLAccount.Visibility = Visibility.Visible;
             busyIndicator.IsBusy = false;

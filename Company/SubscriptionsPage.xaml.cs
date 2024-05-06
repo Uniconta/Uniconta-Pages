@@ -74,6 +74,7 @@ namespace UnicontaClient.Pages.CustomPage
             else
                 txtOwnerUid.IsReadOnly = true;
             layoutItems.DataContext = editrow;
+            leIndustryCode.api = api;
             frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
             cmbCurrency.ItemsSource = AppEnums.Currencies.GetLabels();
             OwnerUidItem.ButtonClicked += OwnerUidItem_ButtonClicked;
@@ -178,6 +179,8 @@ namespace UnicontaClient.Pages.CustomPage
 
                     if (!string.IsNullOrWhiteSpace(ci?.life?.name))
                     {
+                        editrow.IndustryCode = ci.industrycode?.code;
+
                         var address = ci.address;
                         if (address != null)
                         {

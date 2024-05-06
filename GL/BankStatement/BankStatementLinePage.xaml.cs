@@ -953,8 +953,18 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null && voucher.RowId != 0)
                     {
                         dgBankStatementLine.SetLoadedRow(selectedItem);
-                        selectedItem.DocumentRef = voucher.RowId;
-                        selectedItem.Invoice = voucher._Invoice;
+                        if (voucher._Invoice != null)
+                            selectedItem.Invoice = voucher._Invoice;
+                        if (voucher._Dim1 != null)
+                            selectedItem.Dimension1 = voucher._Dim1;
+                        if (voucher._Dim2 != null)
+                            selectedItem.Dimension2 = voucher._Dim2;
+                        if (voucher._Dim3 != null)
+                            selectedItem.Dimension3 = voucher._Dim3;
+                        if (voucher._Dim4 != null)
+                            selectedItem.Dimension4 = voucher._Dim4;
+                        if (voucher._Dim5 != null)
+                            selectedItem.Dimension5 = voucher._Dim5;
                         dgBankStatementLine.SetModifiedRow(selectedItem);
                     }
                 }
@@ -1158,6 +1168,9 @@ namespace UnicontaClient.Pages.CustomPage
                         var TransAmount = !ShowCurrency ? act._AmountCent : act._AmountCurCent;
                         if (Amount == TransAmount && act._Date >= MinDate)
                         {
+                            if (bst._AccountType > 0 && bst.Account != null && act.DCAccount != null && bst.Account != act.DCAccount) // we have a different DC. we cannot match
+                                continue;
+
                             Join(bst, act);
                             bst.Trans = new List<GLTransClientTotalBank>(1) { act };
                             act._Reconciled = true;
@@ -1205,6 +1218,12 @@ namespace UnicontaClient.Pages.CustomPage
                         var act = actList[startIdx];
                         if (act._Date > MaxDate)
                             break;
+
+                        if (bst._AccountType > 0 && bst.Account != null && act.DCAccount != null && bst.Account != act.DCAccount) // we have a different DC. we cannot match
+                        {
+                            startIdx++;
+                            continue;
+                        }
 
                         long sumTrans = 0;
                         int n = startIdx;
@@ -1281,6 +1300,12 @@ namespace UnicontaClient.Pages.CustomPage
                         var bst = bstList[startIdx];
                         if (bst._Date > MaxDate)
                             break;
+
+                        if (bst._AccountType > 0 && bst.Account != null && act.DCAccount != null && bst.Account != act.DCAccount) // we have a different DC. we cannot match
+                        {
+                            startIdx++;
+                            continue;
+                        }
 
                         long sumTrans = 0;
                         int n = startIdx;
@@ -1761,9 +1786,27 @@ namespace UnicontaClient.Pages.CustomPage
             }
             else
             {
-                var selectedtrans = dgAccountsTransGrid.CurrentItem as GLTransClientTotalBank;
-                if (selectedtrans != null && selectedtrans.StatementLines != null)
+                var act = dgAccountsTransGrid.CurrentItem as GLTransClientTotalBank;
+                if (act != null && act.StatementLines != null)
                     dgAccountsTransGrid.CurrentItem = null;
+
+                if (selectedbsl._InJournal)
+                {
+                    var lstAct = ((IEnumerable<GLTransClientTotalBank>)dgAccountsTransGrid.ItemsSource);
+                    if (lstAct != null)
+                    {
+                        var BankStatementLine = selectedbsl.Id;
+                        foreach (var r in lstAct)
+                        {
+                            if (r.BankStatementLine == BankStatementLine)
+                            {
+                                lastSelected = new List<GLTransClientTotalBank>() { r };
+                                dgAccountsTransGrid.CurrentItem = r;
+                                break;
+                            }
+                        }
+                    }
+                }
             }
             dgBankStatementLine.Readonly = !selectedbsl.AllowEditing;
             MarkCol.ReadOnly = false;
@@ -1772,8 +1815,6 @@ namespace UnicontaClient.Pages.CustomPage
             if (ae != null)
                 ae.IsEnabled = selectedbsl.AllowEditing;
         }
-
-        List<BankStatementLineGridClient> lastSelectedbsl;
 
         private void CheckEditor_Checked(object sender, RoutedEventArgs e)
         {
@@ -1822,6 +1863,7 @@ namespace UnicontaClient.Pages.CustomPage
             this.layOutTrans.Caption = string.Format("'{0:N2}'    '({1:N2})'", transAmt, bankStatAmt - transAmt);
         }
 
+        List<BankStatementLineGridClient> lastSelectedbsl;
         private void dgAccountsTransGrid_SelectedItemChanged(object sender, SelectedItemChangedEventArgs e)
         {
             var selectedTrans = dgAccountsTransGrid.CurrentItem as GLTransClientTotalBank;
@@ -1846,6 +1888,24 @@ namespace UnicontaClient.Pages.CustomPage
                 var bsl = getBSLSelecteditem();
                 if (bsl != null && bsl._Trans != null)
                     dgBankStatementLine.CurrentItem = null;
+
+                if (selectedTrans.BankStatementLine != 0)
+                {
+                    var lstbsl = ((IEnumerable<BankStatementLineGridClient>)dgBankStatementLine.ItemsSource);
+                    if (lstbsl != null)
+                    {
+                        var BankStatementLine = selectedTrans.BankStatementLine;
+                        foreach (var r in lstbsl)
+                        {
+                            if (r.Id == BankStatementLine)
+                            {
+                                lastSelectedbsl = new List<BankStatementLineGridClient>() { r };
+                                dgBankStatementLine.CurrentItem = r;
+                                break;
+                            }
+                        }
+                    }
+                }
             }
         }
 

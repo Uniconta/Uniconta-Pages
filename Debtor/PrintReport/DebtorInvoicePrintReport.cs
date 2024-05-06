@@ -141,12 +141,19 @@ namespace UnicontaClient.Pages.CustomPage
                 DebtorInvoice = debtorInvoiceClientUser;
 
                 //For Getting User fields for Debtor
+                DebtorClient debtor;
                 var debtorClietUserType = ReportUtil.GetUserType(typeof(DebtorClient), Comp);
                 var debtorClientUser = Activator.CreateInstance(debtorClietUserType) as DebtorClient;
-                var dcCache = Comp.GetCache(typeof(Uniconta.DataModel.Debtor)) ?? await crudApi.LoadCache(typeof(Uniconta.DataModel.Debtor));
-                var debtor = dcCache.Get(DebtorInvoice._DCAccount);
+                if (DebtorInvoice._OneTimeDC == null)
+                {
+                    var dcCache = Comp.GetCache(typeof(Uniconta.DataModel.Debtor)) ?? await crudApi.LoadCache(typeof(Uniconta.DataModel.Debtor));
+                    debtor = dcCache.Get(DebtorInvoice._DCAccount) as DebtorClient;
+                }
+                else
+                    debtor = DebtorInvoice._OneTimeDC as DebtorClient;
+
                 if (debtor != null)
-                    StreamingManager.Copy((UnicontaBaseEntity)debtor, debtorClientUser);
+                    StreamingManager.Copy(debtor, debtorClientUser);
                 else if (DebtorInvoice._Prospect != 0)
                 {
                     //Check for Prospect. Create a Debtor for Prospect

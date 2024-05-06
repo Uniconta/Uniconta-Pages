@@ -46,13 +46,19 @@ namespace UnicontaClient.Pages.CustomPage
 
         public double ExchangeRate { get; set; }
 
-        public CWExchangeRate()
+        public CWExchangeRate() : this(true, Uniconta.ClientTools.Localization.lookup("ExchangeRate"))
+        {
+        }
+        public CWExchangeRate(bool showExchageRate, string title)
         {
             DataContext = this;
             InitializeComponent();
-            Title = Uniconta.ClientTools.Localization.lookup("ExchangeRate");
+            if (!showExchageRate)
+            {
+                lblExchangeRate.Visibility = edExchangeRate.Visibility = Visibility.Collapsed;
+            }
+            Title = title;
         }
-
 
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {

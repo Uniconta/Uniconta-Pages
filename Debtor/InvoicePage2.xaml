@@ -117,6 +117,9 @@ x:Class="UnicontaClient.Pages.CustomPage.InvoicePage2"
                 <CorasauControls:CorasauLayoutItem FieldName="Installation " x:Name="liInstallation">
                     <CorasauControls:LookupEditor x:Name="leInstallation" Text="{Binding Installation ,Mode=TwoWay}"/>
                 </CorasauControls:CorasauLayoutItem>
+                <CorasauControls:CorasauLayoutItem FieldName="CompanyAddress" x:Name="lblCompanyAddress">
+                    <CorasauControls:LookupEditor x:Name="leCompanyAddress" EditValue="{Binding CompanyAddress,Mode=TwoWay}"/>
+                </CorasauControls:CorasauLayoutItem>
                 <CorasauControls:CorasauLayoutItem FieldName="LayoutGroup" x:Name="liLayoutGroup">
                     <CorasauControls:LookupEditor x:Name="leLayoutGroup" EditValue="{Binding LayoutGroup,Mode=TwoWay}"/>
                 </CorasauControls:CorasauLayoutItem>

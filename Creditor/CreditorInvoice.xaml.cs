@@ -42,17 +42,12 @@ namespace UnicontaClient.Pages.CustomPage
                         UtilCommon.SetDeliveryAdress(dcInvoice, dcInvoice.Creditor, api);
                     }
                 }
-                if (Comp.CreditorInvoices == null)
+                if (Comp.CreditorInvoices != null)
                 {
                     Comp.CreditorInvoices = new IRowIdCache<CreditorInvoiceClient>();
                     Comp.CreditorInvoices.SetCache((IEnumerable<CreditorInvoiceClient>)Arr);
+                    Comp.CreditorInvoicesArr = null;
                 }
-                else
-                {
-                    foreach (var rec in (IEnumerable<CreditorInvoiceClient>)Arr)
-                        Comp.CreditorInvoices.Add(rec);
-                }
-                Comp.CreditorInvoicesArr = null;
             }
         }
     }

@@ -125,7 +125,13 @@ namespace UnicontaClient.Pages.CustomPage
             }
 
             leGroup.api = leEmp.api = lePayroll.api = lePrCategory.api = leWorkspace.api = leWorkspaceNew.api = crudApi;
-            cmbBudgetMethod.ItemsSource = new string[] { Uniconta.ClientTools.Localization.lookup("MonthView"), Uniconta.ClientTools.Localization.lookup("WeekView"), Uniconta.ClientTools.Localization.lookup("DayView") };
+            cmbBudgetMethod.ItemsSource = new string[]
+            {
+                string.Concat(Uniconta.ClientTools.Localization.lookup("MonthView"), " (", Uniconta.ClientTools.Localization.lookup("Start"),")"),
+                string.Concat(Uniconta.ClientTools.Localization.lookup("MonthView"), " (", Uniconta.ClientTools.Localization.lookup("End"), ")"),
+                Uniconta.ClientTools.Localization.lookup("WeekView"), 
+                Uniconta.ClientTools.Localization.lookup("DayView") 
+            };
             cmbBudgetMethod.SelectedIndex = BudgetMethod;
 
             budgetGrpCache = crudApi.GetCache<Uniconta.DataModel.ProjectBudgetGroup>();

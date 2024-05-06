@@ -237,14 +237,9 @@ namespace UnicontaClient.Pages.CustomPage
                 if (selectedAccountstatementList.Count > 0)
                 {
                     var FirstLine = selectedAccountstatementList[0].ChildRecords[0];
-                    var paymentStandardReport = await GeneratePrintReport(selectedAccountstatementList, companyClient, CWSetFeeAmount._PrDate, logo, FirstLine._Code);
+                    var paymentStandardReport = await GeneratePrintReport(selectedAccountstatementList, companyClient, CWSetFeeAmount._PrDate, logo, FirstLine._Code, true);
                     if (paymentStandardReport != null && paymentStandardReport.Count() == 1)
-                    {
                         InvoicePostingPrintGenerator.OpenReportInOutlook(api, paymentStandardReport.First(), debtor, FirstLine._Code);
-
-                        //Update Last dateTime
-                        UpdateDate(selectedAccountstatementList[0].ChildRecords);
-                    }
                 }
             }
             catch (Exception ex)
@@ -256,10 +251,11 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void UpdateDate(IEnumerable<DebtorTransPayment> payments)
         {
-            new ReportAPI(api).UpdateCollectionLog(payments, CWSetFeeAmount._PrDate);
+            if (payments != null)
+                new ReportAPI(api).UpdateCollectionLog(payments, CWSetFeeAmount._PrDate);
         }
 
-        async private Task<IEnumerable<IPrintReport>> GeneratePrintReport(IEnumerable<DebtorPaymentStatementList> paymentStatementList, CompanyClient companyClient, DateTime date, byte[] logo, DebtorEmailType debtorEmailType)
+        async private Task<IEnumerable<IPrintReport>> GeneratePrintReport(IEnumerable<DebtorPaymentStatementList> paymentStatementList, CompanyClient companyClient, DateTime date, byte[] logo, DebtorEmailType debtorEmailType, bool outlook = false)
         {
 
             var updateWithLastCollectionLetter = UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("UpdateWithLastCollection"), Uniconta.ClientTools.Localization.lookup("Confirmation"), MessageBoxButton.YesNo);
@@ -286,7 +282,12 @@ namespace UnicontaClient.Pages.CustomPage
                 }
             }
             if (updates.Count > 0 && updateWithLastCollectionLetter == MessageBoxResult.Yes)
-                UpdateDate(updates);
+            {
+                if (outlook && iprintReportList.Count() == 1)
+                    UpdateDate(paymentStatementList.FirstOrDefault()?.ChildRecords);
+                else
+                    UpdateDate(updates);
+            }
             return iprintReportList;
         }
 
@@ -657,6 +658,8 @@ namespace UnicontaClient.Pages.CustomPage
         {
             foreach (var rec in debtorPayments)
             {
+                if (rec == null)
+                    continue;
                 rec.PaymentCharge = 0d;
                 if (!rec._OnHold && (rec._LastInterest == DateTime.MinValue || rec._LastInterest <= day))
                 {
@@ -664,7 +667,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (prDay)
                     {
                         var dt = rec._LastInterest != DateTime.MinValue ? rec._LastInterest : (rec._DueDate != DateTime.MinValue ? rec._DueDate : rec.Date);
-                        factor = Math.Max(Math.Min((prDate - dt).TotalDays, 360d) / 30d, 0d);
+                        factor = Math.Max(interestValue * Math.Min((prDate - dt).TotalDays, 360d) / 30d, 0d);
                     }
                     rec.FeeAmount = Math.Round((rec._AmountOpenCur != 0 ? rec._AmountOpenCur : rec._AmountOpen) * factor / 100d, desm);
                     rec._Code = DebtorEmailType.InterestNote;

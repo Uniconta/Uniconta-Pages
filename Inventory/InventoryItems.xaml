@@ -93,6 +93,7 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryItems"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="IntraUnit" Visible="False" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="StockPosition" Visible="False" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Weight" Visible="False" Width="90" AllowThousandMask="True" Mask="n3"  />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="NetWeight" Visible="False" Width="90" AllowThousandMask="True" Mask="n3"  />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Volume" Visible="False" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="MinStockLevel" Visible="False" Width="90">
                         <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
@@ -111,6 +112,7 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryItems"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PurchaseQty" Visible="False" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="SalesQty" Visible="False" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PurchaseAccount" Visible="False" Width="90"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="SupplierItemId" Visible="False" Width="100"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PayrollCategory" Visible="False" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Visible="False" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Group" Width="80"/>
@@ -180,6 +182,7 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryItems"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DiscountGroup" Visible="False" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="BrandGroup" Visible="False" Width="100"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CategoryGroup" Visible="False" Width="100"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="StatisticsGroup" Visible="False" Width="100"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="HideInSales" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="HideInPurchase" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CountryOfOrigin" Visible="False" />

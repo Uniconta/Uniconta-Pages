@@ -74,9 +74,19 @@ namespace UnicontaClient.Pages.CustomPage
 
     internal class BalanceClientSort : IComparer<BalanceClient>
     {
+        readonly bool SortExtern;
+        public BalanceClientSort(bool SortExtern) { this.SortExtern = SortExtern; }
+
         public int Compare(BalanceClient x, BalanceClient y)
         {
-            var c = string.Compare(x.AccountNo, y.AccountNo);
+            int c;
+            if (SortExtern)
+            {
+                c = string.Compare(x.Acc._ExternalNo, y.Acc._ExternalNo);
+                if (c != 0)
+                    return c;
+            }
+            c = string.Compare(x.AccountNo, y.AccountNo);
             if (c != 0)
                 return c;
             c = string.Compare(x.Dim1, y.Dim1);
@@ -232,7 +242,7 @@ namespace UnicontaClient.Pages.CustomPage
         bool Skip0Account;
         bool SkipSumAccount, OnlySumAccounts;
         bool ShowDimName;
-        bool UseExternal;
+        bool UseExternal, SortExtern;
         int ShowType;
         protected override bool IsLayoutSaveRequired()
         {
@@ -264,6 +274,7 @@ namespace UnicontaClient.Pages.CustomPage
             this.SkipSumAccount = PassedCriteria.SkipSumAccount;
             this.OnlySumAccounts = PassedCriteria.OnlySumAccounts;
             this.UseExternal = PassedCriteria.UseExternal;
+            this.SortExtern = this.UseExternal && PassedCriteria.SortExtern;
             this.FromAccount = PassedCriteria.FromAccount;
             this.ShowDimName = PassedCriteria.ShowDimName;
             if (string.IsNullOrWhiteSpace(this.FromAccount))
@@ -518,21 +529,22 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     Task<FinancialBalance[]> tsk;
                     bool inTrans;
+                    var forCompany = Crit.forCompany != null ? Crit.forCompany.CompanyId : 0;
                     var dimParams = SetDimensionParameters(Crit.dimval1, Crit.dimval2, Crit.dimval3, Crit.dimval4, Crit.dimval5, dim1details, dim2details, dim3details, dim4details, dim5details);
                     if (method == BalanceColumnMethod.FromTrans || method == BalanceColumnMethod.OnlyJournals)
                     {
                         inTrans = true;
-                        tsk = tranApi.GenerateTotal(null, Crit.frmdateval, Crit.todateval, Crit.journal, dimParams, Crit.forCompany != null ? Crit.forCompany.CompanyId : 0, !Crit.InclPrimo, method == BalanceColumnMethod.OnlyJournals);
+                        tsk = tranApi.GenerateTotal(null, Crit.frmdateval, Crit.todateval, Crit.journal, dimParams, forCompany, !Crit.InclPrimo, method == BalanceColumnMethod.OnlyJournals);
                     }
                     else if (method == BalanceColumnMethod.TransQty)
                     {
                         inTrans = true;
-                        tsk = tranApi.GenerateTotalQty(null, Crit.frmdateval, Crit.todateval, Crit.journal, dimParams, Crit.forCompany != null ? Crit.forCompany.CompanyId : 0, false);
+                        tsk = tranApi.GenerateTotalQty(null, Crit.frmdateval, Crit.todateval, Crit.journal, dimParams, forCompany, false);
                     }
                     else
                     {
                         inTrans = false;
-                        tsk = tranApi.GenerateBudgetTotals(Crit.budgetModel, Crit.frmdateval, Crit.todateval, dimParams, method == BalanceColumnMethod.BudgetQty);
+                        tsk = tranApi.GenerateBudgetTotals(Crit.budgetModel, Crit.frmdateval, Crit.todateval, dimParams, method == BalanceColumnMethod.BudgetQty, forCompany);
                     }
                     var bal = await tsk;
                     if (bal != null)
@@ -815,7 +827,7 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                 }
 
-                BalanceList.Sort(new BalanceClientSort());
+                BalanceList.Sort(new BalanceClientSort(SortExtern));
 
                 AccountName.Visible = AccountNo.Visible = true;
                 Text.Visible = false;
@@ -1094,14 +1106,14 @@ namespace UnicontaClient.Pages.CustomPage
 
             busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
             busyIndicator.IsBusy = true;
-            LineDetailsData listdata = new LineDetailsData();
-            listdata.balClient = balanceClient;
+            LineDetailsData listdata = new LineDetailsData(balanceClient);
             if (templateReportData == null)
             {
                 var arr = balanceClient.ToArray();
-                Array.Sort(arr, new BalanceClientSort());
-                foreach (BalanceClient blc in arr)
+                Array.Sort(arr, new BalanceClientSort(SortExtern));
+                for(int i = 0; i < arr.Length; i++)
                 {
+                    var blc = arr[i];
                     BalanceReportdata data = new BalanceReportdata(blc, hdrData);
                     var AcType = blc.AccountTypeEnum;
                     data.isBold = (AcType <= GLAccountTypes.CalculationExpression) ? FontWeights.Bold : FontWeights.Normal;
@@ -1115,7 +1127,10 @@ namespace UnicontaClient.Pages.CustomPage
             }
             busyIndicator.IsBusy = false;
             CompanyClient cmplClient = api.CompanyEntity.CreateUserType<CompanyClient>();
-            StreamingManager.Copy(api.CompanyEntity, cmplClient);
+            if (cmplClient.GetType() != api.CompanyEntity.GetType())
+                StreamingManager.Copy(api.CompanyEntity, cmplClient);
+            else
+                cmplClient = (CompanyClient)api.CompanyEntity;
             hdrData.Company = cmplClient;
             hdrData.exportServiceUrl = CorasauDataGrid.GetExportServiceConnection(this.api);
             string header = ParentControl.Caption.ToString();
@@ -1127,16 +1142,12 @@ namespace UnicontaClient.Pages.CustomPage
             if (!string.IsNullOrEmpty(PassedCriteria.Template))
             {
                 templateReportData[3] = frontPageReport;
-                AddDockItem(TabControls.BalanceReportTemplatePrint, templateReportData, string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("ReportCriteria"), header), null, true);//new templated report                         
+                AddDockItem(TabControls.BalanceReportTemplatePrint, templateReportData, string.Concat(Uniconta.ClientTools.Localization.lookup("ReportCriteria"), ":", header), null, true);//new templated report                         
             }
             else
             {
-                object[] ob = new object[4];
-                ob[0] = hdrData;
-                ob[1] = listdata;
-                ob[2] = PassedCriteria.ObjBalance;
-                ob[3] = frontPageReport;
-                AddDockItem(TabControls.BalanceReportPrint, ob, string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("ReportCriteria"), header), null, true);
+                AddDockItem(TabControls.BalanceReportPrint, new object[4] { hdrData, listdata, PassedCriteria.ObjBalance, frontPageReport }, 
+                string.Concat(Uniconta.ClientTools.Localization.lookup("ReportCriteria"), ":", header), null, true);
             }
         }
 
@@ -1154,7 +1165,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 var dataBytes = await userReportApi.LoadForRun(frontPageTemplate, 50);
                 if (dataBytes != null && dataBytes.Length > 0)
-                    balanceFrontPageReport = Uniconta.Reports.Utilities.ReportUtil.GetXtraReportFromLayout(dataBytes);
+                    balanceFrontPageReport = Uniconta.Reports.Utilities.ReportUtil.GetStandardXtraReportFromLayout(dataBytes);
 
                 if (balanceFrontPageReport != null)
                 {

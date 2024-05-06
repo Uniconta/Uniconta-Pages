@@ -7,12 +7,15 @@ using Uniconta.ClientTools;
 using System.Windows;
 using Uniconta.Common.User;
 using Uniconta.ClientTools.DataModel;
+using UnicontaClient.Pages;
 
 namespace UnicontaClient.Controls.Dialogs
 {
     public partial class CWSearchUser : ChildWindow
     {
         CompanyAccessAPI comApi;
+        int userType;
+        public UserTypes UserType { get { return (UserTypes)userType; } set { userType =  (int)value; SetAsPerUserType(); } }
         public CWSearchUser(CompanyAccessAPI api)
         {
             comApi = api;
@@ -32,6 +35,24 @@ namespace UnicontaClient.Controls.Dialogs
                 lblSetupText.Visibility = Visibility.Collapsed;
                 lblSetupType.Visibility = Visibility.Collapsed;
                 lstSetupType.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        void SetAsPerUserType()
+        {
+            switch (UserType)
+            {
+                case UserTypes.StandardUser:
+                    this.Title = string.Format(Uniconta.ClientTools.Localization.lookup("AddOBJ"), Uniconta.ClientTools.Localization.lookup("StandardUser"));
+                    break;
+                case UserTypes.ProjectTimeUser:
+                    this.Title = string.Format(Uniconta.ClientTools.Localization.lookup("AddOBJ"), Uniconta.ClientTools.Localization.lookup("ProjectTimeUser"));
+                    cmbUserRights.SelectedIndex = 3;
+                    break;
+                case UserTypes.InvoiceUser:
+                    this.Title = string.Format(Uniconta.ClientTools.Localization.lookup("AddOBJ"), Uniconta.ClientTools.Localization.lookup("InvoiceUser"));
+                    cmbUserRights.SelectedIndex = 3;
+                    break;
             }
         }
 
@@ -81,17 +102,18 @@ namespace UnicontaClient.Controls.Dialogs
                     SetDialogResult(false);
             }
         }
+        public string SearchedText;
         private async void OKButton_Click(object sender, RoutedEventArgs e)
         {
             if (lstSetupType.SelectedIndex != 0)
             {
-                string searchedText = txtSearch.Text;
+                SearchedText = txtSearch.Text;
                 var selectedUser = cmbUsers.SelectedItem as CompanyUserAccessClient;
                 ErrorCodes err;
                 if (selectedUser == null)
-                    err = await comApi.GiveNewUserAccess(searchedText, (CompanyPermissions)cmbUserRights.SelectedIndex);
+                    err = await comApi.GiveNewUserAccess(SearchedText, (CompanyPermissions)cmbUserRights.SelectedIndex);
                 else
-                    err = await comApi.GiveNewUserAccess(searchedText, (CompanyPermissions)selectedUser._Rights);
+                    err = await comApi.GiveNewUserAccess(SearchedText, (CompanyPermissions)selectedUser._Rights);
 
                 if (err != ErrorCodes.Succes)
                     UtilDisplay.ShowErrorCode(err);

@@ -98,6 +98,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgInvJournalLine.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;
+            this.BeforeClose += JournalLine_BeforeClose;
 
             var Comp = api.CompanyEntity;
             this.items = Comp.GetCache(typeof(InvItem));
@@ -126,6 +127,17 @@ namespace UnicontaClient.Pages.CustomPage
                 }
             }
             base.SetParameter(Parameters);
+        }
+
+        private void JournalLine_BeforeClose()
+        {
+            var lines = dgInvJournalLine.ItemsSource as IList;
+            int cnt = lines != null ? lines.Count : 0;
+            var mClient = journal as InvJournalClient;
+            if (mClient != null)
+                mClient.NumberOfLines = cnt;
+            else
+                journal._NumberOfLines = cnt;
         }
 
         protected override void OnLayoutLoaded()
@@ -217,8 +229,11 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 var serie = new InvSerieBatchOpen() { _Item = rec._Item };
                 var lst = await api.Query<InvSerieBatchClient>(serie);
-                localInvSerieBatchList.AddRange(lst);
-                rec.serieBatchSource = lst?.Select(x => x.Number).ToList();
+                if (lst != null)
+                {
+                    localInvSerieBatchList.AddRange(lst);
+                    rec.serieBatchSource = lst.Select(x => x.Number).ToList();
+                }
             }
             else
             {
@@ -661,6 +676,8 @@ namespace UnicontaClient.Pages.CustomPage
 
                             dgInvJournalLine.ItemsSource = null;
                             dgInvJournalLine.ItemsSource = lst;
+                            journal._NumberOfLines = lst.Count;
+                            (journal as InvJournalClient)?.NotifyPropertyChanged("NumberOfLines");
                         }
                     }
                 }

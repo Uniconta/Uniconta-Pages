@@ -3,10 +3,6 @@
 x:Class="UnicontaClient.Pages.CustomPage.UserDocsPage3" 
            xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
-           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-           xmlns:toolkit="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Toolkit"
-           xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
            xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
     <Pages:FormBasePage.Resources>
     
@@ -22,7 +18,7 @@ x:Class="UnicontaClient.Pages.CustomPage.UserDocsPage3"
             <Grid x:Name="documentViewer">
 
             </Grid>
-            <Border Grid.Row="1" Name="border1" Height="2" VerticalAlignment="Top" BorderBrush="{StaticResource BodyTextColorBrush}" BorderThickness="2" Margin="0,5" />
+            <Border Grid.Row="1" Name="border1" Height="2" VerticalAlignment="Top" BorderBrush="{StaticResource BorderColor}" BorderThickness="2" Margin="0,5" />
             <Border Grid.Row="2" Background="{StaticResource LayoutGridColor}">
                 <Grid  Margin="0,5">
                     <Grid.ColumnDefinitions>

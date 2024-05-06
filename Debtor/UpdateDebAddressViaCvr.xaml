@@ -22,11 +22,13 @@ x:Class="UnicontaClient.Pages.CustomPage.UpdateDebAddressViaCvr"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Address2" ReadOnly="True" Width="150"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ZipCode" ReadOnly="True" Width="80"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="City" Width="50" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="IndustryCode" Width="50" ReadOnly="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="NewName" ReadOnly="True" Width="100"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="NewAddress"  Width="150"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="NewAddress2"  Width="150"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="NewZipCode" Width="120"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="NewCity" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="NewIndustryCode" />
                 </localPage:UpdateDebAddressViaCvrGrid.Columns>
             </localPage:UpdateDebAddressViaCvrGrid>
         </UnicontaControls:BusyIndicator>

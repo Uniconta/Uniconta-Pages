@@ -3,13 +3,11 @@
   <RibbonItem TabId="0" LocalizedNameKey="Home">
     <!---When we create a new group and a new TabPage -->
     <RibbonItem Action="Export" LocalizedNameKey="CreateExportFile" LargeGlyph="Export_32x32">
-      <RibbonItem Action="ExportToCSV" LocalizedNameKey="CSV" Glyph="Export_CSV_16x16"/>
-      <RibbonItem Action="ExportToExcel" LocalizedNameKey="Excel" Glyph="Export_xl_16x16" />
-      <RibbonItem Action="ExportToDatev" LocalizedNameKey="Datev" Glyph="DateV_16x16" />
+      <RibbonItem Action="ExportToCSV" LocalizedNameKey="CSV" Glyph="CSV_Top"/>
+      <RibbonItem Action="ExportToExcel" LocalizedNameKey="Excel" Glyph="Excel_Top" />
+      <RibbonItem Action="ExportToDatev" LocalizedNameKey="Datev" Glyph="Datev_16x16" />
     </RibbonItem>
     <RibbonItem Action="SaveExport" LocalizedNameKey="SaveOBJ" Parameter="Export" LargeGlyph="save-32x32" ShortcutKey="Ctrl+S"/>
-    <RibbonItem Action="CreateSupplement"   LocalizedNameKey="CreateOBJ" Parameter="SupplementaryTransactions"  LargeGlyph="Transactions_32x32"/>
-    <RibbonItem Action="DatevHeader" LocalizedNameKey="DatevHeader" LargeGlyph="CreateExit_32x32"/>
   </RibbonItem>
   <RibbonItem>
     <!---If we want to create a new group in same PageTab-->

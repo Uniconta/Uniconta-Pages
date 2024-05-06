@@ -1,12 +1,10 @@
 using System;
 using System.Collections;
-using System.Threading.Tasks;
 using Uniconta.API.Service;
 using Uniconta.ClientTools;
 using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
-using Uniconta.ClientTools.Util;
 using Uniconta.Common;
 using Uniconta.DataModel;
 using UnicontaClient.Models;
@@ -122,7 +120,7 @@ namespace UnicontaClient.Pages.CustomPage
                 var debtor = accountCache.Get(selectedItem.Trans._Account) as DebtorClient;
 
                 selectedItem.OpenTran._Code = selectedItem._Code;
-                var paymentStandardReport = await GeneratePrintReport(selectedItem.OpenTran, debtor, selectedItem._Date, selectedItem._Code);
+                var paymentStandardReport = await Utility.GenerateStandardCollectionReport(selectedItem.OpenTran, debtor, selectedItem._Date, selectedItem._Code, api);
                 if (paymentStandardReport != null)
                 {
                     InvoicePostingPrintGenerator.OpenReportInOutlook(api, paymentStandardReport, debtor, selectedItem._Code);
@@ -151,7 +149,7 @@ namespace UnicontaClient.Pages.CustomPage
                 selectedItem.OpenTran._Code = selectedItem._Code;
                 var debtor = accountCache.Get(selectedItem.Trans._Account) as DebtorClient;
 
-                var paymentStandardReport = await GeneratePrintReport(selectedItem.OpenTran, debtor, selectedItem._Date, selectedItem._Code);
+                var paymentStandardReport = await Utility.GenerateStandardCollectionReport(selectedItem.OpenTran, debtor, selectedItem._SendTime, selectedItem._Code, api);
                 var reportName = selectedItem._Code == DebtorEmailType.InterestNote ? Uniconta.ClientTools.Localization.lookup("InterestNote") : Uniconta.ClientTools.Localization.lookup("CollectionLetter");
                 var dockName = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Preview"), reportName);
                 AddDockItem(UnicontaTabs.StandardPrintReportPage, new object[] { paymentStandardReport, reportName }, dockName);
@@ -167,58 +165,9 @@ namespace UnicontaClient.Pages.CustomPage
                 busyIndicator.IsBusy = false;
             }
         }
-
-        async private Task<IPrintReport> GeneratePrintReport(DCTransOpen payment, DebtorClient debtor, DateTime date, DebtorEmailType debtorEmailType)
-        {
-            var deb = new DebtorPaymentStatementList()
-            {
-                AccountNumber = debtor._Account,
-                Name = debtor._Name,
-            };
-            var rec = new DebtorTransPayment();
-            StreamingManager.Copy((UnicontaBaseEntity)payment, rec);
-            deb.ChildRecords = new DebtorTransPayment[] { rec };
-
-            var lan = UtilDisplay.GetLanguage(debtor, api.CompanyEntity);
-            rec.Trans.LocOb = Uniconta.ClientTools.Localization.GetLocalization(lan);
-            rec._SumAmount = rec.Trans._AmountOpen;
-            rec._SumAmountCur = rec.Trans._AmountOpenCur;
-
-            var collectionPrint = await GenerateStandardCollectionReport(debtor, date, deb, debtorEmailType);
-            if (collectionPrint == null)
-                return null;
-
-            var standardReports = new[] { collectionPrint };
-            var standardPrint = new StandardPrintReport(api, standardReports, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.CollectionLetter);
-
-            await standardPrint.InitializePrint();
-            return standardPrint;
-        }
-
-        async private Task<DebtorCollectionReportClient> GenerateStandardCollectionReport(DebtorClient debtor, DateTime dueDate, DebtorPaymentStatementList selectedItem, DebtorEmailType debtorEmailType)
-        {
-            byte[] logo = await UtilCommon.GetLogo(api);
-
-            var Comp = api.CompanyEntity;
-            var companyClient = Comp.CreateUserType<CompanyClient>();
-            StreamingManager.Copy(Comp, companyClient);
-
-            var lan = UtilDisplay.GetLanguage(debtor, companyClient);
-            string lastMessage;
-            var res = await UtilCommon.GetDebtorMessageClient(api, lan, debtorEmailType);
-            if (res != null)
-                lastMessage = res._Text;
-            else
-                lastMessage = string.Empty;
-
-            debtor.OpenTransactions = selectedItem.ChildRecords;
-            string _reportName = StandardReportUtility.GetLocalizedReportName(debtor, companyClient, debtorEmailType.ToString());
-
-            return new DebtorCollectionReportClient(companyClient, debtor, dueDate, logo, debtorEmailType == DebtorEmailType.InterestNote, _reportName, lastMessage);
-        }
     }
 }
 
-    
+
 
 

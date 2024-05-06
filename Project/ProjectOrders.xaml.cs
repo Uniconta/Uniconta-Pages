@@ -31,10 +31,8 @@ using Uniconta.Client.Pages;
 using DevExpress.Xpf.Grid;
 using DevExpress.Data;
 using Uniconta.Common.Utility;
-using ubl_norway_uniconta;
 using FromXSDFile.OIOUBL.ExportImport;
 using Microsoft.Win32;
-using UBL.Iceland;
 using UnicontaClient.Pages;
 
 using UnicontaClient.Pages;

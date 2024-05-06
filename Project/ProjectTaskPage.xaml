@@ -3,13 +3,9 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectTaskPage"
         xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
         xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
         xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
         xmlns:GantChart="clr-namespace:UnicontaClient.Controls.GantChart"
-        xmlns:themes="http://schemas.devexpress.com/winfx/2008/xaml/editors/themekeys"
         xmlns:UnicontaControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
         DataContext="{dxmvvm:ViewModelSource Type={x:Type GantChart:ProjectTaskVM}}"
         xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm" >
@@ -27,7 +23,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectTaskPage"
         			    Canvas.Left="{Binding Left, Mode=OneWay}"
         			    Height="16" Opacity="1"
         			    Width="{Binding Width, Mode=OneWay}"
-        			    BorderThickness="1" BorderBrush="DimGray" Background="{Binding DataContext.Data.BarColor, RelativeSource={RelativeSource TemplatedParent}}">
+        			    BorderThickness="1" BorderBrush="{StaticResource MenuBorderBrushColor}" Background="{Binding DataContext.Data.BarColor, RelativeSource={RelativeSource TemplatedParent}}">
                 </Border>
 
                 <ItemsControl ItemsSource="{Binding Days, Mode=OneWay}">
@@ -39,7 +35,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectTaskPage"
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Rectangle Width="{Binding DataContext.DayWidth, ElementName=LayoutRoot, Mode=OneWay}"
-        						       Height="20" Stroke="Gray" StrokeThickness="0.1"/>
+        						       Height="20" Stroke="{StaticResource BorderColor}" StrokeThickness="0.1"/>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>

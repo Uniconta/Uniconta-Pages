@@ -16,6 +16,7 @@ using Uniconta.ClientTools.Page;
 using UnicontaClient.Controls;
 using Uniconta.API.Service;
 using Uniconta.ClientTools.Util;
+using Uniconta.ClientTools.Controls;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -140,8 +141,16 @@ namespace UnicontaClient.Pages.CustomPage
                         {
                             st.Reset();
                             st.CopyFrom(fs);
+                            st.SetPosition(0);
                         }
-                        await imp.Import(Voucher, date, _ext, Text, st);
+
+                        byte[] buf;
+                        if (_ext == FileextensionsTypes.JPEG)
+                            buf = FileBrowseControl.ImageResize(st, ".jpg");
+                        else
+                            buf = null;
+
+                        await imp.Import(Voucher, date, _ext, Text, buf ?? st.ToArray());
                     }
                 }
                 catch (Exception ex)
@@ -150,6 +159,7 @@ namespace UnicontaClient.Pages.CustomPage
                 }
             }
             st.Release();
+            _logs.AppendLogLine(Uniconta.ClientTools.Localization.lookup("Done"));
         }
     }
 }

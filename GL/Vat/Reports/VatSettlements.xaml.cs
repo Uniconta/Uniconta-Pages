@@ -16,8 +16,7 @@ using System.Collections;
 using Uniconta.Client.Pages;
 using UnicontaClient.Pages.Reports;
 using Localization = Uniconta.ClientTools.Localization;
-using UnicontaClient.Controls.Dialogs;
-using NPOI.SS.UserModel;
+using System.Windows.Controls;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -52,9 +51,13 @@ namespace UnicontaClient.Pages.CustomPage
             if (countryId != CountryCode.Denmark && countryId != CountryCode.Greenland && countryId != CountryCode.FaroeIslands)
             {
                 RibbonBase rb = (RibbonBase)localMenu.DataContext;
-                UtilDisplay.RemoveMenuCommand(rb, "Upload");
+                UtilDisplay.RemoveMenuCommand(rb, "ApproveVAT");
+                if (countryId != CountryCode.Iceland)
+                {
+                    UtilDisplay.RemoveMenuCommand(rb, "Upload");
+                    UtilDisplay.RemoveMenuCommand(rb, "View");
+                }
             }
-
         }
 
         protected override void LoadCacheInBackGround()
@@ -65,8 +68,6 @@ namespace UnicontaClient.Pages.CustomPage
         void localMenu_OnItemClicked(string ActionType)
         {
             var selectedItem = dgVatVatSettlements.SelectedItem as GLVatReportedClient;
-            //if (selectedItem == null)
-            //    selectedItem = new GLVatReportedClient();
             switch (ActionType)
             {
                 case "DeleteRow":
@@ -80,6 +81,8 @@ namespace UnicontaClient.Pages.CustomPage
                 case "VatReport":
                     if (selectedItem != null)
                         AddDockItem(TabControls.VATReport, new object[] { selectedItem }, string.Format("{0}:{1}-{2}", Uniconta.ClientTools.Localization.lookup("VatReport"), selectedItem.FromDate.ToShortDateString(), selectedItem.ToDate.ToShortDateString()), null, closeIfOpened: true);
+                    else if (dgVatVatSettlements.ItemsSource == null || (dgVatVatSettlements.ItemsSource as IList).Count == 0)
+                        Create();
                     break;
                 case "VatSettlementReport":
                     if (selectedItem != null)
@@ -113,24 +116,30 @@ namespace UnicontaClient.Pages.CustomPage
                             UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("UploadedAt") + ": {0}", selectedItem.UploadedAt.ToShortDateString()), Uniconta.ClientTools.Localization.lookup("Information"));
                             return;
                         }
-                        var cwConfirmationBox = new CWConfirmationBox(Uniconta.ClientTools.Localization.lookup("UploadVATPermissionMsg"), Uniconta.ClientTools.Localization.lookup("Confirmation"), false, null,
-                        true, Uniconta.ClientTools.Localization.lookup("GrantPermission"), Uniconta.ClientTools.Localization.lookup("Continue"));
-                        cwConfirmationBox.Closed += delegate
+
+                        if (api.CompanyEntity._CountryId == CountryCode.Iceland)
                         {
-                            if (cwConfirmationBox.DialogResult == true)
+                            var cwTextControl = new CWTextControl(Localization.lookup("ReportTo") + " " + Localization.lookup("CustomsService"), Uniconta.ClientTools.Localization.lookup("Key"));
+                            cwTextControl.Closed += CwTextControl_Closed;
+                            cwTextControl.Show();
+                        }
+                        else
+                        {
+                            var cwConfirmationBox = new CWConfirmationBox(Uniconta.ClientTools.Localization.lookup("UploadVATPermissionMsg"), 
+                                                        Uniconta.ClientTools.Localization.lookup("Confirmation"), false, null,
+                                                        true, Uniconta.ClientTools.Localization.lookup("GrantPermission"), Uniconta.ClientTools.Localization.lookup("Continue"));
+                            cwConfirmationBox.Closed += delegate
                             {
-                                if (cwConfirmationBox.ConfirmationResult == CWConfirmationBox.ConfirmationResultEnum.Yes)
+                                if (cwConfirmationBox.DialogResult == true)
                                 {
-                                    System.Diagnostics.Process.Start("https://eur02.safelinks.protection.outlook.com/?url=https%3A%2F%2Furldefense.proofpoint.com%2Fv2%2Furl%3Fu%3Dhttps-3A__pdcs.skat.dk_dcs-2Datn-2Dgateway_" +
-                                        "nemlogin-3FtargetUrl-3DaHR0cHM6Ly93d3cuc2thdC5kay9mcm9udC9hcHBtYW5hZ2VyL3NrYXQvbnRzZT9fbmZwYj10cnVlJl9uZnBiPXRydWUmX3BhZ2VMYWJlbD1QMjgwMDY1NTM5MTM1OTczNDk4MTkwOSZfbmZscz1mYWxzZQ-3D-3D%26d%3DDwMFAw%26c%3Dvgc7_" +
-                                        "vOYmgImobMVdyKsCY1rdGZhhtCa2JetijQZAG0%26r%3Dy-Ffb9u1CNakT-m5-tkvg8uGekr8sZ4_HWF7ClzBAtg%26m%3D-_GeOzxAxYuJnuimeioPUULdHuMjnGgsT_BvugxBrqE%26s%3DLHNyqY-YQe8nsTNDtajbSGgim9u3q9TtoUWmznVLg_M%26e%3D&data=05%7C01%7Cac%40uniconta.com%" +
-                                        "7Cbdab8dea154a4bc3742208dbaea79758%7Cc77f48dcdd824f6da939e3b2bd7f2e95%7C0%7C0%7C638295807398038001%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=Jtbi9Wd1jp%2F0dALSTYtzof1bR8fbEzxHVhWe6TNlyYs%3D&reserved=0");
+                                    if (cwConfirmationBox.ConfirmationResult == CWConfirmationBox.ConfirmationResultEnum.Yes)
+                                        System.Diagnostics.Process.Start("https://pdcs.skat.dk/dcs-atn-gateway/nemlogin?targetUrl=aHR0cHM6Ly9udHNlLnNrYXQuZGsvbnRzZS1mcm9udC9jb250ZW50P2lkPWZyYW1lOjJGQUF1dG9yaXNlcnJldmlzb3JtZmw=");
+                                    else if (cwConfirmationBox.ConfirmationResult == CWConfirmationBox.ConfirmationResultEnum.No)
+                                        UploadSettlements(selectedItem, null);
                                 }
-                                else if (cwConfirmationBox.ConfirmationResult == CWConfirmationBox.ConfirmationResultEnum.No)
-                                    UploadSettlements(selectedItem);
-                            }
-                        };
-                        cwConfirmationBox.Show();
+                            };
+                            cwConfirmationBox.Show();
+                        }
                     }
                     break;
                 case "View":
@@ -138,34 +147,14 @@ namespace UnicontaClient.Pages.CustomPage
                         View(selectedItem);
                     break;
                 case "Create":
-                    DateTime fromdate = (dgVatVatSettlements.ItemsSource as IList<GLVatReportedClient>).Select(v => v._ToDate).DefaultIfEmpty().Max();
-                    if (fromdate != DateTime.MinValue)
-                        fromdate = fromdate.AddDays(1);
-                    else
-                        fromdate = new DateTime(DateTime.Now.Year, 1, 1);
-                    int Month;
-                    if (api.CompanyEntity._VatPeriod <= 4)
-                        Month = Math.Max(1, (int)api.CompanyEntity._VatPeriod);
-                    else if (api.CompanyEntity._VatPeriod == 5)
-                        Month = 6;
-                    else
-                        Month = 12;
-                    var dialog = new CWCalculateCommission(api, fromdate, fromdate.AddMonths(Month).AddDays(-1));
-                    dialog.SetTitleAndButton(Uniconta.ClientTools.Localization.lookup("Create"), Uniconta.ClientTools.Localization.lookup("OK"));
-                    dialog.Closed += delegate
+                    Create();
+                    break;
+                case "ApproveVAT":
+                    if (selectedItem?.UploadedAt > DateTime.MinValue)
                     {
-                        if (dialog.DialogResult == true)
-                        {
-                            var vatReported = new GLVatReportedClient
-                            {
-                                CompanyId = api.CompanyId,
-                                _FromDate = dialog.FromDateTime,
-                                _ToDate = dialog.ToDateTime
-                            };
-                            AddDockItem(TabControls.VATReport, new object[] { vatReported }, string.Format("{0}:{1}-{2}", Uniconta.ClientTools.Localization.lookup("VatReport"), vatReported.FromDate.ToShortDateString(), vatReported.ToDate.ToShortDateString()), null);
-                        }
-                    };
-                    dialog.Show();
+                        var deeplink = string.Format("https://ntse.skat.dk/ntse-front/dk/skat/RSU-Moms?periodStartDate={0}&periodSlutDate={1}", selectedItem._FromDate.ToString("yyyy-MM-dd"), selectedItem._ToDate.ToString("yyyy-MM-dd"));
+                        System.Diagnostics.Process.Start(deeplink);
+                    }
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);
@@ -173,12 +162,56 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        void UploadSettlements(GLVatReportedClient selectedItem)
+        void Create()
         {
-            if (UnicontaMessageBox.Show(Localization.lookup("ReportTo") + " " + Localization.lookup("To") + " " + Localization.lookup("CustomsService") + "\n" +
+            var lst = dgVatVatSettlements.ItemsSource as ICollection<GLVatReportedClient>;
+            DateTime fromdate = lst != null && lst.Count > 0 ? lst.Select(v => v._ToDate).Max() : DateTime.MinValue;
+            if (fromdate != DateTime.MinValue)
+                fromdate = fromdate.AddDays(1);
+            else
+                fromdate = new DateTime(DateTime.Now.Year, 1, 1);
+            int Month;
+            if (api.CompanyEntity._VatPeriod <= 4)
+                Month = Math.Max(1, (int)api.CompanyEntity._VatPeriod);
+            else if (api.CompanyEntity._VatPeriod == 5)
+                Month = 6;
+            else
+                Month = 12;
+            var dialog = new CWCalculateCommission(api, fromdate, fromdate.AddMonths(Month).AddDays(-1));
+            dialog.SetTitleAndButton(Uniconta.ClientTools.Localization.lookup("Create"), Uniconta.ClientTools.Localization.lookup("OK"));
+            dialog.Closed += delegate
+            {
+                if (dialog.DialogResult == true)
+                {
+                    var vatReported = new GLVatReportedClient
+                    {
+                        CompanyId = api.CompanyId,
+                        _FromDate = dialog.FromDateTime,
+                        _ToDate = dialog.ToDateTime
+                    };
+                    AddDockItem(TabControls.VATReport, new object[] { vatReported }, string.Format("{0}:{1}-{2}", Uniconta.ClientTools.Localization.lookup("VatReport"), vatReported.FromDate.ToShortDateString(), vatReported.ToDate.ToShortDateString()), null);
+                }
+            };
+            dialog.Show();
+        }
+
+        private void CwTextControl_Closed(object sender, EventArgs e)
+        {
+            var selectedItem = dgVatVatSettlements.SelectedItem as GLVatReportedClient;
+            var cwTextControl = (CWTextControl)sender;
+            if (cwTextControl.DialogResult == true)
+            {
+                var key = cwTextControl.InputValue;
+                UploadSettlements(selectedItem, key);
+            }
+        }
+
+        void UploadSettlements(GLVatReportedClient selectedItem, string key)
+        {
+            if (UnicontaMessageBox.Show(Localization.lookup("ReportTo") + " " + Localization.lookup("CustomsService") + "\n" +
                             Localization.lookup("AreYouSureToContinue"), Localization.lookup("Confirmation"),
                                 MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-                Upload(selectedItem);
+                Upload(selectedItem, key);
         }
 
         async void DeleteRow(GLVatReported rec)
@@ -246,7 +279,7 @@ namespace UnicontaClient.Pages.CustomPage
         static long Generate(VatSumOperationReport[] lst, List<GLTransClientTotal> Trans, DateTime Date, int CompanyId, string Offset, string Text)
         {
             long total = 0;
-            for (var i = 13; i < 19; i++)
+            for (var i = 13; (i < lst.Length && i < 19); i++)
             {
                 var lin = lst[i];
                 if (lin._Amount != 0)
@@ -283,25 +316,34 @@ namespace UnicontaClient.Pages.CustomPage
         void Post(GLVatReportedClient rec, bool post)
         {
             string Offset = null;
-            var Accounts = (GLAccount[])api.GetCache(typeof(GLAccount)).GetRecords;
-            for (int i = 0; (i < Accounts.Length); i++)
+            var Accounts = api.GetCache(typeof(GLAccount));
+            var arr = (GLAccount[])Accounts.GetRecords;
+            for (int i = 0; (i < arr.Length); i++)
             {
-                if (Accounts[i].SystemAccountEnum == SystemAccountTypes.VATSettlement)
+                if (arr[i].SystemAccountEnum == SystemAccountTypes.VATSettlement)
                 {
-                    Offset = Accounts[i]._Account;
+                    Offset = arr[i]._Account;
                     break;
                 }
             }
 
             var cs = StreamingManagerReuse.Create(rec._Data);
             cs.CompanyId = rec.CompanyId;
+            cs.UnpackParm = new VatReportLine.UnpackParm
+            {
+                Accounts = Accounts,
+                Vats = api.GetCache(typeof(GLVat)),
+                VatTypes = api.GetCache(typeof(GLVatType))
+            };
             // current period
             var lstPeriod = (VatReportLine[])cs.ToArray(typeof(VatReportLine));
             var sumPeriod = (VatSumOperationReport[])cs.ToArray(typeof(VatSumOperationReport));
 
             var Trans = new List<GLTransClientTotal>(50);
             var total = Generate(lstPeriod, Trans, rec._ToDate, rec.CompanyId, Offset, null);
-            total += Generate(sumPeriod, Trans, rec._ToDate, rec.CompanyId, Offset, null);
+            var countryId = api.CompanyEntity._CountryId;
+            if (countryId == CountryCode.Denmark || countryId == CountryCode.Greenland || countryId == CountryCode.FaroeIslands)
+                total += Generate(sumPeriod, Trans, rec._ToDate, rec.CompanyId, Offset, null);
 
             // last period
             lstPeriod = (VatReportLine[])cs.ToArray(typeof(VatReportLine));
@@ -389,13 +431,18 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        async void Upload(GLVatReported rec)
+        async void Upload(GLVatReported rec, string key)
         {
             var a = new long[20];
-
+            var Accounts = api.GetCache(typeof(GLAccount));
             var cs = StreamingManagerReuse.Create(rec._Data);
             cs.CompanyId = rec.CompanyId;
-
+            cs.UnpackParm = new VatReportLine.UnpackParm
+            {
+                Accounts = Accounts,
+                Vats = api.GetCache(typeof(GLVat)),
+                VatTypes = api.GetCache(typeof(GLVatType))
+            };
             var vatArray = new double[40];
             var OtherTaxName = new string[10];
 
@@ -417,12 +464,22 @@ namespace UnicontaClient.Pages.CustomPage
             busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
             busyIndicator.IsBusy = true;
 
-            var err = await new VatAPI(api).Upload(rec, a);
+            var err = await new VatAPI(api).Upload(rec, a, key);
 
             busyIndicator.IsBusy = false;
             busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("LoadingMsg");
-
-            UtilDisplay.ShowErrorCode(err);
+            var countryId = api.CompanyEntity._CountryId;
+            if (err != ErrorCodes.Succes)
+                UtilDisplay.ShowErrorCode(err);
+            else if (countryId == CountryCode.Denmark || countryId == CountryCode.Greenland || countryId == CountryCode.FaroeIslands)
+            {
+                TextBlock textBlock;
+                var deeplink = string.Format("https://ntse.skat.dk/ntse-front/dk/skat/RSU-Moms?periodStartDate={0}&periodSlutDate={1}", rec._FromDate.ToString("yyyy-MM-dd"), rec._ToDate.ToString("yyyy-MM-dd"));
+                var deeplinkMsg = string.Format(Uniconta.ClientTools.Localization.lookup("ApproveVATLink"), "www.skat.dk");
+                textBlock = GetHyperlinkTextBlock(deeplink, deeplinkMsg);
+                var cwDynamicCtrl = new CWDynamicControl(textBlock, Uniconta.ClientTools.Localization.lookup("Information"));
+                cwDynamicCtrl.Show();
+            }
         }
 
         async void View(GLVatReported rec)
@@ -441,7 +498,8 @@ namespace UnicontaClient.Pages.CustomPage
                     _TableId = GLVatReported.CLASSID,
                     _TableRowId = rec.RowId,
                     _RowId = 1,
-                    _Data = buf
+                    _Data = buf,
+                    _DocumentType = FileextensionsTypes.PDF
                 };
                 ViewDocument(TabControls.UserDocsPage3, att, string.Format(Uniconta.ClientTools.Localization.lookup("ViewOBJ"),
                 Uniconta.ClientTools.Localization.lookup("CustomsService")), ViewerType.Attachment);
@@ -452,6 +510,19 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (screenName == TabControls.VATReport)
                 dgVatVatSettlements.UpdateItemSource(argument);
+        }
+
+        private TextBlock GetHyperlinkTextBlock(string link, string messageUriContent)
+        {
+            var contents = messageUriContent.Split('#');
+            var textBlock = new TextBlock() { TextWrapping = TextWrapping.Wrap };
+            textBlock.Inlines.Add(new System.Windows.Documents.Run() { Text = contents[0] });
+            var hyperlink = new System.Windows.Documents.Hyperlink() { NavigateUri = new Uri(link) };
+            hyperlink.Inlines.Add(contents[1]);
+            hyperlink.RequestNavigate += (s, e) => { System.Diagnostics.Process.Start(e.Uri.AbsoluteUri); };
+            textBlock.Inlines.Add(hyperlink);
+            textBlock.Inlines.Add(new System.Windows.Documents.Run() { Text = contents[2] });
+            return textBlock;
         }
     }
 }

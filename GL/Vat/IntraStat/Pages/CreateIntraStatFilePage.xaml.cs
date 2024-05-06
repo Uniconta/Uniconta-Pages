@@ -42,6 +42,7 @@ namespace UnicontaClient.Pages.CustomPage
         private bool compressed;
         static DateTime DefaultFromDate, DefaultToDate;
         static bool DefaultImp, DefaultExp;
+        static int DefaultExpGrp;
 
         public override string NameOfControl
         {
@@ -62,6 +63,7 @@ namespace UnicontaClient.Pages.CustomPage
             dgIntraStatGrid.api = api;
             dgIntraStatGrid.BusyIndicator = busyIndicator;
             dgIntraStatGrid.ShowTotalSummary();
+            intraHelper = new IntraHelper(api, DefaultExpGrp);
 
             txtDateFrm.DateTime = DefaultFromDate == DateTime.MinValue ? new DateTime(DateTime.Now.Year, DateTime.Now.Month, 01): DefaultFromDate;
             txtDateTo.DateTime = DefaultToDate == DateTime.MinValue ? new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month)) : DefaultToDate;
@@ -69,7 +71,12 @@ namespace UnicontaClient.Pages.CustomPage
             checkImport.IsChecked = DefaultImp;
             checkExport.IsChecked = DefaultExp;
 
-            intraHelper = new IntraHelper(api);
+            cmbExportGroup.ItemsSource = new string[] 
+            {
+                 string.Concat(Localization.lookup("Export"), " ", Localization.lookup("Group"), " 1"),
+                 string.Concat(Localization.lookup("Export"), " ", Localization.lookup("Group"), " 2")
+            };
+            cmbExportGroup.SelectedIndex = DefaultExpGrp;
         }
 
         public override Task InitQuery()
@@ -414,18 +421,18 @@ namespace UnicontaClient.Pages.CustomPage
                     intraStat.DebtorRegNo = intraStat?.Debtor?._LegalIdent;
 
                     var fdebtorCVR = intraStat.DebtorRegNo;
-                    if (fdebtorCVR != null)
+
+                    if (!string.IsNullOrWhiteSpace(fdebtorCVR))
                     {
-                        long value;
-                        if (!long.TryParse(fdebtorCVR, out value))
-                            fdebtorCVR = Regex.Replace(fdebtorCVR, @"[-/ ]", "");
-
-                        var preCtry = StringBuilderReuse.Create().Append(fdebtorCVR).Truncate(2).ToStringAndRelease();
-                        var pCountry = intraStat.PartnerCountry;
-                        if (preCtry != pCountry)
-                            fdebtorCVR = StringBuilderReuse.Create().Append(pCountry).Append(fdebtorCVR).ToStringAndRelease();
-
-                        intraStat.fDebtorRegNo = fdebtorCVR;
+                        fdebtorCVR = Regex.Replace(fdebtorCVR, "[^0-9]", "");
+                        switch (intraStat.Debtor._Country)
+                        {
+                            case CountryCode.Sweden:
+                                if (fdebtorCVR.Length == 10)
+                                    fdebtorCVR = string.Concat(fdebtorCVR, IntraHelper.SWEDEN_POSTFIX_01);
+                                break;
+                        }
+                        intraStat.fDebtorRegNo = string.Concat(intraStat.PartnerCountry, fdebtorCVR);
                     }
                     else
                     {
@@ -486,8 +493,13 @@ namespace UnicontaClient.Pages.CustomPage
 
             dgIntraStatGrid.Columns.GetColumnByName("SystemInfo").Visible = true;
 
+
+            busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("BusyMessage");
+            busyIndicator.IsBusy = true;
+
             var intralst = (IEnumerable<IntrastatClient>)dgIntraStatGrid.GetVisibleRows();
             intraHelper.Validate(intralst, compressed, onlyValidate);
+            busyIndicator.IsBusy = false;
 
             if (onlyValidate)
             {
@@ -533,6 +545,12 @@ namespace UnicontaClient.Pages.CustomPage
             ws.Clear(ws.GetUsedRange());
 
             GetInvoiceLinesToIntraStat(txtDateFrm.DateTime, txtDateTo.DateTime, checkImport.IsChecked.GetValueOrDefault(), checkExport.IsChecked.GetValueOrDefault());
+        }
+
+        private void cmbExportGroup_SelectedIndexChanged(object sender, RoutedEventArgs e)
+        {
+            DefaultExpGrp = cmbExportGroup.SelectedIndex;
+            intraHelper.exportGroup = DefaultExpGrp;
         }
 
         public override bool HandledOnClearFilter()

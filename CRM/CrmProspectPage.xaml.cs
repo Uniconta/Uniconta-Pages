@@ -1,9 +1,6 @@
 using UnicontaClient.Models;
-using UnicontaClient.Pages;
 using UnicontaClient.Utilities;
 using System;
-using System.Collections;
-using System.Linq;
 using System.Windows;
 using Uniconta.API.Service;
 using Uniconta.ClientTools.Controls;
@@ -13,7 +10,6 @@ using Uniconta.ClientTools.Util;
 using Uniconta.Common;
 using Uniconta.DataModel;
 using Uniconta.API.Crm;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Controls;
 
@@ -28,11 +24,12 @@ namespace UnicontaClient.Pages.CustomPage
 
     public partial class CrmProspectPage : GridBasePage
     {
+        SQLCache interestCache, productsCache;
         public override string NameOfControl
         {
             get { return TabControls.CrmProspectPage.ToString(); }
         }
-        public CrmProspectPage(BaseAPI API): base(API, string.Empty)
+        public CrmProspectPage(BaseAPI API) : base(API, string.Empty)
         {
             InitPage();
         }
@@ -48,7 +45,7 @@ namespace UnicontaClient.Pages.CustomPage
             dgCrmProspectGrid.api = api;
             dgCrmProspectGrid.BusyIndicator = busyIndicator;
             SetRibbonControl(localMenu, dgCrmProspectGrid);
-            
+
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "UndoDelete", "SaveGrid" });
         }
@@ -62,11 +59,14 @@ namespace UnicontaClient.Pages.CustomPage
             UnicontaClient.Utilities.Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
             dgCrmProspectGrid.Readonly = true;
         }
-        protected override void LoadCacheInBackGround()
+        async protected override void LoadCacheInBackGround()
         {
             LoadType(new Type[] { typeof(CrmInterest), typeof(CrmProduct), typeof(Contact) });
+
+            interestCache = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.CrmInterest)) ?? await api.CompanyEntity.LoadCache(typeof(Uniconta.DataModel.CrmInterest), api).ConfigureAwait(false);
+            productsCache = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.CrmProduct)) ?? await api.CompanyEntity.LoadCache(typeof(Uniconta.DataModel.CrmProduct), api).ConfigureAwait(false);
         }
-        
+
         public override void Utility_Refresh(string screenName, object argument = null)
         {
             if (screenName == TabControls.CrmProspectPage2)
@@ -207,6 +207,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 }
                                 break;
                             case CWConfirmationBox.ConfirmationResultEnum.No:
+                                dgCrmProspectGrid.CancelChanges();
                                 break;
                         }
                         editAllChecked = true;
@@ -235,7 +236,7 @@ namespace UnicontaClient.Pages.CustomPage
                 return editAllChecked ? false : dgCrmProspectGrid.HasUnsavedData;
             }
         }
-      
+
         void ConvertProspectToDebtor(CrmProspectClient crmProspect)
         {
             CWConvertProspectToDebtor cwwin = new CWConvertProspectToDebtor(api, crmProspect);
@@ -268,7 +269,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (prospectClient != null)
                 AddDockItem(TabControls.UserNotesPage, dgCrmProspectGrid.syncEntity);
         }
-#if !SILVERLIGHT
+
         private void HasEmailImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             var prospectClient = (sender as TextBlock).Tag as CrmProspectClient;
@@ -286,6 +287,19 @@ namespace UnicontaClient.Pages.CustomPage
             var prospect = (sender as TextBlock).Tag as CrmProspectClient;
             Utility.OpenWebSite(prospect._Www);
         }
-#endif
+
+        private void cmbInterests_GotFocus(object sender, RoutedEventArgs e)
+        {
+            var cmb = sender as ComboBoxEditor;
+            if (cmb != null && interestCache != null)
+                cmb.ItemsSource = interestCache.GetKeyList();
+        }
+
+        private void cmbProducts_GotFocus(object sender, RoutedEventArgs e)
+        {
+            var cmb = sender as ComboBoxEditor;
+            if (cmb != null)
+                cmb.ItemsSource = productsCache.GetKeyList();
+        }
     }
 }

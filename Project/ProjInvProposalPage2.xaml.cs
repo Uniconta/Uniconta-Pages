@@ -116,8 +116,8 @@ namespace UnicontaClient.Pages.CustomPage
             PrCategorylookupeditor.api = Projectlookupeditor.api =
             Employeelookupeditor.api = leAccount.api = lePayment.api = cmbDim1.api = cmbDim2.api =
             cmbDim3.api = cmbDim4.api = cmbDim5.api = leTransType.api = leGroup.api = lePostingAccount.api
-            = leLayoutGroup.api = leInvoiceAccount.api = 
-            leDeliveryAddress.api = leApprover.api = leSplit.api = leVat.api = prTasklookupeditor.api = lePrWorkSpace.api=
+            = leLayoutGroup.api = leInvoiceAccount.api =
+            leCompanyAddress.api = leDeliveryAddress.api = leApprover.api = leSplit.api = leVat.api = prTasklookupeditor.api = lePrWorkSpace.api =
             leDeliveryTerm.api = leShipment.api = crudapi;
 
             cbDeliveryCountry.ItemsSource = Enum.GetValues(typeof(Uniconta.Common.CountryCode));
@@ -400,6 +400,9 @@ namespace UnicontaClient.Pages.CustomPage
                     editrow.DeliveryCountry = debtor._DeliveryCountry;
                 else
                     editrow.DeliveryCountry = null;
+                editrow.DeliveryPhone = debtor._Phone;
+                editrow.DeliveryContactPerson = debtor._ContactPerson;
+                editrow.DeliveryContactEmail = debtor._ContactEmail;
             }
             if (ProjectCache != null)
                 Projectlookupeditor.cache = ProjectCache;
@@ -569,7 +572,17 @@ namespace UnicontaClient.Pages.CustomPage
                     editrow.DeliveryTerm = selectedInstallation._DeliveryTerm;
             }
         }
-
+        private void lblCompanyAddress_ButtonClicked(object sender)
+        {
+            var selectedAddress = leCompanyAddress.SelectedItem as CompanyAddressClient;
+            if (selectedAddress != null)
+            {
+                CopyAddressToRow(selectedAddress._Name, selectedAddress._Address1, selectedAddress._Address2, selectedAddress._Address3, selectedAddress._ZipCode, selectedAddress._City, selectedAddress._Country);
+                editrow.DeliveryContactPerson = selectedAddress._ContactPerson;
+                editrow.DeliveryContactEmail = selectedAddress._ContactEmail;
+                editrow.DeliveryPhone = selectedAddress._Phone;
+            }
+        }
         private void CopyAddressToRow(string name, string address1, string address2, string address3, string zipCode, string city, CountryCode? country)
         {
             var row = this.editrow;

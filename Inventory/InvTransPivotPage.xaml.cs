@@ -53,6 +53,10 @@ namespace UnicontaClient.Pages.CustomPage
             tbGrdTtlCol.Text = Uniconta.ClientTools.Localization.lookup("ShowColumnGrandTotals");
             tbTtlOnFlds.Text = Uniconta.ClientTools.Localization.lookup("ShowTotals");
             chkGrdTtlCol.IsChecked = chkGrdTtlRow.IsChecked = chkTtlOnFlds.IsChecked = true;
+            if (!string.IsNullOrEmpty(api.CompanyEntity._BrandGroup))
+                fieldBrandGroup.Caption = api.CompanyEntity._BrandGroup;
+            if (!string.IsNullOrEmpty(api.CompanyEntity._CategoryGroup))
+                fieldCategoryGroup.Caption = api.CompanyEntity._CategoryGroup;
         }
 
         protected override void OnLayoutLoaded()
@@ -63,6 +67,7 @@ namespace UnicontaClient.Pages.CustomPage
                 labelVisibility = chartControl.Diagram.SeriesTemplate.LabelsVisibility;
                 seriesIndex = GetSeriesId();
             }
+            fieldBrandGroup.Visible = fieldCategoryGroup.Visible = fieldStatisticsGroup.Visible = api.CompanyEntity._InvGroups;
         }
 
         int seriesIndex = 0;

@@ -52,6 +52,9 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryJournalPage2"
                     <CorasauControls:CorasauLayoutItem FieldName="AllowNegativStock" x:Name="liAllowNegativStock">
                         <CheckBox IsChecked="{Binding AllowNegativStock,Mode=TwoWay}" />
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="CheckCostPrice" x:Name="liCheckCostPrice">
+                        <CheckBox IsChecked="{Binding CheckCostPrice,Mode=TwoWay}" />
+                    </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
                 <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpOptions" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Options}" Orientation="Vertical" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" MinWidth="550">
                     <CorasauControls:CorasauLayoutItem FieldName="Blocked" x:Name="liBlocked">

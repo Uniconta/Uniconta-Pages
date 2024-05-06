@@ -10,6 +10,7 @@ x:Class="UnicontaClient.Pages.CustomPage.UserNotesPage"
            xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
            xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools" 
            xmlns:toolkit="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Toolkit"
+           xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
            xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors"
            xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage"  
            d:DesignWidth="640" d:DesignHeight="480">
@@ -17,6 +18,8 @@ x:Class="UnicontaClient.Pages.CustomPage.UserNotesPage"
         <Style x:Key="StyleRow" TargetType="dxg:RowControl">
             <Setter Property="Height" Value="Auto"/>
         </Style>
+            <Util:VisibilityBoolConverter x:Key="VisibilityBoolConverter" />
+            <Util:ImageNameToImagesourceConverter x:Key="ImageNameToImagesourceConverter"/>
     </UserControl.Resources>
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
@@ -34,10 +37,24 @@ x:Class="UnicontaClient.Pages.CustomPage.UserNotesPage"
                             <editor:TextEditSettings TextWrapping="Wrap" AcceptsReturn="True"/>
                         </localPage:CorasauDataGridTemplateColumnClient.EditSettings>
                     </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Subject"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="IsMailNote" Width="30" ReadOnly="True">
+                        <localPage:CorasauDataGridTemplateColumnClient.HeaderTemplate>
+                            <DataTemplate>
+                                <Label Content="&#x2709;" VerticalAlignment="Center"/>
+                            </DataTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.HeaderTemplate>
+                        <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <Label Tag="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" HorizontalAlignment="Center" VerticalAlignment="Center" Content="&#x2709;" Cursor="Hand" MouseLeftButtonDown="IsMailNote_MouseLeftButtonDown" Visibility="{Binding DataContext.RowData.Row.IsMailNote,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource VisibilityBoolConverter}}" RenderOptions.BitmapScalingMode="NearestNeighbor" RenderOptions.EdgeMode="Aliased" />
+                            </ControlTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Group" Width="100" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="GroupName" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="KeyStr" Visible="False" ReadOnly="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="TableId" Visible="False" ReadOnly="True"/>
+                    
                 </localPage:NotesInfoGrid.Columns>
             </localPage:NotesInfoGrid>
         </CorasauControls:BusyIndicator>

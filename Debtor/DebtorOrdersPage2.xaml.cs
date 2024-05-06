@@ -47,6 +47,8 @@ namespace UnicontaClient.Pages.CustomPage
         SQLCache ProjectCache;
         ProjectClient Project;
         ContactClient Contact;
+        bool oneTimeDebtor;
+
         public DebtorOrdersPage2(UnicontaBaseEntity sourcedata, UnicontaBaseEntity master) /* called for edit from particular account */
             : base(sourcedata, true)
         {
@@ -110,7 +112,7 @@ namespace UnicontaClient.Pages.CustomPage
             layoutControl = layoutItems;
             PrCategorylookupeditor.api = Projectlookupeditor.api =
             Employeelookupeditor.api = leAccount.api = lePayment.api = cmbDim1.api = cmbDim2.api =
-            cmbDim3.api = cmbDim4.api = cmbDim5.api = leTransType.api = leGroup.api = lePostingAccount.api
+            cmbDim3.api = cmbDim4.api = cmbDim5.api = leTransType.api = leGroup.api = lePostingAccount.api = leCompanyAddress.api
             = leShipment.api = leLayoutGroup.api = leDeliveryTerm.api = leInvoiceAccount.api = PriceListlookupeditior.api =
             leDeliveryAddress.api = leApprover.api = leSplit.api = leVat.api = prTasklookupeditor.api = lePrWorkSpace.api = lePaymentFormat.api = crudapi;
             leRelatedOrder.CrudApi = crudapi;
@@ -153,10 +155,9 @@ namespace UnicontaClient.Pages.CustomPage
             layoutItems.DataContext = editrow;
             frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
 
-            AcItem.ButtonClicked += AcItem_ButtonClicked;
             liContactName.ButtonClicked += LiContactName_ButtonClicked;
             editrow.PropertyChanged += Editrow_PropertyChanged;
-            AcItem.ToolTip = string.Format(Uniconta.ClientTools.Localization.lookup("CreateOBJ"), Uniconta.ClientTools.Localization.lookup("Debtor"));
+            AcItem.ToolTip = string.Format(Uniconta.ClientTools.Localization.lookup("CreateOBJ"), string.Concat(Uniconta.ClientTools.Localization.lookup("Debtor"), "/", Uniconta.ClientTools.Localization.lookup("OneTimeDebtor")));
             StartLoadCache();
         }
 
@@ -247,9 +248,29 @@ namespace UnicontaClient.Pages.CustomPage
             SetFieldFromDebtor(editrow, Debtor);
         }
 
-        void AcItem_ButtonClicked(object sender)
+        private void ComboBoxEditor_SelectedIndexChanged(object sender, RoutedEventArgs e)
         {
-            AddDebtor_Click(null, null);
+            var cmbEditor = sender as ComboBoxEditor;
+
+            if (cmbEditor.SelectedIndex == -1)
+                return;
+
+            if (cmbEditor.SelectedIndex != 0)
+            {
+                if (editrow.OneTimeDebtor == null)
+                    editrow.OneTimeDebtor = Activator.CreateInstance(api.CompanyEntity.GetUserType(typeof(DebtorClient))) as DebtorClient;
+
+                var debtor = editrow.OneTimeDebtor;
+                debtor.Country = (CountryCode)api.CompanyEntity._Country;
+                var debtorAccountPage2 = dockCtrl.AddDockItem(TabControls.DebtorAccountPage2, this.ParentControl, new object[2] { debtor, true }, Uniconta.ClientTools.Localization.lookup("DebtorAccount"), "Add_16x16") as DebtorAccountPage2;
+                debtorAccountPage2.DoNotSave = true;
+                oneTimeDebtor = true;
+            }
+            else
+                AddDebtor_Click(sender, e);
+
+            cmbEditor.SelectedIndex = -1;
+            cmbEditor.SelectedIndexChanged -= ComboBoxEditor_SelectedIndexChanged;
         }
 
         bool setVoucher;
@@ -262,7 +283,14 @@ namespace UnicontaClient.Pages.CustomPage
                 if (args[2] == this.ParentControl)
                 {
                     leAccount.LoadItemSource();
-                    editrow.SetMaster(args[3] as UnicontaBaseEntity);
+                    var dc = args[3] as UnicontaBaseEntity;
+                    if (oneTimeDebtor)
+                    {
+                        editrow.OneTimeDebtor = dc as DebtorClient;
+                        CopyFromDebtor(editrow.OneTimeDebtor);
+                    }
+                    else
+                        editrow.SetMaster(args[3] as UnicontaBaseEntity);
                     if (string.IsNullOrEmpty(leAccount.EditValue as string))
                         leAccount.SelectedItem = args[3];
                 }
@@ -410,23 +438,10 @@ namespace UnicontaClient.Pages.CustomPage
             editrow.SetMaster(debtor);
             if (this.Project == null) // no project master
                 editrow.PricesInclVat = debtor._PricesInclVat;
+
             if (!RecordLoadedFromTemplate || debtor._DeliveryAddress1 != null)
-            {
-                editrow.DeliveryName = debtor._DeliveryName;
-                editrow.DeliveryAddress1 = debtor._DeliveryAddress1;
-                editrow.DeliveryAddress2 = debtor._DeliveryAddress2;
-                editrow.DeliveryAddress3 = debtor._DeliveryAddress3;
-                editrow.DeliveryCity = debtor._DeliveryCity;
-                if (editrow.DeliveryZipCode != debtor._DeliveryZipCode)
-                {
-                    lookupZipCode = false;
-                    editrow.DeliveryZipCode = debtor._DeliveryZipCode;
-                }
-                if (debtor._DeliveryCountry != 0)
-                    editrow.DeliveryCountry = debtor._DeliveryCountry;
-                else
-                    editrow.DeliveryCountry = null;
-            }
+                CopyFromDebtor(debtor);
+
             if (ProjectCache != null)
                 Projectlookupeditor.cache = ProjectCache;
 
@@ -442,6 +457,9 @@ namespace UnicontaClient.Pages.CustomPage
 
             await api.Read(debtor);
             editrow.RefreshBalance();
+
+            if (debtor._CreditMax != 0 && debtor._CreditMax <= (debtor._CurBalanceCur != 0 ? debtor._CurBalanceCur : debtor._CurBalance))
+                UtilDisplay.ShowErrorCode(ErrorCodes.CreditLimitExceeded);
         }
 
         async void SetPrCategory(DebtorOrderClient editrow)
@@ -595,7 +613,17 @@ namespace UnicontaClient.Pages.CustomPage
                     editrow.DeliveryTerm = selectedInstallation._DeliveryTerm;
             }
         }
-
+        private void lblCompanyAddress_ButtonClicked(object sender)
+        {
+            var selectedAddress = leCompanyAddress.SelectedItem as CompanyAddressClient;
+            if (selectedAddress != null)
+            {
+                CopyAddressToRow(selectedAddress._Name, selectedAddress._Address1, selectedAddress._Address2, selectedAddress._Address3, selectedAddress._ZipCode, selectedAddress._City, selectedAddress._Country);
+                editrow.DeliveryContactPerson = selectedAddress._ContactPerson;
+                editrow.DeliveryContactEmail = selectedAddress._ContactEmail;
+                editrow.DeliveryPhone = selectedAddress._Phone;
+            }
+        }
         private void CopyAddressToRow(string name, string address1, string address2, string address3, string zipCode, string city, CountryCode? country)
         {
             var row = this.editrow;
@@ -616,6 +644,37 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var selectedItem = cmbContactName.SelectedItem as Contact;
             GoToContact(selectedItem, e.Key);
+        }
+
+        private void CopyFromDebtor(Debtor debtor)
+        {
+            if (debtor == null)
+                return;
+
+            editrow.DeliveryName = debtor._DeliveryName;
+            editrow.DeliveryAddress1 = debtor._DeliveryAddress1;
+            editrow.DeliveryAddress2 = debtor._DeliveryAddress2;
+            editrow.DeliveryAddress3 = debtor._DeliveryAddress3;
+            editrow.DeliveryCity = debtor._DeliveryCity;
+            if (editrow.DeliveryZipCode != debtor._DeliveryZipCode)
+            {
+                lookupZipCode = false;
+                editrow.DeliveryZipCode = debtor._DeliveryZipCode;
+            }
+            if (debtor._DeliveryCountry != 0)
+                editrow.DeliveryCountry = debtor._DeliveryCountry;
+            else
+                editrow.DeliveryCountry = null;
+            editrow.DeliveryPhone = debtor._Phone;
+            editrow.DeliveryContactPerson = debtor._ContactPerson;
+            editrow.DeliveryContactEmail = debtor._ContactEmail;
+        }
+        private void AcItem_ComboBoxClicked(object sender)
+        {
+            var comboBoxEditor = sender as ComboBoxEditor;
+
+            comboBoxEditor.ItemsSource = new string[] { string.Format(Uniconta.ClientTools.Localization.lookup("CreateOBJ"), Uniconta.ClientTools.Localization.lookup("Debtor")), Uniconta.ClientTools.Localization.lookup("OneTimeDebtor") };
+            comboBoxEditor.SelectedIndexChanged += ComboBoxEditor_SelectedIndexChanged;
         }
     }
 }

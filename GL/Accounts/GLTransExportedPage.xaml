@@ -18,20 +18,16 @@ x:Class="UnicontaClient.Pages.CustomPage.GLTransExportedPage"
                 <local:GLTransExportedPageGrid.Columns>
                     <local:CorasauDataGridTemplateColumnClient x:Name="FromDate" Width="90"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="ToDate" Width="90"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Lines"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="MaxJournalPostedId" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="ExportedBy" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="SuppLines" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="SuppJournalPostedId"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="SupplementBy" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Exported" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="LastSupplement" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="SuppVersion" Width="50"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Lines" Width="50"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="MinJournalPostedId" Width="100" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="MaxJournalPostedId" Width="100" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Comment" Width="150"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="AccessToken" Width="150" Visible="False"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="IdentityToken" Width="150" Visible="False"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="RefreshToken" Width="150" Visible="False"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="SendToDatevStatus" Width="150" Visible="False"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="TokenValidTo" Width="100" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Exported" Width="90"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ExportedBy" Width="50" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ExportedByUser" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="SendToDatevDOC" Width="100" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="SendToDatevEXTF" Width="100" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="DatevService" Width="150" Visible="False"/>
                 </local:GLTransExportedPageGrid.Columns>
             </local:GLTransExportedPageGrid>

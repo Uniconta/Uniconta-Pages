@@ -33,7 +33,8 @@
       <RibbonItem Action="GridView" LocalizedNameKey="DataGrid" ControlName="ProjectTaskGridPage" Glyph="Multiple_16x16" />
       <RibbonItem Action="ChartView" LocalizedNameKey="EnableChart" Glyph="Report_16x16" />
     </RibbonItem>
-	<RibbonItem Action="DebtorBudgetLines" LocalizedNameKey="Budget" ControlName="DebtorBudgetLinePage" Module="_DebtorBudget" LargeGlyph="Budget_32x32"/>
+    <RibbonItem Action="DebtorBudgetLines" LocalizedNameKey="Budget" ControlName="DebtorBudgetLinePage" Module="_DebtorBudget" LargeGlyph="Budget_32x32"/>
+    <RibbonItem Action="EmployeeRegistrationLinePage" LocalizedNameKey="Register" ControlName="EmployeeRegistrationLinePage" LargeGlyph="Account-statement_32x32"/>
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="QueriesandReports" LocalizedNameKey="QueriesandReports" LargeGlyph="Statistics_32x32">

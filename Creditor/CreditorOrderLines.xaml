@@ -146,6 +146,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOrderLines"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Width="100" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="WorkSpace" Width="100" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PostingAccount" Width="100" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PostingText" Width="100" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Vat" Width="100" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Employee" Width="50" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Variant1Name" Width="100" Visible="False"/>
@@ -174,6 +175,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOrderLines"
                     </localPage:CorasauDataGridForeignKeyColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="OrderNumber" Width="70" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="LineNumber" Mask="" Width="70" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PrimaryKey2Id" Width="70" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="UpdatedAt"   Visible="False">
                         <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                             <DataTemplate>

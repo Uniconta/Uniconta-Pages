@@ -5,7 +5,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CWImportToJournal"
              xmlns:cw="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
              xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
              xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools" 
-             Width="{StaticResource Width16}" Height="{StaticResource Height16}" KeyDown="ChildWindow_KeyDown" >
+             Width="{StaticResource Width16}" Height="{StaticResource Height18}" KeyDown="ChildWindow_KeyDown" >
     <Grid x:Name="LayoutRoot" Margin="2" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
             <RowDefinition />
@@ -13,9 +13,9 @@ x:Class="UnicontaClient.Pages.CustomPage.CWImportToJournal"
         </Grid.RowDefinitions>
         <Grid Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="3"/>
-                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="2"/>
+                <RowDefinition Height="30"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>

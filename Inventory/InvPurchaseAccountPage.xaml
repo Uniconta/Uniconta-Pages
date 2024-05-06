@@ -35,6 +35,10 @@ x:Class="UnicontaClient.Pages.CustomPage.InvPurchaseAccountPage"
                             </DataTemplate>
                         </local:CorasauDataGridTemplateColumnClient.CellTemplate>
                     </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="SupplierItemId" Width="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="SupplierItemName" Width="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DeliveryTime" Width="100"/>
+
                 </local:InvPurchaseAccountGrid.Columns>
             </local:InvPurchaseAccountGrid>
         </CorasauControls:BusyIndicator>

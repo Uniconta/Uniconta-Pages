@@ -7,7 +7,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CwTransportRegistration"
         xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
         xmlns:cw="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
         xmlns:UnicontaControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
-        Height="{StaticResource Height5}" Width="730">
+        Height="500" Width="750">
     <Grid Margin="2" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
             <RowDefinition />
@@ -16,8 +16,13 @@ x:Class="UnicontaClient.Pages.CustomPage.CwTransportRegistration"
         <Grid Margin="5">
             <Grid.RowDefinitions>
                 <RowDefinition Height="30"/>
-                <RowDefinition Height="Auto" />
+                <RowDefinition Height="30" />
                 <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="50"/>
                 <RowDefinition Height="30"/>
                 <RowDefinition Height="30"/>
                 <RowDefinition Height="60"/>
@@ -35,50 +40,70 @@ x:Class="UnicontaClient.Pages.CustomPage.CwTransportRegistration"
                 <ColumnDefinition Width="Auto"/>
 
                 <ColumnDefinition Width="5"/>
-                
+
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="5"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
             <TextBlock  Grid.Column="0" VerticalAlignment="Center" Grid.Row="0" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Project}" />
-            <UnicontaControls:LookupEditor x:Name="leProject" EditValueChanged="leProject_EditValueChanged"  Grid.Column="2" Width="170" Grid.Row="0" Text="{Binding Project, Mode=TwoWay}" Margin="5,5,5,5" HorizontalAlignment="Left" />
+            <UnicontaControls:LookupEditor x:Name="leProject" EditValueChanged="leProject_EditValueChanged"  Grid.Column="2" Width="170" Grid.Row="0" Text="{Binding Project, Mode=TwoWay}" Margin="5 0 5 5" HorizontalAlignment="Left" />
             <TextBlock  Grid.Column="4" VerticalAlignment="Center" Grid.Row="0" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ProjectName}" />
-            <UnicontaControls:TextEditor x:Name="txtProjectName" Grid.Column="6" IsReadOnly="True" Grid.ColumnSpan="2" Width="170" Grid.Row="0" Margin="5,5,5,5" HorizontalAlignment="Left" />
+            <UnicontaControls:TextEditor x:Name="txtProjectName" Grid.Column="6" IsReadOnly="True" Grid.ColumnSpan="2" Width="170" Grid.Row="0" Margin="5 0 5 5" HorizontalAlignment="Left" />
 
-            <Button Click="Button_Click" Grid.Column="8" Grid.ColumnSpan="2" Grid.Row="0" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=RouteCalculator}" Height="23">  </Button>
+            <Button Click="Button_Click" Grid.Column="8" Grid.ColumnSpan="2" Grid.Row="0" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=RouteCalculator}" Height="23"></Button>
 
             <TextBlock Height="25" Grid.Column="0" Grid.Row="1" VerticalAlignment="Top" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=From}" />
-            <StackPanel Orientation="Vertical" Grid.Row="1" Grid.Column="2" Margin="5,5,5,5" HorizontalAlignment="Left">
-                <UnicontaControls:ComboBoxEditor x:Name="cmbFromAdd" SelectedIndexChanged="cmb1_SelectedIndexChanged"  ValueMember="ContactAddress" DisplayMember="Name" Width="170" HorizontalAlignment="Left"/>
-                <UnicontaControls:TextEditor x:Name="txtFromAdd"  Width="170"  TextWrapping="Wrap" AcceptsReturn="True"  Height="80" VerticalContentAlignment="Top" ScrollViewer.VerticalScrollBarVisibility="Auto" />
+            <UnicontaControls:ComboBoxEditor x:Name="cmbFromAdd" Grid.Column="2" Grid.Row="1" SelectedIndexChanged="cmb1_SelectedIndexChanged" DisplayMember="Name" Width="170" Margin="5 0 5 5"/>
+            <TextBlock Height="25" Grid.Column="0" Grid.Row="2" VerticalAlignment="Top" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Name}" />
+            <UnicontaControls:TextEditor x:Name="txtFromName" Grid.Column="2" Grid.Row="2"  Width="170" Margin="0 2 0 0"/>
+            <TextBlock Height="25" Grid.Column="0" Grid.Row="3"  VerticalAlignment="Top" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Address,StringFormat=\{0\} 1}" />
+            <UnicontaControls:TextEditor x:Name="txtFromAdd1" Grid.Column="2" Grid.Row="3" Width="170"   Margin="0 2 0 0"/>
+            <TextBlock Height="25" Grid.Column="0" Grid.Row="4" VerticalAlignment="Top" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Address,StringFormat=\{0\} 2}" />
+            <UnicontaControls:TextEditor x:Name="txtFromAdd2" Grid.Column="2" Grid.Row="4" Width="170"   Margin="0 2 0 0"/>
+            <TextBlock Height="25" Grid.Column="0" Grid.Row="5" VerticalAlignment="Top" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ZipCode}" />
+            <StackPanel Orientation="Horizontal" Grid.Column="2" Grid.Row="5" Margin="5 2 0 0">
+                <UnicontaControls:TextEditor x:Name="txtFromZipCode"   Width="132"  />
+                <Button x:Name="btnFromZipCode" Content="&#x26EF;" Click="btnFromZipCode_Click" Margin="2 0 0 0"></Button>
             </StackPanel>
+            <TextBlock Height="25" Grid.Column="0" Grid.Row="6" VerticalAlignment="Top" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=City}" />
+            <UnicontaControls:TextEditor x:Name="txtFromCity" Grid.Column="2" Grid.Row="6" Width="170"   Margin="0 2 0 0"/>
 
-            <StackPanel Grid.Column="8" Grid.Row="1" Orientation="Vertical">
+            <StackPanel Grid.Column="8" Grid.Row="1" Grid.RowSpan="4" Orientation="Vertical">
                 <TextBlock HorizontalAlignment="Left"   Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=AvoidFerries}" />
                 <UnicontaControls:CheckEditor x:Name="chkAvdFerr"  IsChecked="True" HorizontalAlignment="Left" />
                 <TextBlock HorizontalAlignment="Left" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Returning}" />
                 <UnicontaControls:CheckEditor x:Name="chkReturning" EditValueChanged="chkReturning_EditValueChanged" Grid.Row="3" IsChecked="{Binding Returning, Mode=TwoWay}" HorizontalAlignment="Left" />
             </StackPanel>
-          
+
             <TextBlock  Grid.Column="4" VerticalAlignment="Top" Grid.Row="1" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=To}" />
-            <StackPanel Orientation="Vertical"  Grid.Column="6" Grid.Row="1"  Margin="5,5,5,5" HorizontalAlignment="Left">
-                <UnicontaControls:ComboBoxEditor x:Name="cmbToAdd" SelectedIndexChanged="cmb2_SelectedIndexChanged"  ValueMember="ContactAddress" DisplayMember="Name" Width="170" HorizontalAlignment="Left"/>
-                <UnicontaControls:TextEditor x:Name="txtToAdd"   Width="170"  TextWrapping="Wrap" AcceptsReturn="True"  Height="80" VerticalContentAlignment="Top" ScrollViewer.VerticalScrollBarVisibility="Auto" />
+            <UnicontaControls:ComboBoxEditor Grid.Column="6" Grid.Row="1" x:Name="cmbToAdd" SelectedIndexChanged="cmb2_SelectedIndexChanged"  DisplayMember="Name" Width="170" Margin="5 0 5 5"/>
+            <TextBlock  Grid.Column="4" VerticalAlignment="Top" Grid.Row="2" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Name}" />
+            <UnicontaControls:TextEditor x:Name="txtToName"  Width="170" Grid.Column="6" Grid.Row="2"  Margin="0 2 0 0"/>
+            <TextBlock  Grid.Column="4" VerticalAlignment="Top" Grid.Row="3" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Address,StringFormat=\{0\} 1}" />
+            <UnicontaControls:TextEditor x:Name="txtToAdd1"  Width="170" Grid.Column="6" Grid.Row="3" Margin="0 2 0 0"/>
+            <TextBlock  Grid.Column="4" VerticalAlignment="Top" Grid.Row="4" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Address,StringFormat=\{0\} 2}" />
+            <UnicontaControls:TextEditor x:Name="txtToAdd2"  Width="170" Grid.Column="6" Grid.Row="4" Margin="0 2 0 0"/>
+            <TextBlock  Grid.Column="4" VerticalAlignment="Top" Grid.Row="5" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ZipCode}" />
+            <StackPanel Orientation="Horizontal" Grid.Column="6" Grid.Row="5"  Margin="5 2 0 0">
+                <UnicontaControls:TextEditor x:Name="txtToZipCode"  Width="132" />
+                <Button x:Name="btToZipCode" Content="&#x26EF;" Click="btnToZipCode_Click" Margin="2 0 0 0"></Button>
             </StackPanel>
+            <TextBlock  Grid.Column="4" VerticalAlignment="Top" Grid.Row="6" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=City}" />
+            <UnicontaControls:TextEditor x:Name="txtToCity"  Width="170" Grid.Column="6" Grid.Row="6"  Margin="0 2 0 0"/>
 
-            <TextBlock  Grid.Column="0" VerticalAlignment="Center" Grid.Row="2" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=PayrollCategory}" />
-            <UnicontaControls:LookupEditor x:Name="lePayType" Grid.Column="2" Width="170" Grid.Row="2" Text="{Binding PayType, Mode=TwoWay}" Margin="5,5,5,5" HorizontalAlignment="Left" EditValueChanged="lePayType_EditValueChanged"/>
-            <TextBlock  Grid.Column="4" Grid.Row="2" VerticalAlignment="Center" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Purpose}" />
-            <UnicontaControls:TextEditor Grid.Column="6" Grid.ColumnSpan="2" Grid.Row="2"  Text="{Binding Purpose, Mode=TwoWay}" Width="170" Margin="5,5,5,5" HorizontalAlignment="Left"/>
-            <TextBlock  Grid.Column="0" VerticalAlignment="Center" Grid.Row="3" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Workspace}"/>
-            <UnicontaControls:LookupEditor x:Name="leWorkSpace" Grid.Column="2" Width="170" Grid.Row="3" Text="{Binding WorkSpace, Mode=TwoWay}" EditValueChanged="leWorkSpace_EditValueChanged"  Margin="5,5,5,5" HorizontalAlignment="Left" />
-            <TextBlock  Grid.Column="0" VerticalAlignment="Center" Grid.Row="4" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Task}"  x:Name="lblProjectTask"/>
-            <UnicontaControls:LookupEditor x:Name="leProjectTask" Grid.Column="2" Width="170" Grid.Row="4" Text="{Binding PrTask, Mode=TwoWay}" Margin="5,5,5,5" HorizontalAlignment="Left" />
-            <TextBlock  Grid.Column="4" Grid.Row="3" VerticalAlignment="Center" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=VechicleRegNo}" />
-            <UnicontaControls:TextEditor x:Name="leVechicleRegNo" Grid.Column="6" Grid.Row="3" Margin="5,5,5,5"  Text="{Binding VechicleRegNo,Mode=TwoWay}" Width="170" HorizontalAlignment="Left" />
+            <TextBlock  Grid.Column="0" VerticalAlignment="Center" Grid.Row="7" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=PayrollCategory}" Margin="0,5,0,0"/>
+            <UnicontaControls:LookupEditor x:Name="lePayType" Height="30" Grid.Column="2" Width="170" Grid.Row="7" Text="{Binding PayType, Mode=TwoWay}" VerticalAlignment="Bottom" Margin="5,5,0,0" HorizontalAlignment="Left" EditValueChanged="lePayType_EditValueChanged"/>
+            <TextBlock  Grid.Column="4" Grid.Row="7" VerticalAlignment="Center" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Purpose}" Margin="0,5,0,0" />
+            <UnicontaControls:TextEditor Grid.Column="6" Grid.ColumnSpan="2" Grid.Row="7" Height="30"  Text="{Binding Purpose, Mode=TwoWay}" Width="170" Margin="5,5,0,0" VerticalAlignment="Bottom" HorizontalAlignment="Left"/>
+            <TextBlock  Grid.Column="0" VerticalAlignment="Center" Grid.Row="8" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Workspace}"/>
+            <UnicontaControls:LookupEditor x:Name="leWorkSpace" Grid.Column="2" Width="170" Grid.Row="8" Text="{Binding WorkSpace, Mode=TwoWay}" EditValueChanged="leWorkSpace_EditValueChanged"  Margin="5,5,5,0" HorizontalAlignment="Left" />
+            <TextBlock  Grid.Column="0" VerticalAlignment="Center" Grid.Row="9" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Task}"  x:Name="lblProjectTask"/>
+            <UnicontaControls:LookupEditor x:Name="leProjectTask" Grid.Column="2" Width="170" Grid.Row="9" Text="{Binding PrTask, Mode=TwoWay}" Margin="5,5,5,0" HorizontalAlignment="Left" />
+            <TextBlock  Grid.Column="4" Grid.Row="8" VerticalAlignment="Center" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=VechicleRegNo}" />
+            <UnicontaControls:TextEditor x:Name="leVechicleRegNo" Grid.Column="6" Grid.Row="8" Margin="5,5,5,0"  Text="{Binding VechicleRegNo,Mode=TwoWay}" Width="170" HorizontalAlignment="Left" />
 
-            <Grid  Grid.Row="5" Grid.ColumnSpan="9" HorizontalAlignment="Left" >
+            <Grid  Grid.Row="10" Grid.ColumnSpan="9" HorizontalAlignment="Left" >
                 <StackPanel Orientation="Horizontal">
                     <StackPanel Margin="7,0,0,0">
                         <Label Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Monday}" />
@@ -116,7 +141,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CwTransportRegistration"
                 </StackPanel>
             </Grid>
 
-            <Grid  Grid.Row="6" Grid.ColumnSpan="3" HorizontalAlignment="Left" >
+            <Grid  Grid.Row="11" Grid.ColumnSpan="3" HorizontalAlignment="Left" >
                 <Grid.RowDefinitions>
                     <RowDefinition Height="30"/>
                 </Grid.RowDefinitions>

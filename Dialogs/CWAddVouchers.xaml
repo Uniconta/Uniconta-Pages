@@ -82,7 +82,7 @@
                 <CorasauControls:TextEditor x:Name="txedPostingInstruction" Text="{Binding PostingInstruction,Mode=TwoWay}" AcceptsReturn="True" TextWrapping="Wrap" HorizontalContentAlignment="Left" 
                                                   VerticalContentAlignment="Top" Grid.Column="1" Grid.Row="18" Margin="5,0,0,0" MinHeight="60" />
             </Grid>
-            <GridSplitter HorizontalAlignment="Center" Visibility="Collapsed" x:Name="splitter" VerticalAlignment="Stretch" Background="{StaticResource BodyTextColorBrush}" Grid.Column="1" ShowsPreview="True" />
+            <GridSplitter HorizontalAlignment="Center" Visibility="Collapsed" x:Name="splitter" VerticalAlignment="Stretch" Background="{StaticResource EditorForeGroundTextColor}" Grid.Column="1" ShowsPreview="True" />
             <Grid x:Name="viewLayout" Grid.Column="2" Visibility="Collapsed">
                 <CorasauControls:UnicontaVoucherViewer x:Name="voucherViewer" />
             </Grid>

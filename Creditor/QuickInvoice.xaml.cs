@@ -121,13 +121,6 @@ namespace UnicontaClient.Pages.CustomPage
         {
             RibbonBase rb = (RibbonBase)localMenu.DataContext;
             var Comp = api.CompanyEntity;
-
-#if !SILVERLIGHT
-            if (Comp._CountryId != CountryCode.Denmark)
-                UtilDisplay.RemoveMenuCommand(rb, "ReadOIOUBL");
-#else
-            UtilDisplay.RemoveMenuCommand(rb, "ReadOIOUBL");
-#endif
         }
 
 
@@ -594,9 +587,6 @@ namespace UnicontaClient.Pages.CustomPage
                     var dbOrderLineClient = new CreditorOrderLineClient { Subtotal = true };
                     dgCreditorOrderLineGrid.AddRow(dbOrderLineClient);
                     break;
-                case "ReadOIOUBL":
-                    ReadOIOUBL();
-                    break;
                 case "StockLines":
                     if (dgCreditorOrderLineGrid.SelectedItem == null) return;
 
@@ -776,22 +766,23 @@ namespace UnicontaClient.Pages.CustomPage
 
         void leAccount_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
         {
-            if (readingOIOUBL)
-                return;
             string id = Convert.ToString(e.NewValue);
-            var crdtor = (Uniconta.DataModel.Creditor)creditors?.Get(id);
-            if (crdtor != null)
+            var creditor = (Uniconta.DataModel.Creditor)creditors?.Get(id);
+            if (creditor != null)
             {
-                Order.SetMaster(crdtor);
-                Order.DeliveryName = crdtor._DeliveryName;
-                Order.DeliveryAddress1 = crdtor._DeliveryAddress1;
-                Order.DeliveryAddress2 = crdtor._DeliveryAddress2;
-                Order.DeliveryAddress3 = crdtor._DeliveryAddress3;
-                Order.DeliveryCity = crdtor._DeliveryCity;
-                Order.DeliveryZipCode = crdtor._DeliveryZipCode;
-                if (crdtor._DeliveryCountry != 0)
-                    Order.DeliveryCountry = crdtor._DeliveryCountry;
-                hasEmail = crdtor._InvoiceEmail != null || crdtor._EmailDocuments;
+                Order.SetMaster(creditor);
+                Order.DeliveryName = creditor._DeliveryName;
+                Order.DeliveryAddress1 = creditor._DeliveryAddress1;
+                Order.DeliveryAddress2 = creditor._DeliveryAddress2;
+                Order.DeliveryAddress3 = creditor._DeliveryAddress3;
+                Order.DeliveryCity = creditor._DeliveryCity;
+                Order.DeliveryZipCode = creditor._DeliveryZipCode;
+                if (creditor._DeliveryCountry != 0)
+                    Order.DeliveryCountry = creditor._DeliveryCountry;
+                Order.DeliveryPhone = creditor._Phone;
+                Order.DeliveryContactPerson = creditor._ContactPerson;
+                Order.DeliveryContactEmail = creditor._ContactEmail;
+                hasEmail = creditor._InvoiceEmail != null || creditor._EmailDocuments;
                 if (OrderCurrency != 0 && OrderCurrency != CompCurrency)
                     loadExchange();
                 this.DataContext = null;
@@ -799,7 +790,7 @@ namespace UnicontaClient.Pages.CustomPage
                 IEnumerable<DCOrderLineClient> lines = (IEnumerable<DCOrderLineClient>)dgCreditorOrderLineGrid.ItemsSource;
                 lines?.FirstOrDefault()?.SetMaster(Order);
                 PriceLookup?.OrderChanged(Order);
-                api.Read(crdtor);
+                api.Read(creditor);
             }
         }
 
@@ -812,64 +803,6 @@ namespace UnicontaClient.Pages.CustomPage
                 UtilDisplay.ShowErrorCode(err);
         }
 
-        bool readingOIOUBL;
-        async void ReadOIOUBL()
-        {
-            readingOIOUBL = true;
-#if !SILVERLIGHT
-            try
-            {
-                var sfd = UtilDisplay.LoadOpenFileDialog;
-                sfd.Filter = UtilFunctions.GetFilteredExtensions(FileextensionsTypes.XML);
-
-                var userClickedSave = sfd.ShowDialog();
-                if (userClickedSave != true)
-                    return;
-
-                using (var stream = File.Open(sfd.FileName, FileMode.Open, FileAccess.Read, FileShare.Read))
-                {
-                    var sr = new StreamReader(stream);
-                    var oioublText = sr.ReadToEnd();
-
-                    var order = await OIOUBL.ReadInvoiceCreditNoteOrOrder(oioublText, creditors, api, true);
-                    if (order == null)
-                    {
-                        ClearFields(initialOrder);
-                        return;
-                    }
-
-                    order.SetMaster(api.CompanyEntity);
-                    //PriceLookup?.OrderChanged(order);
-
-                    var orderLines = order.Lines;
-                    order.Lines = null;
-
-                    ClearFields(order);
-
-                    int countLine = 0;
-                    foreach (var line in orderLines)
-                    {
-                        line.SetMaster(order);
-                        line._LineNumber = ++countLine;
-                    }
-
-                    dgCreditorOrderLineGrid.ItemsSource = orderLines;
-
-                    if (order.DocumentRef != 0)
-                        UpdateVoucher(Order);
-                }
-                readingOIOUBL = false;
-            }
-            catch (Exception e)
-            {
-                readingOIOUBL = false;
-                if (e.StackTrace.IndexOf("xmlserializer", StringComparison.CurrentCultureIgnoreCase) >= 0)
-                    UnicontaMessageBox.Show("The file is not a valid XSD schemas. For more information (validation info) use www.oioubl.net/validator/", Uniconta.ClientTools.Localization.lookup("Information"));
-                else
-                    UnicontaMessageBox.Show(e, Uniconta.ClientTools.Localization.lookup("Information"));
-            }
-#endif
-        }
 
         CorasauGridLookupEditorClient prevLocation;
 

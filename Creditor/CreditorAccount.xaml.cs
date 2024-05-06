@@ -1,24 +1,15 @@
 using Uniconta.API.Service;
 using UnicontaClient.Models;
 using UnicontaClient.Utilities;
-using Uniconta.ClientTools;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
 using Uniconta.Common;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
-using System.Collections;
 using Uniconta.ClientTools.Controls;
 using Uniconta.Common.Utility;
 
@@ -32,6 +23,7 @@ namespace UnicontaClient.Pages.CustomPage
     }
     public partial class CreditorAccount : GridBasePage
     {
+        SQLCache interestCache, productsCache;
         public override string NameOfControl
         {
             get { return TabControls.CreditorAccount.ToString(); }
@@ -58,21 +50,16 @@ namespace UnicontaClient.Pages.CustomPage
                 CurBalance.HasDecimals = Overdue.HasDecimals = false;
             dgCreditorAccountGrid.ShowTotalSummary();
 
-#if SILVERLIGHT
-            Application.Current.RootVisual.KeyDown += RootVisual_KeyDown;
-#else
             this.PreviewKeyDown += RootVisual_KeyDown;
-#endif
             this.BeforeClose += CreditorAccount_BeforeClose;
+
+            Interests.Visible = Interests.ShowInColumnChooser = Comp.CRM;
+            Products.Visible = Products.ShowInColumnChooser = Comp.CRM;
         }
 
         private void CreditorAccount_BeforeClose()
         {
-#if SILVERLIGHT
-            Application.Current.RootVisual.KeyDown -= RootVisual_KeyDown;
-#else
             this.PreviewKeyDown -= RootVisual_KeyDown;
-#endif
         }
 
         private void RootVisual_KeyDown(object sender, KeyEventArgs e)
@@ -95,7 +82,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             base.OnLayoutLoaded();
             UnicontaClient.Utilities.Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
-            if (! api.CompanyEntity.DeliveryAddress)
+            if (!api.CompanyEntity.DeliveryAddress)
             {
                 DeliveryName.Visible = false;
                 DeliveryAddress1.Visible = false;
@@ -163,7 +150,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "CreditorTran":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.CreditorTransactions, dgCreditorAccountGrid.syncEntity, 
+                        AddDockItem(TabControls.CreditorTransactions, dgCreditorAccountGrid.syncEntity,
                             string.Concat(Uniconta.ClientTools.Localization.lookup("CreditorTransactions"), "/", selectedItem._Account));
                     break;
                 case "OpenTran":
@@ -242,12 +229,10 @@ namespace UnicontaClient.Pages.CustomPage
                         AddDockItem(TabControls.CreditorPrices, dgCreditorAccountGrid.syncEntity);
                     break;
                 */
-#if !SILVERLIGHT
                 case "CreditorTransPivot":
                     if (selectedItem != null)
                         AddDockItem(TabControls.CreditorInvoiceLinesPivotReport, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Pivot"), selectedItem._Name));
                     break;
-#endif
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -307,6 +292,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 }
                                 break;
                             case CWConfirmationBox.ConfirmationResultEnum.No:
+                                dgCreditorAccountGrid.CancelChanges(); 
                                 break;
                         }
                         editAllChecked = true;
@@ -356,7 +342,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         }
 
-        protected override void LoadCacheInBackGround()
+        async protected override void LoadCacheInBackGround()
         {
             var Comp = api.CompanyEntity;
             var lst = new List<Type>(12) { typeof(Uniconta.DataModel.Employee), typeof(Uniconta.DataModel.GLVat), typeof(Uniconta.DataModel.CreditorGroup), typeof(Uniconta.DataModel.PaymentTerm), typeof(Uniconta.DataModel.CreditorLayoutGroup) };
@@ -372,7 +358,18 @@ namespace UnicontaClient.Pages.CustomPage
                 lst.Add(typeof(Uniconta.DataModel.GLDimType4));
             if (Comp.NumberOfDimensions >= 5)
                 lst.Add(typeof(Uniconta.DataModel.GLDimType5));
+            if (Comp.Shipments)
+            {
+                lst.Add(typeof(Uniconta.DataModel.ShipmentType));
+                lst.Add(typeof(Uniconta.DataModel.DeliveryTerm));
+            }
             LoadType(lst);
+
+            if (Comp.CRM)
+            {
+                interestCache = Comp.GetCache(typeof(Uniconta.DataModel.CrmInterest)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.CrmInterest), api).ConfigureAwait(false);
+                productsCache = Comp.GetCache(typeof(Uniconta.DataModel.CrmProduct)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.CrmProduct), api).ConfigureAwait(false);
+            }
         }
 
         private void HasDocImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -389,7 +386,6 @@ namespace UnicontaClient.Pages.CustomPage
                 AddDockItem(TabControls.UserNotesPage, dgCreditorAccountGrid.syncEntity);
         }
 
-#if !SILVERLIGHT
         private void HasEmailImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             var creditorAccount = (sender as TextBlock).Tag as CreditorClient;
@@ -407,6 +403,19 @@ namespace UnicontaClient.Pages.CustomPage
             var creditorAccount = (sender as TextBlock).Tag as CreditorClient;
             Utility.OpenWebSite(creditorAccount?._Www);
         }
-#endif
+
+        private void cmbInterests_GotFocus(object sender, RoutedEventArgs e)
+        {
+            var cmb = sender as ComboBoxEditor;
+            if (cmb != null && interestCache != null)
+                cmb.ItemsSource = interestCache.GetKeyList();
+        }
+
+        private void cmbProducts_GotFocus(object sender, RoutedEventArgs e)
+        {
+            var cmb = sender as ComboBoxEditor;
+            if (cmb != null)
+                cmb.ItemsSource = productsCache.GetKeyList();
+        }
     }
 }

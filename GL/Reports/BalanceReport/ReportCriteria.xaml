@@ -98,6 +98,8 @@ x:Class="UnicontaClient.Pages.CustomPage.ReportCriteria"
                                                 <RowDefinition Height="Auto"/>
                                                 <RowDefinition Height="5"/>
                                                 <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="5"/>
+                                                <RowDefinition Height="Auto"/>
                                             </Grid.RowDefinitions>
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition MinWidth="140"/>
@@ -115,8 +117,10 @@ x:Class="UnicontaClient.Pages.CustomPage.ReportCriteria"
                                             <CorasauControls:ComboBoxEditor x:Name="cmbSumAccount" Grid.Row="8" Grid.Column="1" Margin="5,0,5,0"/>
                                             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ExternalName}" HorizontalAlignment="Right" Grid.Column="0" Grid.Row="10" VerticalAlignment="Center" Margin="0,0,10,0"/>
                                             <CorasauControls:CheckEditor x:Name="chkUseExternal"  Grid.Row="10" Grid.Column="1"  Margin="5,0,5,0"/>
-                                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CompanyAccountTemplate}" HorizontalAlignment="Right" Grid.Column="0" Grid.Row="12" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                                            <CorasauControls:LookupEditor x:Name="cbTemplate" Grid.Row="12" Grid.Column="1" MinWidth="100" EditValue="{Binding RTemplate,Mode=TwoWay}"   Margin="5,0,5,0"/>
+                                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Sorting}" HorizontalAlignment="Right" Grid.Column="0" Grid.Row="12" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                            <CorasauControls:CheckEditor x:Name="chkSortExtern"  Grid.Row="12" Grid.Column="1"  Margin="5,0,5,0"/>
+                                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CompanyAccountTemplate}" HorizontalAlignment="Right" Grid.Column="0" Grid.Row="14" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                            <CorasauControls:LookupEditor x:Name="cbTemplate" Grid.Row="14" Grid.Column="1" MinWidth="100" EditValue="{Binding RTemplate,Mode=TwoWay}"   Margin="5,0,5,0"/>
                                         </Grid>
                                     </StackPanel>
                                 </Border>

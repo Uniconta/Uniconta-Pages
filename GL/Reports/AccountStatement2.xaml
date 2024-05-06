@@ -11,7 +11,7 @@ x:Class="UnicontaClient.Pages.CustomPage.AccountStatement2"
     <UserControl.Resources>
         <DataTemplate x:Key="RegularCellTemplate">
             <Grid>
-                <TextBlock FontWeight="Bold" Foreground="Red" VerticalAlignment="Center"  Text="{Binding RowData.Row.Account}" />
+                <TextBlock FontWeight="Bold" Foreground="{StaticResource StatementAccountHeaderColorForeground}" VerticalAlignment="Center"  Text="{Binding RowData.Row.Account}" />
             </Grid>
         </DataTemplate>
         <Util:RowIndexConverter x:Key="RowIndexConverter" />
@@ -133,6 +133,7 @@ x:Class="UnicontaClient.Pages.CustomPage.AccountStatement2"
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Correction" Width="50" Visible="False" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Accrued" Width="50" Visible="False" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Allocated" Width="50" Visible="False" />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Modified" Width="50" Visible="False" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="PostCalculated" Width="50" Visible="False" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="VatEntered" Width="50" Visible="False" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Vat" Width="50" />

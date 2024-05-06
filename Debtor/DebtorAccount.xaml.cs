@@ -1,29 +1,19 @@
 using Uniconta.API.Service;
 using UnicontaClient.Models;
 using UnicontaClient.Utilities;
-using Uniconta.ClientTools;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
 using Uniconta.Common;
-using DevExpress.Xpf.Editors.Settings;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
 using System.Collections;
 using Uniconta.ClientTools.Controls;
-using Uniconta.DataModel;
 using Uniconta.Common.User;
 using Uniconta.Common.Utility;
 
@@ -78,6 +68,9 @@ namespace UnicontaClient.Pages.CustomPage
 
             this.PreviewKeyDown += RootVisual_KeyDown;
             this.BeforeClose += DebtorAccount_BeforeClose;
+
+            Interests.Visible = Interests.ShowInColumnChooser = Comp.CRM;
+            Products.Visible = Products.ShowInColumnChooser = Comp.CRM;
         }
 
         private void RootVisual_KeyDown(object sender, KeyEventArgs e)
@@ -322,7 +315,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "ClientInformation":
                     if (selectedItem != null)
                     {
-                        var controlParams = "Dashboard=UC_DK_Std_Univisor_MasterData;Field=Account;sourcetype=UseCurrentRecord";
+                        var controlParams = "Dashboard=UC_DK_Std_Univisor_MasterData;sourcetype=UseCurrentRecord";
                         AddDockItem(TabControls.DashBoardViewerPage, selectedItem, string.Concat(Uniconta.ClientTools.Localization.lookup("Dashboard"), ": ", "UC_DK_Std_Univisor_MasterData"), null, true, null, controlParams, null);
                         break;
                     }
@@ -434,6 +427,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 }
                                 break;
                             case CWConfirmationBox.ConfirmationResultEnum.No:
+                                dgDebtorAccountGrid.CancelChanges();
                                 break;
                         }
                         editAllChecked = true;
@@ -499,6 +493,11 @@ namespace UnicontaClient.Pages.CustomPage
                 lst.Add(typeof(Uniconta.DataModel.GLDimType4));
             if (Comp.NumberOfDimensions >= 5)
                 lst.Add(typeof(Uniconta.DataModel.GLDimType5));
+            if (Comp.Shipments)
+            {
+                lst.Add(typeof(Uniconta.DataModel.ShipmentType));
+                lst.Add(typeof(Uniconta.DataModel.DeliveryTerm));
+            }
             LoadType(lst);
 
             if (Comp.CRM)

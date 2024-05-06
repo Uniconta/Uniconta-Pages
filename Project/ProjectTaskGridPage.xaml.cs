@@ -15,6 +15,8 @@ using Uniconta.API.Service;
 using Uniconta.ClientTools;
 using UnicontaClient.Utilities;
 using System.Linq;
+using System.Windows.Input;
+using System.Drawing;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -197,6 +199,14 @@ namespace UnicontaClient.Pages.CustomPage
                 case "AddPeriod":
                     AddPeriod();
                     break;
+                case "AddNote":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.UserNotesPage, dgProjectTaskGrid.syncEntity);
+                    break;
+                case "AddDoc":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.UserDocsPage, dgProjectTaskGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Documents"), selectedItem._Name));
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -327,6 +337,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 }
                                 break;
                             case CWConfirmationBox.ConfirmationResultEnum.No:
+                                dgProjectTaskGrid.CancelChanges();
                                 break;
                         }
                         editAllChecked = true;
@@ -459,6 +470,20 @@ namespace UnicontaClient.Pages.CustomPage
                 }
             };
             cwProjectTaskClose.Show();
+        }
+
+        private void HasDocImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            var glAccount = (sender as Image).Tag as ProjectTaskClient;
+            if (glAccount != null)
+                AddDockItem(TabControls.UserDocsPage, dgProjectTaskGrid.syncEntity);
+        }
+
+        private void HasNoteImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            var glAccount = (sender as Image).Tag as ProjectTaskClient;
+            if (glAccount != null)
+                AddDockItem(TabControls.UserNotesPage, dgProjectTaskGrid.syncEntity);
         }
     }
 }

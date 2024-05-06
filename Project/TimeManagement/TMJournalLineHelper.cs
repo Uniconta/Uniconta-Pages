@@ -41,7 +41,7 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
         DateTime endDate;
         CrudAPI api;
 
-        SQLCache projectCache, employeeCache, projectGrpCache, prCategoryCache, prTaskCache;
+        SQLCache projectCache, employeeCache, projectGrpCache, prCategoryCache, prTaskCache, prWorkspaceCache;
         SQLTableCache<Uniconta.DataModel.EmpPayrollCategory> payrollCategoryCache;
 
         Uniconta.DataModel.Employee employee;
@@ -50,6 +50,8 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
         Uniconta.DataModel.PrCategory prCategory;
         Uniconta.DataModel.EmpPayrollCategory payrollCat;
         Uniconta.DataModel.ProjectGroup projGroup;
+        Uniconta.DataModel.PrWorkSpace workspace;
+
         #endregion
 
         public enum TMJournalActionType { Close, Open, Approve, Validate }
@@ -83,6 +85,7 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
             projectGrpCache = comp.GetCache(typeof(Uniconta.DataModel.ProjectGroup)) ?? await api.LoadCache(typeof(Uniconta.DataModel.ProjectGroup)).ConfigureAwait(false);
             prCategoryCache = comp.GetCache(typeof(Uniconta.DataModel.PrCategory)) ?? await api.LoadCache(typeof(Uniconta.DataModel.PrCategory)).ConfigureAwait(false);
             prTaskCache = comp.GetCache(typeof(Uniconta.DataModel.ProjectTask)) ?? await api.LoadCache(typeof(Uniconta.DataModel.ProjectTask)).ConfigureAwait(false);
+            prWorkspaceCache = comp.GetCache(typeof(Uniconta.DataModel.PrWorkSpace)) ?? await api.LoadCache(typeof(Uniconta.DataModel.PrWorkSpace)).ConfigureAwait(false);
 
             LoadingTask = null; // we are done
         }
@@ -142,7 +145,7 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
 
             foreach (var rec in payrollCategoryCache)
             {
-                if (rec._InternalType != InternalType.None && rec._InternalType != InternalType.Mileage && rec._InternalProject == null)
+                if (rec._InternalType != 0 && rec._InternalType != InternalType.Mileage && rec._InternalProject == null)
                 {
                     checkErrors.Add(new TMJournalLineError()
                     {
@@ -176,8 +179,20 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
             string lastProjNo = null;
             string lastPayroll = null;
             string lastTaskId = null;
+            string lastWorkspace = null;
+
+            int dayOfStart = this.startDate.DayOfWeek == DayOfWeek.Sunday ? 7 : (int)this.startDate.DayOfWeek;
+            int dayOfEnd = this.endDate.DayOfWeek == DayOfWeek.Sunday ? 7 : (int)this.endDate.DayOfWeek;
+
             foreach (var rec in lines)
             {
+                double hrsInPeriod = 0;
+                for (int x = dayOfStart; x <= dayOfEnd; x++)
+                {
+                    hrsInPeriod += rec.GetHoursDayN(x);
+                }
+
+                rec.HasError = false;
                 rec.ErrorInfo = string.Empty;
                 err = false;
 
@@ -186,6 +201,12 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
                     lastPayroll = rec.PayrollCategory;
                     payrollCat = (EmpPayrollCategory)payrollCategoryCache.Get(lastPayroll);
                     prCategory = (Uniconta.DataModel.PrCategory)prCategoryCache.Get(payrollCat?._PrCategory);
+                }
+
+                if (rec.WorkSpace != null && lastWorkspace != rec.WorkSpace)
+                {
+                    lastWorkspace = rec.WorkSpace;
+                    workspace = (PrWorkSpace)prWorkspaceCache.Get(lastWorkspace);
                 }
 
                 if (lastProjNo != rec._Project)
@@ -206,13 +227,16 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
                 }
 
                 ValidateGeneral(rec);
-                ValidateProject(rec);
+                ValidateProject(rec, hrsInPeriod);
                 ValidateTask(rec);
                 ValidateProjectCategory(rec);
                 ValidatePrice(rec);
+                ValidateWorkspace(rec);
 
                 if (!err)
                     rec.ErrorInfo = VALIDATE_OK;
+                else
+                    rec.HasError = true;
             }
 
             return checkErrors;
@@ -260,52 +284,7 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
                 err = true;
             }
 
-            if (rec._RegistrationType == RegistrationType.Mileage)
-            {
-                if (rec.AddressFrom == null)
-                {
-                    checkErrors.Add(new TMJournalLineError()
-                    {
-                        Message = fieldCannotBeEmpty("AddressFrom"),
-                        RowId = rec.RowId
-                    });
-
-                    err = true;
-                }
-
-                if (rec.AddressTo == null)
-                {
-                    checkErrors.Add(new TMJournalLineError()
-                    {
-                        Message = fieldCannotBeEmpty("AddressTo"),
-                        RowId = rec.RowId
-                    });
-
-                    err = true;
-                }
-
-                if (rec.Text == null)
-                {
-                    checkErrors.Add(new TMJournalLineError()
-                    {
-                        Message = fieldCannotBeEmpty("Purpose"),
-                        RowId = rec.RowId
-                    });
-
-                    err = true;
-                }
-
-                if (rec.VechicleRegNo == null)
-                {
-                    checkErrors.Add(new TMJournalLineError()
-                    {
-                        Message = fieldCannotBeEmpty("VechicleRegNo"),
-                        RowId = rec.RowId
-                    });
-
-                    err = true;
-                }
-            }
+           
         }
 
         /// <summary>
@@ -365,9 +344,9 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
         /// <summary>
         /// Validate - Project
         /// </summary>
-        void ValidateProject(TMJournalLineClient rec)
+        void ValidateProject(TMJournalLineClient rec, double hrsInPeriod)
         {
-            if (err || proj == null)
+            if (err || proj == null || hrsInPeriod == 0)
                 return;
 
             if (proj._Blocked)
@@ -379,6 +358,30 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
                 });
 
                 err = true;
+            }
+        }
+
+        void ValidateWorkspace(TMJournalLineClient rec)
+        {
+            if (err || rec.WorkSpace == null)
+                return;
+
+            if (workspace._Blocked)
+            {
+                checkErrors.Add(new TMJournalLineError()
+                {
+                    Message = Uniconta.ClientTools.Localization.lookup("WorkspaceIsBlocked"),
+                    RowId = rec.RowId
+                });
+                err = true;
+            }
+            else if (workspace._Warning)
+            {
+                checkErrors.Add(new TMJournalLineError()
+                {
+                    Message = "Advarsel - Arbejdsområdet er lukket", //TODO:Label venter til tekst er godkendt
+                    RowId = rec.RowId,
+                });
             }
         }
 
@@ -496,7 +499,7 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
                     err = true;
                 }
 
-                if (payrollCat._InternalType != InternalType.None && rec.Project != payrollCat._InternalProject)
+                if (payrollCat._InternalType != 0 && rec.Project != payrollCat._InternalProject)
                 {
                     checkErrors.Add(new TMJournalLineError()
                     {

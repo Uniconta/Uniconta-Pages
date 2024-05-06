@@ -22,7 +22,7 @@
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="ClosingSheetLines" LocalizedNameKey="ClosingSheetLines" LargeGlyph="Journal_Lines_Highlighted_32x32" ShortcutKey="ALT+L"/>
-    <RibbonItem Action="ClosingSheetLinesAll" LocalizedNameKey="AllLines" LargeGlyph="Order_Confirmation_32x32"/>
+    <RibbonItem Action="ClosingSheetLinesAll" LocalizedNameKey="Journal" LargeGlyph="Order_Confirmation_32x32"/>
     <RibbonItem Action="ClosingSheetHasLines" LocalizedNameKey="HasLines" LargeGlyph="Journal_Lines_32x32"/>
   </RibbonItem>
   <RibbonItem>

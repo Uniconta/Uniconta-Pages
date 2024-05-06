@@ -210,6 +210,11 @@ namespace UnicontaClient.Pages.CustomPage
         protected override void OnLayoutLoaded()
         {
             SetFloatingHeightAndWidth(dockCtrl, position, TabControls.AttachVoucherGridPage);
+
+            if (!api.CompanyEntity.Project)
+                Project.ShowInColumnChooser = Project.Visible = ProjectName.ShowInColumnChooser = ProjectName.Visible = PrCategory.ShowInColumnChooser = PrCategory.Visible =
+                    WorkSpace.ShowInColumnChooser = WorkSpace.Visible = false;
+
             base.OnLayoutLoaded();
         }
         public static void SetFloatingHeightAndWidth(DockControl dockCtrl, Point position, string nameOfControl)

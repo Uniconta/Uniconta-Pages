@@ -43,11 +43,11 @@ namespace UnicontaClient.Pages.CustomPage
         protected override bool ShowTableValueButton { get { return true; } }
 #endif
 
-        public CwSetPeriodPerDate(TMJournalActionType actionType, DateTime startDate, CrudAPI api)
+        public CwSetPeriodPerDate(TMJournalActionType actionType, DateTime startDate, Uniconta.DataModel.Employee employee, CrudAPI api)
         {
             InitializeComponent();
             if (actionType == TMJournalActionType.Approve || actionType == TMJournalActionType.Close)
-                StartDate = startDate.AddDays(6);
+                StartDate = employee._Terminated > startDate && employee._Terminated <= startDate.AddDays(6) ? employee._Terminated : startDate.AddDays(6);
             else
                 StartDate = startDate;
             this.DataContext = this;

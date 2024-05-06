@@ -574,7 +574,16 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "CustomerItemNumber":
                     if (!string.IsNullOrEmpty(rec.CustomerItemNumber))
+                    {
+                        var arr = (InvItem[])items.GetNotNullArray;
+                        for (int i = 0; i < arr.Length; i++)
+                            if (arr[i]._SupplierItemId == rec.CustomerItemNumber && arr[i]._PurchaseAccount == orderMaster._DCAccount)
+                            {
+                                rec.Item = arr[i]._Item;
+                                return;
+                            }
                         DebtorOfferLines.FindItemFromCustomerItem(rec, orderMaster, api, rec.CustomerItemNumber);
+                    }
                     break;
             }
         }

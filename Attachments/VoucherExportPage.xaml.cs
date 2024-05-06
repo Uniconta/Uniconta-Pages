@@ -215,9 +215,8 @@ namespace UnicontaClient.Pages.CustomPage
             var sb = StringBuilderReuse.Create();
             if (exportOption == 1)
             {
-                var dt = voucher._PostingDate;
-                if (dt == DateTime.MinValue)
-                    dt = voucher._Created;
+                var dt = voucher._PostingDate != DateTime.MinValue ? voucher._PostingDate :
+                        (voucher._DocumentDate != DateTime.MinValue ? voucher._DocumentDate : voucher.Created.Date);
                 sb.Append(dt).Append('_').Append(voucher._Voucher);
             }
             else

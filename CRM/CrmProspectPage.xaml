@@ -3,17 +3,16 @@
 x:Class="UnicontaClient.Pages.CustomPage.CrmProspectPage"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
+        xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors"
         xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
-        xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
         xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools">
     <UserControl.Resources>
         <Util:RowIndexConverter x:Key="RowIndexConverter" />
         <Util:VisibilityBoolConverter x:Key="VisibilityBoolConverter" />
         <Util:VisibilityTextConverter x:Key="VisibilityTextConverter" />
         <Util:ImageNameToImagesourceConverter x:Key="ImageNameToImagesourceConverter"/>
+        <Util:ListStringConverter x:Key="ListToStringConverter"/>
     </UserControl.Resources>
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
@@ -86,8 +85,43 @@ x:Class="UnicontaClient.Pages.CustomPage.CrmProspectPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="Www" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="MobilPhone" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="InvoiceEmail" Visible="False"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Interests" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Products"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Interests" Binding="{Binding Path=Interests, Mode=TwoWay, Converter={StaticResource ListToStringConverter}}">
+                        <local:CorasauDataGridTemplateColumnClient.EditSettings>
+                            <editor:ComboBoxEditSettings>
+                                <editor:ComboBoxEditSettings.StyleSettings>
+                                    <editor:CheckedComboBoxStyleSettings />
+                                </editor:ComboBoxEditSettings.StyleSettings>
+                            </editor:ComboBoxEditSettings>
+                        </local:CorasauDataGridTemplateColumnClient.EditSettings>
+                        <local:CorasauDataGridTemplateColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <CorasauControls:ComboBoxEditor GotFocus="cmbInterests_GotFocus"  x:Name="PART_Editor">
+                                    <editor:ComboBoxEdit.StyleSettings>
+                                        <editor:CheckedComboBoxStyleSettings />
+                                    </editor:ComboBoxEdit.StyleSettings>
+                                </CorasauControls:ComboBoxEditor>
+                            </DataTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.CellTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Products" Binding="{Binding Path=Products, Mode=TwoWay, Converter={StaticResource ListToStringConverter}}">
+                        <local:CorasauDataGridTemplateColumnClient.EditSettings>
+                            <editor:ComboBoxEditSettings>
+                                <editor:ComboBoxEditSettings.StyleSettings>
+                                    <editor:CheckedComboBoxStyleSettings />
+                                </editor:ComboBoxEditSettings.StyleSettings>
+                            </editor:ComboBoxEditSettings>
+                        </local:CorasauDataGridTemplateColumnClient.EditSettings>
+                        <local:CorasauDataGridTemplateColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <CorasauControls:ComboBoxEditor GotFocus="cmbProducts_GotFocus"  x:Name="PART_Editor">
+                                    <editor:ComboBoxEdit.StyleSettings>
+                                        <editor:CheckedComboBoxStyleSettings />
+                                    </editor:ComboBoxEdit.StyleSettings>
+                                </CorasauControls:ComboBoxEditor>
+                            </DataTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.CellTemplate>
+                        
+                    </local:CorasauDataGridTemplateColumnClient>
                     <local:CorasauDataGridTemplateColumnClient x:Name="PostingAccount" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Employee" Width="50"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="CompanyRegNo" Width="90"/>
@@ -98,6 +132,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CrmProspectPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="PriceList" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="ItemNameGroup" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="LayoutGroup" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="IndustryCode" Visible="False"/>
                     <local:ComboBoxColumnClient x:Name="UserLanguage" Visible="False"/>
                     <local:ComboBoxColumnClient x:Name="VatZone" Width="60" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Blocked" Visible="False"/>

@@ -87,6 +87,13 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionOrderLines"
                                         </DataTemplate>
                                     </local:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </local:CorasauDataGridTemplateColumnClient>
+                                <local:CorasauDataGridTemplateColumnClient x:Name="QtyNow" Width="90" Visible="False">
+                                    <local:CorasauDataGridTemplateColumnClient.CellTemplate>
+                                        <DataTemplate>
+                                            <CorasauControls:TextEditor  x:Name="PART_Editor" HorizontalContentAlignment="Right" Mask="{Binding Path=DataContext.RowData.Row.Decimals,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource MaskConverter},ConverterParameter=Decimals}" MaskUseAsDisplayFormat="True" MaskType="Numeric" EditValue="{Binding Path=DataContext.RowData.Row.QtyNow,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"/>
+                                        </DataTemplate>
+                                    </local:CorasauDataGridTemplateColumnClient.CellTemplate>
+                                </local:CorasauDataGridTemplateColumnClient>
                                 <local:CorasauDataGridTemplateColumnClient x:Name="CostPrice" Visible="False" />
                                 <local:CorasauDataGridForeignKeyColumnClient x:Name="Warehouse" Width="100">
                                     <local:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
@@ -121,6 +128,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionOrderLines"
                                 <local:CorasauDataGridTemplateColumnClient x:Name="Date" Visible="False" />
                                 <local:CorasauDataGridTemplateColumnClient x:Name="ReferenceNumber" Visible="False" />
                                 <local:CorasauDataGridTemplateColumnClient x:Name="PostingAccount" Width="100" Visible="False"/>
+                                <local:CorasauDataGridTemplateColumnClient x:Name="PostingText" Width="100" Visible="False"/>
                                 <local:CorasauDataGridTemplateColumnClient x:Name="SerieBatchMarked" Width="90" HideHeaderCheck="true" Visible="False"/>
                                 <local:CorasauDataGridTemplateColumnClient x:Name="Employee" Width="50" Visible="False"/>
                                 <local:CorasauDataGridTemplateColumnClient x:Name="EmployeeName" Visible="False"/>
@@ -132,6 +140,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionOrderLines"
                                     </local:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </local:CorasauDataGridTemplateColumnClient>
                                 <local:CorasauDataGridTemplateColumnClient x:Name="LineNumber" Mask="" Width="70" Visible="False"/>
+                                <local:CorasauDataGridTemplateColumnClient x:Name="PrimaryKey2Id" Mask="" Width="70" Visible="False"/>
                                 <local:CorasauDataGridTemplateColumnClient x:Name="UpdatedAt"   Visible="False">
                                     <local:CorasauDataGridTemplateColumnClient.CellTemplate>
                                         <DataTemplate>

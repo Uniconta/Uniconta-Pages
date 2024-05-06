@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<root>
+	<RibbonItem TabId="0" LocalizedNameKey="Home">
+		<RibbonItem Action="Search" LocalizedNameKey="Search" LargeGlyph="Validate_32x32" ShortcutKey="Ctrl+H" />
+	</RibbonItem>
+	<RibbonItem>
+		<RibbonItem Action="Remove" ShortcutKey="Shift+DELETE" LocalizedNameKey="Remove" LargeGlyph="Delete_32x32"/>
+	</RibbonItem>
+	<RibbonItem>
+		<RibbonItem Action="SaveGrid" LocalizedNameKey="UpdateOBJ" Parameter="Debtor" LargeGlyph="save-32x32" ShortcutKey="CTRL+N"/>
+	</RibbonItem>
+	<RibbonItem>
+		<RibbonItem LocalizedNameKey="NumberOfCustomers" ButtonType="Status" />
+		<RibbonItem LocalizedNameKey="NemhandelOBJ" Parameter="Active" ButtonType="Status" />
+		<RibbonItem LocalizedNameKey="NemhandelOBJ" Parameter="Inactive" ButtonType="Status" />
+	</RibbonItem>
+	<RibbonItem>
+		<RibbonItem Action="ActivateNemhandel" LocalizedNameKey="ActivateNemhandel" ButtonType="CheckBox" />
+		<RibbonItem Action="DeactivateNemhandel" LocalizedNameKey="DeactivateNemhandel" ButtonType="CheckBox" />
+		<RibbonItem Action="UpdateRegistration" LocalizedNameKey="UpdateRegistration" ButtonType="CheckBox" />
+		<RibbonItem Action="ErrorRegistration" LocalizedNameKey="ErrorRegistration" ButtonType="CheckBox" />
+	</RibbonItem>
+	<RibbonItem>
+		<RibbonItem Action="NHR" LocalizedNameKey="NHR" LargeGlyph="Nemhandel_Connect_32x32"/>
+	</RibbonItem>
+	<RibbonItem>
+		<RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32">
+			<RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
+			<RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16" ShortcutKey="" />
+			<RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
+			<RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16" ShortcutKey=""/>
+			<RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16" ShortcutKey="Ctrl+U"/>
+			<RibbonItem Action="ExportLayout" LocalizedNameKey="ExportLayout" EnableSeperator="True" Glyph="ExportLayout_16x16" LargeGlyph="ExportLayout_16x16" ShortcutKey=""/>
+			<RibbonItem Action="ImportLayout" LocalizedNameKey="ImportLayout" Glyph="Import_16x16" LargeGlyph="Import_16x16" ShortcutKey=""/>
+			<RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16" ShortcutKey=""/>
+		</RibbonItem>
+	</RibbonItem>
+</root>

@@ -172,7 +172,11 @@ namespace UnicontaClient.Pages.CustomPage
                 case "Archived":
                     if (selectedItem != null)
                         AddDockItem(TabControls.AttachedVouchers, dgEmployeeGrid.SelectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Vouchers"), selectedItem._Name));
-                    break; 
+                    break;
+                case "EmployeeRegistrationLinePage":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.EmployeeRegistrationLinePage, dgEmployeeGrid.SelectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Register"), selectedItem._Name));
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -227,6 +231,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 }
                                 break;
                             case CWConfirmationBox.ConfirmationResultEnum.No:
+                                dgEmployeeGrid.CancelChanges();
                                 break;
                         }
                         editAllChecked = true;

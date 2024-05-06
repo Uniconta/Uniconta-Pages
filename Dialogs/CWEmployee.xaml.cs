@@ -33,27 +33,38 @@ namespace UnicontaClient.Pages
         [Display(Name = "Comment", ResourceType = typeof(InputFieldDataText))]
         public string Comment { get; set; }
 
-#if !SILVERLIGHT
         public int DialogTableId { get; set; }
         protected override int DialogId { get { return DialogTableId; } }
         protected override bool ShowTableValueButton { get { return true; } }
-#endif
+        public bool IsCreateEmployee;
+        public Uniconta.DataModel.Employee SelectedEmployee;
         public CWEmployee(CrudAPI api)
         {
             this.DataContext = this;
             InitializeComponent();
             Title = Uniconta.ClientTools.Localization.lookup("Employee");
-#if !SILVERLIGHT
             SizeToContent = SizeToContent.Height;
-#else
-            Utilities.Utility.SetThemeBehaviorOnChildWindow(this);
-#endif
             lookupEmployee.api = api;
-            Loaded += delegate { lookupEmployee.Focus(); };
+            Loaded += delegate
+            {
+                lookupEmployee.Focus();
+                if (IsCreateEmployee)
+                {
+                    txtComments.Visibility = lblComments.Visibility = Visibility.Collapsed;
+                    btnCreateEmployee.Content = string.Format(Uniconta.ClientTools.Localization.lookup("CreateOBJ"), string.Format(Uniconta.ClientTools.Localization.lookup("NewOBJ"), Uniconta.ClientTools.Localization.lookup("Employee")));
+                    OKButton.Content = string.Format(Uniconta.ClientTools.Localization.lookup("Set"));
+                }
+                else
+                { 
+                   btnCreateEmployee.Visibility =tblOr.Visibility = Visibility.Collapsed;
+                }
+            };
         }
 
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
+            SelectedEmployee = lookupEmployee.SelectedItem as Uniconta.DataModel.Employee;
+            IsCreateEmployee = false;
             SetDialogResult(true);
         }
 
@@ -73,6 +84,12 @@ namespace UnicontaClient.Pages
                 else if (CancelButton.IsFocused)
                     CancelButton_Click(this, e);
             }
+        }
+
+        private void CreateButton_Click(object sender, RoutedEventArgs e)
+        {
+            IsCreateEmployee = true;
+            SetDialogResult(true);
         }
     }
 }

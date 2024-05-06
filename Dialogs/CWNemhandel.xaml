@@ -1,0 +1,136 @@
+﻿<ClientTools:ChildWindow x:Class="UnicontaClient.Controls.Dialogs.CWNemhandel"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+        xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+        xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools" Width="{StaticResource Width28}" SizeToContent="Height" >
+    <CorasauControls:BusyIndicator x:Name="busyIndicator" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Loading}" Margin="3">
+        <Grid x:Name="LayoutRoot" Margin="2" Background="{StaticResource LayoutGridColor}">
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <CorasauControls:CorasauLayoutControl Orientation="Vertical" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
+                <CorasauControls:CorasauLayoutGroup x:Name="grpHeader"  View="GroupBox" GroupBoxDisplayMode="Light" Orientation="Vertical" IsCollapsible="False" HorizontalAlignment="Stretch" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True"
+                                                    Visibility="Collapsed">
+                    <CorasauControls:CorasauLayoutItem  IsLabelSet="False" LabelVerticalAlignment="Top">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="15" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Image Source="{dx:SvgImageSource Uri='/DevExpress.Images.v23.2;component/SvgImages/Reports/GroupHeader.svg'}" Width="16" Height="16" Stretch="UniformToFill" VerticalAlignment="Center" HorizontalAlignment="Left" />
+                            <TextBlock x:Name="txtHeader" TextWrapping="Wrap" VerticalAlignment="Center" HorizontalAlignment="Stretch"  Grid.Column="2"/>
+                        </Grid>
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
+
+                <CorasauControls:CorasauLayoutGroup x:Name="grpCompany"  View="GroupBox" GroupBoxDisplayMode="Light" Orientation="Vertical" IsCollapsible="False" HorizontalAlignment="Stretch" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True"
+                                                    Visibility="Collapsed">
+                    <CorasauControls:CorasauLayoutGroup.HeaderTemplate>
+                        <DataTemplate>
+                            <Image Source="{dx:SvgImageSource Uri='/DevExpress.Images.v23.2;component/SvgImages/Icon Builder/Actions_Home.svg'}" Width="16" Height="16" Stretch="UniformToFill" HorizontalAlignment="Left" />
+                        </DataTemplate>
+                    </CorasauControls:CorasauLayoutGroup.HeaderTemplate>
+                    <CorasauControls:CorasauLayoutItem x:Name="liCompany" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ChangeRegistrationCompany}" LabelVerticalAlignment="Top">
+                        <CheckBox x:Name="chkChangeCompany" IsChecked="{Binding ChangeCompany, Mode=TwoWay}" Grid.Column="2" Grid.Row="2" VerticalAlignment="Center" Checked="ActivateOKButton_Reaction" Unchecked="ActivateOKButton_Reaction" />
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
+
+                <CorasauControls:CorasauLayoutGroup x:Name="grpGLNHeader"  View="GroupBox" GroupBoxDisplayMode="Light" Orientation="Vertical" IsCollapsible="False" HorizontalAlignment="Stretch" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True"
+                                                    Visibility="Collapsed">
+                    <CorasauControls:CorasauLayoutItem x:Name="liEndPointGLN" IsLabelSet="False" LabelVerticalAlignment="Top">
+                        <Grid Margin="0 0 0 15">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="15" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Image Source="{dx:SvgImageSource Uri='/DevExpress.Images.v23.2;component/SvgImages/RichEdit/ColumnsOne.svg'}" Width="16" Height="16" Stretch="UniformToFill" VerticalAlignment="Center" HorizontalAlignment="Left" />
+                            <Label x:Name="lblEndPointGLN" VerticalAlignment="Center" HorizontalAlignment="Stretch"  Grid.Column="2"/>
+                        </Grid>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="liReceiveInvoiceGLN" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ReceiveInvoice}" LabelVerticalAlignment="Top">
+                        <CheckBox x:Name="chkReceiveInvoiceGLN" IsChecked="{Binding ReceiveInvoiceGLN, Mode=TwoWay}" Grid.Column="2" Grid.Row="2" VerticalAlignment="Center" IsEnabled="False"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="liReceiveOrderGLN" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ReceiveOrder}" LabelVerticalAlignment="Top">
+                        <CheckBox x:Name="chkReceiveOrderGLN" IsChecked="{Binding ReceiveOrderGLN, Mode=TwoWay}" Grid.Column="2" Grid.Row="2" VerticalAlignment="Center" Checked="ActivateOKButton_Reaction" Unchecked="ActivateOKButton_Reaction"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="liReceiveStatementGLN" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ReceiveStatement}"  LabelVerticalAlignment="Top">
+                        <CheckBox x:Name="chkReceiveStatementGLN" IsChecked="{Binding ReceiveStatementGLN, Mode=TwoWay}" Grid.Column="2" Grid.Row="2" VerticalAlignment="Center" Checked="ActivateOKButton_Reaction" Unchecked="ActivateOKButton_Reaction"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="liUnRegisterGLN" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Unregister}" LabelVerticalAlignment="Top" Visibility="Collapsed">
+                        <CheckBox x:Name="chkUnregisterGLN" IsChecked="{Binding UnregisterGLN, Mode=TwoWay}" Grid.Column="2" Grid.Row="2" VerticalAlignment="Center" Checked="chkUnregisterGLN_Checked" Unchecked="chkUnregisterGLN_Unchecked" />
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="liImmediatelyGLN" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=UnregisterImmediately}" LabelVerticalAlignment="Top" Visibility="Collapsed">
+                        <CheckBox x:Name="chkImmediatelyGLN" IsChecked="{Binding ImmediatelyGLN, Mode=TwoWay}" VerticalAlignment="Center" Checked="chkImmediatelyGLN_Checked" Unchecked="chkImmediatelyGLN_Unchecked" />
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="liDateGLN" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=RegistrationTime}" LabelVerticalAlignment="Top" Visibility="Collapsed">
+                        <CorasauControls:DateEditor x:Name="dtDateGLN"  EditValue="{Binding DateGLN,Mode=TwoWay}" MaskType="DateTimeAdvancingCaret" DisplayFormatString="dd.MM.yyyy HH:mm"  Mask="dd.MM.yyyy HH:mm" Grid.Column="2" EditValueChanged="DateGLN_EditValueChanged"/>
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
+
+                <CorasauControls:CorasauLayoutGroup x:Name="grpCVRHeader"  View="GroupBox" GroupBoxDisplayMode="Light" Orientation="Vertical" IsCollapsible="False" HorizontalAlignment="Stretch" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True"
+                                                    Visibility="Collapsed">
+                    <CorasauControls:CorasauLayoutItem x:Name="liEndPointCVR" IsLabelSet="False" LabelVerticalAlignment="Top">
+                        <Grid Margin="0 0 0 15">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="15" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Image Source="{dx:SvgImageSource Uri='/DevExpress.Images.v23.2;component/SvgImages/RichEdit/ColumnsThree.svg'}" Width="16" Height="16" Stretch="UniformToFill" VerticalAlignment="Center" HorizontalAlignment="Left" />
+                            <Label x:Name="lblEndPointCVR" VerticalAlignment="Center" HorizontalAlignment="Stretch"  Grid.Column="2"/>
+                        </Grid>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="liReceiveInvoiceCVR" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ReceiveInvoice}" LabelVerticalAlignment="Top">
+                        <CheckBox x:Name="chkReceiveInvoiceCVR" IsChecked="{Binding ReceiveInvoiceCVR, Mode=TwoWay}" Grid.Column="2" Grid.Row="2" VerticalAlignment="Center" IsEnabled="False"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="liReceiveOrderCVR" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ReceiveOrder}" LabelVerticalAlignment="Top">
+                        <CheckBox x:Name="chkReceiveOrderCVR" IsChecked="{Binding ReceiveOrderCVR, Mode=TwoWay}" Grid.Column="2" Grid.Row="2" VerticalAlignment="Center" Checked="ActivateOKButton_Reaction" Unchecked="ActivateOKButton_Reaction"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="liReceiveStatementCVR" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ReceiveStatement}"  LabelVerticalAlignment="Top">
+                        <CheckBox x:Name="chkReceiveStatementCVR" IsChecked="{Binding ReceiveStatementCVR, Mode=TwoWay}" Grid.Column="2" Grid.Row="2" VerticalAlignment="Center" Checked="ActivateOKButton_Reaction" Unchecked="ActivateOKButton_Reaction"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="liUnRegisterCVR" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Unregister}" LabelVerticalAlignment="Top" Visibility="Collapsed">
+                        <CheckBox x:Name="chkUnregisterCVR" IsChecked="{Binding UnregisterCVR, Mode=TwoWay}" Grid.Column="2" Grid.Row="2" VerticalAlignment="Center" Checked="chkUnregisterCVR_Checked" Unchecked="chkUnregisterCVR_Unchecked"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="liImmediatelyCVR" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=RegisterImmediately}" LabelVerticalAlignment="Top" Visibility="Collapsed">
+                        <CheckBox x:Name="chkImmediatelyCVR" IsChecked="{Binding ImmediatelyCVR, Mode=TwoWay}" VerticalAlignment="Center" Checked="chkImmediatelyCVR_Checked" Unchecked="chkImmediatelyCVR_Unchecked" />
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="liDateCVR" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=RegistrationTime}" LabelVerticalAlignment="Top" Visibility="Collapsed">
+                        <CorasauControls:DateEditor x:Name="dtDateCVR"  EditValue="{Binding DateCVR,Mode=TwoWay}" MaskType="DateTimeAdvancingCaret"  DisplayFormatString="dd.MM.yyyy HH:mm"  Mask="dd.MM.yyyy HH:mm" Grid.Column="2" EditValueChanged="DateCVR_EditValueChanged"/>
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
+
+                <CorasauControls:CorasauLayoutGroup x:Name="grpFooter"  View="GroupBox" GroupBoxDisplayMode="Light" Orientation="Vertical" IsCollapsible="False" HorizontalAlignment="Stretch" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True"
+                                                    Visibility="Collapsed">
+                    <CorasauControls:CorasauLayoutItem  IsLabelSet="False" LabelVerticalAlignment="Top">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="15" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="3" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Image Source="{dx:SvgImageSource Uri='/DevExpress.Images.v23.2;component/SvgImages/Reports/GroupFooter.svg'}" Width="16" Height="16" Stretch="UniformToFill" VerticalAlignment="Center" HorizontalAlignment="Left" />
+                            <TextBlock x:Name="txtFooter" TextWrapping="Wrap" VerticalAlignment="Center" HorizontalAlignment="Stretch"  Grid.Column="2"/>
+                            <Label x:Name="lblUnipedia" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="3" />
+                        </Grid>
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
+            </CorasauControls:CorasauLayoutControl>
+            <StackPanel x:Name="actionButton" HorizontalAlignment="Right" Grid.Row="1" Orientation="Horizontal" Margin="0 10 0 0">
+                <Button x:Name="OKButton" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OK}" IsDefault="True"  Click="OKButton_Click"  MinWidth="75" Height="23" 
+                        HorizontalAlignment="Right" Margin="0 0 3 0" />
+                <Button x:Name="CancelButton" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Cancel}" IsCancel="True"  Click="CancelButton_Click"  MinWidth="75" Height="23"
+                        HorizontalAlignment="Right"  />
+            </StackPanel>
+        </Grid>
+    </CorasauControls:BusyIndicator>
+</ClientTools:ChildWindow>

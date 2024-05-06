@@ -29,6 +29,7 @@ using Uniconta.ClientTools.DataModel;
 using Uniconta.DataModel;
 using UnicontaClient.Pages;
 using Uniconta.Common.User;
+using UnicontaClient.Controls.Dialogs;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -41,12 +42,9 @@ namespace UnicontaClient.Pages.CustomPage
             : base(sourceData, true)
         {
             InitializeComponent();
-            cmbCurrency.ItemsSource = AppEnums.Currencies.GetLabels();
+            cmbCurrency.ItemsSource = cmbGroupCurrency.ItemsSource = AppEnums.Currencies.GetLabels();
             cmbCompanyType.ItemsSource = Enum.GetValues(typeof(Uniconta.DataModel.CompanyTypeType));
             layoutControl = layoutItems;
-#if SILVERLIGHT
-            SetCountry();
-#endif
             var Comp = api.CompanyEntity;
             Withholdinglookupeditior.api = api;
             if (!Comp._HasWithholding)
@@ -59,6 +57,7 @@ namespace UnicontaClient.Pages.CustomPage
             frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
             txtCulture.Text = string.Concat("(", Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName, ")");
             this.SaveComplete += EditCompany_SaveComplete;
+            leIndustryCode.api = api;
             if (editrow.Deactive)
             {
                 ribbonControl.EnableButtons("Activate");
@@ -71,6 +70,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
             GetAccountant();
             accountantItem.ButtonClicked += AcItem_ButtonClicked;
+            accountant2Item.ButtonClicked += Ac2Item_ButtonClicked;
             txtCompanyRegNo.EditValueChanged += TxtCVR_EditValueChanged;
             var country = Comp._CountryId;
 
@@ -124,12 +124,7 @@ namespace UnicontaClient.Pages.CustomPage
                 CompanyInfo ci = null;
                 try
                 {
-#if !SILVERLIGHT
                     ci = await CVR.CheckCountry(cvr, editrow.Country);
-#else
-                    var lookupApi = new Uniconta.API.System.UtilityAPI(api);
-                    ci = await lookupApi.LookupCVR(cvr, editrow.Country);
-#endif
                 }
                 catch (Exception ex)
                 {
@@ -144,6 +139,8 @@ namespace UnicontaClient.Pages.CustomPage
 
                     if (!string.IsNullOrWhiteSpace(ci?.life?.name))
                     {
+                        editrow.IndustryCode = ci.industrycode?.code;
+
                         var address = ci.address;
                         if (address != null)
                         {
@@ -184,8 +181,30 @@ namespace UnicontaClient.Pages.CustomPage
              };
             actAccessDialog.Show();
         }
-
+        void Ac2Item_ButtonClicked(object sender)
+        {
+            var act2Dialog = new CWAccountants(api, currentAccountant2);
+            act2Dialog.Closing += delegate
+            {
+                if (act2Dialog.DialogResult == true)
+                {
+                    currentAccountant2 = act2Dialog.selectedAccountant;
+                    if (currentAccountant2 != null)
+                    {
+                        editrow._Accountant2 = currentAccountant2.Id;
+                        txtaccountant2.Text = currentAccountant2.Name;
+                    }
+                    else
+                    {
+                        editrow._Accountant2 = 0;
+                        txtaccountant2.Text = string.Empty;
+                    }
+                }
+            };
+            act2Dialog.Show();
+        }
         AccountantClient currentAccountant;
+        AccountantClient currentAccountant2;
         private async void GetAccountant()
         {
             var acc = await api.Query<AccountantClient>(new UnicontaBaseEntity[] { editrow }, null);
@@ -194,12 +213,27 @@ namespace UnicontaClient.Pages.CustomPage
                 currentAccountant = acc.FirstOrDefault();
                 editrow._Accountant = currentAccountant.Id;
                 txtaccountant.Text = currentAccountant.Name;
+                if (acc.Length > 1)
+                {
+                    currentAccountant2 = acc[1];
+                    editrow._Accountant2 = currentAccountant2.Id;
+                    txtaccountant2.Text = currentAccountant2.Name;
+                }
+                else
+                {
+                    editrow._Accountant2 = 0;
+                    txtaccountant2.Text = string.Empty;
+                    currentAccountant2 = null;
+                }
             }
             else
             {
                 editrow._Accountant = 0;
                 txtaccountant.Text = string.Empty;
                 currentAccountant = null;
+                editrow._Accountant2 = 0;
+                txtaccountant2.Text = string.Empty;
+                currentAccountant2 = null;
             }
         }
 
@@ -265,7 +299,7 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         if (dailog.DialogResult == true)
                         {
-                            CreateBackup(dailog.name, dailog.copyTrans, dailog.copyPhysicalVouchers, dailog.copyAttachments);
+                            CreateBackup(dailog.name, dailog.copyTrans, dailog.copyPhysicalVouchers, dailog.copyAttachments, dailog.copyUsers);
                         }
                     };
                     dailog.Show();
@@ -274,7 +308,7 @@ namespace UnicontaClient.Pages.CustomPage
                     AddDockItem(TabControls.CompanyIPRestrictionPage, editrow, string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("AllowedIPAdresses"), editrow._Name));
                     break;
                 case "RegisterEdelivery":
-                    Utility.OpenWebSite("https://www.uniconta.com/da/moduler/modtag-e-faktura-med-nemhandel/tilmelding/");
+                    Nemhandel();
                     break;
                 default:
                     frmRibbon_BaseActions(ActionType);
@@ -293,12 +327,14 @@ namespace UnicontaClient.Pages.CustomPage
                 RibbonBase rb = (RibbonBase)frmRibbon.DataContext;
                 UtilDisplay.RemoveMenuCommand(rb, "RegisterEdelivery");
             }
+            if (api.CompanyEntity.NumberOfDimensions == 0)
+                liFullPrimo.Visibility = Visibility.Collapsed;
         }
 
-        async void CreateBackup(string name, bool copyTrans, bool copyPhysicalVouchers, bool copyAttachments)
+        async void CreateBackup(string name, bool copyTrans, bool copyPhysicalVouchers, bool copyAttachments, bool copyUsers)
         {
             var compApi = new CompanyAPI(api);
-            var result = await compApi.CreateCopy(name, copyTrans,  copyPhysicalVouchers,  copyAttachments);
+            var result = await compApi.CreateCopy(name, copyTrans,  copyPhysicalVouchers,  copyAttachments, copyUsers);
             UtilDisplay.ShowErrorCode(result);
         }
 
@@ -367,6 +403,41 @@ namespace UnicontaClient.Pages.CustomPage
             EraseYearWindowDialog.Show();
         }
 
+        private async void Nemhandel()
+        {
+            var res = await NHR.ValidateEndPoints(api);
+            if (res != null)
+            {
+                UnicontaMessageBox.Show(res, Uniconta.ClientTools.Localization.lookup("Warning"));
+                return;
+            }
+
+            CWNemhandel cwNemhandel = new CWNemhandel(api);
+            cwNemhandel.DialogTableId = 2000000090;
+            cwNemhandel.Closed += async delegate
+            {
+                if (cwNemhandel.DialogResult == true)
+                {
+                    busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
+                    busyIndicator.IsBusy = true;
+                    ErrorCodes result;
+                    if (cwNemhandel.HasChanges)
+                    {
+                        var nhrAPI = new Uniconta.API.DebtorCreditor.NHRAPI(api);
+                        result = await nhrAPI.NHROperation(cwNemhandel.EndPointLst);
+                    }
+                    else
+                    {
+                        result = ErrorCodes.NoChange;
+                    }
+
+                    busyIndicator.IsBusy = false;
+                    UtilDisplay.ShowErrorCode(result);
+                }
+            };
+            cwNemhandel.Show();
+        }
+
         private void DeleteAllAttachmentsCompany()
         {
             EraseYearWindow EraseYearWindowDialog = new EraseYearWindow(editrow.CompanyName, false);
@@ -380,11 +451,7 @@ namespace UnicontaClient.Pages.CustomPage
                         if (passwordConfirmationDailog.DialogResult == true)
                         {
                             if (UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("ConfirmDeleteTrans"), editrow.CompanyName), Uniconta.ClientTools.Localization.lookup("Confirmation"),
-#if !SILVERLIGHT
                         MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-#else
-                        MessageBoxButton.OKCancel) == MessageBoxResult.OK)
-#endif
                             {
                                 CompanyAPI compApi = new CompanyAPI(api);
                                 var res = await compApi.EraseAllTransactions(passwordConfirmationDailog.Password);
@@ -406,26 +473,15 @@ namespace UnicontaClient.Pages.CustomPage
 
         async void save()
         {
-#if SILVERLIGHT
-            if (cmbCountry.SelectedIndex == -1) return;
-            var country = cmbCountry.SelectedItem as string;
-            if (!string.IsNullOrEmpty(country) || country != null)
-            {
-                var countryName = country.Replace(" ", "");
-                editrow.CountryName = countryName;
-                editrow.Country = (CountryCode)Enum.Parse(typeof(CountryCode), countryName, true);
-            }
-#endif
             await this.saveForm();
             session.OpenCompany(api.CompanyEntity.CompanyId, true);
         }
-#if !SILVERLIGHT
+
         private void CorasauLayoutItem_OnButtonClicked(object sender)
         {
             var location = editrow.Address1 + "+" + editrow.Address2 + "+" + editrow.Address3 + "+" + editrow.Country;
             Utility.OpenGoogleMap(location);
         }
-#endif
 
     }
 }

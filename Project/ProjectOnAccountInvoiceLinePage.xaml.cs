@@ -30,7 +30,6 @@ using Uniconta.ClientTools.Controls;
 #if !SILVERLIGHT
 using Microsoft.Win32;
 using FromXSDFile.OIOUBL.ExportImport;
-using ubl_norway_uniconta;
 #endif
 
 using UnicontaClient.Pages;
@@ -121,40 +120,36 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void GenerateInvoice(ProjectClient dbProject)
         {
-            var Invapi = new Uniconta.API.Project.InvoiceAPI(api);
-            var savetask = saveGrid();
-            CWProjectGenerateInvoice GenrateInvoiceDialog = new CWProjectGenerateInvoice(api, GetSystemDefaultDate(), true, true, true, true, true);
-#if SILVERLIGHT
-            GenrateInvoiceDialog.Height = 210.0d;
-#else
-            GenrateInvoiceDialog.DialogTableId = 2000000047;
-#endif
-            GenrateInvoiceDialog.Closed += async delegate
-            {
-                if (GenrateInvoiceDialog.DialogResult == true)
+                var Invapi = new Uniconta.API.Project.InvoiceAPI(api);
+                var savetask = saveGrid();
+                CWProjectGenerateInvoice GenrateInvoiceDialog = new CWProjectGenerateInvoice(api, GetSystemDefaultDate(), true, true, true, true, true);
+                GenrateInvoiceDialog.DialogTableId = 2000000047;
+                GenrateInvoiceDialog.Closed += async delegate
                 {
-                    busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
-                    busyIndicator.IsBusy = true;
-                    if (savetask != null)
-                        await savetask;
-
-                    var invoicePostingResult = new InvoicePostingPrintGenerator(api, this);
-                    invoicePostingResult.SetUpInvoicePosting(dbProject, GenrateInvoiceDialog.GenrateDate, GenrateInvoiceDialog.IsSimulation, GenrateInvoiceDialog.InvoiceCategory, GenrateInvoiceDialog.ShowInvoice,
-                        GenrateInvoiceDialog.InvoiceQuickPrint, GenrateInvoiceDialog.NumberOfPages, GenrateInvoiceDialog.SendByEmail, GenrateInvoiceDialog.GenerateOIOUBLClicked, null, false);
-                    var result = await invoicePostingResult.Execute();
-                    busyIndicator.IsBusy = false;
-
-                    if (result)
+                    if (GenrateInvoiceDialog.DialogResult == true)
                     {
-                        Task reloadTask = null;
-                        if (!GenrateInvoiceDialog.IsSimulation)
-                            reloadTask = Filter(null);
+                        busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
+                        busyIndicator.IsBusy = true;
+                        if (savetask != null)
+                            await savetask;
+
+                        var invoicePostingResult = new InvoicePostingPrintGenerator(api, this);
+                        invoicePostingResult.SetUpInvoicePosting(dbProject, GenrateInvoiceDialog.GenrateDate, GenrateInvoiceDialog.IsSimulation, GenrateInvoiceDialog.InvoiceCategory, GenrateInvoiceDialog.ShowInvoice,
+                            GenrateInvoiceDialog.InvoiceQuickPrint, GenrateInvoiceDialog.NumberOfPages, GenrateInvoiceDialog.SendByEmail, GenrateInvoiceDialog.GenerateOIOUBLClicked, null, false);
+                        var result = await invoicePostingResult.Execute();
+                        busyIndicator.IsBusy = false;
+
+                        if (result)
+                        {
+                            Task reloadTask = null;
+                            if (!GenrateInvoiceDialog.IsSimulation)
+                                reloadTask = Filter(null);
+                        }
+                        else
+                            Utility.ShowJournalError(invoicePostingResult.PostingResult.ledgerRes, dgProjectOnAccountInvoiceLineGrid);
                     }
-                    else
-                        Utility.ShowJournalError(invoicePostingResult.PostingResult.ledgerRes, dgProjectOnAccountInvoiceLineGrid);
-                }
-            };
-            GenrateInvoiceDialog.Show();
+                };
+                GenrateInvoiceDialog.Show();
         }
 
         private Task Filter(IEnumerable<PropValuePair> propValuePair)
@@ -224,15 +219,8 @@ namespace UnicontaClient.Pages.CustomPage
                 workInstallation = (WorkInstallation)workInstallCache.Get(invClient._Installation);
             }
 
-            CreationResult result;
-
-            if (!debtor._InvoiceInPepPol && (Comp._CountryId == CountryCode.Norway || Comp._CountryId == CountryCode.Netherlands))
-                result = EHF.GenerateEHFXML(Comp, debtor, deliveryAccount, invClient, InvTransInvoiceLines, InvCache, VatCache, null, contactPerson);
-            else
-            {
-                var attachments = await FromXSDFile.OIOUBL.ExportImport.Attachments.CollectInvoiceAttachments(invClient, api);
-                result = Uniconta.API.DebtorCreditor.OIOUBL.GenerateOioXML(Comp, debtor, deliveryAccount, invClient, InvTransInvoiceLines, InvCache, VatCache, null, contactPerson, attachments, layoutGroupCache, workInstallation);
-            }
+            var attachments = await FromXSDFile.OIOUBL.ExportImport.Attachments.CollectInvoiceAttachments(invClient, api);
+            var result = Uniconta.API.DebtorCreditor.OIOUBL.GenerateOioXML(Comp, debtor, deliveryAccount, invClient, InvTransInvoiceLines, InvCache, VatCache, null, contactPerson, attachments, layoutGroupCache, workInstallation);
 
             bool createXmlFile = true;
 

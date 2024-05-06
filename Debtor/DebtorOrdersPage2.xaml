@@ -5,7 +5,6 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrdersPage2"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
     xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
     xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
     mc:Ignorable="d"
@@ -22,7 +21,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrdersPage2"
         <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
             <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="grpFirst">
                 <CorasauControls:CorasauLayoutGroup x:Name="grpAccounts" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Accounts}" Orientation="Vertical" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="400">
-                    <CorasauControls:CorasauLayoutItem FieldName="Account" Style="{StaticResource LayoutItemsstyle}" x:Name="AcItem" ButtonContent="+" >
+                    <CorasauControls:CorasauLayoutItem FieldName="Account" x:Name="AcItem" Style="{StaticResource LayoutItemsComboBoxViewStyle}" ComboBoxClicked="AcItem_ComboBoxClicked">
                         <CorasauControls:LookupEditor x:Name="leAccount" NullText="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Search}" EditValue="{Binding Account,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  EditValueChanged="leAccount_EditValueChanged">
                         </CorasauControls:LookupEditor>
                     </CorasauControls:CorasauLayoutItem>
@@ -141,6 +140,9 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrdersPage2"
                     <CorasauControls:CorasauLayoutItem FieldName="Weight" x:Name="liWeigt">
                         <CorasauControls:DoubleEditor FieldName="Weight" ApplyMask="False"  />
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="NetWeight" x:Name="liNetWeight">
+                        <CorasauControls:DoubleEditor FieldName="NetWeight" ApplyMask="False"  />
+                    </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="Volume" x:Name="liVolume" >
                         <CorasauControls:DoubleEditor FieldName="Volume" ApplyMask="False" />
                     </CorasauControls:CorasauLayoutItem>
@@ -195,6 +197,9 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrdersPage2"
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="Installation" x:Name="lblDeliveryAddress" Style="{StaticResource LayoutItemsstyle}" ButtonContent="&#x2B9D;" ButtonClicked="lblDeliveryAddress_ButtonClicked">
                         <CorasauControls:LookupEditor x:Name="leDeliveryAddress" EditValue="{Binding Installation,Mode=TwoWay}" MinWidth="70"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="CompanyAddress" x:Name="lblCompanyAddress" Style="{StaticResource LayoutItemsstyle}" ButtonContent="&#x2B9D;" ButtonClicked="lblCompanyAddress_ButtonClicked">
+                        <CorasauControls:LookupEditor x:Name="leCompanyAddress" EditValue="{Binding CompanyAddress,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="DeliveryIsInvoiceAddress" x:Name="liDeliveryIsInvoiceAddress">
                         <CorasauControls:CheckEditor x:Name="chkDeliveryIsInvoiceAddress" IsChecked="{Binding DeliveryIsInvoiceAddress, Mode=TwoWay}"/>

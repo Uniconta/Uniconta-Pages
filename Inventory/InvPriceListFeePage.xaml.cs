@@ -35,7 +35,6 @@ namespace UnicontaClient.Pages.CustomPage
         public override bool Readonly { get { return false; } }
         protected override List<string> GridSkipFields { get { return new List<string>(2) { "Name" }; } }
         protected override bool SetValuesOnPaste { get { return true; } }
-        public override bool SingleBufferUpdate { get { return false; } }
         public override bool IsAutoSave { get { return false; } }
 
         internal byte FixedDCType;

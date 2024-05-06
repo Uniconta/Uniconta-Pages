@@ -389,7 +389,8 @@ namespace UnicontaClient.Pages.CustomPage
                                 await dgProjInvProposalGrid.SaveData();
                                 break;
                             case CWConfirmationBox.ConfirmationResultEnum.No:
-                                break;
+                                dgProjInvProposalGrid.CancelChanges();
+                                break; 
                         }
                         editAllChecked = true;
                         dgProjInvProposalGrid.Readonly = true;

@@ -66,7 +66,7 @@ namespace UnicontaClient.Pages.CustomPage
             link.PageHeaderTemplate = PageHeaderTemplate;
             link.DetailTemplate = DetailTemplate;
 #if !SILVERLIGHT
-            link.PaperKind = System.Drawing.Printing.PaperKind.A4;
+            link.PaperKind = DevExpress.Drawing.Printing.DXPaperKind.A4;
 #endif
             link.DetailCount = 1;
             link.CreateDetail += link_CreateDetail;

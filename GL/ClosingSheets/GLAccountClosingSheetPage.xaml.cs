@@ -1,4 +1,3 @@
-using Uniconta.API.System;
 using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
@@ -7,28 +6,15 @@ using Uniconta.DataModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
-using Uniconta.ClientTools;
 using Uniconta.ClientTools.Util;
-using System.Collections.ObjectModel;
-using DevExpress.Xpf.Grid.LookUp;
-using DevExpress.Xpf.Editors.Settings;
 using UnicontaClient.Models;
 using UnicontaClient.Utilities;
 using System.Threading.Tasks;
-using System.Collections;
 using DevExpress.Xpf.Grid;
-using Uniconta.API.Service;
 using Uniconta.API.GeneralLedger;
-using System.Windows.Threading;
-using System.Text;
 using Uniconta.Common.Utility;
 
 using UnicontaClient.Pages;
@@ -49,6 +35,7 @@ namespace UnicontaClient.Pages.CustomPage
         public GLAccountClosingSheetPage(UnicontaBaseEntity master)
             : base(master)
         {
+            showAll = true;
             InitializeComponent();
             this.DataContext = this;
             masterRecord = master as GLClosingSheet;
@@ -64,6 +51,8 @@ namespace UnicontaClient.Pages.CustomPage
             dgGLTable.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;
             ((TableView)dgGLTable.View).RowStyle = Application.Current.Resources["RowStyle"] as Style;
             GetMenuItem();
+
+            this.BeforeClose += _BeforeClose;
         }
 
         static int selectedCode;
@@ -92,7 +81,77 @@ namespace UnicontaClient.Pages.CustomPage
 
         public override Task InitQuery()
         {
-            return BindGrid();
+            var t = BindGrid();
+            LoadNotes(t);
+            return t;
+        }
+
+        async void LoadNotes(Task t)
+        {
+            var notes = await api.Query<Note>(masterRecord);
+            if (notes != null && notes.Length > 0)
+            {
+                await t;
+                var cache = this.AccountListCache;
+                if (cache != null)
+                {
+                    foreach (var n in notes)
+                    {
+                        if (n._Text != null)
+                        {
+                            var i = n._Text.IndexOf(':');
+                            if (i > 0)
+                            {
+                                var Acc = (GLAccountClosingSheetClient)cache.Get(n._Text.Substring(0, i));
+                                if (Acc != null)
+                                {
+                                    Acc._Note = n;
+                                    Acc.SheetNote = n._Text.Substring(i + 2);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        void SaveNotes()
+        {
+            var arr = this.AccountListCache?.GetNotNullArray as GLAccountClosingSheetClient[];
+            if (arr != null)
+            {
+                var ins = new List<Note>();
+                var del = new List<Note>();
+                var upd = new List<Note>();
+                foreach (var Acc in arr)
+                {
+                    if (Acc._Note != null || Acc._SheetNote != null)
+                    {
+                        if (Acc._Note == null)
+                            ins.Add(new Note() { _Text = Acc._Account + ": " + Acc._SheetNote });
+                        else if (string.IsNullOrWhiteSpace(Acc._SheetNote))
+                            del.Add(Acc._Note);
+                        else
+                        {
+                            if (string.Compare(Acc._SheetNote, 0, Acc._Note._Text, Acc._Account.Length + 2, 4000) != 0)
+                            {
+                                Acc._Note._Text = Acc._Account + ": " + Acc._SheetNote;
+                                upd.Add(Acc._Note);
+                            }
+                        }
+                    }
+                }
+                if (ins.Count > 0 || del.Count > 0 || upd.Count > 0)
+                {
+                    api.MultiCrud(ins, upd, del);
+                    if (ins.Count > 0)
+                        masterRecord.HasDocs = true;
+                }
+            }
+        }
+        private void _BeforeClose()
+        {
+            SaveNotes();
         }
 
         void DataControl_CurrentItemChanged(object sender, DevExpress.Xpf.Grid.CurrentItemChangedEventArgs e)
@@ -151,12 +210,10 @@ namespace UnicontaClient.Pages.CustomPage
                 dgGLTable.UpdateItemSource(argument);
         }
 
-        ItemBase ibase;
         protected override void OnLayoutLoaded()
         {
             base.OnLayoutLoaded();
             UnicontaClient.Utilities.Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
-
         }
 
         void dgGLTable_RowDoubleClick()
@@ -225,28 +282,32 @@ namespace UnicontaClient.Pages.CustomPage
 
         IEnumerable<GLAccountClosingSheetClient> ClosingSheetHasLinesList;
         List<GLAccountClosingSheetClient> mainList;
+        bool showAll;
         void ClosingSheetHasLines()
         {
             if (mainList == null)
             {
-                mainList = new List<GLAccountClosingSheetClient>();
-                foreach (var row in dgGLTable.ItemsSource as IEnumerable<GLAccountClosingSheetClient>)
+                var lst = dgGLTable.ItemsSource as IEnumerable<GLAccountClosingSheetClient>;
+                mainList = new List<GLAccountClosingSheetClient>(lst.Count());
+                foreach (var row in lst)
                     mainList.Add(row);
             }
 
             if (ClosingSheetHasLinesList == null)
             {
-                var dgList = dgGLTable.ItemsSource as  IEnumerable<GLAccountClosingSheetClient>;
+                var dgList = dgGLTable.ItemsSource as IEnumerable<GLAccountClosingSheetClient>;
                 if (dgList != null)
                 {
                     ClosingSheetHasLinesList = dgList.Where(x => x.IsEmpty == false);
                     dgGLTable.ItemsSource = ClosingSheetHasLinesList;
+                    showAll = false;
                 }
             }
             else
             {
                 dgGLTable.ItemsSource = mainList;
                 ClosingSheetHasLinesList = null;
+                showAll = true;
             }
         }
 
@@ -278,9 +339,7 @@ namespace UnicontaClient.Pages.CustomPage
         void PostClosingSheet()
         {
             CWPostClosingSheet postingDialog = new CWPostClosingSheet(masterRecord._ToDate);
-#if !SILVERLIGHT
             postingDialog.DialogTableId = 2000000017;
-#endif
             postingDialog.Closed += async delegate
             {
                 if (postingDialog.DialogResult == true)
@@ -329,11 +388,15 @@ namespace UnicontaClient.Pages.CustomPage
             UpdateLines(ClosingLines, PostedLines);
 
             var selectedItem = dgGLTable.SelectedItem;
-
             dgGLTable.ItemsSource = null;
+
+            var arr = (GLAccountClosingSheetClient[])this.AccountListCache.GetKeyStrRecords;
+
+            if (!showAll)
+                arr = arr.Where(x => x.IsEmpty == false).ToArray();
+
             if (masterRecord._Skip0Accounts)
             {
-                var arr = (GLAccountClosingSheetClient[])this.AccountListCache.GetKeyStrRecords;
                 var lst = new List<GLAccountClosingSheetClient>(arr.Length);
                 for (int i = 0; (i < arr.Length); i++)
                 {
@@ -345,7 +408,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             }
             else
-                dgGLTable.ItemsSource = this.AccountListCache.GetKeyStrRecords;
+                dgGLTable.ItemsSource = arr;
 
             if (selectedItem != null)
                 dgGLTable.SelectedItem = selectedItem;
@@ -463,7 +526,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             var rApi = this.rApi;
             var api = this.api;
-            LedgerCache = api.CompanyEntity.GetCache(typeof(GLAccount)) ?? await api.CompanyEntity.LoadCache(typeof(GLAccount), api);
+            LedgerCache = api.GetCache(typeof(GLAccount)) ?? await api.LoadCache(typeof(GLAccount));
 
             var masterRecord = this.masterRecord;
             var numbers = await rApi.GenerateTotals(masterRecord._FromDate, masterRecord._ToDate);
@@ -485,7 +548,7 @@ namespace UnicontaClient.Pages.CustomPage
                     continue;
 
                 var ac2 = new GLAccountClosingSheetClient();
-                StreamingManager.Copy(ac, ac2);
+                ac2.Copy(ac);
 
                 ac2._OrgBalance = bal.SumAll();
                 ac2._LastPeriod = 0;

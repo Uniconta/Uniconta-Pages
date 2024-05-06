@@ -3,21 +3,15 @@
 x:Class="UnicontaClient.Pages.CustomPage.VatReportTemplatePage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d"
-    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core" 
-    xmlns:dxdb="http://schemas.devexpress.com/winfx/2008/xaml/demobase" 
-    xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars" 
     xmlns:dxp="http://schemas.devexpress.com/winfx/2008/xaml/printing" 
     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
-    xmlns:dg="http://schemas.devexpress.com/winfx/2008/xaml/grid"    
-    xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
     xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools" 
-    xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
-    d:DesignHeight="300" d:DesignWidth="400">
-
+    xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage">
     <UserControl.Resources>
+        <SolidColorBrush x:Key="RedForegroundColorBrush" Color="Red" />
+        <SolidColorBrush x:Key="BlueForegroundColorBrush" Color="Blue" />
+        <SolidColorBrush x:Key="PurpleForegroundColorBrush" Color="Purple" />
+        
         <DataTemplate x:Key="detailTemplate">
             <Grid Width="{Binding Path=UsablePageWidth, Mode=OneWay}"  HorizontalAlignment="Stretch" dxp:ExportSettings.TargetType="Panel">      
                 <Grid.Resources>
@@ -83,8 +77,8 @@ x:Class="UnicontaClient.Pages.CustomPage.VatReportTemplatePage"
                     <ColumnDefinition Width="500"/>
                     <ColumnDefinition Width="240"/>
                 </Grid.ColumnDefinitions>
-                <dxe:TextEdit HorizontalAlignment="Center" Grid.Column="0"  Grid.ColumnSpan="2" Grid.Row="0" Text="MODELO 303 CASILLAS A RELLENAR" VerticalAlignment="Center"  FontSize="20" Foreground="Red" FontWeight="Bold"/>
-                <dxe:TextEdit HorizontalAlignment="Center" Grid.Column="1"   Grid.ColumnSpan="2" Grid.Row="2" Text="Datos Uniconta" VerticalAlignment="Center"  FontSize="13" Foreground="Blue" FontWeight="Bold"/>     
+                <dxe:TextEdit HorizontalAlignment="Center" Grid.Column="0"  Grid.ColumnSpan="2" Grid.Row="0" Text="MODELO 303 CASILLAS A RELLENAR" VerticalAlignment="Center"  FontSize="20" Foreground="{StaticResource RedForegroundColorBrush}" FontWeight="Bold"/>
+                <dxe:TextEdit HorizontalAlignment="Center" Grid.Column="1"   Grid.ColumnSpan="2" Grid.Row="2" Text="Datos Uniconta" VerticalAlignment="Center"  FontSize="13" Foreground="{StaticResource BlueForegroundColorBrush}" FontWeight="Bold"/>     
                 <Grid Grid.Column="1" Grid.Row="3">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="80"/>
@@ -95,8 +89,8 @@ x:Class="UnicontaClient.Pages.CustomPage.VatReportTemplatePage"
                     <dxe:TextEdit Grid.Column="1" HorizontalAlignment="Center"  Text="Tipo %" VerticalAlignment="Center"  FontSize="13" FontWeight="Bold"/>
                     <dxe:TextEdit Grid.Column="2" HorizontalAlignment="Center"  Text="Cuota" VerticalAlignment="Center"  FontSize="13"  FontWeight="Bold"/>
                 </Grid>
-                <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="4" Text="Régimen general" VerticalAlignment="Center"  FontSize="15" Foreground="Red" FontWeight="Bold"/>
-                <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0"    Grid.Row="5" Text="IVA devengado" VerticalAlignment="Center"  FontSize="13" Foreground="Red"  FontWeight="Bold"/>
+                <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="4" Text="Régimen general" VerticalAlignment="Center"  FontSize="15" Foreground="{StaticResource RedForegroundColorBrush}" FontWeight="Bold"/>
+                <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0"    Grid.Row="5" Text="IVA devengado" VerticalAlignment="Center"  FontSize="13" Foreground="{StaticResource RedForegroundColorBrush}"  FontWeight="Bold"/>
                 <Grid Grid.Column="1" Grid.Row="5">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="80"/>
@@ -107,7 +101,7 @@ x:Class="UnicontaClient.Pages.CustomPage.VatReportTemplatePage"
                     <dxe:TextEdit Grid.Column="1" HorizontalAlignment="Center"  Text="Casilla" VerticalAlignment="Center"  FontSize="13"/>
                     <dxe:TextEdit Grid.Column="2" HorizontalAlignment="Center"  Text="Casilla" VerticalAlignment="Center"  FontSize="13"/>
                 </Grid>
-                <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" Grid.ColumnSpan="2"   Grid.Row="6" Text="Régimen general" VerticalAlignment="Center"  FontSize="13" Foreground="Purple" FontWeight="Bold"/>                
+                <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" Grid.ColumnSpan="2"   Grid.Row="6" Text="Régimen general" VerticalAlignment="Center"  FontSize="13" Foreground="{StaticResource PurpleForegroundColorBrush}" FontWeight="Bold"/>                
                 <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0"    Grid.Row="7" Text="Casillas 01, 02 y 03 – Régimen general" VerticalAlignment="Center"  FontSize="13" />
                 <Grid Grid.Column="1" Grid.Row="7">
                     <Grid.ColumnDefinitions>
@@ -141,7 +135,7 @@ x:Class="UnicontaClient.Pages.CustomPage.VatReportTemplatePage"
                     <dxe:TextEdit Grid.Column="1" HorizontalAlignment="Center" HorizontalContentAlignment="Right" Text="{Binding Converter={StaticResource VatConverter},ConverterParameter=32,Mode=OneWay}" VerticalAlignment="Center"  FontSize="13"/>
                     <dxe:TextEdit Grid.Column="2" HorizontalAlignment="Center" HorizontalContentAlignment="Right" Text="{Binding Converter={StaticResource VatConverter},ConverterParameter=33,Mode=OneWay}" VerticalAlignment="Center"  FontSize="13"/>
                 </Grid>
-                <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" Grid.ColumnSpan="2"   Grid.Row="10" Text="Adquisiciones intracomunitarias de bienes y servicios." VerticalAlignment="Center"  FontSize="13" Foreground="Purple" FontWeight="Bold" />
+                <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" Grid.ColumnSpan="2"   Grid.Row="10" Text="Adquisiciones intracomunitarias de bienes y servicios." VerticalAlignment="Center"  FontSize="13" Foreground="{StaticResource PurpleForegroundColorBrush}" FontWeight="Bold" />
                 <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0"    Grid.Row="11" Text="Casillas 10 y 11 –Adquisiciones intracomunitarias de bienes y servicios" VerticalAlignment="Center"  FontSize="13" />
                 <Grid Grid.Column="1" Grid.Row="11">
                     <Grid.ColumnDefinitions>
@@ -153,7 +147,7 @@ x:Class="UnicontaClient.Pages.CustomPage.VatReportTemplatePage"
                     <dxe:TextEdit Grid.Column="1" HorizontalAlignment="Center" HorizontalContentAlignment="Right" Text="" VerticalAlignment="Center"  FontSize="13"/>
                     <dxe:TextEdit Grid.Column="2" HorizontalAlignment="Center" HorizontalContentAlignment="Right" Text="{Binding Converter={StaticResource VatConverter},ConverterParameter=43,Mode=OneWay}" VerticalAlignment="Center"  FontSize="13"/>
                 </Grid>
-                <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" TextWrapping="Wrap" Grid.ColumnSpan="2"   Grid.Row="12" Text="Otras operaciones con inversión del sujeto pasivo (excepto. adq. intracom)" VerticalAlignment="Center"  FontSize="13" Foreground="Purple" FontWeight="Bold"/>
+                <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" TextWrapping="Wrap" Grid.ColumnSpan="2"   Grid.Row="12" Text="Otras operaciones con inversión del sujeto pasivo (excepto. adq. intracom)" VerticalAlignment="Center"  FontSize="13" Foreground="{StaticResource PurpleForegroundColorBrush}" FontWeight="Bold"/>
                 <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" TextWrapping="Wrap"   Grid.Row="13" Text="Casillas 12 y 13 – Otras operaciones con inversión del sujeto pasivo (excepto. Adq.Intracom)" VerticalAlignment="Center"  FontSize="13" />
                 <Grid Grid.Column="1" Grid.Row="13">
                     <Grid.ColumnDefinitions>
@@ -165,7 +159,7 @@ x:Class="UnicontaClient.Pages.CustomPage.VatReportTemplatePage"
                     <dxe:TextEdit Grid.Column="1" HorizontalAlignment="Center" HorizontalContentAlignment="Right" Text="" VerticalAlignment="Center"  FontSize="13"/>
                     <dxe:TextEdit Grid.Column="2" HorizontalAlignment="Center" HorizontalContentAlignment="Right" Text="{Binding Converter={StaticResource VatConverter},ConverterParameter=53,Mode=OneWay}" VerticalAlignment="Center"  FontSize="13"/>
                 </Grid>
-                <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" Grid.ColumnSpan="2"   Grid.Row="14" Text="Recargo equivalencia" VerticalAlignment="Center"  FontSize="13" Foreground="Purple" FontWeight="Bold"/>
+                <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" Grid.ColumnSpan="2"   Grid.Row="14" Text="Recargo equivalencia" VerticalAlignment="Center"  FontSize="13" Foreground="{StaticResource PurpleForegroundColorBrush}" FontWeight="Bold"/>
                 <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0"    Grid.Row="15" Text="Casillas 16, 17 y 18 – Recargo equivalencia" VerticalAlignment="Center"  FontSize="13" />
                 <Grid Grid.Column="1" Grid.Row="15">
                     <Grid.ColumnDefinitions>
@@ -199,7 +193,7 @@ x:Class="UnicontaClient.Pages.CustomPage.VatReportTemplatePage"
                     <dxe:TextEdit Grid.Column="1" HorizontalAlignment="Center" HorizontalContentAlignment="Right" Text="{Binding Converter={StaticResource VatConverter},ConverterParameter=82,Mode=OneWay}" VerticalAlignment="Center"  FontSize="13"/>
                     <dxe:TextEdit Grid.Column="2" HorizontalAlignment="Center" HorizontalContentAlignment="Right" Text="{Binding Converter={StaticResource VatConverter},ConverterParameter=83,Mode=OneWay}" VerticalAlignment="Center"  FontSize="13"/>
                 </Grid>
-                <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" Grid.ColumnSpan="2"   Grid.Row="18" Text="Total cuota devengada" VerticalAlignment="Center"  FontSize="13" Foreground="Purple" FontWeight="Bold"/>
+                <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" Grid.ColumnSpan="2"   Grid.Row="18" Text="Total cuota devengada" VerticalAlignment="Center"  FontSize="13" Foreground="{StaticResource PurpleForegroundColorBrush}" FontWeight="Bold"/>
                 <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0"    Grid.Row="19" Text="Casilla 27 – Total cuota devengada" VerticalAlignment="Center"  FontSize="13" />
                 <Grid Grid.Column="1" Grid.Row="19">
                     <Grid.ColumnDefinitions>
@@ -211,8 +205,8 @@ x:Class="UnicontaClient.Pages.CustomPage.VatReportTemplatePage"
                     <dxe:TextEdit Grid.Column="1" HorizontalAlignment="Center" HorizontalContentAlignment="Right" Text="" VerticalAlignment="Center"  FontSize="13"/>
                     <dxe:TextEdit Grid.Column="2" HorizontalAlignment="Center" HorizontalContentAlignment="Right" Text="{Binding Converter={StaticResource VatConverter},ConverterParameter=93,Mode=OneWay}" VerticalAlignment="Center"  FontSize="13"/>
                 </Grid>
-                <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="20" Text="IVA deducible" VerticalAlignment="Center"  FontSize="15" Foreground="Red" FontWeight="Bold"/>
-                <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" TextWrapping="Wrap" Grid.ColumnSpan="2"   Grid.Row="21" Text="Por cuotas soportadas en operaciones interiores corrientes" VerticalAlignment="Center"  FontSize="13" Foreground="Purple" FontWeight="Bold"/>
+                <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="20" Text="IVA deducible" VerticalAlignment="Center"  FontSize="15" Foreground="{StaticResource RedForegroundColorBrush}" FontWeight="Bold"/>
+                <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" TextWrapping="Wrap" Grid.ColumnSpan="2"   Grid.Row="21" Text="Por cuotas soportadas en operaciones interiores corrientes" VerticalAlignment="Center"  FontSize="13" Foreground="{StaticResource PurpleForegroundColorBrush}" FontWeight="Bold"/>
                 <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" TextWrapping="Wrap"   Grid.Row="22" Text="Casillas 28 y 29 – Por cuotas soportadas en operaciones interiores corrientes" VerticalAlignment="Center"  FontSize="13" />
                 <Grid Grid.Column="1" Grid.Row="22">
                     <Grid.ColumnDefinitions>
@@ -224,7 +218,7 @@ x:Class="UnicontaClient.Pages.CustomPage.VatReportTemplatePage"
                     <dxe:TextEdit Grid.Column="1" HorizontalAlignment="Center" HorizontalContentAlignment="Right" Text="" VerticalAlignment="Center"  FontSize="13"/>
                     <dxe:TextEdit Grid.Column="2" HorizontalAlignment="Center" HorizontalContentAlignment="Right" Text="{Binding Converter={StaticResource VatConverter},ConverterParameter=103,Mode=OneWay}" VerticalAlignment="Center"  FontSize="13"/>
                 </Grid>
-                <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" TextWrapping="Wrap" Grid.ColumnSpan="2"   Grid.Row="23" Text="Por cuotas soportadas en operaciones interiores con bienes de inversión" VerticalAlignment="Center"  FontSize="13" Foreground="Purple" FontWeight="Bold"/>
+                <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" TextWrapping="Wrap" Grid.ColumnSpan="2"   Grid.Row="23" Text="Por cuotas soportadas en operaciones interiores con bienes de inversión" VerticalAlignment="Center"  FontSize="13" Foreground="{StaticResource PurpleForegroundColorBrush}" FontWeight="Bold"/>
                 <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" TextWrapping="Wrap"   Grid.Row="24" Text="Casillas 30 y 31 – Por cuotas soportadas en operaciones interiores con bienes de inversion" VerticalAlignment="Center"  FontSize="13" />
                 <Grid Grid.Column="1" Grid.Row="24">
                     <Grid.ColumnDefinitions>
@@ -236,7 +230,7 @@ x:Class="UnicontaClient.Pages.CustomPage.VatReportTemplatePage"
                     <dxe:TextEdit Grid.Column="1" HorizontalAlignment="Center" HorizontalContentAlignment="Right" Text="" VerticalAlignment="Center"  FontSize="13"/>
                     <dxe:TextEdit Grid.Column="2" HorizontalAlignment="Center" HorizontalContentAlignment="Right" Text="{Binding Converter={StaticResource VatConverter},ConverterParameter=113,Mode=OneWay}" VerticalAlignment="Center"  FontSize="13"/>
                 </Grid>
-                <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" TextWrapping="Wrap" Grid.ColumnSpan="2"   Grid.Row="25" Text="Por cuotas soportadas en las importaciones de bienes corrientes" VerticalAlignment="Center"  FontSize="13" Foreground="Purple" FontWeight="Bold"/>
+                <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" TextWrapping="Wrap" Grid.ColumnSpan="2"   Grid.Row="25" Text="Por cuotas soportadas en las importaciones de bienes corrientes" VerticalAlignment="Center"  FontSize="13" Foreground="{StaticResource PurpleForegroundColorBrush}" FontWeight="Bold"/>
                 <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" TextWrapping="Wrap"   Grid.Row="26" Text="Casillas 32 y 33 – Por cuotas soportadas en las importaciones de bienes corrientes" VerticalAlignment="Center"  FontSize="13" />
                 <Grid Grid.Column="1" Grid.Row="26">
                     <Grid.ColumnDefinitions>
@@ -248,7 +242,7 @@ x:Class="UnicontaClient.Pages.CustomPage.VatReportTemplatePage"
                     <dxe:TextEdit Grid.Column="1" HorizontalAlignment="Center" HorizontalContentAlignment="Right" Text="" VerticalAlignment="Center"  FontSize="13"/>
                     <dxe:TextEdit Grid.Column="2" HorizontalAlignment="Center" HorizontalContentAlignment="Right" Text="{Binding Converter={StaticResource VatConverter},ConverterParameter=123,Mode=OneWay}" VerticalAlignment="Center"  FontSize="13"/>
                 </Grid>
-                <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" TextWrapping="Wrap" Grid.ColumnSpan="2"   Grid.Row="27" Text="Por cuotas soportadas en las importaciones de bienes de inversión" VerticalAlignment="Center"  FontSize="13" Foreground="Purple" FontWeight="Bold"/>
+                <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" TextWrapping="Wrap" Grid.ColumnSpan="2"   Grid.Row="27" Text="Por cuotas soportadas en las importaciones de bienes de inversión" VerticalAlignment="Center"  FontSize="13" Foreground="{StaticResource PurpleForegroundColorBrush}" FontWeight="Bold"/>
                 <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" TextWrapping="Wrap"   Grid.Row="28" Text="Casillas 34 y 35 – Por cuotas soportadas en las importaciones de bienes de inversión" VerticalAlignment="Center"  FontSize="13" />
                 <Grid Grid.Column="1" Grid.Row="28">
                     <Grid.ColumnDefinitions>
@@ -260,7 +254,7 @@ x:Class="UnicontaClient.Pages.CustomPage.VatReportTemplatePage"
                     <dxe:TextEdit Grid.Column="1" HorizontalAlignment="Center" HorizontalContentAlignment="Right" Text="" VerticalAlignment="Center"  FontSize="13"/>
                     <dxe:TextEdit Grid.Column="2" HorizontalAlignment="Center" HorizontalContentAlignment="Right" Text="{Binding Converter={StaticResource VatConverter},ConverterParameter=133,Mode=OneWay}" VerticalAlignment="Center"  FontSize="13"/>
                 </Grid>
-                <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" Grid.ColumnSpan="2" TextWrapping="Wrap"  Grid.Row="29" Text="En adquisiciones intracomunitarias de bienes y servicios corrientes" VerticalAlignment="Center"  FontSize="13" Foreground="Purple" FontWeight="Bold"/>
+                <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" Grid.ColumnSpan="2" TextWrapping="Wrap"  Grid.Row="29" Text="En adquisiciones intracomunitarias de bienes y servicios corrientes" VerticalAlignment="Center"  FontSize="13" Foreground="{StaticResource PurpleForegroundColorBrush}" FontWeight="Bold"/>
                 <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0"  TextWrapping="Wrap"  Grid.Row="30" Text="Casillas 36 y 37 – En adquisiciones intracomunitarias de bienes y servicios corrientes" VerticalAlignment="Center"  FontSize="13" />
                 <Grid Grid.Column="1" Grid.Row="30">
                     <Grid.ColumnDefinitions>
@@ -272,7 +266,7 @@ x:Class="UnicontaClient.Pages.CustomPage.VatReportTemplatePage"
                     <dxe:TextEdit Grid.Column="1" HorizontalAlignment="Center" HorizontalContentAlignment="Right" Text="" VerticalAlignment="Center"  FontSize="13"/>
                     <dxe:TextEdit Grid.Column="2" HorizontalAlignment="Center" HorizontalContentAlignment="Right" Text="{Binding Converter={StaticResource VatConverter},ConverterParameter=143,Mode=OneWay}" VerticalAlignment="Center"  FontSize="13"/>
                 </Grid>
-                <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" Grid.ColumnSpan="2" TextWrapping="Wrap"  Grid.Row="31" Text="En adquisiciones intracomunitarias de bienes de inversión" VerticalAlignment="Center"  FontSize="13" Foreground="Purple" FontWeight="Bold"/>
+                <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" Grid.ColumnSpan="2" TextWrapping="Wrap"  Grid.Row="31" Text="En adquisiciones intracomunitarias de bienes de inversión" VerticalAlignment="Center"  FontSize="13" Foreground="{StaticResource PurpleForegroundColorBrush}" FontWeight="Bold"/>
                 <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0"  TextWrapping="Wrap"  Grid.Row="32" Text="Casillas 38 y 39 – En adquisiciones intracomunitarias de bienes de inversion" VerticalAlignment="Center"  FontSize="13" />
                 <Grid Grid.Column="1" Grid.Row="32">
                     <Grid.ColumnDefinitions>
@@ -284,7 +278,7 @@ x:Class="UnicontaClient.Pages.CustomPage.VatReportTemplatePage"
                     <dxe:TextEdit Grid.Column="1" HorizontalAlignment="Center" HorizontalContentAlignment="Right" Text="" VerticalAlignment="Center"  FontSize="13"/>
                     <dxe:TextEdit Grid.Column="2" HorizontalAlignment="Center" HorizontalContentAlignment="Right" Text="{Binding Converter={StaticResource VatConverter},ConverterParameter=153,Mode=OneWay}" VerticalAlignment="Center"  FontSize="13"/>
                 </Grid>
-                <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" Grid.ColumnSpan="2"   Grid.Row="33" Text="Compensaciones Régimen Especial A.G. y P" VerticalAlignment="Center"  FontSize="13" Foreground="Purple" FontWeight="Bold"/>
+                <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" Grid.ColumnSpan="2"   Grid.Row="33" Text="Compensaciones Régimen Especial A.G. y P" VerticalAlignment="Center"  FontSize="13" Foreground="{StaticResource PurpleForegroundColorBrush}" FontWeight="Bold"/>
                 <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0"    Grid.Row="34" Text="Casilla 42 – Compensaciones Régimen Especial A.G. y P." VerticalAlignment="Center"  FontSize="13" />
                 <Grid Grid.Column="1" Grid.Row="34">
                     <Grid.ColumnDefinitions>
@@ -296,7 +290,7 @@ x:Class="UnicontaClient.Pages.CustomPage.VatReportTemplatePage"
                     <dxe:TextEdit Grid.Column="1" HorizontalAlignment="Center" HorizontalContentAlignment="Right" Text="" VerticalAlignment="Center"  FontSize="13"/>
                     <dxe:TextEdit Grid.Column="2" HorizontalAlignment="Center" HorizontalContentAlignment="Right" Text="{Binding Converter={StaticResource VatConverter},ConverterParameter=163,Mode=OneWay}" VerticalAlignment="Center"  FontSize="13"/>
                 </Grid>
-                <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" Grid.ColumnSpan="2"   Grid.Row="35" Text="Total a deducir" VerticalAlignment="Center"  FontSize="13" Foreground="Purple" FontWeight="Bold"/>
+                <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" Grid.ColumnSpan="2"   Grid.Row="35" Text="Total a deducir" VerticalAlignment="Center"  FontSize="13" Foreground="{StaticResource PurpleForegroundColorBrush}" FontWeight="Bold"/>
                 <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0"    Grid.Row="36" Text="Casilla 45 – Total a deducir" VerticalAlignment="Center"  FontSize="13" />
                 <Grid Grid.Column="1" Grid.Row="36">
                     <Grid.ColumnDefinitions>
@@ -308,7 +302,7 @@ x:Class="UnicontaClient.Pages.CustomPage.VatReportTemplatePage"
                     <dxe:TextEdit Grid.Column="1" HorizontalAlignment="Center" HorizontalContentAlignment="Right" Text="" VerticalAlignment="Center"  FontSize="13"/>
                     <dxe:TextEdit Grid.Column="2" HorizontalAlignment="Center" HorizontalContentAlignment="Right" Text="{Binding Converter={StaticResource VatConverter},ConverterParameter=173,Mode=OneWay}" VerticalAlignment="Center"  FontSize="13"/>
                 </Grid>
-                <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" Grid.ColumnSpan="2"   Grid.Row="37" Text="Resultado régimen general" VerticalAlignment="Center"  FontSize="13" Foreground="Purple" FontWeight="Bold"/>
+                <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" Grid.ColumnSpan="2"   Grid.Row="37" Text="Resultado régimen general" VerticalAlignment="Center"  FontSize="13" Foreground="{StaticResource PurpleForegroundColorBrush}" FontWeight="Bold"/>
                 <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0"    Grid.Row="38" Text="Casilla 46 – Resultado régimen general" VerticalAlignment="Center"  FontSize="13" />
                 <Grid Grid.Column="1" Grid.Row="38">
                     <Grid.ColumnDefinitions>
@@ -320,8 +314,8 @@ x:Class="UnicontaClient.Pages.CustomPage.VatReportTemplatePage"
                     <dxe:TextEdit Grid.Column="1" HorizontalAlignment="Center" HorizontalContentAlignment="Right" Text="" VerticalAlignment="Center"  FontSize="13"/>
                     <dxe:TextEdit Grid.Column="2" HorizontalAlignment="Center" HorizontalContentAlignment="Right" Text="{Binding Converter={StaticResource VatConverter},ConverterParameter=183,Mode=OneWay}" VerticalAlignment="Center"  FontSize="13"/>
                 </Grid>
-                <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="39" Text="Información adicional" VerticalAlignment="Center"  FontSize="15" Foreground="Red" FontWeight="Bold"/>
-                <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" Grid.ColumnSpan="2"   Grid.Row="40" Text="Entregas intracomunitarias de bienes y servicios" VerticalAlignment="Center"  FontSize="13" Foreground="Purple" FontWeight="Bold"/>
+                <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="39" Text="Información adicional" VerticalAlignment="Center"  FontSize="15" Foreground="{StaticResource RedForegroundColorBrush}" FontWeight="Bold"/>
+                <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" Grid.ColumnSpan="2"   Grid.Row="40" Text="Entregas intracomunitarias de bienes y servicios" VerticalAlignment="Center"  FontSize="13" Foreground="{StaticResource PurpleForegroundColorBrush}" FontWeight="Bold"/>
                 <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0"    Grid.Row="41" Text="Casilla 59 - Entregas Intracomunitarias de bienesy servicios" VerticalAlignment="Center"  FontSize="13" />
                 <Grid Grid.Column="1" Grid.Row="41">
                     <Grid.ColumnDefinitions>
@@ -333,7 +327,7 @@ x:Class="UnicontaClient.Pages.CustomPage.VatReportTemplatePage"
                     <dxe:TextEdit Grid.Column="1" HorizontalAlignment="Center" HorizontalContentAlignment="Right"  Text="" VerticalAlignment="Center"  FontSize="13"/>
                     <dxe:TextEdit Grid.Column="2" HorizontalAlignment="Center" HorizontalContentAlignment="Right" Text="" VerticalAlignment="Center"  FontSize="13"/>
                 </Grid>
-                <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" Grid.ColumnSpan="2"   Grid.Row="42" Text="Exportaciones y operaciones asimiladas" VerticalAlignment="Center"  FontSize="13" Foreground="Purple" FontWeight="Bold"/>
+                <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" Grid.ColumnSpan="2"   Grid.Row="42" Text="Exportaciones y operaciones asimiladas" VerticalAlignment="Center"  FontSize="13" Foreground="{StaticResource PurpleForegroundColorBrush}" FontWeight="Bold"/>
                 <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0"    Grid.Row="43" Text="Casilla 60 - Exportaciones y operaciones asimiladas" VerticalAlignment="Center"  FontSize="13" />
                 <Grid Grid.Column="1" Grid.Row="43">
                     <Grid.ColumnDefinitions>
@@ -345,7 +339,7 @@ x:Class="UnicontaClient.Pages.CustomPage.VatReportTemplatePage"
                     <dxe:TextEdit Grid.Column="1" HorizontalAlignment="Center" HorizontalContentAlignment="Right"  Text="" VerticalAlignment="Center"  FontSize="13"/>
                     <dxe:TextEdit Grid.Column="2" HorizontalAlignment="Center" HorizontalContentAlignment="Right" Text="" VerticalAlignment="Center"  FontSize="13"/>
                 </Grid>
-                <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" TextWrapping="Wrap"    Grid.Row="44" Text="Operaciones no sujetas o con inversión del sujeto pasivo que originan el derecho a deducción" VerticalAlignment="Center"  FontSize="13" Foreground="Purple" FontWeight="Bold"/>
+                <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" TextWrapping="Wrap"    Grid.Row="44" Text="Operaciones no sujetas o con inversión del sujeto pasivo que originan el derecho a deducción" VerticalAlignment="Center"  FontSize="13" Foreground="{StaticResource PurpleForegroundColorBrush}" FontWeight="Bold"/>
                 <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" TextWrapping="Wrap"   Grid.Row="45" Text="Casilla 61 - Operaciones no sujetas o con inversión del sujeto pasivo que originan el derecho a deducción." VerticalAlignment="Center"  FontSize="13" />
                 <Grid Grid.Column="1" Grid.Row="45">
                     <Grid.ColumnDefinitions>
@@ -358,8 +352,8 @@ x:Class="UnicontaClient.Pages.CustomPage.VatReportTemplatePage"
                     <dxe:TextEdit Grid.Column="2" HorizontalAlignment="Center" HorizontalContentAlignment="Right" Text="" VerticalAlignment="Center"  FontSize="13"/>
                 </Grid>
 
-                <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="46" Text="Resultado" VerticalAlignment="Center"  FontSize="15" Foreground="Red" FontWeight="Bold"/>
-                <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" Grid.ColumnSpan="2"   Grid.Row="47" Text="Suma de resultados ( [46] + [58] + [76] )" VerticalAlignment="Center"  FontSize="13" Foreground="Purple" FontWeight="Bold"/>
+                <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="46" Text="Resultado" VerticalAlignment="Center"  FontSize="15" Foreground="{StaticResource RedForegroundColorBrush}" FontWeight="Bold"/>
+                <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" Grid.ColumnSpan="2"   Grid.Row="47" Text="Suma de resultados ( [46] + [58] + [76] )" VerticalAlignment="Center"  FontSize="13" Foreground="{StaticResource PurpleForegroundColorBrush}" FontWeight="Bold"/>
                 <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0"    Grid.Row="48" Text="Casilla 64 - Suma de resultados" VerticalAlignment="Center"  FontSize="13" />
                 <Grid Grid.Column="1" Grid.Row="48">
                     <Grid.ColumnDefinitions>
@@ -371,7 +365,7 @@ x:Class="UnicontaClient.Pages.CustomPage.VatReportTemplatePage"
                     <dxe:TextEdit Grid.Column="1" HorizontalAlignment="Center" HorizontalContentAlignment="Right" Text="" VerticalAlignment="Center"  FontSize="13"/>
                     <dxe:TextEdit Grid.Column="2" HorizontalAlignment="Center" HorizontalContentAlignment="Right" Text="{Binding Converter={StaticResource VatConverter},ConverterParameter=221,Mode=OneWay}" VerticalAlignment="Center"  FontSize="13"/>
                 </Grid>
-                <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" Grid.ColumnSpan="2"   Grid.Row="49" Text="Resultado ( [66] + [77] - [67] + [68] )" VerticalAlignment="Center"  FontSize="13" Foreground="Purple" FontWeight="Bold"/>
+                <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" Grid.ColumnSpan="2"   Grid.Row="49" Text="Resultado ( [66] + [77] - [67] + [68] )" VerticalAlignment="Center"  FontSize="13" Foreground="{StaticResource PurpleForegroundColorBrush}" FontWeight="Bold"/>
                 <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0"    Grid.Row="50" Text="Casilla 69 -Resultado" VerticalAlignment="Center"  FontSize="13" />
                 <Grid Grid.Column="1" Grid.Row="50">
                     <Grid.ColumnDefinitions>
@@ -383,7 +377,7 @@ x:Class="UnicontaClient.Pages.CustomPage.VatReportTemplatePage"
                     <dxe:TextEdit Grid.Column="1" HorizontalAlignment="Center" HorizontalContentAlignment="Right" Text="" VerticalAlignment="Center"  FontSize="13"/>
                     <dxe:TextEdit Grid.Column="2" HorizontalAlignment="Center" HorizontalContentAlignment="Right" Text="{Binding Converter={StaticResource VatConverter},ConverterParameter=231,Mode=OneWay}" VerticalAlignment="Center"  FontSize="13"/>
                 </Grid>
-                <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" Grid.ColumnSpan="2"   Grid.Row="51" Text="Resultado de la liquidación ( [69] - [70] )" VerticalAlignment="Center"  FontSize="13" Foreground="Purple" FontWeight="Bold"/>
+                <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0" Grid.ColumnSpan="2"   Grid.Row="51" Text="Resultado de la liquidación ( [69] - [70] )" VerticalAlignment="Center"  FontSize="13" Foreground="{StaticResource PurpleForegroundColorBrush}" FontWeight="Bold"/>
                 <dxe:TextEdit HorizontalAlignment="Left" Grid.Column="0"    Grid.Row="52" Text="Casilla 71 - Resultado de la liquidación" VerticalAlignment="Center"  FontSize="13" />
                 <Grid Grid.Column="1" Grid.Row="52">
                     <Grid.ColumnDefinitions>

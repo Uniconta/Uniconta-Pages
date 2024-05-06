@@ -1,0 +1,161 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools" 
+    xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.ProjectTransDeletePage"
+     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+     xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
+     xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"   
+     xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+     xmlns:WPFPages="clr-namespace:UnicontaClient.Pages.CustomPage">
+    <UserControl.Resources>
+        <Util:VisibilityBoolConverter x:Key="VisibilityBoolConverter" />
+        <Util:RowIndexConverter x:Key="RowIndexConverter" />
+        <Util:VisibilityTextConverter x:Key="VisibilityTextConverter" />
+        <Util:ImageNameToImagesourceConverter x:Key="ImageNameToImagesourceConverter"/>
+    </UserControl.Resources>
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Project/ProjectTransDeletePageRibbon.xml" x:Name="localMenu"/>
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <local:ProjectGrid  x:Name="dgProjectGrid" AutoGenerateColumns="None">
+                <local:ProjectGrid.Columns>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="HasNotes" Width="30" ReadOnly="True">
+                        <local:CorasauDataGridTemplateColumnClient.HeaderTemplate>
+                            <DataTemplate>
+                                <Image Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Note_16x16.svg}" Width="16" Height="16" VerticalAlignment="Center"/>
+                            </DataTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.HeaderTemplate>
+                        <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <Image Margin="5" Tag="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Note_16x16.svg}" MouseLeftButtonDown="HasNoteImage_MouseLeftButtonDown" Visibility="{Binding DataContext.RowData.Row.HasNotes,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource VisibilityBoolConverter}}" Stretch="Fill" Width="16" Height="16" RenderOptions.BitmapScalingMode="NearestNeighbor" RenderOptions.EdgeMode="Aliased" />
+                            </ControlTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="HasDocs" ReadOnly="True"  Width="30" >
+                        <local:CorasauDataGridTemplateColumnClient.HeaderTemplate>
+                            <DataTemplate>
+                                <Image Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Document_Attachment_16x16.svg}" Width="16" Height="16" VerticalAlignment="Center"/>
+                            </DataTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.HeaderTemplate>
+                        <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <Image Margin="5" Tag="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Document_Attachment_16x16.svg}" MouseLeftButtonDown="HasDocImage_MouseLeftButtonDown" Visibility="{Binding DataContext.RowData.Row.HasDocs,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource VisibilityBoolConverter}}" Stretch="Fill" Width="16" Height="16" RenderOptions.BitmapScalingMode="NearestNeighbor" RenderOptions.EdgeMode="Aliased" />
+                            </ControlTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
+
+                    <local:CorasauDataGridTemplateColumnClient x:Name="HasEmail"  Width="30" Visible="False" >
+                        <local:CorasauDataGridTemplateColumnClient.HeaderTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="&#x2709;"  Width="16" Height="16" VerticalAlignment="Center"/>
+                            </DataTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.HeaderTemplate>
+                        <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <TextBlock Text="&#x2709;" Margin="5" Tag="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center"  MouseLeftButtonDown="HasEmailImage_MouseLeftButtonDown" Visibility="{Binding DataContext.RowData.Row.Email,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource VisibilityTextConverter}}"  Width="16" Height="16" RenderOptions.BitmapScalingMode="NearestNeighbor" RenderOptions.EdgeMode="Aliased" />
+                            </ControlTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
+
+                    <local:CorasauDataGridForeignKeyColumnClient x:Name="Account" Visible="False">
+                        <local:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <TextBlock Margin="2" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.Account,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" />
+                            </ControlTemplate>
+                        </local:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
+                        <local:CorasauDataGridForeignKeyColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <local:CorasauGridLookupEditorClient x:Name="PART_Editor" />
+                            </DataTemplate>
+                        </local:CorasauDataGridForeignKeyColumnClient.CellTemplate>
+                    </local:CorasauDataGridForeignKeyColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DebtorName" Width="200" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Number"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Name" Width="200"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="MasterProject" Visible="True"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="RootProject" Visible="false"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="EndDiscountPct" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Payment" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Group"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Vat" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Blocked" />
+                    <local:ComboBoxColumnClient x:Name="Currency" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="WorkAddress1" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="WorkAddress2" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="WorkAddress3" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="YourRef" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="OurRef" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Requisition" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Email" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Mobil" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Description" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="StartDate" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="EndDate" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PersonInCharge"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PrStandard" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PriceList" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PrType" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Installation" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="FixedPrice" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ContactName" ReadOnly="True" />
+                    <local:ComboBoxColumnClient x:Name="Phase"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Created"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="cldim1" Width="70" FieldName="Dimension1" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="cldim2" Width="70" FieldName="Dimension2" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="cldim3" Width="70" FieldName="Dimension3" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="cldim4" Width="70" FieldName="Dimension4" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="cldim5" Width="70" FieldName="Dimension5" />
+
+                    <local:CorasauDataGridTemplateColumnClient x:Name="CostValue" Width="100" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="SalesValue" Width="100" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="LabourCost" Width="100" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="LabourSales" Width="100" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ExternalWorkCost" Width="100" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ExternalWorkSales" Width="100" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="MaterialsCost" Width="100" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="MaterialsSales" Width="100" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ExpensesCost" Width="100" Visible="False" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ExpensesSales" Width="100" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="MiscellaneousCost" Width="100" Visible="False" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="MiscellaneousSales" Width="100" Visible="False" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="OtherCost" Width="100" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="OtherSales" Width="100" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="AdjustmentCost" Width="100" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="AdjustmentSales" Width="100" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Revenue"  Width="100" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="OnAccountSales" Width="100" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="WIP" Width="100" Visible="True"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Margin" Width="100" Visible="False" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="MarginRatio" Width="100" Visible="False" />
+                    <local:ComboBoxColumnClient x:Name="InvoicingMethod" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="SalesPrice" Visible="False"/>
+                </local:ProjectGrid.Columns>
+                <local:ProjectGrid.TotalSummary>
+                    <local:SumColumn FieldName="Revenue" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <local:SumColumn FieldName="MaterialsCost" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <local:SumColumn FieldName="ExternalWorkCost" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <local:SumColumn FieldName="LabourCost" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <local:SumColumn FieldName="ExpensesCost" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <local:SumColumn FieldName="MiscellaneousCost" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <local:SumColumn FieldName="OtherCost" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <local:SumColumn FieldName="AdjustmentCost" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <local:SumColumn FieldName="MaterialsSales" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <local:SumColumn FieldName="ExternalWorkSales" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <local:SumColumn FieldName="LabourSales" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <local:SumColumn FieldName="ExpensesSales" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <local:SumColumn FieldName="MiscellaneousSales" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <local:SumColumn FieldName="OtherSales" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <local:SumColumn FieldName="AdjustmentSales" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <local:SumColumn FieldName="CostValue" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <local:SumColumn FieldName="SalesValue" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <local:SumColumn FieldName="WIP" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <local:SumColumn FieldName="Margin" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <local:SumColumn FieldName="MarginRatio" SummaryType="Custom" DisplayFormat="{}{0:N2}"/>
+                </local:ProjectGrid.TotalSummary>
+            </local:ProjectGrid>
+        </CorasauControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

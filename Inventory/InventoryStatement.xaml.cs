@@ -6,23 +6,14 @@ using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.Common;
 using Uniconta.DataModel;
-using DevExpress.Xpf.Editors.Settings;
 using DevExpress.Xpf.Grid;
 using DevExpress.Xpf.Grid.Native;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
 using Uniconta.ClientTools.Util;
 using Uniconta.API.Service;
 using System.Windows.Data;
@@ -304,6 +295,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (dataRowCount > 0)
             {
                 dgInvTran.ItemsSource = statementList;
+                childDgInvTrans.RefreshData();
             }
         }
 

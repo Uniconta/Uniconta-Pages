@@ -120,6 +120,9 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorInvoicePage2"
                 <CorasauControls:CorasauLayoutItem FieldName="Installation " x:Name="liInstallation">
                     <CorasauControls:LookupEditor x:Name="leInstallation" Text="{Binding Installation ,Mode=TwoWay}"/>
                 </CorasauControls:CorasauLayoutItem>
+                <CorasauControls:CorasauLayoutItem FieldName="CompanyAddress" x:Name="lblCompanyAddress">
+                    <CorasauControls:LookupEditor x:Name="leCompanyAddress" EditValue="{Binding CompanyAddress,Mode=TwoWay}"/>
+                </CorasauControls:CorasauLayoutItem>
                 <CorasauControls:CorasauLayoutGroup View="Group"  x:Name="usedim"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Dimensions}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="376">
                     <CorasauControls:CorasauLayoutItem x:Name="lbldim1">
                         <CorasauControls:LookupEditor x:Name="cmbDim1" Text="{Binding Dimension1,Mode=TwoWay}"/>

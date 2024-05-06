@@ -49,6 +49,9 @@ x:Class="UnicontaClient.Pages.CustomPage.EditCompany"
                         <CorasauControls:CorasauLayoutItem FieldName="Currency">
                             <CorasauControls:ComboBoxEditor x:Name="cmbCurrency" SelectedItem="{Binding Currency,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="GroupCurrency">
+                            <CorasauControls:ComboBoxEditor x:Name="cmbGroupCurrency" SelectedItem="{Binding GroupCurrency,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="VatPeriod">
                             <CorasauControls:ComboBoxEditor x:Name="cmbVarPeriod" SelectedItem="{Binding VatPeriod,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
@@ -90,6 +93,12 @@ x:Class="UnicontaClient.Pages.CustomPage.EditCompany"
                     <CorasauControls:CorasauLayoutGroup  View="GroupBox" x:Name="lItemAccountant" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Accountant}" Orientation="Vertical" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" MinWidth="420">
                         <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Accountant}" x:Name="accountantItem" Style="{StaticResource LayoutItemsstyle}">
                             <CorasauControls:TextEditor x:Name="txtaccountant" IsReadOnly="True"/>
+                            <CorasauControls:CorasauLayoutItem.ButtonContent>
+                                <Image Source="{dx:SvgImageSource Uri=/UnicontaPages;component/Assets/img/Right_Arrow_16x16.svg, UsePalette=True}" Height="16" dx:WpfSvgPalette.Palette="{StaticResource SVGIconPallete}"/>
+                            </CorasauControls:CorasauLayoutItem.ButtonContent>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Accountant2,StringFormat=\{0\}2}" x:Name="accountant2Item" Style="{StaticResource LayoutItemsstyle}">
+                            <CorasauControls:TextEditor x:Name="txtaccountant2" IsReadOnly="True"/>
                             <CorasauControls:CorasauLayoutItem.ButtonContent>
                                 <Image Source="{dx:SvgImageSource Uri=/UnicontaPages;component/Assets/img/Right_Arrow_16x16.svg, UsePalette=True}" Height="16" dx:WpfSvgPalette.Palette="{StaticResource SVGIconPallete}"/>
                             </CorasauControls:CorasauLayoutItem.ButtonContent>
@@ -178,6 +187,9 @@ x:Class="UnicontaClient.Pages.CustomPage.EditCompany"
                         <CorasauControls:CorasauLayoutItem FieldName="OIOUBLSendOnServer" x:Name="liOIOUBLSendOnServer">
                             <CorasauControls:CheckEditor IsChecked="{Binding OIOUBLSendOnServer,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="FullPrimo" x:Name="liFullPrimo">
+                            <CorasauControls:CheckEditor IsChecked="{Binding FullPrimo,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="AllowDocumentGuid" x:Name="liAllowDocumentGuid">
                             <CorasauControls:CheckEditor IsChecked="{Binding AllowDocumentGuid,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
@@ -187,6 +199,9 @@ x:Class="UnicontaClient.Pages.CustomPage.EditCompany"
                                     <editor:CheckedComboBoxStyleSettings />
                                 </CorasauControls:ComboBoxEditor.StyleSettings>
                             </CorasauControls:ComboBoxEditor>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="ApproveOnEmail" x:Name="liApproveOnEmail">
+                            <CorasauControls:CheckEditor IsChecked="{Binding ApproveOnEmail,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
 
@@ -217,6 +232,9 @@ x:Class="UnicontaClient.Pages.CustomPage.EditCompany"
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="Fax">
                             <CorasauControls:TextEditor Text="{Binding Fax ,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="IndustryCode" x:Name="liIndustryCode">
+                            <CorasauControls:LookupEditor x:Name="leIndustryCode" Text="{Binding IndustryCode ,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
 

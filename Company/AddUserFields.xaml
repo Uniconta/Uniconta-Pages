@@ -29,6 +29,7 @@ x:Class="UnicontaClient.Pages.CustomPage.AddUserFields"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="RefTable" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Format" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="GroupName" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Mask" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Order" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ReadOnly" Width="50" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Mandatory" Width="50"/>

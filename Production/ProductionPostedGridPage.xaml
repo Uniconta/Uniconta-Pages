@@ -54,7 +54,8 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionPostedGridPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="ProjectName" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="OrderTotal" Width="80" ReadOnly="True" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="NoLines" Width="50" ReadOnly="True" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Remark" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Requisition" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Remark" Width="120" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="ProductionCreated" />
                 </local:ProductionPostedGridClient.Columns>
             </local:ProductionPostedGridClient>

@@ -4,8 +4,11 @@ x:Class="UnicontaClient.Pages.CustomPage.UserCompaniesGridPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
+      xmlns:Util="clr-namespace:UnicontaClient.Utilities"
       xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
-
+    <UserControl.Resources>
+        <Util:BankAccountSatusConverter x:Key="BankStatusConverter" />
+    </UserControl.Resources>
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -68,6 +71,22 @@ x:Class="UnicontaClient.Pages.CustomPage.UserCompaniesGridPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="UseVatOperation" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="TransCount" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="UseUnrealizedVat" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="BankStatus" Visible="False" Width="70">
+                        <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <Grid Margin="5" VerticalAlignment="Center" HorizontalAlignment="Left">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="3" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Image Source="{Binding DataContext.RowData.Row.BankStatus,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource BankStatusConverter}}" 
+Stretch="Fill" Width="16" Height="16" RenderOptions.BitmapScalingMode="NearestNeighbor" RenderOptions.EdgeMode="Aliased" />
+                                    <TextBlock Text="{Binding DataContext.RowData.Row.BankStatus,RelativeSource={RelativeSource TemplatedParent}}" Grid.Column="2" />
+                                </Grid>
+                            </ControlTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
                     <local:CorasauDataGridTemplateColumnClient x:Name="LastBankTrans" Visible="False" Width="90"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="LastPosting" Visible="False"  Width="90"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="NInbox" Visible="False" Width="60">

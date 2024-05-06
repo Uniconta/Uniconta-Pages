@@ -1,33 +1,22 @@
 using UnicontaClient.Models;
-using UnicontaClient.Utilities;
-using Uniconta.ClientTools;
 using Uniconta.ClientTools.Page;
 using Uniconta.Common;
 using Uniconta.DataModel;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
 using Uniconta.ClientTools.Util;
 using System.Collections.ObjectModel;
 using Uniconta.ClientTools.Controls;
-using System.Windows;
 using Uniconta.Common.Utility;
 using Uniconta.API.Service;
 using UnicontaClient.Controls;
 using Uniconta.API.System;
 using Uniconta.ClientTools.DataModel;
-using DevExpress.Xpf.Editors;
-using UnicontaClient.Pages;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -50,6 +39,7 @@ namespace UnicontaClient.Pages.CustomPage
         public string PrintOrientation { get; set; }
         public Balance ObjBalance { get; set; }
         public bool UseExternal { get; set; }
+        public bool SortExtern { get; set; }
         public int ShowType { get; set; }
     }
 
@@ -543,10 +533,10 @@ namespace UnicontaClient.Pages.CustomPage
             var balanceFrontPageReportData = new BalanceFrontPageReportDataClient();
             balanceFrontPageReportData.FromAccount = cbFromAccount.Text;
             balanceFrontPageReportData.ToAccount = cbToAccount.Text;
-            balanceFrontPageReportData.SkipEmptyAccount = (bool)chk0Account.IsChecked;
+            balanceFrontPageReportData.SkipEmptyAccount = (bool)chk0Account.IsChecked.GetValueOrDefault();
             balanceFrontPageReportData.AccountType = Convert.ToString(cmbAccountType.SelectedItem);
             balanceFrontPageReportData.SumAccount = Convert.ToString(cmbSumAccount.SelectedItem);
-            balanceFrontPageReportData.UseExternalName = (bool)chkUseExternal.IsChecked;
+            balanceFrontPageReportData.UseExternalName = (bool)chkUseExternal.IsChecked.GetValueOrDefault();
             balanceFrontPageReportData.Template = cbTemplate.Text;
             var criteria = objCriteria.selectedCriteria.FirstOrDefault();
             balanceFrontPageReportData.BalanceMethod = criteria.BalanceMethod;
@@ -570,21 +560,22 @@ namespace UnicontaClient.Pages.CustomPage
                 return;
 
             objBalance.FrontPageData = balanceFrontPageReportData;
-            objCriteria.dim1details = (bool)chkdim1.IsChecked;
-            objCriteria.dim2details = (bool)chkdim2.IsChecked;
-            objCriteria.dim3details = (bool)chkdim3.IsChecked;
-            objCriteria.dim4details = (bool)chkdim4.IsChecked;
-            objCriteria.dim5details = (bool)chkdim5.IsChecked;
-            objCriteria.ShowDimName = (bool)chkShowDimName.IsChecked;
+            objCriteria.dim1details = (bool)chkdim1.IsChecked.GetValueOrDefault();
+            objCriteria.dim2details = (bool)chkdim2.IsChecked.GetValueOrDefault();
+            objCriteria.dim3details = (bool)chkdim3.IsChecked.GetValueOrDefault();
+            objCriteria.dim4details = (bool)chkdim4.IsChecked.GetValueOrDefault();
+            objCriteria.dim5details = (bool)chkdim5.IsChecked.GetValueOrDefault();
+            objCriteria.ShowDimName = (bool)chkShowDimName.IsChecked.GetValueOrDefault();
             objCriteria.FromAccount = cbFromAccount.Text;
             objCriteria.ToAccount = cbToAccount.Text;
-            objCriteria.Skip0Account = (bool)chk0Account.IsChecked;
+            objCriteria.Skip0Account = (bool)chk0Account.IsChecked.GetValueOrDefault();
             objCriteria.ShowType = cmbAccountType.SelectedIndex;
 
             var i = cmbSumAccount.SelectedIndex;
             objCriteria.SkipSumAccount = (i == 1);
             objCriteria.OnlySumAccounts = (i == 2);
-            objCriteria.UseExternal = (bool)chkUseExternal.IsChecked;
+            objCriteria.UseExternal = chkUseExternal.IsChecked.GetValueOrDefault();
+            objCriteria.SortExtern = chkSortExtern.IsChecked.GetValueOrDefault();
             objCriteria.Template = cbTemplate.Text;
             objCriteria.ObjBalance = objBalance;
             if (cbPrintOrientation.SelectedItem != null)
@@ -592,13 +583,8 @@ namespace UnicontaClient.Pages.CustomPage
             else
                 objCriteria.PrintOrientation = Uniconta.ClientTools.Localization.lookup("Landscape");
 
-            var paramArr = new object[2];
-            if (master != null && master is GLClosingSheet)
-                paramArr[0] = master;
-            else
-                paramArr[0] = null;
-            paramArr[1] = objCriteria;
-            AddDockItem(TabControls.BalanceReport, paramArr, objBalance == null ? Uniconta.ClientTools.Localization.lookup("ReportCriteria") : objBalance.Name, null, true);
+            AddDockItem(TabControls.BalanceReport, new object[2] { master as GLClosingSheet, objCriteria }, 
+                objBalance != null ? objBalance.Name : Uniconta.ClientTools.Localization.lookup("ReportCriteria"), null, true);
         }
 
         void AddBalance()
@@ -816,7 +802,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             updaterow._FromAccount = cbFromAccount.Text;
             updaterow._ToAccount = cbToAccount.Text;
-            updaterow._Skip0Accounts = (bool)chk0Account.IsChecked;
+            updaterow._Skip0Accounts = (bool)chk0Account.IsChecked.GetValueOrDefault();
             updaterow._ShowType = cmbAccountType.SelectedIndex;
 
             if (cmbSumAccount.SelectedIndex == 0) //Show
@@ -832,7 +818,8 @@ namespace UnicontaClient.Pages.CustomPage
                 updaterow._OnlySumAccounts = true;
             }
 
-            updaterow._UseExternal = (bool)chkUseExternal.IsChecked;
+            updaterow._UseExternal = (bool)chkUseExternal.IsChecked.GetValueOrDefault();
+            updaterow._SortExtern = (bool)chkSortExtern.IsChecked.GetValueOrDefault();
             objBalance._Template = cbTemplate.Text;
             updaterow._Name = txtbalanceName.Text;
             updaterow._Landscape = (cbPrintOrientation.SelectedIndex <= 0);
@@ -840,7 +827,7 @@ namespace UnicontaClient.Pages.CustomPage
             updaterow.ColumnSizeName = (byte)NumberConvert.ToInt(txtColoumnSizeName.Text);
             updaterow.ColumnSizeDim = (byte)NumberConvert.ToInt(txtColoumnSizeDim.Text);
             updaterow.ColumnSizeAmount = (byte)NumberConvert.ToInt(txtColoumnSizeAmount.Text);
-            updaterow._PrintFrontPage = (bool)chkPrintFrtPage.IsChecked;
+            updaterow._PrintFrontPage = (bool)chkPrintFrtPage.IsChecked.GetValueOrDefault();
             updaterow.LineSpace = (byte)NumberConvert.ToInt(txtLineSpace.Text);
             updaterow.FontSize = (byte)NumberConvert.ToInt(txtFontSize.Text);
             updaterow.LeftMargin = (byte)NumberConvert.ToInt(txtLeftMargin.Text);
@@ -878,12 +865,12 @@ namespace UnicontaClient.Pages.CustomPage
 
         void SetBalanceDimUsed(Balance objBalance)
         {
-            objBalance.SetDimUsed(1, (bool)chkdim1.IsChecked);
-            objBalance.SetDimUsed(2, (bool)chkdim2.IsChecked);
-            objBalance.SetDimUsed(3, (bool)chkdim3.IsChecked);
-            objBalance.SetDimUsed(4, (bool)chkdim4.IsChecked);
-            objBalance.SetDimUsed(5, (bool)chkdim5.IsChecked);
-            objBalance._InclDimName = (bool)chkShowDimName.IsChecked;
+            objBalance.SetDimUsed(1, (bool)chkdim1.IsChecked.GetValueOrDefault());
+            objBalance.SetDimUsed(2, (bool)chkdim2.IsChecked.GetValueOrDefault());
+            objBalance.SetDimUsed(3, (bool)chkdim3.IsChecked.GetValueOrDefault());
+            objBalance.SetDimUsed(4, (bool)chkdim4.IsChecked.GetValueOrDefault());
+            objBalance.SetDimUsed(5, (bool)chkdim5.IsChecked.GetValueOrDefault());
+            objBalance._InclDimName = (bool)chkShowDimName.IsChecked.GetValueOrDefault();
         }
 
         void GetBalanceDimUsed(Balance obBalance)
@@ -925,6 +912,7 @@ namespace UnicontaClient.Pages.CustomPage
                     cmbSumAccount.SelectedIndex = 2; // Only Show
 
                 chkUseExternal.IsChecked = objBalance._UseExternal;
+                chkSortExtern.IsChecked = objBalance._SortExtern;
                 cbTemplate.EditValue = objBalance._Template;
                 objBalance._Name = txtbalanceName.Text;
                 cbPrintOrientation.SelectedIndex = objBalance._Landscape ? 0 : 1;

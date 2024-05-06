@@ -41,16 +41,17 @@
       <RibbonItem Action="RemoveVat" LocalizedNameKey="RemoveOBJ" Parameter="Vat" Glyph="Close_16x16" />
       <RibbonItem Action="AddVat" LocalizedNameKey="AddOBJ" Parameter="Vat" Glyph="Grid_Add_16x16" />
       <RibbonItem Action="ChangeQuantity" LocalizedNameKey="ChangeOBJ" Parameter="Qty" Glyph="Import_16x16" />
-	  <RibbonItem Action="ChangeAmount" LocalizedNameKey="ChangeOBJ" Parameter="Amount" Glyph="Budget_16x16" />
+      <RibbonItem Action="ChangeAmount" LocalizedNameKey="ChangeOBJ" Parameter="Amount" Glyph="Budget_16x16" />
     <RibbonItem Action="AddEditNote" LocalizedNameKey="AddEditOBJ" Parameter="Note" LargeGlyph="AddUpdate_32x32"/>
     </RibbonItem>
-      <RibbonItem Action="PhyslVoucher" LocalizedNameKey="PhysicalVoucher" Glyph="Cover_16x16" LargeGlyph="View_Voucher_32x32" >
-      <RibbonItem Action="RefVoucher" LocalizedNameKey="Attach" Glyph="Attachments_16x16" LargeGlyph="Attachments_32x32" />
+    <RibbonItem Action="PhyslVoucher" LocalizedNameKey="PhysicalVoucher" Glyph="Cover_16x16" LargeGlyph="View_Voucher_32x32" >
+      <RibbonItem Action="RefVoucher" LocalizedNameKey="Attach" ShortcutKey="Ctrl+T" Glyph="Attachments_16x16" LargeGlyph="Attachments_32x32" />
       <RibbonItem Action="ImportVoucher" LocalizedNameKey="ImportFile" Glyph="Add_16x16" LargeGlyph="Add_32x32" ShortcutKey="Ctrl+J"/>
-      <RibbonItem Action="RemoveVoucher" LocalizedNameKey="Remove" Glyph="Delete_16x16" LargeGlyph="Delete_32x32" />
+      <RibbonItem Action="RemoveVoucher" LocalizedNameKey="Remove" Glyph="Delete_16x16" LargeGlyph="Delete_32x32" ShortcutKey="Ctrl+I"/>
       <RibbonItem Action="DragDrop" LocalizedNameKey="DragAndDrop" Glyph="DragDrop_File_16x16" ShortcutKey="CTRL+G"/>
     </RibbonItem>
     <RibbonItem Action="CopyVoucherToJournal" LocalizedNameKey="CopyVoucherToJournal" LargeGlyph="Install_32x32"/>
+    <RibbonItem Action="ShowConvertedAmount" LocalizedNameKey="ShowConvertedAmount" LargeGlyph="Budget_32x32" />
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="ExportVouchers" LocalizedNameKey="ExportVouchers" LargeGlyph="Upload_32x32" />

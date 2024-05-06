@@ -184,6 +184,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 }
                                 break;
                             case CWConfirmationBox.ConfirmationResultEnum.No:
+                                dgInventoryGroupGrid.CancelChanges();
                                 break;
                         }
                         editAllChecked = true;

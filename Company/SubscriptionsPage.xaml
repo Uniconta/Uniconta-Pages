@@ -78,6 +78,9 @@ x:Class="UnicontaClient.Pages.CustomPage.SubscriptionsPage"
                         <CorasauControls:CorasauLayoutItem FieldName="UnivisorOwner">
                             <CorasauControls:TextEditor Text="{Binding UnivisorOwner,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="IndustryCode" x:Name="liIndustryCode">
+                            <CorasauControls:LookupEditor x:Name="leIndustryCode" Text="{Binding IndustryCode ,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
                     <CorasauControls:CorasauLayoutGroup View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Address}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                         <CorasauControls:CorasauLayoutItem FieldName="Address1">

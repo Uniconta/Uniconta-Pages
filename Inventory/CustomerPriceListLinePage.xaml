@@ -53,7 +53,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CustomerPriceListLinePage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Margin" Width="80" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="MarginRatio" Width="50" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="SalesCharge" Width="80" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PriceUpdate" Width="50" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PriceUpdate" Width="70" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="FixedContributionRate" Width="70"/>
                     <localPage:CorasauDataGridTemplateColumnClient FieldName="PriceListDebtor" x:Name="PriceListDebtor" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient FieldName="PriceListCreditor" x:Name="PriceListCreditor" Visible="False"/>

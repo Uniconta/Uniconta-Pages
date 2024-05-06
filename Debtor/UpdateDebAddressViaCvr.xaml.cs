@@ -69,6 +69,7 @@ namespace UnicontaClient.Pages.CustomPage
             return false;
         }
 
+        SQLCache IndustryCodes;
         private void InitPage()
         {
             InitializeComponent();
@@ -77,6 +78,7 @@ namespace UnicontaClient.Pages.CustomPage
             gridControl.api = api;
             gridControl.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
+            IndustryCodes = api.GetCache(typeof(IndustryCode));
         }
 
         void localMenu_OnItemClicked(string ActionType)
@@ -126,6 +128,12 @@ namespace UnicontaClient.Pages.CustomPage
         public override Task InitQuery()
         {
             return null;
+        }
+
+        protected override async Task LoadCacheInBackGroundAsync()
+        {
+            if (IndustryCodes == null)
+                IndustryCodes = await api.LoadCache(typeof(IndustryCode));
         }
 
         void LoadGrid()
@@ -179,7 +187,7 @@ namespace UnicontaClient.Pages.CustomPage
                     var address = ci.address;
                     var streetAddress = address.CompleteStreet;
                     if (Equal(ci.life.name, debtor._Name) && Equal(streetAddress, debtor._Address1) && Equal(address.street2, debtor._Address2) &&
-                               Equal(address.zipcode, debtor._ZipCode))
+                               Equal(address.zipcode, debtor._ZipCode) && Equal(ci.industrycode?.code, debtor._IndustryCode))
                         continue;
 
                     var newDebtor = debtor;
@@ -188,6 +196,7 @@ namespace UnicontaClient.Pages.CustomPage
                     newDebtor.NewZipCode = address.zipcode;
                     newDebtor.NewCity = address.cityname;
                     newDebtor.NewName = ci.life.name;
+                    newDebtor.NewIndustryCode = IndustryCodes.Get(ci.industrycode?.code)?.KeyStr;
                     newDebList.Add(newDebtor);
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("Loading") + " " + NumberConvert.ToString(newDebList.Count);
                     busyIndicator.IsBusy = false;
@@ -224,7 +233,7 @@ namespace UnicontaClient.Pages.CustomPage
                     var address = ci.address;
                     var streetAddress = address.CompleteStreet;
                     if (Equal(ci.life.name, creditor._Name) && Equal(streetAddress, creditor._Address1) && Equal(address.street2, creditor._Address2) &&
-                               Equal(address.zipcode, creditor._ZipCode))
+                               Equal(address.zipcode, creditor._ZipCode) && Equal(ci.industrycode?.code, creditor._IndustryCode))
                         continue;
 
                     var newCreditor = creditor;
@@ -233,6 +242,7 @@ namespace UnicontaClient.Pages.CustomPage
                     newCreditor.NewZipCode = address.zipcode;
                     newCreditor.NewCity = address.cityname;
                     newCreditor.NewName = ci.life.name;
+                    newCreditor.NewIndustryCode = IndustryCodes.Get(ci.industrycode?.code)?.KeyStr;
                     newCredList.Add(newCreditor);
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("Loading") + " " + NumberConvert.ToString(newCredList.Count);
                     busyIndicator.IsBusy = false;
@@ -269,7 +279,7 @@ namespace UnicontaClient.Pages.CustomPage
                     var address = ci.address;
                     var streetAddress = address.CompleteStreet;
                     if (Equal(ci.life.name, prospect._Name) && Equal(streetAddress, prospect._Address1) && Equal(address.street2, prospect._Address2) &&
-                            Equal(address.zipcode, prospect._ZipCode))
+                            Equal(address.zipcode, prospect._ZipCode) && Equal(ci.industrycode?.code, prospect._IndustryCode))
                         continue;
 
                     var newProspect = prospect;
@@ -278,6 +288,7 @@ namespace UnicontaClient.Pages.CustomPage
                     newProspect.NewZipCode = address.zipcode;
                     newProspect.NewCity = address.cityname;
                     newProspect.NewName = ci.life.name;
+                    newProspect.NewIndustryCode = IndustryCodes.Get(ci.industrycode?.code)?.KeyStr;
                     newProsList.Add(newProspect);
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("Loading") + " " + NumberConvert.ToString(newProsList.Count);
                     busyIndicator.IsBusy = false;
@@ -325,6 +336,7 @@ namespace UnicontaClient.Pages.CustomPage
                 item._ZipCode = item.NewZipCode;
                 item._City = item.NewCity;
                 item._Name = item.NewName;
+                item._IndustryCode= item.NewIndustryCode;
                 lst2[i] = item;
                 i++;
             }
@@ -346,6 +358,7 @@ namespace UnicontaClient.Pages.CustomPage
                 item._Address2 = item.NewAddress2;
                 item._ZipCode = item.NewZipCode;
                 item._City = item.NewCity;
+                item._IndustryCode= item.NewIndustryCode;
                 lst2[i] = item;
                 i++;
             }
@@ -367,6 +380,7 @@ namespace UnicontaClient.Pages.CustomPage
                 item._Address2 = item.NewAddress2;
                 item._ZipCode = item.NewZipCode;
                 item._City = item.NewCity;
+                item._IndustryCode= item.NewIndustryCode;
                 lst2[i] = item;
                 i++;
             }
@@ -393,11 +407,27 @@ namespace UnicontaClient.Pages.CustomPage
                     grp.StatusValue = string.Empty;
             }
         }
+        protected override LookUpTable HandleLookupOnLocalPage(LookUpTable lookup, CorasauDataGrid dg)
+        {
+            var si = dgUpdateDebtorAddress.SelectedItem;
+            if (si == null)
+                return lookup;
+            if (dgUpdateDebtorAddress.CurrentColumn?.Name == "Account")
+            {
+                if (dgUpdateDebtorAddress.DCtype == 0)
+                    lookup.TableType = typeof(Uniconta.DataModel.Debtor);
+                else if (dgUpdateDebtorAddress.DCtype == 1)
+                    lookup.TableType = typeof(Uniconta.DataModel.Creditor);
+                else
+                    lookup.TableType = typeof(Uniconta.DataModel.CrmProspect);
+            }
+            return lookup;
+        }
     }
 
     public class DebtorClientLocal : DebtorClient
     {
-        private string _address, _address2, _city, _zipCode, _name;
+        private string _address, _address2, _city, _zipCode, _name, _industryCode;
         [StringLength(60)]
         [Display(Name = "NewAddress", ResourceType = typeof(DCAccountText))]
         public string NewAddress { get { return _address; } set { _address = value; NotifyPropertyChanged("NewAddress1"); } }
@@ -417,11 +447,14 @@ namespace UnicontaClient.Pages.CustomPage
         [Display(Name = "NewName", ResourceType = typeof(DCAccountText))]
         public string NewName { get { return _name; } set { _name = value; NotifyPropertyChanged("NewName"); } }
 
+        [ForeignKeyAttribute(ForeignKeyTable = typeof(IndustryCode))]
+        [Display(Name = "NewIndustryCode", ResourceType = typeof(DCAccountText))]
+        public string NewIndustryCode { get { return _industryCode; } set { _industryCode = value; NotifyPropertyChanged("NewIndustryCode"); } }
     }
 
     public class CreditorClientLocal : CreditorClient
     {
-        private string _address, _address2, _city, _zipCode, _name;
+        private string _address, _address2, _city, _zipCode, _name, _industryCode;
         [StringLength(60)]
         [Display(Name = "NewAddress", ResourceType = typeof(DCAccountText))]
         public string NewAddress { get { return _address; } set { _address = value; NotifyPropertyChanged("NewAddress1"); } }
@@ -441,11 +474,14 @@ namespace UnicontaClient.Pages.CustomPage
         [Display(Name = "NewName", ResourceType = typeof(DCAccountText))]
         public string NewName { get { return _name; } set { _name = value; NotifyPropertyChanged("NewName"); } }
 
+        [ForeignKeyAttribute(ForeignKeyTable = typeof(IndustryCode))]
+        [Display(Name = "NewIndustryCode", ResourceType = typeof(DCAccountText))]
+        public string NewIndustryCode { get { return _industryCode; } set { _industryCode = value; NotifyPropertyChanged("NewIndustryCode"); } }
     }
 
     public class CrmProspectClientLocal : CrmProspectClient
     {
-        private string _address, _address2, _city, _zipCode, _name;
+        private string _address, _address2, _city, _zipCode, _name, _industryCode;
         [StringLength(60)]
         [Display(Name = "NewAddress", ResourceType = typeof(DCAccountText))]
         public string NewAddress { get { return _address; } set { _address = value; NotifyPropertyChanged("NewAddress1"); } }
@@ -464,6 +500,10 @@ namespace UnicontaClient.Pages.CustomPage
 
         [Display(Name = "NewName", ResourceType = typeof(DCAccountText))]
         public string NewName { get { return _name; } set { _name = value; NotifyPropertyChanged("NewName"); } }
+
+        [ForeignKeyAttribute(ForeignKeyTable = typeof(IndustryCode))]
+        [Display(Name = "NewIndustryCode", ResourceType = typeof(DCAccountText))]
+        public string NewIndustryCode { get { return _industryCode; } set { _industryCode = value; NotifyPropertyChanged("NewIndustryCode"); } }
     }
 }
 

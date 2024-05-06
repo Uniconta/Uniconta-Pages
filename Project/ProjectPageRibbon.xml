@@ -33,7 +33,7 @@
   <RibbonItem LocalizedNameKey="Reports">
     <RibbonItem Action="PrTrans" LocalizedNameKey="Transactions" ControlName="ProjectTransactionPage" LargeGlyph="Transactions_32x32" ShortcutKey="CTRL+T"/>
     <RibbonItem Action="ProjectTransSum" LocalizedNameKey="ProjectCategorySum" ControlName="ProjectTransCategorySumPage" LargeGlyph="Invoice_32x32"/>
-	 <RibbonItem Action="BudgetPanningSchedule" LocalizedNameKey="ProjectBudgetSchedule" ControlName="ProjectBudgetPlanningSchedulePage" Module="_ProjectPlanning" LargeGlyph="Schedule_Task_32x32"/>
+	  <RibbonItem Action="BudgetPanningSchedule" LocalizedNameKey="ProjectBudgetSchedule" ControlName="ProjectBudgetPlanningSchedulePage" Module="_ProjectPlanning" LargeGlyph="Schedule_Task_32x32"/>
     <RibbonItem Action="Budgets" LocalizedNameKey="Budget" Module="ProjectBudget" LargeGlyph="Budget_32x32">
       <RibbonItem Action="Budget" LocalizedNameKey="Budget" ControlName="ProjectBudgetPage" Module="ProjectBudget" Glyph="Budget_32x32" LargeGlyph="Budget_32x32"/>
       <RibbonItem Action="CreateBudget" LocalizedNameKey="CreateBudgetRealized" Module="ProjectBudget"  Glyph="Add_Menu_32x32" LargeGlyph="Add_Menu_32x32" ShortcutKey=""/>
@@ -54,6 +54,7 @@
       <RibbonItem Action="AddNote" ShortcutKey="Alt+N" LocalizedNameKey="Note" ControlName="UserNotesPage" Glyph="Note_16x16" />
       <RibbonItem Action="AddDoc" LocalizedNameKey="Document" ControlName="UserDocsPage" Glyph="Document_Attachment_16x16" />
     </RibbonItem>
+    <RibbonItem Action="Reservations" LocalizedNameKey="Reservations" ControlName="ProjectTransCategorySumPage" LargeGlyph="Invoice_32x32"/>
   </RibbonItem>
   <RibbonItem LocalizedNameKey="Sales">
     <RibbonItem Action="Offers" LocalizedNameKey="Offers" ControlName="DebtorOffers" LargeGlyph="Offer_32x32"/>
@@ -64,7 +65,7 @@
       <RibbonItem Action="QuickInvoice" LocalizedNameKey="QuickInvoice" ControlName="CreateInvoicePage" Module="_ProjQuickInvoice" Glyph="Invoice_16x16"/>
       <RibbonItem Action="SalesOrder" LocalizedNameKey="SalesOrder" ControlName="DebtorOrders" Module="_ProjOrderInvoice" Glyph="Sales_16x16"/>
       <RibbonItem Action="ProjectInvoiceProposal" LocalizedNameKey="InvoiceProposals" ControlName="ProjInvProposal" Glyph="Sales_16x16"/>
-      <RibbonItem Action="PrintInvoice" LocalizedNameKey="PrintInvoice" Glyph="General_Ledger_16x16"/>
+      <RibbonItem Action="PrintInvoice" LocalizedNameKey="PrintInvoice" Module="_ProjPrintInvoice" Glyph="General_Ledger_16x16"/>
       <RibbonItem Action="CreateOrder" LocalizedNameKey="CreateOBJ" Parameter="InvoiceProposal" Glyph="AccountInvoice_16x16"/>
       <RibbonItem Action="ZeroInvoice" LocalizedNameKey="CreateOBJ" Parameter="ZeroInvoice" Module="_ProjZeroInvoice" Glyph="AccountInvoice_16x16"/>
     </RibbonItem>

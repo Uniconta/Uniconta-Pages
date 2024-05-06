@@ -39,7 +39,7 @@ namespace UnicontaClient.Pages.CustomPage
             Dispatcher.BeginInvoke(new Action(() => { OKButton.Focus(); }));
         }
 
-        private  void BindCompany()
+        private void BindCompany()
         {
             Company[] companies = CWDefaultCompany.loadedCompanies;
             cbCompany.ItemsSource = companies.ToList();
@@ -62,7 +62,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (cbBalance.SelectedItem == null)
             {
-                Uniconta.ClientTools.Controls.UnicontaMessageBox.Show( string.Format(Uniconta.ClientTools.Localization.lookup("OBJisEmpty"), Uniconta.ClientTools.Localization.lookup("ReportBalance")), Uniconta.ClientTools.Localization.lookup("Error"));
+                Uniconta.ClientTools.Controls.UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("OBJisEmpty"), Uniconta.ClientTools.Localization.lookup("ReportBalance")), Uniconta.ClientTools.Localization.lookup("Error"));
                 SetDialogResult(false);
             }
             SetDialogResult(true);
@@ -77,7 +77,8 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (cbCompany.SelectedIndex == -1)
                 return;
-           
+            if (Company == null)
+                return;
             busyIndicator.IsBusy = true;
             Company = await BasePage.session.OpenCompany(Company.RowId, true);
             var copyCompanyAPI = new CrudAPI(BasePage.session, Company);

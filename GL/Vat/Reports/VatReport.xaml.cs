@@ -52,6 +52,7 @@ namespace UnicontaClient.Pages.CustomPage
         GLVatReported master;
         List<VatSumOperationReport> sumPeriod, sumPrevPeriod;
         List<VatReportLine> lstPeriod, lstPrevPeriod;
+        bool Simulated;
 
         static DateTime localFromDate, localToDate;
         public VatReport(BaseAPI API) : base(API, string.Empty)
@@ -88,6 +89,12 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         var cs = StreamingManagerReuse.Create(master._Data);
                         cs.CompanyId = api.CompanyId;
+                        cs.UnpackParm = new VatReportLine.UnpackParm
+                        {
+                            Accounts = api.GetCache(typeof(GLAccount)),
+                            Vats = api.GetCache(typeof(GLVat)),
+                            VatTypes = api.GetCache(typeof(GLVatType))
+                        };
                         this.lstPeriod = ((VatReportLine[])cs.ToArray(typeof(VatReportLine)))?.ToList();
                         this.sumPeriod = ((VatSumOperationReport[])cs.ToArray(typeof(VatSumOperationReport)))?.ToList();
                         this.lstPrevPeriod = ((VatReportLine[])cs.ToArray(typeof(VatReportLine)))?.ToList();
@@ -163,7 +170,10 @@ namespace UnicontaClient.Pages.CustomPage
             if (country != CountryCode.Norway)
                 UtilDisplay.RemoveMenuCommand(rb, "VatReportNorway");
             if (country != CountryCode.Denmark)
+            {
                 UtilDisplay.RemoveMenuCommand(rb, "VatReportDenmark");
+                UtilDisplay.RemoveMenuCommand(rb, "OLDVatReportDenmark");
+            }
             if (country != CountryCode.Estonia)
                 UtilDisplay.RemoveMenuCommand(rb, "VatReportEstonia");
             if (country != CountryCode.Netherlands)
@@ -205,12 +215,10 @@ namespace UnicontaClient.Pages.CustomPage
                     if (sum != null)
                         AddDockItem(TabControls.VatReportNorway, new object[] { sum, fromDate, toDate }, "Mva skattemeldingen", null, closeIfOpened: true);
                     break;
-                /*
                 case "OLDVatReportDenmark":
                     if (sum != null)
                         AddDockItem(TabControls.VatReportDenmark, new object[] { api, sum, fromDate, toDate }, "Momsopgørelse", null, closeIfOpened: true);
                     break;
-                */
                 case "VatReportDenmark":
                     if (sum != null)
                         NewVatReport();
@@ -296,9 +304,11 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void SaveVatReport()
         {
-            if (master == null || master._MaxJournalPostedId == 0)
+            if ((master == null || master._MaxJournalPostedId == 0) && !Simulated)
             {
-                var cwTypeConfirmationBox = new CWTypeConfirmationBox(string.Format(Uniconta.ClientTools.Localization.lookup("SaveOBJ") + "?", Uniconta.ClientTools.Localization.lookup("VATsettlements")));
+                var cwTypeConfirmationBox = new CWCommentsDialogBox(string.Format(Uniconta.ClientTools.Localization.lookup("SaveOBJ") + "?", Uniconta.ClientTools.Localization.lookup("VATsettlements")), Uniconta.ClientTools.Localization.lookup("Comment"));
+                cwTypeConfirmationBox.mandatorycomments = false;
+                cwTypeConfirmationBox.DialogTableId = 2000000106;
                 cwTypeConfirmationBox.Closed += CwTypeConfirmationBox_Closed;
                 cwTypeConfirmationBox.Show();
             }
@@ -306,14 +316,14 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void CwTypeConfirmationBox_Closed(object sender, EventArgs e)
         {
-            var cwTypeConfirmationBox = sender as CWTypeConfirmationBox;
+            var cwTypeConfirmationBox = sender as CWCommentsDialogBox;
             if (cwTypeConfirmationBox != null && cwTypeConfirmationBox.DialogResult == true)
             {
                 if (master == null)
                     master = new GLVatReportedClient();
                 master._FromDate = txtDateFrm.DateTime;
                 master._ToDate = txtDateTo.DateTime;
-                master._Comment = cwTypeConfirmationBox.ConfirmationComment;
+                master._Comment = cwTypeConfirmationBox.Comments;
                 save();
             }
         }
@@ -385,7 +395,8 @@ namespace UnicontaClient.Pages.CustomPage
                 ToDate = localToDate = txtDateTo.DateTime.Date;
 
             busyIndicator.IsBusy = true;
-            string Journal = cmbJournal.Text;
+            string Journal = Util.NotEmptyValue(cmbJournal.Text);
+            Simulated = Journal != null;
 
             if (!api.CompanyEntity.HasDecimals)
                 CalculatedVAT.HasDecimals = PostedVAT.HasDecimals = WithoutVAT.HasDecimals = Accumulated.HasDecimals = false;
@@ -461,7 +472,12 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 var country = qapi.CompanyEntity._CountryId;
                 var rapi = new ReportAPI(qapi);
-                var vatTask = VatReported != null ? rapi.VatCodeSum(VatReported, PrevPeriod) : rapi.VatCodeSum(FromDate, ToDate, Journal, PrevPeriod);
+
+                Task<FinancialBalance[]> vatTask;
+                if ((VatReported == null || VatReported._MaxJournalPostedId == 0 || Journal != null) && !PrevPeriod)
+                    vatTask = rapi.VatCodeSum(FromDate, ToDate, Journal, PrevPeriod);
+                else
+                    vatTask = rapi.VatCodeSum(VatReported, PrevPeriod);
 
                 SQLCache accounts = qapi.GetCache(typeof(Uniconta.DataModel.GLAccount)) ?? await qapi.LoadCache(typeof(Uniconta.DataModel.GLAccount));
                 SQLCache vats = qapi.GetCache(typeof(Uniconta.DataModel.GLVat)) ?? await qapi.LoadCache(typeof(Uniconta.DataModel.GLVat));
@@ -616,9 +632,10 @@ namespace UnicontaClient.Pages.CustomPage
                     AccLst = AccsFound.ToList();
                     AccsFound.Clear();
 
-                    AccTotals = await (VatReported != null ?
-                        rapi.GenerateTotal(AccLst, VatReported, PrevPeriod) :
-                        rapi.GenerateTotal(AccLst, FromDate, ToDate, Journal, null, 0, true, false));
+                    if ((VatReported == null || VatReported._MaxJournalPostedId == 0 || Journal != null) && !PrevPeriod)
+                        AccTotals = await rapi.GenerateTotal(AccLst, FromDate, ToDate, Journal, null, 0, true, false);
+                    else
+                        AccTotals = await rapi.GenerateTotal(AccLst, VatReported, PrevPeriod);
 
                     SQLCacheTemplate<FinancialBalance> AccLookup = null;
                     if (AccTotals != null && AccTotals.Length > 0)
@@ -929,7 +946,7 @@ namespace UnicontaClient.Pages.CustomPage
                         AccLst = new List<int>(10);
                     foreach (var acc in (GLAccount[])accounts.GetNotNullArray)
                     {
-                        if (acc._SystemAccount == (byte)SystemAccountTypes.OtherTax)
+                        if (acc._SystemAccount == (byte)SystemAccountTypes.OtherTax && acc._Name != null)
                         {
                             if (acc._Name.IndexOf("olie", StringComparison.CurrentCultureIgnoreCase) >= 0)
                                 acc._SystemAccount = (byte)SystemAccountTypes.OilDuty;

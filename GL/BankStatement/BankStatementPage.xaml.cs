@@ -417,7 +417,11 @@ namespace UnicontaClient.Pages.CustomPage
                             ErrorCodes result = ErrorCodes.NoSucces;
 
                             if (ActionType == "DeleteStatement")
+                            {
                                 result = await bkapi.DeleteLines(selectedItem, Wininterval.FromDate, Wininterval.ToDate, OnlyVoided: Wininterval.OnlyVoided);
+                                if (result == ErrorCodes.Succes)
+                                    bkapi.CompanyEntity.LoadCache(typeof(BankStatement), api, true); // we delete lines, then we have a new balance
+                            }
                             else if (ActionType == "RemoveSettlements")
                                 result = await bkapi.RemoveSettlements(selectedItem, Wininterval.FromDate, Wininterval.ToDate, Wininterval.JournalPostedId, Wininterval.Voucher);
 

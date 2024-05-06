@@ -108,6 +108,7 @@ namespace UnicontaClient.Pages.CustomPage
                 newRow._Date = LastDateTime != DateTime.MinValue ? LastDateTime : BasePage.GetSystemDefaultDate().Date;
                 newRow._Project = last._Project;
                 newRow._PrCategory = last._PrCategory;
+                newRow._WorkSpace = last._WorkSpace;
                 newRow.PrCategorySource = last.PrCategorySource;
             }
         }

@@ -60,7 +60,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             StartLoadCache();
             InitializeComponent();
-            leAccount.api = lePayAccount.api = leCostAccount.api = leVat.api = leVatOpenration.api = leTransType.api = leApprover1.api = leApprover2.api = leProject.api = leProjectcat.api = crudApi;
+            leAccount.api = lePayAccount.api = leCostAccount.api = leVat.api = leVatOpenration.api = leTransType.api = leApprover1.api = leApprover2.api = leProject.api = leProjectcat.api = leProjectWorkspace.api = crudApi;
             layoutControl = layoutItems;
             cmbDim1.api = cmbDim2.api = cmbDim3.api = cmbDim4.api = cmbDim5.api = crudApi;
             Loaded += VouchersPage2_Loaded;
@@ -72,8 +72,8 @@ namespace UnicontaClient.Pages.CustomPage
                 usedim.Visibility = Visibility.Collapsed;
             else
                 Utility.SetDimensions(crudApi, lbldim1, lbldim2, lbldim3, lbldim4, lbldim5, cmbDim1, cmbDim2, cmbDim3, cmbDim4, cmbDim5, usedim);
-           
-            if (LoadedRow == null)  
+
+            if (LoadedRow == null)
                 voucherClientRow = CreateNew() as VouchersClient;
 
             if (!string.IsNullOrEmpty(viewInbin))
@@ -85,12 +85,13 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 ProjectItem.Visibility = Visibility.Collapsed;
                 ProjectCategoryItem.Visibility = Visibility.Collapsed;
+                ProjectWorkSpaceItem.Visibility = Visibility.Collapsed;
             }
 
             if (isFieldsAvailableForEdit)
                 browseCtrlColumn.Visibility = Visibility.Collapsed;
 
-            BusyIndicator = busyIndicator; 
+            BusyIndicator = busyIndicator;
             layoutItems.DataContext = voucherClientRow;
             frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
             browseControl.CompressVisibility = Visibility.Visible;
@@ -340,7 +341,7 @@ namespace UnicontaClient.Pages.CustomPage
                             lst = savedVouchers.ToList();
                         else
                             lst = new VouchersClient[] { voucherClientRow };
-                        var res = await new PostingAPI(api).GenerateJournalFromDocument(journalName, journalDate, journals.IsCreditAmount, journals.AddVoucherNumber, lst);
+                        var res = await new PostingAPI(api) { WorkSpace = journals.Workspace }.GenerateJournalFromDocument(journalName, journalDate, journals.IsCreditAmount, journals.AddVoucherNumber, lst);
                         if (res != 0)
                             UtilDisplay.ShowErrorCode(res);
                     }
@@ -394,7 +395,7 @@ namespace UnicontaClient.Pages.CustomPage
                         if (fileInfo == null)
                             continue;
                         var vc = Activator.CreateInstance(voucherClientRow.GetType()) as VouchersClient;
-                        if (! browseControl.Compress)
+                        if (!browseControl.Compress)
                             vc._NoCompress = true;
                         vc.SetMaster(api.CompanyEntity);
                         multiVouchers[iCtr++] = vc;
@@ -468,6 +469,7 @@ namespace UnicontaClient.Pages.CustomPage
             vc.PaymentId = txtPaymentId.Text;
             vc.Project = leProject.Text;
             vc.PrCategory = leProjectcat.Text;
+            vc.WorkSpace = leProjectWorkspace.Text;
             vc._PostingInstruction = txedPostingInstruction.Text;
             vc.PaymentMethod = Convert.ToString(cmbPaymentMethod.SelectedItemValue);
             vc.ViewInFolder = Convert.ToString(cmbViewInFolder.SelectedItem);

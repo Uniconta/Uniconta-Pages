@@ -50,6 +50,7 @@ namespace UnicontaClient.Pages.CustomPage
         public override string NameOfControl { get { return TabControls.DebtorAccountPage2.ToString(); } }
         public override Type TableType { get { return typeof(DebtorClient); } }
         public override UnicontaBaseEntity ModifiedRow { get { return editrow; } set { editrow = (DebtorClient)value; } }
+        public bool DoNotSave;
         bool isCopiedRow;
 
         public DebtorAccountPage2(UnicontaBaseEntity sourcedata, bool IsEdit)
@@ -76,7 +77,8 @@ namespace UnicontaClient.Pages.CustomPage
             ItemNameGrouplookupeditior.api =
             Vatlookupeditior.api = VatOprlookupeditior.api = PriceListlookupeditior.api = Employeelookupeditor.api = leInvoiceAccount.api = leShipment.api =
             dim1lookupeditior.api = dim2lookupeditior.api = dim3lookupeditior.api = dim4lookupeditior.api = dim5lookupeditior.api = Paymentlookupeditior.api =
-            grouplookupeditor.api = LayoutGrouplookupeditior.api = lePostingAccount.api = leCrmGroup.api = leDeliveryTerm.api = lePaymtFormat.api = leTransType.api = crudapi;
+            grouplookupeditor.api = LayoutGrouplookupeditior.api = lePostingAccount.api = leCrmGroup.api = leDeliveryTerm.api = lePaymtFormat.api = leTransType.api =
+            leIndustryCode.api = crudapi;
 
             Task t;
             if (crudapi.CompanyEntity.CRM)
@@ -101,7 +103,13 @@ namespace UnicontaClient.Pages.CustomPage
             editrow.PropertyChanged += Editrow_PropertyChanged;
             txtCompanyRegNo.LostFocus += TxtCompanyRegNo_LostFocus;
         }
-
+        private void DeliveryContactEmail_ButtonClicked(object sender)
+        {
+            var mail = string.Concat("mailto:", txtEmail.Text);
+            System.Diagnostics.Process proc = new System.Diagnostics.Process();
+            proc.StartInfo.FileName = mail;
+            proc.Start();
+        }
         private void TxtCompanyRegNo_LostFocus(object sender, RoutedEventArgs e)
         {
             if (!hasValueChanged)
@@ -110,20 +118,6 @@ namespace UnicontaClient.Pages.CustomPage
             var countryCode = CheckEuropeanVatInformation(editrow._LegalIdent, editrow._Country, cvrFound);
             if (countryCode != null && editrow._Country != countryCode)
                 editrow.Country = countryCode.Value;
-        }
-
-        int prevSelectedIndex = 0;
-        private void cmbEinvoice_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            ComboBoxEdit edit = sender as ComboBoxEdit;
-            if (edit.SelectedIndex == prevSelectedIndex) return;
-            if (!api.CompanyEntity._Peppol && editrow._InvoiceInPepPol)
-            {
-                edit.SelectedIndex = prevSelectedIndex;
-                UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("PeppolNotActive"), Uniconta.ClientTools.Localization.lookup("Warning"));
-            }
-            else
-                prevSelectedIndex = edit.SelectedIndex;
         }
 
         public static CountryCode? CheckEuropeanVatInformation(string cvr, CountryCode country, bool cvrFound)
@@ -148,7 +142,9 @@ namespace UnicontaClient.Pages.CustomPage
             if (twolettercode != null && !cvrFound && Country2Language.IsEU(country))
             {
                 var vatInfo = EuropeanVatInformation.Get(twolettercode, cvr);
-                if (vatInfo == null)
+                if (vatInfo == null)/* error in service */
+                    return null;
+                else if (string.IsNullOrEmpty(vatInfo.VatNumber))
                 {
                     UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("NotValidVatNo"), Uniconta.ClientTools.Localization.lookup("Warning"));
                     return null;
@@ -215,10 +211,17 @@ namespace UnicontaClient.Pages.CustomPage
             cmbProducts.ItemsSource = cache.GetKeyList();
         }
 
-        private void frmRibbon_OnItemClicked(string ActionType)
+        private async void frmRibbon_OnItemClicked(string ActionType)
         {
             if (ActionType == "Save" && !VaidateEAN(editrow._EAN))
                 return;
+            if (DoNotSave)
+            {
+                MoveFocus();
+                await ClosePage(1);
+                CloseDockItem();
+                return;
+            }
             frmRibbon_BaseActions(ActionType);
         }
 
@@ -241,7 +244,10 @@ namespace UnicontaClient.Pages.CustomPage
             if (!Comp.DeliveryAddress)
                 dAddress.Visibility = Visibility.Collapsed;
             if (!Comp.Shipments)
+            {
                 shipmentItem.Visibility = Visibility.Collapsed;
+                delivertTremItem.Visibility = Visibility.Collapsed;
+            }
             if (!Comp._DirectDebit)
                 liPaymentFormat.Visibility = Visibility.Collapsed;
             if (!Comp.CRM)
@@ -340,6 +346,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (!string.IsNullOrWhiteSpace(ci?.life?.name))
                     {
                         cvrFound = true;
+                        editrow.IndustryCode = ci.industrycode?.code;
                         var address = ci.address;
                         if (address != null)
                         {
@@ -391,10 +398,14 @@ namespace UnicontaClient.Pages.CustomPage
             var txtEmail = ((CorasauLayoutItem)sender).Content as TextEditor;
             if (txtEmail == null)
                 return;
-            var mail = string.Concat("mailto:", txtEmail.Text);
-            System.Diagnostics.Process proc = new System.Diagnostics.Process();
-            proc.StartInfo.FileName = mail;
-            proc.Start();
+            //var mail = string.Concat("mailto:", txtEmail.Text);
+            //System.Diagnostics.Process proc = new System.Diagnostics.Process();
+            //proc.StartInfo.FileName = mail;
+            //proc.Start();
+            var userNote = new UserNotesClient();
+            userNote._SendTo = txtEmail.Text;
+            OutlookNotes outNotes = new OutlookNotes(api, editrow);
+            outNotes.OpenOutLook(userNote);
         }
 
         private void liZipCode_ButtonClicked(object sender)

@@ -69,7 +69,6 @@ namespace UnicontaClient.Pages.CustomPage
             InitializeComponent();
             SetRibbonControl(localMenu, dgDebtorTransOpen);
             dgDebtorTransOpen.api = api;
-            api.ForcePrimarySQL = true;
             dgDebtorTransOpen.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgDebtorTransOpen.UpdateMaster(pageMaster = master);

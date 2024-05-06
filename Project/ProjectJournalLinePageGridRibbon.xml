@@ -49,4 +49,7 @@
 <RibbonItem>
     <RibbonItem Action="UnfoldBOM" LocalizedNameKey="UnfoldBOM" LargeGlyph="CopyUserTable_32x32"/>
   </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="Mileage" LocalizedNameKey="MileageDestination" LargeGlyph="Account-statement_32x32"/>
+  </RibbonItem>
 </root>

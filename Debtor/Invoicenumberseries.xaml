@@ -45,6 +45,9 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorInvoicenumberseries"
                     <CorasauControls:CorasauLayoutItem FieldName="GraceDays" x:Name="liGraceDays">
                         <CorasauControls:IntegerEditor EditValue="{Binding GraceDays,Mode=TwoWay}" SetMask="false"/>
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="OneTimeDebtor" x:Name="liOneTimeDebtor">
+                        <CorasauControls:LookupEditor x:Name="leOneTimeDebtor" Text="{Binding OneTimeDebtor,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
             </CorasauControls:CorasauLayoutGroup>
         </CorasauControls:CorasauLayoutControl>       

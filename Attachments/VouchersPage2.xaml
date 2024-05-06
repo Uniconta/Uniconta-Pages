@@ -89,6 +89,9 @@ x:Class="UnicontaClient.Pages.CustomPage.VouchersPage2"
                         <CorasauControls:CorasauLayoutItem FieldName="PrCategory" Name="ProjectCategoryItem">
                             <CorasauControls:LookupEditor  x:Name="leProjectcat" Text="{Binding PrCategory,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="WorkSpace" Name="ProjectWorkSpaceItem">
+                            <CorasauControls:LookupEditor  x:Name="leProjectWorkspace" Text="{Binding WorkSpace,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="TransType" x:Name="liTransType">
                             <CorasauControls:LookupEditor  x:Name="leTransType" Text="{Binding TransType ,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>

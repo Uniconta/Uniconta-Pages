@@ -73,6 +73,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorDeliveryNotes"
                     <local:CorasauDataGridTemplateColumnClient x:Name="DeliveryPhone" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="DeliveryContactEmail" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Installation" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="CompanyAddress" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="YourRef" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="OurRef" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Remark" />
@@ -84,6 +85,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorDeliveryNotes"
                     <local:CorasauDataGridTemplateColumnClient x:Name="Cartons" Width="70" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Volume" Width="70" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Weight" Width="70" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="NetWeight" Width="70" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="cldim1" Width="70" FieldName="Dimension1" ShowInColumnChooser="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="cldim2" Width="70" FieldName="Dimension2" ShowInColumnChooser="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="cldim3" Width="70" FieldName="Dimension3" ShowInColumnChooser="False"/>

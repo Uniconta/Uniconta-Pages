@@ -1,4 +1,3 @@
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -15,6 +14,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Uniconta.API.Project;
 using Uniconta.API.Service;
 using Uniconta.ClientTools;
 using Uniconta.ClientTools.Controls;
@@ -22,18 +22,18 @@ using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
 using Uniconta.Common;
+using Uniconta.Common.Utility;
 using Uniconta.DataModel;
 using UnicontaClient.Models;
 using UnicontaClient.Pages.Project.TimeManagement;
 using UnicontaClient.Utilities;
-using static UnicontaClient.Pages.Project.TimeManagement.TMJournalLineHelper;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
     public class WorkInProgressReportGrid : CorasauDataGridClient
     {
-        public override Type TableType { get { return typeof(ProjectTransLocalClient); } }
+        public override Type TableType { get { return typeof(ProjectWIPTotalsClient); } }
     }
 
     public partial class WorkInProgressReportPage : GridBasePage
@@ -52,26 +52,21 @@ namespace UnicontaClient.Pages.CustomPage
 
         static string fromPerInCharge, toPerInCharge, fromDebtor, toDebtor;
         static DateTime DefaultFromDate, DefaultToDate;
-        static bool includeZeroBalance;
+        static bool excludeZeroBalance;
         static bool showTask;
         static bool showWorkspace;
         static bool includeJournals;
+        static bool showWIPCostvalue;
 
-        ItemBase iIncludeZeroBalance, iIncludeJournals, iShowTask, iShowWorkspace;
+        ItemBase iIncludeZeroBalance, iIncludeJournals, iShowTask, iShowWorkspace, iShowWIPCostvalue;
         bool hasWorkspace;
+        bool isCostValue;
 
         private const string AND_OPERATOR = "And";
         private const string FILTERVALUE_ZEROBALANCE = @"([OnAccount] <> 0.0 Or [ClosingBalance] <> 0.0)";
+        private const string FILTERVALUE_ZEROBALANCE_COSTVALUE = @"([OnAccount] <> 0.0 Or [ClosingBalanceCostValue] <> 0.0)";
 
-        SQLTableCache<Uniconta.DataModel.Employee> empCache;
         SQLTableCache<Uniconta.DataModel.Project> projCache;
-        SQLTableCache<Uniconta.DataModel.EmpPayrollCategory> payrollCache;
-        SQLTableCache<Uniconta.DataModel.ProjectGroup> projGroupCache;
-        SQLTableCache<Uniconta.DataModel.ProjectInvoiceProposal> projectInvoiceProposalCache;
-        SQLCache workSpaceCache;
-
-
-        Uniconta.API.Project.FindPricesEmpl priceLookup;
 
         public WorkInProgressReportPage(BaseAPI API) : base(API, string.Empty)
         {
@@ -89,16 +84,9 @@ namespace UnicontaClient.Pages.CustomPage
             localMenu.OnChecked += LocalMenu_OnChecked;
             GetMenuItem();
 
-            projCache = api.GetCache<Uniconta.DataModel.Project>();
-            projGroupCache = api.GetCache<Uniconta.DataModel.ProjectGroup>();
-            empCache = api.GetCache<Uniconta.DataModel.Employee>();
-            payrollCache = api.GetCache<Uniconta.DataModel.EmpPayrollCategory>();
-            projectInvoiceProposalCache = api.GetCache<Uniconta.DataModel.ProjectInvoiceProposal>();
-
-            workSpaceCache = api.GetCache(typeof(Uniconta.DataModel.PrWorkSpace));
-
-            iIncludeZeroBalance.IsChecked = includeZeroBalance;
+            iIncludeZeroBalance.IsChecked = !excludeZeroBalance;
             iIncludeJournals.isEditLayout = false;
+            iShowWIPCostvalue.IsChecked = showWIPCostvalue;
 
             showTask = api.CompanyEntity.ProjectTask && showTask;
             iShowTask.IsChecked = showTask;
@@ -106,6 +94,7 @@ namespace UnicontaClient.Pages.CustomPage
             cmbProject.api = api;
             SetProjectSource();
 
+            var workSpaceCache = api.GetCache(typeof(Uniconta.DataModel.PrWorkSpace));
             hasWorkspace = (workSpaceCache == null || workSpaceCache.Count != 0);
             Task.Visible = showTask;
             Workspace.Visible = hasWorkspace && (showWorkspace || showTask);
@@ -125,8 +114,9 @@ namespace UnicontaClient.Pages.CustomPage
 
             txtDateTo.DateTime = WorkInProgressReportPage.DefaultToDate;
             txtDateFrm.DateTime = WorkInProgressReportPage.DefaultFromDate;
-            StartLoadCache();
             WorkInProgressReportPage.SetDateTime(txtDateFrm, txtDateTo);
+
+            LoadGrid();
         }
 
         public static void SetDateTime(DateEditor frmDateeditor, DateEditor todateeditor)
@@ -146,17 +136,21 @@ namespace UnicontaClient.Pages.CustomPage
 
         async private void SetProjectSource()
         {
-            projCache = projCache ?? await this.api.LoadCache<Uniconta.DataModel.Project>();
+            projCache = api.GetCache<Uniconta.DataModel.Project>() ?? await this.api.LoadCache<Uniconta.DataModel.Project>();
             cmbProject.ItemsSource = projCache;
+            StartLoadCache();
         }
 
         protected override void OnLayoutLoaded()
         {
             base.OnLayoutLoaded();
+            iShowWIPCostvalue.isEditLayout = !base.HasLayout();
+
             if (!api.CompanyEntity.ProjectTask)
                 this.Task.Visible = this.Task.ShowInColumnChooser = false;
             UnicontaClient.Utilities.Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
             SetDimensionLocalMenu();
+            SetLayoutSalesCostValue();
         }
 
         public override Task InitQuery()
@@ -171,22 +165,22 @@ namespace UnicontaClient.Pages.CustomPage
             iShowWorkspace = UtilDisplay.GetMenuCommandByName(rb, "ShowWorkspace");
             iShowTask = UtilDisplay.GetMenuCommandByName(rb, "ShowTasks");
             iIncludeJournals = UtilDisplay.GetMenuCommandByName(rb, "InclJournals");
+            iShowWIPCostvalue = UtilDisplay.GetMenuCommandByName(rb, "ShowWIPCostvalue");
         }
 
-        async private void LocalMenu_OnChecked(string actionType, bool IsChecked)
+        private void LocalMenu_OnChecked(string actionType, bool IsChecked)
         {
             switch (actionType)
             {
                 case "InclZeroBalance":
-                    includeZeroBalance = IsChecked;
-                    iIncludeZeroBalance.IsChecked = includeZeroBalance;
+                    excludeZeroBalance = !IsChecked;
+                    iIncludeZeroBalance.IsChecked = !excludeZeroBalance;
                     SetIncludeFilter();
                     break;
                 case "ShowWorkspace":
                     showWorkspace = IsChecked;
                     iShowWorkspace.IsChecked = showWorkspace;
                     Workspace.Visible = showWorkspace;
-
                     if (dgWorkInProgressRpt.ItemsSource != null)
                         LoadGrid();
                     break;
@@ -197,31 +191,82 @@ namespace UnicontaClient.Pages.CustomPage
                     Workspace.Visible = hasWorkspace && (showWorkspace || showTask);
                     iShowWorkspace.isEditLayout = hasWorkspace && !showTask;
                     iShowWorkspace.IsChecked = hasWorkspace && (showWorkspace || showTask);
-
                     if (dgWorkInProgressRpt.ItemsSource != null)
                         LoadGrid();
                     break;
                 case "InclJournals":
                     includeJournals = IsChecked;
                     iIncludeJournals.IsChecked = includeJournals;
-
-                    await IncludeJournals();
-
                     StaticValues.IncludeJournals = includeJournals;
-                    var wipLst = (IEnumerable<ProjectTransLocalClient>)dgWorkInProgressRpt.ItemsSource;
-                    foreach (var rec in wipLst)
+                    IncludeJournals();
+                    break;
+                case "ShowWIPCostvalue":
+                    showWIPCostvalue = IsChecked;
+                    iShowWIPCostvalue.IsChecked = showWIPCostvalue;
+                    SetLayoutSalesCostValue();
+
+                    if(showWIPCostvalue)
                     {
-                        rec.NotifyClosingBalance();
+                        OpeningBalanceCostValue.Visible = true;
+                        EmployeeFeeCostValue.Visible = true;
+                        EmployeeFeeJournalCostValue.Visible = true;
+                        ExpensesCostValue.Visible = true;
+                        RevenueCostValue.Visible = true;
+                        InvoicedCostValue.Visible = true;
+                        TotalInvoicedCostValue.Visible = true;
+                        AdjustmentCostValue.Visible = true;
+                        ClosingBalanceCostValue.Visible = true;
                     }
-                    dgWorkInProgressRpt.Columns.GetColumnByName("EmployeeHoursJournal").Visible = includeJournals;
-                    dgWorkInProgressRpt.Columns.GetColumnByName("EmployeeFeeJournal").Visible = includeJournals;
+                    else
+                    {
+                        OpeningBalance.Visible = true;
+                        EmployeeFee.Visible = true;
+                        EmployeeFeeJournal.Visible = true;
+                        Expenses.Visible = true;
+                        Revenue.Visible = true;
+                        OnAccount.Visible = true;
+                        Invoiced.Visible = true;
+                        TotalInvoiced.Visible = true;
+                        Adjustment.Visible = true;
+                        ClosingBalance.Visible = true;
+                    }
+                    SetIncludeFilter();
+
                     break;
             }
-
-            dgWorkInProgressRpt.UpdateTotalSummary();
         }
 
-        bool tmLinesWIPLoaded;
+        void SetLayoutSalesCostValue()
+        {
+            if (showWIPCostvalue)
+            {
+                isCostValue = true;
+                OpeningBalance.Visible = false;
+                EmployeeFee.Visible = false;
+                EmployeeFeeJournal.Visible = false;
+                Expenses.Visible = false;
+                Revenue.Visible = false;
+                OnAccount.Visible = false;
+                Invoiced.Visible = false;
+                TotalInvoiced.Visible = false;
+                Adjustment.Visible = false;
+                ClosingBalance.Visible = false;
+            }
+            else
+            {
+                isCostValue = false;
+                OpeningBalanceCostValue.Visible = false;
+                EmployeeFeeCostValue.Visible = false;
+                EmployeeFeeJournalCostValue.Visible = false;
+                ExpensesCostValue.Visible = false;
+                RevenueCostValue.Visible = false;
+                InvoicedCostValue.Visible = false;
+                TotalInvoicedCostValue.Visible = false;
+                AdjustmentCostValue.Visible = false;
+                ClosingBalanceCostValue.Visible = false;
+            }
+        }
+
 
         class TmpprojectSum
         {
@@ -229,124 +274,12 @@ namespace UnicontaClient.Pages.CustomPage
             public double EmployeeHoursJournal, EmployeeFeeJournal, EmployeeFeeJournalCostValue;
         }
 
-        async private Task IncludeJournals()
-        {
-            if (tmLinesWIPLoaded)
-                return;
-
-            busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("LoadingMsg");
-            busyIndicator.IsBusy = true;
-
-            var pairTM = new List<PropValuePair>()
-            {
-                PropValuePair.GenereteWhereElements(nameof(TMJournalLineClient.RegistrationType), typeof(int), "0"),
-                PropValuePair.GenereteWhereElements(nameof(TMJournalLineClient.Invoiceable), typeof(bool), "1")
-            };
-
-            var minApproveDate = empCache.Where(x => x._TMApproveDate != DateTime.MinValue && x._Terminated == DateTime.MinValue).Min(x => x._TMApproveDate as DateTime?) ?? DateTime.MinValue;
-            if (minApproveDate != DateTime.MinValue)
-                pairTM.Add(PropValuePair.GenereteWhereElements(nameof(TMJournalLineClient.Date), minApproveDate, CompareOperator.GreaterThanOrEqual));
-
-            var projMaster = projCache.Get(cmbProject.Text);
-            var tmJourLines = await api.Query<TMJournalLineClient>(projMaster, pairTM);
-
-            var tmLines = tmJourLines.Where(s => (s._Project != null &&
-                                                  s._PayrollCategory != null &&
-                                                  s._Date > empCache.Get(s._Employee)._TMApproveDate))
-                                                  .GroupBy(x => new { x._Employee, x._Project, x._PayrollCategory, x._WorkSpace, x._Task, x._Date }).Select(x => new TMJournalLineClientLocal
-                                                  {
-                                                      Date = x.Key._Date,
-                                                      Project = x.Key._Project,
-                                                      Employee = x.Key._Employee,
-                                                      PayrollCategory = x.Key._PayrollCategory,
-                                                      Task = x.Key._Task,
-                                                      WorkSpace = x.Key._WorkSpace,
-                                                      Day1 = x.Sum(y => y._Day1),
-                                                      Day2 = x.Sum(y => y._Day2),
-                                                      Day3 = x.Sum(y => y._Day3),
-                                                      Day4 = x.Sum(y => y._Day4),
-                                                      Day5 = x.Sum(y => y._Day5),
-                                                      Day6 = x.Sum(y => y._Day6),
-                                                      Day7 = x.Sum(y => y._Day7),
-                                                  }).ToList();
-
-            var helper = new TMJournalLineHelper(api);
-            var tmLinesWIP = new Dictionary<string, TmpprojectSum>();
-            var localtmLines = new List<TMJournalLineClient>();
-            string lastEmployee = null;
-
-            var grpEmpDate = tmLines.GroupBy(x => new { x.Employee, x.Date }).Select(g => new { g.Key.Employee, g.Key.Date, EmployeeTable = empCache.Get(g.Key.Employee) });
-            foreach (var emp in grpEmpDate)
-            {
-                var startDate = emp.EmployeeTable._TMApproveDate < emp.Date ? emp.Date : emp.EmployeeTable._TMApproveDate >= emp.Date.AddDays(6) ? DateTime.MinValue : emp.EmployeeTable._TMApproveDate;
-                var endDate = emp.Date.AddDays(6);
-
-                if (startDate != DateTime.MinValue)
-                {
-                    if (lastEmployee == null || lastEmployee != emp.Employee)
-                    {
-                        lastEmployee = emp.Employee;
-                        await priceLookup.EmployeeChanged(emp.EmployeeTable);
-                    }
-
-                    localtmLines.Clear();
-                    foreach (var s in tmLines)
-                        if (s._Date == emp.Date && s._Employee == emp.Employee)
-                            localtmLines.Add(s);
-
-                    await priceLookup.GetEmployeePrice(localtmLines);
-
-                    foreach (var rec in localtmLines)
-                    {
-                        var lookupValue = showWorkspace || showTask ? string.Concat(rec._Project, rec._WorkSpace, rec._Task) : rec._Project ;
-
-                        TmpprojectSum lineWIP;
-                        if (tmLinesWIP.TryGetValue(lookupValue, out lineWIP))
-                        {
-                            lineWIP.EmployeeHoursJournal += rec.Total;
-                            lineWIP.EmployeeFeeJournal += rec.TotalSalesPrice;
-                            lineWIP.EmployeeFeeJournalCostValue += rec.TotalCostPrice;
-                        }
-                        else
-                        {
-                            tmLinesWIP.Add(lookupValue,
-                             new TmpprojectSum
-                             {
-                                 Project = rec._Project,
-                                 EmployeeHoursJournal = rec.Total,
-                                 EmployeeFeeJournal = rec.TotalSalesPrice,
-                                 EmployeeFeeJournalCostValue = rec.TotalCostPrice,
-                             });
-                        }
-                    }
-                }
-            }
-
-            var wipLst = (IEnumerable<ProjectTransLocalClient>)dgWorkInProgressRpt.ItemsSource;
-            foreach (var rec in wipLst)
-            {
-                TmpprojectSum lineWIP;
-                var lookupValue = showWorkspace || showTask ? string.Concat(rec._Project, rec._Workspace, rec._Task) : rec._Project;
-
-                if (tmLinesWIP.TryGetValue(lookupValue, out lineWIP))
-                {
-                    rec.EmployeeHoursJournal += lineWIP.EmployeeHoursJournal;
-                    rec.EmployeeFeeJournal += lineWIP.EmployeeFeeJournal;
-                    rec.EmployeeFeeJournalCostValue += lineWIP.EmployeeFeeJournalCostValue;
-                    rec.NotifyEmployeeJournal();
-                }
-            }
-            tmLinesWIPLoaded = true;
-            busyIndicator.IsBusy = false;
-        }
-
-
         private void SetIncludeFilter()
         {
             string filterString = dgWorkInProgressRpt.FilterString ?? string.Empty;
-            if (includeZeroBalance)
+            if (!excludeZeroBalance)
             {
-                filterString = filterString.Replace(FILTERVALUE_ZEROBALANCE, string.Empty).Trim();
+                filterString = filterString.Replace(isCostValue ? FILTERVALUE_ZEROBALANCE_COSTVALUE : FILTERVALUE_ZEROBALANCE, string.Empty).Trim();
                 if (filterString != string.Empty && filterString.StartsWith(AND_OPERATOR, true, null))
                     filterString = filterString.Substring(3).Trim();
                 else if (filterString != string.Empty && filterString.IndexOf(AND_OPERATOR, filterString.Length - 3) != -1)
@@ -355,9 +288,9 @@ namespace UnicontaClient.Pages.CustomPage
             else
             {
                 if (filterString == string.Empty)
-                    filterString = FILTERVALUE_ZEROBALANCE;
+                    filterString = isCostValue ? FILTERVALUE_ZEROBALANCE_COSTVALUE : FILTERVALUE_ZEROBALANCE;
                 else
-                    filterString += filterString.IndexOf(FILTERVALUE_ZEROBALANCE) == -1 ? string.Format(" {0} {1}", AND_OPERATOR, FILTERVALUE_ZEROBALANCE) : string.Empty;
+                    filterString += filterString.IndexOf(isCostValue ? FILTERVALUE_ZEROBALANCE_COSTVALUE : FILTERVALUE_ZEROBALANCE) == -1 ? string.Format(" {0} {1}", AND_OPERATOR, isCostValue ? FILTERVALUE_ZEROBALANCE_COSTVALUE : FILTERVALUE_ZEROBALANCE) : string.Empty;
             }
             dgWorkInProgressRpt.FilterString = filterString;
         }
@@ -398,419 +331,142 @@ namespace UnicontaClient.Pages.CustomPage
                 UtilDisplay.RemoveMenuCommand(rb, "GroupByDimension1");
         }
 
-        async void LoadGrid()
+        bool tmLinesWIPLoaded;
+
+        async private Task IncludeJournals()
         {
-            SetDateTime(txtDateFrm, txtDateTo);
-            var projMaster = projCache.Get(cmbProject.Text);
-            var transList = new List<ProjectTransLocalClient>();
-            var secTransLst = new List<ProjectTransLocalClient>();
-            List<ProjectTransLocalClient> newLst;
+            dgWorkInProgressRpt.Columns.GetColumnByName("EmployeeHoursJournal").Visible = includeJournals;
+            dgWorkInProgressRpt.Columns.GetColumnByName("EmployeeFeeJournal").Visible = includeJournals;
 
-            tmLinesWIPLoaded = false;
-
-            busyIndicator.IsBusy = true;
-            SetIncludeFilter();
-
-            projCache = projCache ?? await api.LoadCache<Uniconta.DataModel.Project>();
-            projGroupCache = projGroupCache ?? await api.LoadCache<Uniconta.DataModel.ProjectGroup>();
-            empCache = empCache ?? await api.LoadCache<Uniconta.DataModel.Employee>();
-            payrollCache = payrollCache ?? await api.LoadCache<Uniconta.DataModel.EmpPayrollCategory>();
-            projectInvoiceProposalCache = projectInvoiceProposalCache ?? await api.LoadCache<Uniconta.DataModel.ProjectInvoiceProposal>();
-
-            var pairTrans = new PropValuePair[]
+            if (tmLinesWIPLoaded)
             {
-                PropValuePair.GenereteWhereElements(nameof(ProjectTransClient.Date), DefaultToDate, CompareOperator.LessThanOrEqual),
-                PropValuePair.GenereteWhereElements(nameof(ProjectTransClient.Invoiceable), typeof(bool), "1"),
-            };
-            var projTransLst = await api.Query<ProjectTransClient>(projMaster, pairTrans);
-            if (projTransLst == null || projTransLst.Length == 0)
-            {
-                busyIndicator.IsBusy = false;
+                dgWorkInProgressRpt.UpdateTotalSummary();
                 return;
             }
 
-            #region Balance
-            var projTransLstEntity = new List<ProjectTransClient>();
-            var invBalanceLst = new List<WIPInvoices>();
-            string lastProj = null;
-            bool tmpInvoiceable = false;
-            foreach (var x in projTransLst)
-            {
-                if (lastProj != x._Project)
-                {
-                    lastProj = x._Project;
-                    var proj = (Uniconta.DataModel.Project)projCache.Get(lastProj);
-                    var projGrp = projGroupCache.Get(proj?._Group);
-                    tmpInvoiceable = (projGrp != null && projGrp._Invoiceable);
-                }
+            busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("LoadingMsg");
+            busyIndicator.IsBusy = true;
 
-                if (tmpInvoiceable && x._Date >= DefaultFromDate)
-                    projTransLstEntity.Add(x);
-            }
+            var empCache = api.GetCache<Uniconta.DataModel.Employee>() ?? await api.LoadCache<Uniconta.DataModel.Employee>();
+            var priceLookup = new Uniconta.API.Project.FindPricesEmpl(api);
 
-            if (projTransLstEntity.Count > 0)
+            var pairTM = new List<PropValuePair>(4)
             {
-                string lastCat1 = null;
-                CategoryType catType1 = 0;
-                foreach (var x in projTransLstEntity)
+                PropValuePair.GenereteWhereElements(nameof(TMJournalLineClient.RegistrationType), typeof(int), "0"),
+                PropValuePair.GenereteWhereElements(nameof(TMJournalLineClient.Invoiceable), typeof(bool), "1")
+            };
+
+            var minApproveDate = empCache.Where(x => x._TMApproveDate != DateTime.MinValue && x._Terminated == DateTime.MinValue).Min(x => x._TMApproveDate as DateTime?) ?? DateTime.MinValue;
+            if (minApproveDate != DateTime.MinValue)
+                pairTM.Add(PropValuePair.GenereteWhereElements(nameof(TMJournalLineClient.Date), minApproveDate, CompareOperator.GreaterThanOrEqual));
+            if (DefaultToDate != DateTime.MinValue)
+                pairTM.Add(PropValuePair.GenereteWhereElements(nameof(TMJournalLineClient.Date), DefaultToDate, CompareOperator.LessThanOrEqual));
+
+            var tmJourLines = await api.Query<TMJournalLineClient>(projCache.Get(cmbProject.Text), pairTM);
+
+            var tmLines = tmJourLines.Where(s => (s._Project != null &&
+                                                  s._PayrollCategory != null &&
+                                                  s._Date > empCache.Get(s._Employee)._TMApproveDate))
+                                                  .GroupBy(x => new { x._Employee, x._Project, x._PayrollCategory, x._WorkSpace, x._Task, x._Date }).Select(x => new TMJournalLineHelper.TMJournalLineClientLocal
+                                                  {
+                                                      Date = x.Key._Date,
+                                                      Project = x.Key._Project,
+                                                      Employee = x.Key._Employee,
+                                                      PayrollCategory = x.Key._PayrollCategory,
+                                                      Task = x.Key._Task,
+                                                      WorkSpace = x.Key._WorkSpace,
+                                                      Day1 = x.Sum(y => y._Day1),
+                                                      Day2 = x.Sum(y => y._Day2),
+                                                      Day3 = x.Sum(y => y._Day3),
+                                                      Day4 = x.Sum(y => y._Day4),
+                                                      Day5 = x.Sum(y => y._Day5),
+                                                      Day6 = x.Sum(y => y._Day6),
+                                                      Day7 = x.Sum(y => y._Day7),
+                                                  }).ToList();
+
+            var tmLinesWIP = new Dictionary<string, TmpprojectSum>(100);
+            var localtmLines = new List<TMJournalLineClient>(100);
+            string lastEmployee = null;
+
+            var grpEmpDate = tmLines.GroupBy(x => new { x.Employee, x.Date }).Select(g => new { g.Key.Employee, g.Key.Date });
+            foreach (var row in grpEmpDate)
+            {
+                var emp = empCache.Get(row.Employee);
+                var startDate = emp._TMApproveDate < row.Date ? row.Date : emp._TMApproveDate >= row.Date.AddDays(6) ? DateTime.MinValue : emp._TMApproveDate;
+                var endDate = row.Date.AddDays(6);
+
+                if (startDate != DateTime.MinValue)
                 {
-                    if (lastCat1 != x._PrCategory)
+                    if (lastEmployee == null || lastEmployee != emp._Number)
                     {
-                        lastCat1 = x._PrCategory;
-                        var prCat = x.PrCategoryRef;
-                        if (prCat != null)
-                            catType1 = prCat._CatType;
-                        else
-                            catType1 = (CategoryType)255; // dummy
+                        lastEmployee = emp._Number;
+                        await priceLookup.EmployeeChanged(emp);
                     }
 
-                    if (catType1 == CategoryType.Revenue || (catType1 == CategoryType.OnAccountInvoicing))
+                    localtmLines.Clear();
+                    foreach (var s in tmLines)
+                        if (s._Date == row.Date && s._Employee == emp._Number)
+                            localtmLines.Add(s);
+
+                    await priceLookup.GetEmployeePrice(localtmLines);
+
+                    foreach (var rec in localtmLines)
                     {
-                        invBalanceLst.Add(new WIPInvoices()
+                        var lookupValue = showWorkspace || showTask ? string.Concat(rec._Project, rec._WorkSpace, rec._Task) : rec._Project;
+
+                        TmpprojectSum lineWIP;
+                        if (tmLinesWIP.TryGetValue(lookupValue, out lineWIP))
                         {
-                            Project = x._Project,
-                            Task = x._Task,
-                            Workspace = x._WorkSpace,
-                            Invoice = x._Invoice
-                        });
-                    }
-                }
-            }
-
-            WIPInvoices[] invBalanceArr = null;
-            if (projTransLstEntity.Count > 0)
-            {
-                var xpensLst = new List<ProjectTransClient>();
-                var feeLst = new List<ProjectTransClient>();
-                var onAccLst = new List<ProjectTransClient>();
-                var finalInvLst = new List<ProjectTransClient>();
-                var invCostValueLst = new List<ProjectTransClient>();
-                var adjLst = new List<ProjectTransClient>();
-
-                var search = new WIPInvoices();
-                var sort = new WIPInvoiceSort();
-                int pos = 0;
-                invBalanceArr = invBalanceLst.ToArray();
-                Array.Sort(invBalanceArr, sort);
-
-                string lastCat = null;
-                CategoryType catType = 0;
-                foreach (var x in projTransLstEntity)
-                {
-                    if (lastCat != x._PrCategory)
-                    {
-                        lastCat = x._PrCategory;
-                        var prCat = x.PrCategoryRef;
-                        if (prCat != null)
-                            catType = prCat._CatType;
-                        else
-                            catType = (CategoryType)255; // dummy
-                    }
-
-                    if (catType == CategoryType.Materials ||
-                        catType == CategoryType.Expenses ||
-                        catType == CategoryType.ExternalWork ||
-                        catType == CategoryType.Miscellaneous ||
-                        catType == CategoryType.Other)
-                        xpensLst.Add(x);
-                    else if (catType == CategoryType.Labour)
-                        feeLst.Add(x);
-                    else if (catType == CategoryType.OnAccountInvoicing)
-                        onAccLst.Add(x);
-                    else if (catType == CategoryType.Revenue || (catType == CategoryType.OnAccountInvoicing && x.Invoiced == false))
-                        finalInvLst.Add(x);
-                    else if (catType == CategoryType.Adjustment)
-                        adjLst.Add(x);
-
-                    if (x.Invoiced && (catType == CategoryType.Materials ||
-                                       catType == CategoryType.Expenses ||
-                                       catType == CategoryType.ExternalWork ||
-                                       catType == CategoryType.Miscellaneous ||
-                                       catType == CategoryType.Other ||
-                                       catType == CategoryType.Labour ||
-                                       catType == CategoryType.Adjustment))
-                    {
-
-                        if (x._InvoicedOn == 0)
-                        {
-                            invCostValueLst.Add(x);
+                            lineWIP.EmployeeHoursJournal += rec.Total;
+                            lineWIP.EmployeeFeeJournal += rec.TotalSalesPrice;
+                            lineWIP.EmployeeFeeJournalCostValue += rec.TotalCostPrice;
                         }
                         else
                         {
-                            search.Project = x._Project;
-                            search.Invoice = x._InvoicedOn;
-                            pos = Array.BinarySearch(invBalanceArr, search, sort);
-                            if (pos >= 0)
-                                invCostValueLst.Add(x);
+                            tmLinesWIP.Add(lookupValue,
+                             new TmpprojectSum
+                             {
+                                 Project = rec._Project,
+                                 EmployeeHoursJournal = rec.Total,
+                                 EmployeeFeeJournal = rec.TotalSalesPrice,
+                                 EmployeeFeeJournalCostValue = rec.TotalCostPrice,
+                             });
                         }
-                    }
-                }
-
-                var lstGrouped = GetProjectTransLines(feeLst, isFee: true);
-                transList.AddRange(lstGrouped);
-                lstGrouped = GetProjectTransLines(xpensLst, isExpenses: true);
-                transList.AddRange(lstGrouped);
-                lstGrouped = GetProjectTransLines(onAccLst, isOnAccount: true);
-                transList.AddRange(lstGrouped);
-                lstGrouped = GetProjectTransLines(finalInvLst, isFinalInvoice: true);
-                transList.AddRange(lstGrouped);
-                lstGrouped = GetProjectTransLines(adjLst, isAdjustement: true);
-                transList.AddRange(lstGrouped);
-                lstGrouped = GetProjectTransLines(invCostValueLst, isCostInvoice: true);
-                transList.AddRange(lstGrouped);
-
-                var newLst1 = transList.GroupBy(x => new { x.Project, x.Workspace, x.Task }).Select(y => new ProjectTransLocalClient
-                {
-                    _CompanyId = api.CompanyId,
-                    FromDate = DefaultFromDate.Date,
-                    Date = y.First().Date,
-                    _Project = y.First()._Project,
-                    _Task = y.First().Task,
-                    _Workspace = y.First().Workspace,
-                    EmployeeFee = y.Sum(xs => xs.EmployeeFee),
-                    EmployeeFeeCostValue = y.Sum(xs => xs.EmployeeFeeCostValue),
-                    Expenses = y.Sum(xs => xs.Expenses),
-                    ExpensesCostValue = y.Sum(xs => xs.ExpensesCostValue),
-                    OnAccount = y.Sum(xs => xs.OnAccount),
-                    Invoiced = y.Sum(xs => xs.Invoiced),
-                    InvoicedCostValue = y.Sum(xs => xs.InvoicedCostValue),
-                    Adjustment = y.Sum(xs => xs.Adjustment),
-                    AdjustmentCostValue = y.Sum(xs => xs.AdjustmentCostValue),
-                    EmployeeHoursPosted = y.Sum(xs => xs.EmployeeHoursPosted),
-
-                });
-
-                newLst = newLst1.ToList();
-            }
-            else
-                newLst = new List<ProjectTransLocalClient>();
-            #endregion
-
-            #region Opening Balance
-            var transEntity = new List<ProjectTransClient>();
-            lastProj = null;
-            foreach (var x in projTransLst)
-            {
-                if (lastProj != x._Project)
-                {
-                    lastProj = x._Project;
-                    var proj = (Uniconta.DataModel.Project)projCache.Get(lastProj);
-                    var projGrp = projGroupCache.Get(proj?._Group);
-                    tmpInvoiceable = (projGrp != null && projGrp._Invoiceable);
-                }
-
-                if (tmpInvoiceable && x._Date < DefaultFromDate)
-                    transEntity.Add(x);
-            }
-
-            var invOpeningLst = new List<WIPInvoices>(transEntity.Count);
-            if (transEntity.Count > 0)
-            {
-                string lastCatOpen = null;
-                CategoryType catTypeOpen = 0;
-                foreach (var x in transEntity)
-                {
-                    if (lastCatOpen != x._PrCategory)
-                    {
-                        lastCatOpen = x._PrCategory;
-                        var prCat = x.PrCategoryRef;
-                        if (prCat != null)
-                            catTypeOpen = prCat._CatType;
-                        else
-                            catTypeOpen = (CategoryType)255; // dummy
-                    }
-
-                    if (catTypeOpen == CategoryType.Revenue || (catTypeOpen == CategoryType.OnAccountInvoicing))
-                    {
-                        invOpeningLst.Add(new WIPInvoices()
-                        {
-                            Project = x._Project,
-                            Task = x._Task,
-                            Workspace = x._WorkSpace,
-                            Invoice = x._Invoice
-                        });
                     }
                 }
             }
 
-            if (transEntity.Count > 0)
+            var wipLst = (IEnumerable<ProjectWIPTotalsClient>)dgWorkInProgressRpt.ItemsSource;
+            foreach (var rec in wipLst)
             {
-                var xpensLst = new List<ProjectTransClient>();
-                var feeLst = new List<ProjectTransClient>();
-                var onAccLst = new List<ProjectTransClient>();
-                var invCostValueLst = new List<ProjectTransClient>();
-                var invOpeningCostValueLst = new List<ProjectTransClient>();
-                var finalInvLst = new List<ProjectTransClient>();
-                var adjLst = new List<ProjectTransClient>();
-
-                var search = new WIPInvoices();
-                var sort = new WIPInvoiceSort();
-                int pos = 0;
-                var invOpeningArr = invOpeningLst.ToArray();
-                Array.Sort(invOpeningArr, sort);
-
-                string lastCat = null;
-                CategoryType catType = 0;
-                foreach (var x in transEntity)
+                TmpprojectSum lineWIP;
+                var lookupValue = showWorkspace || showTask ? string.Concat(rec._Project, rec._Workspace, rec._Task) : rec._Project;
+                if (tmLinesWIP.TryGetValue(lookupValue, out lineWIP))
                 {
-                    if (lastCat != x._PrCategory)
-                    {
-                        lastCat = x._PrCategory;
-                        var prCat = x.PrCategoryRef;
-                        if (prCat != null)
-                            catType = prCat._CatType;
-                        else
-                            catType = (CategoryType)255; // dummy
-                    }
-
-                    if (catType == CategoryType.Materials ||
-                        catType == CategoryType.Expenses ||
-                        catType == CategoryType.ExternalWork ||
-                        catType == CategoryType.Miscellaneous ||
-                        catType == CategoryType.Other)
-                        xpensLst.Add(x);
-                    else if (catType == CategoryType.Labour)
-                        feeLst.Add(x);
-                    else if (catType == CategoryType.OnAccountInvoicing)
-                        onAccLst.Add(x);
-                    else if (catType == CategoryType.Revenue || (catType == CategoryType.OnAccountInvoicing))
-                        finalInvLst.Add(x);
-                    else if (catType == CategoryType.Adjustment)
-                        adjLst.Add(x);
-
-                    if (x.Invoiced && (catType == CategoryType.Materials ||
-                                     catType == CategoryType.Expenses ||
-                                     catType == CategoryType.ExternalWork ||
-                                     catType == CategoryType.Miscellaneous ||
-                                     catType == CategoryType.Other ||
-                                     catType == CategoryType.Labour ||
-                                     catType == CategoryType.Adjustment))
-                    {
-                        if (x._InvoicedOn == 0)
-                        {
-                            invCostValueLst.Add(x);
-                        }
-                        else
-                        {
-                            search.Project = x._Project;
-                            search.Invoice = x._InvoicedOn;
-                            pos = Array.BinarySearch(invOpeningArr, search, sort);
-                            if (pos >= 0)
-                                invCostValueLst.Add(x);
-                            else
-                                invOpeningCostValueLst.Add(x);
-                        }
-                    }
-                }
-
-                var lstGrouped = GetProjectTransLines(feeLst, isFee: true);
-                secTransLst.AddRange(lstGrouped);
-                lstGrouped = GetProjectTransLines(xpensLst, isExpenses: true);
-                secTransLst.AddRange(lstGrouped);
-                lstGrouped = GetProjectTransLines(onAccLst, isOnAccount: true);
-                secTransLst.AddRange(lstGrouped);
-                lstGrouped = GetProjectTransLines(finalInvLst, isFinalInvoice: true);
-                secTransLst.AddRange(lstGrouped);
-                lstGrouped = GetProjectTransLines(adjLst, isAdjustement: true);
-                secTransLst.AddRange(lstGrouped);
-                lstGrouped = GetProjectTransLines(invCostValueLst, isCostInvoice: true);
-                secTransLst.AddRange(lstGrouped);
-
-                var newLst2 = secTransLst.GroupBy(x => new { x.Project, x.Workspace, x.Task }).Select(y => new ProjectTransLocalClient
-                {
-                    _CompanyId = api.CompanyId,
-                    FromDate = DefaultFromDate.Date,
-                    Date = y.First().Date,
-                    _Project = y.First()._Project,
-                    _Workspace = y.First()._Workspace,
-                    _Task = y.First().Task,
-                    OpeningBalance = Math.Round((y.Sum(xs => xs.EmployeeFee) + y.Sum(xs => xs.Expenses)) + y.Sum(xs => xs.OnAccount) + y.Sum(xs => xs.Invoiced) + y.Sum(xs => xs.Adjustment), 2),
-                    OpeningBalanceCostValue = Math.Round((y.Sum(xs => xs.EmployeeFeeCostValue) + y.Sum(xs => xs.ExpensesCostValue)) + y.Sum(xs => xs.InvoicedCostValue) + y.Sum(xs => xs.AdjustmentCostValue), 2)
-
-                });
-
-                newLst.AddRange(newLst2);
-
-                if (invBalanceArr != null && invBalanceArr.Length > 0)
-                {
-                    #region Exists Invoice in Balance
-                    var invBalCostValueLst = new List<ProjectTransClient>();
-                    foreach (var y in invOpeningCostValueLst)
-                    {
-                        if (y._InvoicedOn == 0)
-                        {
-                            invBalCostValueLst.Add(y);
-                        }
-                        else
-                        {
-                            search.Project = y._Project;
-                            search.Invoice = y._InvoicedOn;
-                            pos = Array.BinarySearch(invBalanceArr, search, sort);
-                            if (pos >= 0)
-                                invBalCostValueLst.Add(y);
-                        }
-                    }
-
-                    lstGrouped = GetProjectTransLines(invBalCostValueLst, isCostInvoice: true);
-                    var newLstBal = lstGrouped.GroupBy(x => new { x.Project, x.Workspace, x.Task }).Select(y => new ProjectTransLocalClient
-                    {
-                        _CompanyId = api.CompanyId,
-                        FromDate = DefaultFromDate.Date,
-                        Date = y.First().Date,
-                        _Project = y.First()._Project,
-                        _Workspace = y.First()._Workspace,
-                        _Task = y.First().Task,
-                        InvoicedCostValue = y.Sum(xs => xs.InvoicedCostValue),
-                    });
-
-                    newLst.AddRange(newLstBal);
-                }
-                #endregion
-            }
-            #endregion
-
-            var projs = projCache.ToArray();
-            for (int i = 0; (i < projs.Length); i++)
-            {
-                var proj = projs[i];
-                var grp = projGroupCache.Get(proj._Group);
-                if (grp != null && grp._Invoiceable)
-                {
-                    newLst.Add(
-                        new ProjectTransLocalClient
-                        {
-                            _CompanyId = proj.CompanyId,
-                            FromDate = DefaultFromDate.Date,
-                            _Project = proj._Number,
-                        });
+                    rec._EmployeeHoursJournal += NumberConvert.ToLong(lineWIP.EmployeeHoursJournal * 100d);
+                    rec._EmployeeFeeJournal += NumberConvert.ToLong(lineWIP.EmployeeFeeJournal * 100d);
+                    rec._EmployeeFeeJournalCostValue += NumberConvert.ToLong(lineWIP.EmployeeFeeJournalCostValue * 100d);
+                    rec.NotifyEmployeeJournal();
+                    rec.NotifyClosingBalance();
                 }
             }
 
-            var finalLst = newLst.GroupBy(x => new { x.Project, x.Workspace, x.Task }).OrderBy(s => s.Key.Project).Select(y => new ProjectTransLocalClient
-            {
-                _CompanyId = api.CompanyId,
-                FromDate = DefaultFromDate.Date,
-                Date = y.First().Date,
-                _Project = y.Key.Project,
-                _Workspace = y.Key.Workspace,
-                _Task = y.Key.Task,
-                OpenInvoiceProposal = projectInvoiceProposalCache.Any(s => s._Project == y.Key.Project),
-                EmployeeFee = y.Sum(xs => xs.EmployeeFee),
-                EmployeeFeeCostValue = y.Sum(xs => xs.EmployeeFeeCostValue),
-                Expenses = y.Sum(xs => xs.Expenses),
-                ExpensesCostValue = y.Sum(xs => xs.ExpensesCostValue),
-                OnAccount = Math.Round(y.Sum(xs => xs.OnAccount), 2), 
-                Invoiced = y.Sum(xs => xs.Invoiced),
-                InvoicedCostValue = y.Sum(xs => xs.InvoicedCostValue),
-                Adjustment = y.Sum(xs => xs.Adjustment),
-                AdjustmentCostValue = y.Sum(xs => xs.AdjustmentCostValue),
-                OpeningBalance = y.Sum(xs => xs.OpeningBalance),
-                OpeningBalanceCostValue = y.Sum(xs => xs.OpeningBalanceCostValue),
-                EmployeeHoursPosted = y.Sum(xs => xs.EmployeeHoursPosted),
+            tmLinesWIPLoaded = true;
+            busyIndicator.IsBusy = false;
 
-            }).ToList();
+            dgWorkInProgressRpt.UpdateTotalSummary();
+        }
 
-            dgWorkInProgressRpt.ItemsSource = finalLst;
+        async void LoadGrid()
+        {
+            SetDateTime(txtDateFrm, txtDateTo);
+            tmLinesWIPLoaded = false;
+
+            busyIndicator.IsBusy = true;
+            var lst = await new ReportAPI(api).GetWIPTotals(new ProjectWIPTotalsClient(), DefaultFromDate, DefaultToDate, cmbProject.Text, showTask, showWorkspace, includeJournals);
+            Array.Sort(lst, new sortTrans());
+
+            dgWorkInProgressRpt.ItemsSource = lst;
             dgWorkInProgressRpt.Visibility = Visibility.Visible;
 
             iIncludeJournals.isEditLayout = true;
@@ -819,88 +475,34 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (includeJournals)
                 IncludeJournals();
-        }
-
-        IEnumerable<ProjectTransLocalClient> GetProjectTransLines(IEnumerable<ProjectTransClient> projectTransLst,
-                                                                  bool isFee = false,
-                                                                  bool isExpenses = false,
-                                                                  bool isOnAccount = false,
-                                                                  bool isFinalInvoice = false,
-                                                                  bool isAdjustement = false,
-                                                                  bool isCostInvoice = false)
-        {
-            IEnumerable<ProjectTransLocalClient> lst;
-
-            if (showWorkspace || showTask)
-            {
-                lst = projectTransLst.GroupBy(x => new { x.Project, x.WorkSpace, x.Task }).Select(y => new ProjectTransLocalClient
-                {
-                    _CompanyId = api.CompanyId,
-                    Date = y.First().Date,
-                    _Project = y.First()._Project,
-                    _Task = showTask ? y.First().Task : null,
-                    _Workspace = showWorkspace ? y.First().WorkSpace : null,
-                    EmployeeFee = isFee == true ? y.Sum(xs => xs.SalesAmount) : 0d,
-                    EmployeeFeeCostValue = isFee == true ? y.Sum(xs => xs.CostAmount) : 0d,
-                    Expenses = isExpenses == true ? y.Sum(xs => xs.SalesAmount) : 0d,
-                    ExpensesCostValue = isExpenses == true ? y.Sum(xs => xs.CostAmount) : 0d,
-                    OnAccount = isOnAccount == true ? y.Sum(xs => xs.SalesAmount) : 0d,
-                    Invoiced = isFinalInvoice == true ? y.Sum(xs => xs.SalesAmount) : 0d,
-                    InvoicedCostValue = isCostInvoice == true ? -y.Sum(xs => xs.CostAmount) : 0d,
-                    Adjustment = isAdjustement == true ? y.Sum(xs => xs.SalesAmount) : 0d,
-                    AdjustmentCostValue = isAdjustement == true ? y.Sum(xs => xs.CostAmount) : 0d,
-                    EmployeeHoursPosted = isFee == true ? y.Sum(xs => xs.Qty) : 0d
-                });
-            }
             else
-            {
-                lst = projectTransLst.GroupBy(x => x.Project).Select(y => new ProjectTransLocalClient
-                {
-                    _CompanyId = api.CompanyId,
-                    Date = y.First().Date,
-                    _Project = y.First()._Project,
-                    EmployeeFee = isFee == true ? y.Sum(xs => xs.SalesAmount) : 0d,
-                    EmployeeFeeCostValue = isFee == true ? y.Sum(xs => xs.CostAmount) : 0d,
-                    Expenses = isExpenses == true ? y.Sum(xs => xs.SalesAmount) : 0d,
-                    ExpensesCostValue = isExpenses == true ? y.Sum(xs => xs.CostAmount) : 0d,
-                    OnAccount = isOnAccount == true ? y.Sum(xs => xs.SalesAmount) : 0d,
-                    Invoiced = isFinalInvoice == true ? y.Sum(xs => xs.SalesAmount) : 0d,
-                    InvoicedCostValue = isCostInvoice == true ? -y.Sum(xs => xs.CostAmount) : 0d,
-                    Adjustment = isAdjustement == true ? y.Sum(xs => xs.SalesAmount) : 0d,
-                    AdjustmentCostValue = isAdjustement == true ? y.Sum(xs => xs.CostAmount) : 0d,
-                    EmployeeHoursPosted = isFee == true ? y.Sum(xs => xs.Qty) : 0d
-                });
-            }
+                dgWorkInProgressRpt.UpdateTotalSummary();
 
-            return lst;
+            SetIncludeFilter();
         }
 
         private void leFromPerInChre_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
         {
-            var value = e.NewValue;
-            if (value != null)
-                fromPerInCharge = (string)value;
+            if (e.NewValue != null)
+                fromPerInCharge = (string)e.NewValue;
         }
 
         private void leToPerInChre_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
         {
-            var value = e.NewValue;
-            if (value != null)
-                toPerInCharge = (string)value;
+            if (e.NewValue != null)
+                toPerInCharge = (string)e.NewValue;
         }
 
         private void leFromDebtor_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
         {
-            var value = e.NewValue;
-            if (value != null)
-                fromDebtor = (string)value;
+            if (e.NewValue != null)
+                fromDebtor = (string)e.NewValue;
         }
 
         private void leToDebtor_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
         {
-            var value = e.NewValue;
-            if (value != null)
-                toDebtor = (string)value;
+            if (e.NewValue != null)
+                toDebtor = (string)e.NewValue;
         }
 
         void dgWorkInProgressRpt_RowDoubleClick()
@@ -910,7 +512,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void localMenu_OnItemClicked(string ActionType)
         {
-            var selectedItem = dgWorkInProgressRpt.SelectedItem as ProjectTransLocalClient;
+            var selectedItem = dgWorkInProgressRpt.SelectedItem as ProjectWIPTotalsClient;
             var selectedItems = dgWorkInProgressRpt.SelectedItems;
 
             switch (ActionType)
@@ -1061,7 +663,7 @@ namespace UnicontaClient.Pages.CustomPage
             dgWorkInProgressRpt_RowDoubleClick();
         }
 
-        private async void CreateOrder(ProjectTransLocalClient selectedItem)
+        private async void CreateOrder(ProjectWIPTotalsClient selectedItem)
         {
             var project = (ProjectClient)projCache.Get(selectedItem.Project);
             ProjectTaskClient projTask = null;
@@ -1069,9 +671,9 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 var projTaskLst = project.Tasks ?? await project.LoadTasks(api);
                 projTask = projTaskLst?.Where(s => s.Task == selectedItem.Task).FirstOrDefault();
-
             }
 
+            var workSpaceCache = api.GetCache(typeof(Uniconta.DataModel.PrWorkSpace));
             var prWorkspace = (PrWorkSpaceClient)workSpaceCache.Get(selectedItem.Workspace);
             var cwCreateOrder = new UnicontaClient.Pages.CWCreateOrderFromProject(api, true, project, projTask, prWorkspace);
             cwCreateOrder.DialogTableId = 2000000053;
@@ -1127,10 +729,10 @@ namespace UnicontaClient.Pages.CustomPage
             cwCreateOrder.Show();
         }
 
-
-        void CreateZeroInvoice(ProjectTransLocalClient selectedItem)
+        void CreateZeroInvoice(ProjectWIPTotalsClient selectedItem)
         {
             var project = (ProjectClient)projCache.Get(selectedItem.Project);
+            var workSpaceCache = api.GetCache(typeof(Uniconta.DataModel.PrWorkSpace));
             var prWorkspace = (PrWorkSpaceClient)workSpaceCache.Get(selectedItem.Workspace);
             var cwCreateZeroInvoice = new UnicontaClient.Pages.CwCreateZeroInvoice(api, project, prWorkspace);
             cwCreateZeroInvoice.DialogTableId = 2000000067;
@@ -1209,47 +811,15 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void HasNoteImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var local = (sender as Image).Tag as ProjectTransLocalClient;
+            var local = (sender as Image).Tag as ProjectWIPTotalsClient;
             if (local != null)
                 AddDockItem(TabControls.UserNotesPage, local.ProjectRef, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Notes"), local.ProjectRef._Name));
         }
 
-        protected override async Task LoadCacheInBackGroundAsync()
+        protected override void LoadCacheInBackGround()
         {
-            projCache = projCache ?? await api.LoadCache<Uniconta.DataModel.Project>().ConfigureAwait(false);
-            projGroupCache = projGroupCache ?? await api.LoadCache<Uniconta.DataModel.ProjectGroup>().ConfigureAwait(false);
-            empCache = empCache ?? await api.LoadCache<Uniconta.DataModel.Employee>().ConfigureAwait(false);
-            payrollCache = payrollCache ?? await api.LoadCache<Uniconta.DataModel.EmpPayrollCategory>().ConfigureAwait(false);
-            projectInvoiceProposalCache = projectInvoiceProposalCache ?? await api.LoadCache<Uniconta.DataModel.ProjectInvoiceProposal>().ConfigureAwait(false);
-            workSpaceCache = workSpaceCache ?? await api.LoadCache(typeof(Uniconta.DataModel.PrWorkSpace)).ConfigureAwait(false);
-
-
-            LoadType(new Type[] { typeof(Uniconta.DataModel.Debtor), typeof(Uniconta.DataModel.ProjectTask), typeof(Uniconta.DataModel.PrCategory) });
-
-            if (this.priceLookup == null)
-                priceLookup = new Uniconta.API.Project.FindPricesEmpl(api);
+            LoadType(new Type[] { typeof(Uniconta.DataModel.PrCategory), typeof(Uniconta.DataModel.PrWorkSpace), typeof(Uniconta.DataModel.Employee), typeof(Uniconta.DataModel.PrType) });
         }
-    }
-
-    public class WIPInvoiceSort : IComparer
-    {
-        public int Compare(object x, object y)
-        {
-            var fx = (WIPInvoices)x;
-            var fy = (WIPInvoices)y;
-            var c = string.Compare(fx.Project, fy.Project);
-            if (c != 0)
-                return c;
-            return (int)(fx.Invoice - fy.Invoice);
-        }
-    }
-
-    class WIPInvoices
-    {
-        public string Project;
-        public string Task;
-        public string Workspace;
-        public long Invoice;
     }
 
     public class StaticValues
@@ -1257,16 +827,26 @@ namespace UnicontaClient.Pages.CustomPage
         public static bool IncludeJournals { get; set; }
     }
 
-    public class ProjectTransLocalClient : INotifyPropertyChanged, UnicontaBaseEntity
+    class sortTrans : IComparer<ProjectWIPTotals>
     {
-        public int _CompanyId;
-        public DateTime FromDate { get; set; }
+        public int Compare(ProjectWIPTotals x, ProjectWIPTotals y)
+        {
+            return string.Compare(x._Project, y._Project);
+        }
+    }
+
+    public class ProjectWIPTotalsClient : ProjectWIPTotals, INotifyPropertyChanged, UnicontaBaseEntity
+    {
+        public int CompanyId { get { return _CompanyId; } set { _CompanyId = value; } }
+        public Type BaseEntityType() { return typeof(ProjectWIPTotals); }
+
+        public DateTime FromDate { get { return _FromDate; } set { _FromDate = value; } }
 
         Uniconta.DataModel.Project _projectRef;
         Uniconta.DataModel.Project projectRef { get { return _projectRef ?? (_projectRef = (Uniconta.DataModel.Project)ClientHelper.GetRef(_CompanyId, typeof(Uniconta.DataModel.Project), _Project)); } }
 
         [Display(Name = "Date", ResourceType = typeof(ProjectTransClientText))]
-        public DateTime Date { get; set; }
+        public DateTime Date { get { return _Date; } set { _Date = value; } }
 
         [ForeignKeyAttribute(ForeignKeyTable = typeof(Uniconta.DataModel.Debtor))]
         [Display(Name = "DAccount", ResourceType = typeof(DCTransText))]
@@ -1279,7 +859,6 @@ namespace UnicontaClient.Pages.CustomPage
         [Display(Name = "RootProject", ResourceType = typeof(ProjectText))]
         public string RootProject { get { return projectRef._RootProject; } }
 
-        public string _Project;
         [ForeignKeyAttribute(ForeignKeyTable = typeof(Uniconta.DataModel.Project))]
         [Display(Name = "Project", ResourceType = typeof(ProjectTransClientText))]
         public string Project { get { return _Project; } }
@@ -1293,11 +872,9 @@ namespace UnicontaClient.Pages.CustomPage
         [Display(Name = "Phase", ResourceType = typeof(ProjectText))]
         public string Phase { get { var proj = projectRef; return proj != null ? AppEnums.ProjectPhase.ToString((int)proj._Phase) : null; } }
 
-        public string _Workspace;
         [Display(Name = "WorkSpace", ResourceType = typeof(ProjectTransClientText))]
         public string Workspace { get { return _Workspace; } }
 
-        public string _Task;
         [ForeignKeyAttribute(ForeignKeyTable = typeof(Uniconta.DataModel.ProjectTask))]
         [Display(Name = "Task", ResourceType = typeof(ProjectTransClientText))]
         public string Task { get { return _Task; } }
@@ -1310,70 +887,70 @@ namespace UnicontaClient.Pages.CustomPage
         public string PersonInChargeName { get { return ClientHelper.GetName(_CompanyId, typeof(Uniconta.DataModel.Employee), PersonInCharge); } }
 
         [Display(Name = "EmployeeFee", ResourceType = typeof(ProjectTransClientText))]
-        public double EmployeeFee { get; set; }
+        public double EmployeeFee { get { return _EmployeeFee / 100d; } }
 
         [Display(Name = "EmployeeFeeCostValue", ResourceType = typeof(ProjectTransClientText))]
-        public double EmployeeFeeCostValue { get; set; }
+        public double EmployeeFeeCostValue { get { return _EmployeeFeeCostValue / 100d; } }
 
         [Display(Name = "EmployeeFeeJournal", ResourceType = typeof(ProjectTransClientText))]
-        public double EmployeeFeeJournal { get; set; }
+        public double EmployeeFeeJournal { get { return _EmployeeFeeJournal / 100d; } }
 
         [Display(Name = "EmployeeFeeJournalCostValue", ResourceType = typeof(ProjectTransClientText))]
-        public double EmployeeFeeJournalCostValue { get; set; }
+        public double EmployeeFeeJournalCostValue { get { return _EmployeeFeeJournalCostValue / 100d; } }
 
         [Display(Name = "EmployeeHoursPosted", ResourceType = typeof(ProjectTransClientText))]
-        public double EmployeeHoursPosted { get; set; }
+        public double EmployeeHoursPosted { get { return _EmployeeHoursPosted / 100d; } }
 
         [Display(Name = "EmployeeHoursJournal", ResourceType = typeof(ProjectTransClientText))]
-        public double EmployeeHoursJournal { get; set; }
+        public double EmployeeHoursJournal { get { return _EmployeeHoursJournal / 100d; } }
 
         [Display(Name = "Expenses", ResourceType = typeof(ProjectTransClientText))]
-        public double Expenses { get; set; }
+        public double Expenses { get { return _Expenses / 100d; } }
 
         [Display(Name = "ExpensesCostValue", ResourceType = typeof(ProjectTransClientText))]
-        public double ExpensesCostValue { get; set; }
+        public double ExpensesCostValue { get { return _ExpensesCostValue / 100d; } }
 
         [Display(Name = "Revenue", ResourceType = typeof(ProjectTransClientText))]
-        public double Revenue { get { return (Math.Round(EmployeeFee + Expenses, 2)); } }
+        public double Revenue { get { return (_EmployeeFee + _Expenses) / 100d; } }
 
         [Display(Name = "RevenueCostValue", ResourceType = typeof(ProjectTransClientText))]
-        public double RevenueCostValue { get { return (Math.Round(EmployeeFeeCostValue + ExpensesCostValue, 2)); } }
+        public double RevenueCostValue { get { return (_EmployeeFeeCostValue + _ExpensesCostValue) / 100d; } }
 
         [Display(Name = "OnAccount", ResourceType = typeof(ProjectTransClientText))]
-        public double OnAccount { get; set; }
+        public double OnAccount { get { return _OnAccount / 100d; } }
 
         [Display(Name = "Invoiced", ResourceType = typeof(ProjectTransClientText))]
-        public double Invoiced { get; set; }
+        public double Invoiced { get { return _Invoiced / 100d; } }
 
         [Display(Name = "InvoicedCostValue", ResourceType = typeof(ProjectTransClientText))]
-        public double InvoicedCostValue { get; set; }
+        public double InvoicedCostValue { get { return _InvoicedCostValue / 100d; } }
 
         [Display(Name = "TotalInvoiced", ResourceType = typeof(ProjectTransClientText))]
-        public double TotalInvoiced { get { return (Math.Round(OnAccount + Invoiced, 2)); } }
+        public double TotalInvoiced { get { return (_OnAccount + _Invoiced) / 100d; } }
 
         [Display(Name = "TotalInvoicedCostValue", ResourceType = typeof(ProjectTransClientText))]
-        public double TotalInvoicedCostValue { get { return (Math.Round(InvoicedCostValue, 2)); } }
+        public double TotalInvoicedCostValue { get { return InvoicedCostValue; } }
 
         [Display(Name = "Adjustment", ResourceType = typeof(ProjectTransClientText))]
-        public double Adjustment { get; set; }
+        public double Adjustment { get { return _Adjustment / 100d; } }
 
         [Display(Name = "AdjustmentCostValue", ResourceType = typeof(ProjectTransClientText))]
-        public double AdjustmentCostValue { get; set; }
+        public double AdjustmentCostValue { get { return _AdjustmentCostValue / 100d; } }
 
         [Display(Name = "OpeningBalance", ResourceType = typeof(ProjectTransClientText))]
-        public double OpeningBalance { get; set; }
+        public double OpeningBalance { get { return _OpeningBalance / 100d; } }
 
         [Display(Name = "OpeningBalanceCostValue", ResourceType = typeof(ProjectTransClientText))]
-        public double OpeningBalanceCostValue { get; set; }
+        public double OpeningBalanceCostValue { get { return _OpeningBalanceCostValue / 100d; } }
 
         [Display(Name = "ClosingBalance", ResourceType = typeof(ProjectTransClientText))]
-        public double ClosingBalance { get { return (Math.Round(OpeningBalance + EmployeeFee + Expenses + Adjustment + OnAccount + Invoiced + (StaticValues.IncludeJournals ? EmployeeFeeJournal : 0), 2)); } }
+        public double ClosingBalance { get { return (_OpeningBalance + _EmployeeFee + _Expenses + _Adjustment + _OnAccount + _Invoiced + (StaticValues.IncludeJournals ? _EmployeeFeeJournal : 0)) / 100d; } }
 
         [Display(Name = "ClosingBalanceCostValue", ResourceType = typeof(ProjectTransClientText))]
-        public double ClosingBalanceCostValue { get { return (Math.Round(OpeningBalanceCostValue + EmployeeFeeCostValue + ExpensesCostValue + AdjustmentCostValue + InvoicedCostValue + (StaticValues.IncludeJournals ? EmployeeFeeJournalCostValue : 0), 2)); } }
+        public double ClosingBalanceCostValue { get { return (_OpeningBalanceCostValue + _EmployeeFeeCostValue + _ExpensesCostValue + _AdjustmentCostValue + _InvoicedCostValue + (StaticValues.IncludeJournals ? _EmployeeFeeJournalCostValue : 0)) / 100d; } }
 
         [Display(Name = "InvoiceProposal", ResourceType = typeof(ProjectTransClientText))]
-        public bool OpenInvoiceProposal { get; set; }
+        public bool OpenInvoiceProposal { get { return _HasInvoiceProposal; } }
 
         internal void NotifyClosingBalance()
         {
@@ -1425,6 +1002,15 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         [ReportingAttribute]
+        public PrWorkSpaceClient WorkSpaceRef
+        {
+            get
+            {
+                return ClientHelper.GetRefClient<PrWorkSpaceClient>(_CompanyId, typeof(Uniconta.DataModel.PrWorkSpace), _Workspace);
+            }
+        }
+
+        [ReportingAttribute]
         public ProjectTaskClient ProjectTaskRef
         {
             get
@@ -1453,11 +1039,5 @@ namespace UnicontaClient.Pages.CustomPage
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public int CompanyId { get { return _CompanyId; } set { _CompanyId = value; } }
-        public Type BaseEntityType() { return GetType(); }
-        public void loadFields(CustomReader r, int SavedWithVersion) { }
-        public void saveFields(CustomWriter w, int SaveVersion) { }
-        public int Version(int ClientAPIVersion) { return 1; }
-        public int ClassId() { return 37364; }
     }
 }

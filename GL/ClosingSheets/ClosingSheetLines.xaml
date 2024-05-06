@@ -10,6 +10,10 @@ x:Class="UnicontaClient.Pages.CustomPage.ClosingSheetLines"
     xmlns:converter="clr-namespace:UnicontaClient.Utilities"
     xmlns:dxn="http://schemas.devexpress.com/winfx/2008/xaml/navbar"
     xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools">
+    <UserControl.Resources>
+        <Util:VisibilityBoolConverter x:Key="VisibilityBoolConverter" />
+        <Util:ImageNameToImagesourceConverter x:Key="ImageNameToImagesourceConverter"/>
+    </UserControl.Resources>
     <Grid x:Name="LayoutRoot" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
@@ -106,13 +110,25 @@ x:Class="UnicontaClient.Pages.CustomPage.ClosingSheetLines"
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="AmountCol" FieldName="Amount"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="JournalPostedId" Width="70"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Origin" Width="100" />
+                        <localPage:CorasauDataGridTemplateColumnClient x:Name="Modified" Width="50"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="VatCol" FieldName="Vat" Width="60" />
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="VatOperation" Width="30" Visible="False" />
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="AmountVat"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Currency" Width="35" />
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="AmountCur"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="AmountBase" Visible="False" />
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="HasVoucherCol" FieldName="HasVoucher" Width="40"/>
+                        <localPage:CorasauDataGridTemplateColumnClient x:Name="HasVoucherCol" FieldName="HasVoucher" Width="30">
+                            <localPage:CorasauDataGridTemplateColumnClient.HeaderTemplate>
+                                <DataTemplate>
+                                    <Image Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Document_Attachment_16x16.svg}" Width="16" Height="16" VerticalAlignment="Center"/>
+                                </DataTemplate>
+                            </localPage:CorasauDataGridTemplateColumnClient.HeaderTemplate>
+                            <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                                <ControlTemplate>
+                                    <Image Margin="5" Tag="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Document_Attachment_16x16.svg}" MouseLeftButtonDown="HasVoucherImage_MouseLeftButtonDown" Visibility="{Binding DataContext.RowData.Row.HasVoucher,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource VisibilityBoolConverter}}" Stretch="Fill" Width="16" Height="16" />
+                                </ControlTemplate>
+                            </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="DocumentRefCol" FieldName="DocumentRef" Width="60" Visible="False"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="DCType" Width="50" />
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="DCAccount"/>

@@ -263,7 +263,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             foreach (var val in empPayrollCatList)
             {
-                if (val._InternalType == InternalType.None)
+                if (val._InternalType == 0)
                     continue;
 
                 internalActive = true;
@@ -578,7 +578,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 #region Mileage
                 double mileageWeek = 0;
-                if (lstCatFlexTime != null)
+                if (lstCatMileage != null)
                 {
                     var lstMileage = empJournalLineLst.Where(x => (x._Date == monday && x._RegistrationType == RegistrationType.Mileage && x._InternalType == InternalType.Mileage)).ToList();
                     if (lstMileage.Count > 0)
@@ -773,7 +773,7 @@ namespace UnicontaClient.Pages.CustomPage
                     #region Efficiency percentage
                     var grpLstInvoiceable = empJournalLineLst.Where(s => s._Date == monday &&
                                                                          s._RegistrationType == Uniconta.DataModel.RegistrationType.Hours &&
-                                                                         s._InternalType == InternalType.None).GroupBy(x => x._Invoiceable).Select(x => new { GroupKey = x.Key, Sum = x.Sum(y => y.Total) });
+                                                                         s._InternalType == 0).GroupBy(x => x._Invoiceable).Select(x => new { GroupKey = x.Key, Sum = x.Sum(y => y.Total) });
 
                     foreach (var i in grpLstInvoiceable)
                     {
@@ -846,7 +846,8 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var calendarStartDate = DateTime.MinValue;
             var weekStartDate = empl._Hired > monday ? empl._Hired : monday;
-            var weekEnddate = monday.AddDays(6);
+
+            var weekEnddate = empl._Terminated > weekStartDate && empl._Terminated <= monday.AddDays(6) ? empl._Terminated : monday.AddDays(6);
 
             DictMappedValue dictMappedValue;
 
@@ -859,21 +860,21 @@ namespace UnicontaClient.Pages.CustomPage
                 var tmEmpCalender = calenders.FirstOrDefault();
                 calendarStartDate = tmEmpCalender.ValidFrom;
 
-                if (weekStartDate < calendarStartDate && calendarStartDate < weekEnddate)
+                var hasValue = dictCalendar.TryGetValue(new Tuple<string, DateTime>(tmEmpCalender.Calendar, monday), out dictMappedValue);
+                if (hasValue)
                 {
-                    var calendar = (TMEmpCalendar)CalendarCache.Get(tmEmpCalender.Calendar);
-                    var calenderLineLst = calendar.CalendarLines ?? await calendar.LoadLines(api);
-                    var test = calenderLineLst.Where(s => s.Date >= calendarStartDate && s.Date <= weekEnddate);
-                    var hoursWeek = test.Sum(s => s.Hours);
-                    var countDays = test.Count();
+                    var days = (weekEnddate - weekStartDate).Days + 1;
+                    if (days != dictMappedValue.CountDays)
+                    {
+                        var calendar = (TMEmpCalendar)CalendarCache.Get(tmEmpCalender.Calendar);
+                        var calenderLineLst = calendar.CalendarLines ?? await calendar.LoadLines(api);
+                        var test = calenderLineLst.Where(s => s.Date >= weekStartDate && s.Date <= weekEnddate);
+                        var hoursWeek = test.Sum(s => s.Hours);
+                        var countDays = test.Count();
 
-                    return new DictMappedValue { Hours = hoursWeek, CountDays = countDays };
-                }
-                else
-                {
-                    var hasValue = dictCalendar.TryGetValue(new Tuple<string, DateTime>(tmEmpCalender.Calendar, monday), out dictMappedValue);
-                    if (hasValue)
-                        return dictMappedValue;
+                        return new DictMappedValue { Hours = hoursWeek, CountDays = countDays };
+                    }
+                    return dictMappedValue;
                 }
             }
             else
@@ -1193,7 +1194,7 @@ namespace UnicontaClient.Pages.CustomPage
                     var valErrorsHours = await tmHelper.ValidateLines(tmLinesLst, startDateApprove, endDateApprove, emplApprove);
                     #endregion
 
-                    var cntErrLines = tmLinesLst.Where(s => s.ErrorInfo != TMJournalLineHelper.VALIDATE_OK).Count();
+                    var cntErrLines = tmLinesLst.Where(s => s.HasError).Count();
                     if (cntErrLines != 0)
                     {
                         rec.ErrorInfo = string.Format("{0}: {1} {2}", Uniconta.ClientTools.Localization.lookup("TimeRegistration"), cntErrLines, Uniconta.ClientTools.Localization.lookup("JournalFailedValidation"));
@@ -1232,7 +1233,8 @@ namespace UnicontaClient.Pages.CustomPage
                                 }
                                 else
                                 {
-                                    lineclient._Text = TMJournalLineClient.GetMileageFormattedText(line._Text, line._AddressFrom, line._AddressTo, line._VechicleRegNo);
+                                    lineclient._Mileage = line._Mileage?[x - 1];
+                                    lineclient._Text = line._Text;
                                     lineclient._Unit = Uniconta.DataModel.ItemUnit.km;
 
                                     lineclient._Qty = qty;

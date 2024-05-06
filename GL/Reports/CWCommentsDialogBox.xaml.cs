@@ -13,10 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using Uniconta.ClientTools.DataModel;
-#if !SILVERLIGHT
 using Uniconta.ClientTools;
-using Uniconta.ClientTools.DataModel;
-#endif
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage.GL.ChartOfAccount.Reports
@@ -28,25 +25,24 @@ namespace UnicontaClient.Pages.CustomPage.GL.ChartOfAccount.Reports
         [InputFieldData]
         public DateTime Date { get; set; }
 
-#if !SILVERLIGHT
         protected override int DialogId { get { return DialogTableId; } }
         public int DialogTableId { get; set; }
         protected override bool ShowTableValueButton { get { return true; } }
-#endif
 
         public CWCommentsDialogBox(string title)
         {
             Init(title, Uniconta.ClientTools.Localization.lookup("Note"));
         }
-
+        public bool mandatorycomments=true;
         public CWCommentsDialogBox(string title, bool enableDateField, DateTime dateField) : this(title)
         {
             if (enableDateField)
             {
                 txtBlockDate.Text = Uniconta.ClientTools.Localization.lookup("Date");
                 txtBlockDate.Visibility = Visibility.Visible;
-                dtDefaultDate.SelectedText = dateField.ToShortDateString();
                 dtDefaultDate.Visibility = Visibility.Visible;
+                if (dateField != DateTime.MinValue)
+                    dtDefaultDate.SelectedText = dateField.ToShortDateString();
             }
         }
 
@@ -56,12 +52,8 @@ namespace UnicontaClient.Pages.CustomPage.GL.ChartOfAccount.Reports
             InitializeComponent();
             this.Title = title;
             this.txtBlockComments.Text = label;
-#if SILVERLIGHT
-            Utility.SetThemeBehaviorOnChildWindow(this);
-#endif
             this.txtEditor.EditValueChanging += txtEditor_EditValueChanging;
             this.Loaded += CW_Loaded;
-            OKButton.IsEnabled = false; ;
         }
 
         public CWCommentsDialogBox(string title, string label)
@@ -71,6 +63,8 @@ namespace UnicontaClient.Pages.CustomPage.GL.ChartOfAccount.Reports
         void CW_Loaded(object sender, RoutedEventArgs e)
         {
             Dispatcher.BeginInvoke(new Action(() => { txtEditor.Focus(); }));
+            if (mandatorycomments)
+                OKButton.IsEnabled = false;
         }
         private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
         {
@@ -78,8 +72,7 @@ namespace UnicontaClient.Pages.CustomPage.GL.ChartOfAccount.Reports
             {
                 SetDialogResult(false);
             }
-            else
-                if (e.Key == Key.Enter)
+            else if (e.Key == Key.Enter)
             {
                 if (CancelButton.IsFocused)
                 {
@@ -91,11 +84,8 @@ namespace UnicontaClient.Pages.CustomPage.GL.ChartOfAccount.Reports
         }
         void txtEditor_EditValueChanging(object sender, DevExpress.Xpf.Editors.EditValueChangingEventArgs e)
         {
-            if (string.IsNullOrEmpty(Convert.ToString(e.NewValue)) || string.IsNullOrWhiteSpace(Convert.ToString(e.NewValue)))
-            {
+            if (mandatorycomments && (string.IsNullOrEmpty(Convert.ToString(e.NewValue)) || string.IsNullOrWhiteSpace(Convert.ToString(e.NewValue))))
                 OKButton.IsEnabled = false;
-                return;
-            }
             else
                 OKButton.IsEnabled = true;
         }
@@ -113,5 +103,3 @@ namespace UnicontaClient.Pages.CustomPage.GL.ChartOfAccount.Reports
         }
     }
 }
-
-

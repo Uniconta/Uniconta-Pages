@@ -93,7 +93,8 @@ namespace UnicontaClient.Pages.CustomPage
             lePostingAccount.api = Employeelookupeditor.api = leAccount.api = lePayment.api = cmbDim1.api
                 = leTransType.api = cmbDim2.api = cmbDim3.api = cmbDim4.api = cmbDim5.api = leGroup.api = leShipment.api =
                 PrCategorylookupeditor.api = Projectlookupeditor.api = leApprover.api = leDeliveryTerm.api = leInvoiceAccount.api =
-                PriceListlookupeditior.api = leLayoutGroup.api = leVat.api = prTasklookupeditor.api = lePrWorkSpace.api = lePaymentFormat.api = crudapi;
+                PriceListlookupeditior.api = leLayoutGroup.api = leVat.api = prTasklookupeditor.api = lePrWorkSpace.api = lePaymentFormat.api = 
+                leCompanyAddress.api = crudapi;
 
             leRelatedOrder.CrudApi = crudapi;
 
@@ -220,7 +221,10 @@ namespace UnicontaClient.Pages.CustomPage
             if (!Comp.Project)
                 grpProject.Visibility = Visibility.Collapsed;
             if (!Comp.Shipments)
+            {
                 itemShipment.Visibility = Visibility.Collapsed;
+                liDeliveryTerm.Visibility = Visibility.Collapsed;
+            }
             if (!Comp.ApprovePurchaseOrders)
                 grpApproval.Visibility = Visibility.Collapsed;
             if (!Comp.SetupSizes)
@@ -414,6 +418,9 @@ namespace UnicontaClient.Pages.CustomPage
                     editrow.DeliveryCountry = creditor._DeliveryCountry;
                 else
                     editrow.DeliveryCountry = null;
+                editrow.DeliveryPhone = creditor._Phone;
+                editrow.DeliveryContactPerson = creditor._ContactPerson;
+                editrow.DeliveryContactEmail = creditor._ContactEmail;
             }
             TableField.SetUserFieldsFromRecord(creditor, editrow);
             BindContact(creditor);
@@ -471,6 +478,34 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var selectedItem = cmbContactName.SelectedItem as Contact;
             GoToContact(selectedItem, e.Key);
+        }
+
+        private void lblCompanyAddress_ButtonClicked(object sender)
+        {
+            var selectedAddress = leCompanyAddress.SelectedItem as CompanyAddressClient;
+            if (selectedAddress != null)
+            {
+                CopyAddressToRow(selectedAddress._Name, selectedAddress._Address1, selectedAddress._Address2, selectedAddress._Address3, selectedAddress._ZipCode, selectedAddress._City, selectedAddress._Country);
+                editrow.DeliveryContactPerson = selectedAddress._ContactPerson;
+                editrow.DeliveryContactEmail = selectedAddress._ContactEmail;
+                editrow.DeliveryPhone = selectedAddress._Phone;
+            }
+        }
+
+        private void CopyAddressToRow(string name, string address1, string address2, string address3, string zipCode, string city, CountryCode? country)
+        {
+            var row = this.editrow;
+            row.DeliveryName = name;
+            row.DeliveryAddress1 = address1;
+            row.DeliveryAddress2 = address2;
+            row.DeliveryAddress3 = address3;
+            row.DeliveryCity = city;
+            if (row.DeliveryZipCode != zipCode)
+            {
+                lookupZipCode = false;
+                row.DeliveryZipCode = zipCode;
+            }
+            row.DeliveryCountry = country;
         }
     }
 }

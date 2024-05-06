@@ -1,30 +1,20 @@
 using Uniconta.API.System;
 using UnicontaClient.Controls.Dialogs;
 using UnicontaClient.Models;
-using UnicontaClient.Utilities;
 using Uniconta.ClientTools;
 using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
 using Uniconta.Common;
-using Uniconta.DataModel;
 using DevExpress.Xpf.Grid;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
 using Uniconta.Common.User;
 using Uniconta.API.Service;
+using System.Collections.Generic;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -39,7 +29,7 @@ namespace UnicontaClient.Pages.CustomPage
         CompanyAccessAPI companyAPI;
         private bool _isFromCreateUser;
         private string _loginID;
-
+        private CompanyUserAccessClient[] _companyUsers;
         public override string NameOfControl
         {
             get { return TabControls.CompanyUsers.ToString(); }
@@ -96,51 +86,44 @@ namespace UnicontaClient.Pages.CustomPage
             SetRibbonControl(localMenu, dgCompanyUsersGrid);
             gridControl.AutoWidth = true;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
+            if (!api.CompanyEntity.Project)
+            {
+                RibbonBase rb = (RibbonBase)localMenu.DataContext;
+                UtilDisplay.RemoveMenuCommand(rb, "AddProjectTimeUser");
+            }
         }
-        
+
         async void RemoveAccess(CompanyUserAccessClient selectedItem)
         {
             ErrorCodes err = await companyAPI.RemoveCompanyAccess(selectedItem._Uid);
             if (err == ErrorCodes.Succes)
             {
-                var view = (TableView) dgCompanyUsersGrid.View;
+                var view = (TableView)dgCompanyUsersGrid.View;
                 view.DeleteRow(view.FocusedRowHandle);
             }
             else
                 UtilDisplay.ShowErrorCode(err);
         }
-        int selectedRowIndex=0;
+        int selectedRowIndex = 0;
         private void localMenu_OnItemClicked(string ActionType)
         {
             var selectedItem = dgCompanyUsersGrid.SelectedItem as CompanyUserAccessClient;
             switch (ActionType)
             {
-                case "AddRow":
-                    var curComp = UtilDisplay.GetDefaultCompany();
-                    long rights = curComp.Rights;
-                    if (AccessLevel.Get(rights, CompanyTasks.AsOwner) == CompanyPermissions.Full)
-                    {
-                        CWSearchUser searchUserDialog = new CWSearchUser(companyAPI);
-                        searchUserDialog.Closing += delegate
-                        {
-                            if (searchUserDialog.DialogResult == true)
-                            {
-                                if (searchUserDialog.lstSetupType.SelectedIndex != 0)
-                                    InitQuery();
-                                else
-                                {
-                                    object[] parm = new object[3];
-                                    parm[0] = api;
-                                    parm[1] = true;
-                                    parm[2] = dockCtrl.Activpanel;
-                                    AddDockItem(TabControls.UsersPage2, parm, Uniconta.ClientTools.Localization.lookup("User"), "Add_16x16");
-                                }
-                            }
-                        };
-                        searchUserDialog.Show();
-                    }
-                    else
-                        UnicontaMessageBox.Show(string.Format("{0} {1}", Uniconta.ClientTools.Localization.lookup("NoRightsToInsert"), Uniconta.ClientTools.Localization.lookup("User")), Uniconta.ClientTools.Localization.lookup("Warning"));
+                case "AddStandardUser":
+                    CreateUser(UserTypes.StandardUser);
+                    break;
+                case "AddWorkUser":
+                    CreateUser(UserTypes.WorkAppUser);
+                    break;
+                case "AddProjectTimeUser":
+                    CreateUser(UserTypes.ProjectTimeUser);
+                    break;
+                case "AddInvoiceUser":
+                    CreateUser(UserTypes.InvoiceUser);
+                    break;
+                case "CopyRecord":
+                    CopyUsersFromCompanies();
                     break;
                 case "EditRow":
                     if (selectedItem != null)
@@ -166,7 +149,7 @@ namespace UnicontaClient.Pages.CustomPage
                             else
                             {
                                 CloseDockItem();
-                                UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("OwnershipChanged"),Uniconta.ClientTools.Localization.lookup("Warning"));
+                                UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("OwnershipChanged"), Uniconta.ClientTools.Localization.lookup("Warning"));
                             }
                         }
                     };
@@ -245,10 +228,81 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         AddDockItem(TabControls.UserProfileUserPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("UserProfiles"), selectedItem._Name));
                     break;
+                case "CreateEmployee":
+                    if (selectedItem != null)
+                        CreateOrSelectEmployee(selectedItem);
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
+        }
+        void CreateUser(UserTypes userType)
+        {
+            switch (userType)
+            {
+                case UserTypes.StandardUser:
+                case UserTypes.ProjectTimeUser:
+                case UserTypes.InvoiceUser:
+                    var curComp = UtilDisplay.GetDefaultCompany();
+                    long rights = curComp.Rights;
+                    if (AccessLevel.Get(rights, CompanyTasks.AsOwner) == CompanyPermissions.Full)
+                    {
+                        CWSearchUser searchUserDialog = new CWSearchUser(companyAPI, _companyUsers);
+                        searchUserDialog.UserType = userType;
+                        searchUserDialog.Closing += delegate
+                        {
+                            if (searchUserDialog.DialogResult == true)
+                            {
+                                if (searchUserDialog.lstSetupType.SelectedIndex != 0)
+                                {
+
+                                    if (userType != UserTypes.StandardUser)
+                                        SetFixedProfile(userType, searchUserDialog.SearchedText);
+                                    else
+                                        InitQuery();
+                                }
+                                else
+                                {
+                                    object[] parm = new object[3];
+                                    parm[0] = api;
+                                    parm[1] = true;
+                                    parm[2] = dockCtrl.Activpanel;
+                                    var upage = dockCtrl.AddDockItem(TabControls.UsersPage2, ParentControl, parm, Uniconta.ClientTools.Localization.lookup("User"), "Add_16x16") as UsersPage2;
+                                    upage.UserType = userType;
+                                }
+                            }
+                        };
+                        searchUserDialog.Show();
+                    }
+                    else
+                        UnicontaMessageBox.Show(string.Format("{0} {1}", Uniconta.ClientTools.Localization.lookup("NoRightsToInsert"), Uniconta.ClientTools.Localization.lookup("User")), Uniconta.ClientTools.Localization.lookup("Warning"));
+                    break;
+                case UserTypes.WorkAppUser:
+                    object[] par = new object[3];
+                    par[0] = api;
+                    par[1] = true;
+                    par[2] = dockCtrl.Activpanel;
+                    var page = dockCtrl.AddDockItem(TabControls.UsersPage2, ParentControl, par, Uniconta.ClientTools.Localization.lookup("User"), "Add_16x16") as UsersPage2;
+                    page.UserType = userType;
+                    break;
+            }
+        }
+        private void CopyUsersFromCompanies()
+        {
+            var cwCompanies = new CWSelectCompany(api);
+            cwCompanies.Closed += async delegate
+            {
+                if (cwCompanies.DialogResult == true && cwCompanies._CompanyObj != null)
+                {
+                    var companyAccessApi = new CompanyAccessAPI(api);
+                    var result = await companyAccessApi.CopyUsersToCompany(cwCompanies._CompanyObj);
+                    UtilDisplay.ShowErrorCode(result);
+                    if (result == ErrorCodes.Succes)
+                        InitQuery();
+                }
+            };
+            cwCompanies.Show();
         }
 
         async private void SetDefaultCompany(CompanyUserAccessClient selectedItem)
@@ -262,18 +316,101 @@ namespace UnicontaClient.Pages.CustomPage
 
         public override void Utility_Refresh(string screenName, object argument = null)
         {
-            if (screenName == TabControls.EditCompanyUser)
+            if (screenName == TabControls.EditCompanyUser || screenName == TabControls.UsersPage2)
                 dgCompanyUsersGrid.UpdateItemSource(argument);
+            else if (screenName == TabControls.EmployeePage2 && dgCompanyUsersGrid.SelectedItem != null)
+                (dgCompanyUsersGrid.SelectedItem as CompanyUserAccessClient)._Employee = ((argument as object[])?[1] as EmployeeClient).KeyStr;
         }
 
+        async void SetFixedProfile(UserTypes userType, string LoginId)   
+        {
+            await InitQuery();
+            FixedProfiles fixedProfile = FixedProfiles.None;
+            if (userType == UserTypes.ProjectTimeUser)
+                fixedProfile = FixedProfiles.ProjectTimeUser;
+            else if (userType == UserTypes.InvoiceUser)
+                fixedProfile = FixedProfiles.Invoice;
+            var userAccess= _companyUsers.Where(u => u._LoginId == LoginId).FirstOrDefault();
+            if (userAccess != null)
+            {
+                var rights = AccessLevel.SetFixedProfile(userAccess._Rights, fixedProfile);
+                userAccess._Rights = rights;
+                userAccess.NotifyPropertyChanged("FixedProfile");
+                var err = await companyAPI.GiveCompanyAccess(userAccess._Uid, rights);
+            }
+        }
         public async override Task InitQuery()
         {
-            var users = (CompanyUserAccessClient[])await companyAPI.GetUserRights(new CompanyUserAccessClient());
+            _companyUsers = (CompanyUserAccessClient[])await companyAPI.GetUserRights(new CompanyUserAccessClient());
             dgCompanyUsersGrid.ItemsSource = null;
-            dgCompanyUsersGrid.ItemsSource = users?.ToList();
+            dgCompanyUsersGrid.ItemsSource = _companyUsers?.ToList();
             dgCompanyUsersGrid.Visibility = Visibility.Visible;
             dgCompanyUsersGrid.BusyIndicator = busyIndicator;
             dgCompanyUsersGrid.tableView.FocusedRowHandle = selectedRowIndex;
+        }
+        void CreateOrSelectEmployee(CompanyUserAccessClient userAccess)
+        {
+            var dialogEmployees = new CWEmployee(api);
+            dialogEmployees.DialogTableId = 2000000107;
+            dialogEmployees.IsCreateEmployee = true;
+            dialogEmployees.Closing += delegate
+            {
+                if (dialogEmployees.DialogResult == true)
+                {
+                    var selectedEmployee = dialogEmployees.SelectedEmployee;
+                    if (selectedEmployee != null)
+                    {
+                        if (!string.IsNullOrEmpty(selectedEmployee._UserLogidId))
+                        {
+                            var msg = string.Format("{0} {1}", Uniconta.ClientTools.Localization.lookup("EmployeeAssigned"), Uniconta.ClientTools.Localization.lookup("AreYouSureToContinue"));
+                            CWConfirmationBox confirmationDialog = new CWConfirmationBox(msg, null, false);
+                            confirmationDialog.Closing += delegate
+                            {
+                                if (confirmationDialog.ConfirmationResult == CWConfirmationBox.ConfirmationResultEnum.Yes)
+                                {
+                                    SetEmployee(selectedEmployee, userAccess);
+                                }
+                            };
+                            confirmationDialog.Show();
+                        }
+                        else
+                            SetEmployee(selectedEmployee, userAccess);
+                    }
+                    else
+                        CreateEmployee(userAccess);
+                }
+            };
+            dialogEmployees.Show();
+        }
+
+        void SetEmployee(Uniconta.DataModel.Employee selectedEmployee, CompanyUserAccessClient userAccess)
+        {
+            var modified = new List<Uniconta.DataModel.Employee>();
+            if (!string.IsNullOrEmpty(userAccess._Employee))
+            {
+                var alreadyAssignedEmployee = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.Employee)).Get(userAccess._Employee) as Uniconta.DataModel.Employee;
+                if (alreadyAssignedEmployee != null)
+                {
+                    alreadyAssignedEmployee._UserLogidId = alreadyAssignedEmployee._UserName = null;
+                    modified.Add(alreadyAssignedEmployee);
+                }
+            }
+            selectedEmployee._UserLogidId = userAccess._LoginId;
+            selectedEmployee._UserName = userAccess._Name;
+            modified.Add(selectedEmployee);
+            api.UpdateNoResponse(modified);
+            userAccess._Employee = selectedEmployee.KeyStr;
+            userAccess.NotifyPropertyChanged("Employee");
+        }
+        void CreateEmployee(CompanyUserAccessClient userAccess)
+        {
+            bool isEdit = false;
+            var emp = new EmployeeClient();
+            emp._Uid = userAccess._Uid;
+            emp._Name = userAccess._Name;
+            emp._UserLogidId = userAccess._LoginId;
+            emp._UserName = userAccess._Name;
+            AddDockItem(TabControls.EmployeePage2, new object[2] { emp, isEdit }, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Add"), emp._UserName));
         }
     }
 }

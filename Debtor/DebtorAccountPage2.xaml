@@ -70,6 +70,9 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorAccountPage2"
                     <CorasauControls:CorasauLayoutItem FieldName="Blocked" x:Name="liBlocked">
                         <CorasauControls:CheckEditor x:Name="Blocked" IsChecked="{Binding Blocked,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="IndustryCode" x:Name="liIndustryCode">
+                        <CorasauControls:LookupEditor x:Name="leIndustryCode" Text="{Binding IndustryCode ,Mode=TwoWay}" />
+                    </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
 
                 <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpGroup" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Group}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left"  Width="400">
@@ -158,7 +161,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorAccountPage2"
                             <CorasauControls:CheckEditor IsChecked="{Binding EmailDocuments,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="InvoiceInXML" x:Name="liInvoiceInXML">
-                        <CorasauControls:ComboBoxEditor SelectedItem="{Binding InvoiceInXML,Mode=TwoWay}" x:Name="cmbEinvoice"  SelectedIndexChanged="cmbEinvoice_SelectedIndexChanged"/>
+                        <CorasauControls:ComboBoxEditor SelectedItem="{Binding InvoiceInXML,Mode=TwoWay}" x:Name="cmbEinvoice"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="EAN" x:Name="liEAN">
                             <CorasauControls:TextEditor x:Name="txtEAN" Text="{Binding EAN,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
@@ -214,34 +217,43 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorAccountPage2"
                         </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
 
-                    <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="dAddress" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="400">
-                        <CorasauControls:CorasauLayoutItem FieldName="DeliveryName" x:Name="liDeliveryName">
-                            <CorasauControls:TextEditor Text="{Binding DeliveryName,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="DeliveryAddress1" x:Name="liDeliveryAddress1">
-                            <CorasauControls:TextEditor Text="{Binding DeliveryAddress1,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="DeliveryAddress2" x:Name="liDeliveryAddress2">
-                            <CorasauControls:TextEditor  Text="{Binding DeliveryAddress2,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="DeliveryAddress3" x:Name="liDeliveryAddress3">
-                            <CorasauControls:TextEditor  Text="{Binding DeliveryAddress3,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="DeliveryZipCode" x:Name="liDeliveryZipCode" Style="{StaticResource LayoutItemsstyle}" ButtonClicked="LiDeliveryZipCode_OnButtonClicked"  ButtonContent="&#x26EF;" Padding="0">
-                            <CorasauControls:TextEditor Text="{Binding DeliveryZipCode,Mode=TwoWay}" x:Name="txtDelZipCode"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="DeliveryCity" x:Name="liDeliveryCity">
-                            <CorasauControls:TextEditor Text="{Binding DeliveryCity,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="DeliveryCountry" x:Name="liDeliveryCountry">
-                            <CorasauControls:ComboBoxEditor x:Name="cbDeliveryCountry" SelectedItem="{Binding DeliveryCountry,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="DeliveryId" x:Name="liDeliveryId">
-                            <CorasauControls:TextEditor  Text="{Binding DeliveryId,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
-                    </CorasauControls:CorasauLayoutGroup>
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="dAddress" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="400">
+                    <CorasauControls:CorasauLayoutItem FieldName="DeliveryName" x:Name="liDeliveryName">
+                        <CorasauControls:TextEditor Text="{Binding DeliveryName,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="DeliveryAddress1" x:Name="liDeliveryAddress1">
+                        <CorasauControls:TextEditor Text="{Binding DeliveryAddress1,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="DeliveryAddress2" x:Name="liDeliveryAddress2">
+                        <CorasauControls:TextEditor  Text="{Binding DeliveryAddress2,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="DeliveryAddress3" x:Name="liDeliveryAddress3">
+                        <CorasauControls:TextEditor  Text="{Binding DeliveryAddress3,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="DeliveryZipCode" x:Name="liDeliveryZipCode" Style="{StaticResource LayoutItemsstyle}" ButtonClicked="LiDeliveryZipCode_OnButtonClicked"  ButtonContent="&#x26EF;" Padding="0">
+                        <CorasauControls:TextEditor Text="{Binding DeliveryZipCode,Mode=TwoWay}" x:Name="txtDelZipCode"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="DeliveryCity" x:Name="liDeliveryCity">
+                        <CorasauControls:TextEditor Text="{Binding DeliveryCity,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="DeliveryCountry" x:Name="liDeliveryCountry">
+                        <CorasauControls:ComboBoxEditor x:Name="cbDeliveryCountry" SelectedItem="{Binding DeliveryCountry,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="DeliveryId" x:Name="liDeliveryId">
+                        <CorasauControls:TextEditor  Text="{Binding DeliveryId,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="DeliveryContactPerson" x:Name="liDeliveryContactPerson">
+                        <CorasauControls:TextEditor  Text="{Binding DeliveryContactPerson,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="DeliveryPhone" x:Name="liDeliveryPhone">
+                        <CorasauControls:TextEditor  Text="{Binding DeliveryPhone,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="DeliveryContactEmail" x:Name="liDeliveryContactEmail" Style="{StaticResource LayoutItemsstyle}" ButtonClicked="DeliveryContactEmail_ButtonClicked" ButtonContent="&#x2709;" Padding="0">
+                        <CorasauControls:TextEditor x:Name="txtEmail" Text="{Binding DeliveryContactEmail,Mode=TwoWay}" MaskType="RegEx" Mask="{StaticResource EmailValidationRegx}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
 
-                    <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="usedim" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Dimension}" Orientation="Vertical" Width="400" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="usedim" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Dimension}" Orientation="Vertical" Width="400" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                         <CorasauControls:CorasauLayoutItem x:Name="lbldim1">
                             <CorasauControls:LookupEditor x:Name="dim1lookupeditior" Text="{Binding Dimension1,Mode=TwoWay}">
                             </CorasauControls:LookupEditor>

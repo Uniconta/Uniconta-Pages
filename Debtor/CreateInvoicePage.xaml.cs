@@ -5,39 +5,20 @@ using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
 using Uniconta.Common;
-using DevExpress.Xpf.Editors.Settings;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
-using System.Collections;
 using Uniconta.DataModel;
 using Uniconta.ClientTools.Controls;
 using Uniconta.API.DebtorCreditor;
 using System.Windows.Threading;
 using DevExpress.Xpf.Grid;
-using UnicontaClient.Controls.Dialogs;
-using DevExpress.XtraReports.UI;
-using System.Reflection;
 using Uniconta.API.Service;
 using DevExpress.Xpf.Editors;
 using Uniconta.Common.Utility;
-#if !SILVERLIGHT
-using ubl_norway_uniconta;
-using UnicontaClient.Pages;
-using FromXSDFile.OIOUBL.ExportImport;
-using Microsoft.Win32;
-#endif
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
@@ -62,7 +43,7 @@ namespace UnicontaClient.Pages.CustomPage
             InitPage(master, orderLines);
         }
 
-        bool hasEmail;
+        bool hasEmail, oneTimeDebtor;
         public DebtorOrderClient Order;
         Uniconta.API.DebtorCreditor.FindPrices PriceLookup;
         SQLCache items, warehouse, debtors, standardVariants, variants1, variants2;
@@ -113,7 +94,8 @@ namespace UnicontaClient.Pages.CustomPage
             cbDeliveryCountry.ItemsSource = Enum.GetValues(typeof(Uniconta.Common.CountryCode));
             txtName.IsEnabled = false;
             dgDebtorOrderLineGrid.Visibility = Visibility.Visible;
-            btnAccount.ToolTip = string.Format(Uniconta.ClientTools.Localization.lookup("CreateOBJ"), Uniconta.ClientTools.Localization.lookup("Debtor"));
+            cmbCreateAccount.ItemsSource = new string[] { string.Format(Uniconta.ClientTools.Localization.lookup("CreateOBJ"), Uniconta.ClientTools.Localization.lookup("Debtor")), Uniconta.ClientTools.Localization.lookup("OneTimeDebtor") };
+            cmbCreateAccount.ToolTip = string.Format(Uniconta.ClientTools.Localization.lookup("CreateOBJ"), Uniconta.ClientTools.Localization.lookup("Debtor"));
             this.debtors = Comp.GetCache(typeof(Debtor));
             this.items = Comp.GetCache(typeof(InvItem));
             this.warehouse = Comp.GetCache(typeof(InvWarehouse));
@@ -139,11 +121,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
 
             dgDebtorOrderLineGrid.allowSave = false;
-#if SILVERLIGHT
-            Application.Current.RootVisual.KeyDown += Page_KeyDown;
-#else
             this.KeyDown += Page_KeyDown;
-#endif
         }
 
         private void Page_KeyDown(object sender, KeyEventArgs e)
@@ -328,7 +306,13 @@ namespace UnicontaClient.Pages.CustomPage
                 if (args[2] == this.ParentControl)
                 {
                     LeAccount.LoadItemSource();
-                    if (string.IsNullOrEmpty(LeAccount.EditValue as string))
+                    if (oneTimeDebtor)//one time
+                    {
+                        Order.OneTimeDebtor = args[3] as DebtorClient;
+                        CopyFromDebtor(Order.OneTimeDebtor);
+                        cmbCreateAccount.SelectedIndex = -1;
+                    }
+                    else if (string.IsNullOrEmpty(LeAccount.EditValue as string))
                         LeAccount.SelectedItem = args[3];
                 }
             }
@@ -517,7 +501,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "ShowInvoice":
                 case "GenerateInvoice":
-                    if (!string.IsNullOrEmpty(Order._DCAccount))
+                    if (!string.IsNullOrEmpty(Order._DCAccount) || Order._OneTimeDC != null)
                     {
                         if (Utility.HasControlRights("GenerateInvoice", api.CompanyEntity))
                         {
@@ -658,6 +642,11 @@ namespace UnicontaClient.Pages.CustomPage
             order.DeliveryCity = invoice._DeliveryCity;
             order.DeliveryZipCode = invoice._DeliveryZipCode;
             order.DeliveryCountry = invoice._DeliveryCountry;
+            Order.DeliveryPhone = invoice.DeliveryPhone;
+            Order.DeliveryContactPerson = invoice.DeliveryContactPerson;
+            Order.DeliveryContactEmail = invoice.DeliveryContactEmail;
+
+            order.CompanyAddress = invoice._CompanyAddress;
             order.Installation = invoice._Installation;
             order.YourRef = invoice._YourRef;
             order.OurRef = invoice._OurRef;
@@ -760,7 +749,7 @@ namespace UnicontaClient.Pages.CustomPage
             var lines = (IEnumerable<DCOrderLineClient>)dgDebtorOrderLineGrid.ItemsSource;
             if (lines == null || lines.Count() == 0)
                 return;
-            var dc = dbOrder.Debtor;
+            var dc = dbOrder.OneTimeDebtor == null ? dbOrder.Debtor : dbOrder.OneTimeDebtor;
             if (dc == null || !Utility.IsExecuteWithBlockedAccount(dc))
                 return;
             if (!api.CompanyEntity.SameCurrency(dbOrder._Currency, dc._Currency))
@@ -783,15 +772,24 @@ namespace UnicontaClient.Pages.CustomPage
                 return;
             }
 
-            string debtorName = dbOrder.Debtor?.Name ?? dbOrder._DCAccount;
+            string debtorName, accountName;
+            bool invoiceInXML;
+            if (dbOrder.OneTimeDebtor == null)
+            {
+                debtorName = dc?.Name ?? dbOrder._DCAccount;
+                accountName = Util.ConcatParenthesis(dbOrder._DCAccount, dbOrder.Name);
+                invoiceInXML = dc != null && dc.IsPeppolSupported && dc._einvoice;
+            }
+            else
+            {
+                debtorName = dc?.Name ?? dbOrder.OneTimeDebtor.Account;
+                accountName = Util.ConcatParenthesis(dbOrder.OneTimeDebtor.Account, dbOrder.OneTimeDebtor.Name);
+                invoiceInXML = false;
+            }
 
-            bool invoiceInXML = dc != null && dc.IsPeppolSupported && dc._einvoice;
 
-            var accountName = Util.ConcatParenthesis(dbOrder._DCAccount, dbOrder.Name);
             CWGenerateInvoice GenrateInvoiceDialog = new CWGenerateInvoice(true, string.Empty, false, askForEmail: true, showNoEmailMsg: !hasEmail, debtorName: debtorName, isOrderOrQuickInv: true, isDebtorOrder: true, InvoiceInXML: invoiceInXML, AccountName: accountName);
-#if !SILVERLIGHT
             GenrateInvoiceDialog.DialogTableId = 2000000005;
-#endif
             GenrateInvoiceDialog.SetInvPrintPreview(showInvPrintPrv);
             if (dbOrder._InvoiceDate != DateTime.MinValue)
                 GenrateInvoiceDialog.SetInvoiceDate(dbOrder._InvoiceDate);
@@ -864,33 +862,20 @@ namespace UnicontaClient.Pages.CustomPage
             this.DataContext = null;
             this.DataContext = Order;
         }
+
         void SetMaster(string Account)
         {
-            var Debtor = (Debtor)debtors?.Get(Account);
-            if (Debtor != null)
+            var debtor = (Debtor)debtors?.Get(Account);
+            if (debtor != null)
             {
                 var Order = this.Order;
-                Order.SetMaster(Debtor);
-                if (this.ProjectMaster != null)
-                    Order.SetMaster(this.ProjectMaster);
-                else
-                    Order.PricesInclVat = Debtor._PricesInclVat;
-
-                Order.DeliveryName = Debtor._DeliveryName;
-                Order.DeliveryAddress1 = Debtor._DeliveryAddress1;
-                Order.DeliveryAddress2 = Debtor._DeliveryAddress2;
-                Order.DeliveryAddress3 = Debtor._DeliveryAddress3;
-                Order.DeliveryCity = Debtor._DeliveryCity;
-                Order.DeliveryZipCode = Debtor._DeliveryZipCode;
-                if (Debtor._DeliveryCountry != 0)
-                    Order.DeliveryCountry = Debtor._DeliveryCountry;
-
-                hasEmail = Debtor._InvoiceEmail != null || Debtor._EmailDocuments;
+                Order.SetMaster(debtor);
+                CopyFromDebtor(debtor);
                 PriceLookup?.OrderChanged(Order);
-                BindContact(Debtor);
+                BindContact(debtor);
                 if (installationCache != null)
                 {
-                    leDeliveryAddress.cacheFilter = new AccountCacheFilter(installationCache, Debtor.__DCType(), Debtor._Account);
+                    leDeliveryAddress.cacheFilter = new AccountCacheFilter(installationCache, debtor.__DCType(), debtor._Account);
                     leDeliveryAddress.InvalidCache();
                 }
                 IEnumerable<DCOrderLineClient> lines = (IEnumerable<DCOrderLineClient>)dgDebtorOrderLineGrid.ItemsSource;
@@ -898,10 +883,37 @@ namespace UnicontaClient.Pages.CustomPage
                     lines?.FirstOrDefault()?.SetMaster(Order);
                 Dispatcher.BeginInvoke(new Action(async () =>
                 {
-                    await api.Read(Debtor);
+                    await api.Read(debtor);
                     Order.RefreshBalance();
                 }));
+
+                if (debtor._CreditMax != 0 && debtor._CreditMax <= (debtor._CurBalanceCur != 0 ? debtor._CurBalanceCur : debtor._CurBalance))
+                    UtilDisplay.ShowErrorCode(ErrorCodes.CreditLimitExceeded);
             }
+        }
+
+        void CopyFromDebtor(Debtor debtor)
+        {
+            if (debtor == null)
+                return;
+
+            if (this.ProjectMaster != null)
+                Order.SetMaster(this.ProjectMaster);
+            else
+                Order.PricesInclVat = debtor._PricesInclVat;
+
+            Order.DeliveryName = debtor._DeliveryName;
+            Order.DeliveryAddress1 = debtor._DeliveryAddress1;
+            Order.DeliveryAddress2 = debtor._DeliveryAddress2;
+            Order.DeliveryAddress3 = debtor._DeliveryAddress3;
+            Order.DeliveryCity = debtor._DeliveryCity;
+            Order.DeliveryZipCode = debtor._DeliveryZipCode;
+            if (debtor._DeliveryCountry != 0)
+                Order.DeliveryCountry = debtor._DeliveryCountry;
+            Order.DeliveryPhone = debtor._Phone;
+            Order.DeliveryContactPerson = debtor._ContactPerson;
+            Order.DeliveryContactEmail = debtor._ContactEmail;
+            hasEmail = debtor._InvoiceEmail != null || debtor._EmailDocuments;
         }
 
         async void setVariant(DebtorOrderLineClient rec, bool SetVariant2)
@@ -1138,12 +1150,29 @@ namespace UnicontaClient.Pages.CustomPage
 
         List<TableAddOnData> documents;
 
-        private void btnAccount_Click(object sender, RoutedEventArgs e)
+        private void cmbCreateAccount_SelectedIndexChanged(object sender, RoutedEventArgs e)
         {
-            object[] param = new object[2];
-            param[0] = api;
-            param[1] = null;
-            AddDockItem(TabControls.DebtorAccountPage2, param, Uniconta.ClientTools.Localization.lookup("DebtorAccount"), "Add_16x16");
+            if (cmbCreateAccount.SelectedIndex == -1)
+                return;
+            if (cmbCreateAccount.SelectedIndex == 1)
+            {
+                if (Order.OneTimeDebtor == null)
+                    Order.OneTimeDebtor = Activator.CreateInstance(api.CompanyEntity.GetUserType(typeof(DebtorClient))) as DebtorClient;
+                var debtor = Order.OneTimeDebtor;
+                debtor.Country = (CountryCode)api.CompanyEntity._Country;
+                var debtorAccountPage2 = dockCtrl.AddDockItem(TabControls.DebtorAccountPage2, this.ParentControl, new object[2] { debtor, true }, Uniconta.ClientTools.Localization.lookup("DebtorAccount"), "Add_16x16") as DebtorAccountPage2;
+                debtorAccountPage2.DoNotSave = true;
+                oneTimeDebtor = true;
+            }
+            else
+            {
+                object[] param = new object[2];
+                param[0] = api;
+                param[1] = null;
+                AddDockItem(TabControls.DebtorAccountPage2, param, Uniconta.ClientTools.Localization.lookup("DebtorAccount"), "Add_16x16");
+                oneTimeDebtor = false;
+            }
+            cmbCreateAccount.SelectedIndex = -1;
         }
 
         FileBrowseControl fileBrowser;

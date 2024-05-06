@@ -4,24 +4,14 @@ using DevExpress.Xpf.Docking;
 using DevExpress.Xpf.Grid;
 using DevExpress.Xpf.Grid.Native;
 using DevExpress.Xpf.Grid.Printing;
-using DevExpress.Xpf.Printing;
-using DevExpress.XtraPrinting;
 using DevExpress.XtraPrinting.DataNodes;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
 using Uniconta.API.DebtorCreditor;
 using Uniconta.API.Service;
 using Uniconta.ClientTools;
@@ -31,7 +21,6 @@ using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
 using Uniconta.Common;
 using Uniconta.DataModel;
-using UnicontaClient.Pages;
 using System.Windows.Data;
 using DevExpress.Data.Filtering;
 using Uniconta.Common.Utility;
@@ -162,6 +151,8 @@ namespace UnicontaClient.Pages.CustomPage
         static bool pageBreak, showCurrency = false;
         static int printIntPreview = 1, transaction;
         bool OnlyOpen, OnlyDue = false;
+        string includedJournals;
+
         public static void SetDateTime(DateEditor frmDateeditor, DateEditor todateeditor)
         {
             if (frmDateeditor.Text == string.Empty)
@@ -254,6 +245,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (Comp.RoundTo100)
                 Amount.HasDecimals = colSumAmount.HasDecimals = Debit.HasDecimals = Credit.HasDecimals = false;
 
+            TransactionReport.SetDailyJournal(cmbJournals, api);
             dgDebtorTrans.RowDoubleClick += DgDebtorTrans_RowDoubleClick;
             dgDebtorTrans.SelectedItemChanged += DgDebtorTrans_SelectedItemChanged; ;
             dgDebtorTrans.MasterRowExpanded += DgDebtorTrans_MasterRowExpanded; ;
@@ -662,7 +654,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         void ExpandAndCollapseAll(bool IsCollapseAll)
         {
-            
+
             for (int iRow = 0; iRow < dataRowCount; iRow++)
                 if (!IsCollapseAll)
                     dgDebtorTrans.ExpandMasterRow(iRow);
@@ -747,7 +739,7 @@ namespace UnicontaClient.Pages.CustomPage
                 var transApi = new ReportAPI(api);
                 DebtorStatement.SetDateTime(txtDateFrm, txtDateTo);
                 DateTime fromDate = DebtorStatement.DefaultFromDate, toDate = DebtorStatement.DefaultToDate;
-
+                includedJournals = cmbJournals.Text;
                 if (!SendAll)
                 {
                     // lets check if we will send all anyway.
@@ -767,7 +759,7 @@ namespace UnicontaClient.Pages.CustomPage
                     var skipBlank = cbxSkipBlank.IsChecked.GetValueOrDefault();
                     busyIndicator.IsBusy = true;
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
-                    var result = await transApi.DebtorAccountStatement(fromDate, toDate, fromAccount, toAccount, OnlyOpen, null, false, debtorFilterValues, emails, onlyThisEmail, OnlyDue, skipBlank);
+                    var result = await transApi.DebtorAccountStatement(fromDate, toDate, fromAccount, toAccount, OnlyOpen, null, false, debtorFilterValues, emails, onlyThisEmail, OnlyDue, skipBlank, includedJournals);
                     busyIndicator.IsBusy = false;
                     if (result == ErrorCodes.Succes)
                         UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("SendEmailMsgOBJ"), Uniconta.ClientTools.Localization.lookup("AccountStatement")),
@@ -785,7 +777,7 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         if (!t._Mark)
                             continue;
-                        var result = await transApi.DebtorAccountStatement(fromDate, toDate, t.Account, t.Account, OnlyOpen, null, RunInBack, debtorFilterValues, emails, onlyThisEmail);
+                        var result = await transApi.DebtorAccountStatement(fromDate, toDate, t.Account, t.Account, OnlyOpen, null, RunInBack, debtorFilterValues, emails, onlyThisEmail, false, false, includedJournals);
                         if (result != ErrorCodes.Succes)
                         {
                             string error = string.Format("{0}: {1}", t.Account, Uniconta.ClientTools.Localization.lookup(result.ToString()));
@@ -810,8 +802,8 @@ namespace UnicontaClient.Pages.CustomPage
                         UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("zeroRecords"), Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OK);
                 }
             }
-            finally 
-            { 
+            finally
+            {
                 running = false;
                 ribbonControl.EnableButtons(new string[] { "SendAsEmail" });
             }
@@ -829,17 +821,24 @@ namespace UnicontaClient.Pages.CustomPage
         /* cannot use Grid GetVisibleRows as class is local */
         IEnumerable<DebtorStatementList> GetVisibleRows()
         {
-            int n = dgDebtorTrans.VisibleRowCount;
-            var lst = dgDebtorTrans.ItemsSource as IEnumerable<DebtorStatementList>;
-            if (lst != null && lst.Count() == n)
-                return lst;
-            var Arr = new DebtorStatementList[n];
-            for (int i = 0; i < n; i++)
+            try
             {
-                var dataRow = dgDebtorTrans.GetRow(dgDebtorTrans.GetRowHandleByVisibleIndex(i));
-                Arr.SetValue(dataRow, i);
+                int n = dgDebtorTrans.VisibleRowCount;
+                var lst = dgDebtorTrans.ItemsSource as IEnumerable<DebtorStatementList>;
+                if (lst != null && lst.Count() == n)
+                    return lst;
+                var Arr = new DebtorStatementList[n];
+                for (int i = 0; i < n; i++)
+                {
+                    var dataRow = dgDebtorTrans.GetRow(dgDebtorTrans.GetRowHandleByVisibleIndex(i));
+                    Arr.SetValue(dataRow, i);
+                }
+                return Arr;
             }
-            return Arr;
+            catch
+            {
+                return null;
+            }
         }
 
         void DebtorStatementClientSetMark(bool value)
@@ -861,7 +860,7 @@ namespace UnicontaClient.Pages.CustomPage
             showCurrency = chkShowCurrency.IsChecked.GetValueOrDefault();
             printIntPreview = cmbPrintintPreview.SelectedIndex;
             transaction = cmbTrasaction.SelectedIndex;
-
+            includedJournals = cmbJournals.Text;
             string fromAccount = null, toAccount = null;
             var accountObj = cmbFromAccount.EditValue;
             if (accountObj != null)
@@ -873,7 +872,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             busyIndicator.IsBusy = true;
             var transApi = new ReportAPI(api);
-            var listTrans = (DebtorTransClientTotal[])await transApi.GetTransWithPrimo(new DebtorTransClientTotal(), fromDate, toDate, fromAccount, toAccount, OnlyOpen, null, debtorFilterValues, OnlyDue);
+            var listTrans = (DebtorTransClientTotal[])await transApi.GetTransWithPrimo(new DebtorTransClientTotal(), fromDate, toDate, fromAccount, toAccount, OnlyOpen, null, debtorFilterValues, OnlyDue, includedJournals);
             if (listTrans != null)
             {
                 var t = accountCacheTask;
@@ -972,6 +971,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (statementList.Count == 1)
                     statementList[0].Mark = true;
                 dgDebtorTrans.ItemsSource = statementList;
+                childDgDebtorTrans.RefreshData();
             }
         }
 

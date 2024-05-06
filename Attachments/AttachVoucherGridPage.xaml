@@ -61,6 +61,7 @@ x:Class="UnicontaClient.Pages.CustomPage.AttachVoucherGridPage"
                         <local:CorasauDataGridTemplateColumnClient x:Name="Vat" Width="60" Visible="False"/>
                         <local:CorasauDataGridTemplateColumnClient x:Name="Project" Visible="False" Width="90"/>
                         <local:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Visible="False" Width="90"/>
+                        <local:CorasauDataGridTemplateColumnClient x:Name="WorkSpace" Visible="False" Width="90" />
                         <local:CorasauDataGridTemplateColumnClient x:Name="PaymentMethod" Width="80" Visible="False" />
                         <local:CorasauDataGridTemplateColumnClient x:Name="PaymentId" MinWidth="100" Visible="False"/>
                         <local:CorasauDataGridTemplateColumnClient x:Name="Approver1" Visible="False" Width="80"/>
@@ -99,9 +100,10 @@ x:Class="UnicontaClient.Pages.CustomPage.AttachVoucherGridPage"
                         <local:CorasauDataGridTemplateColumnClient x:Name="SplitFromDate" Visible="False" />
                         <local:CorasauDataGridTemplateColumnClient x:Name="SplitToDate" Visible="False" />
                         <local:CorasauDataGridTemplateColumnClient x:Name="FromEmail" Visible="False" />
+                        <local:CorasauDataGridTemplateColumnClient x:Name="UserId" Width="70" Visible="False"/>
                     </local:VouchersGrid.Columns>
                 </local:VouchersGrid>
-                <GridSplitter HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="{StaticResource BodyTextColorBrush}" Grid.Column="1" ShowsPreview="True" />
+                <GridSplitter HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="{StaticResource EditorForeGroundTextColor}" Grid.Column="1" ShowsPreview="True" />
                 <CorasauControls:UnicontaVoucherViewer x:Name="voucherViewer" Grid.Column="2" />
             </Grid>
         </CorasauControls:BusyIndicator>

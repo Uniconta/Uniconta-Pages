@@ -72,7 +72,8 @@ namespace UnicontaClient.Pages.CustomPage
                Vatlookupeditior.api = VatOprlookupeditior.api = Employeelookupeditor.api = leInvoiceAccount.api =
                dim1lookupeditior.api = dim2lookupeditior.api = dim3lookupeditior.api = dim4lookupeditior.api = dim5lookupeditior.api =
                Paymentlookupeditior.api = grouplookupeditor.api = PriceListlookupeditior.api = lePostingAccount.api = lePaymtFormat.api =
-               leShipment.api = leDeliveryTerm.api = LayoutGrouplookupeditior.api = prCategoryLookUpeditor.api = leD2CAccount.api = leCrmGroup.api= leTransType.api = crudapi;
+               leShipment.api = leDeliveryTerm.api = LayoutGrouplookupeditior.api = prCategoryLookUpeditor.api = leD2CAccount.api = leCrmGroup.api = leTransType.api =
+               leIndustryCode.api = crudapi;
 
             Task t;
             if (crudapi.CompanyEntity.CRM)
@@ -100,7 +101,13 @@ namespace UnicontaClient.Pages.CustomPage
             txtCompanyRegNo.EditValueChanged += TxtCVR_EditValueChanged;
             txtCompanyRegNo.LostFocus += TxtCompanyRegNo_LostFocus;
         }
-
+        private void DeliveryContactEmail_ButtonClicked(object sender)
+        {
+            var mail = string.Concat("mailto:", txtEmail.Text);
+            System.Diagnostics.Process proc = new System.Diagnostics.Process();
+            proc.StartInfo.FileName = mail;
+            proc.Start();
+        }
         private void TxtCompanyRegNo_LostFocus(object sender, RoutedEventArgs e)
         {
             if (!hasValueChanged)
@@ -278,6 +285,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (!string.IsNullOrWhiteSpace(ci?.life?.name))
                     {
                         cvrFound = true;
+                        editrow.IndustryCode = ci.industrycode?.code;
                         var address = ci.address;
                         if (address != null)
                         {

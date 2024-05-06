@@ -6,10 +6,8 @@ x:Class="UnicontaClient.Pages.CustomPage.SerialToOrderLinePage"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    xmlns:toolkit="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Toolkit"
     xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
     xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage" 
-    xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
     xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
     xmlns:docking="http://schemas.devexpress.com/winfx/2008/xaml/docking"
     d:DesignHeight="300" d:DesignWidth="400">
@@ -67,6 +65,9 @@ x:Class="UnicontaClient.Pages.CustomPage.SerialToOrderLinePage"
                                 </localPage:CorasauDataGridTemplateColumnClient>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="CostPrice" MinWidth="90"/>
                             </localPage:SerialToOrderlineGrid.Columns>
+                            <localPage:SerialToOrderlineGrid.TotalSummary>
+                                <localPage:SumColumn FieldName="QtyMarked" SummaryType="Sum" DisplayFormat="{}{0:N2}"  />
+                            </localPage:SerialToOrderlineGrid.TotalSummary>
                         </localPage:SerialToOrderlineGrid>
                     </docking:LayoutPanel>
                     <docking:LayoutPanel Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Unlinked}" FloatOnDoubleClick="False" AllowDrag="False" AllowDock="False" AllowClose="False" AllowContextMenu="False" AllowMaximize="False" AllowDockToDocumentGroup="False" ShowCloseButton="False"  ShowPinButton="False">

@@ -1,14 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-
-using System.Windows.Controls;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
 using Uniconta.ClientTools.Page;
 using UnicontaClient.Utilities;
 using UnicontaClient.Models;
@@ -18,12 +11,9 @@ using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools;
 using Uniconta.API.System;
 using System.Threading.Tasks;
-using System.Globalization;
 using System.Collections;
-using System.Diagnostics;
 using Uniconta.ClientTools.Util;
 using Uniconta.ClientTools.Controls;
-using UnicontaClient;
 using ImportingTool.Model;
 using System.Threading;
 using Uniconta.API.GeneralLedger;
@@ -93,16 +83,6 @@ namespace UnicontaClient.Pages.CustomPage
                 cmbImportDimension.ItemsSource = new List<string>() { "Ingen", "Kun Afdeling", "Afdeling, Bærer", "Afdeling, Bærer, Formål" };
                 cmbImportDimension.SelectedIndex = 3;
 
-                lblDim1.Label = string.Concat(string.Format(Uniconta.ClientTools.Localization.lookup("ImportOBJ"), Uniconta.ClientTools.Localization.lookup("Dimension")), " 1");
-                lblDim2.Label = string.Concat(string.Format(Uniconta.ClientTools.Localization.lookup("ImportOBJ"), Uniconta.ClientTools.Localization.lookup("Dimension")), " 2");
-                lblDim3.Label = string.Concat(string.Format(Uniconta.ClientTools.Localization.lookup("ImportOBJ"), Uniconta.ClientTools.Localization.lookup("Dimension")), " 3");
-                lblDim4.Label = string.Concat(string.Format(Uniconta.ClientTools.Localization.lookup("ImportOBJ"), Uniconta.ClientTools.Localization.lookup("Dimension")), " 4");
-                lblDim5.Label = string.Concat(string.Format(Uniconta.ClientTools.Localization.lookup("ImportOBJ"), Uniconta.ClientTools.Localization.lookup("Dimension")), " 5");
-                txtNavDim1.Text = Uniconta.ClientTools.Localization.lookup("Optional");
-                txtNavDim2.Text = Uniconta.ClientTools.Localization.lookup("Optional");
-                txtNavDim3.Text = Uniconta.ClientTools.Localization.lookup("Optional");
-                txtNavDim4.Text = Uniconta.ClientTools.Localization.lookup("Optional");
-                txtNavDim5.Text = Uniconta.ClientTools.Localization.lookup("Optional");
                 txtNavErrorAccount.Text = Uniconta.ClientTools.Localization.lookup("Required");
                 txtAccountForPrimo.Text = Uniconta.ClientTools.Localization.lookup("Required");
 
@@ -176,23 +156,8 @@ namespace UnicontaClient.Pages.CustomPage
                 lblDimC5.Visibility = Visibility.Visible;
                 cmbImportDimension.Visibility = Visibility.Visible;
 
-                lblDim1.Visibility = Visibility.Collapsed;
-                txtNavDim1.Visibility = Visibility.Collapsed;
-
                 lblInvConEmail.Visibility = Visibility.Visible;
                 cmbInvoiceOrContactMail.Visibility = Visibility.Visible;
-
-                lblDim2.Visibility = Visibility.Collapsed;
-                txtNavDim2.Visibility = Visibility.Collapsed;
-
-                lblDim3.Visibility = Visibility.Collapsed;
-                txtNavDim3.Visibility = Visibility.Collapsed;
-
-                lblDim4.Visibility = Visibility.Collapsed;
-                txtNavDim4.Visibility = Visibility.Collapsed;
-
-                lblDim5.Visibility = Visibility.Collapsed;
-                txtNavDim5.Visibility = Visibility.Collapsed;
 
                 lblerrorAccount.Visibility = Visibility.Collapsed;
                 txtNavErrorAccount.Visibility = Visibility.Collapsed;
@@ -216,23 +181,9 @@ namespace UnicontaClient.Pages.CustomPage
 
                 lblDimC5.Visibility = Visibility.Collapsed;
                 cmbImportDimension.Visibility = Visibility.Collapsed;
-                lblDim1.Visibility = Visibility.Visible;
-                txtNavDim1.Visibility = Visibility.Visible;
 
                 lblInvConEmail.Visibility = Visibility.Collapsed;
                 cmbInvoiceOrContactMail.Visibility = Visibility.Collapsed;
-
-                lblDim2.Visibility = Visibility.Visible;
-                txtNavDim2.Visibility = Visibility.Visible;
-
-                lblDim3.Visibility = Visibility.Visible;
-                txtNavDim3.Visibility = Visibility.Visible;
-
-                lblDim4.Visibility = Visibility.Visible;
-                txtNavDim4.Visibility = Visibility.Visible;
-
-                lblDim5.Visibility = Visibility.Visible;
-                txtNavDim5.Visibility = Visibility.Visible;
 
                 lblSet0InCustAcc.Visibility = Visibility.Collapsed;
                 lblSet0InVendAcc.Visibility = Visibility.Collapsed;
@@ -268,23 +219,9 @@ namespace UnicontaClient.Pages.CustomPage
 
                 lblDimC5.Visibility = Visibility.Collapsed;
                 cmbImportDimension.Visibility = Visibility.Collapsed;
-                lblDim1.Visibility = Visibility.Collapsed;
-                txtNavDim1.Visibility = Visibility.Collapsed;
 
                 lblInvConEmail.Visibility = Visibility.Visible;
                 cmbInvoiceOrContactMail.Visibility = Visibility.Visible;
-
-                lblDim2.Visibility = Visibility.Collapsed;
-                txtNavDim2.Visibility = Visibility.Collapsed;
-
-                lblDim3.Visibility = Visibility.Collapsed;
-                txtNavDim3.Visibility = Visibility.Collapsed;
-
-                lblDim4.Visibility = Visibility.Collapsed;
-                txtNavDim4.Visibility = Visibility.Collapsed;
-
-                lblDim5.Visibility = Visibility.Collapsed;
-                txtNavDim5.Visibility = Visibility.Collapsed;
 
                 lblSet0InCustAcc.Visibility = Visibility.Collapsed;
                 lblSet0InVendAcc.Visibility = Visibility.Collapsed;
@@ -310,23 +247,8 @@ namespace UnicontaClient.Pages.CustomPage
                 chkSet0InCustAcc.Visibility = Visibility.Visible;
                 chkSet0InVendAcc.Visibility = Visibility.Visible;
 
-                lblDim1.Visibility = Visibility.Collapsed;
-                txtNavDim1.Visibility = Visibility.Collapsed;
-
                 lblInvConEmail.Visibility = Visibility.Visible;
                 cmbInvoiceOrContactMail.Visibility = Visibility.Visible;
-
-                lblDim2.Visibility = Visibility.Collapsed;
-                txtNavDim2.Visibility = Visibility.Collapsed;
-
-                lblDim3.Visibility = Visibility.Collapsed;
-                txtNavDim3.Visibility = Visibility.Collapsed;
-
-                lblDim4.Visibility = Visibility.Collapsed;
-                txtNavDim4.Visibility = Visibility.Collapsed;
-
-                lblDim5.Visibility = Visibility.Collapsed;
-                txtNavDim5.Visibility = Visibility.Collapsed;
 
                 lblerrorAccount.Visibility = Visibility.Collapsed;
                 txtNavErrorAccount.Visibility = Visibility.Collapsed;
@@ -345,23 +267,8 @@ namespace UnicontaClient.Pages.CustomPage
                 lblDimC5.Visibility = Visibility.Collapsed;
                 cmbImportDimension.Visibility = Visibility.Collapsed;
 
-                lblDim1.Visibility = Visibility.Collapsed;
-                txtNavDim1.Visibility = Visibility.Collapsed;
-
                 lblInvConEmail.Visibility = Visibility.Visible;
                 cmbInvoiceOrContactMail.Visibility = Visibility.Visible;
-
-                lblDim2.Visibility = Visibility.Collapsed;
-                txtNavDim2.Visibility = Visibility.Collapsed;
-
-                lblDim3.Visibility = Visibility.Collapsed;
-                txtNavDim3.Visibility = Visibility.Collapsed;
-
-                lblDim4.Visibility = Visibility.Collapsed;
-                txtNavDim4.Visibility = Visibility.Collapsed;
-
-                lblDim5.Visibility = Visibility.Collapsed;
-                txtNavDim5.Visibility = Visibility.Collapsed;
 
                 lblSet0InCustAcc.Visibility = Visibility.Collapsed;
                 lblSet0InVendAcc.Visibility = Visibility.Collapsed;
@@ -384,10 +291,12 @@ namespace UnicontaClient.Pages.CustomPage
                 txtDinero.Text = Uniconta.ClientTools.Localization.lookup("NotApproved");
                 liDirectory.Visibility = Visibility.Collapsed;
                 txtImportFromDirectory.Text = string.Empty;
+                liPhysicalVoucherDir.Visibility = Visibility.Visible;
             }
             else
             {
                 liAuthrizeDinero.Visibility = Visibility.Collapsed;
+                liPhysicalVoucherDir.Visibility = Visibility.Collapsed;
                 liDirectory.Visibility = Visibility.Visible;
                 txtImportFromDirectory.Text = string.Empty;
             }
@@ -601,12 +510,12 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 if (setupType == 1)
                 {
+                    busyIndicator.IsBusy = true;
                     if (fromCompany != null)
                     {
                         editrow.CopyFunctions(fromCompany);
                         busyIndicator.BusyContent = string.Format(Uniconta.ClientTools.Localization.lookup("CopyingCompany"), fromCompany._Name, editrow._Name);
                     }
-                    busyIndicator.IsBusy = true;
                     if (chkDimensions.IsChecked == true && fromCompany != null)
                     {
                         var dim = await session.GetCompany(fromCompany.CompanyId);
@@ -621,8 +530,7 @@ namespace UnicontaClient.Pages.CustomPage
                         }
                     }
                 }
-                else
-                    busyIndicator.IsBusy = true;
+
                 if (string.IsNullOrWhiteSpace(editrow._Name))
                     editrow._Name = "import";
                 if (setupType == 1)
@@ -633,9 +541,7 @@ namespace UnicontaClient.Pages.CustomPage
                     else
                         err = await session.CreateCompany(editrow);
                     if (err == ErrorCodes.Succes)
-                    {
-                        AfterCompanyCreated(editrow, setupType);
-                    }
+                        await AfterCompanyCreated(editrow, setupType);
                     else
                     {
                         busyIndicator.IsBusy = false;
@@ -646,56 +552,41 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     var pastYears = string.IsNullOrWhiteSpace(invoiceDateCounter.Text) ? 0 : -(int)NumberConvert.ToInt(invoiceDateCounter.Text);
                     DateTime invoiceFrmDate = DateTime.Today.AddYears(pastYears);
-                    var listOfNavDim = new List<string>();
-                    var dim = string.IsNullOrWhiteSpace(txtNavDim1.Text) ? string.Empty : txtNavDim1.Text;
-                    listOfNavDim.Add(dim);
-                    dim = string.IsNullOrWhiteSpace(txtNavDim2.Text) ? string.Empty : txtNavDim2.Text;
-                    listOfNavDim.Add(dim);
-                    dim = string.IsNullOrWhiteSpace(txtNavDim3.Text) ? string.Empty : txtNavDim3.Text;
-                    listOfNavDim.Add(dim);
-                    dim = string.IsNullOrWhiteSpace(txtNavDim4.Text) ? string.Empty : txtNavDim4.Text;
-                    listOfNavDim.Add(dim);
-                    dim = string.IsNullOrWhiteSpace(txtNavDim5.Text) ? string.Empty : txtNavDim5.Text;
-                    listOfNavDim.Add(dim);
-
-                    var arrayOfNavDim = listOfNavDim.ToArray();
                     var comp = new Company();
                     CorasauDataGrid.CopyAndClearRowId(editrow, comp);
                     comp._Name = editrow.Name;
-                    object[] compParams = new object[19];
+                    object[] compParams = new object[18];
                     compParams[0] = path;
                     compParams[1] = comp;
                     compParams[2] = (ImportFrom)importFrom;
                     compParams[3] = set0InAccount;
                     compParams[4] = importDim;
-                    compParams[5] = arrayOfNavDim;
-                    compParams[6] = cmbInvoiceOrContactMail.SelectedIndex == 0;
-                    compParams[7] = txtNavErrorAccount.Text;
-                    compParams[8] = includeVatInPrices;
-                    compParams[9] = chkLedgerTransactions.IsChecked.GetValueOrDefault();
-                    compParams[10] = chkDebtorTransactions.IsChecked.GetValueOrDefault();
-                    compParams[11] = chkCreditorTransactions.IsChecked.GetValueOrDefault();
-                    compParams[12] = txtAccountForPrimo.Text;
-                    compParams[13] = chkImportInvoice.IsChecked.GetValueOrDefault();
-                    compParams[14] = set0InCustAcc;
-                    compParams[15] = set0InVendAcc;
-                    compParams[16] = concatC5ItemNames;
-                    compParams[17] = invoiceFrmDate;
-                    compParams[18] = usermaster;
+                    compParams[5] = cmbInvoiceOrContactMail.SelectedIndex == 0;
+                    compParams[6] = txtNavErrorAccount.Text;
+                    compParams[7] = includeVatInPrices;
+                    compParams[8] = chkLedgerTransactions.IsChecked.GetValueOrDefault();
+                    compParams[9] = chkDebtorTransactions.IsChecked.GetValueOrDefault();
+                    compParams[10] = chkCreditorTransactions.IsChecked.GetValueOrDefault();
+                    compParams[11] = txtAccountForPrimo.Text;
+                    compParams[12] = chkImportInvoice.IsChecked.GetValueOrDefault();
+                    compParams[13] = set0InCustAcc;
+                    compParams[14] = set0InVendAcc;
+                    compParams[15] = concatC5ItemNames;
+                    compParams[16] = invoiceFrmDate;
+                    compParams[17] = usermaster;
                     string header = string.Format(Uniconta.ClientTools.Localization.lookup("ImportOBJ"), Uniconta.ClientTools.Localization.lookup("Company"));
                     AddDockItem(TabControls.ImportFromOtherCompanySetup, compParams, header);
                 }
             }
             catch (Exception ex)
             {
+                busyIndicator.IsBusy = false;
                 BasePage.session.ReportException(ex, "Create Company. Setup Page", 0);
                 UnicontaMessageBox.Show(ex);
             }
-            if (setupType == 1)
-                busyIndicator.IsBusy = false;
         }
 
-        async void AfterCompanyCreated(Company editrow, int setupType)
+        async Task AfterCompanyCreated(Company editrow, int setupType)
         {
             Company[] companies = await BasePage.session.GetCompanies();
             UnicontaClient.Controls.CWDefaultCompany.loadedCompanies = companies;
@@ -709,11 +600,11 @@ namespace UnicontaClient.Pages.CustomPage
                     await CopyBaseData();
             }
             await SaveCompanyLogos();
+            busyIndicator.IsBusy = false;
+          
             if (usermaster != null && usermaster.Uid != session.Uid)
-            {
-                busyIndicator.IsBusy = false;
                 return;
-            }
+
             if (setupType == 1)
             {
                 globalEvents.OnRefresh(TabControls.CreateCompany, editrow.RowId);
@@ -764,7 +655,6 @@ namespace UnicontaClient.Pages.CustomPage
             Thread.Sleep(2 * 1000);
             editrow.ClearCache(typeof(GLVat));
             editrow.ClearCache(typeof(GLAccount));
-            busyIndicator.IsBusy = false;
             if (res != ErrorCodes.Succes)
                 UtilDisplay.ShowErrorCode(res);
         }
@@ -853,6 +743,8 @@ namespace UnicontaClient.Pages.CustomPage
 
                     if (!string.IsNullOrWhiteSpace(ci?.life?.name))
                     {
+                        editrow.IndustryCode = ci.industrycode?.code;
+
                         var address = ci.address;
                         if (address != null)
                         {
@@ -894,64 +786,8 @@ namespace UnicontaClient.Pages.CustomPage
             Utility.OpenGoogleMap(location);
         }
 
-
-        private bool isEnteredDim1 = false;
-        private bool isEnteredDim2 = false;
-        private bool isEnteredDim3 = false;
-        private bool isEnteredDim4 = false;
-        private bool isEnteredDim5 = false;
         private bool isEnteredErrorAcc = false;
         private bool isEnteredPrimoAcc = false;
-
-        private void TxtNavDim1_OnGotFocus(object sender, RoutedEventArgs e)
-        {
-            if (!isEnteredDim1)
-            {
-                txtNavDim1.Text = "";
-                isEnteredDim1 = true;
-                txtNavDim1.FontWeight = FontWeights.Normal;
-            }
-        }
-
-        private void TxtNavDim2_OnGotFocus(object sender, RoutedEventArgs e)
-        {
-            if (!isEnteredDim2)
-            {
-                txtNavDim2.Text = "";
-                txtNavDim2.FontWeight = FontWeights.Normal;
-                isEnteredDim2 = true;
-            }
-        }
-
-        private void TxtNavDim3_OnGotFocus(object sender, RoutedEventArgs e)
-        {
-            if (!isEnteredDim3)
-            {
-                txtNavDim3.Text = "";
-                txtNavDim3.FontWeight = FontWeights.Normal;
-                isEnteredDim3 = true;
-            }
-        }
-
-        private void TxtNavDim4_OnGotFocus(object sender, RoutedEventArgs e)
-        {
-            if (!isEnteredDim4)
-            {
-                txtNavDim4.Text = "";
-                txtNavDim4.FontWeight = FontWeights.Normal;
-                isEnteredDim4 = true;
-            }
-        }
-
-        private void TxtNavDim5_OnGotFocus(object sender, RoutedEventArgs e)
-        {
-            if (!isEnteredDim5)
-            {
-                txtNavDim5.Text = "";
-                txtNavDim5.FontWeight = FontWeights.Normal;
-                isEnteredDim5 = true;
-            }
-        }
 
         private void TxtAccountForPrimo_OnGotFocus(object sender, RoutedEventArgs e)
         {
@@ -1033,7 +869,7 @@ namespace UnicontaClient.Pages.CustomPage
                     editrow.CompanyName = comp.Name;
                     editrow.Phone = comp.Phone;
                     editrow.Address1 = comp.Street;
-                    editrow.Address2 = comp.ZipCode + " " + comp.City; 
+                    editrow.Address2 = comp.ZipCode + " " + comp.City;
                     editrow.Email = comp.Email;
                     editrow.Www = comp.Website;
                     editrow._Id = comp.VatNumber;
@@ -1045,6 +881,14 @@ namespace UnicontaClient.Pages.CustomPage
             cwDineroAuthorize.ShowDialog();
         }
 
-
+        private void liPhysicalVoucherDir_ButtonClicked(object sender)
+        {
+            var openFolderDialog = UtilDisplay.LoadFolderBrowserDialog;
+            if (openFolderDialog.ShowDialog() == true)
+            {
+                txtPhysicalVoucherDir.Text = openFolderDialog.SelectedPath;
+                Dinero.PhysicalVoucherPath = openFolderDialog.SelectedPath;
+            }
+        }
     }
 }

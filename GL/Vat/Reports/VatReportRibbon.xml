@@ -7,6 +7,7 @@
     <RibbonItem Action="VatReportSpain" LocalizedNameKey="Modelo 303" LargeGlyph="Show_Invoice_32x32" ShortcutKey="Ctrl+G"/>
     <RibbonItem Action="VatReportNorway" LocalizedNameKey="VatDeclaration" LargeGlyph="Add_Menu_32x32"/>
     <RibbonItem Action="VatReportDenmark" LocalizedNameKey="VatDeclaration" LargeGlyph="Show_Invoice_32x32" ShortcutKey="Ctrl+G"/>
+    <RibbonItem Action="OLDVatReportDenmark" LocalizedNameKey="'Gammel' Momsopgørelse" LargeGlyph="Show_Invoice_32x32" ShortcutKey="Ctrl+G"/>
     <RibbonItem Action="VatReportHolland" LocalizedNameKey="VatDeclaration" LargeGlyph="Show_Invoice_32x32" ShortcutKey="Ctrl+G"/>
     <RibbonItem Action="VatReportEstonia" LocalizedNameKey="VatDeclaration" LargeGlyph="Show_Invoice_32x32" ShortcutKey="Ctrl+G"/>
     <RibbonItem Action="VatReportIceland" LocalizedNameKey="VatDeclaration" LargeGlyph="Show_Invoice_32x32" ShortcutKey="Ctrl+G"/>

@@ -208,6 +208,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 }
                                 break;
                             case CWConfirmationBox.ConfirmationResultEnum.No:
+                                dgDebtorOrderlineGrid.CancelChanges();
                                 break;
                         }
                         editAllChecked = true;

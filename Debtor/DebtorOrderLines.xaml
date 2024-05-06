@@ -162,6 +162,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrderLines"
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Date" Width="90" Visible="False"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="SerieBatchMarked" Width="90" HideHeaderCheck="true" Visible="False"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="PostingAccount" Width="100" Visible="False"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="PostingText" Width="100" Visible="False"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="PurchaseAccount" Width="100" Visible="False"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Vat" Width="50" Visible="False"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Employee" Width="50" Visible="False"/>
@@ -186,6 +187,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrderLines"
                                 </localPage:CorasauDataGridTemplateColumnClient>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="LineNumber" Mask="" Width="70" Visible="False"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="OrderNumber" Width="70" Visible="False"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="PrimaryKey2Id" Width="70" Visible="False"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="UpdatedAt"   Visible="False">
                                     <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                         <DataTemplate>

@@ -73,21 +73,13 @@ namespace UnicontaClient.Pages.CustomPage
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "UndoDelete", "SaveGrid" });
             dgProjectGrid.CustomSummary += DgProjectGrid_CustomSummary;
-#if SILVERLIGHT
-            Application.Current.RootVisual.KeyDown += RootVisual_KeyDown;
-#else
             this.PreviewKeyDown += RootVisual_KeyDown;
-#endif
             this.BeforeClose += Project_BeforeClose;
         }
 
         private void Project_BeforeClose()
         {
-#if SILVERLIGHT
-            Application.Current.RootVisual.KeyDown -= RootVisual_KeyDown;
-#else
             this.PreviewKeyDown -= RootVisual_KeyDown;
-#endif
         }
 
         private void RootVisual_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
@@ -309,13 +301,9 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                     break;
                 case "ChartView":
-#if SILVERLIGHT
-                    UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("SilverlightSupport"), Uniconta.ClientTools.Localization.lookup("Message"), MessageBoxButton.OK);
-#else
                     if (selectedItem != null)
                         AddDockItem(TabControls.ProjectTaskPage, selectedItem, string.Format("{0}({1}): {2}", Uniconta.ClientTools.Localization.lookup("Tasks"), Uniconta.ClientTools.Localization.lookup("EnableChart")
                             , selectedItem._Number));
-#endif
                     break;
 
                 case "GridView":
@@ -338,12 +326,10 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         CreateOrder(selectedItem);
                     break;
-#if !SILVERLIGHT
                 case "PrTransPivot":
                     if (selectedItem != null)
                         AddDockItem(TabControls.ProjectTransPivotReport, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Pivot"), selectedItem._Name));
                     break;
-#endif
                 case "Invoices":
                     if (selectedItem != null)
                     {
@@ -385,6 +371,14 @@ namespace UnicontaClient.Pages.CustomPage
                 case "RefreshGrid":
                     TestDebtorReload(true, dgProjectGrid.ItemsSource as IEnumerable<Uniconta.DataModel.Project>);
                     break;
+                case "DeleteTransactions":
+                    if (selectedItem != null)
+                        DeleteOldTransactions();
+                    break;
+                case "Reservations":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.ProjReservationLine, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Reservations"), selectedItem._Number));
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -395,9 +389,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void CreateBudget()
         {
             var cwCreateBjt = new CwCreateUpdateBudget(api, 0);
-#if !SILVERLIGHT
             cwCreateBjt.DialogTableId = 2000000177;
-#endif
             cwCreateBjt.Closed += async delegate
             {
                 if (cwCreateBjt.DialogResult == true)
@@ -422,9 +414,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void CreateBudgetTask()
         {
             var cwCreateBjtTask = new CwCreateBudgetTask(api, 0);
-#if !SILVERLIGHT
             cwCreateBjtTask.DialogTableId = 2000000179;
-#endif
             cwCreateBjtTask.Closed += async delegate
             {
                 if (cwCreateBjtTask.DialogResult == true)
@@ -451,9 +441,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void UpdatePrices()
         {
             var cwUpdateBjt = new CwCreateUpdateBudget(api, 1);
-#if !SILVERLIGHT
             cwUpdateBjt.DialogTableId = 2000000178;
-#endif
             cwUpdateBjt.Closed += async delegate
             {
                 if (cwUpdateBjt.DialogResult == true)
@@ -479,9 +467,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void CreateTaskFromTask()
         {
             var cwCreateTask = new CWCreateTaskFromTask(api);
-#if !SILVERLIGHT
             cwCreateTask.DialogTableId = 2000000105;
-#endif
             cwCreateTask.Closed += async delegate
             {
                 if (cwCreateTask.DialogResult == true)
@@ -565,9 +551,7 @@ namespace UnicontaClient.Pages.CustomPage
         void CreateZeroInvoice(ProjectClient selectedItem)
         {
             var cwCreateZeroInvoice = new UnicontaClient.Pages.CwCreateZeroInvoice(api, selectedItem);
-#if !SILVERLIGHT
             cwCreateZeroInvoice.DialogTableId = 2000000067;
-#endif
             cwCreateZeroInvoice.Closed += delegate
             {
                 if (cwCreateZeroInvoice.DialogResult == true)
@@ -642,43 +626,34 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void PrintProjectInvoicePostingResult(ProjectClient selectedItem)
         {
-            var generateInvoiceDialog = new CWProjectGenerateInvoice(api, BasePage.GetSystemDefaultDate(), showToFromDate: true, showEmailList: true, showSendOnlyEmailCheck: true);
-#if SILVERLIGHT
-            generateInvoiceDialog.Height = 360.0d;
-#else
-            generateInvoiceDialog.DialogTableId = 2000000047;
-#endif
-            generateInvoiceDialog.Closed += async delegate
-            {
-                if (generateInvoiceDialog.DialogResult == true)
+                var generateInvoiceDialog = new CWProjectGenerateInvoice(api, BasePage.GetSystemDefaultDate(), showToFromDate: true, showEmailList: true, showSendOnlyEmailCheck: true);
+                generateInvoiceDialog.DialogTableId = 2000000047;
+                generateInvoiceDialog.Closed += async delegate
                 {
-                    busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
-                    busyIndicator.IsBusy = true;
-                    var isSimulated = generateInvoiceDialog.IsSimulation;
-#if !SILVERLIGHT
-                    var invoicePostingResult = new UnicontaClient.Pages.InvoicePostingPrintGenerator(
-#elif SILVERLIGHT
-                    var invoicePostingResult = new InvoicePostingPrintGenerator(
-#endif
-                    api, this);
-                    invoicePostingResult.SetUpInvoicePosting(selectedItem, null, generateInvoiceDialog.GenrateDate, isSimulated, CompanyLayoutType.Invoice, generateInvoiceDialog.ShowInvoice, generateInvoiceDialog.InvoiceQuickPrint,
-                        generateInvoiceDialog.NumberOfPages, generateInvoiceDialog.SendByEmail, generateInvoiceDialog.EmailList, generateInvoiceDialog.SendOnlyEmail, generateInvoiceDialog.FromDate, generateInvoiceDialog.ToDate,
-                        generateInvoiceDialog.InvoiceCategory, generateInvoiceDialog.GenerateOIOUBLClicked, null);
-
-                    var result = await invoicePostingResult.Execute();
-                    busyIndicator.IsBusy = false;
-
-                    if (result)
+                    if (generateInvoiceDialog.DialogResult == true)
                     {
-                        Task reloadTask = null;
-                        if (!isSimulated)
-                            reloadTask = Filter();
+                        busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
+                        busyIndicator.IsBusy = true;
+                        var isSimulated = generateInvoiceDialog.IsSimulation;
+                        var invoicePostingResult = new UnicontaClient.Pages.InvoicePostingPrintGenerator(api, this);
+                        invoicePostingResult.SetUpInvoicePosting(selectedItem, null, generateInvoiceDialog.GenrateDate, isSimulated, CompanyLayoutType.Invoice, generateInvoiceDialog.ShowInvoice, generateInvoiceDialog.InvoiceQuickPrint,
+                            generateInvoiceDialog.NumberOfPages, generateInvoiceDialog.SendByEmail, generateInvoiceDialog.EmailList, generateInvoiceDialog.SendOnlyEmail, generateInvoiceDialog.FromDate, generateInvoiceDialog.ToDate,
+                            generateInvoiceDialog.InvoiceCategory, generateInvoiceDialog.GenerateOIOUBLClicked, null);
+
+                        var result = await invoicePostingResult.Execute();
+                        busyIndicator.IsBusy = false;
+
+                        if (result)
+                        {
+                            Task reloadTask = null;
+                            if (!isSimulated)
+                                reloadTask = Filter();
+                        }
+                        else
+                            Utility.ShowJournalError(invoicePostingResult.PostingResult.ledgerRes, dgProjectGrid);
                     }
-                    else
-                        Utility.ShowJournalError(invoicePostingResult.PostingResult.ledgerRes, dgProjectGrid);
-                }
-            };
-            generateInvoiceDialog.Show();
+                };
+                generateInvoiceDialog.Show();
         }
 
         void CopyRecord(ProjectClient selectedItem)
@@ -732,6 +707,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 }
                                 break;
                             case CWConfirmationBox.ConfirmationResultEnum.No:
+                                dgProjectGrid.CancelChanges();
                                 break;
                         }
                         editAllChecked = true;
@@ -798,7 +774,6 @@ namespace UnicontaClient.Pages.CustomPage
                 AddDockItem(TabControls.UserNotesPage, dgProjectGrid.syncEntity);
         }
 
-#if !SILVERLIGHT
         private void HasEmailImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             var projectClient = (sender as TextBlock).Tag as ProjectClient;
@@ -810,6 +785,34 @@ namespace UnicontaClient.Pages.CustomPage
                 proc.Start();
             }
         }
-#endif
+        void DeleteOldTransactions()
+        {
+            var papi = new UnicontaAPI.Project.API.PostingAPI(api);
+            var cwDateSelector = new CWDateSelector();
+            cwDateSelector.DialogTableId = 2000000042;
+            cwDateSelector.Title = Uniconta.ClientTools.Localization.lookup("DeleteTrans");
+            cwDateSelector.Closed += delegate
+            {
+                if (cwDateSelector.DialogResult == true)
+                {
+                    var messageBox = new CWConfirmationBox(Uniconta.ClientTools.Localization.lookup("AreYouSureToContinue"), Uniconta.ClientTools.Localization.lookup("Delete"), false, string.Format("{0}:",
+                           Uniconta.ClientTools.Localization.lookup("Warning")));
+                    messageBox.Closed += async delegate
+                    {
+                        if (messageBox.ConfirmationResult == CWConfirmationBox.ConfirmationResultEnum.Yes)
+                        {
+                            busyIndicator.IsBusy = true;
+                            var result = await papi.DeleteTransactions((dgProjectGrid.SelectedItem as ProjectClient).KeyStr, cwDateSelector.SelectedDate);
+                            busyIndicator.IsBusy = false;
+                            if (result != ErrorCodes.Succes)
+                                UtilDisplay.ShowErrorCode(result);
+                        }
+                    };
+                    messageBox.Show();
+
+                }
+            };
+            cwDateSelector.Show();
+        }
     }
 }

@@ -32,14 +32,15 @@
 	</RibbonItem>
 	<RibbonItem>
 		<RibbonItem Action="ViewDownloadRow" ShortcutKey="F7" LocalizedNameKey="View" LargeGlyph="View_Highlighted_32x32" />
-		<RibbonItem Action="CheckIfPosted" LocalizedNameKey="CheckIfPosted" LargeGlyph="Check_Journal_32x32"/>
+    <RibbonItem Action="CheckIfPosted" LocalizedNameKey="CheckIfPosted" LargeGlyph="Check_Journal_32x32"/>
+    <RibbonItem Action="Transactions" LocalizedNameKey="AccountsTransaction" LargeGlyph="Posted_Transaction_32x32"/>
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="GenerateJournalLines" LocalizedNameKey="GenerateJournalLines" ControlName="GL_DailyJournal" LargeGlyph="Move_32x32" ShortcutKey="Ctrl+J" />
 		<RibbonItem Action="ViewJournalLines" LocalizedNameKey="Journallines" ControlName="GL_DailyJournal" LargeGlyph="Journal_Lines_32x32" />
 		<RibbonItem Action="PostJournal" LocalizedNameKey="PostDirectly" ControlName="GL_DailyJournal" LargeGlyph="Posted_Journal_32x32"/>
 		<RibbonItem Action="GeneratePurchaseOrder" LocalizedNameKey="GeneratePurchaseOrder" ControlName="CreditorOrders" LargeGlyph="Move_32x32" ShortcutKey="Ctrl+G" />
-    <RibbonItem Action="Attach" LocalizedNameKey="Attach" LargeGlyph="Add_32x32"/>
+    <RibbonItem Action="Attach" LocalizedNameKey="Attach" LargeGlyph="Attachments_32x32"/>
   </RibbonItem>
 	<RibbonItem LocalizedNameKey="Bilagscan">
 		<RibbonItem Action="BilagscanSend" LocalizedNameKey="BilagscanSend" Module="Bilagscan" LargeGlyph=";component/Assets/img/Export_32x32" />

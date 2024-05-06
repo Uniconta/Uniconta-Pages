@@ -137,6 +137,9 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjInvProposalPage2"
                         <CorasauControls:CorasauLayoutItem FieldName="Installation" x:Name="lblDeliveryAddress" Style="{StaticResource LayoutItemsstyle}" ButtonContent="&#x2B9D;" ButtonClicked="lblDeliveryAddress_ButtonClicked">
                             <CorasauControls:LookupEditor x:Name="leDeliveryAddress" EditValue="{Binding Installation,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="CompanyAddress" x:Name="lblCompanyAddress" Style="{StaticResource LayoutItemsstyle}" ButtonContent="&#x2B9D;" ButtonClicked="lblCompanyAddress_ButtonClicked">
+                            <CorasauControls:LookupEditor x:Name="leCompanyAddress" EditValue="{Binding CompanyAddress,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="DeliveryIsInvoiceAddress" x:Name="liDeliveryIsInvoiceAddress">
                             <CorasauControls:CheckEditor x:Name="chkDeliveryIsInvoiceAddress" IsChecked="{Binding DeliveryIsInvoiceAddress, Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>

@@ -4,8 +4,20 @@
     <!---When we create a new group and a new TabPage -->
     <RibbonItem Action="NewExport" ShortcutKey="Ctrl+N" LocalizedNameKey="NewOBJ" Parameter="Export" LargeGlyph="Export_32x32"/>
     <RibbonItem Action="DeleteExport" ShortcutKey="Ctrl+D" LocalizedNameKey="DeleteOBJ" Parameter="Export" LargeGlyph="Delete_32x32"/>
+  </RibbonItem>
+  <RibbonItem>
     <RibbonItem Action="ShowExport" ShortcutKey="Ctrl+T" LocalizedNameKey="ShowOBJ" Parameter="Export" LargeGlyph="Invoice_32x32"/>
+  </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="NewSupplement" ShortcutKey="Ctrl+N" LocalizedNameKey="NewOBJ" Parameter="SupplementaryTransactions" LargeGlyph="Export_32x32"/>
     <RibbonItem Action="ShowSupplement" LocalizedNameKey="ShowOBJ" Parameter="SupplementaryTransactions" LargeGlyph="Invoice_32x32"/>
+  </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="DatevHeader" LocalizedNameKey="DatevHeader" LargeGlyph="CreateExit_32x32"/>
+    <RibbonItem Action="DatevVerbinden" LocalizedNameKey="HideOBJ"  Parameter="Green" LargeGlyph="datevconnectb"/>
+    <RibbonItem Action="Upload" LocalizedNameKey="Upload" Parameter="SupplementaryTransactions3" LargeGlyph="datevupload"/>
+    <RibbonItem Action="ConnectedApplications" LocalizedNameKey="Connected Applications" Parameter="SupplementaryTransactions3" LargeGlyph="datevrework"/>
+    <RibbonItem Action="Revoke" LocalizedNameKey="Abmelden" Parameter="SupplementaryTransactions3" LargeGlyph="datevrework"/> 
   </RibbonItem>
   <RibbonItem>
     <!---If we want to create a new group in same PageTab-->
@@ -20,5 +32,13 @@
       <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportLayout" Glyph="Import_16x16"  ShortcutKey=""/>
       <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16" ShortcutKey=""/>
     </RibbonItem>
+  </RibbonItem>
+  <RibbonItem>
+    <!--RibbonItem LocalizedNameKey="ShowAmount" Action="ShowAmount" LargeGlyph="Budget_32x32"/-->
+    <RibbonItem LocalizedNameKey="TokenValid" StatusValue="to"></RibbonItem>
+    <RibbonItem LocalizedNameKey="ToTime" StatusValue="a" />
+    <RibbonItem LocalizedNameKey="ToService" StatusValue="b" />
+    <RibbonItem LocalizedNameKey="User" StatusValue="c" />
+    <RibbonItem LocalizedNameKey="Send" StatusValue="d" />
   </RibbonItem>
 </root>

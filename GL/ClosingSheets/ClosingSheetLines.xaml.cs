@@ -433,7 +433,7 @@ namespace UnicontaClient.Pages.CustomPage
                     RecalculateSum();
                     break;
                 case "SaveGrid":
-                    saveGrid();
+                    SaveAndClose();
                     break;
                 case "DeleteRow":
                     dgClosingSheetLine.DeleteRow();
@@ -446,21 +446,30 @@ namespace UnicontaClient.Pages.CustomPage
                     AddDockItem(TabControls.AccountsTransaction, dgAccountsTransGrid.syncEntity, vheader);
                     break;
                 case "ReverseVoucher":
-                    if (trans == null)
+                    var selectedItems = dgAccountsTransGrid.SelectedItems as IList;
+
+                    if (selectedItems == null)
                         return;
-                    GLClosingSheetLineLocal closingLine = new GLClosingSheetLineLocal();
-                    closingLine.Account = trans._Account;
-                    closingLine.Text = trans._Text;
-                    closingLine.TransType = trans._TransType;
-                    closingLine.Dimension1 = trans._Dimension1;
-                    closingLine.Dimension2 = trans._Dimension2;
-                    closingLine.Dimension3 = trans._Dimension3;
-                    closingLine.Dimension4 = trans._Dimension4;
-                    closingLine.Dimension5 = trans._Dimension5;
-                    closingLine.Amount = -trans._Amount;
-                    if (UseVATCodes)
-                        closingLine.Vat = trans._Vat;
-                    dgClosingSheetLine.AddRow(closingLine);
+                    foreach (GLTransClient tran in selectedItems)
+                    {
+                        var closingLine = new GLClosingSheetLineLocal
+                        {
+                            Account = tran._Account,
+                            Text = tran._Text,
+                            _Voucher = tran._Voucher,
+                            _Date = tran._Date,
+                            TransType = tran._TransType,
+                            Dimension1 = tran._Dimension1,
+                            Dimension2 = tran._Dimension2,
+                            Dimension3 = tran._Dimension3,
+                            Dimension4 = tran._Dimension4,
+                            Dimension5 = tran._Dimension5,
+                            Amount = -tran._Amount
+                        };
+                        if (UseVATCodes)
+                            closingLine.Vat = tran._Vat;
+                        dgClosingSheetLine.AddRow(closingLine);
+                    }
                     RecalculateSum();
                     break;
                 case "ViewDownloadRow":
@@ -503,6 +512,12 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
             }
         }
+        async void SaveAndClose()
+        {
+            var err = await saveGrid();
+            if (err == ErrorCodes.Succes)
+                CloseDockItem();
+        }
         private void AddVoucher(GLClosingSheetLineLocal line, string actionType)
         {
             if (actionType == "DragDrop")
@@ -532,8 +547,12 @@ namespace UnicontaClient.Pages.CustomPage
 
         void SumLines(GLAccountClosingSheetClient acc)
         {
-            var sum = RecalculateSum((IEnumerable<GLClosingSheetLineLocal>)acc.Lines, acc._Account, this.postingDate, this.RoundTo100, this.VatCache);
-            acc.setChangeAndNewBalance(sum);
+            var lines = acc.Lines as IEnumerable<GLClosingSheetLineLocal>;
+            if (lines != null)
+            {
+                var sum = RecalculateSum(lines, acc._Account, this.postingDate, this.RoundTo100, this.VatCache);
+                acc.setChangeAndNewBalance(sum);
+            }
         }
 
         GLAccountClosingSheetClient FindAccount(string Account)
@@ -592,7 +611,8 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (!dgClosingSheetLine.HasUnsavedData)
                 return ErrorCodes.Succes;
-
+            busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("Saving");
+            busyIndicator.IsBusy = true;
             anyChange = true;
             var err = await dgClosingSheetLine.SaveData();
 
@@ -641,9 +661,15 @@ namespace UnicontaClient.Pages.CustomPage
                 masterAccount.Lines = lst;
                 SumLines(masterAccount);
             }
-
-            BindTransactionGrid();
+            busyIndicator.IsBusy = false;
             return err;
+        }
+
+        private void HasVoucherImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            busyIndicator.IsBusy = true;
+            ViewVoucher(TabControls.VouchersPage3, dgAccountsTransGrid.syncEntity);
+            busyIndicator.IsBusy = false;
         }
 
         protected override void OnLayoutLoaded()

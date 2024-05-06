@@ -24,7 +24,10 @@ using DevExpress.Xpf.Grid;
 using System.Windows;
 using Uniconta.API.System;
 using Uniconta.DataModel;
-
+using Uniconta.ClientTools.Util;
+using UnicontaClient.Pages.Attachments;
+using System.ComponentModel.DataAnnotations;
+using System.Reflection;
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
@@ -144,12 +147,49 @@ namespace UnicontaClient.Pages.CustomPage
                 case "DeleteRow":
                     dgNotesGrid.DeleteRow();
                     break;
+                case "ImportMail":
+                    var dialogImport = new CWImportOutlookMails();
+                    dialogImport.Closing += delegate
+                    {
+                        if (dialogImport.DialogResult == true)
+                        {
+                            var note = dialogImport.userNote;
+                            if (note != null)
+                            {
+                                note.SetMaster(dgNotesGrid.masterRecord);
+                                dgNotesGrid.AddRow(note);
+                                SaveNotes();
+                            }
+                        }
+                    };
+                    dialogImport.Show();
+                    break;
+                case "SendMail":
+                    SendMailFromMaster();
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
         }
 
+        void SendMailFromMaster()
+        {
+            var master = dgNotesGrid.masterRecord;
+            var emailProperties = master.GetType().GetProperties().Where(p => p.GetCustomAttribute<DataTypeAttribute>()?.DataType == DataType.EmailAddress).ToList();
+            foreach (var emailProperty in emailProperties)
+            {
+                string email = emailProperty.GetValue(master, null) as string;
+                if (!string.IsNullOrEmpty(email))
+                {
+                    var mail = string.Concat("mailto:", email);
+                    System.Diagnostics.Process proc = new System.Diagnostics.Process();
+                    proc.StartInfo.FileName = mail;
+                    proc.Start();
+                    break;
+                }
+            }
+        }
         async void SaveNotes()
         {
             dgNotesGrid.SelectedItem = null;
@@ -178,5 +218,12 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         public override string NameOfControl { get { return TabControls.UserNotesPage; } }
+
+        private void IsMailNote_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            var selectedItem = dgNotesGrid.SelectedItem as UserNotesClient;
+            if (selectedItem.IsMailNote)
+                OutlookNotes.OpenMail(selectedItem);
+        }
     }
 }

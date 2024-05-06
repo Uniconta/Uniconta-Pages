@@ -91,8 +91,7 @@ namespace UnicontaClient.Pages.CustomPage
         private ProjectInvoiceProposalLineClient CreateNewProposalLine(string item, double qty, string text, double price, double amountEntered, double discPct, double disc, string variant1, string variant2, string variant3, string variant4, string variant5,
            ItemUnit unit, DateTime date, byte week, string note)
         {
-            var type = this.TableTypeUser;
-            var orderline = Activator.CreateInstance(type) as ProjectInvoiceProposalLineClient;
+            var orderline = Activator.CreateInstance(this.TableTypeUser) as ProjectInvoiceProposalLineClient;
             orderline._Qty = qty;
             orderline._Item = item;
             orderline._Text = text;
@@ -154,12 +153,8 @@ namespace UnicontaClient.Pages.CustomPage
             dgProjInvProposedLineGrid.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgProjInvProposedLineGrid.SelectedItemChanged += DgProjInvProposedLineGrid_SelectedItemChanged;
-            OnHandScreenInOrder = api.CompanyEntity._OnHandScreenInOrder;
-            RibbonBase rb = (RibbonBase)localMenu.DataContext;
-            if (!company.Production)
-                UtilDisplay.RemoveMenuCommand(rb, "CreateProduction");
             if (IsOnAccountInvoicing(master))
-                UtilDisplay.RemoveMenuCommand(rb, new string[] { "RegenerateOrderFromProject", "ProjectTransaction" });
+                UtilDisplay.RemoveMenuCommand((RibbonBase)localMenu.DataContext, new string[] { "RegenerateOrderFromProject", "ProjectTransaction" });
 
             InitialLoad();
             dgProjInvProposedLineGrid.ShowTotalSummary();
@@ -169,37 +164,35 @@ namespace UnicontaClient.Pages.CustomPage
 
         private bool IsOnAccountInvoicing(UnicontaBaseEntity master)
         {
-            if (master is ProjectInvoiceProposalClient projInvProposalClient && projInvProposalClient.PrCategoryRef._CatType == CategoryType.OnAccountInvoicing)
-                return true;
-
-            return false;
+            return (master is ProjectInvoiceProposalClient projInvProposalClient && projInvProposalClient.PrCategoryRef._CatType == CategoryType.OnAccountInvoicing);
         }
+
         private void Page_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.F8)
                 ribbonControl.PerformRibbonAction("AddItems");
         }
 
-        double sumMargin, sumSales, sumMarginRatio;
+        double sumCost, sumSales;
         private void dgProjInvProposedLineGrid_CustomSummary(object sender, DevExpress.Data.CustomSummaryEventArgs e)
         {
             var fieldName = ((GridSummaryItem)e.Item).FieldName;
             switch (e.SummaryProcess)
             {
                 case DevExpress.Data.CustomSummaryProcess.Start:
-                    sumMargin = sumSales = 0d;
+                    sumCost = sumSales = 0d;
                     break;
                 case DevExpress.Data.CustomSummaryProcess.Calculate:
                     var row = e.Row as ProjectInvoiceProposalLineClient;
-                    sumSales += row.SalesValue;
-                    sumMargin += row.Margin;
+                    if (row != null)
+                    {
+                        sumSales += row.SalesValue;
+                        sumCost += row.CostValue;
+                    }
                     break;
                 case DevExpress.Data.CustomSummaryProcess.Finalize:
                     if (fieldName == "MarginRatio" && sumSales > 0)
-                    {
-                        sumMarginRatio = 100 * sumMargin / sumSales;
-                        e.TotalValue = sumMarginRatio;
-                    }
+                        e.TotalValue = Math.Round((sumSales - sumCost) * 100d / sumSales, 2);
                     break;
             }
         }
@@ -229,18 +222,9 @@ namespace UnicontaClient.Pages.CustomPage
             if (header != null)
                 SetHeader(header);
         }
-        bool OnHandScreenInOrder;
         protected override void OnLayoutLoaded()
         {
             base.OnLayoutLoaded();
-            var company = this.company;
-            if (!company.Project)
-            {
-                PrCategory.Visible = PrCategory.ShowInColumnChooser = false;
-                Project.Visible = Project.ShowInColumnChooser = false;
-            }
-            else
-                PrCategory.ShowInColumnChooser = Project.ShowInColumnChooser = true;
             if (!company.ProjectTask)
                 Task.Visible = Task.ShowInColumnChooser = false;
             else
@@ -253,7 +237,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (!company.ItemVariants)
                 colVariant.Visible = colVariant.ShowInColumnChooser = false;
-            var n = company.ItemVariants ? company.NumberOfVariants : 0;
+            var n = company.NumberOfVariants;
 
             if (n >= 1)
                 colVariant1.Header = company._Variant1;
@@ -688,12 +672,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "CreateFromInvoice":
                     try
                     {
-                        var par = new object[4];
-                        par[0] = api;
-                        par[1] = ord.Account;
-                        par[2] = true;
-                        par[3] = ord;
-                        AddDockItem(TabControls.CreateOrderFromQuickInvoice, par, true, String.Format(Uniconta.ClientTools.Localization.lookup("CopyOBJ"), Uniconta.ClientTools.Localization.lookup("Invoice")), null, new Point(250, 200));
+                        AddDockItem(TabControls.CreateOrderFromQuickInvoice, new object[4] { api, ord._DCAccount, true, ord }, true, String.Format(Uniconta.ClientTools.Localization.lookup("CopyOBJ"), Uniconta.ClientTools.Localization.lookup("Invoice")), null, new Point(250, 200));
                     }
                     catch (Exception ex)
                     {

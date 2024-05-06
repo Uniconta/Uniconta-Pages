@@ -12,7 +12,7 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryBOMStatement"
         <Util:MaskConverter x:Key="MaskConverter" />
         <DataTemplate x:Key="RegularCellTemplate">
             <Grid>
-                <TextBlock FontWeight="Bold" Foreground="Red" VerticalAlignment="Center"  Text="{Binding RowData.Row.Item}" />
+                <TextBlock FontWeight="Bold" Foreground="{StaticResource StatementAccountHeaderColorForeground}" VerticalAlignment="Center"  Text="{Binding RowData.Row.Item}" />
             </Grid>
         </DataTemplate>
     </UserControl.Resources>

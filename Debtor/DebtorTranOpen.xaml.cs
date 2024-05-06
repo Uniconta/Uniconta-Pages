@@ -236,6 +236,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 }
                                 break;
                             case CWConfirmationBox.ConfirmationResultEnum.No:
+                                dgDebtorTransOpen.CancelChanges();
                                 break;
                         }
                         editAllChecked = true;

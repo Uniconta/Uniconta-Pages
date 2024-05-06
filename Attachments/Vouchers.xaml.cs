@@ -38,6 +38,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using Uniconta.API.System;
+using Uniconta.Common.User;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -219,6 +220,13 @@ namespace UnicontaClient.Pages.CustomPage
             accordionView.MouseLeftButtonUp += AccordionView_MouseLeftButtonUp;
             dgVoucherGrid.ItemsSourceChanged += DgVoucherGrid_ItemsSourceChanged;
             dgVoucherGrid.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;
+            if (rb != null)
+            {
+                var homeTab = UtilDisplay.GetTabByName(rb, "Home");
+                var scanMail = api.CompanyEntity.ScanEmail;
+                if (homeTab != null && !string.IsNullOrEmpty(scanMail))
+                    homeTab.Name = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("Home"), scanMail);
+            }
             SetFooterDetailText();
         }
 
@@ -417,6 +425,7 @@ namespace UnicontaClient.Pages.CustomPage
                 ibaseGridMode.Caption = string.Format(Localization.lookup("ShowOBJ"), Localization.lookup("Folders"));
             else
                 ibaseGridMode.Caption = string.Format(Localization.lookup("HideOBJ"), Localization.lookup("Folders"));
+      
         }
 
         private void accordionView_SelectedItemChanged(object sender, DevExpress.Xpf.Accordion.AccordionSelectedItemChangedEventArgs e)
@@ -519,11 +528,11 @@ namespace UnicontaClient.Pages.CustomPage
                         rec.Dimension4 = dc._Dim4;
                     if (dc._Dim5 != null)
                         rec.Dimension5 = dc._Dim5;
-                    if (dc._PostingAccount != null)
-                        rec.CostAccount = dc._PostingAccount;
                     if (dc._Currency != 0)
                         rec.Currency = AppEnums.Currencies.ToString((int)dc._Currency);
-                    if (dc._Vat != null)
+                    if (dc._PostingAccount != null)
+                        rec.CostAccount = dc._PostingAccount;
+                    else if (dc._Vat != null)
                     {
                         rec.Vat = dc._Vat;
                         rec.VatOperation = dc._VatOperation;
@@ -564,6 +573,16 @@ namespace UnicontaClient.Pages.CustomPage
                         else if (Acc._DefaultOffsetAccountType == GLJournalAccountType.Finans)
                             rec.PayAccount = Acc._DefaultOffsetAccount;
                     }
+                    if (Acc._Dim1 != null)
+                        rec.Dimension1 = Acc._Dim1;
+                    if (Acc._Dim2 != null)
+                        rec.Dimension2 = Acc._Dim2;
+                    if (Acc._Dim3 != null)
+                        rec.Dimension3 = Acc._Dim3;
+                    if (Acc._Dim4 != null)
+                        rec.Dimension4 = Acc._Dim4;
+                    if (Acc._Dim5 != null)
+                        rec.Dimension5 = Acc._Dim5;
                     break;
                 case "PurchaseNumber":
                     if (rec._PurchaseNumber != 0 && api.CompanyEntity.Purchase)
@@ -590,8 +609,8 @@ namespace UnicontaClient.Pages.CustomPage
             if (order != null)
             {
                 rec.CreditorAccount = order._InvoiceAccount ?? order._DCAccount;
-                if (order._Employee != null)
-                    rec.Approver1 = order._Employee;
+                if (order._Approver != null && rec._Approver1 == null)
+                    rec.Approver1 = order._Approver;
             }
         }
 
@@ -743,6 +762,7 @@ namespace UnicontaClient.Pages.CustomPage
                             }
 
                             var postingApi = new PostingAPI(api);
+                            postingApi.WorkSpace = journals.Workspace;
                             IEnumerable<VouchersClient> lst;
                             if (journals.OnlyCurrentRecord)
                             {
@@ -830,6 +850,7 @@ namespace UnicontaClient.Pages.CustomPage
                             busyIndicator.IsBusy = true;
 
                             var postingApi = new PostingAPI(api);
+                            postingApi.WorkSpace = cwjournal.Workspace;
                             IEnumerable<VouchersClient> lst;
                             if (cwjournal.OnlyCurrentRecord)
                             {
@@ -985,7 +1006,10 @@ namespace UnicontaClient.Pages.CustomPage
                         transDialog.Show();
                     }
                     break;
-
+                case "Transactions":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.AccountsTransaction, dgVoucherGrid.SelectedItem, string.Format("{0}: {1}", Localization.lookup("Transactions"), selectedItem.RowId));
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -1528,8 +1552,13 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override void OnLayoutLoaded()
         {
-            base.OnLayoutLoaded();
             Utility.SetDimensionsGrid(api, clDim1, clDim2, clDim3, clDim4, clDim5);
+
+            if (!api.CompanyEntity.Project)
+                Project.ShowInColumnChooser = Project.Visible = ProjectName.ShowInColumnChooser = ProjectName.Visible = PrCategory.ShowInColumnChooser =  PrCategory.Visible =
+                    WorkSpace.ShowInColumnChooser = WorkSpace.Visible = false;
+
+            base.OnLayoutLoaded();
         }
 
         private void Offeset_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -1646,6 +1675,13 @@ namespace UnicontaClient.Pages.CustomPage
                 var orgNo = NumberConvert.ToStringNull(companySettings._OrgNumber);
                 if (orgNo == null)
                 {
+                    var noRightsToUpdate = AccessLevel.Get(api.CompanyEntity.Rights, CompanyTasks.AsOwner) < CompanyPermissions.Modify;
+                    if (noRightsToUpdate)
+                    {
+                        UnicontaMessageBox.Show(string.Format("{0} {1}", Uniconta.ClientTools.Localization.lookup("NoRightsToInsert"), Uniconta.ClientTools.Localization.lookup("Bilagscan")), Uniconta.ClientTools.Localization.lookup("Warning"));
+                        return;
+                    }
+
                     if (string.IsNullOrEmpty(api.CompanyEntity._Id))
                     {
                         UnicontaMessageBox.Show(string.Format(Localization.lookup("CannotBeBlank"), Localization.lookup("CompanyRegNo")), Localization.lookup("Paperflow"), MessageBoxButton.OK, MessageBoxImage.Exclamation);
@@ -1894,17 +1930,23 @@ namespace UnicontaClient.Pages.CustomPage
                                         if (paymentMethod != PaymentTypes.VendorBankAccount && (paymentId != null || jointPaymentId != null))
                                         {
                                             originalVoucher._PaymentMethod = paymentMethod;
-                                            originalVoucher.PaymentId = string.Format("{0} +{1}", paymentId, jointPaymentId);
+                                            originalVoucher.PaymentId = string.Concat(paymentId, " +", jointPaymentId);
                                         }
                                         else if (bbanRegNum != null && bbanAcc != null)
                                         {
-                                            originalVoucher._PaymentMethod = PaymentTypes.VendorBankAccount;
-                                            originalVoucher.PaymentId = string.Format("{0}-{1}", bbanRegNum, bbanAcc);
+                                            if (creditor?._PaymentId == null)
+                                            {
+                                                originalVoucher._PaymentMethod = PaymentTypes.VendorBankAccount;
+                                                originalVoucher.PaymentId = string.Concat(bbanRegNum, "-", bbanAcc);
+                                            }
                                         }
                                         else if (swiftNo != null && ibanNo != null)
                                         {
-                                            originalVoucher._PaymentMethod = PaymentTypes.IBAN;
-                                            originalVoucher.PaymentId = ibanNo;
+                                            if (creditor?._SWIFT == null)
+                                            {
+                                                originalVoucher._PaymentMethod = PaymentTypes.IBAN;
+                                                originalVoucher.PaymentId = ibanNo;
+                                            }
                                         }
                                         originalVoucher.NotifyPropertyChanged("PaymentMethod");
                                     }
@@ -1915,7 +1957,7 @@ namespace UnicontaClient.Pages.CustomPage
                                     }
                                     else if (creditor == null)
                                     {
-                                        var newCreditor = new CreditorClient()
+                                        var cre = new CreditorClient()
                                         {
                                             _Account = creditorCVR,
                                             _LegalIdent = creditorCVR,
@@ -1923,6 +1965,23 @@ namespace UnicontaClient.Pages.CustomPage
                                             _PaymentId = originalVoucher._PaymentId,
                                             _SWIFT = swiftNo
                                         };
+
+                                        var Grp = api.GetCache(typeof(Uniconta.DataModel.CreditorGroup));
+                                        if (Grp != null)
+                                        {
+                                            foreach(var r in (Uniconta.DataModel.CreditorGroup[])Grp.GetNotNullArray)
+                                            {
+                                                if (r._Default)
+                                                {
+                                                    if (r._AutoNumber != null)
+                                                    {
+                                                        cre._Account = null;
+                                                        cre._Group = r._Group;
+                                                    }
+                                                    break;
+                                                }
+                                            }
+                                        }
 
                                         CompanyInfo companyInformation = null;
                                         try
@@ -1934,30 +1993,30 @@ namespace UnicontaClient.Pages.CustomPage
                                         if (companyInformation != null)
                                         {
                                             if (companyInformation.life != null)
-                                                newCreditor._Name = companyInformation.life.name;
+                                                cre._Name = companyInformation.life.name;
 
                                             if (companyInformation.address != null)
                                             {
-                                                newCreditor._Address1 = companyInformation.address.CompleteStreet;
-                                                newCreditor._Address2 = companyInformation.address.street2;
-                                                newCreditor._ZipCode = companyInformation.address.zipcode;
-                                                newCreditor._City = companyInformation.address.cityname;
-                                                newCreditor._Country = companyInformation.address.Country;
+                                                cre._Address1 = companyInformation.address.CompleteStreet;
+                                                cre._Address2 = companyInformation.address.street2;
+                                                cre._ZipCode = companyInformation.address.zipcode;
+                                                cre._City = companyInformation.address.cityname;
+                                                cre._Country = companyInformation.address.Country;
                                             }
 
                                             if (companyInformation.contact != null)
                                             {
-                                                newCreditor._Phone = companyInformation.contact.phone;
-                                                newCreditor._ContactEmail = companyInformation.contact.email;
+                                                cre._Phone = companyInformation.contact.phone;
+                                                cre._ContactEmail = companyInformation.contact.email;
                                             }
                                         }
                                         else
                                         {
-                                            newCreditor.Name = Localization.lookup("NotValidVatNo");
+                                            cre.Name = Localization.lookup("NotValidVatNo");
                                         }
 
-                                        await api.Insert(newCreditor);
-                                        originalVoucher.CreditorAccount = creditorCVR;
+                                        await api.Insert(cre);
+                                        originalVoucher.CreditorAccount = cre._Account;
                                     }
                                     else
                                     {

@@ -39,7 +39,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorInvoiceLine"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceQty"  Width="100" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Unit" Width="50" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="SalesPrice" Width="90"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Discount" Width="90"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="NetDiscount" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DiscountPct" Width="50"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceTotal" Width="100"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CostPrice" Visible="False"/>

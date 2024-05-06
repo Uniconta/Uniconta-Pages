@@ -5,14 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Net;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
 using Uniconta.API.DebtorCreditor;
 using Uniconta.ClientTools;
 using Uniconta.ClientTools.Controls;
@@ -141,6 +134,7 @@ namespace UnicontaClient.Pages.CustomPage
         TableField[] CreditorUserFields { get; set; }
         IEnumerable<PropValuePair> creditorFilterValues;
         bool OnlyOpen, OnlyDue = false;
+        string includedJournals;
         public static void SetDateTime(DateEditor frmDateeditor, DateEditor todateeditor)
         {
             if (frmDateeditor.Text == string.Empty)
@@ -229,6 +223,7 @@ namespace UnicontaClient.Pages.CustomPage
                 cmbToAccount.EditValue = _master._Account;
                 LoadDCTrans();
             }
+            TransactionReport.SetDailyJournal(cmbJournals, api);
             dgCreditorTrans.RowDoubleClick += DgCreditorTrans_RowDoubleClick;
             dgCreditorTrans.SelectedItemChanged += DgCreditorTrans_SelectedItemChanged;
             dgCreditorTrans.MasterRowExpanded += DgCreditorTrans_MasterRowExpanded;
@@ -244,7 +239,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void DgCreditorTrans_MasterRowExpanded(object sender, RowEventArgs e)
         {
-            maintainState = true; 
+            maintainState = true;
             SetCollapseCurrent();
         }
 
@@ -521,13 +516,13 @@ namespace UnicontaClient.Pages.CustomPage
             CreditorStatement.SetDateTime(txtDateFrm, txtDateTo);
             DateTime fromDate = DebtorStatement.DefaultFromDate, toDate = DebtorStatement.DefaultToDate;
             transaction = cmbTrasaction.SelectedIndex;
-
+            includedJournals = cmbJournals.Text;
             var fromAccount = Convert.ToString(cmbFromAccount.EditValue);
             var toAccount = Convert.ToString(cmbToAccount.EditValue);
 
             busyIndicator.IsBusy = true;
             var transApi = new ReportAPI(api);
-            var listTrans = (CreditorTransClientTotal[])await transApi.GetTransWithPrimo(new CreditorTransClientTotal(), fromDate, toDate, fromAccount, toAccount, OnlyOpen, null, creditorFilterValues, OnlyDue);
+            var listTrans = (CreditorTransClientTotal[])await transApi.GetTransWithPrimo(new CreditorTransClientTotal(), fromDate, toDate, fromAccount, toAccount, OnlyOpen, null, creditorFilterValues, OnlyDue, includedJournals);
             if (listTrans != null)
             {
                 if (accountCache == null)
@@ -622,7 +617,10 @@ namespace UnicontaClient.Pages.CustomPage
             dataRowCount = statementList.Count;
             dgCreditorTrans.ItemsSource = null;
             if (dataRowCount > 0)
+            {
                 dgCreditorTrans.ItemsSource = statementList;
+                dgChildCreditorTrans.RefreshData();
+            }
         }
 
         private void cbxPageBreak_Click(object sender, RoutedEventArgs e)

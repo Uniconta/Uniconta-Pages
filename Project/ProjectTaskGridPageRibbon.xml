@@ -9,7 +9,11 @@
 		<RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh" LargeGlyph="refresh"/>
 	</RibbonItem>
 	<RibbonItem>
-		<RibbonItem Action="CreateTaskFromTask" LocalizedNameKey="CopyOBJ" Parameter="Tasks" Glyph="Copy_32x32" LargeGlyph="Copy_32x32" ShortcutKey=""/>
+    <RibbonItem Module="Attachments" LocalizedNameKey="Attachments" LargeGlyph="Attachments_32x32">
+      <RibbonItem Action="AddNote" ShortcutKey="Alt+N" ControlName="UserNotesPage" LocalizedNameKey="Note" Glyph="Note_16x16" />
+      <RibbonItem Action="AddDoc" LocalizedNameKey="Document" ControlName="UserDocsPage" Glyph="Document_Attachment_16x16" />
+    </RibbonItem>
+    <RibbonItem Action="CreateTaskFromTask" LocalizedNameKey="CopyOBJ" Parameter="Tasks" Glyph="Copy_32x32" LargeGlyph="Copy_32x32" ShortcutKey=""/>
 		<RibbonItem Action="CreateBudgetTask" LocalizedNameKey="CreateBudgetTask" Module="ProjectBudget"  Glyph="Add_Menu_32x32" LargeGlyph="Add_Menu_32x32" ShortcutKey=""/>
 	</RibbonItem>
 	<RibbonItem>

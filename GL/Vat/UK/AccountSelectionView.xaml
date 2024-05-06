@@ -25,7 +25,7 @@ x:Class="UnicontaClient.Pages.CustomPage.AccountSelectionView"
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
                                             <TextBlock Text="{Binding ErrorContent}"
-                                                       Foreground="Red"
+                                                       Foreground="{StaticResource StatementAccountHeaderColorForeground}"
                                                        HorizontalAlignment="Right" />
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>

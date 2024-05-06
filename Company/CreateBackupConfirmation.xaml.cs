@@ -20,7 +20,7 @@ namespace UnicontaClient.Pages.CustomPage
     {
         string ConfirmWord;
         public string name;
-        public bool copyTrans, copyPhysicalVouchers, copyAttachments;
+        public bool copyTrans, copyPhysicalVouchers, copyAttachments, copyUsers;
         public CreateBackupConfirmation()
         {
             this.DataContext = this;
@@ -33,6 +33,7 @@ namespace UnicontaClient.Pages.CustomPage
             cbxCopyTrans.Content= string.Format(Uniconta.ClientTools.Localization.lookup("CopyOBJ"), Uniconta.ClientTools.Localization.lookup("Transactions"));
             cbxPhysicalVoucher.Content= string.Format(Uniconta.ClientTools.Localization.lookup("CopyOBJ"), Uniconta.ClientTools.Localization.lookup("PhysicalVouchers"));
             cbxCopyAttachments.Content= string.Format(Uniconta.ClientTools.Localization.lookup("CopyOBJ"), Uniconta.ClientTools.Localization.lookup("Attachments"));
+            cbxCopyUsers.Content= string.Format(Uniconta.ClientTools.Localization.lookup("CopyOBJ"), Uniconta.ClientTools.Localization.lookup("Users"));
             lblName.Text= Uniconta.ClientTools.Localization.lookup("Name");
         }
 
@@ -41,6 +42,7 @@ namespace UnicontaClient.Pages.CustomPage
             copyTrans = cbxCopyTrans.IsChecked.GetValueOrDefault();
             copyPhysicalVouchers = cbxPhysicalVoucher.IsChecked.GetValueOrDefault();
             copyAttachments = cbxCopyAttachments.IsChecked.GetValueOrDefault();
+            copyUsers = cbxCopyUsers.IsChecked.GetValueOrDefault();
             name = txtName.Text;
             this.DialogResult = (string.Compare(txtStart.Text, ConfirmWord, StringComparison.CurrentCultureIgnoreCase) == 0);
          

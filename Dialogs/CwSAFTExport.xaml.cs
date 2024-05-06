@@ -15,6 +15,8 @@ using System.IO;
 using Uniconta.ClientTools.Util;
 using Uniconta.WindowsAPI.GL.SAFT;
 using DevExpress.CodeParser;
+using Uniconta.ClientTools.Controls;
+using DevExpress.Emf;
 
 namespace UnicontaClient.Controls.Dialogs
 {
@@ -33,8 +35,12 @@ namespace UnicontaClient.Controls.Dialogs
         public CwSAFTExport(CrudAPI crudApi)
         {
             this.Title = string.Format(Uniconta.ClientTools.Localization.lookup("ExportOBJ"), Uniconta.ClientTools.Localization.lookup("AuditStandardSAFT"));
-            FromDate = FromDate != DateTime.MinValue ? FromDate : new DateTime(DateTime.Now.Year, 1, 1);
-            ToDate = ToDate != DateTime.MinValue ? ToDate : FromDate.AddYears(1).AddSeconds(-1);
+
+            var accountingYears = crudApi.QuerySync<CompanyFinanceYearClient>();
+            var accountYear = accountingYears.Where(y => y.Current == true).FirstOrDefault();
+
+            FromDate = FromDate != DateTime.MinValue ? FromDate : accountYear.FromDate;
+            ToDate = ToDate != DateTime.MinValue ? ToDate : accountYear.ToDate;
             this.DataContext = this;
             InitializeComponent();
 
@@ -43,17 +49,28 @@ namespace UnicontaClient.Controls.Dialogs
             api = crudApi;
         }
 
-        private void OKButton_Click(object sender, RoutedEventArgs e)
+        private async void OKButton_Click(object sender, RoutedEventArgs e)
         {
-            var docInfo = new SAFTDocumentInfo() { Api = api, FromDate = fromDate.DateTime, ToDate = toDate.DateTime };
-            new SAFTCreate(docInfo);
             var folderBrowserDialog = UtilDisplay.LoadFolderBrowserDialog;
             var dialogResult = folderBrowserDialog.ShowDialog();
             if (dialogResult != true)
                 return;
 
-            docInfo.XmlDoc.Save(Path.Combine(folderBrowserDialog.SelectedPath, docInfo.FileName));
+            var docInfo = new SAFTDocumentInfo() { Api = api, FromDate = FromDate, ToDate = ToDate, FileName = folderBrowserDialog.SelectedPath };
+            try
+            {
+                if (busyIndicator != null)
+                    busyIndicator.IsBusy = true;
 
+                await SAFT.Create(docInfo);
+            }
+            finally
+            {
+                if (busyIndicator != null)
+                    busyIndicator.IsBusy = false;
+            }
+
+            docInfo.XmlDoc.Save(Path.Combine(folderBrowserDialog.SelectedPath, docInfo.FileName));
             SetDialogResult(true);
         }
 

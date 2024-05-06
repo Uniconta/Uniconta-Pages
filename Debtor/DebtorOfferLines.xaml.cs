@@ -527,7 +527,13 @@ namespace UnicontaClient.Pages.CustomPage
             double Amountsum = 0d;
             double Costsum = 0d;
             string VatCode = null;
-            var inclVat = (order != null) ? order._PricesInclVat : false;
+            var inclVat = false;
+            Company Comp = null;
+            if (order != null)
+            {
+                inclVat = order._PricesInclVat;
+                Comp = Company.Get(order.CompanyId);
+            }
             if (source != null)
             {
                 if (inclVat)
@@ -541,7 +547,6 @@ namespace UnicontaClient.Pages.CustomPage
 
                 double qty = 0d;
                 int i = 0;
-                var Comp = Company.Get(order.CompanyId);
                 var items = Comp?.GetCache(typeof(Uniconta.DataModel.InvItem));
                 bool reloadCache = false;
                 foreach (var lin in source)
@@ -590,9 +595,9 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     order.NoLines = i;
                     order.TotalQty = Math.Round(qty, 10);
+                    if (reloadCache)
+                        new QueryAPI(BasePage.session, Comp).LoadCache(typeof(Uniconta.DataModel.InvItem), true);
                 }
-                if (reloadCache)
-                    new QueryAPI(BasePage.session, Comp).LoadCache(typeof(Uniconta.DataModel.InvItem), true);
             }
             Amountsum = Math.Round(Amountsum, 2);
             double AmountsumCur = exRate == 0d ? Amountsum : Math.Round(Amountsum / exRate, 2);

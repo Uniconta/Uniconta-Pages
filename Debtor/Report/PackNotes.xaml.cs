@@ -1,34 +1,20 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows;
 using Uniconta.API.DebtorCreditor;
 using Uniconta.API.Service;
-using UnicontaClient.Models;
-using UnicontaClient.Utilities;
 using Uniconta.ClientTools;
+using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
 using Uniconta.Common;
 using Uniconta.DataModel;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
-using System.Windows.Threading;
-using UnicontaClient.Controls.Dialogs;
-using Uniconta.ClientTools.Controls;
-using DevExpress.XtraReports.UI;
-using System.ComponentModel.DataAnnotations;
-using UnicontaClient.Pages;
-using ubl_norway_uniconta;
-using Microsoft.Win32;
+using UnicontaClient.Models;
+using UnicontaClient.Utilities;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -140,9 +126,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void localMenu_OnItemClicked(string ActionType)
         {
             var selectedItem = dgPackNotesGrid.SelectedItem as DebtorDeliveryNoteClient;
-            string salesHeader = string.Empty;
-            if (selectedItem != null)
-                salesHeader = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Orders"), selectedItem._OrderNumber);
+            
             switch (ActionType)
             {
                 case "EditRow":
@@ -354,7 +338,7 @@ namespace UnicontaClient.Pages.CustomPage
                 //Call Invoice Layout
                 var layoutPrint = new LayoutPrintReport(api, debtorInvoice, CompanyLayoutType.Packnote);
                 layoutPrint.SetupLayoutPrintFields(debtorQcpPrint);
-                
+
                 if (hasLookups)
                     FillLookUps(layoutPrint);
 

@@ -181,9 +181,6 @@ x:Class="UnicontaClient.Pages.CustomPage.ConfigureFunctionalityPage"
                     <CorasauControls:CorasauLayoutItem x:Name="cbBilagscan" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Bilagscan}">
                         <CorasauControls:CheckEditor IsChecked="{Binding Bilagscan, Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="cbPeppol" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Peppol}">
-                        <CorasauControls:CheckEditor IsChecked="{Binding Peppol, Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
                   <CorasauControls:CorasauLayoutItem x:Name="cbIntegrationPack" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=IntegrationPack}">
                     <CorasauControls:CheckEditor IsChecked="{Binding IntegrationPack, Mode=TwoWay}"/>
                   </CorasauControls:CorasauLayoutItem>

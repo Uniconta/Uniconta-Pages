@@ -1,4 +1,3 @@
-using Uniconta.API.DebtorCreditor;
 using UnicontaClient.Models;
 using Uniconta.ClientTools;
 using Uniconta.ClientTools.Controls;
@@ -7,26 +6,11 @@ using Uniconta.ClientTools.Page;
 using Uniconta.Common;
 using Uniconta.DataModel;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
-using System.Windows.Threading;
 using Uniconta.ClientTools.Util;
-
-using Uniconta.API.GeneralLedger;
-using System.Text;
-using UnicontaClient.Utilities;
-using System.ComponentModel.DataAnnotations;
-using UnicontaClient.Controls.Dialogs;
 using DevExpress.Xpf.Grid;
 using System.ComponentModel;
 
@@ -47,7 +31,7 @@ namespace UnicontaClient.Pages.CustomPage
             var newRow = (SerialToOrderLineClient)dataEntity;
             newRow.Mark = true;
             newRow._Qty = (invItemMaster._UseSerial) ? 1d : dcorderlineMaster._Qty;
-            newRow._QtyMarked = newRow._Qty;
+            newRow.QtyMarked = newRow._Qty;
             if (dcorderlineMaster._Warehouse != null)
             {
                 newRow._Warehouse = dcorderlineMaster._Warehouse;
@@ -61,7 +45,7 @@ namespace UnicontaClient.Pages.CustomPage
         InvItem invItemMaster;
         Company Comp;
         SQLCache itemCache;
-
+        bool isQtyMarkedCorrect = true;
         public SerialToOrderLinePage(SynchronizeEntity syncEntity)
            : base(syncEntity, false)
         {
@@ -96,12 +80,17 @@ namespace UnicontaClient.Pages.CustomPage
             if (dcorderlineMaster.__DCType() != 2)
                 RemoveMenuItem();
             if (Comp.Warehouse)
-            {
                 warehouse = Comp.GetCache(typeof(InvWarehouse));
-            }
             ribbonControl.lowerSearchGrid = dgUnlinkedGrid;
             ribbonControl.UpperSearchNullText = Uniconta.ClientTools.Localization.lookup("Link");
             ribbonControl.LowerSearchNullText = Uniconta.ClientTools.Localization.lookup("Unlinked");
+            dgLinkedGrid.ItemsSourceChanged += DgLinkedGrid_ItemsSourceChanged;
+            dgLinkedGrid.ShowTotalSummary();
+        }
+
+        private void DgLinkedGrid_ItemsSourceChanged(object sender, ItemsSourceChangedEventArgs e)
+        {
+            ReCalculateTotal();
         }
 
         protected override void SyncEntityMasterRowChanged(UnicontaBaseEntity args)
@@ -113,7 +102,7 @@ namespace UnicontaClient.Pages.CustomPage
                     return;
                 var argsArray = new object[1];
                 argsArray[0] = args;
-              //  globalEvents.OnRefresh(NameOfControl, argsArray);
+                //  globalEvents.OnRefresh(NameOfControl, argsArray);
             }
             if (args is CreditorOrderLineClient)
             {
@@ -125,7 +114,7 @@ namespace UnicontaClient.Pages.CustomPage
                     return;
                 var argsArray = new object[1];
                 argsArray[0] = args;
-              //  globalEvents.OnRefresh(NameOfControl, argsArray);
+                //  globalEvents.OnRefresh(NameOfControl, argsArray);
             }
             SetupMaster(args);
             SetHeader(args);
@@ -144,7 +133,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             string header = null;
             var orderLine = args as DCOrderLineClient;
-            if(orderLine!= null)
+            if (orderLine != null)
                 header = string.Format("{0}:{1}/{2},{3}", Uniconta.ClientTools.Localization.lookup("SerialBatchNumbers"), orderLine.OrderRowId, orderLine._Item, orderLine.RowId);
             if (header != null)
                 SetHeader(header);
@@ -180,6 +169,9 @@ namespace UnicontaClient.Pages.CustomPage
                     if (string.IsNullOrEmpty(rec._Warehouse))
                         rec._Location = null;
                     break;
+                case "QtyMarked":
+                    ReCalculateTotal();
+                    break;
             }
         }
 
@@ -209,13 +201,9 @@ namespace UnicontaClient.Pages.CustomPage
                     dgUnlinkedGrid.UpdateMaster(mast);
             }
             var t2 = dgUnlinkedGrid.Filter(null);
-#if SILVERLIGHT
-            return t2;
-#else
             return Task.WhenAll(t1, t2);
-#endif
         }
-        
+
         public override void AssignMultipleGrid(List<Uniconta.ClientTools.Controls.CorasauDataGrid> gridCtrls)
         {
             gridCtrls.Add(dgLinkedGrid);
@@ -228,15 +216,14 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 case "AddRow":
                     dgLinkedGrid.AddRow();
+                    ReCalculateTotal();
                     break;
                 case "CopyRow":
                     dgLinkedGrid.CopyRow();
                     var newRow = dgLinkedGrid.CurrentItem as SerialToOrderLineClient;
                     if (newRow != null)
                         newRow.Mark = true;
-                    break;
-                case "SaveGrid":
-                    saveGrid();
+                    ReCalculateTotal();
                     break;
                 case "DeleteRow":
                     dgLinkedGrid.DeleteRow();
@@ -247,8 +234,9 @@ namespace UnicontaClient.Pages.CustomPage
                 case "Unlink":
                     UnlinkRows();
                     break;
+                case "SaveGrid":
                 case "SaveAndClose":
-                    SaveExit();
+                    Save(ActionType);
                     break;
                 case "BatchLocations":
                     OpenBatchLocation();
@@ -257,6 +245,19 @@ namespace UnicontaClient.Pages.CustomPage
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
+        }
+
+        private void Save(string action)
+        {
+            if (isQtyMarkedCorrect)
+            {
+                if (action == "SaveAndClose")
+                    SaveExit();
+                else
+                    saveGrid();
+            }
+            else
+                UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("QtyNotNegative"), Uniconta.ClientTools.Localization.lookup("Warning"));
         }
 
         private void OpenBatchLocation()
@@ -325,7 +326,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             ErrorCodes err;
             if (dcorderlineMaster._SerieBatch != null && dcorderlineMaster.RowId != 0)
-            { 
+            {
                 orgMaster = StreamingManager.Clone((UnicontaBaseEntity)dcorderlineMaster);
                 dcorderlineMaster.SerieBatch = null;
                 if (AllRemoved)
@@ -492,13 +493,50 @@ namespace UnicontaClient.Pages.CustomPage
             useBinding = true;
             return true;
         }
+
+        void ReCalculateTotal()
+        {
+            RibbonBase rb = (RibbonBase)localMenu.DataContext;
+            var groups = UtilDisplay.GetMenuCommandsByStatus(rb, true);
+            var totalTxt = Uniconta.ClientTools.Localization.lookup("Total");
+            var remainingTxt = Uniconta.ClientTools.Localization.lookup("Remaining");
+
+            foreach (var grp in groups)
+            {
+                if (grp.Caption == totalTxt)
+                    grp.StatusValue = dcorderlineMaster._Qty.ToString();
+                else if (grp.Caption == remainingTxt)
+                    grp.StatusValue = RemainingQtyMarked();
+            }
+            dgLinkedGrid.UpdateTotalSummary();
+        }
+
+        string RemainingQtyMarked()
+        {
+            double val = 0d, qtyMarkedRem = 0d;
+
+            var items = dgLinkedGrid.ItemsSource as IEnumerable<SerialToOrderLineClient>;
+
+            if (items != null)
+                foreach (var item in items)
+                    val += item._QtyMarked;
+
+            if (val > dcorderlineMaster.Qty)
+                isQtyMarkedCorrect = false;
+            else
+            {
+                isQtyMarkedCorrect = true;
+                qtyMarkedRem = dcorderlineMaster.Qty - val;
+            }
+            return qtyMarkedRem.ToString();
+        }
     }
     public class SerialToOrderLineClient : InvSerieBatchClient
     {
         bool _mark;
         public bool Mark { get { return _mark; } set { _mark = value; NotifyPropertyChanged("Mark"); } }
-      
-       
+
+
         internal object locationSource;
         public object LocationSource { get { return locationSource; } }
     }

@@ -193,6 +193,7 @@ namespace UnicontaClient.Pages.CustomPage
             lstOrderlines.Capacity = invoiceLines.Length;
 
             int lineNo = 0;
+            bool CopyVat = checkIfCreditNote && dcOrder._DCAccount == dcInvoiceClient._DCAccount;
             double sign = checkIfCreditNote ? -1d : 1d;
             foreach (var invoiceline in invoiceLines)
             {
@@ -233,6 +234,8 @@ namespace UnicontaClient.Pages.CustomPage
                 line._Variant5 = invoiceline._Variant5;
                 line._Warehouse = invoiceline._Warehouse;
                 line._Location = invoiceline._Location;
+                if (CopyVat)
+                    line._Vat = invoiceline._Vat;
 
                 var selectedItem = (InvItem)items?.Get(invoiceline._Item);
                 if (selectedItem != null)

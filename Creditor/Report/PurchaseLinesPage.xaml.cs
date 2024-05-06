@@ -198,6 +198,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 }
                                 break;
                             case CWConfirmationBox.ConfirmationResultEnum.No:
+                                dgCreditorPurchagelineGrid.CancelChanges();
                                 break;
                         }
                         editAllChecked = true;

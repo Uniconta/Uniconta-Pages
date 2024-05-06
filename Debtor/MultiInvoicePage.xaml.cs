@@ -18,7 +18,6 @@ using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
 using Uniconta.Common;
 using Uniconta.DataModel;
-using UBL.Iceland;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage

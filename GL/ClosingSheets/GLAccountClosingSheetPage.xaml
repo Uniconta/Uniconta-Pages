@@ -6,6 +6,7 @@ x:Class="UnicontaClient.Pages.CustomPage.GLAccountClosingSheetPage"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
+    xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors"
     mc:Ignorable="d"
     xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
     xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage" 
@@ -87,6 +88,11 @@ x:Class="UnicontaClient.Pages.CustomPage.GLAccountClosingSheetPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PrimoAccount" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ExternalNo" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Currency" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="SheetNote" Width="200">
+                        <localPage:CorasauDataGridTemplateColumnClient.EditSettings>
+                            <editor:TextEditSettings TextWrapping="Wrap" AcceptsReturn="True"/>
+                        </localPage:CorasauDataGridTemplateColumnClient.EditSettings>
+                    </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Comment" Width="100"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim1" FieldName="Dim1ParmDisplay" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim2" FieldName="Dim2ParmDisplay" Visible="False"/>

@@ -31,7 +31,7 @@ namespace UnicontaClient.Pages.CustomPage
     {
         public override string NameOfControl { get { return TabControls.GLOffsetAccountTemplate; } }
 
-        SQLCache LedgerCache, DebtorCache, CreditorCache;
+        SQLCache LedgerCache, DebtorCache, CreditorCache, ProjectCache;
 
         public GLOffsetAccountTemplate(BaseAPI API) : base(API, string.Empty)
         {
@@ -71,6 +71,7 @@ namespace UnicontaClient.Pages.CustomPage
             LedgerCache = company.GetCache(typeof(Uniconta.DataModel.GLAccount));
             DebtorCache = company.GetCache(typeof(Uniconta.DataModel.Debtor));
             CreditorCache = company.GetCache(typeof(Uniconta.DataModel.Creditor));
+            ProjectCache = company.GetCache(typeof(Uniconta.DataModel.Project));
             RibbonBase rb = (RibbonBase)localMenu.DataContext;
             if (company.RoundTo100)
                 Debit.HasDecimals = Credit.HasDecimals = Amount.HasDecimals = false;
@@ -211,6 +212,44 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
+        void copyDCAccount(GLOffsetAccountLineGridClient rec)
+        {
+            var cache = (rec._AccountType == GLJournalAccountType.Debtor) ? DebtorCache : CreditorCache;
+            var dc = (DCAccount)cache?.Get(rec._Account);
+            if (dc != null)
+            {
+                rec.Vat = null;
+                if (dc._Dim1 != null)
+                    rec.Dimension1 = dc._Dim1;
+                if (dc._Dim2 != null)
+                    rec.Dimension2 = dc._Dim2;
+                if (dc._Dim3 != null)
+                    rec.Dimension3 = dc._Dim3;
+                if (dc._Dim4 != null)
+                    rec.Dimension4 = dc._Dim4;
+                if (dc._Dim5 != null)
+                    rec.Dimension5 = dc._Dim5;
+            }
+        }
+
+        void lookupProjectDim(GLOffsetAccountLineGridClient rec)
+        {
+            var proj = (Uniconta.DataModel.Project)ProjectCache?.Get(rec._Project);
+            if (proj != null)
+            {
+                if (proj._Dim1 != null)
+                    rec.Dimension1 = proj._Dim1;
+                if (proj._Dim2 != null)
+                    rec.Dimension2 = proj._Dim2;
+                if (proj._Dim3 != null)
+                    rec.Dimension3 = proj._Dim3;
+                if (proj._Dim4 != null)
+                    rec.Dimension4 = proj._Dim4;
+                if (proj._Dim5 != null)
+                    rec.Dimension5 = proj._Dim5;
+            }
+        }
+
         void GLOffSetAccountTemplateGridClient_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             var rec = sender as GLOffsetAccountLineGridClient;
@@ -221,7 +260,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "Account":
                     if (rec._AccountType != GLJournalAccountType.Finans)
-                        rec.Vat = null;
+                        copyDCAccount(rec);
                     else
                     {
                         var Acc = (GLAccount)LedgerCache?.Get(rec._Account);
@@ -237,6 +276,9 @@ namespace UnicontaClient.Pages.CustomPage
                 case "Amount":
                     RecalculateSum();
                     break;
+                case "Project":
+                    lookupProjectDim(rec);
+                    break;
             }
         }
 
@@ -248,6 +290,8 @@ namespace UnicontaClient.Pages.CustomPage
                 DebtorCache = await api.LoadCache(typeof(Uniconta.DataModel.Debtor)).ConfigureAwait(false);
             if (CreditorCache == null)
                 CreditorCache = await api.LoadCache(typeof(Uniconta.DataModel.Creditor)).ConfigureAwait(false);
+            if (ProjectCache == null && api.CompanyEntity.Project)
+                ProjectCache = await api.LoadCache(typeof(Uniconta.DataModel.Project)).ConfigureAwait(false);
             LoadType(typeof(Uniconta.DataModel.GLVat));
         }
 

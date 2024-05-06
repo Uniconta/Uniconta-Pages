@@ -15,7 +15,7 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryStatement"
         <Util:MaskConverter x:Key="MaskConverter" />
         <DataTemplate x:Key="RegularCellTemplate">
             <Grid>
-                <TextBlock FontWeight="Bold" Foreground="Red" VerticalAlignment="Center"  Text="{Binding RowData.Row.ItemNumber}" />
+                <TextBlock FontWeight="Bold" Foreground="{StaticResource StatementAccountHeaderColorForeground}" VerticalAlignment="Center"  Text="{Binding RowData.Row.ItemNumber}" />
             </Grid>
         </DataTemplate>
     </UserControl.Resources>
@@ -100,7 +100,7 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryStatement"
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="SalesPrice" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="DCAccount" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="AccountName" Width="150" Visible="False" />
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoicePrice" Visible="False"  />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="NetDiscount" Visible="False"  />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Currency" Visible="False" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="SalesPriceCur" Visible="False"  />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="TotalCur" Visible="False"  />

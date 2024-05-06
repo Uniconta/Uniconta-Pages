@@ -62,7 +62,7 @@
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Text" MinWidth="300" />
                     </localCtrl:AttachedVouchersGrid.Columns>
                 </localCtrl:AttachedVouchersGrid>
-                <GridSplitter HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="{StaticResource BodyTextColorBrush}" Grid.Column="1" ShowsPreview="True" />
+                <GridSplitter HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="{StaticResource EditorForeGroundTextColor}" Grid.Column="1" ShowsPreview="True" />
                 <corasauControls:UnicontaVoucherViewer x:Name="documentViewer" Grid.Column="2" />
             </Grid>
         </corasauControls:BusyIndicator>

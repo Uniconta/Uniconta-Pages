@@ -17,6 +17,8 @@ using Localization = Uniconta.ClientTools.Localization;
 using Uniconta.ClientTools.Controls;
 using Uniconta.Common.Enums;
 using static UnicontaClient.Pages.CreateIntraStatFilePage;
+using Microsoft.IdentityModel.Tokens;
+using Uniconta.ClientTools;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -26,18 +28,23 @@ namespace UnicontaClient.Pages.CustomPage
         #region Constants
         public const string VALIDATE_OK = "Ok";
         public const string UNKNOWN_CVRNO = "QV999999999999";
+        public const string SWEDEN_POSTFIX_01 = "01";
         #endregion
 
         #region Variables
         private CrudAPI api;
         private string companyRegNo;
         private CountryCode companyCountryId;
+        private Dictionary<string, bool> dictVatNumber;
+        public int exportGroup;
         #endregion
 
-        public IntraHelper(CrudAPI api)
+        public IntraHelper(CrudAPI api, int exportGroup)
         {
             companyRegNo = Regex.Replace(api.CompanyEntity._Id ?? string.Empty, "[^0-9]", "");
             companyCountryId = api.CompanyEntity._CountryId;
+            this.exportGroup = exportGroup;
+            dictVatNumber = new Dictionary<string, bool>();
         }
 
         public bool PreValidate()
@@ -81,16 +88,16 @@ namespace UnicontaClient.Pages.CustomPage
                     continue;
                 }
 
-                if (intra.ItemCode == null)
+                if (string.IsNullOrEmpty(intra.ItemCode) && exportGroup == 0)
                 {
                     hasErrors = true;
                     intra.SystemInfo += intra.SystemInfo != null ? Environment.NewLine : null;
                     intra.SystemInfo += string.Format(Localization.lookup("OBJisEmpty"), Localization.lookup("TariffNumber"));
                 }
                 else
-                    intra.ItemCode = Regex.Replace(intra.ItemCode, "[^0-9]", "");
+                    intra.ItemCode = Regex.Replace(intra.ItemCode ?? string.Empty, "[^0-9]", "");
 
-                if (intra.ItemCode != null && intra.ItemCode.Length != 8)
+                if (!string.IsNullOrEmpty(intra.ItemCode) && intra.ItemCode.Length != 8)
                 {
                     hasErrors = true;
                     intra.SystemInfo += intra.SystemInfo != null ? Environment.NewLine : null;
@@ -116,7 +123,7 @@ namespace UnicontaClient.Pages.CustomPage
                     intra.SystemInfo += Localization.lookup("NonEUCountry");
                 }
 
-                if (intra.ImportOrExport == ImportOrExportIntrastat.Export && intra.CountryOfOrigin == CountryCode.Unknown && intra._CountryOfOriginUNK == IntraUnknownCountry.None)
+                if (intra.ImportOrExport == ImportOrExportIntrastat.Export && intra.CountryOfOrigin == CountryCode.Unknown && intra._CountryOfOriginUNK == IntraUnknownCountry.None && exportGroup == 0)
                 {
                     hasErrors = true;
                     intra.SystemInfo += intra.SystemInfo != null ? Environment.NewLine : null;
@@ -130,7 +137,7 @@ namespace UnicontaClient.Pages.CustomPage
                     intra.SystemInfo += Localization.lookup("NoValues");
                 }
 
-                if (intra.NetWeight == 0 && intra.IntraUnit == 0 && (string.IsNullOrWhiteSpace(intra.ItemCode) || !intra.ItemCode.Contains("99500000")))
+                if (intra.NetWeight == 0 && intra.IntraUnit == 0 && (string.IsNullOrWhiteSpace(intra.ItemCode) || !intra.ItemCode.Contains("99500000")) && exportGroup == 0)
                 {
                     hasErrors = true;
                     intra.SystemInfo += intra.SystemInfo != null ? Environment.NewLine : null;
@@ -159,6 +166,23 @@ namespace UnicontaClient.Pages.CustomPage
                         intra.SystemInfo += intra.SystemInfo != null ? Environment.NewLine : null;
                         intra.SystemInfo += string.Format(Localization.lookup("MissingOBJ"), Localization.lookup("DebtorRegNo"));
                     }
+
+                    if (!hasErrors && intra.fDebtorRegNo != UNKNOWN_CVRNO)
+                    {
+                        bool validVatNumber = false;
+                        if (!dictVatNumber.TryGetValue(intra.fDebtorRegNo, out validVatNumber))
+                        {
+                            validVatNumber = CheckEuropeanVatInformation(intra.fDebtorRegNo, intra.Country);
+                            dictVatNumber.Add(intra.fDebtorRegNo, validVatNumber);
+                        }
+
+                        if (!validVatNumber)
+                        {
+                            hasErrors = true;
+                            intra.SystemInfo += intra.SystemInfo != null ? Environment.NewLine : null;
+                            intra.SystemInfo += Uniconta.ClientTools.Localization.lookup("NotValidVatNo");
+                        }
+                    }
                 }
 
                 if (hasErrors)
@@ -166,6 +190,25 @@ namespace UnicontaClient.Pages.CustomPage
                 else
                     intra.SystemInfo = VALIDATE_OK;
             }
+        }
+
+        private bool CheckEuropeanVatInformation(string cvr, CountryCode country)
+        {
+            if (string.IsNullOrEmpty(cvr))
+                return false;
+
+            cvr = Regex.Replace(cvr, "[^0-9]", "");
+
+            int countryCode = (int)country;
+            var twolettercode = Enum.GetName(typeof(CountryISOCode), countryCode);
+
+            if (twolettercode != null)
+            {
+                var vatInfo = EuropeanVatInformation.Get(twolettercode, cvr);
+                if (vatInfo == null || vatInfo.VatNumber != null)
+                    return true;
+            }
+            return false;
         }
 
         class CompressCompare : IEqualityComparer<IntrastatClient>

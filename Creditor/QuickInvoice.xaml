@@ -3,18 +3,12 @@
 x:Class="UnicontaClient.Pages.CustomPage.QuickInvoice"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d"
     xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage" 
-    xmlns:controlsToolkit="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Layout.Toolkit"
-    xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
     xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
     xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
     xmlns:dxn="http://schemas.devexpress.com/winfx/2008/xaml/navbar"
     xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors"
-    xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
-    d:DesignHeight="300" d:DesignWidth="400">
+    xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools">
     <UserControl.Resources>
         <Util:RowIndexConverter x:Key="RowIndexConverter" />
         <Style x:Key="StyleRow" TargetType="dxg:RowControl">
@@ -345,6 +339,7 @@ x:Class="UnicontaClient.Pages.CustomPage.QuickInvoice"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Width="100" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="WorkSpace" Width="100" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PostingAccount" Width="100" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PostingText" Width="100" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Vat" Width="50" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Employee" Width="50" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Variant1Name" Width="100" Visible="False"/>

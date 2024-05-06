@@ -262,6 +262,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 await dgProductionOrders.SaveData();
                                 break;
                             case CWConfirmationBox.ConfirmationResultEnum.No:
+                                dgProductionOrders.CancelChanges();
                                 break;
                         }
                         editAllChecked = true;

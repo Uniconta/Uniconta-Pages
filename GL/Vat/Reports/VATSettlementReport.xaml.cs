@@ -77,7 +77,7 @@ namespace UnicontaClient.Pages.CustomPage
             link.ReportHeaderTemplate = ReportHeaderTemplate;
             link.DetailTemplate = DetailTemplate;
             link.DetailCount = 1;
-            link.PaperKind = System.Drawing.Printing.PaperKind.A4;
+            link.PaperKind = DevExpress.Drawing.Printing.DXPaperKind.A4;
 
             link.CreateDetail += link_CreateDetail;
             return link;

@@ -94,14 +94,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             ribbonControl.DisableButtons(new string[] { "UndoDelete", "DeleteRow", "SaveGrid" });
-            RemoveMenuItem();
             creditorCache = api.GetCache(typeof(Uniconta.DataModel.Creditor));
-        }
-
-        void RemoveMenuItem()
-        {
-            if (api.CompanyEntity._CountryId != CountryCode.Denmark)
-                UtilDisplay.RemoveMenuCommand((RibbonBase)localMenu.DataContext, "ReadOIOUBL");
         }
 
         protected override void OnLayoutLoaded()
@@ -218,6 +211,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                     {
                         CWOrderFromOrder cwOrderFromOrder = new CWOrderFromOrder(api);
+                        cwOrderFromOrder.RelatedOrder= selectedItem.RelatedOrder;
                         cwOrderFromOrder.DialogTableId = 2000000027;
                         cwOrderFromOrder.Closed += async delegate
                         {
@@ -316,18 +310,6 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "RefreshGrid":
                     TestCreditorReload(true, dgCreditorOrdersGrid.ItemsSource as IEnumerable<CreditorOrder>);
-                    break;
-                case "ReadOIOUBL":
-                    var orderOIOCW = new CWOrderOIOUBLImport();
-                    orderOIOCW.Closing += delegate
-                    {
-                        if (orderOIOCW.DialogResult != true)
-                            return;
-
-                        ReadOIOUBL(orderOIOCW.OneOrMultiple);
-                    };
-                    orderOIOCW.Show();
-                    gridRibbon_BaseActions("RefreshGrid");
                     break;
                 case "ApproveOrder":
                     if (selectedItem != null && api.CompanyEntity.ApprovePurchaseOrders)
@@ -481,6 +463,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 }
                                 break;
                             case CWConfirmationBox.ConfirmationResultEnum.No:
+                                dgCreditorOrdersGrid.CancelChanges();
                                 break;
                         }
                         editAllChecked = true;
@@ -529,135 +512,6 @@ namespace UnicontaClient.Pages.CustomPage
             }
             if (refresh)
                 gridRibbon_BaseActions("RefreshGrid");
-        }
-
-        public async void ReadOIOUBL(bool oneOrMultiple)
-        {
-            try
-            {
-                if (creditorCache == null)
-                    creditorCache = api.GetCache(typeof(Uniconta.DataModel.Creditor)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Creditor));
-
-                var orderlist = dgCreditorOrdersGrid.ItemsSource as List<CreditorOrderClient>;
-
-                if (!oneOrMultiple)
-                {
-                    var orderlistToAddToGrid = new List<CreditorOrderClient>();
-                    string listOfFailedFiles = null;
-
-                    var openFolderDialog = UtilDisplay.LoadFolderBrowserDialog;
-                    if (openFolderDialog.ShowDialog() != true)
-                        return;
-
-                    string[] files = Directory.GetFiles(openFolderDialog.SelectedPath);
-
-                    foreach (string file in files)
-                    {
-                        var xmlText = File.ReadAllText(file);
-                        var order = await OIOUBL.ReadInvoiceCreditNoteOrOrder(xmlText, creditorCache, api, oneOrMultiple);
-                        if (order == null)
-                        {
-                            listOfFailedFiles += string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ViewerFailed"), file + Environment.NewLine);
-                            continue;
-                        }
-
-                        var orderlines = order.Lines;
-                        order.Lines = null;
-
-                        var err = await api.Insert(order);
-                        if (err != ErrorCodes.Succes)
-                        {
-                            listOfFailedFiles += string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ViewerFailed"), file + Environment.NewLine);
-                            continue;
-                        }
-
-                        int countLine = 0;
-                        foreach (var line in orderlines)
-                        {
-                            line.SetMaster(order);
-                            line._LineNumber = ++countLine;
-                        }
-
-                        var err2 = await api.Insert(orderlines);
-                        if (err2 != ErrorCodes.Succes)
-                        {
-                            listOfFailedFiles += string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ViewerFailed"), file + Environment.NewLine);
-                            continue;
-                        }
-
-                        order.Lines = orderlines;
-                        orderlistToAddToGrid.Add(order);
-                    }
-
-                    if (orderlist == null || orderlist.Count == 0)
-                        orderlist = orderlistToAddToGrid;
-                    else
-                        orderlist.AddRange(orderlistToAddToGrid);
-
-                    dgCreditorOrdersGrid.ItemsSource = orderlist;
-
-                    if (listOfFailedFiles != null)
-                    {
-                        listOfFailedFiles = listOfFailedFiles + Uniconta.ClientTools.Localization.lookup("RunFileIndividual");
-                        UnicontaMessageBox.Show(listOfFailedFiles, Uniconta.ClientTools.Localization.lookup("Error"));
-                    }
-                }
-                else
-                {
-                    var sfd = UtilDisplay.LoadOpenFileDialog;
-                    sfd.Filter = UtilFunctions.GetFilteredExtensions(FileextensionsTypes.XML);
-
-                    var userClickedSave = sfd.ShowDialog();
-                    if (userClickedSave != true)
-                        return;
-
-                    using (var stream = File.Open(sfd.FileName, FileMode.Open, FileAccess.Read, FileShare.Read))
-                    {
-                        var sr = new StreamReader(stream);
-                        var oioublText = await sr.ReadToEndAsync();
-                        stream.Close();
-
-                        var order = await OIOUBL.ReadInvoiceCreditNoteOrOrder(oioublText, creditorCache, api, oneOrMultiple);
-                        if (order == null)
-                            return;
-
-                        var orderlines = order.Lines;
-                        order.Lines = null;
-
-                        var err = await api.Insert(order);
-                        if (err != ErrorCodes.Succes)
-                        {
-                            UtilDisplay.ShowErrorCode(err);
-                            return;
-                        }
-
-                        int countLine = 0;
-                        foreach (var line in orderlines)
-                        {
-                            line.SetMaster(order);
-                            line._LineNumber = ++countLine;
-                        }
-
-                        err = await api.Insert(orderlines);
-                        if (err != ErrorCodes.Succes)
-                        {
-                            UtilDisplay.ShowErrorCode(err);
-                            return;
-                        }
-
-                        if (orderlist == null || orderlist.Count == 0)
-                            orderlist = new List<CreditorOrderClient>();
-
-                        orderlist.Add(order);
-
-                        dgCreditorOrdersGrid.ItemsSource = orderlist;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                UnicontaMessageBox.Show(ex);
-            }
         }
 
         public override bool IsDataChaged
@@ -863,6 +717,11 @@ namespace UnicontaClient.Pages.CustomPage
                 lst.Add(typeof(Uniconta.DataModel.Contact));
             if (Comp.CreditorPrice)
                 lst.Add(typeof(Uniconta.DataModel.CreditorPriceList));
+            if (Comp.Shipments)
+            {
+                lst.Add(typeof(Uniconta.DataModel.ShipmentType));
+                lst.Add(typeof(Uniconta.DataModel.DeliveryTerm));
+            }
             if (Comp.ItemVariants)
             {
                 lst.Add(typeof(Uniconta.DataModel.InvVariant1));

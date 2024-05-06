@@ -36,7 +36,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorAccountStat"
             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ToDate}" Grid.Column="4"/>
             <CorasauControls:DateEditor x:Name="txtDateTo" Grid.Column="6" Margin="0,3,3,3"/>
         </Grid>
-        <Rectangle Height="1" Fill="{StaticResource BodyTextColorBrush}" Grid.Row="2" />
+        <Rectangle Height="1" Fill="{StaticResource BorderColor}" Grid.Row="2" />
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="3" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <localPage:InvStatisticsGrid  x:Name="dgAcStatsGrid" AutoGenerateColumns="None">
                 <localPage:InvStatisticsGrid.Columns>

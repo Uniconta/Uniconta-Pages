@@ -164,6 +164,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 }
                                 break;
                             case CWConfirmationBox.ConfirmationResultEnum.No:
+                                dgCreditorGroupPosting.CancelChanges();
                                 break;
                         }
                         editAllChecked = true;

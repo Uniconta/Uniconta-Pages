@@ -31,6 +31,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreateBackupConfirmation"
                 <CheckBox x:Name="cbxCopyTrans"></CheckBox>
                 <CheckBox x:Name="cbxPhysicalVoucher"></CheckBox>
                 <CheckBox x:Name="cbxCopyAttachments"></CheckBox>
+                <CheckBox x:Name="cbxCopyUsers"></CheckBox>
             </StackPanel>
             <TextBlock x:Name="lblprompt" Grid.Row="4" VerticalAlignment="Center" Margin="5,5,5,5"/>
             <TextBox Width="200" Grid.Row="5" x:Name="txtStart" Height="25" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,5,5,5"/>

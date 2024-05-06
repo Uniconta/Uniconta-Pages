@@ -173,6 +173,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 }
                                 break;
                             case CWConfirmationBox.ConfirmationResultEnum.No:
+                                dgCrmProspectGrid.CancelChanges();
                                 break;
                         }
                         editAllChecked = true;

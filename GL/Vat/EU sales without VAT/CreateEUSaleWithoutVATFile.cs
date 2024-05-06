@@ -8,14 +8,9 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-
-#if !SILVERLIGHT
 using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Serialization;
-#else
-using System.Windows;
-#endif
 using Uniconta.API.System;
 using Uniconta.ClientTools;
 using Uniconta.ClientTools.Controls;
@@ -32,16 +27,16 @@ namespace UnicontaClient.Pages.CustomPage
 {
     class CreateEUSaleWithoutVATFile
     {
-#if !SILVERLIGHT
-
         #region Constants
         public const string VALIDATE_OK = "Ok";
+        public const string SWEDEN_POSTFIX_01 = "01";
         #endregion
 
         #region Variables
         private CrudAPI api;
         private string companyRegNo;
         private CountryCode companyCountryId;
+        private Dictionary<string, bool> dictVatNumber;
         #endregion
 
         public CreateEUSaleWithoutVATFile(CrudAPI api, string companyRegNo, CountryCode companyCountryId)
@@ -49,6 +44,7 @@ namespace UnicontaClient.Pages.CustomPage
             this.api = api;
             this.companyRegNo = companyRegNo;
             this.companyCountryId = companyCountryId;
+            dictVatNumber = new Dictionary<string, bool>();
         }
 
         public bool CreateFile(IEnumerable<EUSaleWithoutVAT> listOfEUSaleWithoutVAT)
@@ -254,6 +250,25 @@ namespace UnicontaClient.Pages.CustomPage
                         euSale.SystemInfo += Environment.NewLine + string.Format(Localization.lookup("FieldTooLongOBJ"), Localization.lookup("CompanyRegNo"));
                 }
 
+                if (!hasErrors)
+                {
+                    bool validVatNumber = false;
+                    if (!dictVatNumber.TryGetValue(euSale._DebtorRegNoFile, out validVatNumber))
+                    {
+                        validVatNumber = CheckEuropeanVatInformation(euSale._DebtorRegNoFile, euSale.Country);
+                        dictVatNumber.Add(euSale._DebtorRegNoFile, validVatNumber);
+                    }
+
+                    if (!validVatNumber)
+                    {
+                        hasErrors = true;
+                        if (euSale.SystemInfo == VALIDATE_OK)
+                            euSale.SystemInfo = Uniconta.ClientTools.Localization.lookup("NotValidVatNo");
+                        else
+                            euSale.SystemInfo += Environment.NewLine + Uniconta.ClientTools.Localization.lookup("NotValidVatNo");
+                    }
+                }
+
                 if (hasErrors)
                     countErr++;
             }
@@ -268,6 +283,23 @@ namespace UnicontaClient.Pages.CustomPage
                     countErr++;
                 }
             }
+        }
+
+        private bool CheckEuropeanVatInformation(string cvr, CountryCode country)
+        {
+            if (string.IsNullOrEmpty(cvr))
+                return false;
+           
+            int countryCode = (int)country;
+            var twolettercode = Enum.GetName(typeof(CountryISOCode), countryCode);
+            
+            if (twolettercode != null)
+            {
+                var vatInfo = EuropeanVatInformation.Get(twolettercode, cvr);
+                if (vatInfo == null || vatInfo.VatNumber != null)
+                    return true;
+            }
+            return false;
         }
 
         private long StreamToFile(List<EUSaleWithoutVAT> listOfImportExport, StreamWriter sw)
@@ -575,9 +607,10 @@ namespace UnicontaClient.Pages.CustomPage
         [Display(Name = "Item", ResourceType = typeof(InventoryText))]
         public string Item { get { return _Item; } set { _Item = value; NotifyPropertyChanged("Item"); } }
 
+        public string _ItemName;
         [Display(Name = "ItemName", ResourceType = typeof(InvTransText))]
         [NoSQL]
-        public string ItemName { get { return ClientHelper.GetName(_CompanyId, typeof(Uniconta.DataModel.InvItem), Item); } }
+        public string ItemName { get { return _ItemName; } set { _ItemName = value; NotifyPropertyChanged("ItemName"); } }
 
         private string _SystemInfo;
         [Display(Name = "SystemInfo", ResourceType = typeof(DCTransText))]
@@ -730,7 +763,7 @@ namespace UnicontaClient.Pages.CustomPage
         [System.Xml.Serialization.XmlTextAttribute()]
         public string Value;
     }
-#endif
+
     public enum ItemOrServiceType : byte
     {
         None,

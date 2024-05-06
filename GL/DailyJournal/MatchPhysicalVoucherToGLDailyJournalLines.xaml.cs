@@ -448,7 +448,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (act == (byte)GLJournalAccountType.Finans)
                         rec.accntSource = new UnicontaClient.Pages.GLDailyJournalLine.LedgerSQLCacheFilter(cache);
                     else
-                        rec.accntSource = cache.GetNotNullArray;
+                        rec.accntSource = cache;
                     if (rec.accntSource != null)
                     {
                         rec.AccountVersion = ver;

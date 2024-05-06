@@ -60,6 +60,7 @@ x:Class="UnicontaClient.Pages.CustomPage.PostedTransactions"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Canceled" Width="50" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Accrued" Width="50" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Allocated" Width="50" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Modified" Width="50" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PostCalculated" Width="50" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Reconciled" Width="50" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="VatEntered" Width="50" Visible="False" />

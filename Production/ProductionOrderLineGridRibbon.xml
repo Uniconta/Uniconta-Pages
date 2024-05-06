@@ -6,6 +6,7 @@
     <RibbonItem Action="CopyRow" LocalizedNameKey="CopyLine" LargeGlyph="Copy_32x32"/>
     <RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="DeleteOBJ" Parameter="Line" Glyph="Delete_16x16" LargeGlyph="Delete_32x32"/>
     <RibbonItem Action="SaveGrid" ShortcutKey="CTRL+S" LocalizedNameKey="Save" Glyph="save-16x16" LargeGlyph="save-32x32"/>
+    <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh" LargeGlyph="refresh"/>
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="ViewPhoto" ShortcutKey="" LocalizedNameKey="ViewOBJ" Parameter="Photo" LargeGlyph="View_Highlighted_32x32"/>

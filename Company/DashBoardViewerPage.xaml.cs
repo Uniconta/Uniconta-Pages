@@ -2,19 +2,11 @@ using UnicontaClient.Models;
 using DevExpress.DashboardCommon;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using System.Xml.Linq;
 using Uniconta.API.System;
 using Uniconta.ClientTools;
@@ -27,20 +19,12 @@ using UnicontaClient.Controls;
 using UnicontaClient.Utilities;
 using Uniconta.API.Service;
 using System.Windows.Threading;
-using System.Text.RegularExpressions;
 using DevExpress.Mvvm.UI.Interactivity;
 using DevExpress.Xpf.PivotGrid;
 using Uniconta.Common.Utility;
 using System.Reflection.Emit;
-using Uniconta.Reports.Utilities;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel;
 using System.Data;
-using System.Collections;
-using System.Web.Caching;
-using DevExpress.XtraPrinting.Native;
 using Uniconta.ClientTools.Util;
-using DevExpress.XtraSpreadsheet.Model;
 using DevExpress.Data.Filtering;
 
 using UnicontaClient.Pages;
@@ -190,7 +174,6 @@ namespace UnicontaClient.Pages.CustomPage
                     name = savedName;
                     ((DataItem)col).Name = Uniconta.ClientTools.Localization.lookup(name.Substring(1));
                 }
-                IsNestedField(col, dataSourceName);
             }
         }
 
@@ -233,6 +216,7 @@ namespace UnicontaClient.Pages.CustomPage
                 IsNestedField(col, dataSourceName);
             }
         }
+
         Dictionary<string, bool> HasNestedField;
         private void DashboardViewerUniconta_DashboardLoaded(object sender, DevExpress.DashboardWpf.DashboardLoadedEventArgs e)
         {
@@ -253,31 +237,39 @@ namespace UnicontaClient.Pages.CustomPage
                     var grid = dasdboard.Items[item.ComponentName] as GridDashboardItem;
                     if (grid != null)
                     {
-                        var targetLst = grid.Columns.OfType<GridDimensionColumn>().ToList();
+                        var targetLst = grid.Columns;
                         foreach (var col in targetLst)
                         {
-                            var dimName = col.Dimension.Name;
-                            var colName = col.Name;
-                            var savedName = col.CustomProperties.GetValue(col.Dimension.UniqueId) ?? string.Empty;
-
-                            if (!string.IsNullOrEmpty(dimName) && (dimName.StartsWith("&") || dimName.StartsWith("@") || savedName.StartsWith("@") || savedName.StartsWith("&")))
+                            if (col is GridDimensionColumn dimCol)
                             {
-                                if (col.CustomProperties.GetValue(col.Dimension.UniqueId) == null)
-                                    col.CustomProperties.SetValue(col.Dimension.UniqueId, name);
-                                else
-                                    dimName = savedName;
-                                col.Dimension.Name = Uniconta.ClientTools.Localization.lookup(dimName.Substring(1));
-                            }
+                                var colName = dimCol.Dimension.Name;
+                                var savedName = col.CustomProperties.GetValue(dimCol.Dimension.UniqueId) ?? string.Empty;
 
-                            if (!string.IsNullOrEmpty(colName) && (colName.StartsWith("&") || colName.StartsWith("@") || savedName.StartsWith("@") || savedName.StartsWith("&")))
-                            {
-                                if (col.CustomProperties.GetValue(col.Dimension.UniqueId) == null)
-                                    col.CustomProperties.SetValue(col.Dimension.UniqueId, name);
-                                else
-                                    colName = savedName;
-                                col.Name = Uniconta.ClientTools.Localization.lookup(colName.Substring(1));
+                                if (!string.IsNullOrEmpty(colName) && (colName.StartsWith("&") || colName.StartsWith("@")))
+                                {
+                                    if (col.CustomProperties.GetValue(dimCol.Dimension.UniqueId) == null)
+                                        col.CustomProperties.SetValue(dimCol.Dimension.UniqueId, name);
+                                    else
+                                        colName = savedName;
+                                    dimCol.Dimension.Name = Uniconta.ClientTools.Localization.lookup(colName.Substring(1));
+                                }
+                                IsNestedField(dimCol.Dimension, dataSourceComponentName);
                             }
-                            IsNestedField(col.Dimension, dataSourceComponentName);
+                            else if (col is GridMeasureColumn meaCol)
+                            {
+                                var colName = meaCol.Measure.Name;
+                                var savedName = col.CustomProperties.GetValue(meaCol.Measure.UniqueId) ?? string.Empty;
+
+                                if (!string.IsNullOrEmpty(colName) && (colName.StartsWith("&") || colName.StartsWith("@")))
+                                {
+                                    if (col.CustomProperties.GetValue(meaCol.Measure.UniqueId) == null)
+                                        col.CustomProperties.SetValue(meaCol.Measure.UniqueId, name);
+                                    else
+                                        colName = savedName;
+                                    meaCol.Measure.Name = Uniconta.ClientTools.Localization.lookup(colName.Substring(1));
+                                }
+                                IsNestedField(meaCol.Measure, dataSourceComponentName);
+                            }
                         }
                     }
                 }
@@ -654,7 +646,12 @@ namespace UnicontaClient.Pages.CustomPage
                 if (result == ErrorCodes.Succes)
                 {
                     if (_selectedDashBoard.Layout != null)
-                        ReadDataFromDB(_selectedDashBoard.Layout);
+                    {
+                        DevExpress.Utils.DeserializationSettings.InvokeTrusted(() =>
+                        {
+                            ReadDataFromDB(_selectedDashBoard.Layout);
+                        });
+                    }
                     dashboardViewerUniconta.TitleContent = !string.IsNullOrEmpty(titleText) ? titleText : _selectedDashBoard.Name;
                 }
                 else
@@ -772,6 +769,31 @@ namespace UnicontaClient.Pages.CustomPage
             });
         }
 
+        private UnicontaBaseEntity[] LoadCurrentUserCompanies(CrudAPI crudApi)
+        {
+            var currentUserSessionCompanies = CWDefaultCompany.loadedCompanies;
+
+            if (currentUserSessionCompanies == null || currentUserSessionCompanies.Length == 0)
+            {
+                var cmpUser = crudApi.CompanyEntity.CreateUserType<CompanyClient>();
+                if (crudApi.CompanyEntity != null)
+                    StreamingManager.Copy(crudApi.CompanyEntity, cmpUser);
+
+                return new CompanyClient[] { cmpUser };
+            }
+
+            var companies = new CompanyClient[currentUserSessionCompanies.Length];
+
+            for (int index = 0; index < currentUserSessionCompanies.Length; index++)
+            {
+                var comp = currentUserSessionCompanies[index];
+                var cmpUser = crudApi.CompanyEntity.CreateUserType<CompanyClient>();
+                StreamingManager.Copy(comp, cmpUser);
+                companies[index] = cmpUser;
+            }
+            return companies;
+        }
+
         Dashboard _dashboard;
         private void DashboardViewerUniconta_DashboardChanged(object sender, EventArgs e)
         {
@@ -844,7 +866,12 @@ namespace UnicontaClient.Pages.CustomPage
 
                                 CrudAPI compApi = null;
                                 if (fixedComp == null || this.company.CompanyId == fixedComp.CompanyId)
-                                    data = Query(type, api, masterRecords, filterValues).GetAwaiter().GetResult();
+                                {
+                                    if (type == typeof(CompanyClient))
+                                        data = LoadCurrentUserCompanies(api);
+                                    else
+                                        data = Query(type, api, masterRecords, filterValues).GetAwaiter().GetResult();
+                                }
                                 else
                                 {
                                     var comp = CWDefaultCompany.loadedCompanies.FirstOrDefault(x => x.CompanyId == fixedComp.CompanyId);
@@ -859,7 +886,7 @@ namespace UnicontaClient.Pages.CustomPage
                                     ReadData(data, compApi ?? api).GetAwaiter().GetResult(); // if there is image in property it will load again;
 
                                 if (HasNestedField.TryGetValue(DataSourceComponentName, out bool nestField))
-                                    e.Data = UtilFunctions.BuildDataTable(data, type, (compApi ?? api).CompanyEntity);
+                                    e.Data = new DashBoardView.DisplayNameProviderTypedListWrapper<DataView>(UtilFunctions.BuildDataTable(data, type, (compApi ?? api).CompanyEntity).DefaultView, new DashBoardView.DisplayNameProviderStub());
                                 else
                                     e.Data = data;
                             }
@@ -911,22 +938,23 @@ namespace UnicontaClient.Pages.CustomPage
         {
             propValuePair = null;
 
-            if (master == null || masterField == null)
+            if (master == null)
                 return null;
 
-            List<UnicontaBaseEntity> masters = null;
-            PropertyInfo p = TableTYpe.GetProperty(masterField);
-
-            if (p != null)
+            if (masterField != null)
             {
-                var filterValue = master.GetType().GetProperty(masterField).GetValue(master, null);
+                PropertyInfo propInfo = TableTYpe.GetProperty(masterField);
 
-                if (filterValue != null)
-                    propValuePair = PropValuePair.GenereteWhereElements(masterField, p.PropertyType, filterValue.ToString());
+                if (propInfo != null)
+                {
+                    var filterValue = master.GetType().GetProperty(masterField).GetValue(master, null);
 
-                masters = new List<UnicontaBaseEntity>() { master };
+                    if (filterValue != null)
+                        propValuePair = PropValuePair.GenereteWhereElements(masterField, propInfo.PropertyType, filterValue.ToString());
+                }
             }
-            return masters;
+
+            return new List<UnicontaBaseEntity>() { master };
         }
 
         bool TableContainLoginIdProp(Type retType)

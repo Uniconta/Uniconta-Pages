@@ -38,6 +38,7 @@
     <RibbonItem Action="InclJournals" LocalizedNameKey="IncludeJournals" IsCheckBox="True" />
     <RibbonItem Action="ShowWorkspace" LocalizedNameKey="ShowOBJ" Parameter="WorkSpace" IsCheckBox="True" />
     <RibbonItem Action="ShowTasks" LocalizedNameKey="ShowTasks" Module="ProjectTask" IsCheckBox="True" />
+	<RibbonItem Action="ShowWIPCostvalue" LocalizedNameKey="ShowOBJ" Parameter="CostValue" IsCheckBox="True" />
   </RibbonItem>
   <RibbonItem >
     <RibbonItem Action="Transactions" LocalizedNameKey="Transactions"  LargeGlyph="Account-statement_32x32" ShortcutKey="CTRL+T"/>

@@ -85,7 +85,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjInvProposalLine"
                     </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:ComboBoxColumnClient x:Name="Unit" Width="50" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="EAN" Visible="False" Width="150"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CustomerItemNumber" Width="150"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CustomerItemNumber" Width="150" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Price" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Discount" Width="80" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DiscountPct" Width="50"/>
@@ -95,7 +95,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjInvProposalLine"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Margin" Visible="False" Width="70" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="MarginRatio" Visible="False" Width="50" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DoInvoice" Width="50" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="QtyInvoiced" Width="80" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="QtyInvoiced" Width="80" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Currency" Width="35" ReadOnly="True" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CostPrice" Visible="False" />
                     <localPage:CorasauDataGridForeignKeyColumnClient x:Name="Task" Width="80" Visible="False" />
@@ -106,12 +106,13 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjInvProposalLine"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Date" Width="90" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="SerieBatchMarked" Width="90" HideHeaderCheck="true" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PostingAccount" Width="100" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PostingText" Width="100" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Vat" Width="50" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Employee" Width="50" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Project" Width="100" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Width="70" Visible="False" ReadOnly="True" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Width="70" ReadOnly="True" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CategoryName" Width="100" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="WorkSpace" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="WorkSpace" Width="70" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Cartons" Width="100" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Weight" Width="100" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Volume" Width="100" Visible="False"/>
@@ -129,6 +130,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjInvProposalLine"
                     </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="LineNumber" Mask="" Width="70" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="OrderNumber" Width="70" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PrimaryKey2Id" Width="70" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="UpdatedAt"   Visible="False">
                         <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                             <DataTemplate>

@@ -3,15 +3,10 @@
 x:Class="UnicontaClient.Pages.CustomPage.DebtorAccount"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
     xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage"
-    mc:Ignorable="d"   xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
-    xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+    xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
     xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
-    xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors"
-    d:DesignHeight="300" d:DesignWidth="400">
+    xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors">
     <UserControl.Resources>
         <Util:RowIndexConverter x:Key="RowIndexConverter" />
         <Util:VisibilityBoolConverter x:Key="VisibilityBoolConverter" />
@@ -99,7 +94,14 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorAccount"
                     <localPage:ComboBoxColumnClient x:Name="InvoiceInXML" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PricesInclVat" Width="60"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CrmGroup" Width="100" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Interests" Binding="{Binding Path=Interests, Mode=TwoWay, Converter={StaticResource ListToStringConverter}}" Width="100" >
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Interests" Binding="{Binding Path=Interests, Mode=TwoWay, Converter={StaticResource ListToStringConverter}}" Width="100">
+                        <localPage:CorasauDataGridTemplateColumnClient.EditSettings>
+                            <editor:ComboBoxEditSettings>
+                                <editor:ComboBoxEditSettings.StyleSettings>
+                                    <editor:CheckedComboBoxStyleSettings />
+                                </editor:ComboBoxEditSettings.StyleSettings>
+                            </editor:ComboBoxEditSettings>
+                        </localPage:CorasauDataGridTemplateColumnClient.EditSettings>
                         <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                             <DataTemplate>
                                 <CorasauControls:ComboBoxEditor GotFocus="cmbInterests_GotFocus"  x:Name="PART_Editor">
@@ -111,7 +113,14 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorAccount"
                         </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                     </localPage:CorasauDataGridTemplateColumnClient>
 
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Products" Binding="{Binding Path=Products, Mode=TwoWay, Converter={StaticResource ListToStringConverter}}" Width="100" >
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Products" Binding="{Binding Path=Products, Mode=TwoWay, Converter={StaticResource ListToStringConverter}}" Width="100">
+                        <localPage:CorasauDataGridTemplateColumnClient.EditSettings>
+                            <editor:ComboBoxEditSettings>
+                                <editor:ComboBoxEditSettings.StyleSettings>
+                                    <editor:CheckedComboBoxStyleSettings />
+                                </editor:ComboBoxEditSettings.StyleSettings>
+                            </editor:ComboBoxEditSettings>
+                        </localPage:CorasauDataGridTemplateColumnClient.EditSettings>
                         <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                             <DataTemplate>
                                 <CorasauControls:ComboBoxEditor GotFocus="cmbProducts_GotFocus"  x:Name="PART_Editor">
@@ -170,6 +179,10 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorAccount"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="D2CAccount" Visible="False" />
                     <localPage:ComboBoxColumnClient x:Name="BalanceMethod" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="EORI" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="IndustryCode" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryContactPerson" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryPhone" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryContactEmail" Visible="False"/>
                 </localPage:DebtorAccountGrid.Columns>
                 <localPage:DebtorAccountGrid.TotalSummary>
                     <localPage:SumColumn FieldName="CurBalance" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>

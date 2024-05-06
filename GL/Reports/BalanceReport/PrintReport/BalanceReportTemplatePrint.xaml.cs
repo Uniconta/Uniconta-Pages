@@ -328,7 +328,7 @@ namespace UnicontaClient.Pages.CustomPage
         SimpleLink CreateLink(HeaderData hdrdata, List<TemplateDataItems> listbalance, bool _landscape)
         {
             SimpleLink link = new SimpleLink();
-            link.PaperKind = System.Drawing.Printing.PaperKind.A4;
+            link.PaperKind = DevExpress.Drawing.Printing.DXPaperKind.A4;
             link.PrintingSystem.ExportOptions.Html.EmbedImagesInHTML = true;
             ExportOptions options = link.PrintingSystem.ExportOptions;
             ExportOptionKind[] OptionsKinds = new ExportOptionKind[]{

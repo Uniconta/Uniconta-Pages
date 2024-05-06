@@ -103,6 +103,7 @@ x:Class="UnicontaClient.Pages.CustomPage.PurchaseLinesPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Cartons" Width="100" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Weight" Width="100" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Volume" Width="100" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PrimaryKey2Id" Width="70" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Variant1Name" Width="100" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Variant2Name" Width="100" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Variant3Name" Width="100" Visible="False"/>

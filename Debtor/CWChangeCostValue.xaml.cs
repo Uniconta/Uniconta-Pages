@@ -42,7 +42,7 @@ namespace UnicontaClient.Pages.CustomPage
             InitializeComponent();
             this.Title = string.Format(Uniconta.ClientTools.Localization.lookup("ChangeOBJ"), Uniconta.ClientTools.Localization.lookup("CostValue"));
             this.Loaded += CW_Loaded;
-            deQty.Text =  _invTransInvoice.Qty.ToString("N0");
+            deQty.Text =  _invTransInvoice.Qty.ToString();
             deCostPrice.Text = _invTransInvoice.CostPrice.ToString("N2");
             deCostPrice.EditValueChanged += DeCostPrice_EditValueChanged;
             deCostValue.EditValueChanged += DeCostValue_EditValueChanged;

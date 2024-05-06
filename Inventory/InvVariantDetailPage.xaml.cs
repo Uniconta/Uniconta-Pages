@@ -136,7 +136,8 @@ namespace UnicontaClient.Pages.CustomPage
                     if (invMaster != null)
                     {
                         var currentRow = row as InvVariantDetailClient;
-                        currentRow.Item = invMaster.Item;
+                        if (currentRow != null)
+                            currentRow.Item = invMaster.Item;
                     }
                     break;
                 case "CopyRow":

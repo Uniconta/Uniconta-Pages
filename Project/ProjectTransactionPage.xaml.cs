@@ -75,31 +75,24 @@ namespace UnicontaClient.Pages.CustomPage
             InitializePage(master);
         }
 
-        public ProjectTransactionPage(SynchronizeEntity syncEntity) : base(syncEntity, true)
+        static UnicontaBaseEntity getMaster(UnicontaBaseEntity master)
         {
-            UnicontaBaseEntity master = syncEntity.Row;
-            UnicontaBaseEntity argsProj = null;
             var proj = master as Uniconta.DataModel.Project;
             if (proj != null)
-                argsProj = proj;
+                return proj;
+            var projectPosted = master as ProjectJournalPostedClient;
+            if (projectPosted != null)
+                return projectPosted;
+            var WIPreport = master as ProjectWIPTotalsClient;
+            if (WIPreport != null)
+                return WIPreport.ProjectRef;
             else
-            {
-                var projectPosted = master as ProjectJournalPostedClient;
-                if (projectPosted != null)
-                    argsProj = projectPosted;
-                else
-                {
-                    var WIPreport = master as ProjectTransLocalClient;
-                    if (WIPreport != null)
-                        argsProj = WIPreport.ProjectRef;
-                    else
-                    {
-                        var budgetLine = master as ProjectBudgetLine;
-                        if (budgetLine != null)
-                            argsProj = budgetLine;
-                    }
-                }
-            }
+                return master as ProjectBudgetLine;
+        }
+
+        public ProjectTransactionPage(SynchronizeEntity syncEntity) : base(syncEntity, true)
+        {
+            UnicontaBaseEntity argsProj = getMaster(syncEntity.Row);
             InitializePage(argsProj);
             SetHeader();
         }
@@ -107,30 +100,8 @@ namespace UnicontaClient.Pages.CustomPage
         {
             projLst = null;
             ClearTimeTrans();
-            UnicontaBaseEntity argsProj = null;
-            master = args;
-            var proj = args as Uniconta.DataModel.Project;
-            if (proj != null)
-                argsProj = proj;
-            else
-            {
-                var projectPosted = args as ProjectJournalPostedClient;
-                if (projectPosted != null)
-                    argsProj = projectPosted;
-                else
-                {
-                    var WIPreport = args as UnicontaClient.Pages.ProjectTransLocalClient;
-                    if (WIPreport != null)
-                        argsProj = WIPreport.ProjectRef;
-                    else
-                    {
-                        var budgetLine = args as ProjectBudgetLine;
-                        if (budgetLine != null)
-                            argsProj = budgetLine;
-                    }
-                }
-            }
-
+            UnicontaBaseEntity argsProj = getMaster(args);
+            master = argsProj;
             dgProjectTransaction.UpdateMaster(argsProj);
             SetHeader();
             InitQuery();
@@ -139,19 +110,19 @@ namespace UnicontaClient.Pages.CustomPage
         private void SetHeader()
         {
             string header;
-            var syncMaster = dgProjectTransaction.masterRecord as Uniconta.DataModel.Project;
+            var syncMaster = master as Uniconta.DataModel.Project;
             if (syncMaster != null)
-                header = string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("Transactions"), syncMaster._Number);
+                header = string.Concat(Uniconta.ClientTools.Localization.lookup("Transactions"), ": ", syncMaster._Number);
             else
             {
-                var syncMaster2 = dgProjectTransaction.masterRecord as Uniconta.DataModel.PrJournalPosted;
+                var syncMaster2 = master as Uniconta.DataModel.PrJournalPosted;
                 if (syncMaster2 != null)
-                    header = string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("PrTransaction"), syncMaster2.RowId);
+                    header = string.Concat(Uniconta.ClientTools.Localization.lookup("PrTransaction"), ": ", syncMaster2.RowId);
                 else
                 {
-                    var syncMaster3 = dgProjectTransaction.masterRecord as Uniconta.DataModel.ProjectBudgetLine;
+                    var syncMaster3 = master as Uniconta.DataModel.ProjectBudgetLine;
                     if (syncMaster3 != null)
-                        header = string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("PrTransaction"), syncMaster3.RowId);
+                        header = string.Concat(Uniconta.ClientTools.Localization.lookup("PrTransaction"), ": ", syncMaster3.RowId);
                     else
                         return;
                 }
@@ -308,9 +279,26 @@ namespace UnicontaClient.Pages.CustomPage
                     ClearTimeTrans();
                     gridRibbon_BaseActions(ActionType);
                     break;
+                case "ShowMilege":
+                    if (selectedItem != null)
+                        ShowMileage(selectedItem);
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
+            }
+        }
+
+        async void ShowMileage(ProjectTransClient projectTransaction)
+        {
+            if (projectTransaction._MileageRef != 0)
+            {
+                var employeRegLine = (await api.Query<EmployeeRegistrationLineClient>(projectTransaction))?.FirstOrDefault();
+
+                if (employeRegLine != null)
+                    AddDockItem(TabControls.RegisterMileage, new object[2] { employeRegLine, true }, string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("Mileage"), employeRegLine.RowId));
+                else
+                    UtilDisplay.ShowErrorCode(ErrorCodes.CouldNotFind);
             }
         }
 
@@ -321,13 +309,12 @@ namespace UnicontaClient.Pages.CustomPage
                 filter = new List<PropValuePair>() { PropValuePair.GenereteParameter("IncludeSubProject", typeof(string), "1") };
             else
                 filter = null;
-            
+
             await dgProjectTransaction.Filter(filter);
-           
+
             ClearTimeTrans();
             IncludeTimeJournals();
         }
-
 
         public async override Task InitQuery()
         {
@@ -355,7 +342,7 @@ namespace UnicontaClient.Pages.CustomPage
                     proj = master as ProjectClient;
                 if (proj == null)
                 {
-                    var WIPreport = master as UnicontaClient.Pages.ProjectTransLocalClient;
+                    var WIPreport = master as UnicontaClient.Pages.ProjectWIPTotalsClient;
                     if (WIPreport != null)
                         proj = WIPreport.ProjectRef;
                 }
@@ -445,7 +432,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 payrollCat = (Uniconta.DataModel.EmpPayrollCategory)Payrolls?.Get(s._PayrollCategory);
                                 lastPayroll = s._PayrollCategory;
                             }
-                            
+
                             var line = new ProjectTransClient();
                             line.IsTimeJournal = true;
                             line._Project = s._Project;
@@ -468,7 +455,7 @@ namespace UnicontaClient.Pages.CustomPage
                             }
                             else
                             {
-                                line._Text = TMJournalLineClient.GetMileageFormattedText(s._Text, s._AddressFrom, s._AddressTo, s._VechicleRegNo);
+                                line._Text = s._Text;
                                 line._Unit = (byte)ItemUnit.km;
                                 line._Qty = s.Total;
                             }
@@ -525,7 +512,7 @@ namespace UnicontaClient.Pages.CustomPage
                     includeSubProject = IsChecked;
                     ShowInculdeSubProject();
                     break;
-                case "InclTimeJournals": 
+                case "InclTimeJournals":
                     InclTimeJournals = IsChecked;
                     this.IsTimeJournal.Visible = InclTimeJournals;
                     if (InclTimeJournals)
@@ -547,13 +534,13 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (selectedItem._JournalPostedId != 0)
             {
-                var result = await api.Query(new GLDailyJournalPostedClient(), new [] { selectedItem }, null);
+                var result = await api.Query(new GLDailyJournalPostedClient(), new[] { selectedItem }, null);
                 if (result != null && result.Length == 1)
                     new CWGLPostedClientFormView(result[0]).Show();
             }
             else
             {
-                var result = await api.Query(new ProjectJournalPostedClient(), new [] { selectedItem }, null);
+                var result = await api.Query(new ProjectJournalPostedClient(), new[] { selectedItem }, null);
                 if (result != null && result.Length == 1)
                     new CWProjPostedClientFormView(result[0]).Show();
             }
@@ -572,14 +559,14 @@ namespace UnicontaClient.Pages.CustomPage
             if (ibase != null)
             {
                 ibase.Caption = Uniconta.ClientTools.Localization.lookup("EditAll");
-                ribbonControl.DisableButtons( "Save" );
+                ribbonControl.DisableButtons("Save");
             }
         }
         public override bool IsDataChaged
         {
             get
             {
-                return editAllChecked ? false: dgProjectTransaction.HasUnsavedData;
+                return editAllChecked ? false : dgProjectTransaction.HasUnsavedData;
             }
         }
         bool editAllChecked;
@@ -621,12 +608,16 @@ namespace UnicontaClient.Pages.CustomPage
                                      return;
                                  }
                                  break;
+                             case CWConfirmationBox.ConfirmationResultEnum.No:
+                                 ClearTimeTrans(); 
+                                 dgProjectTransaction.CancelChanges();
+                                 break;
                          }
                          editAllChecked = true;
                          dgProjectTransaction.Readonly = true;
                          dgProjectTransaction.tableView.CloseEditor();
                          ibase.Caption = Uniconta.ClientTools.Localization.lookup("EditAll");
-                         ribbonControl.DisableButtons("Save" );
+                         ribbonControl.DisableButtons("Save");
                      };
                     confirmationDialog.Show();
                 }
@@ -635,7 +626,7 @@ namespace UnicontaClient.Pages.CustomPage
                     dgProjectTransaction.Readonly = true;
                     dgProjectTransaction.tableView.CloseEditor();
                     ibase.Caption = Uniconta.ClientTools.Localization.lookup("EditAll");
-                    ribbonControl.DisableButtons( "Save" );
+                    ribbonControl.DisableButtons("Save");
                 }
             }
         }

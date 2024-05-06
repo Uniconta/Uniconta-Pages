@@ -314,6 +314,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 }
                                 break;
                             case CWConfirmationBox.ConfirmationResultEnum.No:
+                                dgFAMGrid.CancelChanges();
                                 break;
                         }
                         editAllChecked = true;

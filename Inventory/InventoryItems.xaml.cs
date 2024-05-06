@@ -148,21 +148,44 @@ namespace UnicontaClient.Pages.CustomPage
         }
         protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
-            var lst = new List<Type>(10) { typeof(Uniconta.DataModel.InvGroup) };
             var Comp = api.CompanyEntity;
+            if (Comp.Warehouse && this.warehouse == null)
+                this.warehouse = await Comp.LoadCache(typeof(Uniconta.DataModel.InvWarehouse), api).ConfigureAwait(false);
+
+            var lst = new List<Type>(18) { typeof(Uniconta.DataModel.InvGroup) };
             if (Comp.ItemVariants)
                 lst.Add(typeof(Uniconta.DataModel.InvStandardVariant));
             if (Comp.Warehouse)
                 lst.Add(typeof(Uniconta.DataModel.InvWarehouse));
-            lst.Add(typeof(Uniconta.DataModel.InvBrandGroup));
-            lst.Add(typeof(Uniconta.DataModel.InvCategoryGroup));
-            lst.Add(typeof(Uniconta.DataModel.InvDiscountGroup));
+            if (Comp.InvPrice)
+                lst.Add(typeof(Uniconta.DataModel.InvDiscountGroup));
             if (Comp.InvDuty)
                 lst.Add(typeof(Uniconta.DataModel.InvDutyGroup));
+            if (Comp._InvGroups)
+            {
+                lst.Add(typeof(Uniconta.DataModel.InvStatisticsGroup));
+                lst.Add(typeof(Uniconta.DataModel.InvBrandGroup));
+                lst.Add(typeof(Uniconta.DataModel.InvCategoryGroup));
+            }
+            if (Comp.Project)
+            {
+                lst.Add(typeof(Uniconta.DataModel.PrCategory));
+                if (Comp.Payroll)
+                    lst.Add(typeof(Uniconta.DataModel.EmpPayrollCategory));
+            }
+            var NumberOfDimensions = Comp.NumberOfDimensions;
+            if (NumberOfDimensions >= 1)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType1));
+            if (NumberOfDimensions >= 2)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType2));
+            if (NumberOfDimensions >= 3)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType3));
+            if (NumberOfDimensions >= 4)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType4));
+            if (NumberOfDimensions >= 5)
+                lst.Add(typeof(Uniconta.DataModel.GLDimType5));
+            lst.Add(typeof(Uniconta.DataModel.Creditor));
             LoadType(lst);
-
-            if (Comp.Warehouse && this.warehouse == null)
-                this.warehouse = await Comp.LoadCache(typeof(Uniconta.DataModel.InvWarehouse), api).ConfigureAwait(false);
         }
 
         protected override void OnLayoutLoaded()
@@ -190,7 +213,13 @@ namespace UnicontaClient.Pages.CustomPage
                 PrCategory.Visible = PrCategory.ShowInColumnChooser = false;
             }
             else
-                PayrollCategory.ShowInColumnChooser = PrCategory.ShowInColumnChooser = true;
+            {
+                PrCategory.ShowInColumnChooser = true;
+                if (!Comp.Payroll)
+                    PayrollCategory.Visible = PayrollCategory.ShowInColumnChooser = false;
+                else
+                    PayrollCategory.ShowInColumnChooser = true;
+            }
             if (!Comp.Location || !Comp.Warehouse)
                 Location.Visible = Location.ShowInColumnChooser = false;
             else
@@ -226,9 +255,20 @@ namespace UnicontaClient.Pages.CustomPage
                 DutyGroup.Visible = DutyGroup.ShowInColumnChooser = false;
             else
                 DutyGroup.ShowInColumnChooser = true;
+            if (!Comp._InvGroups)
+                BrandGroup.Visible = CategoryGroup.Visible = StatisticsGroup.Visible = BrandGroup.ShowInColumnChooser = CategoryGroup.ShowInColumnChooser = StatisticsGroup.ShowInColumnChooser = false;
+            else
+            {
+                BrandGroup.ShowInColumnChooser = CategoryGroup.ShowInColumnChooser = StatisticsGroup.ShowInColumnChooser = true;
+
+                if (Comp._CategoryGroup != null)
+                    CategoryGroup.Header = Comp._CategoryGroup;
+                if (Comp._BrandGroup != null)
+                    BrandGroup.Header = Comp._BrandGroup;
+            }
             setDim();
             dgInventoryItemsGrid.Readonly = true;
-        }
+         }
 
         public override void Utility_Refresh(string screenName, object argument = null)
         {
@@ -440,6 +480,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 }
                                 break;
                             case CWConfirmationBox.ConfirmationResultEnum.No:
+                                dgInventoryItemsGrid.CancelChanges();
                                 break;
                         }
                         editAllChecked = true;

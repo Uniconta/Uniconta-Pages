@@ -2,14 +2,21 @@
 <root>
 	<RibbonItem TabId="0" LocalizedNameKey="Home">
 		<!---When we create a new TabPage -->
-		<RibbonItem Action="AddRow" LocalizedNameKey="AddOBJ" Parameter="User" Glyph="Add_16x16" LargeGlyph="Add_32x32"/>
+		<RibbonItem Action="AddRow" LocalizedNameKey="AddOBJ" Parameter="User" Glyph="Add_16x16" LargeGlyph="Add_32x32">
+      <RibbonItem Action="AddStandardUser" LocalizedNameKey="StandardUser" Glyph="Add_16x16" ShortcutKey="CTRL+N"/>
+      <RibbonItem Action="AddWorkUser" LocalizedNameKey="WorkUser" Glyph="Add_16x16"/>
+      <RibbonItem Action="AddProjectTimeUser" LocalizedNameKey="ProjectTimeUser" Glyph="Add_16x16"/>
+      <RibbonItem Action="AddInvoiceUser" LocalizedNameKey="InvoiceUser" Glyph="Add_16x16" />
+			<RibbonItem Action="CopyRecord" LocalizedNameKey="CopyFromAnotherCompany" Glyph="Copy_16x16" EnableSeperator="True" ShortcutKey="Shift+F2"/>
+		</RibbonItem>
 		<RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="RemoveOBJ" Parameter="User" Glyph="Delete_16x16" LargeGlyph="Delete_32x32"/>
 	</RibbonItem>
 	<RibbonItem>
 		<RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh" LargeGlyph="refresh"/>
 	</RibbonItem>
 	<RibbonItem>
-		<RibbonItem Action="SetPermissions" LocalizedNameKey="SetPermissions" Glyph="User_Rights_32x32" LargeGlyph="User_Rights_32x32"/>
+    <RibbonItem Action="CreateEmployee" LocalizedNameKey="SetOBJ" Parameter="Employee" LargeGlyph="Invite_32x32"/>
+    <RibbonItem Action="SetPermissions" LocalizedNameKey="SetPermissions" Glyph="User_Rights_32x32" LargeGlyph="User_Rights_32x32"/>
 		<RibbonItem Action="TableRights" LocalizedNameKey="TableRights" Glyph="" LargeGlyph="CopyUserTable_32x32"/>
 		<RibbonItem Action="BlockFunctions" LocalizedNameKey="BlockFunctions" Glyph="" LargeGlyph="Add_Menu_32x32"/>
     <RibbonItem Action="EditRow" ShortcutKey="Ctrl+E" LocalizedNameKey="MenuLayout" Glyph="Edit_16x16" LargeGlyph="Edit_32x32"/>

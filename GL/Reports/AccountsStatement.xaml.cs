@@ -3,24 +3,15 @@ using UnicontaClient.Utilities;
 using DevExpress.Xpf.Docking;
 using DevExpress.Xpf.Grid;
 using DevExpress.Xpf.Grid.Native;
-using DevExpress.Xpf.Grid.Printing;
-using DevExpress.Xpf.Printing;
-using DevExpress.XtraPrinting;
-using DevExpress.XtraPrinting.DataNodes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
 using Uniconta.API.GeneralLedger;
 using Uniconta.API.Service;
 using Uniconta.ClientTools;
@@ -33,9 +24,7 @@ using Uniconta.DataModel;
 using System.Windows.Data;
 using DevExpress.Data.Filtering;
 using DevExpress.Xpf.Editors;
-using DevExpress.Mvvm.UI.Interactivity;
 using Uniconta.Common.Utility;
-using UnicontaClient.Pages;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -630,6 +619,7 @@ namespace UnicontaClient.Pages.CustomPage
             dataRowCount = statementList.Count;
             dgGLTrans.ItemsSource = null;
             dgGLTrans.ItemsSource = statementList;
+            childDgGLTrans.RefreshData();
         }
 
         private void cbxPageBreak_Click(object sender, RoutedEventArgs e)

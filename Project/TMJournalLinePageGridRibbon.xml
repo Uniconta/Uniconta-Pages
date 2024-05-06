@@ -59,6 +59,7 @@
 	</RibbonItem>
 	<RibbonItem>
 		<RibbonItem Action="EfficiencyPercentage" LocalizedNameKey="EfficiencyPercentage" StatusValue=""/>
+		<RibbonItem Action="InvoiceableHours" LocalizedNameKey="InvoiceableHours" StatusValue=""/>
 		<RibbonItem Action="VacationBal" LocalizedNameKey="Vacation" StatusValue=""/>
 		<RibbonItem Action="OtherVacationBal" LocalizedNameKey="OtherVacation" StatusValue=""/>
 		<RibbonItem Action="OvertimeBal" LocalizedNameKey="Overtime" StatusValue="" />

@@ -180,7 +180,7 @@ namespace UnicontaClient.Pages.CustomPage
                         masterProject = (Uniconta.DataModel.Project)ProjectCache.Get(budget._Project);
                 }
                 if (masterProject != null)
-                    PriceLookup.OrderChanged(masterProject);
+                    PriceLookup.OrderChanged(masterProject, BasePage.GetSystemDefaultDate());
             }
         }
 
@@ -520,7 +520,11 @@ namespace UnicontaClient.Pages.CustomPage
                 case "CopyRow":
                     var row = dgProjectBudgetLinePageGrid.CopyRow() as ProjectBudgetLineLocal;
                     if (row != null)
+                    {
                         row.Id = 0;
+                        if (row._Date < DateTime.Now && row._Date != DateTime.MinValue)
+                            row.Date = DateTime.Now.Date;
+                    }
                     break;
                 case "SaveGrid":
                     saveGrid();
@@ -552,7 +556,6 @@ namespace UnicontaClient.Pages.CustomPage
         private void AddPeriod()
         {
             var prjBudgetLns = dgProjectBudgetLinePageGrid.GetVisibleRows() as IEnumerable<ProjectBudgetLineLocal>;
-
             if (prjBudgetLns == null || prjBudgetLns.Count() == 0)
                 return;
 

@@ -110,6 +110,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjInvProposal"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryCity" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryCountry" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Installation" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CompanyAddress" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PostingAccount" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceAccount"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceDate" Visible="False"/>

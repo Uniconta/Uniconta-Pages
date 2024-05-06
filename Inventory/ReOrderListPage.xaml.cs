@@ -228,9 +228,9 @@ namespace UnicontaClient.Pages.CustomPage
                     var rbMenuWarehouse = UtilDisplay.GetMenuCommandByName(rb, "PerWarehouse");
                     rbMenuWarehouse.IsChecked = ReorderPrWarehouse;
                 }
-               
-                if (!Comp.PurchaseAccounts)
-                    InvPurchaseAccount.Visible = InvPurchaseAccount.ShowInColumnChooser = false;
+                var showInvPurchaseAccounts = Comp.PurchaseAccounts;
+                InvPurchaseAccount.Visible = InvPurchaseAccount.ShowInColumnChooser = showInvPurchaseAccounts;
+                PurchaseAccount.Visible = PurchaseAccount.ShowInColumnChooser = PurchaseName.Visible = PurchaseName.ShowInColumnChooser = !showInvPurchaseAccounts;
             }
         }
 

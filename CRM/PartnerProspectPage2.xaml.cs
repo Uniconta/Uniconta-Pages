@@ -144,12 +144,7 @@ namespace UnicontaClient.Pages.CustomPage
                 CompanyInfo ci = null;
                 try
                 {
-#if !SILVERLIGHT
                     ci = await CVR.CheckCountry(cvr, editrow._Country);
-#else
-                    var lookupApi = new Uniconta.API.System.UtilityAPI(api);
-                    ci = await lookupApi.LookupCVR(cvr, editrow._Country);
-#endif
                 }
                 catch (Exception ex)
                 {
@@ -163,6 +158,8 @@ namespace UnicontaClient.Pages.CustomPage
 
                     if (!string.IsNullOrWhiteSpace(ci?.life?.name))
                     {
+                        editrow.IndustryCode = ci.industrycode?.code;
+
                         var address = ci.address;
                         if (address != null)
                         {

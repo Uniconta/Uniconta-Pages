@@ -24,8 +24,6 @@ using Uniconta.API.Service;
 using DevExpress.Xpf.Grid;
 using DevExpress.Data;
 using FromXSDFile.OIOUBL.ExportImport;
-using ubl_norway_uniconta;
-using UBL.Iceland;
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
@@ -439,6 +437,7 @@ namespace UnicontaClient.Pages.CustomPage
                                  await dgDebtorOrdersGrid.SaveData();
                                  break;
                              case CWConfirmationBox.ConfirmationResultEnum.No:
+                                 dgDebtorOrdersGrid.CancelChanges();
                                  break;
                          }
                          editAllChecked = true;
@@ -630,6 +629,11 @@ namespace UnicontaClient.Pages.CustomPage
                 lst.Add(typeof(Uniconta.DataModel.WorkInstallation));
             if (Comp.InvPrice)
                 lst.Add(typeof(Uniconta.DataModel.DebtorPriceList));
+            if (Comp.Shipments)
+            {
+                lst.Add(typeof(Uniconta.DataModel.ShipmentType));
+                lst.Add(typeof(Uniconta.DataModel.DeliveryTerm));
+            }
             if (Comp.ItemVariants)
             {
                 lst.Add(typeof(Uniconta.DataModel.InvVariant1));
@@ -824,21 +828,8 @@ namespace UnicontaClient.Pages.CustomPage
                 workInstallation = (WorkInstallation)workInstallCache.Get(invClient._Installation);
             }
 
-            CreationResult result;
-
-            if (!debtor._InvoiceInPepPol && (Comp._CountryId == CountryCode.Norway || Comp._CountryId == CountryCode.Netherlands))
-                result = EHF.GenerateEHFXML(Comp, debtor, deliveryAccount, invClient, invoiceLines, InvCache, VatCache, null, contactPerson);
-            else if (!debtor._InvoiceInPepPol && Comp._CountryId == CountryCode.Iceland)
-            {
-                var paymFormatCache = Comp.GetCache(typeof(DebtorPaymentFormatClientIceland)) ?? await api.LoadCache(typeof(DebtorPaymentFormatClientIceland));
-                TableAddOnData[] attachments = await UBL.Iceland.Attachments.CollectInvoiceAttachments(invClient, api);
-                result = TS136137.GenerateTS136137XML(Comp, debtor, deliveryAccount, invClient, invoiceLines, InvCache, VatCache, null, contactPerson, paymFormatCache, attachments);
-            }
-            else
-            {
-                var attachments = await FromXSDFile.OIOUBL.ExportImport.Attachments.CollectInvoiceAttachments(invClient, api);
-                result = Uniconta.API.DebtorCreditor.OIOUBL.GenerateOioXML(Comp, debtor, deliveryAccount, invClient, invoiceLines, InvCache, VatCache, null, contactPerson, attachments, layoutGroupCache, workInstallation);
-            }
+            var attachments = await FromXSDFile.OIOUBL.ExportImport.Attachments.CollectInvoiceAttachments(invClient, api);
+            var result = Uniconta.API.DebtorCreditor.OIOUBL.GenerateOioXML(Comp, debtor, deliveryAccount, invClient, invoiceLines, InvCache, VatCache, null, contactPerson, attachments, layoutGroupCache, workInstallation);
 
             bool createXmlFile = true;
 

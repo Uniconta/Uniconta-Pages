@@ -265,7 +265,7 @@ namespace UnicontaClient.Pages.CustomPage
                         masterProject = (Uniconta.DataModel.Project)ProjectCache.Get(budget._Project);
                 }
                 if (masterProject != null)
-                    PriceLookup.OrderChanged(masterProject);
+                    PriceLookup.OrderChanged(masterProject, BasePage.GetSystemDefaultDate());
             }
         }
 

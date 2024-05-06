@@ -32,6 +32,7 @@ namespace UnicontaClient.Pages.CustomPage
         DebtorClient Debtor;
         ContactClient Contact;
         CrmProspectClient Prospect;
+        bool oneTimeDebtor;
         public override void OnClosePage(object[] RefreshParams)
         {
             globalEvents.OnRefresh(NameOfControl, RefreshParams);
@@ -97,7 +98,8 @@ namespace UnicontaClient.Pages.CustomPage
             dAddress.Header = Uniconta.ClientTools.Localization.lookup("DeliveryAddr");
             layoutControl = layoutItems;
             Employeelookupeditor.api = leAccount.api = lePayment.api = cmbDim1.api = cmbDim2.api = cmbDim3.api = cmbDim4.api = cmbDim5.api = leLayoutGroup.api = leInvoiceAccount.api = PriceListlookupeditior.api =
-               leGroup.api = leShipment.api = leDeliveryTerm.api = Projectlookupeditor.api = PrCategorylookupeditor.api = leDeliveryAddress.api = leVat.api = prTasklookupeditor.api = lePrWorkSpace.api = crudapi;
+               leGroup.api = leShipment.api = leDeliveryTerm.api = Projectlookupeditor.api = PrCategorylookupeditor.api = leDeliveryAddress.api = leVat.api = prTasklookupeditor.api = lePrWorkSpace.api =
+               leCompanyAddress.api = crudapi;
 
             leRelatedOrder.CrudApi = crudapi;
             cbDeliveryCountry.ItemsSource = Enum.GetValues(typeof(Uniconta.Common.CountryCode));
@@ -136,7 +138,6 @@ namespace UnicontaClient.Pages.CustomPage
             layoutItems.DataContext = editrow;
             frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
 
-            AcItem.ButtonClicked += AcItem_ButtonClicked;
             editrow.PropertyChanged += Editrow_PropertyChanged;
             this.master = master;
             if (Prospect != null || Contact != null)
@@ -166,7 +167,7 @@ namespace UnicontaClient.Pages.CustomPage
             var debt = editrow.Debtor;
             api.SetMaster(contactClient, debt);
             AddDockItem(TabControls.ContactPage2, new object[] { contactClient, false, debt }, string.Format("{0} : {1}",
-                Uniconta.ClientTools.Localization.lookup("Contacts"),debt.Name), "Add_16x16");
+                Uniconta.ClientTools.Localization.lookup("Contacts"), debt.Name), "Add_16x16");
         }
 
         void RemoveMenuItem()
@@ -255,10 +256,6 @@ namespace UnicontaClient.Pages.CustomPage
             SetValuesFromMaster(Debtor);
         }
 
-        void AcItem_ButtonClicked(object sender)
-        {
-            AddDebtor_Click(null, null);
-        }
 
         public override void Utility_Refresh(string screenName, object argument = null)
         {
@@ -269,7 +266,13 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     leAccount.LoadItemSource();
                     var dc = args[3] as UnicontaBaseEntity;
-                    editrow.SetMaster(dc);
+                    if (oneTimeDebtor)
+                    {
+                        editrow.OneTimeDebtor = dc as DebtorClient;
+                        CopyFromDebtor(editrow.OneTimeDebtor);
+                    }
+                    else
+                        editrow.SetMaster(args[3] as UnicontaBaseEntity);
                     if (string.IsNullOrEmpty(leAccount.EditValue as string))
                         leAccount.SelectedItem = dc;
                 }
@@ -362,22 +365,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
             editrow.PricesInclVat = debtor._PricesInclVat;
             if (!RecordLoadedFromTemplate || debtor._DeliveryAddress1 != null)
-            {
-                editrow.DeliveryName = debtor._DeliveryName;
-                editrow.DeliveryAddress1 = debtor._DeliveryAddress1;
-                editrow.DeliveryAddress2 = debtor._DeliveryAddress2;
-                editrow.DeliveryAddress3 = debtor._DeliveryAddress3;
-                editrow.DeliveryCity = debtor._DeliveryCity;
-                if (editrow.DeliveryZipCode != debtor._DeliveryZipCode)
-                {
-                    lookupZipCode = false;
-                    editrow.DeliveryZipCode = debtor._DeliveryZipCode;
-                }
-                if (debtor._DeliveryCountry != 0)
-                    editrow.DeliveryCountry = debtor._DeliveryCountry;
-                else
-                    editrow.DeliveryCountry = null;
-            }
+                CopyFromDebtor(debtor);
 
             TableField.SetUserFieldsFromRecord(debtor, editrow);
             if (ProjectCache != null)
@@ -434,7 +422,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (prospect == null)
             {
-                cmbContactName.ItemsSource = new [] { Contact };
+                cmbContactName.ItemsSource = new[] { Contact };
                 cmbContactName.DisplayMember = "KeyName";
                 cmbContactName.SelectedItem = Contact;
             }
@@ -561,6 +549,91 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var selectedItem = cmbContactName.SelectedItem as Contact;
             GoToContact(selectedItem, e.Key);
+        }
+
+        private void AcItem_ComboBoxClicked(object sender)
+        {
+            var comboBoxEditor = sender as ComboBoxEditor;
+
+            comboBoxEditor.ItemsSource = new string[] { string.Format(Uniconta.ClientTools.Localization.lookup("CreateOBJ"), Uniconta.ClientTools.Localization.lookup("Debtor")), Uniconta.ClientTools.Localization.lookup("OneTimeDebtor") };
+            comboBoxEditor.SelectedIndexChanged += ComboBoxEditor_SelectedIndexChanged;
+        }
+
+        private void ComboBoxEditor_SelectedIndexChanged(object sender, RoutedEventArgs e)
+        {
+            var cmbEditor = sender as ComboBoxEditor;
+
+            if (cmbEditor.SelectedIndex == -1)
+                return;
+
+            if (cmbEditor.SelectedIndex != 0)
+            {
+                if (editrow.OneTimeDebtor == null)
+                    editrow.OneTimeDebtor = Activator.CreateInstance(api.CompanyEntity.GetUserType(typeof(DebtorClient))) as DebtorClient;
+
+                var debtor = editrow.OneTimeDebtor;
+                debtor.Country = (CountryCode)api.CompanyEntity._Country;
+                var debtorAccountPage2 = dockCtrl.AddDockItem(TabControls.DebtorAccountPage2, this.ParentControl, new object[2] { debtor, true }, Uniconta.ClientTools.Localization.lookup("DebtorAccount"), "Add_16x16") as DebtorAccountPage2;
+                debtorAccountPage2.DoNotSave = true;
+                oneTimeDebtor = true;
+            }
+            else
+                AddDebtor_Click(sender, e);
+
+            cmbEditor.SelectedIndex = -1;
+            cmbEditor.SelectedIndexChanged -= ComboBoxEditor_SelectedIndexChanged;
+        }
+
+        private void CopyFromDebtor(Debtor debtor)
+        {
+            if (debtor == null)
+                return;
+
+            editrow.DeliveryName = debtor._DeliveryName;
+            editrow.DeliveryAddress1 = debtor._DeliveryAddress1;
+            editrow.DeliveryAddress2 = debtor._DeliveryAddress2;
+            editrow.DeliveryAddress3 = debtor._DeliveryAddress3;
+            editrow.DeliveryCity = debtor._DeliveryCity;
+            if (editrow.DeliveryZipCode != debtor._DeliveryZipCode)
+            {
+                lookupZipCode = false;
+                editrow.DeliveryZipCode = debtor._DeliveryZipCode;
+            }
+            if (debtor._DeliveryCountry != 0)
+                editrow.DeliveryCountry = debtor._DeliveryCountry;
+            else
+                editrow.DeliveryCountry = null;
+            editrow.DeliveryPhone = debtor._Phone;
+            editrow.DeliveryContactPerson = debtor._ContactPerson;
+            editrow.DeliveryContactEmail = debtor._ContactEmail;
+        }
+
+        private void lblCompanyAddress_ButtonClicked(object sender)
+        {
+            var selectedAddress = leCompanyAddress.SelectedItem as CompanyAddressClient;
+            if (selectedAddress != null)
+            {
+                CopyAddressToRow(selectedAddress._Name, selectedAddress._Address1, selectedAddress._Address2, selectedAddress._Address3, selectedAddress._ZipCode, selectedAddress._City, selectedAddress._Country);
+                editrow.DeliveryContactPerson = selectedAddress._ContactPerson;
+                editrow.DeliveryContactEmail = selectedAddress._ContactEmail;
+                editrow.DeliveryPhone = selectedAddress._Phone;
+            }
+        }
+
+        private void CopyAddressToRow(string name, string address1, string address2, string address3, string zipCode, string city, CountryCode? country)
+        {
+            var row = this.editrow;
+            row.DeliveryName = name;
+            row.DeliveryAddress1 = address1;
+            row.DeliveryAddress2 = address2;
+            row.DeliveryAddress3 = address3;
+            row.DeliveryCity = city;
+            if (row.DeliveryZipCode != zipCode)
+            {
+                lookupZipCode = false;
+                row.DeliveryZipCode = zipCode;
+            }
+            row.DeliveryCountry = country;
         }
     }
 }

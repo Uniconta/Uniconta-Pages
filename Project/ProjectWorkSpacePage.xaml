@@ -18,6 +18,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectWorkSpacePage"
                 <local:PrWorkSpaceGrid.Columns>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Number"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Name" Width="300"/>
+                    <local:ComboBoxColumnClient x:Name="State"  Width="80"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="IsDefault" Width="100"/>
                 </local:PrWorkSpaceGrid.Columns>
             </local:PrWorkSpaceGrid>

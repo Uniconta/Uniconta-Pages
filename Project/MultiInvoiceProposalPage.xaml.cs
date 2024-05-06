@@ -18,9 +18,6 @@ using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
 using Uniconta.Common;
 using Uniconta.DataModel;
-#if !SILVERLIGHT
-using UBL.Iceland;
-#endif
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage

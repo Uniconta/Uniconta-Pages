@@ -21,10 +21,10 @@
                     <ColumnDefinition Width="5" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <TextBlock x:Name="mergeToText" Foreground="{StaticResource BodyTextColorBrush}" Grid.Column="0" VerticalAlignment="Center" TextWrapping="Wrap" />
+                <TextBlock x:Name="mergeToText" Grid.Column="0" VerticalAlignment="Center" TextWrapping="Wrap" />
                 <CorasauControls:LookupEditor x:Name="lookupMergeTo" Height="25" Grid.Column="2"  Grid.Row="0"/>
 
-                <TextBlock x:Name="mergeWithText" Foreground="{StaticResource BodyTextColorBrush}" Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" TextWrapping="Wrap" />
+                <TextBlock x:Name="mergeWithText" Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" TextWrapping="Wrap" />
                 <CorasauControls:LookupEditor x:Name="lookupMergeWith" Height="25" Grid.Column="2"  Grid.Row="2"/>
             </Grid>
         </CorasauControls:BusyIndicator>
