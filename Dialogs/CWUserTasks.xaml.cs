@@ -107,12 +107,12 @@ namespace UnicontaClient.Controls.Dialogs
             }
             else
                 if (e.Key == Key.Enter)
-                {
-                    if (OKButton.IsFocused)
-                        OKButton_Click(null, null);
-                    else if (CancelButton.IsFocused)
-                        SetDialogResult(false);
-                }
+            {
+                if (OKButton.IsFocused)
+                    OKButton_Click(null, null);
+                else if (CancelButton.IsFocused)
+                    SetDialogResult(false);
+            }
         }
         private async void OKButton_Click(object sender, RoutedEventArgs e)
         {
@@ -125,7 +125,7 @@ namespace UnicontaClient.Controls.Dialogs
                     userProfile._Rights = AccessLevel.Set(userProfile._Rights, access._task, access._permission);
                 }
             }
-            if (userAccess != null  && !isNewAccount)
+            if (userAccess != null && !isNewAccount)
             {
                 var err = await api.GiveCompanyAccess(userAccess._Uid, userAccess._Rights);
                 if (err != ErrorCodes.Succes)
@@ -145,19 +145,28 @@ namespace UnicontaClient.Controls.Dialogs
         public static string Task { get { return Uniconta.ClientTools.Localization.lookup("UserTasks"); } }
         public static string Permission { get { return Uniconta.ClientTools.Localization.lookup("SetPermissions"); } }
     }
-    public class TasksAccess
+    public class TasksAccess : INotifyPropertyChanged
     {
         public CompanyPermissions _permission;
         public CompanyTasks _task;
 
         [AppEnumAttribute(EnumName = "CompanyTasks")]
         [Display(Name = "Task", ResourceType = typeof(TasksAcessTextKey))]
-        public string Task { get { return GetTask((int)_task); } set { _task = (CompanyTasks)AppEnums.CompanyTasks.IndexOf(value); } }
+        public string Task { get { return GetTask((int)_task); } set { _task = (CompanyTasks)AppEnums.CompanyTasks.IndexOf(value); NotifyOnPropertyChanged(nameof(Task)); } }
 
         [AppEnumAttribute(EnumName = "CompanyPermissions")]
         [Display(Name = "Permission", ResourceType = typeof(TasksAcessTextKey))]
-        public string Permission { get { return AppEnums.CompanyPermissions.ToString((int)_permission); } set { if (value == null)return; _permission = (CompanyPermissions)AppEnums.CompanyPermissions.IndexOf(value); } }
+        public string Permission
+        {
+            get { return AppEnums.CompanyPermissions.ToString((int)_permission); }
+            set { if (value == null) return; _permission = (CompanyPermissions)AppEnums.CompanyPermissions.IndexOf(value); NotifyOnPropertyChanged(nameof(Permission)); }
+        }
 
+        public event PropertyChangedEventHandler PropertyChanged;
+        public void NotifyOnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
         string GetTask(int task)
         {
             string _task = string.Empty;

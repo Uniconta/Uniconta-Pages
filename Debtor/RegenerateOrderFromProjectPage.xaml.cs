@@ -71,6 +71,8 @@ namespace UnicontaClient.Pages.CustomPage
             Utility.SetupVariants(api, null, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
             dgGenerateOrder.Readonly = true;
             Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
+            Margin.Visible = Margin.ShowInColumnChooser = MarginRatio.Visible = MarginRatio.ShowInColumnChooser =
+           CostAmount.Visible = CostAmount.ShowInColumnChooser = !api.CompanyEntity.HideCostPrice;
         }
 
         protected override void SyncEntityMasterRowChanged(UnicontaBaseEntity args)

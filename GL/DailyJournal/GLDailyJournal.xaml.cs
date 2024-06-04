@@ -28,6 +28,10 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Uniconta.Common.Utility;
 using Localization = Uniconta.ClientTools.Localization;
+using DevExpress.XtraTreeList;
+using DevExpress.Xpf.WindowsUI.Navigation;
+
+
 #if !SILVERLIGHT
 using Bilagscan;
 using System.Net.Http;
@@ -47,6 +51,8 @@ namespace UnicontaClient.Pages.CustomPage
     }
     public partial class GLDailyJournal : GridBasePage
     {
+        private PaperFlowUtil paperFlowUtil;
+
         public override string NameOfControl
         {
             get { return TabControls.GL_DailyJournal.ToString(); }
@@ -69,8 +75,10 @@ namespace UnicontaClient.Pages.CustomPage
             dgGldailyJournal.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgGldailyJournal.RowDoubleClick += dgGldailyJournal_RowDoubleClick;
-           // dgGldailyJournal.PreviewMouseDown += DgGldailyJournal_PreviewMouseDown;
+            // dgGldailyJournal.PreviewMouseDown += DgGldailyJournal_PreviewMouseDown;
             RemoveMenuItem();
+
+            paperFlowUtil = new PaperFlowUtil(api);
         }
 
         //private void DgGldailyJournal_PreviewMouseDown(object sender, MouseButtonEventArgs e)
@@ -194,7 +202,7 @@ namespace UnicontaClient.Pages.CustomPage
                         AddDockItem(TabControls.GLTransLogPage, selectedItem, string.Format("{0}: {1}", Localization.lookup("GLTransLog"), selectedItem._Journal));
                     break;
                 case "BilagscanReadVouchers":
-                    ReadFromBilagscan(selectedItem);
+                    BilagscanRead();
                     break;
                 case "MoveJournalLines":
                     if (selectedItem != null)
@@ -238,320 +246,21 @@ namespace UnicontaClient.Pages.CustomPage
 
         void OpenImportDataPage(GLDailyJournalClient selectedItem)
         {
-            var header = selectedItem._Journal;            
+            var header = selectedItem._Journal;
             var baseEntityArray = new UnicontaBaseEntity[2] { api.CompanyEntity.CreateUserType<GLDailyJournalLineClient>(), selectedItem };
             AddDockItem(TabControls.ImportPage, new object[] { baseEntityArray, header }, string.Format("{0}: {1}", Localization.lookup("Import"), header));
         }
 
-        bool readingFromBilagscan;
-        void ReadFromBilagscan(UnicontaBaseEntity selectedItem)
-        {
-            if (readingFromBilagscan)
-                UnicontaMessageBox.Show(Localization.lookup("UpdateInBackground"), Localization.lookup("Information"), MessageBoxButton.OK);
-            else
-                _ReadFromBilagscan(selectedItem);
-        }
-        async void _ReadFromBilagscan(UnicontaBaseEntity selectedItem)
+        private async void BilagscanRead()
         {
             var journal = dgGldailyJournal.SelectedItem as GLDailyJournalClient;
-            var noOfVouchers = 0;
-            try
-            {
-                readingFromBilagscan = true;
 
-                busyIndicator.IsBusy = true;
-                CompanySettingsClient companySettings = new CompanySettingsClient();
-                await api.Read(companySettings);
-                var orgNo = NumberConvert.ToStringNull(companySettings._OrgNumber);
-                if (orgNo == null)
-                {
-                    busyIndicator.IsBusy = false;
-                    UnicontaMessageBox.Show(string.Format(Localization.lookup("CannotBeBlank"), Localization.lookup("OrgNumber")), Localization.lookup("Paperflow"), MessageBoxButton.OK, MessageBoxImage.Exclamation);
-                    return;
-                }
-                var accessToken = Bilagscan.Account.GetBilagscanAccessToken(api);
-
-                using (var client = new HttpClient())
-                {
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-                    var response = await client.GetAsync($"https://api.bilagscan.dk/v1/organizations/" + orgNo + "/vouchers?seen=false&count=100&offset=0&sorts=-upload_date&status=successful");
-                    var content = await response.Content.ReadAsStringAsync();
-                    var vouchers = Bilagscan.Voucher.GetVouchers(content);
-
-                    var credCache = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.Creditor)) ?? await api.CompanyEntity.LoadCache(typeof(Uniconta.DataModel.Creditor), api);
-                    var offsetCache = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.GLAccount)) ?? await api.CompanyEntity.LoadCache(typeof(Uniconta.DataModel.GLAccount), api);
-
-                    if (vouchers?.data != null && vouchers.data.Length > 0)
-                    {
-                        var creditors = credCache.GetKeyStrRecords as Uniconta.DataModel.Creditor[];
-
-                        var updateLines = new List<GLDailyJournalLineClient>(vouchers.data.Length);
-                        List<Uniconta.DataModel.Creditor> CreList = null;
-
-                        foreach (var voucher in vouchers.data)
-                        {
-                            var journalLine = new GLDailyJournalLineClient();
-                            journalLine.SetMaster(journal);
-
-                            var postingType = BilagscanVoucherType.Invoice;
-                            var hint = Bilagscan.Voucher.GetHint(voucher.note);
-
-                            var bilagscanRefID = voucher.id;
-                            journalLine._ReferenceNumber = bilagscanRefID != 0 ? NumberConvert.ToString(bilagscanRefID) : null;
-
-                            var bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "voucher_number", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
-                            if (bsItem != null)
-                                journalLine._Invoice = bsItem.value;
-
-                            bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "voucher_type", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
-                            if (bsItem != null)
-                            {
-                                switch (bsItem.value)
-                                {
-                                    case "invoice": postingType = BilagscanVoucherType.Invoice; break;
-                                    case "creditnote": postingType = BilagscanVoucherType.Creditnote; break;
-                                    case "receipt": postingType = BilagscanVoucherType.Receipt; break;
-                                }
-                            }
-
-                            bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "company_vat_reg_no", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
-                            var creditorCVR = bsItem?.value ?? string.Empty;
-
-                            bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "total_amount_incl_vat", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
-                            if (bsItem != null)
-                            {
-                                journalLine.Amount = Math.Abs(NumberConvert.ToDoubleNoThousandSeperator(bsItem.value));
-
-                                if (postingType != BilagscanVoucherType.Creditnote)
-                                    journalLine.Amount = -journalLine.Amount;
-                            }
-
-                            CountryCode countryCode = CountryCode.Denmark;
-                            bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "country", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
-                            if (bsItem != null)
-                            {
-                                CountryISOCode countryISO;
-                                countryCode = CountryCode.Denmark; //default
-                                if (Enum.TryParse(bsItem.value, true, out countryISO))
-                                    countryCode = (CountryCode)countryISO;
-                            }
-
-                            bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "invoice_date", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
-                            if (bsItem != null)
-                            {
-                                var invoiceDate = bsItem.value == string.Empty ? DateTime.MinValue : StringSplit.DateParse(bsItem.value, DateFormat.ymd);
-                                journalLine._Date = invoiceDate != DateTime.MinValue ? invoiceDate : GetSystemDefaultDate();
-                            }
-
-                            bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_date", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
-                            if (bsItem != null)
-                                journalLine._DueDate = bsItem.value == string.Empty ? DateTime.MinValue : StringSplit.DateParse(bsItem.value, DateFormat.ymd);
-
-                            bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "currency", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
-                            if (bsItem != null)
-                            {
-                                Currencies currencyISO;
-                                if (!Enum.TryParse(bsItem.value, true, out currencyISO))
-                                    currencyISO = Currencies.DKK; //default
-
-                                journalLine._Currency = (byte)currencyISO;
-                            }
-
-                            bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_account_number", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
-                            var bbanAcc = bsItem?.value;
-
-                            bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_reg_number", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
-                            var bbanRegNum = bsItem?.value;
-
-                            bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_iban", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
-                            var ibanNo = bsItem?.value;
-
-                            bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_swift_bic", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
-                            var swiftNo = bsItem?.value;
-
-                            string paymentCodeId = null;
-                            bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_code_id", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
-                            if (bsItem != null)
-                                paymentCodeId = bsItem.value;
-
-                            bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_id", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
-                            var paymentId = bsItem?.value;
-
-                            bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "joint_payment_id", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
-                            var jointPaymentId = bsItem?.value;
-
-                            var paymentMethod = PaymentTypes.VendorBankAccount;
-                            switch (paymentCodeId)
-                            {
-                                case "71": paymentMethod = PaymentTypes.PaymentMethod3; break;
-                                case "73": paymentMethod = PaymentTypes.PaymentMethod4; break;
-                                case "75": paymentMethod = PaymentTypes.PaymentMethod5; break;
-                                case "04":
-                                case "4": paymentMethod = PaymentTypes.PaymentMethod6; break;
-                            }
-
-                            if (paymentMethod != PaymentTypes.VendorBankAccount && (paymentId != null || jointPaymentId != null))
-                            {
-                                journalLine._PaymentMethod = paymentMethod;
-                                journalLine._PaymentId = string.Format("{0} +{1}", paymentId, jointPaymentId);
-                            }
-                            else if (bbanRegNum != null && bbanAcc != null)
-                            {
-                                journalLine._PaymentMethod = PaymentTypes.VendorBankAccount;
-                                journalLine._PaymentId = string.Format("{0}-{1}", bbanRegNum, bbanAcc);
-                            }
-                            else if (swiftNo != null && ibanNo != null)
-                            {
-                                journalLine._PaymentMethod = PaymentTypes.IBAN;
-                                journalLine._PaymentId = ibanNo;
-                            }
-
-                            journalLine._SettleValue = SettleValueType.Voucher;
-
-                            Uniconta.DataModel.Creditor creditor = null;
-
-                            if (hint != null)
-                            {
-                                journalLine._DocumentRef = hint.RowId;
-                                //if (hint.CreditorAccount != null)
-                                //    creditor = (Uniconta.DataModel.Creditor)credCache.Get(hint.CreditorAccount);
-                                //if (hint.Amount != 0)
-                                //    journalLine.Amount = hint.Amount;
-                                //if (hint.Currency != null && hint.Currency != "-")
-                                //    journalLine.Currency = hint.Currency;
-                                //if (hint.PaymentId != null)
-                                //{
-                                //    journalLine._PaymentId = hint.PaymentId;
-                                //    journalLine.PaymentMethod = hint.PaymentMethod;
-                                //}
-                            }
-
-                            journalLine._AccountType = 2;
-
-                            var creditorCVRNum = Regex.Replace(creditorCVR, "[^0-9]", string.Empty);
-                            if (creditorCVRNum != string.Empty)
-                                creditor = creditors.Where(s => (Regex.Replace(s._LegalIdent ?? string.Empty, "[^0-9.]", "") == creditorCVRNum)).FirstOrDefault();
-
-                            if (creditorCVRNum == string.Empty)
-                            {
-                                journalLine._Text = Localization.lookup("NotValidVatNo");
-                            }
-                            else if (creditor == null)
-                            {
-                                var newCreditor = new CreditorClient()
-                                {
-                                    _Account = creditorCVR,
-                                    _LegalIdent = creditorCVR,
-                                    _PaymentMethod = journalLine._PaymentMethod,
-                                    _PaymentId = journalLine._PaymentId,
-                                    _SWIFT = swiftNo
-                                };
-
-                                CompanyInfo companyInformation = null;
-                                try
-                                {
-                                    companyInformation = await CVR.CheckCountry(creditorCVR, countryCode);
-                                }
-                                catch { }
-
-                                if (companyInformation != null)
-                                {
-                                    if (companyInformation.life != null)
-                                        newCreditor._Name = companyInformation.life.name;
-
-                                    if (companyInformation.address != null)
-                                    {
-                                        newCreditor._Address1 = companyInformation.address.CompleteStreet;                                      
-                                        newCreditor._Address2 = companyInformation.address.street2;                                        
-                                        newCreditor._ZipCode = companyInformation.address.zipcode;
-                                        newCreditor._City = companyInformation.address.cityname;
-                                        newCreditor._Country = companyInformation.address.Country;
-                                    }
-
-                                    if (companyInformation.contact != null)
-                                    {
-                                        newCreditor._Phone = companyInformation.contact.phone;
-                                        newCreditor._ContactEmail = companyInformation.contact.email;
-                                    }
-
-                                    journalLine.Text = newCreditor.Name;
-                                }
-                                else
-                                {
-                                    newCreditor.Name = Localization.lookup("NotValidVatNo");
-                                }
-
-                                await api.Insert(newCreditor);
-                                journalLine._Account = creditorCVR;
-                            }
-                            else
-                            {
-                                string vat;
-                                if (creditor._PostingAccount != null)
-                                {
-                                    journalLine._OffsetAccount = creditor._PostingAccount;
-                                    vat = ((GLAccount)offsetCache.Get(creditor._PostingAccount))?._Vat;
-                                }
-                                else
-                                    vat = creditor._Vat;
-                                if (vat != null)
-                                {
-                                    if (journal._TwoVatCodes)
-                                        journalLine._OffsetVat = vat;
-                                    else
-                                        journalLine._Vat = vat;
-                                }
-
-                                if (journalLine._DueDate == DateTime.MinValue && creditor._Payment != string.Empty)
-                                {
-                                    var paymentTermsCache = api.GetCache(typeof(PaymentTerm)) ?? await api.LoadCache(typeof(PaymentTerm));
-                                    var paymentTerm = (PaymentTerm)paymentTermsCache.Get(creditor._Payment);
-
-                                    if (paymentTerm != null)
-                                        journalLine._DueDate = paymentTerm.GetDueDate(journalLine._DueDate);
-                                }
-
-                                journalLine._Account = creditor._Account;
-                                if (creditor._SWIFT == null && !string.IsNullOrEmpty(swiftNo))
-                                {
-                                    creditor._SWIFT = swiftNo;
-                                    if (CreList == null)
-                                        CreList = new List<Uniconta.DataModel.Creditor>();
-                                    CreList.Add(creditor);
-                                }
-                            }
-
-                            updateLines.Add(journalLine);
-                        }
-
-                        noOfVouchers = updateLines.Count;
-                        var errorCode = await api.Insert(updateLines);
-                        if (CreList != null)
-                            api.UpdateNoResponse(CreList);
-
-                        var sb = StringBuilderReuse.Create("{ \"vouchers\": [ ");
-                        foreach (var voucher in vouchers.data)
-                            sb.AppendNum(voucher.id).Append(',');
-                        sb.Length = sb.Length - 1; // remove last comma
-                        sb.Append(" ] }");
-                        var vContent = new StringContent(sb.ToStringAndRelease(), Encoding.UTF8, "application/json");
-                        response = await client.PostAsync($"https://api.bilagscan.dk/v1/organizations/" + orgNo + "/vouchers/seen", vContent);
-                        await response.Content.ReadAsStringAsync();
-                    }
-                }
-            }
-            finally
-            {
-                readingFromBilagscan = false;
-                busyIndicator.IsBusy = false;
-            }
-
-            if (noOfVouchers == 0)
-                UnicontaMessageBox.Show(string.Format(Localization.lookup("StillProcessingTryAgain"), Localization.lookup("Bilagscan")), Localization.lookup("Bilagscan"), MessageBoxButton.OK, MessageBoxImage.Information);
-            else
+            var noOfVouchers = await paperFlowUtil.ReadJournalLines(journal, busyIndicator);
+            if (noOfVouchers != 0)
             {
                 var messageText = string.Concat(Localization.lookup("NumberOfImportedVouchers"), ": ", NumberConvert.ToString(noOfVouchers), Environment.NewLine, Environment.NewLine,
                         string.Format(Localization.lookup("GoTo"), Localization.lookup("Journallines")), "?");
+
                 if (UnicontaMessageBox.Show(messageText, Localization.lookup("BilagscanRead"), MessageBoxButton.OKCancel, MessageBoxImage.Information) == MessageBoxResult.OK)
                 {
                     AddDockItem(TabControls.GL_DailyJournalLine, journal, null, null, true);

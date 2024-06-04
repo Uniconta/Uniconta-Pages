@@ -258,7 +258,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (cmbEditor.SelectedIndex != 0)
             {
                 if (editrow.OneTimeDebtor == null)
-                    editrow.OneTimeDebtor = Activator.CreateInstance(api.CompanyEntity.GetUserType(typeof(DebtorClient))) as DebtorClient;
+                    editrow.OneTimeDebtor = api.CompanyEntity.CreateUserType<DebtorClient>();
 
                 var debtor = editrow.OneTimeDebtor;
                 debtor.Country = (CountryCode)api.CompanyEntity._Country;

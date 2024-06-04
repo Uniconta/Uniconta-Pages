@@ -1076,6 +1076,15 @@ namespace UnicontaClient.Pages.CustomPage
                     selectedItem.AmountSetBySystem = true;
                     selectedItem.Amount = voucher._Amount;
                 }
+                if (voucher._CostAccount != null && selectedItem._Account == null)
+                {
+                    if (selectedItem._AccountType != 0)
+                    {
+                        selectedItem._AccountType = 0;
+                        selectedItem.NotifyPropertyChanged("AccountType");
+                    }
+                    selectedItem.Account = voucher._CostAccount;
+                }
                 dgGLDailyJournalLine.SetModifiedRow(selectedItem);
             }
         }

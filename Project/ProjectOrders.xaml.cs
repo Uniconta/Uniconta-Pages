@@ -187,6 +187,8 @@ namespace UnicontaClient.Pages.CustomPage
                 DeliveryCity.Visible = false;
                 DeliveryCountry.Visible = false;
             }
+            Margin.Visible = Margin.ShowInColumnChooser = MarginRatio.Visible = MarginRatio.ShowInColumnChooser =
+            CostValue.Visible = CostValue.ShowInColumnChooser = !api.CompanyEntity.HideCostPrice;
         }
 
         protected override void LoadCacheInBackGround()

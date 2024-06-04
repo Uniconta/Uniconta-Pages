@@ -23,18 +23,19 @@ x:Class="UnicontaClient.Pages.CustomPage.GL_PaymentTerms"
             <localPage:PaymentGrid  x:Name="dgPayment" AutoGenerateColumns="None">
                 <localPage:PaymentGrid.Columns>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Payment" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="IsDefault" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PaymentMethod" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Days" AllowThousandMask="false"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PartialPayment" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="FirstPartPct"  Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="RemainingPartPct"  Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DaysInterval" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Account" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DebtorAccount" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Pct1"  Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Pct2"  Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" Width="150" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="IsDefault" Width="70" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PaymentMethod" Width="100" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Days" Width="70" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="GraceDays" Width="70"  Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PartialPayment" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="FirstPartPct" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="RemainingPartPct" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DaysInterval" Width="70" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Account" Width="100" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DebtorAccount" Width="100"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Pct1" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Pct2" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CashDiscountPct"  Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CashDiscountDays"  Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CashdiscountMethod"  Visible="False"/>

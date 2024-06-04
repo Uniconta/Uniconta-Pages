@@ -175,7 +175,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "EmployeeRegistrationLinePage":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.EmployeeRegistrationLinePage, dgEmployeeGrid.SelectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Register"), selectedItem._Name));
+                        AddDockItem(TabControls.EmployeeRegistrationLinePage, dgEmployeeGrid.SelectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("WorkingTime"), selectedItem._Name));
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);

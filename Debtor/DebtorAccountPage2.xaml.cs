@@ -263,6 +263,8 @@ namespace UnicontaClient.Pages.CustomPage
                 liEEIsNotVatDeclOrg.Visibility = Visibility.Collapsed;
             if (Comp._CountryId != CountryCode.Iceland)
                 liPaymentFee.Visibility = Visibility.Collapsed;
+            if (DoNotSave)
+                txtAccount.IsReadOnly = true;
         }
 
         public override bool BeforeSetUserField(ref CorasauLayoutGroup parentGroup)
@@ -398,14 +400,10 @@ namespace UnicontaClient.Pages.CustomPage
             var txtEmail = ((CorasauLayoutItem)sender).Content as TextEditor;
             if (txtEmail == null)
                 return;
-            //var mail = string.Concat("mailto:", txtEmail.Text);
-            //System.Diagnostics.Process proc = new System.Diagnostics.Process();
-            //proc.StartInfo.FileName = mail;
-            //proc.Start();
             var userNote = new UserNotesClient();
             userNote._SendTo = txtEmail.Text;
             OutlookNotes outNotes = new OutlookNotes(api, editrow);
-            outNotes.OpenOutLook(userNote);
+            outNotes.OpenOutLook(userNote, false);
         }
 
         private void liZipCode_ButtonClicked(object sender)

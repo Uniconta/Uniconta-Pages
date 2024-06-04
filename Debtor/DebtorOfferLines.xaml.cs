@@ -212,6 +212,12 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (!company.Warehouse)
                 Warehouse.Visible = Warehouse.ShowInColumnChooser = false;
+
+            Margin.Visible = Margin.ShowInColumnChooser = MarginRatio.Visible = MarginRatio.ShowInColumnChooser =
+           CostPrice.Visible = CostPrice.ShowInColumnChooser = CostValue.Visible = CostValue.ShowInColumnChooser = !api.CompanyEntity.HideCostPrice;
+            RibbonBase rb = (RibbonBase)localMenu.DataContext;
+            if (company.HideCostPrice)
+                UtilDisplay.RemoveMenuCommand(rb, new string[] { "CostValue", "DB" });
         }
 
         public bool DataChaged;
@@ -787,7 +793,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (isPreviewOnly)
             {
-                ExecuteGenerateOffer(Order, DateTime.Now, true, false, false, 0, false, false, false, null);
+                ExecuteGenerateOffer(Order, DateTime.Now, true, false, false, 0, false, false, false, null, true);
                 return;
             }
 
@@ -819,14 +825,14 @@ namespace UnicontaClient.Pages.CustomPage
                 if (generateOfferDialog.DialogResult == true)
                 {
                     ExecuteGenerateOffer(dbOrder, generateOfferDialog.GenrateDate, generateOfferDialog.ShowInvoice, generateOfferDialog.PostOnlyDelivered, generateOfferDialog.InvoiceQuickPrint,
-                        generateOfferDialog.NumberOfPages, generateOfferDialog.SendByEmail, generateOfferDialog.SendByOutlook, generateOfferDialog.sendOnlyToThisEmail, generateOfferDialog.Emails);
+                        generateOfferDialog.NumberOfPages, generateOfferDialog.SendByEmail, generateOfferDialog.SendByOutlook, generateOfferDialog.sendOnlyToThisEmail, generateOfferDialog.Emails, false);
                 }
             };
             generateOfferDialog.Show();
         }
 
         async private void ExecuteGenerateOffer(DebtorOfferClient dbOrder, DateTime genrateDate, bool showInvoice, bool postOnlyDelivered, bool isQuickPrint, int noOfPages, bool sendByEmail, bool sendByOutlook, bool sendOnlyToEmail,
-            string emailList)
+            string emailList, bool isPreviewOnly)
         {
             var invoicePostingResult = new InvoicePostingPrintGenerator(api, this);
             invoicePostingResult.SetUpInvoicePosting(dbOrder, null, CompanyLayoutType.Offer, genrateDate, null, true, showInvoice, postOnlyDelivered, isQuickPrint, noOfPages, sendByEmail, sendByOutlook, sendOnlyToEmail,
@@ -838,6 +844,8 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (!result)
                 Utility.ShowJournalError(invoicePostingResult.PostingResult.ledgerRes, dgDebtorOfferLineGrid);
+            else if (!isPreviewOnly)
+                DebtorOrders.Updatedata(dbOrder, CompanyLayoutType.Offer);
         }
 
         async void CreateProductionOrder(DebtorOfferLineClient offerLine)

@@ -433,14 +433,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 Uniconta.DataModel.DCOrderLineStorageRef[] ExclOrders = null;
                 if (FromDate != DateTime.MinValue || ToDate != DateTime.MinValue)
-                {
-                    var filter = new List<PropValuePair>(2);
-                    if (FromDate != DateTime.MinValue)
-                        filter.Add(PropValuePair.GenereteParameter("FromDate", typeof(string), NumberConvert.ToString(FromDate.Ticks)));
-                    if (ToDate != DateTime.MinValue)
-                        filter.Add(PropValuePair.GenereteParameter("ToDate", typeof(string), NumberConvert.ToString(ToDate.Ticks)));
-                    ExclOrders = await api.Query<Uniconta.DataModel.DCOrderLineStorageRef>(filter);
-                }
+                    ExclOrders = await api.Query<Uniconta.DataModel.DCOrderLineStorageRef>();
 
                 Reserved = await ReservedTask;
                 if (Reserved != null)
@@ -458,6 +451,14 @@ namespace UnicontaClient.Pages.CustomPage
                             var ord = ExclOrders[i];
                             if (ord._MoveType > 0)
                             {
+                                var d = ord._LineDate != DateTime.MinValue ? ord._LineDate : ord._OrderDeliveryDate;
+                                if (d == DateTime.MinValue)
+                                    continue;
+                                if (FromDate == DateTime.MinValue || FromDate <= d)
+                                    continue;
+                                if (ToDate == DateTime.MinValue || ToDate >= d)
+                                    continue;
+                                // we need to exclude this reservation
                                 searchrec._Item = ord._Item;
                                 searchrec._Variant1 = ord._Variant1;
                                 searchrec._Variant2 = ord._Variant2;

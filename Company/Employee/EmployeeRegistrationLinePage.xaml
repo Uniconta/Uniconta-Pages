@@ -1,22 +1,18 @@
 <Pages:GridBasePage xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
 x:Class="UnicontaClient.Pages.CustomPage.EmployeeRegistrationLinePage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage"
-    xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
     xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
-    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
     xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
-    xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors">
-    <UserControl.Resources>
-        <Style x:Key="StyleRow" TargetType="dxg:RowControl">
-            <Setter Property="Height" Value="Auto"/>
-        </Style>
-        <Util:MaskConverter x:Key="MaskConverter" />
-        <Util:RowIndexConverter x:Key="RowIndexConverter" />
-    </UserControl.Resources>
+    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+    xmlns:dxci="http://schemas.devexpress.com/winfx/2008/xaml/charts"
+    xmlns:converter="clr-namespace:UnicontaClient.Utilities"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    <Pages:GridBasePage.Resources>
+        <converter:DoubleToTimeSpanConverter x:Key="DoubleToTimeSpanConverter" />
+    </Pages:GridBasePage.Resources>
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -24,18 +20,109 @@ x:Class="UnicontaClient.Pages.CustomPage.EmployeeRegistrationLinePage"
         </Grid.RowDefinitions>
         <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Company/Employee/EmployeeRegistrationLinePageGridRibbon.xml" x:Name="localMenu"/>
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
-            <localPage:EmployeeRegistrationLinePageGrid x:Name="dgEmployeeRegistrationLinePageGrid" AutoGenerateColumns="None" HorizontalAlignment="Stretch">
-                <localPage:EmployeeRegistrationLinePageGrid.Columns>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="FromTime" ShowTime="True" Width="150" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ToTime" ShowTime="True" Width="150"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PrimaryKeyId" Width="70" Visible="False" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Employee" Width="70"/>
-                    <localPage:ComboBoxColumnClient x:Name="Activity"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Qty" Width="80"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Text" Width="500"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Project" Width="80"/>
-                </localPage:EmployeeRegistrationLinePageGrid.Columns>
-            </localPage:EmployeeRegistrationLinePageGrid>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid HorizontalAlignment="Stretch" Margin="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Button x:Name="prevBtn" Click="prevBtn_Click" Grid.Column="0" Cursor="Hand" Height="50" Width="50" Background="Transparent" BorderBrush="Transparent">
+                        <Button.Content>
+                            <Image Source="{dx:SvgImageSource Uri=/UnicontaPages;component/Assets/img/Previous_32x32.svg, UsePalette=True}" 
+                                   dx:WpfSvgPalette.Palette="{StaticResource SVGIconPallete}" HorizontalAlignment="Stretch" Stretch="Fill" />
+                        </Button.Content>
+                    </Button>
+                    <Grid x:Name="grdContentView" HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.Column="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="5" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid x:Name="grdPeriod" VerticalAlignment="Center">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="5" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock x:Name="txtDuration" FontSize="32" FontWeight="Bold" Grid.ColumnSpan="3" VerticalAlignment="Center" />
+                            <TextBlock x:Name ="txtWeekNum" Grid.Column="0" Grid.Row="1"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="txtWeekPeriod"  Grid.Column="2" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Grid>
+                        <dxci:ChartControl Name="chartControl" Grid.Column="2"  CrosshairEnabled="False" SelectionMode="Single" AnimationMode="OnDataChanged" Background="Transparent"
+                                           BorderBrush="Transparent" >
+                            <dxci:ChartControl.Legend>
+                                <dxci:Legend />
+                            </dxci:ChartControl.Legend>
+                            <dxci:XYDiagram2D>
+                                <dxci:BarSideBySideSeries2D  AnimationAutoStartMode="PlayOnce" BarWidth="0.4" ArgumentScaleType="Auto"  Brush="{StaticResource ChartItemBarColorBrush}"
+                                                             ValueScaleType="Numerical" ShowInLegend="False" ArgumentDataMember="WeekDay" ValueDataMember="AmountOfWork" LabelsVisibility="True">
+                                    <dxci:BarSideBySideSeries2D.Label>
+                                        <dxci:SeriesLabel ResolveOverlappingMode="Default">
+                                            <dxci:SeriesLabel.ElementTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding Content.Text,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource DoubleToTimeSpanConverter}}"  
+                                                               Foreground="{StaticResource ChartItemLegendTextForegroundColor}"/>
+                                                </DataTemplate>
+                                            </dxci:SeriesLabel.ElementTemplate>
+                                        </dxci:SeriesLabel>
+                                    </dxci:BarSideBySideSeries2D.Label>
+                                </dxci:BarSideBySideSeries2D>
+                                <dxci:XYDiagram2D.AxisX>
+                                    <dxci:AxisX2D Interlaced="False">
+                                        <dxci:AxisX2D.WholeRange>
+                                            <dxci:Range SideMarginsValue="1" />
+                                        </dxci:AxisX2D.WholeRange>
+                                    </dxci:AxisX2D>
+                                </dxci:XYDiagram2D.AxisX>
+                                <dxci:XYDiagram2D.AxisY>
+                                    <dxci:AxisY2D Visible="False" Interlaced="False" GridLinesVisible="False" />
+                                </dxci:XYDiagram2D.AxisY>
+                            </dxci:XYDiagram2D>
+                        </dxci:ChartControl>
+                    </Grid>
+                    <Button x:Name="nxtBtn" Click="nxtBtn_Click" Grid.Column="2" Cursor="Hand" Height="50" Width="50" Background="Transparent" BorderBrush="Transparent">
+                        <Button.Content>
+                            <Image Source="{dx:SvgImageSource Uri=/UnicontaPages;component/Assets/img/Next_32x32.svg, UsePalette=True}" 
+                                   dx:WpfSvgPalette.Palette="{StaticResource SVGIconPallete}" HorizontalAlignment="Stretch" Stretch="Fill" />
+                        </Button.Content>
+                    </Button>
+                </Grid>
+                <localPage:EmployeeRegistrationLinePageGrid x:Name="dgEmployeeRegistrationLinePageGrid" Grid.Row="1" AutoGenerateColumns="None" HorizontalAlignment="Stretch" CustomSummary="dgEmployeeRegistrationLinePageGrid_CustomSummary">
+                    <localPage:EmployeeRegistrationLinePageGrid.Columns>
+                        <localPage:CorasauDataGridTemplateColumnClient x:Name="Activity" AllowEditing="False"/>
+                        <localPage:CorasauDataGridTemplateColumnClient x:Name="FromTime" ShowTime="True" AllowEditing="False">
+                            <localPage:CorasauDataGridTemplateColumnClient.EditSettings>
+                                <dxe:TextEditSettings DisplayFormat="g" MaskType="DateTime" />
+                            </localPage:CorasauDataGridTemplateColumnClient.EditSettings>
+                        </localPage:CorasauDataGridTemplateColumnClient>
+                        <localPage:CorasauDataGridTemplateColumnClient x:Name="ToTime" ShowTime="True" AllowEditing="False">
+                            <localPage:CorasauDataGridTemplateColumnClient.EditSettings>
+                                <dxe:TextEditSettings DisplayFormat="g" MaskType="DateTime" />
+                            </localPage:CorasauDataGridTemplateColumnClient.EditSettings>
+                        </localPage:CorasauDataGridTemplateColumnClient>
+                        <localPage:CorasauDataGridTemplateColumnClient x:Name="Text" Visible="False" AllowEditing="False"/>
+                        <localPage:CorasauDataGridTemplateColumnClient x:Name="TotalTime" UnboundDataType="{x:Type sys:TimeSpan}" AllowEditing="False" ShowCriteriaInAutoFilterRow="False">
+                            <localPage:CorasauDataGridTemplateColumnClient.EditSettings>
+                                <dxe:TextEditSettings DisplayFormat="hh\:mm" />
+                            </localPage:CorasauDataGridTemplateColumnClient.EditSettings>
+                        </localPage:CorasauDataGridTemplateColumnClient>
+                        <localPage:CorasauDataGridTemplateColumnClient x:Name="ApprovedAdm" AllowEditing="False" MinWidth="100"/>
+                        <localPage:CorasauDataGridTemplateColumnClient x:Name="ApprovedEmp" AllowEditing="False" MinWidth="100"/>
+                    </localPage:EmployeeRegistrationLinePageGrid.Columns>
+                    <localPage:EmployeeRegistrationLinePageGrid.TotalSummary>
+                        <localPage:SumColumn DisplayFormat="dd\:hh\:mm" SummaryType="Custom" FieldName="TotalTime" />
+                    </localPage:EmployeeRegistrationLinePageGrid.TotalSummary>
+                </localPage:EmployeeRegistrationLinePageGrid>
+            </Grid>
         </CorasauControls:BusyIndicator>
     </Grid>
 </Pages:GridBasePage>

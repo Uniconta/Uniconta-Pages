@@ -89,7 +89,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
             }
         }
-        
+
         protected override void OnLayoutLoaded()
         {
             base.OnLayoutLoaded();
@@ -215,7 +215,7 @@ namespace UnicontaClient.Pages.CustomPage
         void DeleteOldTransactions(bool DeleteAll)
         {
             var papi = new UnicontaAPI.Project.API.PostingAPI(api);
-            var cwDateSelector = new CWDateSelector();
+            var cwDateSelector = new CWDateSelector(DateTime.Now.AddYears(-2));
             cwDateSelector.DialogTableId = 2000000042;
             cwDateSelector.Title = Uniconta.ClientTools.Localization.lookup("DeleteTrans");
             cwDateSelector.Closed += delegate

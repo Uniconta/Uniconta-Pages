@@ -333,6 +333,8 @@ namespace UnicontaClient.Pages.CustomPage
             }
             else
                 PayrollCategory.ShowInColumnChooser = true;
+            CostPrice.Visible = CostPrice.ShowInColumnChooser =
+            Cost.Visible = Cost.ShowInColumnChooser = !api.CompanyEntity.HideCostPrice;
         }
 
         private void DataControl_CurrentItemChanged(object sender, DevExpress.Xpf.Grid.CurrentItemChangedEventArgs e)

@@ -3,8 +3,6 @@
   <RibbonItem TabId="0" TabHeader="Home" LocalizedNameKey="Edit" >
     <!---When we create a new group and a new TabPage -->
     <RibbonItem Action="AddRow" LocalizedNameKey="AddOBJ" Parameter="Line" Glyph="Add_16x16" LargeGlyph="Add_32x32"/>
-    <RibbonItem Action="AddItems" LocalizedNameKey="AddOBJ" Parameter="InventoryItems" LargeGlyph="Add_Menu_32x32"/>
-    <RibbonItem Action="AddVariants" LocalizedNameKey="AddOBJ" Parameter="Variants" Module="ItemVariants" LargeGlyph="GanttChart_32x32"/>
     <RibbonItem Action="CopyRow" LocalizedNameKey="CopyLine" LargeGlyph="Copy_32x32"/>
     <RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="DeleteOBJ" Parameter="Line" Glyph="Delete_16x16" LargeGlyph="Delete_32x32"/>
   </RibbonItem>
@@ -45,11 +43,11 @@
     <RibbonItem Action="CopyBudget" LocalizedNameKey="CopyOBJ" Parameter="Budget" LargeGlyph="Budget_32x32" />
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="PostProjectOrder" LocalizedNameKey="PostProjectOrder" Glyph="Posted_Journal_32x32" ShortcutKey="Ctrl+P"/>
+    <RibbonItem Action="PostProjectOrder" LocalizedNameKey="PostProjectOrder" LargeGlyph="Posted_Journal_32x32" ShortcutKey="Ctrl+P"/>
   </RibbonItem>
   <RibbonItem>
     <RibbonItem LocalizedNameKey="Amount" StatusValue=""/>
-    <RibbonItem LocalizedNameKey="CostValue" StatusValue=""/>
-    <RibbonItem LocalizedNameKey="DB" StatusValue=""/>
+    <RibbonItem Action="CostValue" LocalizedNameKey="CostValue" StatusValue=""/>
+    <RibbonItem Action="DB" LocalizedNameKey="DB" StatusValue=""/>
   </RibbonItem>
 </root>

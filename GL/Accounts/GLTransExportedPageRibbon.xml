@@ -17,7 +17,7 @@
     <RibbonItem Action="DatevVerbinden" LocalizedNameKey="HideOBJ"  Parameter="Green" LargeGlyph="datevconnectb"/>
     <RibbonItem Action="Upload" LocalizedNameKey="Upload" Parameter="SupplementaryTransactions3" LargeGlyph="datevupload"/>
     <RibbonItem Action="ConnectedApplications" LocalizedNameKey="Connected Applications" Parameter="SupplementaryTransactions3" LargeGlyph="datevrework"/>
-    <RibbonItem Action="Revoke" LocalizedNameKey="Abmelden" Parameter="SupplementaryTransactions3" LargeGlyph="datevrework"/> 
+    <RibbonItem Action="ShowLog" LocalizedNameKey="Log Anzigen" Parameter="SupplementaryTransactions3" LargeGlyph="datevlog"/>
   </RibbonItem>
   <RibbonItem>
     <!---If we want to create a new group in same PageTab-->

@@ -11,6 +11,7 @@
 	</RibbonItem>
 	<RibbonItem>
 		<RibbonItem LocalizedNameKey="NumberOfCustomers" ButtonType="Status" />
+		<RibbonItem LocalizedNameKey="NumberChecked" ButtonType="Status" />
 		<RibbonItem LocalizedNameKey="NemhandelOBJ" Parameter="Active" ButtonType="Status" />
 		<RibbonItem LocalizedNameKey="NemhandelOBJ" Parameter="Inactive" ButtonType="Status" />
 	</RibbonItem>

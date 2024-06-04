@@ -79,7 +79,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorPayments"
                     <local:CorasauDataGridTemplateColumnClient x:Name="PostType" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Comment" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Voucher" Width="60"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="OnHold" Width="50"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="OnHold" Width="50" HideHeaderCheck="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Paid" Width="50"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Payment"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="YourRef" Visible="False"/>

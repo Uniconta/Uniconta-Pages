@@ -59,7 +59,7 @@ namespace UnicontaClient.Pages
         private void DisplayContent()
         {
             XMLContentTuple _data = _dataContent[currentIndex];
-            DisposeChildren();
+            ClearGrid();
 
             switch (_data.FileExtensionType)
             {
@@ -199,20 +199,18 @@ namespace UnicontaClient.Pages
 
         protected override void OnClosing(CancelEventArgs e)
         {
-            DisposeChildren();
+            ClearGrid(true);
             base.OnClosing(e);
         }
 
-        private void DisposeChildren()
+        private void ClearGrid(bool isCloseBrowser = false)
         {
-            if (contentViewerGrid.Children.Count == 0)
-                return;
+            if (contentViewerGrid.Children.Count != 0)
+                contentViewerGrid.Children.Clear();
 
-            var childControl = contentViewerGrid.Children[0];
-            if (childControl != null && childControl is UnicontaWebViewer webViewer)
-                webViewer.CloseUnicontaWebViewer();
-
-            contentViewerGrid.Children.Clear();
+            //Handling for Browser closing
+            if (isCloseBrowser)
+                UtilDisplay.CloseUnicontaWebViewer();
         }
     }
 }

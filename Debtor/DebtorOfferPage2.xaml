@@ -142,6 +142,9 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOfferPage2"
                     <CorasauControls:CorasauLayoutItem FieldName="DeliveryContactEmail" x:Name="liDeliveryContactEmail">
                         <CorasauControls:TextEditor  Text="{Binding DeliveryContactEmail,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="OfferPrinted" x:Name="liPacknotePrinted">
+                        <CorasauControls:DateEditor x:Name="dePackNotePrinted" EditValue="{Binding OfferPrinted,Mode=OneWay}" IsReadOnly="True" IsEnabled="False"/>
+                    </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="Installation" x:Name="lblDeliveryAddress" Style="{StaticResource LayoutItemsstyle}" ButtonContent="&#x2B9D;" ButtonClicked="lblDeliveryAddress_ButtonClicked">
                         <CorasauControls:LookupEditor x:Name="leDeliveryAddress" EditValue="{Binding Installation,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>

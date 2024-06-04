@@ -23,6 +23,19 @@ namespace UnicontaClient.Pages.CustomPage
     public class GLAccountClosingSheetGrid : CorasauDataGridClient
     {
         public override Type TableType { get { return typeof(GLAccountClosingSheetClient); } }
+
+        public override string SetColumnTooltip(object row, ColumnBase col)
+        {
+            var tran = row as GLAccountClosingSheetClient;
+            if (tran != null && col != null)
+            {
+                switch (col.FieldName)
+                {
+                    case "SheetNote": return tran.SheetNote ?? "";
+                }
+            }
+            return base.SetColumnTooltip(row, col);
+        }
     }
     public partial class GLAccountClosingSheetPage : GridBasePage
     {
@@ -52,7 +65,6 @@ namespace UnicontaClient.Pages.CustomPage
             ((TableView)dgGLTable.View).RowStyle = Application.Current.Resources["RowStyle"] as Style;
             GetMenuItem();
 
-            this.BeforeClose += _BeforeClose;
         }
 
         static int selectedCode;
@@ -68,7 +80,7 @@ namespace UnicontaClient.Pages.CustomPage
                 for (int i = 0; (i < 10); i++)
                     code[i + 1] = NumberConvert.ToString(i);
                 comboItem.ComboBoxItemSource = code;
-                comboItem.SelectedItem = code[selectedCode]; 
+                comboItem.SelectedItem = code[selectedCode];
                 localMenu.OnSelectedIndexChanged += LocalMenu_OnSelectedIndexChanged;
             }
         }
@@ -128,7 +140,11 @@ namespace UnicontaClient.Pages.CustomPage
                     if (Acc._Note != null || Acc._SheetNote != null)
                     {
                         if (Acc._Note == null)
-                            ins.Add(new Note() { _Text = Acc._Account + ": " + Acc._SheetNote });
+                        {
+                            var n = new Note() { _Text = Acc._Account + ": " + Acc._SheetNote };
+                            n.SetMaster(masterRecord);
+                            ins.Add(n);
+                        }
                         else if (string.IsNullOrWhiteSpace(Acc._SheetNote))
                             del.Add(Acc._Note);
                         else
@@ -145,15 +161,21 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     api.MultiCrud(ins, upd, del);
                     if (ins.Count > 0)
-                        masterRecord.HasDocs = true;
+                    {
+                        masterRecord.HasNotes = true;
+                        masterRecord.GetType().GetMethod("NotifyPropertyChanged")?.Invoke(masterRecord, new object[] { "HasNotes" });
+                    }
                 }
             }
         }
-        private void _BeforeClose()
-        {
-            SaveNotes();
-        }
 
+        public override void PageClosing()
+        {
+            dgGLTable.tableView.PostEditor();
+            SaveNotes();
+            base.PageClosing();
+        }
+        public override bool IsDataChaged => false;
         void DataControl_CurrentItemChanged(object sender, DevExpress.Xpf.Grid.CurrentItemChangedEventArgs e)
         {
             var oldselectedItem = e.OldItem as GLAccountClosingSheetClient;
@@ -372,7 +394,7 @@ namespace UnicontaClient.Pages.CustomPage
         async void RefreshLines()
         {
             busyIndicator.IsBusy = true;
-            var postingResult = await postingApi.PostClosingSheet(masterRecord, selectedCode > 0 ? (byte?)(selectedCode-1) : (byte?)null, true, masterRecord._ToDate, null, 1, null);
+            var postingResult = await postingApi.PostClosingSheet(masterRecord, selectedCode > 0 ? (byte?)(selectedCode - 1) : (byte?)null, true, masterRecord._ToDate, null, 1, null);
 
             GLTrans[] PostedLines;
             var ClosingLines = postingResult?.ClosingLines;

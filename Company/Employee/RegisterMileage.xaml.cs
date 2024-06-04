@@ -8,6 +8,8 @@ using System;
 using System.Windows;
 using Uniconta.ClientTools.Util;
 using System.Threading.Tasks;
+using Uniconta.ClientTools.Controls;
+using DevExpress.Xpf.Core;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -27,6 +29,9 @@ namespace UnicontaClient.Pages.CustomPage
         public override UnicontaBaseEntity ModifiedRow { get { return editrow; } set { editrow = (EmployeeRegistrationLineClient)value; } }
         /*For Edit*/
         public bool DoNotSave;
+
+        bool readOnly;
+        public bool ReadOnly { get { return readOnly; } set { readOnly = value; SetHideSaveDelete(); } }
         public RegisterMileage(UnicontaBaseEntity sourcedata, bool isEdit = true)
             : base(sourcedata, isEdit)
         {
@@ -38,7 +43,7 @@ namespace UnicontaClient.Pages.CustomPage
         void InitPage(CrudAPI crudapi)
         {
             layoutControl = layoutItems;
-            leFromAccount.api = leToAccount.api = leProject.api = leFromCompanyAddress.api = leToCompanyAddress.api = crudapi;
+            leFromAccount.api = leToAccount.api = leFromCompanyAddress.api = leToCompanyAddress.api = crudapi;
             if (LoadedRow == null && editrow == null)
             {
                 frmRibbon.DisableButtons("Delete");
@@ -48,8 +53,22 @@ namespace UnicontaClient.Pages.CustomPage
             layoutItems.DataContext = editrow;
             frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
             editrow.PropertyChanged += Editrow_PropertyChanged;
+              
         }
+        protected override void OnLayoutLoaded()
+        {
+            base.OnLayoutLoaded();
+            if (!readOnly)
+            {
+                chkFromHome.Checked += chkFromHome_Checked;
+                chkToHome.Checked += chkToHome_Checked;
+                chkFromWork.Checked += chkFromWork_Checked;
+                chkToWork.Checked += chkToWork_Checked;
 
+                var emp = (Uniconta.DataModel.Employee)employeeCache.Get(editrow.Employee);
+                editrow.VechicleRegNo = emp._VechicleRegNo;
+            }
+        }
         private async void frmRibbon_OnItemClicked(string ActionType)
         {
             if (DoNotSave && (ActionType == "Save" || ActionType == "Delete"))
@@ -122,7 +141,7 @@ namespace UnicontaClient.Pages.CustomPage
             editrow.FromAccount = null;
             editrow.FromWork = false;
             var emp = (Uniconta.DataModel.Employee)employeeCache.Get(editrow.Employee);
-            SetFromAddress("", emp._Address1, emp._Address2, emp._ZipCode, emp._City, CountryCode.Unknown);
+            SetFromAddress("", emp._Address1, emp._Address2, emp._ZipCode, emp._City, api.CompanyEntity._CountryId);
         }
 
         private void chkFromWork_Checked(object sender, RoutedEventArgs e)
@@ -140,7 +159,7 @@ namespace UnicontaClient.Pages.CustomPage
             editrow.ToAccount = null;
             editrow.ToWork = false;
             var emp = (Uniconta.DataModel.Employee)employeeCache.Get(editrow.Employee);
-            SetToAddress(string.Empty, emp._Address1, emp._Address2, emp._ZipCode, emp._City, CountryCode.Unknown);
+            SetToAddress(string.Empty, emp._Address1, emp._Address2, emp._ZipCode, emp._City, api.CompanyEntity._CountryId);
         }
 
         private void chkToWork_Checked(object sender, RoutedEventArgs e)
@@ -214,6 +233,14 @@ namespace UnicontaClient.Pages.CustomPage
             editrow.ToZipCode = zipCode;
             editrow.ToCity = city;
             editrow.ToCountry = country;
+        }
+
+        void SetHideSaveDelete()
+        {
+            RibbonBase rb = (RibbonBase)frmRibbon.DataContext;
+            UtilDisplay.RemoveMenuCommand(rb, new string[] { "Delete", "Save" });
+            liFromHome.Visibility = liFromWork.Visibility = liToHome.Visibility = liToWork.Visibility = Visibility.Collapsed;
+            layoutItems.ReadOnly = true;
         }
     }
 }

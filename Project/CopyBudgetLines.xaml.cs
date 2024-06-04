@@ -61,8 +61,8 @@ namespace UnicontaClient.Pages.CustomPage
             }
             position = AttachVoucherGridPage.GetPosition(dockCtrl);
         }
-        ProjectInvoiceProposal proposal;
-        public CopyBudgetLines(CrudAPI api, ProjectInvoiceProposal proposal) : base(api, string.Empty)
+        DCOrder proposal;
+        public CopyBudgetLines(CrudAPI api, DCOrder proposal) : base(api, string.Empty)
         {
             this.proposal = proposal;
             InitializeComponent();
@@ -71,7 +71,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
         protected override Filter[] DefaultFilters()
         {
-            Filter dateFilter = new Filter() { name = "Project", value = proposal.Project };
+            Filter dateFilter = new Filter() { name = "Project", value = proposal._Project };
             return new Filter[] { dateFilter };
         }
         private void InitPage()
@@ -80,6 +80,8 @@ namespace UnicontaClient.Pages.CustomPage
             InitializeComponent();
             var comp = crudApi.CompanyEntity;
             SetRibbonControl(localMenu, dgBudgetGrid);
+            dgBudgetGrid.api = api;
+            dgBudgetLinesGrid.api = api;
             dgBudgetGrid.BusyIndicator = busyIndicator;
             dgBudgetGrid.SelectedItemChanged += DgBudgetGrid_SelectedItemChanged;
             dgBudgetLinesGrid.ItemsSourceChanged += DgBudgetLinesGrid_ItemsSourceChanged;
@@ -109,12 +111,19 @@ namespace UnicontaClient.Pages.CustomPage
             var budget = e.NewItem as ProjectBudgetClient;
             BusyIndicator.IsBusy = true;
             budgetLines = await api.Query<ProjectBudgetLineLocal>(budget);
-            if (budgetLines != null)
-                Array.Sort(budgetLines, new ProjectBudgetLineSort());
-            //dgBudgetLinesGrid.ItemsSource = budgetLines;
-            //dgBudgetLinesGrid.Visibility = Visibility.Visible;
+            if (budgetLines?.Length > 0)
+            {
+                Array.Sort(budgetLines, new ProjectBudgetLineSort(budgetLines));
+                var maxId = budgetLines.Select(s => s.Id).Max();
+                foreach (var line in budgetLines)
+                {
+                    if (line.Id == 0)
+                        line.Id = ++maxId;
+                }
+                dgBudgetLinesGrid.MaxId = maxId;
+                dgBudgetLinesGrid.SetSource(budgetLines);
+            }
             BusyIndicator.IsBusy = false;
-            dgBudgetLinesGrid.SetSource(budgetLines);
         }
 
         private void ChildWindow_KeyDown(object sender, KeyEventArgs e)

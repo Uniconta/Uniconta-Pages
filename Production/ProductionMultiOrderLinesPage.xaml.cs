@@ -177,12 +177,10 @@ namespace UnicontaClient.Pages.CustomPage
                 SerieBatch.Visible = SerieBatch.ShowInColumnChooser = false;
             else
                 SerieBatch.ShowInColumnChooser = true;
-#if !SILVERLIGHT
             Utility.SetupVariants(api, colVariant, VariantName, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
-#else
-            Utility.SetupVariants(api, colVariant, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
-#endif
             Utility.SetDimensionsGrid(api, colDim1, colDim2, colDim3, colDim4, colDim5);
+            Margin.Visible = Margin.ShowInColumnChooser = MarginRatio.Visible = MarginRatio.ShowInColumnChooser =
+           CostPrice.Visible = CostPrice.ShowInColumnChooser = !api.CompanyEntity.HideCostPrice;
         }
         private void ProductionMultiOrderLine_CurrentItemChanged(object sender, DevExpress.Xpf.Grid.CurrentItemChangedEventArgs e)
         {

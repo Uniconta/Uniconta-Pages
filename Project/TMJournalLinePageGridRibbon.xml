@@ -44,6 +44,7 @@
 		<RibbonItem Action="Approve" LocalizedNameKey="Approve"   LargeGlyph="Order_Confirmation_32x32"/>
 	</RibbonItem>
 	<RibbonItem>
+		<RibbonItem Action="EmployeeRegistrationLinePage" LocalizedNameKey="WorkingTime" ControlName="EmployeeRegistrationLinePage" LargeGlyph="Account-statement_32x32"/>
 		<RibbonItem Action="RemainingBudget" LocalizedNameKey="RemainingBudget" Module="ProjectBudget" LargeGlyph="Budget_32x32"/>
 	</RibbonItem>
     <RibbonItem>

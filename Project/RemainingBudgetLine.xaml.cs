@@ -117,6 +117,8 @@ namespace UnicontaClient.Pages.CustomPage
             }
             else
                 Task.ShowInColumnChooser = true;
+            Margin.Visible = Margin.ShowInColumnChooser = MarginRatio.Visible = MarginRatio.ShowInColumnChooser =
+            CostPrice.Visible = CostPrice.ShowInColumnChooser = !api.CompanyEntity.HideCostPrice;
         }
 
         async public override Task InitQuery()

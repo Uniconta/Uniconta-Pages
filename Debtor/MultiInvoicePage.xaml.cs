@@ -90,6 +90,8 @@ namespace UnicontaClient.Pages.CustomPage
                 DeliveryPhone.Visible = false;
                 DeliveryContactEmail.Visible = false;
             }
+            Margin.Visible = Margin.ShowInColumnChooser = MarginRatio.Visible = MarginRatio.ShowInColumnChooser =
+            CostValue.Visible = CostValue.ShowInColumnChooser = !api.CompanyEntity.HideCostPrice;
         }
 
         private void LocalMenu_OnItemClicked(string ActionType)

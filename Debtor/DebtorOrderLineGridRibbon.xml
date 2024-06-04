@@ -83,7 +83,7 @@
   </RibbonItem>
   <RibbonItem>
     <RibbonItem LocalizedNameKey="Amount" StatusValue=""/>
-    <RibbonItem LocalizedNameKey="CostValue" StatusValue=""/>
-    <RibbonItem LocalizedNameKey="DB" StatusValue=""/>
+    <RibbonItem Action="CostValue" LocalizedNameKey="CostValue" StatusValue=""/>
+    <RibbonItem Action="DB" LocalizedNameKey="DB" StatusValue=""/>
   </RibbonItem>
 </root>

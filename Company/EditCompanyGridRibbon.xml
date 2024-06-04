@@ -21,6 +21,7 @@
     <RibbonItem Action="Delete" ShortcutKey="Shift+DELETE" LocalizedNameKey="DeleteOBJ" Parameter="Company" Glyph="Delete_16x16" LargeGlyph="Delete_32x32"/>
   </RibbonItem>
   <RibbonItem>
+    <RibbonItem Action="RefreshCache" LocalizedNameKey="RefreshCache" LargeGlyph="refresh"/>
     <RibbonItem Action="CreateBackup" LocalizedNameKey="Backup" LargeGlyph="Update_32x32"/>
   </RibbonItem>
   <RibbonItem>

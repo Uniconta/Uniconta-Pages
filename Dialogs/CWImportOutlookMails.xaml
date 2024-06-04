@@ -27,11 +27,12 @@
             <!-- Row 0-->
          
             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Folder}" VerticalAlignment="Center" Grid.Column="0" Grid.Row="0" />
-            <CorasauControls:ComboBoxEditor x:Name="cmbFolder" Width="100" Grid.Column="1" Grid.Row="0" Margin="5,0,0,0" />
+            <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="1" Margin="5 0 0 0">
+                <RadioButton x:Name="rdbInbox" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Inbox}" GroupName="Folder" Checked="rdbInbox_Checked"/>
+                <RadioButton x:Name="rdbSentItems" Margin="5 0 0 0" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=SentItems}" Checked="rdbSentItems_Checked" GroupName="Folder"/>
+            </StackPanel>
             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Date}" VerticalAlignment="Center" Grid.Column="3" Grid.Row="0" />
-            <CorasauControls:DateEditor x:Name="dtDateFilter" Width="200" Grid.Column="4" Grid.Row="0" Margin="5,0,0,0"/>
-            <Button x:Name="btnSearch" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Search}"   Grid.Column="5" Grid.Row="0" Click="btnSearch_Click" MinWidth="75" 
-             Height="23" HorizontalAlignment="Right" />
+            <CorasauControls:DateEditor x:Name="dtDateFilter" Width="200" Grid.Column="4" Grid.Row="0" Margin="5,0,0,0" EditValueChanged="dtDateFilter_EditValueChanged"/>
             <CorasauControls:ListBoxEditor x:Name="lstMails" Grid.Row="2" Grid.ColumnSpan="6" HorizontalContentAlignment="Stretch">
                 <CorasauControls:ListBoxEditor.ItemContainerStyle>
                     <Style TargetType="{x:Type dxe:ListBoxEditItem}">

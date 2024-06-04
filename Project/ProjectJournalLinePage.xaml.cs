@@ -26,41 +26,14 @@ using Uniconta.API.GeneralLedger;
 using Uniconta.API.Project;
 using Uniconta.API.Service;
 using Uniconta.Common.Utility;
+using Uniconta.ClientTools.Util;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
-    public class ProjectJournalLineLocal : ProjectJournalLineClient
-    {
-        internal bool InsidePropChange;
-        public double costPct, salesPct, costAmount, salesAmount;
-
-        public void SetCost(double cost)
-        {
-            if (cost != 0d)
-                this.CostPrice = Math.Round(cost * (1d + costPct / 100d) + costAmount, 2);
-        }
-        public void SetSales(double sales)
-        {
-            if (sales != 0d)
-                this.SalesPrice = Math.Round(sales * (1d + salesPct / 100d) + salesAmount, 2);
-        }
-
-        internal object locationSource;
-        public object LocationSource { get { return locationSource; } }
-
-        internal object taskSource;
-        public object TaskSource { get { return taskSource; } }
-
-        public PrCategoryCacheFilter PrCategorySource { get; internal set; }
-
-        internal object serieBatchSource;
-        public object SerieBatchSource { get { return serieBatchSource; } }
-    }
-
     public class ProjectJournalLinePageGrid : CorasauDataGridClient
     {
-        public override Type TableType { get { return typeof(ProjectJournalLineLocal); } }
+        public override Type TableType { get { return typeof(ProjectJournalLineClient); } }
         public override IComparer GridSorting { get { return new ProjectJournalLineSort(); } }
         public override string LineNumberProperty { get { return "_LineNumber"; } }
         public override bool AllowSort { get { return false; } }
@@ -71,7 +44,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         public override bool AddRowOnPageDown()
         {
-            var selectedItem = (ProjectJournalLineLocal)this.SelectedItem;
+            var selectedItem = (ProjectJournalLineClient)this.SelectedItem;
             if (selectedItem == null || selectedItem._Project == null || (selectedItem._Qty == 0d && selectedItem._SalesPrice == 0d && selectedItem._CostPrice == 0d))
                 return false;
             return true;
@@ -79,7 +52,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         public override void SetDefaultValues(UnicontaBaseEntity dataEntity, int selectedIndex)
         {
-            var newRow = (ProjectJournalLineLocal)dataEntity;
+            var newRow = (ProjectJournalLineClient)dataEntity;
             var header = this.masterRecord as Uniconta.DataModel.PrJournal;
             if (header != null)
             {
@@ -101,11 +74,11 @@ namespace UnicontaClient.Pages.CustomPage
             }
             else
             {
-                ProjectJournalLineLocal last = null;
-                ProjectJournalLineLocal Cur = null;
+                ProjectJournalLineClient last = null;
+                ProjectJournalLineClient Cur = null;
                 int n = -1;
                 DateTime LastDateTime = DateTime.MinValue;
-                var castItem = lst as IEnumerable<ProjectJournalLineLocal>;
+                var castItem = lst as IEnumerable<ProjectJournalLineClient>;
                 foreach (var journalLine in castItem)
                 {
                     if (journalLine._Date != DateTime.MinValue && Cur == null)
@@ -120,7 +93,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                 newRow._Date = LastDateTime != DateTime.MinValue ? LastDateTime : BasePage.GetSystemDefaultDate().Date;
                 if (this.SelectedItem != null)
-                    last = this.SelectedItem as ProjectJournalLineLocal;
+                    last = this.SelectedItem as ProjectJournalLineClient;
                 newRow._Project = last._Project;
                 newRow._PrCategory = last._PrCategory;
                 newRow._WorkSpace = last._WorkSpace;
@@ -143,6 +116,7 @@ namespace UnicontaClient.Pages.CustomPage
         Uniconta.DataModel.PrJournal masterJournal;
         Dictionary<string, Uniconta.API.DebtorCreditor.FindPrices> dictPriceLookup;
         Uniconta.API.Project.FindPricesEmpl TimePriceLookup;
+        readonly Uniconta.DataModel.Employee masterJournalEmployee;
 
         public ProjectJournalLinePage(BaseAPI API)
             : base(API, string.Empty)
@@ -155,6 +129,10 @@ namespace UnicontaClient.Pages.CustomPage
         {
             Init();
             masterJournal = (Uniconta.DataModel.PrJournal)master;
+
+            if (masterJournal?._Employee != null && EmployeeCache != null)
+                masterJournalEmployee = (Uniconta.DataModel.Employee)EmployeeCache.Get(masterJournal._Employee);
+
             dgProjectJournalLinePageGrid._AutoSave = masterJournal._AutoSave;
             dgProjectJournalLinePageGrid.UpdateMaster(master);
         }
@@ -201,13 +179,6 @@ namespace UnicontaClient.Pages.CustomPage
             base.SetParameter(Parameters);
         }
 
-        public override bool CheckIfBindWithUserfield(out bool isReadOnly, out bool useBinding)
-        {
-            isReadOnly = false;
-            useBinding = true;
-            return true;
-        }
-
         protected override void OnLayoutLoaded()
         {
             base.OnLayoutLoaded();
@@ -251,15 +222,19 @@ namespace UnicontaClient.Pages.CustomPage
                 dgProjectJournalLinePageGrid.ClearFilter();
                 dgProjectJournalLinePageGrid.IsLoadedFromLayoutSaved = false;
             }
+
+            var rb = (RibbonBase)localMenu.DataContext;
+            if (masterJournalEmployee?._UserLogidId != api?.session?.LoginId)
+                UtilDisplay.RemoveMenuCommand(rb, "EmployeeRegistrationLinePage");
         }
 
         private void DataControl_CurrentItemChanged(object sender, DevExpress.Xpf.Grid.CurrentItemChangedEventArgs e)
         {
-            ProjectJournalLineLocal oldselectedItem = e.OldItem as ProjectJournalLineLocal;
+            ProjectJournalLineClient oldselectedItem = e.OldItem as ProjectJournalLineClient;
             if (oldselectedItem != null)
                 oldselectedItem.PropertyChanged -= SelectedItem_PropertyChanged;
 
-            ProjectJournalLineLocal selectedItem = e.NewItem as ProjectJournalLineLocal;
+            ProjectJournalLineClient selectedItem = e.NewItem as ProjectJournalLineClient;
             if (selectedItem != null)
             {
                 selectedItem.InsidePropChange = false;
@@ -269,7 +244,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void SelectedItem_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            var rec = (ProjectJournalLineLocal)sender;
+            var rec = (ProjectJournalLineClient)sender;
             switch (e.PropertyName)
             {
                 case "Item":
@@ -409,7 +384,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        async void GetItemFromSerailNumber(ProjectJournalLineLocal rec)
+        async void GetItemFromSerailNumber(ProjectJournalLineClient rec)
         {
             var reportApi = new Uniconta.API.Inventory.ReportAPI(api);
             busyIndicator.IsBusy = true;
@@ -424,7 +399,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        void FindOnEAN(ProjectJournalLineLocal rec)
+        void FindOnEAN(ProjectJournalLineClient rec)
         {
             var EAN = rec._EAN;
             if (string.IsNullOrWhiteSpace(EAN))
@@ -439,7 +414,7 @@ namespace UnicontaClient.Pages.CustomPage
                 FindOnEANVariant(rec);
         }
 
-        async void FindOnEANVariant(ProjectJournalLineLocal rec)
+        async void FindOnEANVariant(ProjectJournalLineClient rec)
         {
             var ap = new Uniconta.API.Inventory.ReportAPI(api);
             var variant = await ap.GetInvVariantDetail(rec._EAN);
@@ -456,7 +431,7 @@ namespace UnicontaClient.Pages.CustomPage
                     rec._CostPrice = variant._CostPrice;
             }
         }
-        async void setLocation(InvWarehouse master, ProjectJournalLineLocal rec)
+        async void setLocation(InvWarehouse master, ProjectJournalLineClient rec)
         {
             if (api.CompanyEntity.Location)
             {
@@ -471,7 +446,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        async void setTask(Uniconta.DataModel.Project project, ProjectJournalLineLocal rec)
+        async void setTask(Uniconta.DataModel.Project project, ProjectJournalLineClient rec)
         {
             if (api.CompanyEntity.ProjectTask)
             {
@@ -491,12 +466,12 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void Task_GotFocus(object sender, RoutedEventArgs e)
         {
-            var selectedItem = dgProjectJournalLinePageGrid.SelectedItem as ProjectJournalLineLocal;
+            var selectedItem = dgProjectJournalLinePageGrid.SelectedItem as ProjectJournalLineClient;
             if (selectedItem?._Project != null)
                 setTask((Uniconta.DataModel.Project)ProjectCache.Get(selectedItem._Project), selectedItem);
         }
 
-        void SetCat(ProjectJournalLineLocal rec, string cat)
+        void SetCat(ProjectJournalLineClient rec, string cat)
         {
             if (cat != null && cat != rec._PrCategory)
             {
@@ -505,14 +480,14 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        void SetInvoiceable(ProjectJournalLineLocal rec)
+        void SetInvoiceable(ProjectJournalLineClient rec)
         {
             var Cat = (PrCategory)CategoryCache.Get(rec._PrCategory);
             if (Cat != null)
                 rec.Invoiceable = Cat._Invoiceable;
         }
 
-        void PayrollCat(ProjectJournalLineLocal rec, bool AddItem)
+        void PayrollCat(ProjectJournalLineClient rec, bool AddItem)
         {
             var pay = (Uniconta.DataModel.EmpPayrollCategory)PayrollCache?.Get(rec._PayrollCategory);
             if (pay != null)
@@ -538,7 +513,7 @@ namespace UnicontaClient.Pages.CustomPage
             rec.InsidePropChange = false;
         }
 
-        void SetItem(ProjectJournalLineLocal rec)
+        void SetItem(ProjectJournalLineClient rec)
         {
             var item = (InvItem)ItemsCache.Get(rec._Item);
             if (item == null)
@@ -573,7 +548,7 @@ namespace UnicontaClient.Pages.CustomPage
             globalEvents?.NotifyRefreshViewer(NameOfControl, item);
         }
 
-        async void getCostAndSales(ProjectJournalLineLocal rec)
+        async void getCostAndSales(ProjectJournalLineClient rec)
         {
             var proj = (Uniconta.DataModel.Project)ProjectCache.Get(rec._Project);
             if (proj == null)
@@ -614,14 +589,14 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        void UpdatePrice(ProjectJournalLineLocal rec)
+        void UpdatePrice(ProjectJournalLineClient rec)
         {
             var priceLookup = SetPriceLookup(rec);
             if (priceLookup != null && priceLookup.UseCustomerPrices)
                 priceLookup.GetCustomerPrice(rec, false);
         }
 
-        Uniconta.API.DebtorCreditor.FindPrices SetPriceLookup(ProjectJournalLineLocal rec)
+        Uniconta.API.DebtorCreditor.FindPrices SetPriceLookup(ProjectJournalLineClient rec)
         {
             var proj = (Uniconta.DataModel.Project)ProjectCache.Get(rec._Project);
             if (proj != null)
@@ -664,7 +639,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void localMenu_OnItemClicked(string ActionType)
         {
-            var selectedItem = dgProjectJournalLinePageGrid.SelectedItem as ProjectJournalLineLocal;
+            var selectedItem = dgProjectJournalLinePageGrid.SelectedItem as ProjectJournalLineClient;
             switch (ActionType)
             {
                 case "AddRow":
@@ -727,6 +702,10 @@ namespace UnicontaClient.Pages.CustomPage
                         }
                     }
                     break;
+                case "EmployeeRegistrationLinePage":
+                    if (masterJournalEmployee?._UserLogidId == api.session.LoginId)
+                        AddDockItem(TabControls.EmployeeRegistrationLinePage, masterJournalEmployee, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Register"), masterJournalEmployee._Name));
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -735,12 +714,12 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void SerieBatch_GotFocus(object sender, RoutedEventArgs e)
         {
-            ProjectJournalLineLocal selectedItem = dgProjectJournalLinePageGrid.SelectedItem as ProjectJournalLineLocal;
+            ProjectJournalLineClient selectedItem = dgProjectJournalLinePageGrid.SelectedItem as ProjectJournalLineClient;
             if (selectedItem?._Item != null)
                 setSerieBatchSource(ItemsCache.Get<InvItem>(selectedItem._Item), selectedItem);
         }
         List<InvSerieBatchClient> localInvSerieBatchList = null;
-        async void setSerieBatchSource(InvItem master, ProjectJournalLineLocal rec)
+        async void setSerieBatchSource(InvItem master, ProjectJournalLineClient rec)
         {
             if (master != null && master._UseSerialBatch)
             {
@@ -756,7 +735,7 @@ namespace UnicontaClient.Pages.CustomPage
             rec.NotifyPropertyChanged("SerieBatchSource");
         }
 
-        async void UnfoldBOM(ProjectJournalLineLocal selectedItem)
+        async void UnfoldBOM(ProjectJournalLineClient selectedItem)
         {
             var items = this.ItemsCache;
             var item = (InvItem)items.Get(selectedItem._Item);
@@ -770,12 +749,14 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 Array.Sort(list, new InvBOMSort());
                 var lst = new List<UnicontaBaseEntity>(list.Length);
+                var type = dgProjectJournalLinePageGrid.TableTypeUser;
                 foreach (var bom in list)
                 {
                     item = (InvItem)items.Get(bom._ItemPart);
                     if (item == null)
                         continue;
-                    var invJournalLine = new ProjectJournalLineLocal();
+
+                    var invJournalLine = Activator.CreateInstance(type) as ProjectJournalLineClient;
                     invJournalLine._Item = bom._ItemPart;
                     invJournalLine.SetItemValues(item);
                     invJournalLine._Project = selectedItem._Project;
@@ -828,7 +809,7 @@ namespace UnicontaClient.Pages.CustomPage
         bool refreshOnHand;
         Task<ErrorCodes> saveGridLocal()
         {
-            var prOrderLine = dgProjectJournalLinePageGrid.SelectedItem as ProjectJournalLineLocal;
+            var prOrderLine = dgProjectJournalLinePageGrid.SelectedItem as ProjectJournalLineClient;
             dgProjectJournalLinePageGrid.SelectedItem = null;
             dgProjectJournalLinePageGrid.SelectedItem = prOrderLine;
             refreshOnHand = prOrderLine != null && prOrderLine.RowId == 0;
@@ -839,7 +820,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         void UpdatePrices()
         {
-            var source = dgProjectJournalLinePageGrid.GetVisibleRows() as IEnumerable<ProjectJournalLineLocal>;
+            var source = dgProjectJournalLinePageGrid.GetVisibleRows() as IEnumerable<ProjectJournalLineClient>;
             foreach (var rec in source)
             {
                 dgProjectJournalLinePageGrid.SetLoadedRow(rec);
@@ -908,8 +889,8 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void PostJournal()
         {
-            var source = (ICollection<ProjectJournalLineLocal>)dgProjectJournalLinePageGrid.ItemsSource;
-            if (source == null || source.Count == 0)
+            var source = (IEnumerable<ProjectJournalLineClient>)dgProjectJournalLinePageGrid.ItemsSource;
+            if (source == null || source.Count() == 0)
                 return;
             this.api.AllowBackgroundCrud = false;
             var savetask = saveGrid();
@@ -937,9 +918,7 @@ namespace UnicontaClient.Pages.CustomPage
             CWPosting postingDialog = new CWPosting(masterJournal);
             postingDialog.dateMsg = dateMsg;
             postingDialog.companyName = api.CompanyEntity.Name;
-#if !SILVERLIGHT
             postingDialog.DialogTableId = 2000000040;
-#endif
             postingDialog.Closed += async delegate
             {
                 if (postingDialog.DialogResult == true)
@@ -950,7 +929,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (savetask != null)
                         await savetask;
 
-                    // var source = dgProjectJournalLinePageGrid.ItemsSource as IEnumerable<ProjectJournalLineLocal>;
+                    // var source = dgProjectJournalLinePageGrid.ItemsSource as IEnumerable<ProjectJournalLineClient>;
                     var cnt = source.Count();
 
                     Task<PostingResult> task;
@@ -984,7 +963,7 @@ namespace UnicontaClient.Pages.CustomPage
                         {
                             var EmptyAccountOnHold = masterJournal._EmptyAccountOnHold;
                             var UseApproved = masterJournal._UseApproved;
-                            var lst = new List<ProjectJournalLineLocal>();
+                            var lst = new List<ProjectJournalLineClient>();
                             foreach (var journalLine in source)
                                 if (journalLine._OnHold || (journalLine._Project == null && EmptyAccountOnHold) || (UseApproved && !journalLine._Approved))
                                     lst.Add(journalLine);
@@ -1004,7 +983,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (WarehouseCache == null)
                 return;
 
-            var selectedItem = dgProjectJournalLinePageGrid.SelectedItem as ProjectJournalLineLocal;
+            var selectedItem = dgProjectJournalLinePageGrid.SelectedItem as ProjectJournalLineClient;
             if (selectedItem?._Warehouse != null)
             {
                 var selected = (InvWarehouse)WarehouseCache.Get(selectedItem._Warehouse);
@@ -1057,7 +1036,7 @@ namespace UnicontaClient.Pages.CustomPage
                     var opr = (Int32)param[0];
                     var mileage = param[1] as EmployeeRegistrationLineClient;
                     if (mileage == null) return;
-                    var selected = dgProjectJournalLinePageGrid.SelectedItem as ProjectJournalLineLocal;
+                    var selected = dgProjectJournalLinePageGrid.SelectedItem as ProjectJournalLineClient;
                     if (selected == null) return;
                     dgProjectJournalLinePageGrid.SetLoadedRow(selected);
                     selected._Mileage = mileage;

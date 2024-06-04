@@ -16,6 +16,7 @@ using System.Windows.Shapes;
 using System.Windows;
 using System.ComponentModel.DataAnnotations;
 using UnicontaClient.Controls;
+using Uniconta.ClientTools.Controls;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -79,6 +80,16 @@ namespace UnicontaClient.Pages.CustomPage
         }
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
+            if (string.IsNullOrEmpty(Journal))
+            {
+                UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("MandatoryField"), (Uniconta.ClientTools.Localization.lookup("Journal"))), Uniconta.ClientTools.Localization.lookup("Warning"));
+                return;
+            }
+            else if (string.IsNullOrEmpty(Bank))
+            {
+                UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("MandatoryField"), (Uniconta.ClientTools.Localization.lookup("Bank"))), Uniconta.ClientTools.Localization.lookup("Warning"));
+                return;
+            }
             SetDialogResult(true);
         }
 

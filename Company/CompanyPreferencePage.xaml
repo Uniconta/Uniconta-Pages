@@ -66,6 +66,11 @@ x:Class="UnicontaClient.Pages.CustomPage.CompanyPreferencePage"
                             <CorasauControls:CheckEditor IsChecked="{Binding AprvePurchaseOrders,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
+                    <CorasauControls:CorasauLayoutGroup View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Bilagscan}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" MinWidth="420">
+                        <CorasauControls:CorasauLayoutItem FieldName="PaperFlowSaveCreditors">
+                            <CorasauControls:CheckEditor IsChecked="{Binding PaperFlowSaveCreditors,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                    </CorasauControls:CorasauLayoutGroup>
                 </CorasauControls:CorasauLayoutGroup>
                 <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="lastGroup">
                     <CorasauControls:CorasauLayoutGroup View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Inventory}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" MinWidth="420">

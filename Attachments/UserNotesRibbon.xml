@@ -6,7 +6,10 @@
     <RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="Delete" Glyph="Delete_16x16" LargeGlyph="Delete_32x32"/>
     <RibbonItem Action="SaveGrid" ShortcutKey="CTRL+S" LocalizedNameKey="Save" Glyph="save-16x16" LargeGlyph="save-32x32"/>
   </RibbonItem>
-   <RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh" LargeGlyph="refresh"/>
+  </RibbonItem>
+  <RibbonItem LocalizedNameKey="Outlook">
      <RibbonItem Action="ImportMail" LocalizedNameKey="ImportOBJ" Parameter="Email" LargeGlyph="Email_Add_32x32"/>
      <RibbonItem Action="SendMail" LocalizedNameKey="EmailDocuments" LargeGlyph="SendInvoiceMail_32x32"/>
    </RibbonItem>

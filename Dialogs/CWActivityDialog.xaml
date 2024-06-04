@@ -1,0 +1,94 @@
+﻿<control:ChildWindow x:Class="UnicontaClient.Controls.Dialogs.CWActivityDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:control="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+        xmlns:ClientToolCtrl="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+        xmlns:localBehavior="clr-namespace:Uniconta.ClientTools.Behaviour;assembly=ClientTools"
+        xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+        xmlns:dxsch="http://schemas.devexpress.com/winfx/2008/xaml/scheduling"
+        xmlns:dxet="http://schemas.devexpress.com/winfx/2008/xaml/editors/themekeys"
+        xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+        xmlns:converter="clr-namespace:UnicontaClient.Utilities"
+        Height="250" Width="620">
+    <control:ChildWindow.Resources>
+        <dxsch:TimeSpanToDateTimeConverter x:Key="TimeSpanToDateTimeConverter" />
+        <converter:TimeSpanValueToHoursMinuteSecondConverter x:Key="TimeSpanValueToHoursMinuteSecondConverter" />
+        <Style x:Key="{dxet:TimePickerThemeKey ResourceKey=TimeEditBoxStyle, IsThemeIndependent=true}" TargetType="{x:Type dxe:ButtonEdit}">
+            <Setter Property="Margin" Value="0,12,0,12" />
+            <Setter Property="MinWidth" Value="100" />
+            <Setter Property="dxmvvm:Interaction.BehaviorsTemplate">
+                <Setter.Value>
+                    <DataTemplate>
+                        <ContentControl>
+                            <localBehavior:TimePickerBehavior TimeMask="HH:mm" Increment="5"/>
+                        </ContentControl>
+                    </DataTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </control:ChildWindow.Resources>
+    <Grid  x:Name="LayoutRoot" Margin="10" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid x:Name="subLayout">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100" />
+                <ColumnDefinition Width="5" />
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="10" />
+                <ColumnDefinition Width="100" />
+                <ColumnDefinition Width="5" />
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="5" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="5" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="5" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="5" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="5" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Category}" />
+            <ClientToolCtrl:ComboBoxEditor AppEnumName="InternalType" Grid.Column="2" SelectedItem="{Binding Category}" Grid.ColumnSpan="5"/>
+
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=StartDate}" Grid.Row="2" />
+            <ClientToolCtrl:DateEditor EditValue="{Binding StartDate}" Grid.Row="2" Grid.Column="2" />
+
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=StartTime}" Grid.Column="4" Grid.Row="2" />
+            <ClientToolCtrl:DateEditor EditValue="{Binding StartTime,Converter={StaticResource TimeSpanToDateTimeConverter}}" Grid.Row="2" Grid.Column="6" Mask="HH:mm" MaskUseAsDisplayFormat="True">
+                <ClientToolCtrl:DateEditor.StyleSettings>
+                    <dxe:DateEditTimePickerStyleSettings />
+                </ClientToolCtrl:DateEditor.StyleSettings>
+            </ClientToolCtrl:DateEditor>
+
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ToDate}" Grid.Row="6" />
+            <ClientToolCtrl:DateEditor EditValue="{Binding ToDate}" Grid.Row="6" Grid.Column="2" />
+
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ToTime}" Grid.Column="4" Grid.Row="6" />
+            <ClientToolCtrl:DateEditor EditValue="{Binding EndTime,Converter={StaticResource TimeSpanToDateTimeConverter}}" Grid.Row="6" Grid.Column="6" Mask="HH:mm" MaskUseAsDisplayFormat="True">
+                <ClientToolCtrl:DateEditor.StyleSettings>
+                    <dxe:DateEditTimePickerStyleSettings  />
+                </ClientToolCtrl:DateEditor.StyleSettings>
+            </ClientToolCtrl:DateEditor>
+
+            <TextBlock Text="{Binding TotalTime,Converter={StaticResource TimeSpanValueToHoursMinuteSecondConverter},ConverterParameter='H:M'}" Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="7" HorizontalAlignment="Center" />
+
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Comment}" Grid.Row="10" Grid.Column="0" />
+            <ClientToolCtrl:TextEditor AcceptsReturn="True" MinHeight="50" Text="{Binding Commment}" Grid.Column="2" Grid.ColumnSpan="5" Grid.Row="10" VerticalContentAlignment="Top" />
+
+        </Grid>
+        <StackPanel x:Name="actionButton" HorizontalAlignment="Center" Grid.Row="1" Orientation="Horizontal" Margin="0 10 0 0">
+            <Button x:Name="OKButton" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Save}"  IsDefault="True" Click="OKButton_Click" MinWidth="75" Height="23" 
+                    HorizontalAlignment="Right" Margin="0 0 3 0" />
+            <Button x:Name="CancelButton" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Cancel}" IsCancel="True" Click="CancelButton_Click" MinWidth="75"
+                    Height="23" HorizontalAlignment="Right"  Margin="0 0 3 0"/>
+        </StackPanel>
+    </Grid>
+</control:ChildWindow>

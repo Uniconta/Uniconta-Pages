@@ -22,6 +22,7 @@ using System.Windows.Shapes;
 using System.IO;
 using Corasau.Admin.API;
 using Uniconta.WindowsAPI.Service;
+using UnicontaAPI.Project.API;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -66,7 +67,7 @@ namespace UnicontaClient.Pages.CustomPage
             layoutItems.DataContext = editrow;
             currentTheme = editrow._Theme;
             Curlanguage = editrow._Language;
-            
+
             cbDefaultPrinter.ItemsSource = UtilDisplay.GetInstalledPrinters();
             CheckTwoFactorLogin(session.TwoFactorLoginUsed);
             RemoveMenu();
@@ -100,7 +101,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             string buildText = AssemblyBuildDate(this.GetType());
             txtXapBuildDate.Text = buildText;
-            txtClientVersion.Text =System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString();
+            txtClientVersion.Text = System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString();
             txtAPIVersion.Text = APIVersion.CurrentVersion.ToString();
         }
         private async void savePassword()
@@ -168,10 +169,6 @@ namespace UnicontaClient.Pages.CustomPage
                     AddDockItem(TabControls.ActiveSessionsPage, null, string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("ActiveSessions"), editrow._Name));
                     break;
                 case "LatestXap":
-#if SILVERLIGHT
-                    if (LoginPage.PCtype == LoginType.MAC_OOB)
-                        DownloadLatestXap(api, Dispatcher);
-#endif
                     break;
                 case "UserLayout":
                     AddDockItem(TabControls.UserLayoutPage, null, Uniconta.ClientTools.Localization.lookup("UserLayout"));
@@ -193,7 +190,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
             }
         }
-
+        
         async void RemoveTwoFactorLogin()
         {
             var userApi = new TwoFactorLogin(api.session);
@@ -297,7 +294,6 @@ namespace UnicontaClient.Pages.CustomPage
             cwCopylayoutdialog.Show();
 
         }
-#if !SILVERLIGHT
         private void Email_ButtonClicked(object sender)
         {
             var mail = string.Concat("mailto:", txtEmail.Text);
@@ -305,17 +301,5 @@ namespace UnicontaClient.Pages.CustomPage
             proc.StartInfo.FileName = mail;
             proc.Start();
         }
-#elif SILVERLIGHT
-
-        private void cbTheme_SelectedIndexChanged(object sender, RoutedEventArgs e)
-        {
-            var selectedIndex = cbTheme.SelectedIndex;
-            if(selectedIndex > 2)
-            {
-                MessageBox.Show(Uniconta.ClientTools.Localization.lookup("SilverlightSupport"),Uniconta.ClientTools.Localization.lookup("Warning"),MessageBoxButton.OK);
-                cbTheme.SelectedIndex = 0;
-            }
-        }
-#endif
     }
 }

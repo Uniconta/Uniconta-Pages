@@ -28,6 +28,7 @@ using Uniconta.ClientTools.Util;
 using UnicontaClient.Pages.Attachments;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
+using Uniconta.ClientTools.Controls;
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
@@ -49,8 +50,8 @@ namespace UnicontaClient.Pages.CustomPage
     }
     public partial class UserNotesPage : GridBasePage
     {
-         public UserNotesPage(UnicontaBaseEntity masterRecord)
-            : base(masterRecord)
+        public UserNotesPage(UnicontaBaseEntity masterRecord)
+           : base(masterRecord)
         {
             InitializeComponent();
             InitPage(masterRecord);
@@ -117,7 +118,7 @@ namespace UnicontaClient.Pages.CustomPage
             dgNotesGrid.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
         }
-       
+
         protected override void LoadCacheInBackGround() { LoadType(typeof(Uniconta.DataModel.NoteGroup)); }
 
         void localMenu_OnItemClicked(string ActionType)
@@ -142,7 +143,7 @@ namespace UnicontaClient.Pages.CustomPage
                             item.NotifyPropertyChanged("Created");
                         }
                     }
-                    SaveNotes();
+                    SaveNotesAndExit();
                     break;
                 case "DeleteRow":
                     dgNotesGrid.DeleteRow();
@@ -177,20 +178,30 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var master = dgNotesGrid.masterRecord;
             var emailProperties = master.GetType().GetProperties().Where(p => p.GetCustomAttribute<DataTypeAttribute>()?.DataType == DataType.EmailAddress).ToList();
+            bool propertyFound = false;
             foreach (var emailProperty in emailProperties)
             {
                 string email = emailProperty.GetValue(master, null) as string;
                 if (!string.IsNullOrEmpty(email))
                 {
-                    var mail = string.Concat("mailto:", email);
-                    System.Diagnostics.Process proc = new System.Diagnostics.Process();
-                    proc.StartInfo.FileName = mail;
-                    proc.Start();
+                    propertyFound = true;
+                    OutlookNotes outNotes = new OutlookNotes(api, master);
+                    outNotes.OpenOutLook(new UserNotesClient() { SendTo = email }, false);
                     break;
                 }
             }
+            if (!propertyFound)
+            {
+                OutlookNotes outNotes = new OutlookNotes(api, master);
+                outNotes.OpenOutLook(null, false);
+            }
         }
-        async void SaveNotes()
+        async void SaveNotesAndExit()
+        {
+            await SaveNotes();
+            this.CloseDockItem();
+        }
+        async Task SaveNotes()
         {
             dgNotesGrid.SelectedItem = null;
 
@@ -223,7 +234,22 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var selectedItem = dgNotesGrid.SelectedItem as UserNotesClient;
             if (selectedItem.IsMailNote)
-                OutlookNotes.OpenMail(selectedItem);
+            {
+                OutlookNotes outNotes = new OutlookNotes(api, dgNotesGrid.masterRecord);
+                outNotes.OpenOutLook(selectedItem, true, true);
+            }
         }
+
+        public override void Utility_Refresh(string screenName, object argument = null)
+        {
+            if (screenName == "UserNotes")
+            {
+                object[] editParams = new object[2];
+                editParams[0] = 1;
+                editParams[1] = argument;
+                Dispatcher.BeginInvoke(new Action(() => { dgNotesGrid.UpdateItemSource(editParams); }));
+                
+            } 
+    }
     }
 }

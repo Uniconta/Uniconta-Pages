@@ -272,6 +272,8 @@ namespace UnicontaClient.Pages.CustomPage
                 UtilDisplay.RemoveMenuCommand(rb, "FerieogFlex");
                 UtilDisplay.RemoveMenuCommand(rb, "Produktion");
             }
+            if (employee?._UserLogidId != api?.session?.LoginId)
+                UtilDisplay.RemoveMenuCommand(rb, "EmployeeRegistrationLinePage");
         }
 
         async void SetEmployee(Uniconta.DataModel.Employee master)
@@ -1978,6 +1980,10 @@ namespace UnicontaClient.Pages.CustomPage
                     ctrl.startupStartDate = txtDateTo.DateTime;
                     ctrl.startupView = "WeekView";
                     break;
+                case "EmployeeRegistrationLinePage":
+                    if (employee?._UserLogidId == api.session.LoginId)
+                        AddDockItem(TabControls.EmployeeRegistrationLinePage, employee, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Register"), employee._Name));
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -2007,14 +2013,14 @@ namespace UnicontaClient.Pages.CustomPage
                         _Day5 = cw.Day5,
                         _Day6 = cw.Day6,
                         _Day7 = cw.Day7,
-                        _Mileage = cw.MileageLst
+                        _Mileage = cw.Mileage
                     };
                     journalLine.SetMaster(api.CompanyEntity);
                     SetInvoiceable(journalLine);
                     dgTMJournalLineTransRegGrid.AddRow(journalLine);
                     if (cw.Returning)
                     {
-                        journalLine._Mileage = cw.MileageReturnLst;
+                        journalLine._Mileage = cw.MileageReturn;
                         dgTMJournalLineTransRegGrid.AddRow(journalLine);
                     }
                     dgTMJournalLineTransRegGrid.SaveData();
@@ -2165,7 +2171,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 }
                                 else
                                 {
-                                    lineclient._Mileage = rec._Mileage?[x-1];
+                                    lineclient._Mileage = rec._Mileage;
                                     lineclient._Text = rec._Text;
                                     lineclient._Unit = Uniconta.DataModel.ItemUnit.km;
                                     lineclient._Qty = qty;
@@ -2542,7 +2548,7 @@ namespace UnicontaClient.Pages.CustomPage
                     var rec = tmLinesLst.Where(s => s.RowId == error.RowId).FirstOrDefault();
                     if (rec != null)
                     {
-                        if (rec.HasError)
+                        if (rec.LogType == LogTypeEnum.Error)
                         {
                             rec.ErrorInfo += rec.ErrorInfo != string.Empty ? "\n" + error.Message : error.Message;
                             ret = false;
@@ -2704,8 +2710,10 @@ namespace UnicontaClient.Pages.CustomPage
                 }
                 #endregion
 
-                var cntErrLinesTime = tmLinesLst.Where(s => s._RegistrationType == RegistrationType.Hours && s.HasError).Count();
-                var cntErrLinesMileage = tmLinesLst.Where(s => s._RegistrationType == RegistrationType.Mileage && s.HasError).Count();
+                var cntErrLinesTime = tmLinesLst.Where(s => s._RegistrationType == RegistrationType.Hours && s.LogType == LogTypeEnum.Error).Count();
+                var cntWarningLinesTime = tmLinesLst.Where(s => s._RegistrationType == RegistrationType.Hours && s.LogType == LogTypeEnum.Warning).Count();
+
+                var cntErrLinesMileage = tmLinesLst.Where(s => s._RegistrationType == RegistrationType.Mileage && s.LogType == LogTypeEnum.Error).Count();
 
                 if (cntErrLinesTime != 0 || cntErrLinesMileage != 0)
                 {
@@ -2733,7 +2741,16 @@ namespace UnicontaClient.Pages.CustomPage
                 }
                 else if (showMsgOK)
                 {
-                    UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("ValidateNoError"), Uniconta.ClientTools.Localization.lookup("Validate"), MessageBoxButton.OK, MessageBoxImage.Information);
+                    var infoTxt = Uniconta.ClientTools.Localization.lookup("ValidateNoError");
+                    if (cntWarningLinesTime != 0)
+                        infoTxt = string.Concat(infoTxt, Environment.NewLine, Environment.NewLine, string.Concat(Uniconta.ClientTools.Localization.lookup("Warning"), ": ", string.Format(Uniconta.ClientTools.Localization.lookup("IsClosedOBJ"), Uniconta.ClientTools.Localization.lookup("Workspace"))));
+                    UnicontaMessageBox.Show(infoTxt, Uniconta.ClientTools.Localization.lookup("Validate"), MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                else if (cntWarningLinesTime != 0)
+                {
+                    var confirmationMsgBox = UnicontaMessageBox.Show(string.Format("{0}.\n{1}", string.Concat(Uniconta.ClientTools.Localization.lookup("Warning"),": ", string.Format(Uniconta.ClientTools.Localization.lookup("IsClosedOBJ"), Uniconta.ClientTools.Localization.lookup("Workspace"))), Uniconta.ClientTools.Localization.lookup("ProceedConfirmation")), Uniconta.ClientTools.Localization.lookup("Confirmation"), MessageBoxButton.OKCancel);
+                    if (confirmationMsgBox != MessageBoxResult.OK)
+                        return false;
                 }
             }
             return ret;

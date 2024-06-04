@@ -23,88 +23,77 @@ x:Class="UnicontaClient.Pages.CustomPage.RegisterMileage"
         <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
             <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="grpFirst">
                 <CorasauControls:CorasauLayoutGroup x:Name="grpDescription" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Description}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                    <CorasauControls:CorasauLayoutItem FieldName="Project" Name="ProjectItem">
-                        <CorasauControls:LookupEditor  x:Name="leProject" Text="{Binding Project,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="Text" x:Name="liText">
-                        <CorasauControls:TextEditor x:Name="txText" Text="{Binding Text,Mode=TwoWay}"  />
-                    </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="VechicleRegNo" x:Name="liVechicleRegNo">
                         <CorasauControls:TextEditor x:Name="txVechicleRegNo" Text="{Binding VechicleRegNo,Mode=TwoWay}"  />
                     </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="Qty" x:Name="liQty">
-                        <CorasauControls:TextEditor  x:Name="txtQty" Text="{Binding Qty,Mode=TwoWay}" MaskType="Numeric" Mask="N2" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liDate" FieldName="Date">
-                        <CorasauControls:DateEditor EditValue="{Binding Date,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
-                <CorasauControls:CorasauLayoutGroup x:Name="grpFrom" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=From}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                    <CorasauControls:CorasauLayoutItem FieldName="FromHome" Name="liFromHome">
-                        <CorasauControls:CheckEditor  x:Name="chkFromHome" IsChecked="{Binding FromHome,Mode=TwoWay}" Checked="chkFromHome_Checked" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="FromWork" Name="liFromWork">
-                        <CorasauControls:CheckEditor  x:Name="chkFromWork" IsChecked="{Binding FromWork,Mode=TwoWay}" Checked="chkFromWork_Checked" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="FromAccount" Name="liFromAccount">
-                        <CorasauControls:LookupEditor  x:Name="leFromAccount" Text="{Binding FromAccount,Mode=TwoWay}" EditValueChanged="leFromAccount_EditValueChanged"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="FromCompanyAddress" Name="liFromCompanyAddress">
-                        <CorasauControls:LookupEditor  x:Name="leFromCompanyAddress" Text="{Binding FromCompanyAddress,Mode=TwoWay}" EditValueChanged="leFromCompanyAddress_EditValueChanged"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liFromName" FieldName="FromName">
-                        <CorasauControls:TextEditor Text="{Binding FromName,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liFromAddress1" FieldName="FromAddress1">
-                        <CorasauControls:TextEditor Text="{Binding FromAddress1,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liFromAddress2" FieldName="FromAddress2">
-                        <CorasauControls:TextEditor Text="{Binding FromAddress2,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liFromZipCode" FieldName="FromZipCode" Style="{StaticResource LayoutItemsstyle}" ButtonClicked="LiFromZipCode_OnButtonClicked"  ButtonContent="&#x26EF;" Padding="0">
-                        <CorasauControls:TextEditor Text="{Binding FromZipCode,Mode=TwoWay}" x:Name="txtFromZipCode" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liFromCity" FieldName="FromCity">
-                        <CorasauControls:TextEditor Text="{Binding FromCity,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liFromCountry" FieldName="FromCountry" >
-                        <CorasauControls:ComboBoxEditor x:Name="cbFromCountry" AutoComplete="True" SelectedItem="{Binding FromCountry,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                </CorasauControls:CorasauLayoutGroup>
-                <CorasauControls:CorasauLayoutGroup x:Name="grpTo" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=To}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                    <CorasauControls:CorasauLayoutItem FieldName="ToHome" Name="liToHome">
-                        <CorasauControls:CheckEditor  x:Name="chkToHome" IsChecked="{Binding ToHome,Mode=TwoWay}" Checked="chkToHome_Checked" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="ToWork" Name="liToWork">
-                        <CorasauControls:CheckEditor  x:Name="chkToWork" IsChecked="{Binding ToWork,Mode=TwoWay}" Checked="chkToWork_Checked" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="ToAccount" Name="liToAccount">
-                        <CorasauControls:LookupEditor  x:Name="leToAccount" Text="{Binding ToAccount,Mode=TwoWay}" EditValueChanged="leToAccount_EditValueChanged"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="ToCompanyAddress" Name="liToCompanyAddress">
-                        <CorasauControls:LookupEditor  x:Name="leToCompanyAddress" Text="{Binding ToCompanyAddress,Mode=TwoWay}" EditValueChanged="leToCompanyAddress_EditValueChanged"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liToName" FieldName="ToName">
-                        <CorasauControls:TextEditor Text="{Binding ToName,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liToAddress1" FieldName="ToAddress1">
-                        <CorasauControls:TextEditor Text="{Binding ToAddress1,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liToAddress2" FieldName="ToAddress2">
-                        <CorasauControls:TextEditor Text="{Binding ToAddress2,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liToZipCode" FieldName="ToZipCode" Style="{StaticResource LayoutItemsstyle}" ButtonClicked="LiToZipCode_OnButtonClicked"  ButtonContent="&#x26EF;" Padding="0">
-                        <CorasauControls:TextEditor Text="{Binding ToZipCode,Mode=TwoWay}" x:Name="txtToZipCode" />
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liToCity" FieldName="ToCity">
-                        <CorasauControls:TextEditor Text="{Binding ToCity,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liToCountry" FieldName="ToCountry" >
-                        <CorasauControls:ComboBoxEditor x:Name="cbToCountry" AutoComplete="True" SelectedItem="{Binding ToCountry,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
+                <CorasauControls:CorasauLayoutGroup Orientation="Horizontal">
+                    <CorasauControls:CorasauLayoutGroup x:Name="grpFrom" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=From}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                        <CorasauControls:CorasauLayoutItem FieldName="FromHome" Name="liFromHome">
+                            <CorasauControls:CheckEditor  x:Name="chkFromHome" IsChecked="{Binding FromHome,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="FromWork" Name="liFromWork">
+                            <CorasauControls:CheckEditor  x:Name="chkFromWork" IsChecked="{Binding FromWork,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="FromAccount" Name="liFromAccount">
+                            <CorasauControls:LookupEditor  x:Name="leFromAccount" Text="{Binding FromAccount,Mode=TwoWay}" EditValueChanged="leFromAccount_EditValueChanged"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="FromCompanyAddress" Name="liFromCompanyAddress">
+                            <CorasauControls:LookupEditor  x:Name="leFromCompanyAddress" Text="{Binding FromCompanyAddress,Mode=TwoWay}" EditValueChanged="leFromCompanyAddress_EditValueChanged"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liFromName" FieldName="FromName">
+                            <CorasauControls:TextEditor Text="{Binding FromName,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liFromAddress1" FieldName="FromAddress1">
+                            <CorasauControls:TextEditor Text="{Binding FromAddress1,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liFromAddress2" FieldName="FromAddress2">
+                            <CorasauControls:TextEditor Text="{Binding FromAddress2,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liFromZipCode" FieldName="FromZipCode" Style="{StaticResource LayoutItemsstyle}" ButtonClicked="LiFromZipCode_OnButtonClicked"  ButtonContent="&#x26EF;" Padding="0">
+                            <CorasauControls:TextEditor Text="{Binding FromZipCode,Mode=TwoWay}" x:Name="txtFromZipCode" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liFromCity" FieldName="FromCity">
+                            <CorasauControls:TextEditor Text="{Binding FromCity,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liFromCountry" FieldName="FromCountry" >
+                            <CorasauControls:ComboBoxEditor x:Name="cbFromCountry" AutoComplete="True" SelectedItem="{Binding FromCountry,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                    </CorasauControls:CorasauLayoutGroup>
+                    <CorasauControls:CorasauLayoutGroup x:Name="grpTo" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=To}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                        <CorasauControls:CorasauLayoutItem FieldName="ToHome" Name="liToHome">
+                            <CorasauControls:CheckEditor  x:Name="chkToHome" IsChecked="{Binding ToHome,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="ToWork" Name="liToWork">
+                            <CorasauControls:CheckEditor  x:Name="chkToWork" IsChecked="{Binding ToWork,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="ToAccount" Name="liToAccount">
+                            <CorasauControls:LookupEditor  x:Name="leToAccount" Text="{Binding ToAccount,Mode=TwoWay}" EditValueChanged="leToAccount_EditValueChanged"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="ToCompanyAddress" Name="liToCompanyAddress">
+                            <CorasauControls:LookupEditor  x:Name="leToCompanyAddress" Text="{Binding ToCompanyAddress,Mode=TwoWay}" EditValueChanged="leToCompanyAddress_EditValueChanged"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liToName" FieldName="ToName">
+                            <CorasauControls:TextEditor Text="{Binding ToName,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liToAddress1" FieldName="ToAddress1">
+                            <CorasauControls:TextEditor Text="{Binding ToAddress1,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liToAddress2" FieldName="ToAddress2">
+                            <CorasauControls:TextEditor Text="{Binding ToAddress2,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liToZipCode" FieldName="ToZipCode" Style="{StaticResource LayoutItemsstyle}" ButtonClicked="LiToZipCode_OnButtonClicked"  ButtonContent="&#x26EF;" Padding="0">
+                            <CorasauControls:TextEditor Text="{Binding ToZipCode,Mode=TwoWay}" x:Name="txtToZipCode" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liToCity" FieldName="ToCity">
+                            <CorasauControls:TextEditor Text="{Binding ToCity,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liToCountry" FieldName="ToCountry" >
+                            <CorasauControls:ComboBoxEditor x:Name="cbToCountry" AutoComplete="True" SelectedItem="{Binding ToCountry,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                    </CorasauControls:CorasauLayoutGroup>
                 </CorasauControls:CorasauLayoutGroup>
             </CorasauControls:CorasauLayoutGroup>
-            
         </CorasauControls:CorasauLayoutControl>
     </Grid>
 </Pages:FormBasePage>

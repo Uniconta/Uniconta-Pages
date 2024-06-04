@@ -42,9 +42,13 @@
 		<RibbonItem Action="GeneratePurchaseOrder" LocalizedNameKey="GeneratePurchaseOrder" ControlName="CreditorOrders" LargeGlyph="Move_32x32" ShortcutKey="Ctrl+G" />
     <RibbonItem Action="Attach" LocalizedNameKey="Attach" LargeGlyph="Attachments_32x32"/>
   </RibbonItem>
-	<RibbonItem LocalizedNameKey="Bilagscan">
-		<RibbonItem Action="BilagscanSend" LocalizedNameKey="BilagscanSend" Module="Bilagscan" LargeGlyph=";component/Assets/img/Export_32x32" />
-		<RibbonItem Action="BilagscanRead" LocalizedNameKey="BilagscanRead" Module="Bilagscan" LargeGlyph=";component/Assets/img/Import_32x32" />
+	<RibbonItem>
+		<RibbonItem Action="Bilagscan" LocalizedNameKey="Bilagscan" LargeGlyph="Transfer_32x32">
+			<RibbonItem Action="BilagscanSend" LocalizedNameKey="BilagscanSend" Glyph="Export_16x16" />
+			<RibbonItem Action="BilagscanRead" LocalizedNameKey="BilagscanRead" Glyph="Import_16x16" />
+			<RibbonItem Action="BilagscanProfile" LocalizedNameKey="BilagscanProfile" Glyph="View_16x16" />
+			<RibbonItem Action="BilagscanCreateUser" LocalizedNameKey="CreateOBJ" Parameter="User" Glyph="save-16x16" />
+		</RibbonItem>
 	</RibbonItem>
 	<RibbonItem>
     <RibbonItem Action="EnvelopeWizard" LocalizedNameKey="CreateOBJ" Parameter="Envelope" Glyph="Envelope_32x32" LargeGlyph="Envelope_32x32"/>

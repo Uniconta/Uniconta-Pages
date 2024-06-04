@@ -1,4 +1,5 @@
-﻿using DevExpress.XtraScheduler.Outlook.Interop;
+﻿using DevExpress.Utils.Win;
+using DevExpress.XtraScheduler.Outlook.Interop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,8 +24,6 @@ namespace UnicontaClient.Pages.Attachments
         {
             InitializeComponent();
             this.DataContext = this;
-            cmbFolder.ItemsSource = new List<string> {Uniconta.ClientTools.Localization.lookup("Inbox"), Uniconta.ClientTools.Localization.lookup("SentItems") };
-            cmbFolder.SelectedIndex = 0;
             dtDateFilter.DateTime = DateTime.Now;
             this.Title = string.Format(Uniconta.ClientTools.Localization.lookup("ImportOBJ"), Uniconta.ClientTools.Localization.lookup("Mail"));
             this.KeyDown += CWCreateFolder_KeyDown;
@@ -35,7 +34,8 @@ namespace UnicontaClient.Pages.Attachments
         {
             Dispatcher.BeginInvoke(new System.Action(() =>
             {
-                    SaveButton.Focus();
+                SaveButton.Focus();
+                rdbInbox.IsChecked = true;
             }));
         }
 
@@ -67,20 +67,35 @@ namespace UnicontaClient.Pages.Attachments
             SetDialogResult(false);
         }
 
-        private void btnSearch_Click(object sender, RoutedEventArgs e)
-        {
-            var fromDate = dtDateFilter.DateTime;
-            var toDate = dtDateFilter.DateTime.AddDays(1);
-            var notes = OutlookNotes.ImportMails(cmbFolder.SelectedIndex, fromDate, toDate);
-            lstMails.ItemsSource = notes;
-        }
-
         private void ViewMail_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             var lbl = sender as Label;
             var userNote = lbl.Tag as UserNotesClient;
             if (userNote?.Token != null)
-                OutlookNotes.OpenMail(userNote);
+                OutlookNotes.ViewOutlookMail(userNote);
+        }
+
+        private void rdbSentItems_Checked(object sender, RoutedEventArgs e)
+        {
+            Import();
+        }
+
+        void Import()
+        {
+            var fromDate = dtDateFilter.DateTime;
+            var toDate = dtDateFilter.DateTime.AddDays(1);
+            int folder = rdbSentItems.IsChecked == true ? 1 : 0;
+            var notes = OutlookNotes.ImportMails(folder, fromDate, toDate);
+            lstMails.ItemsSource = notes;
+        }
+        private void rdbInbox_Checked(object sender, RoutedEventArgs e)
+        {
+            Import();
+        }
+
+        private void dtDateFilter_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
+        {
+            Import();
         }
     }
 }

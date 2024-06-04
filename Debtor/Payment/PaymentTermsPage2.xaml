@@ -68,13 +68,15 @@ x:Class="UnicontaClient.Pages.CustomPage.PaymentTermsPage2"
                 <CorasauControls:CorasauLayoutGroup x:Name="grpDays" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Days}" Orientation="Vertical" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                     <CorasauControls:CorasauLayoutItem FieldName="Days" x:Name="liDays">
                         <CorasauControls:IntegerEditor EditValue="{Binding Days,Mode=TwoWay}" SetMask="false"/>
-                        <!--<toolkitControls:NumericUpDown Value="{Binding Days,Mode=TwoWay}" Minimum="0" Maximum="1000"/>-->
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="EndOfMonth" x:Name="liEndofMonth">
                         <CheckBox x:Name="chkEndOfMonth" IsChecked="{Binding EndOfMonth,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="PartialPayment" x:Name="liPartialPayment">
                         <CheckBox x:Name="chkPartialPayment" IsChecked="{Binding PartialPayment,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="GraceDays" x:Name="liGraceDays" >
+                        <CorasauControls:IntegerEditor EditValue="{Binding GraceDays,Mode=TwoWay}" MaxLength="30"/>
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
 

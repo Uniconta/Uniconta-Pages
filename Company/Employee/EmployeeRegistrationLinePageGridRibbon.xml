@@ -3,10 +3,8 @@
 	<RibbonItem TabId="0" LocalizedNameKey="Home">
 		<!---When we create a new group and a new TabPage -->
 		<RibbonItem Action="AddRow" LocalizedNameKey="AddOBJ" Parameter="Activity" LargeGlyph="Add_32x32"/>
-		<RibbonItem Action="CopyRow" LocalizedNameKey="CopyOBJ" Parameter="Activity" LargeGlyph="Copy_32x32"/>
-    <RibbonItem Action="AddMileage" LocalizedNameKey="AddOBJ" Parameter="Mileage" LargeGlyph="Add_32x32"/>
-    <RibbonItem Action="EditMileage" LocalizedNameKey="EditOBJ" Parameter="Mileage" LargeGlyph="Edit_32x32"/>
-    <RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="Delete" Glyph="Delete_16x16" LargeGlyph="Delete_32x32"/>
+		<RibbonItem Action="EditRow" LocalizedNameKey="EditOBJ" Parameter="Activity" LargeGlyph="Edit_32x32"/>
+		<RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="Delete" Glyph="Delete_16x16" LargeGlyph="Delete_32x32"/>
 		<RibbonItem Action="SaveGrid" ShortcutKey="CTRL+S" LocalizedNameKey="Save" Glyph="save-16x16" LargeGlyph="save-32x32"/>
 		<RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh" LargeGlyph="refresh"/>
 	</RibbonItem>
@@ -23,8 +21,12 @@
 			<RibbonItem Action="ImportLayout" LocalizedNameKey="ImportLayout" Glyph="Import_16x16" LargeGlyph="Import_16x16" ShortcutKey=""/>
 			<RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16" ShortcutKey=""/>
 		</RibbonItem>
-	</RibbonItem>
+	</RibbonItem>	
 	<RibbonItem>
 		<RibbonItem Action="PrTransaction" LocalizedNameKey="Transactions" ControlName="ProjectTransactionPage" LargeGlyph="Transactions_32x32" ShortcutKey="CTRL+T"/>
+	</RibbonItem>
+	<RibbonItem>
+		<RibbonItem Action="ApproveAdmin" LocalizedNameKey="ApproveWeek" LargeGlyph="Approve_ByAdmin_32x32" />
+		<RibbonItem Action="ApproveEmployee" LocalizedNameKey="ApproveWeek" LargeGlyph="Approve_ByEmployee_32x32" />
 	</RibbonItem>
 </root>

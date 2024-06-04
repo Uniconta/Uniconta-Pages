@@ -1105,8 +1105,19 @@ namespace UnicontaClient.Pages.CustomPage
 
         private async void Approve(List<TimeSheetApprovalLocalClient> journalList)
         {
-            dgTimeSheetApprovalRpt.Columns.GetColumnByName("ErrorInfo").Visible = true;
             var cntJournals = journalList.Count;
+            var continueMsg = string.Format(Uniconta.ClientTools.Localization.lookup("JournalsMarkedApproval") + ". " + 
+                Uniconta.ClientTools.Localization.lookup("Accept") + "?", cntJournals);
+
+            var shouldContinue = UnicontaMessageBox.Show(continueMsg, Uniconta.ClientTools.Localization.lookup("TimeSheetApproval"),
+                MessageBoxButton.OKCancel, MessageBoxImage.Information);
+
+            if (MessageBoxResult.Cancel.Equals(shouldContinue))
+                return;
+
+            dgTimeSheetApprovalRpt.Columns.GetColumnByName("ErrorInfo").Visible = true;
+            dgTimeSheetApprovalRpt.Columns.GetColumnByName("ConfirmWarning").Visible = true;
+
             var cntOK = 0;
             var comp = api.CompanyEntity;
 
@@ -1193,11 +1204,17 @@ namespace UnicontaClient.Pages.CustomPage
                     #region Validate Lines
                     var valErrorsHours = await tmHelper.ValidateLines(tmLinesLst, startDateApprove, endDateApprove, emplApprove);
                     #endregion
+                    var cntErrLines = tmLinesLst.Where(s => s.LogType == LogTypeEnum.Error).Count();
+                    var cntWarningLines = tmLinesLst.Where(s => s.LogType == LogTypeEnum.Warning).Count(); 
 
-                    var cntErrLines = tmLinesLst.Where(s => s.HasError).Count();
                     if (cntErrLines != 0)
                     {
                         rec.ErrorInfo = string.Format("{0}: {1} {2}", Uniconta.ClientTools.Localization.lookup("TimeRegistration"), cntErrLines, Uniconta.ClientTools.Localization.lookup("JournalFailedValidation"));
+                        continue;
+                    }
+                    else if (cntWarningLines != 0 && !rec.ConfirmWarning)
+                    {
+                        rec.ErrorInfo = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("TimeRegistration"), Uniconta.ClientTools.Localization.lookup("Warning"));
                         continue;
                     }
 
@@ -1233,7 +1250,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 }
                                 else
                                 {
-                                    lineclient._Mileage = line._Mileage?[x - 1];
+                                    lineclient._Mileage = line._Mileage;
                                     lineclient._Text = line._Text;
                                     lineclient._Unit = Uniconta.DataModel.ItemUnit.km;
 
@@ -1351,13 +1368,17 @@ namespace UnicontaClient.Pages.CustomPage
                 }
             }
 
+
+            var msgText = cntOK != 0 ? string.Format("{0} {1}", cntOK, Uniconta.ClientTools.Localization.lookup("Approved").ToLower()) : null;
+
             var cntErr = cntJournals - cntOK;
-            string msgText = null;
-
-            msgText = cntOK != 0 ? string.Format("{0}: {1} {2}", Uniconta.ClientTools.Localization.lookup("TimeRegistration"), cntOK, Uniconta.ClientTools.Localization.lookup("Approved")) : msgText;
-            msgText = cntErr != 0 && msgText != null ? Environment.NewLine : msgText;
-            msgText = cntErr != 0 ? string.Format("{0}: {1} {2}", Uniconta.ClientTools.Localization.lookup("NotApproved"), cntErr, Uniconta.ClientTools.Localization.lookup("JournalEntry")) : msgText;
-
+            if (cntErr != 0) 
+            {
+                var errorText = string.Format("{0} {1}", cntErr, Uniconta.ClientTools.Localization.lookup("NotApproved"));
+                msgText = msgText != null ? msgText + Environment.NewLine + errorText : errorText;
+            }
+            
+            msgText = msgText ?? Uniconta.ClientTools.Localization.lookup("NoRecords");
             UnicontaMessageBox.Show(msgText, Uniconta.ClientTools.Localization.lookup("TimeSheetApproval"), MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
@@ -1521,6 +1542,9 @@ namespace UnicontaClient.Pages.CustomPage
                 NotifyPropertyChanged("Status");
             }
         }
+
+        [Display(Name = "ConfirmWarning", ResourceType = typeof(TMJournalLineText))]
+        public bool ConfirmWarning { get; set; }
 
         private string _ErrorInfo;
         [Display(Name = "SystemInfo", ResourceType = typeof(DCTransText))]

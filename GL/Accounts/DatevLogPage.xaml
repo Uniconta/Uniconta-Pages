@@ -1,0 +1,33 @@
+<Pages:GridBasePage xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.DatevLogPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
+             xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+             xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage">
+    <UserControl.Resources>
+        <local:UnderlineConverter x:Key="UnderlineConverter" />
+    </UserControl.Resources>
+    <Grid x:Name="LayoutRoot" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl x:Name="localMenu"  XMLSourcePath=";component/Assets/GridRibbonReadOnlyLayout.xml"/>
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <local:DatevLogGridClient x:Name="dgDatevLogGridClient" AutoGenerateColumns="None">
+                <local:DatevLogGridClient.Columns>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="UserName" Width="100" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="LogTime" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="HTTPBody" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="HTTPHeader"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="HTTPRESPONSEBody"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="HTTPConnMethod"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ToDate"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="SuppVersion" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="HTTPRESPONSECode" />
+                </local:DatevLogGridClient.Columns>
+            </local:DatevLogGridClient>
+        </CorasauControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

@@ -41,20 +41,21 @@ x:Class="UnicontaClient.Pages.CustomPage.QuickInvoice"
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="5"/>
                                 <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="5"/>
-                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="125" />
                                 <ColumnDefinition />
-                                <ColumnDefinition Width="100" />
-                                <ColumnDefinition Width="130" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="125" />
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="125" />
                                 <ColumnDefinition />
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CAccount}"  Grid.Column="0" Grid.Row="0" />
                             <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="0" HorizontalAlignment="Center" Margin="38,0,0,0">
                                 <CorasauControls:LookupEditor x:Name="LeAccount" MaxWidth="140"  EditValue="{Binding Account,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"   EditValueChanged="leAccount_EditValueChanged"   />
-                                <Button x:Name="btnAccount" Content="+"  Margin="3,0,0,0" HorizontalContentAlignment="Center"  Click="btnAccount_Click" />
+                                <Button x:Name="btnAccount" Content="+"  Margin="2,0,0,0" HorizontalContentAlignment="Center"  Click="btnAccount_Click" />
                             </StackPanel>
 
                             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Name}" Grid.Column="0" Grid.Row="2" />
@@ -69,26 +70,26 @@ x:Class="UnicontaClient.Pages.CustomPage.QuickInvoice"
                             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CostAccount}"  Grid.Column="0" Grid.Row="8" />
                             <CorasauControls:LookupEditor MaxWidth="170"  x:Name="LePostingAccount" EditValue="{Binding PostingAccount,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  Grid.Column="1" Grid.Row="8"  Margin="5,0,0,0"  />
 
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TransactionText}"  Grid.Column="0" Grid.Row="10" />
-                            <CorasauControls:TextEditor MaxWidth="170"   x:Name="txtPostingText"    Text="{Binding PostingText,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" Grid.Row="10"   Margin="5,0,0,0"  />
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TransactionText}"  Grid.Column="3" Grid.Row="0" />
+                            <CorasauControls:TextEditor MaxWidth="170"   x:Name="txtPostingText"    Text="{Binding PostingText,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Grid.Column="4" Grid.Row="0"  Margin="5,0,0,0"  />
 
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=InvoiceAmount}" Grid.Column="3" Grid.Row="0" />
-                            <CorasauControls:DoubleEditor MaxWidth="170"  FieldName="InvoiceAmount" Grid.Column="4" Grid.Row="0" Margin="5,0,0,0"  />
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=InvoiceAmount}" Grid.Column="3" Grid.Row="2" />
+                            <CorasauControls:DoubleEditor MaxWidth="170"  FieldName="InvoiceAmount" Grid.Column="4" Grid.Row="2" Margin="5,0,0,0"  />
 
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=EnteredVatAmount}" Grid.Column="3" Grid.Row="2" />
-                            <CorasauControls:DoubleEditor MaxWidth="170"  FieldName="EnteredVatAmount" Grid.Column="4" Grid.Row="2" Margin="5,0,0,0"  />
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=EnteredVatAmount}" Grid.Column="3" Grid.Row="4" />
+                            <CorasauControls:DoubleEditor MaxWidth="170"  FieldName="EnteredVatAmount"  Margin="5,0,0,0" Grid.Column="4" Grid.Row="4" />
 
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=PaymentMethod}" Grid.Column="3" Grid.Row="4" />
-                            <CorasauControls:ComboBoxEditor  MaxWidth="170" x:Name="cbPaymentMethod" SelectedItem="{Binding PaymentMethod,Mode=TwoWay}" Grid.Column="4" Grid.Row="4" Margin="5,0,0,0"  />
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=PaymentMethod}" Grid.Column="3" Grid.Row="6" />
+                            <CorasauControls:ComboBoxEditor  MaxWidth="170" x:Name="cbPaymentMethod" SelectedItem="{Binding PaymentMethod,Mode=TwoWay}"  Margin="5,0,0,0" Grid.Column="4" Grid.Row="6" />
 
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=PaymentId}" Grid.Column="3" Grid.Row="6" />
-                            <CorasauControls:TextEditor MaxWidth="170"  Text="{Binding PaymentId,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Grid.Column="4" Grid.Row="6" Margin="5,0,0,0"  />
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=PaymentId}"  Grid.Column="3" Grid.Row="8"  />
+                            <CorasauControls:TextEditor MaxWidth="170"  Text="{Binding PaymentId,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  Margin="5,0,0,0" Grid.Column="4" Grid.Row="8" />
 
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CashDiscountDate}" Grid.Column="3" Grid.Row="8" />
-                            <CorasauControls:DateEditor MaxWidth="170"  EditValue="{Binding CashDiscountDate,Mode=TwoWay}" Grid.Column="4" Grid.Row="8" Margin="5,0,0,0"  />
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CashDiscountDate}" Grid.Column="6" Grid.Row="0"/>
+                            <CorasauControls:DateEditor MaxWidth="170"  EditValue="{Binding CashDiscountDate,Mode=TwoWay}"  Margin="5,0,0,0"  Grid.Column="7" Grid.Row="0"/>
 
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CashDiscount}" Grid.Column="3" Grid.Row="10" />
-                            <CorasauControls:DoubleEditor MaxWidth="170"  FieldName="CashDiscount" Grid.Column="4" Grid.Row="10" Margin="5,0,0,0"  />
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CashDiscount}" Grid.Column="6" Grid.Row="2"  />
+                            <CorasauControls:DoubleEditor MaxWidth="170"  FieldName="CashDiscount" Grid.Column="7" Grid.Row="2" Margin="5,0,0,0"  />
 
                         </Grid>
                     </dxn:NavBarGroup>
@@ -104,10 +105,10 @@ x:Class="UnicontaClient.Pages.CustomPage.QuickInvoice"
                                 <RowDefinition Height="Auto"/>                               
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="100" />
+                                <ColumnDefinition Width="150" />
                                 <ColumnDefinition />
-                                <ColumnDefinition Width="100" />
-                                <ColumnDefinition Width="130" />
+                                <ColumnDefinition Width="10"  />
+                                <ColumnDefinition Width="150" />
                                 <ColumnDefinition />
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DeliveryName}" Grid.Column="0" Grid.Row="0" />
@@ -139,12 +140,14 @@ x:Class="UnicontaClient.Pages.CustomPage.QuickInvoice"
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="5"/>
                                 <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="5"/>
+                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="100" />
+                                <ColumnDefinition Width="150" />
                                 <ColumnDefinition />
-                                <ColumnDefinition Width="100" />
-                                <ColumnDefinition Width="100" />
+                                <ColumnDefinition Width="10"  />
+                                <ColumnDefinition Width="150" />
                                 <ColumnDefinition />
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=YourRef}" Grid.Column="0" Grid.Row="0" />
@@ -154,17 +157,19 @@ x:Class="UnicontaClient.Pages.CustomPage.QuickInvoice"
                             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OurRef}" Grid.Column="0" Grid.Row="4" />
                             <CorasauControls:TextEditor  MaxWidth="170" Text="{Binding OurRef,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  Grid.Column="1" Grid.Row="4" Margin="5,0,0,0"  />
                             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Remark}" Grid.Column="0" Grid.Row="6" />
-                            <CorasauControls:TextEditor MaxWidth="170"  Text="{Binding Remark,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  Grid.Column="1" Grid.Row="6" Margin="5,0,0,0"  AcceptsReturn="True" VerticalContentAlignment="Top" TextWrapping="Wrap" MinHeight="60"/>
+                            <CorasauControls:TextEditor MaxWidth="170"  Text="{Binding Remark,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  Grid.Column="1" Grid.Row="6" Margin="5,0,0,0"
+                                                        AcceptsReturn="True" VerticalContentAlignment="Top" TextWrapping="Wrap"  Grid.RowSpan="3"/>
 
-                            <TextBlock x:Name="tbProject" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Project}" Grid.Column="3" Grid.Row="0" />
-                            <CorasauControls:LookupEditor x:Name="Projectlookupeditor" EditValue="{Binding Project,Mode=TwoWay}" MaxWidth="170" Grid.Column="4" Grid.Row="0" Margin="5,0,0,0"  />
-                            <TextBlock x:Name="tbPrCategory" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Category}" Grid.Column="3" Grid.Row="2" />
-                            <CorasauControls:LookupEditor x:Name="PrCategorylookupeditor" EditValue="{Binding PrCategory,Mode=TwoWay}"  MaxWidth="170" Grid.Column="4" Grid.Row="2" Margin="5,0,0,0"  />
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Employee}" Grid.Column="3" Grid.Row="4" />
-                            <CorasauControls:LookupEditor x:Name="employeelookupeditor" EditValue="{Binding Employee,Mode=TwoWay}"  MaxWidth="170" Grid.Column="4" Grid.Row="4" Margin="5,0,0,0"  VerticalAlignment="Top" Height="25" />
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CustomsNo}" Grid.Column="3" Grid.Row="6" />
-                            <CorasauControls:TextEditor MaxWidth="170"  Text="{Binding CustomsNo,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  Grid.Column="4" Grid.Row="6" Margin="5,0,0,0" MinHeight="25" VerticalAlignment="Top" />
-                        
+                           
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Employee}" Grid.Column="3" Grid.Row="0" />
+                            <CorasauControls:LookupEditor x:Name="employeelookupeditor" EditValue="{Binding Employee,Mode=TwoWay}"  MaxWidth="170" Grid.Column="4" Grid.Row="0" Margin="5,0,0,0"  VerticalAlignment="Top" />
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CustomsNo}" Grid.Column="3" Grid.Row="2" />
+                            <CorasauControls:TextEditor MaxWidth="170"  Text="{Binding CustomsNo,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  Grid.Column="4" Grid.Row="2" Margin="5,0,0,0"  VerticalAlignment="Top" />
+                            <TextBlock x:Name="tbProject" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Project}" Grid.Column="3" Grid.Row="4" />
+                            <CorasauControls:LookupEditor x:Name="Projectlookupeditor" EditValue="{Binding Project,Mode=TwoWay}" MaxWidth="170" Grid.Column="4" Grid.Row="4" Margin="5,0,0,0"  />
+                            <TextBlock x:Name="tbPrCategory" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Category}" Grid.Column="3" Grid.Row="6" />
+                            <CorasauControls:LookupEditor x:Name="PrCategorylookupeditor" EditValue="{Binding PrCategory,Mode=TwoWay}"  MaxWidth="170" Grid.Column="4" Grid.Row="6" Margin="5,0,0,0"  />
+
                         </Grid>
                     </dxn:NavBarGroup>
                     <dxn:NavBarGroup Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Orders}" IsExpanded="False">
@@ -181,9 +186,9 @@ x:Class="UnicontaClient.Pages.CustomPage.QuickInvoice"
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="100" />
+                                <ColumnDefinition Width="150" />
                                 <ColumnDefinition />
-                                <ColumnDefinition Width="100" />
+                                <ColumnDefinition Width="10"  />
                                 <ColumnDefinition Width="150" />
                                 <ColumnDefinition />
                             </Grid.ColumnDefinitions>
@@ -229,10 +234,10 @@ x:Class="UnicontaClient.Pages.CustomPage.QuickInvoice"
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="100" />
+                                <ColumnDefinition Width="150" />
                                 <ColumnDefinition />
-                                <ColumnDefinition Width="100" />
-                                <ColumnDefinition Width="100" />
+                                <ColumnDefinition Width="10"  />
+                                <ColumnDefinition Width="150" />
                                 <ColumnDefinition />
                             </Grid.ColumnDefinitions>
                             <TextBlock x:Name="lbldim1"  Grid.Column="0" Grid.Row="0" />

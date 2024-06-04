@@ -61,7 +61,7 @@ x:Class="UnicontaClient.Pages.CustomPage.Payments"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ErrorInfo" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PaymentFormat" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Voucher" AllowThousandMask="false" Width="60"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="OnHold" Width="50"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="OnHold" Width="50" HideHeaderCheck="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Paid" Width="50"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="HasVoucher" Width="50"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Payment" Width="90"/>

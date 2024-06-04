@@ -69,6 +69,7 @@ namespace UnicontaClient.Pages.CustomPage
             return false;
         }
 
+        SQLCache IndustryCodes;
         private void InitPage()
         {
             InitializeComponent();
@@ -77,6 +78,7 @@ namespace UnicontaClient.Pages.CustomPage
             gridControl.api = api;
             gridControl.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
+            IndustryCodes = api.GetCache(typeof(IndustryCode));
         }
 
         void localMenu_OnItemClicked(string ActionType)
@@ -114,6 +116,12 @@ namespace UnicontaClient.Pages.CustomPage
         public override Task InitQuery()
         {
             return null;
+        }
+
+        protected override async Task LoadCacheInBackGroundAsync()
+        {
+            if (IndustryCodes == null)
+                IndustryCodes = await api.LoadCache(typeof(IndustryCode));
         }
 
         public virtual void LoadGrid()
@@ -164,7 +172,8 @@ namespace UnicontaClient.Pages.CustomPage
                     var address = ci.address;
                     var streetAddress = address.CompleteStreet;
                     if (Equal(ci.life.name, debtor._Name) && Equal(streetAddress, debtor._Address1) && Equal(address.street2, debtor._Address2) &&
-                               Equal(address.zipcode, debtor._ZipCode) && ci._invoiceinxml == debtor._InvoiceInXML && Equal(debtor.VatNumber, ci.vat))
+                               Equal(address.zipcode, debtor._ZipCode) && ci._invoiceinxml == debtor._InvoiceInXML && Equal(debtor.VatNumber, ci.vat) &&
+                               Equal(ci.industrycode?.code, debtor._IndustryCode))
                         continue;
 
                     var newDebtor = debtor;
@@ -179,6 +188,8 @@ namespace UnicontaClient.Pages.CustomPage
                         newDebtor.NewInvoiceInXML = "Rafrænn reikningur";
                     else
                         newDebtor.NewInvoiceInXML = "Enginn";
+                    if (ci.industrycode != null)
+                        newDebtor.NewIndustryCode = ci.industrycode.code;
 
                     newDebList.Add(newDebtor);
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("Loading") + " " + NumberConvert.ToString(newDebList.Count);
@@ -224,6 +235,7 @@ namespace UnicontaClient.Pages.CustomPage
                 item._City = item.NewCity;
                 item._Name = item.NewName;
                 item._InvoiceInXML = item.NewInvoiceInXML != "Enginn";
+                item._IndustryCode = item.NewIndustryCode;
                 item._VatNumber = item.NewVatNumber;
                 lst2[i] = item;
                 i++;
@@ -281,6 +293,11 @@ namespace UnicontaClient.Pages.CustomPage
                 companyInfo.life = life;
                 companyInfo.vat = ccData.VAT;
                 companyInfo._invoiceinxml = ccData.UniMsg != "";
+                if (!string.IsNullOrEmpty(ccData.Isat))
+                {
+                    companyInfo.industrycode = new Industrycode();
+                    companyInfo.industrycode.code = ccData.Isat;
+                }
                 return companyInfo;
             }
         }
@@ -288,7 +305,7 @@ namespace UnicontaClient.Pages.CustomPage
 
     public class DebtorClientLocal_Iceland : DebtorClient
     {
-        private string _address, _address2, _city, _zipCode, _name;
+        private string _address, _address2, _city, _zipCode, _name, _industryCode;
         private new string _InvoiceInXML, _VatNumber;
 
         [StringLength(60)]
@@ -318,6 +335,9 @@ namespace UnicontaClient.Pages.CustomPage
         [Display(Name = "NewName", ResourceType = typeof(DCAccountText))]
         public string NewName { get { return _name; } set { _name = value; NotifyPropertyChanged("NewName"); } }
 
+        [ForeignKeyAttribute(ForeignKeyTable = typeof(IndustryCode))]
+        [Display(Name = "NewIndustryCode", ResourceType = typeof(DCAccountText))]
+        public string NewIndustryCode { get { return _industryCode; } set { _industryCode = value; NotifyPropertyChanged("NewIndustryCode"); } }
     }
 
     public class DebCred_AccountText : DCAccountText
@@ -329,6 +349,7 @@ namespace UnicontaClient.Pages.CustomPage
     public class CompanyCloudData : RSK_companyData
     {
         public string UniMsg { get; set; }
+        public string Isat { get; set; }
     }
 
     public class CompanyInfoIceland : CompanyInfo

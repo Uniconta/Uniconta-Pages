@@ -160,7 +160,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrderLines"
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="ReferenceNumber" Width="70" Visible="False"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Week" Width="50" Visible="False" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Date" Width="90" Visible="False"/>
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="SerieBatchMarked" Width="90" HideHeaderCheck="true" Visible="False"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="SerieBatchMarked" Width="90" HideHeaderCheck="true" ReadOnly="True" Visible="False"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="PostingAccount" Width="100" Visible="False"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="PostingText" Width="100" Visible="False"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="PurchaseAccount" Width="100" Visible="False"/>

@@ -151,6 +151,16 @@ namespace UnicontaClient.Pages.CustomPage
             UnicontaClient.Utilities.Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
             SetDimensionLocalMenu();
             SetLayoutSalesCostValue();
+
+            EmployeeFeeCostValue.Visible = EmployeeFeeCostValue.ShowInColumnChooser =
+            EmployeeFeeJournalCostValue.Visible = EmployeeFeeJournalCostValue.ShowInColumnChooser =
+            ExpensesCostValue.Visible = ExpensesCostValue.ShowInColumnChooser =
+            RevenueCostValue.Visible = RevenueCostValue.ShowInColumnChooser =
+            InvoicedCostValue.Visible = InvoicedCostValue.ShowInColumnChooser =
+            TotalInvoicedCostValue.Visible = TotalInvoicedCostValue.ShowInColumnChooser =
+            AdjustmentCostValue.Visible = AdjustmentCostValue.ShowInColumnChooser =
+            OpeningBalanceCostValue.Visible = OpeningBalanceCostValue.ShowInColumnChooser =
+            ClosingBalanceCostValue.Visible = ClosingBalanceCostValue.ShowInColumnChooser = !api.CompanyEntity.HideCostPrice && showWIPCostvalue;
         }
 
         public override Task InitQuery()
@@ -820,6 +830,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             LoadType(new Type[] { typeof(Uniconta.DataModel.PrCategory), typeof(Uniconta.DataModel.PrWorkSpace), typeof(Uniconta.DataModel.Employee), typeof(Uniconta.DataModel.PrType) });
         }
+        public override bool FilterOnLoadLayout => false;
     }
 
     public class StaticValues
@@ -1038,6 +1049,6 @@ namespace UnicontaClient.Pages.CustomPage
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-
+      
     }
 }

@@ -63,6 +63,19 @@ namespace UnicontaClient.Pages.CustomPage
                         it._DiscountPct, it._Discount, it._Variant1, it._Variant2, it._Variant3, it._Variant4, it._Variant5, it._Unit, it._Date, it._Week, it._Note));
                 }
             }
+            else if (row is ProjectInvoiceProposalLineClient)
+            {
+                lst = new List<ProjectReservationLineClient>();
+                foreach (var _it in copyFromRows)
+                {
+                    var it = (ProjectInvoiceProposalLineClient)_it;
+                    var itemCache = api.CompanyEntity.GetCache(typeof(InvItem));
+                    if (it._Item == null || (itemCache?.Get(it._Item) as InvItem)?._ItemType != (byte)ItemType.Item)
+                        continue;
+                    lst.Add(CreateNewReservationLine(it._Item, it._Qty, it._Text, it._Price, it._AmountEntered, it._DiscountPct, it._Discount, it._Variant1, it._Variant2, it._Variant3, it._Variant4, it._Variant5, it._Unit,
+                        it._Date, it._Week, it._Note));
+                }
+            }
             else if (row is DCOrderLine)
             {
                 lst = new List<ProjectReservationLineClient>();
@@ -120,7 +133,8 @@ namespace UnicontaClient.Pages.CustomPage
     public partial class ProjReservationLine : GridBasePage
     {
         SQLCache items, standardVariants, variants1, variants2, employees;
-        ProjectReservation Order { get { return dgProjReservationLineGrid.masterRecord as ProjectReservation; } }
+        ProjectClient ProjectOrder { get { return dgProjReservationLineGrid.masterRecord as ProjectClient; } }
+        ProjectReservation Order;
         FindPrices PriceLookup;
         Company company;
         double exchangeRate;
@@ -197,8 +211,12 @@ namespace UnicontaClient.Pages.CustomPage
 
         void SetupMaster(UnicontaBaseEntity args)
         {
+            this.Order = new ProjectReservation();
+            Order.SetMaster(args);
+            Order.RowId = (args as IRowId).RowId;
+
             PriceLookup = null;
-            var OrderId = Order?.RowId;
+            var OrderId = Order.RowId;
             dgProjReservationLineGrid.UpdateMaster(args);
             if (Order?.RowId != OrderId)
                 PriceLookup = new Uniconta.API.DebtorCreditor.FindPrices(Order, api);
@@ -206,10 +224,10 @@ namespace UnicontaClient.Pages.CustomPage
 
         void SetHeader()
         {
-            var syncMaster = Order;
+            var syncMaster = ProjectOrder;
             string header = null;
             if (syncMaster != null)
-                header = string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("ReservationLine"), syncMaster._OrderNumber);
+                header = string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("ReservationLine"), syncMaster._Number);
             if (header != null)
                 SetHeader(header);
         }
@@ -222,6 +240,11 @@ namespace UnicontaClient.Pages.CustomPage
                 Task.ShowInColumnChooser = true;
             SetVariantColumns();
             UnicontaClient.Utilities.Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
+            Margin.Visible = Margin.ShowInColumnChooser = MarginRatio.Visible = MarginRatio.ShowInColumnChooser =
+            CostValue.Visible = CostValue.ShowInColumnChooser = CostPrice.Visible = CostPrice.ShowInColumnChooser = !api.CompanyEntity.HideCostPrice;
+            RibbonBase rb = (RibbonBase)localMenu.DataContext;
+            if (company.HideCostPrice)
+                UtilDisplay.RemoveMenuCommand(rb, new string[] { "CostValue", "DB" });
         }
 
         void SetVariantColumns()
@@ -540,7 +563,6 @@ namespace UnicontaClient.Pages.CustomPage
             double Amountsum = ret.Item1;
             double Costsum = ret.Item2;
             double sales = ret.Item3;
-            ord._OrderTotal = sales;
             if (ord._EndDiscountPct != 0)
                 sales *= (100d - ord._EndDiscountPct) / 100d;
 
@@ -576,7 +598,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void localMenu_OnItemClicked(string ActionType)
         {
             ProjectReservationLineClient row;
-            ProjectReservation ord = this.Order;
+            var ord = this.Order;
             var selectedItem = dgProjReservationLineGrid.SelectedItem as ProjectReservationLineClient;
             switch (ActionType)
             {
@@ -600,24 +622,6 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "DeleteRow":
                     dgProjReservationLineGrid.DeleteRow();
-                    break;
-                case "AddItems":
-                    if (this.items != null)
-                    {
-                        object[] paramArray = new object[3] { new InvItemSalesCacheFilter(this.items), dgProjReservationLineGrid.TableTypeUser, Order };
-                        AddDockItem(TabControls.AddMultipleInventoryItem, paramArray, true,
-                            string.Format(Uniconta.ClientTools.Localization.lookup("AddOBJ"), Uniconta.ClientTools.Localization.lookup("InventoryItems")), null, floatingLoc: Utility.GetDefaultLocation());
-                    }
-                    break;
-                case "AddVariants":
-                    var itm = selectedItem?.InvItem;
-                    if (itm?._StandardVariant != null)
-                    {
-                        var paramItem = new object[] { selectedItem, ord };
-                        dgProjReservationLineGrid.SetLoadedRow(selectedItem);
-                        AddDockItem(TabControls.ItemVariantAddPage, paramItem, true,
-                        string.Format(Uniconta.ClientTools.Localization.lookup("AddOBJ"), Uniconta.ClientTools.Localization.lookup("Variants")), null, floatingLoc: Utility.GetDefaultLocation());
-                    }
                     break;
                 case "CreateFromInvoice":
                     try

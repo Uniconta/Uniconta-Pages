@@ -44,6 +44,8 @@ namespace UnicontaClient.Pages.CustomPage
         {
             base.OnLayoutLoaded();
             setDim();
+            Margin.Visible = Margin.ShowInColumnChooser = MarginRatio.Visible = MarginRatio.ShowInColumnChooser =
+            CostValue.Visible = CostValue.ShowInColumnChooser = !api.CompanyEntity.HideCostPrice;
         }
 
         private void LocalMenu_OnItemClicked(string ActionType)

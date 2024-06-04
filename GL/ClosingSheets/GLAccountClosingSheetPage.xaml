@@ -7,6 +7,7 @@ x:Class="UnicontaClient.Pages.CustomPage.GLAccountClosingSheetPage"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
     xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
     mc:Ignorable="d"
     xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
     xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage" 
@@ -88,10 +89,10 @@ x:Class="UnicontaClient.Pages.CustomPage.GLAccountClosingSheetPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PrimoAccount" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ExternalNo" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Currency" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="SheetNote" Width="200">
-                        <localPage:CorasauDataGridTemplateColumnClient.EditSettings>
-                            <editor:TextEditSettings TextWrapping="Wrap" AcceptsReturn="True"/>
-                        </localPage:CorasauDataGridTemplateColumnClient.EditSettings>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="SheetNote" Width="50" AllowEditing="True" ReadOnly="False">
+                            <localPage:CorasauDataGridTemplateColumnClient.EditSettings>
+                                <editor:MemoEditSettings MaxLength="4000"/>
+                            </localPage:CorasauDataGridTemplateColumnClient.EditSettings>
                     </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Comment" Width="100"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim1" FieldName="Dim1ParmDisplay" Visible="False"/>

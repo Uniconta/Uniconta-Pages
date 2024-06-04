@@ -21,7 +21,7 @@ namespace UnicontaClient.Pages.CustomPage
 {
     public class TMJournalLineStartStopGrid : CorasauDataGridClient
     {
-        public override Type TableType { get { return typeof(ProjectJournalLineLocal); } }
+        public override Type TableType { get { return typeof(ProjectJournalLineClient); } }
         public override IComparer GridSorting { get { return new ProjectJournalLineSort(); } }
         public override bool IsAutoSave { get { return false; } }
         public bool IsTime { get; set; }
@@ -100,7 +100,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             busyIndicator.IsBusy = true;
             var masters = new List<UnicontaBaseEntity> { projectJournal };
-            var prJrnLineLst = await api.Query<ProjectJournalLineLocal>(masters, null);
+            var prJrnLineLst = await api.Query<ProjectJournalLineClient>(masters, null);
             dgJournalLineStartStopPageGrid.ItemsSource = prJrnLineLst?.Where(x => x.Qty == 0 && x.TimeTo.TimeOfDay.ToString() == "00:00:00" && !string.IsNullOrEmpty(x.Text) && !x.Text.Contains("Text:")).ToList();
             dgJournalLineStartStopPageGrid.Visibility = Visibility.Visible;
             busyIndicator.IsBusy = false;
@@ -114,12 +114,12 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void localMenu_OnItemClicked(string ActionType)
         {
-            var selectedItem = dgJournalLineStartStopPageGrid.SelectedItem as ProjectJournalLineLocal;
+            var selectedItem = dgJournalLineStartStopPageGrid.SelectedItem as ProjectJournalLineClient;
             switch (ActionType)
             {
                 case "AddRow":
                     {
-                        var newItem = new ProjectJournalLineLocal();
+                        var newItem = new ProjectJournalLineClient();
                         newItem.SetMaster(projectJournal);
                         AddDockItem(TabControls.TmJournalLineStartStopPage2, new object[] { newItem, false, true }, Uniconta.ClientTools.Localization.lookup("StartTimeRegistration"), "Add_16x16");
                     }
@@ -140,7 +140,7 @@ namespace UnicontaClient.Pages.CustomPage
                         EditAll();
                     break;
                 case "AddLine":
-                    var newLIne = new ProjectJournalLineLocal();
+                    var newLIne = new ProjectJournalLineClient();
                     newLIne.SetMaster(projectJournal);
                     newLIne.TimeFrom = DateTime.Now;
                     dgJournalLineStartStopPageGrid.AddRow(newLIne);
@@ -169,12 +169,12 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        void CopyRecord(ProjectJournalLineLocal selectedItem)
+        void CopyRecord(ProjectJournalLineClient selectedItem)
         {
             if (selectedItem == null)
                 return;
 
-            var projectJournalLine = Activator.CreateInstance(selectedItem.GetType()) as ProjectJournalLineLocal;
+            var projectJournalLine = Activator.CreateInstance(selectedItem.GetType()) as ProjectJournalLineClient;
             CorasauDataGrid.CopyAndClearRowId(selectedItem, projectJournalLine);
             AddDockItem(TabControls.DebtorAccountPage2, new object[2] { projectJournalLine, IdObject.get(false) }, Uniconta.ClientTools.Localization.lookup("DebtorAccount"), "Add_16x16");
         }
@@ -260,7 +260,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        async void Stop(ProjectJournalLineLocal selectedItem)
+        async void Stop(ProjectJournalLineClient selectedItem)
         {
             TimeToRounding(selectedItem);
             if (company.TimeManagement)
@@ -291,7 +291,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         }
 
-        private async Task<ErrorCodes> InsertTMJournalLine(ProjectJournalLineLocal selectedItem)
+        private async Task<ErrorCodes> InsertTMJournalLine(ProjectJournalLineClient selectedItem)
         {
             TMJournalLineClient tmJournalLine = new TMJournalLineClient
             {
@@ -320,7 +320,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         async protected override Task<ErrorCodes> saveGrid()
         {
-            var visibleItems = dgJournalLineStartStopPageGrid.VisibleItems.Cast<ProjectJournalLineLocal>();
+            var visibleItems = dgJournalLineStartStopPageGrid.VisibleItems.Cast<ProjectJournalLineClient>();
 
             ErrorCodes result = await base.saveGrid();
             if (visibleItems == null || result != ErrorCodes.Succes)
@@ -356,7 +356,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             return result;
         }
-        void GetHours(ProjectJournalLineLocal PrJrLine, TMJournalLineClient tmJrLine)
+        void GetHours(ProjectJournalLineClient PrJrLine, TMJournalLineClient tmJrLine)
         {
             TimeSpan ts = PrJrLine.TimeTo - PrJrLine.TimeFrom;
             var weekDay = (int)DateTime.Now.DayOfWeek;
@@ -387,7 +387,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        void TimeToRounding(ProjectJournalLineLocal lineClient)
+        void TimeToRounding(ProjectJournalLineClient lineClient)
         {
             var roundingEnum = AppEnums.TMRounding.IndexOf(companySettings.RoundingStop);
             var time = lineClient.TimeTo.TimeOfDay.TotalSeconds;

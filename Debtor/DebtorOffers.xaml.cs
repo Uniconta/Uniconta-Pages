@@ -94,7 +94,7 @@ namespace UnicontaClient.Pages.CustomPage
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             ribbonControl.DisableButtons(new string[] { "UndoDelete", "DeleteRow", "SaveGrid" });
         }
-       
+
         protected override void OnLayoutLoaded()
         {
             base.OnLayoutLoaded();
@@ -126,6 +126,8 @@ namespace UnicontaClient.Pages.CustomPage
                 Task.ShowInColumnChooser = Task.Visible = false;
             else
                 Task.ShowInColumnChooser = true;
+            Margin.Visible = Margin.ShowInColumnChooser = MarginRatio.Visible = MarginRatio.ShowInColumnChooser =
+            CostValue.Visible = CostValue.ShowInColumnChooser = !api.CompanyEntity.HideCostPrice;
         }
 
         protected override void LoadCacheInBackGround()
@@ -408,6 +410,8 @@ namespace UnicontaClient.Pages.CustomPage
 
                     if (!result)
                         Utility.ShowJournalError(invoicePostingResult.PostingResult.ledgerRes, dgDebtorOffers);
+                    else
+                        DebtorOrders.Updatedata(dbOrder, CompanyLayoutType.Offer);
                 }
             };
             GenrateOfferDialog.Show();

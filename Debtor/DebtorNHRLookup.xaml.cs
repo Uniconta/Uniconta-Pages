@@ -70,6 +70,7 @@ namespace UnicontaClient.Pages.CustomPage
             gridControl.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             localMenu.OnChecked += LocalMenu_OnChecked;
+            txtValidateNumber.Text = "300";
             GetMenuItem();
 
             debtorCache = api.GetCache<Uniconta.DataModel.Debtor>();
@@ -232,6 +233,7 @@ namespace UnicontaClient.Pages.CustomPage
             int cntNHRInActive = 0;
             int cntNHRActive = 0;
 
+            int validateMax = string.IsNullOrWhiteSpace(txtValidateNumber.Text) ? 0 : (int)NumberConvert.ToInt(txtValidateNumber.Text);
             var newDebNHRLst = new List<DebtorNHR>(debtorList.Count());
             int cntTotal = debtorList.Length;
 
@@ -249,12 +251,6 @@ namespace UnicontaClient.Pages.CustomPage
 
                 try
                 {
-                    if (HasGLNSetting(debtor))
-                    {
-                        cntNHRActive++;
-                        continue;
-                    }
-
                     cntAll++;
                     if (cntAll == 1 || cntAll == cntTotal || (cntAll % 50) == 0)
                     {
@@ -262,34 +258,54 @@ namespace UnicontaClient.Pages.CustomPage
                         busyIndicator.IsBusy = false;
                     }
 
+                    bool doSkip = false; 
+                    if (HasGLNSetting(debtor))
+                    {
+                        cntNHRActive++;
+                        doSkip = true;
+                    }
+
                     var nhrInfo = await NHR.Lookup(debtor, isLive);
-                    if (nhrInfo == null || nhrInfo.NotRegistered)
+                    if (nhrInfo == null || nhrInfo.NotRegistered || debtor._InvoiceInPepPol)
                     {
                         cntNHRInActive++;
-                        continue;
+                        doSkip = true;
                     }
 
-                    switch (nhrInfo.Status)
+                    if (!doSkip)
                     {
-                        case NemhandelStatus.OK: cntNHRActive++; break;
-                        case NemhandelStatus.ActivateNHR: cntActivateNHR++; break;
-                        case NemhandelStatus.DeactivateNHR: cntDeactivateNHR++; break;
-                        case NemhandelStatus.UpdateRegistration: cntUpdateRegistration++; break;
-                        case NemhandelStatus.ErrorRegistration: cntErrorRegistration++; break;
+                        switch (nhrInfo.Status)
+                        {
+                            case NemhandelStatus.OK: cntNHRActive++; break;
+                            case NemhandelStatus.ActivateNHR: cntActivateNHR++; break;
+                            case NemhandelStatus.DeactivateNHR: cntDeactivateNHR++; break;
+                            case NemhandelStatus.UpdateRegistration: cntUpdateRegistration++; break;
+                            case NemhandelStatus.ErrorRegistration: cntErrorRegistration++; break;
+                        }
+
+                        if (nhrInfo.Status != Uniconta.ClientTools.NemhandelStatus.OK && nhrInfo.Status != Uniconta.ClientTools.NemhandelStatus.None)
+                        {
+                            var debtorNHR = debtor;
+                            debtorNHR.StatusInfo = nhrInfo.StatusInfo;
+                            debtorNHR.NewGLN = nhrInfo.GLNNew;
+                            debtorNHR.OnlyOIORASP = nhrInfo.OnlyOIORASP;
+                            debtorNHR._Status = (byte)nhrInfo.Status;
+                            debtorNHR.EndPointURL = nhrInfo.EndPointURL;
+                            debtorNHR.EndPointRegisterName = nhrInfo.EndPointRegisterName;
+                            debtorNHR.GLNSource = nhrInfo.GLNList;
+
+                            newDebNHRLst.Add(debtorNHR);
+                        }
                     }
 
-                    if (nhrInfo.Status != Uniconta.ClientTools.NemhandelStatus.OK && nhrInfo.Status != Uniconta.ClientTools.NemhandelStatus.None)
+                    if (validateMax > 0 && nhrInfo != null && !nhrInfo.Found)
                     {
-                        var debtorNHR = debtor;
-                        debtorNHR.StatusInfo = nhrInfo.StatusInfo;
-                        debtorNHR.NewGLN = nhrInfo.GLNNew;
-                        debtorNHR.OnlyOIORASP = nhrInfo.OnlyOIORASP;
-                        debtorNHR._Status = (byte)nhrInfo.Status;
-                        debtorNHR.EndPointURL = nhrInfo.EndPointURL;
-                        debtorNHR.EndPointRegisterName = nhrInfo.EndPointRegisterName;
-                        debtorNHR.GLNSource = nhrInfo.GLNList;
-
-                        newDebNHRLst.Add(debtorNHR);
+                        validateMax--;
+                        if (validateMax <= 0)
+                        {
+                            busyIndicator.IsBusy = false;
+                            break;
+                        }
                     }
                 }
                 catch
@@ -299,7 +315,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
             ClearBusy();
             dgDebtorNHRLookup.ItemsSource = newDebNHRLst;
-            SetStatusText(cntTotal, cntNHRInActive, cntNHRActive, cntActivateNHR, cntDeactivateNHR, cntUpdateRegistration, cntErrorRegistration);
+            SetStatusText(cntTotal, cntNHRInActive, cntNHRActive, cntActivateNHR, cntDeactivateNHR, cntUpdateRegistration, cntErrorRegistration, cntAll);
             iActivate.IsChecked = true;
             iDeavtivate.IsChecked = true;
         }
@@ -389,7 +405,10 @@ namespace UnicontaClient.Pages.CustomPage
                     continue;
 
                 if (dcAcc._Status == (byte)NemhandelStatus.ActivateNHR)
+                {
                     eInvoice = true;
+                    newGLN = dcAcc.NewGLN;
+                }
                 else if (dcAcc._Status == (byte)NemhandelStatus.DeactivateNHR)
                     eInvoice = false;
                 else if (dcAcc._Status == (byte)NemhandelStatus.UpdateRegistration || dcAcc._Status == (byte)NemhandelStatus.ErrorRegistration)
@@ -419,6 +438,8 @@ namespace UnicontaClient.Pages.CustomPage
 
                 dcAcc._Status = (byte)NemhandelStatus.OK;
                 dcAcc._InvoiceInXML = eInvoice;
+                if (eInvoice)
+                    dcAcc._InvoiceEmail = null;
                 if (newGLN != null)
                     dcAcc.EAN = newGLN;
 
@@ -432,14 +453,14 @@ namespace UnicontaClient.Pages.CustomPage
             return api.Update(lst1, lst2);
         }
 
-        void SetStatusText(int total, int nhrInActive, int nhrActive, int activateNHR, int deactivateNHR, int updateRegistration, int errorRegistration)
+        void SetStatusText(int total, int nhrInActive, int nhrActive, int activateNHR, int deactivateNHR, int updateRegistration, int errorRegistration, int cntAll)
         {
             RibbonBase rb = (RibbonBase)localMenu.DataContext;
             var groups = UtilDisplay.GetMenuCommandsByStatus(rb, true);
 
             var totalTxt = Uniconta.ClientTools.Localization.lookup("NumberOfCustomers");
-            //var nhrActiveTxt = "Send via Nemhandel";
-            //var nhrInActiveTxt = Uniconta.ClientTools.Localization.lookup("NemhandelNotRegistered");
+            var numberChecked = Uniconta.ClientTools.Localization.lookup("NumberChecked");
+
             var nhrActiveTxt = string.Format(Uniconta.ClientTools.Localization.lookup("NemhandelOBJ"), Uniconta.ClientTools.Localization.lookup("Active").ToLower());
             var nhrInActiveTxt = string.Format(Uniconta.ClientTools.Localization.lookup("NemhandelOBJ"), Uniconta.ClientTools.Localization.lookup("Inactive").ToLower());
 
@@ -452,6 +473,8 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 if (grp.Caption == totalTxt)
                     grp.StatusValue = NumberConvert.ToString(total);
+                else if (grp.Caption == numberChecked)
+                    grp.StatusValue = NumberConvert.ToString(cntAll);
                 else if (grp.Caption == nhrActiveTxt)
                     grp.StatusValue = NumberConvert.ToString(nhrActive);
                 else if (grp.Caption == nhrInActiveTxt)

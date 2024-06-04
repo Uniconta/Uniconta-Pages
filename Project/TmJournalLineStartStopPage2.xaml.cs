@@ -26,7 +26,7 @@ namespace UnicontaClient.Pages.CustomPage
 {
     public partial class TmJournalLineStartStopPage2 : FormBasePage
     {
-        ProjectJournalLineLocal editrow;
+        ProjectJournalLineClient editrow;
         SQLCache ProjectCache, JournalCache, payrollCache;
         CompanySettingsClient companySettings;
         bool IsTime;
@@ -35,13 +35,13 @@ namespace UnicontaClient.Pages.CustomPage
             globalEvents.OnRefresh(NameOfControl, RefreshParams);
         }
         public override string NameOfControl { get { return TabControls.TmJournalLineStartStopPage2.ToString(); } }
-        public override Type TableType { get { return typeof(ProjectJournalLineLocal); } }
-        public override UnicontaBaseEntity ModifiedRow { get { return editrow; } set { editrow = (ProjectJournalLineLocal)value; } }
+        public override Type TableType { get { return typeof(ProjectJournalLineClient); } }
+        public override UnicontaBaseEntity ModifiedRow { get { return editrow; } set { editrow = (ProjectJournalLineClient)value; } }
         public TmJournalLineStartStopPage2(UnicontaBaseEntity sourcedata, bool isEdit = true, bool isTime=true )
             : base(sourcedata, isEdit)
         {
             if (!isEdit)
-                editrow = (ProjectJournalLineLocal)StreamingManager.Clone(sourcedata);
+                editrow = (ProjectJournalLineClient)StreamingManager.Clone(sourcedata);
             IsTime= isTime;
             InitPage(api);
         }
@@ -92,7 +92,7 @@ namespace UnicontaClient.Pages.CustomPage
             frmRibbon_BaseActions(ActionType);
         }
 
-        void TimeFromRounding(ProjectJournalLineLocal lineClient)
+        void TimeFromRounding(ProjectJournalLineClient lineClient)
         {
             switch (companySettings._RoundingStart)
             {

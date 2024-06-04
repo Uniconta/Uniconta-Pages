@@ -39,6 +39,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using Uniconta.API.System;
 using Uniconta.Common.User;
+using System.Diagnostics;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -170,6 +171,8 @@ namespace UnicontaClient.Pages.CustomPage
         public static bool IsGridMode = false;
         ItemBase ibaseGridMode;
         RibbonBase rb;
+        private PaperFlowUtil paperFlowUtil;
+
         public Vouchers(BaseAPI API)
             : base(API, string.Empty)
         {
@@ -228,6 +231,8 @@ namespace UnicontaClient.Pages.CustomPage
                     homeTab.Name = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("Home"), scanMail);
             }
             SetFooterDetailText();
+
+            paperFlowUtil = new PaperFlowUtil(api);
         }
 
         public async override Task InitQuery()
@@ -425,7 +430,7 @@ namespace UnicontaClient.Pages.CustomPage
                 ibaseGridMode.Caption = string.Format(Localization.lookup("ShowOBJ"), Localization.lookup("Folders"));
             else
                 ibaseGridMode.Caption = string.Format(Localization.lookup("HideOBJ"), Localization.lookup("Folders"));
-      
+
         }
 
         private void accordionView_SelectedItemChanged(object sender, DevExpress.Xpf.Accordion.AccordionSelectedItemChangedEventArgs e)
@@ -929,6 +934,14 @@ namespace UnicontaClient.Pages.CustomPage
                 case "BilagscanRead":
                     if (api.CompanyEntity.Bilagscan)
                         BilagscanRead();
+                    break;
+                case "BilagscanProfile":
+                    if (api.CompanyEntity.Bilagscan)
+                        Process.Start("https://my.paperflow.com/");
+                    break;
+                case "BilagscanCreateUser":
+                    if (api.CompanyEntity.Bilagscan)
+                        CreatePaperFlowUser();
                     break;
                 case "SplitPDF":
                     if (selectedItem != null)
@@ -1555,7 +1568,7 @@ namespace UnicontaClient.Pages.CustomPage
             Utility.SetDimensionsGrid(api, clDim1, clDim2, clDim3, clDim4, clDim5);
 
             if (!api.CompanyEntity.Project)
-                Project.ShowInColumnChooser = Project.Visible = ProjectName.ShowInColumnChooser = ProjectName.Visible = PrCategory.ShowInColumnChooser =  PrCategory.Visible =
+                Project.ShowInColumnChooser = Project.Visible = ProjectName.ShowInColumnChooser = ProjectName.Visible = PrCategory.ShowInColumnChooser = PrCategory.Visible =
                     WorkSpace.ShowInColumnChooser = WorkSpace.Visible = false;
 
             base.OnLayoutLoaded();
@@ -1638,7 +1651,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         bool IsSending;
-        private void BilagscanSend()
+        private async void BilagscanSend()
         {
             if (IsSending)
                 UnicontaMessageBox.Show(Localization.lookup("UpdateInBackground"), Localization.lookup("Information"), MessageBoxButton.OK);
@@ -1650,6 +1663,21 @@ namespace UnicontaClient.Pages.CustomPage
                     UnicontaMessageBox.Show(Localization.lookup("NoRecordExport"), Localization.lookup("Message"));
                     return;
                 }
+
+                if (api.CompanyEntity._PaperFlowSaveCreditors)
+                {
+                    var hasDefaultGrp = (await api.LoadCache(typeof(Uniconta.DataModel.CreditorGroup)))?
+                        .GetNotNullArray?
+                        .Select(r => (Uniconta.DataModel.CreditorGroup)r)?
+                        .Any(r => r._Default) ?? false;
+
+                    if (!hasDefaultGrp)
+                    {
+                        UnicontaMessageBox.Show(Localization.lookup("PaperflowMissingCreditorGroup"), Localization.lookup("Bilagscan"));
+                        return;
+                    }
+                }
+
                 if (UnicontaMessageBox.Show(string.Concat(Localization.lookup("BilagscanSend"), " (", NumberConvert.ToString(lst.Count), " ", Localization.lookup("Vouchers"), ") ?"), Localization.lookup("Information"), MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                     _BilagscanSend(lst);
             }
@@ -1660,6 +1688,80 @@ namespace UnicontaClient.Pages.CustomPage
             ribbonControl.PerformRibbonAction("ViewDownloadRow");
         }
 
+        private void CreatePaperFlowUser()
+        {
+            var cwwin = new CWCreateBilagScanUser(api, string.Format(Localization.lookup("CreateOBJ"), Localization.lookup("User").ToLower()));
+            cwwin.Closing += async delegate
+            {
+                if (cwwin.DialogResult == true)
+                {
+                    var orgNo = await GetOrganisationNumber();
+                    var response = await Bilagscan.UserService.InviteToOrganization(cwwin.txtEmail.Text, orgNo);
+                    var error = response?.error;
+                    if (error != null)
+                    {
+                        var message = error.message;
+                        if (!message.Equals("The e-mail address has already been invited"))
+                            UnicontaMessageBox.Show(string.Format("{0}: {1}", Localization.lookup("Bilagscan"), message),
+                                Localization.lookup("Warning"));
+                    }
+                }
+            };
+
+            cwwin.Show();
+
+            if (cwwin.DialogResult == true)
+                Process.Start("https://my.paperflow.com/");
+        }
+
+        private async Task<string> GetOrganisationNumber()
+        {
+            // Verify organization
+            CompanySettingsClient companySettings = new CompanySettingsClient();
+            await api.Read(companySettings);
+            var orgNo = NumberConvert.ToStringNull(companySettings._OrgNumber);
+            if (orgNo == null)
+            {
+                var noRightsToUpdate = AccessLevel.Get(api.CompanyEntity.Rights, CompanyTasks.AsOwner) < CompanyPermissions.Modify;
+                if (noRightsToUpdate)
+                {
+                    UnicontaMessageBox.Show(string.Format("{0} {1}", Localization.lookup("NoRightsToInsert"), Localization.lookup("Bilagscan")), Localization.lookup("Warning"));
+                    return null;
+                }
+
+                if (string.IsNullOrEmpty(api.CompanyEntity._Id))
+                {
+                    UnicontaMessageBox.Show(string.Format(Localization.lookup("CannotBeBlank"), Localization.lookup("CompanyRegNo")), Localization.lookup("Paperflow"), MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                    return null;
+                }
+
+                if (UnicontaMessageBox.Show(Localization.lookup("BilagscanTerms"), Localization.lookup("Paperflow"), MessageBoxButton.OKCancel, MessageBoxImage.Question) != MessageBoxResult.OK)
+                    return null;
+
+                orgNo = await OrganisationService.CreateOrganization(api, companySettings);
+                if (orgNo == null)
+                {
+                    UnicontaMessageBox.Show(string.Format(Localization.lookup("CannotBeBlank"), Localization.lookup("OrgNumber")), Localization.lookup("Paperflow"), MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                    return null;
+                }
+            }
+            switch (await OrganisationService.VerifyOrganization(orgNo))
+            {
+                case "NOCOMPANY":
+                    UnicontaMessageBox.Show("Plug-in'en kan ikke finde et firma.", "Overfør til Paperflow");
+                    break;
+                case "NOTABLE":
+                    //Tools.CreateUserTable(api);
+                    //await Account.CreateOrganization(api, Globals.access_token);
+                    break;
+                case "NOORGANIZATION":
+                    UnicontaMessageBox.Show("Plug-in'en kan ikke finde din organisation hos Paperflow.", "Overfør til Paperflow");
+                    break;
+            }
+
+            return orgNo;
+        }
+
         async void _BilagscanSend(List<VouchersClient> lst)
         {
             try
@@ -1667,50 +1769,9 @@ namespace UnicontaClient.Pages.CustomPage
                 IsSending = true;
                 Save();
 
-                var accessToken = Account.GetBilagscanAccessToken(api);
-
-                // Verify organization
-                CompanySettingsClient companySettings = new CompanySettingsClient();
-                await api.Read(companySettings);
-                var orgNo = NumberConvert.ToStringNull(companySettings._OrgNumber);
-                if (orgNo == null)
-                {
-                    var noRightsToUpdate = AccessLevel.Get(api.CompanyEntity.Rights, CompanyTasks.AsOwner) < CompanyPermissions.Modify;
-                    if (noRightsToUpdate)
-                    {
-                        UnicontaMessageBox.Show(string.Format("{0} {1}", Uniconta.ClientTools.Localization.lookup("NoRightsToInsert"), Uniconta.ClientTools.Localization.lookup("Bilagscan")), Uniconta.ClientTools.Localization.lookup("Warning"));
-                        return;
-                    }
-
-                    if (string.IsNullOrEmpty(api.CompanyEntity._Id))
-                    {
-                        UnicontaMessageBox.Show(string.Format(Localization.lookup("CannotBeBlank"), Localization.lookup("CompanyRegNo")), Localization.lookup("Paperflow"), MessageBoxButton.OK, MessageBoxImage.Exclamation);
-                        return;
-                    }
-
-                    if (UnicontaMessageBox.Show(Localization.lookup("BilagscanTerms"), Localization.lookup("Paperflow"), MessageBoxButton.OKCancel, MessageBoxImage.Question) != MessageBoxResult.OK)
-                        return;
-
-                    orgNo = await Account.CreateOrganization(api, accessToken, companySettings);
-                    if (orgNo == null)
-                    {
-                        UnicontaMessageBox.Show(string.Format(Localization.lookup("CannotBeBlank"), Localization.lookup("OrgNumber")), Localization.lookup("Paperflow"), MessageBoxButton.OK, MessageBoxImage.Exclamation);
-                        return;
-                    }
-                }
-                switch (await Account.VerifyOrganization(orgNo, accessToken))
-                {
-                    case "NOCOMPANY":
-                        UnicontaMessageBox.Show("Plug-in'en kan ikke finde et firma.", "Overfør til Paperflow");
-                        break;
-                    case "NOTABLE":
-                        //Tools.CreateUserTable(api);
-                        //await Account.CreateOrganization(api, Globals.access_token);
-                        break;
-                    case "NOORGANIZATION":
-                        UnicontaMessageBox.Show("Plug-in'en kan ikke finde din organisation hos Paperflow.", "Overfør til Paperflow");
-                        break;
-                }
+                var orgNo = await GetOrganisationNumber();
+                if (string.IsNullOrEmpty(orgNo))
+                    return;
 
                 var voucherOrg = new List<Document>(lst.Count);
                 var voucherUpdates = new List<Document>(lst.Count);
@@ -1728,7 +1789,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (voucher._Data == null)
                         await UtilDisplay.GetData(voucher, api);
 
-                    if (await Bilagscan.Voucher.Upload(voucher, orgNo, accessToken))
+                    if (await VoucherService.Upload(voucher, orgNo))
                     {
                         voucherOrg.Add(org);
                         upd._SentToBilagscan = true;
@@ -1764,309 +1825,13 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        bool readingFromBilagscan;
-        void BilagscanRead()
+        private async void BilagscanRead()
         {
-            if (readingFromBilagscan)
-                UnicontaMessageBox.Show(Localization.lookup("UpdateInBackground"), Localization.lookup("Information"), MessageBoxButton.OK);
-            else
-                _BilagscanRead();
-        }
-        async void _BilagscanRead()
-        {
-            var noOfVouchers = 0;
-            try
-            {
-                readingFromBilagscan = true;
-                busyIndicator.IsBusy = true;
-                Save();
+            var gridVouchers = (IEnumerable<VouchersClient>)dgVoucherGrid.ItemsSource;
 
-                var accessToken = Bilagscan.Account.GetBilagscanAccessToken(api);
-                CompanySettingsClient companySettings = new CompanySettingsClient();
-                await api.Read(companySettings);
-                var orgNo = NumberConvert.ToString(companySettings._OrgNumber);
-
-                System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;
-                using (var client = new HttpClient())
-                {
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-                    var response = await client.GetAsync($"https://api.bilagscan.dk/v1/organizations/" + orgNo + "/vouchers?seen=false&count=100&offset=0&sorts=-upload_date&status=successful");
-                    var content = await response.Content.ReadAsStringAsync();
-                    var vouchers = Bilagscan.Voucher.GetVouchers(content);
-
-                    if (vouchers?.data != null && vouchers.data.Length > 0)
-                    {
-                        var updateLines = new List<UnicontaBaseEntity>(vouchers.data.Length);
-                        List<Uniconta.DataModel.Creditor> CreList = null;
-                        var search = new DocumentNoRef();
-                        foreach (var voucher in vouchers.data)
-                        {
-                            var hint = Bilagscan.Voucher.GetHint(voucher.note);
-                            if (hint != null)
-                            {
-                                var originalVoucher = ((IEnumerable<VouchersClient>)dgVoucherGrid.ItemsSource)?.Where(r => r.RowId == hint.RowId).FirstOrDefault();
-                                if (originalVoucher == null)
-                                {
-                                    search._DocumentRef = hint.RowId;
-                                    var loadedVoucher = await api.Query<VouchersClient>(search);
-                                    if (loadedVoucher == null || loadedVoucher.Length == 0)
-                                        continue;
-                                    originalVoucher = loadedVoucher[0];
-                                }
-                                originalVoucher.Reference = NumberConvert.ToStringNull(voucher.id);
-
-                                var bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "voucher_number", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
-                                if (bsItem != null)
-                                    originalVoucher.Invoice = bsItem.value;
-
-                                bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "voucher_type", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
-                                if (bsItem != null)
-                                {
-                                    switch (bsItem.value)
-                                    {
-                                        case "invoice": originalVoucher._Content = ContentTypes.Invoice; break;
-                                        case "creditnote": originalVoucher._Content = ContentTypes.CreditNote; break;
-                                        case "receipt": originalVoucher._Content = ContentTypes.Receipt; break;
-                                    }
-                                    originalVoucher.NotifyPropertyChanged("Content");
-                                }
-
-                                var creditorCVR = string.Empty;
-                                bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "company_vat_reg_no", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
-                                if (bsItem != null)
-                                    creditorCVR = bsItem.value;
-
-                                bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "total_amount_incl_vat", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
-                                if (bsItem != null)
-                                {
-                                    originalVoucher.Amount = Math.Abs(NumberConvert.ToDoubleNoThousandSeperator(bsItem.value));
-
-                                    if (originalVoucher._Content == ContentTypes.CreditNote)
-                                        originalVoucher.Amount = -originalVoucher._Amount;
-                                }
-
-                                CountryCode countryCode = CountryCode.Denmark;
-                                bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "country", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
-                                if (bsItem != null)
-                                {
-                                    CountryISOCode countryISO;
-                                    countryCode = CountryCode.Denmark; //default
-                                    if (Enum.TryParse(bsItem.value, true, out countryISO))
-                                        countryCode = (CountryCode)countryISO;
-                                }
-
-                                bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "invoice_date", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
-                                if (bsItem != null)
-                                {
-                                    var invoiceDate = bsItem.value == string.Empty ? DateTime.Today : StringSplit.DateParse(bsItem.value, DateFormat.ymd);
-                                    originalVoucher.PostingDate = invoiceDate;
-                                }
-
-                                bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_date", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
-                                if (bsItem != null)
-                                {
-                                    var paymentDate = bsItem.value == string.Empty ? DateTime.MinValue : StringSplit.DateParse(bsItem.value, DateFormat.ymd);
-                                    originalVoucher.PayDate = paymentDate;
-                                }
-
-                                if (originalVoucher._PurchaseNumber == 0)
-                                {
-                                    bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "purchase_order_number", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
-                                    if (bsItem != null)
-                                        originalVoucher.PurchaseNumber = (int)NumberConvert.ToInt(Regex.Replace(bsItem.value, "[^0-9]", string.Empty));
-                                }
-
-                                bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "currency", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
-                                if (bsItem != null)
-                                {
-                                    Currencies currencyISO;
-                                    if (!Enum.TryParse(bsItem.value, true, out currencyISO))
-                                        currencyISO = Currencies.DKK; //default
-
-                                    originalVoucher._Currency = (byte)currencyISO;
-                                    originalVoucher.NotifyPropertyChanged("Currency");
-                                }
-
-                                if (originalVoucher._CreditorAccount == null)
-                                {
-                                    Uniconta.DataModel.Creditor creditor = null;
-                                    var creditorCVRNum = Regex.Replace(creditorCVR, "[^0-9]", string.Empty);
-                                    if (creditorCVRNum != string.Empty)
-                                        creditor = (CreditorCache.GetKeyStrRecords as Uniconta.DataModel.Creditor[]).Where(s => (Regex.Replace(s._LegalIdent ?? string.Empty, "[^0-9.]", "") == creditorCVRNum)).FirstOrDefault();
-
-                                    bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_swift_bic", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
-                                    var swiftNo = bsItem?.value;
-
-                                    if (originalVoucher._PaymentId == null && creditor?._PaymentId == null)
-                                    {
-                                        bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_account_number", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
-                                        var bbanAcc = bsItem?.value;
-
-                                        bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_reg_number", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
-                                        var bbanRegNum = bsItem?.value;
-
-                                        bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_iban", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
-                                        var ibanNo = bsItem?.value;
-
-                                        bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_code_id", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
-                                        var paymentCodeId = bsItem?.value;
-
-                                        bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "payment_id", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
-                                        var paymentId = bsItem?.value;
-
-                                        bsItem = voucher.header_fields.Where(hf => string.Compare(hf.code, "joint_payment_id", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
-                                        var jointPaymentId = bsItem?.value;
-
-                                        var paymentMethod = PaymentTypes.VendorBankAccount;
-                                        switch (paymentCodeId)
-                                        {
-                                            case "71": paymentMethod = PaymentTypes.PaymentMethod3; break;
-                                            case "73": paymentMethod = PaymentTypes.PaymentMethod4; break;
-                                            case "75": paymentMethod = PaymentTypes.PaymentMethod5; break;
-                                            case "04":
-                                            case "4": paymentMethod = PaymentTypes.PaymentMethod6; break;
-                                        }
-
-                                        if (paymentMethod != PaymentTypes.VendorBankAccount && (paymentId != null || jointPaymentId != null))
-                                        {
-                                            originalVoucher._PaymentMethod = paymentMethod;
-                                            originalVoucher.PaymentId = string.Concat(paymentId, " +", jointPaymentId);
-                                        }
-                                        else if (bbanRegNum != null && bbanAcc != null)
-                                        {
-                                            if (creditor?._PaymentId == null)
-                                            {
-                                                originalVoucher._PaymentMethod = PaymentTypes.VendorBankAccount;
-                                                originalVoucher.PaymentId = string.Concat(bbanRegNum, "-", bbanAcc);
-                                            }
-                                        }
-                                        else if (swiftNo != null && ibanNo != null)
-                                        {
-                                            if (creditor?._SWIFT == null)
-                                            {
-                                                originalVoucher._PaymentMethod = PaymentTypes.IBAN;
-                                                originalVoucher.PaymentId = ibanNo;
-                                            }
-                                        }
-                                        originalVoucher.NotifyPropertyChanged("PaymentMethod");
-                                    }
-
-                                    if (creditorCVRNum == string.Empty)
-                                    {
-                                        originalVoucher._Text = Localization.lookup("NotValidVatNo");
-                                    }
-                                    else if (creditor == null)
-                                    {
-                                        var cre = new CreditorClient()
-                                        {
-                                            _Account = creditorCVR,
-                                            _LegalIdent = creditorCVR,
-                                            _PaymentMethod = originalVoucher._PaymentMethod,
-                                            _PaymentId = originalVoucher._PaymentId,
-                                            _SWIFT = swiftNo
-                                        };
-
-                                        var Grp = api.GetCache(typeof(Uniconta.DataModel.CreditorGroup));
-                                        if (Grp != null)
-                                        {
-                                            foreach(var r in (Uniconta.DataModel.CreditorGroup[])Grp.GetNotNullArray)
-                                            {
-                                                if (r._Default)
-                                                {
-                                                    if (r._AutoNumber != null)
-                                                    {
-                                                        cre._Account = null;
-                                                        cre._Group = r._Group;
-                                                    }
-                                                    break;
-                                                }
-                                            }
-                                        }
-
-                                        CompanyInfo companyInformation = null;
-                                        try
-                                        {
-                                            companyInformation = await CVR.CheckCountry(creditorCVR, countryCode);
-                                        }
-                                        catch { }
-
-                                        if (companyInformation != null)
-                                        {
-                                            if (companyInformation.life != null)
-                                                cre._Name = companyInformation.life.name;
-
-                                            if (companyInformation.address != null)
-                                            {
-                                                cre._Address1 = companyInformation.address.CompleteStreet;
-                                                cre._Address2 = companyInformation.address.street2;
-                                                cre._ZipCode = companyInformation.address.zipcode;
-                                                cre._City = companyInformation.address.cityname;
-                                                cre._Country = companyInformation.address.Country;
-                                            }
-
-                                            if (companyInformation.contact != null)
-                                            {
-                                                cre._Phone = companyInformation.contact.phone;
-                                                cre._ContactEmail = companyInformation.contact.email;
-                                            }
-                                        }
-                                        else
-                                        {
-                                            cre.Name = Localization.lookup("NotValidVatNo");
-                                        }
-
-                                        await api.Insert(cre);
-                                        originalVoucher.CreditorAccount = cre._Account;
-                                    }
-                                    else
-                                    {
-                                        if (!string.IsNullOrEmpty(creditor._PostingAccount))
-                                        {
-                                            originalVoucher.CostAccount = creditor._PostingAccount;
-                                            var acc = (Uniconta.DataModel.GLAccount)LedgerCache?.Get(creditor._PostingAccount);
-                                            if (acc != null && acc._Vat != null)
-                                                originalVoucher.Vat = acc._Vat;
-                                        }
-
-                                        originalVoucher.CreditorAccount = creditor._Account;
-                                    }
-                                }
-
-                                updateLines.Add(originalVoucher);
-                                noOfVouchers++; ;
-                            }
-                        }
-
-                        api.UpdateNoResponse(updateLines);
-                        if (CreList != null)
-                            api.UpdateNoResponse(CreList);
-
-                        // Mark vouchers as seen
-                        var sb = StringBuilderReuse.Create("{ \"vouchers\": [ ");
-                        foreach (var voucher in vouchers.data)
-                            sb.AppendNum(voucher.id).Append(',');
-                        sb.Length = sb.Length - 1; // remove last comma
-                        sb.Append(" ] }");
-                        var vContent = new StringContent(sb.ToStringAndRelease(), Encoding.UTF8, "application/json");
-                        System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;
-                        response = await client.PostAsync($"https://api.bilagscan.dk/v1/organizations/" + orgNo + "/vouchers/seen", vContent);
-                        await response.Content.ReadAsStringAsync();
-                    }
-                }
-            }
-            finally
-            {
-                readingFromBilagscan = false;
-                busyIndicator.IsBusy = false;
-            }
-
-            if (noOfVouchers == 0)
-                UnicontaMessageBox.Show(string.Format(Localization.lookup("StillProcessingTryAgain"), Localization.lookup("Paperflow")), Localization.lookup("Paperflow"), MessageBoxButton.OK, MessageBoxImage.Information);
-            else
-            {
+            var noOfVouchers = await paperFlowUtil.ReadVouchers(gridVouchers, busyIndicator);
+            if (noOfVouchers != 0)
                 UnicontaMessageBox.Show(string.Concat(Localization.lookup("NumberOfImportedVouchers"), ": ", NumberConvert.ToString(noOfVouchers)), Localization.lookup("Paperflow"), MessageBoxButton.OK, MessageBoxImage.Information);
-                //ribbonControl.PerformRibbonAction("RefreshGrid");
-            }
         }
 
         private void Save(bool saveGridData = true)

@@ -30,6 +30,7 @@ using Uniconta.DataModel;
 using UnicontaClient.Pages;
 using Uniconta.Common.User;
 using UnicontaClient.Controls.Dialogs;
+using System.Windows.Markup.Localizer;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -310,6 +311,9 @@ namespace UnicontaClient.Pages.CustomPage
                 case "RegisterEdelivery":
                     Nemhandel();
                     break;
+                case "RefreshCache":
+                    RefreshCache();
+                    break;
                 default:
                     frmRibbon_BaseActions(ActionType);
                     globalEvents.OnRefresh(TabControls.CreateCompany, editrow.CompanyId);
@@ -482,6 +486,10 @@ namespace UnicontaClient.Pages.CustomPage
             var location = editrow.Address1 + "+" + editrow.Address2 + "+" + editrow.Address3 + "+" + editrow.Country;
             Utility.OpenGoogleMap(location);
         }
-
+        async void RefreshCache()
+        {
+            ErrorCodes res = await new CompanyAPI(session, api.CompanyEntity).RefreshCache();
+            UtilDisplay.ShowErrorCode(res);
+        }
     }
 }

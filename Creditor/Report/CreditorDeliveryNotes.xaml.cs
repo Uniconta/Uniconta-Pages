@@ -109,7 +109,9 @@ namespace UnicontaClient.Pages.CustomPage
                 DeliveryContactPerson.Visible = false;
                 DeliveryPhone.Visible = false;
                 DeliveryContactEmail.Visible = false;
-      }
+            }
+            Margin.Visible = Margin.ShowInColumnChooser = MarginRatio.Visible = MarginRatio.ShowInColumnChooser =
+            CostValue.Visible = CostValue.ShowInColumnChooser = !api.CompanyEntity.HideCostPrice;
         }
 
         private void SetDimension()

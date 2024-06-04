@@ -32,8 +32,8 @@ namespace UnicontaClient.Pages.CustomPage
     public partial class CwTransportRegistration : ChildWindow
     {
 
-        public List<EmployeeRegistrationLineClient> MileageLst { get; set; }
-        public List<EmployeeRegistrationLineClient> MileageReturnLst { get; set; }
+        public EmployeeRegistrationLineClient Mileage { get; set; }
+        public EmployeeRegistrationLineClient MileageReturn { get; set; }
 
         public string Purpose { get; set; }
         [ForeignKeyAttribute(ForeignKeyTable = typeof(Uniconta.DataModel.Project))]
@@ -166,7 +166,7 @@ namespace UnicontaClient.Pages.CustomPage
                         City = cAddress._City,
                         Country= cAddress._Country,
                         IsCompanyAddress = true,
-                        CompanyAddressNumber = cAddress._Number
+                        CompanyAddress = cAddress._Name
                     });
                     sbWork.Clear();
                 }
@@ -317,21 +317,9 @@ namespace UnicontaClient.Pages.CustomPage
                 return;
             }
             
-            MileageLst = new List<EmployeeRegistrationLineClient>();
-            MileageReturnLst = Returning ? new List<EmployeeRegistrationLineClient>() : null;
-            for (int day = 1; day <= 7; day++)
-            {
-                double dayValue = GetDayValue(day);
-
-                var Mileage = CreateMileageEntry(day, dayValue);
-                MileageLst.Add(Mileage);
-
-                if (Returning)
-                {
-                    var MileageReturn = CreateReturnMileageEntry(Mileage);
-                    MileageReturnLst.Add(MileageReturn);
-                }
-            }
+            Mileage = CreateMileageEntry();
+            if (Returning)
+                MileageReturn = CreateReturnMileageEntry(Mileage);
 
             PrTask = internalProject == null ? leProjectTask.Text : null;
             SetDialogResult(true);
@@ -344,19 +332,13 @@ namespace UnicontaClient.Pages.CustomPage
             return true;
         }
 
-        private EmployeeRegistrationLineClient CreateMileageEntry(int day, double dayValue)
+        private EmployeeRegistrationLineClient CreateMileageEntry()
         {
             var mileage = new EmployeeRegistrationLineClient();
             mileage.SetMaster(crudApi.CompanyEntity);
-            mileage._Project = Project;
-            mileage._Employee = employee._Number;
             mileage._VechicleRegNo = employee._VechicleRegNo;
-            mileage._Text = Purpose;
 
             SetFromToDetails(mileage);
-
-            mileage._Date = journalline.Date.AddDays(day - 1);
-            mileage._Qty = dayValue;
 
             return mileage;
         }
@@ -365,12 +347,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var mileageReturn = new EmployeeRegistrationLineClient();
             mileageReturn.SetMaster(crudApi.CompanyEntity);
-            mileageReturn._Project = Project;
-            mileageReturn._Employee = employee._Number;
             mileageReturn._VechicleRegNo = employee._VechicleRegNo;
-            mileageReturn._Text = Purpose;
-            mileageReturn._Date = mileage._Date;
-            mileageReturn._Qty = mileage._Qty;
 
             SwapFromToDetails(mileage, mileageReturn);
 
@@ -388,7 +365,7 @@ namespace UnicontaClient.Pages.CustomPage
             mileage._FromWork = addressList[fromIndex].IsCompanyAddress;
             mileage._FromHome = addressList[fromIndex].IsPrivateAddress;
             mileage._FromAccount = addressList[fromIndex].DebtorAccount;
-            mileage._FromCompanyAddress = addressList[fromIndex].CompanyAddressNumber;
+            mileage._FromCompanyAddress = addressList[fromIndex].CompanyAddress;
 
             mileage._ToName = txtToName.Text;
             mileage._ToAddress1 = txtToAdd1.Text;
@@ -399,7 +376,7 @@ namespace UnicontaClient.Pages.CustomPage
             mileage._ToWork = addressList[toIndex].IsCompanyAddress;
             mileage._ToHome = addressList[toIndex].IsPrivateAddress;
             mileage._ToAccount = addressList[toIndex].DebtorAccount;
-            mileage._ToCompanyAddress = addressList[toIndex].CompanyAddressNumber;
+            mileage._ToCompanyAddress = addressList[toIndex].CompanyAddress;
         }
 
         private void SwapFromToDetails(EmployeeRegistrationLineClient fromMileage, EmployeeRegistrationLineClient toMileage)
@@ -409,6 +386,7 @@ namespace UnicontaClient.Pages.CustomPage
             toMileage._FromAddress2 = fromMileage._ToAddress2;
             toMileage._FromZipCode = fromMileage._ToZipCode;
             toMileage._FromCity = fromMileage._ToCity;
+            toMileage._FromCountry = fromMileage._ToCountry;
             toMileage._FromWork = fromMileage._ToWork;
             toMileage._FromHome = fromMileage._ToHome;
             toMileage._FromAccount = fromMileage._ToAccount;
@@ -419,25 +397,11 @@ namespace UnicontaClient.Pages.CustomPage
             toMileage._ToAddress2 = fromMileage._FromAddress2;
             toMileage._ToZipCode = fromMileage._FromZipCode;
             toMileage._ToCity = fromMileage._FromCity;
+            toMileage._ToCountry = fromMileage._ToCountry;
             toMileage._ToWork = fromMileage._FromWork;
             toMileage._ToHome = fromMileage._FromHome;
             toMileage._ToAccount = fromMileage._FromAccount;
             toMileage._ToCompanyAddress = fromMileage._FromCompanyAddress;
-        }
-
-        private double GetDayValue(int day)
-        {
-            switch (day)
-            {
-                case 1: return Day1;
-                case 2: return Day2;
-                case 3: return Day3;
-                case 4: return Day4;
-                case 5: return Day5;
-                case 6: return Day6;
-                case 7: return Day7;
-                default: return 0;
-            }
         }
 
         double total = 0d;
@@ -586,7 +550,7 @@ namespace UnicontaClient.Pages.CustomPage
             public string City { get; set; }
             public CountryCode Country { get; set; }
             public string DebtorAccount { get; set; }
-            public string CompanyAddressNumber { get; set; }
+            public string CompanyAddress { get; set; }
             public bool IsCompanyAddress { get; set; }
             public bool IsPrivateAddress { get; set; }
         }

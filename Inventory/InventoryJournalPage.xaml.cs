@@ -24,7 +24,7 @@ namespace UnicontaClient.Pages.CustomPage
 
     public partial class InventoryJournalPage : GridBasePage
     {
-        public override string NameOfControl { get { return TabControls.InventoryJournalPage ; } }
+        public override string NameOfControl { get { return TabControls.InventoryJournalPage; } }
 
         public InventoryJournalPage(BaseAPI API) : base(API, string.Empty)
         {
@@ -42,7 +42,7 @@ namespace UnicontaClient.Pages.CustomPage
             SetRibbonControl(localMenu, dgInventoryJournal);
             dgInventoryJournal.api = api;
             dgInventoryJournal.BusyIndicator = busyIndicator;
-            
+
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgInventoryJournal.RowDoubleClick += DgInventoryJournal_RowDoubleClick;
         }
@@ -87,7 +87,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "InventoryJournalLine":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.InventoryJournalLines , selectedItem, string.Format("{0} {1} : {2}", Uniconta.ClientTools.Localization.lookup("Inventory"), Uniconta.ClientTools.Localization.lookup("Journal"), selectedItem.Journal));
+                        AddDockItem(TabControls.InventoryJournalLines, selectedItem, string.Format("{0} {1} : {2}", Uniconta.ClientTools.Localization.lookup("Inventory"), Uniconta.ClientTools.Localization.lookup("Journal"), selectedItem.Journal));
                     break;
                 case "DeleteAllJournalLines":
                     if (selectedItem == null)
@@ -117,12 +117,41 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         AddDockItem(TabControls.InventoryPostedJournals, selectedItem);
                     break;
+                case "MoveJournalLines":
+                    if (selectedItem != null)
+                        MoveJournalLines(selectedItem);
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
         }
 
+        void MoveJournalLines(InvJournalClient journal)
+        {
+            var cwWin = new CwMoveInvJournalLines(api);
+            cwWin.Closed += async delegate
+            {
+                if (cwWin.DialogResult == true && cwWin.InvJournal != null)
+                {
+                    busyIndicator.IsBusy = true;
+                    var result = await (new Uniconta.API.Inventory.PostingAPI(api)).MoveJournalLines(journal, cwWin.InvJournal);
+                    busyIndicator.IsBusy = false;
+                    UtilDisplay.ShowErrorCode(result);
+                    if (result == 0)
+                    {
+                        foreach (var lin in (IEnumerable<InvJournalClient>)dgInventoryJournal.ItemsSource)
+                            if (lin.RowId == cwWin.InvJournal.RowId)
+                            {
+                                lin.NumberOfLines = lin._NumberOfLines + journal._NumberOfLines;
+                                journal.NumberOfLines = 0;
+                                break;
+                            }
+                    }
+                }
+            };
+            cwWin.Show();
+        }
         void OpenImportDataPage(InvJournalClient selectedItem)
         {
             string header = selectedItem.Journal;

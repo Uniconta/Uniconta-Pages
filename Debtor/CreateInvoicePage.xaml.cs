@@ -176,6 +176,12 @@ namespace UnicontaClient.Pages.CustomPage
 
             Utility.SetupVariants(api, colVariant, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
             Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
+
+            Margin.Visible = Margin.ShowInColumnChooser = MarginRatio.Visible = MarginRatio.ShowInColumnChooser =
+           CostPrice.Visible = CostPrice.ShowInColumnChooser = CostValue.Visible = CostValue.ShowInColumnChooser = !api.CompanyEntity.HideCostPrice;
+            RibbonBase rb = (RibbonBase)localMenu.DataContext;
+            if (company.HideCostPrice)
+                UtilDisplay.RemoveMenuCommand(rb, new string[] { "CostValue", "DB" });
         }
         private async void Editrow_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
@@ -1157,7 +1163,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (cmbCreateAccount.SelectedIndex == 1)
             {
                 if (Order.OneTimeDebtor == null)
-                    Order.OneTimeDebtor = Activator.CreateInstance(api.CompanyEntity.GetUserType(typeof(DebtorClient))) as DebtorClient;
+                    Order.OneTimeDebtor = api.CompanyEntity.CreateUserType<DebtorClient>();
                 var debtor = Order.OneTimeDebtor;
                 debtor.Country = (CountryCode)api.CompanyEntity._Country;
                 var debtorAccountPage2 = dockCtrl.AddDockItem(TabControls.DebtorAccountPage2, this.ParentControl, new object[2] { debtor, true }, Uniconta.ClientTools.Localization.lookup("DebtorAccount"), "Add_16x16") as DebtorAccountPage2;

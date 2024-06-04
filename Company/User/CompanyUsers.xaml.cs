@@ -86,11 +86,16 @@ namespace UnicontaClient.Pages.CustomPage
             SetRibbonControl(localMenu, dgCompanyUsersGrid);
             gridControl.AutoWidth = true;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
-            if (!api.CompanyEntity.Project)
+            RibbonBase rb = (RibbonBase)localMenu.DataContext;
+            if (api.session.Uid == api.CompanyEntity._OwnerUid)
             {
-                RibbonBase rb = (RibbonBase)localMenu.DataContext;
-                UtilDisplay.RemoveMenuCommand(rb, "AddProjectTimeUser");
+                if (api.session.User._Role == (byte)UserRoles.Accountant)
+                    UtilDisplay.RemoveMenuCommand(rb, "AddProjectTimeUser");
+                if (api.session.User._Role == (byte)UserRoles.Standard)
+                    UtilDisplay.RemoveMenuCommand(rb, "AddInvoiceUser");
             }
+            if (!api.CompanyEntity.Project)
+                UtilDisplay.RemoveMenuCommand(rb, "AddProjectTimeUser");
         }
 
         async void RemoveAccess(CompanyUserAccessClient selectedItem)
@@ -383,24 +388,31 @@ namespace UnicontaClient.Pages.CustomPage
             dialogEmployees.Show();
         }
 
-        void SetEmployee(Uniconta.DataModel.Employee selectedEmployee, CompanyUserAccessClient userAccess)
+        async void SetEmployee(Uniconta.DataModel.Employee selectedEmployee, CompanyUserAccessClient userAccess)
         {
-            var modified = new List<Uniconta.DataModel.Employee>();
             if (!string.IsNullOrEmpty(userAccess._Employee))
             {
                 var alreadyAssignedEmployee = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.Employee)).Get(userAccess._Employee) as Uniconta.DataModel.Employee;
                 if (alreadyAssignedEmployee != null)
                 {
-                    alreadyAssignedEmployee._UserLogidId = alreadyAssignedEmployee._UserName = null;
-                    modified.Add(alreadyAssignedEmployee);
+                    var clearedAssignedEmployee = StreamingManager.Clone(alreadyAssignedEmployee) as Uniconta.DataModel.Employee;
+                    clearedAssignedEmployee._UserLogidId = clearedAssignedEmployee._UserName = null;
+                    clearedAssignedEmployee._Uid = 0;
+                    await api.Update(alreadyAssignedEmployee, clearedAssignedEmployee);
                 }
             }
-            selectedEmployee._UserLogidId = userAccess._LoginId;
-            selectedEmployee._UserName = userAccess._Name;
-            modified.Add(selectedEmployee);
-            api.UpdateNoResponse(modified);
-            userAccess._Employee = selectedEmployee.KeyStr;
-            userAccess.NotifyPropertyChanged("Employee");
+            var copySelectedEmployee = StreamingManager.Clone(selectedEmployee) as Uniconta.DataModel.Employee;
+            copySelectedEmployee._Uid = userAccess._Uid;
+            copySelectedEmployee._UserLogidId = userAccess._LoginId;
+            copySelectedEmployee._UserName = userAccess._Name;
+            var err = await api.Update(selectedEmployee, copySelectedEmployee);
+            if (err == ErrorCodes.Succes)
+            {
+                userAccess._Employee = selectedEmployee.KeyStr;
+                userAccess.NotifyPropertyChanged("Employee");
+            }
+            else
+                UtilDisplay.ShowErrorCode(err);
         }
         void CreateEmployee(CompanyUserAccessClient userAccess)
         {

@@ -249,7 +249,7 @@ namespace UnicontaClient.Pages.CustomPage
                         break;
                     }
                 }
-
+                dgProjInvProjectLineGrid.isDefaultFirstRow = false;
                 // we need to delete all rows in grid
                 dgProjInvProjectLineGrid.DeleteAllRows();
 

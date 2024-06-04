@@ -196,7 +196,10 @@ namespace UnicontaClient.Pages.CustomPage
                     newDebtor.NewZipCode = address.zipcode;
                     newDebtor.NewCity = address.cityname;
                     newDebtor.NewName = ci.life.name;
-                    newDebtor.NewIndustryCode = IndustryCodes.Get(ci.industrycode?.code)?.KeyStr;
+                    if (IndustryCodes != null)
+                        newDebtor.NewIndustryCode = IndustryCodes.Get(ci.industrycode?.code)?.KeyStr;
+                    else
+                        newDebtor.NewIndustryCode = ci.industrycode?.code;
                     newDebList.Add(newDebtor);
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("Loading") + " " + NumberConvert.ToString(newDebList.Count);
                     busyIndicator.IsBusy = false;

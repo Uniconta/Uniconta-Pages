@@ -31,7 +31,7 @@ x:Class="UnicontaClient.Pages.CustomPage.EmpPayrolCategoryPage"
                     <localPage:CorasauDataGridTemplateColumnClient FieldName="CategoryName" x:Name="colCategoryName" ReadOnly="True" Width="150" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient FieldName="Item" x:Name="colItem" Width="100"/>
                     <localPage:CorasauDataGridTemplateColumnClient FieldName="ItemName" x:Name="colItemName" ReadOnly="True" Width="150"/>
-                    <localPage:CorasauDataGridTemplateColumnClient FieldName="CostPrice" Width="90"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CostPrice" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient FieldName="SalesPrice" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient FieldName="Rate" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension1" x:Name="cldim1" />

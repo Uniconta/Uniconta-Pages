@@ -21,12 +21,13 @@
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="InventoryJournalLine" LocalizedNameKey="Journallines" ControlName="InventoryJournalLines" LargeGlyph="Order_Lines_Highlighted_32x32" ShortcutKey="ALT+L"/>
-     <RibbonItem Action="InvJournalPosted" LocalizedNameKey="PostedJournals" ControlName="InventoryPostedJournals" Glyph="Cover_16x16" LargeGlyph="Posted_Journal_32x32"/>
+    <RibbonItem Action="InvJournalPosted" LocalizedNameKey="PostedJournals" ControlName="InventoryPostedJournals" Glyph="Cover_16x16" LargeGlyph="Posted_Journal_32x32"/>
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="ImportData" LocalizedNameKey="ImportFromFile" Parameter="" LargeGlyph="Import_32x32"/>
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="DeleteAllJournalLines" LocalizedNameKey="DeleteAllJournalLines" Glyph="Delete_16x16" LargeGlyph="Delete_32x32" />
+    <RibbonItem Action="MoveJournalLines" LocalizedNameKey="MoveOBJ" Parameter="Journallines" LargeGlyph="Move_32x32" />
   </RibbonItem>
 </root>

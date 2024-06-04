@@ -5,7 +5,6 @@ x:Class="UnicontaClient.Pages.CustomPage.Employee"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:toolkit="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Toolkit"
     mc:Ignorable="d" 
     xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
     xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage" 
@@ -85,7 +84,6 @@ x:Class="UnicontaClient.Pages.CustomPage.Employee"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Confirmation" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Offer" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PayrollCategory" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ShowCost" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="TMCloseDate" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="TMApproveDate" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="VechicleRegNo" Visible="False" />

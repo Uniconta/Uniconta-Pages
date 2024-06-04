@@ -39,7 +39,7 @@ x:Class="UnicontaClient.Pages.CustomPage.SerialToOrderLinePage"
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Expire" MinWidth="90" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Number" MinWidth="100" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Comment" MinWidth="200" />
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="QtyMarked" AllowEditing="True">
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="QtyMarked">
                                     <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                         <DataTemplate>
                                             <CorasauControls:TextEditor x:Name="PART_Editor" HorizontalContentAlignment="Right" Mask="{Binding Path=DataContext.RowData.Row.Decimals,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource MaskConverter},ConverterParameter=Decimals}" MaskUseAsDisplayFormat="True" MaskType="Numeric" 
@@ -66,7 +66,7 @@ x:Class="UnicontaClient.Pages.CustomPage.SerialToOrderLinePage"
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="CostPrice" MinWidth="90"/>
                             </localPage:SerialToOrderlineGrid.Columns>
                             <localPage:SerialToOrderlineGrid.TotalSummary>
-                                <localPage:SumColumn FieldName="QtyMarked" SummaryType="Sum" DisplayFormat="{}{0:N2}"  />
+                                <localPage:SumColumn x:Name="markedItem" FieldName="QtyMarked" SummaryType="Sum" DisplayFormat="{}{0:N2}"  />
                             </localPage:SerialToOrderlineGrid.TotalSummary>
                         </localPage:SerialToOrderlineGrid>
                     </docking:LayoutPanel>

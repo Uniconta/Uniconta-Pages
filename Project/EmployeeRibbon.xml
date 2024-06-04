@@ -28,13 +28,12 @@
   </RibbonItem>
   <RibbonItem>
 	 <RibbonItem Action="BudgetPanningSchedule" LocalizedNameKey="ProjectBudgetSchedule" ControlName="ProjectBudgetPlanningSchedulePage" Module="_ProjectPlanning" LargeGlyph="Schedule_Task_32x32"/>
-    <RibbonItem Action="TimeSheet" LocalizedNameKey="TimeRegistration" ControlName="TMJournalLinePage" Module="TimeManagement" LargeGlyph="Timesheet_32x32"/>
+    <RibbonItem Action="TimeSheet" LocalizedNameKey="ProjectTimeEntry" ControlName="TMJournalLinePage" Module="TimeManagement" LargeGlyph="Timesheet_32x32"/>
     <RibbonItem Action="ProjectTask" LocalizedNameKey="Tasks" Module="ProjectTask" LargeGlyph="GanttChart_32x32">
       <RibbonItem Action="GridView" LocalizedNameKey="DataGrid" ControlName="ProjectTaskGridPage" Glyph="Multiple_16x16" />
       <RibbonItem Action="ChartView" LocalizedNameKey="EnableChart" Glyph="Report_16x16" />
     </RibbonItem>
     <RibbonItem Action="DebtorBudgetLines" LocalizedNameKey="Budget" ControlName="DebtorBudgetLinePage" Module="_DebtorBudget" LargeGlyph="Budget_32x32"/>
-    <RibbonItem Action="EmployeeRegistrationLinePage" LocalizedNameKey="Register" ControlName="EmployeeRegistrationLinePage" LargeGlyph="Account-statement_32x32"/>
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="QueriesandReports" LocalizedNameKey="QueriesandReports" LargeGlyph="Statistics_32x32">
@@ -42,6 +41,7 @@
     </RibbonItem>
   </RibbonItem>
   <RibbonItem>
+    <RibbonItem Action="EmployeeRegistrationLinePage" LocalizedNameKey="WorkingTime" ControlName="EmployeeRegistrationLinePage" LargeGlyph="Account-statement_32x32"/>
     <RibbonItem Action="Trans" LocalizedNameKey="Transactions" ControlName="ProjectTransactionPage" Glyph="Transactions_16x16" LargeGlyph="Transactions_32x32" ShortcutKey="CTRL+T"/>
     <RibbonItem Module="Attachments" LocalizedNameKey="Attachments" LargeGlyph="Attachments_32x32">
       <RibbonItem Action="AddNote" ShortcutKey="Alt+N" LocalizedNameKey="Note" ControlName="UserNotesPage" Glyph="Note_16x16" />

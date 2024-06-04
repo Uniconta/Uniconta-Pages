@@ -13,6 +13,7 @@ using System.Windows;
 using Uniconta.ClientTools.Util;
 using DevExpress.Xpf.Grid;
 using System.ComponentModel;
+using Uniconta.Common.Utility;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -31,7 +32,7 @@ namespace UnicontaClient.Pages.CustomPage
             var newRow = (SerialToOrderLineClient)dataEntity;
             newRow.Mark = true;
             newRow._Qty = (invItemMaster._UseSerial) ? 1d : dcorderlineMaster._Qty;
-            newRow.QtyMarked = newRow._Qty;
+            //newRow.QtyMarked = newRow._Qty;
             if (dcorderlineMaster._Warehouse != null)
             {
                 newRow._Warehouse = dcorderlineMaster._Warehouse;
@@ -45,7 +46,6 @@ namespace UnicontaClient.Pages.CustomPage
         InvItem invItemMaster;
         Company Comp;
         SQLCache itemCache;
-        bool isQtyMarkedCorrect = true;
         public SerialToOrderLinePage(SynchronizeEntity syncEntity)
            : base(syncEntity, false)
         {
@@ -249,7 +249,9 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void Save(string action)
         {
-            if (isQtyMarkedCorrect)
+            var val = NumberConvert.ToDouble(dgLinkedGrid.GetTotalSummaryValue((SummaryItemBase)markedItem)?.ToString());
+
+            if (val <= dcorderlineMaster.Qty)
             {
                 if (action == "SaveAndClose")
                     SaveExit();
@@ -513,7 +515,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         string RemainingQtyMarked()
         {
-            double val = 0d, qtyMarkedRem = 0d;
+            double val = 0d;
 
             var items = dgLinkedGrid.ItemsSource as IEnumerable<SerialToOrderLineClient>;
 
@@ -521,13 +523,8 @@ namespace UnicontaClient.Pages.CustomPage
                 foreach (var item in items)
                     val += item._QtyMarked;
 
-            if (val > dcorderlineMaster.Qty)
-                isQtyMarkedCorrect = false;
-            else
-            {
-                isQtyMarkedCorrect = true;
-                qtyMarkedRem = dcorderlineMaster.Qty - val;
-            }
+            var qtyMarkedRem = dcorderlineMaster.Qty - val;
+
             return qtyMarkedRem.ToString();
         }
     }
@@ -535,7 +532,6 @@ namespace UnicontaClient.Pages.CustomPage
     {
         bool _mark;
         public bool Mark { get { return _mark; } set { _mark = value; NotifyPropertyChanged("Mark"); } }
-
 
         internal object locationSource;
         public object LocationSource { get { return locationSource; } }

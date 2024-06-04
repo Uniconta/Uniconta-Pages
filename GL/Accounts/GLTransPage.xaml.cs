@@ -84,7 +84,7 @@ namespace UnicontaClient.Pages.CustomPage
         public override Task InitQuery()
         {
             if (newSupplement)
-                return BindGrid(new [] { PropValuePair.GenereteParameter("Supplement", typeof(Int32), "1") });
+                return BindGrid(new[] { PropValuePair.GenereteParameter("Supplement", typeof(Int32), "1") });
             else
                 return BindGrid(null);
         }
@@ -146,6 +146,15 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "CreateSupplement":
                     CreateSupplement();
+                    break;
+                case "ViewDownloadRow":
+                    if (selectedItem != null)
+                        DebtorTransactions.ShowVoucher(dgAccountsTransGrid.syncEntity, api, busyIndicator);
+                    break;
+                case "SendDocToDatev":
+                    // Send Mark GLTransClient Doc to datev 
+                    // in GLTransPage.xaml i nead a field, that i cann mark like, in 
+                    // BankStatementLinePage.xaml so i cann mark the trans, and upload !
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);
@@ -218,7 +227,7 @@ namespace UnicontaClient.Pages.CustomPage
                 UnicontaMessageBox.Show("Fehler bei Lieferanten: \n" + err, "", MessageBoxButton.OK);
                 return false;
             }
-             
+
             this.AccountLength = AccountLength - 1;
             return true;
         }
@@ -255,7 +264,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (!DataIsValidForExport(Accounts, Debtors, Creditors))
                 return;
-            
+
 
             var datev = await CreateDatevHeader(api);
 
@@ -294,7 +303,7 @@ namespace UnicontaClient.Pages.CustomPage
                 UnicontaMessageBox.Show("Im DATEV-Informationen fehlen die Verrechnungskonto", Uniconta.ClientTools.Localization.lookup("Exception"));
                 return;
             }
-            
+
             if (UnicontaMessageBox.Show("DATEV exportieren ?", Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OKCancel) == MessageBoxResult.OK)
             {
                 try
@@ -478,7 +487,7 @@ namespace UnicontaClient.Pages.CustomPage
             void PopulateEmptyFieldIndexLists()
             {
                 //Postings
-                var list = new List<int>(100) { 8, 11, 15, 41, 90, 94, 95, 97, 101, 102, 104, 106, 108, 109, 111, 117, 119};
+                var list = new List<int>(100) { 8, 11, 15, 41, 90, 94, 95, 97, 101, 102, 104, 106, 108, 109, 111, 117, 119 };
 
                 list.AddRange(Enumerable.Range(19, 17)); // Start from 19 and count 17 times up... (19 - 35)
                 list.AddRange(Enumerable.Range(47, 40)); // Start from 47 and counts 40 times up... (47 - 86) 
@@ -486,7 +495,7 @@ namespace UnicontaClient.Pages.CustomPage
 
 
                 //DCDatev
-                list = new List<int>(200) { 16, 17, 96, 97, 98, 99, 101, 102, 103, 106, 132, 133, 219, 95, 243, 246, 248};
+                list = new List<int>(200) { 16, 17, 96, 97, 98, 99, 101, 102, 103, 106, 132, 133, 219, 95, 243, 246, 248 };
 
                 list.AddRange(Enumerable.Range(2, 12)); // 2 - 13
                 list.AddRange(Enumerable.Range(20, 5)); // 20 - 24
@@ -604,7 +613,7 @@ namespace UnicontaClient.Pages.CustomPage
                         hasSumAccount = false;
                     }
 
-                    if (tc._DCType > 0 && (byte)tc._DCType <= 2) 
+                    if (tc._DCType > 0 && (byte)tc._DCType <= 2)
                     {
                         if (dcSumAccounts.Contains(tc._Account))
                         {
@@ -617,7 +626,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                     voucher.Add(tc);
                 }
-                GenerateDatevPostingLines(voucher, fileStream, ! (hasSumAccount || hasBankAccount), DefaultContraAccount);
+                GenerateDatevPostingLines(voucher, fileStream, !(hasSumAccount || hasBankAccount), DefaultContraAccount);
                 fileStream.Close();
             }
 
@@ -717,9 +726,9 @@ namespace UnicontaClient.Pages.CustomPage
                 {
 
                     var stop = 2;
-                
+
                 }
-                
+
                 var vat = (this.VATs.Get(tc._Vat) as GLVat);
                 var isAutoAccount = (this.Accounts.Get(tc.Account) as GLAccount)._DATEVAuto;
 
@@ -761,7 +770,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                     DCInvoice[] arr;
                     if (tc._DCType == GLTransRefType.Debtor)
-                    {                     
+                    {
                         arr = this.debInvoice;
                         entry.DocumentRef = tc.JournalPostedId; //PG Guid p� Debitor poster!
                     }
@@ -822,7 +831,7 @@ namespace UnicontaClient.Pages.CustomPage
                     LedgerAccountLength = AccountLength,
                     DateFrom = fromDate.ToString("yyyyMMdd"),
                     DateTo = toDate.ToString("yyyyMMdd"),
-                    CurrencyCode ="EUR" //DT Per
+                    CurrencyCode = "EUR" //DT Per
                 };
                 return header;
             }
@@ -868,7 +877,7 @@ namespace UnicontaClient.Pages.CustomPage
                 var i4 = JournalPostedId ^ (0x21E39982 * Account);
                 var docguid = new Guid((uint)i1, (ushort)i2, (ushort)(i2 >> 16), (byte)i3, (byte)(i3 >> 8), (byte)(i3 >> 16), (byte)(i3 >> 24), (byte)i4, (byte)(i4 >> 8), (byte)(i4 >> 16), (byte)(i4 >> 24));
                 StringBuilder version = new StringBuilder(Convert.ToString(docguid)); //DT Per version have to be 4.
-                version[14] = '4'; 
+                version[14] = '4';
                 var docguidtext = version.ToString();
                 docguid = new Guid(docguidtext);
                 return docguid;
@@ -887,9 +896,9 @@ namespace UnicontaClient.Pages.CustomPage
                 var i4 = DocumentRef ^ (0x21E39982 * Account);
                 var docguid = new Guid((uint)i1, (ushort)i2, (ushort)(i2 >> 16), (byte)i3, (byte)(i3 >> 8), (byte)(i3 >> 16), (byte)(i3 >> 24), (byte)i4, (byte)(i4 >> 8), (byte)(i4 >> 16), (byte)(i4 >> 24));
                 StringBuilder version = new StringBuilder(Convert.ToString(docguid)); //DT Per version have to be 4.
-                version[14] = '4'; 
+                version[14] = '4';
                 var docguidtext = version.ToString();
-                docguid = new Guid(docguidtext);               
+                docguid = new Guid(docguidtext);
                 return docguid;
             }
         }
@@ -1026,17 +1035,17 @@ namespace UnicontaClient.Pages.CustomPage
             public int RecordType;
             public int AccountingReason;
             public int Locking;
-            public string CurrencyCode;            
-            public string Reserved27;            
+            public string CurrencyCode;
+            public string Reserved27;
             public string Application;
 
             private HashSet<int> dataCategories = new HashSet<int>() { 21, 65, 67, 20, 47, 16, 44, 46, 48, 63, 62 };
             private HashSet<string> formatNames = new HashSet<string>() { "Buchungsstapel", "Wiederkehrende Buchungen", "Buchungstextkonstanten", "Kontenbeschriftungen", "Debitoren/Kreditoren",
-                                                                "Textschl�ssel", "Zahlungsbedingungen", "Diverse Adressen", "Anlagenbuchf�hrung � Buchungssatzvorlagen", " Anlagenbuchf�hrung � Filialen"};
-            private HashSet<int> formatVersions = new HashSet<int>() { 1, 2, 5,  };
+                                                                "Textschl�ssel", "Zahlungsbedingungen", "Diverse Adressen", "Anlagenbuchf?hrung ? Buchungssatzvorlagen", " Anlagenbuchf?hrung ? Filialen"};
+            private HashSet<int> formatVersions = new HashSet<int>() { 1, 2, 5, };
 
             public string getHeaderString()
-            {               
+            {
                 //PG
                 return "\"" + FormatLabel + "\"" + ";" +
                         VersionNumber + ";" +
@@ -1068,7 +1077,7 @@ namespace UnicontaClient.Pages.CustomPage
                         "\"" + "\"" + ";" +
                         "\"" + Application + "\"";
             }
-            
+
             public bool isValidHeader()
             {
                 return FormatLabel.Length < 5 &&

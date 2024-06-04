@@ -574,7 +574,7 @@ namespace UnicontaClient.Pages.CustomPage
         public static string IntraField { get { return Localization.lookup("Field"); } }
         public static string Filler { get { return Localization.lookup("Filler"); } }  
         public static string TransType { get { return Localization.lookup("TransferType"); } }
-        public static string ItemAmount { get { return Localization.lookup("Quantity"); } }
+        public static string ItemAmount { get { return Localization.lookup("Qty"); } }
         public static string InternalRefNo { get { return Localization.lookup("ReferenceNr"); } }
         public static string ImportOrExport { get { return Localization.lookup("Direction"); } }
         public static string Date { get { return Localization.lookup("Date"); } }

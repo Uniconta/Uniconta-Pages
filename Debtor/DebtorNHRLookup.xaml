@@ -8,10 +8,23 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorNHRLookup"
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <CorasauControls:CorasauRibbonControl x:Name="localMenu" XMLSourcePath=";component/Pages/Debtor/DebtorNHRLookupGridRibbon.xml"/>
-        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+        <Grid Grid.Row="1" Margin="5">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=NumberCustomersChecked}" Grid.Column="0" Grid.Row="0" Margin="10,3,3,3" VerticalAlignment="Center"/>
+            <CorasauControls:IntegerEditor x:Name="txtValidateNumber" Grid.Column="1" Grid.Row="0" Margin="10,3,3,3" Height="23" MinWidth="50"/>
+        </Grid>
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="2" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <local:DebtorNHRLookupGrid  x:Name="dgDebtorNHRLookup" AutoGenerateColumns="None">
                 <local:DebtorNHRLookupGrid.Columns>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Account" ReadOnly="True" Width="100" />

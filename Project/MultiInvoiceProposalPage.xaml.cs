@@ -94,6 +94,8 @@ namespace UnicontaClient.Pages.CustomPage
                 DeliveryCity.Visible = false;
                 DeliveryCountry.Visible = false;
             }
+            Margin.Visible = Margin.ShowInColumnChooser = MarginRatio.Visible = MarginRatio.ShowInColumnChooser =
+            CostValue.Visible = CostValue.ShowInColumnChooser = !api.CompanyEntity.HideCostPrice;
         }
 
         private void LocalMenu_OnItemClicked(string ActionType)

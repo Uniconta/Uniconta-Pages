@@ -116,10 +116,40 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         OpenImportDataPage(selectedItem);
                     break;
+                case "MoveJournalLines":
+                    if (selectedItem != null)
+                        MoveJournalLines(selectedItem);
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
+        }
+
+        void MoveJournalLines(ProjectJournalClient journal)
+        {
+            var cwWin = new CwMoveProjectJournalLines(api);
+            cwWin.Closed += async delegate
+            {
+                if (cwWin.DialogResult == true && cwWin.ProjectJournal != null)
+                {
+                    busyIndicator.IsBusy = true;
+                    var result = await (new PostingAPI(api)).MoveJournalLines(journal, cwWin.ProjectJournal);
+                    busyIndicator.IsBusy = false;
+                    UtilDisplay.ShowErrorCode(result);
+                    if (result == 0)
+                    {
+                        foreach (var lin in (IEnumerable<ProjectJournalClient>)dgProjectJournal.ItemsSource)
+                            if (lin.RowId == cwWin.ProjectJournal.RowId)
+                            {
+                                lin.NumberOfLines = lin._NumberOfLines + journal._NumberOfLines;
+                                journal.NumberOfLines = 0;
+                                break;
+                            }
+                    }
+                }
+            };
+            cwWin.Show();
         }
 
         void OpenImportDataPage(ProjectJournalClient selectedItem)

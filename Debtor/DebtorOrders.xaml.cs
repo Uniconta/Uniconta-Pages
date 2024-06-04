@@ -161,6 +161,8 @@ namespace UnicontaClient.Pages.CustomPage
                 Task.ShowInColumnChooser = Task.Visible = false;
             else
                 Task.ShowInColumnChooser = Task.Visible = true;
+            Margin.Visible = Margin.ShowInColumnChooser = MarginRatio.Visible = MarginRatio.ShowInColumnChooser =
+            CostValue.Visible = CostValue.ShowInColumnChooser = !api.CompanyEntity.HideCostPrice;
         }
 
         void dgDebtorOrdersGrid_RowDoubleClick()
@@ -489,6 +491,21 @@ namespace UnicontaClient.Pages.CustomPage
                 dbOrder._PicklistPrinted = BasePage.GetSystemDefaultDate();
                 prop = "PicklistPrinted";
             }
+            else if(doctype == CompanyLayoutType.Requisition)
+            {
+                dbOrder._ConfirmPrinted = BasePage.GetSystemDefaultDate();
+                prop = "RequisitionPrinted";
+            }
+            else if(doctype== CompanyLayoutType.PurchaseOrder)
+            {
+                dbOrder._PicklistPrinted = BasePage.GetSystemDefaultDate();
+                prop = "PicklistPrinted";
+            }
+            else if(doctype == CompanyLayoutType.Offer)
+            {
+                dbOrder._ConfirmPrinted= BasePage.GetSystemDefaultDate();
+                prop = "OfferPrinted";
+            }
             else
                 return;
             dbOrder.NotifyPropertyChanged(prop);
@@ -713,7 +730,7 @@ namespace UnicontaClient.Pages.CustomPage
             CWGenerateInvoice GenrateInvoiceDialog = new CWGenerateInvoice(true, string.Empty, false, true, true, showNoEmailMsg: !showSendByMail, debtorName: debtorName, isOrderOrQuickInv: true, isDebtorOrder: true,
                 InvoiceInXML: invoiceInXML, AccountName: accountName);
             GenrateInvoiceDialog.DialogTableId = 2000000010;
-            
+
             var additionalOrdersList = Utility.GetAdditionalOrders(api, dbOrder);
 
             if (prevDbOrder != null && prevDbOrder.OrderNumber == dbOrder.OrderNumber)
@@ -748,7 +765,7 @@ namespace UnicontaClient.Pages.CustomPage
                     var result = await invoicePostingResult.Execute();
                     busyIndicator.IsBusy = false;
 
-                    if(isSimulated)
+                    if (isSimulated)
                     {
                         prevDbOrder = dbOrder;
                         prevDateTime = GenrateInvoiceDialog.GenrateDate;

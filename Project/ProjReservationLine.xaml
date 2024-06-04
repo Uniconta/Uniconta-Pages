@@ -94,6 +94,13 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjReservationLine"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Margin" Visible="False" Width="70" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="MarginRatio" Visible="False" Width="50" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DoInvoice" Width="50" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="QtyNow" Width="80" AllowMath="True">
+                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <CorasauControls:TextEditor  x:Name="PART_Editor" HorizontalContentAlignment="Right" ValidateOnEnterKeyPressed="False" ValidateOnTextInput="False" DisplayFormatString="{Binding Path=DataContext.RowData.Row.Decimals,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource MaskConverter},ConverterParameter=Decimals}" MaskUseAsDisplayFormat="False" EditValue="{Binding Path=DataContext.RowData.Row.QtyNow,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}"/>
+                            </DataTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                    </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="QtyInvoiced" Width="80" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CostPrice" Visible="False" />
                     <localPage:ComboBoxColumnClient x:Name="Storage" Width="100" />

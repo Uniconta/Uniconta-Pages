@@ -105,6 +105,18 @@ namespace UnicontaClient.Pages.CustomPage
             else if (screenName == TabControls.UserNotesPage || screenName == TabControls.UserDocsPage && argument != null)
                 dgClosingSheet.UpdateItemSource(argument);
         }
+        private void HasDocImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            var debtorAccount = (sender as Image).Tag as GLClosingSheetClient;
+            if (debtorAccount != null)
+                AddDockItem(TabControls.UserDocsPage, dgClosingSheet.syncEntity);
+        }
 
+        private void HasNoteImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            var debtorAccount = (sender as Image).Tag as GLClosingSheetClient;
+            if (debtorAccount != null)
+                AddDockItem(TabControls.UserNotesPage, dgClosingSheet.syncEntity);
+        }
     }
 }

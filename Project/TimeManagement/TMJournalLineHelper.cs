@@ -192,7 +192,7 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
                     hrsInPeriod += rec.GetHoursDayN(x);
                 }
 
-                rec.HasError = false;
+                rec.LogType = LogTypeEnum.Info;
                 rec.ErrorInfo = string.Empty;
                 err = false;
 
@@ -236,7 +236,7 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
                 if (!err)
                     rec.ErrorInfo = VALIDATE_OK;
                 else
-                    rec.HasError = true;
+                    rec.LogType = LogTypeEnum.Error;
             }
 
             return checkErrors;
@@ -369,7 +369,7 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
             if (workspace._Blocked)
             {
                 checkErrors.Add(new TMJournalLineError()
-                {
+                {   
                     Message = Uniconta.ClientTools.Localization.lookup("WorkspaceIsBlocked"),
                     RowId = rec.RowId
                 });
@@ -379,9 +379,10 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
             {
                 checkErrors.Add(new TMJournalLineError()
                 {
-                    Message = "Advarsel - Arbejdsområdet er lukket", //TODO:Label venter til tekst er godkendt
+                    Message = string.Concat(Uniconta.ClientTools.Localization.lookup("Warning"),":",string.Format(Uniconta.ClientTools.Localization.lookup("IsClosedOBJ"), Uniconta.ClientTools.Localization.lookup("Workspace"))),
                     RowId = rec.RowId,
                 });
+                rec.LogType = LogTypeEnum.Warning;
             }
         }
 
@@ -398,7 +399,7 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
                 if (prTask._Ended)
                 {
                     checkErrors.Add(new TMJournalLineError()
-                    {
+                    {   
                         Message = Uniconta.ClientTools.Localization.lookup("TaskIsEnded"),
                         RowId = rec.RowId
                     });
@@ -432,7 +433,7 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
             if (payrollCat?._PrCategory == null)
             {
                 checkErrors.Add(new TMJournalLineError()
-                {
+                {   
                     Message = fieldCannotBeEmpty("ProjectCategory"),
                     RowId = rec.RowId
                 });
@@ -462,7 +463,7 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
                 else if (!projGroup._Invoiceable && prCategory._Invoiceable)
                 {
                     checkErrors.Add(new TMJournalLineError()
-                    {
+                    {   
                         Message = string.Concat(Uniconta.ClientTools.Localization.lookup("CombinationNotAllowed"), " ",
                                                 Uniconta.ClientTools.Localization.lookup("Project"), " (",
                                                 Uniconta.ClientTools.Localization.lookup("NotInvoiceable"), ")/",

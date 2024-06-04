@@ -64,6 +64,8 @@ namespace UnicontaClient.Pages.CustomPage
             InitialLoad();
             SetColumns();
             ribbonControl.DisableButtons(new string[] { "DeleteRow", "SaveGrid" });
+            Margin.Visible = Margin.ShowInColumnChooser = MarginRatio.Visible = MarginRatio.ShowInColumnChooser =
+           CostPrice.Visible = CostPrice.ShowInColumnChooser = CostValue.Visible = CostValue.ShowInColumnChooser = !api.CompanyEntity.HideCostPrice;
         }
 
         private void InitialLoad()

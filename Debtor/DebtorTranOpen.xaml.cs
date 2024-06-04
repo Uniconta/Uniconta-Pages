@@ -175,8 +175,11 @@ namespace UnicontaClient.Pages.CustomPage
                 collectionLetterWin.Closed += delegate
                 {
                     if (collectionLetterWin.DialogResult == true)
-                        if (!Enum.TryParse(collectionLetterWin.Result, out emailType))
+                    {
+                        var index = AppEnums.DebtorEmailType.TryIndexOf(collectionLetterWin.Result);
+                        if (!Enum.TryParse(index.ToString(), out emailType))
                             return;
+                    }
                 };
                 collectionLetterWin.Show();
             }
